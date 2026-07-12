@@ -1,0 +1,246 @@
+import SwiftUI
+
+/// One flashcard study session for a theme: English front → reveal French + phonetic,
+/// TTS playback, optional "Say it" speak-back practice, Again/Good/Easy grading via SRS.
+struct FlashcardSessionView: View {
+    let phase: Int
+    let theme: VocabTheme
+
+    private let store = LearningStore()
+    @StateObject private var speechBox = SpeechBox()
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var queue: [VocabEntry] = []
+    @State private var index = 0
+    @State private var isRevealed = false
+    @State private var reviewedCount = 0
+    @State private var sessionStart = Date()
+    @State private var isListeningBack = false
+    @State private var sayItHint: String?
+    @State private var showMarie = false
+
+    var body: some View {
+        ZStack {
+            Passeport.parchmentDim.ignoresSafeArea()
+
+            if queue.isEmpty {
+                summaryView
+            } else if index < queue.count {
+                cardView
+            } else {
+                summaryView
+            }
+        }
+        .navigationTitle(theme.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            queue = SRSService(store: store).buildQueue(phase: phase, themeId: theme.id, limit: 30)
+            sessionStart = Date()
+        }
+        .onDisappear {
+            speechBox.speech.deactivate()
+            logMinutes()
+        }
+    }
+
+    private var currentEntry: VocabEntry? {
+        index < queue.count ? queue[index] : nil
+    }
+
+    private var cardView: some View {
+        VStack(spacing: 20) {
+            HStack {
+                Text("\(index + 1) / \(queue.count)")
+                    .font(Passeport.mono(11))
+                    .foregroundColor(Passeport.slateDim)
+                Spacer()
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 8)
+
+            Spacer()
+
+            VStack(spacing: 16) {
+                if let entry = currentEntry {
+                    Text(entry.en)
+                        .font(Passeport.display(24, weight: .medium))
+                        .foregroundColor(Passeport.text)
+                        .multilineTextAlignment(.center)
+
+                    if isRevealed {
+                        VStack(spacing: 6) {
+                            Text(entry.fr)
+                                .font(Passeport.display(22, weight: .medium))
+                                .foregroundColor(Passeport.maroon)
+                            Text(entry.phonetic)
+                                .font(Passeport.mono(13))
+                                .foregroundColor(Passeport.slateDim)
+                        }
+                        .transition(.opacity)
+
+                        HStack(spacing: 20) {
+                            Button {
+                                speechBox.speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
+                            } label: {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(Passeport.brass)
+                                    .frame(width: 48, height: 48)
+                                    .background(Passeport.card)
+                                    .clipShape(Circle())
+                            }
+
+                            Button {
+                                sayIt(entry: entry)
+                            } label: {
+                                Image(systemName: isListeningBack ? "mic.fill" : "mic")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(isListeningBack ? .white : Passeport.maroon)
+                                    .frame(width: 48, height: 48)
+                                    .background(isListeningBack ? Passeport.maroon : Passeport.card)
+                                    .clipShape(Circle())
+                            }
+                        }
+
+                        if let sayItHint {
+                            Text(sayItHint)
+                                .font(Passeport.mono(10.5))
+                                .foregroundColor(Passeport.slateDim)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity)
+            .passeportCard(padding: 28)
+            .padding(.horizontal, 18)
+
+            Spacer()
+
+            if !isRevealed {
+                Button {
+                    withAnimation { isRevealed = true }
+                    if let entry = currentEntry {
+                        speechBox.speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
+                    }
+                } label: {
+                    Text("Reveal")
+                }
+                .buttonStyle(PasseportPrimaryButton())
+                .padding(.horizontal, 18)
+                .padding(.bottom, 24)
+            } else {
+                HStack(spacing: 10) {
+                    gradeButton(title: "Again", color: Passeport.slate, grade: .again)
+                    gradeButton(title: "Good", color: Passeport.brass, grade: .good)
+                    gradeButton(title: "Easy", color: Passeport.maroon, grade: .easy)
+                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, 24)
+            }
+        }
+    }
+
+    private func gradeButton(title: String, color: Color, grade: SRSGrade) -> some View {
+        Button {
+            grade_(entry: currentEntry, grade: grade)
+        } label: {
+            Text(title)
+                .font(Passeport.body(13.5, weight: .medium))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .background(color)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    private func grade_(entry: VocabEntry?, grade: SRSGrade) {
+        guard let entry else { return }
+        SRSService(store: store).grade(entryId: entry.id, grade: grade)
+        reviewedCount += 1
+        sayItHint = nil
+        isRevealed = false
+        index += 1
+    }
+
+    private func sayIt(entry: VocabEntry) {
+        guard !isListeningBack else {
+            speechBox.speech.stopListening()
+            isListeningBack = false
+            return
+        }
+        isListeningBack = true
+        sayItHint = nil
+        speechBox.speech.startListening(locale: "fr-FR", onPartial: { _ in }) { transcript in
+            isListeningBack = false
+            let said = fold(transcript)
+            let target = fold(entry.fr)
+            if said.isEmpty {
+                sayItHint = "Didn't catch that — try again."
+            } else if said.contains(target) || target.contains(said) {
+                sayItHint = "Nice — that sounds right! 🎉"
+            } else {
+                sayItHint = "Close — target: \"\(entry.fr)\". This is just a hint, not graded."
+            }
+        }
+    }
+
+    private func fold(_ text: String) -> String {
+        text.folding(options: .diacriticInsensitive, locale: Locale(identifier: "fr-FR"))
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func logMinutes() {
+        guard reviewedCount > 0 else { return }
+        let minutes = max(1, Int(Date().timeIntervalSince(sessionStart) / 60))
+        store.markHabit(date: Date(), habitId: "anki", done: true, addMinutes: minutes)
+    }
+
+    private var summaryView: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 36))
+                .foregroundColor(Passeport.brass)
+            Text(reviewedCount > 0 ? "Session complete" : "All caught up")
+                .font(Passeport.display(19, weight: .medium))
+                .foregroundColor(Passeport.text)
+            Text(reviewedCount > 0 ? "\(reviewedCount) cards reviewed." : "No cards due in \"\(theme.title)\" right now.")
+                .font(Passeport.body(13))
+                .foregroundColor(Passeport.slateDim)
+            Button {
+                dismiss()
+            } label: {
+                Text("Done")
+            }
+            .buttonStyle(PasseportPrimaryButton())
+            .padding(.horizontal, 60)
+            .padding(.top, 8)
+
+            if reviewedCount > 0 {
+                Button {
+                    speechBox.speech.deactivate()
+                    showMarie = true
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.fill")
+                        Text("Practice this theme with Marie")
+                    }
+                    .font(Passeport.mono(11, weight: .medium))
+                    .foregroundColor(Passeport.maroon)
+                }
+            }
+        }
+        .padding(24)
+        .fullScreenCover(isPresented: $showMarie) {
+            SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext(vocabTheme: theme, phase: phase))
+        }
+    }
+}
+
+/// Wraps LessonSpeechService in an ObservableObject box so the view can own one instance
+/// across the flashcard session lifecycle.
+private final class SpeechBox: ObservableObject {
+    let speech = LessonSpeechService()
+}

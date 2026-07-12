@@ -1,0 +1,79 @@
+{
+  "readingProgression": [
+    { "stage": 1, "title": "Children's books & easy readers", "detail": "Simple vocabulary, present tense, pictures for context." },
+    { "stage": 2, "title": "Short news articles", "detail": "RFI Savoirs and TV5MONDE graded articles." },
+    { "stage": 3, "title": "News & opinion pieces", "detail": "Regular news, editorials, argumentative texts." },
+    { "stage": 4, "title": "Government & technical texts", "detail": "IRCC pages, formal documents, technology articles." }
+  ],
+  "listeningTargets": [
+    { "id": "slow", "title": "Slow French", "minutes": 20, "detail": "InnerFrench, Français avec Pierre, slow news" },
+    { "id": "podcast", "title": "Podcasts", "minutes": 20, "detail": "News-based French learning podcasts" },
+    { "id": "normal", "title": "Normal-speed conversations", "minutes": 20, "detail": "Radio-Canada, native YouTube, series with Language Reactor" }
+  ],
+  "speakingTopics": [
+    {
+      "id": "introduce_yourself",
+      "title": "Introduce yourself",
+      "promptFr": "Présentez-vous : votre nom, votre origine, votre travail, votre famille.",
+      "hints": ["Je m'appelle…", "Je viens de…", "Je travaille comme…", "Ma famille…"]
+    },
+    {
+      "id": "describe_work",
+      "title": "Describe your work",
+      "promptFr": "Décrivez votre travail d'ingénieur en intelligence artificielle : vos tâches, vos projets, ce que vous aimez.",
+      "hints": ["Je suis responsable de…", "Au quotidien, je…", "Ce que j'aime dans mon travail…"]
+    },
+    {
+      "id": "explain_studies",
+      "title": "Explain your studies",
+      "promptFr": "Parlez de votre parcours scolaire et universitaire : qu'avez-vous étudié et pourquoi ?",
+      "hints": ["J'ai étudié…", "J'ai obtenu mon diplôme en…", "J'ai choisi ce domaine parce que…"]
+    },
+    {
+      "id": "give_opinion",
+      "title": "Give an opinion",
+      "promptFr": "Donnez votre opinion sur un sujet d'actualité de votre choix. Justifiez avec deux ou trois arguments.",
+      "hints": ["À mon avis…", "Je pense que…", "D'une part… d'autre part…", "En conclusion…"]
+    },
+    {
+      "id": "compare_choices",
+      "title": "Compare two choices",
+      "promptFr": "Comparez deux options : par exemple deux offres d'emploi ou deux villes. Laquelle choisiriez-vous et pourquoi ?",
+      "hints": ["X est plus… que Y", "En revanche…", "Si je devais choisir, je prendrais…"]
+    },
+    {
+      "id": "solve_problem",
+      "title": "Solve a problem",
+      "promptFr": "Vous avez un conflit d'horaire ou un problème de service. Expliquez le problème et proposez des solutions.",
+      "hints": ["Le problème, c'est que…", "Je propose de…", "Une autre solution serait de…"]
+    },
+    {
+      "id": "make_suggestions",
+      "title": "Make suggestions",
+      "promptFr": "Un collègue veut apprendre le français rapidement. Faites-lui des suggestions concrètes.",
+      "hints": ["Tu devrais…", "Je te conseille de…", "Il vaut mieux…", "Pourquoi ne pas…"]
+    },
+    {
+      "id": "advantages_disadvantages",
+      "title": "Advantages & disadvantages",
+      "promptFr": "Discutez des avantages et des inconvénients du télétravail ou de l'intelligence artificielle.",
+      "hints": ["L'avantage principal, c'est…", "Par contre…", "Il ne faut pas oublier que…", "Tout bien considéré…"]
+    }
+  ],
+  "writingGuidance": [
+    "Emails: greeting, purpose in the first sentence, details, action, closing formula.",
+    "Complaint letters: facts with dates → the problem → your demand. Firm but polite.",
+    "Opinion essays: introduction, 2-3 arguments each with an example, conclusion. 4-5 different connectors minimum.",
+    "Formal requests: veuillez + infinitive, je vous prie d'agréer mes salutations distinguées."
+  ],
+  "externalResources": [
+    { "name": "TV5MONDE — Apprendre le français", "bestFor": "Listening and reading practice, graded by level", "free": true },
+    { "name": "RFI Savoirs", "bestFor": "News-based French learning", "free": true },
+    { "name": "InnerFrench (YouTube/podcast)", "bestFor": "Intermediate listening, slow and clear", "free": true },
+    { "name": "Français avec Pierre (YouTube)", "bestFor": "Grammar explanations", "free": true },
+    { "name": "Language Reactor", "bestFor": "Dual subtitles for YouTube/Netflix", "free": true },
+    { "name": "PrepMyFuture TEF", "bestFor": "TEF-specific practice tests", "free": false },
+    { "name": "GlobalExam TEF", "bestFor": "TEF-specific practice tests", "free": false },
+    { "name": "Italki", "bestFor": "1-2 live speaking sessions/week with a human tutor", "free": false }
+  ]
+}

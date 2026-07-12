@@ -1,0 +1,5022 @@
+{
+  "phase": 3,
+  "title": "CLB 7 Vocabulary",
+  "themes": [
+    {
+      "id": "adjectives",
+      "title": "Descriptive Adjectives",
+      "entries": [
+        {
+          "id": "p3_adjectives_bon-ne",
+          "en": "good",
+          "fr": "bon(ne)",
+          "phonetic": "boh(n) / buhn"
+        },
+        {
+          "id": "p3_adjectives_mauvais-e",
+          "en": "bad",
+          "fr": "mauvais(e)",
+          "phonetic": "moh-veh"
+        },
+        {
+          "id": "p3_adjectives_grand-e",
+          "en": "big",
+          "fr": "grand(e)",
+          "phonetic": "grah(n)"
+        },
+        {
+          "id": "p3_adjectives_petit-e",
+          "en": "small",
+          "fr": "petit(e)",
+          "phonetic": "puh-tee"
+        },
+        {
+          "id": "p3_adjectives_nouveau-nouvelle",
+          "en": "new",
+          "fr": "nouveau/nouvelle",
+          "phonetic": "noo-voh / noo-vehl"
+        },
+        {
+          "id": "p3_adjectives_vieux-vieille",
+          "en": "old",
+          "fr": "vieux/vieille",
+          "phonetic": "vyuh / vyay"
+        },
+        {
+          "id": "p3_adjectives_beau-belle",
+          "en": "beautiful",
+          "fr": "beau/belle",
+          "phonetic": "boh / behl"
+        },
+        {
+          "id": "p3_adjectives_laid-e",
+          "en": "ugly",
+          "fr": "laid(e)",
+          "phonetic": "leh"
+        },
+        {
+          "id": "p3_adjectives_facile",
+          "en": "easy",
+          "fr": "facile",
+          "phonetic": "fah-seel"
+        },
+        {
+          "id": "p3_adjectives_difficile",
+          "en": "difficult",
+          "fr": "difficile",
+          "phonetic": "dee-fee-seel"
+        },
+        {
+          "id": "p3_adjectives_rapide",
+          "en": "fast",
+          "fr": "rapide",
+          "phonetic": "rah-peed"
+        },
+        {
+          "id": "p3_adjectives_lent-e",
+          "en": "slow",
+          "fr": "lent(e)",
+          "phonetic": "lah(n)"
+        },
+        {
+          "id": "p3_adjectives_content-e-heureux",
+          "en": "happy",
+          "fr": "content(e)/heureux",
+          "phonetic": "koh(n)-tah(n) / uh-ruh"
+        },
+        {
+          "id": "p3_adjectives_triste",
+          "en": "sad",
+          "fr": "triste",
+          "phonetic": "treest"
+        },
+        {
+          "id": "p3_adjectives_fatigue-e",
+          "en": "tired",
+          "fr": "fatigué(e)",
+          "phonetic": "fah-tee-gay"
+        },
+        {
+          "id": "p3_adjectives_occupe-e",
+          "en": "busy",
+          "fr": "occupé(e)",
+          "phonetic": "oh-kew-pay"
+        },
+        {
+          "id": "p3_adjectives_important-e",
+          "en": "important",
+          "fr": "important(e)",
+          "phonetic": "am-por-tah(n)"
+        },
+        {
+          "id": "p3_adjectives_necessaire",
+          "en": "necessary",
+          "fr": "nécessaire",
+          "phonetic": "nay-seh-sehr"
+        },
+        {
+          "id": "p3_adjectives_possible",
+          "en": "possible",
+          "fr": "possible",
+          "phonetic": "poh-see-bluh"
+        },
+        {
+          "id": "p3_adjectives_different-e",
+          "en": "different",
+          "fr": "différent(e)",
+          "phonetic": "dee-fay-rah(n)"
+        },
+        {
+          "id": "p3_adjectives_fort-e",
+          "en": "strong",
+          "fr": "fort(e)",
+          "phonetic": "for / fort"
+        },
+        {
+          "id": "p3_adjectives_faible",
+          "en": "weak",
+          "fr": "faible",
+          "phonetic": "feh-bluh"
+        },
+        {
+          "id": "p3_adjectives_cher-chere",
+          "en": "expensive",
+          "fr": "cher/chère",
+          "phonetic": "shehr"
+        },
+        {
+          "id": "p3_adjectives_bon-marche",
+          "en": "cheap",
+          "fr": "bon marché",
+          "phonetic": "boh(n) mar-shay"
+        },
+        {
+          "id": "p3_adjectives_plein-e",
+          "en": "full",
+          "fr": "plein(e)",
+          "phonetic": "plan / plehn"
+        },
+        {
+          "id": "p3_adjectives_vide",
+          "en": "empty",
+          "fr": "vide",
+          "phonetic": "veed"
+        },
+        {
+          "id": "p3_adjectives_propre",
+          "en": "clean",
+          "fr": "propre",
+          "phonetic": "proh-pruh"
+        },
+        {
+          "id": "p3_adjectives_sale",
+          "en": "dirty",
+          "fr": "sale",
+          "phonetic": "sahl"
+        },
+        {
+          "id": "p3_adjectives_chaud-e",
+          "en": "hot",
+          "fr": "chaud(e)",
+          "phonetic": "shoh / shohd"
+        },
+        {
+          "id": "p3_adjectives_froid-e",
+          "en": "cold",
+          "fr": "froid(e)",
+          "phonetic": "frwah / frwahd"
+        },
+        {
+          "id": "p3_adjectives_jeune",
+          "en": "young",
+          "fr": "jeune",
+          "phonetic": "zhuhn"
+        },
+        {
+          "id": "p3_adjectives_riche",
+          "en": "rich",
+          "fr": "riche",
+          "phonetic": "reesh"
+        },
+        {
+          "id": "p3_adjectives_pauvre",
+          "en": "poor",
+          "fr": "pauvre",
+          "phonetic": "poh-vruh"
+        },
+        {
+          "id": "p3_adjectives_utile",
+          "en": "useful",
+          "fr": "utile",
+          "phonetic": "ew-teel"
+        },
+        {
+          "id": "p3_adjectives_inutile",
+          "en": "useless",
+          "fr": "inutile",
+          "phonetic": "ee-new-teel"
+        },
+        {
+          "id": "p3_adjectives_disponible",
+          "en": "available",
+          "fr": "disponible",
+          "phonetic": "dee-spoh-nee-bluh"
+        },
+        {
+          "id": "p3_adjectives_gratuit-e",
+          "en": "free (no cost)",
+          "fr": "gratuit(e)",
+          "phonetic": "grah-twee"
+        },
+        {
+          "id": "p3_adjectives_libre",
+          "en": "free (available)",
+          "fr": "libre",
+          "phonetic": "lee-bruh"
+        },
+        {
+          "id": "p3_adjectives_dangereux-dangereuse",
+          "en": "dangerous",
+          "fr": "dangereux/dangereuse",
+          "phonetic": "dah(n)-zhuh-ruh"
+        },
+        {
+          "id": "p3_adjectives_sur-e",
+          "en": "safe / sure",
+          "fr": "sûr(e)",
+          "phonetic": "sewr"
+        },
+        {
+          "id": "p3_adjectives_grave-serieux",
+          "en": "serious",
+          "fr": "grave / sérieux",
+          "phonetic": "grahv / say-ryuh"
+        },
+        {
+          "id": "p3_adjectives_drole",
+          "en": "funny",
+          "fr": "drôle",
+          "phonetic": "drohl"
+        },
+        {
+          "id": "p3_adjectives_etrange",
+          "en": "strange",
+          "fr": "étrange",
+          "phonetic": "ay-trah(n)zh"
+        },
+        {
+          "id": "p3_adjectives_fier-fiere",
+          "en": "proud",
+          "fr": "fier/fière",
+          "phonetic": "fyehr"
+        },
+        {
+          "id": "p3_adjectives_honnete",
+          "en": "honest",
+          "fr": "honnête",
+          "phonetic": "oh-neht"
+        },
+        {
+          "id": "p3_adjectives_poli-e",
+          "en": "polite",
+          "fr": "poli(e)",
+          "phonetic": "poh-lee"
+        },
+        {
+          "id": "p3_adjectives_impoli-e",
+          "en": "rude",
+          "fr": "impoli(e)",
+          "phonetic": "am-poh-lee"
+        },
+        {
+          "id": "p3_adjectives_patient-e",
+          "en": "patient",
+          "fr": "patient(e)",
+          "phonetic": "pah-syah(n)"
+        },
+        {
+          "id": "p3_adjectives_fiable",
+          "en": "reliable",
+          "fr": "fiable",
+          "phonetic": "fyah-bluh"
+        },
+        {
+          "id": "p3_adjectives_efficace",
+          "en": "efficient",
+          "fr": "efficace",
+          "phonetic": "ay-fee-kahss"
+        },
+        {
+          "id": "p3_adjectives_flexible",
+          "en": "flexible",
+          "fr": "flexible",
+          "phonetic": "flehk-see-bluh"
+        },
+        {
+          "id": "p3_adjectives_exigeant-e",
+          "en": "demanding",
+          "fr": "exigeant(e)",
+          "phonetic": "ehg-zee-zhah(n)"
+        },
+        {
+          "id": "p3_adjectives_satisfait-e",
+          "en": "satisfied",
+          "fr": "satisfait(e)",
+          "phonetic": "sah-teess-feh"
+        },
+        {
+          "id": "p3_adjectives_decu-e",
+          "en": "disappointed",
+          "fr": "déçu(e)",
+          "phonetic": "day-sew"
+        },
+        {
+          "id": "p3_adjectives_inquiet-inquiete",
+          "en": "worried",
+          "fr": "inquiet/inquiète",
+          "phonetic": "an-kyeh / an-kyeht"
+        },
+        {
+          "id": "p3_adjectives_pratique",
+          "en": "practical / convenient",
+          "fr": "pratique",
+          "phonetic": "prah-teek"
+        },
+        {
+          "id": "p3_adjectives_convenable",
+          "en": "suitable",
+          "fr": "convenable",
+          "phonetic": "koh(n)-vuh-nah-bluh"
+        },
+        {
+          "id": "p3_adjectives_essentiel-le",
+          "en": "essential",
+          "fr": "essentiel(le)",
+          "phonetic": "ay-sah(n)-syehl"
+        },
+        {
+          "id": "p3_adjectives_actuel-le",
+          "en": "current",
+          "fr": "actuel(le)",
+          "phonetic": "ahk-tew-ehl"
+        },
+        {
+          "id": "p3_adjectives_precedent-e",
+          "en": "previous",
+          "fr": "précédent(e)",
+          "phonetic": "pray-say-dah(n)"
+        },
+        {
+          "id": "p3_adjectives_suivant-e",
+          "en": "following / next",
+          "fr": "suivant(e)",
+          "phonetic": "swee-vah(n)"
+        },
+        {
+          "id": "p3_adjectives_semblable",
+          "en": "similar",
+          "fr": "semblable",
+          "phonetic": "sah(n)-blah-bluh"
+        },
+        {
+          "id": "p3_adjectives_moyen-ne",
+          "en": "average",
+          "fr": "moyen(ne)",
+          "phonetic": "mwah-yan / mwah-yehn"
+        },
+        {
+          "id": "p3_adjectives_enorme",
+          "en": "enormous",
+          "fr": "énorme",
+          "phonetic": "ay-norm"
+        },
+        {
+          "id": "p3_adjectives_minuscule",
+          "en": "tiny",
+          "fr": "minuscule",
+          "phonetic": "mee-new-skewl"
+        },
+        {
+          "id": "p3_adjectives_profond-e",
+          "en": "deep",
+          "fr": "profond(e)",
+          "phonetic": "proh-foh(n)"
+        },
+        {
+          "id": "p3_adjectives_large",
+          "en": "wide",
+          "fr": "large",
+          "phonetic": "larzh"
+        },
+        {
+          "id": "p3_adjectives_etroit-e",
+          "en": "narrow",
+          "fr": "étroit(e)",
+          "phonetic": "ay-trwah"
+        }
+      ]
+    },
+    {
+      "id": "adverbs",
+      "title": "Adverbs & Frequency",
+      "entries": [
+        {
+          "id": "p3_adverbs_tres",
+          "en": "very",
+          "fr": "très",
+          "phonetic": "treh"
+        },
+        {
+          "id": "p3_adverbs_beaucoup",
+          "en": "a lot / much",
+          "fr": "beaucoup",
+          "phonetic": "boh-koo"
+        },
+        {
+          "id": "p3_adverbs_peu",
+          "en": "a little",
+          "fr": "un peu",
+          "phonetic": "uh(n) puh"
+        },
+        {
+          "id": "p3_adverbs_toujours",
+          "en": "always",
+          "fr": "toujours",
+          "phonetic": "too-zhoor"
+        },
+        {
+          "id": "p3_adverbs_jamais",
+          "en": "never",
+          "fr": "jamais",
+          "phonetic": "zhah-meh"
+        },
+        {
+          "id": "p3_adverbs_souvent",
+          "en": "often",
+          "fr": "souvent",
+          "phonetic": "soo-vah(n)"
+        },
+        {
+          "id": "p3_adverbs_parfois",
+          "en": "sometimes",
+          "fr": "parfois",
+          "phonetic": "par-fwah"
+        },
+        {
+          "id": "p3_adverbs_deja",
+          "en": "already",
+          "fr": "déjà",
+          "phonetic": "day-zhah"
+        },
+        {
+          "id": "p3_adverbs_encore",
+          "en": "still / again",
+          "fr": "encore",
+          "phonetic": "ah(n)-kor"
+        },
+        {
+          "id": "p3_adverbs_vite-rapidement",
+          "en": "quickly",
+          "fr": "vite / rapidement",
+          "phonetic": "veet"
+        },
+        {
+          "id": "p3_adverbs_lentement",
+          "en": "slowly",
+          "fr": "lentement",
+          "phonetic": "lah(n)t-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_vraiment",
+          "en": "really",
+          "fr": "vraiment",
+          "phonetic": "vreh-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_presque",
+          "en": "almost",
+          "fr": "presque",
+          "phonetic": "prehsk"
+        },
+        {
+          "id": "p3_adverbs_ensemble",
+          "en": "together",
+          "fr": "ensemble",
+          "phonetic": "ah(n)-sah(n)-bluh"
+        },
+        {
+          "id": "p3_adverbs_maintenant",
+          "en": "now",
+          "fr": "maintenant",
+          "phonetic": "man-tuh-nah(n)"
+        },
+        {
+          "id": "p3_adverbs_immediatement",
+          "en": "immediately",
+          "fr": "immédiatement",
+          "phonetic": "ee-may-dyaht-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_recemment",
+          "en": "recently",
+          "fr": "récemment",
+          "phonetic": "ray-sah-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_actuellement",
+          "en": "currently",
+          "fr": "actuellement",
+          "phonetic": "ahk-tew-ehl-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_autrefois",
+          "en": "formerly / in the past",
+          "fr": "autrefois",
+          "phonetic": "oh-truh-fwah"
+        },
+        {
+          "id": "p3_adverbs_bientot",
+          "en": "soon",
+          "fr": "bientôt",
+          "phonetic": "byan-toh"
+        },
+        {
+          "id": "p3_adverbs_tard",
+          "en": "late",
+          "fr": "tard",
+          "phonetic": "tar"
+        },
+        {
+          "id": "p3_adverbs_tot",
+          "en": "early",
+          "fr": "tôt",
+          "phonetic": "toh"
+        },
+        {
+          "id": "p3_adverbs_partout",
+          "en": "everywhere",
+          "fr": "partout",
+          "phonetic": "par-too"
+        },
+        {
+          "id": "p3_adverbs_nulle-part",
+          "en": "nowhere",
+          "fr": "nulle part",
+          "phonetic": "newl par"
+        },
+        {
+          "id": "p3_adverbs_ailleurs",
+          "en": "elsewhere",
+          "fr": "ailleurs",
+          "phonetic": "ah-yuhr"
+        },
+        {
+          "id": "p3_adverbs_probablement",
+          "en": "probably",
+          "fr": "probablement",
+          "phonetic": "proh-bah-bluh-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_peut-etre",
+          "en": "maybe",
+          "fr": "peut-être",
+          "phonetic": "puh-teh-truh"
+        },
+        {
+          "id": "p3_adverbs_certainement",
+          "en": "certainly",
+          "fr": "certainement",
+          "phonetic": "sehr-tehn-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_absolument",
+          "en": "absolutely",
+          "fr": "absolument",
+          "phonetic": "ahb-soh-lew-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_completement",
+          "en": "completely",
+          "fr": "complètement",
+          "phonetic": "koh(n)-pleht-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_surtout",
+          "en": "especially",
+          "fr": "surtout",
+          "phonetic": "sewr-too"
+        },
+        {
+          "id": "p3_adverbs_principalement",
+          "en": "mainly",
+          "fr": "principalement",
+          "phonetic": "pran-see-pahl-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_generalement",
+          "en": "generally",
+          "fr": "généralement",
+          "phonetic": "zhay-nay-rahl-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_rarement",
+          "en": "rarely",
+          "fr": "rarement",
+          "phonetic": "rahr-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_frequemment",
+          "en": "frequently",
+          "fr": "fréquemment",
+          "phonetic": "fray-kah-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_soigneusement",
+          "en": "carefully",
+          "fr": "soigneusement",
+          "phonetic": "swah-nyuhz-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_malheureusement",
+          "en": "unfortunately",
+          "fr": "malheureusement",
+          "phonetic": "mah-luh-ruhz-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_heureusement",
+          "en": "fortunately",
+          "fr": "heureusement",
+          "phonetic": "uh-ruhz-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_soudainement",
+          "en": "suddenly",
+          "fr": "soudainement",
+          "phonetic": "soo-dehn-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_enfin",
+          "en": "finally / at last",
+          "fr": "enfin",
+          "phonetic": "ah(n)-fan"
+        },
+        {
+          "id": "p3_adverbs_assez",
+          "en": "quite / rather",
+          "fr": "assez",
+          "phonetic": "ah-say"
+        },
+        {
+          "id": "p3_adverbs_trop",
+          "en": "too (much)",
+          "fr": "trop",
+          "phonetic": "troh"
+        },
+        {
+          "id": "p3_adverbs_suffisamment",
+          "en": "enough / sufficiently",
+          "fr": "suffisamment",
+          "phonetic": "sew-fee-zah-mah(n)"
+        },
+        {
+          "id": "p3_adverbs_environ",
+          "en": "approximately",
+          "fr": "environ",
+          "phonetic": "ah(n)-vee-roh(n)"
+        }
+      ]
+    },
+    {
+      "id": "emotions",
+      "title": "Emotions & Feelings",
+      "entries": [
+        {
+          "id": "p3_emotions_se-sentir",
+          "en": "to feel",
+          "fr": "se sentir",
+          "phonetic": "suh sah(n)-teer"
+        },
+        {
+          "id": "p3_emotions_penser",
+          "en": "to think",
+          "fr": "penser",
+          "phonetic": "pah(n)-say"
+        },
+        {
+          "id": "p3_emotions_esperer",
+          "en": "to hope",
+          "fr": "espérer",
+          "phonetic": "eh-spay-ray"
+        },
+        {
+          "id": "p3_emotions_craindre",
+          "en": "to fear",
+          "fr": "craindre",
+          "phonetic": "kran-druh"
+        },
+        {
+          "id": "p3_emotions_bonheur",
+          "en": "happiness",
+          "fr": "le bonheur",
+          "phonetic": "luh boh-nuhr"
+        },
+        {
+          "id": "p3_emotions_inquietude",
+          "en": "worry",
+          "fr": "l'inquiétude",
+          "phonetic": "lan-kyay-tewd"
+        },
+        {
+          "id": "p3_emotions_surprise",
+          "en": "surprise",
+          "fr": "la surprise",
+          "phonetic": "lah sewr-preez"
+        },
+        {
+          "id": "p3_emotions_colere",
+          "en": "anger",
+          "fr": "la colère",
+          "phonetic": "lah koh-lehr"
+        },
+        {
+          "id": "p3_emotions_tristesse",
+          "en": "sadness",
+          "fr": "la tristesse",
+          "phonetic": "lah tree-stehss"
+        },
+        {
+          "id": "p3_emotions_peur",
+          "en": "fear",
+          "fr": "la peur",
+          "phonetic": "lah puhr"
+        },
+        {
+          "id": "p3_emotions_joie",
+          "en": "joy",
+          "fr": "la joie",
+          "phonetic": "lah zhwah"
+        },
+        {
+          "id": "p3_emotions_fierte",
+          "en": "pride",
+          "fr": "la fierté",
+          "phonetic": "lah fyehr-tay"
+        },
+        {
+          "id": "p3_emotions_honte",
+          "en": "shame",
+          "fr": "la honte",
+          "phonetic": "lah oh(n)t"
+        },
+        {
+          "id": "p3_emotions_stress",
+          "en": "stress",
+          "fr": "le stress",
+          "phonetic": "luh strehss"
+        },
+        {
+          "id": "p3_emotions_soulagement",
+          "en": "relief",
+          "fr": "le soulagement",
+          "phonetic": "luh soo-lahzh-mah(n)"
+        },
+        {
+          "id": "p3_emotions_deception",
+          "en": "disappointment",
+          "fr": "la déception",
+          "phonetic": "lah day-sehp-syoh(n)"
+        },
+        {
+          "id": "p3_emotions_espoir",
+          "en": "hope",
+          "fr": "l'espoir",
+          "phonetic": "leh-spwahr"
+        },
+        {
+          "id": "p3_emotions_confiance",
+          "en": "confidence / trust",
+          "fr": "la confiance",
+          "phonetic": "lah koh(n)-fyah(n)ss"
+        },
+        {
+          "id": "p3_emotions_doute",
+          "en": "doubt",
+          "fr": "le doute",
+          "phonetic": "luh doot"
+        },
+        {
+          "id": "p3_emotions_sinquieter",
+          "en": "to worry",
+          "fr": "s'inquiéter",
+          "phonetic": "san-kyay-tay"
+        },
+        {
+          "id": "p3_emotions_se-facher",
+          "en": "to get angry",
+          "fr": "se fâcher",
+          "phonetic": "suh fah-shay"
+        },
+        {
+          "id": "p3_emotions_pleurer",
+          "en": "to cry",
+          "fr": "pleurer",
+          "phonetic": "pluh-ray"
+        },
+        {
+          "id": "p3_emotions_rire",
+          "en": "to laugh",
+          "fr": "rire",
+          "phonetic": "reer"
+        },
+        {
+          "id": "p3_emotions_sourire",
+          "en": "to smile",
+          "fr": "sourire",
+          "phonetic": "soo-reer"
+        },
+        {
+          "id": "p3_emotions_avoir-honte",
+          "en": "to be ashamed",
+          "fr": "avoir honte",
+          "phonetic": "ah-vwahr oh(n)t"
+        },
+        {
+          "id": "p3_emotions_avoir-peur",
+          "en": "to be afraid",
+          "fr": "avoir peur",
+          "phonetic": "ah-vwahr puhr"
+        },
+        {
+          "id": "p3_emotions_profiter-de",
+          "en": "to take advantage of / enjoy",
+          "fr": "profiter de",
+          "phonetic": "proh-fee-tay duh"
+        },
+        {
+          "id": "p3_emotions_regretter",
+          "en": "to regret",
+          "fr": "regretter",
+          "phonetic": "ruh-greh-tay"
+        },
+        {
+          "id": "p3_emotions_apprecier",
+          "en": "to appreciate",
+          "fr": "apprécier",
+          "phonetic": "ah-pray-syay"
+        },
+        {
+          "id": "p3_emotions_etre-emu-e",
+          "en": "to be moved",
+          "fr": "être ému(e)",
+          "phonetic": "eh-truh ay-mew"
+        },
+        {
+          "id": "p3_emotions_enthousiaste",
+          "en": "enthusiastic / excited",
+          "fr": "enthousiaste",
+          "phonetic": "ah(n)-too-zyahst"
+        },
+        {
+          "id": "p3_emotions_nerveux-nerveuse",
+          "en": "nervous",
+          "fr": "nerveux/nerveuse",
+          "phonetic": "nehr-vuh / nehr-vuhz"
+        },
+        {
+          "id": "p3_emotions_jaloux-jalouse",
+          "en": "jealous",
+          "fr": "jaloux/jalouse",
+          "phonetic": "zhah-loo / zhah-looz"
+        },
+        {
+          "id": "p3_emotions_reconnaissant-e",
+          "en": "grateful",
+          "fr": "reconnaissant(e)",
+          "phonetic": "ruh-koh-neh-sah(n)"
+        },
+        {
+          "id": "p3_emotions_se-calmer",
+          "en": "to calm down",
+          "fr": "se calmer",
+          "phonetic": "suh kahl-may"
+        },
+        {
+          "id": "p3_emotions_humeur",
+          "en": "mood",
+          "fr": "l'humeur",
+          "phonetic": "lew-muhr"
+        },
+        {
+          "id": "p3_emotions_sentiment",
+          "en": "feeling",
+          "fr": "le sentiment",
+          "phonetic": "luh sah(n)-tee-mah(n)"
+        }
+      ]
+    },
+    {
+      "id": "body",
+      "title": "Body & Health",
+      "entries": [
+        {
+          "id": "p3_body_tete",
+          "en": "head",
+          "fr": "la tête",
+          "phonetic": "lah teht"
+        },
+        {
+          "id": "p3_body_main",
+          "en": "hand",
+          "fr": "la main",
+          "phonetic": "lah man"
+        },
+        {
+          "id": "p3_body_pied",
+          "en": "foot",
+          "fr": "le pied",
+          "phonetic": "luh pyay"
+        },
+        {
+          "id": "p3_body_oeil-les-yeux",
+          "en": "eye / eyes",
+          "fr": "l'œil / les yeux",
+          "phonetic": "luhy / lay zyuh"
+        },
+        {
+          "id": "p3_body_coeur",
+          "en": "heart",
+          "fr": "le cœur",
+          "phonetic": "luh kuhr"
+        },
+        {
+          "id": "p3_body_dos",
+          "en": "back",
+          "fr": "le dos",
+          "phonetic": "luh doh"
+        },
+        {
+          "id": "p3_body_ventre",
+          "en": "stomach",
+          "fr": "le ventre",
+          "phonetic": "luh vah(n)-truh"
+        },
+        {
+          "id": "p3_body_faire-mal",
+          "en": "to hurt",
+          "fr": "faire mal",
+          "phonetic": "fehr mahl"
+        },
+        {
+          "id": "p3_body_malade",
+          "en": "sick",
+          "fr": "malade",
+          "phonetic": "mah-lahd"
+        },
+        {
+          "id": "p3_body_en-bonne-sante",
+          "en": "healthy",
+          "fr": "en bonne santé",
+          "phonetic": "ah(n) buhn sah(n)-tay"
+        },
+        {
+          "id": "p3_body_bras",
+          "en": "arm",
+          "fr": "le bras",
+          "phonetic": "luh brah"
+        },
+        {
+          "id": "p3_body_jambe",
+          "en": "leg",
+          "fr": "la jambe",
+          "phonetic": "lah zhah(n)b"
+        },
+        {
+          "id": "p3_body_bouche",
+          "en": "mouth",
+          "fr": "la bouche",
+          "phonetic": "lah boosh"
+        },
+        {
+          "id": "p3_body_nez",
+          "en": "nose",
+          "fr": "le nez",
+          "phonetic": "luh nay"
+        },
+        {
+          "id": "p3_body_oreille",
+          "en": "ear",
+          "fr": "l'oreille",
+          "phonetic": "loh-ray"
+        },
+        {
+          "id": "p3_body_dent",
+          "en": "tooth",
+          "fr": "la dent",
+          "phonetic": "lah dah(n)"
+        },
+        {
+          "id": "p3_body_cheveux",
+          "en": "hair",
+          "fr": "les cheveux",
+          "phonetic": "lay shuh-vuh"
+        },
+        {
+          "id": "p3_body_peau",
+          "en": "skin",
+          "fr": "la peau",
+          "phonetic": "lah poh"
+        },
+        {
+          "id": "p3_body_genou",
+          "en": "knee",
+          "fr": "le genou",
+          "phonetic": "luh zhuh-noo"
+        },
+        {
+          "id": "p3_body_epaule",
+          "en": "shoulder",
+          "fr": "l'épaule",
+          "phonetic": "lay-pohl"
+        },
+        {
+          "id": "p3_body_doigt",
+          "en": "finger",
+          "fr": "le doigt",
+          "phonetic": "luh dwah"
+        },
+        {
+          "id": "p3_body_cou",
+          "en": "neck",
+          "fr": "le cou",
+          "phonetic": "luh koo"
+        },
+        {
+          "id": "p3_body_sang",
+          "en": "blood",
+          "fr": "le sang",
+          "phonetic": "luh sah(n)"
+        },
+        {
+          "id": "p3_body_visage",
+          "en": "face",
+          "fr": "le visage",
+          "phonetic": "luh vee-zahzh"
+        },
+        {
+          "id": "p3_body_sante",
+          "en": "health",
+          "fr": "la santé",
+          "phonetic": "lah sah(n)-tay"
+        },
+        {
+          "id": "p3_body_douleur",
+          "en": "pain",
+          "fr": "la douleur",
+          "phonetic": "lah doo-luhr"
+        },
+        {
+          "id": "p3_body_mal-de-tete",
+          "en": "headache",
+          "fr": "le mal de tête",
+          "phonetic": "luh mahl duh teht"
+        },
+        {
+          "id": "p3_body_fievre",
+          "en": "fever",
+          "fr": "la fièvre",
+          "phonetic": "lah fyeh-vruh"
+        },
+        {
+          "id": "p3_body_toux",
+          "en": "cough",
+          "fr": "la toux",
+          "phonetic": "lah too"
+        },
+        {
+          "id": "p3_body_se-reposer",
+          "en": "to rest",
+          "fr": "se reposer",
+          "phonetic": "suh ruh-poh-zay"
+        },
+        {
+          "id": "p3_body_respirer",
+          "en": "to breathe",
+          "fr": "respirer",
+          "phonetic": "reh-spee-ray"
+        },
+        {
+          "id": "p3_body_bien-dormir",
+          "en": "to sleep well",
+          "fr": "bien dormir",
+          "phonetic": "byan dor-meer"
+        }
+      ]
+    },
+    {
+      "id": "clothing",
+      "title": "Clothing & Fashion",
+      "entries": [
+        {
+          "id": "p3_clothing_vetements",
+          "en": "clothes",
+          "fr": "les vêtements",
+          "phonetic": "lay veht-mah(n)"
+        },
+        {
+          "id": "p3_clothing_chemise",
+          "en": "shirt",
+          "fr": "la chemise",
+          "phonetic": "lah shuh-meez"
+        },
+        {
+          "id": "p3_clothing_pantalon",
+          "en": "pants",
+          "fr": "le pantalon",
+          "phonetic": "luh pah(n)-tah-loh(n)"
+        },
+        {
+          "id": "p3_clothing_chaussures",
+          "en": "shoes",
+          "fr": "les chaussures",
+          "phonetic": "lay shoh-sewr"
+        },
+        {
+          "id": "p3_clothing_manteau",
+          "en": "coat",
+          "fr": "le manteau",
+          "phonetic": "luh mah(n)-toh"
+        },
+        {
+          "id": "p3_clothing_porter",
+          "en": "to wear",
+          "fr": "porter",
+          "phonetic": "por-tay"
+        },
+        {
+          "id": "p3_clothing_taille",
+          "en": "size",
+          "fr": "la taille",
+          "phonetic": "lah tie"
+        },
+        {
+          "id": "p3_clothing_robe",
+          "en": "dress",
+          "fr": "la robe",
+          "phonetic": "lah rohb"
+        },
+        {
+          "id": "p3_clothing_jupe",
+          "en": "skirt",
+          "fr": "la jupe",
+          "phonetic": "lah zhewp"
+        },
+        {
+          "id": "p3_clothing_pull",
+          "en": "sweater",
+          "fr": "le pull",
+          "phonetic": "luh pewl"
+        },
+        {
+          "id": "p3_clothing_veste",
+          "en": "jacket",
+          "fr": "la veste",
+          "phonetic": "lah vehst"
+        },
+        {
+          "id": "p3_clothing_chapeau",
+          "en": "hat",
+          "fr": "le chapeau",
+          "phonetic": "luh shah-poh"
+        },
+        {
+          "id": "p3_clothing_chaussettes",
+          "en": "socks",
+          "fr": "les chaussettes",
+          "phonetic": "lay shoh-seht"
+        },
+        {
+          "id": "p3_clothing_gants",
+          "en": "gloves",
+          "fr": "les gants",
+          "phonetic": "lay gah(n)"
+        },
+        {
+          "id": "p3_clothing_echarpe",
+          "en": "scarf",
+          "fr": "l'écharpe",
+          "phonetic": "lay-sharp"
+        },
+        {
+          "id": "p3_clothing_bottes",
+          "en": "boots",
+          "fr": "les bottes",
+          "phonetic": "lay boht"
+        },
+        {
+          "id": "p3_clothing_cravate",
+          "en": "tie",
+          "fr": "la cravate",
+          "phonetic": "lah krah-vaht"
+        },
+        {
+          "id": "p3_clothing_costume",
+          "en": "suit",
+          "fr": "le costume",
+          "phonetic": "luh koh-stewm"
+        },
+        {
+          "id": "p3_clothing_shabiller",
+          "en": "to get dressed",
+          "fr": "s'habiller",
+          "phonetic": "sah-bee-yay"
+        },
+        {
+          "id": "p3_clothing_essayer",
+          "en": "to try on",
+          "fr": "essayer",
+          "phonetic": "ay-say-yay"
+        },
+        {
+          "id": "p3_clothing_mode",
+          "en": "fashion",
+          "fr": "la mode",
+          "phonetic": "lah mohd"
+        }
+      ]
+    },
+    {
+      "id": "city",
+      "title": "City & Places",
+      "entries": [
+        {
+          "id": "p3_city_ville",
+          "en": "city",
+          "fr": "la ville",
+          "phonetic": "lah veel"
+        },
+        {
+          "id": "p3_city_village",
+          "en": "village",
+          "fr": "le village",
+          "phonetic": "luh vee-lahzh"
+        },
+        {
+          "id": "p3_city_eglise",
+          "en": "church",
+          "fr": "l'église",
+          "phonetic": "lay-gleez"
+        },
+        {
+          "id": "p3_city_parc",
+          "en": "park",
+          "fr": "le parc",
+          "phonetic": "luh park"
+        },
+        {
+          "id": "p3_city_bibliotheque",
+          "en": "library",
+          "fr": "la bibliothèque",
+          "phonetic": "lah bee-blee-oh-tehk"
+        },
+        {
+          "id": "p3_city_musee",
+          "en": "museum",
+          "fr": "le musée",
+          "phonetic": "luh mew-zay"
+        },
+        {
+          "id": "p3_city_poste",
+          "en": "post office",
+          "fr": "la poste",
+          "phonetic": "lah pohst"
+        },
+        {
+          "id": "p3_city_poste-de-police",
+          "en": "police station",
+          "fr": "le poste de police",
+          "phonetic": "luh pohst duh poh-leess"
+        },
+        {
+          "id": "p3_city_marche",
+          "en": "market",
+          "fr": "le marché",
+          "phonetic": "luh mar-shay"
+        },
+        {
+          "id": "p3_city_quartier",
+          "en": "neighborhood",
+          "fr": "le quartier",
+          "phonetic": "luh kar-tyay"
+        },
+        {
+          "id": "p3_city_banlieue",
+          "en": "suburb",
+          "fr": "la banlieue",
+          "phonetic": "lah bah(n)-lyuh"
+        },
+        {
+          "id": "p3_city_centre-ville",
+          "en": "downtown",
+          "fr": "le centre-ville",
+          "phonetic": "luh sah(n)-truh-veel"
+        },
+        {
+          "id": "p3_city_immeuble",
+          "en": "building",
+          "fr": "l'immeuble",
+          "phonetic": "lee-muh-bluh"
+        },
+        {
+          "id": "p3_city_pont",
+          "en": "bridge",
+          "fr": "le pont",
+          "phonetic": "luh poh(n)"
+        },
+        {
+          "id": "p3_city_trottoir",
+          "en": "sidewalk",
+          "fr": "le trottoir",
+          "phonetic": "luh troh-twahr"
+        },
+        {
+          "id": "p3_city_circulation",
+          "en": "traffic",
+          "fr": "la circulation",
+          "phonetic": "lah seer-kew-lah-syoh(n)"
+        },
+        {
+          "id": "p3_city_passage-pieton",
+          "en": "crosswalk",
+          "fr": "le passage piéton",
+          "phonetic": "luh pah-sahzh pyay-toh(n)"
+        },
+        {
+          "id": "p3_city_hotel-de-ville",
+          "en": "city hall",
+          "fr": "l'hôtel de ville",
+          "phonetic": "loh-tehl duh veel"
+        },
+        {
+          "id": "p3_city_pharmacie",
+          "en": "pharmacy",
+          "fr": "la pharmacie",
+          "phonetic": "lah far-mah-see"
+        },
+        {
+          "id": "p3_city_boulangerie",
+          "en": "bakery",
+          "fr": "la boulangerie",
+          "phonetic": "lah boo-lah(n)-zhuh-ree"
+        },
+        {
+          "id": "p3_city_hopital",
+          "en": "hospital",
+          "fr": "l'hôpital",
+          "phonetic": "loh-pee-tahl"
+        },
+        {
+          "id": "p3_city_gare",
+          "en": "train station",
+          "fr": "la gare",
+          "phonetic": "lah gar"
+        },
+        {
+          "id": "p3_city_arret-de-bus",
+          "en": "bus stop",
+          "fr": "l'arrêt de bus",
+          "phonetic": "lah-reh duh bewss"
+        },
+        {
+          "id": "p3_city_metro",
+          "en": "subway",
+          "fr": "le métro",
+          "phonetic": "luh may-troh"
+        },
+        {
+          "id": "p3_city_stationnement",
+          "en": "parking lot",
+          "fr": "le stationnement",
+          "phonetic": "luh stah-syohn-mah(n)"
+        },
+        {
+          "id": "p3_city_carrefour",
+          "en": "intersection",
+          "fr": "le carrefour",
+          "phonetic": "luh kar-foor"
+        },
+        {
+          "id": "p3_city_gratte-ciel",
+          "en": "skyscraper",
+          "fr": "le gratte-ciel",
+          "phonetic": "luh graht-syehl"
+        }
+      ]
+    },
+    {
+      "id": "hobbies",
+      "title": "Sports & Hobbies",
+      "entries": [
+        {
+          "id": "p3_hobbies_sport",
+          "en": "sport",
+          "fr": "le sport",
+          "phonetic": "luh spor"
+        },
+        {
+          "id": "p3_hobbies_courir",
+          "en": "to run",
+          "fr": "courir",
+          "phonetic": "koo-reer"
+        },
+        {
+          "id": "p3_hobbies_nager",
+          "en": "to swim",
+          "fr": "nager",
+          "phonetic": "nah-zhay"
+        },
+        {
+          "id": "p3_hobbies_jouer-a",
+          "en": "to play (a sport)",
+          "fr": "jouer à",
+          "phonetic": "zhoo-ay ah"
+        },
+        {
+          "id": "p3_hobbies_jouer-de",
+          "en": "to play (an instrument)",
+          "fr": "jouer de",
+          "phonetic": "zhoo-ay duh"
+        },
+        {
+          "id": "p3_hobbies_musique",
+          "en": "music",
+          "fr": "la musique",
+          "phonetic": "lah mew-zeek"
+        },
+        {
+          "id": "p3_hobbies_jeu",
+          "en": "game",
+          "fr": "le jeu",
+          "phonetic": "luh zhuh"
+        },
+        {
+          "id": "p3_hobbies_marcher",
+          "en": "to walk",
+          "fr": "marcher",
+          "phonetic": "mar-shay"
+        },
+        {
+          "id": "p3_hobbies_equipe",
+          "en": "team",
+          "fr": "l'équipe",
+          "phonetic": "lay-keep"
+        },
+        {
+          "id": "p3_hobbies_passe-temps",
+          "en": "hobby",
+          "fr": "le passe-temps",
+          "phonetic": "luh pahss-tah(n)"
+        },
+        {
+          "id": "p3_hobbies_dessiner",
+          "en": "to draw",
+          "fr": "dessiner",
+          "phonetic": "deh-see-nay"
+        },
+        {
+          "id": "p3_hobbies_peindre",
+          "en": "to paint",
+          "fr": "peindre",
+          "phonetic": "pan-druh"
+        },
+        {
+          "id": "p3_hobbies_chanter",
+          "en": "to sing",
+          "fr": "chanter",
+          "phonetic": "shah(n)-tay"
+        },
+        {
+          "id": "p3_hobbies_danser",
+          "en": "to dance",
+          "fr": "danser",
+          "phonetic": "dah(n)-say"
+        },
+        {
+          "id": "p3_hobbies_lire",
+          "en": "to read",
+          "fr": "lire",
+          "phonetic": "leer"
+        },
+        {
+          "id": "p3_hobbies_lecture",
+          "en": "reading",
+          "fr": "la lecture",
+          "phonetic": "lah lehk-tewr"
+        },
+        {
+          "id": "p3_hobbies_cuisiner",
+          "en": "to cook",
+          "fr": "cuisiner",
+          "phonetic": "kwee-zee-nay"
+        },
+        {
+          "id": "p3_hobbies_voyager",
+          "en": "to travel",
+          "fr": "voyager",
+          "phonetic": "vwah-yah-zhay"
+        },
+        {
+          "id": "p3_hobbies_randonnee",
+          "en": "hiking",
+          "fr": "la randonnée",
+          "phonetic": "lah rah(n)-doh-nay"
+        },
+        {
+          "id": "p3_hobbies_velo",
+          "en": "cycling / bike",
+          "fr": "le vélo",
+          "phonetic": "luh vay-loh"
+        },
+        {
+          "id": "p3_hobbies_ski",
+          "en": "skiing",
+          "fr": "le ski",
+          "phonetic": "luh skee"
+        },
+        {
+          "id": "p3_hobbies_patinage",
+          "en": "skating",
+          "fr": "le patinage",
+          "phonetic": "luh pah-tee-nahzh"
+        },
+        {
+          "id": "p3_hobbies_hockey",
+          "en": "hockey",
+          "fr": "le hockey",
+          "phonetic": "luh oh-keh"
+        },
+        {
+          "id": "p3_hobbies_natation",
+          "en": "swimming",
+          "fr": "la natation",
+          "phonetic": "lah nah-tah-syoh(n)"
+        },
+        {
+          "id": "p3_hobbies_salle-de-sport",
+          "en": "gym",
+          "fr": "la salle de sport",
+          "phonetic": "lah sahl duh spor"
+        },
+        {
+          "id": "p3_hobbies_sentrainer",
+          "en": "to train / practice",
+          "fr": "s'entraîner",
+          "phonetic": "sah(n)-treh-nay"
+        },
+        {
+          "id": "p3_hobbies_match",
+          "en": "match / game (sports)",
+          "fr": "le match",
+          "phonetic": "luh mahtch"
+        },
+        {
+          "id": "p3_hobbies_gagner",
+          "en": "to win",
+          "fr": "gagner",
+          "phonetic": "gah-nyay"
+        },
+        {
+          "id": "p3_hobbies_perdre",
+          "en": "to lose",
+          "fr": "perdre",
+          "phonetic": "pehr-druh"
+        }
+      ]
+    },
+    {
+      "id": "nature",
+      "title": "Weather & Nature",
+      "entries": [
+        {
+          "id": "p3_nature_soleil",
+          "en": "sun",
+          "fr": "le soleil",
+          "phonetic": "luh soh-lay"
+        },
+        {
+          "id": "p3_nature_pluie",
+          "en": "rain",
+          "fr": "la pluie",
+          "phonetic": "lah plwee"
+        },
+        {
+          "id": "p3_nature_neige",
+          "en": "snow",
+          "fr": "la neige",
+          "phonetic": "lah nehzh"
+        },
+        {
+          "id": "p3_nature_vent",
+          "en": "wind",
+          "fr": "le vent",
+          "phonetic": "luh vah(n)"
+        },
+        {
+          "id": "p3_nature_nuage",
+          "en": "cloud",
+          "fr": "le nuage",
+          "phonetic": "luh new-ahzh"
+        },
+        {
+          "id": "p3_nature_ciel",
+          "en": "sky",
+          "fr": "le ciel",
+          "phonetic": "luh syehl"
+        },
+        {
+          "id": "p3_nature_arbre",
+          "en": "tree",
+          "fr": "l'arbre",
+          "phonetic": "lar-bruh"
+        },
+        {
+          "id": "p3_nature_mer",
+          "en": "sea",
+          "fr": "la mer",
+          "phonetic": "lah mehr"
+        },
+        {
+          "id": "p3_nature_montagne",
+          "en": "mountain",
+          "fr": "la montagne",
+          "phonetic": "lah moh(n)-tahnyuh"
+        },
+        {
+          "id": "p3_nature_riviere",
+          "en": "river",
+          "fr": "la rivière",
+          "phonetic": "lah ree-vyehr"
+        },
+        {
+          "id": "p3_nature_tempete",
+          "en": "storm",
+          "fr": "la tempête",
+          "phonetic": "lah tah(n)-peht"
+        },
+        {
+          "id": "p3_nature_orage",
+          "en": "thunderstorm",
+          "fr": "l'orage",
+          "phonetic": "loh-rahzh"
+        },
+        {
+          "id": "p3_nature_brouillard",
+          "en": "fog",
+          "fr": "le brouillard",
+          "phonetic": "luh broo-yar"
+        },
+        {
+          "id": "p3_nature_glace",
+          "en": "ice",
+          "fr": "la glace",
+          "phonetic": "lah glahss"
+        },
+        {
+          "id": "p3_nature_gel",
+          "en": "frost / freezing",
+          "fr": "le gel",
+          "phonetic": "luh zhehl"
+        },
+        {
+          "id": "p3_nature_canicule",
+          "en": "heat wave",
+          "fr": "la canicule",
+          "phonetic": "lah kah-nee-kewl"
+        },
+        {
+          "id": "p3_nature_inondation",
+          "en": "flood",
+          "fr": "l'inondation",
+          "phonetic": "lee-noh(n)-dah-syoh(n)"
+        },
+        {
+          "id": "p3_nature_secheresse",
+          "en": "drought",
+          "fr": "la sécheresse",
+          "phonetic": "lah say-shuh-rehss"
+        },
+        {
+          "id": "p3_nature_foret",
+          "en": "forest",
+          "fr": "la forêt",
+          "phonetic": "lah foh-reh"
+        },
+        {
+          "id": "p3_nature_lac",
+          "en": "lake",
+          "fr": "le lac",
+          "phonetic": "luh lahk"
+        },
+        {
+          "id": "p3_nature_ile",
+          "en": "island",
+          "fr": "l'île",
+          "phonetic": "leel"
+        },
+        {
+          "id": "p3_nature_plage",
+          "en": "beach",
+          "fr": "la plage",
+          "phonetic": "lah plahzh"
+        },
+        {
+          "id": "p3_nature_fleur",
+          "en": "flower",
+          "fr": "la fleur",
+          "phonetic": "lah fluhr"
+        },
+        {
+          "id": "p3_nature_herbe",
+          "en": "grass",
+          "fr": "l'herbe",
+          "phonetic": "lehrb"
+        },
+        {
+          "id": "p3_nature_feuille",
+          "en": "leaf",
+          "fr": "la feuille",
+          "phonetic": "lah fuhy"
+        },
+        {
+          "id": "p3_nature_terre",
+          "en": "earth / ground",
+          "fr": "la terre",
+          "phonetic": "lah tehr"
+        },
+        {
+          "id": "p3_nature_lune",
+          "en": "moon",
+          "fr": "la lune",
+          "phonetic": "lah lewn"
+        },
+        {
+          "id": "p3_nature_etoile",
+          "en": "star",
+          "fr": "l'étoile",
+          "phonetic": "lay-twahl"
+        },
+        {
+          "id": "p3_nature_saison",
+          "en": "season",
+          "fr": "la saison",
+          "phonetic": "lah seh-zoh(n)"
+        },
+        {
+          "id": "p3_nature_previsions-meteo",
+          "en": "weather forecast",
+          "fr": "les prévisions météo",
+          "phonetic": "lay pray-vee-zyoh(n) may-tay-oh"
+        },
+        {
+          "id": "p3_nature_degre",
+          "en": "degree",
+          "fr": "le degré",
+          "phonetic": "luh duh-gray"
+        },
+        {
+          "id": "p3_nature_il-gele",
+          "en": "it's freezing",
+          "fr": "il gèle",
+          "phonetic": "eel zhehl"
+        }
+      ]
+    },
+    {
+      "id": "expressions",
+      "title": "Everyday Expressions & Idioms",
+      "entries": [
+        {
+          "id": "p3_expressions_pas-de-probleme",
+          "en": "no problem",
+          "fr": "pas de problème",
+          "phonetic": "pah duh proh-blehm"
+        },
+        {
+          "id": "p3_expressions_bien-sur",
+          "en": "of course",
+          "fr": "bien sûr",
+          "phonetic": "byan sewr"
+        },
+        {
+          "id": "p3_expressions_au-fait-a-propos",
+          "en": "by the way",
+          "fr": "au fait / à propos",
+          "phonetic": "oh feht"
+        },
+        {
+          "id": "p3_expressions_bref",
+          "en": "in short",
+          "fr": "bref",
+          "phonetic": "brehf"
+        },
+        {
+          "id": "p3_expressions_voila-exactement",
+          "en": "that's it / exactly",
+          "fr": "voilà / exactement",
+          "phonetic": "vwah-lah"
+        },
+        {
+          "id": "p3_expressions_ca-depend",
+          "en": "it depends",
+          "fr": "ça dépend",
+          "phonetic": "sah day-pah(n)"
+        },
+        {
+          "id": "p3_expressions_bonne-chance",
+          "en": "good luck",
+          "fr": "bonne chance",
+          "phonetic": "buhn shah(n)ss"
+        },
+        {
+          "id": "p3_expressions_felicitations",
+          "en": "congratulations",
+          "fr": "félicitations",
+          "phonetic": "fay-lee-see-tah-syoh(n)"
+        },
+        {
+          "id": "p3_expressions_prends-soin-de-toi",
+          "en": "take care",
+          "fr": "prends soin de toi",
+          "phonetic": "prah(n) swan duh twah"
+        },
+        {
+          "id": "p3_expressions_a-bientot",
+          "en": "see you soon",
+          "fr": "à bientôt",
+          "phonetic": "ah byan-toh"
+        },
+        {
+          "id": "p3_expressions_ca-marche",
+          "en": "that works",
+          "fr": "ça marche",
+          "phonetic": "sah marsh"
+        },
+        {
+          "id": "p3_expressions_ne-ten-fais-pas",
+          "en": "don't worry",
+          "fr": "ne t'en fais pas",
+          "phonetic": "nuh tah(n) feh pah"
+        },
+        {
+          "id": "p3_expressions_ca-ne-fait-rien",
+          "en": "it doesn't matter",
+          "fr": "ça ne fait rien",
+          "phonetic": "sah nuh feh ryan"
+        },
+        {
+          "id": "p3_expressions_jai-hate",
+          "en": "I can't wait",
+          "fr": "j'ai hâte",
+          "phonetic": "zhay aht"
+        },
+        {
+          "id": "p3_expressions_tant-mieux",
+          "en": "so much the better",
+          "fr": "tant mieux",
+          "phonetic": "tah(n) myuh"
+        },
+        {
+          "id": "p3_expressions_tant-pis",
+          "en": "too bad",
+          "fr": "tant pis",
+          "phonetic": "tah(n) pee"
+        },
+        {
+          "id": "p3_expressions_de-toute-facon",
+          "en": "anyway / in any case",
+          "fr": "de toute façon",
+          "phonetic": "duh toot fah-soh(n)"
+        },
+        {
+          "id": "p3_expressions_tout-a-coup",
+          "en": "all of a sudden",
+          "fr": "tout à coup",
+          "phonetic": "too tah koo"
+        },
+        {
+          "id": "p3_expressions_tout-de-suite",
+          "en": "right away",
+          "fr": "tout de suite",
+          "phonetic": "toot sweet"
+        },
+        {
+          "id": "p3_expressions_ca-vaut-la-peine",
+          "en": "it's worth it",
+          "fr": "ça vaut la peine",
+          "phonetic": "sah voh lah pehn"
+        },
+        {
+          "id": "p3_expressions_avoir-de-la-chance",
+          "en": "to be lucky",
+          "fr": "avoir de la chance",
+          "phonetic": "ah-vwahr duh lah shah(n)ss"
+        },
+        {
+          "id": "p3_expressions_etre-en-train-de",
+          "en": "to be in the middle of (doing)",
+          "fr": "être en train de",
+          "phonetic": "eh-truh ah(n) tran duh"
+        },
+        {
+          "id": "p3_expressions_venir-de",
+          "en": "to have just (done)",
+          "fr": "venir de",
+          "phonetic": "vuh-neer duh"
+        },
+        {
+          "id": "p3_expressions_avoir-besoin-de",
+          "en": "to need",
+          "fr": "avoir besoin de",
+          "phonetic": "ah-vwahr buh-zwan duh"
+        },
+        {
+          "id": "p3_expressions_avoir-lair",
+          "en": "to seem / look like",
+          "fr": "avoir l'air",
+          "phonetic": "ah-vwahr lehr"
+        },
+        {
+          "id": "p3_expressions_faire-un-effort",
+          "en": "to make an effort",
+          "fr": "faire un effort",
+          "phonetic": "fehr uh(n) nay-for"
+        },
+        {
+          "id": "p3_expressions_faire-attention",
+          "en": "to pay attention",
+          "fr": "faire attention",
+          "phonetic": "fehr ah-tah(n)-syoh(n)"
+        },
+        {
+          "id": "p3_expressions_prendre-une-decision",
+          "en": "to make a decision",
+          "fr": "prendre une décision",
+          "phonetic": "prah(n)-druh ewn day-see-zyoh(n)"
+        },
+        {
+          "id": "p3_expressions_avoir-raison",
+          "en": "to be right",
+          "fr": "avoir raison",
+          "phonetic": "ah-vwahr reh-zoh(n)"
+        },
+        {
+          "id": "p3_expressions_avoir-tort",
+          "en": "to be wrong",
+          "fr": "avoir tort",
+          "phonetic": "ah-vwahr tor"
+        },
+        {
+          "id": "p3_expressions_sentendre-bien",
+          "en": "to get along well",
+          "fr": "s'entendre bien",
+          "phonetic": "sah(n)-tah(n)-druh byan"
+        },
+        {
+          "id": "p3_expressions_shabituer-a",
+          "en": "to get used to",
+          "fr": "s'habituer à",
+          "phonetic": "sah-bee-tew-ay ah"
+        },
+        {
+          "id": "p3_expressions_ca-va-de-soi",
+          "en": "that goes without saying",
+          "fr": "ça va de soi",
+          "phonetic": "sah vah duh swah"
+        },
+        {
+          "id": "p3_expressions_ce-nest-pas-grave",
+          "en": "it's not a big deal",
+          "fr": "ce n'est pas grave",
+          "phonetic": "suh neh pah grahv"
+        }
+      ]
+    },
+    {
+      "id": "employment",
+      "title": "Employment & Career",
+      "entries": [
+        {
+          "id": "p3_employment_entretien-dembauche",
+          "en": "job interview",
+          "fr": "l'entretien d'embauche",
+          "phonetic": "lah(n)-truh-tyan dah(n)-bohsh"
+        },
+        {
+          "id": "p3_employment_contrat",
+          "en": "contract",
+          "fr": "le contrat",
+          "phonetic": "luh koh(n)-trah"
+        },
+        {
+          "id": "p3_employment_promotion",
+          "en": "promotion",
+          "fr": "la promotion",
+          "phonetic": "lah proh-moh-syoh(n)"
+        },
+        {
+          "id": "p3_employment_ingenieur-e",
+          "en": "engineer",
+          "fr": "l'ingénieur(e)",
+          "phonetic": "lan-zhay-nyuhr"
+        },
+        {
+          "id": "p3_employment_developpeur",
+          "en": "developer",
+          "fr": "le développeur",
+          "phonetic": "luh day-vuh-loh-puhr"
+        },
+        {
+          "id": "p3_employment_la-gestionnaire",
+          "en": "manager",
+          "fr": "le/la gestionnaire",
+          "phonetic": "luh zhehs-tyoh-nehr"
+        },
+        {
+          "id": "p3_employment_avantages-sociaux",
+          "en": "benefits",
+          "fr": "les avantages sociaux",
+          "phonetic": "lay zah-vah(n)-tahzh soh-syoh"
+        },
+        {
+          "id": "p3_employment_demission",
+          "en": "resignation",
+          "fr": "la démission",
+          "phonetic": "lah day-mee-syoh(n)"
+        },
+        {
+          "id": "p3_employment_marche-du-travail",
+          "en": "job market",
+          "fr": "le marché du travail",
+          "phonetic": "luh mar-shay dew trah-vah-y"
+        },
+        {
+          "id": "p3_employment_competence",
+          "en": "skill",
+          "fr": "la compétence",
+          "phonetic": "lah koh(n)-pay-tah(n)ss"
+        },
+        {
+          "id": "p3_employment_salaire",
+          "en": "salary",
+          "fr": "le salaire",
+          "phonetic": "luh sah-lehr"
+        },
+        {
+          "id": "p3_employment_la-collegue",
+          "en": "colleague",
+          "fr": "le/la collègue",
+          "phonetic": "luh koh-lehg"
+        },
+        {
+          "id": "p3_employment_embaucher",
+          "en": "to hire",
+          "fr": "embaucher",
+          "phonetic": "ah(n)-boh-shay"
+        },
+        {
+          "id": "p3_employment_demissionner",
+          "en": "to resign",
+          "fr": "démissionner",
+          "phonetic": "day-mee-syoh-nay"
+        },
+        {
+          "id": "p3_employment_licencier",
+          "en": "to lay off / fire",
+          "fr": "licencier",
+          "phonetic": "lee-sah(n)-syay"
+        },
+        {
+          "id": "p3_employment_reunion",
+          "en": "meeting",
+          "fr": "la réunion",
+          "phonetic": "lah ray-ew-nyoh(n)"
+        },
+        {
+          "id": "p3_employment_delai",
+          "en": "deadline",
+          "fr": "le délai",
+          "phonetic": "luh day-leh"
+        },
+        {
+          "id": "p3_employment_tache",
+          "en": "task",
+          "fr": "la tâche",
+          "phonetic": "lah tahsh"
+        },
+        {
+          "id": "p3_employment_horaire",
+          "en": "schedule",
+          "fr": "l'horaire",
+          "phonetic": "loh-rehr"
+        },
+        {
+          "id": "p3_employment_a-temps-plein",
+          "en": "full-time",
+          "fr": "à temps plein",
+          "phonetic": "ah tah(n) plan"
+        },
+        {
+          "id": "p3_employment_a-temps-partiel",
+          "en": "part-time",
+          "fr": "à temps partiel",
+          "phonetic": "ah tah(n) par-syehl"
+        },
+        {
+          "id": "p3_employment_heures-supplementaires",
+          "en": "overtime",
+          "fr": "les heures supplémentaires",
+          "phonetic": "lay zuhr sew-play-mah(n)-tehr"
+        },
+        {
+          "id": "p3_employment_augmentation",
+          "en": "raise (salary)",
+          "fr": "l'augmentation",
+          "phonetic": "lohg-mah(n)-tah-syoh(n)"
+        },
+        {
+          "id": "p3_employment_experience",
+          "en": "experience",
+          "fr": "l'expérience",
+          "phonetic": "lehk-spay-ryah(n)ss"
+        },
+        {
+          "id": "p3_employment_curriculum-vitae-le-cv",
+          "en": "resume / CV",
+          "fr": "le curriculum vitae (le CV)",
+          "phonetic": "luh say-vay"
+        },
+        {
+          "id": "p3_employment_lettre-de-motivation",
+          "en": "cover letter",
+          "fr": "la lettre de motivation",
+          "phonetic": "lah leh-truh duh moh-tee-vah-syoh(n)"
+        },
+        {
+          "id": "p3_employment_employeur",
+          "en": "employer",
+          "fr": "l'employeur",
+          "phonetic": "lah(n)-plwah-yuhr"
+        },
+        {
+          "id": "p3_employment_employe-e",
+          "en": "employee",
+          "fr": "l'employé(e)",
+          "phonetic": "lah(n)-plwah-yay"
+        },
+        {
+          "id": "p3_employment_stage",
+          "en": "internship",
+          "fr": "le stage",
+          "phonetic": "luh stahzh"
+        },
+        {
+          "id": "p3_employment_la-stagiaire",
+          "en": "intern / trainee",
+          "fr": "le/la stagiaire",
+          "phonetic": "luh stah-zhyehr"
+        },
+        {
+          "id": "p3_employment_chomage",
+          "en": "unemployment",
+          "fr": "le chômage",
+          "phonetic": "luh shoh-mahzh"
+        },
+        {
+          "id": "p3_employment_offre-demploi",
+          "en": "job offer",
+          "fr": "l'offre d'emploi",
+          "phonetic": "loh-fruh dah(n)-plwah"
+        },
+        {
+          "id": "p3_employment_postuler",
+          "en": "to apply (for a job)",
+          "fr": "postuler",
+          "phonetic": "poh-stew-lay"
+        },
+        {
+          "id": "p3_employment_candidat-la-candidate",
+          "en": "candidate",
+          "fr": "le candidat / la candidate",
+          "phonetic": "luh kah(n)-dee-dah"
+        },
+        {
+          "id": "p3_employment_poste",
+          "en": "position / job",
+          "fr": "le poste",
+          "phonetic": "luh pohst"
+        },
+        {
+          "id": "p3_employment_carriere",
+          "en": "career",
+          "fr": "la carrière",
+          "phonetic": "lah kah-ryehr"
+        },
+        {
+          "id": "p3_employment_travail-dequipe",
+          "en": "teamwork",
+          "fr": "le travail d'équipe",
+          "phonetic": "luh trah-vahy day-keep"
+        },
+        {
+          "id": "p3_employment_patron-la-patronne",
+          "en": "boss",
+          "fr": "le patron / la patronne",
+          "phonetic": "luh pah-troh(n)"
+        },
+        {
+          "id": "p3_employment_service",
+          "en": "department",
+          "fr": "le service",
+          "phonetic": "luh sehr-veess"
+        },
+        {
+          "id": "p3_employment_ressources-humaines",
+          "en": "human resources",
+          "fr": "les ressources humaines",
+          "phonetic": "lay ruh-soorss ew-mehn"
+        },
+        {
+          "id": "p3_employment_fiche-de-paie",
+          "en": "pay slip",
+          "fr": "la fiche de paie",
+          "phonetic": "lah feesh duh pay"
+        },
+        {
+          "id": "p3_employment_conge",
+          "en": "leave / vacation",
+          "fr": "le congé",
+          "phonetic": "luh koh(n)-zhay"
+        },
+        {
+          "id": "p3_employment_conge-de-maladie",
+          "en": "sick leave",
+          "fr": "le congé de maladie",
+          "phonetic": "luh koh(n)-zhay duh mah-lah-dee"
+        },
+        {
+          "id": "p3_employment_conge-parental",
+          "en": "parental leave",
+          "fr": "le congé parental",
+          "phonetic": "luh koh(n)-zhay pah-rah(n)-tahl"
+        },
+        {
+          "id": "p3_employment_retraite",
+          "en": "retirement",
+          "fr": "la retraite",
+          "phonetic": "lah ruh-treht"
+        },
+        {
+          "id": "p3_employment_prendre-sa-retraite",
+          "en": "to retire",
+          "fr": "prendre sa retraite",
+          "phonetic": "prah(n)-druh sah ruh-treht"
+        },
+        {
+          "id": "p3_employment_syndicat",
+          "en": "union",
+          "fr": "le syndicat",
+          "phonetic": "luh san-dee-kah"
+        },
+        {
+          "id": "p3_employment_greve",
+          "en": "strike",
+          "fr": "la grève",
+          "phonetic": "lah grehv"
+        },
+        {
+          "id": "p3_employment_lieu-de-travail",
+          "en": "workplace",
+          "fr": "le lieu de travail",
+          "phonetic": "luh lyuh duh trah-vahy"
+        },
+        {
+          "id": "p3_employment_conditions-de-travail",
+          "en": "working conditions",
+          "fr": "les conditions de travail",
+          "phonetic": "lay koh(n)-dee-syoh(n) duh trah-vahy"
+        },
+        {
+          "id": "p3_employment_teletravail",
+          "en": "telework / remote work",
+          "fr": "le télétravail",
+          "phonetic": "luh tay-lay-trah-vahy"
+        },
+        {
+          "id": "p3_employment_gerer",
+          "en": "to manage",
+          "fr": "gérer",
+          "phonetic": "zhay-ray"
+        },
+        {
+          "id": "p3_employment_responsabilite",
+          "en": "responsibility",
+          "fr": "la responsabilité",
+          "phonetic": "lah reh-spoh(n)-sah-bee-lee-tay"
+        },
+        {
+          "id": "p3_employment_objectif",
+          "en": "goal / objective",
+          "fr": "l'objectif",
+          "phonetic": "lohb-zhehk-teef"
+        },
+        {
+          "id": "p3_employment_rendement",
+          "en": "performance / output",
+          "fr": "le rendement",
+          "phonetic": "luh rah(n)-duh-mah(n)"
+        },
+        {
+          "id": "p3_employment_formation-professionnelle",
+          "en": "professional training",
+          "fr": "la formation professionnelle",
+          "phonetic": "lah for-mah-syoh(n) proh-feh-syoh-nehl"
+        },
+        {
+          "id": "p3_employment_gagner-sa-vie",
+          "en": "to earn a living",
+          "fr": "gagner sa vie",
+          "phonetic": "gah-nyay sah vee"
+        },
+        {
+          "id": "p3_employment_qualifications",
+          "en": "qualifications",
+          "fr": "les qualifications",
+          "phonetic": "lay kah-lee-fee-kah-syoh(n)"
+        },
+        {
+          "id": "p3_employment_periode-dessai",
+          "en": "probation period",
+          "fr": "la période d'essai",
+          "phonetic": "lah pay-ryohd deh-say"
+        },
+        {
+          "id": "p3_employment_preavis",
+          "en": "notice (resignation)",
+          "fr": "le préavis",
+          "phonetic": "luh pray-ah-vee"
+        }
+      ]
+    },
+    {
+      "id": "immigration",
+      "title": "Immigration & Citizenship",
+      "entries": [
+        {
+          "id": "p3_immigration_residence-permanente",
+          "en": "permanent residence",
+          "fr": "la résidence permanente",
+          "phonetic": "lah ray-zee-dah(n)ss pehr-mah-nah(n)t"
+        },
+        {
+          "id": "p3_immigration_citoyennete",
+          "en": "citizenship",
+          "fr": "la citoyenneté",
+          "phonetic": "lah see-twah-yehn-tay"
+        },
+        {
+          "id": "p3_immigration_demande",
+          "en": "application",
+          "fr": "la demande",
+          "phonetic": "lah duh-mah(n)d"
+        },
+        {
+          "id": "p3_immigration_documents",
+          "en": "documents",
+          "fr": "les documents",
+          "phonetic": "lay doh-kew-mah(n)"
+        },
+        {
+          "id": "p3_immigration_visa",
+          "en": "visa",
+          "fr": "le visa",
+          "phonetic": "luh vee-zah"
+        },
+        {
+          "id": "p3_immigration_admissibilite",
+          "en": "eligibility",
+          "fr": "l'admissibilité",
+          "phonetic": "lahd-mee-see-bee-lee-tay"
+        },
+        {
+          "id": "p3_immigration_statut",
+          "en": "status",
+          "fr": "le statut",
+          "phonetic": "luh stah-tew"
+        },
+        {
+          "id": "p3_immigration_parrainage",
+          "en": "sponsorship",
+          "fr": "le parrainage",
+          "phonetic": "luh pah-reh-nahzh"
+        },
+        {
+          "id": "p3_immigration_immigrant-e",
+          "en": "immigrant",
+          "fr": "l'immigrant(e)",
+          "phonetic": "lee-mee-grah(n)"
+        },
+        {
+          "id": "p3_immigration_passeport",
+          "en": "passport",
+          "fr": "le passeport",
+          "phonetic": "luh pahss-por"
+        },
+        {
+          "id": "p3_immigration_permis-de-travail",
+          "en": "work permit",
+          "fr": "le permis de travail",
+          "phonetic": "luh pehr-mee duh trah-vahy"
+        },
+        {
+          "id": "p3_immigration_permis-detudes",
+          "en": "study permit",
+          "fr": "le permis d'études",
+          "phonetic": "luh pehr-mee day-tewd"
+        },
+        {
+          "id": "p3_immigration_refugie-la-refugiee",
+          "en": "refugee",
+          "fr": "le réfugié / la réfugiée",
+          "phonetic": "luh ray-few-zhyay"
+        },
+        {
+          "id": "p3_immigration_asile",
+          "en": "asylum",
+          "fr": "l'asile",
+          "phonetic": "lah-zeel"
+        },
+        {
+          "id": "p3_immigration_frontiere",
+          "en": "border",
+          "fr": "la frontière",
+          "phonetic": "lah froh(n)-tyehr"
+        },
+        {
+          "id": "p3_immigration_douane",
+          "en": "customs",
+          "fr": "la douane",
+          "phonetic": "lah dwahn"
+        },
+        {
+          "id": "p3_immigration_agent-dimmigration",
+          "en": "immigration officer",
+          "fr": "l'agent d'immigration",
+          "phonetic": "lah-zhah(n) dee-mee-grah-syoh(n)"
+        },
+        {
+          "id": "p3_immigration_immigrer",
+          "en": "to immigrate",
+          "fr": "immigrer",
+          "phonetic": "ee-mee-gray"
+        },
+        {
+          "id": "p3_immigration_sinstaller",
+          "en": "to settle",
+          "fr": "s'installer",
+          "phonetic": "san-stah-lay"
+        },
+        {
+          "id": "p3_immigration_nouvel-arrivant",
+          "en": "newcomer",
+          "fr": "le nouvel arrivant",
+          "phonetic": "luh noo-vehl ah-ree-vah(n)"
+        },
+        {
+          "id": "p3_immigration_integration",
+          "en": "integration",
+          "fr": "l'intégration",
+          "phonetic": "lan-tay-grah-syoh(n)"
+        },
+        {
+          "id": "p3_immigration_test-de-langue",
+          "en": "language test",
+          "fr": "le test de langue",
+          "phonetic": "luh tehst duh lah(n)g"
+        },
+        {
+          "id": "p3_immigration_maitrise-de-la-langue",
+          "en": "language proficiency",
+          "fr": "la maîtrise de la langue",
+          "phonetic": "lah meh-treez duh lah lah(n)g"
+        },
+        {
+          "id": "p3_immigration_delai-de-traitement",
+          "en": "processing time",
+          "fr": "le délai de traitement",
+          "phonetic": "luh day-leh duh treht-mah(n)"
+        },
+        {
+          "id": "p3_immigration_donnees-biometriques",
+          "en": "biometrics",
+          "fr": "les données biométriques",
+          "phonetic": "lay doh-nay byoh-may-treek"
+        },
+        {
+          "id": "p3_immigration_visite-medicale",
+          "en": "medical exam",
+          "fr": "la visite médicale",
+          "phonetic": "lah vee-zeet may-dee-kahl"
+        },
+        {
+          "id": "p3_immigration_certificat-de-police",
+          "en": "police certificate",
+          "fr": "le certificat de police",
+          "phonetic": "luh sehr-tee-fee-kah duh poh-leess"
+        },
+        {
+          "id": "p3_immigration_preuve-de-fonds",
+          "en": "proof of funds",
+          "fr": "la preuve de fonds",
+          "phonetic": "lah pruhv duh foh(n)"
+        },
+        {
+          "id": "p3_immigration_entree-express",
+          "en": "express entry",
+          "fr": "l'entrée express",
+          "phonetic": "lah(n)-tray ehk-sprehss"
+        },
+        {
+          "id": "p3_immigration_systeme-de-points",
+          "en": "points system",
+          "fr": "le système de points",
+          "phonetic": "luh see-stehm duh pwan"
+        },
+        {
+          "id": "p3_immigration_invitation-a-presenter-une",
+          "en": "invitation to apply",
+          "fr": "l'invitation à présenter une demande",
+          "phonetic": "lan-vee-tah-syoh(n) ah pray-zah(n)-tay ewn duh-mah(n)d"
+        },
+        {
+          "id": "p3_immigration_candidat-des-provinces",
+          "en": "provincial nominee",
+          "fr": "le candidat des provinces",
+          "phonetic": "luh kah(n)-dee-dah day proh-va(n)ss"
+        },
+        {
+          "id": "p3_immigration_ceremonie-de-citoyennete",
+          "en": "citizenship ceremony",
+          "fr": "la cérémonie de citoyenneté",
+          "phonetic": "lah say-ray-moh-nee duh see-twah-yehn-tay"
+        },
+        {
+          "id": "p3_immigration_serment",
+          "en": "oath",
+          "fr": "le serment",
+          "phonetic": "luh sehr-mah(n)"
+        },
+        {
+          "id": "p3_immigration_acte-de-naissance",
+          "en": "birth certificate",
+          "fr": "l'acte de naissance",
+          "phonetic": "lahkt duh neh-sah(n)ss"
+        },
+        {
+          "id": "p3_immigration_acte-de-mariage",
+          "en": "marriage certificate",
+          "fr": "l'acte de mariage",
+          "phonetic": "lahkt duh mah-ryahzh"
+        },
+        {
+          "id": "p3_immigration_traduction",
+          "en": "translation",
+          "fr": "la traduction",
+          "phonetic": "lah trah-dewk-syoh(n)"
+        },
+        {
+          "id": "p3_immigration_copie-certifiee",
+          "en": "certified copy",
+          "fr": "la copie certifiée",
+          "phonetic": "lah koh-pee sehr-tee-fyay"
+        },
+        {
+          "id": "p3_immigration_formulaire-de-demande",
+          "en": "application form",
+          "fr": "le formulaire de demande",
+          "phonetic": "luh for-mew-lehr duh duh-mah(n)d"
+        },
+        {
+          "id": "p3_immigration_frais",
+          "en": "fees",
+          "fr": "les frais",
+          "phonetic": "lay freh"
+        },
+        {
+          "id": "p3_immigration_renouveler",
+          "en": "to renew",
+          "fr": "renouveler",
+          "phonetic": "ruh-noo-vlay"
+        },
+        {
+          "id": "p3_immigration_date-dexpiration",
+          "en": "expiry date",
+          "fr": "la date d'expiration",
+          "phonetic": "lah daht dehk-spee-rah-syoh(n)"
+        },
+        {
+          "id": "p3_immigration_resident-temporaire",
+          "en": "temporary resident",
+          "fr": "le résident temporaire",
+          "phonetic": "luh ray-zee-dah(n) tah(n)-poh-rehr"
+        }
+      ]
+    },
+    {
+      "id": "government",
+      "title": "Government & Law",
+      "entries": [
+        {
+          "id": "p3_government_gouvernement",
+          "en": "government",
+          "fr": "le gouvernement",
+          "phonetic": "luh goo-vehr-nuh-mah(n)"
+        },
+        {
+          "id": "p3_government_politique",
+          "en": "policy / politics",
+          "fr": "la politique",
+          "phonetic": "lah poh-lee-teek"
+        },
+        {
+          "id": "p3_government_ministre",
+          "en": "minister",
+          "fr": "le ministre",
+          "phonetic": "luh mee-nee-struh"
+        },
+        {
+          "id": "p3_government_loi",
+          "en": "law",
+          "fr": "la loi",
+          "phonetic": "lah lwah"
+        },
+        {
+          "id": "p3_government_election",
+          "en": "election",
+          "fr": "l'élection",
+          "phonetic": "lay-lehk-syoh(n)"
+        },
+        {
+          "id": "p3_government_citoyen",
+          "en": "citizen",
+          "fr": "le citoyen",
+          "phonetic": "luh see-twah-yan"
+        },
+        {
+          "id": "p3_government_vote",
+          "en": "vote",
+          "fr": "le vote",
+          "phonetic": "luh voht"
+        },
+        {
+          "id": "p3_government_droit",
+          "en": "right (legal)",
+          "fr": "le droit",
+          "phonetic": "luh drwah"
+        },
+        {
+          "id": "p3_government_premier-ministre",
+          "en": "prime minister",
+          "fr": "le premier ministre",
+          "phonetic": "luh pruh-myay mee-nee-struh"
+        },
+        {
+          "id": "p3_government_depute",
+          "en": "member of parliament",
+          "fr": "le député",
+          "phonetic": "luh day-pew-tay"
+        },
+        {
+          "id": "p3_government_parlement",
+          "en": "parliament",
+          "fr": "le parlement",
+          "phonetic": "luh par-luh-mah(n)"
+        },
+        {
+          "id": "p3_government_province",
+          "en": "province",
+          "fr": "la province",
+          "phonetic": "lah proh-va(n)ss"
+        },
+        {
+          "id": "p3_government_federal-e",
+          "en": "federal",
+          "fr": "fédéral(e)",
+          "phonetic": "fay-day-rahl"
+        },
+        {
+          "id": "p3_government_provincial-e",
+          "en": "provincial",
+          "fr": "provincial(e)",
+          "phonetic": "proh-van-syahl"
+        },
+        {
+          "id": "p3_government_municipal-e",
+          "en": "municipal",
+          "fr": "municipal(e)",
+          "phonetic": "mew-nee-see-pahl"
+        },
+        {
+          "id": "p3_government_maire",
+          "en": "mayor",
+          "fr": "le maire",
+          "phonetic": "luh mehr"
+        },
+        {
+          "id": "p3_government_tribunal",
+          "en": "court",
+          "fr": "le tribunal",
+          "phonetic": "luh tree-bew-nahl"
+        },
+        {
+          "id": "p3_government_juge",
+          "en": "judge",
+          "fr": "le juge",
+          "phonetic": "luh zhewzh"
+        },
+        {
+          "id": "p3_government_avocat-e",
+          "en": "lawyer",
+          "fr": "l'avocat(e)",
+          "phonetic": "lah-voh-kah"
+        },
+        {
+          "id": "p3_government_justice",
+          "en": "justice",
+          "fr": "la justice",
+          "phonetic": "lah zhew-steess"
+        },
+        {
+          "id": "p3_government_regle",
+          "en": "rule",
+          "fr": "la règle",
+          "phonetic": "lah reh-gluh"
+        },
+        {
+          "id": "p3_government_devoir",
+          "en": "duty / obligation",
+          "fr": "le devoir",
+          "phonetic": "luh duh-vwahr"
+        },
+        {
+          "id": "p3_government_liberte",
+          "en": "freedom",
+          "fr": "la liberté",
+          "phonetic": "lah lee-behr-tay"
+        },
+        {
+          "id": "p3_government_egalite",
+          "en": "equality",
+          "fr": "l'égalité",
+          "phonetic": "lay-gah-lee-tay"
+        },
+        {
+          "id": "p3_government_democratie",
+          "en": "democracy",
+          "fr": "la démocratie",
+          "phonetic": "lah day-moh-krah-see"
+        },
+        {
+          "id": "p3_government_constitution",
+          "en": "constitution",
+          "fr": "la constitution",
+          "phonetic": "lah koh(n)-stee-tew-syoh(n)"
+        },
+        {
+          "id": "p3_government_parti-politique",
+          "en": "political party",
+          "fr": "le parti politique",
+          "phonetic": "luh par-tee poh-lee-teek"
+        },
+        {
+          "id": "p3_government_voter",
+          "en": "to vote",
+          "fr": "voter",
+          "phonetic": "voh-tay"
+        },
+        {
+          "id": "p3_government_campagne",
+          "en": "campaign",
+          "fr": "la campagne",
+          "phonetic": "lah kah(n)-pah-nyuh"
+        },
+        {
+          "id": "p3_government_debat",
+          "en": "debate",
+          "fr": "le débat",
+          "phonetic": "luh day-bah"
+        },
+        {
+          "id": "p3_government_services-publics",
+          "en": "public services",
+          "fr": "les services publics",
+          "phonetic": "lay sehr-veess pew-bleek"
+        },
+        {
+          "id": "p3_government_contribuable",
+          "en": "taxpayer",
+          "fr": "le contribuable",
+          "phonetic": "luh koh(n)-tree-bew-ah-bluh"
+        },
+        {
+          "id": "p3_government_reglement",
+          "en": "regulation",
+          "fr": "le règlement",
+          "phonetic": "luh reh-gluh-mah(n)"
+        }
+      ]
+    },
+    {
+      "id": "finance",
+      "title": "Business & Finance",
+      "entries": [
+        {
+          "id": "p3_finance_entreprise",
+          "en": "company",
+          "fr": "l'entreprise",
+          "phonetic": "lah(n)-truh-preez"
+        },
+        {
+          "id": "p3_finance_budget",
+          "en": "budget",
+          "fr": "le budget",
+          "phonetic": "luh bewd-zheh"
+        },
+        {
+          "id": "p3_finance_investissement",
+          "en": "investment",
+          "fr": "l'investissement",
+          "phonetic": "lan-veh-stees-mah(n)"
+        },
+        {
+          "id": "p3_finance_benefice",
+          "en": "profit",
+          "fr": "le bénéfice",
+          "phonetic": "luh bay-nay-feess"
+        },
+        {
+          "id": "p3_finance_perte",
+          "en": "loss",
+          "fr": "la perte",
+          "phonetic": "lah pehrt"
+        },
+        {
+          "id": "p3_finance_marche",
+          "en": "market",
+          "fr": "le marché",
+          "phonetic": "luh mar-shay"
+        },
+        {
+          "id": "p3_finance_concurrence",
+          "en": "competition",
+          "fr": "la concurrence",
+          "phonetic": "lah koh(n)-kew-rah(n)ss"
+        },
+        {
+          "id": "p3_finance_impots",
+          "en": "taxes",
+          "fr": "les impôts",
+          "phonetic": "lay zam-poh"
+        },
+        {
+          "id": "p3_finance_economie",
+          "en": "economy",
+          "fr": "l'économie",
+          "phonetic": "lay-koh-noh-mee"
+        },
+        {
+          "id": "p3_finance_compte-bancaire",
+          "en": "bank account",
+          "fr": "le compte bancaire",
+          "phonetic": "luh koh(n)t bah(n)-kehr"
+        },
+        {
+          "id": "p3_finance_epargne",
+          "en": "savings",
+          "fr": "l'épargne",
+          "phonetic": "lay-par-nyuh"
+        },
+        {
+          "id": "p3_finance_pret",
+          "en": "loan",
+          "fr": "le prêt",
+          "phonetic": "luh preh"
+        },
+        {
+          "id": "p3_finance_hypotheque",
+          "en": "mortgage",
+          "fr": "l'hypothèque",
+          "phonetic": "lee-poh-tehk"
+        },
+        {
+          "id": "p3_finance_dette",
+          "en": "debt",
+          "fr": "la dette",
+          "phonetic": "lah deht"
+        },
+        {
+          "id": "p3_finance_taux-dinteret",
+          "en": "interest rate",
+          "fr": "le taux d'intérêt",
+          "phonetic": "luh toh dan-tay-reh"
+        },
+        {
+          "id": "p3_finance_carte-de-credit",
+          "en": "credit card",
+          "fr": "la carte de crédit",
+          "phonetic": "lah kart duh kray-dee"
+        },
+        {
+          "id": "p3_finance_depense",
+          "en": "expense",
+          "fr": "la dépense",
+          "phonetic": "lah day-pah(n)ss"
+        },
+        {
+          "id": "p3_finance_revenu",
+          "en": "income",
+          "fr": "le revenu",
+          "phonetic": "luh ruh-vuh-new"
+        },
+        {
+          "id": "p3_finance_facture",
+          "en": "bill / invoice",
+          "fr": "la facture",
+          "phonetic": "lah fahk-tewr"
+        },
+        {
+          "id": "p3_finance_recu",
+          "en": "receipt",
+          "fr": "le reçu",
+          "phonetic": "luh ruh-sew"
+        },
+        {
+          "id": "p3_finance_depenser",
+          "en": "to spend",
+          "fr": "dépenser",
+          "phonetic": "day-pah(n)-say"
+        },
+        {
+          "id": "p3_finance_economiser",
+          "en": "to save (money)",
+          "fr": "économiser",
+          "phonetic": "ay-koh-noh-mee-zay"
+        },
+        {
+          "id": "p3_finance_emprunter",
+          "en": "to borrow",
+          "fr": "emprunter",
+          "phonetic": "ah(n)-pruh(n)-tay"
+        },
+        {
+          "id": "p3_finance_preter",
+          "en": "to lend",
+          "fr": "prêter",
+          "phonetic": "preh-tay"
+        },
+        {
+          "id": "p3_finance_investir",
+          "en": "to invest",
+          "fr": "investir",
+          "phonetic": "an-veh-steer"
+        },
+        {
+          "id": "p3_finance_inflation",
+          "en": "inflation",
+          "fr": "l'inflation",
+          "phonetic": "lan-flah-syoh(n)"
+        },
+        {
+          "id": "p3_finance_croissance",
+          "en": "growth",
+          "fr": "la croissance",
+          "phonetic": "lah krwah-sah(n)ss"
+        },
+        {
+          "id": "p3_finance_crise",
+          "en": "crisis",
+          "fr": "la crise",
+          "phonetic": "lah kreez"
+        },
+        {
+          "id": "p3_finance_client-la-cliente",
+          "en": "customer / client",
+          "fr": "le client / la cliente",
+          "phonetic": "luh klee-ah(n)"
+        },
+        {
+          "id": "p3_finance_fournisseur",
+          "en": "supplier",
+          "fr": "le fournisseur",
+          "phonetic": "luh foor-nee-suhr"
+        },
+        {
+          "id": "p3_finance_ventes",
+          "en": "sales",
+          "fr": "les ventes",
+          "phonetic": "lay vah(n)t"
+        },
+        {
+          "id": "p3_finance_achat",
+          "en": "purchase",
+          "fr": "l'achat",
+          "phonetic": "lah-shah"
+        },
+        {
+          "id": "p3_finance_assurance",
+          "en": "insurance",
+          "fr": "l'assurance",
+          "phonetic": "lah-sew-rah(n)ss"
+        },
+        {
+          "id": "p3_finance_cout-de-la-vie",
+          "en": "cost of living",
+          "fr": "le coût de la vie",
+          "phonetic": "luh koo duh lah vee"
+        },
+        {
+          "id": "p3_finance_devise",
+          "en": "currency",
+          "fr": "la devise",
+          "phonetic": "lah duh-veez"
+        },
+        {
+          "id": "p3_finance_taux-de-change",
+          "en": "exchange rate",
+          "fr": "le taux de change",
+          "phonetic": "luh toh duh shah(n)zh"
+        },
+        {
+          "id": "p3_finance_virement",
+          "en": "bank transfer",
+          "fr": "le virement",
+          "phonetic": "luh veer-mah(n)"
+        },
+        {
+          "id": "p3_finance_retrait",
+          "en": "withdrawal",
+          "fr": "le retrait",
+          "phonetic": "luh ruh-treh"
+        },
+        {
+          "id": "p3_finance_depot",
+          "en": "deposit",
+          "fr": "le dépôt",
+          "phonetic": "luh day-poh"
+        }
+      ]
+    },
+    {
+      "id": "technology",
+      "title": "Technology & AI",
+      "entries": [
+        {
+          "id": "p3_technology_securite",
+          "en": "security",
+          "fr": "la sécurité",
+          "phonetic": "lah say-kew-ree-tay"
+        },
+        {
+          "id": "p3_technology_nuage-cloud",
+          "en": "cloud",
+          "fr": "le nuage / cloud",
+          "phonetic": "luh new-ahzh"
+        },
+        {
+          "id": "p3_technology_serveur",
+          "en": "server",
+          "fr": "le serveur",
+          "phonetic": "luh sehr-vuhr"
+        },
+        {
+          "id": "p3_technology_base-de-donnees",
+          "en": "database",
+          "fr": "la base de données",
+          "phonetic": "lah bahz duh doh-nay"
+        },
+        {
+          "id": "p3_technology_algorithme",
+          "en": "algorithm",
+          "fr": "l'algorithme",
+          "phonetic": "lahl-goh-reet-muh"
+        },
+        {
+          "id": "p3_technology_intelligence-artificielle",
+          "en": "artificial intelligence",
+          "fr": "l'intelligence artificielle",
+          "phonetic": "lan-teh-lee-zhah(n)ss ar-tee-fee-syehl"
+        },
+        {
+          "id": "p3_technology_apprentissage-automatique",
+          "en": "machine learning",
+          "fr": "l'apprentissage automatique",
+          "phonetic": "lah-prah(n)-tee-sahzh oh-toh-mah-teek"
+        },
+        {
+          "id": "p3_technology_code",
+          "en": "code",
+          "fr": "le code",
+          "phonetic": "luh kohd"
+        },
+        {
+          "id": "p3_technology_developpement",
+          "en": "development",
+          "fr": "le développement",
+          "phonetic": "luh day-vuh-lohp-mah(n)"
+        },
+        {
+          "id": "p3_technology_logiciel",
+          "en": "software",
+          "fr": "le logiciel",
+          "phonetic": "luh loh-zhee-syehl"
+        },
+        {
+          "id": "p3_technology_application",
+          "en": "application / app",
+          "fr": "l'application",
+          "phonetic": "lah-plee-kah-syoh(n)"
+        },
+        {
+          "id": "p3_technology_reseau",
+          "en": "network",
+          "fr": "le réseau",
+          "phonetic": "luh ray-zoh"
+        },
+        {
+          "id": "p3_technology_ordinateur",
+          "en": "computer",
+          "fr": "l'ordinateur",
+          "phonetic": "lor-dee-nah-tuhr"
+        },
+        {
+          "id": "p3_technology_ordinateur-portable",
+          "en": "laptop",
+          "fr": "l'ordinateur portable",
+          "phonetic": "lor-dee-nah-tuhr por-tah-bluh"
+        },
+        {
+          "id": "p3_technology_ecran",
+          "en": "screen",
+          "fr": "l'écran",
+          "phonetic": "lay-krah(n)"
+        },
+        {
+          "id": "p3_technology_clavier",
+          "en": "keyboard",
+          "fr": "le clavier",
+          "phonetic": "luh klah-vyay"
+        },
+        {
+          "id": "p3_technology_fichier",
+          "en": "file",
+          "fr": "le fichier",
+          "phonetic": "luh fee-shyay"
+        },
+        {
+          "id": "p3_technology_dossier",
+          "en": "folder",
+          "fr": "le dossier",
+          "phonetic": "luh doh-syay"
+        },
+        {
+          "id": "p3_technology_mot-de-passe",
+          "en": "password",
+          "fr": "le mot de passe",
+          "phonetic": "luh moh duh pahss"
+        },
+        {
+          "id": "p3_technology_utilisateur",
+          "en": "user",
+          "fr": "l'utilisateur",
+          "phonetic": "lew-tee-lee-zah-tuhr"
+        },
+        {
+          "id": "p3_technology_donnees",
+          "en": "data",
+          "fr": "les données",
+          "phonetic": "lay doh-nay"
+        },
+        {
+          "id": "p3_technology_site-web",
+          "en": "website",
+          "fr": "le site web",
+          "phonetic": "luh seet wehb"
+        },
+        {
+          "id": "p3_technology_courriel",
+          "en": "email",
+          "fr": "le courriel",
+          "phonetic": "luh koo-ryehl"
+        },
+        {
+          "id": "p3_technology_telecharger",
+          "en": "to download",
+          "fr": "télécharger",
+          "phonetic": "tay-lay-shar-zhay"
+        },
+        {
+          "id": "p3_technology_televerser",
+          "en": "to upload",
+          "fr": "téléverser",
+          "phonetic": "tay-lay-vehr-say"
+        },
+        {
+          "id": "p3_technology_mise-a-jour",
+          "en": "update",
+          "fr": "la mise à jour",
+          "phonetic": "lah meez ah zhoor"
+        },
+        {
+          "id": "p3_technology_mettre-a-jour",
+          "en": "to update",
+          "fr": "mettre à jour",
+          "phonetic": "meh-truh ah zhoor"
+        },
+        {
+          "id": "p3_technology_se-connecter",
+          "en": "to log in",
+          "fr": "se connecter",
+          "phonetic": "suh koh-nehk-tay"
+        },
+        {
+          "id": "p3_technology_se-deconnecter",
+          "en": "to log out",
+          "fr": "se déconnecter",
+          "phonetic": "suh day-koh-nehk-tay"
+        },
+        {
+          "id": "p3_technology_parametres",
+          "en": "settings",
+          "fr": "les paramètres",
+          "phonetic": "lay pah-rah-meh-truh"
+        },
+        {
+          "id": "p3_technology_confidentialite",
+          "en": "privacy / confidentiality",
+          "fr": "la confidentialité",
+          "phonetic": "lah koh(n)-fee-dah(n)-syah-lee-tay"
+        },
+        {
+          "id": "p3_technology_cybersecurite",
+          "en": "cybersecurity",
+          "fr": "la cybersécurité",
+          "phonetic": "lah see-behr-say-kew-ree-tay"
+        },
+        {
+          "id": "p3_technology_piratage",
+          "en": "hacking",
+          "fr": "le piratage",
+          "phonetic": "luh pee-rah-tahzh"
+        },
+        {
+          "id": "p3_technology_outil",
+          "en": "tool",
+          "fr": "l'outil",
+          "phonetic": "loo-tee"
+        },
+        {
+          "id": "p3_technology_numerique",
+          "en": "digital",
+          "fr": "numérique",
+          "phonetic": "new-may-reek"
+        },
+        {
+          "id": "p3_technology_innovation",
+          "en": "innovation",
+          "fr": "l'innovation",
+          "phonetic": "lee-noh-vah-syoh(n)"
+        }
+      ]
+    },
+    {
+      "id": "environment",
+      "title": "Environment & Climate",
+      "entries": [
+        {
+          "id": "p3_environment_environnement",
+          "en": "environment",
+          "fr": "l'environnement",
+          "phonetic": "lah(n)-vee-ron-mah(n)"
+        },
+        {
+          "id": "p3_environment_climat",
+          "en": "climate",
+          "fr": "le climat",
+          "phonetic": "luh klee-mah"
+        },
+        {
+          "id": "p3_environment_pollution",
+          "en": "pollution",
+          "fr": "la pollution",
+          "phonetic": "lah poh-lew-syoh(n)"
+        },
+        {
+          "id": "p3_environment_developpement-durable",
+          "en": "sustainable development",
+          "fr": "le développement durable",
+          "phonetic": "luh day-vuh-lohp-mah(n) dew-rah-bluh"
+        },
+        {
+          "id": "p3_environment_ressources-naturelles",
+          "en": "natural resources",
+          "fr": "les ressources naturelles",
+          "phonetic": "lay ruh-soorss nah-tew-rehl"
+        },
+        {
+          "id": "p3_environment_recyclage",
+          "en": "recycling",
+          "fr": "le recyclage",
+          "phonetic": "luh ruh-see-klahzh"
+        },
+        {
+          "id": "p3_environment_energies-renouvelables",
+          "en": "renewable energy",
+          "fr": "les énergies renouvelables",
+          "phonetic": "lay zay-nehr-zhee ruh-noo-vlah-bluh"
+        },
+        {
+          "id": "p3_environment_changement-climatique",
+          "en": "climate change",
+          "fr": "le changement climatique",
+          "phonetic": "luh shah(n)zh-mah(n) klee-mah-teek"
+        },
+        {
+          "id": "p3_environment_rechauffement-climatique",
+          "en": "global warming",
+          "fr": "le réchauffement climatique",
+          "phonetic": "luh ray-shohf-mah(n) klee-mah-teek"
+        },
+        {
+          "id": "p3_environment_gaz-a-effet-de",
+          "en": "greenhouse gas",
+          "fr": "le gaz à effet de serre",
+          "phonetic": "luh gahz ah ay-feh duh sehr"
+        },
+        {
+          "id": "p3_environment_empreinte-carbone",
+          "en": "carbon footprint",
+          "fr": "l'empreinte carbone",
+          "phonetic": "lah(n)-prant kar-bohn"
+        },
+        {
+          "id": "p3_environment_dechets",
+          "en": "waste / garbage",
+          "fr": "les déchets",
+          "phonetic": "lay day-sheh"
+        },
+        {
+          "id": "p3_environment_recycler",
+          "en": "to recycle",
+          "fr": "recycler",
+          "phonetic": "ruh-see-klay"
+        },
+        {
+          "id": "p3_environment_gaspiller",
+          "en": "to waste",
+          "fr": "gaspiller",
+          "phonetic": "gah-spee-yay"
+        },
+        {
+          "id": "p3_environment_gaspillage",
+          "en": "wasting",
+          "fr": "le gaspillage",
+          "phonetic": "luh gah-spee-yahzh"
+        },
+        {
+          "id": "p3_environment_proteger",
+          "en": "to protect",
+          "fr": "protéger",
+          "phonetic": "proh-tay-zhay"
+        },
+        {
+          "id": "p3_environment_protection",
+          "en": "protection",
+          "fr": "la protection",
+          "phonetic": "lah proh-tehk-syoh(n)"
+        },
+        {
+          "id": "p3_environment_polluer",
+          "en": "to pollute",
+          "fr": "polluer",
+          "phonetic": "poh-lew-ay"
+        },
+        {
+          "id": "p3_environment_deforestation",
+          "en": "deforestation",
+          "fr": "la déforestation",
+          "phonetic": "lah day-foh-reh-stah-syoh(n)"
+        },
+        {
+          "id": "p3_environment_biodiversite",
+          "en": "biodiversity",
+          "fr": "la biodiversité",
+          "phonetic": "lah byoh-dee-vehr-see-tay"
+        },
+        {
+          "id": "p3_environment_espece",
+          "en": "species",
+          "fr": "l'espèce",
+          "phonetic": "leh-spehss"
+        },
+        {
+          "id": "p3_environment_en-voie-de-disparition",
+          "en": "endangered",
+          "fr": "en voie de disparition",
+          "phonetic": "ah(n) vwah duh dee-spah-ree-syoh(n)"
+        },
+        {
+          "id": "p3_environment_energie-solaire",
+          "en": "solar energy",
+          "fr": "l'énergie solaire",
+          "phonetic": "lay-nehr-zhee soh-lehr"
+        },
+        {
+          "id": "p3_environment_energie-eolienne",
+          "en": "wind energy",
+          "fr": "l'énergie éolienne",
+          "phonetic": "lay-nehr-zhee ay-oh-lyehn"
+        },
+        {
+          "id": "p3_environment_voiture-electrique",
+          "en": "electric car",
+          "fr": "la voiture électrique",
+          "phonetic": "lah vwah-tewr ay-lehk-treek"
+        },
+        {
+          "id": "p3_environment_transports-en-commun",
+          "en": "public transit",
+          "fr": "les transports en commun",
+          "phonetic": "lay trah(n)-spor ah(n) koh-muh(n)"
+        },
+        {
+          "id": "p3_environment_sensibilisation",
+          "en": "awareness-raising",
+          "fr": "la sensibilisation",
+          "phonetic": "lah sah(n)-see-bee-lee-zah-syoh(n)"
+        },
+        {
+          "id": "p3_environment_consommation",
+          "en": "consumption",
+          "fr": "la consommation",
+          "phonetic": "lah koh(n)-soh-mah-syoh(n)"
+        },
+        {
+          "id": "p3_environment_plastique",
+          "en": "plastic",
+          "fr": "le plastique",
+          "phonetic": "luh plah-steek"
+        },
+        {
+          "id": "p3_environment_compost",
+          "en": "compost",
+          "fr": "le compost",
+          "phonetic": "luh koh(n)-pohst"
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "title": "Media & News",
+      "entries": [
+        {
+          "id": "p3_media_medias",
+          "en": "media",
+          "fr": "les médias",
+          "phonetic": "lay may-dyah"
+        },
+        {
+          "id": "p3_media_article",
+          "en": "article",
+          "fr": "l'article",
+          "phonetic": "lar-tee-kluh"
+        },
+        {
+          "id": "p3_media_point-de-vue",
+          "en": "point of view",
+          "fr": "le point de vue",
+          "phonetic": "luh pwan duh vew"
+        },
+        {
+          "id": "p3_media_nouvelle",
+          "en": "news item",
+          "fr": "la nouvelle",
+          "phonetic": "lah noo-vehl"
+        },
+        {
+          "id": "p3_media_journal",
+          "en": "newspaper",
+          "fr": "le journal",
+          "phonetic": "luh zhoor-nahl"
+        },
+        {
+          "id": "p3_media_la-journaliste",
+          "en": "journalist",
+          "fr": "le/la journaliste",
+          "phonetic": "luh zhoor-nah-leest"
+        },
+        {
+          "id": "p3_media_titre",
+          "en": "headline / title",
+          "fr": "le titre",
+          "phonetic": "luh tee-truh"
+        },
+        {
+          "id": "p3_media_reportage",
+          "en": "news report",
+          "fr": "le reportage",
+          "phonetic": "luh ruh-por-tahzh"
+        },
+        {
+          "id": "p3_media_entrevue",
+          "en": "interview (media)",
+          "fr": "l'entrevue",
+          "phonetic": "lah(n)-truh-vew"
+        },
+        {
+          "id": "p3_media_emission",
+          "en": "broadcast / program",
+          "fr": "l'émission",
+          "phonetic": "lay-mee-syoh(n)"
+        },
+        {
+          "id": "p3_media_chaine",
+          "en": "channel",
+          "fr": "la chaîne",
+          "phonetic": "lah shehn"
+        },
+        {
+          "id": "p3_media_publicite",
+          "en": "advertisement",
+          "fr": "la publicité",
+          "phonetic": "lah pew-blee-see-tay"
+        },
+        {
+          "id": "p3_media_reseaux-sociaux",
+          "en": "social media",
+          "fr": "les réseaux sociaux",
+          "phonetic": "lay ray-zoh soh-syoh"
+        },
+        {
+          "id": "p3_media_fausses-nouvelles",
+          "en": "fake news",
+          "fr": "les fausses nouvelles",
+          "phonetic": "lay fohss noo-vehl"
+        },
+        {
+          "id": "p3_media_source",
+          "en": "source",
+          "fr": "la source",
+          "phonetic": "lah soorss"
+        },
+        {
+          "id": "p3_media_information",
+          "en": "information",
+          "fr": "l'information",
+          "phonetic": "lan-for-mah-syoh(n)"
+        },
+        {
+          "id": "p3_media_actualite",
+          "en": "current events",
+          "fr": "l'actualité",
+          "phonetic": "lahk-tew-ah-lee-tay"
+        },
+        {
+          "id": "p3_media_presse",
+          "en": "press",
+          "fr": "la presse",
+          "phonetic": "lah prehss"
+        },
+        {
+          "id": "p3_media_liberte-de-la-presse",
+          "en": "freedom of the press",
+          "fr": "la liberté de la presse",
+          "phonetic": "lah lee-behr-tay duh lah prehss"
+        },
+        {
+          "id": "p3_media_public",
+          "en": "audience / public",
+          "fr": "le public",
+          "phonetic": "luh pew-bleek"
+        },
+        {
+          "id": "p3_media_influence",
+          "en": "influence",
+          "fr": "l'influence",
+          "phonetic": "lan-flew-ah(n)ss"
+        },
+        {
+          "id": "p3_media_informer",
+          "en": "to inform",
+          "fr": "informer",
+          "phonetic": "an-for-may"
+        },
+        {
+          "id": "p3_media_publier",
+          "en": "to publish",
+          "fr": "publier",
+          "phonetic": "pew-blee-ay"
+        },
+        {
+          "id": "p3_media_partager",
+          "en": "to share",
+          "fr": "partager",
+          "phonetic": "par-tah-zhay"
+        },
+        {
+          "id": "p3_media_abonne-e",
+          "en": "subscriber",
+          "fr": "l'abonné(e)",
+          "phonetic": "lah-boh-nay"
+        },
+        {
+          "id": "p3_media_abonnement",
+          "en": "subscription",
+          "fr": "l'abonnement",
+          "phonetic": "lah-bohn-mah(n)"
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "title": "Education & Training",
+      "entries": [
+        {
+          "id": "p3_education_formation",
+          "en": "training",
+          "fr": "la formation",
+          "phonetic": "lah for-mah-syoh(n)"
+        },
+        {
+          "id": "p3_education_etablissement",
+          "en": "institution",
+          "fr": "l'établissement",
+          "phonetic": "lay-tah-bleess-mah(n)"
+        },
+        {
+          "id": "p3_education_bourse",
+          "en": "scholarship",
+          "fr": "la bourse",
+          "phonetic": "lah boorss"
+        },
+        {
+          "id": "p3_education_diplome",
+          "en": "degree / diploma",
+          "fr": "le diplôme",
+          "phonetic": "luh dee-plohm"
+        },
+        {
+          "id": "p3_education_reconnaissance-des-acquis",
+          "en": "recognition of prior learning",
+          "fr": "la reconnaissance des acquis",
+          "phonetic": "lah ruh-koh-neh-sah(n)ss day zah-kee"
+        },
+        {
+          "id": "p3_education_universite",
+          "en": "university",
+          "fr": "l'université",
+          "phonetic": "lew-nee-vehr-see-tay"
+        },
+        {
+          "id": "p3_education_college-le-cegep",
+          "en": "college",
+          "fr": "le collège / le cégep",
+          "phonetic": "luh koh-lehzh / luh say-zhehp"
+        },
+        {
+          "id": "p3_education_cours",
+          "en": "course / class",
+          "fr": "le cours",
+          "phonetic": "luh koor"
+        },
+        {
+          "id": "p3_education_examen",
+          "en": "exam",
+          "fr": "l'examen",
+          "phonetic": "lehg-zah-man"
+        },
+        {
+          "id": "p3_education_note",
+          "en": "grade / mark",
+          "fr": "la note",
+          "phonetic": "lah noht"
+        },
+        {
+          "id": "p3_education_etudiant-e",
+          "en": "student",
+          "fr": "l'étudiant(e)",
+          "phonetic": "lay-tew-dyah(n)"
+        },
+        {
+          "id": "p3_education_professeur",
+          "en": "professor / teacher",
+          "fr": "le professeur",
+          "phonetic": "luh proh-feh-suhr"
+        },
+        {
+          "id": "p3_education_recherche",
+          "en": "research",
+          "fr": "la recherche",
+          "phonetic": "lah ruh-shehrsh"
+        },
+        {
+          "id": "p3_education_connaissances",
+          "en": "knowledge",
+          "fr": "les connaissances",
+          "phonetic": "lay koh-neh-sah(n)ss"
+        },
+        {
+          "id": "p3_education_apprendre",
+          "en": "to learn",
+          "fr": "apprendre",
+          "phonetic": "ah-prah(n)-druh"
+        },
+        {
+          "id": "p3_education_enseigner",
+          "en": "to teach",
+          "fr": "enseigner",
+          "phonetic": "ah(n)-seh-nyay"
+        },
+        {
+          "id": "p3_education_sinscrire",
+          "en": "to register / enroll",
+          "fr": "s'inscrire",
+          "phonetic": "san-skreer"
+        },
+        {
+          "id": "p3_education_inscription",
+          "en": "registration",
+          "fr": "l'inscription",
+          "phonetic": "lan-skreep-syoh(n)"
+        },
+        {
+          "id": "p3_education_frais-de-scolarite",
+          "en": "tuition fees",
+          "fr": "les frais de scolarité",
+          "phonetic": "lay freh duh skoh-lah-ree-tay"
+        },
+        {
+          "id": "p3_education_emploi-du-temps",
+          "en": "timetable",
+          "fr": "l'emploi du temps",
+          "phonetic": "lah(n)-plwah dew tah(n)"
+        },
+        {
+          "id": "p3_education_devoirs",
+          "en": "homework",
+          "fr": "les devoirs",
+          "phonetic": "lay duh-vwahr"
+        },
+        {
+          "id": "p3_education_niveau",
+          "en": "level",
+          "fr": "le niveau",
+          "phonetic": "luh nee-voh"
+        },
+        {
+          "id": "p3_education_certificat",
+          "en": "certificate",
+          "fr": "le certificat",
+          "phonetic": "luh sehr-tee-fee-kah"
+        },
+        {
+          "id": "p3_education_perfectionnement",
+          "en": "professional development",
+          "fr": "le perfectionnement",
+          "phonetic": "luh pehr-fehk-syohn-mah(n)"
+        },
+        {
+          "id": "p3_education_apprentissage-continu",
+          "en": "lifelong learning",
+          "fr": "l'apprentissage continu",
+          "phonetic": "lah-prah(n)-tee-sahzh koh(n)-tee-new"
+        }
+      ]
+    },
+    {
+      "id": "healthcare",
+      "title": "Healthcare & Medical",
+      "entries": [
+        {
+          "id": "p3_healthcare_rendez-vous",
+          "en": "appointment",
+          "fr": "le rendez-vous",
+          "phonetic": "luh rah(n)-day-voo"
+        },
+        {
+          "id": "p3_healthcare_symptomes",
+          "en": "symptoms",
+          "fr": "les symptômes",
+          "phonetic": "lay sanp-tohm"
+        },
+        {
+          "id": "p3_healthcare_traitement",
+          "en": "treatment",
+          "fr": "le traitement",
+          "phonetic": "luh treht-mah(n)"
+        },
+        {
+          "id": "p3_healthcare_assurance-maladie",
+          "en": "health insurance",
+          "fr": "l'assurance maladie",
+          "phonetic": "lah-sew-rah(n)ss mah-lah-dee"
+        },
+        {
+          "id": "p3_healthcare_urgence",
+          "en": "emergency",
+          "fr": "l'urgence",
+          "phonetic": "lewr-zhah(n)ss"
+        },
+        {
+          "id": "p3_healthcare_diagnostic",
+          "en": "diagnosis",
+          "fr": "le diagnostic",
+          "phonetic": "luh dyahg-noh-steek"
+        },
+        {
+          "id": "p3_healthcare_la-specialiste",
+          "en": "specialist",
+          "fr": "le/la spécialiste",
+          "phonetic": "luh spay-syah-leest"
+        },
+        {
+          "id": "p3_healthcare_ordonnance",
+          "en": "prescription",
+          "fr": "l'ordonnance",
+          "phonetic": "lor-doh-nah(n)ss"
+        },
+        {
+          "id": "p3_healthcare_medecin",
+          "en": "doctor",
+          "fr": "le médecin",
+          "phonetic": "luh mayd-san"
+        },
+        {
+          "id": "p3_healthcare_medecin-de-famille",
+          "en": "family doctor",
+          "fr": "le médecin de famille",
+          "phonetic": "luh mayd-san duh fah-mee-y"
+        },
+        {
+          "id": "p3_healthcare_infirmier-linfirmiere",
+          "en": "nurse",
+          "fr": "l'infirmier / l'infirmière",
+          "phonetic": "lan-feer-myay / lan-feer-myehr"
+        },
+        {
+          "id": "p3_healthcare_patient-la-patiente",
+          "en": "patient",
+          "fr": "le patient / la patiente",
+          "phonetic": "luh pah-syah(n)"
+        },
+        {
+          "id": "p3_healthcare_medicament",
+          "en": "medication",
+          "fr": "le médicament",
+          "phonetic": "luh may-dee-kah-mah(n)"
+        },
+        {
+          "id": "p3_healthcare_vaccin",
+          "en": "vaccine",
+          "fr": "le vaccin",
+          "phonetic": "luh vahk-san"
+        },
+        {
+          "id": "p3_healthcare_chirurgie",
+          "en": "surgery",
+          "fr": "la chirurgie",
+          "phonetic": "lah shee-rewr-zhee"
+        },
+        {
+          "id": "p3_healthcare_clinique",
+          "en": "clinic",
+          "fr": "la clinique",
+          "phonetic": "lah klee-neek"
+        },
+        {
+          "id": "p3_healthcare_salle-dattente",
+          "en": "waiting room",
+          "fr": "la salle d'attente",
+          "phonetic": "lah sahl dah-tah(n)t"
+        },
+        {
+          "id": "p3_healthcare_carte-dassurance-maladie",
+          "en": "health card",
+          "fr": "la carte d'assurance maladie",
+          "phonetic": "lah kart dah-sew-rah(n)ss mah-lah-dee"
+        },
+        {
+          "id": "p3_healthcare_prise-de-sang",
+          "en": "blood test",
+          "fr": "la prise de sang",
+          "phonetic": "lah preez duh sah(n)"
+        },
+        {
+          "id": "p3_healthcare_radiographie",
+          "en": "x-ray",
+          "fr": "la radiographie",
+          "phonetic": "lah rah-dyoh-grah-fee"
+        },
+        {
+          "id": "p3_healthcare_sante-mentale",
+          "en": "mental health",
+          "fr": "la santé mentale",
+          "phonetic": "lah sah(n)-tay mah(n)-tahl"
+        },
+        {
+          "id": "p3_healthcare_guerir",
+          "en": "to heal / recover",
+          "fr": "guérir",
+          "phonetic": "gay-reer"
+        },
+        {
+          "id": "p3_healthcare_guerison",
+          "en": "recovery",
+          "fr": "la guérison",
+          "phonetic": "lah gay-ree-zoh(n)"
+        },
+        {
+          "id": "p3_healthcare_blessure",
+          "en": "injury",
+          "fr": "la blessure",
+          "phonetic": "lah bleh-sewr"
+        },
+        {
+          "id": "p3_healthcare_se-blesser",
+          "en": "to injure oneself",
+          "fr": "se blesser",
+          "phonetic": "suh bleh-say"
+        },
+        {
+          "id": "p3_healthcare_allergie",
+          "en": "allergy",
+          "fr": "l'allergie",
+          "phonetic": "lah-lehr-zhee"
+        },
+        {
+          "id": "p3_healthcare_grossesse",
+          "en": "pregnancy",
+          "fr": "la grossesse",
+          "phonetic": "lah groh-sehss"
+        },
+        {
+          "id": "p3_healthcare_la-dentiste",
+          "en": "dentist",
+          "fr": "le/la dentiste",
+          "phonetic": "luh dah(n)-teest"
+        }
+      ]
+    },
+    {
+      "id": "society",
+      "title": "Society & Abstract Concepts",
+      "entries": [
+        {
+          "id": "p3_society_societe",
+          "en": "society",
+          "fr": "la société",
+          "phonetic": "lah soh-syay-tay"
+        },
+        {
+          "id": "p3_society_defi",
+          "en": "challenge",
+          "fr": "le défi",
+          "phonetic": "luh day-fee"
+        },
+        {
+          "id": "p3_society_solution",
+          "en": "solution",
+          "fr": "la solution",
+          "phonetic": "lah soh-lew-syoh(n)"
+        },
+        {
+          "id": "p3_society_avantage-linconvenient",
+          "en": "advantage / disadvantage",
+          "fr": "l'avantage / l'inconvénient",
+          "phonetic": "lah-vah(n)-tahzh / lan-koh(n)-vay-nyah(n)"
+        },
+        {
+          "id": "p3_society_population",
+          "en": "population",
+          "fr": "la population",
+          "phonetic": "lah poh-pew-lah-syoh(n)"
+        },
+        {
+          "id": "p3_society_communaute",
+          "en": "community",
+          "fr": "la communauté",
+          "phonetic": "lah koh-mew-noh-tay"
+        },
+        {
+          "id": "p3_society_culture",
+          "en": "culture",
+          "fr": "la culture",
+          "phonetic": "lah kewl-tewr"
+        },
+        {
+          "id": "p3_society_diversite",
+          "en": "diversity",
+          "fr": "la diversité",
+          "phonetic": "lah dee-vehr-see-tay"
+        },
+        {
+          "id": "p3_society_inclusion",
+          "en": "inclusion",
+          "fr": "l'inclusion",
+          "phonetic": "lan-klew-zyoh(n)"
+        },
+        {
+          "id": "p3_society_discrimination",
+          "en": "discrimination",
+          "fr": "la discrimination",
+          "phonetic": "lah dee-skree-mee-nah-syoh(n)"
+        },
+        {
+          "id": "p3_society_pauvrete",
+          "en": "poverty",
+          "fr": "la pauvreté",
+          "phonetic": "lah poh-vruh-tay"
+        },
+        {
+          "id": "p3_society_richesse",
+          "en": "wealth",
+          "fr": "la richesse",
+          "phonetic": "lah ree-shehss"
+        },
+        {
+          "id": "p3_society_inegalite",
+          "en": "inequality",
+          "fr": "l'inégalité",
+          "phonetic": "lee-nay-gah-lee-tay"
+        },
+        {
+          "id": "p3_society_itinerance",
+          "en": "homelessness",
+          "fr": "l'itinérance",
+          "phonetic": "lee-tee-nay-rah(n)ss"
+        },
+        {
+          "id": "p3_society_logement",
+          "en": "housing",
+          "fr": "le logement",
+          "phonetic": "luh lohzh-mah(n)"
+        },
+        {
+          "id": "p3_society_crise-du-logement",
+          "en": "housing crisis",
+          "fr": "la crise du logement",
+          "phonetic": "lah kreez dew lohzh-mah(n)"
+        },
+        {
+          "id": "p3_society_generation",
+          "en": "generation",
+          "fr": "la génération",
+          "phonetic": "lah zhay-nay-rah-syoh(n)"
+        },
+        {
+          "id": "p3_society_vieillissement-de-la-population",
+          "en": "aging population",
+          "fr": "le vieillissement de la population",
+          "phonetic": "luh vyay-eess-mah(n) duh lah poh-pew-lah-syoh(n)"
+        },
+        {
+          "id": "p3_society_jeunesse",
+          "en": "youth",
+          "fr": "la jeunesse",
+          "phonetic": "lah zhuh-nehss"
+        },
+        {
+          "id": "p3_society_comportement",
+          "en": "behavior",
+          "fr": "le comportement",
+          "phonetic": "luh koh(n)-por-tuh-mah(n)"
+        },
+        {
+          "id": "p3_society_valeur",
+          "en": "value (moral)",
+          "fr": "la valeur",
+          "phonetic": "lah vah-luhr"
+        },
+        {
+          "id": "p3_society_croyance",
+          "en": "belief",
+          "fr": "la croyance",
+          "phonetic": "lah krwah-yah(n)ss"
+        },
+        {
+          "id": "p3_society_tendance",
+          "en": "trend / tendency",
+          "fr": "la tendance",
+          "phonetic": "lah tah(n)-dah(n)ss"
+        },
+        {
+          "id": "p3_society_phenomene",
+          "en": "phenomenon",
+          "fr": "le phénomène",
+          "phonetic": "luh fay-noh-mehn"
+        },
+        {
+          "id": "p3_society_consequence",
+          "en": "consequence",
+          "fr": "la conséquence",
+          "phonetic": "lah koh(n)-say-kah(n)ss"
+        },
+        {
+          "id": "p3_society_cause",
+          "en": "cause",
+          "fr": "la cause",
+          "phonetic": "lah kohz"
+        },
+        {
+          "id": "p3_society_effet",
+          "en": "effect",
+          "fr": "l'effet",
+          "phonetic": "lay-feh"
+        },
+        {
+          "id": "p3_society_impact",
+          "en": "impact",
+          "fr": "l'impact",
+          "phonetic": "lam-pahkt"
+        },
+        {
+          "id": "p3_society_enjeu",
+          "en": "issue / stake",
+          "fr": "l'enjeu",
+          "phonetic": "lah(n)-zhuh"
+        },
+        {
+          "id": "p3_society_mesure",
+          "en": "measure",
+          "fr": "la mesure",
+          "phonetic": "lah muh-zewr"
+        },
+        {
+          "id": "p3_society_progres",
+          "en": "progress",
+          "fr": "le progrès",
+          "phonetic": "luh proh-greh"
+        },
+        {
+          "id": "p3_society_changement",
+          "en": "change",
+          "fr": "le changement",
+          "phonetic": "luh shah(n)zh-mah(n)"
+        },
+        {
+          "id": "p3_society_evolution",
+          "en": "evolution / development",
+          "fr": "l'évolution",
+          "phonetic": "lay-voh-lew-syoh(n)"
+        },
+        {
+          "id": "p3_society_bien-etre",
+          "en": "well-being",
+          "fr": "le bien-être",
+          "phonetic": "luh byan-neh-truh"
+        },
+        {
+          "id": "p3_society_qualite-de-vie",
+          "en": "quality of life",
+          "fr": "la qualité de vie",
+          "phonetic": "lah kah-lee-tay duh vee"
+        },
+        {
+          "id": "p3_society_equilibre-travail-vie-personnelle",
+          "en": "work-life balance",
+          "fr": "l'équilibre travail-vie personnelle",
+          "phonetic": "lay-kee-lee-bruh trah-vahy vee pehr-soh-nehl"
+        }
+      ]
+    },
+    {
+      "id": "opinions",
+      "title": "Opinions & Argumentation",
+      "entries": [
+        {
+          "id": "p3_opinions_a-mon-avis",
+          "en": "in my opinion",
+          "fr": "à mon avis",
+          "phonetic": "ah moh(n) nah-vee"
+        },
+        {
+          "id": "p3_opinions_je-pense-que",
+          "en": "I think that",
+          "fr": "je pense que",
+          "phonetic": "zhuh pah(n)ss kuh"
+        },
+        {
+          "id": "p3_opinions_je-suis-daccord",
+          "en": "I agree",
+          "fr": "je suis d'accord",
+          "phonetic": "zhuh swee dah-kor"
+        },
+        {
+          "id": "p3_opinions_je-ne-suis-pas",
+          "en": "I disagree",
+          "fr": "je ne suis pas d'accord",
+          "phonetic": "zhuh nuh swee pah dah-kor"
+        },
+        {
+          "id": "p3_opinions_estimer",
+          "en": "to consider / estimate (that)",
+          "fr": "estimer",
+          "phonetic": "eh-stee-may"
+        },
+        {
+          "id": "p3_opinions_considerer",
+          "en": "to consider",
+          "fr": "considérer",
+          "phonetic": "koh(n)-see-day-ray"
+        },
+        {
+          "id": "p3_opinions_constater",
+          "en": "to note / observe",
+          "fr": "constater",
+          "phonetic": "koh(n)-stah-tay"
+        },
+        {
+          "id": "p3_opinions_affirmer",
+          "en": "to affirm / state",
+          "fr": "affirmer",
+          "phonetic": "ah-feer-may"
+        },
+        {
+          "id": "p3_opinions_pretendre",
+          "en": "to claim",
+          "fr": "prétendre",
+          "phonetic": "pray-tah(n)-druh"
+        },
+        {
+          "id": "p3_opinions_souligner",
+          "en": "to emphasize / underline",
+          "fr": "souligner",
+          "phonetic": "soo-lee-nyay"
+        },
+        {
+          "id": "p3_opinions_signaler",
+          "en": "to point out",
+          "fr": "signaler",
+          "phonetic": "see-nyah-lay"
+        },
+        {
+          "id": "p3_opinions_supposer",
+          "en": "to suppose",
+          "fr": "supposer",
+          "phonetic": "sew-poh-zay"
+        },
+        {
+          "id": "p3_opinions_admettre",
+          "en": "to admit",
+          "fr": "admettre",
+          "phonetic": "ahd-meh-truh"
+        },
+        {
+          "id": "p3_opinions_reconnaitre",
+          "en": "to acknowledge / recognize",
+          "fr": "reconnaître",
+          "phonetic": "ruh-koh-neh-truh"
+        },
+        {
+          "id": "p3_opinions_convaincre",
+          "en": "to convince",
+          "fr": "convaincre",
+          "phonetic": "koh(n)-van-kruh"
+        },
+        {
+          "id": "p3_opinions_persuader",
+          "en": "to persuade",
+          "fr": "persuader",
+          "phonetic": "pehr-swah-day"
+        },
+        {
+          "id": "p3_opinions_soutenir",
+          "en": "to maintain / support (an idea)",
+          "fr": "soutenir",
+          "phonetic": "soo-tuh-neer"
+        },
+        {
+          "id": "p3_opinions_douter",
+          "en": "to doubt",
+          "fr": "douter",
+          "phonetic": "doo-tay"
+        },
+        {
+          "id": "p3_opinions_il-me-semble-que",
+          "en": "it seems to me that",
+          "fr": "il me semble que",
+          "phonetic": "eel muh sah(n)-bluh kuh"
+        },
+        {
+          "id": "p3_opinions_il-parait-que",
+          "en": "it appears that",
+          "fr": "il paraît que",
+          "phonetic": "eel pah-reh kuh"
+        },
+        {
+          "id": "p3_opinions_de-mon-point-de",
+          "en": "from my point of view",
+          "fr": "de mon point de vue",
+          "phonetic": "duh moh(n) pwan duh vew"
+        },
+        {
+          "id": "p3_opinions_en-ce-qui-me",
+          "en": "as far as I'm concerned",
+          "fr": "en ce qui me concerne",
+          "phonetic": "ah(n) suh kee muh koh(n)-sehrn"
+        },
+        {
+          "id": "p3_opinions_selon",
+          "en": "according to",
+          "fr": "selon",
+          "phonetic": "suh-loh(n)"
+        },
+        {
+          "id": "p3_opinions_apres-moi",
+          "en": "in my view / according to me",
+          "fr": "d'après moi",
+          "phonetic": "dah-preh mwah"
+        },
+        {
+          "id": "p3_opinions_je-suis-convaincu-e",
+          "en": "I am convinced that",
+          "fr": "je suis convaincu(e) que",
+          "phonetic": "zhuh swee koh(n)-van-kew kuh"
+        },
+        {
+          "id": "p3_opinions_je-suis-certain-e",
+          "en": "I am certain that",
+          "fr": "je suis certain(e) que",
+          "phonetic": "zhuh swee sehr-tan kuh"
+        },
+        {
+          "id": "p3_opinions_il-est-evident-que",
+          "en": "it is obvious that",
+          "fr": "il est évident que",
+          "phonetic": "eel eh tay-vee-dah(n) kuh"
+        },
+        {
+          "id": "p3_opinions_il-est-clair-que",
+          "en": "it is clear that",
+          "fr": "il est clair que",
+          "phonetic": "eel eh klehr kuh"
+        },
+        {
+          "id": "p3_opinions_il-est-indeniable-que",
+          "en": "it is undeniable that",
+          "fr": "il est indéniable que",
+          "phonetic": "eel eh tan-day-nyah-bluh kuh"
+        },
+        {
+          "id": "p3_opinions_part",
+          "en": "on the one hand",
+          "fr": "d'une part",
+          "phonetic": "dewn par"
+        },
+        {
+          "id": "p3_opinions_autre-part",
+          "en": "on the other hand",
+          "fr": "d'autre part",
+          "phonetic": "doh-truh par"
+        },
+        {
+          "id": "p3_opinions_au-contraire",
+          "en": "on the contrary",
+          "fr": "au contraire",
+          "phonetic": "oh koh(n)-trehr"
+        },
+        {
+          "id": "p3_opinions_tandis-que",
+          "en": "whereas / while",
+          "fr": "tandis que",
+          "phonetic": "tah(n)-dee kuh"
+        },
+        {
+          "id": "p3_opinions_par-rapport-a",
+          "en": "compared to",
+          "fr": "par rapport à",
+          "phonetic": "par rah-por ah"
+        },
+        {
+          "id": "p3_opinions_en-comparaison-avec",
+          "en": "in comparison with",
+          "fr": "en comparaison avec",
+          "phonetic": "ah(n) koh(n)-pah-reh-zoh(n) ah-vehk"
+        },
+        {
+          "id": "p3_opinions_plus-que",
+          "en": "more ... than",
+          "fr": "plus ... que",
+          "phonetic": "plew ... kuh"
+        },
+        {
+          "id": "p3_opinions_moins-que",
+          "en": "less ... than",
+          "fr": "moins ... que",
+          "phonetic": "mwan ... kuh"
+        },
+        {
+          "id": "p3_opinions_aussi-que",
+          "en": "as ... as",
+          "fr": "aussi ... que",
+          "phonetic": "oh-see ... kuh"
+        },
+        {
+          "id": "p3_opinions_meilleur-la-meilleure",
+          "en": "the best",
+          "fr": "le meilleur / la meilleure",
+          "phonetic": "luh may-yuhr"
+        },
+        {
+          "id": "p3_opinions_pire",
+          "en": "the worst",
+          "fr": "le pire",
+          "phonetic": "luh peer"
+        },
+        {
+          "id": "p3_opinions_peser-le-pour-et",
+          "en": "to weigh the pros and cons",
+          "fr": "peser le pour et le contre",
+          "phonetic": "puh-zay luh poor ay luh koh(n)-truh"
+        },
+        {
+          "id": "p3_opinions_resoudre-un-probleme",
+          "en": "to solve a problem",
+          "fr": "résoudre un problème",
+          "phonetic": "ray-zoo-druh uh(n) proh-blehm"
+        },
+        {
+          "id": "p3_opinions_proposer",
+          "en": "to propose",
+          "fr": "proposer",
+          "phonetic": "proh-poh-zay"
+        },
+        {
+          "id": "p3_opinions_suggerer",
+          "en": "to suggest",
+          "fr": "suggérer",
+          "phonetic": "sewg-zhay-ray"
+        },
+        {
+          "id": "p3_opinions_recommander",
+          "en": "to recommend",
+          "fr": "recommander",
+          "phonetic": "ruh-koh-mah(n)-day"
+        },
+        {
+          "id": "p3_opinions_il-vaudrait-mieux",
+          "en": "it would be better to",
+          "fr": "il vaudrait mieux",
+          "phonetic": "eel voh-dreh myuh"
+        },
+        {
+          "id": "p3_opinions_on-devrait",
+          "en": "we should",
+          "fr": "on devrait",
+          "phonetic": "oh(n) duh-vreh"
+        },
+        {
+          "id": "p3_opinions_trouver-une-solution",
+          "en": "to find a solution",
+          "fr": "trouver une solution",
+          "phonetic": "troo-vay ewn soh-lew-syoh(n)"
+        },
+        {
+          "id": "p3_opinions_faire-face-a",
+          "en": "to face (a problem)",
+          "fr": "faire face à",
+          "phonetic": "fehr fahss ah"
+        },
+        {
+          "id": "p3_opinions_aborder",
+          "en": "to address / tackle (a topic)",
+          "fr": "aborder",
+          "phonetic": "ah-bor-day"
+        },
+        {
+          "id": "p3_opinions_soulever",
+          "en": "to raise (an issue)",
+          "fr": "soulever",
+          "phonetic": "soo-luh-vay"
+        },
+        {
+          "id": "p3_opinions_hesiter",
+          "en": "to hesitate",
+          "fr": "hésiter",
+          "phonetic": "ay-zee-tay"
+        }
+      ]
+    },
+    {
+      "id": "connectors",
+      "title": "Connectors & Transitions",
+      "entries": [
+        {
+          "id": "p3_connectors_tout-dabord",
+          "en": "first of all",
+          "fr": "tout d'abord",
+          "phonetic": "too dah-bor"
+        },
+        {
+          "id": "p3_connectors_premierement",
+          "en": "firstly",
+          "fr": "premièrement",
+          "phonetic": "pruh-myehr-mah(n)"
+        },
+        {
+          "id": "p3_connectors_ensuite",
+          "en": "then / next",
+          "fr": "ensuite",
+          "phonetic": "ah(n)-sweet"
+        },
+        {
+          "id": "p3_connectors_puis",
+          "en": "then / afterwards",
+          "fr": "puis",
+          "phonetic": "pwee"
+        },
+        {
+          "id": "p3_connectors_finalement",
+          "en": "finally",
+          "fr": "finalement",
+          "phonetic": "fee-nahl-mah(n)"
+        },
+        {
+          "id": "p3_connectors_en-conclusion",
+          "en": "in conclusion",
+          "fr": "en conclusion",
+          "phonetic": "ah(n) koh(n)-klew-zyoh(n)"
+        },
+        {
+          "id": "p3_connectors_pour-conclure",
+          "en": "to conclude",
+          "fr": "pour conclure",
+          "phonetic": "poor koh(n)-klewr"
+        },
+        {
+          "id": "p3_connectors_en-resume",
+          "en": "in summary",
+          "fr": "en résumé",
+          "phonetic": "ah(n) ray-zew-may"
+        },
+        {
+          "id": "p3_connectors_cependant",
+          "en": "however",
+          "fr": "cependant",
+          "phonetic": "suh-pah(n)-dah(n)"
+        },
+        {
+          "id": "p3_connectors_neanmoins",
+          "en": "nevertheless",
+          "fr": "néanmoins",
+          "phonetic": "nay-ah(n)-mwan"
+        },
+        {
+          "id": "p3_connectors_pourtant",
+          "en": "yet / and yet",
+          "fr": "pourtant",
+          "phonetic": "poor-tah(n)"
+        },
+        {
+          "id": "p3_connectors_malgre",
+          "en": "despite",
+          "fr": "malgré",
+          "phonetic": "mahl-gray"
+        },
+        {
+          "id": "p3_connectors_bien-que",
+          "en": "although",
+          "fr": "bien que",
+          "phonetic": "byan kuh"
+        },
+        {
+          "id": "p3_connectors_meme-si",
+          "en": "even if / even though",
+          "fr": "même si",
+          "phonetic": "mehm see"
+        },
+        {
+          "id": "p3_connectors_alors-que",
+          "en": "while / whereas",
+          "fr": "alors que",
+          "phonetic": "ah-lor kuh"
+        },
+        {
+          "id": "p3_connectors_donc",
+          "en": "therefore / so",
+          "fr": "donc",
+          "phonetic": "doh(n)k"
+        },
+        {
+          "id": "p3_connectors_par-consequent",
+          "en": "consequently",
+          "fr": "par conséquent",
+          "phonetic": "par koh(n)-say-kah(n)"
+        },
+        {
+          "id": "p3_connectors_ainsi",
+          "en": "thus / in this way",
+          "fr": "ainsi",
+          "phonetic": "an-see"
+        },
+        {
+          "id": "p3_connectors_cest-pourquoi",
+          "en": "that's why",
+          "fr": "c'est pourquoi",
+          "phonetic": "seh poor-kwah"
+        },
+        {
+          "id": "p3_connectors_a-cause-de",
+          "en": "because of",
+          "fr": "à cause de",
+          "phonetic": "ah kohz duh"
+        },
+        {
+          "id": "p3_connectors_grace-a",
+          "en": "thanks to",
+          "fr": "grâce à",
+          "phonetic": "grahss ah"
+        },
+        {
+          "id": "p3_connectors_car",
+          "en": "because / for",
+          "fr": "car",
+          "phonetic": "kar"
+        },
+        {
+          "id": "p3_connectors_puisque",
+          "en": "since (cause)",
+          "fr": "puisque",
+          "phonetic": "pwee-skuh"
+        },
+        {
+          "id": "p3_connectors_etant-donne-que",
+          "en": "given that",
+          "fr": "étant donné que",
+          "phonetic": "ay-tah(n) doh-nay kuh"
+        },
+        {
+          "id": "p3_connectors_afin-de",
+          "en": "in order to",
+          "fr": "afin de",
+          "phonetic": "ah-fan duh"
+        },
+        {
+          "id": "p3_connectors_pour-que",
+          "en": "so that",
+          "fr": "pour que",
+          "phonetic": "poor kuh"
+        },
+        {
+          "id": "p3_connectors_de-plus",
+          "en": "moreover",
+          "fr": "de plus",
+          "phonetic": "duh plewss"
+        },
+        {
+          "id": "p3_connectors_en-outre",
+          "en": "furthermore",
+          "fr": "en outre",
+          "phonetic": "ah(n) noo-truh"
+        },
+        {
+          "id": "p3_connectors_ailleurs",
+          "en": "besides / incidentally",
+          "fr": "d'ailleurs",
+          "phonetic": "dah-yuhr"
+        },
+        {
+          "id": "p3_connectors_egalement",
+          "en": "also / equally",
+          "fr": "également",
+          "phonetic": "ay-gahl-mah(n)"
+        },
+        {
+          "id": "p3_connectors_en-fait",
+          "en": "in fact",
+          "fr": "en fait",
+          "phonetic": "ah(n) feht"
+        },
+        {
+          "id": "p3_connectors_en-realite",
+          "en": "in reality / actually",
+          "fr": "en réalité",
+          "phonetic": "ah(n) ray-ah-lee-tay"
+        },
+        {
+          "id": "p3_connectors_par-exemple",
+          "en": "for example",
+          "fr": "par exemple",
+          "phonetic": "par ehg-zah(n)-pluh"
+        },
+        {
+          "id": "p3_connectors_notamment",
+          "en": "notably / in particular",
+          "fr": "notamment",
+          "phonetic": "noh-tah-mah(n)"
+        },
+        {
+          "id": "p3_connectors_autrement-dit",
+          "en": "in other words",
+          "fr": "autrement dit",
+          "phonetic": "oh-truh-mah(n) dee"
+        },
+        {
+          "id": "p3_connectors_cest-a-dire",
+          "en": "that is to say",
+          "fr": "c'est-à-dire",
+          "phonetic": "seh-tah-deer"
+        },
+        {
+          "id": "p3_connectors_en-ce-qui-concerne",
+          "en": "regarding / as for",
+          "fr": "en ce qui concerne",
+          "phonetic": "ah(n) suh kee koh(n)-sehrn"
+        },
+        {
+          "id": "p3_connectors_a-propos-de",
+          "en": "about / concerning",
+          "fr": "à propos de",
+          "phonetic": "ah proh-poh duh"
+        },
+        {
+          "id": "p3_connectors_sauf",
+          "en": "except",
+          "fr": "sauf",
+          "phonetic": "sohf"
+        },
+        {
+          "id": "p3_connectors_a-moins-que",
+          "en": "unless",
+          "fr": "à moins que",
+          "phonetic": "ah mwan kuh"
+        },
+        {
+          "id": "p3_connectors_que",
+          "en": "as soon as",
+          "fr": "dès que",
+          "phonetic": "deh kuh"
+        },
+        {
+          "id": "p3_connectors_pendant-que",
+          "en": "while (during)",
+          "fr": "pendant que",
+          "phonetic": "pah(n)-dah(n) kuh"
+        },
+        {
+          "id": "p3_connectors_a-condition-que",
+          "en": "provided that",
+          "fr": "à condition que",
+          "phonetic": "ah koh(n)-dee-syoh(n) kuh"
+        },
+        {
+          "id": "p3_connectors_en-cas-de",
+          "en": "in case of",
+          "fr": "en cas de",
+          "phonetic": "ah(n) kah duh"
+        },
+        {
+          "id": "p3_connectors_sinon",
+          "en": "otherwise",
+          "fr": "sinon",
+          "phonetic": "see-noh(n)"
+        },
+        {
+          "id": "p3_connectors_en-tout-cas",
+          "en": "in any case",
+          "fr": "en tout cas",
+          "phonetic": "ah(n) too kah"
+        },
+        {
+          "id": "p3_connectors_dans-lensemble",
+          "en": "on the whole",
+          "fr": "dans l'ensemble",
+          "phonetic": "dah(n) lah(n)-sah(n)-bluh"
+        },
+        {
+          "id": "p3_connectors_a-premiere-vue",
+          "en": "at first sight",
+          "fr": "à première vue",
+          "phonetic": "ah pruh-myehr vew"
+        }
+      ]
+    },
+    {
+      "id": "letters",
+      "title": "Formal Letters & Correspondence",
+      "entries": [
+        {
+          "id": "p3_letters_veuillez",
+          "en": "please (formal imperative)",
+          "fr": "veuillez",
+          "phonetic": "vuh-yay"
+        },
+        {
+          "id": "p3_letters_ci-joint",
+          "en": "attached / enclosed",
+          "fr": "ci-joint",
+          "phonetic": "see-zhwan"
+        },
+        {
+          "id": "p3_letters_veuillez-trouver-ci-joint",
+          "en": "please find attached",
+          "fr": "veuillez trouver ci-joint",
+          "phonetic": "vuh-yay troo-vay see-zhwan"
+        },
+        {
+          "id": "p3_letters_cordialement",
+          "en": "best regards / sincerely",
+          "fr": "cordialement",
+          "phonetic": "kor-dyahl-mah(n)"
+        },
+        {
+          "id": "p3_letters_je-vous-prie-dagreer",
+          "en": "yours sincerely (very formal)",
+          "fr": "je vous prie d'agréer mes salutations distinguées",
+          "phonetic": "zhuh voo pree dah-gray-ay may sah-lew-tah-syoh(n) dee-stan-gay"
+        },
+        {
+          "id": "p3_letters_madame-monsieur",
+          "en": "Dear Sir or Madam",
+          "fr": "Madame, Monsieur",
+          "phonetic": "mah-dahm, muh-syuh"
+        },
+        {
+          "id": "p3_letters_a-qui-de-droit",
+          "en": "to whom it may concern",
+          "fr": "à qui de droit",
+          "phonetic": "ah kee duh drwah"
+        },
+        {
+          "id": "p3_letters_je-vous-ecris",
+          "en": "I am writing to you",
+          "fr": "je vous écris",
+          "phonetic": "zhuh voo zay-kree"
+        },
+        {
+          "id": "p3_letters_suite-a",
+          "en": "further to / following",
+          "fr": "suite à",
+          "phonetic": "sweet ah"
+        },
+        {
+          "id": "p3_letters_en-reponse-a",
+          "en": "in response to",
+          "fr": "en réponse à",
+          "phonetic": "ah(n) ray-poh(n)ss ah"
+        },
+        {
+          "id": "p3_letters_je-souhaiterais",
+          "en": "I would like to (formal)",
+          "fr": "je souhaiterais",
+          "phonetic": "zhuh soo-eh-tuh-reh"
+        },
+        {
+          "id": "p3_letters_je-vous-serais-reconnaissant",
+          "en": "I would be grateful if",
+          "fr": "je vous serais reconnaissant(e) de",
+          "phonetic": "zhuh voo suh-reh ruh-koh-neh-sah(n) duh"
+        },
+        {
+          "id": "p3_letters_vous-trouverez-ci-joint",
+          "en": "you will find attached",
+          "fr": "vous trouverez ci-joint",
+          "phonetic": "voo troo-vuh-ray see-zhwan"
+        },
+        {
+          "id": "p3_letters_nhesitez-pas-a-me",
+          "en": "do not hesitate to contact me",
+          "fr": "n'hésitez pas à me contacter",
+          "phonetic": "nay-zee-tay pah ah muh koh(n)-tahk-tay"
+        },
+        {
+          "id": "p3_letters_dans-lattente-de-votre",
+          "en": "awaiting your reply",
+          "fr": "dans l'attente de votre réponse",
+          "phonetic": "dah(n) lah-tah(n)t duh voh-truh ray-poh(n)ss"
+        },
+        {
+          "id": "p3_letters_avance",
+          "en": "in advance",
+          "fr": "d'avance",
+          "phonetic": "dah-vah(n)ss"
+        },
+        {
+          "id": "p3_letters_je-vous-remercie-davance",
+          "en": "thank you in advance",
+          "fr": "je vous remercie d'avance",
+          "phonetic": "zhuh voo ruh-mehr-see dah-vah(n)ss"
+        },
+        {
+          "id": "p3_letters_destinataire",
+          "en": "recipient",
+          "fr": "le destinataire",
+          "phonetic": "luh deh-stee-nah-tehr"
+        },
+        {
+          "id": "p3_letters_expediteur",
+          "en": "sender",
+          "fr": "l'expéditeur",
+          "phonetic": "lehk-spay-dee-tuhr"
+        },
+        {
+          "id": "p3_letters_objet",
+          "en": "subject (of a letter)",
+          "fr": "l'objet",
+          "phonetic": "lohb-zheh"
+        },
+        {
+          "id": "p3_letters_signature",
+          "en": "signature",
+          "fr": "la signature",
+          "phonetic": "lah see-nyah-tewr"
+        },
+        {
+          "id": "p3_letters_signer",
+          "en": "to sign",
+          "fr": "signer",
+          "phonetic": "see-nyay"
+        },
+        {
+          "id": "p3_letters_joindre",
+          "en": "to attach / enclose",
+          "fr": "joindre",
+          "phonetic": "zhwan-druh"
+        },
+        {
+          "id": "p3_letters_piece-jointe",
+          "en": "attachment (email)",
+          "fr": "la pièce jointe",
+          "phonetic": "lah pyehss zhwant"
+        },
+        {
+          "id": "p3_letters_vous-informer-que",
+          "en": "to inform you that",
+          "fr": "vous informer que",
+          "phonetic": "voo zan-for-may kuh"
+        },
+        {
+          "id": "p3_letters_jaccuse-reception",
+          "en": "I acknowledge receipt",
+          "fr": "j'accuse réception",
+          "phonetic": "zhah-kewz ray-sehp-syoh(n)"
+        },
+        {
+          "id": "p3_letters_reclamation",
+          "en": "complaint",
+          "fr": "la réclamation",
+          "phonetic": "lah ray-klah-mah-syoh(n)"
+        },
+        {
+          "id": "p3_letters_se-plaindre",
+          "en": "to complain",
+          "fr": "se plaindre",
+          "phonetic": "suh plan-druh"
+        },
+        {
+          "id": "p3_letters_requete",
+          "en": "formal request",
+          "fr": "la requête",
+          "phonetic": "lah ruh-keht"
+        },
+        {
+          "id": "p3_letters_solliciter",
+          "en": "to request (formal)",
+          "fr": "solliciter",
+          "phonetic": "soh-lee-see-tay"
+        },
+        {
+          "id": "p3_letters_candidature",
+          "en": "job application",
+          "fr": "la candidature",
+          "phonetic": "lah kah(n)-dee-dah-tewr"
+        },
+        {
+          "id": "p3_letters_respectueusement",
+          "en": "respectfully",
+          "fr": "respectueusement",
+          "phonetic": "reh-spehk-tew-uhz-mah(n)"
+        },
+        {
+          "id": "p3_letters_avec-mes-meilleures-salutations",
+          "en": "with my best regards",
+          "fr": "avec mes meilleures salutations",
+          "phonetic": "ah-vehk may may-yuhr sah-lew-tah-syoh(n)"
+        },
+        {
+          "id": "p3_letters_je-reste-a-votre",
+          "en": "I remain at your disposal",
+          "fr": "je reste à votre disposition",
+          "phonetic": "zhuh rehst ah voh-truh dee-spoh-zee-syoh(n)"
+        }
+      ]
+    }
+  ]
+}

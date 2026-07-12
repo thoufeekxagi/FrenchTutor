@@ -1,0 +1,541 @@
+{
+  "lessons": [
+    {
+      "id": "present",
+      "title": "Présent",
+      "subtitle": "Present tense",
+      "order": 1,
+      "usage": [
+        "Habits and routines: things you do regularly.",
+        "General truths and facts.",
+        "Actions happening right now — French uses the same form for 'I speak' and 'I am speaking'."
+      ],
+      "narration": [
+        "Welcome to the present tense, le présent. This is the tense you will use most. It covers habits, facts, and what is happening right now. In French, je parle means both I speak and I am speaking — one form does both jobs.",
+        "Regular E R verbs like parler follow one pattern. Drop the E R, then add the endings. Je parle. Tu parles. Il parle. Nous parlons. Vous parlez. Ils parlent. Notice: je, tu, il, and ils all sound the same — parle. Only nous and vous change the sound.",
+        "Regular I R verbs like finir take different endings. Je finis. Tu finis. Il finit. Nous finissons. Vous finissez. Ils finissent. Hear the double S appear in the plural: finissons, finissez, finissent.",
+        "Listen to real examples. Je travaille comme ingénieur — I work as an engineer. Il fait beau aujourd'hui — the weather is nice today. Try building your own sentence about your daily routine using a regular E R verb."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler",
+          "group": "-er",
+          "rows": [
+            { "pronoun": "je", "form": "parle" },
+            { "pronoun": "tu", "form": "parles" },
+            { "pronoun": "il/elle", "form": "parle" },
+            { "pronoun": "nous", "form": "parlons" },
+            { "pronoun": "vous", "form": "parlez" },
+            { "pronoun": "ils/elles", "form": "parlent" }
+          ]
+        },
+        {
+          "verb": "finir",
+          "group": "-ir",
+          "rows": [
+            { "pronoun": "je", "form": "finis" },
+            { "pronoun": "tu", "form": "finis" },
+            { "pronoun": "il/elle", "form": "finit" },
+            { "pronoun": "nous", "form": "finissons" },
+            { "pronoun": "vous", "form": "finissez" },
+            { "pronoun": "ils/elles", "form": "finissent" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Je travaille comme ingénieur.", "en": "I work as an engineer." },
+        { "fr": "Il fait beau aujourd'hui.", "en": "The weather is nice today." },
+        { "fr": "Nous habitons à Toronto.", "en": "We live in Toronto." },
+        { "fr": "Elle finit son projet ce soir.", "en": "She finishes her project tonight." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Je ___ (parler) français tous les jours.", "answer": "parle", "choices": ["parle", "parles", "parlons"] },
+        { "type": "fill_blank", "prompt": "Nous ___ (finir) le travail à cinq heures.", "answer": "finissons", "choices": ["finissez", "finissons", "finissent"] },
+        { "type": "fill_blank", "prompt": "Ils ___ (travailler) au bureau.", "answer": "travaillent", "choices": ["travaille", "travaillez", "travaillent"] },
+        { "type": "fill_blank", "prompt": "Tu ___ (choisir) le menu du jour ?", "answer": "choisis", "choices": ["choisis", "choisit", "choisissez"] },
+        { "type": "fill_blank", "prompt": "Vous ___ (habiter) où exactement ?", "answer": "habitez", "choices": ["habitons", "habitez", "habitent"] },
+        { "type": "fill_blank", "prompt": "Elle ___ (étudier) le français le soir.", "answer": "étudie", "choices": ["étudie", "étudies", "étudient"] },
+        { "type": "fill_blank", "prompt": "On ___ (manger) ensemble à midi.", "answer": "mange", "choices": ["mange", "manges", "mangent"] },
+        { "type": "fill_blank", "prompt": "Les enfants ___ (finir) leurs devoirs.", "answer": "finissent", "choices": ["finit", "finissons", "finissent"] }
+      ]
+    },
+    {
+      "id": "passe_compose",
+      "title": "Passé composé",
+      "subtitle": "Compound past",
+      "order": 2,
+      "usage": [
+        "Completed actions in the past — events that happened and finished.",
+        "Formed with an auxiliary (avoir or être in the present) plus the past participle.",
+        "Most verbs use avoir; movement and reflexive verbs use être, and with être the participle agrees with the subject."
+      ],
+      "narration": [
+        "The passé composé is your storytelling tense for completed events. It has two pieces: an auxiliary verb — avoir or être — plus a past participle. J'ai parlé: I spoke, or I have spoken.",
+        "Most verbs take avoir. J'ai parlé. Tu as parlé. Il a parlé. Nous avons parlé. Vous avez parlé. Ils ont parlé. The participle of an E R verb ends in é: parlé, travaillé, mangé.",
+        "A small family of verbs — mostly movement, like aller, venir, arriver, partir — takes être instead. Je suis allé. Elle est arrivée. And listen carefully: with être, the participle agrees. Elle est arrivée takes an extra E because elle is feminine.",
+        "Examples. J'ai travaillé hier — I worked yesterday. Elle est arrivée en retard — she arrived late. Ask yourself: what did you do this morning? Answer in the passé composé."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler (avec avoir)",
+          "group": "avoir + participe",
+          "rows": [
+            { "pronoun": "j'", "form": "ai parlé" },
+            { "pronoun": "tu", "form": "as parlé" },
+            { "pronoun": "il/elle", "form": "a parlé" },
+            { "pronoun": "nous", "form": "avons parlé" },
+            { "pronoun": "vous", "form": "avez parlé" },
+            { "pronoun": "ils/elles", "form": "ont parlé" }
+          ]
+        },
+        {
+          "verb": "aller (avec être)",
+          "group": "être + participe",
+          "rows": [
+            { "pronoun": "je", "form": "suis allé(e)" },
+            { "pronoun": "tu", "form": "es allé(e)" },
+            { "pronoun": "il/elle", "form": "est allé(e)" },
+            { "pronoun": "nous", "form": "sommes allé(e)s" },
+            { "pronoun": "vous", "form": "êtes allé(e)(s)" },
+            { "pronoun": "ils/elles", "form": "sont allé(e)s" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "J'ai travaillé hier.", "en": "I worked yesterday." },
+        { "fr": "Elle est arrivée en retard.", "en": "She arrived late." },
+        { "fr": "Nous avons fini le rapport.", "en": "We finished the report." },
+        { "fr": "Ils sont partis à huit heures.", "en": "They left at eight o'clock." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "J'___ (parler) avec le directeur ce matin.", "answer": "ai parlé", "choices": ["ai parlé", "suis parlé", "a parlé"] },
+        { "type": "fill_blank", "prompt": "Elle ___ (arriver) en retard.", "answer": "est arrivée", "choices": ["a arrivé", "est arrivée", "est arrivé"] },
+        { "type": "fill_blank", "prompt": "Nous ___ (finir) le projet hier soir.", "answer": "avons fini", "choices": ["avons fini", "sommes finis", "avons finis"] },
+        { "type": "fill_blank", "prompt": "Ils ___ (aller) au cinéma samedi.", "answer": "sont allés", "choices": ["ont allé", "sont allés", "sont allé"] },
+        { "type": "fill_blank", "prompt": "Tu ___ (voir) le nouveau film ?", "answer": "as vu", "choices": ["as vu", "es vu", "as voir"] },
+        { "type": "fill_blank", "prompt": "Vous ___ (prendre) le train ce matin ?", "answer": "avez pris", "choices": ["avez pris", "êtes pris", "avez prendu"] },
+        { "type": "fill_blank", "prompt": "Je ___ (venir) au Canada en 2020.", "answer": "suis venu", "choices": ["ai venu", "suis venu", "suis viens"] },
+        { "type": "fill_blank", "prompt": "Elles ___ (faire) leurs courses.", "answer": "ont fait", "choices": ["sont faites", "ont fait", "ont faites"] }
+      ]
+    },
+    {
+      "id": "imparfait",
+      "title": "Imparfait",
+      "subtitle": "Imperfect",
+      "order": 3,
+      "usage": [
+        "Ongoing or repeated past actions — what used to happen.",
+        "Descriptions and background: weather, feelings, settings.",
+        "Contrast with passé composé: imparfait sets the scene, passé composé is the event."
+      ],
+      "narration": [
+        "The imparfait paints the background of the past. Use it for what used to happen, for descriptions, for how things were. Quand j'étais jeune, j'habitais à Ottawa — when I was young, I lived in Ottawa.",
+        "The endings are the same for every verb in French: ais, ais, ait, ions, iez, aient. Je parlais. Tu parlais. Il parlait. Nous parlions. Vous parliez. Ils parlaient.",
+        "For I R verbs, the stem keeps the double S: je finissais, nous finissions. Take the nous form of the present, drop the O N S, and you have the imparfait stem. Nous finissons gives finiss-.",
+        "The key skill for the exam: choosing between imparfait and passé composé. Il pleuvait — it was raining, that is the scene. Je suis sorti — I went out, that is the event. Scene in imparfait, event in passé composé."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler",
+          "group": "-er",
+          "rows": [
+            { "pronoun": "je", "form": "parlais" },
+            { "pronoun": "tu", "form": "parlais" },
+            { "pronoun": "il/elle", "form": "parlait" },
+            { "pronoun": "nous", "form": "parlions" },
+            { "pronoun": "vous", "form": "parliez" },
+            { "pronoun": "ils/elles", "form": "parlaient" }
+          ]
+        },
+        {
+          "verb": "finir",
+          "group": "-ir",
+          "rows": [
+            { "pronoun": "je", "form": "finissais" },
+            { "pronoun": "tu", "form": "finissais" },
+            { "pronoun": "il/elle", "form": "finissait" },
+            { "pronoun": "nous", "form": "finissions" },
+            { "pronoun": "vous", "form": "finissiez" },
+            { "pronoun": "ils/elles", "form": "finissaient" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Quand j'étais jeune, j'habitais à Ottawa.", "en": "When I was young, I lived in Ottawa." },
+        { "fr": "Il pleuvait pendant le voyage.", "en": "It was raining during the trip." },
+        { "fr": "Nous regardions la télé quand tu as appelé.", "en": "We were watching TV when you called." },
+        { "fr": "Elle travaillait chaque été au restaurant.", "en": "She worked at the restaurant every summer." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Quand j'étais petit, je ___ (jouer) au parc.", "answer": "jouais", "choices": ["jouais", "jouait", "ai joué"] },
+        { "type": "fill_blank", "prompt": "Il ___ (pleuvoir) quand nous sommes sortis.", "answer": "pleuvait", "choices": ["a plu", "pleuvait", "pleut"] },
+        { "type": "fill_blank", "prompt": "Nous ___ (habiter) à Montréal avant 2019.", "answer": "habitions", "choices": ["habitions", "habitiez", "avons habité"] },
+        { "type": "fill_blank", "prompt": "Elles ___ (finir) toujours avant midi.", "answer": "finissaient", "choices": ["finissait", "finissaient", "ont fini"] },
+        { "type": "fill_blank", "prompt": "Tu ___ (être) fatigué hier soir, non ?", "answer": "étais", "choices": ["étais", "était", "as été"] },
+        { "type": "fill_blank", "prompt": "Je regardais la télé quand il ___ (appeler).", "answer": "a appelé", "choices": ["appelait", "a appelé", "appelle"] },
+        { "type": "fill_blank", "prompt": "Vous ___ (travailler) où avant ce poste ?", "answer": "travailliez", "choices": ["travaillez", "travailliez", "travaillaient"] },
+        { "type": "fill_blank", "prompt": "Le café ___ (être) plein ce matin-là.", "answer": "était", "choices": ["a été", "était", "est"] }
+      ]
+    },
+    {
+      "id": "futur_simple",
+      "title": "Futur simple",
+      "subtitle": "Simple future",
+      "order": 4,
+      "usage": [
+        "Future plans and predictions.",
+        "Formed on the infinitive plus the endings -ai, -as, -a, -ons, -ez, -ont.",
+        "More formal than futur proche; common in writing and promises."
+      ],
+      "narration": [
+        "The futur simple talks about what will happen. Je parlerai français couramment — I will speak French fluently. That is a promise worth practicing.",
+        "The recipe: take the infinitive and add the endings of avoir. Parler gives je parlerai, tu parleras, il parlera, nous parlerons, vous parlerez, ils parleront.",
+        "I R verbs work the same way: je finirai, nous finirons. If the infinitive ends in R E, like prendre, drop the final E first: je prendrai.",
+        "Watch for the classic irregular stems: être gives je serai, avoir gives j'aurai, aller gives j'irai, faire gives je ferai. Nous finirons le projet demain — we will finish the project tomorrow."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler",
+          "group": "-er",
+          "rows": [
+            { "pronoun": "je", "form": "parlerai" },
+            { "pronoun": "tu", "form": "parleras" },
+            { "pronoun": "il/elle", "form": "parlera" },
+            { "pronoun": "nous", "form": "parlerons" },
+            { "pronoun": "vous", "form": "parlerez" },
+            { "pronoun": "ils/elles", "form": "parleront" }
+          ]
+        },
+        {
+          "verb": "finir",
+          "group": "-ir",
+          "rows": [
+            { "pronoun": "je", "form": "finirai" },
+            { "pronoun": "tu", "form": "finiras" },
+            { "pronoun": "il/elle", "form": "finira" },
+            { "pronoun": "nous", "form": "finirons" },
+            { "pronoun": "vous", "form": "finirez" },
+            { "pronoun": "ils/elles", "form": "finiront" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Je parlerai français couramment.", "en": "I will speak French fluently." },
+        { "fr": "Nous finirons le projet demain.", "en": "We will finish the project tomorrow." },
+        { "fr": "Elle sera à Montréal la semaine prochaine.", "en": "She will be in Montreal next week." },
+        { "fr": "Ils auront une réponse vendredi.", "en": "They will have an answer on Friday." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Je ___ (parler) avec elle demain.", "answer": "parlerai", "choices": ["parlerai", "parlerais", "parle"] },
+        { "type": "fill_blank", "prompt": "Nous ___ (finir) avant la date limite.", "answer": "finirons", "choices": ["finirons", "finissons", "finirions"] },
+        { "type": "fill_blank", "prompt": "Elle ___ (être) contente de te voir.", "answer": "sera", "choices": ["sera", "serait", "est"] },
+        { "type": "fill_blank", "prompt": "Ils ___ (avoir) les résultats lundi.", "answer": "auront", "choices": ["auront", "avaient", "ont"] },
+        { "type": "fill_blank", "prompt": "Tu ___ (aller) au Canada l'année prochaine ?", "answer": "iras", "choices": ["iras", "allais", "vas"] },
+        { "type": "fill_blank", "prompt": "Vous ___ (faire) quoi après l'examen ?", "answer": "ferez", "choices": ["ferez", "faites", "feriez"] },
+        { "type": "fill_blank", "prompt": "On ___ (prendre) le train de sept heures.", "answer": "prendra", "choices": ["prendra", "prend", "prenait"] },
+        { "type": "fill_blank", "prompt": "Je ___ (pouvoir) t'aider ce week-end.", "answer": "pourrai", "choices": ["pourrai", "peux", "pouvais"] }
+      ]
+    },
+    {
+      "id": "futur_proche",
+      "title": "Futur proche",
+      "subtitle": "Near future",
+      "order": 5,
+      "usage": [
+        "Near-term plans: what you are going to do.",
+        "Formed with aller in the present plus an infinitive.",
+        "Very common in spoken French — often preferred over futur simple in conversation."
+      ],
+      "narration": [
+        "The futur proche is the easiest future in French, and the one you will hear most in conversation. Take aller in the present, add an infinitive. Je vais partir — I am going to leave.",
+        "Je vais partir. Tu vas partir. Il va partir. Nous allons partir. Vous allez partir. Ils vont partir. Only aller changes; the second verb never moves.",
+        "Use it for anything close or planned. Nous allons commencer demain — we are going to start tomorrow. Je vais appeler le médecin — I am going to call the doctor.",
+        "In the exam, mixing futur proche for plans and futur simple for promises or predictions makes you sound natural. Say out loud three things you are going to do tonight, starting each with je vais."
+      ],
+      "conjugations": [
+        {
+          "verb": "aller + partir",
+          "group": "aller (présent) + infinitif",
+          "rows": [
+            { "pronoun": "je", "form": "vais partir" },
+            { "pronoun": "tu", "form": "vas partir" },
+            { "pronoun": "il/elle", "form": "va partir" },
+            { "pronoun": "nous", "form": "allons partir" },
+            { "pronoun": "vous", "form": "allez partir" },
+            { "pronoun": "ils/elles", "form": "vont partir" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Je vais partir bientôt.", "en": "I am going to leave soon." },
+        { "fr": "Nous allons commencer demain.", "en": "We are going to start tomorrow." },
+        { "fr": "Elle va acheter une voiture.", "en": "She is going to buy a car." },
+        { "fr": "Ils vont déménager à Québec.", "en": "They are going to move to Quebec City." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Je ___ (aller) appeler le médecin.", "answer": "vais", "choices": ["vais", "va", "irai"] },
+        { "type": "fill_blank", "prompt": "Nous ___ commencer la réunion.", "answer": "allons", "choices": ["allons", "allez", "vont"] },
+        { "type": "fill_blank", "prompt": "Ils vont ___ (déménager) le mois prochain.", "answer": "déménager", "choices": ["déménager", "déménagent", "déménagé"] },
+        { "type": "fill_blank", "prompt": "Tu ___ prendre un café avec nous ?", "answer": "vas", "choices": ["vas", "va", "vais"] },
+        { "type": "fill_blank", "prompt": "Elle va ___ (finir) son rapport ce soir.", "answer": "finir", "choices": ["finir", "finit", "fini"] },
+        { "type": "fill_blank", "prompt": "Vous ___ visiter Québec cet été ?", "answer": "allez", "choices": ["allez", "allons", "irez"] }
+      ]
+    },
+    {
+      "id": "conditionnel",
+      "title": "Conditionnel présent",
+      "subtitle": "Conditional",
+      "order": 6,
+      "usage": [
+        "Polite requests: je voudrais — I would like.",
+        "Hypotheses: si j'avais le temps, je voyagerais.",
+        "Advice and suggestions: tu devrais — you should."
+      ],
+      "narration": [
+        "The conditionnel is the tense of politeness and possibility. Je voudrais un café, s'il vous plaît — I would like a coffee, please. You will use this every single day.",
+        "The recipe combines two things you already know: the futur simple stem plus the imparfait endings. Parler gives je parlerais, tu parlerais, il parlerait, nous parlerions, vous parleriez, ils parleraient.",
+        "Three conditionnel verbs carry most conversations: je voudrais — I would like, je pourrais — I could, and tu devrais — you should. Memorize these three as fixed phrases.",
+        "For hypotheses, French uses si plus imparfait, then conditionnel. Si j'avais le temps, je voyagerais plus — if I had time, I would travel more. This exact structure scores points in the TEF speaking section when you compare choices or give advice."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler",
+          "group": "-er",
+          "rows": [
+            { "pronoun": "je", "form": "parlerais" },
+            { "pronoun": "tu", "form": "parlerais" },
+            { "pronoun": "il/elle", "form": "parlerait" },
+            { "pronoun": "nous", "form": "parlerions" },
+            { "pronoun": "vous", "form": "parleriez" },
+            { "pronoun": "ils/elles", "form": "parleraient" }
+          ]
+        },
+        {
+          "verb": "finir",
+          "group": "-ir",
+          "rows": [
+            { "pronoun": "je", "form": "finirais" },
+            { "pronoun": "tu", "form": "finirais" },
+            { "pronoun": "il/elle", "form": "finirait" },
+            { "pronoun": "nous", "form": "finirions" },
+            { "pronoun": "vous", "form": "finiriez" },
+            { "pronoun": "ils/elles", "form": "finiraient" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Je voudrais un café, s'il vous plaît.", "en": "I would like a coffee, please." },
+        { "fr": "Si j'avais le temps, je voyagerais plus.", "en": "If I had time, I would travel more." },
+        { "fr": "Tu devrais parler au responsable.", "en": "You should speak to the manager." },
+        { "fr": "Pourriez-vous répéter, s'il vous plaît ?", "en": "Could you repeat, please?" }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Je ___ (vouloir) réserver une table.", "answer": "voudrais", "choices": ["voudrais", "veux", "voudrai"] },
+        { "type": "fill_blank", "prompt": "___-vous m'aider, s'il vous plaît ?", "answer": "Pourriez", "choices": ["Pourriez", "Pouvez", "Pourrez"] },
+        { "type": "fill_blank", "prompt": "Si j'avais le temps, je ___ (voyager) plus.", "answer": "voyagerais", "choices": ["voyagerais", "voyagerai", "voyageais"] },
+        { "type": "fill_blank", "prompt": "Tu ___ (devoir) te reposer un peu.", "answer": "devrais", "choices": ["devrais", "dois", "devras"] },
+        { "type": "fill_blank", "prompt": "Nous ___ (aimer) visiter la Gaspésie.", "answer": "aimerions", "choices": ["aimerions", "aimerons", "aimions"] },
+        { "type": "fill_blank", "prompt": "À ta place, je ___ (prendre) le poste à Montréal.", "answer": "prendrais", "choices": ["prendrais", "prendrai", "prenais"] },
+        { "type": "fill_blank", "prompt": "Ils ___ (être) contents de vous rencontrer.", "answer": "seraient", "choices": ["seraient", "seront", "étaient"] },
+        { "type": "fill_blank", "prompt": "Si le prix baissait, elle ___ (acheter) la maison.", "answer": "achèterait", "choices": ["achèterait", "achètera", "achetait"] }
+      ]
+    },
+    {
+      "id": "subjonctif",
+      "title": "Subjonctif présent",
+      "subtitle": "Subjunctive",
+      "order": 7,
+      "usage": [
+        "After expressions of necessity: il faut que…",
+        "After desires and emotions: je veux que…, je suis content que…",
+        "After doubt and concession: je ne pense pas que…, bien que…"
+      ],
+      "narration": [
+        "The subjonctif appears after certain trigger phrases — expressions of necessity, desire, emotion, or doubt. Il faut que je parte — I have to leave. The trigger is il faut que; parte is the subjunctive.",
+        "For regular verbs, take the ils form of the present, drop E N T, and add the endings: e, es, e, ions, iez, ent. Parler: que je parle, que nous parlions. Finir keeps its double S: que je finisse, que nous finissions.",
+        "Memorize the top triggers as complete chunks: il faut que — it is necessary that. Je veux que — I want that. Bien que — although. Avant que — before. Pour que — so that.",
+        "For the exam, two or three well-placed subjunctives impress the examiner. Learn these ready-made sentences: Il faut que je parte. Je veux que tu réussisses. Bien qu'il pleuve, nous sortons. Practice saying all three."
+      ],
+      "conjugations": [
+        {
+          "verb": "parler",
+          "group": "-er",
+          "rows": [
+            { "pronoun": "que je", "form": "parle" },
+            { "pronoun": "que tu", "form": "parles" },
+            { "pronoun": "qu'il/elle", "form": "parle" },
+            { "pronoun": "que nous", "form": "parlions" },
+            { "pronoun": "que vous", "form": "parliez" },
+            { "pronoun": "qu'ils/elles", "form": "parlent" }
+          ]
+        },
+        {
+          "verb": "finir",
+          "group": "-ir",
+          "rows": [
+            { "pronoun": "que je", "form": "finisse" },
+            { "pronoun": "que tu", "form": "finisses" },
+            { "pronoun": "qu'il/elle", "form": "finisse" },
+            { "pronoun": "que nous", "form": "finissions" },
+            { "pronoun": "que vous", "form": "finissiez" },
+            { "pronoun": "qu'ils/elles", "form": "finissent" }
+          ]
+        }
+      ],
+      "examples": [
+        { "fr": "Il faut que je parte.", "en": "I have to leave." },
+        { "fr": "Je veux que tu réussisses.", "en": "I want you to succeed." },
+        { "fr": "Bien qu'il pleuve, nous sortons.", "en": "Although it's raining, we're going out." },
+        { "fr": "Il est important que vous soyez à l'heure.", "en": "It's important that you be on time." }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Il faut que je ___ (partir) avant midi.", "answer": "parte", "choices": ["parte", "pars", "partirai"] },
+        { "type": "fill_blank", "prompt": "Je veux que tu ___ (réussir) ton examen.", "answer": "réussisses", "choices": ["réussisses", "réussis", "réussiras"] },
+        { "type": "fill_blank", "prompt": "Bien qu'il ___ (pleuvoir), nous sortons.", "answer": "pleuve", "choices": ["pleuve", "pleut", "pleuvait"] },
+        { "type": "fill_blank", "prompt": "Il est important que vous ___ (être) à l'heure.", "answer": "soyez", "choices": ["soyez", "êtes", "serez"] },
+        { "type": "fill_blank", "prompt": "Elle préfère que nous ___ (finir) aujourd'hui.", "answer": "finissions", "choices": ["finissions", "finissons", "finirons"] },
+        { "type": "fill_blank", "prompt": "Il faut que tu ___ (faire) tes valises.", "answer": "fasses", "choices": ["fasses", "fais", "feras"] },
+        { "type": "fill_blank", "prompt": "Je doute qu'il ___ (avoir) raison.", "answer": "ait", "choices": ["ait", "a", "aura"] },
+        { "type": "fill_blank", "prompt": "Pour que vous ___ (pouvoir) réussir, pratiquez chaque jour.", "answer": "puissiez", "choices": ["puissiez", "pouvez", "pourrez"] }
+      ]
+    }
+  ],
+  "irregularVerbs": [
+    {
+      "verb": "être", "en": "to be",
+      "present": ["suis", "es", "est", "sommes", "êtes", "sont"],
+      "passeCompose": "j'ai été",
+      "examples": [{ "fr": "Je suis ingénieur.", "en": "I am an engineer." }]
+    },
+    {
+      "verb": "avoir", "en": "to have",
+      "present": ["ai", "as", "a", "avons", "avez", "ont"],
+      "passeCompose": "j'ai eu",
+      "examples": [{ "fr": "Nous avons deux enfants.", "en": "We have two children." }]
+    },
+    {
+      "verb": "aller", "en": "to go",
+      "present": ["vais", "vas", "va", "allons", "allez", "vont"],
+      "passeCompose": "je suis allé(e)",
+      "examples": [{ "fr": "Je vais au bureau en métro.", "en": "I go to the office by metro." }]
+    },
+    {
+      "verb": "faire", "en": "to do / make",
+      "present": ["fais", "fais", "fait", "faisons", "faites", "font"],
+      "passeCompose": "j'ai fait",
+      "examples": [{ "fr": "Il fait ses courses le samedi.", "en": "He does his shopping on Saturdays." }]
+    },
+    {
+      "verb": "pouvoir", "en": "to be able to",
+      "present": ["peux", "peux", "peut", "pouvons", "pouvez", "peuvent"],
+      "passeCompose": "j'ai pu",
+      "examples": [{ "fr": "Je peux vous aider ?", "en": "Can I help you?" }]
+    },
+    {
+      "verb": "vouloir", "en": "to want",
+      "present": ["veux", "veux", "veut", "voulons", "voulez", "veulent"],
+      "passeCompose": "j'ai voulu",
+      "examples": [{ "fr": "Elle veut apprendre le français.", "en": "She wants to learn French." }]
+    },
+    {
+      "verb": "devoir", "en": "must / to owe",
+      "present": ["dois", "dois", "doit", "devons", "devez", "doivent"],
+      "passeCompose": "j'ai dû",
+      "examples": [{ "fr": "Je dois partir à cinq heures.", "en": "I must leave at five o'clock." }]
+    },
+    {
+      "verb": "venir", "en": "to come",
+      "present": ["viens", "viens", "vient", "venons", "venez", "viennent"],
+      "passeCompose": "je suis venu(e)",
+      "examples": [{ "fr": "Ils viennent de l'Inde.", "en": "They come from India." }]
+    },
+    {
+      "verb": "prendre", "en": "to take",
+      "present": ["prends", "prends", "prend", "prenons", "prenez", "prennent"],
+      "passeCompose": "j'ai pris",
+      "examples": [{ "fr": "Je prends le bus chaque matin.", "en": "I take the bus every morning." }]
+    },
+    {
+      "verb": "voir", "en": "to see",
+      "present": ["vois", "vois", "voit", "voyons", "voyez", "voient"],
+      "passeCompose": "j'ai vu",
+      "examples": [{ "fr": "On voit la montagne d'ici.", "en": "You can see the mountain from here." }]
+    },
+    {
+      "verb": "dire", "en": "to say",
+      "present": ["dis", "dis", "dit", "disons", "dites", "disent"],
+      "passeCompose": "j'ai dit",
+      "examples": [{ "fr": "Qu'est-ce que vous dites ?", "en": "What are you saying?" }]
+    },
+    {
+      "verb": "mettre", "en": "to put",
+      "present": ["mets", "mets", "met", "mettons", "mettez", "mettent"],
+      "passeCompose": "j'ai mis",
+      "examples": [{ "fr": "Je mets la clé sur la table.", "en": "I put the key on the table." }]
+    }
+  ],
+  "topics": [
+    {
+      "id": "pronouns",
+      "title": "Object & Relative Pronouns",
+      "narration": [
+        "Object pronouns replace nouns to avoid repetition. Le, la, and les replace direct objects: je le vois — I see him. Lui and leur replace indirect objects: je lui parle — I speak to him. Y replaces a place: j'y vais — I'm going there. En replaces a quantity: j'en veux — I want some.",
+        "Relative pronouns connect two sentences. Qui is the subject: l'homme qui parle — the man who speaks. Que is the object: le livre que je lis — the book that I read. Dont means of which: le projet dont je parle. Où means where: la ville où j'habite."
+      ],
+      "sections": [
+        {
+          "heading": "Object pronouns",
+          "body": "le, la, les (direct) · lui, leur (indirect) · y (place) · en (quantity). They go before the verb.",
+          "examples": [
+            { "fr": "Je le vois.", "en": "I see him/it." },
+            { "fr": "Je lui parle.", "en": "I speak to him/her." },
+            { "fr": "J'y vais.", "en": "I'm going there." },
+            { "fr": "J'en veux.", "en": "I want some." }
+          ]
+        },
+        {
+          "heading": "Relative pronouns",
+          "body": "qui (subject) · que (object) · dont (of which/whom) · où (where).",
+          "examples": [
+            { "fr": "Le livre que je lis est intéressant.", "en": "The book I'm reading is interesting." },
+            { "fr": "La ville où j'habite est belle.", "en": "The city where I live is beautiful." },
+            { "fr": "C'est le collègue qui m'a aidé.", "en": "He's the colleague who helped me." },
+            { "fr": "Le dossier dont vous parlez est prêt.", "en": "The file you're talking about is ready." }
+          ]
+        }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Tu vois Marie ? Oui, je ___ vois.", "answer": "la", "choices": ["la", "lui", "y"] },
+        { "type": "fill_blank", "prompt": "Tu parles à ton frère ? Oui, je ___ parle.", "answer": "lui", "choices": ["le", "lui", "en"] },
+        { "type": "fill_blank", "prompt": "Tu vas au bureau ? Oui, j'___ vais.", "answer": "y", "choices": ["y", "en", "le"] },
+        { "type": "fill_blank", "prompt": "Le livre ___ je lis est excellent.", "answer": "que", "choices": ["que", "qui", "dont"] },
+        { "type": "fill_blank", "prompt": "C'est l'ami ___ m'a aidé.", "answer": "qui", "choices": ["qui", "que", "où"] },
+        { "type": "fill_blank", "prompt": "La ville ___ j'habite est calme.", "answer": "où", "choices": ["où", "que", "dont"] }
+      ]
+    },
+    {
+      "id": "passive_voice",
+      "title": "Passive Voice",
+      "narration": [
+        "The passive voice flips the sentence: the thing receiving the action becomes the subject. Form it with être plus the past participle. Le rapport a été écrit par l'équipe — the report was written by the team. The participle agrees with the subject: la lettre a été écrite."
+      ],
+      "sections": [
+        {
+          "heading": "Formation",
+          "body": "être (any tense) + past participle, agreeing with the subject. The doer is introduced with par.",
+          "examples": [
+            { "fr": "Le rapport a été écrit par l'équipe.", "en": "The report was written by the team." },
+            { "fr": "La décision sera prise demain.", "en": "The decision will be made tomorrow." },
+            { "fr": "Les documents sont vérifiés chaque semaine.", "en": "The documents are checked every week." }
+          ]
+        }
+      ],
+      "drills": [
+        { "type": "fill_blank", "prompt": "Le rapport a été ___ (écrire) par l'équipe.", "answer": "écrit", "choices": ["écrit", "écrite", "écrire"] },
+        { "type": "fill_blank", "prompt": "La lettre a été ___ (envoyer) hier.", "answer": "envoyée", "choices": ["envoyée", "envoyé", "envoyer"] },
+        { "type": "fill_blank", "prompt": "Les résultats ___ été publiés ce matin.", "answer": "ont", "choices": ["ont", "sont", "avaient"] },
+        { "type": "fill_blank", "prompt": "La décision ___ prise demain.", "answer": "sera", "choices": ["sera", "serait", "a"] }
+      ]
+    }
+  ]
+}

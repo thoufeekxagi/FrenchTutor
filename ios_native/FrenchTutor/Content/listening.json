@@ -1,0 +1,143 @@
+{
+  "exercises": [
+    {
+      "id": "l01",
+      "title": "Au café",
+      "phase": 1,
+      "script": "Bonjour ! Je voudrais un café et un croissant, s'il vous plaît. C'est combien ? Cinq euros ? Voilà. Merci beaucoup. Bonne journée !",
+      "questions": [
+        { "q": "What does the customer order?", "choices": ["Coffee and a croissant", "Tea and bread", "Coffee and a sandwich"], "answerIndex": 0 },
+        { "q": "How much does it cost?", "choices": ["Three euros", "Five euros", "Ten euros"], "answerIndex": 1 }
+      ],
+      "dictation": ["Je voudrais un café et un croissant, s'il vous plaît."]
+    },
+    {
+      "id": "l02",
+      "title": "La famille de Claire",
+      "phase": 1,
+      "script": "Je m'appelle Claire. J'habite à Lyon avec ma famille. Mon père est médecin et ma mère est professeure. J'ai un frère et une sœur. Mon frère a vingt ans et il étudie à l'université.",
+      "questions": [
+        { "q": "Where does Claire live?", "choices": ["Paris", "Lyon", "Marseille"], "answerIndex": 1 },
+        { "q": "What is her father's job?", "choices": ["Teacher", "Doctor", "Engineer"], "answerIndex": 1 },
+        { "q": "How old is her brother?", "choices": ["Eighteen", "Twenty", "Twenty-two"], "answerIndex": 1 }
+      ],
+      "dictation": ["Mon père est médecin et ma mère est professeure."]
+    },
+    {
+      "id": "l03",
+      "title": "Quelle heure est-il ?",
+      "phase": 1,
+      "script": "Le train pour Montréal part à quatorze heures trente, quai numéro deux. Le prochain train part à seize heures quinze. Le voyage dure trois heures.",
+      "questions": [
+        { "q": "When does the train to Montreal leave?", "choices": ["2:30 PM", "4:15 PM", "3:00 PM"], "answerIndex": 0 },
+        { "q": "How long is the trip?", "choices": ["Two hours", "Three hours", "Four hours"], "answerIndex": 1 }
+      ],
+      "dictation": ["Le train pour Montréal part à quatorze heures trente."]
+    },
+    {
+      "id": "l04",
+      "title": "Au marché",
+      "phase": 1,
+      "script": "Bonjour madame. Je voudrais un kilo de tomates et deux baguettes. Vous avez des fraises ? Non ? Alors, donnez-moi des pommes. Ça fait huit euros cinquante.",
+      "questions": [
+        { "q": "What can't the customer buy today?", "choices": ["Tomatoes", "Strawberries", "Apples"], "answerIndex": 1 },
+        { "q": "What is the total?", "choices": ["8.50 euros", "8.15 euros", "9.50 euros"], "answerIndex": 0 }
+      ],
+      "dictation": ["Je voudrais un kilo de tomates et deux baguettes."]
+    },
+    {
+      "id": "l05",
+      "title": "Un rendez-vous chez le médecin",
+      "phase": 2,
+      "script": "Bonjour, cabinet du docteur Martin. Vous voulez prendre rendez-vous ? Le docteur est disponible mardi à dix heures ou jeudi à quinze heures. Jeudi ? Très bien. Quel est votre nom ? N'oubliez pas d'apporter votre carte d'assurance maladie.",
+      "questions": [
+        { "q": "Which appointment does the patient choose?", "choices": ["Tuesday at 10 AM", "Thursday at 3 PM", "Thursday at 10 AM"], "answerIndex": 1 },
+        { "q": "What must the patient bring?", "choices": ["Their passport", "Their health insurance card", "Their prescription"], "answerIndex": 1 }
+      ],
+      "dictation": ["N'oubliez pas d'apporter votre carte d'assurance maladie."]
+    },
+    {
+      "id": "l06",
+      "title": "À la banque",
+      "phase": 2,
+      "script": "Bonjour, je voudrais ouvrir un compte bancaire. Bien sûr, monsieur. Il faut remplir ce formulaire et présenter une pièce d'identité et une preuve d'adresse. Vous recevrez votre carte bancaire par la poste dans une semaine.",
+      "questions": [
+        { "q": "What does the customer want to do?", "choices": ["Withdraw money", "Open a bank account", "Get a loan"], "answerIndex": 1 },
+        { "q": "When will the bank card arrive?", "choices": ["In one week", "In two weeks", "The same day"], "answerIndex": 0 },
+        { "q": "What documents are needed?", "choices": ["Only a passport", "ID and proof of address", "A work permit"], "answerIndex": 1 }
+      ],
+      "dictation": ["Il faut remplir ce formulaire et présenter une pièce d'identité."]
+    },
+    {
+      "id": "l07",
+      "title": "Chercher un appartement",
+      "phase": 2,
+      "script": "Allô ? Je vous appelle au sujet de l'appartement à louer. Il est toujours disponible ? Oui, c'est un trois-pièces au deuxième étage, avec un balcon. Le loyer est de mille deux cents dollars par mois, charges comprises. Vous pouvez le visiter samedi matin.",
+      "questions": [
+        { "q": "What kind of apartment is it?", "choices": ["A studio", "A three-room apartment", "A house"], "answerIndex": 1 },
+        { "q": "How much is the rent?", "choices": ["$1,200 including utilities", "$1,200 plus utilities", "$2,100 including utilities"], "answerIndex": 0 },
+        { "q": "When can they visit?", "choices": ["Sunday morning", "Saturday morning", "Saturday afternoon"], "answerIndex": 1 }
+      ],
+      "dictation": ["Le loyer est de mille deux cents dollars par mois, charges comprises."]
+    },
+    {
+      "id": "l08",
+      "title": "Le bulletin météo",
+      "phase": 2,
+      "script": "Voici la météo pour demain. Le matin, il fera froid avec des températures de moins cinq degrés. L'après-midi, le ciel sera nuageux et il neigera en soirée. N'oubliez pas vos gants et votre manteau d'hiver !",
+      "questions": [
+        { "q": "What will the morning temperature be?", "choices": ["Minus five degrees", "Five degrees", "Minus fifteen degrees"], "answerIndex": 0 },
+        { "q": "What will happen in the evening?", "choices": ["It will rain", "It will snow", "It will be sunny"], "answerIndex": 1 }
+      ],
+      "dictation": ["L'après-midi, le ciel sera nuageux et il neigera en soirée."]
+    },
+    {
+      "id": "l09",
+      "title": "Un entretien d'embauche",
+      "phase": 3,
+      "script": "Parlez-moi de votre parcours professionnel. J'ai travaillé pendant cinq ans comme ingénieur en intelligence artificielle. J'ai dirigé une équipe de quatre personnes et j'ai développé plusieurs projets importants. Pourquoi voulez-vous quitter votre poste actuel ? Je cherche de nouveaux défis et je souhaite m'installer au Canada pour des raisons familiales.",
+      "questions": [
+        { "q": "How long has the candidate worked as an AI engineer?", "choices": ["Four years", "Five years", "Ten years"], "answerIndex": 1 },
+        { "q": "How many people did they manage?", "choices": ["Four", "Five", "Fourteen"], "answerIndex": 0 },
+        { "q": "Why do they want to move to Canada?", "choices": ["For a higher salary", "For family reasons", "For studies"], "answerIndex": 1 }
+      ],
+      "dictation": ["Je cherche de nouveaux défis et je souhaite m'installer au Canada."]
+    },
+    {
+      "id": "l10",
+      "title": "Les nouvelles technologies",
+      "phase": 3,
+      "script": "Selon une étude récente, de plus en plus d'entreprises canadiennes utilisent l'intelligence artificielle. Cependant, certains employés craignent de perdre leur emploi. Les experts estiment néanmoins que la technologie créera plus de postes qu'elle n'en supprimera, notamment dans les secteurs de la santé et de l'éducation.",
+      "questions": [
+        { "q": "What do some employees fear?", "choices": ["Lower salaries", "Losing their jobs", "Longer hours"], "answerIndex": 1 },
+        { "q": "What do experts believe?", "choices": ["Technology will create more jobs than it eliminates", "Technology will eliminate most jobs", "Nothing will change"], "answerIndex": 0 },
+        { "q": "Which sectors are mentioned?", "choices": ["Finance and transport", "Health and education", "Construction and agriculture"], "answerIndex": 1 }
+      ],
+      "dictation": ["Les experts estiment que la technologie créera plus de postes qu'elle n'en supprimera."]
+    },
+    {
+      "id": "l11",
+      "title": "Une réclamation",
+      "phase": 3,
+      "script": "Bonjour, je vous appelle parce que j'ai un problème avec ma commande. J'ai commandé un ordinateur portable il y a deux semaines, pourtant je n'ai toujours rien reçu. C'est inadmissible. Je comprends votre frustration, monsieur. Je vais vérifier immédiatement. Effectivement, il y a eu une erreur dans l'adresse de livraison. Nous vous enverrons le colis en express, sans frais supplémentaires, et vous recevrez un bon de réduction de vingt pour cent.",
+      "questions": [
+        { "q": "What is the problem?", "choices": ["The laptop is broken", "The order never arrived", "The price was wrong"], "answerIndex": 1 },
+        { "q": "What caused the problem?", "choices": ["An error in the delivery address", "The item was out of stock", "The payment failed"], "answerIndex": 0 },
+        { "q": "What compensation is offered?", "choices": ["A full refund", "Express shipping and a 20% discount voucher", "A free laptop"], "answerIndex": 1 }
+      ],
+      "dictation": ["J'ai commandé un ordinateur portable il y a deux semaines, pourtant je n'ai toujours rien reçu."]
+    },
+    {
+      "id": "l12",
+      "title": "L'immigration au Canada",
+      "phase": 3,
+      "script": "Le Canada accueille chaque année plus de quatre cent mille nouveaux résidents permanents. Les candidats à l'immigration doivent démontrer leurs compétences linguistiques en français ou en anglais. Par conséquent, de nombreux candidats passent des examens comme le TEF Canada. Un bon niveau de français, notamment le niveau CLB sept, augmente considérablement les chances d'obtenir la résidence permanente.",
+      "questions": [
+        { "q": "How many new permanent residents does Canada welcome each year?", "choices": ["More than 400,000", "More than 40,000", "More than 4 million"], "answerIndex": 0 },
+        { "q": "What must immigration candidates demonstrate?", "choices": ["Work experience only", "Language skills in French or English", "A university degree"], "answerIndex": 1 },
+        { "q": "What increases the chances of permanent residency?", "choices": ["CLB 7 French level", "A job offer only", "Family in Canada"], "answerIndex": 0 }
+      ],
+      "dictation": ["Un bon niveau de français augmente considérablement les chances d'obtenir la résidence permanente."]
+    }
+  ]
+}

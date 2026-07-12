@@ -20,6 +20,7 @@ class GeminiLiveService: NSObject {
     private var currentUserTranscript = ""
     private var currentTutorTranscript = ""
     private var isIntentionalDisconnect = false
+    private let lessonContext: String?
 
     static let systemPrompt = """
 You are Marie, a warm, gentle French tutor speaking to a complete beginner on a phone call.
@@ -49,8 +50,9 @@ EXAMPLE OF A BAD REPLY (NEVER DO THIS):
 START THE CALL WITH A WARM, SLOW GREETING IN SIMPLE FRENCH, then briefly ask in English if they're new to French so you know how much to slow down.
 """
 
-    init(apiKey: String) {
+    init(apiKey: String, lessonContext: String? = nil) {
         self.apiKey = apiKey
+        self.lessonContext = lessonContext
         self.session = URLSession(configuration: .default)
         super.init()
     }
@@ -115,6 +117,11 @@ START THE CALL WITH A WARM, SLOW GREETING IN SIMPLE FRENCH, then briefly ask in 
         send(msg)
     }
 
+    private var fullSystemPrompt: String {
+        guard let lessonContext, !lessonContext.isEmpty else { return GeminiLiveService.systemPrompt }
+        return GeminiLiveService.systemPrompt + "\n\nLESSON CONTEXT — the student is currently studying this material; steer practice toward it while following ALL rules above:\n" + lessonContext
+    }
+
     private func sendSetup() {
         let setup: [String: Any] = [
             "setup": [
@@ -130,7 +137,7 @@ START THE CALL WITH A WARM, SLOW GREETING IN SIMPLE FRENCH, then briefly ask in 
                     ]
                 ],
                 "systemInstruction": [
-                    "parts": [["text": GeminiLiveService.systemPrompt]]
+                    "parts": [["text": fullSystemPrompt]]
                 ],
                 "outputAudioTranscription": [:],
                 "inputAudioTranscription": [:],

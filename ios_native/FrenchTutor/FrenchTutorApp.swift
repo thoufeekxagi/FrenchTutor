@@ -8,11 +8,23 @@ let geminiApiKey: String = {
     return key
 }()
 
+/// OpenRouter powers the lesson-brain (Q&A, writing grading, quiz feedback).
+/// Unlike Gemini, a missing key is not fatal — labs simply show an "AI feedback unavailable" banner.
+let openRouterApiKey: String = {
+    (Bundle.main.object(forInfoDictionaryKey: "OPENROUTER_API_KEY") as? String) ?? ""
+}()
+
 @main
 struct FrenchTutorApp: App {
+    init() {
+        #if DEBUG
+        ContentService.shared.assertAllContentDecodes()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            MainTabView()
         }
     }
 }

@@ -18,9 +18,9 @@ struct SessionView: View {
     private let storage: StorageService
     private let sessionId: String
 
-    init(apiKey: String) {
+    init(apiKey: String, lessonContext: String? = nil) {
         self.apiKey = apiKey
-        self.gemini = GeminiLiveService(apiKey: apiKey)
+        self.gemini = GeminiLiveService(apiKey: apiKey, lessonContext: lessonContext)
         self.audio = AudioStreamingService()
         self.storage = StorageService()
         self.sessionId = UUID().uuidString

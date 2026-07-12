@@ -9,20 +9,55 @@
 		A10001 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001; };
 		A10004 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004; };
 		A10005 /* FrenchTutorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20005; };
-		A10006 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20006; };
 		A10007 /* SessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007; };
+		A10013 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015; };
+		A10014 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016; };
+		A10015 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017; };
+		A10016 /* LabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018; };
+		A10017 /* MocksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019; };
+		A10018 /* ProgressScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020; };
+		A10019 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20021; };
+		A10020 /* Content in Resources */ = {isa = PBXBuildFile; fileRef = A20022; };
+		A10021 /* ContentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20023; };
+		A10022 /* ContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20024; };
 		A10008 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008; };
 		A10009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20009; };
 		A10011 /* GeminiLiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20012; };
 		A10012 /* AudioStreamingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013; };
+		A10023 /* LearningStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20025; };
+		A10024 /* SRSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20026; };
+		A10025 /* ProgressService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20027; };
+		A10026 /* LessonAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20028; };
+		A10027 /* LessonSpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20029; };
+		A10028 /* LessonQAOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20030; };
+		A10029 /* VocabLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20031; };
+		A10030 /* FlashcardSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20032; };
+		A10031 /* ConjugationTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20033; };
+		A10032 /* DrillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20034; };
+		A10033 /* GrammarLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20035; };
+		A10034 /* GrammarLessonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20036; };
+		A10035 /* ConnectorsLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20037; };
+		A10036 /* ListeningLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20038; };
+		A10037 /* ListeningExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20039; };
+		A10038 /* WritingLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20040; };
+		A10039 /* WritingTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20041; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A20001 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A20004 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		A20005 /* FrenchTutorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrenchTutorApp.swift; sourceTree = "<group>"; };
-		A20006 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		A20007 /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
+		A20015 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A20016 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A20017 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A20018 /* LabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabsView.swift; sourceTree = "<group>"; };
+		A20019 /* MocksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MocksView.swift; sourceTree = "<group>"; };
+		A20020 /* ProgressScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressScreen.swift; sourceTree = "<group>"; };
+		A20021 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A20022 /* Content */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Content; sourceTree = "<group>"; };
+		A20023 /* ContentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentModels.swift; sourceTree = "<group>"; };
+		A20024 /* ContentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentService.swift; sourceTree = "<group>"; };
 		A20008 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A20009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -30,6 +65,23 @@
 		A20013 /* AudioStreamingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamingService.swift; sourceTree = "<group>"; };
 		A30001 /* FrenchTutor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FrenchTutor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20014 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		A20025 /* LearningStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningStore.swift; sourceTree = "<group>"; };
+		A20026 /* SRSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRSService.swift; sourceTree = "<group>"; };
+		A20027 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
+		A20028 /* LessonAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonAgentService.swift; sourceTree = "<group>"; };
+		A20029 /* LessonSpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonSpeechService.swift; sourceTree = "<group>"; };
+		A20030 /* LessonQAOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonQAOverlay.swift; sourceTree = "<group>"; };
+		A20031 /* VocabLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabLabView.swift; sourceTree = "<group>"; };
+		A20032 /* FlashcardSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashcardSessionView.swift; sourceTree = "<group>"; };
+		A20033 /* ConjugationTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConjugationTableView.swift; sourceTree = "<group>"; };
+		A20034 /* DrillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrillView.swift; sourceTree = "<group>"; };
+		A20035 /* GrammarLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarLabView.swift; sourceTree = "<group>"; };
+		A20036 /* GrammarLessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarLessonView.swift; sourceTree = "<group>"; };
+		A20037 /* ConnectorsLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorsLabView.swift; sourceTree = "<group>"; };
+		A20038 /* ListeningLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningLabView.swift; sourceTree = "<group>"; };
+		A20039 /* ListeningExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningExerciseView.swift; sourceTree = "<group>"; };
+		A20040 /* WritingLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingLabView.swift; sourceTree = "<group>"; };
+		A20041 /* WritingTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingTaskView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,13 +116,39 @@
 			isa = PBXGroup;
 			children = (
 				A20005 /* FrenchTutorApp.swift */,
-				A20006 /* HomeView.swift */,
+				A20022 /* Content */,
+				A20023 /* ContentModels.swift */,
+				A20024 /* ContentService.swift */,
+				A20015 /* Theme.swift */,
+				A20016 /* MainTabView.swift */,
+				A20017 /* DashboardView.swift */,
+				A20018 /* LabsView.swift */,
+				A20019 /* MocksView.swift */,
+				A20020 /* ProgressScreen.swift */,
+				A20021 /* SettingsView.swift */,
 				A20007 /* SessionView.swift */,
 				A20008 /* HistoryView.swift */,
 				A20001 /* Models.swift */,
 				A20012 /* GeminiLiveService.swift */,
 				A20013 /* AudioStreamingService.swift */,
 				A20004 /* StorageService.swift */,
+				A20025 /* LearningStore.swift */,
+				A20026 /* SRSService.swift */,
+				A20027 /* ProgressService.swift */,
+				A20028 /* LessonAgentService.swift */,
+				A20029 /* LessonSpeechService.swift */,
+				A20030 /* LessonQAOverlay.swift */,
+				A20031 /* VocabLabView.swift */,
+				A20032 /* FlashcardSessionView.swift */,
+				A20033 /* ConjugationTableView.swift */,
+				A20034 /* DrillView.swift */,
+				A20035 /* GrammarLabView.swift */,
+				A20036 /* GrammarLessonView.swift */,
+				A20037 /* ConnectorsLabView.swift */,
+				A20038 /* ListeningLabView.swift */,
+				A20039 /* ListeningExerciseView.swift */,
+				A20040 /* WritingLabView.swift */,
+				A20041 /* WritingTaskView.swift */,
 				A20009 /* Assets.xcassets */,
 				A20010 /* Info.plist */,
 			);
@@ -132,6 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10009 /* Assets.xcassets in Resources */,
+				A10020 /* Content in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,11 +224,36 @@
 				A10001 /* Models.swift in Sources */,
 				A10004 /* StorageService.swift in Sources */,
 				A10005 /* FrenchTutorApp.swift in Sources */,
-				A10006 /* HomeView.swift in Sources */,
 				A10007 /* SessionView.swift in Sources */,
+				A10013 /* Theme.swift in Sources */,
+				A10014 /* MainTabView.swift in Sources */,
+				A10015 /* DashboardView.swift in Sources */,
+				A10016 /* LabsView.swift in Sources */,
+				A10017 /* MocksView.swift in Sources */,
+				A10018 /* ProgressScreen.swift in Sources */,
+				A10019 /* SettingsView.swift in Sources */,
+				A10021 /* ContentModels.swift in Sources */,
+				A10022 /* ContentService.swift in Sources */,
 				A10008 /* HistoryView.swift in Sources */,
 				A10011 /* GeminiLiveService.swift in Sources */,
 				A10012 /* AudioStreamingService.swift in Sources */,
+				A10023 /* LearningStore.swift in Sources */,
+				A10024 /* SRSService.swift in Sources */,
+				A10025 /* ProgressService.swift in Sources */,
+				A10026 /* LessonAgentService.swift in Sources */,
+				A10027 /* LessonSpeechService.swift in Sources */,
+				A10028 /* LessonQAOverlay.swift in Sources */,
+				A10029 /* VocabLabView.swift in Sources */,
+				A10030 /* FlashcardSessionView.swift in Sources */,
+				A10031 /* ConjugationTableView.swift in Sources */,
+				A10032 /* DrillView.swift in Sources */,
+				A10033 /* GrammarLabView.swift in Sources */,
+				A10034 /* GrammarLessonView.swift in Sources */,
+				A10035 /* ConnectorsLabView.swift in Sources */,
+				A10036 /* ListeningLabView.swift in Sources */,
+				A10037 /* ListeningExerciseView.swift in Sources */,
+				A10038 /* WritingLabView.swift in Sources */,
+				A10039 /* WritingTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
