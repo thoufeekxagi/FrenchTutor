@@ -44,6 +44,10 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
     /// queue completes (not called if `stop()` is invoked). `rate` overrides the Settings rate
     /// for this utterance only (e.g. listening lab's Slow/Normal buttons).
     func speak(items: [SpeechItem], rate: Float? = nil, onItemStart: ((Int) -> Void)? = nil, onFinished: (() -> Void)? = nil) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.speak(items: items, rate: rate, onItemStart: onItemStart, onFinished: onFinished) }
+            return
+        }
         stop()
         guard !items.isEmpty else { onFinished?(); return }
         activateAudioSession()
@@ -69,6 +73,10 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     func stop() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.stop() }
+            return
+        }
         synthesizer.stopSpeaking(at: .immediate)
         ttsQueue.removeAll()
         ttsIndex = 0
@@ -223,18 +231,24 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
 
         var lastTranscript = ""
         recognitionTask = recognizer.recognitionTask(with: request) { [weak self] result, error in
-            guard let self else { return }
-            if let result {
-                lastTranscript = result.bestTranscription.formattedString
-                onPartial(lastTranscript)
-                self.resetSilenceTimer {
+            // SFSpeechRecognitionTask's callback can fire on a background thread. AVSpeechSynthesizer
+            // and AVAudioEngine are not thread-safe, so every downstream call (stopListening →
+            // deactivate → synthesizer.stopSpeaking) MUST happen on the main thread, or it can race
+            // with the synthesizer delegate callbacks and crash with EXC_BAD_ACCESS.
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if let result {
+                    lastTranscript = result.bestTranscription.formattedString
+                    onPartial(lastTranscript)
+                    self.resetSilenceTimer {
+                        self.stopListening()
+                        onFinal(lastTranscript)
+                    }
+                }
+                if error != nil {
                     self.stopListening()
                     onFinal(lastTranscript)
                 }
-            }
-            if error != nil {
-                self.stopListening()
-                onFinal(lastTranscript)
             }
         }
         resetSilenceTimer { [weak self] in
@@ -245,10 +259,16 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
 
     private func resetSilenceTimer(_ action: @escaping () -> Void) {
         silenceTimer?.invalidate()
-        silenceTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in action() }
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+            DispatchQueue.main.async { action() }
+        }
     }
 
     func stopListening() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.stopListening() }
+            return
+        }
         silenceTimer?.invalidate()
         silenceTimer = nil
         recognitionTask?.cancel()
@@ -286,6 +306,10 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
     /// MUST be called before presenting SessionView (the Marie call) and in onDisappear of any
     /// lesson view that used this service, so AudioStreamingService can claim the session cleanly.
     func deactivate() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.deactivate() }
+            return
+        }
         stop()
         stopListening()
         do {
