@@ -7,7 +7,7 @@ struct FlashcardSessionView: View {
     let theme: VocabTheme
 
     private let store = LearningStore()
-    @StateObject private var speechBox = SpeechBox()
+    private let speech = LessonSpeechService.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var queue: [VocabEntry] = []
@@ -38,7 +38,7 @@ struct FlashcardSessionView: View {
             sessionStart = Date()
         }
         .onDisappear {
-            speechBox.speech.deactivate()
+            speech.deactivate()
             logMinutes()
         }
     }
@@ -80,7 +80,7 @@ struct FlashcardSessionView: View {
 
                         HStack(spacing: 20) {
                             Button {
-                                speechBox.speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
+                                speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
                             } label: {
                                 Image(systemName: "speaker.wave.2.fill")
                                     .font(.system(size: 18))
@@ -121,7 +121,7 @@ struct FlashcardSessionView: View {
                 Button {
                     withAnimation { isRevealed = true }
                     if let entry = currentEntry {
-                        speechBox.speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
+                        speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
                     }
                 } label: {
                     Text("Reveal")
@@ -166,13 +166,13 @@ struct FlashcardSessionView: View {
 
     private func sayIt(entry: VocabEntry) {
         guard !isListeningBack else {
-            speechBox.speech.stopListening()
+            speech.stopListening()
             isListeningBack = false
             return
         }
         isListeningBack = true
         sayItHint = nil
-        speechBox.speech.startListening(locale: "fr-FR", onPartial: { _ in }) { transcript in
+        speech.startListening(locale: "fr-FR", onPartial: { _ in }) { transcript in
             isListeningBack = false
             let said = fold(transcript)
             let target = fold(entry.fr)
@@ -220,7 +220,7 @@ struct FlashcardSessionView: View {
 
             if reviewedCount > 0 {
                 Button {
-                    speechBox.speech.deactivate()
+                    speech.deactivate()
                     showMarie = true
                 } label: {
                     HStack {
@@ -237,10 +237,4 @@ struct FlashcardSessionView: View {
             SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext(vocabTheme: theme, phase: phase))
         }
     }
-}
-
-/// Wraps LessonSpeechService in an ObservableObject box so the view can own one instance
-/// across the flashcard session lifecycle.
-private final class SpeechBox: ObservableObject {
-    let speech = LessonSpeechService()
 }

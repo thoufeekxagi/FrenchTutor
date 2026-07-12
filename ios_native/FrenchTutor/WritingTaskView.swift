@@ -6,7 +6,7 @@ struct WritingTaskView: View {
     let task: WritingTask
 
     private let store = LearningStore()
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
     @State private var showEnglish = false
     @State private var content = ""
     @State private var isGrading = false
@@ -56,7 +56,7 @@ struct WritingTaskView: View {
 
                     if feedback != nil {
                         Button {
-                            speechBox.speech.deactivate()
+                            speech.deactivate()
                             showMarie = true
                         } label: {
                             HStack {
@@ -86,9 +86,9 @@ struct WritingTaskView: View {
             }
         }
         .onAppear { sessionStart = Date() }
-        .onDisappear { speechBox.speech.deactivate(); logMinutes() }
+        .onDisappear { speech.deactivate(); logMinutes() }
         .sheet(isPresented: $showQA) {
-            LessonQAOverlay(lessonContext: lessonContext, speech: speechBox.speech, isPresented: $showQA)
+            LessonQAOverlay(lessonContext: lessonContext, speech: speech, isPresented: $showQA)
                 .presentationDetents([.medium])
         }
         .fullScreenCover(isPresented: $showMarie) {
@@ -216,7 +216,7 @@ struct WritingTaskView: View {
                         Text("Improved version").font(Passeport.body(12, weight: .medium)).foregroundColor(Passeport.text)
                         Spacer()
                         Button {
-                            speechBox.speech.speak(items: LessonSpeechService.speechItems(from: feedback.improvedVersion))
+                            speech.speak(items: LessonSpeechService.speechItems(from: feedback.improvedVersion))
                         } label: {
                             Image(systemName: "speaker.wave.2").font(.system(size: 11)).foregroundColor(Passeport.brass)
                         }

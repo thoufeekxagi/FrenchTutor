@@ -10,6 +10,11 @@ import Speech
 /// SessionView, and this service deactivates itself when idle.
 final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
 
+    /// One instance for the whole app. Every lesson view must use this, never `LessonSpeechService()`
+    /// directly — multiple live AVSpeechSynthesizer/AVAudioEngine instances fighting over the same
+    /// system audio session is what caused crashes and audio-session-churn slowness.
+    static let shared = LessonSpeechService()
+
     // MARK: TTS
 
     struct SpeechItem {
@@ -91,7 +96,6 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
             isSpeaking = false
             let finished = onFinished
             onFinished = nil
-            deactivateIfIdle()
             finished?()
             return
         }
@@ -279,28 +283,30 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
         audioEngine?.stop()
         audioEngine = nil
         isListening = false
-        deactivateIfIdle()
     }
 
     // MARK: Audio session (single-owner)
 
+    private var sessionConfiguredForRecording: Bool?
+
     private func activateAudioSession(forRecording: Bool = false) {
         do {
             let session = AVAudioSession.sharedInstance()
-            if forRecording {
-                try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetooth])
-            } else {
-                try session.setCategory(.playback, mode: .spokenAudio)
+            // Re-configuring the category/mode is a relatively expensive call — skip it if we're
+            // already set up the same way (this is what made screen navigation feel sluggish when
+            // every lab view touched the session on appear/disappear).
+            if sessionConfiguredForRecording != forRecording {
+                if forRecording {
+                    try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
+                } else {
+                    try session.setCategory(.playback, mode: .spokenAudio)
+                }
+                sessionConfiguredForRecording = forRecording
             }
             try session.setActive(true)
         } catch {
             print("LessonSpeechService: audio session error — \(error)")
         }
-    }
-
-    private func deactivateIfIdle() {
-        guard !isSpeaking, !isListening else { return }
-        deactivate()
     }
 
     /// MUST be called before presenting SessionView (the Marie call) and in onDisappear of any
@@ -312,6 +318,7 @@ final class LessonSpeechService: NSObject, AVSpeechSynthesizerDelegate {
         }
         stop()
         stopListening()
+        sessionConfiguredForRecording = nil
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         } catch {

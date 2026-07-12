@@ -6,7 +6,7 @@ struct ListeningExerciseView: View {
     let exercise: ListeningExercise
 
     private let store = LearningStore()
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var showScript = false
@@ -49,7 +49,7 @@ struct ListeningExerciseView: View {
         .navigationTitle(exercise.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { sessionStart = Date() }
-        .onDisappear { speechBox.speech.deactivate() }
+        .onDisappear { speech.deactivate() }
     }
 
     private var allQuestionsAnswered: Bool {
@@ -104,7 +104,7 @@ struct ListeningExerciseView: View {
     }
 
     private func play(rate: Float) {
-        speechBox.speech.speak(items: [.init(text: exercise.script, language: "fr-FR")], rate: rate)
+        speech.speak(items: [.init(text: exercise.script, language: "fr-FR")], rate: rate)
     }
 
     private var questionsCard: some View {
@@ -156,7 +156,7 @@ struct ListeningExerciseView: View {
             ForEach(Array(exercise.dictation.enumerated()), id: \.offset) { i, sentence in
                 VStack(alignment: .leading, spacing: 6) {
                     Button {
-                        speechBox.speech.speak(items: [.init(text: sentence, language: "fr-FR")])
+                        speech.speak(items: [.init(text: sentence, language: "fr-FR")])
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "speaker.wave.2.fill").font(.system(size: 12))

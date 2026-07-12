@@ -88,7 +88,7 @@ struct GrammarLabView: View {
 
 struct IrregularVerbsView: View {
     let verbs: [IrregularVerb]
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
 
     var body: some View {
         ZStack {
@@ -97,7 +97,7 @@ struct IrregularVerbsView: View {
                 VStack(spacing: 10) {
                     ForEach(verbs) { verb in
                         IrregularVerbTableView(verb: verb) { text in
-                            speechBox.speech.speak(items: [.init(text: text, language: "fr-FR")])
+                            speech.speak(items: [.init(text: text, language: "fr-FR")])
                         }
                     }
                 }
@@ -108,11 +108,6 @@ struct IrregularVerbsView: View {
         }
         .navigationTitle("Irregular verbs")
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speechBox.speech.deactivate() }
+        .onDisappear { speech.deactivate() }
     }
-}
-
-/// Shared ObservableObject box so SwiftUI views can own a LessonSpeechService instance.
-final class SpeechServiceBox: ObservableObject {
-    let speech = LessonSpeechService()
 }

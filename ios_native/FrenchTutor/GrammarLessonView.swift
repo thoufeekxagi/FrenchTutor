@@ -7,7 +7,7 @@ struct GrammarLessonView: View {
     let lesson: GrammarLesson
 
     private let store = LearningStore()
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
     @State private var isPlaying = false
     @State private var highlightedCard = 0
     @State private var showQA = false
@@ -30,7 +30,7 @@ struct GrammarLessonView: View {
                             ConjugationTableView(
                                 verb: conj.verb, group: conj.group, rows: conj.rows,
                                 highlightedPronoun: nil,
-                                onSpeak: { text in speechBox.speech.speak(items: [.init(text: text, language: "fr-FR")]) }
+                                onSpeak: { text in speech.speak(items: [.init(text: text, language: "fr-FR")]) }
                             )
                             .id(i + 1)
                             .overlay(
@@ -58,9 +58,9 @@ struct GrammarLessonView: View {
         }
         .navigationTitle(lesson.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speechBox.speech.deactivate() }
+        .onDisappear { speech.deactivate() }
         .sheet(isPresented: $showQA) {
-            LessonQAOverlay(lessonContext: lessonContext, speech: speechBox.speech, isPresented: $showQA)
+            LessonQAOverlay(lessonContext: lessonContext, speech: speech, isPresented: $showQA)
                 .presentationDetents([.medium])
         }
         .fullScreenCover(isPresented: $showMarie) {
@@ -70,7 +70,7 @@ struct GrammarLessonView: View {
 
     private var discussWithMarieButton: some View {
         Button {
-            speechBox.speech.deactivate()
+            speech.deactivate()
             showMarie = true
         } label: {
             HStack {
@@ -112,7 +112,7 @@ struct GrammarLessonView: View {
                     }
                     Spacer()
                     Button {
-                        speechBox.speech.speak(items: [.init(text: ex.fr, language: "fr-FR")])
+                        speech.speak(items: [.init(text: ex.fr, language: "fr-FR")])
                     } label: {
                         Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundColor(Passeport.brass)
                     }
@@ -162,7 +162,7 @@ struct GrammarLessonView: View {
                 .foregroundColor(Passeport.slateDim)
             Spacer()
             Button {
-                speechBox.speech.pause()
+                speech.pause()
                 isPlaying = false
                 showQA = true
             } label: {
@@ -185,19 +185,19 @@ struct GrammarLessonView: View {
 
     private func togglePlay() {
         if isPlaying {
-            speechBox.speech.pause()
+            speech.pause()
             isPlaying = false
             return
         }
-        if speechBox.speech.isSpeaking {
-            speechBox.speech.resume()
+        if speech.isSpeaking {
+            speech.resume()
             isPlaying = true
             return
         }
         isPlaying = true
         let items = LessonSpeechService.speechItems(from: lesson.narration)
         // Map narration item index proportionally onto the card range for scroll highlight.
-        speechBox.speech.speak(
+        speech.speak(
             items: items,
             onItemStart: { idx in
                 let card = min(cardCount - 1, (idx * cardCount) / max(1, items.count))
@@ -225,7 +225,7 @@ struct TopicLessonView: View {
     let topic: GrammarTopic
 
     private let store = LearningStore()
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
     @State private var isPlaying = false
     @State private var showQA = false
     @State private var showMarie = false
@@ -252,7 +252,7 @@ struct TopicLessonView: View {
                                     }
                                     Spacer()
                                     Button {
-                                        speechBox.speech.speak(items: [.init(text: ex.fr, language: "fr-FR")])
+                                        speech.speak(items: [.init(text: ex.fr, language: "fr-FR")])
                                     } label: {
                                         Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundColor(Passeport.brass)
                                     }
@@ -282,7 +282,7 @@ struct TopicLessonView: View {
                     }
 
                     Button {
-                        speechBox.speech.deactivate()
+                        speech.deactivate()
                         showMarie = true
                     } label: {
                         HStack {
@@ -309,7 +309,7 @@ struct TopicLessonView: View {
                         .font(Passeport.mono(11)).foregroundColor(Passeport.slateDim)
                     Spacer()
                     Button {
-                        speechBox.speech.pause(); isPlaying = false; showQA = true
+                        speech.pause(); isPlaying = false; showQA = true
                     } label: {
                         Image(systemName: "mic.fill").font(.system(size: 16)).foregroundColor(.white)
                             .frame(width: 44, height: 44).background(Passeport.brass).clipShape(Circle())
@@ -323,9 +323,9 @@ struct TopicLessonView: View {
         }
         .navigationTitle(topic.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speechBox.speech.deactivate() }
+        .onDisappear { speech.deactivate() }
         .sheet(isPresented: $showQA) {
-            LessonQAOverlay(lessonContext: lessonContext, speech: speechBox.speech, isPresented: $showQA)
+            LessonQAOverlay(lessonContext: lessonContext, speech: speech, isPresented: $showQA)
                 .presentationDetents([.medium])
         }
         .fullScreenCover(isPresented: $showMarie) {
@@ -334,11 +334,11 @@ struct TopicLessonView: View {
     }
 
     private func togglePlay() {
-        if isPlaying { speechBox.speech.pause(); isPlaying = false; return }
-        if speechBox.speech.isSpeaking { speechBox.speech.resume(); isPlaying = true; return }
+        if isPlaying { speech.pause(); isPlaying = false; return }
+        if speech.isSpeaking { speech.resume(); isPlaying = true; return }
         isPlaying = true
         let items = LessonSpeechService.speechItems(from: topic.narration)
-        speechBox.speech.speak(items: items, onFinished: { isPlaying = false })
+        speech.speak(items: items, onFinished: { isPlaying = false })
     }
 
     private func recordDrillResult(_ correct: Bool) {

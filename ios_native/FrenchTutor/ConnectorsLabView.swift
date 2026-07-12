@@ -3,7 +3,7 @@ import SwiftUI
 /// Category-grouped connector rows + a 10-question quiz. Connectors are TEF-scoring
 /// "articulateurs logiques" (cependant, par conséquent, etc.).
 struct ConnectorsLabView: View {
-    @StateObject private var speechBox = SpeechServiceBox()
+    private let speech = LessonSpeechService.shared
     @State private var showQuiz = false
 
     private var pack: ConnectorsPack? { ContentService.shared.connectors() }
@@ -61,7 +61,7 @@ struct ConnectorsLabView: View {
         }
         .navigationTitle("Connectors")
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speechBox.speech.deactivate() }
+        .onDisappear { speech.deactivate() }
         .sheet(isPresented: $showQuiz) {
             if let pack {
                 ConnectorsQuizView(connectors: pack.connectors)
@@ -87,7 +87,7 @@ struct ConnectorsLabView: View {
             }
             Spacer()
             Button {
-                speechBox.speech.speak(items: [.init(text: connector.example.fr, language: "fr-FR")])
+                speech.speak(items: [.init(text: connector.example.fr, language: "fr-FR")])
             } label: {
                 Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundColor(Passeport.brass)
             }
