@@ -1,0 +1,15 @@
+# Secrets
+Secrets.xcconfig
+
+# Xcode user-specific state
+xcuserdata/
+*.xcuserstate
+*.xcbkptlist
+
+# macOS metadata
+.DS_Store
+
+# Build artifacts
+build/
+DerivedData/
+.build/
