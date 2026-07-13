@@ -84,6 +84,7 @@ struct WritingTaskView: View {
                     Image(systemName: "mic.fill").foregroundColor(Passeport.brass)
                 }
             }
+            MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() }
         }
         .onAppear { sessionStart = Date() }
         .onDisappear { speech.deactivate(); logMinutes() }
@@ -153,6 +154,8 @@ struct WritingTaskView: View {
             }
             TextEditor(text: $content)
                 .font(Passeport.body(13.5))
+                .foregroundColor(Passeport.text)
+                .tint(Passeport.maroon)
                 .frame(minHeight: 180)
                 .scrollContentBackground(.hidden)
                 .background(Passeport.parchmentDim)

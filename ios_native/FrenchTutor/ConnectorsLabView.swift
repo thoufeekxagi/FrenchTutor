@@ -5,6 +5,7 @@ import SwiftUI
 struct ConnectorsLabView: View {
     private let speech = LessonSpeechService.shared
     @State private var showQuiz = false
+    @State private var showMarie = false
 
     private var pack: ConnectorsPack? { ContentService.shared.connectors() }
 
@@ -61,11 +62,15 @@ struct ConnectorsLabView: View {
         }
         .navigationTitle("Connectors")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
         .onDisappear { speech.deactivate() }
         .sheet(isPresented: $showQuiz) {
             if let pack {
                 ConnectorsQuizView(connectors: pack.connectors)
             }
+        }
+        .fullScreenCover(isPresented: $showMarie) {
+            SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext())
         }
     }
 
@@ -133,6 +138,11 @@ struct ConnectorsQuizView: View {
             }
         }
         .onAppear { buildQuestions() }
+        .onChange(of: index) { newValue in
+            guard newValue == questions.count, !questions.isEmpty else { return }
+            let score = Double(correctCount) / Double(questions.count)
+            LearningStore().setLessonStatus("connectors_quiz", status: score >= 0.7 ? "completed" : "in_progress", score: score)
+        }
     }
 
     private var quizCard: some View {

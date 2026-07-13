@@ -19,6 +19,8 @@ struct FlashcardSessionView: View {
     @State private var sayItHint: String?
     @State private var showMarie = false
 
+    private var lessonContext: String { ContentService.shared.lessonContext(vocabTheme: theme, phase: phase) }
+
     var body: some View {
         ZStack {
             Passeport.parchmentDim.ignoresSafeArea()
@@ -33,9 +35,13 @@ struct FlashcardSessionView: View {
         }
         .navigationTitle(theme.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
         .onAppear {
             queue = SRSService(store: store).buildQueue(phase: phase, themeId: theme.id, limit: 30)
             sessionStart = Date()
+        }
+        .fullScreenCover(isPresented: $showMarie) {
+            SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
         }
         .onDisappear {
             speech.deactivate()
@@ -218,6 +224,17 @@ struct FlashcardSessionView: View {
             .padding(.horizontal, 60)
             .padding(.top, 8)
 
+            if reviewedCount == 0 {
+                Button {
+                    queue = SRSService(store: store).allEntries(phase: phase, themeId: theme.id)
+                    index = 0
+                } label: {
+                    Text("Review all \(theme.entries.count) words anyway")
+                        .font(Passeport.mono(11, weight: .medium))
+                        .foregroundColor(Passeport.maroon)
+                }
+            }
+
             if reviewedCount > 0 {
                 Button {
                     speech.deactivate()
@@ -233,8 +250,5 @@ struct FlashcardSessionView: View {
             }
         }
         .padding(24)
-        .fullScreenCover(isPresented: $showMarie) {
-            SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext(vocabTheme: theme, phase: phase))
-        }
     }
 }

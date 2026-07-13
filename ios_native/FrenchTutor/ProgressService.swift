@@ -121,6 +121,50 @@ class ProgressService {
         ]
     }
 
+    /// Compact "where the student is" summary, injected into every Marie call and
+    /// LessonAgent question so the AI calibrates level/pacing instead of assuming
+    /// a fixed beginner starting point every time.
+    func learnerProfileSummary() -> String {
+        var lines: [String] = []
+
+        if let month = currentMonth() {
+            lines.append("Currently on month \(month.month) of a 6-month CLB 7 / TEF-TCF Canada plan: \(month.title).")
+        }
+
+        let vocab = vocabCounts()
+        if vocab.total > 0 {
+            lines.append("Vocabulary: \(vocab.known) words mastered, \(vocab.learning) still being learned, out of \(vocab.total) total across 3 phases.")
+        }
+
+        let checklist = grammarChecklist()
+        let mastered = checklist.filter { $0.done }.map { $0.title }
+        let pending = checklist.filter { !$0.done }.map { $0.title }
+        if !mastered.isEmpty {
+            lines.append("Grammar already mastered: \(mastered.joined(separator: ", ")).")
+        }
+        if !pending.isEmpty {
+            lines.append("Grammar still being learned: \(pending.joined(separator: ", ")).")
+        }
+
+        let quiz = store.lessonStatus("connectors_quiz")
+        if quiz.status != "not_started", let score = quiz.score {
+            lines.append("Connectors quiz best score: \(Int(score * 100))%.")
+        }
+
+        let mistakes = store.topMistakeTags(limit: 3)
+        if !mistakes.isEmpty {
+            let described = mistakes.map { "\($0.description) (seen \($0.count)x)" }.joined(separator: "; ")
+            lines.append("Recurring mistakes to watch for and gently work back in: \(described).")
+        }
+
+        let streakDays = streak()
+        lines.append(streakDays > 0
+            ? "On a \(streakDays)-day study streak — keep the momentum, don't restate the basics."
+            : "No active streak right now — a little extra encouragement helps.")
+
+        return lines.joined(separator: " ")
+    }
+
     /// Total speaking minutes derived from stored call sessions.
     func speakingMinutes(sessions: [Session]) -> Int {
         let iso = ISO8601DateFormatter()

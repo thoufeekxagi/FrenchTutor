@@ -13,6 +13,8 @@ struct GrammarLessonView: View {
     @State private var showQA = false
     @State private var showMarie = false
     @State private var drillResults: [Bool] = []
+    @State private var engaged = false
+    @State private var sessionStart = Date()
 
     private var lessonContext: String { ContentService.shared.lessonContext(grammarLesson: lesson) }
 
@@ -58,7 +60,9 @@ struct GrammarLessonView: View {
         }
         .navigationTitle(lesson.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speech.deactivate() }
+        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
+        .onAppear { sessionStart = Date() }
+        .onDisappear { speech.deactivate(); logMinutes() }
         .sheet(isPresented: $showQA) {
             LessonQAOverlay(lessonContext: lessonContext, speech: speech, isPresented: $showQA)
                 .presentationDetents([.medium])
@@ -79,6 +83,12 @@ struct GrammarLessonView: View {
             }
         }
         .buttonStyle(PasseportPrimaryButton())
+    }
+
+    private func logMinutes() {
+        guard engaged else { return }
+        let minutes = max(1, Int(Date().timeIntervalSince(sessionStart) / 60))
+        store.markHabit(date: Date(), habitId: "reading", done: true, addMinutes: minutes)
     }
 
     private var usageCard: some View {
@@ -195,6 +205,7 @@ struct GrammarLessonView: View {
             return
         }
         isPlaying = true
+        engaged = true
         let items = LessonSpeechService.speechItems(from: lesson.narration)
         // Map narration item index proportionally onto the card range for scroll highlight.
         speech.speak(
@@ -208,6 +219,7 @@ struct GrammarLessonView: View {
     }
 
     private func recordDrillResult(_ correct: Bool) {
+        engaged = true
         drillResults.append(correct)
         guard drillResults.count == lesson.drills.count else { return }
         let score = Double(drillResults.filter { $0 }.count) / Double(drillResults.count)
@@ -230,6 +242,8 @@ struct TopicLessonView: View {
     @State private var showQA = false
     @State private var showMarie = false
     @State private var drillResults: [Bool] = []
+    @State private var engaged = false
+    @State private var sessionStart = Date()
 
     private var lessonContext: String { ContentService.shared.lessonContext(topic: topic) }
 
@@ -323,7 +337,9 @@ struct TopicLessonView: View {
         }
         .navigationTitle(topic.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { speech.deactivate() }
+        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
+        .onAppear { sessionStart = Date() }
+        .onDisappear { speech.deactivate(); logMinutes() }
         .sheet(isPresented: $showQA) {
             LessonQAOverlay(lessonContext: lessonContext, speech: speech, isPresented: $showQA)
                 .presentationDetents([.medium])
@@ -337,14 +353,22 @@ struct TopicLessonView: View {
         if isPlaying { speech.pause(); isPlaying = false; return }
         if speech.isSpeaking { speech.resume(); isPlaying = true; return }
         isPlaying = true
+        engaged = true
         let items = LessonSpeechService.speechItems(from: topic.narration)
         speech.speak(items: items, onFinished: { isPlaying = false })
     }
 
     private func recordDrillResult(_ correct: Bool) {
+        engaged = true
         drillResults.append(correct)
         guard drillResults.count == topic.drills.count else { return }
         let score = Double(drillResults.filter { $0 }.count) / Double(drillResults.count)
         store.setLessonStatus(topic.id, status: score >= 0.8 ? "completed" : "in_progress", score: score)
+    }
+
+    private func logMinutes() {
+        guard engaged else { return }
+        let minutes = max(1, Int(Date().timeIntervalSince(sessionStart) / 60))
+        store.markHabit(date: Date(), habitId: "reading", done: true, addMinutes: minutes)
     }
 }

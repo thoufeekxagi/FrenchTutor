@@ -9,6 +9,7 @@ struct DashboardView: View {
     @State private var streak = 0
     @State private var currentMonth: RoadmapMonth?
     @State private var marieLessonContext: String?
+    @State private var showPathway = false
 
     let storage = StorageService()
     private let store = LearningStore()
@@ -22,6 +23,7 @@ struct DashboardView: View {
                 ScrollView {
                     VStack(spacing: 14) {
                         header
+                        dailyPathwayCard
                         callMarieCard
                         speakingTopicsCard
                         todaysPlan
@@ -46,7 +48,53 @@ struct DashboardView: View {
         .fullScreenCover(isPresented: $showSession, onDismiss: { reload(); marieLessonContext = nil }) {
             SessionView(apiKey: geminiApiKey, lessonContext: marieLessonContext)
         }
+        .fullScreenCover(isPresented: $showPathway, onDismiss: { reload() }) {
+            DailyPathwayView()
+        }
         .onAppear { reload() }
+    }
+
+    /// The primary daily CTA: one continuous Marie call that teaches today's vocab, grammar,
+    /// listening, a quick writing check, and a closing roleplay — no picking labs first.
+    private var dailyPathwayCard: some View {
+        Button(action: { showPathway = true }) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14))
+                        .foregroundColor(Passeport.parchment)
+                    KickerText(text: "Today's session", color: Passeport.parchment.opacity(0.8))
+                    Spacer()
+                }
+                Text("Start Daily Pathway")
+                    .font(Passeport.display(23, weight: .semibold))
+                    .foregroundColor(Passeport.parchment)
+                Text(pathwaySummary)
+                    .font(Passeport.body(12.5))
+                    .foregroundColor(Passeport.parchment.opacity(0.85))
+                    .multilineTextAlignment(.leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+            .background(
+                LinearGradient(colors: [Passeport.maroon, Passeport.maroonDeep], startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: Passeport.maroon.opacity(0.25), radius: 14, x: 0, y: 6)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    private var pathwaySummary: String {
+        let words = SRSService(store: store).dailyMixedQueue().count
+        let grammarTitle = ProgressService(store: store).grammarChecklist().first(where: { !$0.done })?.title
+        let listeningCount = ContentService.shared.listening()?.exercises.count ?? 0
+        var parts: [String] = []
+        parts.append(words > 0 ? "\(words) words" : "vocab review")
+        if let grammarTitle { parts.append(grammarTitle) }
+        if listeningCount > 0 { parts.append("a listening passage") }
+        parts.append("roleplay with Marie")
+        return parts.joined(separator: " · ")
     }
 
     private var header: some View {
@@ -79,28 +127,27 @@ struct DashboardView: View {
         .padding(.top, 6)
     }
 
+    /// Secondary/unstructured option — free-form call with no pathway stages.
     private var callMarieCard: some View {
         Button(action: { showSession = true }) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 8) {
-                    Image(systemName: "phone.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(Passeport.brass)
-                    KickerText(text: "Speaking · live tutor")
-                    Spacer()
+            HStack(spacing: 10) {
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(Passeport.brass)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Just talk to Marie")
+                        .font(Passeport.body(13.5, weight: .medium))
+                        .foregroundColor(Passeport.parchment)
+                    Text("Unstructured practice, any topic")
+                        .font(Passeport.mono(10))
+                        .foregroundColor(Passeport.slate)
                 }
-                Text("Call Marie")
-                    .font(Passeport.display(21, weight: .semibold))
-                    .foregroundColor(Passeport.parchment)
-                Text("Real-time French conversation. Speak, get corrected, improve.")
-                    .font(Passeport.body(12.5))
-                    .foregroundColor(Passeport.slate)
-                    .multilineTextAlignment(.leading)
+                Spacer()
+                Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Passeport.slate)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(18)
+            .padding(14)
             .background(Passeport.ink)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -138,35 +185,19 @@ struct DashboardView: View {
 
     private var todaysPlan: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Today's plan")
-                .font(Passeport.display(16, weight: .medium))
-                .foregroundColor(Passeport.text)
-                .padding(.bottom, 6)
+            HStack {
+                Text("Today's plan")
+                    .font(Passeport.display(16, weight: .medium))
+                    .foregroundColor(Passeport.text)
+                Spacer()
+                Text("auto-tracked")
+                    .font(Passeport.mono(9, weight: .medium))
+                    .foregroundColor(Passeport.slateDim)
+            }
+            .padding(.bottom, 6)
 
             ForEach(Array(habits.enumerated()), id: \.element.habit.id) { index, item in
-                Button(action: { toggleHabit(item.habit, done: !item.done) }) {
-                    HStack(spacing: 11) {
-                        Image(systemName: item.done ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 19))
-                            .foregroundColor(item.done ? Passeport.brass : Passeport.slate)
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(item.habit.title)
-                                .font(Passeport.body(13, weight: .medium))
-                                .foregroundColor(Passeport.text)
-                                .strikethrough(item.done, color: Passeport.slateDim)
-                            Text(item.habit.detail)
-                                .font(Passeport.body(11))
-                                .foregroundColor(Passeport.slateDim)
-                                .lineLimit(1)
-                        }
-                        Spacer()
-                        Text("\(item.habit.minutes)m")
-                            .font(Passeport.mono(10.5))
-                            .foregroundColor(Passeport.slateDim)
-                    }
-                    .padding(.vertical, 8)
-                }
-                .buttonStyle(PlainButtonStyle())
+                habitRow(item)
                 if index < habits.count - 1 {
                     Divider().overlay(Passeport.hairline)
                 }
@@ -174,6 +205,56 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .passeportCard()
+    }
+
+    /// Rows are pure navigation — completion is set automatically when the student actually
+    /// uses the corresponding lab (see markHabit calls in each lab view), never by tapping here.
+    @ViewBuilder
+    private func habitRow(_ item: (habit: DailyHabit, done: Bool, minutes: Int)) -> some View {
+        if item.habit.id == "speaking" {
+            Button { showSession = true } label: { habitRowContent(item) }
+                .buttonStyle(PlainButtonStyle())
+        } else {
+            NavigationLink(destination: habitDestination(item.habit)) { habitRowContent(item) }
+                .buttonStyle(PlainButtonStyle())
+        }
+    }
+
+    private func habitRowContent(_ item: (habit: DailyHabit, done: Bool, minutes: Int)) -> some View {
+        HStack(spacing: 11) {
+            Image(systemName: item.done ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 19))
+                .foregroundColor(item.done ? Passeport.brass : Passeport.slate)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(item.habit.title)
+                    .font(Passeport.body(13, weight: .medium))
+                    .foregroundColor(Passeport.text)
+                    .strikethrough(item.done, color: Passeport.slateDim)
+                Text(item.habit.detail)
+                    .font(Passeport.body(11))
+                    .foregroundColor(Passeport.slateDim)
+                    .lineLimit(1)
+            }
+            Spacer()
+            Text("\(item.habit.minutes)m")
+                .font(Passeport.mono(10.5))
+                .foregroundColor(Passeport.slateDim)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11))
+                .foregroundColor(Passeport.slate)
+        }
+        .padding(.vertical, 8)
+    }
+
+    @ViewBuilder
+    private func habitDestination(_ habit: DailyHabit) -> some View {
+        switch habit.id {
+        case "anki": DailyPracticeView()
+        case "listening": ListeningLabView()
+        case "reading": GrammarLabView()
+        case "writing": WritingLabView()
+        default: LabsView()
+        }
     }
 
     @ViewBuilder
@@ -235,12 +316,6 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .passeportCard()
-    }
-
-    private func toggleHabit(_ habit: DailyHabit, done: Bool) {
-        store.markHabit(date: Date(), habitId: habit.id, done: done)
-        habits = progressService.todaysHabits()
-        streak = progressService.streak()
     }
 
     private func reload() {

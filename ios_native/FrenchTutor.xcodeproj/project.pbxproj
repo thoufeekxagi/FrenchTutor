@@ -41,6 +41,14 @@
 		A10037 /* ListeningExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20039; };
 		A10038 /* WritingLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20040; };
 		A10039 /* WritingTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20041; };
+		A10040 /* MarieAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20042; };
+		A10041 /* DailyPracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20043; };
+		A10042 /* AgentTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20044; };
+		A10043 /* DailyPathwayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20045; };
+		A10044 /* AgentLedVocabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20046; };
+		A10045 /* AgentLedListeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20047; };
+		A10046 /* PathwayWritingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20048; };
+		A10047 /* VocabPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20049; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +90,14 @@
 		A20039 /* ListeningExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningExerciseView.swift; sourceTree = "<group>"; };
 		A20040 /* WritingLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingLabView.swift; sourceTree = "<group>"; };
 		A20041 /* WritingTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingTaskView.swift; sourceTree = "<group>"; };
+		A20042 /* MarieAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarieAccess.swift; sourceTree = "<group>"; };
+		A20043 /* DailyPracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPracticeView.swift; sourceTree = "<group>"; };
+		A20044 /* AgentTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTool.swift; sourceTree = "<group>"; };
+		A20045 /* DailyPathwayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPathwayView.swift; sourceTree = "<group>"; };
+		A20046 /* AgentLedVocabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLedVocabView.swift; sourceTree = "<group>"; };
+		A20047 /* AgentLedListeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLedListeningView.swift; sourceTree = "<group>"; };
+		A20048 /* PathwayWritingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathwayWritingView.swift; sourceTree = "<group>"; };
+		A20049 /* VocabPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabPickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +165,14 @@
 				A20039 /* ListeningExerciseView.swift */,
 				A20040 /* WritingLabView.swift */,
 				A20041 /* WritingTaskView.swift */,
+				A20042 /* MarieAccess.swift */,
+				A20043 /* DailyPracticeView.swift */,
+				A20044 /* AgentTool.swift */,
+				A20045 /* DailyPathwayView.swift */,
+				A20046 /* AgentLedVocabView.swift */,
+				A20047 /* AgentLedListeningView.swift */,
+				A20048 /* PathwayWritingView.swift */,
+				A20049 /* VocabPickerView.swift */,
 				A20009 /* Assets.xcassets */,
 				A20010 /* Info.plist */,
 			);
@@ -254,6 +278,14 @@
 				A10037 /* ListeningExerciseView.swift in Sources */,
 				A10038 /* WritingLabView.swift in Sources */,
 				A10039 /* WritingTaskView.swift in Sources */,
+				A10040 /* MarieAccess.swift in Sources */,
+				A10041 /* DailyPracticeView.swift in Sources */,
+				A10042 /* AgentTool.swift in Sources */,
+				A10043 /* DailyPathwayView.swift in Sources */,
+				A10044 /* AgentLedVocabView.swift in Sources */,
+				A10045 /* AgentLedListeningView.swift in Sources */,
+				A10046 /* PathwayWritingView.swift in Sources */,
+				A10047 /* VocabPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

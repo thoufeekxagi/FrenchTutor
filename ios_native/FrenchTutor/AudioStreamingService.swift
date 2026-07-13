@@ -22,6 +22,15 @@ class AudioStreamingService: NSObject {
     // voice processing (which would degrade output audio quality).
     var isOutputActive = false
 
+    // `isOutputActive` is set false the moment the SERVER signals turnComplete — but network
+    // delivery outruns real-time playback, so scheduled audio can still be physically playing
+    // through the speaker for seconds after that. Reopening the mic at turnComplete let it pick
+    // up the tail of the tutor's own still-playing voice as if it were fresh user speech (the
+    // root cause of attempts/intents being detected that the student never actually said). This
+    // tracks the real end of the scheduled playback queue as an independent, additional gate.
+    private var scheduledPlaybackEndTime = Date.distantPast
+    private let playbackTailGraceSeconds = 0.35
+
     private var isPlayerAttached = false
     private var playerConnectFormat: AVAudioFormat?
 
@@ -303,6 +312,7 @@ class AudioStreamingService: NSObject {
         playerNode.stop()
         engine.stop()
         audioChunkCallback = nil
+        scheduledPlaybackEndTime = .distantPast
     }
 
     private func processInputBuffer(_ buffer: AVAudioPCMBuffer) {
@@ -339,7 +349,7 @@ class AudioStreamingService: NSObject {
         let byteCount = frameLength * MemoryLayout<Int16>.size
         let data = Data(bytes: int16Data, count: byteCount)
 
-        guard !isOutputActive else { return }
+        guard !isOutputActive, Date() >= scheduledPlaybackEndTime.addingTimeInterval(playbackTailGraceSeconds) else { return }
 
         micChunkCount += 1
         if micChunkCount == 1 || micChunkCount % 10 == 0 {
@@ -388,6 +398,13 @@ class AudioStreamingService: NSObject {
             print("AudioStreamingService: dropping chunk, format mismatch live=\(liveFormat) buffer=\(buffer.format)")
             return
         }
+
+        // Chunks arrive over the network faster than real-time playback, so this buffer's audio
+        // won't actually finish sounding until whatever's already queued finishes, plus this
+        // buffer's own duration. Extend the tracked timeline instead of resetting it — that's
+        // what makes scheduledPlaybackEndTime reflect the real end of everything queued so far.
+        let bufferDuration = Double(buffer.frameLength) / buffer.format.sampleRate
+        scheduledPlaybackEndTime = max(scheduledPlaybackEndTime, Date()).addingTimeInterval(bufferDuration)
 
         playerNode.scheduleBuffer(buffer)
     }
@@ -455,6 +472,10 @@ class AudioStreamingService: NSObject {
 
     func stopPlayback() {
         playerNode.stop()
+        // Discards everything queued, so the tracked playback timeline is now stale — without
+        // this reset the mic gate would keep blocking uploads until a time that no longer
+        // corresponds to any audio actually playing.
+        scheduledPlaybackEndTime = .distantPast
     }
 
     func setSpeakerEnabled(_ enabled: Bool) {

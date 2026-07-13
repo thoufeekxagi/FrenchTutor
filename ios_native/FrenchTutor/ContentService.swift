@@ -6,6 +6,7 @@ final class ContentService {
     private init() {}
 
     private var vocabCache: [Int: VocabPhase] = [:]
+    private var vocabExamplesCache: [String: LessonAgentService.VocabExample]?
     private var grammarCache: GrammarPack?
     private var connectorsCache: ConnectorsPack?
     private var listeningCache: ListeningPack?
@@ -26,6 +27,21 @@ final class ContentService {
 
     var vocabPhases: [VocabPhase] {
         [1, 2, 3].compactMap { vocabPhase($0) }
+    }
+
+    /// Every vocab word's example sentence, pre-authored once offline for the whole ~1400-word
+    /// bank (Content/vocab_examples.json, keyed by word id) — not generated live by an LLM at
+    /// session time. Missing entries (a handful of words a generation pass couldn't cover) are
+    /// simply omitted; callers treat a missing example as "no example this session," not an error.
+    func vocabExamples(for words: [VocabEntry]) -> [String: LessonAgentService.VocabExample] {
+        lock.lock()
+        if vocabExamplesCache == nil {
+            vocabExamplesCache = load("vocab_examples") ?? [:]
+        }
+        let all = vocabExamplesCache ?? [:]
+        lock.unlock()
+        let ids = Set(words.map { $0.id })
+        return all.filter { ids.contains($0.key) }
     }
 
     func grammar() -> GrammarPack? {
@@ -98,6 +114,14 @@ final class ContentService {
     func lessonContext(vocabTheme theme: VocabTheme, phase: Int) -> String {
         let lines = theme.entries.map { "\($0.fr) = \($0.en)" }
         return "LESSON: Vocabulary — \(theme.title) (phase \(phase))\n" + lines.joined(separator: ", ")
+    }
+
+    /// For a flat cross-theme word list (e.g. the Daily Pathway's mixed SRS queue), unlike
+    /// `lessonContext(vocabTheme:)` which needs a single theme.
+    func lessonContext(vocabEntries entries: [VocabEntry]) -> String {
+        guard !entries.isEmpty else { return "" }
+        let lines = entries.map { "\($0.fr) = \($0.en)" }
+        return "TODAY'S VOCABULARY LIST (\(entries.count) words):\n" + lines.joined(separator: ", ")
     }
 
     func lessonContext(writingTask task: WritingTask) -> String {

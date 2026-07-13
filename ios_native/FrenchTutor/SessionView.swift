@@ -327,6 +327,10 @@ struct SessionView: View {
             storage.saveMessage(sessionId: sessionId, role: msg.isUser ? "user" : "assistant", content: msg.content)
         }
 
+        if callDuration >= 45 {
+            LearningStore().markHabit(date: Date(), habitId: "speaking", done: true, addMinutes: max(1, callDuration / 60))
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             dismiss()
         }

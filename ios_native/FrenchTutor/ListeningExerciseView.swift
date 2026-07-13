@@ -15,6 +15,7 @@ struct ListeningExerciseView: View {
     @State private var dictationFeedback: [Int: String] = [:]
     @State private var isChecking = false
     @State private var sessionStart = Date()
+    @State private var showMarie = false
 
     private var lessonContext: String { ContentService.shared.lessonContext(listeningExercise: exercise) }
 
@@ -48,8 +49,12 @@ struct ListeningExerciseView: View {
         }
         .navigationTitle(exercise.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
         .onAppear { sessionStart = Date() }
         .onDisappear { speech.deactivate() }
+        .fullScreenCover(isPresented: $showMarie) {
+            SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+        }
     }
 
     private var allQuestionsAnswered: Bool {
@@ -166,6 +171,8 @@ struct ListeningExerciseView: View {
                     }
                     TextField("Type what you hear…", text: dictationBinding(i))
                         .font(Passeport.body(13))
+                        .foregroundColor(Passeport.text)
+                        .tint(Passeport.maroon)
                         .padding(10)
                         .background(Passeport.parchmentDim)
                         .clipShape(RoundedRectangle(cornerRadius: 8))

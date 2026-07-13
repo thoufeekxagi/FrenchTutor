@@ -79,6 +79,43 @@ class SRSService {
         return Array(queue.prefix(limit))
     }
 
+    /// All entries in a theme regardless of due date — used for "review anyway" retakes.
+    func allEntries(phase: Int, themeId: String) -> [VocabEntry] {
+        guard let phaseContent = ContentService.shared.vocabPhase(phase) else { return [] }
+        return phaseContent.themes.first(where: { $0.id == themeId })?.entries ?? []
+    }
+
+    /// Cross-phase queue for the daily anchor session: every due review across all phases,
+    /// plus new words (curriculum order — phase 1 themes first) up to `newCap` for the day.
+    func dailyMixedQueue(newCap: Int = 25, limit: Int = 60) -> [VocabEntry] {
+        let allEntries = ContentService.shared.vocabPhases.flatMap { phase in phase.themes.flatMap { $0.entries } }
+        let states = store.allSRSStates()
+        let now = Date()
+
+        var due: [VocabEntry] = []
+        var unseen: [VocabEntry] = []
+        for entry in allEntries {
+            if let state = states[entry.id] {
+                if let dueAt = state.dueAt, dueAt <= now { due.append(entry) }
+            } else {
+                unseen.append(entry)
+            }
+        }
+
+        let newBudget = max(0, newCap - store.newEntriesIntroducedToday())
+        let queue = due + unseen.prefix(newBudget)
+        return Array(queue.prefix(limit))
+    }
+
+    /// A sample of already-learned words (reps >= 2) across all phases, for a quick recall quiz.
+    func knownSample(limit: Int = 6) -> [VocabEntry] {
+        let allEntries = ContentService.shared.vocabPhases.flatMap { phase in phase.themes.flatMap { $0.entries } }
+        let states = store.allSRSStates()
+        let knownIds = Set(states.filter { $0.value.reps >= 2 }.map { $0.key })
+        let knownEntries = allEntries.filter { knownIds.contains($0.id) }
+        return Array(knownEntries.shuffled().prefix(limit))
+    }
+
     /// Due and unseen counts for badges on deck rows.
     func counts(phase: Int, themeId: String? = nil) -> (due: Int, unseen: Int, known: Int) {
         guard let phaseContent = ContentService.shared.vocabPhase(phase) else { return (0, 0, 0) }

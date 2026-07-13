@@ -75,6 +75,24 @@ class LearningStore {
             created_at TEXT NOT NULL
         );
         """)
+        exec("""
+        CREATE TABLE IF NOT EXISTS mistake_tags (
+            tag TEXT PRIMARY KEY,
+            description TEXT NOT NULL,
+            example TEXT,
+            count INTEGER NOT NULL DEFAULT 1,
+            last_seen_at TEXT NOT NULL,
+            resolved INTEGER NOT NULL DEFAULT 0
+        );
+        """)
+        exec("""
+        CREATE TABLE IF NOT EXISTS session_diary (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            stage TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        """)
     }
 
     deinit {
@@ -346,6 +364,84 @@ class LearningStore {
                 let score: Double? = sqlite3_column_type(stmt, 4) != SQLITE_NULL ? sqlite3_column_double(stmt, 4) : nil
                 let createdAt = String(cString: sqlite3_column_text(stmt, 5))
                 result.append(WritingSubmission(id: id, taskId: task, content: content, feedback: feedback, score: score, createdAt: createdAt))
+            }
+        }
+        sqlite3_finalize(stmt)
+        return result
+    }
+
+    // MARK: - Mistake ledger
+
+    /// Upserts a recurring-error tag: increments the count and refreshes the example if the
+    /// tag already exists (and isn't resolved), otherwise inserts a fresh one. This is what
+    /// lets "you keep mixing up être/avoir" carry across sessions instead of resetting.
+    func logMistake(tag: String, description: String, example: String?) {
+        let sql = """
+        INSERT INTO mistake_tags (tag, description, example, count, last_seen_at, resolved)
+        VALUES (?, ?, ?, 1, ?, 0)
+        ON CONFLICT(tag) DO UPDATE SET
+            count = count + 1,
+            description = excluded.description,
+            example = excluded.example,
+            last_seen_at = excluded.last_seen_at,
+            resolved = 0;
+        """
+        var stmt: OpaquePointer?
+        if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+            bindText(stmt, 1, tag)
+            bindText(stmt, 2, description)
+            if let example { bindText(stmt, 3, example) } else { sqlite3_bind_null(stmt, 3) }
+            bindText(stmt, 4, iso.string(from: Date()))
+            sqlite3_step(stmt)
+        }
+        sqlite3_finalize(stmt)
+    }
+
+    /// Unresolved mistake tags sorted by recurrence — the most-repeated struggles first, which
+    /// is what gets fed into the learner profile so every session naturally circles back to them.
+    func topMistakeTags(limit: Int = 5) -> [(tag: String, description: String, count: Int)] {
+        let sql = "SELECT tag, description, count FROM mistake_tags WHERE resolved = 0 ORDER BY count DESC, last_seen_at DESC LIMIT ?;"
+        var stmt: OpaquePointer?
+        var result: [(String, String, Int)] = []
+        if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+            sqlite3_bind_int(stmt, 1, Int32(limit))
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                let tag = String(cString: sqlite3_column_text(stmt, 0))
+                let description = String(cString: sqlite3_column_text(stmt, 1))
+                let count = Int(sqlite3_column_int(stmt, 2))
+                result.append((tag, description, count))
+            }
+        }
+        sqlite3_finalize(stmt)
+        return result
+    }
+
+    func resolveMistakeTag(_ tag: String) {
+        exec("UPDATE mistake_tags SET resolved = 1 WHERE tag = '\(tag.replacingOccurrences(of: "'", with: "''"))';")
+    }
+
+    // MARK: - Session diary
+
+    func saveDiaryEntry(stage: String, summary: String) {
+        let sql = "INSERT INTO session_diary (stage, summary, created_at) VALUES (?, ?, ?);"
+        var stmt: OpaquePointer?
+        if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+            bindText(stmt, 1, stage)
+            bindText(stmt, 2, summary)
+            bindText(stmt, 3, iso.string(from: Date()))
+            sqlite3_step(stmt)
+        }
+        sqlite3_finalize(stmt)
+    }
+
+    func recentDiaryEntries(limit: Int = 3) -> [String] {
+        let sql = "SELECT summary FROM session_diary ORDER BY id DESC LIMIT ?;"
+        var stmt: OpaquePointer?
+        var result: [String] = []
+        if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+            sqlite3_bind_int(stmt, 1, Int32(limit))
+            while sqlite3_step(stmt) == SQLITE_ROW {
+                result.append(String(cString: sqlite3_column_text(stmt, 0)))
             }
         }
         sqlite3_finalize(stmt)
