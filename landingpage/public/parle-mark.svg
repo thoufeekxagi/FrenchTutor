@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <path d="M 794 0 L 1024 0 L 1024 230 Z" fill="#EF4444" opacity="0.9"/>
+  <path d="M 722 0 L 952 0 L 952 230 Z" fill="#FFFFFF" opacity="0.85"/>
+  <path d="M 650 0 L 880 0 L 880 230 Z" fill="#3B82F6" opacity="0.85"/>
+  <g transform="translate(512, 430)">
+    <path d="M -220 -60 Q -260 0 -220 60" fill="none" stroke="url(#accent)" stroke-width="32" stroke-linecap="round" opacity="0.35"/>
+    <path d="M 220 -60 Q 260 0 220 60" fill="none" stroke="url(#accent)" stroke-width="32" stroke-linecap="round" opacity="0.35"/>
+    <path d="M -170 -110 Q -230 0 -170 110" fill="none" stroke="url(#accent)" stroke-width="28" stroke-linecap="round" opacity="0.55"/>
+    <path d="M 170 -110 Q 230 0 170 110" fill="none" stroke="url(#accent)" stroke-width="28" stroke-linecap="round" opacity="0.55"/>
+    <path d="M -130 -160 L 130 -160 C 190 -160 220 -130 220 -70 L 220 30 C 220 90 190 120 130 120 L 40 120 L 0 180 L -40 120 L -130 120 C -190 120 -220 90 -220 30 L -220 -70 C -220 -130 -190 -160 -130 -160 Z" fill="url(#accent)"/>
+    <g transform="translate(0, -10)">
+      <rect x="-36" y="-80" width="72" height="100" rx="36" fill="#4C1D95"/>
+      <rect x="-18" y="-60" width="36" height="60" rx="18" fill="#F8FAFC"/>
+      <path d="M -60 20 Q -60 60 0 60 Q 60 60 60 20" fill="none" stroke="#4C1D95" stroke-width="16" stroke-linecap="round"/>
+      <line x1="0" y1="60" x2="0" y2="90" stroke="#4C1D95" stroke-width="16" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g transform="translate(700, 760)">
+    <circle cx="0" cy="0" r="130" fill="#FFFFFF"/>
+    <text x="0" y="42" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="140" fill="#4C1D95">7</text>
+    <text x="0" y="85" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="34" fill="#6366F1" letter-spacing="4">CLB</text>
+  </g>
+</svg>
