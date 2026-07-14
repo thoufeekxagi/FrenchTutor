@@ -72,17 +72,18 @@ abstract final class DesignTokens {
 
   // --- Typography ---
 
-  /// Editorial serif for HERO moments only. Below 22pt this silently returns
-  /// the sans voice — a central guard so no call site can ship small serif.
+  /// Display voice — Inter, heavier and tighter at hero sizes. The serif
+  /// experiment is fully retired (2026-07): every platform, every screen,
+  /// onboarding included, renders the same SF-style sans.
   static TextStyle display(double size, {FontWeight weight = FontWeight.w500}) {
-    if (size < 22) {
-      return GoogleFonts.inter(
-          fontSize: size,
-          fontWeight: weight.value < FontWeight.w600.value ? FontWeight.w600 : weight,
-          color: ink,
-          letterSpacing: -0.2);
-    }
-    return GoogleFonts.playfairDisplay(fontSize: size, fontWeight: weight, color: ink);
+    final resolved = size >= 22
+        ? (weight.value < FontWeight.w700.value ? FontWeight.w700 : weight)
+        : (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight);
+    return GoogleFonts.inter(
+        fontSize: size,
+        fontWeight: resolved,
+        color: ink,
+        letterSpacing: size >= 22 ? -0.5 : -0.2);
   }
 
   /// The UI voice — Inter everywhere (SF Pro look, identical cross-platform).
