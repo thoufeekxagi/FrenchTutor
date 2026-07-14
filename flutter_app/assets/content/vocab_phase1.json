@@ -1,0 +1,3000 @@
+{
+  "phase": 1,
+  "title": "Survival French",
+  "themes": [
+    {
+      "id": "pronouns_basics",
+      "title": "Pronouns & Basics",
+      "entries": [
+        {
+          "id": "p1_pronouns_basics_je",
+          "en": "I",
+          "fr": "je",
+          "phonetic": "zhuh"
+        },
+        {
+          "id": "p1_pronouns_basics_tu",
+          "en": "you (informal)",
+          "fr": "tu",
+          "phonetic": "tew"
+        },
+        {
+          "id": "p1_pronouns_basics_vous",
+          "en": "you (formal/plural)",
+          "fr": "vous",
+          "phonetic": "voo"
+        },
+        {
+          "id": "p1_pronouns_basics_il",
+          "en": "he",
+          "fr": "il",
+          "phonetic": "eel"
+        },
+        {
+          "id": "p1_pronouns_basics_elle",
+          "en": "she",
+          "fr": "elle",
+          "phonetic": "ehl"
+        },
+        {
+          "id": "p1_pronouns_basics_nous",
+          "en": "we",
+          "fr": "nous",
+          "phonetic": "noo"
+        },
+        {
+          "id": "p1_pronouns_basics_ils",
+          "en": "they (m)",
+          "fr": "ils",
+          "phonetic": "eel"
+        },
+        {
+          "id": "p1_pronouns_basics_elles",
+          "en": "they (f)",
+          "fr": "elles",
+          "phonetic": "ehl"
+        },
+        {
+          "id": "p1_pronouns_basics_oui",
+          "en": "yes",
+          "fr": "oui",
+          "phonetic": "wee"
+        },
+        {
+          "id": "p1_pronouns_basics_non",
+          "en": "no",
+          "fr": "non",
+          "phonetic": "noh(n)"
+        },
+        {
+          "id": "p1_pronouns_basics_on",
+          "en": "we / one (informal)",
+          "fr": "on",
+          "phonetic": "oh(n)"
+        },
+        {
+          "id": "p1_pronouns_basics_moi",
+          "en": "me",
+          "fr": "moi",
+          "phonetic": "mwah"
+        },
+        {
+          "id": "p1_pronouns_basics_toi",
+          "en": "you (stressed)",
+          "fr": "toi",
+          "phonetic": "twah"
+        },
+        {
+          "id": "p1_pronouns_basics_lui",
+          "en": "him",
+          "fr": "lui",
+          "phonetic": "lwee"
+        },
+        {
+          "id": "p1_pronouns_basics_eux",
+          "en": "them",
+          "fr": "eux",
+          "phonetic": "uh"
+        },
+        {
+          "id": "p1_pronouns_basics_ca",
+          "en": "this / that",
+          "fr": "ça",
+          "phonetic": "sah"
+        },
+        {
+          "id": "p1_pronouns_basics_ce",
+          "en": "this / it",
+          "fr": "ce",
+          "phonetic": "suh"
+        },
+        {
+          "id": "p1_pronouns_basics_ici",
+          "en": "here",
+          "fr": "ici",
+          "phonetic": "ee-see"
+        },
+        {
+          "id": "p1_pronouns_basics_la",
+          "en": "there",
+          "fr": "là",
+          "phonetic": "lah"
+        },
+        {
+          "id": "p1_pronouns_basics_et",
+          "en": "and",
+          "fr": "et",
+          "phonetic": "ay"
+        },
+        {
+          "id": "p1_pronouns_basics_ou",
+          "en": "or",
+          "fr": "ou",
+          "phonetic": "oo"
+        },
+        {
+          "id": "p1_pronouns_basics_mais",
+          "en": "but",
+          "fr": "mais",
+          "phonetic": "meh"
+        },
+        {
+          "id": "p1_pronouns_basics_parce-que",
+          "en": "because",
+          "fr": "parce que",
+          "phonetic": "pars kuh"
+        },
+        {
+          "id": "p1_pronouns_basics_avec",
+          "en": "with",
+          "fr": "avec",
+          "phonetic": "ah-vehk"
+        },
+        {
+          "id": "p1_pronouns_basics_sans",
+          "en": "without",
+          "fr": "sans",
+          "phonetic": "sah(n)"
+        },
+        {
+          "id": "p1_pronouns_basics_dans",
+          "en": "in",
+          "fr": "dans",
+          "phonetic": "dah(n)"
+        },
+        {
+          "id": "p1_pronouns_basics_sur",
+          "en": "on",
+          "fr": "sur",
+          "phonetic": "sewr"
+        },
+        {
+          "id": "p1_pronouns_basics_sous",
+          "en": "under",
+          "fr": "sous",
+          "phonetic": "soo"
+        },
+        {
+          "id": "p1_pronouns_basics_pour",
+          "en": "for",
+          "fr": "pour",
+          "phonetic": "poor"
+        },
+        {
+          "id": "p1_pronouns_basics_de",
+          "en": "of / from",
+          "fr": "de",
+          "phonetic": "duh"
+        },
+        {
+          "id": "p1_pronouns_basics_a",
+          "en": "to / at",
+          "fr": "à",
+          "phonetic": "ah"
+        },
+        {
+          "id": "p1_pronouns_basics_mon-ma",
+          "en": "my",
+          "fr": "mon / ma",
+          "phonetic": "moh(n) / mah"
+        },
+        {
+          "id": "p1_pronouns_basics_ton-ta",
+          "en": "your (informal)",
+          "fr": "ton / ta",
+          "phonetic": "toh(n) / tah"
+        },
+        {
+          "id": "p1_pronouns_basics_son-sa",
+          "en": "his / her",
+          "fr": "son / sa",
+          "phonetic": "soh(n) / sah"
+        },
+        {
+          "id": "p1_pronouns_basics_notre",
+          "en": "our",
+          "fr": "notre",
+          "phonetic": "noh-truh"
+        },
+        {
+          "id": "p1_pronouns_basics_votre",
+          "en": "your (formal/plural)",
+          "fr": "votre",
+          "phonetic": "voh-truh"
+        },
+        {
+          "id": "p1_pronouns_basics_leur",
+          "en": "their",
+          "fr": "leur",
+          "phonetic": "luhr"
+        },
+        {
+          "id": "p1_pronouns_basics_aussi",
+          "en": "also / too",
+          "fr": "aussi",
+          "phonetic": "oh-see"
+        },
+        {
+          "id": "p1_pronouns_basics_ne-pas",
+          "en": "not",
+          "fr": "ne... pas",
+          "phonetic": "nuh... pah"
+        },
+        {
+          "id": "p1_pronouns_basics_il-y-a",
+          "en": "there is / there are",
+          "fr": "il y a",
+          "phonetic": "eel ee ah"
+        }
+      ]
+    },
+    {
+      "id": "verbs",
+      "title": "Essential Verbs",
+      "entries": [
+        {
+          "id": "p1_verbs_etre",
+          "en": "to be",
+          "fr": "être",
+          "phonetic": "eh-truh"
+        },
+        {
+          "id": "p1_verbs_avoir",
+          "en": "to have",
+          "fr": "avoir",
+          "phonetic": "ah-vwahr"
+        },
+        {
+          "id": "p1_verbs_aller",
+          "en": "to go",
+          "fr": "aller",
+          "phonetic": "ah-lay"
+        },
+        {
+          "id": "p1_verbs_faire",
+          "en": "to do / make",
+          "fr": "faire",
+          "phonetic": "fehr"
+        },
+        {
+          "id": "p1_verbs_pouvoir",
+          "en": "to be able to",
+          "fr": "pouvoir",
+          "phonetic": "poo-vwahr"
+        },
+        {
+          "id": "p1_verbs_vouloir",
+          "en": "to want",
+          "fr": "vouloir",
+          "phonetic": "voo-lwahr"
+        },
+        {
+          "id": "p1_verbs_devoir",
+          "en": "must / to owe",
+          "fr": "devoir",
+          "phonetic": "duh-vwahr"
+        },
+        {
+          "id": "p1_verbs_venir",
+          "en": "to come",
+          "fr": "venir",
+          "phonetic": "vuh-neer"
+        },
+        {
+          "id": "p1_verbs_prendre",
+          "en": "to take",
+          "fr": "prendre",
+          "phonetic": "prah(n)-druh"
+        },
+        {
+          "id": "p1_verbs_mettre",
+          "en": "to put",
+          "fr": "mettre",
+          "phonetic": "meh-truh"
+        },
+        {
+          "id": "p1_verbs_donner",
+          "en": "to give",
+          "fr": "donner",
+          "phonetic": "doh-nay"
+        },
+        {
+          "id": "p1_verbs_voir",
+          "en": "to see",
+          "fr": "voir",
+          "phonetic": "vwahr"
+        },
+        {
+          "id": "p1_verbs_dire",
+          "en": "to say",
+          "fr": "dire",
+          "phonetic": "deer"
+        },
+        {
+          "id": "p1_verbs_parler",
+          "en": "to speak",
+          "fr": "parler",
+          "phonetic": "par-lay"
+        },
+        {
+          "id": "p1_verbs_manger",
+          "en": "to eat",
+          "fr": "manger",
+          "phonetic": "mah(n)-zhay"
+        },
+        {
+          "id": "p1_verbs_boire",
+          "en": "to drink",
+          "fr": "boire",
+          "phonetic": "bwahr"
+        },
+        {
+          "id": "p1_verbs_travailler",
+          "en": "to work",
+          "fr": "travailler",
+          "phonetic": "trah-vah-yay"
+        },
+        {
+          "id": "p1_verbs_etudier",
+          "en": "to study",
+          "fr": "étudier",
+          "phonetic": "ay-tew-dyay"
+        },
+        {
+          "id": "p1_verbs_vivre",
+          "en": "to live",
+          "fr": "vivre",
+          "phonetic": "vee-vruh"
+        },
+        {
+          "id": "p1_verbs_aimer",
+          "en": "to like / love",
+          "fr": "aimer",
+          "phonetic": "eh-may"
+        },
+        {
+          "id": "p1_verbs_regarder",
+          "en": "to watch / look at",
+          "fr": "regarder",
+          "phonetic": "ruh-gar-day"
+        },
+        {
+          "id": "p1_verbs_ecouter",
+          "en": "to listen",
+          "fr": "écouter",
+          "phonetic": "ay-koo-tay"
+        },
+        {
+          "id": "p1_verbs_habiter",
+          "en": "to live / reside",
+          "fr": "habiter",
+          "phonetic": "ah-bee-tay"
+        },
+        {
+          "id": "p1_verbs_arriver",
+          "en": "to arrive",
+          "fr": "arriver",
+          "phonetic": "ah-ree-vay"
+        },
+        {
+          "id": "p1_verbs_partir",
+          "en": "to leave",
+          "fr": "partir",
+          "phonetic": "par-teer"
+        },
+        {
+          "id": "p1_verbs_chercher",
+          "en": "to look for",
+          "fr": "chercher",
+          "phonetic": "shehr-shay"
+        },
+        {
+          "id": "p1_verbs_trouver",
+          "en": "to find",
+          "fr": "trouver",
+          "phonetic": "troo-vay"
+        },
+        {
+          "id": "p1_verbs_penser",
+          "en": "to think",
+          "fr": "penser",
+          "phonetic": "pah(n)-say"
+        },
+        {
+          "id": "p1_verbs_savoir",
+          "en": "to know (facts)",
+          "fr": "savoir",
+          "phonetic": "sah-vwahr"
+        },
+        {
+          "id": "p1_verbs_connaitre",
+          "en": "to know (people/places)",
+          "fr": "connaître",
+          "phonetic": "koh-neh-truh"
+        },
+        {
+          "id": "p1_verbs_comprendre",
+          "en": "to understand",
+          "fr": "comprendre",
+          "phonetic": "koh(n)-prah(n)-druh"
+        },
+        {
+          "id": "p1_verbs_apprendre",
+          "en": "to learn",
+          "fr": "apprendre",
+          "phonetic": "ah-prah(n)-druh"
+        },
+        {
+          "id": "p1_verbs_lire",
+          "en": "to read",
+          "fr": "lire",
+          "phonetic": "leer"
+        },
+        {
+          "id": "p1_verbs_ecrire",
+          "en": "to write",
+          "fr": "écrire",
+          "phonetic": "ay-kreer"
+        },
+        {
+          "id": "p1_verbs_ouvrir",
+          "en": "to open",
+          "fr": "ouvrir",
+          "phonetic": "oo-vreer"
+        },
+        {
+          "id": "p1_verbs_fermer",
+          "en": "to close",
+          "fr": "fermer",
+          "phonetic": "fehr-may"
+        },
+        {
+          "id": "p1_verbs_commencer",
+          "en": "to begin",
+          "fr": "commencer",
+          "phonetic": "koh-mah(n)-say"
+        },
+        {
+          "id": "p1_verbs_finir",
+          "en": "to finish",
+          "fr": "finir",
+          "phonetic": "fee-neer"
+        },
+        {
+          "id": "p1_verbs_attendre",
+          "en": "to wait",
+          "fr": "attendre",
+          "phonetic": "ah-tah(n)-druh"
+        },
+        {
+          "id": "p1_verbs_demander",
+          "en": "to ask",
+          "fr": "demander",
+          "phonetic": "duh-mah(n)-day"
+        },
+        {
+          "id": "p1_verbs_repondre",
+          "en": "to answer",
+          "fr": "répondre",
+          "phonetic": "ray-poh(n)-druh"
+        },
+        {
+          "id": "p1_verbs_aider",
+          "en": "to help",
+          "fr": "aider",
+          "phonetic": "eh-day"
+        },
+        {
+          "id": "p1_verbs_payer",
+          "en": "to pay",
+          "fr": "payer",
+          "phonetic": "peh-yay"
+        },
+        {
+          "id": "p1_verbs_marcher",
+          "en": "to walk",
+          "fr": "marcher",
+          "phonetic": "mar-shay"
+        },
+        {
+          "id": "p1_verbs_courir",
+          "en": "to run",
+          "fr": "courir",
+          "phonetic": "koo-reer"
+        },
+        {
+          "id": "p1_verbs_dormir",
+          "en": "to sleep",
+          "fr": "dormir",
+          "phonetic": "dor-meer"
+        },
+        {
+          "id": "p1_verbs_se-lever",
+          "en": "to get up",
+          "fr": "se lever",
+          "phonetic": "suh luh-vay"
+        },
+        {
+          "id": "p1_verbs_se-coucher",
+          "en": "to go to bed",
+          "fr": "se coucher",
+          "phonetic": "suh koo-shay"
+        },
+        {
+          "id": "p1_verbs_jouer",
+          "en": "to play",
+          "fr": "jouer",
+          "phonetic": "zhoo-ay"
+        },
+        {
+          "id": "p1_verbs_rester",
+          "en": "to stay",
+          "fr": "rester",
+          "phonetic": "rehs-tay"
+        },
+        {
+          "id": "p1_verbs_entrer",
+          "en": "to enter",
+          "fr": "entrer",
+          "phonetic": "ah(n)-tray"
+        },
+        {
+          "id": "p1_verbs_sortir",
+          "en": "to go out",
+          "fr": "sortir",
+          "phonetic": "sor-teer"
+        },
+        {
+          "id": "p1_verbs_tomber",
+          "en": "to fall",
+          "fr": "tomber",
+          "phonetic": "toh(n)-bay"
+        },
+        {
+          "id": "p1_verbs_porter",
+          "en": "to wear / carry",
+          "fr": "porter",
+          "phonetic": "por-tay"
+        },
+        {
+          "id": "p1_verbs_appeler",
+          "en": "to call",
+          "fr": "appeler",
+          "phonetic": "ah-puh-lay"
+        },
+        {
+          "id": "p1_verbs_sappeler",
+          "en": "to be called",
+          "fr": "s'appeler",
+          "phonetic": "sah-puh-lay"
+        },
+        {
+          "id": "p1_verbs_avoir-besoin-de",
+          "en": "to need",
+          "fr": "avoir besoin de",
+          "phonetic": "ah-vwahr buh-zwan duh"
+        },
+        {
+          "id": "p1_verbs_preferer",
+          "en": "to prefer",
+          "fr": "préférer",
+          "phonetic": "pray-fay-ray"
+        },
+        {
+          "id": "p1_verbs_choisir",
+          "en": "to choose",
+          "fr": "choisir",
+          "phonetic": "shwah-zeer"
+        },
+        {
+          "id": "p1_verbs_envoyer",
+          "en": "to send",
+          "fr": "envoyer",
+          "phonetic": "ah(n)-vwah-yay"
+        },
+        {
+          "id": "p1_verbs_recevoir",
+          "en": "to receive",
+          "fr": "recevoir",
+          "phonetic": "ruh-suh-vwahr"
+        },
+        {
+          "id": "p1_verbs_perdre",
+          "en": "to lose",
+          "fr": "perdre",
+          "phonetic": "pehr-druh"
+        },
+        {
+          "id": "p1_verbs_gagner",
+          "en": "to win / earn",
+          "fr": "gagner",
+          "phonetic": "gah-nyay"
+        },
+        {
+          "id": "p1_verbs_utiliser",
+          "en": "to use",
+          "fr": "utiliser",
+          "phonetic": "ew-tee-lee-zay"
+        },
+        {
+          "id": "p1_verbs_changer",
+          "en": "to change",
+          "fr": "changer",
+          "phonetic": "shah(n)-zhay"
+        },
+        {
+          "id": "p1_verbs_retourner",
+          "en": "to return / go back",
+          "fr": "retourner",
+          "phonetic": "ruh-toor-nay"
+        },
+        {
+          "id": "p1_verbs_visiter",
+          "en": "to visit",
+          "fr": "visiter",
+          "phonetic": "vee-zee-tay"
+        },
+        {
+          "id": "p1_verbs_oublier",
+          "en": "to forget",
+          "fr": "oublier",
+          "phonetic": "oo-blee-yay"
+        },
+        {
+          "id": "p1_verbs_se-souvenir",
+          "en": "to remember",
+          "fr": "se souvenir",
+          "phonetic": "suh soo-vuh-neer"
+        },
+        {
+          "id": "p1_verbs_essayer",
+          "en": "to try",
+          "fr": "essayer",
+          "phonetic": "eh-say-yay"
+        }
+      ]
+    },
+    {
+      "id": "greetings",
+      "title": "Greetings & Politeness",
+      "entries": [
+        {
+          "id": "p1_greetings_bonjour",
+          "en": "hello / good morning",
+          "fr": "bonjour",
+          "phonetic": "boh(n)-zhoor"
+        },
+        {
+          "id": "p1_greetings_bonsoir",
+          "en": "good evening",
+          "fr": "bonsoir",
+          "phonetic": "boh(n)-swahr"
+        },
+        {
+          "id": "p1_greetings_salut",
+          "en": "hi / bye (informal)",
+          "fr": "salut",
+          "phonetic": "sah-lew"
+        },
+        {
+          "id": "p1_greetings_au-revoir",
+          "en": "goodbye",
+          "fr": "au revoir",
+          "phonetic": "oh ruh-vwahr"
+        },
+        {
+          "id": "p1_greetings_merci",
+          "en": "thank you",
+          "fr": "merci",
+          "phonetic": "mehr-see"
+        },
+        {
+          "id": "p1_greetings_sil-vous-plait",
+          "en": "please (formal)",
+          "fr": "s'il vous plaît",
+          "phonetic": "seel voo pleh"
+        },
+        {
+          "id": "p1_greetings_sil-te-plait",
+          "en": "please (informal)",
+          "fr": "s'il te plaît",
+          "phonetic": "seel tuh pleh"
+        },
+        {
+          "id": "p1_greetings_excusez-moi",
+          "en": "excuse me",
+          "fr": "excusez-moi",
+          "phonetic": "ehk-skew-zay mwah"
+        },
+        {
+          "id": "p1_greetings_comment-allez-vous",
+          "en": "how are you? (formal)",
+          "fr": "comment allez-vous ?",
+          "phonetic": "koh-mah(n) tah-lay voo"
+        },
+        {
+          "id": "p1_greetings_ca-va",
+          "en": "how's it going? (informal)",
+          "fr": "ça va ?",
+          "phonetic": "sah vah"
+        },
+        {
+          "id": "p1_greetings_de-rien",
+          "en": "you're welcome",
+          "fr": "de rien",
+          "phonetic": "duh ree-ah(n)"
+        },
+        {
+          "id": "p1_greetings_pardon-desole",
+          "en": "sorry",
+          "fr": "pardon / désolé(e)",
+          "phonetic": "par-doh(n) / day-zoh-lay"
+        },
+        {
+          "id": "p1_greetings_bienvenue",
+          "en": "welcome",
+          "fr": "bienvenue",
+          "phonetic": "byan-vuh-new"
+        },
+        {
+          "id": "p1_greetings_bonne-nuit",
+          "en": "good night",
+          "fr": "bonne nuit",
+          "phonetic": "bohn nwee"
+        },
+        {
+          "id": "p1_greetings_a-bientot",
+          "en": "see you soon",
+          "fr": "à bientôt",
+          "phonetic": "ah byan-toh"
+        },
+        {
+          "id": "p1_greetings_a-demain",
+          "en": "see you tomorrow",
+          "fr": "à demain",
+          "phonetic": "ah duh-man"
+        },
+        {
+          "id": "p1_greetings_a-tout-a-lheure",
+          "en": "see you later",
+          "fr": "à tout à l'heure",
+          "phonetic": "ah too tah luhr"
+        },
+        {
+          "id": "p1_greetings_enchante",
+          "en": "nice to meet you",
+          "fr": "enchanté(e)",
+          "phonetic": "ah(n)-shah(n)-tay"
+        },
+        {
+          "id": "p1_greetings_bonne-journee",
+          "en": "have a good day",
+          "fr": "bonne journée",
+          "phonetic": "bohn zhoor-nay"
+        },
+        {
+          "id": "p1_greetings_bonne-soiree",
+          "en": "have a good evening",
+          "fr": "bonne soirée",
+          "phonetic": "bohn swah-ray"
+        },
+        {
+          "id": "p1_greetings_bon-appetit",
+          "en": "enjoy your meal",
+          "fr": "bon appétit",
+          "phonetic": "boh(n) nah-pay-tee"
+        },
+        {
+          "id": "p1_greetings_bonne-chance",
+          "en": "good luck",
+          "fr": "bonne chance",
+          "phonetic": "bohn shah(n)s"
+        },
+        {
+          "id": "p1_greetings_sante",
+          "en": "cheers (toast)",
+          "fr": "santé",
+          "phonetic": "sah(n)-tay"
+        },
+        {
+          "id": "p1_greetings_felicitations",
+          "en": "congratulations",
+          "fr": "félicitations",
+          "phonetic": "fay-lee-see-tah-syoh(n)"
+        },
+        {
+          "id": "p1_greetings_daccord",
+          "en": "okay / agreed",
+          "fr": "d'accord",
+          "phonetic": "dah-kor"
+        },
+        {
+          "id": "p1_greetings_bien-sur",
+          "en": "of course",
+          "fr": "bien sûr",
+          "phonetic": "byan sewr"
+        },
+        {
+          "id": "p1_greetings_peut-etre",
+          "en": "maybe",
+          "fr": "peut-être",
+          "phonetic": "puh-teh-truh"
+        },
+        {
+          "id": "p1_greetings_je-ne-sais-pas",
+          "en": "I don't know",
+          "fr": "je ne sais pas",
+          "phonetic": "zhuh nuh seh pah"
+        },
+        {
+          "id": "p1_greetings_je-ne-comprends-pas",
+          "en": "I don't understand",
+          "fr": "je ne comprends pas",
+          "phonetic": "zhuh nuh koh(n)-prah(n) pah"
+        },
+        {
+          "id": "p1_greetings_pouvez-vous-repeter",
+          "en": "can you repeat?",
+          "fr": "pouvez-vous répéter ?",
+          "phonetic": "poo-vay voo ray-pay-tay"
+        },
+        {
+          "id": "p1_greetings_parlez-plus-lentement",
+          "en": "speak more slowly",
+          "fr": "parlez plus lentement",
+          "phonetic": "par-lay plew lah(n)-tuh-mah(n)"
+        },
+        {
+          "id": "p1_greetings_comment-vous-appelez-vous",
+          "en": "what is your name?",
+          "fr": "comment vous appelez-vous ?",
+          "phonetic": "koh-mah(n) voo zah-play voo"
+        },
+        {
+          "id": "p1_greetings_je-mappelle",
+          "en": "my name is...",
+          "fr": "je m'appelle...",
+          "phonetic": "zhuh mah-pehl"
+        },
+        {
+          "id": "p1_greetings_merci-beaucoup",
+          "en": "thank you very much",
+          "fr": "merci beaucoup",
+          "phonetic": "mehr-see boh-koo"
+        },
+        {
+          "id": "p1_greetings_ca-va-bien",
+          "en": "I'm fine",
+          "fr": "ça va bien",
+          "phonetic": "sah vah byan"
+        },
+        {
+          "id": "p1_greetings_parlez-vous-anglais",
+          "en": "do you speak English?",
+          "fr": "parlez-vous anglais ?",
+          "phonetic": "par-lay voo ah(n)-gleh"
+        },
+        {
+          "id": "p1_greetings_je-parle-un-peu-francais",
+          "en": "I speak a little French",
+          "fr": "je parle un peu français",
+          "phonetic": "zhuh parl uh(n) puh frah(n)-seh"
+        }
+      ]
+    },
+    {
+      "id": "numbers",
+      "title": "Numbers",
+      "entries": [
+        {
+          "id": "p1_numbers_zero",
+          "en": "zero",
+          "fr": "zéro",
+          "phonetic": "zay-roh"
+        },
+        {
+          "id": "p1_numbers_un",
+          "en": "one",
+          "fr": "un",
+          "phonetic": "uh(n)"
+        },
+        {
+          "id": "p1_numbers_deux",
+          "en": "two",
+          "fr": "deux",
+          "phonetic": "duh"
+        },
+        {
+          "id": "p1_numbers_trois",
+          "en": "three",
+          "fr": "trois",
+          "phonetic": "trwah"
+        },
+        {
+          "id": "p1_numbers_quatre",
+          "en": "four",
+          "fr": "quatre",
+          "phonetic": "kah-truh"
+        },
+        {
+          "id": "p1_numbers_cinq",
+          "en": "five",
+          "fr": "cinq",
+          "phonetic": "sank"
+        },
+        {
+          "id": "p1_numbers_six",
+          "en": "six",
+          "fr": "six",
+          "phonetic": "sees"
+        },
+        {
+          "id": "p1_numbers_sept",
+          "en": "seven",
+          "fr": "sept",
+          "phonetic": "seht"
+        },
+        {
+          "id": "p1_numbers_huit",
+          "en": "eight",
+          "fr": "huit",
+          "phonetic": "weet"
+        },
+        {
+          "id": "p1_numbers_neuf",
+          "en": "nine",
+          "fr": "neuf",
+          "phonetic": "nuhf"
+        },
+        {
+          "id": "p1_numbers_dix",
+          "en": "ten",
+          "fr": "dix",
+          "phonetic": "dees"
+        },
+        {
+          "id": "p1_numbers_onze",
+          "en": "eleven",
+          "fr": "onze",
+          "phonetic": "ohnz"
+        },
+        {
+          "id": "p1_numbers_douze",
+          "en": "twelve",
+          "fr": "douze",
+          "phonetic": "dooz"
+        },
+        {
+          "id": "p1_numbers_treize",
+          "en": "thirteen",
+          "fr": "treize",
+          "phonetic": "trehz"
+        },
+        {
+          "id": "p1_numbers_quatorze",
+          "en": "fourteen",
+          "fr": "quatorze",
+          "phonetic": "kah-torz"
+        },
+        {
+          "id": "p1_numbers_quinze",
+          "en": "fifteen",
+          "fr": "quinze",
+          "phonetic": "kanz"
+        },
+        {
+          "id": "p1_numbers_seize",
+          "en": "sixteen",
+          "fr": "seize",
+          "phonetic": "sehz"
+        },
+        {
+          "id": "p1_numbers_dix-sept",
+          "en": "seventeen",
+          "fr": "dix-sept",
+          "phonetic": "dee-seht"
+        },
+        {
+          "id": "p1_numbers_dix-huit",
+          "en": "eighteen",
+          "fr": "dix-huit",
+          "phonetic": "deez-weet"
+        },
+        {
+          "id": "p1_numbers_dix-neuf",
+          "en": "nineteen",
+          "fr": "dix-neuf",
+          "phonetic": "deez-nuhf"
+        },
+        {
+          "id": "p1_numbers_vingt",
+          "en": "twenty",
+          "fr": "vingt",
+          "phonetic": "van"
+        },
+        {
+          "id": "p1_numbers_vingt-et-un",
+          "en": "twenty-one",
+          "fr": "vingt et un",
+          "phonetic": "van tay uh(n)"
+        },
+        {
+          "id": "p1_numbers_vingt-deux",
+          "en": "twenty-two",
+          "fr": "vingt-deux",
+          "phonetic": "van-duh"
+        },
+        {
+          "id": "p1_numbers_vingt-cinq",
+          "en": "twenty-five",
+          "fr": "vingt-cinq",
+          "phonetic": "van-sank"
+        },
+        {
+          "id": "p1_numbers_trente",
+          "en": "thirty",
+          "fr": "trente",
+          "phonetic": "trah(n)t"
+        },
+        {
+          "id": "p1_numbers_quarante",
+          "en": "forty",
+          "fr": "quarante",
+          "phonetic": "kah-rah(n)t"
+        },
+        {
+          "id": "p1_numbers_cinquante",
+          "en": "fifty",
+          "fr": "cinquante",
+          "phonetic": "san-kah(n)t"
+        },
+        {
+          "id": "p1_numbers_soixante",
+          "en": "sixty",
+          "fr": "soixante",
+          "phonetic": "swah-sah(n)t"
+        },
+        {
+          "id": "p1_numbers_soixante-dix",
+          "en": "seventy",
+          "fr": "soixante-dix",
+          "phonetic": "swah-sah(n)t-dees"
+        },
+        {
+          "id": "p1_numbers_quatre-vingts",
+          "en": "eighty",
+          "fr": "quatre-vingts",
+          "phonetic": "kah-truh-van"
+        },
+        {
+          "id": "p1_numbers_quatre-vingt-dix",
+          "en": "ninety",
+          "fr": "quatre-vingt-dix",
+          "phonetic": "kah-truh-van-dees"
+        },
+        {
+          "id": "p1_numbers_cent",
+          "en": "one hundred",
+          "fr": "cent",
+          "phonetic": "sah(n)"
+        },
+        {
+          "id": "p1_numbers_deux-cents",
+          "en": "two hundred",
+          "fr": "deux cents",
+          "phonetic": "duh sah(n)"
+        },
+        {
+          "id": "p1_numbers_mille",
+          "en": "one thousand",
+          "fr": "mille",
+          "phonetic": "meel"
+        },
+        {
+          "id": "p1_numbers_un-million",
+          "en": "one million",
+          "fr": "un million",
+          "phonetic": "uh(n) mee-lyoh(n)"
+        },
+        {
+          "id": "p1_numbers_premier-premiere",
+          "en": "first",
+          "fr": "premier / première",
+          "phonetic": "pruh-myay / pruh-myehr"
+        },
+        {
+          "id": "p1_numbers_deuxieme",
+          "en": "second",
+          "fr": "deuxième",
+          "phonetic": "duh-zyehm"
+        },
+        {
+          "id": "p1_numbers_troisieme",
+          "en": "third",
+          "fr": "troisième",
+          "phonetic": "trwah-zyehm"
+        },
+        {
+          "id": "p1_numbers_la-moitie",
+          "en": "half",
+          "fr": "la moitié",
+          "phonetic": "lah mwah-tyay"
+        },
+        {
+          "id": "p1_numbers_une-fois",
+          "en": "once / one time",
+          "fr": "une fois",
+          "phonetic": "ewn fwah"
+        }
+      ]
+    },
+    {
+      "id": "days_months_time",
+      "title": "Days, Months & Time",
+      "entries": [
+        {
+          "id": "p1_days_months_time_lundi",
+          "en": "Monday",
+          "fr": "lundi",
+          "phonetic": "luh(n)-dee"
+        },
+        {
+          "id": "p1_days_months_time_mardi",
+          "en": "Tuesday",
+          "fr": "mardi",
+          "phonetic": "mar-dee"
+        },
+        {
+          "id": "p1_days_months_time_mercredi",
+          "en": "Wednesday",
+          "fr": "mercredi",
+          "phonetic": "mehr-kruh-dee"
+        },
+        {
+          "id": "p1_days_months_time_jeudi",
+          "en": "Thursday",
+          "fr": "jeudi",
+          "phonetic": "zhuh-dee"
+        },
+        {
+          "id": "p1_days_months_time_vendredi",
+          "en": "Friday",
+          "fr": "vendredi",
+          "phonetic": "vah(n)-druh-dee"
+        },
+        {
+          "id": "p1_days_months_time_samedi",
+          "en": "Saturday",
+          "fr": "samedi",
+          "phonetic": "sahm-dee"
+        },
+        {
+          "id": "p1_days_months_time_dimanche",
+          "en": "Sunday",
+          "fr": "dimanche",
+          "phonetic": "dee-mah(n)sh"
+        },
+        {
+          "id": "p1_days_months_time_janvier",
+          "en": "January",
+          "fr": "janvier",
+          "phonetic": "zhah(n)-vyay"
+        },
+        {
+          "id": "p1_days_months_time_fevrier",
+          "en": "February",
+          "fr": "février",
+          "phonetic": "fay-vree-yay"
+        },
+        {
+          "id": "p1_days_months_time_mars",
+          "en": "March",
+          "fr": "mars",
+          "phonetic": "mars"
+        },
+        {
+          "id": "p1_days_months_time_avril",
+          "en": "April",
+          "fr": "avril",
+          "phonetic": "ah-vreel"
+        },
+        {
+          "id": "p1_days_months_time_mai",
+          "en": "May",
+          "fr": "mai",
+          "phonetic": "meh"
+        },
+        {
+          "id": "p1_days_months_time_juin",
+          "en": "June",
+          "fr": "juin",
+          "phonetic": "zhwan"
+        },
+        {
+          "id": "p1_days_months_time_juillet",
+          "en": "July",
+          "fr": "juillet",
+          "phonetic": "zhwee-yeh"
+        },
+        {
+          "id": "p1_days_months_time_aout",
+          "en": "August",
+          "fr": "août",
+          "phonetic": "oot"
+        },
+        {
+          "id": "p1_days_months_time_septembre",
+          "en": "September",
+          "fr": "septembre",
+          "phonetic": "sehp-tah(n)-bruh"
+        },
+        {
+          "id": "p1_days_months_time_octobre",
+          "en": "October",
+          "fr": "octobre",
+          "phonetic": "ohk-toh-bruh"
+        },
+        {
+          "id": "p1_days_months_time_novembre",
+          "en": "November",
+          "fr": "novembre",
+          "phonetic": "noh-vah(n)-bruh"
+        },
+        {
+          "id": "p1_days_months_time_decembre",
+          "en": "December",
+          "fr": "décembre",
+          "phonetic": "day-sah(n)-bruh"
+        },
+        {
+          "id": "p1_days_months_time_aujourdhui",
+          "en": "today",
+          "fr": "aujourd'hui",
+          "phonetic": "oh-zhoor-dwee"
+        },
+        {
+          "id": "p1_days_months_time_demain",
+          "en": "tomorrow",
+          "fr": "demain",
+          "phonetic": "duh-man"
+        },
+        {
+          "id": "p1_days_months_time_hier",
+          "en": "yesterday",
+          "fr": "hier",
+          "phonetic": "yehr"
+        },
+        {
+          "id": "p1_days_months_time_maintenant",
+          "en": "now",
+          "fr": "maintenant",
+          "phonetic": "man-tuh-nah(n)"
+        },
+        {
+          "id": "p1_days_months_time_le-matin",
+          "en": "morning",
+          "fr": "le matin",
+          "phonetic": "luh mah-tan"
+        },
+        {
+          "id": "p1_days_months_time_lapres-midi",
+          "en": "afternoon",
+          "fr": "l'après-midi",
+          "phonetic": "lah-preh-mee-dee"
+        },
+        {
+          "id": "p1_days_months_time_le-soir",
+          "en": "evening",
+          "fr": "le soir",
+          "phonetic": "luh swahr"
+        },
+        {
+          "id": "p1_days_months_time_la-nuit",
+          "en": "night",
+          "fr": "la nuit",
+          "phonetic": "lah nwee"
+        },
+        {
+          "id": "p1_days_months_time_lheure",
+          "en": "hour / time",
+          "fr": "l'heure",
+          "phonetic": "luhr"
+        },
+        {
+          "id": "p1_days_months_time_la-minute",
+          "en": "minute",
+          "fr": "la minute",
+          "phonetic": "lah mee-newt"
+        },
+        {
+          "id": "p1_days_months_time_la-seconde",
+          "en": "second (time)",
+          "fr": "la seconde",
+          "phonetic": "lah suh-goh(n)d"
+        },
+        {
+          "id": "p1_days_months_time_le-jour",
+          "en": "day",
+          "fr": "le jour",
+          "phonetic": "luh zhoor"
+        },
+        {
+          "id": "p1_days_months_time_la-semaine",
+          "en": "week",
+          "fr": "la semaine",
+          "phonetic": "lah suh-mehn"
+        },
+        {
+          "id": "p1_days_months_time_le-mois",
+          "en": "month",
+          "fr": "le mois",
+          "phonetic": "luh mwah"
+        },
+        {
+          "id": "p1_days_months_time_lannee",
+          "en": "year",
+          "fr": "l'année",
+          "phonetic": "lah-nay"
+        },
+        {
+          "id": "p1_days_months_time_le-week-end",
+          "en": "weekend",
+          "fr": "le week-end",
+          "phonetic": "luh wee-kehnd"
+        },
+        {
+          "id": "p1_days_months_time_tot",
+          "en": "early",
+          "fr": "tôt",
+          "phonetic": "toh"
+        },
+        {
+          "id": "p1_days_months_time_tard",
+          "en": "late",
+          "fr": "tard",
+          "phonetic": "tar"
+        },
+        {
+          "id": "p1_days_months_time_toujours",
+          "en": "always",
+          "fr": "toujours",
+          "phonetic": "too-zhoor"
+        },
+        {
+          "id": "p1_days_months_time_souvent",
+          "en": "often",
+          "fr": "souvent",
+          "phonetic": "soo-vah(n)"
+        },
+        {
+          "id": "p1_days_months_time_parfois",
+          "en": "sometimes",
+          "fr": "parfois",
+          "phonetic": "par-fwah"
+        },
+        {
+          "id": "p1_days_months_time_jamais",
+          "en": "never",
+          "fr": "jamais",
+          "phonetic": "zhah-meh"
+        },
+        {
+          "id": "p1_days_months_time_avant",
+          "en": "before",
+          "fr": "avant",
+          "phonetic": "ah-vah(n)"
+        },
+        {
+          "id": "p1_days_months_time_apres",
+          "en": "after",
+          "fr": "après",
+          "phonetic": "ah-preh"
+        },
+        {
+          "id": "p1_days_months_time_pendant",
+          "en": "during",
+          "fr": "pendant",
+          "phonetic": "pah(n)-dah(n)"
+        },
+        {
+          "id": "p1_days_months_time_bientot",
+          "en": "soon",
+          "fr": "bientôt",
+          "phonetic": "byan-toh"
+        },
+        {
+          "id": "p1_days_months_time_deja",
+          "en": "already",
+          "fr": "déjà",
+          "phonetic": "day-zhah"
+        },
+        {
+          "id": "p1_days_months_time_encore",
+          "en": "again / still",
+          "fr": "encore",
+          "phonetic": "ah(n)-kor"
+        },
+        {
+          "id": "p1_days_months_time_quelle-heure-est-il",
+          "en": "what time is it?",
+          "fr": "quelle heure est-il ?",
+          "phonetic": "kehl uhr eh-teel"
+        }
+      ]
+    },
+    {
+      "id": "family_people",
+      "title": "Family & People",
+      "entries": [
+        {
+          "id": "p1_family_people_la-famille",
+          "en": "family",
+          "fr": "la famille",
+          "phonetic": "lah fah-mee"
+        },
+        {
+          "id": "p1_family_people_le-pere",
+          "en": "father",
+          "fr": "le père",
+          "phonetic": "luh pehr"
+        },
+        {
+          "id": "p1_family_people_la-mere",
+          "en": "mother",
+          "fr": "la mère",
+          "phonetic": "lah mehr"
+        },
+        {
+          "id": "p1_family_people_le-frere",
+          "en": "brother",
+          "fr": "le frère",
+          "phonetic": "luh frehr"
+        },
+        {
+          "id": "p1_family_people_la-soeur",
+          "en": "sister",
+          "fr": "la sœur",
+          "phonetic": "lah suhr"
+        },
+        {
+          "id": "p1_family_people_le-fils",
+          "en": "son",
+          "fr": "le fils",
+          "phonetic": "luh feess"
+        },
+        {
+          "id": "p1_family_people_la-fille",
+          "en": "daughter",
+          "fr": "la fille",
+          "phonetic": "lah fee"
+        },
+        {
+          "id": "p1_family_people_le-mari",
+          "en": "husband",
+          "fr": "le mari",
+          "phonetic": "luh mah-ree"
+        },
+        {
+          "id": "p1_family_people_la-femme",
+          "en": "wife",
+          "fr": "la femme",
+          "phonetic": "lah fahm"
+        },
+        {
+          "id": "p1_family_people_les-parents",
+          "en": "parents",
+          "fr": "les parents",
+          "phonetic": "lay pah-rah(n)"
+        },
+        {
+          "id": "p1_family_people_le-grand-pere",
+          "en": "grandfather",
+          "fr": "le grand-père",
+          "phonetic": "luh grah(n)-pehr"
+        },
+        {
+          "id": "p1_family_people_la-grand-mere",
+          "en": "grandmother",
+          "fr": "la grand-mère",
+          "phonetic": "lah grah(n)-mehr"
+        },
+        {
+          "id": "p1_family_people_lenfant",
+          "en": "child",
+          "fr": "l'enfant",
+          "phonetic": "lah(n)-fah(n)"
+        },
+        {
+          "id": "p1_family_people_lami",
+          "en": "friend",
+          "fr": "l'ami(e)",
+          "phonetic": "lah-mee"
+        },
+        {
+          "id": "p1_family_people_loncle",
+          "en": "uncle",
+          "fr": "l'oncle",
+          "phonetic": "loh(n)-kluh"
+        },
+        {
+          "id": "p1_family_people_la-tante",
+          "en": "aunt",
+          "fr": "la tante",
+          "phonetic": "lah tah(n)t"
+        },
+        {
+          "id": "p1_family_people_le-cousin-la-cousine",
+          "en": "cousin",
+          "fr": "le cousin / la cousine",
+          "phonetic": "luh koo-zan / lah koo-zeen"
+        },
+        {
+          "id": "p1_family_people_le-neveu",
+          "en": "nephew",
+          "fr": "le neveu",
+          "phonetic": "luh nuh-vuh"
+        },
+        {
+          "id": "p1_family_people_la-niece",
+          "en": "niece",
+          "fr": "la nièce",
+          "phonetic": "lah nyehs"
+        },
+        {
+          "id": "p1_family_people_le-bebe",
+          "en": "baby",
+          "fr": "le bébé",
+          "phonetic": "luh bay-bay"
+        },
+        {
+          "id": "p1_family_people_lhomme",
+          "en": "man",
+          "fr": "l'homme",
+          "phonetic": "lohm"
+        },
+        {
+          "id": "p1_family_people_le-garcon",
+          "en": "boy",
+          "fr": "le garçon",
+          "phonetic": "luh gar-soh(n)"
+        },
+        {
+          "id": "p1_family_people_monsieur",
+          "en": "Mr / sir",
+          "fr": "monsieur",
+          "phonetic": "muh-syuh"
+        },
+        {
+          "id": "p1_family_people_madame",
+          "en": "Mrs / ma'am",
+          "fr": "madame",
+          "phonetic": "mah-dahm"
+        },
+        {
+          "id": "p1_family_people_les-gens",
+          "en": "people",
+          "fr": "les gens",
+          "phonetic": "lay zhah(n)"
+        },
+        {
+          "id": "p1_family_people_la-personne",
+          "en": "person",
+          "fr": "la personne",
+          "phonetic": "lah pehr-sohn"
+        },
+        {
+          "id": "p1_family_people_le-voisin-la-voisine",
+          "en": "neighbor",
+          "fr": "le voisin / la voisine",
+          "phonetic": "luh vwah-zan / lah vwah-zeen"
+        },
+        {
+          "id": "p1_family_people_le-petit-ami",
+          "en": "boyfriend",
+          "fr": "le petit ami",
+          "phonetic": "luh puh-tee tah-mee"
+        },
+        {
+          "id": "p1_family_people_la-petite-amie",
+          "en": "girlfriend",
+          "fr": "la petite amie",
+          "phonetic": "lah puh-teet ah-mee"
+        },
+        {
+          "id": "p1_family_people_le-nom",
+          "en": "name",
+          "fr": "le nom",
+          "phonetic": "luh noh(n)"
+        }
+      ]
+    },
+    {
+      "id": "food_shopping",
+      "title": "Food & Shopping",
+      "entries": [
+        {
+          "id": "p1_food_shopping_le-pain",
+          "en": "bread",
+          "fr": "le pain",
+          "phonetic": "luh pan"
+        },
+        {
+          "id": "p1_food_shopping_leau",
+          "en": "water",
+          "fr": "l'eau",
+          "phonetic": "loh"
+        },
+        {
+          "id": "p1_food_shopping_le-lait",
+          "en": "milk",
+          "fr": "le lait",
+          "phonetic": "luh leh"
+        },
+        {
+          "id": "p1_food_shopping_la-viande",
+          "en": "meat",
+          "fr": "la viande",
+          "phonetic": "lah vyah(n)d"
+        },
+        {
+          "id": "p1_food_shopping_les-legumes",
+          "en": "vegetables",
+          "fr": "les légumes",
+          "phonetic": "lay lay-gewm"
+        },
+        {
+          "id": "p1_food_shopping_les-fruits",
+          "en": "fruits",
+          "fr": "les fruits",
+          "phonetic": "lay frwee"
+        },
+        {
+          "id": "p1_food_shopping_le-fromage",
+          "en": "cheese",
+          "fr": "le fromage",
+          "phonetic": "luh froh-mahzh"
+        },
+        {
+          "id": "p1_food_shopping_le-magasin",
+          "en": "store",
+          "fr": "le magasin",
+          "phonetic": "luh mah-gah-zan"
+        },
+        {
+          "id": "p1_food_shopping_le-prix",
+          "en": "price",
+          "fr": "le prix",
+          "phonetic": "luh pree"
+        },
+        {
+          "id": "p1_food_shopping_acheter",
+          "en": "to buy",
+          "fr": "acheter",
+          "phonetic": "ash-tay"
+        },
+        {
+          "id": "p1_food_shopping_vendre",
+          "en": "to sell",
+          "fr": "vendre",
+          "phonetic": "vah(n)-druh"
+        },
+        {
+          "id": "p1_food_shopping_combien",
+          "en": "how much?",
+          "fr": "combien ?",
+          "phonetic": "koh(n)-byan"
+        },
+        {
+          "id": "p1_food_shopping_largent",
+          "en": "money",
+          "fr": "l'argent",
+          "phonetic": "lar-zhah(n)"
+        },
+        {
+          "id": "p1_food_shopping_cher",
+          "en": "expensive",
+          "fr": "cher",
+          "phonetic": "shehr"
+        },
+        {
+          "id": "p1_food_shopping_pas-cher",
+          "en": "cheap",
+          "fr": "pas cher",
+          "phonetic": "pah shehr"
+        },
+        {
+          "id": "p1_food_shopping_le-cafe",
+          "en": "coffee",
+          "fr": "le café",
+          "phonetic": "luh kah-fay"
+        },
+        {
+          "id": "p1_food_shopping_le-the",
+          "en": "tea",
+          "fr": "le thé",
+          "phonetic": "luh tay"
+        },
+        {
+          "id": "p1_food_shopping_le-vin",
+          "en": "wine",
+          "fr": "le vin",
+          "phonetic": "luh van"
+        },
+        {
+          "id": "p1_food_shopping_la-biere",
+          "en": "beer",
+          "fr": "la bière",
+          "phonetic": "lah byehr"
+        },
+        {
+          "id": "p1_food_shopping_le-jus",
+          "en": "juice",
+          "fr": "le jus",
+          "phonetic": "luh zhew"
+        },
+        {
+          "id": "p1_food_shopping_le-sucre",
+          "en": "sugar",
+          "fr": "le sucre",
+          "phonetic": "luh sew-kruh"
+        },
+        {
+          "id": "p1_food_shopping_le-sel",
+          "en": "salt",
+          "fr": "le sel",
+          "phonetic": "luh sehl"
+        },
+        {
+          "id": "p1_food_shopping_le-poivre",
+          "en": "pepper",
+          "fr": "le poivre",
+          "phonetic": "luh pwah-vruh"
+        },
+        {
+          "id": "p1_food_shopping_le-beurre",
+          "en": "butter",
+          "fr": "le beurre",
+          "phonetic": "luh buhr"
+        },
+        {
+          "id": "p1_food_shopping_loeuf",
+          "en": "egg",
+          "fr": "l'œuf",
+          "phonetic": "luhf"
+        },
+        {
+          "id": "p1_food_shopping_le-poisson",
+          "en": "fish",
+          "fr": "le poisson",
+          "phonetic": "luh pwah-soh(n)"
+        },
+        {
+          "id": "p1_food_shopping_le-poulet",
+          "en": "chicken",
+          "fr": "le poulet",
+          "phonetic": "luh poo-leh"
+        },
+        {
+          "id": "p1_food_shopping_le-riz",
+          "en": "rice",
+          "fr": "le riz",
+          "phonetic": "luh ree"
+        },
+        {
+          "id": "p1_food_shopping_les-pates",
+          "en": "pasta",
+          "fr": "les pâtes",
+          "phonetic": "lay paht"
+        },
+        {
+          "id": "p1_food_shopping_la-pomme",
+          "en": "apple",
+          "fr": "la pomme",
+          "phonetic": "lah pohm"
+        },
+        {
+          "id": "p1_food_shopping_la-banane",
+          "en": "banana",
+          "fr": "la banane",
+          "phonetic": "lah bah-nahn"
+        },
+        {
+          "id": "p1_food_shopping_lorange",
+          "en": "orange (fruit)",
+          "fr": "l'orange",
+          "phonetic": "loh-rah(n)zh"
+        },
+        {
+          "id": "p1_food_shopping_la-pomme-de-terre",
+          "en": "potato",
+          "fr": "la pomme de terre",
+          "phonetic": "lah pohm duh tehr"
+        },
+        {
+          "id": "p1_food_shopping_la-tomate",
+          "en": "tomato",
+          "fr": "la tomate",
+          "phonetic": "lah toh-maht"
+        },
+        {
+          "id": "p1_food_shopping_la-salade",
+          "en": "salad",
+          "fr": "la salade",
+          "phonetic": "lah sah-lahd"
+        },
+        {
+          "id": "p1_food_shopping_la-soupe",
+          "en": "soup",
+          "fr": "la soupe",
+          "phonetic": "lah soop"
+        },
+        {
+          "id": "p1_food_shopping_le-gateau",
+          "en": "cake",
+          "fr": "le gâteau",
+          "phonetic": "luh gah-toh"
+        },
+        {
+          "id": "p1_food_shopping_le-chocolat",
+          "en": "chocolate",
+          "fr": "le chocolat",
+          "phonetic": "luh shoh-koh-lah"
+        },
+        {
+          "id": "p1_food_shopping_le-petit-dejeuner",
+          "en": "breakfast",
+          "fr": "le petit déjeuner",
+          "phonetic": "luh puh-tee day-zhuh-nay"
+        },
+        {
+          "id": "p1_food_shopping_le-dejeuner",
+          "en": "lunch",
+          "fr": "le déjeuner",
+          "phonetic": "luh day-zhuh-nay"
+        },
+        {
+          "id": "p1_food_shopping_le-diner",
+          "en": "dinner",
+          "fr": "le dîner",
+          "phonetic": "luh dee-nay"
+        },
+        {
+          "id": "p1_food_shopping_le-restaurant",
+          "en": "restaurant",
+          "fr": "le restaurant",
+          "phonetic": "luh rehs-toh-rah(n)"
+        },
+        {
+          "id": "p1_food_shopping_le-menu",
+          "en": "menu",
+          "fr": "le menu",
+          "phonetic": "luh muh-new"
+        },
+        {
+          "id": "p1_food_shopping_laddition",
+          "en": "the bill",
+          "fr": "l'addition",
+          "phonetic": "lah-dee-syoh(n)"
+        },
+        {
+          "id": "p1_food_shopping_le-serveur",
+          "en": "waiter",
+          "fr": "le serveur",
+          "phonetic": "luh sehr-vuhr"
+        },
+        {
+          "id": "p1_food_shopping_le-marche",
+          "en": "market",
+          "fr": "le marché",
+          "phonetic": "luh mar-shay"
+        },
+        {
+          "id": "p1_food_shopping_le-supermarche",
+          "en": "supermarket",
+          "fr": "le supermarché",
+          "phonetic": "luh sew-pehr-mar-shay"
+        },
+        {
+          "id": "p1_food_shopping_la-boulangerie",
+          "en": "bakery",
+          "fr": "la boulangerie",
+          "phonetic": "lah boo-lah(n)-zhuh-ree"
+        },
+        {
+          "id": "p1_food_shopping_la-carte-bancaire",
+          "en": "bank card",
+          "fr": "la carte bancaire",
+          "phonetic": "lah kart bah(n)-kehr"
+        },
+        {
+          "id": "p1_food_shopping_en-especes",
+          "en": "in cash",
+          "fr": "en espèces",
+          "phonetic": "ah(n) neh-spehs"
+        },
+        {
+          "id": "p1_food_shopping_gratuit",
+          "en": "free (no cost)",
+          "fr": "gratuit",
+          "phonetic": "grah-twee"
+        },
+        {
+          "id": "p1_food_shopping_avoir-faim",
+          "en": "to be hungry",
+          "fr": "avoir faim",
+          "phonetic": "ah-vwahr fan"
+        },
+        {
+          "id": "p1_food_shopping_avoir-soif",
+          "en": "to be thirsty",
+          "fr": "avoir soif",
+          "phonetic": "ah-vwahr swahf"
+        },
+        {
+          "id": "p1_food_shopping_delicieux",
+          "en": "delicious",
+          "fr": "délicieux",
+          "phonetic": "day-lee-syuh"
+        },
+        {
+          "id": "p1_food_shopping_commander",
+          "en": "to order",
+          "fr": "commander",
+          "phonetic": "koh-mah(n)-day"
+        },
+        {
+          "id": "p1_food_shopping_un-verre",
+          "en": "a glass",
+          "fr": "un verre",
+          "phonetic": "uh(n) vehr"
+        },
+        {
+          "id": "p1_food_shopping_une-bouteille",
+          "en": "a bottle",
+          "fr": "une bouteille",
+          "phonetic": "ewn boo-tehy"
+        }
+      ]
+    },
+    {
+      "id": "home_colors_weather",
+      "title": "Home, Colors & Weather",
+      "entries": [
+        {
+          "id": "p1_home_colors_weather_la-maison",
+          "en": "house",
+          "fr": "la maison",
+          "phonetic": "lah meh-zoh(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_lappartement",
+          "en": "apartment",
+          "fr": "l'appartement",
+          "phonetic": "lah-par-tuh-mah(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_la-chambre",
+          "en": "bedroom",
+          "fr": "la chambre",
+          "phonetic": "lah shah(n)-bruh"
+        },
+        {
+          "id": "p1_home_colors_weather_la-cuisine",
+          "en": "kitchen",
+          "fr": "la cuisine",
+          "phonetic": "lah kwee-zeen"
+        },
+        {
+          "id": "p1_home_colors_weather_a-gauche",
+          "en": "left",
+          "fr": "à gauche",
+          "phonetic": "ah gohsh"
+        },
+        {
+          "id": "p1_home_colors_weather_a-droite",
+          "en": "right",
+          "fr": "à droite",
+          "phonetic": "ah drwaht"
+        },
+        {
+          "id": "p1_home_colors_weather_la-rue",
+          "en": "street",
+          "fr": "la rue",
+          "phonetic": "lah rew"
+        },
+        {
+          "id": "p1_home_colors_weather_il-fait-beau",
+          "en": "nice weather",
+          "fr": "il fait beau",
+          "phonetic": "eel feh boh"
+        },
+        {
+          "id": "p1_home_colors_weather_il-pleut",
+          "en": "it's raining",
+          "fr": "il pleut",
+          "phonetic": "eel pluh"
+        },
+        {
+          "id": "p1_home_colors_weather_froid",
+          "en": "cold",
+          "fr": "froid",
+          "phonetic": "frwah"
+        },
+        {
+          "id": "p1_home_colors_weather_chaud",
+          "en": "hot",
+          "fr": "chaud",
+          "phonetic": "shoh"
+        },
+        {
+          "id": "p1_home_colors_weather_rouge",
+          "en": "red",
+          "fr": "rouge",
+          "phonetic": "roozh"
+        },
+        {
+          "id": "p1_home_colors_weather_bleu",
+          "en": "blue",
+          "fr": "bleu",
+          "phonetic": "bluh"
+        },
+        {
+          "id": "p1_home_colors_weather_vert",
+          "en": "green",
+          "fr": "vert",
+          "phonetic": "vehr"
+        },
+        {
+          "id": "p1_home_colors_weather_noir",
+          "en": "black",
+          "fr": "noir",
+          "phonetic": "nwahr"
+        },
+        {
+          "id": "p1_home_colors_weather_blanc",
+          "en": "white",
+          "fr": "blanc",
+          "phonetic": "blah(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_la-salle-de-bain",
+          "en": "bathroom",
+          "fr": "la salle de bain",
+          "phonetic": "lah sahl duh ban"
+        },
+        {
+          "id": "p1_home_colors_weather_les-toilettes",
+          "en": "toilet",
+          "fr": "les toilettes",
+          "phonetic": "lay twah-leht"
+        },
+        {
+          "id": "p1_home_colors_weather_le-salon",
+          "en": "living room",
+          "fr": "le salon",
+          "phonetic": "luh sah-loh(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_la-porte",
+          "en": "door",
+          "fr": "la porte",
+          "phonetic": "lah port"
+        },
+        {
+          "id": "p1_home_colors_weather_la-fenetre",
+          "en": "window",
+          "fr": "la fenêtre",
+          "phonetic": "lah fuh-neh-truh"
+        },
+        {
+          "id": "p1_home_colors_weather_la-table",
+          "en": "table",
+          "fr": "la table",
+          "phonetic": "lah tah-bluh"
+        },
+        {
+          "id": "p1_home_colors_weather_la-chaise",
+          "en": "chair",
+          "fr": "la chaise",
+          "phonetic": "lah shehz"
+        },
+        {
+          "id": "p1_home_colors_weather_le-lit",
+          "en": "bed",
+          "fr": "le lit",
+          "phonetic": "luh lee"
+        },
+        {
+          "id": "p1_home_colors_weather_la-cle",
+          "en": "key",
+          "fr": "la clé",
+          "phonetic": "lah klay"
+        },
+        {
+          "id": "p1_home_colors_weather_letage",
+          "en": "floor / story",
+          "fr": "l'étage",
+          "phonetic": "lay-tahzh"
+        },
+        {
+          "id": "p1_home_colors_weather_le-jardin",
+          "en": "garden",
+          "fr": "le jardin",
+          "phonetic": "luh zhar-dan"
+        },
+        {
+          "id": "p1_home_colors_weather_tout-droit",
+          "en": "straight ahead",
+          "fr": "tout droit",
+          "phonetic": "too drwah"
+        },
+        {
+          "id": "p1_home_colors_weather_pres",
+          "en": "near",
+          "fr": "près",
+          "phonetic": "preh"
+        },
+        {
+          "id": "p1_home_colors_weather_loin",
+          "en": "far",
+          "fr": "loin",
+          "phonetic": "lwan"
+        },
+        {
+          "id": "p1_home_colors_weather_jaune",
+          "en": "yellow",
+          "fr": "jaune",
+          "phonetic": "zhohn"
+        },
+        {
+          "id": "p1_home_colors_weather_orange",
+          "en": "orange (color)",
+          "fr": "orange",
+          "phonetic": "oh-rah(n)zh"
+        },
+        {
+          "id": "p1_home_colors_weather_rose",
+          "en": "pink",
+          "fr": "rose",
+          "phonetic": "rohz"
+        },
+        {
+          "id": "p1_home_colors_weather_violet",
+          "en": "purple",
+          "fr": "violet",
+          "phonetic": "vyoh-leh"
+        },
+        {
+          "id": "p1_home_colors_weather_gris",
+          "en": "gray",
+          "fr": "gris",
+          "phonetic": "gree"
+        },
+        {
+          "id": "p1_home_colors_weather_marron",
+          "en": "brown",
+          "fr": "marron",
+          "phonetic": "mah-roh(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_il-neige",
+          "en": "it's snowing",
+          "fr": "il neige",
+          "phonetic": "eel nehzh"
+        },
+        {
+          "id": "p1_home_colors_weather_il-y-a-du-vent",
+          "en": "it's windy",
+          "fr": "il y a du vent",
+          "phonetic": "eel ee ah dew vah(n)"
+        },
+        {
+          "id": "p1_home_colors_weather_le-soleil",
+          "en": "sun",
+          "fr": "le soleil",
+          "phonetic": "luh soh-lehy"
+        },
+        {
+          "id": "p1_home_colors_weather_la-pluie",
+          "en": "rain",
+          "fr": "la pluie",
+          "phonetic": "lah plwee"
+        },
+        {
+          "id": "p1_home_colors_weather_la-neige",
+          "en": "snow",
+          "fr": "la neige",
+          "phonetic": "lah nehzh"
+        },
+        {
+          "id": "p1_home_colors_weather_le-nuage",
+          "en": "cloud",
+          "fr": "le nuage",
+          "phonetic": "luh new-ahzh"
+        },
+        {
+          "id": "p1_home_colors_weather_le-temps",
+          "en": "the weather",
+          "fr": "le temps",
+          "phonetic": "luh tah(n)"
+        }
+      ]
+    },
+    {
+      "id": "adjectives",
+      "title": "Adjectives & Adverbs",
+      "entries": [
+        {
+          "id": "p1_adjectives_grand",
+          "en": "big / tall",
+          "fr": "grand(e)",
+          "phonetic": "grah(n) / grah(n)d"
+        },
+        {
+          "id": "p1_adjectives_petit",
+          "en": "small",
+          "fr": "petit(e)",
+          "phonetic": "puh-tee / puh-teet"
+        },
+        {
+          "id": "p1_adjectives_bon-bonne",
+          "en": "good",
+          "fr": "bon / bonne",
+          "phonetic": "boh(n) / bohn"
+        },
+        {
+          "id": "p1_adjectives_mauvais",
+          "en": "bad",
+          "fr": "mauvais(e)",
+          "phonetic": "moh-veh / moh-vehz"
+        },
+        {
+          "id": "p1_adjectives_nouveau-nouvelle",
+          "en": "new",
+          "fr": "nouveau / nouvelle",
+          "phonetic": "noo-voh / noo-vehl"
+        },
+        {
+          "id": "p1_adjectives_vieux-vieille",
+          "en": "old (things)",
+          "fr": "vieux / vieille",
+          "phonetic": "vyuh / vyehy"
+        },
+        {
+          "id": "p1_adjectives_jeune",
+          "en": "young",
+          "fr": "jeune",
+          "phonetic": "zhuhn"
+        },
+        {
+          "id": "p1_adjectives_beau-belle",
+          "en": "beautiful",
+          "fr": "beau / belle",
+          "phonetic": "boh / behl"
+        },
+        {
+          "id": "p1_adjectives_joli",
+          "en": "pretty",
+          "fr": "joli(e)",
+          "phonetic": "zhoh-lee"
+        },
+        {
+          "id": "p1_adjectives_facile",
+          "en": "easy",
+          "fr": "facile",
+          "phonetic": "fah-seel"
+        },
+        {
+          "id": "p1_adjectives_difficile",
+          "en": "difficult",
+          "fr": "difficile",
+          "phonetic": "dee-fee-seel"
+        },
+        {
+          "id": "p1_adjectives_rapide",
+          "en": "fast",
+          "fr": "rapide",
+          "phonetic": "rah-peed"
+        },
+        {
+          "id": "p1_adjectives_lent",
+          "en": "slow",
+          "fr": "lent(e)",
+          "phonetic": "lah(n) / lah(n)t"
+        },
+        {
+          "id": "p1_adjectives_long-longue",
+          "en": "long",
+          "fr": "long / longue",
+          "phonetic": "loh(n) / loh(n)g"
+        },
+        {
+          "id": "p1_adjectives_court",
+          "en": "short",
+          "fr": "court(e)",
+          "phonetic": "koor / koort"
+        },
+        {
+          "id": "p1_adjectives_fort",
+          "en": "strong",
+          "fr": "fort(e)",
+          "phonetic": "for / fort"
+        },
+        {
+          "id": "p1_adjectives_heureux-heureuse",
+          "en": "happy",
+          "fr": "heureux / heureuse",
+          "phonetic": "uh-ruh / uh-ruhz"
+        },
+        {
+          "id": "p1_adjectives_triste",
+          "en": "sad",
+          "fr": "triste",
+          "phonetic": "treest"
+        },
+        {
+          "id": "p1_adjectives_fatigue",
+          "en": "tired",
+          "fr": "fatigué(e)",
+          "phonetic": "fah-tee-gay"
+        },
+        {
+          "id": "p1_adjectives_content",
+          "en": "glad / pleased",
+          "fr": "content(e)",
+          "phonetic": "koh(n)-tah(n) / koh(n)-tah(n)t"
+        },
+        {
+          "id": "p1_adjectives_important",
+          "en": "important",
+          "fr": "important(e)",
+          "phonetic": "an-por-tah(n) / an-por-tah(n)t"
+        },
+        {
+          "id": "p1_adjectives_ouvert",
+          "en": "open",
+          "fr": "ouvert(e)",
+          "phonetic": "oo-vehr / oo-vehrt"
+        },
+        {
+          "id": "p1_adjectives_ferme",
+          "en": "closed",
+          "fr": "fermé(e)",
+          "phonetic": "fehr-may"
+        },
+        {
+          "id": "p1_adjectives_plein",
+          "en": "full",
+          "fr": "plein(e)",
+          "phonetic": "plan / plehn"
+        },
+        {
+          "id": "p1_adjectives_vide",
+          "en": "empty",
+          "fr": "vide",
+          "phonetic": "veed"
+        },
+        {
+          "id": "p1_adjectives_propre",
+          "en": "clean",
+          "fr": "propre",
+          "phonetic": "proh-pruh"
+        },
+        {
+          "id": "p1_adjectives_sale",
+          "en": "dirty",
+          "fr": "sale",
+          "phonetic": "sahl"
+        },
+        {
+          "id": "p1_adjectives_meme",
+          "en": "same",
+          "fr": "même",
+          "phonetic": "mehm"
+        },
+        {
+          "id": "p1_adjectives_autre",
+          "en": "other",
+          "fr": "autre",
+          "phonetic": "oh-truh"
+        },
+        {
+          "id": "p1_adjectives_dernier-derniere",
+          "en": "last",
+          "fr": "dernier / dernière",
+          "phonetic": "dehr-nyay / dehr-nyehr"
+        },
+        {
+          "id": "p1_adjectives_prochain",
+          "en": "next",
+          "fr": "prochain(e)",
+          "phonetic": "proh-shan / proh-shehn"
+        },
+        {
+          "id": "p1_adjectives_seul",
+          "en": "alone",
+          "fr": "seul(e)",
+          "phonetic": "suhl"
+        },
+        {
+          "id": "p1_adjectives_tout-tous",
+          "en": "all / every",
+          "fr": "tout / tous",
+          "phonetic": "too"
+        },
+        {
+          "id": "p1_adjectives_beaucoup",
+          "en": "a lot / much",
+          "fr": "beaucoup",
+          "phonetic": "boh-koo"
+        },
+        {
+          "id": "p1_adjectives_un-peu",
+          "en": "a little",
+          "fr": "un peu",
+          "phonetic": "uh(n) puh"
+        },
+        {
+          "id": "p1_adjectives_tres",
+          "en": "very",
+          "fr": "très",
+          "phonetic": "treh"
+        },
+        {
+          "id": "p1_adjectives_trop",
+          "en": "too much",
+          "fr": "trop",
+          "phonetic": "troh"
+        },
+        {
+          "id": "p1_adjectives_bien",
+          "en": "well",
+          "fr": "bien",
+          "phonetic": "byan"
+        },
+        {
+          "id": "p1_adjectives_mal",
+          "en": "badly",
+          "fr": "mal",
+          "phonetic": "mahl"
+        },
+        {
+          "id": "p1_adjectives_vite",
+          "en": "quickly",
+          "fr": "vite",
+          "phonetic": "veet"
+        }
+      ]
+    },
+    {
+      "id": "questions",
+      "title": "Question Words",
+      "entries": [
+        {
+          "id": "p1_questions_qui",
+          "en": "who",
+          "fr": "qui",
+          "phonetic": "kee"
+        },
+        {
+          "id": "p1_questions_quoi",
+          "en": "what",
+          "fr": "quoi",
+          "phonetic": "kwah"
+        },
+        {
+          "id": "p1_questions_ou",
+          "en": "where",
+          "fr": "où",
+          "phonetic": "oo"
+        },
+        {
+          "id": "p1_questions_quand",
+          "en": "when",
+          "fr": "quand",
+          "phonetic": "kah(n)"
+        },
+        {
+          "id": "p1_questions_pourquoi",
+          "en": "why",
+          "fr": "pourquoi",
+          "phonetic": "poor-kwah"
+        },
+        {
+          "id": "p1_questions_comment",
+          "en": "how",
+          "fr": "comment",
+          "phonetic": "koh-mah(n)"
+        },
+        {
+          "id": "p1_questions_quel-quelle",
+          "en": "which",
+          "fr": "quel / quelle",
+          "phonetic": "kehl"
+        },
+        {
+          "id": "p1_questions_combien-de",
+          "en": "how many",
+          "fr": "combien de",
+          "phonetic": "koh(n)-byan duh"
+        },
+        {
+          "id": "p1_questions_est-ce-que",
+          "en": "question starter (is it that...)",
+          "fr": "est-ce que",
+          "phonetic": "ehs kuh"
+        },
+        {
+          "id": "p1_questions_quest-ce-que-cest",
+          "en": "what is it?",
+          "fr": "qu'est-ce que c'est ?",
+          "phonetic": "kehs kuh seh"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "title": "Transport & Travel",
+      "entries": [
+        {
+          "id": "p1_transport_le-train",
+          "en": "train",
+          "fr": "le train",
+          "phonetic": "luh tran"
+        },
+        {
+          "id": "p1_transport_le-bus",
+          "en": "bus",
+          "fr": "le bus",
+          "phonetic": "luh bews"
+        },
+        {
+          "id": "p1_transport_le-metro",
+          "en": "subway",
+          "fr": "le métro",
+          "phonetic": "luh may-troh"
+        },
+        {
+          "id": "p1_transport_lavion",
+          "en": "plane",
+          "fr": "l'avion",
+          "phonetic": "lah-vyoh(n)"
+        },
+        {
+          "id": "p1_transport_la-voiture",
+          "en": "car",
+          "fr": "la voiture",
+          "phonetic": "lah vwah-tewr"
+        },
+        {
+          "id": "p1_transport_le-velo",
+          "en": "bicycle",
+          "fr": "le vélo",
+          "phonetic": "luh vay-loh"
+        },
+        {
+          "id": "p1_transport_le-taxi",
+          "en": "taxi",
+          "fr": "le taxi",
+          "phonetic": "luh tahk-see"
+        },
+        {
+          "id": "p1_transport_la-gare",
+          "en": "train station",
+          "fr": "la gare",
+          "phonetic": "lah gar"
+        },
+        {
+          "id": "p1_transport_laeroport",
+          "en": "airport",
+          "fr": "l'aéroport",
+          "phonetic": "lah-ay-roh-por"
+        },
+        {
+          "id": "p1_transport_larret-de-bus",
+          "en": "bus stop",
+          "fr": "l'arrêt de bus",
+          "phonetic": "lah-reh duh bews"
+        },
+        {
+          "id": "p1_transport_le-billet",
+          "en": "ticket",
+          "fr": "le billet",
+          "phonetic": "luh bee-yeh"
+        },
+        {
+          "id": "p1_transport_un-aller-simple",
+          "en": "one-way ticket",
+          "fr": "un aller simple",
+          "phonetic": "uh(n) nah-lay san-pluh"
+        },
+        {
+          "id": "p1_transport_un-aller-retour",
+          "en": "round trip",
+          "fr": "un aller-retour",
+          "phonetic": "uh(n) nah-lay ruh-toor"
+        },
+        {
+          "id": "p1_transport_le-plan",
+          "en": "map (city)",
+          "fr": "le plan",
+          "phonetic": "luh plah(n)"
+        },
+        {
+          "id": "p1_transport_la-station",
+          "en": "station (metro)",
+          "fr": "la station",
+          "phonetic": "lah stah-syoh(n)"
+        },
+        {
+          "id": "p1_transport_a-pied",
+          "en": "on foot",
+          "fr": "à pied",
+          "phonetic": "ah pyay"
+        },
+        {
+          "id": "p1_transport_conduire",
+          "en": "to drive",
+          "fr": "conduire",
+          "phonetic": "koh(n)-dweer"
+        },
+        {
+          "id": "p1_transport_voyager",
+          "en": "to travel",
+          "fr": "voyager",
+          "phonetic": "vwah-yah-zhay"
+        },
+        {
+          "id": "p1_transport_la-valise",
+          "en": "suitcase",
+          "fr": "la valise",
+          "phonetic": "lah vah-leez"
+        },
+        {
+          "id": "p1_transport_le-passeport",
+          "en": "passport",
+          "fr": "le passeport",
+          "phonetic": "luh pahs-por"
+        },
+        {
+          "id": "p1_transport_la-douane",
+          "en": "customs",
+          "fr": "la douane",
+          "phonetic": "lah dwahn"
+        },
+        {
+          "id": "p1_transport_en-retard",
+          "en": "late (not on time)",
+          "fr": "en retard",
+          "phonetic": "ah(n) ruh-tar"
+        },
+        {
+          "id": "p1_transport_a-lheure",
+          "en": "on time",
+          "fr": "à l'heure",
+          "phonetic": "ah luhr"
+        },
+        {
+          "id": "p1_transport_le-quai",
+          "en": "platform",
+          "fr": "le quai",
+          "phonetic": "luh kay"
+        },
+        {
+          "id": "p1_transport_la-sortie",
+          "en": "exit",
+          "fr": "la sortie",
+          "phonetic": "lah sor-tee"
+        },
+        {
+          "id": "p1_transport_lentree",
+          "en": "entrance",
+          "fr": "l'entrée",
+          "phonetic": "lah(n)-tray"
+        }
+      ]
+    },
+    {
+      "id": "body_health",
+      "title": "Body & Health",
+      "entries": [
+        {
+          "id": "p1_body_health_la-tete",
+          "en": "head",
+          "fr": "la tête",
+          "phonetic": "lah teht"
+        },
+        {
+          "id": "p1_body_health_loeil",
+          "en": "eye",
+          "fr": "l'œil",
+          "phonetic": "luhy"
+        },
+        {
+          "id": "p1_body_health_les-yeux",
+          "en": "eyes",
+          "fr": "les yeux",
+          "phonetic": "lay zyuh"
+        },
+        {
+          "id": "p1_body_health_le-nez",
+          "en": "nose",
+          "fr": "le nez",
+          "phonetic": "luh nay"
+        },
+        {
+          "id": "p1_body_health_la-bouche",
+          "en": "mouth",
+          "fr": "la bouche",
+          "phonetic": "lah boosh"
+        },
+        {
+          "id": "p1_body_health_loreille",
+          "en": "ear",
+          "fr": "l'oreille",
+          "phonetic": "loh-rehy"
+        },
+        {
+          "id": "p1_body_health_la-main",
+          "en": "hand",
+          "fr": "la main",
+          "phonetic": "lah man"
+        },
+        {
+          "id": "p1_body_health_le-bras",
+          "en": "arm",
+          "fr": "le bras",
+          "phonetic": "luh brah"
+        },
+        {
+          "id": "p1_body_health_la-jambe",
+          "en": "leg",
+          "fr": "la jambe",
+          "phonetic": "lah zhah(n)b"
+        },
+        {
+          "id": "p1_body_health_le-pied",
+          "en": "foot",
+          "fr": "le pied",
+          "phonetic": "luh pyay"
+        },
+        {
+          "id": "p1_body_health_le-dos",
+          "en": "back",
+          "fr": "le dos",
+          "phonetic": "luh doh"
+        },
+        {
+          "id": "p1_body_health_le-ventre",
+          "en": "stomach",
+          "fr": "le ventre",
+          "phonetic": "luh vah(n)-truh"
+        },
+        {
+          "id": "p1_body_health_le-coeur",
+          "en": "heart",
+          "fr": "le cœur",
+          "phonetic": "luh kuhr"
+        },
+        {
+          "id": "p1_body_health_la-dent",
+          "en": "tooth",
+          "fr": "la dent",
+          "phonetic": "lah dah(n)"
+        },
+        {
+          "id": "p1_body_health_les-cheveux",
+          "en": "hair",
+          "fr": "les cheveux",
+          "phonetic": "lay shuh-vuh"
+        },
+        {
+          "id": "p1_body_health_malade",
+          "en": "sick",
+          "fr": "malade",
+          "phonetic": "mah-lahd"
+        },
+        {
+          "id": "p1_body_health_la-douleur",
+          "en": "pain",
+          "fr": "la douleur",
+          "phonetic": "lah doo-luhr"
+        },
+        {
+          "id": "p1_body_health_avoir-mal",
+          "en": "to hurt / have pain",
+          "fr": "avoir mal",
+          "phonetic": "ah-vwahr mahl"
+        },
+        {
+          "id": "p1_body_health_le-medecin",
+          "en": "doctor",
+          "fr": "le médecin",
+          "phonetic": "luh mayd-san"
+        },
+        {
+          "id": "p1_body_health_lhopital",
+          "en": "hospital",
+          "fr": "l'hôpital",
+          "phonetic": "loh-pee-tahl"
+        },
+        {
+          "id": "p1_body_health_la-pharmacie",
+          "en": "pharmacy",
+          "fr": "la pharmacie",
+          "phonetic": "lah far-mah-see"
+        },
+        {
+          "id": "p1_body_health_le-medicament",
+          "en": "medicine",
+          "fr": "le médicament",
+          "phonetic": "luh may-dee-kah-mah(n)"
+        },
+        {
+          "id": "p1_body_health_lurgence",
+          "en": "emergency",
+          "fr": "l'urgence",
+          "phonetic": "lewr-zhah(n)s"
+        },
+        {
+          "id": "p1_body_health_la-sante",
+          "en": "health",
+          "fr": "la santé",
+          "phonetic": "lah sah(n)-tay"
+        },
+        {
+          "id": "p1_body_health_la-fievre",
+          "en": "fever",
+          "fr": "la fièvre",
+          "phonetic": "lah fyeh-vruh"
+        },
+        {
+          "id": "p1_body_health_le-rhume",
+          "en": "a cold (illness)",
+          "fr": "le rhume",
+          "phonetic": "luh rewm"
+        }
+      ]
+    },
+    {
+      "id": "clothing",
+      "title": "Clothing",
+      "entries": [
+        {
+          "id": "p1_clothing_les-vetements",
+          "en": "clothes",
+          "fr": "les vêtements",
+          "phonetic": "lay veht-mah(n)"
+        },
+        {
+          "id": "p1_clothing_la-chemise",
+          "en": "shirt",
+          "fr": "la chemise",
+          "phonetic": "lah shuh-meez"
+        },
+        {
+          "id": "p1_clothing_le-pantalon",
+          "en": "pants",
+          "fr": "le pantalon",
+          "phonetic": "luh pah(n)-tah-loh(n)"
+        },
+        {
+          "id": "p1_clothing_la-robe",
+          "en": "dress",
+          "fr": "la robe",
+          "phonetic": "lah rohb"
+        },
+        {
+          "id": "p1_clothing_la-jupe",
+          "en": "skirt",
+          "fr": "la jupe",
+          "phonetic": "lah zhewp"
+        },
+        {
+          "id": "p1_clothing_le-manteau",
+          "en": "coat",
+          "fr": "le manteau",
+          "phonetic": "luh mah(n)-toh"
+        },
+        {
+          "id": "p1_clothing_la-veste",
+          "en": "jacket",
+          "fr": "la veste",
+          "phonetic": "lah vehst"
+        },
+        {
+          "id": "p1_clothing_le-pull",
+          "en": "sweater",
+          "fr": "le pull",
+          "phonetic": "luh pewl"
+        },
+        {
+          "id": "p1_clothing_le-t-shirt",
+          "en": "t-shirt",
+          "fr": "le t-shirt",
+          "phonetic": "luh tee-shuhrt"
+        },
+        {
+          "id": "p1_clothing_les-chaussures",
+          "en": "shoes",
+          "fr": "les chaussures",
+          "phonetic": "lay shoh-sewr"
+        },
+        {
+          "id": "p1_clothing_les-chaussettes",
+          "en": "socks",
+          "fr": "les chaussettes",
+          "phonetic": "lay shoh-seht"
+        },
+        {
+          "id": "p1_clothing_le-chapeau",
+          "en": "hat",
+          "fr": "le chapeau",
+          "phonetic": "luh shah-poh"
+        },
+        {
+          "id": "p1_clothing_lecharpe",
+          "en": "scarf",
+          "fr": "l'écharpe",
+          "phonetic": "lay-sharp"
+        },
+        {
+          "id": "p1_clothing_les-gants",
+          "en": "gloves",
+          "fr": "les gants",
+          "phonetic": "lay gah(n)"
+        },
+        {
+          "id": "p1_clothing_la-ceinture",
+          "en": "belt",
+          "fr": "la ceinture",
+          "phonetic": "lah san-tewr"
+        },
+        {
+          "id": "p1_clothing_le-sac",
+          "en": "bag",
+          "fr": "le sac",
+          "phonetic": "luh sahk"
+        },
+        {
+          "id": "p1_clothing_la-taille",
+          "en": "size",
+          "fr": "la taille",
+          "phonetic": "lah tahy"
+        },
+        {
+          "id": "p1_clothing_shabiller",
+          "en": "to get dressed",
+          "fr": "s'habiller",
+          "phonetic": "sah-bee-yay"
+        },
+        {
+          "id": "p1_clothing_les-lunettes",
+          "en": "glasses",
+          "fr": "les lunettes",
+          "phonetic": "lay lew-neht"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "target": "CLB 7+ · TEF/TCF Canada · 6-month track",
+  "months": [
+    {
+      "month": 1,
+      "title": "500 words · Present tense · Basic conversations",
+      "goals": [
+        "Learn pronunciation & French sounds",
+        "Master present tense (regular + top 20 verbs)",
+        "Build first 500-word deck (Phase 1)",
+        "Start daily listening (10-15 min slow French)"
+      ],
+      "grammarChecklist": ["present"]
+    },
+    {
+      "month": 2,
+      "title": "1,000 words · Passé composé · Simple writing",
+      "goals": [
+        "Learn passé composé (avoir/être auxiliaries)",
+        "Write 5 short paragraphs about yourself",
+        "Increase listening to 20-30 min/day",
+        "Start speaking out loud daily (Marie counts!)"
+      ],
+      "grammarChecklist": ["passe_compose"]
+    },
+    {
+      "month": 3,
+      "title": "1,800 words · Imparfait · Listening practice",
+      "goals": [
+        "Master imparfait vs passé composé usage",
+        "Watch/listen to native content with subtitles",
+        "Practice describing your work/studies",
+        "Review Phase 1 + 2 vocab (spaced repetition)"
+      ],
+      "grammarChecklist": ["imparfait"]
+    },
+    {
+      "month": 4,
+      "title": "2,400 words · Conditionnel · Speaking every day",
+      "goals": [
+        "Learn conditionnel présent",
+        "Practice TEF-style speaking questions (Section A & B)",
+        "Compare two choices / give opinions out loud",
+        "Daily speaking sessions with Marie"
+      ],
+      "grammarChecklist": ["futur_simple", "futur_proche", "conditionnel"]
+    },
+    {
+      "month": 5,
+      "title": "3,000 words · TEF question types · Mock speaking/writing",
+      "goals": [
+        "Learn basic subjonctif",
+        "Do full TEF-style writing tasks (email + essay)",
+        "Do full TEF-style speaking mock (both sections)",
+        "Review connectors — use them actively in writing"
+      ],
+      "grammarChecklist": ["subjonctif", "pronouns"]
+    },
+    {
+      "month": 6,
+      "title": "Full TEF Canada practice exams",
+      "goals": [
+        "Complete 2-3 full-length practice exams",
+        "Identify and drill weakest section",
+        "Daily speaking + listening, no new grammar",
+        "Book real exam date"
+      ],
+      "grammarChecklist": ["passive_voice"]
+    }
+  ],
+  "dailyHabits": [
+    { "id": "listening", "title": "Listening", "detail": "Slow French → podcast → normal speed", "minutes": 20, "lab": "listening" },
+    { "id": "speaking", "title": "Speaking", "detail": "Call Marie or practice aloud", "minutes": 20, "lab": "speaking" },
+    { "id": "anki", "title": "Vocab review", "detail": "Flashcards with spaced repetition", "minutes": 15, "lab": "vocab" },
+    { "id": "reading", "title": "Reading", "detail": "Graded readers → news articles", "minutes": 20, "lab": "grammar" },
+    { "id": "writing", "title": "Writing", "detail": "Short emails, paragraphs, essays", "minutes": 15, "lab": "writing" }
+  ],
+  "vocabularyBreakdown": "Nouns 1,500 · Verbs 600 · Adjectives 500 · Adverbs 200 · Connectors 150 · Expressions 300 = 3,000 active words"
+}

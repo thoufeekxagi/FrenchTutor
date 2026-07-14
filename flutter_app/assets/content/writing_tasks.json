@@ -1,0 +1,124 @@
+{
+  "tasks": [
+    {
+      "id": "w01",
+      "type": "email",
+      "title": "Email to a friend: your week",
+      "promptFr": "Écrivez un courriel à un(e) ami(e) pour raconter votre semaine. Parlez de votre travail et de vos activités.",
+      "promptEn": "Write an email to a friend about your week. Talk about your work and activities.",
+      "minWords": 60,
+      "targetConnectors": ["donc", "de_plus", "ensuite"],
+      "rubricHints": ["Informal register (tu)", "Use passé composé for completed events", "Include a greeting and a closing"]
+    },
+    {
+      "id": "w02",
+      "type": "email",
+      "title": "Professional email: request information",
+      "promptFr": "Écrivez un courriel à une école de langues pour demander des informations sur les cours de français : horaires, prix et niveaux offerts.",
+      "promptEn": "Write an email to a language school asking for information about French courses: schedule, prices, and levels offered.",
+      "minWords": 80,
+      "targetConnectors": ["tout_dabord", "de_plus", "enfin"],
+      "rubricHints": ["Formal register (vous)", "Use conditionnel for polite requests (je voudrais, pourriez-vous)", "Formal opening and closing (Madame, Monsieur / Cordialement)"]
+    },
+    {
+      "id": "w03",
+      "type": "email",
+      "title": "Cancel and reschedule an appointment",
+      "promptFr": "Vous ne pouvez pas aller à votre rendez-vous chez le dentiste. Écrivez un courriel pour annuler et proposer une nouvelle date.",
+      "promptEn": "You can't make your dentist appointment. Write an email to cancel and suggest a new date.",
+      "minWords": 60,
+      "targetConnectors": ["malgre", "par_consequent", "des_que"],
+      "rubricHints": ["Formal register", "Apologize and give a reason", "Propose specific alternatives"]
+    },
+    {
+      "id": "w04",
+      "type": "complaint_letter",
+      "title": "Lettre de réclamation: late delivery",
+      "promptFr": "Vous avez commandé un produit en ligne il y a un mois et vous ne l'avez pas reçu. Écrivez une lettre de réclamation au service client.",
+      "promptEn": "You ordered a product online a month ago and haven't received it. Write a complaint letter to customer service.",
+      "minWords": 100,
+      "targetConnectors": ["pourtant", "par_consequent", "en_effet", "malgre"],
+      "rubricHints": ["Formal register", "State facts with dates", "Demand a specific resolution (refund, delivery)", "Firm but polite tone"]
+    },
+    {
+      "id": "w05",
+      "type": "complaint_letter",
+      "title": "Lettre de réclamation: noisy hotel",
+      "promptFr": "Vous avez passé un week-end dans un hôtel très bruyant avec un service décevant. Écrivez une lettre de réclamation au directeur.",
+      "promptEn": "You spent a weekend in a very noisy hotel with disappointing service. Write a complaint letter to the manager.",
+      "minWords": 100,
+      "targetConnectors": ["cependant", "de_plus", "cest_pourquoi", "neanmoins"],
+      "rubricHints": ["Formal register", "Describe problems using imparfait/passé composé", "Request compensation"]
+    },
+    {
+      "id": "w06",
+      "type": "opinion_essay",
+      "title": "Essay: remote work",
+      "promptFr": "Le télétravail est-il une bonne chose pour les employés et les entreprises ? Donnez votre opinion avec des arguments et des exemples.",
+      "promptEn": "Is remote work a good thing for employees and companies? Give your opinion with arguments and examples.",
+      "minWords": 150,
+      "targetConnectors": ["tout_dabord", "en_revanche", "de_plus", "par_consequent", "en_conclusion"],
+      "rubricHints": ["Structure: introduction, 2-3 arguments, conclusion", "Present both sides then take a position", "Use at least 5 different connectors"]
+    },
+    {
+      "id": "w07",
+      "type": "opinion_essay",
+      "title": "Essay: artificial intelligence",
+      "promptFr": "L'intelligence artificielle va-t-elle améliorer notre vie quotidienne ou créer plus de problèmes ? Exprimez votre point de vue.",
+      "promptEn": "Will artificial intelligence improve our daily lives or create more problems? Express your point of view.",
+      "minWords": 150,
+      "targetConnectors": ["dune_part", "neanmoins", "notamment", "ainsi", "en_conclusion"],
+      "rubricHints": ["Take a clear position", "Give concrete examples (your own field!)", "Acknowledge counter-arguments with bien que or cependant"]
+    },
+    {
+      "id": "w08",
+      "type": "opinion_essay",
+      "title": "Essay: city vs suburbs",
+      "promptFr": "Vaut-il mieux vivre en ville ou en banlieue ? Comparez les deux options et donnez votre préférence.",
+      "promptEn": "Is it better to live in the city or the suburbs? Compare the two options and give your preference.",
+      "minWords": 150,
+      "targetConnectors": ["alors_que", "en_revanche", "tandis_que", "donc", "quant_a"],
+      "rubricHints": ["Comparative structures (plus... que, moins... que)", "Balanced comparison before your choice", "Conditionnel for hypotheticals"]
+    },
+    {
+      "id": "w09",
+      "type": "formal_request",
+      "title": "Demande formelle: work certificate",
+      "promptFr": "Écrivez une lettre à votre employeur pour demander une attestation de travail dont vous avez besoin pour votre dossier d'immigration.",
+      "promptEn": "Write a letter to your employer requesting a work certificate needed for your immigration file.",
+      "minWords": 80,
+      "targetConnectors": ["en_effet", "afin_de", "des_que"],
+      "rubricHints": ["Very formal register", "Explain the purpose", "Use veuillez and je vous prie d'agréer formulas"]
+    },
+    {
+      "id": "w10",
+      "type": "formal_request",
+      "title": "Demande formelle: information from the government",
+      "promptFr": "Écrivez un message à un organisme gouvernemental canadien pour demander des informations sur le renouvellement de votre permis de travail.",
+      "promptEn": "Write a message to a Canadian government agency asking for information about renewing your work permit.",
+      "minWords": 80,
+      "targetConnectors": ["tout_dabord", "par_ailleurs", "afin_de"],
+      "rubricHints": ["Formal administrative vocabulary", "Reference numbers and dates", "Clear numbered questions work well"]
+    },
+    {
+      "id": "w11",
+      "type": "email",
+      "title": "Suggest a plan to a colleague",
+      "promptFr": "Proposez à un collègue d'organiser une activité d'équipe. Suggérez une date, un lieu et une activité, et expliquez pourquoi.",
+      "promptEn": "Suggest organizing a team activity to a colleague. Propose a date, place, and activity, and explain why.",
+      "minWords": 70,
+      "targetConnectors": ["ainsi", "de_plus", "quant_a"],
+      "rubricHints": ["Semi-formal register", "Conditionnel for suggestions (on pourrait, ce serait)", "Invite a response"]
+    },
+    {
+      "id": "w12",
+      "type": "opinion_essay",
+      "title": "Essay: learning languages online",
+      "promptFr": "Peut-on vraiment apprendre une langue avec des applications et l'intelligence artificielle, sans professeur ? Donnez votre avis.",
+      "promptEn": "Can you really learn a language with apps and AI, without a teacher? Give your opinion.",
+      "minWords": 150,
+      "targetConnectors": ["en_effet", "cependant", "notamment", "grace_a", "en_conclusion"],
+      "rubricHints": ["Perfect topic to draw on your own experience", "Nuanced position scores higher", "Vary your sentence openings"]
+    }
+  ]
+}

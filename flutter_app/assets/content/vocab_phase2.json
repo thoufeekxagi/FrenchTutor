@@ -1,0 +1,158 @@
+{
+  "phase": 2,
+  "title": "Everyday Communication",
+  "themes": [
+    {
+      "id": "work",
+      "title": "Work",
+      "entries": [
+        {"id": "p2_work_travail", "en": "work / job", "fr": "le travail", "phonetic": "luh trah-vah-y"},
+        {"id": "p2_work_collegue", "en": "colleague", "fr": "le/la collègue", "phonetic": "luh koh-lehg"},
+        {"id": "p2_work_patron", "en": "boss", "fr": "le patron / le chef", "phonetic": "luh pah-troh(n) / shehf"},
+        {"id": "p2_work_bureau", "en": "office", "fr": "le bureau", "phonetic": "luh bew-roh"},
+        {"id": "p2_work_reunion", "en": "meeting", "fr": "la réunion", "phonetic": "lah ray-ew-nyoh(n)"},
+        {"id": "p2_work_salaire", "en": "salary", "fr": "le salaire", "phonetic": "luh sah-lehr"},
+        {"id": "p2_work_emploi", "en": "employment", "fr": "l'emploi", "phonetic": "lah(n)-plwah"},
+        {"id": "p2_work_embaucher", "en": "to hire", "fr": "embaucher", "phonetic": "ah(n)-boh-shay"},
+        {"id": "p2_work_demissionner", "en": "to resign", "fr": "démissionner", "phonetic": "day-mee-syoh-nay"},
+        {"id": "p2_work_cv", "en": "resume", "fr": "le CV", "phonetic": "luh say-vay"},
+        {"id": "p2_work_entretien", "en": "interview", "fr": "l'entretien", "phonetic": "lah(n)-truh-tyan"},
+        {"id": "p2_work_temps_plein", "en": "full-time / part-time", "fr": "à temps plein / partiel", "phonetic": "ah tah(n) plan / par-syehl"}
+      ]
+    },
+    {
+      "id": "school",
+      "title": "School",
+      "entries": [
+        {"id": "p2_school_ecole", "en": "school", "fr": "l'école", "phonetic": "lay-kohl"},
+        {"id": "p2_school_universite", "en": "university", "fr": "l'université", "phonetic": "lew-nee-vehr-see-tay"},
+        {"id": "p2_school_cours", "en": "class / course", "fr": "le cours", "phonetic": "luh koor"},
+        {"id": "p2_school_examen", "en": "exam", "fr": "l'examen", "phonetic": "lehg-zah-man"},
+        {"id": "p2_school_diplome", "en": "degree / diploma", "fr": "le diplôme", "phonetic": "luh dee-plohm"},
+        {"id": "p2_school_etudiant", "en": "student", "fr": "l'étudiant(e)", "phonetic": "lay-tew-dyah(n)"},
+        {"id": "p2_school_professeur", "en": "teacher / professor", "fr": "le professeur", "phonetic": "luh proh-feh-suhr"},
+        {"id": "p2_school_devoirs", "en": "homework", "fr": "les devoirs", "phonetic": "lay duh-vwahr"},
+        {"id": "p2_school_reussir", "en": "to succeed / pass", "fr": "réussir", "phonetic": "ray-ew-seer"}
+      ]
+    },
+    {
+      "id": "transportation",
+      "title": "Transportation",
+      "entries": [
+        {"id": "p2_transport_voiture", "en": "car", "fr": "la voiture", "phonetic": "lah vwah-tewr"},
+        {"id": "p2_transport_autobus", "en": "bus", "fr": "l'autobus", "phonetic": "loh-toh-bewss"},
+        {"id": "p2_transport_train", "en": "train", "fr": "le train", "phonetic": "luh tran"},
+        {"id": "p2_transport_avion", "en": "plane", "fr": "l'avion", "phonetic": "lah-vyoh(n)"},
+        {"id": "p2_transport_metro", "en": "subway", "fr": "le métro", "phonetic": "luh may-troh"},
+        {"id": "p2_transport_velo", "en": "bicycle", "fr": "le vélo", "phonetic": "luh vay-loh"},
+        {"id": "p2_transport_conduire", "en": "to drive", "fr": "conduire", "phonetic": "koh(n)-dweer"},
+        {"id": "p2_transport_billet", "en": "ticket", "fr": "le billet", "phonetic": "luh bee-yeh"},
+        {"id": "p2_transport_arret", "en": "stop", "fr": "l'arrêt", "phonetic": "lah-reh"},
+        {"id": "p2_transport_trajet", "en": "trip / commute", "fr": "le trajet", "phonetic": "luh trah-zheh"}
+      ]
+    },
+    {
+      "id": "banking",
+      "title": "Banking & Money",
+      "entries": [
+        {"id": "p2_bank_banque", "en": "bank", "fr": "la banque", "phonetic": "lah bah(n)k"},
+        {"id": "p2_bank_compte", "en": "account", "fr": "le compte", "phonetic": "luh koh(n)t"},
+        {"id": "p2_bank_argent", "en": "money", "fr": "l'argent", "phonetic": "lar-zhah(n)"},
+        {"id": "p2_bank_retirer", "en": "to withdraw", "fr": "retirer", "phonetic": "ruh-tee-ray"},
+        {"id": "p2_bank_deposer", "en": "to deposit", "fr": "déposer", "phonetic": "day-poh-zay"},
+        {"id": "p2_bank_pret", "en": "loan", "fr": "le prêt", "phonetic": "luh preh"},
+        {"id": "p2_bank_carte_credit", "en": "credit card", "fr": "la carte de crédit", "phonetic": "lah kart duh kray-dee"},
+        {"id": "p2_bank_payer", "en": "to pay", "fr": "payer", "phonetic": "peh-yay"},
+        {"id": "p2_bank_emprunter", "en": "to borrow", "fr": "emprunter", "phonetic": "ah(n)-pruh(n)-tay"},
+        {"id": "p2_bank_epargner", "en": "to save (money)", "fr": "épargner", "phonetic": "ay-par-nyay"}
+      ]
+    },
+    {
+      "id": "healthcare",
+      "title": "Healthcare",
+      "entries": [
+        {"id": "p2_health_medecin", "en": "doctor", "fr": "le médecin", "phonetic": "luh mayd-san"},
+        {"id": "p2_health_hopital", "en": "hospital", "fr": "l'hôpital", "phonetic": "loh-pee-tahl"},
+        {"id": "p2_health_rdv", "en": "appointment", "fr": "le rendez-vous", "phonetic": "luh rah(n)-day-voo"},
+        {"id": "p2_health_maladie", "en": "illness", "fr": "la maladie", "phonetic": "lah mah-lah-dee"},
+        {"id": "p2_health_symptome", "en": "symptom", "fr": "le symptôme", "phonetic": "luh sam-tohm"},
+        {"id": "p2_health_traitement", "en": "treatment", "fr": "le traitement", "phonetic": "luh treht-mah(n)"},
+        {"id": "p2_health_assurance", "en": "insurance", "fr": "l'assurance", "phonetic": "lah-sew-rah(n)s"},
+        {"id": "p2_health_pharmacie", "en": "pharmacy", "fr": "la pharmacie", "phonetic": "lah far-mah-see"},
+        {"id": "p2_health_avoir_mal", "en": "to have pain in", "fr": "avoir mal à", "phonetic": "ah-vwahr mahl ah"},
+        {"id": "p2_health_guerir", "en": "to heal / recover", "fr": "guérir", "phonetic": "gay-reer"}
+      ]
+    },
+    {
+      "id": "restaurants",
+      "title": "Restaurants & Food",
+      "entries": [
+        {"id": "p2_resto_restaurant", "en": "restaurant", "fr": "le restaurant", "phonetic": "luh reh-stoh-rah(n)"},
+        {"id": "p2_resto_menu", "en": "menu", "fr": "la carte / le menu", "phonetic": "lah kart / luh muh-new"},
+        {"id": "p2_resto_commander", "en": "to order", "fr": "commander", "phonetic": "koh-mah(n)-day"},
+        {"id": "p2_resto_addition", "en": "the bill", "fr": "l'addition", "phonetic": "lah-dee-syoh(n)"},
+        {"id": "p2_resto_serveur", "en": "waiter / waitress", "fr": "le serveur / la serveuse", "phonetic": "luh sehr-vuhr / lah sehr-vuhz"},
+        {"id": "p2_resto_reserver", "en": "to reserve / book", "fr": "réserver", "phonetic": "ray-zehr-vay"},
+        {"id": "p2_resto_plat", "en": "dish", "fr": "le plat", "phonetic": "luh plah"},
+        {"id": "p2_resto_dessert", "en": "dessert", "fr": "le dessert", "phonetic": "luh deh-sehr"}
+      ]
+    },
+    {
+      "id": "technology",
+      "title": "Technology",
+      "entries": [
+        {"id": "p2_tech_ordinateur", "en": "computer", "fr": "l'ordinateur", "phonetic": "lor-dee-nah-tuhr"},
+        {"id": "p2_tech_telephone", "en": "phone", "fr": "le téléphone", "phonetic": "luh tay-lay-fohn"},
+        {"id": "p2_tech_internet", "en": "internet", "fr": "l'internet", "phonetic": "lan-tehr-neht"},
+        {"id": "p2_tech_logiciel", "en": "software", "fr": "le logiciel", "phonetic": "luh loh-zhee-syehl"},
+        {"id": "p2_tech_application", "en": "app", "fr": "l'application", "phonetic": "lah-plee-kah-syoh(n)"},
+        {"id": "p2_tech_telecharger", "en": "to download", "fr": "télécharger", "phonetic": "tay-lay-shar-zhay"},
+        {"id": "p2_tech_fichier", "en": "file", "fr": "le fichier", "phonetic": "luh fee-shyay"},
+        {"id": "p2_tech_mot_de_passe", "en": "password", "fr": "le mot de passe", "phonetic": "luh moh duh pahss"},
+        {"id": "p2_tech_reseau", "en": "network", "fr": "le réseau", "phonetic": "luh ray-zoh"},
+        {"id": "p2_tech_enregistrer", "en": "to save (file)", "fr": "enregistrer", "phonetic": "ah(n)-ruh-zhee-stray"}
+      ]
+    },
+    {
+      "id": "travel",
+      "title": "Travel",
+      "entries": [
+        {"id": "p2_travel_voyage", "en": "trip / travel", "fr": "le voyage", "phonetic": "luh vwah-yahzh"},
+        {"id": "p2_travel_hotel", "en": "hotel", "fr": "l'hôtel", "phonetic": "loh-tehl"},
+        {"id": "p2_travel_passeport", "en": "passport", "fr": "le passeport", "phonetic": "luh pahss-pohr"},
+        {"id": "p2_travel_reservation", "en": "reservation", "fr": "la réservation", "phonetic": "lah ray-zehr-vah-syoh(n)"},
+        {"id": "p2_travel_valise", "en": "suitcase", "fr": "la valise", "phonetic": "lah vah-leez"},
+        {"id": "p2_travel_aeroport", "en": "airport", "fr": "l'aéroport", "phonetic": "lah-ay-roh-pohr"},
+        {"id": "p2_travel_vol", "en": "flight", "fr": "le vol", "phonetic": "luh vohl"},
+        {"id": "p2_travel_douane", "en": "customs", "fr": "la douane", "phonetic": "lah doo-ahn"}
+      ]
+    },
+    {
+      "id": "friends_hobbies",
+      "title": "Friends & Hobbies",
+      "entries": [
+        {"id": "p2_friends_ami", "en": "friend", "fr": "l'ami(e)", "phonetic": "lah-mee"},
+        {"id": "p2_friends_loisir", "en": "hobby", "fr": "le loisir", "phonetic": "luh lwah-zeer"},
+        {"id": "p2_friends_sport", "en": "sport", "fr": "le sport", "phonetic": "luh spohr"},
+        {"id": "p2_friends_lire", "en": "to read", "fr": "lire", "phonetic": "leer"},
+        {"id": "p2_friends_jouer", "en": "to play", "fr": "jouer", "phonetic": "zhoo-ay"},
+        {"id": "p2_friends_regarder_film", "en": "to watch a movie", "fr": "regarder un film", "phonetic": "ruh-gar-day uh(n) feelm"},
+        {"id": "p2_friends_sortir", "en": "to go out", "fr": "sortir", "phonetic": "sor-teer"},
+        {"id": "p2_friends_weekend", "en": "weekend", "fr": "le week-end", "phonetic": "luh week-end"}
+      ]
+    },
+    {
+      "id": "housing",
+      "title": "Housing",
+      "entries": [
+        {"id": "p2_housing_loyer", "en": "rent", "fr": "le loyer", "phonetic": "luh lwah-yay"},
+        {"id": "p2_housing_proprietaire", "en": "landlord / owner", "fr": "le propriétaire", "phonetic": "luh proh-pree-ay-tehr"},
+        {"id": "p2_housing_locataire", "en": "tenant", "fr": "le locataire", "phonetic": "luh loh-kah-tehr"},
+        {"id": "p2_housing_bail", "en": "lease", "fr": "le bail", "phonetic": "luh bah-y"},
+        {"id": "p2_housing_demenager", "en": "to move (house)", "fr": "déménager", "phonetic": "day-may-nah-zhay"},
+        {"id": "p2_housing_quartier", "en": "neighborhood", "fr": "le quartier", "phonetic": "luh kar-tyay"},
+        {"id": "p2_housing_meuble", "en": "furnished", "fr": "meublé", "phonetic": "muh-blay"}
+      ]
+    }
+  ]
+}

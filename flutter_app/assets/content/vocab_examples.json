@@ -1,0 +1,5570 @@
+{
+ "p1_pronouns_basics_je": {
+  "fr": "Je suis étudiant.",
+  "en": "I am a student."
+ },
+ "p1_pronouns_basics_tu": {
+  "fr": "Tu es gentil.",
+  "en": "You are kind."
+ },
+ "p1_pronouns_basics_vous": {
+  "fr": "Vous êtes ici.",
+  "en": "You are here."
+ },
+ "p1_pronouns_basics_il": {
+  "fr": "Il est content.",
+  "en": "He is happy."
+ },
+ "p1_pronouns_basics_elle": {
+  "fr": "Elle parle français.",
+  "en": "She speaks French."
+ },
+ "p1_pronouns_basics_nous": {
+  "fr": "Nous allons au parc.",
+  "en": "We go to the park."
+ },
+ "p1_pronouns_basics_ils": {
+  "fr": "Ils jouent au foot.",
+  "en": "They (m) play soccer."
+ },
+ "p1_pronouns_basics_elles": {
+  "fr": "Elles lisent un livre.",
+  "en": "They (f) read a book."
+ },
+ "p1_pronouns_basics_ce": {
+  "fr": "Je veux ce livre.",
+  "en": "I want this book."
+ },
+ "p1_pronouns_basics_ici": {
+  "fr": "Il est ici.",
+  "en": "He is here."
+ },
+ "p1_pronouns_basics_la": {
+  "fr": "Elle est là.",
+  "en": "She is there."
+ },
+ "p1_pronouns_basics_et": {
+  "fr": "J'ai un chat et un chien.",
+  "en": "I have a cat and a dog."
+ },
+ "p1_pronouns_basics_ou": {
+  "fr": "Tu veux du thé ou du café?",
+  "en": "Do you want tea or coffee?"
+ },
+ "p1_pronouns_basics_mais": {
+  "fr": "Il est petit mais fort.",
+  "en": "He is small but strong."
+ },
+ "p1_pronouns_basics_parce-que": {
+  "fr": "Je suis heureux parce que tu es là.",
+  "en": "I am happy because you are there."
+ },
+ "p1_pronouns_basics_avec": {
+  "fr": "Je vais à l'école avec mon frère.",
+  "en": "I go to school with my brother."
+ },
+ "p1_pronouns_basics_sans": {
+  "fr": "Je vais sans mon ami.",
+  "en": "I am going without my friend."
+ },
+ "p1_pronouns_basics_dans": {
+  "fr": "Le chat est dans la boîte.",
+  "en": "The cat is in the box."
+ },
+ "p1_pronouns_basics_sur": {
+  "fr": "Le livre est sur la table.",
+  "en": "The book is on the table."
+ },
+ "p1_pronouns_basics_sous": {
+  "fr": "Les chaussures sont sous le lit.",
+  "en": "The shoes are under the bed."
+ },
+ "p1_pronouns_basics_pour": {
+  "fr": "Ce cadeau est pour toi.",
+  "en": "This gift is for you."
+ },
+ "p1_pronouns_basics_de": {
+  "fr": "Je viens de Paris.",
+  "en": "I come from Paris."
+ },
+ "p1_pronouns_basics_a": {
+  "fr": "Nous allons à l'école.",
+  "en": "We are going to school."
+ },
+ "p1_pronouns_basics_mon-ma": {
+  "fr": "Ma sœur est ici.",
+  "en": "My sister is here."
+ },
+ "p1_pronouns_basics_oui": {
+  "fr": "Oui, j'aime les pommes.",
+  "en": "Yes, I like apples."
+ },
+ "p1_pronouns_basics_non": {
+  "fr": "Non, je ne comprends pas.",
+  "en": "No, I don't understand."
+ },
+ "p1_pronouns_basics_on": {
+  "fr": "On regarde un film ce soir.",
+  "en": "We/One are watching a movie tonight."
+ },
+ "p1_pronouns_basics_moi": {
+  "fr": "C'est un cadeau pour moi.",
+  "en": "It's a gift for me."
+ },
+ "p1_pronouns_basics_toi": {
+  "fr": "Je parle souvent avec toi.",
+  "en": "I often talk with you."
+ },
+ "p1_pronouns_basics_lui": {
+  "fr": "Je lui donne mon livre.",
+  "en": "I give him my book."
+ },
+ "p1_pronouns_basics_eux": {
+  "fr": "Ils jouent avec eux au parc.",
+  "en": "They play with them in the park."
+ },
+ "p1_pronouns_basics_ca": {
+  "fr": "C'est ça, c'est bon.",
+  "en": "That's it, it's good."
+ },
+ "p1_pronouns_basics_ton-ta": {
+  "fr": "Ton livre et ta plume sont sur la table.",
+  "en": "Your book and your pen are on the table."
+ },
+ "p1_pronouns_basics_son-sa": {
+  "fr": "Son frère et sa sœur sont ici.",
+  "en": "His brother and her sister are here."
+ },
+ "p1_pronouns_basics_notre": {
+  "fr": "Notre école est grande.",
+  "en": "Our school is big."
+ },
+ "p1_pronouns_basics_votre": {
+  "fr": "Votre ami vient demain.",
+  "en": "Your friend is coming tomorrow."
+ },
+ "p1_verbs_etre": {
+  "fr": "Je veux être heureux.",
+  "en": "I want to be happy."
+ },
+ "p1_verbs_avoir": {
+  "fr": "Il faut avoir de la patience.",
+  "en": "One must have patience."
+ },
+ "p1_verbs_aller": {
+  "fr": "J'aime aller au cinéma.",
+  "en": "I like to go to the cinema."
+ },
+ "p1_verbs_faire": {
+  "fr": "Tu peux faire du sport.",
+  "en": "You can do sports."
+ },
+ "p1_verbs_pouvoir": {
+  "fr": "Il faut pouvoir nager.",
+  "en": "One must be able to swim."
+ },
+ "p1_verbs_vouloir": {
+  "fr": "Elle veut vouloir voyager.",
+  "en": "She wants to want to travel."
+ },
+ "p1_verbs_devoir": {
+  "fr": "Ils doivent devoir partir.",
+  "en": "They must have to leave."
+ },
+ "p1_verbs_venir": {
+  "fr": "J'aime venir ici.",
+  "en": "I like to come here."
+ },
+ "p1_verbs_prendre": {
+  "fr": "Je veux prendre un stylo.",
+  "en": "I want to take a pen."
+ },
+ "p1_verbs_mettre": {
+  "fr": "Il faut mettre le livre sur la table.",
+  "en": "You need to put the book on the table."
+ },
+ "p1_verbs_donner": {
+  "fr": "Tu peux donner ton cahier à Marie.",
+  "en": "You can give your notebook to Mary."
+ },
+ "p1_verbs_voir": {
+  "fr": "J'aime voir les films le soir.",
+  "en": "I like to see movies in the evening."
+ },
+ "p1_verbs_dire": {
+  "fr": "Nous devons dire la vérité.",
+  "en": "We must tell the truth."
+ },
+ "p1_verbs_parler": {
+  "fr": "Elle préfère parler lentement.",
+  "en": "She prefers to speak slowly."
+ },
+ "p1_verbs_manger": {
+  "fr": "Ils veulent manger des pommes.",
+  "en": "They want to eat apples."
+ },
+ "p1_verbs_boire": {
+  "fr": "Il faut boire de l'eau chaque jour.",
+  "en": "You need to drink water every day."
+ },
+ "p1_verbs_travailler": {
+  "fr": "Je veux travailler.",
+  "en": "I want to work."
+ },
+ "p1_verbs_etudier": {
+  "fr": "Il faut étudier.",
+  "en": "One must study."
+ },
+ "p1_verbs_vivre": {
+  "fr": "Tu peux vivre ici.",
+  "en": "You can live here."
+ },
+ "p1_verbs_aimer": {
+  "fr": "Il faut aimer.",
+  "en": "One must love."
+ },
+ "p1_verbs_regarder": {
+  "fr": "Tu peux regarder la télé.",
+  "en": "You can watch TV."
+ },
+ "p1_verbs_ecouter": {
+  "fr": "J'aime écouter la musique.",
+  "en": "I like to listen to music."
+ },
+ "p1_verbs_habiter": {
+  "fr": "Il faut habiter près de l'école.",
+  "en": "One must live near the school."
+ },
+ "p1_verbs_arriver": {
+  "fr": "Tu peux arriver tôt.",
+  "en": "You can arrive early."
+ },
+ "p1_verbs_partir": {
+  "fr": "Je veux partir maintenant.",
+  "en": "I want to leave now."
+ },
+ "p1_verbs_chercher": {
+  "fr": "Je veux chercher mes clés.",
+  "en": "I want to look for my keys."
+ },
+ "p1_verbs_trouver": {
+  "fr": "Je veux trouver un bon restaurant.",
+  "en": "I want to find a good restaurant."
+ },
+ "p1_verbs_penser": {
+  "fr": "Je veux penser à mon projet.",
+  "en": "I want to think about my project."
+ },
+ "p1_verbs_savoir": {
+  "fr": "Je veux savoir l'heure.",
+  "en": "I want to know the time."
+ },
+ "p1_verbs_connaitre": {
+  "fr": "Je veux connaître ton frère.",
+  "en": "I want to know your brother."
+ },
+ "p1_verbs_comprendre": {
+  "fr": "Je veux comprendre cette règle.",
+  "en": "I want to understand this rule."
+ },
+ "p1_verbs_apprendre": {
+  "fr": "Je veux apprendre à nager.",
+  "en": "I want to learn to swim."
+ },
+ "p1_verbs_lire": {
+  "fr": "Je veux lire ce livre.",
+  "en": "I want to read this book."
+ },
+ "p1_verbs_ecrire": {
+  "fr": "Il faut écrire lentement.",
+  "en": "One must write slowly."
+ },
+ "p1_verbs_ouvrir": {
+  "fr": "Tu peux ouvrir la fenêtre.",
+  "en": "You can open the window."
+ },
+ "p1_verbs_fermer": {
+  "fr": "Nous devons fermer la porte.",
+  "en": "We must close the door."
+ },
+ "p1_verbs_commencer": {
+  "fr": "J'aime commencer tôt.",
+  "en": "I like to start early."
+ },
+ "p1_verbs_finir": {
+  "fr": "Elle aime finir son travail.",
+  "en": "She likes to finish her work."
+ },
+ "p1_verbs_attendre": {
+  "fr": "Vous pouvez attendre ici.",
+  "en": "You can wait here."
+ },
+ "p1_verbs_demander": {
+  "fr": "Ils veulent demander de l'aide.",
+  "en": "They want to ask for help."
+ },
+ "p1_verbs_repondre": {
+  "fr": "Je veux répondre à la question.",
+  "en": "I want to answer the question."
+ },
+ "p1_verbs_aider": {
+  "fr": "Tu peux aider ton ami.",
+  "en": "You can help your friend."
+ },
+ "p1_verbs_payer": {
+  "fr": "Il faut payer la facture.",
+  "en": "One must pay the bill."
+ },
+ "p1_verbs_marcher": {
+  "fr": "On peut marcher dans le parc.",
+  "en": "We can walk in the park."
+ },
+ "p1_verbs_courir": {
+  "fr": "Elle aime courir le matin.",
+  "en": "She likes to run in the morning."
+ },
+ "p1_verbs_dormir": {
+  "fr": "Nous devons dormir tôt.",
+  "en": "We must sleep early."
+ },
+ "p1_verbs_se-lever": {
+  "fr": "Il faut se lever à sept heures.",
+  "en": "One must get up at seven o'clock."
+ },
+ "p1_verbs_se-coucher": {
+  "fr": "Je préfère se coucher tôt.",
+  "en": "I prefer to go to bed early."
+ },
+ "p1_verbs_jouer": {
+  "fr": "Je veux jouer au football.",
+  "en": "I want to play football."
+ },
+ "p1_verbs_rester": {
+  "fr": "Il faut rester calme.",
+  "en": "One must stay calm."
+ },
+ "p1_verbs_entrer": {
+  "fr": "Tu peux entrer maintenant.",
+  "en": "You can enter now."
+ },
+ "p1_verbs_sortir": {
+  "fr": "Nous aimons sortir le soir.",
+  "en": "We like to go out in the evening."
+ },
+ "p1_verbs_tomber": {
+  "fr": "Elle ne veut pas tomber.",
+  "en": "She does not want to fall."
+ },
+ "p1_verbs_porter": {
+  "fr": "Je dois porter ce sac.",
+  "en": "I must carry this bag."
+ },
+ "p1_verbs_appeler": {
+  "fr": "Tu peux appeler ton ami.",
+  "en": "You can call your friend."
+ },
+ "p1_verbs_sappeler": {
+  "fr": "Il faut apprendre à s'appeler correctement.",
+  "en": "One must learn to call oneself correctly."
+ },
+ "p1_verbs_avoir-besoin-de": {
+  "fr": "Tu peux avoir besoin de l'aide.",
+  "en": "You can need help."
+ },
+ "p1_verbs_preferer": {
+  "fr": "Je veux préférer le thé au café.",
+  "en": "I want to prefer tea to coffee."
+ },
+ "p1_verbs_choisir": {
+  "fr": "Il faut choisir un livre intéressant.",
+  "en": "One must choose an interesting book."
+ },
+ "p1_verbs_envoyer": {
+  "fr": "J'aime envoyer des lettres à mes amis.",
+  "en": "I like to send letters to my friends."
+ },
+ "p1_verbs_recevoir": {
+  "fr": "Tu peux recevoir un cadeau demain.",
+  "en": "You can receive a gift tomorrow."
+ },
+ "p1_verbs_perdre": {
+  "fr": "Il ne faut pas perdre ton temps.",
+  "en": "One must not lose your time."
+ },
+ "p1_verbs_gagner": {
+  "fr": "Je veux gagner de l'argent.",
+  "en": "I want to earn money."
+ },
+ "p1_verbs_utiliser": {
+  "fr": "Tu peux utiliser cet ordinateur.",
+  "en": "You can use this computer."
+ },
+ "p1_verbs_changer": {
+  "fr": "Je veux changer d'avis.",
+  "en": "I want to change my mind."
+ },
+ "p1_verbs_retourner": {
+  "fr": "Il faut retourner à l'école.",
+  "en": "One must return to school."
+ },
+ "p1_verbs_visiter": {
+  "fr": "J'aime visiter le parc.",
+  "en": "I like to visit the park."
+ },
+ "p1_verbs_oublier": {
+  "fr": "Il faut oublier les erreurs.",
+  "en": "One must forget the mistakes."
+ },
+ "p1_verbs_se-souvenir": {
+  "fr": "Il faut se souvenir de son anniversaire.",
+  "en": "One must remember one's birthday."
+ },
+ "p1_verbs_essayer": {
+  "fr": "Tu peux essayer ce livre.",
+  "en": "You can try this book."
+ },
+ "p1_greetings_bonjour": {
+  "fr": "Je dis bonjour à mes amis.",
+  "en": "I say hello to my friends."
+ },
+ "p1_greetings_bonsoir": {
+  "fr": "Je dis bonsoir avant de dormir.",
+  "en": "I say good evening before sleeping."
+ },
+ "p1_greetings_salut": {
+  "fr": "Salut !",
+  "en": "Hi!"
+ },
+ "p1_greetings_de-rien": {
+  "fr": "Je dis de rien.",
+  "en": "You're welcome."
+ },
+ "p1_greetings_pardon-desole": {
+  "fr": "Je dis pardon / désolé(e).",
+  "en": "Sorry."
+ },
+ "p1_greetings_bienvenue": {
+  "fr": "C'est bienvenue.",
+  "en": "Welcome."
+ },
+ "p1_greetings_bonne-nuit": {
+  "fr": "Je dis bonne nuit.",
+  "en": "Good night."
+ },
+ "p1_greetings_a-bientot": {
+  "fr": "Je dis à bientôt.",
+  "en": "See you soon."
+ },
+ "p1_greetings_a-demain": {
+  "fr": "Je dis à demain.",
+  "en": "See you tomorrow."
+ },
+ "p1_greetings_a-tout-a-lheure": {
+  "fr": "Je dis à tout à l'heure.",
+  "en": "See you later."
+ },
+ "p1_greetings_enchante": {
+  "fr": "Je dis enchanté(e).",
+  "en": "Nice to meet you."
+ },
+ "p1_greetings_bonne-journee": {
+  "fr": "Je te souhaite bonne journée.",
+  "en": "I wish you a good day."
+ },
+ "p1_greetings_bonne-soiree": {
+  "fr": "Je te souhaite bonne soirée.",
+  "en": "I wish you a good evening."
+ },
+ "p1_greetings_bon-appetit": {
+  "fr": "Je te souhaite bon appétit.",
+  "en": "I wish you enjoy your meal."
+ },
+ "p1_greetings_bonne-chance": {
+  "fr": "Je te souhaite bonne chance.",
+  "en": "I wish you good luck."
+ },
+ "p1_greetings_sante": {
+  "fr": "On dit santé quand on trinque.",
+  "en": "We say cheers when we toast."
+ },
+ "p1_greetings_felicitations": {
+  "fr": "Je te dis félicitations pour ton succès.",
+  "en": "I say congratulations for your success."
+ },
+ "p1_greetings_daccord": {
+  "fr": "Tu es d'accord avec moi?",
+  "en": "Do you agree with me?"
+ },
+ "p1_greetings_bien-sur": {
+  "fr": "Bien sûr, je viendrai demain.",
+  "en": "Of course, I will come tomorrow."
+ },
+ "p1_greetings_peut-etre": {
+  "fr": "Peut-être il viendra demain.",
+  "en": "Maybe he will come tomorrow."
+ },
+ "p1_greetings_je-ne-sais-pas": {
+  "fr": "Je ne sais pas où est la gare.",
+  "en": "I don't know where the station is."
+ },
+ "p1_greetings_je-ne-comprends-pas": {
+  "fr": "Je ne comprends pas cette consigne.",
+  "en": "I don't understand this instruction."
+ },
+ "p1_greetings_pouvez-vous-repeter": {
+  "fr": "Pouvez-vous répéter ?",
+  "en": "Can you repeat?"
+ },
+ "p1_greetings_parlez-plus-lentement": {
+  "fr": "Parlez plus lentement, s'il vous plaît.",
+  "en": "Speak more slowly, please."
+ },
+ "p1_greetings_comment-vous-appelez-vous": {
+  "fr": "Comment vous appelez-vous ?",
+  "en": "What is your name?"
+ },
+ "p1_greetings_je-mappelle": {
+  "fr": "Je m'appelle... et j'aime apprendre le français.",
+  "en": "My name is... and I like learning French."
+ },
+ "p1_greetings_merci-beaucoup": {
+  "fr": "Merci beaucoup pour votre aide.",
+  "en": "Thank you very much for your help."
+ },
+ "p1_greetings_ca-va-bien": {
+  "fr": "Tout va bien, ça va bien.",
+  "en": "Everything is fine, I'm fine."
+ },
+ "p1_greetings_parlez-vous-anglais": {
+  "fr": "Parlez-vous anglais ? Oui, je parle un peu.",
+  "en": "Do you speak English? Yes, I speak a little."
+ },
+ "p1_greetings_je-parle-un-peu-francais": {
+  "fr": "Je suis heureux, je parle un peu français.",
+  "en": "I am happy, I speak a little French."
+ },
+ "p1_numbers_zero": {
+  "fr": "Il fait zéro degré dehors.",
+  "en": "It is zero degrees outside."
+ },
+ "p1_numbers_un": {
+  "fr": "J'ai un frère.",
+  "en": "I have a brother."
+ },
+ "p1_numbers_deux": {
+  "fr": "Nous avons deux chats.",
+  "en": "We have two cats."
+ },
+ "p1_numbers_trois": {
+  "fr": "Elle a trois pommes.",
+  "en": "She has three apples."
+ },
+ "p1_numbers_quatre": {
+  "fr": "Il y a quatre saisons.",
+  "en": "There are four seasons."
+ },
+ "p1_numbers_cinq": {
+  "fr": "Il y a cinq chats.",
+  "en": "There are five cats."
+ },
+ "p1_numbers_six": {
+  "fr": "Elle a six livres.",
+  "en": "She has six books."
+ },
+ "p1_numbers_sept": {
+  "fr": "Nous avons sept jours.",
+  "en": "We have seven days."
+ },
+ "p1_numbers_huit": {
+  "fr": "Ils voient huit oiseaux.",
+  "en": "They see eight birds."
+ },
+ "p1_numbers_neuf": {
+  "fr": "Tu peux prendre neuf crayons.",
+  "en": "You can take nine pencils."
+ },
+ "p1_numbers_dix": {
+  "fr": "Il faut attendre dix minutes.",
+  "en": "One must wait ten minutes."
+ },
+ "p1_numbers_onze": {
+  "fr": "J'aime onze chansons.",
+  "en": "I like eleven songs."
+ },
+ "p1_numbers_douze": {
+  "fr": "Nous voulons douze gâteaux.",
+  "en": "We want twelve cakes."
+ },
+ "p1_numbers_treize": {
+  "fr": "J'ai treize ans.",
+  "en": "I am thirteen years old."
+ },
+ "p1_numbers_quatorze": {
+  "fr": "Elle a quatorze ans.",
+  "en": "She is fourteen years old."
+ },
+ "p1_numbers_quinze": {
+  "fr": "Il a quinze ans.",
+  "en": "He is fifteen years old."
+ },
+ "p1_numbers_seize": {
+  "fr": "Nous avons seize ans.",
+  "en": "We are sixteen years old."
+ },
+ "p1_numbers_dix-sept": {
+  "fr": "Il a dix-sept ans.",
+  "en": "He is seventeen years old."
+ },
+ "p1_numbers_dix-huit": {
+  "fr": "Elle a dix-huit ans.",
+  "en": "She is eighteen years old."
+ },
+ "p1_numbers_dix-neuf": {
+  "fr": "Nous avons dix-neuf ans.",
+  "en": "We are nineteen years old."
+ },
+ "p1_numbers_vingt": {
+  "fr": "Il a vingt ans.",
+  "en": "He is twenty years old."
+ },
+ "p1_numbers_vingt-et-un": {
+  "fr": "J'ai vingt et un ans.",
+  "en": "I am twenty-one years old."
+ },
+ "p1_numbers_vingt-deux": {
+  "fr": "Il a vingt-deux livres.",
+  "en": "He has twenty-two books."
+ },
+ "p1_numbers_vingt-cinq": {
+  "fr": "Elle a vingt-cinq pommes.",
+  "en": "She has twenty-five apples."
+ },
+ "p1_numbers_trente": {
+  "fr": "Il fait trente degrés.",
+  "en": "It is thirty degrees."
+ },
+ "p1_numbers_quarante": {
+  "fr": "Nous avons quarante minutes.",
+  "en": "We have forty minutes."
+ },
+ "p1_numbers_cinquante": {
+  "fr": "Le film dure cinquante minutes.",
+  "en": "The film lasts fifty minutes."
+ },
+ "p1_numbers_soixante": {
+  "fr": "Il y a soixante étudiants.",
+  "en": "There are sixty students."
+ },
+ "p1_numbers_soixante-dix": {
+  "fr": "Il faut soixante-dix euros.",
+  "en": "You need seventy euros."
+ },
+ "p1_numbers_quatre-vingts": {
+  "fr": "Il y a quatre-vingts pages dans ce livre.",
+  "en": "There are eighty pages in this book."
+ },
+ "p1_numbers_quatre-vingt-dix": {
+  "fr": "Ça coûte quatre-vingt-dix euros.",
+  "en": "It costs ninety euros."
+ },
+ "p1_numbers_cent": {
+  "fr": "Il y a cent personnes dans la salle.",
+  "en": "There are one hundred people in the room."
+ },
+ "p1_numbers_deux-cents": {
+  "fr": "Il y a deux cents chaises dans la salle.",
+  "en": "There are two hundred chairs in the room."
+ },
+ "p1_numbers_mille": {
+  "fr": "Il y a mille étoiles dans le ciel.",
+  "en": "There are one thousand stars in the sky."
+ },
+ "p1_numbers_un-million": {
+  "fr": "Il a gagné un million de dollars.",
+  "en": "He won one million dollars."
+ },
+ "p1_numbers_premier-premiere": {
+  "fr": "C'est le premier chapitre du livre.",
+  "en": "This is the first chapter of the book."
+ },
+ "p1_numbers_deuxieme": {
+  "fr": "Elle est la deuxième élève de la classe.",
+  "en": "She is the second student in the class."
+ },
+ "p1_numbers_troisieme": {
+  "fr": "C'est le troisième chapitre.",
+  "en": "It's the third chapter."
+ },
+ "p1_numbers_la-moitie": {
+  "fr": "Je prends la moitié du pain.",
+  "en": "I take half of the bread."
+ },
+ "p1_numbers_une-fois": {
+  "fr": "Je vais au cinéma une fois par mois.",
+  "en": "I go to the cinema once a month."
+ },
+ "p1_days_months_time_lundi": {
+  "fr": "Aujourd'hui c'est lundi.",
+  "en": "Today is Monday."
+ },
+ "p1_days_months_time_mardi": {
+  "fr": "Demain c'est mardi.",
+  "en": "Tomorrow is Tuesday."
+ },
+ "p1_days_months_time_mercredi": {
+  "fr": "C'est mercredi.",
+  "en": "It's Wednesday."
+ },
+ "p1_days_months_time_jeudi": {
+  "fr": "C'est jeudi.",
+  "en": "It's Thursday."
+ },
+ "p1_days_months_time_vendredi": {
+  "fr": "Je sors vendredi.",
+  "en": "I go out on Friday."
+ },
+ "p1_days_months_time_samedi": {
+  "fr": "Aujourd'hui c'est samedi.",
+  "en": "Today is Saturday."
+ },
+ "p1_days_months_time_dimanche": {
+  "fr": "Demain c'est dimanche.",
+  "en": "Tomorrow is Sunday."
+ },
+ "p1_days_months_time_janvier": {
+  "fr": "Le mois de janvier est froid.",
+  "en": "The month of January is cold."
+ },
+ "p1_days_months_time_fevrier": {
+  "fr": "En février, il neige parfois.",
+  "en": "In February, it sometimes snows."
+ },
+ "p1_days_months_time_mars": {
+  "fr": "Le mois de mars apporte le printemps.",
+  "en": "The month of March brings spring."
+ },
+ "p1_days_months_time_avril": {
+  "fr": "En avril, ne te découvre pas d'un fil.",
+  "en": "In April, don't shed a thread."
+ },
+ "p1_days_months_time_mai": {
+  "fr": "En mai, fais ce qu'il te plaît.",
+  "en": "In May, do what pleases you."
+ },
+ "p1_days_months_time_juin": {
+  "fr": "Le mois de juin est chaud.",
+  "en": "The month of June is hot."
+ },
+ "p1_days_months_time_juillet": {
+  "fr": "En juillet, nous allons à la plage.",
+  "en": "In July, we go to the beach."
+ },
+ "p1_days_months_time_aout": {
+  "fr": "En août, il fait très chaud.",
+  "en": "In August, it is very hot."
+ },
+ "p1_days_months_time_septembre": {
+  "fr": "En septembre, les feuilles commencent à tomber.",
+  "en": "In September, the leaves start to fall."
+ },
+ "p1_days_months_time_octobre": {
+  "fr": "En octobre, nous célébrons Halloween.",
+  "en": "In October, we celebrate Halloween."
+ },
+ "p1_days_months_time_novembre": {
+  "fr": "En novembre, il pleut souvent.",
+  "en": "In November, it often rains."
+ },
+ "p1_days_months_time_decembre": {
+  "fr": "En décembre, nous décorons le sapin.",
+  "en": "In December, we decorate the Christmas tree."
+ },
+ "p1_days_months_time_aujourdhui": {
+  "fr": "Aujourd'hui, je lis un livre.",
+  "en": "Today, I am reading a book."
+ },
+ "p1_days_months_time_demain": {
+  "fr": "Demain, nous allons au cinéma.",
+  "en": "Tomorrow, we are going to the cinema."
+ },
+ "p1_days_months_time_hier": {
+  "fr": "Hier, je suis allé au parc.",
+  "en": "Yesterday, I went to the park."
+ },
+ "p1_days_months_time_maintenant": {
+  "fr": "Nous étudions maintenant.",
+  "en": "We are studying now."
+ },
+ "p1_days_months_time_le-matin": {
+  "fr": "Je me réveille le matin.",
+  "en": "I wake up in the morning."
+ },
+ "p1_days_months_time_lapres-midi": {
+  "fr": "Nous allons au cinéma l'après-midi.",
+  "en": "We go to the cinema in the afternoon."
+ },
+ "p1_days_months_time_le-soir": {
+  "fr": "Je lis un livre le soir.",
+  "en": "I read a book in the evening."
+ },
+ "p1_days_months_time_la-nuit": {
+  "fr": "Il fait sombre la nuit.",
+  "en": "It is dark at night."
+ },
+ "p1_days_months_time_lheure": {
+  "fr": "Je regarde l'heure.",
+  "en": "I look at the time."
+ },
+ "p1_days_months_time_la-minute": {
+  "fr": "Il faut attendre la minute.",
+  "en": "One must wait a minute."
+ },
+ "p1_days_months_time_la-seconde": {
+  "fr": "Il faut attendre la seconde.",
+  "en": "One must wait for the second."
+ },
+ "p1_days_months_time_le-jour": {
+  "fr": "C'est le jour aujourd'hui.",
+  "en": "It's the day today."
+ },
+ "p1_days_months_time_la-semaine": {
+  "fr": "C'est la semaine.",
+  "en": "It's the week."
+ },
+ "p1_days_months_time_le-mois": {
+  "fr": "C'est le mois.",
+  "en": "It's the month."
+ },
+ "p1_days_months_time_lannee": {
+  "fr": "C'est l'année.",
+  "en": "It's the year."
+ },
+ "p1_days_months_time_le-week-end": {
+  "fr": "C'est le week-end.",
+  "en": "It's the weekend."
+ },
+ "p1_days_months_time_tot": {
+  "fr": "Il se lève tôt.",
+  "en": "He gets up early."
+ },
+ "p1_days_months_time_tard": {
+  "fr": "Elle rentre tard.",
+  "en": "She comes home late."
+ },
+ "p1_days_months_time_toujours": {
+  "fr": "Je suis toujours prêt.",
+  "en": "I am always ready."
+ },
+ "p1_days_months_time_souvent": {
+  "fr": "Nous allons souvent au parc.",
+  "en": "We often go to the park."
+ },
+ "p1_days_months_time_parfois": {
+  "fr": "Elle lit parfois des livres.",
+  "en": "She sometimes reads books."
+ },
+ "p1_days_months_time_jamais": {
+  "fr": "Je ne mange jamais de viande.",
+  "en": "I never eat meat."
+ },
+ "p1_days_months_time_avant": {
+  "fr": "Nous partons avant midi.",
+  "en": "We leave before noon."
+ },
+ "p1_days_months_time_apres": {
+  "fr": "Il dort après le travail.",
+  "en": "He sleeps after work."
+ },
+ "p1_days_months_time_pendant": {
+  "fr": "Nous étudions pendant une heure.",
+  "en": "We study for one hour."
+ },
+ "p1_days_months_time_bientot": {
+  "fr": "Ils arrivent bientôt.",
+  "en": "They will arrive soon."
+ },
+ "p1_days_months_time_deja": {
+  "fr": "Je l'ai déjà vu.",
+  "en": "I have already seen it."
+ },
+ "p1_days_months_time_encore": {
+  "fr": "Je veux encore du pain.",
+  "en": "I want more bread."
+ },
+ "p1_days_months_time_quelle-heure-est-il": {
+  "fr": "Excusez-moi, quelle heure est-il ?",
+  "en": "Excuse me, what time is it?"
+ },
+ "p1_family_people_la-famille": {
+  "fr": "La famille vient dîner ce soir.",
+  "en": "The family is coming to dinner tonight."
+ },
+ "p1_family_people_le-pere": {
+  "fr": "Le père travaille à l'hôpital.",
+  "en": "The father works at the hospital."
+ },
+ "p1_family_people_la-mere": {
+  "fr": "La mère prépare le déjeuner.",
+  "en": "The mother is preparing lunch."
+ },
+ "p1_family_people_le-frere": {
+  "fr": "Le frère de Marie joue au foot.",
+  "en": "Marie's brother plays soccer."
+ },
+ "p1_family_people_la-soeur": {
+  "fr": "La sœur de Paul aime lire.",
+  "en": "Paul's sister likes to read."
+ },
+ "p1_family_people_le-fils": {
+  "fr": "Le fils est là.",
+  "en": "The son is there."
+ },
+ "p1_family_people_la-fille": {
+  "fr": "La fille est là.",
+  "en": "The daughter is there."
+ },
+ "p1_family_people_le-mari": {
+  "fr": "Le mari est là.",
+  "en": "The husband is there."
+ },
+ "p1_family_people_la-femme": {
+  "fr": "La femme est là.",
+  "en": "The wife is there."
+ },
+ "p1_family_people_les-parents": {
+  "fr": "Les parents sont là.",
+  "en": "The parents are there."
+ },
+ "p1_family_people_le-grand-pere": {
+  "fr": "Le grand-père est là.",
+  "en": "The grandfather is there."
+ },
+ "p1_family_people_la-grand-mere": {
+  "fr": "La grand-mère est là.",
+  "en": "The grandmother is there."
+ },
+ "p1_family_people_lenfant": {
+  "fr": "L'enfant est là.",
+  "en": "The child is there."
+ },
+ "p1_family_people_lami": {
+  "fr": "Je veux rencontrer l'ami(e).",
+  "en": "I want to meet the friend."
+ },
+ "p1_family_people_loncle": {
+  "fr": "Je salue l'oncle.",
+  "en": "I greet the uncle."
+ },
+ "p1_family_people_la-tante": {
+  "fr": "Je vois la tante.",
+  "en": "I see the aunt."
+ },
+ "p1_family_people_le-cousin-la-cousine": {
+  "fr": "Je parle avec le cousin / la cousine.",
+  "en": "I talk with the cousin."
+ },
+ "p1_family_people_le-neveu": {
+  "fr": "Je aide le neveu.",
+  "en": "I help the nephew."
+ },
+ "p1_family_people_la-niece": {
+  "fr": "Je regarde la nièce.",
+  "en": "I look at the niece."
+ },
+ "p1_family_people_le-bebe": {
+  "fr": "Je porte le bébé.",
+  "en": "I carry the baby."
+ },
+ "p1_family_people_lhomme": {
+  "fr": "Je connais l'homme.",
+  "en": "I know the man."
+ },
+ "p1_family_people_le-garcon": {
+  "fr": "Le garçon lit un livre.",
+  "en": "The boy reads a book."
+ },
+ "p1_family_people_monsieur": {
+  "fr": "Bonjour, monsieur!",
+  "en": "Hello, sir!"
+ },
+ "p1_family_people_madame": {
+  "fr": "Madame, comment allez-vous?",
+  "en": "Ma'am, how are you?"
+ },
+ "p1_family_people_les-gens": {
+  "fr": "Les gens parlent dans la rue.",
+  "en": "People are talking in the street."
+ },
+ "p1_family_people_la-personne": {
+  "fr": "Cette personne est gentille.",
+  "en": "This person is kind."
+ },
+ "p1_family_people_le-voisin-la-voisine": {
+  "fr": "Le voisin aide à porter les courses.",
+  "en": "The neighbor helps to carry the groceries."
+ },
+ "p1_family_people_le-petit-ami": {
+  "fr": "Elle présente son petit ami à sa famille.",
+  "en": "She introduces her boyfriend to her family."
+ },
+ "p1_family_people_la-petite-amie": {
+  "fr": "Il présente sa petite amie à ses amis.",
+  "en": "He introduces his girlfriend to his friends."
+ },
+ "p1_food_shopping_le-magasin": {
+  "fr": "Je vais au magasin.",
+  "en": "I am going to the store."
+ },
+ "p1_food_shopping_le-prix": {
+  "fr": "Quel est le prix ?",
+  "en": "What is the price?"
+ },
+ "p1_food_shopping_acheter": {
+  "fr": "Je veux acheter un cadeau.",
+  "en": "I want to buy a gift."
+ },
+ "p1_food_shopping_vendre": {
+  "fr": "Il faut vendre la maison.",
+  "en": "One must sell the house."
+ },
+ "p1_food_shopping_combien": {
+  "fr": "Tu demandes combien ?",
+  "en": "You are asking how much?"
+ },
+ "p1_food_shopping_largent": {
+  "fr": "Je compte l'argent.",
+  "en": "I am counting the money."
+ },
+ "p1_food_shopping_cher": {
+  "fr": "Ce téléphone est cher.",
+  "en": "That phone is expensive."
+ },
+ "p1_food_shopping_pas-cher": {
+  "fr": "Ce sac n'est pas cher.",
+  "en": "That bag is not cheap."
+ },
+ "p1_food_shopping_le-cafe": {
+  "fr": "Je bois le café.",
+  "en": "I drink the coffee."
+ },
+ "p1_food_shopping_le-the": {
+  "fr": "J'aime le thé.",
+  "en": "I like the tea."
+ },
+ "p1_food_shopping_le-vin": {
+  "fr": "Il préfère le vin.",
+  "en": "He prefers the wine."
+ },
+ "p1_food_shopping_la-biere": {
+  "fr": "Elle boit la bière.",
+  "en": "She drinks the beer."
+ },
+ "p1_food_shopping_le-jus": {
+  "fr": "Nous voulons le jus.",
+  "en": "We want the juice."
+ },
+ "p1_food_shopping_le-sucre": {
+  "fr": "Je mets le sucre.",
+  "en": "I put the sugar."
+ },
+ "p1_food_shopping_le-sel": {
+  "fr": "Je prends le sel.",
+  "en": "I take the salt."
+ },
+ "p1_food_shopping_le-poivre": {
+  "fr": "Elle utilise le poivre.",
+  "en": "She uses the pepper."
+ },
+ "p1_food_shopping_le-beurre": {
+  "fr": "Je mange le beurre.",
+  "en": "I eat butter."
+ },
+ "p1_food_shopping_loeuf": {
+  "fr": "Je mange l'œuf.",
+  "en": "I eat the egg."
+ },
+ "p1_food_shopping_le-poisson": {
+  "fr": "Je mange le poisson.",
+  "en": "I eat the fish."
+ },
+ "p1_food_shopping_le-poulet": {
+  "fr": "J'aime le poulet.",
+  "en": "I like chicken."
+ },
+ "p1_food_shopping_le-riz": {
+  "fr": "Je mange le riz.",
+  "en": "I eat the rice."
+ },
+ "p1_food_shopping_les-pates": {
+  "fr": "Je mange les pâtes.",
+  "en": "I eat the pasta."
+ },
+ "p1_food_shopping_la-pomme": {
+  "fr": "Je mange la pomme.",
+  "en": "I eat the apple."
+ },
+ "p1_food_shopping_la-banane": {
+  "fr": "J'aime la banane.",
+  "en": "I like banana."
+ },
+ "p1_food_shopping_lorange": {
+  "fr": "J'aime l'orange.",
+  "en": "I like the orange."
+ },
+ "p1_food_shopping_la-pomme-de-terre": {
+  "fr": "Je mange la pomme de terre.",
+  "en": "I eat the potato."
+ },
+ "p1_food_shopping_la-tomate": {
+  "fr": "La tomate est rouge.",
+  "en": "The tomato is red."
+ },
+ "p1_food_shopping_la-salade": {
+  "fr": "Je prends la salade.",
+  "en": "I take the salad."
+ },
+ "p1_food_shopping_la-soupe": {
+  "fr": "La soupe est chaude.",
+  "en": "The soup is hot."
+ },
+ "p1_food_shopping_le-gateau": {
+  "fr": "Je veux le gâteau.",
+  "en": "I want the cake."
+ },
+ "p1_food_shopping_le-chocolat": {
+  "fr": "J'aime le chocolat.",
+  "en": "I like the chocolate."
+ },
+ "p1_food_shopping_le-petit-dejeuner": {
+  "fr": "Nous prenons le petit déjeuner.",
+  "en": "We have breakfast."
+ },
+ "p1_food_shopping_le-dejeuner": {
+  "fr": "Je prends le déjeuner à midi.",
+  "en": "I have lunch at noon."
+ },
+ "p1_food_shopping_le-diner": {
+  "fr": "Je mange le dîner à 19h.",
+  "en": "I eat dinner at 7pm."
+ },
+ "p1_food_shopping_le-restaurant": {
+  "fr": "Je vois le restaurant en face.",
+  "en": "I see the restaurant across the street."
+ },
+ "p1_food_shopping_le-menu": {
+  "fr": "Je lis le menu attentivement.",
+  "en": "I read the menu carefully."
+ },
+ "p1_food_shopping_laddition": {
+  "fr": "Je demande l'addition, s'il vous plaît.",
+  "en": "I ask for the bill, please."
+ },
+ "p1_food_shopping_le-serveur": {
+  "fr": "Le serveur est très gentil.",
+  "en": "The waiter is very kind."
+ },
+ "p1_food_shopping_le-marche": {
+  "fr": "Je vais voir le marché le samedi.",
+  "en": "I go to see the market on Saturday."
+ },
+ "p1_food_shopping_le-supermarche": {
+  "fr": "Je vais voir le supermarché demain.",
+  "en": "I will go see the supermarket tomorrow."
+ },
+ "p1_food_shopping_la-boulangerie": {
+  "fr": "C'est la boulangerie.",
+  "en": "It is the bakery."
+ },
+ "p1_food_shopping_la-carte-bancaire": {
+  "fr": "C'est la carte bancaire.",
+  "en": "It is the bank card."
+ },
+ "p1_food_shopping_en-especes": {
+  "fr": "Je paie en espèces.",
+  "en": "I pay in cash."
+ },
+ "p1_food_shopping_gratuit": {
+  "fr": "C'est gratuit.",
+  "en": "It is free."
+ },
+ "p1_food_shopping_avoir-faim": {
+  "fr": "J'ai envie d'avoir faim.",
+  "en": "I feel like being hungry."
+ },
+ "p1_food_shopping_avoir-soif": {
+  "fr": "J'ai envie d'avoir soif.",
+  "en": "I feel like being thirsty."
+ },
+ "p1_food_shopping_delicieux": {
+  "fr": "C'est délicieux.",
+  "en": "It is delicious."
+ },
+ "p1_food_shopping_commander": {
+  "fr": "Je veux commander.",
+  "en": "I want to order."
+ },
+ "p1_food_shopping_un-verre": {
+  "fr": "Je bois de l'eau dans un verre.",
+  "en": "I drink water in a glass."
+ },
+ "p1_food_shopping_une-bouteille": {
+  "fr": "Elle achète une bouteille de vin.",
+  "en": "She buys a bottle of wine."
+ },
+ "p1_home_colors_weather_la-maison": {
+  "fr": "La maison est grande.",
+  "en": "The house is big."
+ },
+ "p1_home_colors_weather_lappartement": {
+  "fr": "L'appartement est près du parc.",
+  "en": "The apartment is near the park."
+ },
+ "p1_home_colors_weather_la-chambre": {
+  "fr": "La chambre est propre.",
+  "en": "The bedroom is clean."
+ },
+ "p1_home_colors_weather_la-cuisine": {
+  "fr": "La cuisine sent bon.",
+  "en": "The kitchen smells good."
+ },
+ "p1_home_colors_weather_a-gauche": {
+  "fr": "Tournez à gauche.",
+  "en": "Turn left."
+ },
+ "p1_home_colors_weather_a-droite": {
+  "fr": "Le magasin est à droite.",
+  "en": "The store is to the right."
+ },
+ "p1_home_colors_weather_la-rue": {
+  "fr": "Je marche dans la rue.",
+  "en": "I walk in the street."
+ },
+ "p1_home_colors_weather_il-fait-beau": {
+  "fr": "Aujourd'hui, il fait beau.",
+  "en": "Today, the weather is nice."
+ },
+ "p1_home_colors_weather_il-pleut": {
+  "fr": "Demain, il pleut.",
+  "en": "Tomorrow, it is raining."
+ },
+ "p1_home_colors_weather_froid": {
+  "fr": "Il fait froid.",
+  "en": "It is cold."
+ },
+ "p1_home_colors_weather_chaud": {
+  "fr": "Il fait chaud.",
+  "en": "It is hot."
+ },
+ "p1_home_colors_weather_rouge": {
+  "fr": "Le stylo est rouge.",
+  "en": "The pen is red."
+ },
+ "p1_home_colors_weather_bleu": {
+  "fr": "Le ciel est bleu.",
+  "en": "The sky is blue."
+ },
+ "p1_home_colors_weather_vert": {
+  "fr": "Le T-shirt est vert.",
+  "en": "The T-shirt is green."
+ },
+ "p1_home_colors_weather_noir": {
+  "fr": "Le chat est noir.",
+  "en": "The cat is black."
+ },
+ "p1_home_colors_weather_blanc": {
+  "fr": "Le mur est blanc.",
+  "en": "The wall is white."
+ },
+ "p1_home_colors_weather_la-salle-de-bain": {
+  "fr": "Je suis dans la salle de bain.",
+  "en": "I am in the bathroom."
+ },
+ "p1_home_colors_weather_les-toilettes": {
+  "fr": "Je vois les toilettes.",
+  "en": "I see the toilets."
+ },
+ "p1_home_colors_weather_le-salon": {
+  "fr": "Je suis dans le salon.",
+  "en": "I am in the living room."
+ },
+ "p1_home_colors_weather_la-porte": {
+  "fr": "La porte est fermée.",
+  "en": "The door is closed."
+ },
+ "p1_home_colors_weather_la-fenetre": {
+  "fr": "J'ouvre la fenêtre.",
+  "en": "I open the window."
+ },
+ "p1_home_colors_weather_la-table": {
+  "fr": "Je mets le livre sur la table.",
+  "en": "I put the book on the table."
+ },
+ "p1_home_colors_weather_la-chaise": {
+  "fr": "La chaise est ici.",
+  "en": "The chair is here."
+ },
+ "p1_home_colors_weather_le-lit": {
+  "fr": "Le lit est grand.",
+  "en": "The bed is big."
+ },
+ "p1_home_colors_weather_la-cle": {
+  "fr": "La clé est petite.",
+  "en": "The key is small."
+ },
+ "p1_home_colors_weather_letage": {
+  "fr": "L'étage est calme.",
+  "en": "The floor is quiet."
+ },
+ "p1_home_colors_weather_jaune": {
+  "fr": "Le ciel est jaune.",
+  "en": "The sky is yellow."
+ },
+ "p1_home_colors_weather_orange": {
+  "fr": "Le fruit est orange.",
+  "en": "The fruit is orange."
+ },
+ "p1_home_colors_weather_rose": {
+  "fr": "La fleur est rose.",
+  "en": "The flower is pink."
+ },
+ "p1_home_colors_weather_violet": {
+  "fr": "Le vêtement est violet.",
+  "en": "The clothing is purple."
+ },
+ "p1_home_colors_weather_gris": {
+  "fr": "Le pull est gris.",
+  "en": "The sweater is gray."
+ },
+ "p1_home_colors_weather_marron": {
+  "fr": "Le chien est marron.",
+  "en": "The dog is brown."
+ },
+ "p1_home_colors_weather_il-neige": {
+  "fr": "Il neige aujourd'hui.",
+  "en": "It's snowing today."
+ },
+ "p1_home_colors_weather_il-y-a-du-vent": {
+  "fr": "Il y a du vent dehors.",
+  "en": "It's windy outside."
+ },
+ "p1_home_colors_weather_le-soleil": {
+  "fr": "Le soleil est grand.",
+  "en": "The sun is big."
+ },
+ "p1_home_colors_weather_la-pluie": {
+  "fr": "La pluie tombe.",
+  "en": "The rain is falling."
+ },
+ "p1_home_colors_weather_la-neige": {
+  "fr": "La neige tombe.",
+  "en": "The snow is falling."
+ },
+ "p1_home_colors_weather_le-nuage": {
+  "fr": "Le nuage est grand.",
+  "en": "The cloud is big."
+ },
+ "p1_home_colors_weather_le-temps": {
+  "fr": "Le temps est bon.",
+  "en": "The weather is good."
+ },
+ "p1_adjectives_grand": {
+  "fr": "Le soleil est grand.",
+  "en": "The sun is big."
+ },
+ "p1_adjectives_petit": {
+  "fr": "Le nuage est petit.",
+  "en": "The cloud is small."
+ },
+ "p1_adjectives_bon-bonne": {
+  "fr": "Le soleil est bon.",
+  "en": "The sun is good."
+ },
+ "p1_adjectives_mauvais": {
+  "fr": "C'est mauvais.",
+  "en": "It's bad."
+ },
+ "p1_adjectives_nouveau-nouvelle": {
+  "fr": "C'est un nouveau livre.",
+  "en": "It's a new book."
+ },
+ "p1_adjectives_vieux-vieille": {
+  "fr": "C'est un vieux vélo.",
+  "en": "It's an old bike."
+ },
+ "p1_adjectives_jeune": {
+  "fr": "Elle est jeune.",
+  "en": "She is young."
+ },
+ "p1_adjectives_beau-belle": {
+  "fr": "C'est un beau tableau.",
+  "en": "It's a beautiful painting."
+ },
+ "p1_adjectives_joli": {
+  "fr": "C'est un joli cadeau.",
+  "en": "It's a pretty gift."
+ },
+ "p1_adjectives_facile": {
+  "fr": "Cet exercice est facile.",
+  "en": "This exercise is easy."
+ },
+ "p1_adjectives_difficile": {
+  "fr": "Cette question est difficile.",
+  "en": "This question is difficult."
+ },
+ "p1_adjectives_rapide": {
+  "fr": "C'est une voiture rapide.",
+  "en": "It's a fast car."
+ },
+ "p1_adjectives_lent": {
+  "fr": "Il est lent(e).",
+  "en": "He is slow."
+ },
+ "p1_adjectives_long-longue": {
+  "fr": "La rivière est long / longue.",
+  "en": "The river is long."
+ },
+ "p1_adjectives_court": {
+  "fr": "Le film est court(e).",
+  "en": "The movie is short."
+ },
+ "p1_adjectives_fort": {
+  "fr": "Il est fort(e).",
+  "en": "He is strong."
+ },
+ "p1_adjectives_heureux-heureuse": {
+  "fr": "Elle est heureux / heureuse.",
+  "en": "She is happy."
+ },
+ "p1_adjectives_triste": {
+  "fr": "Il est triste.",
+  "en": "He is sad."
+ },
+ "p1_adjectives_fatigue": {
+  "fr": "Nous sommes fatigué(e).",
+  "en": "We are tired."
+ },
+ "p1_adjectives_content": {
+  "fr": "Je suis content(e).",
+  "en": "I am glad."
+ },
+ "p1_adjectives_important": {
+  "fr": "C'est important(e).",
+  "en": "It is important."
+ },
+ "p1_adjectives_ouvert": {
+  "fr": "La fenêtre est ouvert(e).",
+  "en": "The window is open."
+ },
+ "p1_adjectives_ferme": {
+  "fr": "La porte est fermé(e).",
+  "en": "The door is closed."
+ },
+ "p1_adjectives_plein": {
+  "fr": "Le verre est plein(e).",
+  "en": "The glass is full."
+ },
+ "p1_adjectives_vide": {
+  "fr": "La bouteille est vide.",
+  "en": "The bottle is empty."
+ },
+ "p1_adjectives_propre": {
+  "fr": "Ta chambre est propre.",
+  "en": "Your room is clean."
+ },
+ "p1_adjectives_sale": {
+  "fr": "C'est sale.",
+  "en": "It is dirty."
+ },
+ "p1_adjectives_meme": {
+  "fr": "C'est le même livre.",
+  "en": "It's the same book."
+ },
+ "p1_adjectives_autre": {
+  "fr": "Je veux un autre café.",
+  "en": "I want another coffee."
+ },
+ "p1_adjectives_dernier-derniere": {
+  "fr": "C'est le dernier jour.",
+  "en": "It's the last day."
+ },
+ "p1_adjectives_prochain": {
+  "fr": "Le prochain train arrive bientôt.",
+  "en": "The next train arrives soon."
+ },
+ "p1_adjectives_seul": {
+  "fr": "Il est seul à la maison.",
+  "en": "He is alone at home."
+ },
+ "p1_adjectives_tout-tous": {
+  "fr": "Tout est prêt.",
+  "en": "Everything is ready."
+ },
+ "p1_adjectives_beaucoup": {
+  "fr": "Il y a beaucoup de gens.",
+  "en": "There are a lot of people."
+ },
+ "p1_adjectives_un-peu": {
+  "fr": "Je parle un peu français.",
+  "en": "I speak a little French."
+ },
+ "p1_adjectives_tres": {
+  "fr": "C'est très bon.",
+  "en": "It's very good."
+ },
+ "p1_adjectives_trop": {
+  "fr": "Il fait trop chaud.",
+  "en": "It's too hot."
+ },
+ "p1_adjectives_bien": {
+  "fr": "Elle chante bien.",
+  "en": "She sings well."
+ },
+ "p1_adjectives_mal": {
+  "fr": "Il parle mal.",
+  "en": "He speaks badly."
+ },
+ "p1_adjectives_vite": {
+  "fr": "Il court vite.",
+  "en": "He runs quickly."
+ },
+ "p1_questions_qui": {
+  "fr": "Qui est ton ami?",
+  "en": "Who is your friend?"
+ },
+ "p1_questions_quoi": {
+  "fr": "Tu veux quoi?",
+  "en": "What do you want?"
+ },
+ "p1_questions_ou": {
+  "fr": "Où est la bibliothèque?",
+  "en": "Where is the library?"
+ },
+ "p1_questions_quand": {
+  "fr": "Quand part le train ?",
+  "en": "When does the train leave?"
+ },
+ "p1_questions_pourquoi": {
+  "fr": "Pourquoi tu étudies le français ?",
+  "en": "Why are you studying French?"
+ },
+ "p1_questions_comment": {
+  "fr": "Comment tu t'appelles ?",
+  "en": "What's your name?"
+ },
+ "p1_questions_quel-quelle": {
+  "fr": "Quel livre lis-tu ?",
+  "en": "Which book are you reading?"
+ },
+ "p1_questions_combien-de": {
+  "fr": "Combien de pommes veux-tu ?",
+  "en": "How many apples do you want?"
+ },
+ "p1_questions_est-ce-que": {
+  "fr": "Est-ce que tu aimes le chocolat ?",
+  "en": "Do you like chocolate?"
+ },
+ "p1_questions_quest-ce-que-cest": {
+  "fr": "Qu'est-ce que c'est ?",
+  "en": "What is it?"
+ },
+ "p1_transport_le-train": {
+  "fr": "Qu'est-ce que c'est ?",
+  "en": "What is it?"
+ },
+ "p1_transport_le-bus": {
+  "fr": "Je vais prendre le bus.",
+  "en": "I am going to take the bus."
+ },
+ "p1_transport_le-metro": {
+  "fr": "Je vais prendre le métro.",
+  "en": "I am going to take the subway."
+ },
+ "p1_transport_lavion": {
+  "fr": "Je vais prendre l'avion.",
+  "en": "I am going to take the plane."
+ },
+ "p1_transport_la-voiture": {
+  "fr": "Je vais prendre la voiture.",
+  "en": "I am going to take the car."
+ },
+ "p1_transport_le-velo": {
+  "fr": "Je vais prendre le vélo.",
+  "en": "I am going to take the bicycle."
+ },
+ "p1_transport_le-taxi": {
+  "fr": "Je vais prendre le taxi.",
+  "en": "I am going to take the taxi."
+ },
+ "p1_transport_la-gare": {
+  "fr": "Je vais à la gare.",
+  "en": "I am going to the train station."
+ },
+ "p1_transport_laeroport": {
+  "fr": "Je vais à l'aéroport.",
+  "en": "I am going to the airport."
+ },
+ "p1_transport_larret-de-bus": {
+  "fr": "Je vois l'arrêt de bus.",
+  "en": "I see the bus stop."
+ },
+ "p1_transport_le-billet": {
+  "fr": "J'ai le billet.",
+  "en": "I have the ticket."
+ },
+ "p1_transport_un-aller-simple": {
+  "fr": "Je prends un aller simple.",
+  "en": "I take a one-way ticket."
+ },
+ "p1_transport_un-aller-retour": {
+  "fr": "Nous voulons un aller-retour.",
+  "en": "We want a round trip."
+ },
+ "p1_transport_le-plan": {
+  "fr": "Tu as le plan.",
+  "en": "You have the map."
+ },
+ "p1_transport_la-station": {
+  "fr": "Elle est à la station.",
+  "en": "She is at the station."
+ },
+ "p1_transport_a-pied": {
+  "fr": "On va à pied.",
+  "en": "We go on foot."
+ },
+ "p1_transport_conduire": {
+  "fr": "Je veux conduire.",
+  "en": "I want to drive."
+ },
+ "p1_transport_voyager": {
+  "fr": "J'aime voyager.",
+  "en": "I like to travel."
+ },
+ "p1_transport_la-valise": {
+  "fr": "Ma valise est lourde.",
+  "en": "My suitcase is heavy."
+ },
+ "p1_transport_le-passeport": {
+  "fr": "Mon passeport est dans ma poche.",
+  "en": "My passport is in my pocket."
+ },
+ "p1_transport_la-douane": {
+  "fr": "Nous passons par la douane.",
+  "en": "We go through customs."
+ },
+ "p1_transport_en-retard": {
+  "fr": "Le train est en retard.",
+  "en": "The train is late."
+ },
+ "p1_transport_a-lheure": {
+  "fr": "Nous sommes à l'heure.",
+  "en": "We are on time."
+ },
+ "p1_transport_le-quai": {
+  "fr": "Le quai est près de la sortie.",
+  "en": "The platform is near the exit."
+ },
+ "p1_transport_la-sortie": {
+  "fr": "La sortie est ici.",
+  "en": "The exit is here."
+ },
+ "p1_transport_lentree": {
+  "fr": "Je vois l'entrée.",
+  "en": "I see the entrance."
+ },
+ "p1_body_health_la-tete": {
+  "fr": "Je lève la tête.",
+  "en": "I raise my head."
+ },
+ "p1_body_health_loeil": {
+  "fr": "Je ferme l'œil.",
+  "en": "I close my eye."
+ },
+ "p1_body_health_les-yeux": {
+  "fr": "J'ouvre les yeux.",
+  "en": "I open my eyes."
+ },
+ "p1_body_health_le-nez": {
+  "fr": "Il touche le nez.",
+  "en": "He touches the nose."
+ },
+ "p1_body_health_la-bouche": {
+  "fr": "Elle ouvre la bouche.",
+  "en": "She opens her mouth."
+ },
+ "p1_body_health_loreille": {
+  "fr": "Je touche l'oreille.",
+  "en": "I touch the ear."
+ },
+ "p1_body_health_la-main": {
+  "fr": "Je lève la main.",
+  "en": "I raise my hand."
+ },
+ "p1_body_health_le-bras": {
+  "fr": "Je lève le bras.",
+  "en": "I raise my arm."
+ },
+ "p1_body_health_la-jambe": {
+  "fr": "Il touche la jambe.",
+  "en": "He touches the leg."
+ },
+ "p1_body_health_le-pied": {
+  "fr": "Il se lave le pied.",
+  "en": "He washes his foot."
+ },
+ "p1_body_health_le-dos": {
+  "fr": "Il a mal au dos.",
+  "en": "He has a sore back."
+ },
+ "p1_body_health_le-ventre": {
+  "fr": "Il touche le ventre.",
+  "en": "He touches the stomach."
+ },
+ "p1_body_health_le-coeur": {
+  "fr": "Elle écoute le cœur.",
+  "en": "She listens to the heart."
+ },
+ "p1_body_health_la-dent": {
+  "fr": "Elle brosse la dent.",
+  "en": "She brushes the tooth."
+ },
+ "p1_body_health_les-cheveux": {
+  "fr": "Elle peigne les cheveux.",
+  "en": "She combs the hair."
+ },
+ "p1_body_health_malade": {
+  "fr": "Je suis malade aujourd'hui.",
+  "en": "I am sick today."
+ },
+ "p1_body_health_la-douleur": {
+  "fr": "La douleur est forte.",
+  "en": "The pain is strong."
+ },
+ "p1_body_health_avoir-mal": {
+  "fr": "Je peux avoir mal après l'effort.",
+  "en": "I can have pain after the effort."
+ },
+ "p1_body_health_le-medecin": {
+  "fr": "Le médecin examine le patient.",
+  "en": "The doctor examines the patient."
+ },
+ "p1_body_health_lhopital": {
+  "fr": "L'hôpital est proche.",
+  "en": "The hospital is close."
+ },
+ "p1_body_health_la-pharmacie": {
+  "fr": "La pharmacie ouvre à neuf heures.",
+  "en": "The pharmacy opens at nine o'clock."
+ },
+ "p1_body_health_le-medicament": {
+  "fr": "Le médicament réduit la fièvre.",
+  "en": "The medicine reduces the fever."
+ },
+ "p1_body_health_lurgence": {
+  "fr": "L'urgence nécessite une réaction rapide.",
+  "en": "The emergency requires a quick response."
+ },
+ "p1_body_health_la-sante": {
+  "fr": "La santé est importante.",
+  "en": "Health is important."
+ },
+ "p1_body_health_la-fievre": {
+  "fr": "La fièvre est haute.",
+  "en": "The fever is high."
+ },
+ "p1_body_health_le-rhume": {
+  "fr": "J'ai le rhume.",
+  "en": "I have a cold."
+ },
+ "p1_clothing_les-vetements": {
+  "fr": "Les vêtements sont propres.",
+  "en": "The clothes are clean."
+ },
+ "p1_clothing_la-chemise": {
+  "fr": "La chemise est bleue.",
+  "en": "The shirt is blue."
+ },
+ "p1_clothing_le-pantalon": {
+  "fr": "Le pantalon est noir.",
+  "en": "The pants are black."
+ },
+ "p1_clothing_la-robe": {
+  "fr": "La robe est jolie.",
+  "en": "The dress is pretty."
+ },
+ "p1_clothing_la-jupe": {
+  "fr": "La jupe est courte.",
+  "en": "The skirt is short."
+ },
+ "p1_clothing_le-manteau": {
+  "fr": "Je veux le manteau.",
+  "en": "I want the coat."
+ },
+ "p1_clothing_la-veste": {
+  "fr": "J'aime la veste.",
+  "en": "I like the jacket."
+ },
+ "p1_clothing_le-pull": {
+  "fr": "Tu peux porter le pull.",
+  "en": "You can wear the sweater."
+ },
+ "p1_clothing_le-t-shirt": {
+  "fr": "Il faut acheter le t-shirt.",
+  "en": "One must buy the t-shirt."
+ },
+ "p1_clothing_les-chaussures": {
+  "fr": "Nous avons les chaussures.",
+  "en": "We have the shoes."
+ },
+ "p1_clothing_les-chaussettes": {
+  "fr": "Elle porte les chaussettes.",
+  "en": "She wears the socks."
+ },
+ "p1_clothing_le-chapeau": {
+  "fr": "Je cherche le chapeau.",
+  "en": "I am looking for the hat."
+ },
+ "p1_clothing_lecharpe": {
+  "fr": "Ils portent l'écharpe.",
+  "en": "They wear the scarf."
+ },
+ "p1_clothing_les-gants": {
+  "fr": "Je porte les gants quand il fait froid.",
+  "en": "I wear the gloves when it's cold."
+ },
+ "p1_clothing_la-ceinture": {
+  "fr": "Elle achète la ceinture.",
+  "en": "She buys the belt."
+ },
+ "p1_clothing_le-sac": {
+  "fr": "Il met le livre dans le sac.",
+  "en": "He puts the book in the bag."
+ },
+ "p1_clothing_la-taille": {
+  "fr": "Quelle est la taille de ce vêtement?",
+  "en": "What is the size of this garment?"
+ },
+ "p1_clothing_shabiller": {
+  "fr": "Il faut s'habiller avant de sortir.",
+  "en": "One must get dressed before going out."
+ },
+ "p1_clothing_les-lunettes": {
+  "fr": "Elle porte les lunettes pour lire.",
+  "en": "She wears the glasses to read."
+ },
+ "p2_work_travail": {
+  "fr": "Il aime le travail.",
+  "en": "He likes work."
+ },
+ "p2_work_collegue": {
+  "fr": "Le/la collègue vient de finir le travail.",
+  "en": "The colleague has just finished work."
+ },
+ "p2_work_patron": {
+  "fr": "Je vois le patron.",
+  "en": "I see the boss."
+ },
+ "p2_work_bureau": {
+  "fr": "Je suis dans le bureau.",
+  "en": "I am in the office."
+ },
+ "p2_work_reunion": {
+  "fr": "Nous commençons la réunion.",
+  "en": "We start the meeting."
+ },
+ "p2_work_salaire": {
+  "fr": "Il reçoit le salaire.",
+  "en": "He receives the salary."
+ },
+ "p2_work_emploi": {
+  "fr": "Elle cherche l'emploi.",
+  "en": "She is looking for employment."
+ },
+ "p2_work_embaucher": {
+  "fr": "Ils veulent embaucher.",
+  "en": "They want to hire."
+ },
+ "p2_work_demissionner": {
+  "fr": "Tu peux démissionner.",
+  "en": "You can resign."
+ },
+ "p2_work_cv": {
+  "fr": "Nous avons le CV.",
+  "en": "We have the resume."
+ },
+ "p2_work_entretien": {
+  "fr": "J'ai l'entretien demain.",
+  "en": "I have the interview tomorrow."
+ },
+ "p2_work_temps_plein": {
+  "fr": "Je cherche un travail à temps plein / partiel.",
+  "en": "I am looking for a full-time / part-time job."
+ },
+ "p2_school_ecole": {
+  "fr": "J'aime aller à l'école.",
+  "en": "I like going to school."
+ },
+ "p2_school_universite": {
+  "fr": "Elle rêve d'aller à l'université.",
+  "en": "She dreams of going to university."
+ },
+ "p2_school_cours": {
+  "fr": "J'ai le cours de français.",
+  "en": "I have the French class."
+ },
+ "p2_school_examen": {
+  "fr": "Il révise pour l'examen.",
+  "en": "He is reviewing for the exam."
+ },
+ "p2_school_diplome": {
+  "fr": "Elle a obtenu le diplôme.",
+  "en": "She has obtained the diploma."
+ },
+ "p2_school_etudiant": {
+  "fr": "Je connais l'étudiant(e) qui parle espagnol.",
+  "en": "I know the student (male/female) who speaks Spanish."
+ },
+ "p2_school_professeur": {
+  "fr": "Je vois le professeur chaque matin.",
+  "en": "I see the teacher every morning."
+ },
+ "p2_school_devoirs": {
+  "fr": "Je dois finir les devoirs avant ce soir.",
+  "en": "I have to finish the homework before tonight."
+ },
+ "p2_school_reussir": {
+  "fr": "Je veux réussir à l'examen.",
+  "en": "I want to succeed on the exam."
+ },
+ "p2_transport_voiture": {
+  "fr": "Ma sœur conduit la voiture lentement.",
+  "en": "My sister drives the car slowly."
+ },
+ "p2_transport_autobus": {
+  "fr": "Nous prenons l'autobus pour aller à l'école.",
+  "en": "We take the bus to go to school."
+ },
+ "p2_transport_train": {
+  "fr": "Le train arrive à huit heures.",
+  "en": "The train arrives at eight o'clock."
+ },
+ "p2_transport_avion": {
+  "fr": "Ils prennent l'avion demain.",
+  "en": "They are taking the plane tomorrow."
+ },
+ "p2_transport_metro": {
+  "fr": "Nous prenons le métro chaque jour.",
+  "en": "We take the subway every day."
+ },
+ "p2_transport_velo": {
+  "fr": "Je veux le vélo.",
+  "en": "I want the bicycle."
+ },
+ "p2_transport_conduire": {
+  "fr": "Je peux conduire.",
+  "en": "I can drive."
+ },
+ "p2_transport_billet": {
+  "fr": "J'ai le billet.",
+  "en": "I have the ticket."
+ },
+ "p2_transport_arret": {
+  "fr": "C'est l'arrêt.",
+  "en": "It's the stop."
+ },
+ "p2_transport_trajet": {
+  "fr": "Le trajet est long.",
+  "en": "The trip is long."
+ },
+ "p2_bank_banque": {
+  "fr": "Je vais à la banque.",
+  "en": "I go to the bank."
+ },
+ "p2_bank_compte": {
+  "fr": "Je vois le compte.",
+  "en": "I see the account."
+ },
+ "p2_bank_argent": {
+  "fr": "J'ai besoin de l'argent.",
+  "en": "I need money."
+ },
+ "p2_bank_retirer": {
+  "fr": "Je veux retirer de l'argent.",
+  "en": "I want to withdraw money."
+ },
+ "p2_bank_deposer": {
+  "fr": "Il faut déposer le chèque aujourd'hui.",
+  "en": "He must deposit the check today."
+ },
+ "p2_bank_pret": {
+  "fr": "Je demande le prêt.",
+  "en": "I am requesting the loan."
+ },
+ "p2_bank_carte_credit": {
+  "fr": "J'utilise la carte de crédit.",
+  "en": "I use the credit card."
+ },
+ "p2_bank_payer": {
+  "fr": "Je veux payer maintenant.",
+  "en": "I want to pay now."
+ },
+ "p2_bank_emprunter": {
+  "fr": "Tu peux emprunter mon livre.",
+  "en": "You can borrow my book."
+ },
+ "p2_bank_epargner": {
+  "fr": "Il faut épargner chaque mois.",
+  "en": "He must save each month."
+ },
+ "p2_health_medecin": {
+  "fr": "Je vois le médecin.",
+  "en": "I see the doctor."
+ },
+ "p2_health_hopital": {
+  "fr": "Je vais à l'hôpital.",
+  "en": "I go to the hospital."
+ },
+ "p2_health_rdv": {
+  "fr": "C'est le rendez-vous.",
+  "en": "It is the appointment."
+ },
+ "p2_health_maladie": {
+  "fr": "Je parle de la maladie.",
+  "en": "I talk about the illness."
+ },
+ "p2_health_symptome": {
+  "fr": "Il décrit le symptôme.",
+  "en": "He describes the symptom."
+ },
+ "p2_health_traitement": {
+  "fr": "Le traitement est bon.",
+  "en": "The treatment is good."
+ },
+ "p2_health_assurance": {
+  "fr": "Elle a l'assurance.",
+  "en": "She has the insurance."
+ },
+ "p2_health_pharmacie": {
+  "fr": "Je vais à la pharmacie.",
+  "en": "I go to the pharmacy."
+ },
+ "p2_health_avoir_mal": {
+  "fr": "Je peux avoir mal à la tête.",
+  "en": "I can have a headache."
+ },
+ "p2_health_guerir": {
+  "fr": "Je veux guérir.",
+  "en": "I want to heal/recover."
+ },
+ "p2_resto_restaurant": {
+  "fr": "Je vais au restaurant.",
+  "en": "I am going to the restaurant."
+ },
+ "p2_resto_menu": {
+  "fr": "Je regarde la carte.",
+  "en": "I am looking at the menu."
+ },
+ "p2_resto_commander": {
+  "fr": "Je veux commander.",
+  "en": "I want to order."
+ },
+ "p2_resto_addition": {
+  "fr": "Je demande l'addition.",
+  "en": "I am asking for the bill."
+ },
+ "p2_resto_serveur": {
+  "fr": "Le serveur est gentil.",
+  "en": "The waiter is kind."
+ },
+ "p2_resto_reserver": {
+  "fr": "Je veux réserver.",
+  "en": "I want to reserve/book."
+ },
+ "p2_resto_plat": {
+  "fr": "J'aime le plat.",
+  "en": "I like the dish."
+ },
+ "p2_resto_dessert": {
+  "fr": "Je veux le dessert.",
+  "en": "I want the dessert."
+ },
+ "p2_tech_ordinateur": {
+  "fr": "J'utilise l'ordinateur.",
+  "en": "I use the computer."
+ },
+ "p2_tech_telephone": {
+  "fr": "Je réponds au téléphone.",
+  "en": "I answer the phone."
+ },
+ "p2_tech_internet": {
+  "fr": "Je cherche sur l'internet.",
+  "en": "I search on the internet."
+ },
+ "p2_tech_logiciel": {
+  "fr": "J'installe le logiciel.",
+  "en": "I install the software."
+ },
+ "p2_tech_application": {
+  "fr": "J'ouvre l'application.",
+  "en": "I open the app."
+ },
+ "p2_tech_telecharger": {
+  "fr": "Je veux télécharger le fichier.",
+  "en": "I want to download the file."
+ },
+ "p2_tech_fichier": {
+  "fr": "J'ouvre le fichier.",
+  "en": "I open the file."
+ },
+ "p2_tech_mot_de_passe": {
+  "fr": "Je veux enregistrer le mot de passe.",
+  "en": "I want to save the password."
+ },
+ "p2_tech_reseau": {
+  "fr": "Je vois le réseau.",
+  "en": "I see the network."
+ },
+ "p2_tech_enregistrer": {
+  "fr": "Je dois enregistrer le voyage.",
+  "en": "I need to save the trip."
+ },
+ "p2_travel_aeroport": {
+  "fr": "Je vais à l'aéroport.",
+  "en": "I am going to the airport."
+ },
+ "p2_travel_vol": {
+  "fr": "Mon vol est à dix heures.",
+  "en": "My flight is at ten o'clock."
+ },
+ "p2_travel_douane": {
+  "fr": "Nous passons la douane.",
+  "en": "We go through customs."
+ },
+ "p2_friends_ami": {
+  "fr": "Je rencontre l'ami(e) demain.",
+  "en": "I meet my friend tomorrow."
+ },
+ "p2_friends_loisir": {
+  "fr": "Le loisir est agréable.",
+  "en": "Leisure is pleasant."
+ },
+ "p2_friends_sport": {
+  "fr": "J'aime le sport.",
+  "en": "I like sport."
+ },
+ "p2_friends_lire": {
+  "fr": "J'aime lire.",
+  "en": "I like to read."
+ },
+ "p2_friends_jouer": {
+  "fr": "Je veux jouer.",
+  "en": "I want to play."
+ },
+ "p2_friends_regarder_film": {
+  "fr": "Je veux regarder un film ce soir.",
+  "en": "I want to watch a movie tonight."
+ },
+ "p2_friends_sortir": {
+  "fr": "Tu peux sortir avec tes amis.",
+  "en": "You can go out with your friends."
+ },
+ "p2_friends_weekend": {
+  "fr": "J'aime le week-end parce que je peux dormir tard.",
+  "en": "I like the weekend because I can sleep late."
+ },
+ "p2_housing_loyer": {
+  "fr": "Je paie le loyer chaque mois.",
+  "en": "I pay the rent each month."
+ },
+ "p2_housing_proprietaire": {
+  "fr": "Le propriétaire est très gentil.",
+  "en": "The landlord is very kind."
+ },
+ "p2_housing_locataire": {
+  "fr": "Le locataire doit rendre les clés.",
+  "en": "The tenant must return the keys."
+ },
+ "p2_housing_bail": {
+  "fr": "Nous avons signé le bail hier.",
+  "en": "We signed the lease yesterday."
+ },
+ "p2_housing_demenager": {
+  "fr": "Ils vont déménager prochainement.",
+  "en": "They are going to move soon."
+ },
+ "p2_housing_quartier": {
+  "fr": "J'aime le quartier.",
+  "en": "I like the neighborhood."
+ },
+ "p2_housing_meuble": {
+  "fr": "L'appartement est meublé.",
+  "en": "The apartment is furnished."
+ },
+ "p3_adjectives_bon-ne": {
+  "fr": "C'est un bon livre.",
+  "en": "It's a good book."
+ },
+ "p3_adjectives_mauvais-e": {
+  "fr": "Le temps est mauvais aujourd'hui.",
+  "en": "The weather is bad today."
+ },
+ "p3_adjectives_grand-e": {
+  "fr": "Il est grand.",
+  "en": "He is tall."
+ },
+ "p3_adjectives_petit-e": {
+  "fr": "Elle a un petit chien.",
+  "en": "She has a small dog."
+ },
+ "p3_adjectives_nouveau-nouvelle": {
+  "fr": "C'est un nouveau projet.",
+  "en": "It's a new project."
+ },
+ "p3_adjectives_vieux-vieille": {
+  "fr": "Mon vieux vélo fonctionne encore.",
+  "en": "My old bike still works."
+ },
+ "p3_adjectives_beau-belle": {
+  "fr": "Je trouve ça beau/belle.",
+  "en": "I find it beautiful."
+ },
+ "p3_adjectives_laid-e": {
+  "fr": "Je trouve ça laid(e).",
+  "en": "I find it ugly."
+ },
+ "p3_adjectives_facile": {
+  "fr": "Cet exercice est facile.",
+  "en": "This exercise is easy."
+ },
+ "p3_adjectives_difficile": {
+  "fr": "Ce problème est difficile.",
+  "en": "This problem is difficult."
+ },
+ "p3_adjectives_rapide": {
+  "fr": "Cette voiture est rapide.",
+  "en": "This car is fast."
+ },
+ "p3_adjectives_lent-e": {
+  "fr": "Je trouve le train lent(e).",
+  "en": "I find the train slow."
+ },
+ "p3_adjectives_content-e-heureux": {
+  "fr": "Je me sens content(e)/heureux.",
+  "en": "I feel happy."
+ },
+ "p3_adjectives_triste": {
+  "fr": "Il est triste.",
+  "en": "He is sad."
+ },
+ "p3_adjectives_fatigue-e": {
+  "fr": "Je suis fatigué(e) après le travail.",
+  "en": "I am tired after work."
+ },
+ "p3_adjectives_occupe-e": {
+  "fr": "Elle est occupé(e) ce soir.",
+  "en": "She is busy tonight."
+ },
+ "p3_adjectives_important-e": {
+  "fr": "C'est important(e) de étudier chaque jour.",
+  "en": "It is important to study every day."
+ },
+ "p3_adjectives_necessaire": {
+  "fr": "Il est nécessaire de boire de l'eau.",
+  "en": "It is necessary to drink water."
+ },
+ "p3_adjectives_possible": {
+  "fr": "Est-ce que c'est possible de venir demain?",
+  "en": "Is it possible to come tomorrow?"
+ },
+ "p3_adjectives_different-e": {
+  "fr": "Mon avis est différent(e) du tien.",
+  "en": "My opinion is different from yours."
+ },
+ "p3_adjectives_fort-e": {
+  "fr": "Il est fort(e) en mathématiques.",
+  "en": "He/She is strong in math."
+ },
+ "p3_adjectives_faible": {
+  "fr": "Elle se sent faible aujourd'hui.",
+  "en": "She feels weak today."
+ },
+ "p3_adjectives_cher-chere": {
+  "fr": "Ce livre est cher.",
+  "en": "This book is expensive."
+ },
+ "p3_adjectives_bon-marche": {
+  "fr": "Ce restaurant est bon marché.",
+  "en": "This restaurant is cheap."
+ },
+ "p3_adjectives_plein-e": {
+  "fr": "Le verre est plein.",
+  "en": "The glass is full."
+ },
+ "p3_adjectives_vide": {
+  "fr": "La bouteille est vide.",
+  "en": "The bottle is empty."
+ },
+ "p3_adjectives_propre": {
+  "fr": "Ta chambre est propre.",
+  "en": "Your room is clean."
+ },
+ "p3_adjectives_sale": {
+  "fr": "Son t-shirt est sale.",
+  "en": "His/her T-shirt is dirty."
+ },
+ "p3_adjectives_chaud-e": {
+  "fr": "Le café est chaud.",
+  "en": "The coffee is hot."
+ },
+ "p3_adjectives_froid-e": {
+  "fr": "Le vent est froid.",
+  "en": "The wind is cold."
+ },
+ "p3_adjectives_jeune": {
+  "fr": "Il est jeune.",
+  "en": "He is young."
+ },
+ "p3_adjectives_riche": {
+  "fr": "Elle est riche.",
+  "en": "She is rich."
+ },
+ "p3_adjectives_pauvre": {
+  "fr": "Il est pauvre.",
+  "en": "He is poor."
+ },
+ "p3_adjectives_utile": {
+  "fr": "C'est utile.",
+  "en": "It is useful."
+ },
+ "p3_adjectives_inutile": {
+  "fr": "C'est inutile.",
+  "en": "It is useless."
+ },
+ "p3_adjectives_disponible": {
+  "fr": "Le ticket est disponible.",
+  "en": "The ticket is available."
+ },
+ "p3_adjectives_gratuit-e": {
+  "fr": "Ce service est gratuit(e).",
+  "en": "This service is free (no cost)."
+ },
+ "p3_adjectives_libre": {
+  "fr": "Le parc est libre.",
+  "en": "The park is free (available)."
+ },
+ "p3_adjectives_dangereux-dangereuse": {
+  "fr": "C'est dangereux.",
+  "en": "It's dangerous."
+ },
+ "p3_adjectives_sur-e": {
+  "fr": "C'est sûr.",
+  "en": "It's certain."
+ },
+ "p3_adjectives_grave-serieux": {
+  "fr": "C'est grave.",
+  "en": "It's serious."
+ },
+ "p3_adjectives_drole": {
+  "fr": "C'est drôle.",
+  "en": "It's funny."
+ },
+ "p3_adjectives_etrange": {
+  "fr": "C'est étrange.",
+  "en": "It's strange."
+ },
+ "p3_adjectives_fier-fiere": {
+  "fr": "Je suis fier.",
+  "en": "I am proud."
+ },
+ "p3_adjectives_honnete": {
+  "fr": "Il est honnête.",
+  "en": "He is honest."
+ },
+ "p3_adjectives_poli-e": {
+  "fr": "Il est poli.",
+  "en": "He is polite."
+ },
+ "p3_adjectives_impoli-e": {
+  "fr": "Il est impoli(e).",
+  "en": "He/She is rude."
+ },
+ "p3_adjectives_patient-e": {
+  "fr": "Elle est patient(e).",
+  "en": "She is patient."
+ },
+ "p3_adjectives_fiable": {
+  "fr": "Ce outil est fiable.",
+  "en": "This tool is reliable."
+ },
+ "p3_adjectives_efficace": {
+  "fr": "Cette méthode est efficace.",
+  "en": "This method is effective."
+ },
+ "p3_adjectives_flexible": {
+  "fr": "Il est flexible.",
+  "en": "He is flexible."
+ },
+ "p3_adjectives_exigeant-e": {
+  "fr": "Le professeur est exigeant(e).",
+  "en": "The teacher is demanding."
+ },
+ "p3_adjectives_satisfait-e": {
+  "fr": "Nous sommes satisfait(e).",
+  "en": "We are satisfied."
+ },
+ "p3_adjectives_decu-e": {
+  "fr": "Ils sont déçu(e).",
+  "en": "They are disappointed."
+ },
+ "p3_adjectives_inquiet-inquiete": {
+  "fr": "Le garçon est inquiet.",
+  "en": "The boy is worried."
+ },
+ "p3_adjectives_pratique": {
+  "fr": "Cette méthode est pratique.",
+  "en": "This method is practical."
+ },
+ "p3_adjectives_convenable": {
+  "fr": "Cette solution est convenable.",
+  "en": "This solution is suitable."
+ },
+ "p3_adjectives_essentiel-le": {
+  "fr": "Il est essentiel de boire de l'eau.",
+  "en": "It is essential to drink water."
+ },
+ "p3_adjectives_actuel-le": {
+  "fr": "Le problème actuel est difficile.",
+  "en": "The current problem is difficult."
+ },
+ "p3_adjectives_precedent-e": {
+  "fr": "Le chapitre précédent était intéressant.",
+  "en": "The previous chapter was interesting."
+ },
+ "p3_adjectives_suivant-e": {
+  "fr": "Le bus suivant arrive dans cinq minutes.",
+  "en": "The next bus arrives in five minutes."
+ },
+ "p3_adjectives_semblable": {
+  "fr": "Cette tâche est semblable à l'autre.",
+  "en": "This task is similar to the other."
+ },
+ "p3_adjectives_moyen-ne": {
+  "fr": "C'est moyen(ne).",
+  "en": "It's average."
+ },
+ "p3_adjectives_enorme": {
+  "fr": "C'est énorme.",
+  "en": "It's enormous."
+ },
+ "p3_adjectives_minuscule": {
+  "fr": "C'est minuscule.",
+  "en": "It's tiny."
+ },
+ "p3_adjectives_profond-e": {
+  "fr": "C'est profond(e).",
+  "en": "It's deep."
+ },
+ "p3_adjectives_large": {
+  "fr": "C'est large.",
+  "en": "It's wide."
+ },
+ "p3_adjectives_etroit-e": {
+  "fr": "C'est étroit(e).",
+  "en": "It's narrow."
+ },
+ "p3_adverbs_tres": {
+  "fr": "C'est très bon.",
+  "en": "It's very good."
+ },
+ "p3_adverbs_beaucoup": {
+  "fr": "Il y a beaucoup de livres.",
+  "en": "There are many books."
+ },
+ "p3_adverbs_peu": {
+  "fr": "Je veux un peu d'eau.",
+  "en": "I want a little water."
+ },
+ "p3_adverbs_toujours": {
+  "fr": "Il est toujours gentil.",
+  "en": "He is always kind."
+ },
+ "p3_adverbs_jamais": {
+  "fr": "Je ne mange jamais de viande.",
+  "en": "I never eat meat."
+ },
+ "p3_adverbs_souvent": {
+  "fr": "Nous allons souvent au parc.",
+  "en": "We often go to the park."
+ },
+ "p3_adverbs_parfois": {
+  "fr": "Elle lit parfois le soir.",
+  "en": "She sometimes reads in the evening."
+ },
+ "p3_adverbs_deja": {
+  "fr": "Tu as déjà fini tes devoirs.",
+  "en": "You have already finished your homework."
+ },
+ "p3_adverbs_encore": {
+  "fr": "Il veut encore jouer.",
+  "en": "He still wants to play."
+ },
+ "p3_adverbs_vite-rapidement": {
+  "fr": "Elle court vite.",
+  "en": "She runs quickly."
+ },
+ "p3_adverbs_lentement": {
+  "fr": "Il marche lentement.",
+  "en": "He walks slowly."
+ },
+ "p3_adverbs_vraiment": {
+  "fr": "C'est vraiment bon.",
+  "en": "It's really good."
+ },
+ "p3_adverbs_presque": {
+  "fr": "Il est presque prêt.",
+  "en": "He is almost ready."
+ },
+ "p3_adverbs_ensemble": {
+  "fr": "Nous travaillons ensemble.",
+  "en": "We work together."
+ },
+ "p3_adverbs_maintenant": {
+  "fr": "Je mange maintenant.",
+  "en": "I am eating now."
+ },
+ "p3_adverbs_immediatement": {
+  "fr": "Il répond immédiatement.",
+  "en": "He responds immediately."
+ },
+ "p3_adverbs_recemment": {
+  "fr": "Elle est arrivée récemment.",
+  "en": "She arrived recently."
+ },
+ "p3_adverbs_actuellement": {
+  "fr": "Il travaille actuellement.",
+  "en": "He is working currently."
+ },
+ "p3_adverbs_autrefois": {
+  "fr": "Autrefois, je lisais des livres.",
+  "en": "In the past, I used to read books."
+ },
+ "p3_adverbs_bientot": {
+  "fr": "Je vais partir bientôt.",
+  "en": "I am going to leave soon."
+ },
+ "p3_adverbs_tard": {
+  "fr": "Il arrive tard.",
+  "en": "He arrives late."
+ },
+ "p3_adverbs_tot": {
+  "fr": "Elle se lève tôt.",
+  "en": "She gets up early."
+ },
+ "p3_adverbs_partout": {
+  "fr": "On trouve des cafés partout.",
+  "en": "One can find cafés everywhere."
+ },
+ "p3_adverbs_nulle-part": {
+  "fr": "Je ne trouve mes clés nulle part.",
+  "en": "I cannot find my keys anywhere."
+ },
+ "p3_adverbs_peut-etre": {
+  "fr": "Peut-être qu'il viendra demain.",
+  "en": "Maybe he will come tomorrow."
+ },
+ "p3_adverbs_certainement": {
+  "fr": "Il est certainement prêt.",
+  "en": "He is certainly ready."
+ },
+ "p3_adverbs_absolument": {
+  "fr": "C'est absolument vrai.",
+  "en": "That's absolutely true."
+ },
+ "p3_adverbs_completement": {
+  "fr": "Je suis complètement fatigué.",
+  "en": "I am completely tired."
+ },
+ "p3_adverbs_surtout": {
+  "fr": "J'aime surtout le chocolat.",
+  "en": "I especially like chocolate."
+ },
+ "p3_adverbs_principalement": {
+  "fr": "Nous travaillons principalement le matin.",
+  "en": "We work mainly in the morning."
+ },
+ "p3_adverbs_generalement": {
+  "fr": "Il est généralement ponctuel.",
+  "en": "He is generally punctual."
+ },
+ "p3_adverbs_rarement": {
+  "fr": "Elle va rarement au cinéma.",
+  "en": "She rarely goes to the cinema."
+ },
+ "p3_adverbs_frequemment": {
+  "fr": "Il va fréquemment à la bibliothèque.",
+  "en": "He frequently goes to the library."
+ },
+ "p3_adverbs_soigneusement": {
+  "fr": "Elle écrit soigneusement ses devoirs.",
+  "en": "She writes her homework carefully."
+ },
+ "p3_adverbs_malheureusement": {
+  "fr": "Malheureusement, il pleut aujourd'hui.",
+  "en": "Unfortunately, it is raining today."
+ },
+ "p3_adverbs_heureusement": {
+  "fr": "Heureusement, le bus est arrivé à l'heure.",
+  "en": "Fortunately, the bus arrived on time."
+ },
+ "p3_adverbs_soudainement": {
+  "fr": "Soudainement, les lumières se sont éteintes.",
+  "en": "Suddenly, the lights went out."
+ },
+ "p3_adverbs_enfin": {
+  "fr": "Enfin, nous avons fini le travail.",
+  "en": "Finally, we have finished the work."
+ },
+ "p3_adverbs_assez": {
+  "fr": "C'est assez difficile pour moi.",
+  "en": "It's quite difficult for me."
+ },
+ "p3_adverbs_trop": {
+  "fr": "Le café est trop chaud.",
+  "en": "The coffee is too hot."
+ },
+ "p3_adverbs_suffisamment": {
+  "fr": "C'est suffisamment bon.",
+  "en": "It is good enough."
+ },
+ "p3_adverbs_environ": {
+  "fr": "Il est environ huit heures.",
+  "en": "It is about eight o'clock."
+ },
+ "p3_emotions_se-sentir": {
+  "fr": "Il faut se sentir calme.",
+  "en": "We need to feel calm."
+ },
+ "p3_emotions_penser": {
+  "fr": "Je vais penser à toi.",
+  "en": "I am going to think about you."
+ },
+ "p3_emotions_esperer": {
+  "fr": "Nous devons espérer le meilleur.",
+  "en": "We must hope for the best."
+ },
+ "p3_emotions_craindre": {
+  "fr": "Tu ne dois pas craindre le danger.",
+  "en": "You must not fear danger."
+ },
+ "p3_emotions_bonheur": {
+  "fr": "Le bonheur est important.",
+  "en": "Happiness is important."
+ },
+ "p3_emotions_inquietude": {
+  "fr": "L'inquiétude peut être forte.",
+  "en": "Worry can be strong."
+ },
+ "p3_emotions_surprise": {
+  "fr": "Je ressens la surprise.",
+  "en": "I feel surprise."
+ },
+ "p3_emotions_colere": {
+  "fr": "Je ressens la colère.",
+  "en": "I feel anger."
+ },
+ "p3_emotions_tristesse": {
+  "fr": "Je ressens la tristesse.",
+  "en": "I feel sadness."
+ },
+ "p3_emotions_peur": {
+  "fr": "Je ressens la peur.",
+  "en": "I feel fear."
+ },
+ "p3_emotions_joie": {
+  "fr": "Je ressens la joie.",
+  "en": "I feel joy."
+ },
+ "p3_emotions_fierte": {
+  "fr": "Je ressens la fierté.",
+  "en": "I feel pride."
+ },
+ "p3_emotions_honte": {
+  "fr": "Je ressens la honte.",
+  "en": "I feel shame."
+ },
+ "p3_emotions_stress": {
+  "fr": "Je ressens le stress.",
+  "en": "I feel stress."
+ },
+ "p3_emotions_soulagement": {
+  "fr": "Je sens le soulagement après l'examen.",
+  "en": "I feel relief after the exam."
+ },
+ "p3_emotions_deception": {
+  "fr": "Elle ressent la déception quand elle perd.",
+  "en": "She feels disappointment when she loses."
+ },
+ "p3_emotions_espoir": {
+  "fr": "Nous gardons l'espoir malgré tout.",
+  "en": "We keep hope despite everything."
+ },
+ "p3_emotions_confiance": {
+  "fr": "Il a la confiance en ses amis.",
+  "en": "He has confidence in his friends."
+ },
+ "p3_emotions_doute": {
+  "fr": "Ils ont le doute sur la réponse.",
+  "en": "They have doubt about the answer."
+ },
+ "p3_emotions_sinquieter": {
+  "fr": "Je veux s'inquiéter moins.",
+  "en": "I want to worry less."
+ },
+ "p3_emotions_se-facher": {
+  "fr": "Tu peux se fâcher quand c'est injuste.",
+  "en": "You can get angry when it's unfair."
+ },
+ "p3_emotions_pleurer": {
+  "fr": "Il faut pleurer parfois.",
+  "en": "One must cry sometimes."
+ },
+ "p3_emotions_rire": {
+  "fr": "J'aime rire.",
+  "en": "I like to laugh."
+ },
+ "p3_emotions_sourire": {
+  "fr": "J'aime sourire.",
+  "en": "I like to smile."
+ },
+ "p3_emotions_avoir-honte": {
+  "fr": "Il faut avoir honte.",
+  "en": "One must be ashamed."
+ },
+ "p3_emotions_avoir-peur": {
+  "fr": "Il faut avoir peur.",
+  "en": "One must be afraid."
+ },
+ "p3_emotions_profiter-de": {
+  "fr": "J'aime profiter de la plage.",
+  "en": "I like to enjoy the beach."
+ },
+ "p3_emotions_regretter": {
+  "fr": "Il faut regretter ses erreurs.",
+  "en": "One must regret his/her mistakes."
+ },
+ "p3_emotions_apprecier": {
+  "fr": "J'aime apprécier le calme.",
+  "en": "I like to appreciate calm."
+ },
+ "p3_emotions_etre-emu-e": {
+  "fr": "Il faut être ému(e) devant ce film.",
+  "en": "One must be moved in front of this film."
+ },
+ "p3_body_main": {
+  "fr": "Je lève la main.",
+  "en": "I raise my hand."
+ },
+ "p3_body_pied": {
+  "fr": "Il tape du pied.",
+  "en": "He taps his foot."
+ },
+ "p3_body_oeil-les-yeux": {
+  "fr": "Je ferme l'œil.",
+  "en": "I close my eye."
+ },
+ "p3_body_coeur": {
+  "fr": "Elle écoute son cœur.",
+  "en": "She listens to her heart."
+ },
+ "p3_body_dos": {
+  "fr": "Il a mal au dos.",
+  "en": "He has a sore back."
+ },
+ "p3_body_ventre": {
+  "fr": "Elle serre le ventre.",
+  "en": "She tightens her stomach."
+ },
+ "p3_body_faire-mal": {
+  "fr": "Tu peux faire mal.",
+  "en": "You can hurt."
+ },
+ "p3_body_malade": {
+  "fr": "Il est malade.",
+  "en": "He is sick."
+ },
+ "p3_body_en-bonne-sante": {
+  "fr": "Il est en bonne santé.",
+  "en": "He is healthy."
+ },
+ "p3_body_bras": {
+  "fr": "Je lève le bras.",
+  "en": "I raise my arm."
+ },
+ "p3_body_jambe": {
+  "fr": "Elle montre la jambe.",
+  "en": "She shows her leg."
+ },
+ "p3_body_bouche": {
+  "fr": "Il ferme la bouche.",
+  "en": "He closes his mouth."
+ },
+ "p3_body_nez": {
+  "fr": "Elle se touche le nez.",
+  "en": "She touches her nose."
+ },
+ "p3_body_oreille": {
+  "fr": "Nous écoutons avec l'oreille.",
+  "en": "We listen with the ear."
+ },
+ "p3_body_dent": {
+  "fr": "Tu brosses la dent.",
+  "en": "You brush the tooth."
+ },
+ "p3_body_cheveux": {
+  "fr": "Ils peignent les cheveux.",
+  "en": "They comb the hair."
+ },
+ "p3_body_peau": {
+  "fr": "La peau est douce.",
+  "en": "The skin is soft."
+ },
+ "p3_body_genou": {
+  "fr": "Le genou fait mal.",
+  "en": "The knee hurts."
+ },
+ "p3_body_epaule": {
+  "fr": "L'épaule est forte.",
+  "en": "The shoulder is strong."
+ },
+ "p3_body_doigt": {
+  "fr": "Le doigt est petit.",
+  "en": "The finger is small."
+ },
+ "p3_body_cou": {
+  "fr": "Le cou est long.",
+  "en": "The neck is long."
+ },
+ "p3_body_sang": {
+  "fr": "Le sang est rouge.",
+  "en": "The blood is red."
+ },
+ "p3_body_visage": {
+  "fr": "Le visage est beau.",
+  "en": "The face is beautiful."
+ },
+ "p3_body_sante": {
+  "fr": "La santé est importante.",
+  "en": "Health is important."
+ },
+ "p3_body_douleur": {
+  "fr": "Je sens la douleur.",
+  "en": "I feel the pain."
+ },
+ "p3_body_mal-de-tete": {
+  "fr": "J'ai le mal de tête.",
+  "en": "I have a headache."
+ },
+ "p3_body_fievre": {
+  "fr": "Elle a la fièvre.",
+  "en": "She has a fever."
+ },
+ "p3_body_toux": {
+  "fr": "Il a la toux.",
+  "en": "He has a cough."
+ },
+ "p3_body_se-reposer": {
+  "fr": "Il faut se reposer.",
+  "en": "One must rest."
+ },
+ "p3_body_respirer": {
+  "fr": "Il faut respirer.",
+  "en": "One must breathe."
+ },
+ "p3_body_bien-dormir": {
+  "fr": "Il faut bien dormir.",
+  "en": "One must sleep well."
+ },
+ "p3_clothing_vetements": {
+  "fr": "J'achète les vêtements.",
+  "en": "I buy the clothes."
+ },
+ "p3_clothing_chemise": {
+  "fr": "Je porte la chemise.",
+  "en": "I wear the shirt."
+ },
+ "p3_clothing_pantalon": {
+  "fr": "Tu mets le pantalon.",
+  "en": "You put on the pants."
+ },
+ "p3_clothing_chaussures": {
+  "fr": "Elle achète les chaussures.",
+  "en": "She buys the shoes."
+ },
+ "p3_clothing_manteau": {
+  "fr": "Nous avons le manteau.",
+  "en": "We have the coat."
+ },
+ "p3_clothing_porter": {
+  "fr": "Je veux porter la chemise.",
+  "en": "I want to wear the shirt."
+ },
+ "p3_clothing_taille": {
+  "fr": "Quelle est ta taille?",
+  "en": "What is your size?"
+ },
+ "p3_clothing_robe": {
+  "fr": "Elle aime la robe.",
+  "en": "She likes the dress."
+ },
+ "p3_clothing_jupe": {
+  "fr": "Il cherche la jupe.",
+  "en": "He is looking for the skirt."
+ },
+ "p3_clothing_pull": {
+  "fr": "Je porte le pull.",
+  "en": "I wear the sweater."
+ },
+ "p3_clothing_veste": {
+  "fr": "Elle achète la veste.",
+  "en": "She buys the jacket."
+ },
+ "p3_clothing_chapeau": {
+  "fr": "Il met le chapeau.",
+  "en": "He puts on the hat."
+ },
+ "p3_clothing_chaussettes": {
+  "fr": "Elle porte les chaussettes.",
+  "en": "She wears the socks."
+ },
+ "p3_clothing_gants": {
+  "fr": "Il met les gants.",
+  "en": "He puts on the gloves."
+ },
+ "p3_clothing_echarpe": {
+  "fr": "Elle porte l'écharpe.",
+  "en": "She wears the scarf."
+ },
+ "p3_clothing_bottes": {
+  "fr": "Il porte les bottes.",
+  "en": "He wears the boots."
+ },
+ "p3_clothing_cravate": {
+  "fr": "Il met la cravate.",
+  "en": "He puts on the tie."
+ },
+ "p3_clothing_costume": {
+  "fr": "J'aime le costume.",
+  "en": "I like the suit."
+ },
+ "p3_clothing_shabiller": {
+  "fr": "Il faut s'habiller.",
+  "en": "One must get dressed."
+ },
+ "p3_clothing_essayer": {
+  "fr": "Tu peux essayer.",
+  "en": "You can try."
+ },
+ "p3_clothing_mode": {
+  "fr": "J'aime la mode.",
+  "en": "I like fashion."
+ },
+ "p3_city_ville": {
+  "fr": "J'aime la ville.",
+  "en": "I like the city."
+ },
+ "p3_city_village": {
+  "fr": "J'aime le village.",
+  "en": "I like the village."
+ },
+ "p3_city_eglise": {
+  "fr": "Je vois l'église.",
+  "en": "I see the church."
+ },
+ "p3_city_parc": {
+  "fr": "J'aime le parc.",
+  "en": "I like the park."
+ },
+ "p3_city_bibliotheque": {
+  "fr": "Je vais à la bibliothèque.",
+  "en": "I go to the library."
+ },
+ "p3_city_musee": {
+  "fr": "Je vois le musée.",
+  "en": "I see the museum."
+ },
+ "p3_city_poste": {
+  "fr": "Je vais à la poste.",
+  "en": "I go to the post office."
+ },
+ "p3_city_poste-de-police": {
+  "fr": "Je vois le poste de police.",
+  "en": "I see the police station."
+ },
+ "p3_city_marche": {
+  "fr": "J'aime le marché.",
+  "en": "I like the market."
+ },
+ "p3_city_quartier": {
+  "fr": "J'aime le quartier.",
+  "en": "I like the neighborhood."
+ },
+ "p3_city_banlieue": {
+  "fr": "J'habite dans la banlieue.",
+  "en": "I live in the suburb."
+ },
+ "p3_city_centre-ville": {
+  "fr": "Je vois le centre-ville.",
+  "en": "I see downtown."
+ },
+ "p3_city_immeuble": {
+  "fr": "L'immeuble est près de la rue.",
+  "en": "The building is near the street."
+ },
+ "p3_city_pont": {
+  "fr": "Le pont traverse la rivière.",
+  "en": "The bridge crosses the river."
+ },
+ "p3_city_trottoir": {
+  "fr": "Le trottoir est large.",
+  "en": "The sidewalk is wide."
+ },
+ "p3_city_circulation": {
+  "fr": "La circulation est dense aujourd'hui.",
+  "en": "The traffic is heavy today."
+ },
+ "p3_city_passage-pieton": {
+  "fr": "Le passage piéton est devant l'école.",
+  "en": "The crosswalk is in front of the school."
+ },
+ "p3_city_hotel-de-ville": {
+  "fr": "L'hôtel de ville est ouvert le matin.",
+  "en": "The city hall is open in the morning."
+ },
+ "p3_city_pharmacie": {
+  "fr": "La pharmacie vend des médicaments.",
+  "en": "The pharmacy sells medicine."
+ },
+ "p3_city_boulangerie": {
+  "fr": "La boulangerie fait du pain frais.",
+  "en": "The bakery makes fresh bread."
+ },
+ "p3_city_hopital": {
+  "fr": "Je vais à l'hôpital.",
+  "en": "I am going to the hospital."
+ },
+ "p3_city_gare": {
+  "fr": "Elle attend à la gare.",
+  "en": "She is waiting at the train station."
+ },
+ "p3_city_arret-de-bus": {
+  "fr": "Nous sommes à l'arrêt de bus.",
+  "en": "We are at the bus stop."
+ },
+ "p3_city_metro": {
+  "fr": "Il prend le métro chaque matin.",
+  "en": "He takes the subway every morning."
+ },
+ "p3_city_stationnement": {
+  "fr": "Le stationnement est gratuit ici.",
+  "en": "The parking lot is free here."
+ },
+ "p3_city_carrefour": {
+  "fr": "Tournez à droite au carrefour.",
+  "en": "Turn right at the intersection."
+ },
+ "p3_city_gratte-ciel": {
+  "fr": "On voit un gratte-ciel derrière le parc.",
+  "en": "You can see a skyscraper behind the park."
+ },
+ "p3_hobbies_sport": {
+  "fr": "Elle aime faire du sport.",
+  "en": "She likes to do sport."
+ },
+ "p3_hobbies_courir": {
+  "fr": "...",
+  "en": "..."
+ },
+ "p3_hobbies_nager": {
+  "fr": "Je veux courir.",
+  "en": "I want to run."
+ },
+ "p3_hobbies_passe-temps": {
+  "fr": "Il aime son passe-temps.",
+  "en": "He likes his hobby."
+ },
+ "p3_hobbies_dessiner": {
+  "fr": "Je veux dessiner.",
+  "en": "I want to draw."
+ },
+ "p3_hobbies_peindre": {
+  "fr": "Tu peux peindre.",
+  "en": "You can paint."
+ },
+ "p3_hobbies_chanter": {
+  "fr": "Elle adore chanter.",
+  "en": "She loves to sing."
+ },
+ "p3_hobbies_danser": {
+  "fr": "Nous aimons danser.",
+  "en": "We like to dance."
+ },
+ "p3_hobbies_lire": {
+  "fr": "J'aime lire.",
+  "en": "I like to read."
+ },
+ "p3_hobbies_lecture": {
+  "fr": "Elle aime la lecture.",
+  "en": "She likes reading."
+ },
+ "p3_hobbies_cuisiner": {
+  "fr": "Il doit cuisiner.",
+  "en": "He must cook."
+ },
+ "p3_hobbies_voyager": {
+  "fr": "J'aime voyager.",
+  "en": "I like to travel."
+ },
+ "p3_hobbies_randonnee": {
+  "fr": "Je fais de la randonnée le samedi.",
+  "en": "I go hiking on Saturday."
+ },
+ "p3_hobbies_velo": {
+  "fr": "J'aime le vélo.",
+  "en": "I like biking."
+ },
+ "p3_hobbies_ski": {
+  "fr": "J'aime le ski.",
+  "en": "I like skiing."
+ },
+ "p3_hobbies_patinage": {
+  "fr": "J'aime le patinage.",
+  "en": "I like skating."
+ },
+ "p3_hobbies_hockey": {
+  "fr": "J'aime le hockey.",
+  "en": "I like hockey."
+ },
+ "p3_hobbies_natation": {
+  "fr": "J'aime la natation.",
+  "en": "I like swimming."
+ },
+ "p3_hobbies_salle-de-sport": {
+  "fr": "Je vais à la salle de sport.",
+  "en": "I go to the gym."
+ },
+ "p3_hobbies_sentrainer": {
+  "fr": "Il faut s'entraîner.",
+  "en": "One must train/practice."
+ },
+ "p3_hobbies_match": {
+  "fr": "Nous regardons le match.",
+  "en": "We are watching the match."
+ },
+ "p3_hobbies_gagner": {
+  "fr": "Nous voulons gagner.",
+  "en": "We want to win."
+ },
+ "p3_hobbies_perdre": {
+  "fr": "Nous ne voulons pas perdre.",
+  "en": "We do not want to lose."
+ },
+ "p3_nature_soleil": {
+  "fr": "Le soleil brille.",
+  "en": "The sun is shining."
+ },
+ "p3_nature_pluie": {
+  "fr": "La pluie est forte.",
+  "en": "The rain is heavy."
+ },
+ "p3_nature_neige": {
+  "fr": "La neige tombe.",
+  "en": "The snow is falling."
+ },
+ "p3_nature_vent": {
+  "fr": "Le vent souffle.",
+  "en": "The wind is blowing."
+ },
+ "p3_nature_nuage": {
+  "fr": "Je regarde le nuage.",
+  "en": "I am looking at the cloud."
+ },
+ "p3_nature_ciel": {
+  "fr": "Le ciel est bleu aujourd'hui.",
+  "en": "The sky is blue today."
+ },
+ "p3_nature_arbre": {
+  "fr": "Je vois l'arbre dans le jardin.",
+  "en": "I see the tree in the garden."
+ },
+ "p3_nature_mer": {
+  "fr": "Nous aimons la mer en été.",
+  "en": "We like the sea in summer."
+ },
+ "p3_nature_brouillard": {
+  "fr": "Nous voyons le brouillard sur la route le matin.",
+  "en": "We see the fog on the road in the morning."
+ },
+ "p3_nature_glace": {
+  "fr": "Les enfants patinent sur la glace du lac.",
+  "en": "The children skate on the ice of the lake."
+ },
+ "p3_nature_gel": {
+  "fr": "Le gel rend les fenêtres blanches en hiver.",
+  "en": "Frost makes the windows white in winter."
+ },
+ "p3_nature_canicule": {
+  "fr": "Pendant la canicule, il faut boire beaucoup d'eau.",
+  "en": "During the heat wave, you must drink lots of water."
+ },
+ "p3_nature_inondation": {
+  "fr": "L'inondation a endommagé plusieurs maisons du village.",
+  "en": "The flood damaged several houses in the village."
+ },
+ "p3_nature_secheresse": {
+  "fr": "La sécheresse rend le sol très dur et fissuré.",
+  "en": "The drought makes the ground very hard and cracked."
+ },
+ "p3_nature_foret": {
+  "fr": "Nous faisons une promenade dans la forêt chaque dimanche.",
+  "en": "We take a walk in the forest every Sunday in the forest each Sunday."
+ },
+ "p3_nature_lac": {
+  "fr": "Le lac reflète les montagnes comme un miroir.",
+  "en": "The lake reflects the mountains like a mirror."
+ },
+ "p3_nature_ile": {
+  "fr": "L'île est belle.",
+  "en": "The island is beautiful."
+ },
+ "p3_nature_plage": {
+  "fr": "La plage est chaude.",
+  "en": "The beach is hot."
+ },
+ "p3_nature_fleur": {
+  "fr": "La fleur est rouge.",
+  "en": "The flower is red."
+ },
+ "p3_nature_herbe": {
+  "fr": "L'herbe est verte.",
+  "en": "The grass is green."
+ },
+ "p3_nature_feuille": {
+  "fr": "La feuille tombe.",
+  "en": "The leaf falls."
+ },
+ "p3_nature_terre": {
+  "fr": "La terre est ronde.",
+  "en": "The earth is round."
+ },
+ "p3_nature_lune": {
+  "fr": "Je regarde la lune.",
+  "en": "I am looking at the moon."
+ },
+ "p3_nature_etoile": {
+  "fr": "L'étoile brille.",
+  "en": "The star shines."
+ },
+ "p3_nature_saison": {
+  "fr": "C'est la saison des fleurs.",
+  "en": "It's the season of flowers."
+ },
+ "p3_nature_previsions-meteo": {
+  "fr": "Je regarde les prévisions météo chaque matin.",
+  "en": "I check the weather forecast each morning."
+ },
+ "p3_nature_degre": {
+  "fr": "Il fait froid, le degré est bas.",
+  "en": "It's cold, the degree is low."
+ },
+ "p3_nature_il-gele": {
+  "fr": "Demain, il gèle encore.",
+  "en": "Tomorrow, it will freeze again."
+ },
+ "p3_expressions_pas-de-probleme": {
+  "fr": "Pas de problème, je t'attends.",
+  "en": "No problem, I'll wait for you."
+ },
+ "p3_expressions_bien-sur": {
+  "fr": "Bien sûr, tu peux venir.",
+  "en": "Of course, you can come."
+ },
+ "p3_expressions_voila-exactement": {
+  "fr": "Voilà, c'est bon.",
+  "en": "There, it's good."
+ },
+ "p3_expressions_ca-depend": {
+  "fr": "Ça dépend du temps.",
+  "en": "It depends on the weather."
+ },
+ "p3_expressions_bonne-chance": {
+  "fr": "Bonne chance pour ton examen!",
+  "en": "Good luck on your exam!"
+ },
+ "p3_expressions_felicitations": {
+  "fr": "Félicitations pour ton succès!",
+  "en": "Congratulations on your success!"
+ },
+ "p3_expressions_prends-soin-de-toi": {
+  "fr": "Prends soin de toi, tu es important.",
+  "en": "Take care of yourself, you are important."
+ },
+ "p3_expressions_a-bientot": {
+  "fr": "À bientôt, on se voit demain!",
+  "en": "See you soon, we'll see each other tomorrow!"
+ },
+ "p3_expressions_ca-marche": {
+  "fr": "Ça marche, on peut y aller.",
+  "en": "That works, we can go there."
+ },
+ "p3_expressions_ca-ne-fait-rien": {
+  "fr": "Ça ne fait rien, on peut essayer demain.",
+  "en": "It doesn't matter, we can try tomorrow."
+ },
+ "p3_expressions_jai-hate": {
+  "fr": "J'ai hâte de voir le film.",
+  "en": "I can't wait to see the film."
+ },
+ "p3_expressions_tant-mieux": {
+  "fr": "Tant mieux si tu as réussi.",
+  "en": "So much the better if you succeeded."
+ },
+ "p3_expressions_tant-pis": {
+  "fr": "Tant pis, je ne vais pas avoir de dessert.",
+  "en": "Too bad, I'm not going to have dessert."
+ },
+ "p3_expressions_de-toute-facon": {
+  "fr": "De toute façon, il faut partir maintenant.",
+  "en": "Anyway, we have to leave now."
+ },
+ "p3_expressions_tout-a-coup": {
+  "fr": "Tout à coup, il a commencé à pleuvoir.",
+  "en": "All of a sudden, it started to rain."
+ },
+ "p3_expressions_tout-de-suite": {
+  "fr": "Tout de suite, réponds à la porte.",
+  "en": "Right away, answer the door."
+ },
+ "p3_expressions_ca-vaut-la-peine": {
+  "fr": "Ça vaut la peine d'essayer ce nouveau restaurant.",
+  "en": "It's worth trying this new restaurant."
+ },
+ "p3_expressions_avoir-de-la-chance": {
+  "fr": "Je veux avoir de la chance.",
+  "en": "I want to be lucky."
+ },
+ "p3_expressions_etre-en-train-de": {
+  "fr": "Il faut être en train de réviser pour l'examen.",
+  "en": "One must be in the middle of studying for the exam."
+ },
+ "p3_expressions_venir-de": {
+  "fr": "Il faut venir de finir ses devoirs.",
+  "en": "One must have just finished homework."
+ },
+ "p3_expressions_avoir-besoin-de": {
+  "fr": "Il faut avoir besoin de repos après le travail.",
+  "en": "One must need rest after work."
+ },
+ "p3_expressions_avoir-lair": {
+  "fr": "Il semble avoir l'air fatigué.",
+  "en": "He seems to look tired."
+ },
+ "p3_expressions_faire-un-effort": {
+  "fr": "Je dois faire un effort pour réussir.",
+  "en": "I must make an effort to succeed."
+ },
+ "p3_expressions_faire-attention": {
+  "fr": "Tu dois faire attention en traversant la rue.",
+  "en": "You must pay attention when crossing the street."
+ },
+ "p3_expressions_prendre-une-decision": {
+  "fr": "Il faut prendre une décision rapidement.",
+  "en": "One must make a decision quickly."
+ },
+ "p3_expressions_avoir-raison": {
+  "fr": "Je veux avoir raison.",
+  "en": "I want to be right."
+ },
+ "p3_employment_promotion": {
+  "fr": "La promotion est annoncée demain.",
+  "en": "The promotion is announced tomorrow."
+ },
+ "p3_employment_ingenieur-e": {
+  "fr": "Mon ami est l'ingénieur(e) de l'entreprise.",
+  "en": "My friend is the engineer of the company."
+ },
+ "p3_employment_developpeur": {
+  "fr": "Le développeur travaille sur un nouveau projet.",
+  "en": "The developer works on a new project."
+ },
+ "p3_employment_la-gestionnaire": {
+  "fr": "Le/la gestionnaire organise la réunion.",
+  "en": "The manager organizes the meeting."
+ },
+ "p3_employment_avantages-sociaux": {
+  "fr": "Les avantages sociaux comprennent l'assurance santé.",
+  "en": "The benefits include health insurance."
+ },
+ "p3_employment_demission": {
+  "fr": "Elle a annoncé sa démission hier.",
+  "en": "She announced her resignation yesterday."
+ },
+ "p3_employment_marche-du-travail": {
+  "fr": "Le marché du travail est compétitif actuellement.",
+  "en": "The job market is competitive right now."
+ },
+ "p3_employment_competence": {
+  "fr": "Cette compétence est très utile.",
+  "en": "This skill is very useful."
+ },
+ "p3_employment_salaire": {
+  "fr": "le salaire est important.",
+  "en": "The salary is important."
+ },
+ "p3_employment_la-collegue": {
+  "fr": "Je travaille avec le/la collègue.",
+  "en": "I work with the colleague."
+ },
+ "p3_employment_embaucher": {
+  "fr": "Nous voulons embaucher quelqu'un.",
+  "en": "We want to hire someone."
+ },
+ "p3_employment_demissionner": {
+  "fr": "Il pense à démissionner.",
+  "en": "He is thinking about resigning."
+ },
+ "p3_employment_licencier": {
+  "fr": "Ils doivent licencier quelqu'un.",
+  "en": "They must fire someone."
+ },
+ "p3_employment_reunion": {
+  "fr": "la réunion commence à neuf heures.",
+  "en": "The meeting starts at nine o'clock."
+ },
+ "p3_employment_delai": {
+  "fr": "Nous devons respecter le délai.",
+  "en": "We must respect the deadline."
+ },
+ "p3_employment_tache": {
+  "fr": "Cette tâche est difficile.",
+  "en": "This task is difficult."
+ },
+ "p3_employment_horaire": {
+  "fr": "Je regarde l'horaire du train.",
+  "en": "I am looking at the schedule."
+ },
+ "p3_employment_a-temps-plein": {
+  "fr": "Elle travaille à temps plein.",
+  "en": "She works full-time."
+ },
+ "p3_employment_a-temps-partiel": {
+  "fr": "Il préfère travailler à temps partiel.",
+  "en": "He prefers to work part-time."
+ },
+ "p3_employment_heures-supplementaires": {
+  "fr": "Les heures supplémentaires sont payées davantage.",
+  "en": "Overtime is paid more."
+ },
+ "p3_employment_augmentation": {
+  "fr": "L'augmentation sera annoncée demain.",
+  "en": "The raise will be announced tomorrow."
+ },
+ "p3_employment_experience": {
+  "fr": "L'expérience est importante pour ce poste.",
+  "en": "Experience is important for this position."
+ },
+ "p3_employment_curriculum-vitae-le-cv": {
+  "fr": "Il a mis à jour le curriculum vitae.",
+  "en": "He updated his resume."
+ },
+ "p3_employment_lettre-de-motivation": {
+  "fr": "Elle a envoyé la lettre de motivation.",
+  "en": "She sent her cover letter."
+ },
+ "p3_employment_employeur": {
+  "fr": "L'employeur cherche un stagiaire.",
+  "en": "The employer is looking for an intern."
+ },
+ "p3_employment_employe-e": {
+  "fr": "L'employé(e) travaille à temps plein.",
+  "en": "The employee works full-time."
+ },
+ "p3_employment_stage": {
+  "fr": "Je fais le stage.",
+  "en": "I am doing the internship."
+ },
+ "p3_employment_la-stagiaire": {
+  "fr": "Le/la stagiaire apprend vite.",
+  "en": "The intern learns quickly."
+ },
+ "p3_employment_chomage": {
+  "fr": "Je regarde le chômage.",
+  "en": "I am looking at unemployment."
+ },
+ "p3_employment_offre-demploi": {
+  "fr": "Je vois l'offre d'emploi.",
+  "en": "I see the job offer."
+ },
+ "p3_employment_postuler": {
+  "fr": "Je veux postuler.",
+  "en": "I want to apply."
+ },
+ "p3_employment_candidat-la-candidate": {
+  "fr": "Le candidat / la candidate répond aux questions.",
+  "en": "The candidate answers the questions."
+ },
+ "p3_employment_poste": {
+  "fr": "J'aime mon poste.",
+  "en": "I like my job."
+ },
+ "p3_employment_carriere": {
+  "fr": "Elle rêve d'une belle carrière.",
+  "en": "She dreams of a beautiful career."
+ },
+ "p3_employment_travail-dequipe": {
+  "fr": "Le travail d'équipe est important.",
+  "en": "Teamwork is important."
+ },
+ "p3_employment_patron-la-patronne": {
+  "fr": "Le patron nous écoute.",
+  "en": "The boss listens to us."
+ },
+ "p3_employment_service": {
+  "fr": "Je travaille dans le service.",
+  "en": "I work in the department."
+ },
+ "p3_employment_ressources-humaines": {
+  "fr": "Les ressources humaines aident les employés.",
+  "en": "Human resources help the employees."
+ },
+ "p3_employment_fiche-de-paie": {
+  "fr": "Je vérifie ma fiche de paie chaque mois.",
+  "en": "I check my pay slip each month."
+ },
+ "p3_employment_conge": {
+  "fr": "Je prends un congé la semaine prochaine.",
+  "en": "I am taking leave next week."
+ },
+ "p3_employment_conge-de-maladie": {
+  "fr": "Il prend le congé de maladie.",
+  "en": "He takes sick leave."
+ },
+ "p3_employment_conge-parental": {
+  "fr": "Elle prend le congé parental.",
+  "en": "She takes parental leave."
+ },
+ "p3_employment_retraite": {
+  "fr": "Il pense à la retraite.",
+  "en": "He thinks about retirement."
+ },
+ "p3_employment_prendre-sa-retraite": {
+  "fr": "Il veut prendre sa retraite.",
+  "en": "He wants to retire."
+ },
+ "p3_employment_syndicat": {
+  "fr": "Il travaille dans le syndicat.",
+  "en": "He works in the union."
+ },
+ "p3_employment_greve": {
+  "fr": "Ils font la grève.",
+  "en": "They are on strike."
+ },
+ "p3_employment_lieu-de-travail": {
+  "fr": "Il aime le lieu de travail.",
+  "en": "He likes the workplace."
+ },
+ "p3_employment_conditions-de-travail": {
+  "fr": "Ils améliorent les conditions de travail.",
+  "en": "They improve working conditions."
+ },
+ "p3_employment_periode-dessai": {
+  "fr": "Nous parlons de la période d'essai.",
+  "en": "We are talking about the probation period."
+ },
+ "p3_employment_preavis": {
+  "fr": "Il faut respecter le préavis.",
+  "en": "One must respect the notice period."
+ },
+ "p3_immigration_residence-permanente": {
+  "fr": "Elle a obtenu la résidence permanente.",
+  "en": "She obtained permanent residence."
+ },
+ "p3_immigration_citoyennete": {
+  "fr": "Nous discutons de la citoyenneté.",
+  "en": "We are discussing citizenship."
+ },
+ "p3_immigration_demande": {
+  "fr": "Elle a soumis la demande.",
+  "en": "She submitted the application."
+ },
+ "p3_immigration_documents": {
+  "fr": "Veuillez fournir les documents.",
+  "en": "Please provide the documents."
+ },
+ "p3_immigration_visa": {
+  "fr": "Nous attendons le visa.",
+  "en": "We are waiting for the visa."
+ },
+ "p3_immigration_admissibilite": {
+  "fr": "L'admissibilité dépend de plusieurs facteurs.",
+  "en": "Eligibility depends on several factors."
+ },
+ "p3_immigration_statut": {
+  "fr": "C'est le statut.",
+  "en": "It's the status."
+ },
+ "p3_immigration_parrainage": {
+  "fr": "C'est le parrainage.",
+  "en": "It's the sponsorship."
+ },
+ "p3_immigration_immigrant-e": {
+  "fr": "C'est l'immigrant(e).",
+  "en": "It's the immigrant."
+ },
+ "p3_immigration_passeport": {
+  "fr": "C'est le passeport.",
+  "en": "It's the passport."
+ },
+ "p3_immigration_permis-de-travail": {
+  "fr": "C'est le permis de travail.",
+  "en": "It's the work permit."
+ },
+ "p3_immigration_permis-detudes": {
+  "fr": "C'est le permis d'études.",
+  "en": "It's the study permit."
+ },
+ "p3_immigration_refugie-la-refugiee": {
+  "fr": "C'est le réfugié / la réfugiée.",
+  "en": "It's the refugee."
+ },
+ "p3_immigration_asile": {
+  "fr": "C'est l'asile.",
+  "en": "It's the asylum."
+ },
+ "p3_immigration_maitrise-de-la-langue": {
+  "fr": "La maîtrise de la langue est importante.",
+  "en": "Language proficiency is important."
+ },
+ "p3_immigration_delai-de-traitement": {
+  "fr": "Le délai de traitement peut varier.",
+  "en": "Processing time may vary."
+ },
+ "p3_immigration_donnees-biometriques": {
+  "fr": "Les données biométriques sont requises.",
+  "en": "Biometrics are required."
+ },
+ "p3_immigration_visite-medicale": {
+  "fr": "La visite médicale doit être faite.",
+  "en": "The medical exam must be done."
+ },
+ "p3_immigration_certificat-de-police": {
+  "fr": "Le certificat de police est nécessaire.",
+  "en": "The police certificate is necessary."
+ },
+ "p3_immigration_preuve-de-fonds": {
+  "fr": "La preuve de fonds doit être fournie.",
+  "en": "Proof of funds must be provided."
+ },
+ "p3_immigration_entree-express": {
+  "fr": "L'entrée express accélère le processus.",
+  "en": "Express entry speeds up the process."
+ },
+ "p3_immigration_systeme-de-points": {
+  "fr": "Le système de points évalue les candidats.",
+  "en": "The points system evaluates candidates."
+ },
+ "p3_immigration_invitation-a-presenter-une": {
+  "fr": "Je vois l'invitation à présenter une demande sur le bureau.",
+  "en": "I see the invitation to apply on the desk."
+ },
+ "p3_immigration_candidat-des-provinces": {
+  "fr": "Nous connaissons le candidat des provinces qui vient d'arriver.",
+  "en": "We know the provincial nominee who just arrived."
+ },
+ "p3_immigration_ceremonie-de-citoyennete": {
+  "fr": "La cérémonie de citoyenneté aura lieu demain matin.",
+  "en": "The citizenship ceremony will take place tomorrow morning."
+ },
+ "p3_immigration_serment": {
+  "fr": "Le serment est pris devant le juge.",
+  "en": "The oath is taken before the judge."
+ },
+ "p3_immigration_acte-de-naissance": {
+  "fr": "L'acte de naissance est requis pour l'inscription.",
+  "en": "The birth certificate is required for registration."
+ },
+ "p3_immigration_acte-de-mariage": {
+  "fr": "L'acte de mariage doit être traduit.",
+  "en": "The marriage certificate must be translated."
+ },
+ "p3_immigration_traduction": {
+  "fr": "La traduction est prête à être remise.",
+  "en": "The translation is ready to be handed over."
+ },
+ "p3_immigration_copie-certifiee": {
+  "fr": "La copie certifiée sera acceptée par l'administration.",
+  "en": "The certified copy will be accepted by the administration."
+ },
+ "p3_immigration_formulaire-de-demande": {
+  "fr": "Je remplis le formulaire de demande.",
+  "en": "I fill out the application form."
+ },
+ "p3_immigration_frais": {
+  "fr": "Les frais sont élevés.",
+  "en": "The fees are high."
+ },
+ "p3_immigration_renouveler": {
+  "fr": "Je veux renouveler mon permis.",
+  "en": "I want to renew my permit."
+ },
+ "p3_immigration_date-dexpiration": {
+  "fr": "La date d'expiration est demain.",
+  "en": "The expiry date is tomorrow."
+ },
+ "p3_immigration_resident-temporaire": {
+  "fr": "Le résident temporaire doit présenter ses papiers.",
+  "en": "The temporary resident must present his/her documents."
+ },
+ "p3_government_gouvernement": {
+  "fr": "Le gouvernement annonce de nouvelles mesures.",
+  "en": "The government announces new measures."
+ },
+ "p3_government_politique": {
+  "fr": "La politique d'immigration est claire.",
+  "en": "The immigration policy is clear."
+ },
+ "p3_government_ministre": {
+  "fr": "Le ministre répond aux questions.",
+  "en": "The minister answers the questions."
+ },
+ "p3_government_loi": {
+  "fr": "Je respecte la loi.",
+  "en": "I respect the law."
+ },
+ "p3_government_province": {
+  "fr": "La province a ses propres lois.",
+  "en": "The province has its own laws."
+ },
+ "p3_government_federal-e": {
+  "fr": "Le gouvernement fédéral travaille à Ottawa.",
+  "en": "The federal government works in Ottawa."
+ },
+ "p3_government_provincial-e": {
+  "fr": "Chaque province a un gouvernement provincial.",
+  "en": "Each province has a provincial government."
+ },
+ "p3_government_municipal-e": {
+  "fr": "Le conseil municipal décide du budget.",
+  "en": "The municipal council decides the budget."
+ },
+ "p3_government_maire": {
+  "fr": "Le maire préside la réunion.",
+  "en": "The mayor chairs the meeting."
+ },
+ "p3_government_tribunal": {
+  "fr": "Le tribunal rend une décision.",
+  "en": "The court renders a decision."
+ },
+ "p3_government_juge": {
+  "fr": "Le juge écoute les témoins.",
+  "en": "The judge listens to the witnesses."
+ },
+ "p3_government_avocat-e": {
+  "fr": "L'avocat défend son client.",
+  "en": "The lawyer defends his/her client."
+ },
+ "p3_government_justice": {
+  "fr": "La justice est bonne.",
+  "en": "Justice is good."
+ },
+ "p3_government_regle": {
+  "fr": "La règle est claire.",
+  "en": "The rule is clear."
+ },
+ "p3_government_devoir": {
+  "fr": "Le devoir est important.",
+  "en": "Duty is important."
+ },
+ "p3_government_liberte": {
+  "fr": "La liberté est belle.",
+  "en": "Freedom is beautiful."
+ },
+ "p3_government_egalite": {
+  "fr": "L'égalité est juste.",
+  "en": "Equality is just."
+ },
+ "p3_government_democratie": {
+  "fr": "La démocratie est bonne.",
+  "en": "Democracy is good."
+ },
+ "p3_government_constitution": {
+  "fr": "La constitution est importante.",
+  "en": "The constitution is important."
+ },
+ "p3_government_parti-politique": {
+  "fr": "Le parti politique est nouveau.",
+  "en": "The political party is new."
+ },
+ "p3_government_voter": {
+  "fr": "Je veux voter.",
+  "en": "I want to vote."
+ },
+ "p3_government_campagne": {
+  "fr": "La campagne est longue.",
+  "en": "The campaign is long."
+ },
+ "p3_government_debat": {
+  "fr": "Le débat est intéressant.",
+  "en": "The debate is interesting."
+ },
+ "p3_government_services-publics": {
+  "fr": "Les services publics sont utiles.",
+  "en": "Public services are useful."
+ },
+ "p3_government_contribuable": {
+  "fr": "Le contribuable vote.",
+  "en": "The taxpayer votes."
+ },
+ "p3_government_reglement": {
+  "fr": "Le règlement est clair.",
+  "en": "The regulation is clear."
+ },
+ "p3_finance_entreprise": {
+  "fr": "L'entreprise embauche des travailleurs.",
+  "en": "The company hires workers."
+ },
+ "p3_finance_budget": {
+  "fr": "Le budget est limité.",
+  "en": "The budget is limited."
+ },
+ "p3_finance_investissement": {
+  "fr": "Je pense à l'investissement.",
+  "en": "I am thinking about the investment."
+ },
+ "p3_finance_benefice": {
+  "fr": "Le bénéfice de l'entreprise est bon.",
+  "en": "The company's profit is good."
+ },
+ "p3_finance_perte": {
+  "fr": "La perte est importante.",
+  "en": "The loss is significant."
+ },
+ "p3_finance_marche": {
+  "fr": "Le marché est ouvert.",
+  "en": "The market is open."
+ },
+ "p3_finance_concurrence": {
+  "fr": "La concurrence est forte.",
+  "en": "The competition is strong."
+ },
+ "p3_finance_impots": {
+  "fr": "Les impôts sont élevés.",
+  "en": "The taxes are high."
+ },
+ "p3_finance_economie": {
+  "fr": "L'économie se développe.",
+  "en": "The economy is developing."
+ },
+ "p3_finance_compte-bancaire": {
+  "fr": "J'ai ouvert le compte bancaire.",
+  "en": "I have opened the bank account."
+ },
+ "p3_finance_epargne": {
+  "fr": "Je fais de l'épargne chaque mois.",
+  "en": "I save money each month."
+ },
+ "p3_finance_pret": {
+  "fr": "Je paie le prêt chaque mois.",
+  "en": "I pay the loan each month."
+ },
+ "p3_finance_hypotheque": {
+  "fr": "Elle a l'hypothèque de sa maison.",
+  "en": "She has the mortgage on her house."
+ },
+ "p3_finance_dette": {
+  "fr": "La dette du pays augmente.",
+  "en": "The country's debt is increasing."
+ },
+ "p3_finance_taux-dinteret": {
+  "fr": "Le taux d'intérêt est bas cette année.",
+  "en": "The interest rate is low this year."
+ },
+ "p3_finance_carte-de-credit": {
+  "fr": "La carte de crédit est pratique.",
+  "en": "The credit card is convenient."
+ },
+ "p3_finance_depense": {
+  "fr": "Cette dépense était nécessaire.",
+  "en": "This expense was necessary."
+ },
+ "p3_finance_revenu": {
+  "fr": "Le revenu du ménage a augmenté.",
+  "en": "The household's income has increased."
+ },
+ "p3_finance_facture": {
+  "fr": "Je regarde la facture.",
+  "en": "I look at the bill."
+ },
+ "p3_finance_recu": {
+  "fr": "Je garde le reçu.",
+  "en": "I keep the receipt."
+ },
+ "p3_finance_depenser": {
+  "fr": "Je veux dépenser moins.",
+  "en": "I want to spend less."
+ },
+ "p3_finance_economiser": {
+  "fr": "Je dois économiser chaque mois.",
+  "en": "I must save each month."
+ },
+ "p3_finance_emprunter": {
+  "fr": "Tu peux emprunter mon vélo.",
+  "en": "You can borrow my bike."
+ },
+ "p3_finance_preter": {
+  "fr": "Je peux prêter mon stylo.",
+  "en": "I can lend my pen."
+ },
+ "p3_finance_investir": {
+  "fr": "Ils veulent investir dans l'immobilier.",
+  "en": "They want to invest in real estate."
+ },
+ "p3_finance_inflation": {
+  "fr": "L'inflation augmente rapidement.",
+  "en": "Inflation is rising quickly."
+ },
+ "p3_finance_croissance": {
+  "fr": "La croissance est bonne.",
+  "en": "Growth is good."
+ },
+ "p3_finance_crise": {
+  "fr": "La crise est difficile.",
+  "en": "The crisis is difficult."
+ },
+ "p3_finance_client-la-cliente": {
+  "fr": "Le client / la cliente est présent.",
+  "en": "The customer is present."
+ },
+ "p3_finance_fournisseur": {
+  "fr": "Le fournisseur travaille.",
+  "en": "The supplier works."
+ },
+ "p3_finance_ventes": {
+  "fr": "Les ventes augmentent.",
+  "en": "Sales increase."
+ },
+ "p3_finance_achat": {
+  "fr": "L'achat est facile.",
+  "en": "The purchase is easy."
+ },
+ "p3_finance_assurance": {
+  "fr": "L'assurance protège.",
+  "en": "Insurance protects."
+ },
+ "p3_finance_cout-de-la-vie": {
+  "fr": "Le coût de la vie est élevé.",
+  "en": "The cost of living is high."
+ },
+ "p3_finance_devise": {
+  "fr": "C'est la devise du pays.",
+  "en": "It is the country's currency."
+ },
+ "p3_finance_taux-de-change": {
+  "fr": "C'est le taux de change aujourd'hui.",
+  "en": "It is the exchange rate today."
+ },
+ "p3_finance_virement": {
+  "fr": "C'est le virement bancaire.",
+  "en": "It is the bank transfer."
+ },
+ "p3_finance_retrait": {
+  "fr": "C'est le retrait d'argent.",
+  "en": "It is the withdrawal of money."
+ },
+ "p3_finance_depot": {
+  "fr": "C'est le dépôt de chèque.",
+  "en": "It is the deposit of a check."
+ },
+ "p3_technology_securite": {
+  "fr": "C'est la sécurité importante.",
+  "en": "It is important security."
+ },
+ "p3_technology_nuage-cloud": {
+  "fr": "C'est le nuage / cloud.",
+  "en": "It is the cloud."
+ },
+ "p3_technology_serveur": {
+  "fr": "C'est le serveur.",
+  "en": "It is the server."
+ },
+ "p3_technology_base-de-donnees": {
+  "fr": "J'utilise la base de données.",
+  "en": "I use the database."
+ },
+ "p3_technology_algorithme": {
+  "fr": "L'algorithme est rapide.",
+  "en": "The algorithm is fast."
+ },
+ "p3_technology_intelligence-artificielle": {
+  "fr": "L'intelligence artificielle aide les humains.",
+  "en": "Artificial intelligence helps humans."
+ },
+ "p3_technology_apprentissage-automatique": {
+  "fr": "L'apprentissage automatique nécessite des données.",
+  "en": "Machine learning requires data."
+ },
+ "p3_technology_code": {
+  "fr": "J'écris le code chaque jour.",
+  "en": "I write the code every day."
+ },
+ "p3_technology_developpement": {
+  "fr": "Le développement prend du temps.",
+  "en": "Development takes time."
+ },
+ "p3_technology_logiciel": {
+  "fr": "J'aime le logiciel.",
+  "en": "I like the software."
+ },
+ "p3_technology_application": {
+  "fr": "J'utilise l'application sur mon téléphone.",
+  "en": "I use the application on my phone."
+ },
+ "p3_technology_reseau": {
+  "fr": "J'aime le réseau.",
+  "en": "I like the network."
+ },
+ "p3_technology_ordinateur": {
+  "fr": "Je regarde l'ordinateur.",
+  "en": "I look at the computer."
+ },
+ "p3_technology_ordinateur-portable": {
+  "fr": "J'utilise l'ordinateur portable.",
+  "en": "I use the laptop."
+ },
+ "p3_technology_ecran": {
+  "fr": "Je regarde l'écran.",
+  "en": "I look at the screen."
+ },
+ "p3_technology_clavier": {
+  "fr": "Je tape sur le clavier.",
+  "en": "I type on the keyboard."
+ },
+ "p3_technology_fichier": {
+  "fr": "J'ouvre le fichier.",
+  "en": "I open the file."
+ },
+ "p3_technology_dossier": {
+  "fr": "Je mets le dossier ici.",
+  "en": "I put the folder here."
+ },
+ "p3_technology_mot-de-passe": {
+  "fr": "Je dois entrer le mot de passe.",
+  "en": "I need to enter the password."
+ },
+ "p3_technology_utilisateur": {
+  "fr": "Je demande à l'utilisateur de vérifier.",
+  "en": "I ask the user to check."
+ },
+ "p3_technology_donnees": {
+  "fr": "Nous analysons les données chaque jour.",
+  "en": "We analyze the data each day."
+ },
+ "p3_technology_site-web": {
+  "fr": "J'aime visiter le site web chaque matin.",
+  "en": "I like to visit the website each morning."
+ },
+ "p3_technology_courriel": {
+  "fr": "Il a reçu le courriel hier.",
+  "en": "He received the email yesterday."
+ },
+ "p3_technology_telecharger": {
+  "fr": "Je veux télécharger la musique.",
+  "en": "I want to download the music."
+ },
+ "p3_technology_televerser": {
+  "fr": "Tu peux téléverser les photos.",
+  "en": "You can upload the photos."
+ },
+ "p3_technology_mise-a-jour": {
+  "fr": "La mise à jour corrige les erreurs.",
+  "en": "The update fixes the errors."
+ },
+ "p3_technology_mettre-a-jour": {
+  "fr": "Il faut mettre à jour le système.",
+  "en": "One must update the system."
+ },
+ "p3_technology_se-connecter": {
+  "fr": "Se connecter est facile.",
+  "en": "Logging in is easy."
+ },
+ "p3_technology_se-deconnecter": {
+  "fr": "Se déconnecter prend du temps.",
+  "en": "Logging out takes time."
+ },
+ "p3_technology_parametres": {
+  "fr": "Les paramètres sont ici.",
+  "en": "The settings are here."
+ },
+ "p3_technology_confidentialite": {
+  "fr": "La confidentialité est importante.",
+  "en": "Confidentiality is important."
+ },
+ "p3_technology_cybersecurite": {
+  "fr": "La cybersécurité protège les données.",
+  "en": "Cybersecurity protects data."
+ },
+ "p3_technology_piratage": {
+  "fr": "Le piratage est dangereux.",
+  "en": "Hacking is dangerous."
+ },
+ "p3_technology_outil": {
+  "fr": "L'outil est utile.",
+  "en": "The tool is useful."
+ },
+ "p3_technology_numerique": {
+  "fr": "Ce document est numérique.",
+  "en": "This document is digital."
+ },
+ "p3_technology_innovation": {
+  "fr": "L'innovation est importante pour l'avenir.",
+  "en": "Innovation is important for the future."
+ },
+ "p3_environment_environnement": {
+  "fr": "Nous devons protéger l'environnement.",
+  "en": "We must protect the environment."
+ },
+ "p3_environment_climat": {
+  "fr": "Le climat change rapidement.",
+  "en": "The climate is changing quickly."
+ },
+ "p3_environment_pollution": {
+  "fr": "La pollution nuit à la santé.",
+  "en": "Pollution harms health."
+ },
+ "p3_environment_developpement-durable": {
+  "fr": "Le développement durable est nécessaire pour notre planète.",
+  "en": "Sustainable development is necessary for our planet."
+ },
+ "p3_environment_ressources-naturelles": {
+  "fr": "Nous devons préserver les ressources naturelles.",
+  "en": "We must preserve natural resources."
+ },
+ "p3_environment_changement-climatique": {
+  "fr": "Le changement climatique est un défi majeur pour la planète.",
+  "en": "Climate change is a major challenge for the planet."
+ },
+ "p3_environment_rechauffement-climatique": {
+  "fr": "Le réchauffement climatique provoque la fonte des glaces.",
+  "en": "Global warming causes the melting of ice."
+ },
+ "p3_environment_gaz-a-effet-de": {
+  "fr": "Le gaz à effet de serre le plus connu est le dioxyde de carbone.",
+  "en": "The most well-known greenhouse gas is carbon dioxide."
+ },
+ "p3_environment_empreinte-carbone": {
+  "fr": "Réduire l'empreinte carbone aide à lutter contre le changement climatique.",
+  "en": "Reducing the carbon footprint helps fight climate change."
+ },
+ "p3_environment_dechets": {
+  "fr": "Nous devons trier les déchets pour mieux recycler.",
+  "en": "We must sort waste to recycle better."
+ },
+ "p3_environment_recycler": {
+  "fr": "Je veux recycler le papier et le plastique.",
+  "en": "I want to recycle paper and plastic."
+ },
+ "p3_environment_gaspiller": {
+  "fr": "Il ne faut pas gaspiller l'eau potable.",
+  "en": "One must not waste drinking water."
+ },
+ "p3_environment_gaspillage": {
+  "fr": "Le gaspillage d'énergie augmente les factures.",
+  "en": "Wasting energy increases bills."
+ },
+ "p3_environment_proteger": {
+  "fr": "Je veux protéger la planète.",
+  "en": "I want to protect the planet."
+ },
+ "p3_environment_protection": {
+  "fr": "La protection de la nature est importante.",
+  "en": "The protection of nature is important."
+ },
+ "p3_environment_polluer": {
+  "fr": "Il faut éviter de polluer l'air.",
+  "en": "We must avoid polluting the air."
+ },
+ "p3_environment_deforestation": {
+  "fr": "La déforestation détruit les forêts.",
+  "en": "Deforestation destroys forests."
+ },
+ "p3_environment_biodiversite": {
+  "fr": "Nous devons protéger la biodiversité.",
+  "en": "We must protect biodiversity."
+ },
+ "p3_environment_espece": {
+  "fr": "Cette espèce est menacée.",
+  "en": "This species is threatened."
+ },
+ "p3_environment_en-voie-de-disparition": {
+  "fr": "Le panda est en voie de disparition.",
+  "en": "The panda is endangered."
+ },
+ "p3_environment_energie-solaire": {
+  "fr": "L'énergie solaire est renouvelable.",
+  "en": "Solar energy is renewable."
+ },
+ "p3_hobbies_musique": {
+  "fr": "J'aime écouter la musique.",
+  "en": "I like listening to music."
+ },
+ "p3_hobbies_jeu": {
+  "fr": "J'aime le jeu.",
+  "en": "I like the game."
+ },
+ "p3_hobbies_marcher": {
+  "fr": "Je veux marcher.",
+  "en": "I want to walk."
+ },
+ "p3_hobbies_equipe": {
+  "fr": "Notre équipe gagne.",
+  "en": "Our team wins."
+ },
+ "p3_nature_montagne": {
+  "fr": "Nous voyons la montagne.",
+  "en": "We see the mountain."
+ },
+ "p3_nature_riviere": {
+  "fr": "Le bateau est sur la rivière.",
+  "en": "The boat is on the river."
+ },
+ "p3_nature_tempete": {
+  "fr": "Il y a une tempête.",
+  "en": "There is a storm."
+ },
+ "p3_nature_orage": {
+  "fr": "Nous entendons l'orage.",
+  "en": "We hear the thunderstorm."
+ },
+ "p1_pronouns_basics_leur": {
+  "fr": "C'est leur livre.",
+  "en": "It's their book."
+ },
+ "p1_pronouns_basics_aussi": {
+  "fr": "Je veux aussi venir.",
+  "en": "I also want to come."
+ },
+ "p1_pronouns_basics_ne-pas": {
+  "fr": "Je ne sais pas.",
+  "en": "I don't know."
+ },
+ "p1_pronouns_basics_il-y-a": {
+  "fr": "Il y a un chat.",
+  "en": "There is a cat."
+ },
+ "p1_greetings_au-revoir": {
+  "fr": "Au revoir, à demain!",
+  "en": "Goodbye, see you tomorrow!"
+ },
+ "p1_greetings_merci": {
+  "fr": "Merci beaucoup!",
+  "en": "Thank you very much!"
+ },
+ "p1_greetings_sil-vous-plait": {
+  "fr": "S'il vous plaît, asseyez-vous.",
+  "en": "Please, sit down."
+ },
+ "p1_greetings_sil-te-plait": {
+  "fr": "S'il te plaît, passe le sel.",
+  "en": "Please, pass the salt."
+ },
+ "p1_greetings_excusez-moi": {
+  "fr": "Excusez-moi, s'il vous plaît.",
+  "en": "Excuse me, please."
+ },
+ "p1_greetings_comment-allez-vous": {
+  "fr": "Comment allez-vous ?",
+  "en": "How are you? (formal)"
+ },
+ "p1_greetings_ca-va": {
+  "fr": "Ça va ?",
+  "en": "How's it going? (informal)"
+ },
+ "p1_family_people_le-nom": {
+  "fr": "Je ne connais pas le nom.",
+  "en": "I don't know the name."
+ },
+ "p1_food_shopping_le-pain": {
+  "fr": "Le pain est bon.",
+  "en": "The bread is good."
+ },
+ "p1_food_shopping_leau": {
+  "fr": "L'eau est froide.",
+  "en": "The water is cold."
+ },
+ "p1_food_shopping_le-lait": {
+  "fr": "Le lait est blanc.",
+  "en": "The milk is white."
+ },
+ "p1_food_shopping_la-viande": {
+  "fr": "La viande est chère.",
+  "en": "The meat is expensive."
+ },
+ "p2_travel_hotel": {
+  "fr": "Nous restons à l'hôtel près de la plage.",
+  "en": "We are staying at the hotel near the beach."
+ },
+ "p2_travel_passeport": {
+  "fr": "Tu dois montrer le passeport à l'agent.",
+  "en": "You must show the passport to the agent."
+ },
+ "p2_travel_reservation": {
+  "fr": "J'ai confirmé la réservation en ligne.",
+  "en": "I confirmed the reservation online."
+ },
+ "p2_travel_valise": {
+  "fr": "Elle a oublié la valise dans le taxi.",
+  "en": "She forgot the suitcase in the taxi."
+ },
+ "p3_adverbs_ailleurs": {
+  "fr": "Il veut vivre ailleurs l'année prochaine.",
+  "en": "He wants to live elsewhere next year."
+ },
+ "p3_adverbs_probablement": {
+  "fr": "Il sera probablement en retard.",
+  "en": "He will probably be late."
+ },
+ "p3_emotions_enthousiaste": {
+  "fr": "Elle est enthousiaste à propos du voyage.",
+  "en": "She is enthusiastic about the trip."
+ },
+ "p3_emotions_nerveux-nerveuse": {
+  "fr": "Il se sent nerveux/nerveuse avant l'entretien.",
+  "en": "He feels nervous before the interview."
+ },
+ "p3_expressions_au-fait-a-propos": {
+  "fr": "au fait / à propos, as-tu fini tes devoirs ?",
+  "en": "By the way, have you finished your homework?"
+ },
+ "p3_expressions_bref": {
+  "fr": "bref, on partira demain.",
+  "en": "In short, we will leave tomorrow."
+ },
+ "p3_expressions_ne-ten-fais-pas": {
+  "fr": "ne t'en fais pas, tout va bien.",
+  "en": "Don't worry, everything is fine."
+ },
+ "p3_expressions_avoir-tort": {
+  "fr": "Il faut éviter d'avoir tort.",
+  "en": "One must avoid being wrong."
+ },
+ "p3_expressions_sentendre-bien": {
+  "fr": "Ils veulent s'entendre bien.",
+  "en": "They want to get along well."
+ },
+ "p3_expressions_shabituer-a": {
+  "fr": "Il faut s'habituer à la nouvelle école.",
+  "en": "One must get used to the new school."
+ },
+ "p3_expressions_ca-va-de-soi": {
+  "fr": "C'est évident, ça va de soi.",
+  "en": "It's obvious, that goes without saying."
+ },
+ "p3_expressions_ce-nest-pas-grave": {
+  "fr": "Ce n'est pas grave, on peut essayer encore.",
+  "en": "It's not a big deal, we can try again."
+ },
+ "p3_employment_gagner-sa-vie": {
+  "fr": "Il faut gagner sa vie.",
+  "en": "One must earn a living."
+ },
+ "p3_employment_qualifications": {
+  "fr": "Il a les qualifications nécessaires.",
+  "en": "He has the necessary qualifications."
+ },
+ "p3_immigration_frontiere": {
+  "fr": "Nous avons traversé la frontière.",
+  "en": "We crossed the border."
+ },
+ "p3_immigration_douane": {
+  "fr": "Ils passent par la douane.",
+  "en": "They go through customs."
+ },
+ "p3_immigration_agent-dimmigration": {
+  "fr": "L'agent d'immigration vérifie les papiers.",
+  "en": "The immigration officer checks the documents."
+ },
+ "p3_immigration_immigrer": {
+  "fr": "Je veux immigrer au Canada.",
+  "en": "I want to immigrate to Canada."
+ },
+ "p3_immigration_sinstaller": {
+  "fr": "Ils vont s'installer à Montréal.",
+  "en": "They are going to settle in Montreal."
+ },
+ "p3_immigration_nouvel-arrivant": {
+  "fr": "Le nouvel arrivant cherche un travail.",
+  "en": "The newcomer is looking for a job."
+ },
+ "p3_environment_plastique": {
+  "fr": "Je vois le plastique.",
+  "en": "I see the plastic."
+ },
+ "p3_environment_compost": {
+  "fr": "Je mets le compost.",
+  "en": "I put the compost."
+ },
+ "p3_media_medias": {
+  "fr": "Je regarde les médias.",
+  "en": "I watch the media."
+ },
+ "p3_media_article": {
+  "fr": "Je lis l'article.",
+  "en": "I read the article."
+ },
+ "p3_media_point-de-vue": {
+  "fr": "Quel est ton point de vue?",
+  "en": "What is your point of view?"
+ },
+ "p3_media_nouvelle": {
+  "fr": "J'aime la nouvelle.",
+  "en": "I like the news."
+ },
+ "p3_media_journal": {
+  "fr": "Je lis le journal.",
+  "en": "I read the newspaper."
+ },
+ "p3_media_la-journaliste": {
+  "fr": "C'est le/la journaliste.",
+  "en": "That is the journalist."
+ },
+ "p3_immigration_integration": {
+  "fr": "Nous parlons de l'intégration des nouveaux arrivants.",
+  "en": "We talk about the integration of newcomers."
+ },
+ "p3_immigration_test-de-langue": {
+  "fr": "Elle doit passer le test de langue pour obtenir la citoyenneté.",
+  "en": "She must take the language test to obtain citizenship."
+ },
+ "p3_government_election": {
+  "fr": "Nous attendons les résultats de l'élection.",
+  "en": "We are waiting for the election results."
+ },
+ "p3_government_citoyen": {
+  "fr": "Le citoyen doit respecter les lois.",
+  "en": "The citizen must obey the laws."
+ },
+ "p3_government_vote": {
+  "fr": "Le vote aura lieu demain.",
+  "en": "The vote will take place tomorrow."
+ },
+ "p3_government_droit": {
+  "fr": "Le droit de manifester est protégé.",
+  "en": "The right to protest is protected."
+ },
+ "p3_government_premier-ministre": {
+  "fr": "Le premier ministre a annoncé de nouvelles mesures.",
+  "en": "The prime minister announced new measures."
+ },
+ "p3_government_depute": {
+  "fr": "Le député a posé une question au gouvernement.",
+  "en": "The member of parliament asked a question to the government."
+ },
+ "p3_government_parlement": {
+  "fr": "Le parlement débat aujourd'hui.",
+  "en": "Parliament is debating today."
+ },
+ "p3_environment_recyclage": {
+  "fr": "Le recyclage réduit les déchets.",
+  "en": "Recycling reduces waste."
+ },
+ "p3_environment_energies-renouvelables": {
+  "fr": "Les énergies renouvelables sont importantes.",
+  "en": "Renewable energies are important."
+ },
+ "p3_environment_energie-eolienne": {
+  "fr": "L'énergie éolienne est propre.",
+  "en": "Wind energy is clean."
+ },
+ "p3_environment_voiture-electrique": {
+  "fr": "La voiture électrique est silencieuse.",
+  "en": "The electric car is quiet."
+ },
+ "p3_environment_transports-en-commun": {
+  "fr": "Les transports en commun sont pratiques.",
+  "en": "Public transit is convenient."
+ },
+ "p3_environment_consommation": {
+  "fr": "La consommation d'énergie doit être réduite.",
+  "en": "Energy consumption must be reduced."
+ },
+ "p3_media_titre": {
+  "fr": "C'est le titre du journal.",
+  "en": "It's the headline of the newspaper."
+ },
+ "p3_media_reportage": {
+  "fr": "J'ai écouté l'entrevue à la radio.",
+  "en": "I listened to the interview on the radio."
+ },
+ "p3_media_entrevue": {
+  "fr": "Cette émission est très populaire.",
+  "en": "This show is very popular."
+ },
+ "p3_media_emission": {
+  "fr": "Je regarde la chaîne chaque soir.",
+  "en": "I watch the channel every evening."
+ },
+ "p3_media_chaine": {
+  "fr": "La publicité interrompt le film.",
+  "en": "The advertisement interrupts the film."
+ },
+ "p3_media_publicite": {
+  "fr": "On partage des photos sur les réseaux sociaux.",
+  "en": "We share photos on social media."
+ },
+ "p3_media_reseaux-sociaux": {
+  "fr": "Il faut vérifier les fausses nouvelles avant de les partager.",
+  "en": "One must check fake news before sharing them."
+ },
+ "p3_media_source": {
+  "fr": "Je veux trouver la source.",
+  "en": "I want to find the source."
+ },
+ "p3_media_information": {
+  "fr": "Je veux obtenir l'information.",
+  "en": "I want to obtain the information."
+ },
+ "p3_media_actualite": {
+  "fr": "Je veux suivre l'actualité.",
+  "en": "I want to follow current events."
+ },
+ "p3_media_presse": {
+  "fr": "Je veux lire la presse.",
+  "en": "I want to read the press."
+ },
+ "p3_media_liberte-de-la-presse": {
+  "fr": "Je soutiens la liberté de la presse.",
+  "en": "I support freedom of the press."
+ },
+ "p3_media_public": {
+  "fr": "Le public écoute.",
+  "en": "The public listens."
+ },
+ "p3_media_influence": {
+  "fr": "L'influence est grande.",
+  "en": "The influence is great."
+ },
+ "p3_media_informer": {
+  "fr": "Je veux informer le public.",
+  "en": "I want to inform the public."
+ },
+ "p1_food_shopping_les-legumes": {
+  "fr": "Je mange les légumes chaque jour.",
+  "en": "I eat vegetables every day."
+ },
+ "p1_food_shopping_les-fruits": {
+  "fr": "Elle aime les fruits.",
+  "en": "She likes fruits."
+ },
+ "p1_food_shopping_le-fromage": {
+  "fr": "Je veux le fromage.",
+  "en": "I want the cheese."
+ },
+ "p1_home_colors_weather_le-jardin": {
+  "fr": "Nous allons dans le jardin.",
+  "en": "We go to the garden."
+ },
+ "p1_home_colors_weather_tout-droit": {
+  "fr": "Continue tout droit.",
+  "en": "Go straight ahead."
+ },
+ "p1_home_colors_weather_pres": {
+  "fr": "L'école est près de chez moi.",
+  "en": "The school is near my house."
+ },
+ "p1_home_colors_weather_loin": {
+  "fr": "La gare est loin du centre.",
+  "en": "The station is far from the center."
+ },
+ "p2_travel_voyage": {
+  "fr": "J'aime le voyage.",
+  "en": "I like the trip."
+ },
+ "p3_emotions_jaloux-jalouse": {
+  "fr": "Il est jaloux de son nouveau travail.",
+  "en": "He is jealous of his new job."
+ },
+ "p3_emotions_reconnaissant-e": {
+  "fr": "Je suis reconnaissant pour votre soutien.",
+  "en": "I am grateful for your support."
+ },
+ "p3_emotions_se-calmer": {
+  "fr": "Il faut se calmer avant de parler.",
+  "en": "One must calm down before speaking."
+ },
+ "p3_emotions_humeur": {
+  "fr": "Son humeur est bonne aujourd'hui.",
+  "en": "His mood is good today."
+ },
+ "p3_emotions_sentiment": {
+  "fr": "Ce sentiment est difficile à expliquer.",
+  "en": "This feeling is hard to explain."
+ },
+ "p3_body_tete": {
+  "fr": "Elle se tient la tête parce qu'elle a mal.",
+  "en": "She holds her head because she has a headache."
+ },
+ "p3_hobbies_jouer-a": {
+  "fr": "Il faut jouer à football pour s'amuser.",
+  "en": "One must play football to have fun."
+ },
+ "p3_hobbies_jouer-de": {
+  "fr": "Elle veut jouer de guitare ce soir.",
+  "en": "She wants to play guitar tonight."
+ },
+ "p3_healthcare_patient-la-patiente": {
+  "fr": "Le patient attend dans la salle d'attente.",
+  "en": "The patient is waiting in the waiting room."
+ },
+ "p3_healthcare_medicament": {
+  "fr": "Le médicament est sur la table.",
+  "en": "The medication is on the table."
+ },
+ "p3_healthcare_vaccin": {
+  "fr": "Le vaccin est efficace.",
+  "en": "The vaccine is effective."
+ },
+ "p3_healthcare_chirurgie": {
+  "fr": "La chirurgie est prévue demain.",
+  "en": "The surgery is scheduled for tomorrow."
+ },
+ "p3_healthcare_clinique": {
+  "fr": "La clinique est ouverte.",
+  "en": "The clinic is open."
+ },
+ "p3_healthcare_salle-dattente": {
+  "fr": "Je suis dans la salle d'attente.",
+  "en": "I am in the waiting room."
+ },
+ "p3_healthcare_carte-dassurance-maladie": {
+  "fr": "Montrez votre carte d'assurance maladie.",
+  "en": "Show your health card."
+ },
+ "p3_healthcare_prise-de-sang": {
+  "fr": "La prise de sang est rapide.",
+  "en": "The blood test is quick."
+ },
+ "p3_healthcare_assurance-maladie": {
+  "fr": "Je dois montrer ma carte d'assurance maladie à la réception.",
+  "en": "I must show my health insurance card at the reception."
+ },
+ "p3_healthcare_urgence": {
+  "fr": "L'urgence est ouverte 24 heures sur 24.",
+  "en": "The emergency is open 24 hours a day."
+ },
+ "p3_healthcare_diagnostic": {
+  "fr": "Le médecin explique le diagnostic clairement.",
+  "en": "The doctor explains the diagnosis clearly."
+ },
+ "p3_healthcare_la-specialiste": {
+  "fr": "Vous pouvez consulter le/la spécialiste pour ce problème.",
+  "en": "You can consult the specialist for this problem."
+ },
+ "p3_healthcare_ordonnance": {
+  "fr": "Le pharmacien vérifie l'ordonnance avant de donner les médicaments.",
+  "en": "The pharmacist checks the prescription before giving the medication."
+ },
+ "p3_healthcare_medecin": {
+  "fr": "Le médecin écoute attentivement les symptômes.",
+  "en": "The doctor listens carefully to the symptoms."
+ },
+ "p3_healthcare_medecin-de-famille": {
+  "fr": "Je prends rendez-vous avec le médecin de famille chaque année.",
+  "en": "I make an appointment with the family doctor each year."
+ },
+ "p3_healthcare_infirmier-linfirmiere": {
+  "fr": "L'infirmier / l'infirmière aide le patient à se lever.",
+  "en": "The nurse helps the patient to get up."
+ },
+ "p3_healthcare_radiographie": {
+  "fr": "Le médecin regarde la radiographie.",
+  "en": "The doctor looks at the x-ray."
+ },
+ "p3_healthcare_sante-mentale": {
+  "fr": "Il faut prendre soin de la santé mentale.",
+  "en": "One must take care of mental health."
+ },
+ "p3_healthcare_guerir": {
+  "fr": "Il faut guérir complètement.",
+  "en": "One must heal completely."
+ },
+ "p3_healthcare_guerison": {
+  "fr": "On parle de la guérison.",
+  "en": "We talk about the recovery."
+ },
+ "p3_healthcare_blessure": {
+  "fr": "Il montre la blessure.",
+  "en": "He shows the injury."
+ },
+ "p3_healthcare_se-blesser": {
+  "fr": "Il faut faire attention pour ne pas se blesser.",
+  "en": "One must be careful not to injure oneself."
+ },
+ "p3_healthcare_allergie": {
+  "fr": "On parle de l'allergie.",
+  "en": "We talk about the allergy."
+ },
+ "p3_healthcare_grossesse": {
+  "fr": "Il parle de la grossesse.",
+  "en": "He talks about the pregnancy."
+ },
+ "p3_society_crise-du-logement": {
+  "fr": "La crise du logement est un problème sérieux.",
+  "en": "The housing crisis is a serious problem."
+ },
+ "p3_society_generation": {
+  "fr": "La génération est importante pour l'avenir.",
+  "en": "The generation is important for the future."
+ },
+ "p3_society_vieillissement-de-la-population": {
+  "fr": "Le vieillissement de la population pose des défis.",
+  "en": "The aging population poses challenges."
+ },
+ "p3_society_jeunesse": {
+  "fr": "La jeunesse rêve de changer le monde.",
+  "en": "Youth dreams of changing the world."
+ },
+ "p3_society_comportement": {
+  "fr": "Le comportement des enfants reflète leur éducation.",
+  "en": "Children's behavior reflects their upbringing."
+ },
+ "p3_society_valeur": {
+  "fr": "La valeur de l'honnêteté est respectée.",
+  "en": "The value of honesty is respected."
+ },
+ "p3_society_croyance": {
+  "fr": "La croyance en la paix guide leurs actions.",
+  "en": "Belief in peace guides their actions."
+ },
+ "p3_society_tendance": {
+  "fr": "La tendance actuelle montre un intérêt pour l'écologie.",
+  "en": "The current trend shows an interest in ecology."
+ },
+ "p3_education_recherche": {
+  "fr": "La recherche est intéressante.",
+  "en": "Research is interesting."
+ },
+ "p3_education_connaissances": {
+  "fr": "Les connaissances sont importantes.",
+  "en": "Knowledge is important."
+ },
+ "p3_education_apprendre": {
+  "fr": "Je veux apprendre le français.",
+  "en": "I want to learn French."
+ },
+ "p3_education_enseigner": {
+  "fr": "Tu peux enseigner l'anglais.",
+  "en": "You can teach English."
+ },
+ "p3_education_sinscrire": {
+  "fr": "Il faut s'inscrire avant vendredi.",
+  "en": "One must register before Friday."
+ },
+ "p3_education_inscription": {
+  "fr": "L'inscription commence lundi.",
+  "en": "Registration starts Monday."
+ },
+ "p3_education_frais-de-scolarite": {
+  "fr": "Les frais de scolarité sont élevés.",
+  "en": "Tuition fees are high."
+ },
+ "p3_education_emploi-du-temps": {
+  "fr": "L'emploi du temps est chargé.",
+  "en": "The timetable is busy."
+ },
+ "p3_healthcare_la-dentiste": {
+  "fr": "Je veux devenir le/la dentiste.",
+  "en": "I want to become a dentist."
+ },
+ "p3_society_societe": {
+  "fr": "La société est importante.",
+  "en": "Society is important."
+ },
+ "p3_society_defi": {
+  "fr": "Le défi est difficile.",
+  "en": "The challenge is difficult."
+ },
+ "p3_society_solution": {
+  "fr": "La solution est claire.",
+  "en": "The solution is clear."
+ },
+ "p3_society_avantage-linconvenient": {
+  "fr": "L'avantage / l'inconvénient est à considérer.",
+  "en": "The advantage / disadvantage is to be considered."
+ },
+ "p3_society_population": {
+  "fr": "La population grandit.",
+  "en": "The population is growing."
+ },
+ "p3_society_communaute": {
+  "fr": "La communauté travaille ensemble.",
+  "en": "The community works together."
+ },
+ "p3_society_culture": {
+  "fr": "La culture est riche.",
+  "en": "The culture is rich."
+ },
+ "p3_employment_entretien-dembauche": {
+  "fr": "Je prépare l'entretien d'embauche demain.",
+  "en": "I am preparing the job interview tomorrow."
+ },
+ "p3_employment_contrat": {
+  "fr": "J'ai signé le contrat aujourd'hui.",
+  "en": "I signed the contract today."
+ },
+ "p3_employment_teletravail": {
+  "fr": "Il préfère le télétravail pour travailler à la maison.",
+  "en": "He prefers telework to work from home."
+ },
+ "p3_employment_gerer": {
+  "fr": "Je dois gérer la responsabilité.",
+  "en": "I must manage the responsibility."
+ },
+ "p3_employment_responsabilite": {
+  "fr": "Elle assume la responsabilité du projet.",
+  "en": "She assumes responsibility for the project."
+ },
+ "p3_employment_objectif": {
+  "fr": "Nous devons atteindre l'objectif fixé.",
+  "en": "We must reach the set objective."
+ },
+ "p3_employment_rendement": {
+  "fr": "Le rendement de l'équipe est bon.",
+  "en": "The team's performance is good."
+ },
+ "p3_employment_formation-professionnelle": {
+  "fr": "Elle suit la formation professionnelle chaque mois.",
+  "en": "She follows professional training each month."
+ },
+ "p3_opinions_supposer": {
+  "fr": "Je veux supposer que tu viens demain.",
+  "en": "I want to suppose that you are coming tomorrow."
+ },
+ "p3_opinions_admettre": {
+  "fr": "Il faut admettre que c'est difficile.",
+  "en": "One must admit that it is difficult."
+ },
+ "p3_opinions_reconnaitre": {
+  "fr": "Tu peux reconnaître ton erreur.",
+  "en": "You can acknowledge your mistake."
+ },
+ "p3_opinions_convaincre": {
+  "fr": "Je peux convaincre mes amis.",
+  "en": "I can convince my friends."
+ },
+ "p3_opinions_persuader": {
+  "fr": "Elle peut persuader son frère.",
+  "en": "She can persuade her brother."
+ },
+ "p3_opinions_soutenir": {
+  "fr": "Nous devons soutenir cette idée.",
+  "en": "We must support this idea."
+ },
+ "p3_opinions_douter": {
+  "fr": "Je ne veux pas douter de toi.",
+  "en": "I do not want to doubt you."
+ },
+ "p3_opinions_il-me-semble-que": {
+  "fr": "Il me semble que le film est intéressant.",
+  "en": "It seems to me that the film is interesting."
+ },
+ "p3_opinions_je-ne-suis-pas": {
+  "fr": "Je ne suis pas d'accord avec toi.",
+  "en": "I disagree with you."
+ },
+ "p3_opinions_estimer": {
+  "fr": "Je veux estimer le prix.",
+  "en": "I want to estimate the price."
+ },
+ "p3_opinions_considerer": {
+  "fr": "Il faut considérer toutes les possibilités.",
+  "en": "One must consider all possibilities."
+ },
+ "p3_opinions_constater": {
+  "fr": "Tu peux constater la différence.",
+  "en": "You can notice the difference."
+ },
+ "p3_opinions_affirmer": {
+  "fr": "Elle aime affirmer son opinion.",
+  "en": "She likes to state her opinion."
+ },
+ "p3_opinions_pretendre": {
+  "fr": "Nous devons prétendre que tout va bien.",
+  "en": "We must pretend that everything is fine."
+ },
+ "p3_opinions_souligner": {
+  "fr": "Je vais souligner ce point important.",
+  "en": "I will underline this important point."
+ },
+ "p3_opinions_signaler": {
+  "fr": "Ils peuvent signaler un problème.",
+  "en": "They can point out a problem."
+ },
+ "p3_media_publier": {
+  "fr": "Je veux publier mon article.",
+  "en": "I want to publish my article."
+ },
+ "p3_media_partager": {
+  "fr": "Tu peux partager tes photos.",
+  "en": "You can share your photos."
+ },
+ "p3_media_abonne-e": {
+  "fr": "Je connais l'abonné(e) de cette page.",
+  "en": "I know the subscriber of this page."
+ },
+ "p3_media_abonnement": {
+  "fr": "L'abonnement est actif.",
+  "en": "The subscription is active."
+ },
+ "p3_education_formation": {
+  "fr": "Je suis la formation en ligne.",
+  "en": "I am taking the training online."
+ },
+ "p3_education_etablissement": {
+  "fr": "L'établissement ouvre à neuf heures.",
+  "en": "The institution opens at nine o'clock."
+ },
+ "p3_education_bourse": {
+  "fr": "Elle a obtenu la bourse pour étudier.",
+  "en": "She obtained the scholarship to study."
+ },
+ "p3_education_diplome": {
+  "fr": "Il a le diplôme de fin d'études.",
+  "en": "He has the degree/diploma of graduation."
+ },
+ "p3_opinions_il-est-clair-que": {
+  "fr": "Il est clair que le ciel est bleu.",
+  "en": "It is clear that the sky is blue."
+ },
+ "p3_opinions_il-est-indeniable-que": {
+  "fr": "Il est indéniable que elle travaille dur.",
+  "en": "It is undeniable that she works hard."
+ },
+ "p3_opinions_part": {
+  "fr": "D'une part, j'aime le chocolat.",
+  "en": "On the one hand, I like chocolate."
+ },
+ "p3_opinions_autre-part": {
+  "fr": "D'autre part, je préfère la vanille.",
+  "en": "On the other hand, I prefer vanilla."
+ },
+ "p3_opinions_au-contraire": {
+  "fr": "Au contraire, il fait froid aujourd'hui.",
+  "en": "On the contrary, it is cold today."
+ },
+ "p3_opinions_tandis-que": {
+  "fr": "Tandis que je lis, elle écoute de la musique.",
+  "en": "While I read, she listens to music."
+ },
+ "p3_opinions_par-rapport-a": {
+  "fr": "Par rapport à l'année dernière, les ventes ont augmenté.",
+  "en": "Compared to last year, sales have increased."
+ },
+ "p3_opinions_en-comparaison-avec": {
+  "fr": "En comparaison avec son frère, elle est plus grande.",
+  "en": "In comparison with her brother, she is taller."
+ },
+ "p3_opinions_suggerer": {
+  "fr": "Je peux suggérer une idée.",
+  "en": "I can suggest an idea."
+ },
+ "p3_opinions_recommander": {
+  "fr": "Je peux recommander ce livre.",
+  "en": "I can recommend this book."
+ },
+ "p3_opinions_il-vaudrait-mieux": {
+  "fr": "Il vaudrait mieux partir tôt.",
+  "en": "It would be better to leave early."
+ },
+ "p3_opinions_on-devrait": {
+  "fr": "On devrait étudier davantage.",
+  "en": "We should study more."
+ },
+ "p3_opinions_trouver-une-solution": {
+  "fr": "Je veux trouver une solution.",
+  "en": "I want to find a solution."
+ },
+ "p3_opinions_faire-face-a": {
+  "fr": "Il faut faire face à la difficulté.",
+  "en": "We must face the difficulty."
+ },
+ "p3_opinions_aborder": {
+  "fr": "Nous pouvons aborder ce sujet.",
+  "en": "We can address this topic."
+ },
+ "p3_opinions_soulever": {
+  "fr": "Elle aime soulever des questions.",
+  "en": "She likes to raise questions."
+ },
+ "p3_society_phenomene": {
+  "fr": "Nous étudions le phénomène.",
+  "en": "We study the phenomenon."
+ },
+ "p3_society_consequence": {
+  "fr": "Nous voyons la conséquence.",
+  "en": "We see the consequence."
+ },
+ "p3_society_cause": {
+  "fr": "Nous cherchons la cause.",
+  "en": "We look for the cause."
+ },
+ "p3_society_effet": {
+  "fr": "Nous observons l'effet.",
+  "en": "We observe the effect."
+ },
+ "p3_society_impact": {
+  "fr": "Nous mesurons l'impact.",
+  "en": "We measure the impact."
+ },
+ "p3_society_enjeu": {
+  "fr": "Nous discutons de l'enjeu.",
+  "en": "We discuss the issue."
+ },
+ "p3_society_mesure": {
+  "fr": "Nous prenons la mesure.",
+  "en": "We take the measure."
+ },
+ "p3_society_progres": {
+  "fr": "Nous voyons le progrès.",
+  "en": "We see the progress."
+ },
+ "p3_society_changement": {
+  "fr": "Je pense que le changement est nécessaire.",
+  "en": "I think that change is necessary."
+ },
+ "p3_society_evolution": {
+  "fr": "Je crois que l'évolution est positive.",
+  "en": "I believe that evolution is positive."
+ },
+ "p3_society_bien-etre": {
+  "fr": "Nous voulons le bien-être de chacun.",
+  "en": "We want the well-being of everyone."
+ },
+ "p3_society_qualite-de-vie": {
+  "fr": "Améliorer la qualité de vie prend du temps.",
+  "en": "Improving quality of life takes time."
+ },
+ "p3_society_equilibre-travail-vie-personnelle": {
+  "fr": "Trouver l'équilibre travail-vie personnelle est un défi.",
+  "en": "Finding work-life balance is a challenge."
+ },
+ "p3_opinions_a-mon-avis": {
+  "fr": "Je pense que, à mon avis, c'est une bonne idée.",
+  "en": "I think that, in my opinion, it's a good idea."
+ },
+ "p3_opinions_je-pense-que": {
+  "fr": "Après réflexion, je pense que c'est vrai.",
+  "en": "After reflection, I think that's true."
+ },
+ "p3_opinions_je-suis-daccord": {
+  "fr": "Après discussion, je suis d'accord avec votre proposition.",
+  "en": "After discussion, I agree with your proposal."
+ },
+ "p3_opinions_il-parait-que": {
+  "fr": "Il paraît que il va pleuvoir demain.",
+  "en": "It appears that it will rain tomorrow."
+ },
+ "p3_opinions_de-mon-point-de": {
+  "fr": "De mon point de vue, c'est une bonne idée.",
+  "en": "From my point of view, it's a good idea."
+ },
+ "p3_opinions_en-ce-qui-me": {
+  "fr": "En ce qui me concerne, je préfère le thé.",
+  "en": "As far as I'm concerned, I prefer tea."
+ },
+ "p3_opinions_selon": {
+  "fr": "Selon le professeur, l'examen est difficile.",
+  "en": "According to the professor, the exam is difficult."
+ },
+ "p3_opinions_apres-moi": {
+  "fr": "D'après moi, ce film est intéressant.",
+  "en": "In my view, this film is interesting."
+ },
+ "p3_opinions_je-suis-convaincu-e": {
+  "fr": "Je suis convaincu(e) que tu réussiras.",
+  "en": "I am convinced that you will succeed."
+ },
+ "p3_opinions_je-suis-certain-e": {
+  "fr": "Je suis certain(e) que nous allons gagner.",
+  "en": "I am certain that we will win."
+ },
+ "p3_society_diversite": {
+  "fr": "La diversité est importante.",
+  "en": "Diversity is important."
+ },
+ "p3_society_inclusion": {
+  "fr": "L'inclusion aide tout le monde.",
+  "en": "Inclusion helps everyone."
+ },
+ "p3_society_discrimination": {
+  "fr": "La discrimination est mauvaise.",
+  "en": "Discrimination is bad."
+ },
+ "p3_society_pauvrete": {
+  "fr": "La pauvreté fait souffrir beaucoup de gens.",
+  "en": "Poverty makes many people suffer."
+ },
+ "p3_society_richesse": {
+  "fr": "La richesse peut apporter du bonheur.",
+  "en": "Wealth can bring happiness."
+ },
+ "p3_society_inegalite": {
+  "fr": "L'inégalité crée des problèmes.",
+  "en": "Inequality creates problems."
+ },
+ "p3_society_itinerance": {
+  "fr": "L'itinérance touche de nombreuses personnes.",
+  "en": "Homelessness affects many people."
+ },
+ "p3_society_logement": {
+  "fr": "Le logement est important.",
+  "en": "Housing is important."
+ },
+ "p3_opinions_hesiter": {
+  "fr": "Je n'aime pas hésiter quand je dois choisir.",
+  "en": "I don't like to hesitate when I have to choose."
+ },
+ "p3_connectors_tout-dabord": {
+  "fr": "Tout d'abord, je lis le texte.",
+  "en": "First of all, I read the text."
+ },
+ "p3_connectors_premierement": {
+  "fr": "Premièrement, nous allons au parc.",
+  "en": "Firstly, we go to the park."
+ },
+ "p3_connectors_ensuite": {
+  "fr": "Ensuite, nous mangeons une pomme.",
+  "en": "Then, we eat an apple."
+ },
+ "p3_connectors_puis": {
+  "fr": "Puis, je regarde un film.",
+  "en": "Then, I watch a movie."
+ },
+ "p3_connectors_finalement": {
+  "fr": "Finalement, ils sont contents.",
+  "en": "Finally, they are happy."
+ },
+ "p3_connectors_en-conclusion": {
+  "fr": "En conclusion, le livre est intéressant.",
+  "en": "In conclusion, the book is interesting."
+ },
+ "p3_connectors_pour-conclure": {
+  "fr": "Pour conclure, merci de votre attention.",
+  "en": "To conclude, thank you for your attention."
+ },
+ "p3_connectors_donc": {
+  "fr": "Il pleut, donc je reste à la maison.",
+  "en": "It's raining, so I stay at home."
+ },
+ "p3_connectors_par-consequent": {
+  "fr": "Il a oublié son parapluie, par conséquent il est mouillé.",
+  "en": "He forgot his umbrella, consequently he is wet."
+ },
+ "p3_connectors_ainsi": {
+  "fr": "Elle a étudié tous les jours, ainsi elle a passé l'examen.",
+  "en": "She studied every day, thus she passed the exam."
+ },
+ "p3_connectors_cest-pourquoi": {
+  "fr": "Nous sommes en retard, c'est pourquoi nous devons courir.",
+  "en": "We are late, that's why we have to run."
+ },
+ "p3_connectors_a-cause-de": {
+  "fr": "Le vol a été annulé à cause de la tempête.",
+  "en": "The flight was cancelled because of the storm."
+ },
+ "p3_connectors_grace-a": {
+  "fr": "Nous avons fini le projet grâce à ton aide.",
+  "en": "We finished the project thanks to your help."
+ },
+ "p3_connectors_car": {
+  "fr": "Je suis resté à l'intérieur car il faisait froid.",
+  "en": "I stayed inside because it was cold."
+ },
+ "p3_connectors_puisque": {
+  "fr": "Nous sommes partis tôt puisque le train part à 8h.",
+  "en": "We left early since the train leaves at 8 o'clock."
+ },
+ "p3_connectors_etant-donne-que": {
+  "fr": "Je reste à la maison, étant donné que il pleut.",
+  "en": "I am staying at home, given that it is raining."
+ },
+ "p3_connectors_afin-de": {
+  "fr": "J'étudie afin de réussir.",
+  "en": "I study in order to succeed."
+ },
+ "p3_connectors_pour-que": {
+  "fr": "Je parle lentement pour que tu comprennes.",
+  "en": "I speak slowly so that you understand."
+ },
+ "p3_connectors_de-plus": {
+  "fr": "Il est intelligent, de plus il travaille dur.",
+  "en": "He is intelligent, moreover he works hard."
+ },
+ "p3_connectors_en-outre": {
+  "fr": "Elle est aimable, en outre elle aide souvent.",
+  "en": "She is kind, furthermore she often helps."
+ },
+ "p3_connectors_ailleurs": {
+  "fr": "Nous allons au cinéma, d'ailleurs il fait beau.",
+  "en": "We are going to the cinema, besides the weather is nice."
+ },
+ "p3_connectors_egalement": {
+  "fr": "Ils sont également prêts à partir.",
+  "en": "They are also ready to leave."
+ },
+ "p3_connectors_en-fait": {
+  "fr": "En fait, je préfère le thé au café.",
+  "en": "In fact, I prefer tea to coffee."
+ },
+ "p3_connectors_en-realite": {
+  "fr": "En réalité, il pleut aujourd'hui.",
+  "en": "In reality, it is raining today."
+ },
+ "p3_connectors_par-exemple": {
+  "fr": "Par exemple, j'aime les pommes.",
+  "en": "For example, I like apples."
+ },
+ "p3_connectors_notamment": {
+  "fr": "Il parle plusieurs langues, notamment l'espagnol.",
+  "en": "He speaks several languages, notably Spanish."
+ },
+ "p3_connectors_autrement-dit": {
+  "fr": "Il est en retard, autrement dit, il arrivera tard.",
+  "en": "He is late, in other words, he will arrive late."
+ },
+ "p3_connectors_cest-a-dire": {
+  "fr": "Elle veut voyager, c'est-à-dire découvrir de nouveaux pays.",
+  "en": "She wants to travel, that is to say, discover new countries."
+ },
+ "p3_connectors_en-ce-qui-concerne": {
+  "fr": "En ce qui concerne le devoir, tu peux commencer maintenant.",
+  "en": "As for the homework, you can start now."
+ },
+ "p3_connectors_a-propos-de": {
+  "fr": "À propos de ce film, as-tu aimé la fin?",
+  "en": "About this movie, did you like the ending?"
+ },
+ "p3_connectors_sauf": {
+  "fr": "Tous les étudiants sont présents, sauf Jean.",
+  "en": "All the students are present, except Jean."
+ },
+ "p3_letters_avance": {
+  "fr": "Je vous remercie d'avance.",
+  "en": "Thank you in advance."
+ },
+ "p3_letters_je-vous-remercie-davance": {
+  "fr": "Je vous remercie d'avance.",
+  "en": "Thank you in advance."
+ },
+ "p3_letters_destinataire": {
+  "fr": "Le destinataire reçoit la lettre.",
+  "en": "The recipient receives the letter."
+ },
+ "p3_letters_expediteur": {
+  "fr": "L'expéditeur écrit la lettre.",
+  "en": "The sender writes the letter."
+ },
+ "p3_letters_objet": {
+  "fr": "L'objet du message est clair.",
+  "en": "The subject of the message is clear."
+ },
+ "p3_letters_signature": {
+  "fr": "La signature est en bas.",
+  "en": "The signature is at the bottom."
+ },
+ "p3_letters_signer": {
+  "fr": "Je veux signer le document.",
+  "en": "I want to sign the document."
+ },
+ "p3_letters_joindre": {
+  "fr": "Tu peux joindre le fichier.",
+  "en": "You can attach the file."
+ },
+ "p3_letters_respectueusement": {
+  "fr": "Je vous écris respectueusement.",
+  "en": "I am writing to you respectfully."
+ },
+ "p3_letters_avec-mes-meilleures-salutations": {
+  "fr": "Je termine cette lettre avec mes meilleures salutations.",
+  "en": "I end this letter with my best regards."
+ },
+ "p3_letters_je-reste-a-votre": {
+  "fr": "Je reste à votre disposition pour toute question.",
+  "en": "I remain at your disposal for any questions."
+ },
+ "p3_connectors_en-resume": {
+  "fr": "En résumé, le livre était intéressant.",
+  "en": "In summary, the book was interesting."
+ },
+ "p3_connectors_cependant": {
+  "fr": "Il voulait partir, cependant il est resté.",
+  "en": "He wanted to leave, however he stayed."
+ },
+ "p3_connectors_neanmoins": {
+  "fr": "Elle est fatiguée, néanmoins elle continue à travailler.",
+  "en": "She is tired, nevertheless she continues to work."
+ },
+ "p3_connectors_pourtant": {
+  "fr": "Il fait beau, pourtant nous restons à l'intérieur.",
+  "en": "It's nice weather, yet we stay inside."
+ },
+ "p3_connectors_malgre": {
+  "fr": "Malgré le froid, nous allons nager.",
+  "en": "Despite the cold, we are going swimming."
+ },
+ "p3_connectors_bien-que": {
+  "fr": "Bien que tard, il décide d'étudier.",
+  "en": "Although late, he decides to study."
+ },
+ "p3_connectors_meme-si": {
+  "fr": "Même si il pleut, nous sortirons.",
+  "en": "Even if it rains, we will go out."
+ },
+ "p3_connectors_alors-que": {
+  "fr": "Elle chantait, alors que je lisais.",
+  "en": "She was singing, whereas I was reading."
+ },
+ "p3_letters_je-vous-ecris": {
+  "fr": "Je vous écris pour vous tenir informé de l'avancement du projet.",
+  "en": "I am writing to you to keep you informed of the project's progress."
+ },
+ "p3_letters_suite-a": {
+  "fr": "Suite à notre entretien, je vous envoie le compte rendu.",
+  "en": "Following our meeting, I am sending you the minutes."
+ },
+ "p3_letters_en-reponse-a": {
+  "fr": "En réponse à votre courriel, voici les documents demandés.",
+  "en": "In response to your email, here are the requested documents."
+ },
+ "p3_letters_je-souhaiterais": {
+  "fr": "Je souhaiterais savoir si vous êtes disponible jeudi prochain.",
+  "en": "I would like to know if you are available next Thursday."
+ },
+ "p3_letters_je-vous-serais-reconnaissant": {
+  "fr": "Je vous serais reconnaissant(e) de bien vouloir confirmer votre participation.",
+  "en": "I would be grateful if you could kindly confirm your participation."
+ },
+ "p3_letters_vous-trouverez-ci-joint": {
+  "fr": "Vous trouverez ci-joint la facture du mois de mars.",
+  "en": "You will find attached the invoice for March."
+ },
+ "p3_letters_nhesitez-pas-a-me": {
+  "fr": "N'hésitez pas à me contacter si vous avez besoin d'éclaircissements.",
+  "en": "Do not hesitate to contact me if you need clarification."
+ },
+ "p3_letters_dans-lattente-de-votre": {
+  "fr": "Dans l'attente de votre réponse, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.",
+  "en": "Awaiting your reply, please accept, Sir/Madam, the expression of my distinguished regards."
+ },
+ "p3_connectors_a-moins-que": {
+  "fr": "Je sortirai à moins qu'il pleuve.",
+  "en": "I will go out unless it rains."
+ },
+ "p3_connectors_que": {
+  "fr": "Je partirai dès que tu arriveras.",
+  "en": "I will leave as soon as you arrive."
+ },
+ "p3_connectors_pendant-que": {
+  "fr": "Je lis pendant que tu étudies.",
+  "en": "I read while you study."
+ },
+ "p3_connectors_a-condition-que": {
+  "fr": "Tu peux venir à condition que tu sois à l'heure.",
+  "en": "You can come provided that you are on time."
+ },
+ "p3_connectors_en-cas-de": {
+  "fr": "Prends ton parapluie en cas de pluie.",
+  "en": "Take your umbrella in case of rain."
+ },
+ "p3_connectors_sinon": {
+  "fr": "Il faut étudier, sinon tu échoueras.",
+  "en": "One must study, otherwise you will fail."
+ },
+ "p3_connectors_en-tout-cas": {
+  "fr": "En tout cas, je vais essayer.",
+  "en": "In any case, I will try."
+ },
+ "p3_connectors_dans-lensemble": {
+  "fr": "Dans l'ensemble, le film était bon.",
+  "en": "On the whole, the film was good."
+ },
+ "p3_letters_piece-jointe": {
+  "fr": "Je vois la pièce jointe.",
+  "en": "I see the attachment."
+ },
+ "p3_letters_vous-informer-que": {
+  "fr": "Je veux vous informer que le projet est terminé.",
+  "en": "I want to inform you that the project is finished."
+ },
+ "p3_letters_jaccuse-reception": {
+  "fr": "Je dois j'accuse réception de votre courriel.",
+  "en": "I must acknowledge receipt of your email."
+ },
+ "p3_letters_reclamation": {
+  "fr": "J'ai reçu la réclamation.",
+  "en": "I received the complaint."
+ },
+ "p3_letters_se-plaindre": {
+  "fr": "Il ne faut pas se plaindre pour rien.",
+  "en": "One should not complain for nothing."
+ },
+ "p3_letters_requete": {
+  "fr": "Elle a envoyé la requête hier.",
+  "en": "She sent the formal request yesterday."
+ },
+ "p3_letters_solliciter": {
+  "fr": "Tu peux solliciter un conseil.",
+  "en": "You can request advice."
+ },
+ "p3_letters_candidature": {
+  "fr": "J'ai examiné la candidature.",
+  "en": "I have reviewed the job application."
+ },
+ "p3_opinions_peser-le-pour-et": {
+  "fr": "Avant de décider, il faut peser le pour et le contre.",
+  "en": "Before deciding, one must weigh the pros and cons."
+ },
+ "p3_opinions_resoudre-un-probleme": {
+  "fr": "Il veut résoudre un problème.",
+  "en": "He wants to solve a problem."
+ },
+ "p3_opinions_proposer": {
+  "fr": "Je vais proposer une idée.",
+  "en": "I am going to propose an idea."
+ },
+ "p3_connectors_a-premiere-vue": {
+  "fr": "À première vue, cela semble facile.",
+  "en": "At first sight, it seems easy."
+ },
+ "p3_letters_veuillez": {
+  "fr": "Veuillez patienter.",
+  "en": "Please wait."
+ },
+ "p3_letters_ci-joint": {
+  "fr": "Le document est ci-joint.",
+  "en": "The document is attached."
+ },
+ "p3_letters_veuillez-trouver-ci-joint": {
+  "fr": "Veuillez trouver ci-joint le contrat.",
+  "en": "Please find attached the contract."
+ },
+ "p3_letters_cordialement": {
+  "fr": "Cordialement, Jean.",
+  "en": "Best regards, Jean."
+ },
+ "p3_letters_je-vous-prie-dagreer": {
+  "fr": "Je vous prie d'agréer mes salutations distinguées.",
+  "en": "Yours sincerely (very formal)"
+ },
+ "p3_letters_madame-monsieur": {
+  "fr": "Madame, Monsieur, je vous écris.",
+  "en": "Dear Sir or Madam, I am writing to you."
+ },
+ "p3_letters_a-qui-de-droit": {
+  "fr": "Je l'envoie à qui de droit.",
+  "en": "I am sending it to whom it may concern."
+ },
+ "p3_education_etudiant-e": {
+  "fr": "Je suis l'étudiant(e) de cette classe.",
+  "en": "I am the student of this class."
+ },
+ "p3_education_professeur": {
+  "fr": "Le professeur explique la leçon.",
+  "en": "The teacher explains the lesson."
+ },
+ "p3_education_devoirs": {
+  "fr": "Je dois finir les devoirs avant demain.",
+  "en": "I have to finish the homework before tomorrow."
+ },
+ "p3_education_niveau": {
+  "fr": "Le niveau est bon.",
+  "en": "The level is good."
+ },
+ "p3_education_certificat": {
+  "fr": "Je vais recevoir le certificat après l'examen.",
+  "en": "I will receive the certificate after the exam."
+ },
+ "p3_education_perfectionnement": {
+  "fr": "Je veux le perfectionnement en français.",
+  "en": "I want the professional development in French."
+ },
+ "p3_education_apprentissage-continu": {
+  "fr": "L'apprentissage continu est important pour réussir.",
+  "en": "Continuous learning is important to succeed."
+ },
+ "p3_healthcare_rendez-vous": {
+  "fr": "Le rendez-vous est à 10 heures.",
+  "en": "The appointment is at 10 o'clock."
+ },
+ "p3_healthcare_symptomes": {
+  "fr": "Les symptômes sont fièvre et toux.",
+  "en": "The symptoms are fever and cough."
+ },
+ "p3_healthcare_traitement": {
+  "fr": "Le traitement est efficace.",
+  "en": "The treatment is effective."
+ },
+ "p3_opinions_il-est-evident-que": {
+  "fr": "Il est évident que tu comprends.",
+  "en": "It is obvious that you understand."
+ },
+ "p3_opinions_plus-que": {
+  "fr": "Il est plus grand que moi.",
+  "en": "He is taller than me."
+ },
+ "p3_opinions_moins-que": {
+  "fr": "Elle est moins rapide que lui.",
+  "en": "She is less fast than him."
+ },
+ "p3_opinions_aussi-que": {
+  "fr": "Ce livre est aussi intéressant que celui-là.",
+  "en": "This book is as interesting as that one."
+ },
+ "p3_opinions_meilleur-la-meilleure": {
+  "fr": "C'est le meilleur choix et elle est la meilleure étudiante.",
+  "en": "It is the best choice and she is the best student."
+ },
+ "p3_opinions_pire": {
+  "fr": "C'est le pire jour de ma semaine.",
+  "en": "It is the worst day of my week."
+ },
+ "p3_environment_sensibilisation": {
+  "fr": "La sensibilisation aux dangers d'Internet est nécessaire dès l'école.",
+  "en": "Awareness-raising of the dangers of the Internet is necessary from school onward."
+ },
+ "p3_media_fausses-nouvelles": {
+  "fr": "Il faut vérifier les sources avant de croire les fausses nouvelles.",
+  "en": "One must check the sources before believing fake news."
+ },
+ "p3_education_reconnaissance-des-acquis": {
+  "fr": "La reconnaissance des acquis permet d'obtenir des crédits sans refaire le cours.",
+  "en": "Recognition of prior learning allows obtaining credits without retaking the course."
+ },
+ "p3_education_universite": {
+  "fr": "L'université offre plusieurs programmes en sciences et en arts.",
+  "en": "The university offers several programs in science and arts."
+ },
+ "p3_education_college-le-cegep": {
+  "fr": "Après le secondaire, je veux étudier au collège / le cégep pour devenir technicien.",
+  "en": "After high school, I want to study at college / CEGEP to become a technician."
+ },
+ "p3_education_cours": {
+  "fr": "Le cours d'histoire commence à neuf heures chaque lundi.",
+  "en": "The history course starts at nine o'clock each Monday."
+ },
+ "p3_education_examen": {
+  "fr": "L'examen de mathématiques sera vendredi prochain.",
+  "en": "The math exam will be next Friday."
+ },
+ "p3_education_note": {
+  "fr": "Ma note en français s'est améliorée après avoir pratiqué l'écriture.",
+  "en": "My grade in French has improved after practicing writing."
+ }
+}
