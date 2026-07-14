@@ -4,6 +4,7 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/daily_session.dart';
+import '../../models/profile.dart';
 import '../../models/srs_state.dart';
 import 'app_migrations.dart';
 
@@ -100,6 +101,46 @@ class LearningStore {
         summary TEXT NOT NULL DEFAULT ''
       )
     ''');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Profile — single local row, created on first read.
+  // ---------------------------------------------------------------------------
+
+  Profile profile() {
+    final rows = _db.select('SELECT * FROM profiles WHERE deleted_at IS NULL LIMIT 1');
+    if (rows.isNotEmpty) {
+      final r = rows.first;
+      final onboardedRaw = r['onboarded_at'] as String?;
+      return Profile(
+        id: r['id'] as String,
+        goal: r['goal'] as String,
+        level: r['level'] as String,
+        sessionLength: r['session_length'] as String,
+        reminderTime: r['reminder_time'] as String?,
+        onboardedAt: onboardedRaw != null ? DateTime.tryParse(onboardedRaw) : null,
+      );
+    }
+    final fresh = Profile(id: _uuid.v4());
+    _db.execute(
+      'INSERT INTO profiles (id, created_at, updated_at) VALUES (?, ?, ?)',
+      [fresh.id, _now(), _now()],
+    );
+    return fresh;
+  }
+
+  void saveProfile(Profile p) {
+    _db.execute('''
+      UPDATE profiles SET goal = ?, level = ?, session_length = ?, reminder_time = ?,
+        onboarded_at = ?, updated_at = ?
+      WHERE id = ?
+    ''', [p.goal, p.level, p.sessionLength, p.reminderTime, p.onboardedAt?.toIso8601String(), _now(), p.id]);
+  }
+
+  /// True until the very first card is ever graded — day-one learners get a
+  /// gentler new-word budget.
+  bool hasNoReviewHistory() {
+    return (_db.select('SELECT COUNT(*) AS c FROM vocab_reviews').first['c'] as int) == 0;
   }
 
   // ---------------------------------------------------------------------------

@@ -130,4 +130,44 @@ void main() {
       expect(store.habits()['anki']!.done, isTrue);
     });
   });
+
+  group('Queue policy (P0.6/P0.7)', () {
+    test('budgets follow session length, not a raw card-count setting', () {
+      expect(SRSService.policyFor('quick', firstEverSession: false),
+          (newBudget: 2, reviewBudget: 5, totalCap: 7));
+      expect(SRSService.policyFor('standard', firstEverSession: false),
+          (newBudget: 4, reviewBudget: 8, totalCap: 10));
+      expect(SRSService.policyFor('deep', firstEverSession: false),
+          (newBudget: 6, reviewBudget: 12, totalCap: 16));
+    });
+
+    test('day one is capped at 3 new words regardless of ambition', () {
+      expect(SRSService.policyFor('deep', firstEverSession: true).newBudget, 3);
+      expect(SRSService.policyFor('quick', firstEverSession: true).newBudget, 2);
+    });
+
+    test('hasNoReviewHistory flips after the first grade', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      expect(store.hasNoReviewHistory(), isTrue);
+      SRSService(store: store).grade(entryId: 'w1', grade: SRSGrade.again);
+      expect(store.hasNoReviewHistory(), isFalse);
+    });
+
+    test('profile roundtrips and defaults to standard/zero', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      final p = store.profile();
+      expect(p.sessionLength, 'standard');
+      expect(p.level, 'zero');
+      expect(p.isOnboarded, isFalse);
+      p.goal = 'everyday';
+      p.sessionLength = 'quick';
+      p.onboardedAt = DateTime.now();
+      store.saveProfile(p);
+      final again = store.profile();
+      expect(again.id, p.id);
+      expect(again.goal, 'everyday');
+      expect(again.sessionLength, 'quick');
+      expect(again.isOnboarded, isTrue);
+    });
+  });
 }

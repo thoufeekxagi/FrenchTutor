@@ -96,6 +96,11 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   final Set<String> _handledCallIds = {};
 
+  /// Words failed ('again') during THIS session — they loop back at the end
+  /// until passed, instead of silently vanishing until tomorrow.
+  final Set<String> _againGradedThisSession = {};
+  int _againLoopRounds = 0;
+
   String _recentTranscriptBuffer = '';
   bool _spokenWordMatched = false;
   bool _wordPulse = false;
@@ -108,8 +113,17 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   _VocabSessionCard? get _currentCard => _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
 
-  // Hard app-side floor, mirroring the pacing rule already stated in the system prompt.
-  int get _minAttemptsRequired => _currentCard != null ? 4 : 0;
+  // Adaptive app-side floor (P0.6): a brand-new word earns real practice
+  // (4 passes), a familiar one a quick confirmation (2), a mature one a single
+  // recall — not four ritual repetitions of a word the learner already owns.
+  int get _minAttemptsRequired {
+    final card = _currentCard;
+    if (card == null) return 0;
+    final state = _store.srsState(card.entry.id);
+    if (state == null || state.reps == 0) return 4;
+    if (state.isKnown) return 1;
+    return 2;
+  }
 
   BilingualExample? get _currentExample {
     final card = _currentCard;
@@ -296,8 +310,12 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
   void _performAdvance() {
     final card = _currentCard;
     if (_hasAttempted && !_wasGraded && card != null) {
-      SRSService(store: _store).grade(entryId: card.entry.id, grade: SRSGrade.good);
+      // Attempted but never explicitly graded: record honest, conservative
+      // progress (hard = short interval), never a silent 'good' (P0.9).
+      SRSService(store: _store)
+          .grade(entryId: card.entry.id, grade: SRSGrade.hard, responseType: SRSResponseType.auto);
       _wasGraded = true;
+      _againGradedThisSession.remove(card.entry.id);
     }
     _fireBatchedJudge();
     if (_currentCard != null) _reviewedCount += 1;
@@ -383,7 +401,13 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
         final gradeStr = args['grade'] as String?;
         final grade = _srsGrade(gradeStr);
         if (grade != null) {
-          SRSService(store: _store).grade(entryId: card.entry.id, grade: grade);
+          SRSService(store: _store)
+              .grade(entryId: card.entry.id, grade: grade, responseType: SRSResponseType.auto);
+          if (grade == SRSGrade.again) {
+            _againGradedThisSession.add(card.entry.id);
+          } else {
+            _againGradedThisSession.remove(card.entry.id);
+          }
           _wasGraded = true;
           _logDebug('→ ACCEPTED, graded $gradeStr');
           _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': true}, scheduling: 'SILENT');
@@ -482,6 +506,29 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   void _wrapUp() {
     if (_isWrappingUp) return;
+    // Again-loop (P0.6): words the learner failed this session come back for
+    // another pass before the session ends — capped at 2 extra rounds so a
+    // hard day still finishes.
+    if (_againGradedThisSession.isNotEmpty && _againLoopRounds < 2) {
+      _againLoopRounds += 1;
+      final retryIds = Set<String>.from(_againGradedThisSession);
+      _againGradedThisSession.clear();
+      final retryCards = widget.vocabQueue
+          .where((e) => retryIds.contains(e.id))
+          .map((e) => _VocabSessionCard(e))
+          .toList();
+      if (retryCards.isNotEmpty) {
+        setState(() => _sessionPlan.addAll(retryCards));
+        final first = retryCards.first.entry;
+        _gemini.injectContext(
+          'Before wrapping up: the student struggled with ${retryCards.length} word(s) earlier — '
+          'loop back through them one more time, starting with ${first.fr} = ${first.en}. '
+          'Keep it light and encouraging: one quick recall attempt each, no full re-teach unless they miss it again.',
+        );
+        _logDebug('→ again-loop round $_againLoopRounds: ${retryCards.length} word(s) re-queued');
+        return;
+      }
+    }
     _isWrappingUp = true;
     _gemini.injectContext(
       'The student has now reviewed every word on today\'s list. Say a short warm closing line (one sentence) congratulating them, then stop talking.',

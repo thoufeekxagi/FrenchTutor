@@ -98,10 +98,34 @@ class SRSService {
     return phaseContent.themes.firstWhere((t) => t.id == themeId, orElse: () => VocabTheme(id: '', title: '', entries: [])).entries;
   }
 
-  Future<List<VocabEntry>> dailyMixedQueue({int newCap = 25, int limit = 60}) async {
+  /// The single queue policy for the guided Daily Path (PILOT_PLAN.md P0.6/P0.7):
+  /// budgets come from the learner's session-length preference, not a raw
+  /// card-count setting, and are deliberately humane — an agent-led session
+  /// costs several spoken passes per word. Labs stay uncapped via buildQueue.
+  static ({int newBudget, int reviewBudget, int totalCap}) policyFor(
+    String sessionLength, {
+    required bool firstEverSession,
+  }) {
+    final base = switch (sessionLength) {
+      'quick' => (newBudget: 2, reviewBudget: 5, totalCap: 7),
+      'deep' => (newBudget: 6, reviewBudget: 12, totalCap: 16),
+      _ => (newBudget: 4, reviewBudget: 8, totalCap: 10), // standard
+    };
+    // Day one: three words, one small win — never a flood.
+    if (firstEverSession) {
+      return (newBudget: 3.clamp(0, base.newBudget), reviewBudget: base.reviewBudget, totalCap: base.totalCap);
+    }
+    return base;
+  }
+
+  Future<List<VocabEntry>> dailyMixedQueue() async {
     final allEntries = ContentService.shared.vocabPhases.expand((p) => p.themes.expand((t) => t.entries)).toList();
     final states = store.allSRSStates();
     final now = DateTime.now();
+    final policy = policyFor(
+      store.profile().sessionLength,
+      firstEverSession: store.hasNoReviewHistory(),
+    );
 
     final due = <VocabEntry>[];
     final unseen = <VocabEntry>[];
@@ -114,9 +138,9 @@ class SRSService {
       }
     }
 
-    final newBudget = (newCap - store.newEntriesIntroducedToday()).clamp(0, newCap);
-    final queue = [...due, ...unseen.take(newBudget)];
-    return queue.take(limit).toList();
+    final newBudget = (policy.newBudget - store.newEntriesIntroducedToday()).clamp(0, policy.newBudget);
+    final queue = [...due.take(policy.reviewBudget), ...unseen.take(newBudget)];
+    return queue.take(policy.totalCap).toList();
   }
 
   List<VocabEntry> knownSample({int limit = 6}) {
