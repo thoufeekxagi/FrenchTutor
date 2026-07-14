@@ -1,0 +1,29 @@
+# ParleSprint
+
+> ParleSprint is a personalized French-learning platform for serious adult learners. It connects vocabulary, grammar, reading, listening, writing, and live AI speaking practice in one feedback loop.
+
+## Core product
+
+- Personalized Daily Pathway across major French skills
+- Live voice-to-voice practice with an AI tutor named Marie
+- Spaced-repetition vocabulary and pronunciation practice
+- Voice-led grammar, reading, and listening sessions
+- Structured writing practice with feedback
+- Flexible quick, standard, and deep practice modes
+- Focused support for TEF Canada, TCF Canada, CLB, and NCLC goals
+
+## Intended learners
+
+ParleSprint is designed for motivated adults, including complete beginners, developing French speakers, professionals, immigrants, and learners preparing for TEF or TCF Canada.
+
+## Learning method
+
+ParleSprint uses a connected loop: learn useful material, attempt it independently, receive feedback, apply it in context, and review it at the appropriate time. One stage can feed context into the next instead of treating skills as unrelated exercises.
+
+## Honest limitations
+
+ParleSprint does not guarantee fluency, a test score, permanent residence, or an immigration outcome. Marie is an AI tutor, not a human teacher. The product is currently preparing a limited founding learner pilot.
+
+## Canonical source
+
+The canonical product description and founding cohort application are available on the ParleSprint home page.
