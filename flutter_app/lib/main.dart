@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
+import 'data/content_service.dart';
+import 'providers/database_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: FrenchTutorApp()));
+
+  final db = await openAppDatabase();
+  await ContentService.shared.preload();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+      ],
+      child: const FrenchTutorApp(),
+    ),
+  );
 }
