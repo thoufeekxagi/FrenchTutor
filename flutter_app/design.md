@@ -40,11 +40,21 @@ Rules enforced in review: no `Platform.isIOS` in screens; no raw `MaterialPageRo
 ## 1. Product design stance
 
 **Positioning:** premium, editorial, calm — a "passport/field journal" aesthetic, not a
-"playground." The `Passeport` identity: pastel French-flag palette (ink `#1B2A4A`, parchment
-`#FAF9F6`, maroon `#C8433E`, brass `#6B8FC4`, slate grays), Playfair Display serif for headings,
-system sans for body, JetBrains Mono for data/labels. Cards are white with 1px ink-hairline
-borders and 14pt radius — depth comes from color and hairlines, never drop shadows. One dominant
-action per screen (the Continue button pattern); everything else is quiet.
+"playground." Visual ground truth: the mockups in `ux-design/passeport style/` (git). The
+`Passeport` identity as implemented (2026-07 retheme):
+
+- **Palette:** ink navy `#1B2A4A` (hero surfaces like the "Just talk to Marie" card), warm paper
+  `#F7F4EC` background, white cards, deep bordeaux `#8E3B3B` (chips, primary accents), real gold
+  `#B08D4A` (icons, progress, success), slate grays. The old blue "brass" and near-white
+  background are gone — gold and warm cream are what make the mockups read premium.
+- **Type:** serif (Playfair) is a DISPLAY voice only — the "Bonjour !" greeting, screen titles,
+  flashcard French words, all ≥22pt. `DesignTokens.display()` enforces the floor: below 22pt it
+  silently returns Inter semibold, so no call site can ship small serif ("Times New Roman app"
+  is the exact failure this guards against). ALL other text is **Inter** — SF Pro metrics,
+  identical on iOS/Android/web. No monospace anywhere; labels/kickers are letterspaced Inter.
+- **Cards:** white, 16pt radius, whisper-soft shadow (`DesignTokens.cardShadow`) — no borders,
+  no Material elevation. Chips are FILLED pills (bordeaux bg, white text), not tinted outlines.
+- One dominant action per screen (the Continue pattern); everything else is quiet.
 
 **What we are explicitly avoiding**, backed by research into why these read as manipulative or
 juvenile for a serious/adult audience:

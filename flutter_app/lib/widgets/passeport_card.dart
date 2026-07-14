@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../config/theme.dart';
+import '../design/tokens.dart';
 
+/// The house card: white on warm paper, generous radius, depth from a
+/// whisper-soft shadow — no borders, no Material elevation (see
+/// ux-design/passeport style mockups).
 class PasseportCard extends StatelessWidget {
   const PasseportCard({super.key, required this.child, this.padding = 16});
 
@@ -11,16 +14,13 @@ class PasseportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
+        color: DesignTokens.card,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        boxShadow: DesignTokens.cardShadow,
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Passeport.card,
-        child: Padding(
-          padding: EdgeInsets.all(padding),
-          child: child,
-        ),
+      child: Padding(
+        padding: EdgeInsets.all(padding),
+        child: child,
       ),
     );
   }

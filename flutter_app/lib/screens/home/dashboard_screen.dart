@@ -130,7 +130,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 3),
                 Text(
                   'Bonjour !',
-                  style: Passeport.display(24, weight: FontWeight.w500)
+                  style: Passeport.display(32, weight: FontWeight.w600)
                       .copyWith(color: Passeport.text),
                 ),
               ],
@@ -162,33 +162,42 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return GestureDetector(
       onTap: () => _openSession(),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
         decoration: BoxDecoration(
           color: Passeport.ink,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: DesignTokens.cardShadow,
         ),
         child: Row(
           children: [
-            Icon(CupertinoIcons.phone_fill, size: 14, color: Passeport.brass),
-            const SizedBox(width: 10),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Passeport.brass.withValues(alpha: 0.18),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(CupertinoIcons.phone_fill, size: 20, color: Passeport.brass),
+            ),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Just talk to Marie',
-                    style: Passeport.body(13.5, weight: FontWeight.w500)
+                    style: Passeport.display(22, weight: FontWeight.w600)
                         .copyWith(color: Passeport.parchment),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 3),
                   Text(
                     'Unstructured practice, any topic',
-                    style: Passeport.mono(10).copyWith(color: Passeport.slate),
+                    style: Passeport.body(12.5).copyWith(color: Passeport.slate),
                   ),
                 ],
               ),
             ),
-            Icon(CupertinoIcons.chevron_right, size: 12, color: Passeport.slate),
+            const Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
           ],
         ),
       ),
@@ -225,15 +234,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       lessonContext: ref.read(contentServiceProvider).speakingTopicContext(topic),
                     ),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                       decoration: BoxDecoration(
-                        color: Passeport.maroon.withValues(alpha: 0.1),
+                        color: Passeport.maroon,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
                         topic.title,
-                        style: Passeport.mono(11, weight: FontWeight.w500)
-                            .copyWith(color: Passeport.maroon),
+                        style: Passeport.body(13, weight: FontWeight.w500)
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ),
