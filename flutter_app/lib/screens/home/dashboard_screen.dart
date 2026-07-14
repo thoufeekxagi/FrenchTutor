@@ -10,6 +10,7 @@ import '../../models/content_models.dart';
 import '../../config/api_keys.dart';
 import '../../services/lesson_speech_service.dart';
 import '../session/session_screen.dart';
+import 'daily_pathway_widget.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -78,6 +79,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
             children: [
               _buildHeader(),
+              const SizedBox(height: 14),
+              DailyPathwayWidget(onProgress: _reload),
               const SizedBox(height: 14),
               _buildCallMarieCard(),
               const SizedBox(height: 14),

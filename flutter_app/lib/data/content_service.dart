@@ -45,6 +45,15 @@ class ContentService {
 
   BilingualExample? vocabExamples(String entryId) => _vocabExamples?[entryId];
 
+  Map<String, BilingualExample> vocabExamplesFor(List<VocabEntry> words) {
+    final map = <String, BilingualExample>{};
+    for (final word in words) {
+      final example = _vocabExamples?[word.id];
+      if (example != null) map[word.id] = example;
+    }
+    return map;
+  }
+
   GrammarPack? grammar() => _grammar;
   ConnectorsPack? connectors() => _connectors;
   ListeningPack? listening() => _listening;
