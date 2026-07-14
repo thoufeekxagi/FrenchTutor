@@ -144,7 +144,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _isNewById = {
       for (final entry in widget.vocabQueue) entry.id: (_store.srsState(entry.id)?.reps ?? 0) == 0,
     };
-    final context = _buildContext(_sessionPlan, widget.examplesByWordId, _isNewById, widget.focusNote);
+    final context = _buildContext(_sessionPlan, widget.examplesByWordId, _isNewById, widget.focusNote, _store.profile().level);
     _gemini = GeminiLiveService(
       apiKey: ApiKeys.geminiKey,
       lessonContext: context,
@@ -900,15 +900,25 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     Map<String, BilingualExample> examples,
     Map<String, bool> isNewById,
     String? focusNote,
+    String learnerLevel,
   ) {
     if (plan.isEmpty) {
       return 'VOCAB STAGE: no new or due vocabulary today. Briefly tell the student there\'s nothing new to review right now and that they can end the call whenever ready.';
     }
+    // Marie's English/French ratio follows the learner's self-declared level —
+    // a total beginner drowning in French and an intermediate being drip-fed
+    // English both churn (PILOT_PLAN.md Phase 3).
+    final languageGuidance = switch (learnerLevel) {
+      'conversational' =>
+        'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.',
+      _ =>
+        'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.',
+    };
     final parts = <String>[];
     parts.add('''
 VOCAB STAGE — this is a focused vocabulary session, nothing else. The student's screen ALREADY shows the English, French, and pronunciation for the current word the instant it appears — you never need to reveal anything.
 
-CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who's conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they're here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — 'to eat', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.
+$languageGuidance
 
 CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and the instant they say something like "next", "got it", "ready", or "go back", the app moves the card itself — instantly, on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take — you aren't taking one. Instead, teach the current word for as long as it takes, and when it feels like a natural moment, ask a genuine question like "does that feel good? Ready for the next one?" — this is real conversation, not a mechanism, since it's the student's own answer (heard by the app, not you) that actually moves things forward.
 

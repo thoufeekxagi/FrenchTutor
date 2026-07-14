@@ -5,7 +5,6 @@ import '../providers/database_provider.dart';
 import '../widgets/floating_notetaker.dart';
 import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
-import 'mocks/mocks_screen.dart';
 import 'progress/progress_screen.dart';
 import 'settings/settings_screen.dart';
 
@@ -22,7 +21,6 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   static const _screens = [
     DashboardScreen(),
     LabsScreen(),
-    MocksScreen(),
     ProgressScreen(),
     SettingsScreen(),
   ];
@@ -47,9 +45,8 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
         selectedFontSize: 12,
         unselectedFontSize: 12,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: 'Labs'),
-          BottomNavigationBarItem(icon: Icon(Icons.checklist_rounded), label: 'Mocks'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Today'),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: 'Practice'),
           BottomNavigationBarItem(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],

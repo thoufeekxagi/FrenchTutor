@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../models/profile.dart';
+import '../../providers/database_provider.dart';
 import '../../widgets/kicker_text.dart';
 
 const availableModels = [
@@ -25,11 +28,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _modelOverride = '';
   String _openRouterKey = '';
   bool _notetakerEnabled = false;
+  late Profile _profile;
 
   @override
   void initState() {
     super.initState();
+    _profile = ref.read(learningStoreProvider).profile();
     _loadSettings();
+  }
+
+  void _saveProfile(void Function(Profile) mutate) {
+    setState(() => mutate(_profile));
+    ref.read(learningStoreProvider).saveProfile(_profile);
   }
 
   Future<void> _loadSettings() async {
@@ -110,13 +120,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         children: [
-          // --- Exam / Target ---
+          // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
           _PasseportCard(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SettingsRow(label: 'Exam', value: 'TEF Canada'),
-                Divider(height: 1, color: Passeport.hairline),
-                _SettingsRow(label: 'Target', value: 'CLB 7'),
+                KickerText('Learning', color: Passeport.slateDim),
+                const SizedBox(height: 6),
+                _ChoiceRow(
+                  label: 'Goal',
+                  options: const [('tef_canada', 'TEF Canada'), ('everyday', 'Everyday'), ('unsure', 'Exploring')],
+                  selected: _profile.goal,
+                  onChanged: (v) => _saveProfile((p) => p.goal = v),
+                ),
+                Divider(height: 16, color: Passeport.hairline),
+                _ChoiceRow(
+                  label: 'Session length',
+                  options: const [('quick', 'Quick'), ('standard', 'Standard'), ('deep', 'Deep')],
+                  selected: _profile.sessionLength,
+                  onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
+                ),
               ],
             ),
           ),
@@ -189,11 +212,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     },
                   ),
                 ),
+                if (kDebugMode) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Text(
-                      'New cards/day: $_newCardsPerDay',
+                      'New cards/day (labs): $_newCardsPerDay',
                       style: Passeport.body(12.5)
                           .copyWith(color: Passeport.text),
                     ),
@@ -221,13 +245,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ],
                 ),
+                ],
               ],
             ),
           ),
           const SizedBox(height: 12),
 
-          // --- AI tutor (OpenRouter) ---
-          _PasseportCard(
+          // --- AI tutor (OpenRouter) — developer build only ---
+          if (kDebugMode) _PasseportCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -285,7 +310,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          if (kDebugMode) const SizedBox(height: 12),
 
           // --- Notetaker ---
           _PasseportCard(
@@ -319,9 +344,64 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+
+          // --- About & support ---
+          _PasseportCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                KickerText('ParleSprint', color: Passeport.slateDim),
+                const SizedBox(height: 4),
+                _SettingsRow(label: 'Version', value: '0.9 pilot'),
+                Divider(height: 1, color: Passeport.hairline),
+                _SettingsRow(label: 'Feedback', value: 'thoufeek@agiventures.ca'),
+              ],
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+}
+
+/// Inline pill selector for short exclusive choices.
+class _ChoiceRow extends StatelessWidget {
+  const _ChoiceRow({required this.label, required this.options, required this.selected, required this.onChanged});
+
+  final String label;
+  final List<(String, String)> options;
+  final String selected;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: options.map((o) {
+            final isSelected = o.$1 == selected;
+            return GestureDetector(
+              onTap: () => onChanged(o.$1),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: isSelected ? Passeport.maroon : Passeport.parchmentDim,
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Text(o.$2,
+                    style: Passeport.mono(10.5, weight: FontWeight.w500)
+                        .copyWith(color: isSelected ? Passeport.parchment : Passeport.text)),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

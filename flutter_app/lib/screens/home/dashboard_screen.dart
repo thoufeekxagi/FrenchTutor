@@ -24,7 +24,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Session> _sessions = [];
   bool _loading = true;
-  int _streak = 0;
+  int _activeDaysThisMonth = 0;
   RoadmapMonth? _currentMonth;
 
   @override
@@ -48,8 +48,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final progress = ref.read(progressServiceProvider);
     final storage = ref.read(storageServiceProvider);
 
+    final store = ref.read(learningStoreProvider);
+    final monthPrefix = store.dayString(DateTime.now()).substring(0, 7);
     setState(() {
-      _streak = progress.streak();
+      _activeDaysThisMonth = store.activeDays().where((d) => d.startsWith(monthPrefix)).length;
       _loading = true;
     });
 
@@ -103,9 +105,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildHeader() {
+    final goal = ref.read(learningStoreProvider).profile().goal;
+    final goalLabel = switch (goal) {
+      'tef_canada' => 'CLB 7 · TEF Canada',
+      'everyday' => 'Everyday French',
+      _ => 'Fundamentals',
+    };
     final kickerParts = <String>[];
     if (_currentMonth != null) kickerParts.add('Month ${_currentMonth!.month}');
-    kickerParts.addAll(['CLB 7', 'TEF Canada']);
+    kickerParts.add(goalLabel);
 
     return Padding(
       padding: const EdgeInsets.only(top: 6),
@@ -132,17 +140,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               borderRadius: BorderRadius.circular(100),
               border: Border.all(color: Passeport.hairline, width: 1),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.local_fire_department, size: 13, color: Passeport.maroon),
-                const SizedBox(width: 5),
-                Text(
-                  '$_streak',
-                  style: Passeport.mono(12, weight: FontWeight.w500)
-                      .copyWith(color: Passeport.text),
-                ),
-              ],
+            child: Text(
+              '$_activeDaysThisMonth day${_activeDaysThisMonth == 1 ? '' : 's'} this month',
+              style: Passeport.mono(11, weight: FontWeight.w500)
+                  .copyWith(color: Passeport.text),
             ),
           ),
         ],

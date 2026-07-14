@@ -234,6 +234,16 @@ class LearningStore {
         .toList();
   }
 
+  /// Distinct entries recalled successfully (good/easy) since [since] —
+  /// the evidence behind "this week you can now…" progress framing.
+  List<String> entriesRecalledSince(DateTime since) {
+    final rows = _db.select(
+      "SELECT DISTINCT entry_id FROM vocab_reviews WHERE reviewed_at >= ? AND grade IN ('good', 'easy')",
+      [since.toUtc().toIso8601String()],
+    );
+    return rows.map((r) => r['entry_id'] as String).toList();
+  }
+
   // ---------------------------------------------------------------------------
   // Daily Path persistence — one row per local date, updated on every
   // meaningful transition so the learner can always resume exactly in place.

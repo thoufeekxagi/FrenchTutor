@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
+import '../../data/content_service.dart';
 import '../../providers/database_provider.dart';
 import '../../services/progress_service.dart';
 import '../../models/content_models.dart';
@@ -32,9 +33,17 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final progress = ref.watch(progressServiceProvider);
-    final streakCount = progress.streak();
     final habits = progress.todaysHabits();
     final skills = progress.skillProgress();
+    final store = ref.read(learningStoreProvider);
+    final monthPrefix = store.dayString(DateTime.now()).substring(0, 7);
+    final activeDays = store.activeDays().where((d) => d.startsWith(monthPrefix)).length;
+    final recalledIds = store.entriesRecalledSince(DateTime.now().subtract(const Duration(days: 7))).toSet();
+    final recalledWords = ContentService.shared.vocabPhases
+        .expand((ph) => ph.themes.expand((t) => t.entries))
+        .where((e) => recalledIds.contains(e.id))
+        .take(6)
+        .toList();
 
     return Scaffold(
       backgroundColor: Passeport.parchment,
@@ -51,8 +60,8 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
             ),
             const SizedBox(height: 28),
 
-            // --- Streak display ---
-            _buildStreakCard(streakCount),
+            // --- Evidence, not streaks: what the learner can actually do ---
+            _buildEvidenceCard(activeDays, recalledIds.length, recalledWords),
             const SizedBox(height: 24),
 
             // --- Today's habits ---
@@ -98,27 +107,49 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     );
   }
 
-  Widget _buildStreakCard(int streakCount) {
+  Widget _buildEvidenceCard(int activeDays, int recalledCount, List<VocabEntry> sampleWords) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 28),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Passeport.card,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Passeport.hairline, width: 1),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.local_fire_department, size: 44, color: Passeport.maroon),
-          const SizedBox(height: 8),
+          Text('This week', style: Passeport.display(16, weight: FontWeight.w600)),
+          const SizedBox(height: 6),
           Text(
-            '$streakCount',
-            style: Passeport.display(42, weight: FontWeight.w700),
+            recalledCount > 0
+                ? 'You recalled $recalledCount word${recalledCount == 1 ? '' : 's'} from memory, unaided.'
+                : 'Your first recalled words will show up here.',
+            style: Passeport.body(13).copyWith(color: Passeport.slateDim),
           ),
-          const SizedBox(height: 2),
+          if (sampleWords.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: sampleWords
+                  .map((w) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Passeport.brass.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(w.fr,
+                            style: Passeport.mono(11, weight: FontWeight.w500)
+                                .copyWith(color: Passeport.inkSoft)),
+                      ))
+                  .toList(),
+            ),
+          ],
+          const SizedBox(height: 12),
           Text(
-            streakCount == 1 ? 'day streak' : 'day streak',
-            style: Passeport.body(14).copyWith(color: Passeport.slateDim),
+            '$activeDays study day${activeDays == 1 ? '' : 's'} this month',
+            style: Passeport.mono(11).copyWith(color: Passeport.slateDim),
           ),
         ],
       ),
