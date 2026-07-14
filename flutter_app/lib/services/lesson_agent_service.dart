@@ -1,0 +1,529 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+
+import '../config/api_keys.dart';
+import '../models/content_models.dart';
+
+/// The "brain" behind lesson labs: answers questions, grades writing, explains
+/// wrong quiz answers — all via OpenRouter free-tier text models. Voice (TTS/STT)
+/// is handled separately by LessonSpeechService; this service is text-only.
+class AgentError implements Exception {
+  const AgentError._(this.message);
+
+  final String message;
+
+  static const missingKey =
+      AgentError._('AI feedback unavailable — add an OpenRouter key in Settings.');
+  static const requestFailed =
+      AgentError._('The AI tutor is busy right now. Try again in a moment.');
+  static const badResponse = AgentError._('The AI tutor gave an unexpected response.');
+
+  static AgentError badJSON(String raw) =>
+      AgentError._('LLM returned non-JSON: ${raw.substring(0, raw.length > 200 ? 200 : raw.length)}');
+
+  @override
+  String toString() => message;
+}
+
+class WritingFeedback {
+  WritingFeedback({
+    required this.scoreOutOf10,
+    required this.strengths,
+    required this.corrections,
+    required this.connectorFeedback,
+    required this.improvedVersion,
+  });
+
+  final double scoreOutOf10;
+  final List<String> strengths;
+  final List<({String original, String fixed, String why})> corrections;
+  final String connectorFeedback;
+  final String improvedVersion;
+}
+
+class MicroWritingFeedback {
+  MicroWritingFeedback({required this.scoreOutOf10, required this.comment});
+
+  final double scoreOutOf10;
+  final String comment;
+}
+
+class MistakeJudgment {
+  MistakeJudgment({required this.isCorrect, this.tag, this.description});
+
+  final bool isCorrect;
+  final String? tag;
+  final String? description;
+}
+
+class SessionPlan {
+  SessionPlan({required this.focusNote, this.prioritizedWordIds});
+
+  final String focusNote;
+  final List<String>? prioritizedWordIds;
+}
+
+class GrammarSessionPlan {
+  GrammarSessionPlan({required this.chosenId, required this.focusNote});
+
+  final String chosenId;
+  final String focusNote;
+}
+
+class LessonAgentService {
+  LessonAgentService._();
+
+  static final LessonAgentService shared = LessonAgentService._();
+
+  /// Single fixed model, no fallback chain — MVP keeps this simple. Picked by live
+  /// head-to-head testing against the other free-tier candidates on the app's actual
+  /// prompt shapes: fastest turnaround (~3-4s vs. 8-13s) and the only one that returned
+  /// clean JSON with no stray leading/trailing whitespace to strip.
+  /// Overridable from Settings via the "openrouter_model_override" preference.
+  Future<String> get _model async {
+    final prefs = await SharedPreferences.getInstance();
+    final override = prefs.getString('openrouter_model_override');
+    if (override != null && override.isNotEmpty) return override;
+    return 'nvidia/nemotron-3-super-120b-a12b:free';
+  }
+
+  Future<String> get _apiKey async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getString('openrouter_api_key');
+    if (stored != null && stored.isNotEmpty) return stored;
+    return ApiKeys.openRouterKey;
+  }
+
+  static String extractJSON(String raw) {
+    var s = raw.trim();
+    // Strip markdown code fences: ```json ... ``` or ``` ... ```
+    if (s.startsWith('```')) {
+      final firstNewline = s.indexOf('\n');
+      if (firstNewline != -1) {
+        s = s.substring(firstNewline + 1);
+      }
+      if (s.endsWith('```')) {
+        s = s.substring(0, s.length - 3).trim();
+      }
+    }
+    final objStart = s.indexOf('{');
+    final objEnd = s.lastIndexOf('}');
+    if (objStart != -1 && objEnd != -1 && objEnd > objStart) {
+      return s.substring(objStart, objEnd + 1);
+    }
+    final arrStart = s.indexOf('[');
+    final arrEnd = s.lastIndexOf(']');
+    if (arrStart != -1 && arrEnd != -1 && arrEnd > arrStart) {
+      return s.substring(arrStart, arrEnd + 1);
+    }
+    return s;
+  }
+
+  // MARK: - Public API
+
+  /// Bilingual tutor persona; answers are meant to be spoken aloud, so no markdown, ≤120 words.
+  Future<String> askQuestion({
+    required String lessonContext,
+    required String question,
+    List<({String role, String text})> history = const [],
+  }) async {
+    const system = '''
+You are a friendly, encouraging bilingual (English/French) French tutor helping a student preparing for the TEF/TCF Canada exam (target CLB 7). The student is mid-lesson; use the LESSON CONTEXT to ground your answer. Keep answers under 120 words, spoken-style — no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
+    final messages = <Map<String, String>>[
+      {'role': 'system', 'content': '$system\n\nLESSON CONTEXT:\n$lessonContext'},
+    ];
+    for (final turn in history) {
+      messages.add({'role': turn.role == 'user' ? 'user' : 'assistant', 'content': turn.text});
+    }
+    messages.add({'role': 'user', 'content': question});
+    return _complete(messages: messages);
+  }
+
+  Future<WritingFeedback> gradeWriting({required WritingTask task, required String submission}) async {
+    const system = '''
+You are a strict but encouraging TEF Canada writing examiner. Grade the student's submission against the task using a TEF-style rubric (task completion, grammar/conjugation accuracy, vocabulary range, use of logical connectors, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+{"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string}''';
+    final user = '''
+TASK: ${task.title}
+PROMPT: ${task.promptFr}
+MINIMUM WORDS: ${task.minWords}
+TARGET CONNECTORS: ${task.targetConnectors.join(', ')}
+
+STUDENT SUBMISSION:
+$submission''';
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+    return _parseWritingFeedback(raw);
+  }
+
+  /// Runs invisibly alongside a live vocab session — takes what the student was asked to say
+  /// and what speech recognition captured, and judges whether it was a reasonable attempt.
+  /// Never shown to the user directly; only feeds the mistake ledger. Fire-and-forget by
+  /// design: callers should swallow errors rather than surface them, since this is a nice-to-have
+  /// enrichment, not part of the live conversation loop.
+  Future<MistakeJudgment> judgePronunciationAttempt({
+    required String targetWord,
+    required String studentSaid,
+  }) async {
+    // Kept as short as possible — this call fires on nearly every turn of a live session,
+    // so its fixed cost multiplies fast; every token trimmed here is the single biggest
+    // lever on this service's total token spend.
+    const system = '''
+Silently audit a French pronunciation attempt (student never sees this). They were asked to say a French word aloud; below is what speech recognition captured (imperfect — be lenient on transcription noise, but flag real errors: wrong verb form, confused similar word, wrong word, silence). Reply with ONLY compact JSON, no markdown, no commentary: {"correct": boolean, "tag": string_or_null, "description": string_or_null}. tag = short stable snake_case slug for the error type (e.g. "nasal_vowel_confusion"), reused across words so it can be tracked over time. Both null when correct is true.''';
+    final user = 'TARGET WORD: $targetWord\nSPEECH RECOGNITION CAPTURED: $studentSaid';
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+    return _parseMistakeJudgment(raw);
+  }
+
+  /// Runs once, briefly, before a vocab session starts — looks at recurring mistakes and
+  /// recent session history and decides what's worth emphasizing today, instead of always
+  /// presenting the same fixed order. Callers should treat this as best-effort: on failure,
+  /// fall back to the original candidate order with no focus note, no user-visible error.
+  Future<SessionPlan> planVocabSession({
+    required List<VocabEntry> candidateWords,
+    required List<({String tag, String description, int count})> mistakeTags,
+    required List<String> recentDiary,
+  }) async {
+    const system = '''
+You are quietly planning a French vocabulary practice session before it starts — the student won't see this reasoning, only the short focus note you write. Given the candidate word list, the student's recurring mistake patterns, and recent session notes, decide: (1) a one-sentence, warm, specific focus note for how today's session should be framed (e.g. referencing a specific recurring mistake if relevant), and (2) optionally reorder the word IDs to front-load anything especially relevant to their recent struggles — or return null to keep the given order if no reordering is warranted. Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings_or_null}. The prioritized_word_ids, if provided, must be a permutation of the exact candidate IDs given — never invent new ones.''';
+    final wordList = candidateWords.map((w) => '${w.id}: ${w.fr} (${w.en})').join('; ');
+    var user = 'CANDIDATE WORDS: $wordList';
+    if (mistakeTags.isNotEmpty) {
+      user += '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
+    }
+    if (recentDiary.isNotEmpty) {
+      user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
+    }
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+    return _parseSessionPlan(raw, validIds: candidateWords.map((w) => w.id).toSet());
+  }
+
+  /// Runs once, briefly, before a grammar session starts, when the student picks "Auto" in
+  /// the grammar picker — looks at recurring mistakes and recent session history and picks
+  /// ONE tense/topic from the candidate list to focus on today, exactly the same best-effort
+  /// shape as `planVocabSession` (fall back to the first candidate, no focus note, on failure).
+  Future<GrammarSessionPlan> planGrammarSession({
+    required List<({String id, String title})> candidates,
+    required List<({String tag, String description, int count})> mistakeTags,
+    required List<String> recentDiary,
+  }) async {
+    const system = '''
+You are quietly picking which ONE French grammar point a beginner should practice today — the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, the student's recurring mistake patterns, and recent session notes, choose the single most useful one to practice right now (e.g. if their mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given — never invent a new one.''';
+    final list = candidates.map((c) => '${c.id}: ${c.title}').join('; ');
+    var user = 'CANDIDATES: $list';
+    if (mistakeTags.isNotEmpty) {
+      user += '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
+    }
+    if (recentDiary.isNotEmpty) {
+      user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
+    }
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+    return _parseGrammarSessionPlan(
+      raw,
+      validIds: candidates.map((c) => c.id).toSet(),
+      fallbackId: candidates.isNotEmpty ? candidates.first.id : '',
+    );
+  }
+
+  /// Runs ONCE, right after the vocab stage ends, if the student picks "a short reading/
+  /// listening session on the words I just practiced" — assembles a short French passage/
+  /// dialogue that naturally reuses those words, broken into `ReadingSegment`s (word/phrase,
+  /// meaning, one simple grammar note, one pronunciation tip). This is pre-generation, not live
+  /// teaching: the result is cached and handed to the listening screen exactly like
+  /// offline-authored content — the model is never called again during the teaching session
+  /// itself. Grammar notes are intentionally kept simple (no conjugation tables, no advanced
+  /// tense discussion) for this first version.
+  Future<ReadingPassage> buildReadingPassageFromVocab({required List<VocabEntry> words}) async {
+    const system = '''
+You are quietly assembling a short French reading/listening passage for a total beginner preparing for TEF/TCF Canada, using ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", etc. as needed for grammatical French) — do not introduce unrelated advanced vocabulary. Write 4-8 short segments (a word or a very short phrase each) that together form a simple, coherent short passage or dialogue when read in order. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation or subjunctive — this is intentionally basic for a first pass. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+{"title": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
+Each segment's "fr" must be the exact short phrase as it appears in the passage (in order, so concatenating them with spaces reproduces the full passage), "en" its English meaning, "grammar_note" one simple English sentence explaining why that word/word order is used, and "pronunciation_tip" one simple English sentence with a pronunciation pointer.''';
+    final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
+    final user = 'VOCABULARY WORDS TO REUSE: $wordList';
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ], maxTokens: 1400);
+    return _parseReadingPassage(raw);
+  }
+
+  /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
+  /// deck of `GrammarPracticeCard`s (one short French sentence in the chosen tense per card,
+  /// its English meaning, and a one-line grammar note), reusing the vocabulary words the
+  /// student just practiced in the Vocab stage wherever natural, and informed by that Vocab
+  /// session's actual transcript (what they said, how it went) rather than teaching the tense
+  /// in a vacuum. Pre-generation, not live teaching: mirrors `buildReadingPassageFromVocab`'s
+  /// shape. Kept deliberately lean — only the tense name, a handful of vocab words, and one
+  /// short line of recent context go in, not a full transcript or the whole usage-notes list.
+  String lastRawResponse = '';
+
+  Future<List<GrammarPracticeCard>> generateGrammarPracticeCards({
+    required String tenseTitle,
+    required List<String> tenseUsage,
+    required List<String> vocabWords,
+    required String recentVocabTranscript,
+    int count = 6,
+  }) async {
+    final words = vocabWords.take(6);
+    final wordList = words.isEmpty ? '' : ' using words: ${words.join(', ')}';
+    final user =
+        '$count beginner French sentences in $tenseTitle$wordList. Pure JSON only: {"cards":[{"fr":"...","en":"...","note":"..."}]}';
+    final raw = await _complete(messages: [
+      {'role': 'user', 'content': user},
+    ], maxTokens: 800);
+    lastRawResponse = raw;
+    return _parseGrammarPracticeCards(raw);
+  }
+
+  /// A fast, lightweight grade for the Daily Pathway's writing stage — one or two sentences
+  /// using specific target words, not a full TEF rubric essay grade like `gradeWriting`.
+  Future<MicroWritingFeedback> gradeMicroWriting({
+    required String prompt,
+    required List<String> targetWords,
+    required String submission,
+  }) async {
+    const system = '''
+You are a friendly French tutor grading a one-to-two sentence micro writing exercise. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape: {"score_out_of_10": number, "comment": string}. The comment should be one short encouraging sentence, spoken-style with no markdown, since it will be read aloud.''';
+    final user = '''
+TASK: $prompt
+TARGET WORDS: ${targetWords.join(', ')}
+
+STUDENT SUBMISSION:
+$submission''';
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+    return _parseMicroWritingFeedback(raw);
+  }
+
+  Future<String> checkDictation({required String expected, required String submitted}) async {
+    const system = '''
+You are a French dictation checker. Compare the EXPECTED sentence to the STUDENT'S TYPED version. In under 60 words, spoken-style with no markdown, tell the student what they got right and point out any missed accents, silent letters, or misheard words.''';
+    final user = 'EXPECTED: $expected\nSTUDENT WROTE: $submitted';
+    return _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+  }
+
+  Future<String> quizFeedback({
+    required String question,
+    required String correctAnswer,
+    required String studentAnswer,
+    required String lessonContext,
+  }) async {
+    const system = '''
+You are a French grammar tutor. The student answered a drill question incorrectly. In under 80 words, spoken-style with no markdown, explain why the correct answer is right and why their answer was wrong, using the LESSON CONTEXT for grounding.''';
+    final user =
+        'LESSON CONTEXT:\n$lessonContext\n\nQUESTION: $question\nCORRECT ANSWER: $correctAnswer\nSTUDENT ANSWER: $studentAnswer';
+    return _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ]);
+  }
+
+  // MARK: - Networking
+
+  Future<String> _complete({required List<Map<String, String>> messages, int maxTokens = 1024}) async {
+    final key = await _apiKey;
+    if (key.isEmpty) throw AgentError.missingKey;
+    final model = await _model;
+    return _request(model: model, messages: messages, maxTokens: maxTokens, apiKey: key);
+  }
+
+  Future<String> _request({
+    required String model,
+    required List<Map<String, String>> messages,
+    required int maxTokens,
+    required String apiKey,
+  }) async {
+    final uri = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
+    http.Response response;
+    try {
+      response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/frenchtutor-app',
+          'X-Title': 'FrenchTutor Passeport',
+        },
+        // Without an explicit cap, a large batch response (e.g. 25 example sentences in one
+        // JSON array) can get cut off mid-object by the model's own default completion length,
+        // producing invalid JSON that fails to parse entirely — silently dropping every example
+        // in the whole session, not just the ones past the cutoff. Callers with bigger expected
+        // outputs (batch generation) pass a larger explicit value.
+        body: jsonEncode({
+          'model': model,
+          'messages': messages,
+          'temperature': 0.4,
+          'max_tokens': maxTokens,
+        }),
+      );
+    } catch (_) {
+      throw AgentError.requestFailed;
+    }
+
+    if (response.statusCode == 429 || (response.statusCode >= 500 && response.statusCode <= 599)) {
+      throw AgentError.requestFailed;
+    }
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw AgentError.requestFailed;
+    }
+
+    try {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final choices = json['choices'] as List?;
+      final first = choices?.isNotEmpty == true ? choices!.first as Map<String, dynamic> : null;
+      final message = first?['message'] as Map<String, dynamic>?;
+      final content = message?['content'] as String?;
+      if (content == null || content.isEmpty) throw AgentError.badResponse;
+      return content.trim();
+    } catch (e) {
+      if (e is AgentError) rethrow;
+      throw AgentError.badResponse;
+    }
+  }
+
+  WritingFeedback _parseWritingFeedback(String raw) {
+    final obj = _decodeObject(raw);
+    final score = _asDouble(obj['score_out_of_10']);
+    final strengths = (obj['strengths'] as List?)?.map((e) => e.toString()).toList() ?? <String>[];
+    final correctionsRaw = (obj['corrections'] as List?) ?? [];
+    final corrections = correctionsRaw.map((c) {
+      final m = c as Map<String, dynamic>;
+      return (
+        original: m['original'] as String? ?? '',
+        fixed: m['fixed'] as String? ?? '',
+        why: m['why'] as String? ?? '',
+      );
+    }).toList();
+    final connectorFeedback = obj['connector_feedback'] as String? ?? '';
+    final improved = obj['improved_version'] as String? ?? '';
+    return WritingFeedback(
+      scoreOutOf10: score,
+      strengths: strengths,
+      corrections: corrections,
+      connectorFeedback: connectorFeedback,
+      improvedVersion: improved,
+    );
+  }
+
+  MicroWritingFeedback _parseMicroWritingFeedback(String raw) {
+    final obj = _decodeObject(raw);
+    final score = _asDouble(obj['score_out_of_10']);
+    final comment = obj['comment'] as String? ?? '';
+    return MicroWritingFeedback(scoreOutOf10: score, comment: comment);
+  }
+
+  MistakeJudgment _parseMistakeJudgment(String raw) {
+    final obj = _decodeObject(raw);
+    final correct = obj['correct'] as bool? ?? true;
+    return MistakeJudgment(
+      isCorrect: correct,
+      tag: obj['tag'] as String?,
+      description: obj['description'] as String?,
+    );
+  }
+
+  ReadingPassage _parseReadingPassage(String raw) {
+    final obj = _decodeObject(raw);
+    final title = obj['title'] as String? ?? 'Reading passage';
+    final segmentsRaw = (obj['segments'] as List?) ?? [];
+    final segments = segmentsRaw
+        .map((s) => s as Map<String, dynamic>)
+        .where((s) => (s['fr'] as String?)?.isNotEmpty == true)
+        .map((s) => ReadingSegment(
+              fr: s['fr'] as String,
+              en: s['en'] as String? ?? '',
+              grammarNote: s['grammar_note'] as String? ?? '',
+              pronunciationTip: s['pronunciation_tip'] as String? ?? '',
+            ))
+        .toList();
+    if (segments.isEmpty) throw AgentError.badResponse;
+    final rawFullText = obj['full_text'] as String?;
+    final fullText = (rawFullText != null && rawFullText.isNotEmpty)
+        ? rawFullText
+        : segments.map((s) => s.fr).join(' ');
+    return ReadingPassage(
+      id: 'generated-${const Uuid().v4().substring(0, 8)}',
+      title: title,
+      segments: segments,
+      fullText: fullText,
+    );
+  }
+
+  List<GrammarPracticeCard> _parseGrammarPracticeCards(String raw) {
+    final obj = _decodeObject(raw);
+    final cardsRaw = (obj['cards'] as List?) ?? [];
+    final cards = <GrammarPracticeCard>[];
+    for (var i = 0; i < cardsRaw.length; i++) {
+      final card = cardsRaw[i] as Map<String, dynamic>;
+      final fr = card['fr'] as String?;
+      if (fr == null || fr.isEmpty) continue;
+      cards.add(GrammarPracticeCard(
+        id: 'generated-$i-${const Uuid().v4().substring(0, 6)}',
+        fr: fr,
+        en: card['en'] as String? ?? '',
+        note: card['note'] as String? ?? '',
+      ));
+    }
+    if (cards.isEmpty) throw AgentError.badResponse;
+    return cards;
+  }
+
+  SessionPlan _parseSessionPlan(String raw, {required Set<String> validIds}) {
+    final obj = _decodeObject(raw);
+    final focusNote = obj['focus_note'] as String? ?? '';
+    var prioritized = (obj['prioritized_word_ids'] as List?)?.map((e) => e.toString()).toList();
+    // Guard against a hallucinated/incomplete reordering — only trust it if it's an exact
+    // permutation of the real candidate IDs, otherwise fall back to the given order.
+    if (prioritized != null && prioritized.toSet() != validIds) {
+      prioritized = null;
+    }
+    return SessionPlan(focusNote: focusNote, prioritizedWordIds: prioritized);
+  }
+
+  GrammarSessionPlan _parseGrammarSessionPlan(
+    String raw, {
+    required Set<String> validIds,
+    required String fallbackId,
+  }) {
+    final obj = _decodeObject(raw);
+    final focusNote = obj['focus_note'] as String? ?? '';
+    final chosenId = obj['chosen_id'] as String?;
+    // Guard against a hallucinated ID the same way vocab guards a hallucinated reordering.
+    final validChosenId = (chosenId != null && validIds.contains(chosenId)) ? chosenId : fallbackId;
+    return GrammarSessionPlan(chosenId: validChosenId, focusNote: focusNote);
+  }
+
+  Map<String, dynamic> _decodeObject(String raw) {
+    final jsonString = extractJSON(raw);
+    try {
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (_) {
+      throw AgentError.badJSON(raw);
+    }
+  }
+
+  double _asDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    return 0;
+  }
+}

@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
+import '../../services/lesson_agent_service.dart';
+import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/lesson_qa_overlay.dart';
 
 class WritingTaskScreen extends ConsumerStatefulWidget {
   const WritingTaskScreen({super.key, required this.task});
@@ -20,8 +23,14 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   bool _showEnglish = false;
   String _content = '';
   final _textController = TextEditingController();
+  bool _isGrading = false;
+  WritingFeedback? _feedback;
+  String? _errorText;
+  final DateTime _sessionStart = DateTime.now();
 
   WritingTask get task => widget.task;
+
+  String get _lessonContext => '${task.title}\n${task.promptFr}\n${task.promptEn}';
 
   int get _wordCount {
     if (_content.trim().isEmpty) return 0;
@@ -41,8 +50,45 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
 
   @override
   void dispose() {
+    _logMinutes();
     _textController.dispose();
     super.dispose();
+  }
+
+  void _logMinutes() {
+    final minutes = DateTime.now().difference(_sessionStart).inMinutes;
+    if (minutes <= 0 || _content.isEmpty) return;
+    ref.read(learningStoreProvider).markHabit('writing', minutes: minutes);
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _isGrading = true;
+      _errorText = null;
+    });
+    final submittedText = _content;
+    try {
+      final result = await ref.read(lessonAgentServiceProvider).gradeWriting(
+            task: task,
+            submission: submittedText,
+          );
+      if (!mounted) return;
+      setState(() {
+        _feedback = result;
+        _isGrading = false;
+      });
+      ref.read(learningStoreProvider).saveSubmission(
+            taskId: task.id,
+            text: submittedText,
+            feedback: result.improvedVersion,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorText = e.toString();
+        _isGrading = false;
+      });
+    }
   }
 
   @override
@@ -54,6 +100,12 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         backgroundColor: Passeport.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(Icons.mic, color: Passeport.brass),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -63,19 +115,124 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
           _connectorsCard(),
           const SizedBox(height: 16),
           _editorCard(),
+          if (_isGrading) ...[
+            const SizedBox(height: 16),
+            const Center(child: CircularProgressIndicator(color: Passeport.maroon)),
+          ],
+          if (_feedback != null) ...[
+            const SizedBox(height: 16),
+            _feedbackCard(_feedback!),
+          ],
+          if (_errorText != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _errorText!,
+              style: Passeport.mono(11).copyWith(color: Passeport.maroon),
+            ),
+          ],
           const SizedBox(height: 16),
           PasseportPrimaryButton(
-            label: 'Submit for grading',
-            onPressed: null, // Disabled — Phase 4
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: Text(
-              'Grading requires API — Phase 4',
-              style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
-            ),
+            label: _feedback == null ? 'Submit for grading' : 'Re-submit',
+            onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
           ),
           const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  // -- Feedback card --
+
+  Widget _feedbackCard(WritingFeedback feedback) {
+    return PasseportCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const KickerText('Feedback', color: Passeport.slateDim),
+              const Spacer(),
+              Text(
+                '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
+                style: Passeport.display(16, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+              ),
+            ],
+          ),
+          if (feedback.strengths.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Strengths', style: Passeport.body(12, weight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            for (final s in feedback.strengths)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.check, size: 12, color: Passeport.brass),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(s, style: Passeport.body(12).copyWith(color: Passeport.slateDim))),
+                  ],
+                ),
+              ),
+          ],
+          if (feedback.corrections.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Corrections', style: Passeport.body(12, weight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            for (final c in feedback.corrections)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          c.original,
+                          style: Passeport.body(11.5).copyWith(
+                            color: Passeport.maroon,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.arrow_forward, size: 9, color: Passeport.slate),
+                        const SizedBox(width: 6),
+                        Text(
+                          c.fixed,
+                          style: Passeport.body(11.5, weight: FontWeight.w500).copyWith(color: Passeport.brass),
+                        ),
+                      ],
+                    ),
+                    if (c.why.isNotEmpty)
+                      Text(c.why, style: Passeport.mono(10).copyWith(color: Passeport.slateDim)),
+                  ],
+                ),
+              ),
+          ],
+          if (feedback.connectorFeedback.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Connectors', style: Passeport.body(12, weight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            Text(feedback.connectorFeedback, style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
+          ],
+          if (feedback.improvedVersion.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text('Improved version', style: Passeport.body(12, weight: FontWeight.w500)),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.volume_up, size: 16, color: Passeport.brass),
+                  onPressed: () => LessonSpeechService.shared.speak(
+                    items: LessonSpeechService.speechItemsFromText(feedback.improvedVersion),
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                ),
+              ],
+            ),
+            Text(feedback.improvedVersion, style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+          ],
         ],
       ),
     );

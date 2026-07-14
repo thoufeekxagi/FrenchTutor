@@ -7,6 +7,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/lesson_qa_overlay.dart';
 
 class TopicLessonScreen extends ConsumerStatefulWidget {
   const TopicLessonScreen({super.key, required this.topic});
@@ -23,6 +24,12 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
   final Map<int, bool> _drillChecked = {};
   bool _drillsSubmitted = false;
   bool _isPlaying = false;
+
+  String get _lessonContext {
+    final topic = widget.topic;
+    final narration = topic.narration.join(' ');
+    return '${topic.title}\n$narration';
+  }
 
   double get _drillScore {
     if (widget.topic.drills.isEmpty) return 1.0;
@@ -89,6 +96,12 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
         foregroundColor: Passeport.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(Icons.mic, color: Passeport.brass),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -113,6 +126,7 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
                       drill: widget.topic.drills[i],
                       selectedAnswer: _drillAnswers[i],
                       isChecked: _drillChecked[i] ?? false,
+                      lessonContext: _lessonContext,
                       onSelect: _drillsSubmitted
                           ? null
                           : (answer) {
@@ -273,18 +287,57 @@ class _TopicSectionWidget extends StatelessWidget {
 
 // -- Drill widget (same as GrammarLessonScreen) --
 
-class _DrillWidget extends StatelessWidget {
+class _DrillWidget extends ConsumerStatefulWidget {
   const _DrillWidget({
     required this.drill,
     required this.selectedAnswer,
     required this.isChecked,
+    required this.lessonContext,
     required this.onSelect,
   });
 
   final Drill drill;
   final String? selectedAnswer;
   final bool isChecked;
+  final String lessonContext;
   final ValueChanged<String>? onSelect;
+
+  @override
+  ConsumerState<_DrillWidget> createState() => _DrillWidgetState();
+}
+
+class _DrillWidgetState extends ConsumerState<_DrillWidget> {
+  String? _explanation;
+  bool _isExplaining = false;
+
+  Drill get drill => widget.drill;
+  String? get selectedAnswer => widget.selectedAnswer;
+  bool get isChecked => widget.isChecked;
+
+  bool get _isWrong => isChecked && selectedAnswer != drill.answer;
+
+  Future<void> _explain() async {
+    setState(() => _isExplaining = true);
+    try {
+      final text = await ref.read(lessonAgentServiceProvider).quizFeedback(
+            question: drill.prompt,
+            correctAnswer: drill.answer,
+            studentAnswer: selectedAnswer ?? '',
+            lessonContext: widget.lessonContext,
+          );
+      if (!mounted) return;
+      setState(() {
+        _explanation = text;
+        _isExplaining = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _explanation = e.toString();
+        _isExplaining = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -301,6 +354,28 @@ class _DrillWidget extends StatelessWidget {
             _buildFillIn()
           else
             _buildChoices(),
+          if (_isWrong) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Spacer(),
+                GestureDetector(
+                  onTap: _isExplaining ? null : _explain,
+                  child: Text(
+                    _isExplaining ? '…' : 'Explain',
+                    style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                  ),
+                ),
+              ],
+            ),
+            if (_explanation != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                _explanation!,
+                style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+              ),
+            ],
+          ],
         ],
       ),
     );
@@ -376,7 +451,7 @@ class _DrillWidget extends StatelessWidget {
         }
 
         return GestureDetector(
-          onTap: onSelect != null ? () => onSelect!(choice) : null,
+          onTap: widget.onSelect != null ? () => widget.onSelect!(choice) : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(

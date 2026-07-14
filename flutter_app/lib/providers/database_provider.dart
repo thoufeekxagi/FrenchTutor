@@ -7,6 +7,7 @@ import '../data/database/learning_store.dart';
 import '../data/content_service.dart';
 import '../services/srs_service.dart';
 import '../services/progress_service.dart';
+import '../services/lesson_agent_service.dart';
 
 final databaseProvider = Provider<Database>((ref) {
   throw UnimplementedError('Must be overridden at startup');
@@ -30,6 +31,10 @@ final srsServiceProvider = Provider<SRSService>((ref) {
 
 final progressServiceProvider = Provider<ProgressService>((ref) {
   return ProgressService(store: ref.watch(learningStoreProvider));
+});
+
+final lessonAgentServiceProvider = Provider<LessonAgentService>((ref) {
+  return LessonAgentService.shared;
 });
 
 Future<Database> openAppDatabase() async {

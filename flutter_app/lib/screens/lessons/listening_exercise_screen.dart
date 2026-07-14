@@ -7,6 +7,7 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/lesson_qa_overlay.dart';
 
 class ListeningExerciseScreen extends ConsumerStatefulWidget {
   const ListeningExerciseScreen({super.key, required this.exercise});
@@ -22,9 +23,12 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   final Map<int, int> _answers = {};
   final Map<int, String> _dictationInputs = {};
   final Map<int, String> _dictationFeedback = {};
+  final Set<int> _dictationChecking = {};
   late DateTime _sessionStart;
 
   ListeningExercise get exercise => widget.exercise;
+
+  String get _lessonContext => '${exercise.title}\n${exercise.script}';
 
   double get _score {
     if (exercise.questions.isEmpty) return 0;
@@ -59,6 +63,12 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         backgroundColor: Passeport.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(Icons.mic, color: Passeport.brass),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -284,11 +294,17 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         ),
         const SizedBox(height: 6),
         GestureDetector(
-          onTap: () => _checkDictation(i, sentence),
-          child: Text(
-            'Check',
-            style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
-          ),
+          onTap: _dictationChecking.contains(i) ? null : () => _checkDictation(i, sentence),
+          child: _dictationChecking.contains(i)
+              ? const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Passeport.maroon),
+                )
+              : Text(
+                  'Check',
+                  style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                ),
         ),
         if (_dictationFeedback[i] != null) ...[
           const SizedBox(height: 4),
@@ -301,22 +317,37 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
     );
   }
 
-  // -- Dictation check (simple normalized comparison) --
+  // -- Dictation check (AI feedback via OpenRouter, falls back to a plain match check) --
 
-  void _checkDictation(int index, String expected) {
+  Future<void> _checkDictation(int index, String expected) async {
     final submitted = _dictationInputs[index] ?? '';
-    final normalizedExpected = _normalize(expected);
-    final normalizedSubmitted = _normalize(submitted);
+    if (submitted.trim().isEmpty) {
+      setState(() => _dictationFeedback[index] = 'Type your answer, then tap Check.');
+      return;
+    }
+    if (_normalize(expected) == _normalize(submitted)) {
+      setState(() => _dictationFeedback[index] = 'Perfect match!');
+      return;
+    }
 
-    setState(() {
-      if (normalizedSubmitted.isEmpty) {
-        _dictationFeedback[index] = 'Type your answer, then tap Check.';
-      } else if (normalizedExpected == normalizedSubmitted) {
-        _dictationFeedback[index] = 'Perfect match!';
-      } else {
+    setState(() => _dictationChecking.add(index));
+    try {
+      final feedback = await ref.read(lessonAgentServiceProvider).checkDictation(
+            expected: expected,
+            submitted: submitted,
+          );
+      if (!mounted) return;
+      setState(() {
+        _dictationFeedback[index] = feedback;
+        _dictationChecking.remove(index);
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
         _dictationFeedback[index] = 'Not quite — expected: "$expected"';
-      }
-    });
+        _dictationChecking.remove(index);
+      });
+    }
   }
 
   String _normalize(String text) {
