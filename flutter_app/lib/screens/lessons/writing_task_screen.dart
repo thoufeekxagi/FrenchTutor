@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
+import '../../config/api_keys.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
@@ -9,6 +10,8 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/lesson_qa_overlay.dart';
+import '../../widgets/marie_toolbar_button.dart';
+import '../session/session_screen.dart';
 
 class WritingTaskScreen extends ConsumerStatefulWidget {
   const WritingTaskScreen({super.key, required this.task});
@@ -30,7 +33,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
 
   WritingTask get task => widget.task;
 
-  String get _lessonContext => '${task.title}\n${task.promptFr}\n${task.promptEn}';
+  String get _lessonContext => ref.read(contentServiceProvider).writingTaskContext(task);
 
   int get _wordCount {
     if (_content.trim().isEmpty) return 0;
@@ -105,6 +108,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
             icon: const Icon(Icons.mic, color: Passeport.brass),
           ),
+          MarieToolbarButton(lessonContext: _lessonContext),
         ],
       ),
       body: ListView(
@@ -135,6 +139,30 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             label: _feedback == null ? 'Submit for grading' : 'Re-submit',
             onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
           ),
+          if (_feedback != null) ...[
+            const SizedBox(height: 12),
+            Center(
+              child: TextButton.icon(
+                onPressed: () {
+                  LessonSpeechService.shared.deactivate();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (_) => SessionScreen(
+                        apiKey: ApiKeys.geminiKey,
+                        lessonContext: _lessonContext,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.phone, size: 16, color: Passeport.maroon),
+                label: Text(
+                  'Discuss feedback with Marie',
+                  style: Passeport.mono(11, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),

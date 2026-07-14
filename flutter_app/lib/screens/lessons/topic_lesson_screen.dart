@@ -8,6 +8,7 @@ import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/lesson_qa_overlay.dart';
+import '../../widgets/marie_toolbar_button.dart';
 
 class TopicLessonScreen extends ConsumerStatefulWidget {
   const TopicLessonScreen({super.key, required this.topic});
@@ -25,11 +26,7 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
   bool _drillsSubmitted = false;
   bool _isPlaying = false;
 
-  String get _lessonContext {
-    final topic = widget.topic;
-    final narration = topic.narration.join(' ');
-    return '${topic.title}\n$narration';
-  }
+  String get _lessonContext => ref.read(contentServiceProvider).grammarTopicContext(widget.topic);
 
   double get _drillScore {
     if (widget.topic.drills.isEmpty) return 1.0;
@@ -101,6 +98,7 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
             icon: const Icon(Icons.mic, color: Passeport.brass),
           ),
+          MarieToolbarButton(lessonContext: _lessonContext),
         ],
       ),
       body: Stack(

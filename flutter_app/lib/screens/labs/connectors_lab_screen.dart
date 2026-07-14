@@ -8,6 +8,7 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/marie_toolbar_button.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
   const ConnectorsLabScreen({super.key});
@@ -34,6 +35,9 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
         backgroundColor: Passeport.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          MarieToolbarButton(lessonContext: ref.read(contentServiceProvider).connectorsContext()),
+        ],
       ),
       body: pack == null
           ? Center(

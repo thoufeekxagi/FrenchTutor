@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local API keys for --dart-define-from-file (never commit real keys)
+dart_defines.json

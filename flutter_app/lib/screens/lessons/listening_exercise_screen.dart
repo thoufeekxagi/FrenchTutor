@@ -8,6 +8,7 @@ import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/lesson_qa_overlay.dart';
+import '../../widgets/marie_toolbar_button.dart';
 
 class ListeningExerciseScreen extends ConsumerStatefulWidget {
   const ListeningExerciseScreen({super.key, required this.exercise});
@@ -28,7 +29,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
 
   ListeningExercise get exercise => widget.exercise;
 
-  String get _lessonContext => '${exercise.title}\n${exercise.script}';
+  String get _lessonContext => ref.read(contentServiceProvider).listeningExerciseContext(exercise);
 
   double get _score {
     if (exercise.questions.isEmpty) return 0;
@@ -68,6 +69,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
             icon: const Icon(Icons.mic, color: Passeport.brass),
           ),
+          MarieToolbarButton(lessonContext: _lessonContext),
         ],
       ),
       body: ListView(

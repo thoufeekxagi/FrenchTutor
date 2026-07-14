@@ -7,6 +7,9 @@ import '../../widgets/kicker_text.dart';
 import '../../providers/database_provider.dart';
 import '../../models/session.dart';
 import '../../models/content_models.dart';
+import '../../config/api_keys.dart';
+import '../../services/lesson_speech_service.dart';
+import '../session/session_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -24,6 +27,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _reload();
+  }
+
+  Future<void> _openSession({String? lessonContext}) async {
+    LessonSpeechService.shared.deactivate();
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => SessionScreen(apiKey: ApiKeys.geminiKey, lessonContext: lessonContext),
+      ),
+    );
     _reload();
   }
 
@@ -135,9 +149,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildCallMarieCard() {
     return GestureDetector(
-      onTap: () {
-        // Phase 2: no-op. Live call feature comes in a later phase.
-      },
+      onTap: () => _openSession(),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -198,9 +210,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: GestureDetector(
-                    onTap: () {
-                      // Phase 2: no-op. Topic-based calls come in a later phase.
-                    },
+                    onTap: () => _openSession(
+                      lessonContext: ref.read(contentServiceProvider).speakingTopicContext(topic),
+                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
