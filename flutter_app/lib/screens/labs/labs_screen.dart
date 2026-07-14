@@ -101,16 +101,19 @@ class _LabTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Passeport.card,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Passeport.hairline, width: 1),
       ),
-      child: ListTile(
-        leading: Icon(icon, color: Passeport.brass, size: 28),
-        title: Text(title, style: Passeport.body(15, weight: FontWeight.w500)),
-        subtitle: Text(subtitle, style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
-        trailing: Icon(Icons.chevron_right, color: Passeport.slate, size: 20),
-        onTap: onTap,
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Passeport.card,
+        child: ListTile(
+          leading: Icon(icon, color: Passeport.brass, size: 28),
+          title: Text(title, style: Passeport.body(15, weight: FontWeight.w500)),
+          subtitle: Text(subtitle, style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
+          trailing: Icon(Icons.chevron_right, color: Passeport.slate, size: 20),
+          onTap: onTap,
+        ),
       ),
     );
   }

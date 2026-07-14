@@ -9,7 +9,7 @@ class ContentService {
   VocabPhase? _phase1;
   VocabPhase? _phase2;
   VocabPhase? _phase3;
-  Map<String, List<BilingualExample>>? _vocabExamples;
+  Map<String, BilingualExample>? _vocabExamples;
   GrammarPack? _grammar;
   ConnectorsPack? _connectors;
   ListeningPack? _listening;
@@ -43,7 +43,7 @@ class ContentService {
 
   List<VocabPhase> get vocabPhases => [_phase1, _phase2, _phase3].whereType<VocabPhase>().toList();
 
-  List<BilingualExample> vocabExamples(String entryId) => _vocabExamples?[entryId] ?? [];
+  BilingualExample? vocabExamples(String entryId) => _vocabExamples?[entryId];
 
   GrammarPack? grammar() => _grammar;
   ConnectorsPack? connectors() => _connectors;
@@ -130,9 +130,9 @@ class ContentService {
 
   Future<void> _loadVocabExamples() async {
     final json = await _loadJson('vocab_examples.json');
-    final map = <String, List<BilingualExample>>{};
+    final map = <String, BilingualExample>{};
     for (final entry in json.entries) {
-      map[entry.key as String] = (entry.value as List).map((e) => BilingualExample.fromJson(e)).toList();
+      map[entry.key] = BilingualExample.fromJson(entry.value as Map<String, dynamic>);
     }
     _vocabExamples = map;
   }

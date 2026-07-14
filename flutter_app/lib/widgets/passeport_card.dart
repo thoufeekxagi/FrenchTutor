@@ -10,13 +10,18 @@ class PasseportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        color: Passeport.card,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Passeport.hairline, width: 1),
       ),
-      child: child,
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Passeport.card,
+        child: Padding(
+          padding: EdgeInsets.all(padding),
+          child: child,
+        ),
+      ),
     );
   }
 }
