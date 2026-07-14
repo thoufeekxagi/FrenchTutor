@@ -31,7 +31,7 @@ class WritingLabScreen extends ConsumerWidget {
           : ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               itemCount: pack.tasks.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final task = pack.tasks[index];
                 return _WritingTaskTile(

@@ -301,7 +301,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const Spacer(),
                     Switch.adaptive(
                       value: _notetakerEnabled,
-                      activeColor: Passeport.maroon,
+                      activeThumbColor: Passeport.maroon,
                       onChanged: (v) {
                         setState(() => _notetakerEnabled = v);
                         _saveBool('notetaker_enabled', v);

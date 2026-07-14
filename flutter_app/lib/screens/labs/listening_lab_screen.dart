@@ -32,7 +32,7 @@ class ListeningLabScreen extends ConsumerWidget {
           : ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               itemCount: pack.exercises.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final exercise = pack.exercises[index];
                 final progress = store.lessonStatus('listening_${exercise.id}');

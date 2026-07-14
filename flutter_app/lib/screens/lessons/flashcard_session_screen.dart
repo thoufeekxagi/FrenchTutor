@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
