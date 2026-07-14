@@ -54,6 +54,7 @@ struct ListeningExerciseView: View {
         .onDisappear { speech.deactivate() }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 

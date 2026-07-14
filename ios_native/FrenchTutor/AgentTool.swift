@@ -41,43 +41,29 @@ struct AgentTool {
         ),
     ]
 
-    /// Listening + grammar session (Daily Pathway stage 2). Reading and listening are grouped
-    /// together (TEF prep convention), and today's grammar focus is woven in as a natural aside
-    /// rather than a fully separate stage.
-    static let listeningPalette: [AgentTool] = [
+    /// Reading & Listening session (Daily Pathway stage 2), rebuilt against the same rule as
+    /// `vocabPalette`: navigation through the passage's segments is decided entirely by the app
+    /// (watching the student's transcript / button taps), never by a model tool call. The old
+    /// version gave the model show_conjugation/ask_drill/show_question as tools it fired on its
+    /// own judgment — same pacing/desync problems as vocab had before the fix. Only one
+    /// judgment-only tool remains, mirroring vocab's mark_result.
+    static let readingPalette: [AgentTool] = [
         AgentTool(
-            name: "show_conjugation",
-            description: "Highlight a specific verb's conjugation table on the student's screen while you walk through it.",
-            parameters: object(["verb": ["type": "STRING", "description": "The infinitive of the verb to highlight, exactly as it appears in the lesson context."]], required: ["verb"])
+            name: "mark_segment_result",
+            description: "Propose a grade for how well the student did with the current word/phrase segment. The app will only accept this if the student has actually attempted it.",
+            parameters: object(["grade": stringEnum("How well the student recalled/pronounced the segment.", values: ["again", "good", "easy"])], required: ["grade"])
         ),
+    ]
+
+    /// Grammar session (Daily Pathway stage 2, between Vocab and Reading & Listening). Same rule
+    /// as vocab/reading: navigation through today's grammar steps (usage points, conjugation
+    /// tables, drills) is entirely app-driven; the model gets exactly one judgment-only tool for
+    /// grading a drill answer, never a tool to advance/reveal content on its own initiative.
+    static let grammarPalette: [AgentTool] = [
         AgentTool(
-            name: "ask_drill",
-            description: "Display a specific practice drill (fill-in-the-blank question with choices) from today's grammar lesson so the student can answer by tapping or saying the answer aloud.",
-            parameters: object(["index": ["type": "INTEGER", "description": "Zero-based index of the drill in today's grammar lesson's drill list."]], required: ["index"])
-        ),
-        AgentTool(
-            name: "grade_drill",
-            description: "Record whether the student's answer to a displayed drill was correct.",
-            parameters: object([
-                "index": ["type": "INTEGER", "description": "Zero-based index of the drill."],
-                "correct": ["type": "BOOLEAN", "description": "Whether the student's answer was correct."]
-            ], required: ["index", "correct"])
-        ),
-        AgentTool(
-            name: "show_question",
-            description: "Display a listening comprehension question with its multiple-choice options after you've spoken the passage aloud.",
-            parameters: object([
-                "question": ["type": "STRING", "description": "The comprehension question text."],
-                "choices": ["type": "ARRAY", "items": ["type": "STRING"], "description": "The answer choices."]
-            ], required: ["question", "choices"])
-        ),
-        AgentTool(
-            name: "mark_answer",
-            description: "Record the student's answer to the currently displayed listening question.",
-            parameters: object([
-                "choice_index": ["type": "INTEGER", "description": "Zero-based index of the choice the student picked."],
-                "correct": ["type": "BOOLEAN", "description": "Whether that choice was correct."]
-            ], required: ["choice_index", "correct"])
+            name: "mark_drill_result",
+            description: "Record whether the student's spoken answer to the current drill was correct. The app will only accept this if the student has actually attempted an answer.",
+            parameters: object(["correct": ["type": "BOOLEAN", "description": "Whether the student's answer was correct."]], required: ["correct"])
         ),
     ]
 }

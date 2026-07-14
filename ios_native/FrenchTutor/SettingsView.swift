@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var testResult: String?
     @State private var isTesting = false
 
+    @ObservedObject private var notetaker = NotetakerState.shared
+
     private var roadmapStartDate: Binding<Date> {
         Binding(
             get: { Date(timeIntervalSinceReferenceDate: roadmapStartTimestamp) },
@@ -90,6 +92,17 @@ struct SettingsView: View {
                                     .foregroundColor(Passeport.slateDim)
                             }
                             #endif
+                        }
+                        .passeportCard(padding: 14)
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            KickerText(text: "Notetaker", color: Passeport.slateDim)
+                            Toggle("Floating notetaker", isOn: $notetaker.isEnabled)
+                                .font(Passeport.body(12.5))
+                                .tint(Passeport.maroon)
+                            Text("Shows a draggable note bubble during lessons so you can jot things down while listening or writing.")
+                                .font(Passeport.body(11))
+                                .foregroundColor(Passeport.slateDim)
                         }
                         .passeportCard(padding: 14)
                     }

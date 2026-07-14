@@ -2,6 +2,9 @@ import SwiftUI
 
 struct SessionView: View {
     let apiKey: String
+    // nil = unstructured "Just talk to Marie" call; "speaking" when this is the Daily Pathway's
+    // closing roleplay stage. Only affects how the saved session is tagged for Recent Sessions.
+    var stage: String? = nil
     @Environment(\.dismiss) var dismiss
 
     @State private var messages: [ChatMessage] = []
@@ -18,8 +21,9 @@ struct SessionView: View {
     private let storage: StorageService
     private let sessionId: String
 
-    init(apiKey: String, lessonContext: String? = nil) {
+    init(apiKey: String, lessonContext: String? = nil, stage: String? = nil) {
         self.apiKey = apiKey
+        self.stage = stage
         self.gemini = GeminiLiveService(apiKey: apiKey, lessonContext: lessonContext)
         self.audio = AudioStreamingService()
         self.storage = StorageService()
@@ -320,7 +324,7 @@ struct SessionView: View {
         let now = ISO8601DateFormatter().string(from: Date())
         let summary = generateLocalSummary()
 
-        let session = Session(id: sessionId, startedAt: now, endedAt: now, summary: summary, topic: nil, vocabulary: [])
+        let session = Session(id: sessionId, startedAt: now, endedAt: now, summary: summary, topic: nil, vocabulary: [], stage: stage)
         storage.saveSession(session)
 
         for msg in messages {

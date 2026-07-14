@@ -47,8 +47,13 @@
 		A10043 /* DailyPathwayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20045; };
 		A10044 /* AgentLedVocabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20046; };
 		A10045 /* AgentLedListeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20047; };
+		A10099 /* PostVocabChoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20099; };
+		A10100 /* SessionRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20100; };
+		A10097 /* AgentLedGrammarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20097; };
+		A10098 /* GrammarPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20098; };
 		A10046 /* PathwayWritingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20048; };
 		A10047 /* VocabPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20049; };
+		A10101 /* FloatingNotetaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20101; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,8 +101,13 @@
 		A20045 /* DailyPathwayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPathwayView.swift; sourceTree = "<group>"; };
 		A20046 /* AgentLedVocabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLedVocabView.swift; sourceTree = "<group>"; };
 		A20047 /* AgentLedListeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLedListeningView.swift; sourceTree = "<group>"; };
+		A20099 /* PostVocabChoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostVocabChoiceView.swift; sourceTree = "<group>"; };
+		A20100 /* SessionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecorder.swift; sourceTree = "<group>"; };
+		A20097 /* AgentLedGrammarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLedGrammarView.swift; sourceTree = "<group>"; };
+		A20098 /* GrammarPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarPickerView.swift; sourceTree = "<group>"; };
 		A20048 /* PathwayWritingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathwayWritingView.swift; sourceTree = "<group>"; };
 		A20049 /* VocabPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabPickerView.swift; sourceTree = "<group>"; };
+		A20101 /* FloatingNotetaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingNotetaker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,8 +181,13 @@
 				A20045 /* DailyPathwayView.swift */,
 				A20046 /* AgentLedVocabView.swift */,
 				A20047 /* AgentLedListeningView.swift */,
+				A20099 /* PostVocabChoiceView.swift */,
+				A20100 /* SessionRecorder.swift */,
+				A20097 /* AgentLedGrammarView.swift */,
+				A20098 /* GrammarPickerView.swift */,
 				A20048 /* PathwayWritingView.swift */,
 				A20049 /* VocabPickerView.swift */,
+				A20101 /* FloatingNotetaker.swift */,
 				A20009 /* Assets.xcassets */,
 				A20010 /* Info.plist */,
 			);
@@ -284,8 +299,13 @@
 				A10043 /* DailyPathwayView.swift in Sources */,
 				A10044 /* AgentLedVocabView.swift in Sources */,
 				A10045 /* AgentLedListeningView.swift in Sources */,
+				A10099 /* PostVocabChoiceView.swift in Sources */,
+				A10100 /* SessionRecorder.swift in Sources */,
+				A10097 /* AgentLedGrammarView.swift in Sources */,
+				A10098 /* GrammarPickerView.swift in Sources */,
 				A10046 /* PathwayWritingView.swift in Sources */,
 				A10047 /* VocabPickerView.swift in Sources */,
+				A10101 /* FloatingNotetaker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

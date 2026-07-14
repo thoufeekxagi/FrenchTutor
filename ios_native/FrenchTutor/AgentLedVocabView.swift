@@ -39,7 +39,9 @@ struct AgentLedVocabView: View {
     @State private var gemini: GeminiLiveService
     private let audio = AudioStreamingService()
     private let store = LearningStore()
+    private let recorder = SessionRecorder(stage: "vocab", topic: "Vocabulary")
     private let sessionPlan: [VocabSessionCard]
+    private let isNewById: [String: Bool]
 
     @State private var callStatus: CallStatus = .connecting
     @State private var callDuration = 0
@@ -69,6 +71,12 @@ struct AgentLedVocabView: View {
     @State private var wasGraded = false
     @State private var lastDetectedIntent: UserIntent = .none
 
+    // The judge no longer fires on every single utterance (that was wasted tokens and a source
+    // of stale-task races). It fires exactly once per word, right as the app leaves that card,
+    // judging only the student's most recent attempt on it.
+    @State private var lastAttemptText: String? = nil
+    @State private var pendingJudgeTask: Task<Void, Never>? = nil
+
     // Duplicate-call guard: Gemini Live is documented to occasionally fire the identical
     // tool call twice in rapid succession. Track handled IDs and no-op the repeat.
     @State private var handledCallIds: Set<String> = []
@@ -91,12 +99,22 @@ struct AgentLedVocabView: View {
         let isNewById: [String: Bool] = Dictionary(uniqueKeysWithValues: vocabQueue.map { entry in
             (entry.id, (tempStore.srsState(for: entry.id)?.reps ?? 0) == 0)
         })
+        self.isNewById = isNewById
         let context = AgentLedVocabView.buildContext(plan: plan, examples: examplesByWordId, isNewById: isNewById, focusNote: focusNote)
         _gemini = State(initialValue: GeminiLiveService(apiKey: geminiApiKey, lessonContext: context, tools: AgentTool.vocabPalette))
     }
 
     private var currentCard: VocabSessionCard? {
         cardIndex < sessionPlan.count ? sessionPlan[cardIndex] : nil
+    }
+
+    // Hard app-side floor, mirroring the pacing rule already stated in the system prompt.
+    // The prompt alone isn't reliable — the comment above `pacingReminder` documents that her
+    // adherence visibly degrades deeper into a session — so this is the backstop that actually
+    // guarantees the beginner pacing regardless of what she does or forgets. Flat 4 attempts
+    // for every word for now, NEW or FAMILIAR — revisit differentiating them later.
+    private var minAttemptsRequired: Int {
+        currentCard != nil ? 4 : 0
     }
 
     // Shown for every card, not just "new" words — an example is pre-generated for the whole
@@ -353,7 +371,8 @@ struct AgentLedVocabView: View {
             if !finished { errorMessage = "Connection lost"; finishAndReturn() }
         }
         gemini.onError = { msg in errorMessage = msg }
-        gemini.onUserTranscript = { text in handleUserTranscript(text) }
+        gemini.onUserTranscript = { text in recorder.logUser(text); handleUserTranscript(text) }
+        gemini.onTutorTranscript = { text in recorder.logTutor(text) }
         gemini.onAudioChunk = { data in
             lastAudioChunkAt = Date()
             audio.isOutputActive = true
@@ -401,20 +420,27 @@ struct AgentLedVocabView: View {
         // commands, not practice, and shouldn't count toward the repetition a word still needs.
         if intent == .none {
             attemptCount += 1
+            // Remember the most recent genuine attempt only — judged once, in a single batched
+            // call, right when the app leaves this card. No per-utterance judge calls anymore,
+            // so there's no background judge task racing a fast card change.
+            lastAttemptText = trimmed
         }
         logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue), attempts: \(attemptCount)")
-        // Only worth judging when it's NOT a recognized navigation command — "next"/"again"/
-        // "go back" aren't pronunciation attempts, so sending them to the judge would just be
-        // wasted tokens on every single "next" the student says (which happens a lot).
-        if intent == .none {
-            judgeAttempt(said: trimmed)
-        }
         // Navigation is 100% driven by the student's own words, decided and executed by the
         // app right here — immediately, not after any delay, and not routed through Marie at
         // all. She has no next_card/previous_card tool anymore; she only finds out the current
         // word changed via the context note below and reacts to it in conversation.
         switch intent {
-        case .advance: advanceFromUserIntent()
+        case .advance:
+            if attemptCount < minAttemptsRequired {
+                // Enforced here, not just in the prompt — she might ask "ready for the next
+                // one?" too early, and the student might reflexively answer "yes"/"sure" to a
+                // question, but the app itself still won't move until the real minimum practice
+                // has happened. This is what actually guarantees the beginner pace.
+                logDebug("→ advance blocked: only \(attemptCount)/\(minAttemptsRequired) attempts so far")
+            } else {
+                advanceFromUserIntent()
+            }
         case .back: goBackFromUserIntent()
         case .again, .none: break
         }
@@ -464,12 +490,14 @@ struct AgentLedVocabView: View {
             SRSService(store: store).grade(entryId: card.entry.id, grade: .good)
             wasGraded = true
         }
+        fireBatchedJudge()
         if currentCard != nil { reviewedCount += 1 }
         cardIndex += 1
         resetPerCardState()
     }
 
     private func performGoBack() {
+        fireBatchedJudge()
         cardIndex -= 1
         resetPerCardState()
     }
@@ -571,6 +599,12 @@ struct AgentLedVocabView: View {
         lastDetectedIntent = .none
         spokenWordMatched = false
         recentTranscriptBuffer = ""
+        lastAttemptText = nil
+        // Dedup only ever needs to hold IDs for the card currently in play — carrying them
+        // across a card change served no purpose and let the set grow unbounded for the whole
+        // session, plus meant a stale duplicate from an old card could still silently no-op a
+        // legitimate call on the new one if Gemini ever reused an ID.
+        handledCallIds.removeAll()
     }
 
     /// Watches her live speech transcript for the current word — the moment it appears is a
@@ -595,15 +629,21 @@ struct AgentLedVocabView: View {
         text.folding(options: .diacriticInsensitive, locale: Locale(identifier: "fr-FR")).lowercased()
     }
 
-    /// Invisible background "judge": takes what she was just asked to repeat and what speech
-    /// recognition heard, and quietly logs a mistake tag if it looks like a genuine recurring
-    /// error pattern — never blocks the live conversation, never shown to the student, and any
-    /// failure (rate limit, network) is silently swallowed since this is a pure enrichment.
-    private func judgeAttempt(said text: String) {
-        guard let card = currentCard else { return }
+    /// Fires exactly once per word, right as the app leaves that card (forward or back) — judges
+    /// only the student's most recent attempt on it, and quietly logs a mistake tag if it looks
+    /// like a genuine recurring error pattern. Never blocks the live conversation, never shown to
+    /// the student, and any failure (rate limit, network) is silently swallowed since this is a
+    /// pure enrichment. The card/word are captured up front, before the index moves, so the
+    /// result always belongs to the word it was actually judging even though it lands after the
+    /// student has already moved to the next one. Any still-running judge from the previous card
+    /// is cancelled first — only one of these should ever be in flight at a time.
+    private func fireBatchedJudge() {
+        pendingJudgeTask?.cancel()
+        guard let text = lastAttemptText, let card = currentCard else { return }
         let word = card.entry.fr
-        Task {
+        pendingJudgeTask = Task {
             guard let judgment = try? await LessonAgentService.shared.judgePronunciationAttempt(targetWord: word, studentSaid: text),
+                  !Task.isCancelled,
                   !judgment.isCorrect, let tag = judgment.tag, let description = judgment.description else { return }
             store.logMistake(tag: tag, description: description, example: text)
         }
@@ -629,12 +669,14 @@ struct AgentLedVocabView: View {
         finished = true
         timer?.invalidate()
         speakingWatchdog?.invalidate()
+        pendingJudgeTask?.cancel()
         audio.stopStreaming()
         gemini.disconnect()
         callStatus = .ended
         if reviewedCount > 0 {
             store.saveDiaryEntry(stage: "vocab", summary: "Practiced \(reviewedCount) word(s) in a live vocab session.")
         }
+        recorder.finish(summary: reviewedCount > 0 ? "Practiced \(reviewedCount) word(s): " + Array(vocabQueue.prefix(reviewedCount)).map { $0.fr }.joined(separator: ", ") : "Ended early, no words reviewed.")
         onComplete(VocabStageResult(wordsCovered: Array(vocabQueue.prefix(reviewedCount)), reviewedCount: reviewedCount))
         dismiss()
     }

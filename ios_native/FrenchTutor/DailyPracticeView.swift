@@ -48,6 +48,7 @@ struct DailyPracticeView: View {
         .onDisappear { speech.deactivate(); logMinutes() }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: recapContext())
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 

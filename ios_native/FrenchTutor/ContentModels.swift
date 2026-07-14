@@ -110,6 +110,22 @@ struct Connector: Codable, Identifiable {
     let example: BilingualExample
 }
 
+// MARK: - Grammar practice cards (generated)
+
+/// One card in a generated grammar practice session — deliberately shaped just like `VocabEntry`
+/// (front/back, one card at a time) instead of the old usage-bullet/conjugation-table/drill
+/// layout, so `AgentLedGrammarView` can walk through it exactly the way `AgentLedVocabView` walks
+/// through vocab: a short French sentence in the chosen tense on the back, its English meaning on
+/// the front, and a one-line grammar note in place of vocab's phonetic hint. Generated ONCE before
+/// the session starts (see `LessonAgentService.generateGrammarPracticeCards`), never invented live
+/// during teaching, per STRUCTURE.md.
+struct GrammarPracticeCard: Codable, Identifiable {
+    let id: String
+    let fr: String
+    let en: String
+    let note: String
+}
+
 // MARK: - Listening
 
 struct ListeningPack: Codable {
@@ -130,6 +146,31 @@ struct MultipleChoiceQuestion: Codable, Identifiable {
     let choices: [String]
     let answerIndex: Int
     var id: String { q }
+}
+
+// MARK: - Reading passage (Daily Pathway stage 2, agent-led word-by-word walkthrough)
+
+/// One word or short phrase within a `ReadingPassage`, taught the same way vocab teaches a
+/// single word — meaning, a simple grammar note, a pronunciation tip — but walked through in
+/// the order it appears in the passage rather than as an isolated flashcard. Grammar notes are
+/// intentionally simple (one sentence, no conjugation tables) for this first version; a
+/// harder/dynamic-difficulty version is planned for later once this base pattern is proven.
+struct ReadingSegment: Codable, Identifiable {
+    let fr: String          // the French word or short phrase
+    let en: String          // English meaning
+    let grammarNote: String // one simple sentence, English, why this form/word order
+    let pronunciationTip: String // one simple sentence, English
+    var id: String { fr }
+}
+
+/// A short French passage broken into `ReadingSegment`s, built once (either offline-authored from
+/// `Content/listening.json` or generated a single time right when the student picks the "from
+/// words I just practiced" path) — never live, word-by-word, during the teaching session itself.
+struct ReadingPassage: Codable, Identifiable {
+    let id: String
+    let title: String
+    let segments: [ReadingSegment]
+    let fullText: String // the whole French text for display
 }
 
 // MARK: - Writing

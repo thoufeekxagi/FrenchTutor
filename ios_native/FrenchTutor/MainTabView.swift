@@ -24,5 +24,6 @@ struct MainTabView: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(Passeport.maroon)
+        .overlay(FloatingNotetakerOverlay())
     }
 }

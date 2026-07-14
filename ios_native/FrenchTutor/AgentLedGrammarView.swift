@@ -1,41 +1,46 @@
 import SwiftUI
 
-struct ListeningStageResult {
-    let grammarDrillResults: [Bool]
-    let listeningCorrect: Int
-    let listeningAttempted: Int
+struct GrammarStageResult {
+    let topicTitle: String
+    let drillResults: [Bool]
 }
 
-private struct ReadingSessionCard {
-    let segment: ReadingSegment
+private struct GrammarSessionCard {
+    let card: GrammarPracticeCard
 }
 
-private enum ReadingUserIntent: String {
+private enum GrammarUserIntent: String {
     case advance
     case again
     case back
     case none
 }
 
-/// Daily Pathway stage 2 — rebuilt against the same rule as `AgentLedVocabView`: Marie teaches,
-/// the app owns every navigation decision. Walks through a pre-built `ReadingPassage` (either
-/// LLM-assembled once from the vocab just practiced, or mapped offline from an existing lab
-/// script — see `PostVocabChoiceView`) one word/phrase segment at a time, the exact same way
-/// vocab walks through one word at a time. See STRUCTURE.md for the full rationale; this view
-/// used to give the model show_conjugation/ask_drill/show_question as tools it called on its own
-/// initiative, which had the same pacing/desync problems vocab had before its own fix.
-struct AgentLedListeningView: View {
-    let passage: ReadingPassage
+/// Daily Pathway stage 2 — one chosen tense/topic (see `GrammarPickerView`), walked through
+/// EXACTLY the way `AgentLedVocabView` walks through vocab: one generated sentence card at a
+/// time (front = English meaning, back = the French sentence, a one-line grammar note where
+/// vocab shows phonetics), app-owned step index, deterministic intent detection, Back/Next
+/// buttons wired to the same functions as voice, a single judgment-only tool. This used to be a
+/// dry usage-bullet/conjugation-table/drill layout that didn't feel anything like vocab's proven
+/// card interaction — it's been rebuilt to match that pattern structurally, not just in spirit.
+/// Cards are generated ONCE before the session starts (`LessonAgentService
+/// .generateGrammarPracticeCards`, informed by the vocab words + transcript from the Vocab stage
+/// that just happened) — nothing invented live by the model, matching STRUCTURE.md.
+struct AgentLedGrammarView: View {
+    let cards: [GrammarPracticeCard]
+    let tenseTitle: String
+    var focusNote: String? = nil
     var vocabSummary: VocabStageResult? = nil
-    var onComplete: (ListeningStageResult) -> Void
+    var onComplete: (GrammarStageResult) -> Void
 
     @Environment(\.dismiss) private var dismiss
 
     @State private var gemini: GeminiLiveService
     private let audio = AudioStreamingService()
     private let store = LearningStore()
-    private let recorder = SessionRecorder(stage: "reading_listening", topic: "Reading & Listening")
-    private let sessionPlan: [ReadingSessionCard]
+    private let recorder: SessionRecorder
+    private let sessionPlan: [GrammarSessionCard]
+    private let topicId: String
 
     @State private var callStatus: CallStatus = .connecting
     @State private var callDuration = 0
@@ -48,33 +53,35 @@ struct AgentLedListeningView: View {
     @State private var lastAudioChunkAt = Date()
     @State private var speakingWatchdog: Timer?
 
-    @State private var segmentIndex = 0
-    @State private var reviewedCount = 0
-
-    // Same live debug log as vocab's — every gate decision and detected intent, visible in
-    // real time rather than a black box.
+    @State private var cardIndex = 0
+    @State private var drillResults: [Bool] = []
     @State private var debugLog: [String] = []
 
     @State private var hasAttempted = false
-    @State private var attemptCount = 0
     @State private var wasGraded = false
-    @State private var lastDetectedIntent: ReadingUserIntent = .none
-
-    // Documented Gemini Live bug: dedupe identical tool calls fired in rapid succession.
+    @State private var lastDetectedIntent: GrammarUserIntent = .none
     @State private var handledCallIds: Set<String> = []
 
-    init(passage: ReadingPassage, vocabSummary: VocabStageResult? = nil, onComplete: @escaping (ListeningStageResult) -> Void) {
-        self.passage = passage
+    @State private var recentTranscriptBuffer = ""
+    @State private var spokenSentenceMatched = false
+    @State private var sentencePulse = false
+
+    init(cards: [GrammarPracticeCard], tenseTitle: String, focusNote: String? = nil, vocabSummary: VocabStageResult? = nil, onComplete: @escaping (GrammarStageResult) -> Void) {
+        self.cards = cards
+        self.tenseTitle = tenseTitle
+        self.focusNote = focusNote
         self.vocabSummary = vocabSummary
         self.onComplete = onComplete
-        let plan = passage.segments.map { ReadingSessionCard(segment: $0) }
+        self.topicId = "grammar_\(tenseTitle.lowercased().replacingOccurrences(of: " ", with: "_"))"
+        self.recorder = SessionRecorder(stage: "grammar", topic: "Grammar — \(tenseTitle)")
+        let plan = cards.map { GrammarSessionCard(card: $0) }
         self.sessionPlan = plan
-        let context = AgentLedListeningView.buildContext(passage: passage, plan: plan, vocabSummary: vocabSummary)
-        _gemini = State(initialValue: GeminiLiveService(apiKey: geminiApiKey, lessonContext: context, tools: AgentTool.readingPalette))
+        let context = AgentLedGrammarView.buildContext(tenseTitle: tenseTitle, plan: plan, focusNote: focusNote, vocabSummary: vocabSummary)
+        _gemini = State(initialValue: GeminiLiveService(apiKey: geminiApiKey, lessonContext: context, tools: AgentTool.grammarPalette))
     }
 
-    private var currentCard: ReadingSessionCard? {
-        segmentIndex < sessionPlan.count ? sessionPlan[segmentIndex] : nil
+    private var currentCard: GrammarSessionCard? {
+        cardIndex < sessionPlan.count ? sessionPlan[cardIndex] : nil
     }
 
     var body: some View {
@@ -93,7 +100,7 @@ struct AgentLedListeningView: View {
         }
         .onAppear { setupCallbacks(); gemini.connect() }
         .onDisappear { finishAndReturn() }
-        .alert("End this section?", isPresented: $showEndConfirm) {
+        .alert("End grammar practice?", isPresented: $showEndConfirm) {
             Button("Cancel", role: .cancel) {}
             Button("End", role: .destructive) { finishAndReturn() }
         } message: { Text("Your progress so far is saved.") }
@@ -112,10 +119,10 @@ struct AgentLedListeningView: View {
             }
             .padding(.horizontal, 20).padding(.top, 12)
             VStack(spacing: 2) {
-                Text("Reading & Listening").font(Passeport.display(20, weight: .semibold)).foregroundColor(Passeport.text)
+                Text("Grammar — \(tenseTitle)").font(Passeport.display(19, weight: .semibold)).foregroundColor(Passeport.text)
                 HStack(spacing: 5) {
                     Circle().fill(statusColor).frame(width: 7, height: 7)
-                    Text("\(min(segmentIndex + 1, sessionPlan.count)) of \(sessionPlan.count) · \(statusText)")
+                    Text("\(min(cardIndex + 1, sessionPlan.count)) of \(sessionPlan.count) · \(statusText)")
                         .font(Passeport.mono(11.5)).foregroundColor(Passeport.slateDim)
                 }
             }
@@ -124,46 +131,45 @@ struct AgentLedListeningView: View {
         .padding(.bottom, 12)
     }
 
+    // Card layout mirrors AgentLedVocabView's exactly: English meaning on top (the "front"), the
+    // French sentence big and maroon below (the "back", pulses when Marie says it), and the
+    // grammar note in an "Example"-style card underneath — same shape as vocab's example sentence
+    // card, just carrying the grammar explanation instead.
     @ViewBuilder
     private var content: some View {
-        VStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                KickerText(text: passage.title, color: Passeport.slateDim)
-                Text(passage.fullText).font(Passeport.body(13)).foregroundColor(Passeport.slateDim)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading).passeportCard()
-
-            if let card = currentCard {
+        if let session = currentCard {
+            let card = session.card
+            VStack(spacing: 16) {
                 VStack(spacing: 10) {
-                    Text(card.segment.fr).font(Passeport.display(22, weight: .medium)).foregroundColor(Passeport.maroon)
-                    if !card.segment.en.isEmpty {
-                        Text(card.segment.en).font(Passeport.display(16, weight: .medium)).foregroundColor(Passeport.text)
-                    }
+                    Text(card.en).font(Passeport.display(20, weight: .medium)).foregroundColor(Passeport.text)
+                    Text(card.fr)
+                        .font(Passeport.display(20, weight: .medium))
+                        .foregroundColor(Passeport.maroon)
+                        .multilineTextAlignment(.center)
+                        .scaleEffect(sentencePulse ? 1.05 : 1.0)
                 }
-                .frame(maxWidth: .infinity).passeportCard(padding: 24)
+                .frame(maxWidth: .infinity).passeportCard(padding: 28)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(sentencePulse ? Passeport.brass : .clear, lineWidth: 2)
+                )
 
-                VStack(alignment: .leading, spacing: 8) {
+                if !card.note.isEmpty {
                     VStack(alignment: .leading, spacing: 3) {
                         KickerText(text: "Grammar note", color: Passeport.slateDim)
-                        Text(card.segment.grammarNote).font(Passeport.body(13)).foregroundColor(Passeport.text)
+                        Text(card.note).font(Passeport.body(13, weight: .medium)).foregroundColor(Passeport.text)
                     }
-                    VStack(alignment: .leading, spacing: 3) {
-                        KickerText(text: "Pronunciation", color: Passeport.slateDim)
-                        Text(card.segment.pronunciationTip).font(Passeport.body(13)).foregroundColor(Passeport.text)
-                    }
+                    .frame(maxWidth: .infinity, alignment: .leading).passeportCard()
                 }
-                .frame(maxWidth: .infinity, alignment: .leading).passeportCard()
 
-                Text("Repeat it out loud — Marie is listening. Say \"next\" when you're ready, or \"again\" to hear it once more.")
+                Text("Say the sentence out loud — Marie is listening. Say \"next\" when you're ready, or \"again\" to hear it once more.")
                     .font(Passeport.mono(10.5)).foregroundColor(Passeport.slateDim).multilineTextAlignment(.center)
 
-                // Same guaranteed navigation fallback as vocab — Back/Next always work, no
-                // dependency on speech recognition or the model.
                 HStack(spacing: 12) {
                     Button { goBackFromUserIntent() } label: {
                         Label("Back", systemImage: "chevron.left")
                             .font(Passeport.body(13, weight: .medium))
-                            .foregroundColor(segmentIndex == 0 ? Passeport.slateDim.opacity(0.5) : Passeport.text)
+                            .foregroundColor(cardIndex == 0 ? Passeport.slateDim.opacity(0.5) : Passeport.text)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Passeport.card)
@@ -171,7 +177,7 @@ struct AgentLedListeningView: View {
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(Passeport.hairline, lineWidth: 1))
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .disabled(segmentIndex == 0)
+                    .disabled(cardIndex == 0)
 
                     Button { advanceFromUserIntent() } label: {
                         Label("Next", systemImage: "chevron.right")
@@ -180,16 +186,13 @@ struct AgentLedListeningView: View {
                     }
                     .buttonStyle(PasseportPrimaryButton())
                 }
-            } else {
-                VStack(spacing: 10) {
-                    Image(systemName: "checkmark.seal.fill").font(.system(size: 30)).foregroundColor(Passeport.brass)
-                    Text(isWrappingUp ? "Wrapping up…" : "All done!").font(Passeport.body(14, weight: .medium)).foregroundColor(Passeport.text)
-                    Button { finishAndReturn() } label: { Text("Continue to Speaking →") }
-                        .buttonStyle(PasseportPrimaryButton())
-                        .padding(.horizontal, 40).padding(.top, 6)
-                }
-                .frame(maxWidth: .infinity).passeportCard()
             }
+        } else {
+            VStack(spacing: 10) {
+                Image(systemName: "checkmark.seal.fill").font(.system(size: 30)).foregroundColor(Passeport.brass)
+                Text(isWrappingUp ? "Wrapping up…" : "All done!").font(Passeport.body(14, weight: .medium)).foregroundColor(Passeport.text)
+            }
+            .frame(maxWidth: .infinity).passeportCard()
         }
     }
 
@@ -306,6 +309,7 @@ struct AgentLedListeningView: View {
             if callStatus != .muted { callStatus = .listening }
         }
         gemini.onToolCall = { name, args, callId in handleToolCall(name: name, args: args, callId: callId) }
+        gemini.onTranscriptDelta = { delta in handleTranscriptDelta(delta) }
 
         speakingWatchdog?.invalidate()
         speakingWatchdog = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -316,7 +320,7 @@ struct AgentLedListeningView: View {
         }
     }
 
-    // MARK: - The gate: identical shape to AgentLedVocabView's, walking segments instead of words
+    // MARK: - The gate: same shape as vocab, walking one generated sentence card at a time
 
     private func handleUserTranscript(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
@@ -324,8 +328,7 @@ struct AgentLedListeningView: View {
         hasAttempted = true
         let intent = detectIntent(trimmed)
         lastDetectedIntent = intent
-        if intent == .none { attemptCount += 1 }
-        logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue), attempts: \(attemptCount)")
+        logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue)")
         switch intent {
         case .advance: advanceFromUserIntent()
         case .back: goBackFromUserIntent()
@@ -335,9 +338,10 @@ struct AgentLedListeningView: View {
 
     private static let pacingReminder = """
     Reminder: this is a total beginner — explain primarily in English, using French only for \
-    the target word/phrase itself, never full French explanations. Do at least 2 full passes \
-    (read it, have them repeat, react, walk through the grammar note and pronunciation tip) \
-    before you even suggest moving on.
+    the target sentence itself, not full French explanations. Keep grammar SIMPLE — no advanced \
+    tense talk beyond the note shown, this is intentionally basic for now. Do at least one full \
+    pass (say the sentence, have them repeat it, react, explain the grammar note) before you even \
+    suggest moving on.
     """
 
     private func advanceFromUserIntent() {
@@ -345,56 +349,51 @@ struct AgentLedListeningView: View {
         logDebug("→ user-driven advance")
         performAdvance()
         if let next = currentCard {
-            gemini.injectContext(Self.contextNote(for: next.segment, prefix: "The student has moved on to the next part of the passage"))
+            gemini.injectContext("The student has moved on to the next sentence: \"\(next.card.fr)\" (\(next.card.en)). Grammar note: \(next.card.note) \(Self.pacingReminder)")
         } else {
             wrapUp()
         }
     }
 
     private func goBackFromUserIntent() {
-        guard segmentIndex > 0 else { return }
+        guard cardIndex > 0 else { return }
         logDebug("→ user-driven go back")
         performGoBack()
         if let card = currentCard {
-            gemini.injectContext(Self.contextNote(for: card.segment, prefix: "The student asked to go back to"))
+            gemini.injectContext("The student asked to go back to: \"\(card.card.fr)\" (\(card.card.en)). Grammar note: \(card.card.note) \(Self.pacingReminder)")
         }
     }
 
-    private static func contextNote(for segment: ReadingSegment, prefix: String) -> String {
-        let meaning = segment.en.isEmpty ? "" : " = \(segment.en)"
-        return "\(prefix): \"\(segment.fr)\"\(meaning). Grammar note to mention: \(segment.grammarNote) Pronunciation tip: \(segment.pronunciationTip) \(pacingReminder)"
-    }
-
     private func performAdvance() {
-        if hasAttempted, !wasGraded { wasGraded = true }
-        if currentCard != nil { reviewedCount += 1 }
-        segmentIndex += 1
+        if hasAttempted, !wasGraded {
+            drillResults.append(lastDetectedIntent != .again)
+            wasGraded = true
+        }
+        cardIndex += 1
         resetPerCardState()
     }
 
     private func performGoBack() {
-        segmentIndex -= 1
+        cardIndex -= 1
         resetPerCardState()
     }
 
-    private func detectIntent(_ text: String) -> ReadingUserIntent {
+    private func detectIntent(_ text: String) -> GrammarUserIntent {
         let t = fold(text)
 
-        // Same ambiguity guard as vocab: if the utterance is just today's segment itself, that's
-        // a practice attempt, never navigation — even if the segment text happens to overlap a
-        // nav keyword (e.g. a passage segment that is itself "oui").
+        // Same ambiguity guard as vocab: if the utterance is nothing but the current sentence
+        // itself (the student practicing it), never misread that as a navigation command even if
+        // it happens to contain a word that overlaps a keyword below.
         if let card = currentCard {
             let cleaned = t.trimmingCharacters(in: CharacterSet(charactersIn: ".!?,"))
-            let targetFr = fold(card.segment.fr)
-            let targetEn = fold(card.segment.en)
-            let words = cleaned.split(separator: " ").map(String.init)
-            if !words.isEmpty, !targetFr.isEmpty, words.allSatisfy({ $0 == targetFr || $0 == targetEn }) {
-                logDebug("→ intent suppressed: utterance is just the current segment (\"\(card.segment.fr)\"), treating as practice not a command")
+            let targetFr = fold(card.card.fr)
+            if !targetFr.isEmpty, cleaned == targetFr {
+                logDebug("→ intent suppressed: utterance is just today's sentence, treating as practice not a command")
                 return .none
             }
         }
 
-        let backKeywords = ["go back", "back to the", "back up", "previous", "the one before", "last part", "redo the last", "revenons"]
+        let backKeywords = ["go back", "back to the", "back up", "previous", "the one before", "last sentence", "redo the last", "revenons"]
         let againKeywords = ["again", "repeat", "one more time", "say it again", "encore", "repete", "repète", "une fois de plus"]
         let advanceKeywords = ["next", "move on", "got it", "i know this", "i know", "ready", "continue", "yes", "yeah", "yep", "sure", "sounds good", "let's go", "d'accord", "suivant", "on continue", "oui"]
         if backKeywords.contains(where: { t.contains($0) }) { return .back }
@@ -404,7 +403,7 @@ struct AgentLedListeningView: View {
     }
 
     private func handleToolCall(name: String, args: [String: Any], callId: String) {
-        logDebug("proposed: \(name)(\(args)) [segment \(segmentIndex + 1), attempted=\(hasAttempted), intent=\(lastDetectedIntent.rawValue)]")
+        logDebug("proposed: \(name)(\(args)) [card \(cardIndex + 1), attempted=\(hasAttempted), intent=\(lastDetectedIntent.rawValue)]")
 
         if handledCallIds.contains(callId) {
             logDebug("→ DUPLICATE call ID, ignoring side effects")
@@ -414,7 +413,7 @@ struct AgentLedListeningView: View {
         handledCallIds.insert(callId)
 
         switch name {
-        case "mark_segment_result":
+        case "mark_result":
             if lastDetectedIntent == .again {
                 logDebug("→ REJECTED (intent=again)")
                 gemini.sendToolResponse(callId: callId, name: name, result: [
@@ -425,7 +424,7 @@ struct AgentLedListeningView: View {
             guard hasAttempted, currentCard != nil else {
                 logDebug("→ REJECTED (no attempt yet)")
                 gemini.sendToolResponse(callId: callId, name: name, result: [
-                    "ok": false, "reason": "The student hasn't attempted this segment yet — listen for their attempt before grading."
+                    "ok": false, "reason": "The student hasn't attempted this sentence yet."
                 ])
                 return
             }
@@ -434,9 +433,15 @@ struct AgentLedListeningView: View {
                 gemini.sendToolResponse(callId: callId, name: name, result: ["ok": true], scheduling: "SILENT")
                 return
             }
-            wasGraded = true
-            logDebug("→ ACCEPTED")
-            gemini.sendToolResponse(callId: callId, name: name, result: ["ok": true], scheduling: "SILENT")
+            if let gradeStr = args["grade"] as? String {
+                wasGraded = true
+                drillResults.append(gradeStr != "again")
+                logDebug("→ ACCEPTED, graded \(gradeStr)")
+                gemini.sendToolResponse(callId: callId, name: name, result: ["ok": true], scheduling: "SILENT")
+            } else {
+                logDebug("→ REJECTED (bad grade arg)")
+                gemini.sendToolResponse(callId: callId, name: name, result: ["ok": false], scheduling: "SILENT")
+            }
 
         default:
             logDebug("→ unknown tool \(name)")
@@ -452,9 +457,25 @@ struct AgentLedListeningView: View {
 
     private func resetPerCardState() {
         hasAttempted = false
-        attemptCount = 0
         wasGraded = false
         lastDetectedIntent = .none
+        spokenSentenceMatched = false
+        recentTranscriptBuffer = ""
+    }
+
+    private func handleTranscriptDelta(_ delta: String) {
+        guard !spokenSentenceMatched, let card = currentCard else { return }
+        recentTranscriptBuffer += delta
+        if recentTranscriptBuffer.count > 300 {
+            recentTranscriptBuffer = String(recentTranscriptBuffer.suffix(300))
+        }
+        let target = fold(card.card.fr)
+        guard !target.isEmpty, fold(recentTranscriptBuffer).contains(target) else { return }
+        spokenSentenceMatched = true
+        withAnimation(.easeInOut(duration: 0.25)) { sentencePulse = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            withAnimation(.easeInOut(duration: 0.25)) { sentencePulse = false }
+        }
     }
 
     private func fold(_ text: String) -> String {
@@ -464,7 +485,7 @@ struct AgentLedListeningView: View {
     private func wrapUp() {
         guard !isWrappingUp else { return }
         isWrappingUp = true
-        gemini.injectContext("The student has now gone through the whole passage. Say a short warm closing line (one sentence) congratulating them, then stop talking.")
+        gemini.injectContext("The student has now gone through today's grammar practice. Say a short warm closing line (one sentence) congratulating them, then stop talking.")
     }
 
     private func finishAndReturn() {
@@ -475,66 +496,59 @@ struct AgentLedListeningView: View {
         audio.stopStreaming()
         gemini.disconnect()
         callStatus = .ended
-        if reviewedCount > 0 {
-            store.saveDiaryEntry(stage: "reading", summary: "Read through \(reviewedCount) part(s) of \"\(passage.title)\" in a live reading/listening session.")
+        if cardIndex > 0 {
+            let score = drillResults.isEmpty ? nil : Double(drillResults.filter { $0 }.count) / Double(drillResults.count)
+            store.setLessonStatus(topicId, status: (score ?? 1.0) >= 0.8 ? "completed" : "in_progress", score: score)
+            store.saveDiaryEntry(stage: "grammar", summary: "Practiced \(tenseTitle) in a live grammar session.")
         }
-        recorder.finish(summary: reviewedCount > 0 ? "Read through \(reviewedCount) part(s) of \"\(passage.title)\"." : "Ended early.")
-        onComplete(ListeningStageResult(grammarDrillResults: [], listeningCorrect: reviewedCount, listeningAttempted: reviewedCount))
+        recorder.finish(summary: cardIndex > 0 ? "Practiced \(min(cardIndex, sessionPlan.count)) sentence(s) on \(tenseTitle)." : "Ended early.")
+        onComplete(GrammarStageResult(topicTitle: tenseTitle, drillResults: drillResults))
         dismiss()
     }
 
-    private static func buildContext(passage: ReadingPassage, plan: [ReadingSessionCard], vocabSummary: VocabStageResult?) -> String {
+    private static func buildContext(tenseTitle: String, plan: [GrammarSessionCard], focusNote: String?, vocabSummary: VocabStageResult?) -> String {
         guard !plan.isEmpty else {
-            return "READING & LISTENING STAGE: no passage available today. Briefly tell the student there's nothing to read right now and that they can end the call whenever ready."
+            return "GRAMMAR STAGE: nothing to practice today. Briefly tell the student there's nothing new and that they can end the call whenever ready."
         }
         var parts: [String] = []
         parts.append("""
-        READING & LISTENING STAGE — walking through a short French passage, one word or short \
-        phrase at a time, exactly the way the vocab stage teaches one word at a time. The \
-        student's screen ALREADY shows the current segment's French text and English meaning the \
-        instant it appears — you never need to reveal anything.
+        GRAMMAR STAGE — this is a focused grammar session on ONE tense/topic ("\(tenseTitle)"), \
+        walked through one short French sentence at a time, exactly like the vocab session that \
+        just happened but for a full sentence instead of a single word. The student's screen \
+        ALREADY shows the English meaning, the French sentence, and a grammar note the instant it \
+        appears — you never need to reveal anything.
 
-        CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of \
-        your own explaining, encouragement, instructions, and questions should be in English — \
-        French should only ever appear as the current segment itself, never as your own \
-        explanatory language. Never answer in French only, including when they ask you to repeat \
-        something. If you catch yourself explaining something in French, stop and say it in \
-        English instead.
+        CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of your \
+        own explaining, encouragement, instructions, and questions should be in English — French \
+        should only appear as the sentence itself, never as your own explanatory language.
 
-        CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding \
-        when to move to the next segment or go back, and you have no tool to do that yourself. \
-        The app is watching the student's own words directly, and the instant they say something \
-        like "next", "got it", "ready", or "go back", the app moves the segment itself — instantly, \
-        with zero involvement from you. You'll simply be told the new current segment afterward \
-        and should react to it naturally, as if you'd just turned the page together. Never say \
-        things like "let's move on" as an announcement of an action you're about to take.
+        CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go \
+        back. The app watches the student's own words directly and moves the card itself the \
+        instant they say something like "next" or "go back" — zero involvement from you. You'll \
+        simply be told the new current sentence afterward and should react to it naturally.
 
-        You have exactly one tool: mark_segment_result, for recording how well the student did \
-        with the current segment (grade: again/good/easy). It's a proposal — the app only accepts \
-        it once it's confirmed the student actually attempted it. A rejection is not an error; \
-        never mention it to the student, just keep teaching naturally.
+        You have exactly one tool: mark_result, for recording how well the student did with the \
+        current sentence (grade: again/good/easy). It's a proposal — the app only accepts it once \
+        it's confirmed the student actually attempted the sentence. A rejection is not an error; \
+        never mention it, just keep teaching naturally.
 
-        CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SINGLE SEGMENT, DO NOT SKIP OR REORDER STEPS:
-          1. Read the French word/phrase slowly and clearly, pairing it with its English meaning.
+        CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SENTENCE:
+          1. Say the French sentence clearly, paired with its English meaning.
           2. Ask the student to repeat it, and give them a real beat of silence to actually try.
-          3. React briefly to their attempt (encouragement, or a light correction).
-          4. THEN explain the grammar note already shown on their screen (why this word/word \
-             order is used) AND the pronunciation tip already shown, in your own words, briefly.
-          5. ONLY NOW ask a genuine question about moving on — e.g. "Ready for the next part, or \
-             want to try it once more?" — and wait for their actual answer next turn.
-        This student is a true beginner: do at least 2 full passes of steps 1-4 before step 5, not \
-        one. Keep grammar explanations SIMPLE — no conjugation tables, no advanced tense talk, this \
-        is intentionally basic; a harder version comes later.
+          3. React briefly to their attempt.
+          4. THEN explain the grammar note already shown on screen, in plain simple English.
+          5. ONLY NOW ask if they're ready to move on, and wait for their actual answer.
+        Keep grammar explanations SIMPLE — no advanced tense talk beyond the note shown, this is \
+        intentionally basic for now; a harder/dynamic-difficulty version comes later.
         """)
-        let lines = plan.enumerated().map { i, card -> String in
-            let meaning = card.segment.en.isEmpty ? "" : " = \(card.segment.en)"
-            return "\(i + 1). \(card.segment.fr)\(meaning) — grammar note: \(card.segment.grammarNote) pronunciation tip: \(card.segment.pronunciationTip)"
+        let lines = plan.enumerated().map { i, session in "\(i + 1). \(session.card.fr) = \(session.card.en) — \(session.card.note)" }
+        parts.append("TODAY'S SENTENCES (\(plan.count)):\n" + lines.joined(separator: "\n"))
+        if let focusNote, !focusNote.isEmpty {
+            parts.append("TODAY'S FOCUS (mention this naturally near the start): \(focusNote)")
         }
-        parts.append("FULL PASSAGE TEXT: \(passage.fullText)")
-        parts.append("SEGMENTS IN ORDER (\(plan.count)):\n" + lines.joined(separator: "\n"))
         if let vocabSummary, !vocabSummary.wordsCovered.isEmpty {
             let words = vocabSummary.wordsCovered.map { $0.fr }.joined(separator: ", ")
-            parts.append("VOCABULARY JUST COVERED (in the previous stage, feel free to note the connection naturally if relevant): \(words)")
+            parts.append("VOCABULARY JUST COVERED (previous stage, these sentences reuse some of these words): \(words)")
         }
         return parts.joined(separator: "\n\n")
     }

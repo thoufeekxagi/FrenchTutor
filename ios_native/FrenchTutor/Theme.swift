@@ -1,20 +1,20 @@
 import SwiftUI
 
 enum Passeport {
-    // Palette
-    static let ink = Color(red: 16/255, green: 25/255, blue: 43/255)          // #10192B
-    static let inkSoft = Color(red: 24/255, green: 34/255, blue: 54/255)      // #182236
-    static let parchment = Color(red: 246/255, green: 241/255, blue: 231/255) // #F6F1E7
-    static let parchmentDim = Color(red: 239/255, green: 232/255, blue: 216/255) // #EFE8D8
-    static let card = Color(red: 255/255, green: 254/255, blue: 251/255)      // #FFFEFB
-    static let maroon = Color(red: 122/255, green: 37/255, blue: 48/255)      // #7A2530
-    static let maroonDeep = Color(red: 92/255, green: 27/255, blue: 36/255)   // #5C1B24
-    static let brass = Color(red: 184/255, green: 134/255, blue: 62/255)      // #B8863E
-    static let slate = Color(red: 139/255, green: 147/255, blue: 161/255)     // #8B93A1
-    static let slateDim = Color(red: 91/255, green: 100/255, blue: 114/255)   // #5B6472
-    static let text = Color(red: 27/255, green: 34/255, blue: 48/255)         // #1B2230
-    static let hairline = Color(red: 27/255, green: 34/255, blue: 48/255).opacity(0.12)
-    static let hairlineLight = Color(red: 246/255, green: 241/255, blue: 231/255).opacity(0.16)
+    // Palette — pastel take on the French flag (bleu / blanc / rouge)
+    static let ink = Color(red: 27/255, green: 42/255, blue: 74/255)          // #1B2A4A pastel navy
+    static let inkSoft = Color(red: 37/255, green: 55/255, blue: 92/255)      // #25375C
+    static let parchment = Color(red: 250/255, green: 249/255, blue: 246/255) // #FAF9F6 soft blanc
+    static let parchmentDim = Color(red: 237/255, green: 241/255, blue: 247/255) // #EDF1F7 pastel blue-white
+    static let card = Color(red: 255/255, green: 255/255, blue: 255/255)      // #FFFFFF
+    static let maroon = Color(red: 200/255, green: 67/255, blue: 62/255)      // #C8433E pastel rouge
+    static let maroonDeep = Color(red: 168/255, green: 50/255, blue: 41/255)  // #A83229
+    static let brass = Color(red: 107/255, green: 143/255, blue: 196/255)     // #6B8FC4 pastel bleu accent
+    static let slate = Color(red: 149/255, green: 160/255, blue: 178/255)     // #95A0B2
+    static let slateDim = Color(red: 96/255, green: 108/255, blue: 128/255)   // #606C80
+    static let text = Color(red: 27/255, green: 42/255, blue: 74/255)         // #1B2A4A
+    static let hairline = Color(red: 27/255, green: 42/255, blue: 74/255).opacity(0.12)
+    static let hairlineLight = Color(red: 250/255, green: 249/255, blue: 246/255).opacity(0.16)
 
     // Typography
     static func display(_ size: CGFloat, weight: Font.Weight = .medium) -> Font {

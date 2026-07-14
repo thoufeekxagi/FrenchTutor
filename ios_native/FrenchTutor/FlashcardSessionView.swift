@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// One flashcard study session for a theme: English front → reveal French + phonetic,
-/// TTS playback, optional "Say it" speak-back practice, Again/Good/Easy grading via SRS.
+/// One flashcard study session for a theme: French + phonetic front → swipe/tap to reveal the
+/// English meaning, TTS playback (slow + normal), optional "Say it" speak-back practice,
+/// Again/Good/Easy grading via SRS — graded by swiping the card left/right/up once revealed.
 struct FlashcardSessionView: View {
     let phase: Int
     let theme: VocabTheme
@@ -17,9 +18,8 @@ struct FlashcardSessionView: View {
     @State private var sessionStart = Date()
     @State private var isListeningBack = false
     @State private var sayItHint: String?
-    @State private var showMarie = false
-
-    private var lessonContext: String { ContentService.shared.lessonContext(vocabTheme: theme, phase: phase) }
+    @State private var showVocabSession = false
+    @State private var dragOffset: CGSize = .zero
 
     var body: some View {
         ZStack {
@@ -35,14 +35,25 @@ struct FlashcardSessionView: View {
         }
         .navigationTitle(theme.title)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { MarieToolbarButton(showMarie: $showMarie) { speech.deactivate() } }
+        .toolbar { MarieToolbarButton(showMarie: $showVocabSession) { speech.deactivate() } }
         .onAppear {
             queue = SRSService(store: store).buildQueue(phase: phase, themeId: theme.id, limit: 30)
             sessionStart = Date()
+            if let first = currentEntry {
+                speech.speak(items: [.init(text: first.fr, language: "fr-FR")])
+            }
         }
-        .fullScreenCover(isPresented: $showMarie) {
-            SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+        .fullScreenCover(isPresented: $showVocabSession) {
+            AgentLedVocabView(
+                vocabQueue: Array(queue[index...]),
+                examplesByWordId: ContentService.shared.vocabExamples(for: Array(queue[index...]))
+            ) { result in
+                reviewedCount += result.reviewedCount
+                showVocabSession = false
+            }
+            .overlay(FloatingNotetakerOverlay())
         }
+        .overlay(FloatingNotetakerOverlay())
         .onDisappear {
             speech.deactivate()
             logMinutes()
@@ -53,6 +64,8 @@ struct FlashcardSessionView: View {
         index < queue.count ? queue[index] : nil
     }
 
+    private static let swipeThreshold: CGFloat = 90
+
     private var cardView: some View {
         VStack(spacing: 20) {
             HStack {
@@ -60,6 +73,15 @@ struct FlashcardSessionView: View {
                     .font(Passeport.mono(11))
                     .foregroundColor(Passeport.slateDim)
                 Spacer()
+                if isRevealed {
+                    Text("swipe: ← again · up easy · → good")
+                        .font(Passeport.mono(9))
+                        .foregroundColor(Passeport.slateDim)
+                } else {
+                    Text("tap or swipe up to reveal")
+                        .font(Passeport.mono(9))
+                        .foregroundColor(Passeport.slateDim)
+                }
             }
             .padding(.horizontal, 18)
             .padding(.top, 8)
@@ -68,51 +90,61 @@ struct FlashcardSessionView: View {
 
             VStack(spacing: 16) {
                 if let entry = currentEntry {
-                    Text(entry.en)
-                        .font(Passeport.display(24, weight: .medium))
-                        .foregroundColor(Passeport.text)
-                        .multilineTextAlignment(.center)
+                    VStack(spacing: 6) {
+                        Text(entry.fr)
+                            .font(Passeport.display(24, weight: .medium))
+                            .foregroundColor(Passeport.text)
+                        Text(entry.phonetic)
+                            .font(Passeport.mono(13))
+                            .foregroundColor(Passeport.slateDim)
+                    }
+                    .multilineTextAlignment(.center)
+
+                    HStack(spacing: 16) {
+                        Button {
+                            speech.speak(items: [.init(text: entry.fr, language: "fr-FR")], rate: 0.3)
+                        } label: {
+                            Image(systemName: "tortoise.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(Passeport.brass)
+                                .frame(width: 44, height: 44)
+                                .background(Passeport.card)
+                                .clipShape(Circle())
+                        }
+                        Button {
+                            speech.speak(items: [.init(text: entry.fr, language: "fr-FR")], rate: 0.45)
+                        } label: {
+                            Image(systemName: "speaker.wave.2.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(Passeport.brass)
+                                .frame(width: 44, height: 44)
+                                .background(Passeport.card)
+                                .clipShape(Circle())
+                        }
+                    }
 
                     if isRevealed {
-                        VStack(spacing: 6) {
-                            Text(entry.fr)
-                                .font(Passeport.display(22, weight: .medium))
+                        VStack(spacing: 10) {
+                            Text(entry.en)
+                                .font(Passeport.display(20, weight: .medium))
                                 .foregroundColor(Passeport.maroon)
-                            Text(entry.phonetic)
-                                .font(Passeport.mono(13))
-                                .foregroundColor(Passeport.slateDim)
-                        }
-                        .transition(.opacity)
-
-                        HStack(spacing: 20) {
-                            Button {
-                                speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
-                            } label: {
-                                Image(systemName: "speaker.wave.2.fill")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(Passeport.brass)
-                                    .frame(width: 48, height: 48)
-                                    .background(Passeport.card)
-                                    .clipShape(Circle())
-                            }
-
                             Button {
                                 sayIt(entry: entry)
                             } label: {
                                 Image(systemName: isListeningBack ? "mic.fill" : "mic")
                                     .font(.system(size: 18))
                                     .foregroundColor(isListeningBack ? .white : Passeport.maroon)
-                                    .frame(width: 48, height: 48)
+                                    .frame(width: 44, height: 44)
                                     .background(isListeningBack ? Passeport.maroon : Passeport.card)
                                     .clipShape(Circle())
                             }
+                            if let sayItHint {
+                                Text(sayItHint)
+                                    .font(Passeport.mono(10.5))
+                                    .foregroundColor(Passeport.slateDim)
+                            }
                         }
-
-                        if let sayItHint {
-                            Text(sayItHint)
-                                .font(Passeport.mono(10.5))
-                                .foregroundColor(Passeport.slateDim)
-                        }
+                        .transition(.opacity)
                     }
                 }
             }
@@ -120,45 +152,71 @@ struct FlashcardSessionView: View {
             .frame(maxWidth: .infinity)
             .passeportCard(padding: 28)
             .padding(.horizontal, 18)
+            .offset(dragOffset)
+            .rotationEffect(.degrees(Double(dragOffset.width / 22)))
+            .overlay(swipeHint)
+            .gesture(cardDrag)
+            .onTapGesture { revealIfNeeded() }
 
             Spacer()
+            Spacer()
+        }
+    }
 
-            if !isRevealed {
-                Button {
-                    withAnimation { isRevealed = true }
-                    if let entry = currentEntry {
-                        speech.speak(items: [.init(text: entry.fr, language: "fr-FR")])
-                    }
-                } label: {
-                    Text("Reveal")
-                }
-                .buttonStyle(PasseportPrimaryButton())
-                .padding(.horizontal, 18)
-                .padding(.bottom, 24)
-            } else {
-                HStack(spacing: 10) {
-                    gradeButton(title: "Again", color: Passeport.slate, grade: .again)
-                    gradeButton(title: "Good", color: Passeport.brass, grade: .good)
-                    gradeButton(title: "Easy", color: Passeport.maroon, grade: .easy)
-                }
-                .padding(.horizontal, 18)
-                .padding(.bottom, 24)
+    @ViewBuilder
+    private var swipeHint: some View {
+        if isRevealed {
+            if dragOffset.width < -24 {
+                swipeBadge(text: "AGAIN", color: Passeport.slate)
+            } else if dragOffset.width > 24 {
+                swipeBadge(text: "GOOD", color: Passeport.brass)
+            } else if dragOffset.height < -24 {
+                swipeBadge(text: "EASY", color: Passeport.maroon)
             }
         }
     }
 
-    private func gradeButton(title: String, color: Color, grade: SRSGrade) -> some View {
-        Button {
-            grade_(entry: currentEntry, grade: grade)
-        } label: {
-            Text(title)
-                .font(Passeport.body(13.5, weight: .medium))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 13)
-                .background(color)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-        }
+    private func swipeBadge(text: String, color: Color) -> some View {
+        Text(text)
+            .font(Passeport.mono(13, weight: .medium))
+            .foregroundColor(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(color)
+            .clipShape(Capsule())
+    }
+
+    private func revealIfNeeded() {
+        guard !isRevealed else { return }
+        withAnimation { isRevealed = true }
+    }
+
+    private var cardDrag: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                if isRevealed { dragOffset = value.translation }
+            }
+            .onEnded { value in
+                if !isRevealed {
+                    revealIfNeeded()
+                    return
+                }
+                let t = value.translation
+                withAnimation {
+                    if t.height < -Self.swipeThreshold && abs(t.height) > abs(t.width) {
+                        dragOffset = CGSize(width: 0, height: -600)
+                        grade_(entry: currentEntry, grade: .easy)
+                    } else if t.width > Self.swipeThreshold {
+                        dragOffset = CGSize(width: 600, height: t.height)
+                        grade_(entry: currentEntry, grade: .good)
+                    } else if t.width < -Self.swipeThreshold {
+                        dragOffset = CGSize(width: -600, height: t.height)
+                        grade_(entry: currentEntry, grade: .again)
+                    } else {
+                        dragOffset = .zero
+                    }
+                }
+            }
     }
 
     private func grade_(entry: VocabEntry?, grade: SRSGrade) {
@@ -168,6 +226,10 @@ struct FlashcardSessionView: View {
         sayItHint = nil
         isRevealed = false
         index += 1
+        dragOffset = .zero
+        if let next = currentEntry {
+            speech.speak(items: [.init(text: next.fr, language: "fr-FR")])
+        }
     }
 
     private func sayIt(entry: VocabEntry) {
@@ -238,7 +300,7 @@ struct FlashcardSessionView: View {
             if reviewedCount > 0 {
                 Button {
                     speech.deactivate()
-                    showMarie = true
+                    showVocabSession = true
                 } label: {
                     HStack {
                         Image(systemName: "phone.fill")

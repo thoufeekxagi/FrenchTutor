@@ -14,6 +14,7 @@ struct PathwayWritingView: View {
     @Environment(\.dismiss) private var dismiss
     private let store = LearningStore()
     private let sessionId = UUID().uuidString
+    private let recorder = SessionRecorder(stage: "writing", topic: "Writing")
 
     @State private var submission = ""
     @State private var isGrading = false
@@ -60,7 +61,12 @@ struct PathwayWritingView: View {
                         }
                         .frame(maxWidth: .infinity).passeportCard()
 
-                        Button { onComplete(WritingStageResult(score: feedback.scoreOutOf10)); dismiss() } label: { Text("Finish") }
+                        Button {
+                            recorder.logUser(submission)
+                            recorder.logTutor(feedback.comment)
+                            recorder.finish(summary: String(format: "Scored %.1f/10 on: %@", feedback.scoreOutOf10, prompt))
+                            onComplete(WritingStageResult(score: feedback.scoreOutOf10)); dismiss()
+                        } label: { Text("Finish") }
                             .buttonStyle(PasseportPrimaryButton())
                     }
                     Spacer()

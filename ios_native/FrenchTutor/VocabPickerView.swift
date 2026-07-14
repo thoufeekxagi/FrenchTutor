@@ -77,6 +77,7 @@ struct VocabPickerView: View {
                 onComplete(result)
                 dismiss()
             }
+            .overlay(FloatingNotetakerOverlay())
         }
     }
 
@@ -161,15 +162,23 @@ struct VocabPickerView: View {
         .buttonStyle(PlainButtonStyle())
     }
 
+    /// Same card-grid structure as the category picker itself, just one level deeper — a compact
+    /// 2-column grid of word chips fits far more words on screen than a row-per-word list did.
     private func categoryWordSheet(theme: VocabTheme) -> some View {
         let allSelected = theme.entries.allSatisfy { manualSelection.contains($0.id) }
         return NavigationStack {
-            List {
-                ForEach(theme.entries) { entry in
-                    wordRow(entry)
+            ZStack {
+                Passeport.parchmentDim.ignoresSafeArea()
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
+                        ForEach(theme.entries) { entry in
+                            wordChip(entry)
+                        }
+                    }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 14)
                 }
             }
-            .listStyle(.plain)
             .navigationTitle(theme.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -190,25 +199,37 @@ struct VocabPickerView: View {
         .presentationDetents([.medium, .large])
     }
 
-    private func wordRow(_ entry: VocabEntry) -> some View {
+    private func wordChip(_ entry: VocabEntry) -> some View {
         let isKnown = knownIds.contains(entry.id)
         let isSelected = manualSelection.contains(entry.id)
         return Button {
             if isSelected { manualSelection.remove(entry.id) } else { manualSelection.insert(entry.id) }
         } label: {
-            HStack(spacing: 10) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 19))
-                    .foregroundColor(isSelected ? Passeport.maroon : Passeport.slate)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(entry.fr).font(Passeport.body(14, weight: .medium)).foregroundColor(Passeport.text)
-                    Text(entry.en).font(Passeport.body(11.5)).foregroundColor(Passeport.slateDim)
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 4) {
+                    Text(entry.fr)
+                        .font(Passeport.body(12.5, weight: .medium))
+                        .foregroundColor(isSelected ? Passeport.parchment : Passeport.text)
+                        .lineLimit(1)
+                    Spacer()
+                    if isKnown {
+                        Image(systemName: "checkmark.seal.fill").font(.system(size: 10)).foregroundColor(.green)
+                    }
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 13))
+                        .foregroundColor(isSelected ? Passeport.parchment : Passeport.slate)
                 }
-                Spacer()
-                if isKnown {
-                    Image(systemName: "checkmark.seal.fill").font(.system(size: 14)).foregroundColor(.green)
-                }
+                Text(entry.en)
+                    .font(Passeport.mono(9.5))
+                    .foregroundColor(isSelected ? Passeport.parchment.opacity(0.85) : Passeport.slateDim)
+                    .lineLimit(1)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(isSelected ? Passeport.maroon : Passeport.card)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Passeport.hairline, lineWidth: isSelected ? 0 : 1))
         }
         .buttonStyle(PlainButtonStyle())
     }

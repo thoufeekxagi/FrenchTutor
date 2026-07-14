@@ -1,67 +1,72 @@
 import SwiftUI
 
-/// The Daily Pathway hub: today's material is assembled once here, then handed through four
-/// focused stages in sequence — each its own small, reliable agent-led (or plain typed) screen
-/// rather than one giant session trying to juggle everything. Each stage is fed a summary of
-/// what came before, so the whole thing behaves as one continuous feedback loop even though
-/// it's technically four separate steps: Vocabulary → Reading & Listening → Speaking (the
-/// existing, untouched "Discuss with Marie" call) → Writing.
+/// The Daily Pathway hub — lives directly inside the Dashboard's "Today's plan" card now, not
+/// behind a tap into a separate modal copy of itself. Today's material is assembled once here,
+/// then handed through five focused stages in sequence — each its own small, reliable agent-led
+/// (or plain typed) screen rather than one giant session trying to juggle everything. Each stage
+/// is fed a summary of what came before, so the whole thing behaves as one continuous feedback
+/// loop even though it's technically five separate steps: Vocabulary → Grammar → Reading &
+/// Listening → Writing → Speaking (the existing, untouched "Discuss with Marie" call, now last so
+/// it can pull together everything the student did in the other four stages into one closing
+/// roleplay). Tapping a row opens ONLY that stage's real session, full-screen, one modal layer —
+/// never this same stage list again behind it.
 struct DailyPathwayView: View {
-    @Environment(\.dismiss) private var dismiss
-
     private enum Stage: Int, CaseIterable, Identifiable {
-        case vocab, listening, speaking, writing
+        case vocab, grammar, postVocabChoice, listening, writing, speaking
         var id: Int { rawValue }
 
         var title: String {
             switch self {
             case .vocab: return "Vocabulary"
-            case .listening: return "Reading & Listening"
-            case .speaking: return "Speaking"
+            case .grammar: return "Grammar"
+            case .postVocabChoice, .listening: return "Reading & Listening"
             case .writing: return "Writing"
+            case .speaking: return "Speaking"
             }
         }
-        var icon: String {
+        var detail: String {
             switch self {
-            case .vocab: return "rectangle.stack.fill"
-            case .listening: return "headphones"
-            case .speaking: return "phone.fill"
-            case .writing: return "pencil.line"
+            case .vocab: return "Flashcards with spaced repetition"
+            case .grammar: return "Pick a tense, or let Marie choose"
+            case .postVocabChoice, .listening: return "Word-by-word passage walkthrough"
+            case .writing: return "Short emails, paragraphs, essays"
+            case .speaking: return "Closing roleplay with Marie"
             }
         }
+        var habitId: String {
+            switch self {
+            case .vocab: return "anki"
+            case .grammar: return "reading"
+            case .postVocabChoice, .listening: return "listening"
+            case .writing: return "writing"
+            case .speaking: return "speaking"
+            }
+        }
+        // The choice screen is an internal hop on the way to Listening, not its own row in the
+        // stage list — it's shown automatically right after Reading & Listening is started.
+        static var visibleCases: [Stage] { [.vocab, .grammar, .listening, .writing, .speaking] }
     }
 
     private let vocabQueue: [VocabEntry]
-    private let grammarLesson: GrammarLesson?
-    private let grammarTopic: GrammarTopic?
     private let listeningExercise: ListeningExercise?
     private let store = LearningStore()
 
     @State private var completed: Set<Stage> = []
     @State private var vocabResult: VocabStageResult?
+    @State private var grammarResult: GrammarStageResult?
     @State private var listeningResult: ListeningStageResult?
     @State private var writingResult: WritingStageResult?
+    // Set once, right after the post-vocab choice screen, then handed to AgentLedListeningView
+    // unchanged — the passage is fixed content from that point on, never regenerated.
+    @State private var chosenReadingPassage: ReadingPassage?
 
     @State private var activeStage: Stage?
+    var onProgress: () -> Void = {}
 
-    init() {
+    init(onProgress: @escaping () -> Void = {}) {
+        self.onProgress = onProgress
         let store = LearningStore()
         self.vocabQueue = SRSService(store: store).dailyMixedQueue()
-
-        let grammarPack = ContentService.shared.grammar()
-        let sortedLessons = grammarPack?.lessons.sorted(by: { $0.order < $1.order }) ?? []
-        let incompleteLesson = sortedLessons.first { store.lessonStatus($0.id).status != "completed" }
-        let incompleteTopic = grammarPack?.topics.first { store.lessonStatus($0.id).status != "completed" }
-        if let incompleteLesson {
-            self.grammarLesson = incompleteLesson
-            self.grammarTopic = nil
-        } else if let incompleteTopic {
-            self.grammarLesson = nil
-            self.grammarTopic = incompleteTopic
-        } else {
-            self.grammarLesson = sortedLessons.first
-            self.grammarTopic = nil
-        }
 
         let listeningPack = ContentService.shared.listening()
         let sortedExercises = listeningPack?.exercises.sorted(by: { $0.phase < $1.phase }) ?? []
@@ -69,51 +74,40 @@ struct DailyPathwayView: View {
     }
 
     private var nextStage: Stage? {
-        Stage.allCases.first { !completed.contains($0) }
+        Stage.visibleCases.first { !completed.contains($0) }
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Passeport.parchmentDim.ignoresSafeArea()
-                ScrollView {
-                    VStack(spacing: 14) {
-                        summaryCard
-                        VStack(spacing: 8) {
-                            ForEach(Stage.allCases, id: \.self) { stage in
-                                stageRow(stage)
-                            }
-                        }
-                        if completed.count == Stage.allCases.count {
-                            doneCard
-                        }
-                    }
-                    .padding(.horizontal, 18)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
-                }
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Today's plan")
+                    .font(Passeport.display(16, weight: .medium))
+                    .foregroundColor(Passeport.text)
+                Spacer()
+                Text("auto-tracked")
+                    .font(Passeport.mono(9, weight: .medium))
+                    .foregroundColor(Passeport.slateDim)
             }
-            .navigationTitle("Daily Pathway")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") { dismiss() }
-                }
-            }
-        }
-        .fullScreenCover(item: Binding(get: { activeStage }, set: { activeStage = $0 })) { stage in
-            destination(for: stage)
-        }
-    }
+            .padding(.bottom, 6)
 
-    private var summaryCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            KickerText(text: "Today's session", color: Passeport.slateDim)
-            Text("\(vocabQueue.count) words · \((grammarLesson?.title ?? grammarTopic?.title) ?? "review") · \(listeningExercise != nil ? "1 listening passage" : "no listening today")")
-                .font(Passeport.body(13)).foregroundColor(Passeport.text)
+            ForEach(Array(Stage.visibleCases.enumerated()), id: \.element) { index, stage in
+                stageRow(stage)
+                if index < Stage.visibleCases.count - 1 {
+                    Divider().overlay(Passeport.hairline)
+                }
+            }
+
+            if completed.count == Stage.visibleCases.count {
+                doneCard
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .passeportCard()
+        .fullScreenCover(item: Binding(get: { activeStage }, set: { activeStage = $0 })) { stage in
+            destination(for: stage)
+                .overlay(FloatingNotetakerOverlay())
+                .onAppear { NotetakerState.shared.currentContext = stage.title }
+        }
     }
 
     private func stageRow(_ stage: Stage) -> some View {
@@ -122,42 +116,41 @@ struct DailyPathwayView: View {
         return Button {
             activeStage = stage
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 11) {
                 Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20))
+                    .font(.system(size: 19))
                     .foregroundColor(isDone ? Passeport.brass : Passeport.slate)
-                Image(systemName: stage.icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(Passeport.maroon)
-                    .frame(width: 20)
-                Text(stage.title)
-                    .font(Passeport.body(14, weight: .medium))
-                    .foregroundColor(Passeport.text)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(stage.title)
+                        .font(Passeport.body(13, weight: .medium))
+                        .foregroundColor(Passeport.text)
+                        .strikethrough(isDone, color: Passeport.slateDim)
+                    Text(stage.detail)
+                        .font(Passeport.body(11))
+                        .foregroundColor(Passeport.slateDim)
+                        .lineLimit(1)
+                }
                 Spacer()
                 if isNext {
                     Text("Start").font(Passeport.mono(10.5, weight: .medium)).foregroundColor(Passeport.parchment)
                         .padding(.horizontal, 10).padding(.vertical, 5)
                         .background(Passeport.maroon).clipShape(Capsule())
                 } else if !isDone {
-                    Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Passeport.slate)
+                    Image(systemName: "chevron.right").font(.system(size: 11)).foregroundColor(Passeport.slate)
                 }
             }
-            .padding(14)
-            .passeportCard(padding: 0)
+            .padding(.vertical, 8)
         }
         .buttonStyle(PlainButtonStyle())
     }
 
     private var doneCard: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "party.popper.fill").font(.system(size: 30)).foregroundColor(Passeport.brass)
-            Text("Today's pathway complete!").font(Passeport.display(17, weight: .medium)).foregroundColor(Passeport.text)
-            Button { dismiss() } label: { Text("Done") }
-                .buttonStyle(PasseportPrimaryButton())
-                .padding(.horizontal, 60)
+        HStack(spacing: 8) {
+            Image(systemName: "party.popper.fill").font(.system(size: 16)).foregroundColor(Passeport.brass)
+            Text("Today's pathway complete!").font(Passeport.body(13, weight: .medium)).foregroundColor(Passeport.text)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 8)
+        .padding(.top, 6)
     }
 
     @ViewBuilder
@@ -170,29 +163,53 @@ struct DailyPathwayView: View {
                 if result.reviewedCount > 0 {
                     store.markHabit(date: Date(), habitId: "anki", done: true, addMinutes: 5)
                 }
+                onProgress()
+            }
+        case .grammar:
+            GrammarPickerView(vocabSummary: vocabResult) { result in
+                grammarResult = result
+                completed.insert(.grammar)
+                store.markHabit(date: Date(), habitId: "reading", done: true, addMinutes: 8)
+                onProgress()
+                // Route through the choice screen next, not straight to Listening — the student
+                // decides there whether the passage reuses today's practiced words or the
+                // existing pre-authored lab content.
+                activeStage = .postVocabChoice
+            }
+        case .postVocabChoice:
+            PostVocabChoiceView(vocabResult: vocabResult, fallbackExercise: listeningExercise) { passage in
+                chosenReadingPassage = passage
+                activeStage = .listening
             }
         case .listening:
-            AgentLedListeningView(
-                grammarLesson: grammarLesson, grammarTopic: grammarTopic,
-                listeningExercise: listeningExercise, vocabSummary: vocabResult
-            ) { result in
-                listeningResult = result
-                completed.insert(.listening)
-                if grammarLesson != nil || grammarTopic != nil {
-                    store.markHabit(date: Date(), habitId: "reading", done: true, addMinutes: 8)
+            if let passage = chosenReadingPassage {
+                AgentLedListeningView(passage: passage, vocabSummary: vocabResult) { result in
+                    listeningResult = result
+                    completed.insert(.listening)
+                    if result.listeningAttempted > 0 {
+                        store.markHabit(date: Date(), habitId: "listening", done: true, addMinutes: 8)
+                    }
+                    onProgress()
                 }
-                if listeningExercise != nil {
-                    store.markHabit(date: Date(), habitId: "listening", done: true, addMinutes: 8)
+            } else {
+                // Nothing to read today (no vocab covered and no lab exercise available) —
+                // skip straight through rather than show an empty session.
+                Color.clear.onAppear {
+                    listeningResult = ListeningStageResult(grammarDrillResults: [], listeningCorrect: 0, listeningAttempted: 0)
+                    completed.insert(.listening)
+                    activeStage = nil
+                    onProgress()
                 }
             }
-        case .speaking:
-            SessionView(apiKey: geminiApiKey, lessonContext: speakingContext())
         case .writing:
             PathwayWritingView(targetWords: writingTargets()) { result in
                 writingResult = result
                 completed.insert(.writing)
                 store.markHabit(date: Date(), habitId: "writing", done: true, addMinutes: 5)
+                onProgress()
             }
+        case .speaking:
+            SessionView(apiKey: geminiApiKey, lessonContext: speakingContext(), stage: "speaking")
         }
     }
 
@@ -201,20 +218,21 @@ struct DailyPathwayView: View {
         return covered.isEmpty ? Array(vocabQueue.prefix(2)) : Array(covered.shuffled().prefix(2))
     }
 
-    /// Rich context for the Speaking stage, built from what actually happened in the first two
-    /// stages — the closing roleplay uses real material from today, not a generic prompt.
+    /// Rich context for the closing Speaking stage, built from what actually happened across all
+    /// four earlier stages — the roleplay uses real material from today, not a generic prompt.
     private func speakingContext() -> String {
         var parts: [String] = ["DAILY PATHWAY — CLOSING ROLEPLAY: have a short natural conversation using today's material in a real-world scenario relevant to TEF/TCF Canada prep."]
         if let vocabResult, !vocabResult.wordsCovered.isEmpty {
             parts.append("Vocabulary covered today: " + vocabResult.wordsCovered.map { $0.fr }.joined(separator: ", "))
         }
-        if let grammarLesson {
-            parts.append("Grammar focus today: \(grammarLesson.title).")
-        } else if let grammarTopic {
-            parts.append("Grammar focus today: \(grammarTopic.title).")
+        if let grammarResult {
+            parts.append("Grammar focus today: \(grammarResult.topicTitle).")
         }
         if let listeningResult, listeningResult.listeningAttempted > 0 {
-            parts.append("Listening comprehension: \(listeningResult.listeningCorrect)/\(listeningResult.listeningAttempted) correct.")
+            parts.append("Reading & listening: went through \(listeningResult.listeningAttempted) part(s) of today's passage.")
+        }
+        if let writingResult, let score = writingResult.score {
+            parts.append("Writing score today: \(String(format: "%.1f", score))/10.")
         }
         return parts.joined(separator: "\n\n")
     }

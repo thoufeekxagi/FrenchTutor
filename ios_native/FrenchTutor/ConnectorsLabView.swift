@@ -71,6 +71,7 @@ struct ConnectorsLabView: View {
         }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext())
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 
@@ -236,6 +237,7 @@ struct ConnectorsQuizView: View {
         .padding(24)
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: ContentService.shared.lessonContext())
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 

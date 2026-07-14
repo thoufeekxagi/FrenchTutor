@@ -24,14 +24,36 @@ final class LessonAgentService {
         case missingKey
         case requestFailed
         case badResponse
+        case badJSON(String)
 
         var errorDescription: String? {
             switch self {
             case .missingKey: return "AI feedback unavailable — add an OpenRouter key in Settings."
             case .requestFailed: return "The AI tutor is busy right now. Try again in a moment."
             case .badResponse: return "The AI tutor gave an unexpected response."
+            case .badJSON(let raw): return "LLM returned non-JSON: \(String(raw.prefix(200)))"
             }
         }
+    }
+
+    static func extractJSON(from raw: String) -> String {
+        var s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Strip markdown code fences: ```json ... ``` or ``` ... ```
+        if s.hasPrefix("```") {
+            if let firstNewline = s.firstIndex(of: "\n") {
+                s = String(s[s.index(after: firstNewline)...])
+            }
+            if s.hasSuffix("```") {
+                s = String(s.dropLast(3)).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        if let start = s.firstIndex(of: "{"), let end = s.lastIndex(of: "}") {
+            return String(s[start...end])
+        }
+        if let start = s.firstIndex(of: "["), let end = s.lastIndex(of: "]") {
+            return String(s[start...end])
+        }
+        return s
     }
 
     // MARK: - Public API
@@ -159,9 +181,107 @@ final class LessonAgentService {
         return try parseSessionPlan(raw, validIds: Set(candidateWords.map { $0.id }))
     }
 
+    struct GrammarSessionPlan {
+        let chosenId: String
+        let focusNote: String
+    }
+
+    /// Runs once, briefly, before a grammar session starts, when the student picks "Auto" in
+    /// `GrammarPickerView` — looks at recurring mistakes and recent session history and picks
+    /// ONE tense/topic from the candidate list to focus on today, exactly the same best-effort
+    /// shape as `planVocabSession` (fall back to the first candidate, no focus note, on failure).
+    func planGrammarSession(candidates: [(id: String, title: String)], mistakeTags: [(tag: String, description: String, count: Int)], recentDiary: [String]) async throws -> GrammarSessionPlan {
+        let system = """
+        You are quietly picking which ONE French grammar point a beginner should practice today — \
+        the student won't see this reasoning, only the short focus note you write. Given the \
+        candidate list of tenses/topics, the student's recurring mistake patterns, and recent \
+        session notes, choose the single most useful one to practice right now (e.g. if their \
+        mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, \
+        specific focus note for how today's session should be framed. If nothing stands out, pick \
+        the first candidate. Respond with ONLY a compact JSON object: \
+        {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate \
+        IDs given — never invent a new one.
+        """
+        let list = candidates.map { "\($0.id): \($0.title)" }.joined(separator: "; ")
+        var user = "CANDIDATES: \(list)"
+        if !mistakeTags.isEmpty {
+            user += "\n\nRECURRING MISTAKES: " + mistakeTags.map { "\($0.description) (seen \($0.count)x)" }.joined(separator: "; ")
+        }
+        if !recentDiary.isEmpty {
+            user += "\n\nRECENT SESSION NOTES: " + recentDiary.joined(separator: " | ")
+        }
+        let raw = try await complete(messages: [
+            ["role": "system", "content": system],
+            ["role": "user", "content": user]
+        ])
+        return try parseGrammarSessionPlan(raw, validIds: Set(candidates.map { $0.id }), fallbackId: candidates.first?.id ?? "")
+    }
+
     struct VocabExample: Codable {
         let fr: String
         let en: String
+    }
+
+    /// Runs ONCE, right after the vocab stage ends, if the student picks "a short reading/
+    /// listening session on the words I just practiced" — assembles a short French passage/
+    /// dialogue that naturally reuses those words, broken into `ReadingSegment`s (word/phrase,
+    /// meaning, one simple grammar note, one pronunciation tip). This is pre-generation, not live
+    /// teaching: the result is cached and handed to `AgentLedListeningView` exactly like
+    /// offline-authored content — the model is never called again during the teaching session
+    /// itself. Grammar notes are intentionally kept simple (no conjugation tables, no advanced
+    /// tense discussion) for this first version; a harder/dynamic-difficulty version is planned
+    /// for later once this base pattern is proven out, same as vocab's example-sentence approach.
+    func buildReadingPassageFromVocab(words: [VocabEntry]) async throws -> ReadingPassage {
+        let system = """
+        You are quietly assembling a short French reading/listening passage for a total beginner \
+        preparing for TEF/TCF Canada, using ONLY the vocabulary words given below (plus basic \
+        connecting words like articles, "et", "je", "est", etc. as needed for grammatical French) — \
+        do not introduce unrelated advanced vocabulary. Write 4-8 short segments (a word or a very \
+        short phrase each) that together form a simple, coherent short passage or dialogue when \
+        read in order. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation \
+        or subjunctive — this is intentionally basic for a first pass. Respond with ONLY a compact \
+        JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+        {"title": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
+        Each segment's "fr" must be the exact short phrase as it appears in the passage (in order, \
+        so concatenating them with spaces reproduces the full passage), "en" its English meaning, \
+        "grammar_note" one simple English sentence explaining why that word/word order is used, and \
+        "pronunciation_tip" one simple English sentence with a pronunciation pointer.
+        """
+        let wordList = words.map { "\($0.fr) (\($0.en))" }.joined(separator: ", ")
+        let user = "VOCABULARY WORDS TO REUSE: \(wordList)"
+        let raw = try await complete(messages: [
+            ["role": "system", "content": system],
+            ["role": "user", "content": user]
+        ], maxTokens: 1400)
+        return try parseReadingPassage(raw)
+    }
+
+
+    /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage (see
+    /// `GrammarPickerView`) — builds a short deck of `GrammarPracticeCard`s (one short French
+    /// sentence in the chosen tense per card, its English meaning, and a one-line grammar note),
+    /// reusing the vocabulary words the student just practiced in the Vocab stage wherever
+    /// natural, and informed by that Vocab session's actual transcript (what they said, how it
+    /// went) rather than teaching the tense in a vacuum. Pre-generation, not live teaching: the
+    /// result is cached and handed to `AgentLedGrammarView` exactly like offline-authored content
+    /// — mirrors `buildReadingPassageFromVocab`'s shape. Grammar is kept intentionally SIMPLE
+    /// (present-tense-level clarity even for other tenses) for this first pass; a harder/dynamic-
+    /// difficulty version is planned for later, same as vocab's and reading's approach.
+    /// Kept deliberately lean — only the tense name, a handful of vocab words, and one short line
+    /// of recent context go in, not a full transcript or the whole usage-notes list. A bigger
+    /// prompt was adding real latency for no quality gain; this is the whole request now, so it's
+    /// fast and there's nothing left to trim without losing the point of the feature.
+    var lastRawResponse: String = ""
+
+    func generateGrammarPracticeCards(tenseTitle: String, tenseUsage: [String], vocabWords: [String], recentVocabTranscript: String, count: Int = 6) async throws -> [GrammarPracticeCard] {
+        let words = vocabWords.prefix(6)
+        let wordList = words.isEmpty ? "" : " using words: " + words.joined(separator: ", ")
+        let user = "\(count) beginner French sentences in \(tenseTitle)\(wordList). Pure JSON only: {\"cards\":[{\"fr\":\"...\",\"en\":\"...\",\"note\":\"...\"}]}"
+        let raw = try await complete(messages: [
+            ["role": "user", "content": user]
+        ], maxTokens: 800)
+        lastRawResponse = raw
+        return try parseGrammarPracticeCards(raw)
     }
 
     /// A fast, lightweight grade for the Daily Pathway's writing stage — one or two sentences
@@ -263,13 +383,10 @@ final class LessonAgentService {
     }
 
     private func parseWritingFeedback(_ raw: String) throws -> WritingFeedback {
-        var jsonString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let start = jsonString.firstIndex(of: "{"), let end = jsonString.lastIndex(of: "}") {
-            jsonString = String(jsonString[start...end])
-        }
+        let jsonString = Self.extractJSON(from: raw)
         guard let data = jsonString.data(using: .utf8),
-              let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw AgentError.badResponse
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
         }
         let score = (obj["score_out_of_10"] as? Double) ?? Double(obj["score_out_of_10"] as? Int ?? 0)
         let strengths = obj["strengths"] as? [String] ?? []
@@ -291,13 +408,10 @@ final class LessonAgentService {
     }
 
     private func parseMicroWritingFeedback(_ raw: String) throws -> MicroWritingFeedback {
-        var jsonString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let start = jsonString.firstIndex(of: "{"), let end = jsonString.lastIndex(of: "}") {
-            jsonString = String(jsonString[start...end])
-        }
+        let jsonString = Self.extractJSON(from: raw)
         guard let data = jsonString.data(using: .utf8),
-              let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw AgentError.badResponse
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
         }
         let score = (obj["score_out_of_10"] as? Double) ?? Double(obj["score_out_of_10"] as? Int ?? 0)
         let comment = obj["comment"] as? String ?? ""
@@ -305,26 +419,62 @@ final class LessonAgentService {
     }
 
     private func parseMistakeJudgment(_ raw: String) throws -> MistakeJudgment {
-        var jsonString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let start = jsonString.firstIndex(of: "{"), let end = jsonString.lastIndex(of: "}") {
-            jsonString = String(jsonString[start...end])
-        }
+        let jsonString = Self.extractJSON(from: raw)
         guard let data = jsonString.data(using: .utf8),
-              let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw AgentError.badResponse
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
         }
         let correct = obj["correct"] as? Bool ?? true
         return MistakeJudgment(isCorrect: correct, tag: obj["tag"] as? String, description: obj["description"] as? String)
     }
 
-    private func parseSessionPlan(_ raw: String, validIds: Set<String>) throws -> SessionPlan {
-        var jsonString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let start = jsonString.firstIndex(of: "{"), let end = jsonString.lastIndex(of: "}") {
-            jsonString = String(jsonString[start...end])
-        }
+    private func parseReadingPassage(_ raw: String) throws -> ReadingPassage {
+        let jsonString = Self.extractJSON(from: raw)
         guard let data = jsonString.data(using: .utf8),
-              let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw AgentError.badResponse
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
+        }
+        let title = obj["title"] as? String ?? "Reading passage"
+        let segmentsRaw = obj["segments"] as? [[String: Any]] ?? []
+        let segments = segmentsRaw.compactMap { seg -> ReadingSegment? in
+            guard let fr = seg["fr"] as? String, !fr.isEmpty else { return nil }
+            return ReadingSegment(
+                fr: fr,
+                en: seg["en"] as? String ?? "",
+                grammarNote: seg["grammar_note"] as? String ?? "",
+                pronunciationTip: seg["pronunciation_tip"] as? String ?? ""
+            )
+        }
+        guard !segments.isEmpty else { throw AgentError.badResponse }
+        let fullText = (obj["full_text"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? segments.map { $0.fr }.joined(separator: " ")
+        return ReadingPassage(id: "generated-\(UUID().uuidString.prefix(8))", title: title, segments: segments, fullText: fullText)
+    }
+
+    private func parseGrammarPracticeCards(_ raw: String) throws -> [GrammarPracticeCard] {
+        let jsonString = Self.extractJSON(from: raw)
+        guard let data = jsonString.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
+        }
+        let cardsRaw = obj["cards"] as? [[String: Any]] ?? []
+        let cards = cardsRaw.enumerated().compactMap { index, card -> GrammarPracticeCard? in
+            guard let fr = card["fr"] as? String, !fr.isEmpty else { return nil }
+            return GrammarPracticeCard(
+                id: "generated-\(index)-\(UUID().uuidString.prefix(6))",
+                fr: fr,
+                en: card["en"] as? String ?? "",
+                note: card["note"] as? String ?? ""
+            )
+        }
+        guard !cards.isEmpty else { throw AgentError.badResponse }
+        return cards
+    }
+
+    private func parseSessionPlan(_ raw: String, validIds: Set<String>) throws -> SessionPlan {
+        let jsonString = Self.extractJSON(from: raw)
+        guard let data = jsonString.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
         }
         let focusNote = obj["focus_note"] as? String ?? ""
         var prioritized = obj["prioritized_word_ids"] as? [String]
@@ -334,6 +484,19 @@ final class LessonAgentService {
             prioritized = nil
         }
         return SessionPlan(focusNote: focusNote, prioritizedWordIds: prioritized)
+    }
+
+    private func parseGrammarSessionPlan(_ raw: String, validIds: Set<String>, fallbackId: String) throws -> GrammarSessionPlan {
+        let jsonString = Self.extractJSON(from: raw)
+        guard let data = jsonString.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw AgentError.badJSON(raw)
+        }
+        let focusNote = obj["focus_note"] as? String ?? ""
+        let chosenId = obj["chosen_id"] as? String
+        // Guard against a hallucinated ID the same way vocab guards a hallucinated reordering.
+        let validChosenId = (chosenId.map { validIds.contains($0) } == true) ? chosenId! : fallbackId
+        return GrammarSessionPlan(chosenId: validChosenId, focusNote: focusNote)
     }
 
 }

@@ -69,6 +69,7 @@ struct GrammarLessonView: View {
         }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 
@@ -346,6 +347,7 @@ struct TopicLessonView: View {
         }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 

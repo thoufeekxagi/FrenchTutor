@@ -94,6 +94,7 @@ struct WritingTaskView: View {
         }
         .fullScreenCover(isPresented: $showMarie) {
             SessionView(apiKey: geminiApiKey, lessonContext: lessonContext)
+                .overlay(FloatingNotetakerOverlay())
         }
     }
 

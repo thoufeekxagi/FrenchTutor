@@ -62,6 +62,32 @@ final class ContentService {
         return listeningCache
     }
 
+    /// Maps a pre-authored `ListeningExercise` (Content/listening.json) into the `ReadingPassage`
+    /// shape the agent-led reading/listening stage teaches from — Option B ("from today's
+    /// lesson") in the post-vocab choice. This is a pure, offline, synchronous mapping (word-split
+    /// on the existing script text with generic grammar/pronunciation notes) — no LLM call, so it
+    /// can never fail or go stale; Option A (LLM-assembled from practiced vocab) is the only path
+    /// that calls out to `LessonAgentService`.
+    func readingPassage(fromListening exercise: ListeningExercise) -> ReadingPassage {
+        // Split into short phrases (roughly clause-sized) rather than single words — a script
+        // sentence broken into individual words loses too much context for a beginner walkthrough.
+        let phrases = exercise.script
+            .replacingOccurrences(of: "!", with: ".")
+            .replacingOccurrences(of: "?", with: "?.")
+            .split(separator: ".")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let segments = phrases.map { phrase in
+            ReadingSegment(
+                fr: phrase,
+                en: "", // no pre-authored translation per phrase; the model explains it live in English
+                grammarNote: "Notice the word order — French often keeps subject, verb, object in the same order as English, but watch for small differences like adjective placement.",
+                pronunciationTip: "Read it slowly first, sounding out each syllable, then try it at a natural pace."
+            )
+        }
+        return ReadingPassage(id: exercise.id, title: exercise.title, segments: segments, fullText: exercise.script)
+    }
+
     func writingTasks() -> WritingPack? {
         lock.lock(); defer { lock.unlock() }
         if writingCache == nil { writingCache = load("writing_tasks") }
