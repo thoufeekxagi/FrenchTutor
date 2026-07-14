@@ -17,6 +17,7 @@ import '../../utils/text_fold.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../session/session_screen.dart' show CallStatus;
 import 'agent_led_vocab_screen.dart' show VocabStageResult;
 
@@ -101,6 +102,10 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
   @override
   void initState() {
     super.initState();
+    // Deferred to after this frame — see pathway_writing_screen.dart for why.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Listening';
+    });
     _store = ref.read(learningStoreProvider);
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
@@ -460,22 +465,37 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final notetaker = ref.watch(notetakerStateProvider);
+    // Matches iOS's fullScreenCover (no swipe-to-dismiss). See session_screen.dart for why
+    // canPop stays permanently false — _confirmEnd()'s own Navigator.pop() still works since
+    // it's a direct pop, not a system-initiated one.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _confirmEnd();
+      },
+      child: Scaffold(
       backgroundColor: Passeport.parchmentDim,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            _header(),
-            Expanded(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), child: _content())),
-            if (_errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Text(_errorMessage, style: Passeport.mono(12).copyWith(color: Passeport.maroon)),
-              ),
-            _debugPanel(),
-            _controls(),
+            Column(
+              children: [
+                _header(),
+                Expanded(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), child: _content())),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(_errorMessage, style: Passeport.mono(12).copyWith(color: Passeport.maroon)),
+                  ),
+                _debugPanel(),
+                _controls(),
+              ],
+            ),
+            FloatingNotetakerOverlay(state: notetaker),
           ],
         ),
+      ),
       ),
     );
   }

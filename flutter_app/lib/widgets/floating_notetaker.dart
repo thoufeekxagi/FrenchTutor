@@ -56,6 +56,11 @@ class NotetakerState extends ChangeNotifier {
 
   int _lastAutosavedWordCount = 0;
 
+  /// Row id of the note currently being drafted, once autosave has created it. Reusing this
+  /// id on every subsequent autosave/commit is what makes one note-taking session end up as
+  /// ONE evolving row instead of a new duplicate row every 5 words.
+  int? _draftNoteId;
+
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isEnabled = prefs.getBool('notetaker.enabled') ?? true;
@@ -70,17 +75,19 @@ class NotetakerState extends ChangeNotifier {
         _draftText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
     if (wordCount > 0 && wordCount - _lastAutosavedWordCount >= 5) {
       _lastAutosavedWordCount = wordCount;
-      storage.saveNote(tag: _currentContext, text: _draftText);
+      _draftNoteId = storage.saveNote(id: _draftNoteId, tag: _currentContext, text: _draftText);
     }
   }
 
-  /// Manual Save — commits the draft and clears state.
+  /// Manual Save — commits the draft (updating the same row autosave created, if any) and
+  /// clears state so the bubble reopens empty next time.
   void commitDraft() {
     final trimmed = _draftText.trim();
     if (trimmed.isNotEmpty) {
-      storage.saveNote(tag: _currentContext, text: trimmed);
+      storage.saveNote(id: _draftNoteId, tag: _currentContext, text: trimmed);
     }
     _draftText = '';
+    _draftNoteId = null;
     _lastAutosavedWordCount = 0;
     _isExpanded = false;
     notifyListeners();

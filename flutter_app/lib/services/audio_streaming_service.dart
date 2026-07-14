@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
@@ -32,6 +33,19 @@ class AudioStreamingService {
   bool _isPlayerStarted = false;
   bool _isSessionConfigured = false;
   void Function(List<int> chunk)? _audioChunkCallback;
+
+  /// Gemini delivers audio over the WebSocket in irregular network bursts, not a steady
+  /// real-time stream. Feeding each chunk to flutter_sound the instant it arrives — as the
+  /// original code did — starves the player's small internal buffer between bursts (causing
+  /// audible gaps/cutoffs) and, worse, can call `feedUint8FromStream` again before the
+  /// previous call has finished awaiting, which is a known source of pops/jitter in
+  /// flutter_sound. This queue decouples network arrival timing from playback feeding: chunks
+  /// are appended here immediately, and a single drain loop feeds them to the player strictly
+  /// one at a time, always awaiting the previous feed before starting the next. Native
+  /// AVAudioEngine got this smoothing for free via buffer-ahead scheduling; flutter_sound
+  /// needs it built explicitly.
+  final Queue<Uint8List> _playbackQueue = Queue<Uint8List>();
+  bool _isDrainingPlaybackQueue = false;
 
   /// While true, captured mic audio is not forwarded via the chunk callback. Used to
   /// prevent the mic from picking up the tutor's own speaker output and feeding it back to
@@ -139,13 +153,19 @@ class AudioStreamingService {
       sampleRate: _outputSampleRate,
       numChannels: 1,
       interleaved: true,
-      bufferSize: 4096,
+      // 4096 (~85ms at 24kHz mono PCM16) was too tight — any network burst gap wider than
+      // that underran the player and produced an audible cutoff. 16384 (~340ms) gives the
+      // serialized playback queue above enough headroom to smooth over Gemini's bursty
+      // WebSocket delivery without the extra latency becoming perceptible in conversation.
+      bufferSize: 16384,
     );
     _isPlayerStarted = true;
   }
 
   /// Queues a chunk of Marie's voice (24kHz mono PCM16) for playback and extends the
-  /// tracked playback end-of-timeline used by the mic gate above.
+  /// tracked playback end-of-timeline used by the mic gate above. The chunk is appended to
+  /// `_playbackQueue` and fed to the player by the serialized drain loop below — never fed
+  /// directly here — so bursty network delivery can't starve or race the player.
   Future<void> playAudioChunk(List<int> pcmBytes) async {
     await _ensurePlayerStarted();
     final bytes = Uint8List.fromList(pcmBytes);
@@ -159,15 +179,36 @@ class AudioStreamingService {
     final base = _scheduledPlaybackEndTime.isAfter(now) ? _scheduledPlaybackEndTime : now;
     _scheduledPlaybackEndTime = base.add(Duration(milliseconds: (bufferDurationSeconds * 1000).round()));
 
+    _playbackQueue.add(bytes);
+    _drainPlaybackQueue();
+  }
+
+  /// Feeds queued chunks to the player strictly one at a time, always awaiting the previous
+  /// `feedUint8FromStream` call before starting the next. Safe to call repeatedly — re-entrant
+  /// calls while a drain is already running just return immediately, since the running loop
+  /// will pick up anything newly queued.
+  Future<void> _drainPlaybackQueue() async {
+    if (_isDrainingPlaybackQueue) return;
+    _isDrainingPlaybackQueue = true;
     try {
-      await _player.feedUint8FromStream(bytes);
-    } catch (_) {
-      // Dropped chunk — matches the iOS original's "drop and let the system recover" behavior
-      // on a transient playback error rather than crashing the call.
+      while (_playbackQueue.isNotEmpty) {
+        final bytes = _playbackQueue.removeFirst();
+        try {
+          await _player.feedUint8FromStream(bytes);
+        } catch (_) {
+          // Dropped chunk — matches the iOS original's "drop and let the system recover"
+          // behavior on a transient playback error rather than crashing the call.
+        }
+      }
+    } finally {
+      _isDrainingPlaybackQueue = false;
     }
   }
 
   Future<void> stopPlayback() async {
+    // Discard anything not yet fed to the player — otherwise queued chunks from before the
+    // interruption keep draining and playing after the model was told to stop (barge-in).
+    _playbackQueue.clear();
     try {
       if (!_player.isStopped) await _player.stopPlayer();
     } catch (_) {}

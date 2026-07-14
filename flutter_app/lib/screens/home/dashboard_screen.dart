@@ -10,6 +10,7 @@ import '../../models/content_models.dart';
 import '../../config/api_keys.dart';
 import '../../services/lesson_speech_service.dart';
 import '../session/session_screen.dart';
+import '../notes/notes_review_screen.dart';
 import 'daily_pathway_widget.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -87,6 +88,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               _buildSpeakingTopics(),
               const SizedBox(height: 14),
               _buildRecentSessions(),
+              const SizedBox(height: 14),
+              _buildReviewNotesCard(),
             ],
           ),
         ),
@@ -234,6 +237,43 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Review notes
+  // ---------------------------------------------------------------------------
+
+  Widget _buildReviewNotesCard() {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const NotesReviewScreen()),
+      ),
+      child: PasseportCard(
+        child: Row(
+          children: [
+            Icon(Icons.edit_note, size: 20, color: Passeport.brass),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Review notes',
+                    style: Passeport.body(13.5, weight: FontWeight.w500).copyWith(color: Passeport.text),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    'Everything you jotted down, by lesson',
+                    style: Passeport.mono(10).copyWith(color: Passeport.slateDim),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, size: 16, color: Passeport.slate),
+          ],
+        ),
       ),
     );
   }

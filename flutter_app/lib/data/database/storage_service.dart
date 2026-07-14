@@ -92,8 +92,20 @@ class StorageService {
     _db.execute('DELETE FROM sessions WHERE id = ?', [id]);
   }
 
-  void saveNote({String? tag, required String text}) {
+  /// Creates a new note when [id] is null, or updates the existing row (text + updated_at)
+  /// when [id] is given — returns the row's id either way. Callers doing incremental autosave
+  /// (the floating notetaker) MUST pass back the id they got from the previous call, or every
+  /// autosave tick creates a new duplicate row instead of evolving one draft.
+  int saveNote({int? id, String? tag, required String text}) {
+    if (id != null) {
+      _db.execute(
+        "UPDATE notes SET tag = ?, text = ?, updated_at = datetime('now') WHERE id = ?",
+        [tag, text, id],
+      );
+      return id;
+    }
     _db.execute('INSERT INTO notes (tag, text) VALUES (?, ?)', [tag, text]);
+    return _db.lastInsertRowId;
   }
 
   List<Note> getAllNotes() {

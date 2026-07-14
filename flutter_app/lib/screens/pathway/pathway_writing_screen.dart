@@ -10,6 +10,7 @@ import '../../services/session_recorder.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/floating_notetaker.dart';
 
 class WritingStageResult {
   WritingStageResult({this.score});
@@ -44,6 +45,13 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
   @override
   void initState() {
     super.initState();
+    // Deferred to after this frame — setting currentContext synchronously here notifies
+    // FloatingNotetakerOverlay listeners (mounted elsewhere, e.g. the tab-bar root) while
+    // THIS screen is still in its own initial build, which Flutter disallows
+    // ("setState() or markNeedsBuild() called during build").
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Writing';
+    });
     _recorder = SessionRecorder(storage: ref.read(storageServiceProvider), stage: 'writing', topic: 'Writing');
   }
 
@@ -107,66 +115,71 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
           child: Text('Skip', style: TextStyle(color: Passeport.slateDim)),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
-        child: Column(
-          children: [
-            PasseportCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const KickerText('Quick writing check', color: Passeport.slateDim),
-                  const SizedBox(height: 8),
-                  Text(_prompt, style: Passeport.body(13.5)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (_feedback == null) ...[
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(color: Passeport.card, borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.all(4),
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: (val) => setState(() => _submission = val),
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    style: Passeport.body(13.5),
-                    cursorColor: Passeport.maroon,
-                    decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.all(12)),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+            child: Column(
+              children: [
+                PasseportCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const KickerText('Quick writing check', color: Passeport.slateDim),
+                      const SizedBox(height: 8),
+                      Text(_prompt, style: Passeport.body(13.5)),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              PasseportPrimaryButton(
-                label: _isGrading ? 'Grading…' : 'Submit',
-                onPressed: (_isGrading || _submission.trim().isEmpty) ? null : _submit,
-              ),
-              if (_errorText != null) ...[
-                const SizedBox(height: 8),
-                Text(_errorText!, style: Passeport.mono(11).copyWith(color: Passeport.maroon)),
-              ],
-            ] else ...[
-              PasseportCard(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${_feedback!.scoreOutOf10.toStringAsFixed(1)} / 10',
-                      style: Passeport.display(28, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                const SizedBox(height: 16),
+                if (_feedback == null) ...[
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(color: Passeport.card, borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.all(4),
+                      child: TextField(
+                        controller: _controller,
+                        onChanged: (val) => setState(() => _submission = val),
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        style: Passeport.body(13.5),
+                        cursorColor: Passeport.maroon,
+                        decoration: const InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.all(12)),
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(_feedback!.comment, style: Passeport.body(13.5), textAlign: TextAlign.center),
+                  ),
+                  const SizedBox(height: 12),
+                  PasseportPrimaryButton(
+                    label: _isGrading ? 'Grading…' : 'Submit',
+                    onPressed: (_isGrading || _submission.trim().isEmpty) ? null : _submit,
+                  ),
+                  if (_errorText != null) ...[
+                    const SizedBox(height: 8),
+                    Text(_errorText!, style: Passeport.mono(11).copyWith(color: Passeport.maroon)),
                   ],
-                ),
-              ),
-              const Spacer(),
-              PasseportPrimaryButton(label: 'Finish', onPressed: _finish),
-            ],
-          ],
-        ),
+                ] else ...[
+                  PasseportCard(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${_feedback!.scoreOutOf10.toStringAsFixed(1)} / 10',
+                          style: Passeport.display(28, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(_feedback!.comment, style: Passeport.body(13.5), textAlign: TextAlign.center),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  PasseportPrimaryButton(label: 'Finish', onPressed: _finish),
+                ],
+              ],
+            ),
+          ),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+        ],
       ),
     );
   }

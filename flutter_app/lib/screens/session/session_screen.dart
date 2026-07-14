@@ -11,6 +11,7 @@ import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/floating_notetaker.dart';
 
 enum CallStatus { connecting, listening, tutorSpeaking, muted, ended }
 
@@ -47,6 +48,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   void initState() {
     super.initState();
     LessonSpeechService.shared.deactivate();
+    // Deferred to after this frame — see pathway_writing_screen.dart for why.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Speaking';
+    });
     _audio = AudioStreamingService();
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
@@ -297,26 +302,44 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final notetaker = ref.watch(notetakerStateProvider);
+    // Matches iOS's fullScreenCover, which has no swipe-to-dismiss gesture at all — without
+    // this, Flutter's iOS edge-swipe-back gesture (still active even on a fullscreenDialog
+    // MaterialPageRoute) can silently end the call, bypassing the "End Call?" confirmation
+    // entirely. canPop stays false permanently: the confirmation dialog's own Navigator.pop()
+    // call bypasses canPop since it's a direct pop, not a system-initiated one, so confirming
+    // still works normally.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _confirmEnd();
+      },
+      child: Scaffold(
       backgroundColor: Passeport.parchmentDim,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            _callHeader(),
-            Expanded(child: _transcriptView()),
-            if (_errorMessage.isNotEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                color: Passeport.maroon.withValues(alpha: 0.1),
-                child: Text(
-                  _errorMessage,
-                  style: Passeport.mono(12).copyWith(color: Passeport.maroon),
-                ),
-              ),
-            _callControls(),
+            Column(
+              children: [
+                _callHeader(),
+                Expanded(child: _transcriptView()),
+                if (_errorMessage.isNotEmpty)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    color: Passeport.maroon.withValues(alpha: 0.1),
+                    child: Text(
+                      _errorMessage,
+                      style: Passeport.mono(12).copyWith(color: Passeport.maroon),
+                    ),
+                  ),
+                _callControls(),
+              ],
+            ),
+            FloatingNotetakerOverlay(state: notetaker),
           ],
         ),
+      ),
       ),
     );
   }
