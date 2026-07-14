@@ -4,7 +4,7 @@ import '../models/session.dart';
 
 class SessionRecorder {
   SessionRecorder({required StorageService storage, required this.stage, required this.topic})
-      : _storage = storage,
+      : _storage = storage, // ignore: prefer_initializing_formals
         sessionId = const Uuid().v4(),
         _startedAt = DateTime.now().toIso8601String();
 

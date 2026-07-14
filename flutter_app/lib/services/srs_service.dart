@@ -15,7 +15,12 @@ class SRSService {
     return value > 0 ? value : 20;
   }
 
-  SRSState grade({required String entryId, required SRSGrade grade}) {
+  SRSState grade({
+    required String entryId,
+    required SRSGrade grade,
+    SRSResponseType responseType = SRSResponseType.auto,
+    String? sessionId,
+  }) {
     var state = store.srsState(entryId) ?? SRSState(entryId: entryId);
     final now = DateTime.now();
 
@@ -25,6 +30,13 @@ class SRSService {
         state.intervalDays = 0;
         state.ease = (state.ease - 0.2).clamp(1.3, double.infinity);
         state.dueAt = now.add(const Duration(minutes: 10));
+      case SRSGrade.hard:
+        // Correct but effortful (e.g. needed a hint): shorter interval than
+        // good, slight ease penalty, but still progress — never a reset.
+        state.intervalDays = state.reps == 0 ? 1 : (state.intervalDays * 1.2).clamp(1, double.infinity);
+        state.ease = (state.ease - 0.15).clamp(1.3, double.infinity);
+        state.reps += 1;
+        state.dueAt = now.add(Duration(seconds: (state.intervalDays * 86400).round()));
       case SRSGrade.good:
         if (state.reps == 0) {
           state.intervalDays = 1;
@@ -42,8 +54,11 @@ class SRSService {
         state.dueAt = now.add(Duration(seconds: (state.intervalDays * 86400).round()));
     }
 
-    state.lastGrade = grade.index;
+    state.lastGrade = grade;
+    state.lastReviewedAt = now;
+    state.introducedOn ??= store.dayString(now);
     store.upsertSRS(state);
+    store.logReview(entryId: entryId, grade: grade, responseType: responseType, sessionId: sessionId);
     return state;
   }
 

@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:sqlite3/sqlite3.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../models/daily_session.dart';
 import '../../models/srs_state.dart';
+import 'app_migrations.dart';
 
 class LessonProgress {
   LessonProgress({required this.lessonId, required this.status, this.score});
@@ -37,25 +43,22 @@ class DiaryEntry {
   final String summary;
 }
 
+const _uuid = Uuid();
+
 class LearningStore {
   LearningStore(this._db) {
-    _db.execute('PRAGMA journal_mode=WAL');
-    _migrate();
+    runAppMigrations(_db);
+    _migrateLegacy();
   }
 
   final Database _db;
 
-  void _migrate() {
-    _db.execute('''
-      CREATE TABLE IF NOT EXISTS vocab_srs (
-        entry_id TEXT PRIMARY KEY,
-        ease REAL NOT NULL DEFAULT 2.5,
-        interval_days REAL NOT NULL DEFAULT 0,
-        reps INTEGER NOT NULL DEFAULT 0,
-        due_at TEXT,
-        last_grade INTEGER
-      )
-    ''');
+  String _now() => DateTime.now().toUtc().toIso8601String();
+
+  /// Legacy tables that predate the versioned migration system (see
+  /// app_migrations.dart). Kept as-is for now; they already key on stable ids
+  /// and will be folded into versioned migrations when they change shape.
+  void _migrateLegacy() {
     _db.execute('''
       CREATE TABLE IF NOT EXISTS lesson_progress (
         lesson_id TEXT PRIMARY KEY,
@@ -99,16 +102,20 @@ class LearningStore {
     ''');
   }
 
-  // --- SRS ---
+  // ---------------------------------------------------------------------------
+  // SRS — current card state lives in vocab_cards; every grade also appends to
+  // the immutable vocab_reviews log, which is the source of truth for pacing.
+  // ---------------------------------------------------------------------------
 
   SRSState? srsState(String entryId) {
-    final rows = _db.select('SELECT * FROM vocab_srs WHERE entry_id = ?', [entryId]);
+    final rows = _db.select(
+        'SELECT * FROM vocab_cards WHERE entry_id = ? AND deleted_at IS NULL', [entryId]);
     if (rows.isEmpty) return null;
     return _srsFromRow(rows.first);
   }
 
   Map<String, SRSState> allSRSStates() {
-    final rows = _db.select('SELECT * FROM vocab_srs');
+    final rows = _db.select('SELECT * FROM vocab_cards WHERE deleted_at IS NULL');
     final map = <String, SRSState>{};
     for (final r in rows) {
       final s = _srsFromRow(r);
@@ -118,20 +125,161 @@ class LearningStore {
   }
 
   void upsertSRS(SRSState state) {
-    _db.execute(
-      '''INSERT OR REPLACE INTO vocab_srs (entry_id, ease, interval_days, reps, due_at, last_grade)
-         VALUES (?, ?, ?, ?, ?, ?)''',
-      [state.entryId, state.ease, state.intervalDays, state.reps, state.dueAt?.toIso8601String(), state.lastGrade],
-    );
+    _db.execute('''
+      INSERT INTO vocab_cards
+        (id, entry_id, ease, interval_days, reps, due_at, introduced_on,
+         last_reviewed_at, last_grade, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(entry_id) DO UPDATE SET
+        ease = excluded.ease,
+        interval_days = excluded.interval_days,
+        reps = excluded.reps,
+        due_at = excluded.due_at,
+        introduced_on = COALESCE(vocab_cards.introduced_on, excluded.introduced_on),
+        last_reviewed_at = excluded.last_reviewed_at,
+        last_grade = excluded.last_grade,
+        updated_at = excluded.updated_at
+    ''', [
+      _uuid.v4(),
+      state.entryId,
+      state.ease,
+      state.intervalDays,
+      state.reps,
+      state.dueAt?.toIso8601String(),
+      state.introducedOn,
+      state.lastReviewedAt?.toIso8601String(),
+      state.lastGrade?.name,
+      _now(),
+      _now(),
+    ]);
   }
 
+  /// Append one review to the immutable log.
+  void logReview({
+    required String entryId,
+    required SRSGrade grade,
+    required SRSResponseType responseType,
+    String? sessionId,
+  }) {
+    _db.execute('''
+      INSERT INTO vocab_reviews (id, entry_id, grade, response_type, session_id, reviewed_at, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', [_uuid.v4(), entryId, grade.name, responseType.name, sessionId, _now(), _now()]);
+  }
+
+  /// Cards first graded today — counted from the explicit introduced_on column,
+  /// never inferred from due dates.
   int newEntriesIntroducedToday() {
-    final today = dayString(DateTime.now());
     final rows = _db.select(
-      "SELECT COUNT(*) AS c FROM vocab_srs WHERE date(due_at) >= ? AND reps = 1",
-      [today],
+      'SELECT COUNT(*) AS c FROM vocab_cards WHERE introduced_on = ? AND deleted_at IS NULL',
+      [dayString(DateTime.now())],
     );
     return rows.first['c'] as int;
+  }
+
+  /// Entries reviewed today with their latest grade — feeds progress evidence
+  /// ("this week you can now…") and same-session again-loops.
+  List<({String entryId, SRSGrade grade, DateTime reviewedAt})> reviewsOn(DateTime day) {
+    final rows = _db.select(
+      "SELECT entry_id, grade, reviewed_at FROM vocab_reviews WHERE date(reviewed_at) = date(?) ORDER BY reviewed_at",
+      [day.toUtc().toIso8601String()],
+    );
+    return rows
+        .map((r) => (
+              entryId: r['entry_id'] as String,
+              grade: SRSGrade.values.asNameMap()[r['grade'] as String] ?? SRSGrade.good,
+              reviewedAt: DateTime.parse(r['reviewed_at'] as String),
+            ))
+        .toList();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Daily Path persistence — one row per local date, updated on every
+  // meaningful transition so the learner can always resume exactly in place.
+  // ---------------------------------------------------------------------------
+
+  DailySession dailySession({DateTime? on}) {
+    final date = dayString(on ?? DateTime.now());
+    final rows = _db.select(
+        'SELECT * FROM daily_sessions WHERE local_date = ? AND deleted_at IS NULL', [date]);
+    if (rows.isNotEmpty) return _dailyFromRow(rows.first);
+
+    final session = DailySession(id: _uuid.v4(), localDate: date);
+    _db.execute('''
+      INSERT INTO daily_sessions (id, local_date, stages_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    ''', [session.id, date, session.stagesToJson(), _now(), _now()]);
+    return session;
+  }
+
+  void saveDailySession(DailySession session) {
+    _db.execute('''
+      UPDATE daily_sessions SET
+        planned_length = ?, current_stage = ?, current_item_index = ?,
+        stages_json = ?, vocab_entry_ids_json = ?, grammar_lesson_id = ?,
+        reading_passage_json = ?, started_at = ?, completed_at = ?, updated_at = ?
+      WHERE id = ?
+    ''', [
+      session.plannedLength,
+      session.currentStage?.name,
+      session.currentItemIndex,
+      session.stagesToJson(),
+      session.vocabEntryIds != null ? jsonEncode(session.vocabEntryIds) : null,
+      session.grammarLessonId,
+      session.readingPassageJson != null ? jsonEncode(session.readingPassageJson) : null,
+      session.startedAt?.toIso8601String(),
+      session.completedAt?.toIso8601String(),
+      _now(),
+      session.id,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // AI sessions — real timestamps, utterance counts, honest end reasons.
+  // ---------------------------------------------------------------------------
+
+  String startAiSession({String? dailySessionId, String? stage, String? topic}) {
+    final id = _uuid.v4();
+    _db.execute('''
+      INSERT INTO ai_sessions (id, daily_session_id, stage, topic, connected_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', [id, dailySessionId, stage, topic, _now(), _now(), _now()]);
+    return id;
+  }
+
+  void endAiSession(
+    String id, {
+    required String endedReason,
+    required int learnerUtteranceCount,
+    String? transcriptJson,
+  }) {
+    _db.execute('''
+      UPDATE ai_sessions SET ended_at = ?, ended_reason = ?, learner_utterance_count = ?,
+        transcript_json = COALESCE(?, transcript_json), updated_at = ?
+      WHERE id = ?
+    ''', [_now(), endedReason, learnerUtteranceCount, transcriptJson, _now(), id]);
+
+    // Credit ledger entry from real timestamps (advisory until server-metered).
+    final rows = _db.select('SELECT connected_at, ended_at FROM ai_sessions WHERE id = ?', [id]);
+    if (rows.isNotEmpty && rows.first['connected_at'] != null && rows.first['ended_at'] != null) {
+      final seconds = DateTime.parse(rows.first['ended_at'] as String)
+          .difference(DateTime.parse(rows.first['connected_at'] as String))
+          .inSeconds;
+      if (seconds > 0) {
+        _db.execute('''
+          INSERT INTO credit_usage (id, local_date, seconds_used, ai_session_id, created_at)
+          VALUES (?, ?, ?, ?, ?)
+        ''', [_uuid.v4(), dayString(DateTime.now()), seconds, id, _now()]);
+      }
+    }
+  }
+
+  int aiSecondsUsedToday() {
+    final rows = _db.select(
+      'SELECT COALESCE(SUM(seconds_used), 0) AS s FROM credit_usage WHERE local_date = ?',
+      [dayString(DateTime.now())],
+    );
+    return rows.first['s'] as int;
   }
 
   // --- Lesson progress ---
@@ -171,13 +319,16 @@ class LearningStore {
 
   // --- Daily activity ---
 
+  /// Minutes ACCUMULATE across a day (a second session adds, never replaces).
   void markHabit(String habitId, {bool done = true, int minutes = 0}) {
     final today = dayString(DateTime.now());
-    _db.execute(
-      '''INSERT OR REPLACE INTO daily_activity (date, habit_id, done, minutes)
-         VALUES (?, ?, ?, ?)''',
-      [today, habitId, done ? 1 : 0, minutes],
-    );
+    _db.execute('''
+      INSERT INTO daily_activity (date, habit_id, done, minutes)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(date, habit_id) DO UPDATE SET
+        done = MAX(daily_activity.done, excluded.done),
+        minutes = daily_activity.minutes + excluded.minutes
+    ''', [today, habitId, done ? 1 : 0, minutes]);
   }
 
   Map<String, HabitEntry> habits({DateTime? on}) {
@@ -276,18 +427,39 @@ class LearningStore {
   }
 
   SRSState _srsFromRow(Row row) {
-    DateTime? dueAt;
-    final raw = row['due_at'];
-    if (raw != null && raw is String && raw.isNotEmpty) {
-      dueAt = DateTime.tryParse(raw);
-    }
+    DateTime? parseDate(Object? raw) =>
+        raw is String && raw.isNotEmpty ? DateTime.tryParse(raw) : null;
     return SRSState(
       entryId: row['entry_id'] as String,
       ease: (row['ease'] as num).toDouble(),
       intervalDays: (row['interval_days'] as num).toDouble(),
       reps: row['reps'] as int,
-      dueAt: dueAt,
-      lastGrade: row['last_grade'] as int?,
+      dueAt: parseDate(row['due_at']),
+      lastGrade: SRSGrade.values.asNameMap()[row['last_grade'] as String?],
+      introducedOn: row['introduced_on'] as String?,
+      lastReviewedAt: parseDate(row['last_reviewed_at']),
+    );
+  }
+
+  DailySession _dailyFromRow(Row row) {
+    DateTime? parseDate(Object? raw) =>
+        raw is String && raw.isNotEmpty ? DateTime.tryParse(raw) : null;
+    return DailySession(
+      id: row['id'] as String,
+      localDate: row['local_date'] as String,
+      plannedLength: row['planned_length'] as String,
+      currentStage: PathwayStage.values.asNameMap()[row['current_stage'] as String?],
+      currentItemIndex: row['current_item_index'] as int,
+      stages: DailySession.stagesFromJson(row['stages_json'] as String),
+      vocabEntryIds: row['vocab_entry_ids_json'] != null
+          ? (jsonDecode(row['vocab_entry_ids_json'] as String) as List).cast<String>()
+          : null,
+      grammarLessonId: row['grammar_lesson_id'] as String?,
+      readingPassageJson: row['reading_passage_json'] != null
+          ? (jsonDecode(row['reading_passage_json'] as String) as Map).cast<String, dynamic>()
+          : null,
+      startedAt: parseDate(row['started_at']),
+      completedAt: parseDate(row['completed_at']),
     );
   }
 }

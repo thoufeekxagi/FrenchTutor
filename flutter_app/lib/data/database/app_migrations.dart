@@ -1,0 +1,189 @@
+import 'package:sqlite3/sqlite3.dart';
+
+/// Versioned, forward-only migrations. Each entry runs at most once, inside a
+/// transaction, and is recorded in `schema_migrations`.
+///
+/// Schema rules (see PILOT_PLAN.md Phase 0.1 — these make the eventual
+/// Supabase/Postgres migration a mechanical copy, not a rewrite):
+///  - client-generated UUID v4 TEXT primary keys, never AUTOINCREMENT
+///  - nullable `user_id` on every table (becomes NOT NULL + RLS on Supabase)
+///  - `created_at`/`updated_at` as ISO-8601 UTC TEXT, written by the app
+///  - soft deletes via `deleted_at`
+///  - history is append-only (vocab_reviews, ai_sessions, credit_usage);
+///    current state (vocab_cards) is a cache derived from it
+///  - TEXT/INTEGER/REAL only; JSON payloads in `*_json` TEXT columns
+void runAppMigrations(Database db) {
+  db.execute('PRAGMA journal_mode=WAL');
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      version INTEGER PRIMARY KEY,
+      applied_at TEXT NOT NULL
+    )
+  ''');
+
+  final applied = db
+      .select('SELECT version FROM schema_migrations')
+      .map((r) => r['version'] as int)
+      .toSet();
+
+  _migrations.forEach((version, migration) {
+    if (applied.contains(version)) return;
+    db.execute('BEGIN');
+    try {
+      migration(db);
+      db.execute(
+        'INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)',
+        [version, DateTime.now().toUtc().toIso8601String()],
+      );
+      db.execute('COMMIT');
+    } catch (_) {
+      db.execute('ROLLBACK');
+      rethrow;
+    }
+  });
+}
+
+bool _tableExists(Database db, String name) {
+  return db
+      .select("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", [name])
+      .isNotEmpty;
+}
+
+/// Ordered map of version -> migration. Never edit a shipped migration;
+/// add a new version instead.
+final Map<int, void Function(Database)> _migrations = {
+  1: _migrationV1,
+};
+
+void _migrationV1(Database db) {
+  const statements = [
+    // --- Learner profile (single local row until auth exists) ---
+    '''
+    CREATE TABLE IF NOT EXISTS profiles (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      goal TEXT NOT NULL DEFAULT 'tef_canada',
+      level TEXT NOT NULL DEFAULT 'zero',
+      session_length TEXT NOT NULL DEFAULT 'standard',
+      reminder_time TEXT,
+      onboarded_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+
+    // --- SRS current state (cache; source of truth is vocab_reviews) ---
+    '''
+    CREATE TABLE IF NOT EXISTS vocab_cards (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      entry_id TEXT NOT NULL UNIQUE,
+      ease REAL NOT NULL DEFAULT 2.5,
+      interval_days REAL NOT NULL DEFAULT 0,
+      reps INTEGER NOT NULL DEFAULT 0,
+      due_at TEXT,
+      introduced_on TEXT,
+      last_reviewed_at TEXT,
+      last_grade TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_vocab_cards_due ON vocab_cards (due_at)',
+
+    // --- Append-only review log ---
+    '''
+    CREATE TABLE IF NOT EXISTS vocab_reviews (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      entry_id TEXT NOT NULL,
+      grade TEXT NOT NULL,
+      response_type TEXT NOT NULL DEFAULT 'auto',
+      session_id TEXT,
+      reviewed_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_vocab_reviews_entry ON vocab_reviews (entry_id)',
+    'CREATE INDEX IF NOT EXISTS idx_vocab_reviews_at ON vocab_reviews (reviewed_at)',
+
+    // --- Persisted, resumable Daily Path (one row per local date) ---
+    '''
+    CREATE TABLE IF NOT EXISTS daily_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      local_date TEXT NOT NULL UNIQUE,
+      planned_length TEXT NOT NULL DEFAULT 'standard',
+      current_stage TEXT,
+      current_item_index INTEGER NOT NULL DEFAULT 0,
+      stages_json TEXT NOT NULL DEFAULT '{}',
+      vocab_entry_ids_json TEXT,
+      grammar_lesson_id TEXT,
+      reading_passage_json TEXT,
+      started_at TEXT,
+      completed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+
+    // --- Voice/AI sessions with real timestamps ---
+    '''
+    CREATE TABLE IF NOT EXISTS ai_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      daily_session_id TEXT,
+      stage TEXT,
+      topic TEXT,
+      connected_at TEXT,
+      ended_at TEXT,
+      learner_utterance_count INTEGER NOT NULL DEFAULT 0,
+      ended_reason TEXT,
+      transcript_json TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_ai_sessions_daily ON ai_sessions (daily_session_id)',
+
+    // --- Credit ledger (advisory locally; server-authoritative at launch) ---
+    '''
+    CREATE TABLE IF NOT EXISTS credit_usage (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      local_date TEXT NOT NULL,
+      seconds_used INTEGER NOT NULL,
+      ai_session_id TEXT,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON credit_usage (local_date)',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
+  }
+
+  // One-time import of legacy SRS state, only if the old table exists.
+  // introduced_on is unknowable for legacy rows; approximate with the last
+  // review anchor we have (due_at date) so budgets start sane, not inflated.
+  if (_tableExists(db, 'vocab_srs')) {
+    db.execute('''
+      INSERT OR IGNORE INTO vocab_cards
+        (id, entry_id, ease, interval_days, reps, due_at, introduced_on,
+         last_grade, created_at, updated_at)
+      SELECT
+        lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-4' ||
+          substr(lower(hex(randomblob(2))), 2) || '-a' ||
+          substr(lower(hex(randomblob(2))), 2) || '-' || lower(hex(randomblob(6))),
+        entry_id, ease, interval_days, reps, due_at,
+        CASE WHEN due_at IS NOT NULL THEN date(due_at) ELSE NULL END,
+        CASE last_grade WHEN 0 THEN 'again' WHEN 1 THEN 'good' WHEN 2 THEN 'easy' END,
+        datetime('now'), datetime('now')
+      FROM vocab_srs
+    ''');
+  }
+}

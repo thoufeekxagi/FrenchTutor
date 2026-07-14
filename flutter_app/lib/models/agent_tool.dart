@@ -20,7 +20,7 @@ class AgentTool {
   static Map<String, dynamic> _stringEnum(String description, {List<String>? values}) => {
         'type': 'STRING',
         'description': description,
-        if (values != null) 'enum': values,
+        'enum': ?values,
       };
 
   static final vocabPalette = [

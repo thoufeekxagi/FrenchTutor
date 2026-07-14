@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'config/theme.dart';
+import 'design/app_theme.dart';
 import 'screens/main_tab_screen.dart';
 
 class FrenchTutorApp extends StatelessWidget {
@@ -8,9 +8,10 @@ class FrenchTutorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'French Tutor',
+      title: 'ParleSprint',
       debugShowCheckedModeBanner: false,
-      theme: Passeport.themeData(),
+      theme: AppTheme.themeData(),
+      scrollBehavior: const AppScrollBehavior(),
       home: const MainTabScreen(),
     );
   }
