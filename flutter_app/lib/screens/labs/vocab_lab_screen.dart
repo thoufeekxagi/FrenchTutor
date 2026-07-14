@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -128,8 +129,7 @@ class _ThemeTile extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => FlashcardSessionScreen(phase: phaseNumber, theme: theme),
+          AppRouter.route(builder: (_) => FlashcardSessionScreen(phase: phaseNumber, theme: theme),
           ),
         );
       },

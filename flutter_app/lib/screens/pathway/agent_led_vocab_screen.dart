@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -585,21 +586,14 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
   }
 
   Future<void> _confirmEnd() async {
-    final shouldEnd = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('End vocabulary practice?'),
-        content: const Text("Words you've already reviewed are saved."),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('End', style: TextStyle(color: Passeport.maroon)),
-          ),
-        ],
-      ),
+    final shouldEnd = await showPSConfirmDialog(
+      context,
+      title: 'End vocabulary practice?',
+      message: "Words you've already reviewed are saved.",
+      confirmLabel: 'End',
+      destructive: true,
     );
-    if (shouldEnd == true && mounted) _finish(completed: false, reason: 'cancelled');
+    if (shouldEnd && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
   void _showAllWordsSheet() {

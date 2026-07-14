@@ -1,3 +1,5 @@
+import '../../widgets/adaptive/adaptive.dart';
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -36,9 +38,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Future<void> _openSession({String? lessonContext}) async {
     LessonSpeechService.shared.deactivate();
     await Navigator.of(context).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => SessionScreen(apiKey: ApiKeys.geminiKey, lessonContext: lessonContext),
+      AppRouter.route(fullscreenDialog: true, builder: (_) => SessionScreen(apiKey: ApiKeys.geminiKey, lessonContext: lessonContext),
       ),
     );
     _reload();
@@ -250,7 +250,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildReviewNotesCard() {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const NotesReviewScreen()),
+        AppRouter.route(builder: (_) => const NotesReviewScreen()),
       ),
       child: PasseportCard(
         child: Row(
@@ -298,7 +298,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           if (_loading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator(color: Passeport.maroon)),
+              child: Center(child: PSProgressIndicator()),
             )
           else if (_sessions.isEmpty)
             Padding(
@@ -314,7 +314,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           else
             ..._sessions.take(5).map((session) => GestureDetector(
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => HistoryScreen(session: session)),
+                    AppRouter.route(builder: (_) => HistoryScreen(session: session)),
                   ),
                   child: _SessionCard(session: session),
                 )),

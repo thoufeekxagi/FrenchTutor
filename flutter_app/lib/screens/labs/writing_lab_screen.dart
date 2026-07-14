@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -39,8 +40,7 @@ class WritingLabScreen extends ConsumerWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => WritingTaskScreen(task: task),
+                      AppRouter.route(builder: (_) => WritingTaskScreen(task: task),
                       ),
                     );
                   },

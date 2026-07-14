@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import 'vocab_lab_screen.dart';
@@ -33,7 +34,7 @@ class LabsScreen extends StatelessWidget {
                       subtitle: 'Flashcards & SRS',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const VocabLabScreen()),
+                        AppRouter.route(builder: (_) => const VocabLabScreen()),
                       ),
                     ),
                     _LabTile(
@@ -42,7 +43,7 @@ class LabsScreen extends StatelessWidget {
                       subtitle: 'Lessons & drills',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const GrammarLabScreen()),
+                        AppRouter.route(builder: (_) => const GrammarLabScreen()),
                       ),
                     ),
                     _LabTile(
@@ -51,7 +52,7 @@ class LabsScreen extends StatelessWidget {
                       subtitle: 'Logic words',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const ConnectorsLabScreen()),
+                        AppRouter.route(builder: (_) => const ConnectorsLabScreen()),
                       ),
                     ),
                     _LabTile(
@@ -60,7 +61,7 @@ class LabsScreen extends StatelessWidget {
                       subtitle: 'Comprehension',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const ListeningLabScreen()),
+                        AppRouter.route(builder: (_) => const ListeningLabScreen()),
                       ),
                     ),
                     _LabTile(
@@ -69,7 +70,7 @@ class LabsScreen extends StatelessWidget {
                       subtitle: 'Essays & grading',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const WritingLabScreen()),
+                        AppRouter.route(builder: (_) => const WritingLabScreen()),
                       ),
                     ),
                   ],

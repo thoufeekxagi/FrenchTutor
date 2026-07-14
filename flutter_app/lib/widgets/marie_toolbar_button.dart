@@ -1,3 +1,4 @@
+import '../design/app_router.dart';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/api_keys.dart';
@@ -19,9 +20,7 @@ class MarieToolbarButton extends StatelessWidget {
       onPressed: () {
         LessonSpeechService.shared.deactivate();
         Navigator.of(context).push(
-          MaterialPageRoute(
-            fullscreenDialog: true,
-            builder: (_) => SessionScreen(
+          AppRouter.route(fullscreenDialog: true, builder: (_) => SessionScreen(
               apiKey: ApiKeys.geminiKey,
               lessonContext: lessonContext,
               stage: stage,

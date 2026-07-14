@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'data/content_service.dart';
@@ -8,6 +10,14 @@ import 'providers/database_provider.dart';
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    // Portrait-only on phones for the pilot — no landscape call/lesson
+    // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
+    if (!kIsWeb) {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
     try {
       final db = await openAppDatabase();
       await ContentService.shared.preload();

@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -111,7 +112,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
                           child: PasseportPrimaryButton(label: 'Retry', onPressed: _generateCardsAndStart),
                         ),
                       ] else ...[
-                        const CircularProgressIndicator(color: Passeport.maroon),
+                        PSProgressIndicator(),
                         const SizedBox(height: 10),
                         Text(_planningLabel, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
                       ],

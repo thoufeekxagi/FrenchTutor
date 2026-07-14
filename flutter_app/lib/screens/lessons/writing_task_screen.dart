@@ -1,3 +1,5 @@
+import '../../widgets/adaptive/adaptive.dart';
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -121,7 +123,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
           _editorCard(),
           if (_isGrading) ...[
             const SizedBox(height: 16),
-            const Center(child: CircularProgressIndicator(color: Passeport.maroon)),
+            const Center(child: PSProgressIndicator()),
           ],
           if (_feedback != null) ...[
             const SizedBox(height: 16),
@@ -146,9 +148,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 onPressed: () {
                   LessonSpeechService.shared.deactivate();
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      fullscreenDialog: true,
-                      builder: (_) => SessionScreen(
+                    AppRouter.route(fullscreenDialog: true, builder: (_) => SessionScreen(
                         apiKey: ApiKeys.geminiKey,
                         lessonContext: _lessonContext,
                       ),

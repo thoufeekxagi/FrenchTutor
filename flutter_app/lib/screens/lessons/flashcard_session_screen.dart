@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -188,7 +189,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
         scrolledUnderElevation: 0,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PSProgressIndicator())
           : _showSummary
               ? _buildSummary()
               : _buildSession(),

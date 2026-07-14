@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -437,21 +438,14 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
   }
 
   Future<void> _confirmEnd() async {
-    final shouldEnd = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('End this section?'),
-        content: const Text('Your progress so far is saved.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('End', style: TextStyle(color: Passeport.maroon)),
-          ),
-        ],
-      ),
+    final shouldEnd = await showPSConfirmDialog(
+      context,
+      title: 'End this section?',
+      message: "Your progress so far is saved.",
+      confirmLabel: 'End',
+      destructive: true,
     );
-    if (shouldEnd == true && mounted) _finish(completed: false, reason: 'cancelled');
+    if (shouldEnd && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
   String _formatDuration(int seconds) => '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';

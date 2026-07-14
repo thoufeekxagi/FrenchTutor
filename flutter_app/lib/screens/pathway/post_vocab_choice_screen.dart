@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/theme.dart';
@@ -98,7 +99,7 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Passeport.maroon),
+                      PSProgressIndicator(),
                       const SizedBox(height: 10),
                       Text(_buildingLabel, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
                     ],

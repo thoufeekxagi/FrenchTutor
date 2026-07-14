@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -113,7 +114,7 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
 
   Widget _reviewBody() {
     if (_index >= _queue.length) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: PSProgressIndicator());
     }
     final entry = _queue[_index];
     return Column(

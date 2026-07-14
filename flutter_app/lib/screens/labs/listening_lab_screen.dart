@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -42,8 +43,7 @@ class ListeningLabScreen extends ConsumerWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => ListeningExerciseScreen(exercise: exercise),
+                      AppRouter.route(builder: (_) => ListeningExerciseScreen(exercise: exercise),
                       ),
                     );
                   },

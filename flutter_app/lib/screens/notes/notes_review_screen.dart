@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -69,7 +70,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
         scrolledUnderElevation: 0,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Passeport.maroon))
+          ? const Center(child: PSProgressIndicator())
           : _notes.isEmpty
               ? _emptyState()
               : Column(

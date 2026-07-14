@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -318,21 +319,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   }
 
   Future<void> _confirmEnd() async {
-    final shouldEnd = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('End Call?'),
-        content: const Text('Your session transcript and summary will be saved.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('End Call', style: TextStyle(color: Passeport.maroon)),
-          ),
-        ],
-      ),
+    final shouldEnd = await showPSConfirmDialog(
+      context,
+      title: 'End Call?',
+      message: "Your session transcript and summary will be saved.",
+      confirmLabel: 'End Call',
+      destructive: true,
     );
-    if (shouldEnd == true) {
+    if (shouldEnd) {
       _endedReason = 'completed';
       _endCall();
     }

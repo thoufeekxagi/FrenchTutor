@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -122,8 +123,7 @@ class _LessonTile extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => GrammarLessonScreen(lesson: lesson),
+          AppRouter.route(builder: (_) => GrammarLessonScreen(lesson: lesson),
           ),
         );
       },
@@ -156,8 +156,7 @@ class _TopicTile extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => TopicLessonScreen(topic: topic),
+          AppRouter.route(builder: (_) => TopicLessonScreen(topic: topic),
           ),
         );
       },

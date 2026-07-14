@@ -1,3 +1,4 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,7 +83,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Passeport.maroon),
+                      PSProgressIndicator(),
                       const SizedBox(height: 10),
                       Text("Personalizing today's session…", style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
                     ],

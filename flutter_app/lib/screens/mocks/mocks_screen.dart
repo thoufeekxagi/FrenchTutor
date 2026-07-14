@@ -1,3 +1,4 @@
+import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../widgets/passeport_card.dart';
@@ -69,7 +70,7 @@ class MocksScreen extends StatelessWidget {
               child: GestureDetector(
                 onTap: destination == null
                     ? null
-                    : () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => destination)),
+                    : () => Navigator.of(context).push(AppRouter.route(builder: (_) => destination)),
                 child: PasseportCard(
                   padding: 13,
                   child: Row(
