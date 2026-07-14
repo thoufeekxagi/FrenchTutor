@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Parle needs microphone access so you can practice speaking French with your AI tutor.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Parle uses speech recognition to transcribe your French practice for review.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

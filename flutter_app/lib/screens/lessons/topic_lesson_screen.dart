@@ -6,6 +6,7 @@ import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
+import '../../services/lesson_speech_service.dart';
 
 class TopicLessonScreen extends ConsumerStatefulWidget {
   const TopicLessonScreen({super.key, required this.topic});
@@ -21,6 +22,7 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
   final Map<int, String?> _drillAnswers = {};
   final Map<int, bool> _drillChecked = {};
   bool _drillsSubmitted = false;
+  bool _isPlaying = false;
 
   double get _drillScore {
     if (widget.topic.drills.isEmpty) return 1.0;
@@ -52,6 +54,31 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
     store.setLessonStatus(widget.topic.id, status, score: score);
   }
 
+  void _togglePlayback() {
+    final speech = LessonSpeechService.shared;
+    if (speech.isSpeaking) {
+      speech.pause();
+      setState(() => _isPlaying = false);
+    } else if (speech.isPaused) {
+      speech.resume();
+      setState(() => _isPlaying = true);
+    } else {
+      speech.speak(
+        items: LessonSpeechService.speechItemsFromLines(widget.topic.narration),
+        onFinished: () {
+          if (mounted) setState(() => _isPlaying = false);
+        },
+      );
+      setState(() => _isPlaying = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    LessonSpeechService.shared.deactivate();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,46 +90,113 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      body: Stack(
         children: [
-          // Topic sections
-          ...widget.topic.sections.map((section) => Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: _TopicSectionWidget(section: section),
-              )),
+          ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+            children: [
+              // Topic sections
+              ...widget.topic.sections.map((section) => Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: _TopicSectionWidget(section: section),
+                  )),
 
-          // Drills
-          if (widget.topic.drills.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            const KickerText('Practice'),
-            const SizedBox(height: 8),
-            ...List.generate(widget.topic.drills.length, (i) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _DrillWidget(
-                  drill: widget.topic.drills[i],
-                  selectedAnswer: _drillAnswers[i],
-                  isChecked: _drillChecked[i] ?? false,
-                  onSelect: _drillsSubmitted
-                      ? null
-                      : (answer) {
-                          setState(() => _drillAnswers[i] = answer);
-                        },
-                ),
-              );
-            }),
-            const SizedBox(height: 8),
-            if (!_drillsSubmitted)
-              PasseportPrimaryButton(
-                label: 'Check Answers',
-                onPressed: _allDrillsAnswered ? _submitDrills : null,
-              )
-            else
-              _DrillResultBanner(score: _drillScore),
-            const SizedBox(height: 32),
-          ],
+              // Drills
+              if (widget.topic.drills.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                const KickerText('Practice'),
+                const SizedBox(height: 8),
+                ...List.generate(widget.topic.drills.length, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _DrillWidget(
+                      drill: widget.topic.drills[i],
+                      selectedAnswer: _drillAnswers[i],
+                      isChecked: _drillChecked[i] ?? false,
+                      onSelect: _drillsSubmitted
+                          ? null
+                          : (answer) {
+                              setState(() => _drillAnswers[i] = answer);
+                            },
+                    ),
+                  );
+                }),
+                const SizedBox(height: 8),
+                if (!_drillsSubmitted)
+                  PasseportPrimaryButton(
+                    label: 'Check Answers',
+                    onPressed: _allDrillsAnswered ? _submitDrills : null,
+                  )
+                else
+                  _DrillResultBanner(score: _drillScore),
+                const SizedBox(height: 32),
+              ],
+            ],
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _NarrationControlBar(
+              isPlaying: _isPlaying,
+              onToggle: _togglePlayback,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// -- Narration control bar --
+
+class _NarrationControlBar extends StatelessWidget {
+  const _NarrationControlBar({required this.isPlaying, required this.onToggle});
+
+  final bool isPlaying;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Passeport.card,
+        boxShadow: [
+          BoxShadow(
+            color: Passeport.ink.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Passeport.maroon,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  color: Passeport.parchment,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              isPlaying ? 'Narrating…' : 'Play lesson',
+              style: Passeport.body(14, weight: FontWeight.w500),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -138,17 +232,32 @@ class _TopicSectionWidget extends StatelessWidget {
                 const SizedBox(height: 12),
                 ...section.examples.map((ex) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: Column(
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            ex.fr,
-                            style: Passeport.body(14, weight: FontWeight.w600),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  ex.fr,
+                                  style: Passeport.body(14, weight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  ex.en,
+                                  style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            ex.en,
-                            style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                          IconButton(
+                            icon: const Icon(Icons.volume_up, color: Passeport.brass),
+                            onPressed: () {
+                              LessonSpeechService.shared.speak(
+                                items: [SpeechItem(text: ex.fr, language: 'fr-FR')],
+                              );
+                            },
                           ),
                         ],
                       ),

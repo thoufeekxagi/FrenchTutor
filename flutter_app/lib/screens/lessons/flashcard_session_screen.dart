@@ -6,6 +6,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
 import '../../models/srs_state.dart';
+import '../../services/lesson_speech_service.dart';
 
 class FlashcardSessionScreen extends ConsumerStatefulWidget {
   const FlashcardSessionScreen({
@@ -33,10 +34,38 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
   Offset _dragOffset = Offset.zero;
   bool _isDragging = false;
 
+  // Speech state
+  bool _isListeningBack = false;
+  String? _sayItHint;
+
+  static const _diacriticMap = {
+    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+    'à': 'a', 'â': 'a',
+    'ç': 'c',
+    'î': 'i', 'ï': 'i',
+    'ô': 'o',
+    'û': 'u', 'ù': 'u',
+    'œ': 'oe',
+  };
+
+  String _fold(String text) {
+    var result = text.toLowerCase().trim();
+    _diacriticMap.forEach((accented, plain) {
+      result = result.replaceAll(accented, plain);
+    });
+    return result;
+  }
+
   @override
   void initState() {
     super.initState();
     _loadQueue();
+  }
+
+  @override
+  void dispose() {
+    LessonSpeechService.shared.deactivate();
+    super.dispose();
   }
 
   Future<void> _loadQueue() async {
@@ -48,6 +77,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       _isLoading = false;
       if (_queue.isEmpty) _showSummary = true;
     });
+    _speakCurrentCard();
   }
 
   void _loadAllWords() {
@@ -60,6 +90,56 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       _showSummary = false;
       _reviewedCount = 0;
     });
+    _speakCurrentCard();
+  }
+
+  void _speakCurrentCard() {
+    if (_currentIndex >= _queue.length || _showSummary) return;
+    final entry = _queue[_currentIndex];
+    LessonSpeechService.shared.speak(
+      items: [SpeechItem(text: entry.fr, language: 'fr-FR')],
+    );
+  }
+
+  void _speakWord(VocabEntry entry, {double? rate}) {
+    LessonSpeechService.shared.speak(
+      items: [SpeechItem(text: entry.fr, language: 'fr-FR')],
+      rate: rate,
+    );
+  }
+
+  void _toggleSayIt(VocabEntry entry) {
+    if (_isListeningBack) {
+      LessonSpeechService.shared.stopListening();
+      setState(() => _isListeningBack = false);
+      return;
+    }
+    setState(() {
+      _isListeningBack = true;
+      _sayItHint = null;
+    });
+    LessonSpeechService.shared.startListening(
+      locale: 'fr-FR',
+      onPartial: (_) {},
+      onFinal: (transcript) {
+        if (!mounted) return;
+        final foldedTranscript = _fold(transcript);
+        final foldedTarget = _fold(entry.fr);
+        String hint;
+        if (foldedTranscript.isEmpty) {
+          hint = "Didn't catch that — try again.";
+        } else if (foldedTranscript.contains(foldedTarget) ||
+            foldedTarget.contains(foldedTranscript)) {
+          hint = 'Nice — that sounds right! 🎉';
+        } else {
+          hint = 'Close — target: "${entry.fr}". This is just a hint, not graded.';
+        }
+        setState(() {
+          _isListeningBack = false;
+          _sayItHint = hint;
+        });
+      },
+    );
   }
 
   void _gradeCard(SRSGrade grade) {
@@ -76,12 +156,17 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       _dragOffset = Offset.zero;
       _isDragging = false;
       _isRevealed = false;
+      _isListeningBack = false;
+      _sayItHint = null;
       if (_currentIndex + 1 >= _queue.length) {
         _showSummary = true;
       } else {
         _currentIndex++;
       }
     });
+    if (!_showSummary) {
+      _speakCurrentCard();
+    }
   }
 
   SRSGrade? _gradeFromDrag(Offset offset) {
@@ -206,16 +291,29 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
               ),
             ),
             const SizedBox(height: 16),
+            _buildSpeakerRow(entry),
+            const SizedBox(height: 12),
             if (!_isRevealed)
               Text(
                 'Tap to reveal',
                 style: Passeport.body(13).copyWith(color: Passeport.slate),
               )
-            else
+            else ...[
               Text(
                 'Swipe: left = Again, right = Good, up = Easy',
                 style: Passeport.body(12).copyWith(color: Passeport.slate),
               ),
+              const SizedBox(height: 12),
+              _buildSayItButton(entry),
+              if (_sayItHint != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _sayItHint!,
+                  textAlign: TextAlign.center,
+                  style: Passeport.mono(12).copyWith(color: Passeport.slateDim),
+                ),
+              ],
+            ],
             const Spacer(),
           ],
         ),
@@ -278,6 +376,66 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
         ],
       ),
     );
+  }
+
+  Widget _buildSpeakerRow(VocabEntry entry) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _circleIconButton(
+          icon: Icons.slow_motion_video,
+          onTap: () => _speakWord(entry, rate: 0.3),
+          tooltip: 'Slow',
+        ),
+        const SizedBox(width: 16),
+        _circleIconButton(
+          icon: Icons.volume_up,
+          onTap: () => _speakWord(entry, rate: 0.45),
+          tooltip: 'Normal',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSayItButton(VocabEntry entry) {
+    return Center(
+      child: _circleIconButton(
+        icon: _isListeningBack ? Icons.mic : Icons.mic_none,
+        onTap: () => _toggleSayIt(entry),
+        tooltip: 'Say it',
+        active: _isListeningBack,
+      ),
+    );
+  }
+
+  Widget _circleIconButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    String? tooltip,
+    bool active = false,
+  }) {
+    final button = Material(
+      color: active ? Passeport.maroon.withValues(alpha: 0.12) : Passeport.card,
+      shape: CircleBorder(
+        side: BorderSide(
+          color: active ? Passeport.maroon : Passeport.hairline,
+          width: 1,
+        ),
+      ),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Icon(
+            icon,
+            size: 22,
+            color: active ? Passeport.maroon : Passeport.ink,
+          ),
+        ),
+      ),
+    );
+    return tooltip != null ? Tooltip(message: tooltip, child: button) : button;
   }
 
   Widget _swipeBadge(String label, Color color) {

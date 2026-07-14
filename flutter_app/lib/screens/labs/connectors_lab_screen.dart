@@ -7,6 +7,7 @@ import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../services/lesson_speech_service.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
   const ConnectorsLabScreen({super.key});
@@ -16,6 +17,12 @@ class ConnectorsLabScreen extends ConsumerStatefulWidget {
 }
 
 class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
+  @override
+  void dispose() {
+    LessonSpeechService.shared.deactivate();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final pack = ref.watch(contentServiceProvider).connectors();
@@ -130,7 +137,9 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
           IconButton(
             icon: Icon(Icons.volume_up, size: 16, color: Passeport.brass),
             onPressed: () {
-              // TTS — Phase 3
+              LessonSpeechService.shared.speak(
+                items: [SpeechItem(text: connector.example.fr, language: 'fr-FR')],
+              );
             },
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),

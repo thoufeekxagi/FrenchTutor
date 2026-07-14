@@ -6,6 +6,7 @@ import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../services/lesson_speech_service.dart';
 
 class ListeningExerciseScreen extends ConsumerStatefulWidget {
   const ListeningExerciseScreen({super.key, required this.exercise});
@@ -41,6 +42,12 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   void initState() {
     super.initState();
     _sessionStart = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    LessonSpeechService.shared.deactivate();
+    super.dispose();
   }
 
   @override
@@ -89,9 +96,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
           const SizedBox(height: 10),
           Row(
             children: [
-              _speedButton('Slow', Icons.slow_motion_video),
+              _speedButton('Slow', Icons.slow_motion_video, 0.32),
               const SizedBox(width: 12),
-              _speedButton('Normal', Icons.play_arrow_rounded),
+              _speedButton('Normal', Icons.play_arrow_rounded, 0.48),
             ],
           ),
           const SizedBox(height: 8),
@@ -117,10 +124,13 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
     );
   }
 
-  Widget _speedButton(String label, IconData icon) {
+  Widget _speedButton(String label, IconData icon, double rate) {
     return InkWell(
       onTap: () {
-        // TTS playback — Phase 3
+        LessonSpeechService.shared.speak(
+          items: [SpeechItem(text: exercise.script, language: 'fr-FR')],
+          rate: rate,
+        );
       },
       borderRadius: BorderRadius.circular(20),
       child: Container(
@@ -239,7 +249,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         // Play sentence button (no-op for now)
         GestureDetector(
           onTap: () {
-            // TTS — Phase 3
+            LessonSpeechService.shared.speak(
+              items: [SpeechItem(text: sentence, language: 'fr-FR')],
+            );
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
