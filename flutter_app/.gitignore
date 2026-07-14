@@ -44,8 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Local API key helper — reads real keys from ../ios_native/Secrets.xcconfig, never commit
-run_with_keys.sh
+# Local API keys — self-contained inside flutter_app, never commit. See
+# secrets.local.properties.example for the template a new dev copies from.
+secrets.local.properties
 
 # Local API keys for --dart-define-from-file (never commit real keys)
 dart_defines.json
