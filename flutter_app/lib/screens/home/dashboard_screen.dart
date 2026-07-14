@@ -11,6 +11,7 @@ import '../../config/api_keys.dart';
 import '../../services/lesson_speech_service.dart';
 import '../session/session_screen.dart';
 import '../notes/notes_review_screen.dart';
+import '../history/history_screen.dart';
 import 'daily_pathway_widget.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -310,7 +311,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             )
           else
-            ..._sessions.take(5).map((session) => _SessionCard(session: session)),
+            ..._sessions.take(5).map((session) => GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => HistoryScreen(session: session)),
+                  ),
+                  child: _SessionCard(session: session),
+                )),
         ],
       ),
     );
