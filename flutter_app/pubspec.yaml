@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   drift: ^2.22.1
+  sqlite3: ^2.4.7
   sqlite3_flutter_libs: ^0.5.28
   path_provider: ^2.1.5
   path: ^1.9.1
@@ -22,13 +23,14 @@ dependencies:
   flutter_tts: ^4.2.0
   speech_to_text: ^7.0.0
   permission_handler: ^11.3.1
-  record: ^7.1.1
-  just_audio: ^0.9.43
+  flutter_sound: ^9.30.0
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.2
   json_annotation: ^4.9.0
   uuid: ^4.5.1
   intl: ^0.20.2
+  audio_session: ^0.2.4
+  logger: ^2.7.0
 
 dev_dependencies:
   flutter_test:

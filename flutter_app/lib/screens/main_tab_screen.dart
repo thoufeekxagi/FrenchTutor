@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
+import '../providers/database_provider.dart';
+import '../widgets/floating_notetaker.dart';
 import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
 import 'mocks/mocks_screen.dart';
 import 'progress/progress_screen.dart';
 import 'settings/settings_screen.dart';
 
-class MainTabScreen extends StatefulWidget {
+class MainTabScreen extends ConsumerStatefulWidget {
   const MainTabScreen({super.key});
 
   @override
-  State<MainTabScreen> createState() => _MainTabScreenState();
+  ConsumerState<MainTabScreen> createState() => _MainTabScreenState();
 }
 
-class _MainTabScreenState extends State<MainTabScreen> {
+class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   int _currentIndex = 0;
 
   static const _screens = [
@@ -26,8 +29,14 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notetaker = ref.watch(notetakerStateProvider);
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: Stack(
+        children: [
+          IndexedStack(index: _currentIndex, children: _screens),
+          FloatingNotetakerOverlay(state: notetaker),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
