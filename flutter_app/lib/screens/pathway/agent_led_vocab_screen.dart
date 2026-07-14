@@ -15,6 +15,7 @@ import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/session_recorder.dart';
+import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
 import '../../utils/text_fold.dart';
 import '../../widgets/passeport_card.dart';
@@ -51,13 +52,11 @@ class AgentLedVocabScreen extends ConsumerStatefulWidget {
     required this.vocabQueue,
     this.focusNote,
     this.examplesByWordId = const {},
-    required this.onComplete,
   });
 
   final List<VocabEntry> vocabQueue;
   final String? focusNote;
   final Map<String, BilingualExample> examplesByWordId;
-  final void Function(VocabStageResult result) onComplete;
 
   @override
   ConsumerState<AgentLedVocabScreen> createState() => _AgentLedVocabScreenState();
@@ -145,7 +144,8 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   @override
   void dispose() {
-    _finishAndReturn();
+    // Resources only — a disposed screen must never report learning results.
+    _teardown();
     _debugScrollController.dispose();
     super.dispose();
   }
@@ -176,7 +176,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _gemini.onDisconnected = () {
       if (!_finished) {
         _errorMessage = 'Connection lost';
-        _finishAndReturn();
+        _finish(completed: false, reason: 'disconnected');
       }
     };
 
@@ -203,7 +203,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
-      if (_isWrappingUp) _finishAndReturn();
+      if (_isWrappingUp) _finish(completed: true);
     };
 
     _gemini.onInterrupted = () {
@@ -488,7 +488,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     );
   }
 
-  void _finishAndReturn() {
+  void _teardown() {
     if (_finished) return;
     _finished = true;
     _timer?.cancel();
@@ -496,7 +496,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _audio.stopStreaming();
     _audio.dispose();
     _gemini.disconnect();
-    if (mounted) setState(() => _callStatus = CallStatus.ended);
     if (_reviewedCount > 0) {
       _store.saveDiaryEntry(stage: 'vocab', summary: 'Practiced $_reviewedCount word(s) in a live vocab session.');
     }
@@ -506,7 +505,22 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
           ? 'Practiced $_reviewedCount word(s): ${coveredWords.map((e) => e.fr).join(", ")}'
           : 'Ended early, no words reviewed.',
     );
-    widget.onComplete(VocabStageResult(wordsCovered: coveredWords, reviewedCount: _reviewedCount));
+  }
+
+  /// The only place this screen exits — pops exactly once with a typed
+  /// outcome; the PathwayCoordinator decides what it means for the day.
+  void _finish({required bool completed, String reason = 'finished'}) {
+    final alreadyDone = _finished;
+    _teardown();
+    if (!mounted || alreadyDone) return;
+    setState(() => _callStatus = CallStatus.ended);
+    final coveredWords = widget.vocabQueue.take(_reviewedCount).toList();
+    final result = VocabStageResult(wordsCovered: coveredWords, reviewedCount: _reviewedCount);
+    final outcome = completed
+        ? StageOutcome.completed(result, reason: reason)
+        : StageOutcome<VocabStageResult>.paused(
+            result: _reviewedCount > 0 ? result : null, reason: reason);
+    Navigator.of(context).pop(outcome);
   }
 
   Future<void> _toggleMute() async {
@@ -538,7 +552,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
         ],
       ),
     );
-    if (shouldEnd == true && mounted) Navigator.of(context).pop();
+    if (shouldEnd == true && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
   void _showAllWordsSheet() {

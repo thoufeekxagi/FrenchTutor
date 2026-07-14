@@ -13,17 +13,23 @@ import 'agent_led_vocab_screen.dart' show VocabStageResult;
 /// the flow), or today's existing pre-authored lab passage. Whichever option is picked, the
 /// listening gate screen itself never calls out to a model to invent content.
 /// Ported from PostVocabChoiceView.swift.
+/// The typed result this screen pops with. A null [passage] means a real
+/// empty state (nothing to read today) — distinct from backing out, which
+/// pops null at the route level and leaves the stage pending.
+class PostVocabChoice {
+  const PostVocabChoice(this.passage);
+  final ReadingPassage? passage;
+}
+
 class PostVocabChoiceScreen extends StatefulWidget {
   const PostVocabChoiceScreen({
     super.key,
     this.vocabResult,
     this.fallbackExercise,
-    required this.onChoice,
   });
 
   final VocabStageResult? vocabResult;
   final ListeningExercise? fallbackExercise;
-  final void Function(ReadingPassage? passage) onChoice;
 
   @override
   State<PostVocabChoiceScreen> createState() => _PostVocabChoiceScreenState();
@@ -108,10 +114,11 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
   void _chooseFromTodaysLesson() {
     final exercise = widget.fallbackExercise;
     if (exercise == null) {
-      widget.onChoice(null);
+      Navigator.of(context).pop(const PostVocabChoice(null));
       return;
     }
-    widget.onChoice(ContentService.shared.readingPassage(fromListening: exercise));
+    Navigator.of(context)
+        .pop(PostVocabChoice(ContentService.shared.readingPassage(fromListening: exercise)));
   }
 
   /// Fires exactly one LLM call (never repeated, never called again during teaching), raced
@@ -137,7 +144,7 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
     if (!mounted) return;
     setState(() => _isBuilding = false);
     if (passage != null) {
-      widget.onChoice(passage);
+      Navigator.of(context).pop(PostVocabChoice(passage));
     } else {
       _chooseFromTodaysLesson();
     }

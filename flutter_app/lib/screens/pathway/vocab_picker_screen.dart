@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
+import '../../design/app_router.dart';
+import '../../flow/stage_outcome.dart';
 import '../../data/content_service.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
@@ -21,9 +23,7 @@ enum _PickerMode { auto, category }
 /// green check and are excluded from Auto mode by default, though they can still be manually
 /// re-picked. Ported from VocabPickerView.swift.
 class VocabPickerScreen extends ConsumerStatefulWidget {
-  const VocabPickerScreen({super.key, required this.onComplete});
-
-  final void Function(VocabStageResult result) onComplete;
+  const VocabPickerScreen({super.key});
 
   @override
   ConsumerState<VocabPickerScreen> createState() => _VocabPickerScreenState();
@@ -384,19 +384,15 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     if (!mounted) return;
     setState(() => _isPlanning = false);
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => AgentLedVocabScreen(
-          vocabQueue: chosenQueue,
-          focusNote: focusNote,
-          examplesByWordId: sessionExamples,
-          onComplete: (result) {
-            widget.onComplete(result);
-            Navigator.of(context).pop();
-          },
-        ),
+    final outcome = await AppRouter.push<StageOutcome<VocabStageResult>>(
+      context,
+      (_) => AgentLedVocabScreen(
+        vocabQueue: chosenQueue,
+        focusNote: focusNote,
+        examplesByWordId: sessionExamples,
       ),
+      fullscreenDialog: true,
     );
+    if (outcome != null && mounted) Navigator.of(context).pop(outcome);
   }
 }

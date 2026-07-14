@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../config/api_keys.dart';
 import '../../config/theme.dart';
+import '../../flow/stage_outcome.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
@@ -50,14 +51,13 @@ class AgentLedGrammarScreen extends ConsumerStatefulWidget {
     required this.tenseTitle,
     this.focusNote,
     this.vocabSummary,
-    required this.onComplete,
+
   });
 
   final List<GrammarPracticeCard> cards;
   final String tenseTitle;
   final String? focusNote;
   final VocabStageResult? vocabSummary;
-  final void Function(GrammarStageResult result) onComplete;
 
   @override
   ConsumerState<AgentLedGrammarScreen> createState() => _AgentLedGrammarScreenState();
@@ -135,7 +135,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
   @override
   void dispose() {
-    _finishAndReturn();
+    // Resources only — a disposed screen must never report learning results.
+    _teardown();
     _debugScrollController.dispose();
     super.dispose();
   }
@@ -166,7 +167,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _gemini.onDisconnected = () {
       if (!_finished) {
         _errorMessage = 'Connection lost';
-        _finishAndReturn();
+        _finish(completed: false, reason: 'disconnected');
       }
     };
 
@@ -193,7 +194,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
-      if (_isWrappingUp) _finishAndReturn();
+      if (_isWrappingUp) _finish(completed: true);
     };
 
     _gemini.onInterrupted = () {
@@ -415,7 +416,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     );
   }
 
-  void _finishAndReturn() {
+  void _teardown() {
     if (_finished) return;
     _finished = true;
     _timer?.cancel();
@@ -423,7 +424,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _audio.stopStreaming();
     _audio.dispose();
     _gemini.disconnect();
-    if (mounted) setState(() => _callStatus = CallStatus.ended);
     if (_cardIndex > 0) {
       final score = _drillResults.isEmpty ? null : _drillResults.where((r) => r).length / _drillResults.length;
       _store.setLessonStatus(_topicId, (score ?? 1.0) >= 0.8 ? 'completed' : 'in_progress', score: score);
@@ -434,7 +434,21 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           ? 'Practiced ${_cardIndex.clamp(0, _sessionPlan.length)} sentence(s) on ${widget.tenseTitle}.'
           : 'Ended early.',
     );
-    widget.onComplete(GrammarStageResult(topicTitle: widget.tenseTitle, drillResults: _drillResults));
+  }
+
+  /// The only exit — pops exactly once with a typed outcome; the
+  /// PathwayCoordinator decides what it means for the day.
+  void _finish({required bool completed, String reason = 'finished'}) {
+    final alreadyDone = _finished;
+    _teardown();
+    if (!mounted || alreadyDone) return;
+    setState(() => _callStatus = CallStatus.ended);
+    final result = GrammarStageResult(topicTitle: widget.tenseTitle, drillResults: _drillResults);
+    final outcome = completed
+        ? StageOutcome.completed(result, reason: reason)
+        : StageOutcome<GrammarStageResult>.paused(
+            result: _drillResults.isNotEmpty ? result : null, reason: reason);
+    Navigator.of(context).pop(outcome);
   }
 
   Future<void> _toggleMute() async {
@@ -466,7 +480,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         ],
       ),
     );
-    if (shouldEnd == true && mounted) Navigator.of(context).pop();
+    if (shouldEnd == true && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
   String _formatDuration(int seconds) => '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';

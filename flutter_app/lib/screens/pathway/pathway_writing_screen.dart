@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../config/theme.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
@@ -21,10 +22,9 @@ class WritingStageResult {
 /// accuracy (spelling, connectors), not voice, so this deliberately has none of the
 /// audio-session complexity the other stages do. Ported from PathwayWritingView.swift.
 class PathwayWritingScreen extends ConsumerStatefulWidget {
-  const PathwayWritingScreen({super.key, required this.targetWords, required this.onComplete});
+  const PathwayWritingScreen({super.key, required this.targetWords});
 
   final List<VocabEntry> targetWords;
-  final void Function(WritingStageResult result) onComplete;
 
   @override
   ConsumerState<PathwayWritingScreen> createState() => _PathwayWritingScreenState();
@@ -92,13 +92,15 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
       _recorder.logTutor(feedback.comment);
       _recorder.finish(summary: 'Scored ${feedback.scoreOutOf10.toStringAsFixed(1)}/10 on: $_prompt');
     }
-    widget.onComplete(WritingStageResult(score: feedback?.scoreOutOf10));
-    Navigator.of(context).pop();
+    // Completed only when something was actually submitted and graded.
+    final outcome = feedback != null
+        ? StageOutcome.completed(WritingStageResult(score: feedback.scoreOutOf10))
+        : const StageOutcome<WritingStageResult>.paused(reason: 'cancelled');
+    Navigator.of(context).pop(outcome);
   }
 
   void _skip() {
-    widget.onComplete(WritingStageResult());
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(const StageOutcome<WritingStageResult>.skipped());
   }
 
   @override

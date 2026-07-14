@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/theme.dart';
+import '../../design/app_router.dart';
+import '../../flow/stage_outcome.dart';
 import '../../data/content_service.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
@@ -24,10 +26,9 @@ enum _PickerMode { auto, manual }
 /// picks directly from every tense/topic already authored in assets/content/grammar.json).
 /// Ported from GrammarPickerView.swift.
 class GrammarPickerScreen extends ConsumerStatefulWidget {
-  const GrammarPickerScreen({super.key, this.vocabSummary, required this.onComplete});
+  const GrammarPickerScreen({super.key, this.vocabSummary});
 
   final VocabStageResult? vocabSummary;
-  final void Function(GrammarStageResult result) onComplete;
 
   @override
   ConsumerState<GrammarPickerScreen> createState() => _GrammarPickerScreenState();
@@ -186,22 +187,20 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
     }
   }
 
-  void _openSession(List<GrammarPracticeCard> cards, String tenseTitle) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => AgentLedGrammarScreen(
-          cards: cards,
-          tenseTitle: tenseTitle,
-          focusNote: _focusNote,
-          vocabSummary: widget.vocabSummary,
-          onComplete: (result) {
-            widget.onComplete(result);
-            Navigator.of(context).pop();
-          },
-        ),
+  Future<void> _openSession(List<GrammarPracticeCard> cards, String tenseTitle) async {
+    // Await the agent screen's typed outcome and forward it up as this
+    // picker's own result — one navigator layer, one pop, no callbacks.
+    final outcome = await AppRouter.push<StageOutcome<GrammarStageResult>>(
+      context,
+      (_) => AgentLedGrammarScreen(
+        cards: cards,
+        tenseTitle: tenseTitle,
+        focusNote: _focusNote,
+        vocabSummary: widget.vocabSummary,
       ),
+      fullscreenDialog: true,
     );
+    if (outcome != null && mounted) Navigator.of(context).pop(outcome);
   }
 
   void _logDebug(String message) {

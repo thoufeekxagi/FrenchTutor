@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../config/theme.dart';
 import '../../models/chat_message.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
@@ -19,11 +20,15 @@ enum CallStatus { connecting, listening, tutorSpeaking, muted, ended }
 /// `stage` is null for the unstructured "Just talk to Marie" call, or e.g. "speaking" for the
 /// Daily Pathway's closing roleplay stage — it only affects how the saved session is tagged.
 class SessionScreen extends ConsumerStatefulWidget {
-  const SessionScreen({super.key, required this.apiKey, this.lessonContext, this.stage});
+  const SessionScreen({super.key, required this.apiKey, this.lessonContext, this.stage, this.dailySessionId});
 
   final String apiKey;
   final String? lessonContext;
   final String? stage;
+
+  /// Set when this call is the Daily Pathway's speaking stage — links the
+  /// ai_sessions record to today's pathway row.
+  final String? dailySessionId;
 
   @override
   ConsumerState<SessionScreen> createState() => _SessionScreenState();
@@ -36,6 +41,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   bool _sessionSaved = false;
   int _callDuration = 0;
   bool _isSpeakerOn = true;
+
+  // Real evidence for the coordinator's completion threshold (P0.3) and for
+  // honest history (the old code saved startedAt == endedAt == save time).
+  DateTime? _connectedAt;
+  int _userUtteranceCount = 0;
+  String _endedReason = 'cancelled';
+  String? _aiSessionRecordId;
 
   Timer? _timer;
   final ScrollController _scrollController = ScrollController();
@@ -84,6 +96,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     _gemini.disconnect();
     if (mounted) setState(() => _callStatus = CallStatus.ended);
 
+    final recordId = _aiSessionRecordId;
+    if (recordId != null) {
+      ref.read(learningStoreProvider).endAiSession(
+            recordId,
+            endedReason: _endedReason,
+            learnerUtteranceCount: _userUtteranceCount,
+          );
+    }
     _saveSessionLocally();
   }
 
@@ -109,6 +129,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   void _setupCallbacks() {
     _gemini.onConnected = () async {
       if (!mounted) return;
+      _connectedAt = DateTime.now();
+      _aiSessionRecordId = ref.read(learningStoreProvider).startAiSession(
+            dailySessionId: widget.dailySessionId,
+            stage: widget.stage,
+            topic: widget.lessonContext != null ? 'lesson' : 'free_talk',
+          );
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
 
@@ -130,6 +156,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
     _gemini.onDisconnected = () {
       if (!mounted || _sessionSaved) return;
+      _endedReason = 'disconnected';
       setState(() {
         _errorMessage = 'Connection lost';
         _callStatus = CallStatus.ended;
@@ -142,6 +169,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     };
 
     _gemini.onUserTranscript = (text) {
+      _userUtteranceCount += 1;
       if (!mounted) return;
       _appendMessage(ChatMessage(role: 'user', content: text));
     };
@@ -191,13 +219,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   }
 
   void _saveSessionLocally() {
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now();
     final summary = _generateLocalSummary();
 
     final session = Session(
       id: _sessionId,
-      startedAt: now,
-      endedAt: now,
+      startedAt: (_connectedAt ?? now.subtract(Duration(seconds: _callDuration))).toIso8601String(),
+      endedAt: now.toIso8601String(),
       summary: summary,
       stage: widget.stage,
     );
@@ -212,7 +240,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     }
 
     Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop(SpeakingResult(
+          connected: _connectedAt != null,
+          durationSeconds: _callDuration,
+          learnerUtteranceCount: _userUtteranceCount,
+          endedReason: _endedReason,
+        ));
+      }
     });
   }
 
@@ -297,7 +332,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         ],
       ),
     );
-    if (shouldEnd == true) _endCall();
+    if (shouldEnd == true) {
+      _endedReason = 'completed';
+      _endCall();
+    }
   }
 
   @override

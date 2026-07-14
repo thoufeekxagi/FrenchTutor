@@ -324,6 +324,9 @@ class ReadingSegment {
         grammarNote: json['grammarNote'] as String,
         pronunciationTip: json['pronunciationTip'] as String,
       );
+
+  Map<String, dynamic> toJson() =>
+      {'fr': fr, 'en': en, 'grammarNote': grammarNote, 'pronunciationTip': pronunciationTip};
 }
 
 class ReadingPassage {
@@ -340,6 +343,13 @@ class ReadingPassage {
         segments: (json['segments'] as List).map((e) => ReadingSegment.fromJson(e)).toList(),
         fullText: json['fullText'] as String,
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'segments': segments.map((s) => s.toJson()).toList(),
+        'fullText': fullText,
+      };
 }
 
 // MARK: - Writing

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../config/api_keys.dart';
 import '../../config/theme.dart';
+import '../../flow/stage_outcome.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
@@ -53,12 +54,10 @@ class AgentLedListeningScreen extends ConsumerStatefulWidget {
     super.key,
     required this.passage,
     this.vocabSummary,
-    required this.onComplete,
   });
 
   final ReadingPassage passage;
   final VocabStageResult? vocabSummary;
-  final void Function(ListeningStageResult result) onComplete;
 
   @override
   ConsumerState<AgentLedListeningScreen> createState() => _AgentLedListeningScreenState();
@@ -127,7 +126,8 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
 
   @override
   void dispose() {
-    _finishAndReturn();
+    // Resources only — a disposed screen must never report learning results.
+    _teardown();
     _debugScrollController.dispose();
     super.dispose();
   }
@@ -158,7 +158,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
     _gemini.onDisconnected = () {
       if (!_finished) {
         _errorMessage = 'Connection lost';
-        _finishAndReturn();
+        _finish(completed: false, reason: 'disconnected');
       }
     };
 
@@ -185,7 +185,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
-      if (_isWrappingUp) _finishAndReturn();
+      if (_isWrappingUp) _finish(completed: true);
     };
 
     _gemini.onInterrupted = () {
@@ -382,7 +382,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
     );
   }
 
-  void _finishAndReturn() {
+  void _teardown() {
     if (_finished) return;
     _finished = true;
     _timer?.cancel();
@@ -390,7 +390,6 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
     _audio.stopStreaming();
     _audio.dispose();
     _gemini.disconnect();
-    if (mounted) setState(() => _callStatus = CallStatus.ended);
     if (_reviewedCount > 0) {
       _store.saveDiaryEntry(
         stage: 'reading',
@@ -402,11 +401,25 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
           ? 'Read through $_reviewedCount part(s) of "${widget.passage.title}".'
           : 'Ended early.',
     );
-    widget.onComplete(ListeningStageResult(
+  }
+
+  /// The only exit — pops exactly once with a typed outcome; the
+  /// PathwayCoordinator decides what it means for the day.
+  void _finish({required bool completed, String reason = 'finished'}) {
+    final alreadyDone = _finished;
+    _teardown();
+    if (!mounted || alreadyDone) return;
+    setState(() => _callStatus = CallStatus.ended);
+    final result = ListeningStageResult(
       grammarDrillResults: const [],
       listeningCorrect: _reviewedCount,
       listeningAttempted: _reviewedCount,
-    ));
+    );
+    final outcome = completed
+        ? StageOutcome.completed(result, reason: reason)
+        : StageOutcome<ListeningStageResult>.paused(
+            result: _reviewedCount > 0 ? result : null, reason: reason);
+    Navigator.of(context).pop(outcome);
   }
 
   Future<void> _toggleMute() async {
@@ -438,7 +451,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
         ],
       ),
     );
-    if (shouldEnd == true && mounted) Navigator.of(context).pop();
+    if (shouldEnd == true && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
   String _formatDuration(int seconds) => '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
@@ -637,8 +650,8 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: PasseportPrimaryButton(
-                    label: 'Continue to Speaking →',
-                    onPressed: _finishAndReturn,
+                    label: 'Continue →',
+                    onPressed: () => _finish(completed: true),
                   ),
                 ),
               ],
