@@ -25,6 +25,7 @@ abstract final class DesignTokens {
   static const maroon = Color(0xFF8E3B3B); // deep bordeaux, per mockup chips
   static const maroonDeep = Color(0xFF6E2C2C);
   static const brass = Color(0xFFB08D4A); // real gold — was mistakenly blue
+  static const sage = Color(0xFF6F8F6F);
   static const slate = Color(0xFF95A0B2);
   static const slateDim = Color(0xFF606C80);
   static const text = ink;

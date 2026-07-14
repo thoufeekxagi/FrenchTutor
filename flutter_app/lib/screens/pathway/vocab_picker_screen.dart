@@ -54,7 +54,10 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         backgroundColor: Passeport.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+        leading: IconButton(
+          icon: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.slateDim),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Stack(
         children: [

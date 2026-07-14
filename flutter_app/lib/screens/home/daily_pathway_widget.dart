@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,24 +12,34 @@ import '../../widgets/passeport_card.dart';
 const _stageTitles = {
   PathwayStage.vocab: 'Vocabulary',
   PathwayStage.grammar: 'Grammar',
-  PathwayStage.listening: 'Reading & Listening',
+  PathwayStage.listening: 'Reading',
   PathwayStage.writing: 'Writing',
   PathwayStage.speaking: 'Speaking',
 };
 
-const _stageHints = {
-  PathwayStage.vocab: 'a few words, spaced repetition',
-  PathwayStage.grammar: 'one pattern, short drills',
-  PathwayStage.listening: 'a short passage, word by word',
-  PathwayStage.writing: 'two sentences, graded',
-  PathwayStage.speaking: 'use it all with Marie',
+const _stageIcons = {
+  PathwayStage.vocab: CupertinoIcons.square_stack_3d_up,
+  PathwayStage.grammar: CupertinoIcons.book,
+  PathwayStage.listening: CupertinoIcons.headphones,
+  PathwayStage.writing: CupertinoIcons.pencil,
+  PathwayStage.speaking: CupertinoIcons.mic_fill,
 };
 
-/// The Daily Path card on Home — deliberately compact (2026-07 redesign):
-/// title, a five-segment progress bar, ONE next-step line, and Continue.
-/// The old five-row checklist said the same thing three times; the segments
-/// carry the day's shape at a glance without shouting. State is the persisted
-/// `daily_sessions` row via [PathwayCoordinator]; navigation stays owned there.
+/// Muted per-stage tints — the bento variety of the gamified mockup, held
+/// down to the Passeport palette so it stays adult (no candy colors).
+const _stageHues = {
+  PathwayStage.vocab: Passeport.brass,
+  PathwayStage.grammar: Passeport.ink,
+  PathwayStage.listening: Passeport.sage,
+  PathwayStage.writing: Passeport.maroon,
+  PathwayStage.speaking: Passeport.slateDim,
+};
+
+/// Today's French as a bento tile grid (2026-07, per ux-design/gamified
+/// mockup — its structure, our palette). Each stage is a tile; ONLY the
+/// current stage tile is an action (filled bordeaux, Start/Continue), done
+/// tiles carry a gold check, later tiles sit muted and inert. Order is still
+/// enforced by the PathwayCoordinator; the grid is honest about it.
 class DailyPathwayWidget extends ConsumerStatefulWidget {
   const DailyPathwayWidget({super.key, this.onProgress});
 
@@ -47,7 +58,7 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
     _coordinator = PathwayCoordinator(store: ref.read(learningStoreProvider));
   }
 
-  Future<void> _continue() async {
+  Future<void> _openCurrent() async {
     PSHaptics.light();
     await _coordinator.continueNext(context);
     if (!mounted) return;
@@ -79,7 +90,7 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
     final next = _coordinator.nextStage;
 
     return PasseportCard(
-      padding: 18,
+      padding: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -87,103 +98,144 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
             children: [
               Text("Today's French", style: Passeport.display(17, weight: FontWeight.w600)),
               const Spacer(),
-              Text(_progressLabel(session),
-                  style: Passeport.body(12, weight: FontWeight.w500).copyWith(color: Passeport.slateDim)),
+              if (next != null)
+                GestureDetector(
+                  onTap: _skipCurrent,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: Text('Skip',
+                        style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+                  ),
+                )
+              else
+                Text('à demain !', style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
             ],
           ),
-          const SizedBox(height: 14),
-          _segmentBar(session, next),
           const SizedBox(height: 12),
-          Text(
-            next != null ? _leadLine(session, next) : 'Done for today — à demain !',
-            style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-          ),
-          if (next != null) ...[
-            const SizedBox(height: 14),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _continue,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Passeport.maroon,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: Text(
-                  _isResuming(session, next) ? 'Continue ${_stageTitles[next]}' : 'Continue',
-                  style: Passeport.body(15, weight: FontWeight.w600),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: _skipCurrent,
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  minimumSize: Size.zero,
-                ),
-                child: Text('Skip for today',
-                    style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
-              ),
-            ),
-          ],
+          LayoutBuilder(builder: (context, constraints) {
+            const gap = 10.0;
+            final half = (constraints.maxWidth - gap) / 2;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final stage in PathwayStage.values)
+                  SizedBox(
+                    // 2-column bento; Speaking (the day's finale) gets the
+                    // full-width bottom tile.
+                    width: stage == PathwayStage.speaking ? constraints.maxWidth : half,
+                    child: _StageTile(
+                      stage: stage,
+                      status: session.stages[stage]!.status,
+                      isNext: stage == next,
+                      onTap: stage == next ? _openCurrent : null,
+                    ),
+                  ),
+              ],
+            );
+          }),
         ],
       ),
     );
   }
+}
 
-  /// Five thin segments: gold = done, bordeaux = up next, faint = later.
-  /// The whole day's shape in one glance, no list.
-  Widget _segmentBar(DailySession session, PathwayStage? next) {
-    return Row(
-      children: [
-        for (final stage in PathwayStage.values) ...[
-          Expanded(
-            child: Tooltip(
-              message: _stageTitles[stage]!,
-              child: AnimatedContainer(
-                duration: DesignTokens.durationMedium,
-                curve: DesignTokens.curveStandard,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: _segmentColor(session.stages[stage]!.status, stage == next),
-                  borderRadius: BorderRadius.circular(3),
-                ),
+class _StageTile extends StatelessWidget {
+  const _StageTile({
+    required this.stage,
+    required this.status,
+    required this.isNext,
+    this.onTap,
+  });
+
+  final PathwayStage stage;
+  final StageStatus status;
+  final bool isNext;
+  final VoidCallback? onTap;
+
+  bool get _isDone => status == StageStatus.completed;
+  bool get _isSkipped => status == StageStatus.skipped;
+  bool get _isPaused => status == StageStatus.paused;
+
+  @override
+  Widget build(BuildContext context) {
+    final hue = _stageHues[stage]!;
+
+    final Color bg;
+    final Color fg;
+    if (isNext) {
+      bg = Passeport.maroon;
+      fg = Colors.white;
+    } else if (_isDone || _isSkipped) {
+      bg = Passeport.brass.withValues(alpha: 0.14);
+      fg = Passeport.ink;
+    } else {
+      bg = hue.withValues(alpha: 0.08);
+      fg = Passeport.ink.withValues(alpha: 0.55);
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: DesignTokens.durationMedium,
+        curve: DesignTokens.curveStandard,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: isNext ? Colors.white.withValues(alpha: 0.16) : hue.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(
+                _isDone ? CupertinoIcons.checkmark : _stageIcons[stage]!,
+                size: 17,
+                color: isNext
+                    ? Colors.white
+                    : _isDone
+                        ? Passeport.brass
+                        : hue.withValues(alpha: onTap == null && !_isDone ? 0.6 : 1),
               ),
             ),
-          ),
-          if (stage != PathwayStage.values.last) const SizedBox(width: 5),
-        ],
-      ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _stageTitles[stage]!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Passeport.body(13.5, weight: FontWeight.w600).copyWith(color: fg),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    _statusLabel,
+                    style: Passeport.body(11).copyWith(
+                        color: isNext ? Colors.white.withValues(alpha: 0.85) : Passeport.slateDim),
+                  ),
+                ],
+              ),
+            ),
+            if (isNext)
+              const Icon(CupertinoIcons.arrow_right, size: 15, color: Colors.white),
+          ],
+        ),
+      ),
     );
   }
 
-  Color _segmentColor(StageStatus status, bool isNext) {
-    if (status == StageStatus.completed) return Passeport.brass;
-    if (status == StageStatus.skipped) return Passeport.brass.withValues(alpha: 0.35);
-    if (isNext) return Passeport.maroon;
-    return Passeport.ink.withValues(alpha: 0.08);
+  String get _statusLabel {
+    if (isNext) return _isPaused ? 'Continue' : 'Start';
+    if (_isDone) return 'Done';
+    if (_isSkipped) return 'Skipped';
+    return 'Later';
   }
-
-  String _progressLabel(DailySession session) {
-    final done = PathwayStage.values
-        .where((s) =>
-            session.stages[s]!.status == StageStatus.completed ||
-            session.stages[s]!.status == StageStatus.skipped)
-        .length;
-    return '$done of ${PathwayStage.values.length}';
-  }
-
-  String _leadLine(DailySession session, PathwayStage next) {
-    if (_isResuming(session, next)) {
-      return 'Paused in ${_stageTitles[next]!.toLowerCase()} — pick up right where you left off.';
-    }
-    return 'Up next · ${_stageTitles[next]} — ${_stageHints[next]}';
-  }
-
-  bool _isResuming(DailySession session, PathwayStage next) =>
-      session.stages[next]!.status == StageStatus.paused;
 }
