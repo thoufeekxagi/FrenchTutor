@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -260,7 +261,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.mic_none, size: 16, color: Passeport.brass),
+            const Icon(CupertinoIcons.mic, size: 16, color: Passeport.brass),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

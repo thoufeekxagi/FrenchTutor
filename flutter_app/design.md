@@ -1,10 +1,17 @@
-# Design Reference — Native iOS Feel for a Serious Learning App
+# Design Reference — One ParleSprint Vibe, Native Mechanics Everywhere
 
-This is the permanent design reference for this app. It exists because the app is Flutter but
-must feel like a native Apple app, and because the product is deliberately **not** a gamified
+This is the permanent design reference for ParleSprint. The app is Flutter shipping to
+**iOS, Android, and web from one codebase**, and the product is deliberately **not** a gamified
 consumer app (no Duolingo-style streak guilt, mascots, or confetti) — it's positioned as a
 "hardcore but clean" tool for adult learners who want to actually learn French, closer in spirit
 to an exam-prep tool than a habit-loop game.
+
+**The one-vibe rule (decided 2026-07):** the app must feel like the SAME premium product on every
+platform. Visual identity (palette, type, icons, cards, segmented pills, spinners' calm pacing,
+no-ripple taps) is **brand-first and identical everywhere**; only the *mechanics* that users feel
+in their hands adapt per platform (page-transition style + edge-swipe back on iOS, dialog frame,
+scroll always rubber-bands). Concretely: CupertinoIcons on ALL platforms, `NoSplash` on ALL
+platforms, the same hairline-bordered cards everywhere — but `CupertinoPageRoute` only on iOS.
 
 Two Claude skills are derived from this file: `design-system` (tokens: color, type, spacing,
 motion, iconography) and `ui-patterns` (navigation, components, screen flows, anti-patterns).
@@ -12,12 +19,32 @@ Update this file first when the design direction changes, then regenerate the sk
 
 ---
 
+## 0. The implemented wiring (code map — keep in sync)
+
+The design system is CODE, not just prose. Three layers, already built:
+
+| Layer | File | Owns |
+|---|---|---|
+| 1. Tokens | `lib/design/tokens.dart` (`DesignTokens`) | palette, type ramp (Playfair display / system body / JetBrains mono), 4pt spacing, radii (8/10/14/pill), 44pt tap floor, motion (200/300/450ms, easeOutCubic, never elastic), web breakpoints (600/1024, 560pt content column) |
+| 2. Theme | `lib/design/app_theme.dart` (`AppTheme`, `AppScrollBehavior`) | ThemeData from tokens; per-platform `PageTransitionsTheme` (Cupertino on iOS/macOS, Zoom on Android, fade on web); `NoSplash` everywhere; bouncing scroll everywhere |
+| 3. Components | `lib/widgets/adaptive/adaptive.dart` + `lib/design/app_router.dart` | `AppRouter.push` (THE only way to navigate — raw `MaterialPageRoute` is banned), `showPSConfirmDialog`, `showPSActionSheet`, `showPSDatePicker` (Cupertino wheel everywhere), `PSSegmented` pills, `PSSwitch`, `PSProgressIndicator`, `PSHaptics` (no-op on web), `PSContentColumn` (centers content ≥600pt wide) |
+
+`lib/config/theme.dart` (`Passeport`) is a thin back-compat alias over `DesignTokens` — existing
+screens reference it; new code should import the design layers directly.
+
+Rules enforced in review: no `Platform.isIOS` in screens; no raw `MaterialPageRoute`; no
+`Icons.*` (CupertinoIcons only); no elastic/overshoot curves; every tap target ≥44pt.
+
+---
+
 ## 1. Product design stance
 
 **Positioning:** premium, editorial, calm — a "passport/field journal" aesthetic, not a
-"playground." The existing `Passeport` theme (pastel French-flag palette, Playfair Display
-serif headings, JetBrains Mono for data) already points the right direction; the problem is that
-almost none of the actual widgets are native — everything is built from Material components.
+"playground." The `Passeport` identity: pastel French-flag palette (ink `#1B2A4A`, parchment
+`#FAF9F6`, maroon `#C8433E`, brass `#6B8FC4`, slate grays), Playfair Display serif for headings,
+system sans for body, JetBrains Mono for data/labels. Cards are white with 1px ink-hairline
+borders and 14pt radius — depth comes from color and hairlines, never drop shadows. One dominant
+action per screen (the Continue button pattern); everything else is quiet.
 
 **What we are explicitly avoiding**, backed by research into why these read as manipulative or
 juvenile for a serious/adult audience:

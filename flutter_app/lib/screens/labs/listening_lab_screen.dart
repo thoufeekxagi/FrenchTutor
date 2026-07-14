@@ -1,4 +1,5 @@
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -124,11 +125,11 @@ class _ListeningTile extends StatelessWidget {
   Widget _statusIcon(String status) {
     switch (status) {
       case 'completed':
-        return Icon(Icons.check_circle, color: Passeport.brass, size: 20);
+        return Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 20);
       case 'in_progress':
-        return Icon(Icons.radio_button_checked, color: Passeport.maroon, size: 20);
+        return Icon(CupertinoIcons.largecircle_fill_circle, color: Passeport.maroon, size: 20);
       default:
-        return Icon(Icons.radio_button_unchecked, color: Passeport.slate, size: 20);
+        return Icon(CupertinoIcons.circle, color: Passeport.slate, size: 20);
     }
   }
 }

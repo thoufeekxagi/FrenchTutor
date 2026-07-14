@@ -1,5 +1,6 @@
 import '../../widgets/adaptive/adaptive.dart';
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -76,6 +77,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       backgroundColor: Passeport.parchmentDim,
       body: SafeArea(
+        child: PSContentColumn(
         child: RefreshIndicator(
           color: Passeport.maroon,
           onRefresh: () async => _reload(),
@@ -95,6 +97,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               _buildReviewNotesCard(),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -166,7 +169,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.phone, size: 14, color: Passeport.brass),
+            Icon(CupertinoIcons.phone_fill, size: 14, color: Passeport.brass),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -185,7 +188,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, size: 12, color: Passeport.slate),
+            Icon(CupertinoIcons.chevron_right, size: 12, color: Passeport.slate),
           ],
         ),
       ),
@@ -255,7 +258,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       child: PasseportCard(
         child: Row(
           children: [
-            Icon(Icons.edit_note, size: 20, color: Passeport.brass),
+            Icon(CupertinoIcons.square_pencil, size: 20, color: Passeport.brass),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -273,7 +276,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, size: 16, color: Passeport.slate),
+            Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
           ],
         ),
       ),
@@ -347,7 +350,7 @@ class _SessionCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Center(
-              child: Icon(Icons.chat_bubble, size: 15, color: Passeport.maroon),
+              child: Icon(CupertinoIcons.chat_bubble_fill, size: 15, color: Passeport.maroon),
             ),
           ),
           const SizedBox(width: 12),
@@ -383,7 +386,7 @@ class _SessionCard extends StatelessWidget {
             ),
             const SizedBox(width: 4),
           ],
-          Icon(Icons.chevron_right, size: 12, color: Passeport.slate),
+          Icon(CupertinoIcons.chevron_right, size: 12, color: Passeport.slate),
         ],
       ),
     );

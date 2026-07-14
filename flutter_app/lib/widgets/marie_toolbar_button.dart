@@ -1,4 +1,5 @@
 import '../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/api_keys.dart';
@@ -28,7 +29,7 @@ class MarieToolbarButton extends StatelessWidget {
           ),
         );
       },
-      icon: const Icon(Icons.phone, color: Passeport.maroon),
+      icon: const Icon(CupertinoIcons.phone_fill, color: Passeport.maroon),
     );
   }
 }

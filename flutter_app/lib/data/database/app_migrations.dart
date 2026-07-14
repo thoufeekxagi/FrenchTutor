@@ -1,4 +1,4 @@
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqlite3/common.dart';
 
 /// Versioned, forward-only migrations. Each entry runs at most once, inside a
 /// transaction, and is recorded in `schema_migrations`.
@@ -12,7 +12,7 @@ import 'package:sqlite3/sqlite3.dart';
 ///  - history is append-only (vocab_reviews, ai_sessions, credit_usage);
 ///    current state (vocab_cards) is a cache derived from it
 ///  - TEXT/INTEGER/REAL only; JSON payloads in `*_json` TEXT columns
-void runAppMigrations(Database db) {
+void runAppMigrations(CommonDatabase db) {
   db.execute('PRAGMA journal_mode=WAL');
   db.execute('''
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -43,19 +43,21 @@ void runAppMigrations(Database db) {
   });
 }
 
-bool _tableExists(Database db, String name) {
-  return db
-      .select("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", [name])
-      .isNotEmpty;
+bool _tableExists(CommonDatabase db, String name) {
+  return db.select(
+    "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+    [name],
+  ).isNotEmpty;
 }
 
 /// Ordered map of version -> migration. Never edit a shipped migration;
 /// add a new version instead.
-final Map<int, void Function(Database)> _migrations = {
+final Map<int, void Function(CommonDatabase)> _migrations = {
   1: _migrationV1,
+  2: _migrationV2,
 };
 
-void _migrationV1(Database db) {
+void _migrationV1(CommonDatabase db) {
   const statements = [
     // --- Learner profile (single local row until auth exists) ---
     '''
@@ -185,5 +187,67 @@ void _migrationV1(Database db) {
         datetime('now'), datetime('now')
       FROM vocab_srs
     ''');
+  }
+}
+
+void _migrationV2(CommonDatabase db) {
+  const statements = [
+    '''
+    CREATE TABLE IF NOT EXISTS installations (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      platform TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS entitlements (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      product_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      source TEXT NOT NULL,
+      expires_at TEXT,
+      verified_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_entitlements_status ON entitlements (status)',
+    '''
+    CREATE TABLE IF NOT EXISTS sync_outbox (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      table_name TEXT NOT NULL,
+      row_id TEXT NOT NULL,
+      operation TEXT NOT NULL,
+      attempt_count INTEGER NOT NULL DEFAULT 0,
+      last_error_code TEXT,
+      processed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_sync_outbox_pending ON sync_outbox (processed_at, created_at)',
+    '''
+    CREATE TABLE IF NOT EXISTS operational_events (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      installation_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      properties_json TEXT NOT NULL DEFAULT '{}',
+      occurred_at TEXT NOT NULL,
+      uploaded_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_operational_events_pending ON operational_events (uploaded_at, occurred_at)',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
   }
 }

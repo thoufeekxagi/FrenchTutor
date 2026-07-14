@@ -1,4 +1,5 @@
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../widgets/passeport_card.dart';
@@ -14,10 +15,10 @@ class MocksScreen extends StatelessWidget {
   const MocksScreen({super.key});
 
   static const _sections = [
-    (name: 'Listening', icon: Icons.headphones, time: '40 min', labId: 'listening'),
-    (name: 'Reading', icon: Icons.menu_book, time: '60 min', labId: 'connectors'),
-    (name: 'Writing', icon: Icons.edit, time: '60 min', labId: 'writing'),
-    (name: 'Speaking', icon: Icons.mic, time: '15 min', labId: 'marie'),
+    (name: 'Listening', icon: CupertinoIcons.headphones, time: '40 min', labId: 'listening'),
+    (name: 'Reading', icon: CupertinoIcons.book, time: '60 min', labId: 'connectors'),
+    (name: 'Writing', icon: CupertinoIcons.pencil, time: '60 min', labId: 'writing'),
+    (name: 'Speaking', icon: CupertinoIcons.mic_fill, time: '15 min', labId: 'marie'),
   ];
 
   Widget? _destination(String labId) {
@@ -92,7 +93,7 @@ class MocksScreen extends StatelessWidget {
                       ),
                       Text(section.time, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
                       const SizedBox(width: 6),
-                      Icon(Icons.chevron_right, size: 16, color: Passeport.slate),
+                      Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
                     ],
                   ),
                 ),

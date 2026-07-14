@@ -1,4 +1,5 @@
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -124,8 +125,8 @@ class _ThemeTile extends StatelessWidget {
         ],
       ),
       trailing: allKnown
-          ? const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 22)
-          : Icon(Icons.chevron_right, color: Passeport.slate, size: 20),
+          ? const Icon(CupertinoIcons.checkmark_circle_fill, color: Color(0xFF4CAF50), size: 22)
+          : Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
       onTap: () {
         Navigator.push(
           context,

@@ -1,5 +1,6 @@
 import '../../widgets/adaptive/adaptive.dart';
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -108,7 +109,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         actions: [
           IconButton(
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(Icons.mic, color: Passeport.brass),
+            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -155,7 +156,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.phone, size: 16, color: Passeport.maroon),
+                icon: const Icon(CupertinoIcons.phone_fill, size: 16, color: Passeport.maroon),
                 label: Text(
                   'Discuss feedback with Marie',
                   style: Passeport.mono(11, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
@@ -196,7 +197,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.check, size: 12, color: Passeport.brass),
+                    const Icon(CupertinoIcons.checkmark, size: 12, color: Passeport.brass),
                     const SizedBox(width: 6),
                     Expanded(child: Text(s, style: Passeport.body(12).copyWith(color: Passeport.slateDim))),
                   ],
@@ -223,7 +224,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.arrow_forward, size: 9, color: Passeport.slate),
+                        const Icon(CupertinoIcons.arrow_right, size: 9, color: Passeport.slate),
                         const SizedBox(width: 6),
                         Text(
                           c.fixed,
@@ -250,7 +251,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 Text('Improved version', style: Passeport.body(12, weight: FontWeight.w500)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.volume_up, size: 16, color: Passeport.brass),
+                  icon: const Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.brass),
                   onPressed: () => LessonSpeechService.shared.speak(
                     items: LessonSpeechService.speechItemsFromText(feedback.improvedVersion),
                   ),

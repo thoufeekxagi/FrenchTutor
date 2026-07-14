@@ -1,6 +1,7 @@
 import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +22,13 @@ enum CallStatus { connecting, listening, tutorSpeaking, muted, ended }
 /// `stage` is null for the unstructured "Just talk to Marie" call, or e.g. "speaking" for the
 /// Daily Pathway's closing roleplay stage — it only affects how the saved session is tagged.
 class SessionScreen extends ConsumerStatefulWidget {
-  const SessionScreen({super.key, required this.apiKey, this.lessonContext, this.stage, this.dailySessionId});
+  const SessionScreen({
+    super.key,
+    required this.apiKey,
+    this.lessonContext,
+    this.stage,
+    this.dailySessionId,
+  });
 
   final String apiKey;
   final String? lessonContext;
@@ -99,7 +106,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
     final recordId = _aiSessionRecordId;
     if (recordId != null) {
-      ref.read(learningStoreProvider).endAiSession(
+      ref
+          .read(learningStoreProvider)
+          .endAiSession(
             recordId,
             endedReason: _endedReason,
             learnerUtteranceCount: _userUtteranceCount,
@@ -131,7 +140,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     _gemini.onConnected = () async {
       if (!mounted) return;
       _connectedAt = DateTime.now();
-      _aiSessionRecordId = ref.read(learningStoreProvider).startAiSession(
+      _aiSessionRecordId = ref
+          .read(learningStoreProvider)
+          .startAiSession(
             dailySessionId: widget.dailySessionId,
             stage: widget.stage,
             topic: widget.lessonContext != null ? 'lesson' : 'free_talk',
@@ -225,7 +236,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
     final session = Session(
       id: _sessionId,
-      startedAt: (_connectedAt ?? now.subtract(Duration(seconds: _callDuration))).toIso8601String(),
+      startedAt:
+          (_connectedAt ?? now.subtract(Duration(seconds: _callDuration)))
+              .toIso8601String(),
       endedAt: now.toIso8601String(),
       summary: summary,
       stage: widget.stage,
@@ -233,21 +246,32 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     final storage = ref.read(storageServiceProvider);
     storage.saveSession(session);
     for (final msg in _messages) {
-      storage.saveMessage(sessionId: _sessionId, role: msg.isUser ? 'user' : 'assistant', content: msg.content);
+      storage.saveMessage(
+        sessionId: _sessionId,
+        role: msg.isUser ? 'user' : 'assistant',
+        content: msg.content,
+      );
     }
 
     if (_callDuration >= 45) {
-      ref.read(learningStoreProvider).markHabit('speaking', minutes: (_callDuration / 60).clamp(1, 999).round());
+      ref
+          .read(learningStoreProvider)
+          .markHabit(
+            'speaking',
+            minutes: (_callDuration / 60).clamp(1, 999).round(),
+          );
     }
 
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
-        Navigator.of(context).pop(SpeakingResult(
-          connected: _connectedAt != null,
-          durationSeconds: _callDuration,
-          learnerUtteranceCount: _userUtteranceCount,
-          endedReason: _endedReason,
-        ));
+        Navigator.of(context).pop(
+          SpeakingResult(
+            connected: _connectedAt != null,
+            durationSeconds: _callDuration,
+            learnerUtteranceCount: _userUtteranceCount,
+            endedReason: _endedReason,
+          ),
+        );
       }
     });
   }
@@ -260,17 +284,75 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     final duration = _formatDuration(_callDuration);
 
     var summary = 'Session lasted $duration. ';
-    summary += '$userMessages exchanges from you, $tutorMessages responses from tutor. ';
+    summary +=
+        '$userMessages exchanges from you, $tutorMessages responses from tutor. ';
 
     final allText = _messages.map((m) => m.content).join(' ').toLowerCase();
     const frenchKeywords = {
-      'bonjour', 'merci', 'oui', 'non', 'je', 'vous', 'le', 'la', 'les', 'comment', 'avec', 'pour',
-      'suis', 'appelle', 'salut', 'ça', 'va', 'très', 'bien', 'mal', 'aussi', 'mais', 'et', 'ou',
-      'ne', 'pas', 'ai', 'as', 'a', 'avons', 'avez', 'ont', 'sont', 'être', 'avoir', 'aller',
-      'faire', 'dire', 'voir', 'savoir', 'pouvoir', 'vouloir', 'devoir', 'falloir', 'venir',
-      'prendre', 'donner', 'parler', 'écouter', 'regarder', 'aimer', 'manger', 'boire', 'acheter',
-      'vendre', 'habiter', 'travailler', 'étudier', 'apprendre', 'comprendre', 'répéter',
-      'corriger', 'expliquer', 'traduire',
+      'bonjour',
+      'merci',
+      'oui',
+      'non',
+      'je',
+      'vous',
+      'le',
+      'la',
+      'les',
+      'comment',
+      'avec',
+      'pour',
+      'suis',
+      'appelle',
+      'salut',
+      'ça',
+      'va',
+      'très',
+      'bien',
+      'mal',
+      'aussi',
+      'mais',
+      'et',
+      'ou',
+      'ne',
+      'pas',
+      'ai',
+      'as',
+      'a',
+      'avons',
+      'avez',
+      'ont',
+      'sont',
+      'être',
+      'avoir',
+      'aller',
+      'faire',
+      'dire',
+      'voir',
+      'savoir',
+      'pouvoir',
+      'vouloir',
+      'devoir',
+      'falloir',
+      'venir',
+      'prendre',
+      'donner',
+      'parler',
+      'écouter',
+      'regarder',
+      'aimer',
+      'manger',
+      'boire',
+      'acheter',
+      'vendre',
+      'habiter',
+      'travailler',
+      'étudier',
+      'apprendre',
+      'comprendre',
+      'répéter',
+      'corriger',
+      'expliquer',
+      'traduire',
     };
     final words = allText.split(' ').toSet();
     final frenchUsed = words.intersection(frenchKeywords).toList()..sort();
@@ -278,7 +360,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       summary += 'French words used: ${frenchUsed.take(10).join(', ')}. ';
     }
 
-    summary += userMessages > 3 ? 'Good practice session — keep going!' : 'Try speaking more next time for better practice.';
+    summary += userMessages > 3
+        ? 'Good practice session — keep going!'
+        : 'Try speaking more next time for better practice.';
     return summary;
   }
 
@@ -347,31 +431,36 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-      backgroundColor: Passeport.parchmentDim,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _callHeader(),
-                Expanded(child: _transcriptView()),
-                if (_errorMessage.isNotEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    color: Passeport.maroon.withValues(alpha: 0.1),
-                    child: Text(
-                      _errorMessage,
-                      style: Passeport.mono(12).copyWith(color: Passeport.maroon),
+        backgroundColor: Passeport.parchmentDim,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  _callHeader(),
+                  Expanded(child: _transcriptView()),
+                  if (_errorMessage.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      color: Passeport.maroon.withValues(alpha: 0.1),
+                      child: Text(
+                        _errorMessage,
+                        style: Passeport.mono(
+                          12,
+                        ).copyWith(color: Passeport.maroon),
+                      ),
                     ),
-                  ),
-                _callControls(),
-              ],
-            ),
-            FloatingNotetakerOverlay(state: notetaker),
-          ],
+                  _callControls(),
+                ],
+              ),
+              FloatingNotetakerOverlay(state: notetaker),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -385,18 +474,24 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             children: [
               GestureDetector(
                 onTap: _confirmEnd,
-                child: const Icon(Icons.close, size: 20, color: Passeport.ink),
+                child: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.ink),
               ),
               const Spacer(),
               Text(
                 _formatDuration(_callDuration),
-                style: Passeport.mono(15, weight: FontWeight.w500).copyWith(color: Passeport.slateDim),
+                style: Passeport.mono(
+                  15,
+                  weight: FontWeight.w500,
+                ).copyWith(color: Passeport.slateDim),
               ),
               const Spacer(),
               Container(
                 width: 10,
                 height: 10,
-                decoration: BoxDecoration(color: _statusColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: _statusColor,
+                  shape: BoxShape.circle,
+                ),
               ),
             ],
           ),
@@ -405,9 +500,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
           padding: const EdgeInsets.only(top: 12, bottom: 16),
           child: Column(
             children: [
-              Text('French Tutor', style: Passeport.display(20, weight: FontWeight.w600)),
+              Text(
+                'French Tutor',
+                style: Passeport.display(20, weight: FontWeight.w600),
+              ),
               const SizedBox(height: 2),
-              Text(_statusText, style: Passeport.body(13).copyWith(color: Passeport.slateDim)),
+              Text(
+                _statusText,
+                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+              ),
             ],
           ),
         ),
@@ -421,10 +522,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.phone_in_talk, size: 48, color: Passeport.slate.withValues(alpha: 0.5)),
+            Icon(
+              CupertinoIcons.phone_fill,
+              size: 48,
+              color: Passeport.slate.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             Text(
-              _callStatus == CallStatus.connecting ? 'Connecting to your tutor...' : 'Start speaking to begin',
+              _callStatus == CallStatus.connecting
+                  ? 'Connecting to your tutor...'
+                  : 'Start speaking to begin',
               style: Passeport.body(14).copyWith(color: Passeport.slateDim),
             ),
           ],
@@ -449,19 +556,29 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _controlButton(
-            icon: _callStatus == CallStatus.muted ? Icons.mic_off : Icons.mic,
+            icon: _callStatus == CallStatus.muted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
             label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic On',
-            color: _callStatus == CallStatus.muted ? Passeport.slate : Passeport.brass,
-            onTap: (_callStatus == CallStatus.connecting || _callStatus == CallStatus.ended) ? null : _toggleMute,
+            color: _callStatus == CallStatus.muted
+                ? Passeport.slate
+                : Passeport.brass,
+            onTap:
+                (_callStatus == CallStatus.connecting ||
+                    _callStatus == CallStatus.ended)
+                ? null
+                : _toggleMute,
           ),
           _controlButton(
-            icon: _isSpeakerOn ? Icons.volume_up : Icons.hearing,
+            icon: _isSpeakerOn ? CupertinoIcons.speaker_2_fill : CupertinoIcons.ear,
             label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
             color: _isSpeakerOn ? Passeport.brass : Passeport.slate,
-            onTap: (_callStatus == CallStatus.connecting || _callStatus == CallStatus.ended) ? null : _toggleSpeaker,
+            onTap:
+                (_callStatus == CallStatus.connecting ||
+                    _callStatus == CallStatus.ended)
+                ? null
+                : _toggleSpeaker,
           ),
           _controlButton(
-            icon: Icons.call_end,
+            icon: CupertinoIcons.phone_down_fill,
             label: 'End Call',
             color: Passeport.maroon,
             onTap: _confirmEnd,
@@ -488,7 +605,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             child: Icon(icon, color: Colors.white, size: 24),
           ),
           const SizedBox(height: 6),
-          Text(label, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
+          Text(
+            label,
+            style: Passeport.mono(11).copyWith(color: Passeport.slateDim),
+          ),
         ],
       ),
     );
@@ -504,7 +624,9 @@ class _MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUser = message.isUser;
     return Row(
-      mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment: isUser
+          ? MainAxisAlignment.end
+          : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!isUser) _avatar(false),
@@ -518,7 +640,9 @@ class _MessageBubble extends StatelessWidget {
             ),
             child: Text(
               message.content,
-              style: Passeport.body(13.5).copyWith(color: isUser ? Colors.white : Passeport.text),
+              style: Passeport.body(
+                13.5,
+              ).copyWith(color: isUser ? Colors.white : Passeport.text),
             ),
           ),
         ),
@@ -533,11 +657,13 @@ class _MessageBubble extends StatelessWidget {
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        color: (isUser ? Passeport.maroon : Passeport.brass).withValues(alpha: 0.15),
+        color: (isUser ? Passeport.maroon : Passeport.brass).withValues(
+          alpha: 0.15,
+        ),
         shape: BoxShape.circle,
       ),
       child: Icon(
-        isUser ? Icons.person : Icons.school,
+        isUser ? CupertinoIcons.person_fill : CupertinoIcons.book_fill,
         size: 14,
         color: isUser ? Passeport.maroon : Passeport.brass,
       ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -150,12 +151,12 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
     final isNext = stage == next;
 
     final icon = isDone
-        ? Icons.check_circle
+        ? CupertinoIcons.checkmark_circle_fill
         : isSkipped
-            ? Icons.remove_circle_outline
+            ? CupertinoIcons.minus_circle
             : isPaused
-                ? Icons.pause_circle_outline
-                : Icons.circle_outlined;
+                ? CupertinoIcons.pause_circle
+                : CupertinoIcons.circle;
     final iconColor = isDone
         ? Passeport.brass
         : isNext

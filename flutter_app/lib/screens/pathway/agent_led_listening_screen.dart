@@ -1,6 +1,7 @@
 import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -514,7 +515,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
           child: Row(
             children: [
-              GestureDetector(onTap: _confirmEnd, child: const Icon(Icons.close, size: 20, color: Passeport.ink)),
+              GestureDetector(onTap: _confirmEnd, child: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.ink)),
               const Spacer(),
               Text(_formatDuration(_callDuration), style: Passeport.mono(13, weight: FontWeight.w500).copyWith(color: Passeport.slateDim)),
               const Spacer(),
@@ -613,7 +614,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _segmentIndex == 0 ? null : _goBackFromUserIntent,
-                  icon: const Icon(Icons.chevron_left, size: 16),
+                  icon: const Icon(CupertinoIcons.chevron_left, size: 16),
                   label: const Text('Back'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -637,7 +638,7 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.verified, size: 30, color: Passeport.brass),
+                const Icon(CupertinoIcons.checkmark_seal_fill, size: 30, color: Passeport.brass),
                 const SizedBox(height: 10),
                 Text(_isWrappingUp ? 'Wrapping up…' : 'All done!', style: Passeport.body(14, weight: FontWeight.w500)),
                 const SizedBox(height: 6),
@@ -679,12 +680,12 @@ class _AgentLedListeningScreenState extends ConsumerState<AgentLedListeningScree
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _controlButton(
-            icon: _callStatus == CallStatus.muted ? Icons.mic_off : Icons.mic,
+            icon: _callStatus == CallStatus.muted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
             label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic on',
             color: _callStatus == CallStatus.muted ? Passeport.slate : Passeport.maroon,
             onTap: (_callStatus == CallStatus.connecting || _callStatus == CallStatus.ended) ? null : _toggleMute,
           ),
-          _controlButton(icon: Icons.call_end, label: 'End', color: const Color(0xFFD93333), onTap: _confirmEnd),
+          _controlButton(icon: CupertinoIcons.phone_down_fill, label: 'End', color: const Color(0xFFD93333), onTap: _confirmEnd),
         ],
       ),
     );

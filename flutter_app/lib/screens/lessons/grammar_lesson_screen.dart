@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -96,7 +97,7 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
         actions: [
           IconButton(
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(Icons.mic, color: Passeport.brass),
+            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -180,7 +181,7 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.volume_up, color: Passeport.brass),
+                          icon: const Icon(CupertinoIcons.speaker_2_fill, color: Passeport.brass),
                           onPressed: () {
                             LessonSpeechService.shared.speak(
                               items: [SpeechItem(text: ex.fr, language: 'fr-FR')],
@@ -281,7 +282,7 @@ class _NarrationControlBar extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
                   color: Passeport.parchment,
                 ),
               ),
@@ -583,7 +584,7 @@ class _DrillResultBanner extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            passed ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+            passed ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.info_circle,
             color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
             size: 24,
           ),

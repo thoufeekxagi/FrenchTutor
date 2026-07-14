@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -383,13 +384,13 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _circleIconButton(
-          icon: Icons.slow_motion_video,
+          icon: CupertinoIcons.speedometer,
           onTap: () => _speakWord(entry, rate: 0.3),
           tooltip: 'Slow',
         ),
         const SizedBox(width: 16),
         _circleIconButton(
-          icon: Icons.volume_up,
+          icon: CupertinoIcons.speaker_2_fill,
           onTap: () => _speakWord(entry, rate: 0.45),
           tooltip: 'Normal',
         ),
@@ -400,7 +401,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
   Widget _buildSayItButton(VocabEntry entry) {
     return Center(
       child: _circleIconButton(
-        icon: _isListeningBack ? Icons.mic : Icons.mic_none,
+        icon: _isListeningBack ? CupertinoIcons.mic_fill : CupertinoIcons.mic,
         onTap: () => _toggleSayIt(entry),
         tooltip: 'Say it',
         active: _isListeningBack,
@@ -461,7 +462,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Icon(Icons.check_circle_rounded, size: 64, color: Passeport.brass),
+            Icon(CupertinoIcons.checkmark_circle_fill, size: 64, color: Passeport.brass),
             const SizedBox(height: 20),
             Text(
               'Session Complete',

@@ -38,8 +38,9 @@ abstract final class AppTheme {
           },
         },
       ),
-      // No Android ink ripple on iOS/web — a plain highlight fade instead.
-      splashFactory: isCupertino || kIsWeb ? NoSplash.splashFactory : InkRipple.splashFactory,
+      // No ink ripple anywhere — one ParleSprint vibe on every platform; taps
+      // acknowledge with a quiet highlight fade, never a spreading splash.
+      splashFactory: NoSplash.splashFactory,
       highlightColor: DesignTokens.ink.withValues(alpha: 0.06),
       appBarTheme: AppBarTheme(
         backgroundColor: DesignTokens.parchment,

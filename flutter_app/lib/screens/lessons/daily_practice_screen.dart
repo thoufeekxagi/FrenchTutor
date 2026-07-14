@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -239,11 +240,11 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
                         Text(choice, style: Passeport.body(13.5, weight: FontWeight.w500)),
                         if (_quizSelected != null && choice == item.entry.en) ...[
                           const SizedBox(width: 8),
-                          Icon(Icons.check_circle, color: Passeport.brass, size: 18),
+                          Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 18),
                         ],
                         if (_quizSelected != null && choice == _quizSelected && choice != item.entry.en) ...[
                           const SizedBox(width: 8),
-                          Icon(Icons.cancel, color: Passeport.maroon, size: 18),
+                          Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.maroon, size: 18),
                         ],
                       ],
                     ),
@@ -267,7 +268,7 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.verified, size: 36, color: Passeport.brass),
+            Icon(CupertinoIcons.checkmark_seal_fill, size: 36, color: Passeport.brass),
             const SizedBox(height: 14),
             Text('Daily practice complete', style: Passeport.display(19)),
             const SizedBox(height: 8),

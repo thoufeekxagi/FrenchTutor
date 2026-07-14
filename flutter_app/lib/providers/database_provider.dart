@@ -1,16 +1,17 @@
-import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqlite3/common.dart';
+import '../data/database/database_opener.dart';
 import '../data/database/storage_service.dart';
 import '../data/database/learning_store.dart';
+import '../data/database/pilot_infrastructure_store.dart';
 import '../data/content_service.dart';
 import '../services/srs_service.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
+import '../services/pilot_access_service.dart';
 import '../widgets/floating_notetaker.dart';
 
-final databaseProvider = Provider<Database>((ref) {
+final databaseProvider = Provider<CommonDatabase>((ref) {
   throw UnimplementedError('Must be overridden at startup');
 });
 
@@ -20,6 +21,19 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 
 final learningStoreProvider = Provider<LearningStore>((ref) {
   return LearningStore(ref.watch(databaseProvider));
+});
+
+final pilotInfrastructureStoreProvider = Provider<PilotInfrastructureStore>((
+  ref,
+) {
+  return PilotInfrastructureStore(ref.watch(databaseProvider));
+});
+
+final pilotAccessServiceProvider = Provider<PilotAccessService>((ref) {
+  return PilotAccessService(
+    store: ref.watch(learningStoreProvider),
+    infrastructure: ref.watch(pilotInfrastructureStoreProvider),
+  );
 });
 
 final contentServiceProvider = Provider<ContentService>((ref) {
@@ -49,8 +63,4 @@ final notetakerStateProvider = Provider<NotetakerState>((ref) {
   return NotetakerState(storage: ref.watch(storageServiceProvider));
 });
 
-Future<Database> openAppDatabase() async {
-  final dir = await getApplicationDocumentsDirectory();
-  final path = '${dir.path}${Platform.pathSeparator}french_tutor.db';
-  return sqlite3.open(path);
-}
+Future<CommonDatabase> openAppDatabase() => openDatabase();

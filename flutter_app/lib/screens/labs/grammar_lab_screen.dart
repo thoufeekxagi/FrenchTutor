@@ -1,4 +1,5 @@
 import '../../design/app_router.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -117,7 +118,7 @@ class _LessonTile extends StatelessWidget {
         children: [
           _StatusBadge(status: status),
           const SizedBox(width: 4),
-          Icon(Icons.chevron_right, color: Passeport.slate, size: 20),
+          Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
         ],
       ),
       onTap: () {
@@ -150,7 +151,7 @@ class _TopicTile extends StatelessWidget {
         children: [
           _StatusBadge(status: status),
           const SizedBox(width: 4),
-          Icon(Icons.chevron_right, color: Passeport.slate, size: 20),
+          Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
         ],
       ),
       onTap: () {

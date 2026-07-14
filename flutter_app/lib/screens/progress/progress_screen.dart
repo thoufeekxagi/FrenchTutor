@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
+import '../../widgets/adaptive/adaptive.dart';
 import '../../data/content_service.dart';
 import '../../providers/database_provider.dart';
 import '../../services/progress_service.dart';
@@ -48,6 +50,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     return Scaffold(
       backgroundColor: Passeport.parchment,
       body: SafeArea(
+        child: PSContentColumn(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           children: [
@@ -102,6 +105,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
 
             const SizedBox(height: 32),
           ],
+        ),
         ),
       ),
     );
@@ -179,7 +183,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
             child: Row(
               children: [
                 Icon(
-                  item.done ? Icons.check_circle : Icons.circle_outlined,
+                  item.done ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
                   size: 22,
                   color: item.done ? Passeport.maroon : Passeport.slate,
                 ),
@@ -308,15 +312,15 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
   IconData _iconForSkill(String name) {
     switch (name) {
       case 'Vocabulary':
-        return Icons.style;
+        return CupertinoIcons.square_stack_3d_up;
       case 'Grammar':
-        return Icons.menu_book;
+        return CupertinoIcons.book;
       case 'Listening':
-        return Icons.headphones;
+        return CupertinoIcons.headphones;
       case 'Writing':
-        return Icons.edit_note;
+        return CupertinoIcons.square_pencil;
       default:
-        return Icons.school;
+        return CupertinoIcons.book_fill;
     }
   }
 }

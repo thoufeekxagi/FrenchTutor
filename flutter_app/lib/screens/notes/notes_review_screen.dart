@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -135,7 +136,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.edit_note, size: 40, color: Passeport.slate),
+            Icon(CupertinoIcons.square_pencil, size: 40, color: Passeport.slate),
             const SizedBox(height: 12),
             Text(
               'No notes yet',
@@ -169,7 +170,7 @@ class _NoteCard extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(color: Passeport.maroon, borderRadius: BorderRadius.circular(14)),
-        child: const Icon(Icons.delete_outline, color: Colors.white),
+        child: const Icon(CupertinoIcons.trash, color: Colors.white),
       ),
       onDismissed: (_) => onDelete(),
       child: PasseportCard(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -36,7 +37,7 @@ class HistoryScreen extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 18),
+          icon: const Icon(CupertinoIcons.chevron_left, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -92,7 +93,7 @@ class HistoryScreen extends ConsumerWidget {
             CircleAvatar(
               radius: 14,
               backgroundColor: Passeport.brass.withValues(alpha: 0.15),
-              child: Icon(Icons.school, size: 14, color: Passeport.brass),
+              child: Icon(CupertinoIcons.book_fill, size: 14, color: Passeport.brass),
             ),
             const SizedBox(width: 8),
           ],

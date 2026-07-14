@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -139,7 +140,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
           ),
           const SizedBox(width: 10),
           IconButton(
-            icon: Icon(Icons.volume_up, size: 16, color: Passeport.brass),
+            icon: Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.brass),
             onPressed: () {
               LessonSpeechService.shared.speak(
                 items: [SpeechItem(text: connector.example.fr, language: 'fr-FR')],
@@ -369,7 +370,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.verified, size: 36, color: Passeport.brass),
+            Icon(CupertinoIcons.checkmark_seal_fill, size: 36, color: Passeport.brass),
             const SizedBox(height: 14),
             Text(
               '$_correctCount / ${_questions.length}',

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
@@ -221,7 +222,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
           ],
         ),
         child: Icon(
-          _state.isExpanded ? Icons.keyboard_arrow_down : Icons.edit,
+          _state.isExpanded ? CupertinoIcons.chevron_down : CupertinoIcons.pencil,
           size: 20,
           color: Passeport.parchment,
         ),
@@ -294,7 +295,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               const Spacer(),
               GestureDetector(
                 onTap: () => _state.collapse(),
-                child: Icon(Icons.close, size: 16, color: Passeport.slateDim),
+                child: Icon(CupertinoIcons.xmark, size: 16, color: Passeport.slateDim),
               ),
             ],
           ),

@@ -1,9 +1,12 @@
+import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/kicker_text.dart';
@@ -29,11 +32,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _openRouterKey = '';
   bool _notetakerEnabled = false;
   late Profile _profile;
+  late PilotAccessSnapshot _access;
 
   @override
   void initState() {
     super.initState();
     _profile = ref.read(learningStoreProvider).profile();
+    _access = ref.read(pilotAccessServiceProvider).snapshot();
     _loadSettings();
   }
 
@@ -52,8 +57,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _notetakerEnabled = prefs.getBool('notetaker_enabled') ?? false;
       final timestamp = prefs.getInt('roadmap_start_date');
       if (timestamp != null) {
-        _roadmapStartDate =
-            DateTime.fromMillisecondsSinceEpoch(timestamp);
+        _roadmapStartDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
     });
   }
@@ -79,31 +83,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _pickRoadmapStartDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _roadmapStartDate,
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Passeport.maroon,
-              onPrimary: Colors.white,
-              surface: Passeport.parchment,
-              onSurface: Passeport.text,
-            ),
-          ),
-          child: child!,
-        );
-      },
+    final picked = await showPSDatePicker(
+      context,
+      initial: _roadmapStartDate,
+      first: DateTime(2024),
+      last: DateTime(2030),
     );
     if (picked != null) {
       setState(() => _roadmapStartDate = picked);
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(
-          'roadmap_start_date', picked.millisecondsSinceEpoch);
+      await prefs.setInt('roadmap_start_date', picked.millisecondsSinceEpoch);
     }
+  }
+
+  String _entitlementLabel(PilotEntitlementStatus status) {
+    return switch (status) {
+      PilotEntitlementStatus.localPreview => 'Local preview',
+      PilotEntitlementStatus.active => 'Active',
+      PilotEntitlementStatus.grace => 'Grace period',
+      PilotEntitlementStatus.inactive => 'Not active',
+      PilotEntitlementStatus.verificationUnavailable => 'Check unavailable',
+    };
   }
 
   @override
@@ -117,7 +117,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
+      body: PSContentColumn(
+        child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         children: [
           // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
@@ -129,14 +130,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 6),
                 _ChoiceRow(
                   label: 'Goal',
-                  options: const [('tef_canada', 'TEF Canada'), ('everyday', 'Everyday'), ('unsure', 'Exploring')],
+                  options: const [
+                    ('tef_canada', 'TEF Canada'),
+                    ('everyday', 'Everyday'),
+                    ('unsure', 'Exploring'),
+                  ],
                   selected: _profile.goal,
                   onChanged: (v) => _saveProfile((p) => p.goal = v),
                 ),
                 Divider(height: 16, color: Passeport.hairline),
                 _ChoiceRow(
                   label: 'Session length',
-                  options: const [('quick', 'Quick'), ('standard', 'Standard'), ('deep', 'Deep')],
+                  options: const [
+                    ('quick', 'Quick'),
+                    ('standard', 'Standard'),
+                    ('deep', 'Deep'),
+                  ],
                   selected: _profile.sessionLength,
                   onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
                 ),
@@ -161,18 +170,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         Text(
                           'Start date',
-                          style: Passeport.body(12.5)
-                              .copyWith(color: Passeport.slateDim),
+                          style: Passeport.body(
+                            12.5,
+                          ).copyWith(color: Passeport.slateDim),
                         ),
                         const Spacer(),
                         Text(
                           DateFormat.yMMMd().format(_roadmapStartDate),
-                          style: Passeport.mono(12, weight: FontWeight.w500)
-                              .copyWith(color: Passeport.maroon),
+                          style: Passeport.mono(
+                            12,
+                            weight: FontWeight.w500,
+                          ).copyWith(color: Passeport.maroon),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.calendar_today,
-                            size: 14, color: Passeport.maroon),
+                        const Icon(
+                          CupertinoIcons.calendar,
+                          size: 14,
+                          color: Passeport.maroon,
+                        ),
                       ],
                     ),
                   ),
@@ -191,8 +206,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 10),
                 Text(
                   'Narration rate',
-                  style: Passeport.body(12.5)
-                      .copyWith(color: Passeport.slateDim),
+                  style: Passeport.body(
+                    12.5,
+                  ).copyWith(color: Passeport.slateDim),
                 ),
                 const SizedBox(height: 4),
                 SliderTheme(
@@ -213,38 +229,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 if (kDebugMode) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      'New cards/day (labs): $_newCardsPerDay',
-                      style: Passeport.body(12.5)
-                          .copyWith(color: Passeport.text),
-                    ),
-                    const Spacer(),
-                    _StepperButton(
-                      icon: Icons.remove,
-                      onTap: _newCardsPerDay > 5
-                          ? () {
-                              setState(() => _newCardsPerDay -= 5);
-                              _saveInt(
-                                  'srs_new_cards_per_day', _newCardsPerDay);
-                            }
-                          : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _StepperButton(
-                      icon: Icons.add,
-                      onTap: _newCardsPerDay < 50
-                          ? () {
-                              setState(() => _newCardsPerDay += 5);
-                              _saveInt(
-                                  'srs_new_cards_per_day', _newCardsPerDay);
-                            }
-                          : null,
-                    ),
-                  ],
-                ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        'New cards/day (labs): $_newCardsPerDay',
+                        style: Passeport.body(
+                          12.5,
+                        ).copyWith(color: Passeport.text),
+                      ),
+                      const Spacer(),
+                      _StepperButton(
+                        icon: CupertinoIcons.minus,
+                        onTap: _newCardsPerDay > 5
+                            ? () {
+                                setState(() => _newCardsPerDay -= 5);
+                                _saveInt(
+                                  'srs_new_cards_per_day',
+                                  _newCardsPerDay,
+                                );
+                              }
+                            : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _StepperButton(
+                        icon: CupertinoIcons.plus,
+                        onTap: _newCardsPerDay < 50
+                            ? () {
+                                setState(() => _newCardsPerDay += 5);
+                                _saveInt(
+                                  'srs_new_cards_per_day',
+                                  _newCardsPerDay,
+                                );
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
                 ],
               ],
             ),
@@ -252,64 +273,77 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 12),
 
           // --- AI tutor (OpenRouter) — developer build only ---
-          if (kDebugMode) _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('AI tutor (OpenRouter)',
-                    color: Passeport.slateDim),
-                const SizedBox(height: 10),
-                _SettingsRow(
-                  label: 'Key status',
-                  value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
-                ),
-                Divider(height: 1, color: Passeport.hairline),
-                const SizedBox(height: 10),
-                Text(
-                  'Preferred model',
-                  style: Passeport.body(12.5)
-                      .copyWith(color: Passeport.slateDim),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Passeport.hairline),
-                    borderRadius: BorderRadius.circular(8),
+          if (kDebugMode)
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText(
+                    'AI tutor (OpenRouter)',
+                    color: Passeport.slateDim,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _modelOverride,
-                      isExpanded: true,
-                      style: Passeport.body(12.5)
-                          .copyWith(color: Passeport.text),
-                      dropdownColor: Passeport.parchment,
-                      icon: const Icon(Icons.arrow_drop_down,
-                          color: Passeport.maroon),
-                      items: [
-                        DropdownMenuItem(
-                          value: '',
-                          child: Text('Auto (fallback chain)',
-                              style: Passeport.body(12.5)),
+                  const SizedBox(height: 10),
+                  _SettingsRow(
+                    label: 'Key status',
+                    value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Preferred model',
+                    style: Passeport.body(
+                      12.5,
+                    ).copyWith(color: Passeport.slateDim),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Passeport.hairline),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _modelOverride,
+                        isExpanded: true,
+                        style: Passeport.body(
+                          12.5,
+                        ).copyWith(color: Passeport.text),
+                        dropdownColor: Passeport.parchment,
+                        icon: const Icon(
+                          CupertinoIcons.chevron_down,
+                          color: Passeport.maroon,
                         ),
-                        ...availableModels.map((model) => DropdownMenuItem(
+                        items: [
+                          DropdownMenuItem(
+                            value: '',
+                            child: Text(
+                              'Auto (fallback chain)',
+                              style: Passeport.body(12.5),
+                            ),
+                          ),
+                          ...availableModels.map(
+                            (model) => DropdownMenuItem(
                               value: model,
-                              child: Text(model,
-                                  style: Passeport.mono(11),
-                                  overflow: TextOverflow.ellipsis),
-                            )),
-                      ],
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => _modelOverride = v);
-                        _saveString('openrouter_model_override', v);
-                      },
+                              child: Text(
+                                model,
+                                style: Passeport.mono(11),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          if (v == null) return;
+                          setState(() => _modelOverride = v);
+                          _saveString('openrouter_model_override', v);
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           if (kDebugMode) const SizedBox(height: 12),
 
           // --- Notetaker ---
@@ -321,8 +355,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Text('Floating notetaker',
-                        style: Passeport.body(12.5)),
+                    Text('Floating notetaker', style: Passeport.body(12.5)),
                     const Spacer(),
                     Switch.adaptive(
                       value: _notetakerEnabled,
@@ -338,8 +371,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   'Shows a draggable note bubble during lessons so you can '
                   'jot things down while listening or writing.',
-                  style: Passeport.body(11)
-                      .copyWith(color: Passeport.slateDim),
+                  style: Passeport.body(11).copyWith(color: Passeport.slateDim),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          _PasseportCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                KickerText('Access', color: Passeport.slateDim),
+                const SizedBox(height: 4),
+                _SettingsRow(
+                  label: 'Founding pass',
+                  value: _entitlementLabel(_access.entitlement.status),
+                ),
+                Divider(height: 1, color: Passeport.hairline),
+                _SettingsRow(
+                  label: 'Tracked speaking today',
+                  value:
+                      '${(_access.remainingSeconds / 60).ceil()} min remaining',
+                ),
+                Divider(height: 1, color: Passeport.hairline),
+                _SettingsRow(
+                  label: 'Verification',
+                  value: _access.serverAuthoritative
+                      ? 'Cloud verified'
+                      : 'Local preview',
                 ),
               ],
             ),
@@ -355,12 +415,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 4),
                 _SettingsRow(label: 'Version', value: '0.9 pilot'),
                 Divider(height: 1, color: Passeport.hairline),
-                _SettingsRow(label: 'Feedback', value: 'thoufeek@agiventures.ca'),
+                _SettingsRow(
+                  label: 'Feedback',
+                  value: 'thoufeek@agiventures.ca',
+                ),
               ],
             ),
           ),
           const SizedBox(height: 24),
         ],
+        ),
       ),
     );
   }
@@ -368,7 +432,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
 /// Inline pill selector for short exclusive choices.
 class _ChoiceRow extends StatelessWidget {
-  const _ChoiceRow({required this.label, required this.options, required this.selected, required this.onChanged});
+  const _ChoiceRow({
+    required this.label,
+    required this.options,
+    required this.selected,
+    required this.onChanged,
+  });
 
   final String label;
   final List<(String, String)> options;
@@ -380,7 +449,10 @@ class _ChoiceRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+        Text(
+          label,
+          style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -389,14 +461,20 @@ class _ChoiceRow extends StatelessWidget {
             return GestureDetector(
               onTap: () => onChanged(o.$1),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? Passeport.maroon : Passeport.parchmentDim,
                   borderRadius: BorderRadius.circular(100),
                 ),
-                child: Text(o.$2,
-                    style: Passeport.mono(10.5, weight: FontWeight.w500)
-                        .copyWith(color: isSelected ? Passeport.parchment : Passeport.text)),
+                child: Text(
+                  o.$2,
+                  style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(
+                    color: isSelected ? Passeport.parchment : Passeport.text,
+                  ),
+                ),
               ),
             );
           }).toList(),
@@ -440,13 +518,18 @@ class _SettingsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 11),
       child: Row(
         children: [
-          Text(label,
-              style:
-                  Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+          Text(
+            label,
+            style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+          ),
           const Spacer(),
-          Text(value,
-              style: Passeport.mono(12, weight: FontWeight.w500)
-                  .copyWith(color: Passeport.text)),
+          Text(
+            value,
+            style: Passeport.mono(
+              12,
+              weight: FontWeight.w500,
+            ).copyWith(color: Passeport.text),
+          ),
         ],
       ),
     );

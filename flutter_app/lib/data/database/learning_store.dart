@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqlite3/common.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/daily_session.dart';
@@ -22,7 +22,12 @@ class HabitEntry {
 }
 
 class WritingSubmission {
-  WritingSubmission({required this.taskId, required this.text, required this.feedback, required this.submittedAt});
+  WritingSubmission({
+    required this.taskId,
+    required this.text,
+    required this.feedback,
+    required this.submittedAt,
+  });
   final String taskId;
   final String text;
   final String feedback;
@@ -30,7 +35,12 @@ class WritingSubmission {
 }
 
 class MistakeTag {
-  MistakeTag({required this.tag, required this.description, required this.count, required this.resolved});
+  MistakeTag({
+    required this.tag,
+    required this.description,
+    required this.count,
+    required this.resolved,
+  });
   final String tag;
   final String description;
   final int count;
@@ -52,7 +62,7 @@ class LearningStore {
     _migrateLegacy();
   }
 
-  final Database _db;
+  final CommonDatabase _db;
 
   String _now() => DateTime.now().toUtc().toIso8601String();
 
@@ -108,7 +118,9 @@ class LearningStore {
   // ---------------------------------------------------------------------------
 
   Profile profile() {
-    final rows = _db.select('SELECT * FROM profiles WHERE deleted_at IS NULL LIMIT 1');
+    final rows = _db.select(
+      'SELECT * FROM profiles WHERE deleted_at IS NULL LIMIT 1',
+    );
     if (rows.isNotEmpty) {
       final r = rows.first;
       final onboardedRaw = r['onboarded_at'] as String?;
@@ -118,7 +130,9 @@ class LearningStore {
         level: r['level'] as String,
         sessionLength: r['session_length'] as String,
         reminderTime: r['reminder_time'] as String?,
-        onboardedAt: onboardedRaw != null ? DateTime.tryParse(onboardedRaw) : null,
+        onboardedAt: onboardedRaw != null
+            ? DateTime.tryParse(onboardedRaw)
+            : null,
       );
     }
     final fresh = Profile(id: _uuid.v4());
@@ -130,17 +144,30 @@ class LearningStore {
   }
 
   void saveProfile(Profile p) {
-    _db.execute('''
+    _db.execute(
+      '''
       UPDATE profiles SET goal = ?, level = ?, session_length = ?, reminder_time = ?,
         onboarded_at = ?, updated_at = ?
       WHERE id = ?
-    ''', [p.goal, p.level, p.sessionLength, p.reminderTime, p.onboardedAt?.toIso8601String(), _now(), p.id]);
+    ''',
+      [
+        p.goal,
+        p.level,
+        p.sessionLength,
+        p.reminderTime,
+        p.onboardedAt?.toIso8601String(),
+        _now(),
+        p.id,
+      ],
+    );
   }
 
   /// True until the very first card is ever graded — day-one learners get a
   /// gentler new-word budget.
   bool hasNoReviewHistory() {
-    return (_db.select('SELECT COUNT(*) AS c FROM vocab_reviews').first['c'] as int) == 0;
+    return (_db.select('SELECT COUNT(*) AS c FROM vocab_reviews').first['c']
+            as int) ==
+        0;
   }
 
   // ---------------------------------------------------------------------------
@@ -150,13 +177,17 @@ class LearningStore {
 
   SRSState? srsState(String entryId) {
     final rows = _db.select(
-        'SELECT * FROM vocab_cards WHERE entry_id = ? AND deleted_at IS NULL', [entryId]);
+      'SELECT * FROM vocab_cards WHERE entry_id = ? AND deleted_at IS NULL',
+      [entryId],
+    );
     if (rows.isEmpty) return null;
     return _srsFromRow(rows.first);
   }
 
   Map<String, SRSState> allSRSStates() {
-    final rows = _db.select('SELECT * FROM vocab_cards WHERE deleted_at IS NULL');
+    final rows = _db.select(
+      'SELECT * FROM vocab_cards WHERE deleted_at IS NULL',
+    );
     final map = <String, SRSState>{};
     for (final r in rows) {
       final s = _srsFromRow(r);
@@ -166,7 +197,8 @@ class LearningStore {
   }
 
   void upsertSRS(SRSState state) {
-    _db.execute('''
+    _db.execute(
+      '''
       INSERT INTO vocab_cards
         (id, entry_id, ease, interval_days, reps, due_at, introduced_on,
          last_reviewed_at, last_grade, created_at, updated_at)
@@ -180,19 +212,21 @@ class LearningStore {
         last_reviewed_at = excluded.last_reviewed_at,
         last_grade = excluded.last_grade,
         updated_at = excluded.updated_at
-    ''', [
-      _uuid.v4(),
-      state.entryId,
-      state.ease,
-      state.intervalDays,
-      state.reps,
-      state.dueAt?.toIso8601String(),
-      state.introducedOn,
-      state.lastReviewedAt?.toIso8601String(),
-      state.lastGrade?.name,
-      _now(),
-      _now(),
-    ]);
+    ''',
+      [
+        _uuid.v4(),
+        state.entryId,
+        state.ease,
+        state.intervalDays,
+        state.reps,
+        state.dueAt?.toIso8601String(),
+        state.introducedOn,
+        state.lastReviewedAt?.toIso8601String(),
+        state.lastGrade?.name,
+        _now(),
+        _now(),
+      ],
+    );
   }
 
   /// Append one review to the immutable log.
@@ -202,10 +236,21 @@ class LearningStore {
     required SRSResponseType responseType,
     String? sessionId,
   }) {
-    _db.execute('''
+    _db.execute(
+      '''
       INSERT INTO vocab_reviews (id, entry_id, grade, response_type, session_id, reviewed_at, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', [_uuid.v4(), entryId, grade.name, responseType.name, sessionId, _now(), _now()]);
+    ''',
+      [
+        _uuid.v4(),
+        entryId,
+        grade.name,
+        responseType.name,
+        sessionId,
+        _now(),
+        _now(),
+      ],
+    );
   }
 
   /// Cards first graded today — counted from the explicit introduced_on column,
@@ -220,17 +265,23 @@ class LearningStore {
 
   /// Entries reviewed today with their latest grade — feeds progress evidence
   /// ("this week you can now…") and same-session again-loops.
-  List<({String entryId, SRSGrade grade, DateTime reviewedAt})> reviewsOn(DateTime day) {
+  List<({String entryId, SRSGrade grade, DateTime reviewedAt})> reviewsOn(
+    DateTime day,
+  ) {
     final rows = _db.select(
       "SELECT entry_id, grade, reviewed_at FROM vocab_reviews WHERE date(reviewed_at) = date(?) ORDER BY reviewed_at",
       [day.toUtc().toIso8601String()],
     );
     return rows
-        .map((r) => (
-              entryId: r['entry_id'] as String,
-              grade: SRSGrade.values.asNameMap()[r['grade'] as String] ?? SRSGrade.good,
-              reviewedAt: DateTime.parse(r['reviewed_at'] as String),
-            ))
+        .map(
+          (r) => (
+            entryId: r['entry_id'] as String,
+            grade:
+                SRSGrade.values.asNameMap()[r['grade'] as String] ??
+                SRSGrade.good,
+            reviewedAt: DateTime.parse(r['reviewed_at'] as String),
+          ),
+        )
         .toList();
   }
 
@@ -252,49 +303,68 @@ class LearningStore {
   DailySession dailySession({DateTime? on}) {
     final date = dayString(on ?? DateTime.now());
     final rows = _db.select(
-        'SELECT * FROM daily_sessions WHERE local_date = ? AND deleted_at IS NULL', [date]);
+      'SELECT * FROM daily_sessions WHERE local_date = ? AND deleted_at IS NULL',
+      [date],
+    );
     if (rows.isNotEmpty) return _dailyFromRow(rows.first);
 
     final session = DailySession(id: _uuid.v4(), localDate: date);
-    _db.execute('''
+    _db.execute(
+      '''
       INSERT INTO daily_sessions (id, local_date, stages_json, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?)
-    ''', [session.id, date, session.stagesToJson(), _now(), _now()]);
+    ''',
+      [session.id, date, session.stagesToJson(), _now(), _now()],
+    );
     return session;
   }
 
   void saveDailySession(DailySession session) {
-    _db.execute('''
+    _db.execute(
+      '''
       UPDATE daily_sessions SET
         planned_length = ?, current_stage = ?, current_item_index = ?,
         stages_json = ?, vocab_entry_ids_json = ?, grammar_lesson_id = ?,
         reading_passage_json = ?, started_at = ?, completed_at = ?, updated_at = ?
       WHERE id = ?
-    ''', [
-      session.plannedLength,
-      session.currentStage?.name,
-      session.currentItemIndex,
-      session.stagesToJson(),
-      session.vocabEntryIds != null ? jsonEncode(session.vocabEntryIds) : null,
-      session.grammarLessonId,
-      session.readingPassageJson != null ? jsonEncode(session.readingPassageJson) : null,
-      session.startedAt?.toIso8601String(),
-      session.completedAt?.toIso8601String(),
-      _now(),
-      session.id,
-    ]);
+    ''',
+      [
+        session.plannedLength,
+        session.currentStage?.name,
+        session.currentItemIndex,
+        session.stagesToJson(),
+        session.vocabEntryIds != null
+            ? jsonEncode(session.vocabEntryIds)
+            : null,
+        session.grammarLessonId,
+        session.readingPassageJson != null
+            ? jsonEncode(session.readingPassageJson)
+            : null,
+        session.startedAt?.toIso8601String(),
+        session.completedAt?.toIso8601String(),
+        _now(),
+        session.id,
+      ],
+    );
   }
 
   // ---------------------------------------------------------------------------
   // AI sessions — real timestamps, utterance counts, honest end reasons.
   // ---------------------------------------------------------------------------
 
-  String startAiSession({String? dailySessionId, String? stage, String? topic}) {
+  String startAiSession({
+    String? dailySessionId,
+    String? stage,
+    String? topic,
+  }) {
     final id = _uuid.v4();
-    _db.execute('''
+    _db.execute(
+      '''
       INSERT INTO ai_sessions (id, daily_session_id, stage, topic, connected_at, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', [id, dailySessionId, stage, topic, _now(), _now(), _now()]);
+    ''',
+      [id, dailySessionId, stage, topic, _now(), _now(), _now()],
+    );
     return id;
   }
 
@@ -304,23 +374,34 @@ class LearningStore {
     required int learnerUtteranceCount,
     String? transcriptJson,
   }) {
-    _db.execute('''
+    _db.execute(
+      '''
       UPDATE ai_sessions SET ended_at = ?, ended_reason = ?, learner_utterance_count = ?,
         transcript_json = COALESCE(?, transcript_json), updated_at = ?
       WHERE id = ?
-    ''', [_now(), endedReason, learnerUtteranceCount, transcriptJson, _now(), id]);
+    ''',
+      [_now(), endedReason, learnerUtteranceCount, transcriptJson, _now(), id],
+    );
 
     // Credit ledger entry from real timestamps (advisory until server-metered).
-    final rows = _db.select('SELECT connected_at, ended_at FROM ai_sessions WHERE id = ?', [id]);
-    if (rows.isNotEmpty && rows.first['connected_at'] != null && rows.first['ended_at'] != null) {
+    final rows = _db.select(
+      'SELECT connected_at, ended_at FROM ai_sessions WHERE id = ?',
+      [id],
+    );
+    if (rows.isNotEmpty &&
+        rows.first['connected_at'] != null &&
+        rows.first['ended_at'] != null) {
       final seconds = DateTime.parse(rows.first['ended_at'] as String)
           .difference(DateTime.parse(rows.first['connected_at'] as String))
           .inSeconds;
       if (seconds > 0) {
-        _db.execute('''
+        _db.execute(
+          '''
           INSERT INTO credit_usage (id, local_date, seconds_used, ai_session_id, created_at)
           VALUES (?, ?, ?, ?, ?)
-        ''', [_uuid.v4(), dayString(DateTime.now()), seconds, id, _now()]);
+        ''',
+          [_uuid.v4(), dayString(DateTime.now()), seconds, id, _now()],
+        );
       }
     }
   }
@@ -336,8 +417,13 @@ class LearningStore {
   // --- Lesson progress ---
 
   LessonProgress lessonStatus(String lessonId) {
-    final rows = _db.select('SELECT * FROM lesson_progress WHERE lesson_id = ?', [lessonId]);
-    if (rows.isEmpty) return LessonProgress(lessonId: lessonId, status: 'not_started');
+    final rows = _db.select(
+      'SELECT * FROM lesson_progress WHERE lesson_id = ?',
+      [lessonId],
+    );
+    if (rows.isEmpty) {
+      return LessonProgress(lessonId: lessonId, status: 'not_started');
+    }
     final r = rows.first;
     return LessonProgress(
       lessonId: r['lesson_id'] as String,
@@ -373,18 +459,23 @@ class LearningStore {
   /// Minutes ACCUMULATE across a day (a second session adds, never replaces).
   void markHabit(String habitId, {bool done = true, int minutes = 0}) {
     final today = dayString(DateTime.now());
-    _db.execute('''
+    _db.execute(
+      '''
       INSERT INTO daily_activity (date, habit_id, done, minutes)
       VALUES (?, ?, ?, ?)
       ON CONFLICT(date, habit_id) DO UPDATE SET
         done = MAX(daily_activity.done, excluded.done),
         minutes = daily_activity.minutes + excluded.minutes
-    ''', [today, habitId, done ? 1 : 0, minutes]);
+    ''',
+      [today, habitId, done ? 1 : 0, minutes],
+    );
   }
 
   Map<String, HabitEntry> habits({DateTime? on}) {
     final date = dayString(on ?? DateTime.now());
-    final rows = _db.select('SELECT * FROM daily_activity WHERE date = ?', [date]);
+    final rows = _db.select('SELECT * FROM daily_activity WHERE date = ?', [
+      date,
+    ]);
     final map = <String, HabitEntry>{};
     for (final r in rows) {
       map[r['habit_id'] as String] = HabitEntry(
@@ -396,13 +487,19 @@ class LearningStore {
   }
 
   List<String> activeDays() {
-    final rows = _db.select('SELECT DISTINCT date FROM daily_activity WHERE done = 1 ORDER BY date DESC');
+    final rows = _db.select(
+      'SELECT DISTINCT date FROM daily_activity WHERE done = 1 ORDER BY date DESC',
+    );
     return rows.map((r) => r['date'] as String).toList();
   }
 
   // --- Writing submissions ---
 
-  void saveSubmission({required String taskId, required String text, String feedback = ''}) {
+  void saveSubmission({
+    required String taskId,
+    required String text,
+    String feedback = '',
+  }) {
     _db.execute(
       'INSERT INTO writing_submissions (task_id, text, feedback) VALUES (?, ?, ?)',
       [taskId, text, feedback],
@@ -410,14 +507,18 @@ class LearningStore {
   }
 
   List<WritingSubmission> submissions() {
-    final rows = _db.select('SELECT * FROM writing_submissions ORDER BY submitted_at DESC');
+    final rows = _db.select(
+      'SELECT * FROM writing_submissions ORDER BY submitted_at DESC',
+    );
     return rows
-        .map((r) => WritingSubmission(
-              taskId: r['task_id'] as String,
-              text: r['text'] as String,
-              feedback: r['feedback'] as String,
-              submittedAt: r['submitted_at'] as String,
-            ))
+        .map(
+          (r) => WritingSubmission(
+            taskId: r['task_id'] as String,
+            text: r['text'] as String,
+            feedback: r['feedback'] as String,
+            submittedAt: r['submitted_at'] as String,
+          ),
+        )
         .toList();
   }
 
@@ -437,12 +538,14 @@ class LearningStore {
       [limit],
     );
     return rows
-        .map((r) => MistakeTag(
-              tag: r['tag'] as String,
-              description: r['description'] as String,
-              count: r['count'] as int,
-              resolved: (r['resolved'] as int) == 1,
-            ))
+        .map(
+          (r) => MistakeTag(
+            tag: r['tag'] as String,
+            description: r['description'] as String,
+            count: r['count'] as int,
+            resolved: (r['resolved'] as int) == 1,
+          ),
+        )
         .toList();
   }
 
@@ -461,13 +564,18 @@ class LearningStore {
   }
 
   List<DiaryEntry> recentDiaryEntries({int limit = 10}) {
-    final rows = _db.select('SELECT * FROM session_diary ORDER BY id DESC LIMIT ?', [limit]);
+    final rows = _db.select(
+      'SELECT * FROM session_diary ORDER BY id DESC LIMIT ?',
+      [limit],
+    );
     return rows
-        .map((r) => DiaryEntry(
-              date: r['date'] as String,
-              stage: r['stage'] as String,
-              summary: r['summary'] as String,
-            ))
+        .map(
+          (r) => DiaryEntry(
+            date: r['date'] as String,
+            stage: r['stage'] as String,
+            summary: r['summary'] as String,
+          ),
+        )
         .toList();
   }
 
@@ -499,15 +607,18 @@ class LearningStore {
       id: row['id'] as String,
       localDate: row['local_date'] as String,
       plannedLength: row['planned_length'] as String,
-      currentStage: PathwayStage.values.asNameMap()[row['current_stage'] as String?],
+      currentStage: PathwayStage.values
+          .asNameMap()[row['current_stage'] as String?],
       currentItemIndex: row['current_item_index'] as int,
       stages: DailySession.stagesFromJson(row['stages_json'] as String),
       vocabEntryIds: row['vocab_entry_ids_json'] != null
-          ? (jsonDecode(row['vocab_entry_ids_json'] as String) as List).cast<String>()
+          ? (jsonDecode(row['vocab_entry_ids_json'] as String) as List)
+                .cast<String>()
           : null,
       grammarLessonId: row['grammar_lesson_id'] as String?,
       readingPassageJson: row['reading_passage_json'] != null
-          ? (jsonDecode(row['reading_passage_json'] as String) as Map).cast<String, dynamic>()
+          ? (jsonDecode(row['reading_passage_json'] as String) as Map)
+                .cast<String, dynamic>()
           : null,
       startedAt: parseDate(row['started_at']),
       completedAt: parseDate(row['completed_at']),

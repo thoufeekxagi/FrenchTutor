@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../config/theme.dart';
@@ -54,7 +55,7 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.menu_book, size: 30, color: Passeport.brass),
+                  const Icon(CupertinoIcons.book, size: 30, color: Passeport.brass),
                   const SizedBox(height: 8),
                   Text('Reading & Listening', style: Passeport.display(20, weight: FontWeight.w600)),
                   const SizedBox(height: 8),

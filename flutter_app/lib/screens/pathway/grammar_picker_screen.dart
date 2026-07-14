@@ -1,6 +1,7 @@
 import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -77,13 +78,13 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-                child: SegmentedButton<_PickerMode>(
+                child: PSSegmented<_PickerMode>(
                   segments: const [
-                    ButtonSegment(value: _PickerMode.auto, label: Text('Auto')),
-                    ButtonSegment(value: _PickerMode.manual, label: Text('Choose')),
+                    (value: _PickerMode.auto, label: 'Auto'),
+                    (value: _PickerMode.manual, label: 'Choose'),
                   ],
-                  selected: {_mode},
-                  onSelectionChanged: (s) => setState(() => _mode = s.first),
+                  selected: _mode,
+                  onChanged: (m) => setState(() => _mode = m),
                 ),
               ),
               Expanded(child: _mode == _PickerMode.auto ? _autoBody() : _manualBody()),
@@ -101,7 +102,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (_generationFailed != null) ...[
-                        const Icon(Icons.warning_amber_rounded, size: 24, color: Passeport.maroon),
+                        const Icon(CupertinoIcons.exclamationmark_triangle_fill, size: 24, color: Passeport.maroon),
                         const SizedBox(height: 8),
                         Text("Couldn't build today's practice", style: Passeport.body(14, weight: FontWeight.w500)),
                         const SizedBox(height: 6),
@@ -241,7 +242,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.auto_awesome, size: 30, color: Passeport.brass),
+                const Icon(CupertinoIcons.sparkles, size: 30, color: Passeport.brass),
                 const SizedBox(height: 10),
                 Text("Let Marie pick today's focus", style: Passeport.display(19, weight: FontWeight.w500)),
                 const SizedBox(height: 8),
@@ -349,7 +350,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
         padding: 14,
         child: Row(
           children: [
-            Icon(isDone ? Icons.check_circle : Icons.circle_outlined, color: isDone ? Passeport.brass : Passeport.slate, size: 20),
+            Icon(isDone ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle, color: isDone ? Passeport.brass : Passeport.slate, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -360,7 +361,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, size: 16, color: Passeport.slate),
+            const Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
           ],
         ),
       ),

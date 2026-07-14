@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
@@ -150,7 +151,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                   const Spacer(),
                   IconButton(
                     onPressed: _close,
-                    icon: const Icon(Icons.cancel, color: Passeport.slate, size: 20),
+                    icon: const Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.slate, size: 20),
                   ),
                 ],
               ),
@@ -177,7 +178,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.auto_awesome, size: 13, color: Passeport.brass),
+                              const Icon(CupertinoIcons.sparkles, size: 13, color: Passeport.brass),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(_answer!, style: Passeport.body(13.5).copyWith(color: Passeport.text)),
@@ -204,7 +205,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                   if (_answer != null) ...[
                     IconButton(
                       onPressed: _replay,
-                      icon: const Icon(Icons.volume_up, size: 16, color: Passeport.slateDim),
+                      icon: const Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.slateDim),
                       style: IconButton.styleFrom(
                         backgroundColor: Passeport.parchmentDim,
                         shape: const CircleBorder(),
@@ -223,7 +224,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        _isListening ? Icons.mic : Icons.mic_none,
+                        _isListening ? CupertinoIcons.mic_fill : CupertinoIcons.mic,
                         color: Colors.white,
                         size: 22,
                       ),

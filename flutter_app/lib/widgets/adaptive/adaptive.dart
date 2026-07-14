@@ -155,6 +155,105 @@ abstract final class PSHaptics {
   }
 }
 
+/// Brand segmented control — same quiet pill selector on every platform
+/// (replaces Material's SegmentedButton, whose outlined look breaks the vibe).
+class PSSegmented<T> extends StatelessWidget {
+  const PSSegmented({super.key, required this.segments, required this.selected, required this.onChanged});
+
+  final List<({T value, String label})> segments;
+  final T selected;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: DesignTokens.parchmentDim,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+      ),
+      child: Row(
+        children: segments.map((seg) {
+          final isSelected = seg.value == selected;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                PSHaptics.selection();
+                onChanged(seg.value);
+              },
+              child: AnimatedContainer(
+                duration: DesignTokens.durationFast,
+                curve: DesignTokens.curveStandard,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? DesignTokens.card : Colors.transparent,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                  border: Border.all(
+                      color: isSelected ? DesignTokens.hairline : Colors.transparent),
+                ),
+                child: Text(
+                  seg.label,
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.body(13, weight: isSelected ? FontWeight.w600 : FontWeight.w400)
+                      .copyWith(color: isSelected ? DesignTokens.ink : DesignTokens.slateDim),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+/// Date picker: iOS-style wheel in a bottom sheet on every platform — the
+/// Material calendar dialog is the single most jarring "different app" moment.
+Future<DateTime?> showPSDatePicker(
+  BuildContext context, {
+  required DateTime initial,
+  required DateTime first,
+  required DateTime last,
+}) async {
+  DateTime selected = initial;
+  final confirmed = await showModalBottomSheet<bool>(
+    context: context,
+    backgroundColor: DesignTokens.card,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusCard)),
+    ),
+    builder: (context) => SafeArea(
+      child: SizedBox(
+        height: 300,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CupertinoButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('Done',
+                      style: DesignTokens.body(15, weight: FontWeight.w600)
+                          .copyWith(color: DesignTokens.maroon)),
+                ),
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: initial,
+                minimumDate: first,
+                maximumDate: last,
+                onDateTimeChanged: (d) => selected = d,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  return confirmed == true ? selected : null;
+}
+
 /// Constrains wide layouts (web/tablet) to a readable centered column;
 /// pass-through on phones.
 class PSContentColumn extends StatelessWidget {

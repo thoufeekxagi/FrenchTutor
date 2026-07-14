@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
@@ -45,10 +46,10 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
         selectedFontSize: 12,
         unselectedFontSize: 12,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Today'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: 'Practice'),
-          BottomNavigationBarItem(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.house_fill), label: 'Today'),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.square_grid_2x2), label: 'Practice'),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.chart_bar_square), label: 'Progress'),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.gear_alt_fill), label: 'Settings'),
         ],
       ),
     );

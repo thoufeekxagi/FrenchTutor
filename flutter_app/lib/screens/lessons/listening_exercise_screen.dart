@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
@@ -67,7 +68,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         actions: [
           IconButton(
             onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(Icons.mic, color: Passeport.brass),
+            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -108,9 +109,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
           const SizedBox(height: 10),
           Row(
             children: [
-              _speedButton('Slow', Icons.slow_motion_video, 0.32),
+              _speedButton('Slow', CupertinoIcons.speedometer, 0.32),
               const SizedBox(width: 12),
-              _speedButton('Normal', Icons.play_arrow_rounded, 0.48),
+              _speedButton('Normal', CupertinoIcons.play_fill, 0.48),
             ],
           ),
           const SizedBox(height: 8),
@@ -219,9 +220,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
                     ),
                     if (_answers[qi] != null) ...[
                       if (ci == question.answerIndex)
-                        Icon(Icons.check_circle, color: Passeport.brass, size: 18)
+                        Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 18)
                       else if (ci == _answers[qi])
-                        Icon(Icons.cancel, color: Passeport.maroon, size: 18),
+                        Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.maroon, size: 18),
                     ],
                   ],
                 ),
@@ -268,7 +269,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.volume_up, size: 14, color: Passeport.brass),
+              Icon(CupertinoIcons.speaker_2_fill, size: 14, color: Passeport.brass),
               const SizedBox(width: 6),
               Text(
                 'Play sentence ${i + 1}',

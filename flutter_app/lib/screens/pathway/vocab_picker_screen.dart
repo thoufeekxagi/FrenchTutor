@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,13 +62,13 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-                child: SegmentedButton<_PickerMode>(
+                child: PSSegmented<_PickerMode>(
                   segments: const [
-                    ButtonSegment(value: _PickerMode.auto, label: Text('Auto')),
-                    ButtonSegment(value: _PickerMode.category, label: Text('By Category')),
+                    (value: _PickerMode.auto, label: 'Auto'),
+                    (value: _PickerMode.category, label: 'By Category'),
                   ],
-                  selected: {_mode},
-                  onSelectionChanged: (s) => setState(() => _mode = s.first),
+                  selected: _mode,
+                  onChanged: (m) => setState(() => _mode = m),
                 ),
               ),
               Expanded(child: _mode == _PickerMode.auto ? _autoBody() : _categoryBody()),
@@ -113,7 +114,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.auto_awesome, size: 30, color: Passeport.brass),
+                    const Icon(CupertinoIcons.sparkles, size: 30, color: Passeport.brass),
                     const SizedBox(height: 10),
                     Text('${queue.length} words today', style: Passeport.display(20, weight: FontWeight.w500)),
                     const SizedBox(height: 8),
@@ -310,11 +311,11 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                     style: Passeport.body(12.5, weight: FontWeight.w500).copyWith(color: isSelected ? Passeport.parchment : Passeport.text),
                   ),
                 ),
-                if (isKnown) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.verified, size: 10, color: Colors.green)),
+                if (isKnown) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(CupertinoIcons.checkmark_seal_fill, size: 10, color: Colors.green)),
                 Padding(
                   padding: const EdgeInsets.only(left: 4),
                   child: Icon(
-                    isSelected ? Icons.check_circle : Icons.circle_outlined,
+                    isSelected ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
                     size: 13,
                     color: isSelected ? Passeport.parchment : Passeport.slate,
                   ),

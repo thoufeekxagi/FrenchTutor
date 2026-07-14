@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:sqlite3/sqlite3.dart' hide Session;
+import 'package:sqlite3/common.dart' hide Session;
 import '../../models/session.dart';
 import '../../models/chat_message.dart';
 import '../../models/note.dart';
@@ -9,7 +9,7 @@ class StorageService {
     _migrate();
   }
 
-  final Database _db;
+  final CommonDatabase _db;
 
   void _migrate() {
     _db.execute('''
@@ -49,7 +49,15 @@ class StorageService {
     _db.execute(
       '''INSERT OR REPLACE INTO sessions (id, started_at, ended_at, summary, topic, vocabulary, stage)
          VALUES (?, ?, ?, ?, ?, ?, ?)''',
-      [session.id, session.startedAt, session.endedAt, session.summary, session.topic, vocabJson, session.stage],
+      [
+        session.id,
+        session.startedAt,
+        session.endedAt,
+        session.summary,
+        session.topic,
+        vocabJson,
+        session.stage,
+      ],
     );
   }
 
@@ -66,7 +74,11 @@ class StorageService {
     return rows.isEmpty ? null : _sessionFromRow(rows.first);
   }
 
-  void saveMessage({required String sessionId, required String role, required String content}) {
+  void saveMessage({
+    required String sessionId,
+    required String role,
+    required String content,
+  }) {
     _db.execute(
       'INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)',
       [sessionId, role, content],
@@ -79,11 +91,13 @@ class StorageService {
       [sessionId],
     );
     return rows
-        .map((r) => ChatMessage(
-              id: r['id'].toString(),
-              role: r['role'] as String,
-              content: r['content'] as String,
-            ))
+        .map(
+          (r) => ChatMessage(
+            id: r['id'].toString(),
+            role: r['role'] as String,
+            content: r['content'] as String,
+          ),
+        )
         .toList();
   }
 
@@ -111,14 +125,16 @@ class StorageService {
   List<Note> getAllNotes() {
     final rows = _db.select('SELECT * FROM notes ORDER BY updated_at DESC');
     return rows
-        .map((r) => Note(
-              id: r['id'] as int,
-              tag: r['tag'] as String?,
-              text: r['text'] as String,
-              createdAt: r['created_at'] as String,
-              updatedAt: r['updated_at'] as String,
-              timesShown: r['times_shown'] as int,
-            ))
+        .map(
+          (r) => Note(
+            id: r['id'] as int,
+            tag: r['tag'] as String?,
+            text: r['text'] as String,
+            createdAt: r['created_at'] as String,
+            updatedAt: r['updated_at'] as String,
+            timesShown: r['times_shown'] as int,
+          ),
+        )
         .toList();
   }
 
