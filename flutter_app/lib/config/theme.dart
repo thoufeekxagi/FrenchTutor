@@ -18,6 +18,7 @@ abstract final class Passeport {
   static const maroon = DesignTokens.maroon;
   static const maroonDeep = DesignTokens.maroonDeep;
   static const brass = DesignTokens.brass;
+  static const sage = DesignTokens.sage;
   static const slate = DesignTokens.slate;
   static const slateDim = DesignTokens.slateDim;
   static const text = DesignTokens.text;
