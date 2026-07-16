@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "1.0.0",
+  "frameworkVersion": "1.1.0",
   "curriculumVersion": "professional_intro_v1",
   "competencies": [
     {
@@ -113,6 +113,15 @@
       "role": "teaches",
       "modality": "controlled_writing",
       "weight": 0.8,
+      "curriculumVersion": "professional_intro_v1"
+    },
+    {
+      "id": "map_present_self_description_speaking",
+      "contentItemId": "present",
+      "competencyId": "grammar_present_self_description",
+      "role": "practises",
+      "modality": "controlled_speaking",
+      "weight": 0.7,
       "curriculumVersion": "professional_intro_v1"
     },
     {

@@ -4,6 +4,7 @@ import 'package:french_tutor/data/database/competency_store.dart';
 import 'package:french_tutor/orchestration/dev/developer_path_preview.dart';
 import 'package:french_tutor/orchestration/models/competency.dart';
 import 'package:french_tutor/orchestration/models/content_descriptor.dart';
+import 'package:french_tutor/orchestration/planning/orchestrator.dart';
 import 'package:french_tutor/orchestration/runtime/orchestration_bootstrapper.dart';
 import 'package:french_tutor/orchestration/validation/competency_graph_validator.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -18,7 +19,7 @@ void main() {
       final framework = ContentService.shared.competencyFramework();
 
       expect(framework, isNotNull);
-      expect(framework!.frameworkVersion, '1.0.0');
+      expect(framework!.frameworkVersion, '1.1.0');
       expect(framework.curriculumVersion, 'professional_intro_v1');
       expect(framework.competencies, isNotEmpty);
       expect(framework.mappings, isNotEmpty);
@@ -34,7 +35,7 @@ void main() {
       expect(issues, isEmpty, reason: issues.join('\n'));
     });
 
-    test('persists and restores the framework through migration v3', () {
+    test('persists and restores the framework through current migrations', () {
       final db = sqlite3.openInMemory();
       addTearDown(db.dispose);
       final store = CompetencyStore(db);
@@ -58,7 +59,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3],
+        [1, 2, 3, 4],
       );
     });
 
@@ -80,20 +81,30 @@ void main() {
       expect(first.persisted, isTrue);
       expect(second.persisted, isFalse);
       expect(second.competencyCount, 6);
-      expect(second.mappingCount, 11);
+      expect(second.mappingCount, 12);
     });
 
     test(
       'developer personas produce constrained non-mutating path previews',
       () {
         final framework = ContentService.shared.competencyFramework()!;
+        final states = [
+          for (final competency in framework.competencies)
+            PlannerCompetencyState(
+              competencyId: competency.id,
+              belief: 0.9,
+              uncertainty: 0.1,
+            ),
+        ];
         final commuter = const DeveloperPathPreviewBuilder().build(
           framework: framework,
           persona: developerPersonaScenarios.first,
+          competencyStates: states,
         );
         final intensive = const DeveloperPathPreviewBuilder().build(
           framework: framework,
           persona: developerPersonaScenarios[2],
+          competencyStates: states,
         );
 
         expect(

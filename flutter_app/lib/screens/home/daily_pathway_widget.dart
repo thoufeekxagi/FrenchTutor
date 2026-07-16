@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../flow/pathway_coordinator.dart';
 import '../../models/daily_session.dart';
+import '../../orchestration/evidence/task_result_adapters.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
@@ -55,7 +56,14 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
   @override
   void initState() {
     super.initState();
-    _coordinator = PathwayCoordinator(store: ref.read(learningStoreProvider));
+    final framework = ref.read(competencyStoreProvider).framework();
+    _coordinator = PathwayCoordinator(
+      store: ref.read(learningStoreProvider),
+      evidenceStore: framework == null ? null : ref.read(evidenceStoreProvider),
+      taskResultAdapters: framework == null
+          ? null
+          : TaskResultAdapters(framework: framework),
+    );
   }
 
   Future<void> _openCurrent() async {

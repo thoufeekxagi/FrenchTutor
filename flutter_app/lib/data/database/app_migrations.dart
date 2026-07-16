@@ -56,6 +56,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   1: _migrationV1,
   2: _migrationV2,
   3: _migrationV3,
+  4: _migrationV4,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -297,6 +298,86 @@ void _migrationV3(CommonDatabase db) {
     ''',
     'CREATE INDEX IF NOT EXISTS idx_content_competencies_content ON content_competencies (content_item_id)',
     'CREATE INDEX IF NOT EXISTS idx_content_competencies_competency ON content_competencies (competency_id)',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
+  }
+}
+
+void _migrationV4(CommonDatabase db) {
+  const statements = [
+    '''
+    CREATE TABLE IF NOT EXISTS evidence_events (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      plan_id TEXT,
+      plan_task_id TEXT,
+      session_id TEXT,
+      content_item_id TEXT NOT NULL,
+      competency_id TEXT NOT NULL,
+      modality TEXT NOT NULL,
+      support_level TEXT NOT NULL,
+      correctness REAL CHECK (correctness IS NULL OR correctness BETWEEN 0 AND 1),
+      score REAL CHECK (score IS NULL OR score BETWEEN 0 AND 1),
+      response_time_ms INTEGER CHECK (response_time_ms IS NULL OR response_time_ms >= 0),
+      attempt_number INTEGER NOT NULL DEFAULT 1 CHECK (attempt_number >= 1),
+      evaluator TEXT NOT NULL,
+      evaluator_confidence REAL NOT NULL CHECK (evaluator_confidence BETWEEN 0 AND 1),
+      response_json TEXT,
+      error_codes_json TEXT NOT NULL DEFAULT '[]',
+      occurred_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_evidence_user_competency_modality_at ON evidence_events (user_id, competency_id, modality, occurred_at)',
+    'CREATE INDEX IF NOT EXISTS idx_evidence_plan_task ON evidence_events (plan_id, plan_task_id)',
+    'CREATE INDEX IF NOT EXISTS idx_evidence_session ON evidence_events (session_id)',
+    'CREATE INDEX IF NOT EXISTS idx_evidence_occurred_at ON evidence_events (occurred_at)',
+    '''
+    CREATE TABLE IF NOT EXISTS error_events (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      competency_id TEXT NOT NULL,
+      source_evidence_id TEXT NOT NULL,
+      error_code TEXT NOT NULL,
+      observed_form TEXT,
+      expected_form TEXT,
+      explanation TEXT,
+      severity REAL NOT NULL CHECK (severity BETWEEN 0 AND 1),
+      evaluator TEXT NOT NULL,
+      evaluator_confidence REAL NOT NULL CHECK (evaluator_confidence BETWEEN 0 AND 1),
+      resolved_by_evidence_id TEXT,
+      occurred_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_errors_source_evidence ON error_events (source_evidence_id)',
+    'CREATE INDEX IF NOT EXISTS idx_errors_user_competency_at ON error_events (user_id, competency_id, occurred_at)',
+    'CREATE INDEX IF NOT EXISTS idx_errors_resolution ON error_events (resolved_by_evidence_id)',
+    '''
+    CREATE TRIGGER IF NOT EXISTS evidence_events_no_update
+    BEFORE UPDATE ON evidence_events BEGIN
+      SELECT RAISE(ABORT, 'evidence_events is append-only');
+    END
+    ''',
+    '''
+    CREATE TRIGGER IF NOT EXISTS evidence_events_no_delete
+    BEFORE DELETE ON evidence_events BEGIN
+      SELECT RAISE(ABORT, 'evidence_events is append-only');
+    END
+    ''',
+    '''
+    CREATE TRIGGER IF NOT EXISTS error_events_no_update
+    BEFORE UPDATE ON error_events BEGIN
+      SELECT RAISE(ABORT, 'error_events is append-only');
+    END
+    ''',
+    '''
+    CREATE TRIGGER IF NOT EXISTS error_events_no_delete
+    BEFORE DELETE ON error_events BEGIN
+      SELECT RAISE(ABORT, 'error_events is append-only');
+    END
+    ''',
   ];
   for (final sql in statements) {
     db.execute(sql);

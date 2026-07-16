@@ -1,5 +1,6 @@
 import '../models/competency.dart';
 import '../models/content_descriptor.dart';
+import '../planning/orchestrator.dart';
 
 class DeveloperPersonaScenario {
   const DeveloperPersonaScenario({
@@ -100,6 +101,8 @@ class DeveloperPreviewTask {
     required this.modality,
     required this.role,
     required this.estimatedMinutes,
+    required this.priority,
+    required this.score,
     required this.reason,
   });
 
@@ -109,6 +112,8 @@ class DeveloperPreviewTask {
   final PerformanceModality modality;
   final ContentMappingRole role;
   final int estimatedMinutes;
+  final PlanPriority priority;
+  final double score;
   final String reason;
 }
 
@@ -132,50 +137,41 @@ class DeveloperPathPreviewBuilder {
   DeveloperPathPreview build({
     required CompetencyFramework framework,
     required DeveloperPersonaScenario persona,
+    List<PlannerCompetencyState> competencyStates = const [],
   }) {
-    final competencies = _topologicalCompetencies(framework);
-    final mappingsByCompetency = <String, List<ContentCompetencyMapping>>{};
-    for (final mapping in framework.mappings) {
-      mappingsByCompetency
-          .putIfAbsent(mapping.competencyId, () => [])
-          .add(mapping);
-    }
-
-    final tasks = <DeveloperPreviewTask>[];
-    var usedMinutes = 0;
-    for (final competency in competencies) {
-      final mappings = mappingsByCompetency[competency.id] ?? const [];
-      final eligible = mappings.where((mapping) {
-        final speaking = _isSpeaking(mapping.modality);
-        if (speaking && !persona.canSpeakAloud) return false;
-        if (speaking && !persona.networkAvailable) return false;
-        return true;
-      }).toList()..sort((a, b) => b.weight.compareTo(a.weight));
-      if (eligible.isEmpty) continue;
-      final mapping = eligible.first;
-      final minutes = _minutesFor(mapping.modality);
-      if (usedMinutes + minutes > persona.availableMinutes &&
-          tasks.isNotEmpty) {
-        continue;
-      }
-      tasks.add(
+    final competencies = {
+      for (final competency in framework.competencies)
+        competency.id: competency,
+    };
+    final plan = const Orchestrator().plan(
+      framework: framework,
+      context: PlanningContext(
+        availableMinutes: persona.availableMinutes,
+        canSpeakAloud: persona.canSpeakAloud,
+        networkAvailable: persona.networkAvailable,
+        goal: 'canada',
+        competencyStates: competencyStates,
+      ),
+    );
+    final tasks = [
+      for (final task in plan.tasks)
         DeveloperPreviewTask(
-          contentItemId: mapping.contentItemId,
-          competencyId: competency.id,
-          competencyTitle: competency.title,
-          modality: mapping.modality,
-          role: mapping.role,
-          estimatedMinutes: minutes,
-          reason: competency.prerequisiteIds.isEmpty
-              ? 'Foundation for ${competency.title.toLowerCase()}'
-              : 'Builds on ${competency.prerequisiteIds.join(', ')}',
+          contentItemId: task.contentItemId,
+          competencyId: task.competencyId,
+          competencyTitle:
+              competencies[task.competencyId]?.title ?? task.competencyId,
+          modality: task.modality,
+          role: task.role,
+          estimatedMinutes: task.estimatedMinutes,
+          priority: task.priority,
+          score: task.score,
+          reason: _reason(task),
         ),
-      );
-      usedMinutes += minutes;
-    }
-
+    ];
     final notes = <String>[
       'Preview only: no learner evidence, mastery, or production plan is changed.',
+      if (competencyStates.isEmpty)
+        'No graded evidence exists yet; the planner is using cold-start beliefs.',
       if (persona.level == 'A0' || persona.level == 'A1')
         'The current graph begins at A2; this persona needs an A0/A1 diagnostic bridge.',
       if (persona.level == 'B2')
@@ -188,46 +184,22 @@ class DeveloperPathPreviewBuilder {
     return DeveloperPathPreview(
       persona: persona,
       tasks: tasks,
-      totalMinutes: usedMinutes,
+      totalMinutes: plan.totalMinutes,
       notes: notes,
     );
   }
 
-  List<Competency> _topologicalCompetencies(CompetencyFramework framework) {
-    final byId = {
-      for (final competency in framework.competencies)
-        competency.id: competency,
-    };
-    final visited = <String>{};
-    final ordered = <Competency>[];
-
-    void visit(Competency competency) {
-      if (!visited.add(competency.id)) return;
-      for (final prerequisiteId in competency.prerequisiteIds) {
-        final prerequisite = byId[prerequisiteId];
-        if (prerequisite != null) visit(prerequisite);
-      }
-      ordered.add(competency);
-    }
-
-    for (final competency in framework.competencies) {
-      visit(competency);
-    }
-    return ordered;
+  String _reason(PlanTask task) {
+    final strongest =
+        task.reasonTrace.where((trace) => trace.contribution > 0).toList()
+          ..sort((a, b) => b.contribution.compareTo(a.contribution));
+    if (strongest.isEmpty) return 'Selected by constrained utility policy.';
+    return strongest
+        .take(3)
+        .map(
+          (trace) =>
+              '${trace.reason.name} ${trace.contribution.toStringAsFixed(2)}',
+        )
+        .join(' · ');
   }
-
-  bool _isSpeaking(PerformanceModality modality) =>
-      modality == PerformanceModality.controlledSpeaking ||
-      modality == PerformanceModality.spontaneousSpeaking ||
-      modality == PerformanceModality.pronunciationProduction;
-
-  int _minutesFor(PerformanceModality modality) => switch (modality) {
-    PerformanceModality.listeningRecognition => 10,
-    PerformanceModality.readingRecognition => 7,
-    PerformanceModality.controlledWriting => 12,
-    PerformanceModality.spontaneousWriting => 18,
-    PerformanceModality.controlledSpeaking => 12,
-    PerformanceModality.spontaneousSpeaking => 18,
-    PerformanceModality.pronunciationProduction => 8,
-  };
 }

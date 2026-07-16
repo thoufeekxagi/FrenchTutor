@@ -1524,14 +1524,14 @@ This section is the resume point for future agents. Update it after every implem
 
 ### Current phase
 
-`O2: Evidence ledger`
+`O3/O4: Learner-state persistence and governed plan snapshots`
 
 ### Phase status
 
 - [x] O1 Competency foundation
-- [ ] O2 Evidence ledger
-- [ ] O3 Probabilistic twin updater v1
-- [ ] O4 Governed adaptive orchestrator v1
+- [x] O2 Evidence ledger
+- [ ] O3 Probabilistic twin updater v1 — online/rebuild baseline complete; persistence, review scheduling, transfer, and calibration remain
+- [ ] O4 Governed adaptive orchestrator v1 — constrained live-state baseline complete; proposal validation and immutable plan persistence remain
 - [ ] O4.5 Adaptive policy shadow evaluation
 - [ ] O5 Plan executor and home integration
 - [ ] O6 Connected vertical loop
@@ -1569,29 +1569,29 @@ Resolve only when the corresponding phase requires them:
 
 ### Last completed work
 
-Phase O1 established the competency foundation:
+Phase O2 and the O3/O4 runtime baselines now provide:
 
-- typed competency-kind, performance-modality, evidence-support, and content-mapping models;
-- versioned `professional_intro_v1` competency graph spanning lexical, grammar, phonology, function, strategy, and discourse nodes;
-- mappings to existing vocabulary, grammar, listening, derived reading, writing, pronunciation-practice, and speaking content;
-- strict validation for identifiers, references, cycles, versions, content existence, mapping coverage, and weights;
-- ContentService loading and known-content indexing;
-- forward-only migration v3 with competency-framework, competency, and content-mapping tables;
-- typed transactional CompetencyStore persistence;
-- startup bootstrap that validates and synchronizes the graph before the app renders;
-- debug-only Orchestration Lab with six persona scenarios, time/voice/network constraints, and non-mutating path previews;
-- validator, parser, migration, runtime-idempotency, persona-constraint, and round-trip tests;
-- successful signed iOS build, direct wireless installation, and launch on the `kodekarbon` device.
+- immutable typed evidence, error, evaluator-provenance, and task-result contracts;
+- forward-only migration v4 with append-only evidence/error tables, indexes, and update/delete guards;
+- transactional evidence persistence with duplicate rejection and atomic rollback;
+- a versioned evaluator-confidence cap policy;
+- vocabulary, grammar, listening, writing, and speaking result adapters that preserve attempts and withhold untrusted mastery claims;
+- pathway-coordinator evidence emission without changing existing task completion thresholds;
+- contextual competency-by-modality BKT beliefs, explicit confidence, forgetting, and deterministic rebuilds;
+- evidence-to-observation validation against the authoritative competency mappings;
+- a deterministic constrained utility planner with time, voice, network, prerequisite, weakness, uncertainty, review, error, transfer, and goal signals;
+- a debug Orchestration Lab driven by the real evidence ledger, rebuilt learner beliefs, and planner decision traces;
+- focused contract, repository, adapter, learner-model, planner, graph, and lab tests.
 
 ### Exact next action
 
-Implement Phase O2 beginning with:
+Harden and persist the O3/O4 runtime:
 
-1. define typed evidence-event, error-event, evaluator, provenance, and task-result models;
-2. add append-only evidence and error migrations plus repository methods;
-3. define the evidence contract adapters without changing existing task completion semantics;
-4. connect one deterministic vocabulary result and one grammar result to evidence emission behind tests;
-5. preserve raw task evidence and prohibit screens or LLM services from updating learner state directly.
+1. add derived competency-state and immutable learning-plan snapshot migrations/repositories;
+2. persist rebuild provenance, review urgency, and model/policy versions;
+3. add bounded transfer detection and error-resolution projection;
+4. add the SRS policy boundary and offline fallback-plan contract;
+5. validate bounded LLM plan proposals against approved candidate IDs without allowing direct state writes.
 
 ## 22. Definition of v1 success
 

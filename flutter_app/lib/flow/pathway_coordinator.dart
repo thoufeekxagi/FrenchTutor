@@ -2,10 +2,14 @@ import 'package:flutter/widgets.dart';
 
 import '../config/api_keys.dart';
 import '../data/content_service.dart';
+import '../data/database/evidence_store.dart';
 import '../data/database/learning_store.dart';
 import '../design/app_router.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
+import '../orchestration/evidence/task_result_adapters.dart';
+import '../orchestration/models/competency.dart';
+import '../orchestration/models/task_result.dart';
 import '../screens/pathway/agent_led_listening_screen.dart';
 import '../screens/pathway/agent_led_vocab_screen.dart';
 import '../screens/pathway/agent_led_grammar_screen.dart';
@@ -26,9 +30,15 @@ import 'stage_outcome.dart';
 /// - Completion is decided HERE from objective evidence, never by a screen
 ///   being disposed.
 class PathwayCoordinator {
-  PathwayCoordinator({required this.store});
+  PathwayCoordinator({
+    required this.store,
+    this.evidenceStore,
+    this.taskResultAdapters,
+  });
 
   final LearningStore store;
+  final EvidenceStore? evidenceStore;
+  final TaskResultAdapters? taskResultAdapters;
 
   DailySession get session => _session ??= store.dailySession();
   DailySession? _session;
@@ -88,15 +98,36 @@ class PathwayCoordinator {
       (_) => const VocabPickerScreen(),
       fullscreenDialog: true,
     );
-    _applyOutcome(PathwayStage.vocab, outcome, toJson: (r) {
-      // Persist the covered word ids: writing targets and the speaking
-      // roleplay rebuild VocabEntry objects from these.
-      return {
-        'wordIds': r.wordsCovered.map((e) => e.id).toList(),
-        'reviewedCount': r.reviewedCount,
-      };
-    });
+    _applyOutcome(
+      PathwayStage.vocab,
+      outcome,
+      toJson: (r) {
+        // Persist the covered word ids: writing targets and the speaking
+        // roleplay rebuild VocabEntry objects from these.
+        return {
+          'wordIds': r.wordsCovered.map((e) => e.id).toList(),
+          'reviewedCount': r.reviewedCount,
+        };
+      },
+    );
     final result = outcome?.result;
+    final adapters = taskResultAdapters;
+    if (result != null && adapters != null) {
+      final supportedIds = result.wordsCovered
+          .map((word) => word.id)
+          .where(
+            (id) =>
+                adapters.supports(id, PerformanceModality.readingRecognition),
+          )
+          .toList(growable: false);
+      _recordTaskResult(
+        PathwayStage.vocab,
+        adapters.vocabulary(
+          context: _evidenceContext(outcome!),
+          reviewedContentItemIds: supportedIds,
+        ),
+      );
+    }
     if (result != null && result.reviewedCount > 0) {
       store.markHabit('anki', minutes: 5);
     }
@@ -108,13 +139,32 @@ class PathwayCoordinator {
       (_) => GrammarPickerScreen(vocabSummary: _vocabResult()),
       fullscreenDialog: true,
     );
-    _applyOutcome(PathwayStage.grammar, outcome, toJson: (r) {
-      return {
-        'topicTitle': r.topicTitle,
-        'drillsCorrect': r.drillResults.where((d) => d).length,
-        'drillsTotal': r.drillResults.length,
-      };
-    });
+    _applyOutcome(
+      PathwayStage.grammar,
+      outcome,
+      toJson: (r) {
+        return {
+          'topicTitle': r.topicTitle,
+          'drillsCorrect': r.drillResults.where((d) => d).length,
+          'drillsTotal': r.drillResults.length,
+        };
+      },
+    );
+    final result = outcome?.result;
+    final adapters = taskResultAdapters;
+    final contentItemId = result == null || adapters == null
+        ? null
+        : _grammarContentItemId(result.topicTitle, adapters);
+    if (result != null && contentItemId != null && adapters != null) {
+      _recordTaskResult(
+        PathwayStage.grammar,
+        adapters.grammar(
+          context: _evidenceContext(outcome!),
+          contentItemId: contentItemId,
+          drillResults: result.drillResults,
+        ),
+      );
+    }
     if (outcome?.isCompleted == true) {
       store.markHabit('reading', minutes: 8);
     }
@@ -145,7 +195,9 @@ class PathwayCoordinator {
         // Nothing to read today (no vocab covered, no lab exercise): a real
         // empty state, recorded as skipped rather than invented content.
         session.stages[PathwayStage.listening]!.status = StageStatus.skipped;
-        session.stages[PathwayStage.listening]!.resultJson = {'reason': 'no_content'};
+        session.stages[PathwayStage.listening]!.resultJson = {
+          'reason': 'no_content',
+        };
         _maybeFinishDay();
         _save();
         return;
@@ -157,12 +209,36 @@ class PathwayCoordinator {
     if (!context.mounted) return;
     final outcome = await AppRouter.push<StageOutcome<ListeningStageResult>>(
       context,
-      (_) => AgentLedListeningScreen(passage: passage!, vocabSummary: _vocabResult()),
+      (_) => AgentLedListeningScreen(
+        passage: passage!,
+        vocabSummary: _vocabResult(),
+      ),
       fullscreenDialog: true,
     );
-    _applyOutcome(PathwayStage.listening, outcome, toJson: (r) {
-      return {'attempted': r.listeningAttempted, 'correct': r.listeningCorrect};
-    });
+    _applyOutcome(
+      PathwayStage.listening,
+      outcome,
+      toJson: (r) {
+        return {
+          'attempted': r.listeningAttempted,
+          'correct': r.listeningCorrect,
+        };
+      },
+    );
+    final result = outcome?.result;
+    final adapters = taskResultAdapters;
+    if (result != null && adapters != null) {
+      _recordTaskResult(
+        PathwayStage.listening,
+        adapters.listening(
+          context: _evidenceContext(outcome!),
+          contentItemId: passage.id,
+          correct: result.listeningCorrect,
+          attempted: result.listeningAttempted,
+          objectivelyGraded: false,
+        ),
+      );
+    }
     if (outcome?.result != null && outcome!.result!.listeningAttempted > 0) {
       store.markHabit('listening', minutes: 8);
     }
@@ -174,9 +250,25 @@ class PathwayCoordinator {
       (_) => PathwayWritingScreen(targetWords: _writingTargets()),
       fullscreenDialog: true,
     );
-    _applyOutcome(PathwayStage.writing, outcome, toJson: (r) {
-      return {if (r.score != null) 'score': r.score};
-    });
+    _applyOutcome(
+      PathwayStage.writing,
+      outcome,
+      toJson: (r) {
+        return {if (r.score != null) 'score': r.score};
+      },
+    );
+    final result = outcome?.result;
+    final adapters = taskResultAdapters;
+    if (result != null && adapters != null) {
+      _recordTaskResult(
+        PathwayStage.writing,
+        adapters.writing(
+          context: _evidenceContext(outcome!),
+          contentItemId: 'w01',
+          scoreOutOf10: result.score,
+        ),
+      );
+    }
     if (outcome?.isCompleted == true) {
       store.markHabit('writing', minutes: 5);
     }
@@ -207,8 +299,28 @@ class PathwayCoordinator {
     } else {
       _applyOutcome(
         PathwayStage.speaking,
-        StageOutcome<Map<String, dynamic>>.paused(reason: result?.endedReason ?? 'cancelled'),
+        StageOutcome<Map<String, dynamic>>.paused(
+          reason: result?.endedReason ?? 'cancelled',
+        ),
         toJson: (r) => r,
+      );
+    }
+    final adapters = taskResultAdapters;
+    if (result != null && adapters != null) {
+      _recordTaskResult(
+        PathwayStage.speaking,
+        adapters.speaking(
+          context: TaskEvidenceContext(
+            sessionId: session.id,
+            status: result.meetsThreshold
+                ? TaskResultStatus.completed
+                : TaskResultStatus.abandoned,
+            occurredAt: DateTime.now(),
+          ),
+          contentItemId: 'describe_work',
+          learnerUtteranceCount: result.learnerUtteranceCount,
+          durationSeconds: result.durationSeconds,
+        ),
       );
     }
   }
@@ -242,6 +354,55 @@ class PathwayCoordinator {
     _save();
   }
 
+  TaskEvidenceContext _evidenceContext<T>(StageOutcome<T> outcome) =>
+      TaskEvidenceContext(
+        sessionId: session.id,
+        status: switch (outcome.status) {
+          StageStatus.completed => TaskResultStatus.completed,
+          StageStatus.skipped => TaskResultStatus.skipped,
+          StageStatus.pending ||
+          StageStatus.active ||
+          StageStatus.paused => TaskResultStatus.abandoned,
+        },
+        occurredAt: DateTime.now(),
+      );
+
+  void _recordTaskResult(PathwayStage stage, TaskResult result) {
+    final evidence = evidenceStore;
+    if (evidence == null) return;
+    evidence.insertTaskResult(result);
+    final record = session.stages[stage]!;
+    record.resultJson = {
+      ...?record.resultJson,
+      'evidenceEventIds': result.competencyEvidence
+          .map((event) => event.id)
+          .toList(growable: false),
+      'evidenceWithheld': ?result.technicalMetadata['evidenceWithheld'],
+    };
+    _save();
+  }
+
+  String? _grammarContentItemId(String title, TaskResultAdapters adapters) {
+    final pack = ContentService.shared.grammar();
+    if (pack == null) return null;
+    for (final lesson in pack.lessons) {
+      if (lesson.title == title &&
+          adapters.supports(
+            lesson.id,
+            PerformanceModality.controlledSpeaking,
+          )) {
+        return lesson.id;
+      }
+    }
+    for (final topic in pack.topics) {
+      if (topic.title == title &&
+          adapters.supports(topic.id, PerformanceModality.controlledSpeaking)) {
+        return topic.id;
+      }
+    }
+    return null;
+  }
+
   void _maybeFinishDay() {
     if (session.isComplete && session.completedAt == null) {
       session.completedAt = DateTime.now();
@@ -251,8 +412,13 @@ class PathwayCoordinator {
   VocabStageResult? _vocabResult() {
     final json = session.stages[PathwayStage.vocab]!.resultJson;
     if (json == null) return null;
-    final words = _entriesByIds((json['wordIds'] as List?)?.cast<String>() ?? const []);
-    return VocabStageResult(wordsCovered: words, reviewedCount: (json['reviewedCount'] as int?) ?? 0);
+    final words = _entriesByIds(
+      (json['wordIds'] as List?)?.cast<String>() ?? const [],
+    );
+    return VocabStageResult(
+      wordsCovered: words,
+      reviewedCount: (json['reviewedCount'] as int?) ?? 0,
+    );
   }
 
   ReadingPassage? _persistedPassage() {
@@ -270,7 +436,9 @@ class PathwayCoordinator {
     final sorted = [...(pack?.exercises ?? <ListeningExercise>[])]
       ..sort((a, b) => a.phase.compareTo(b.phase));
     for (final e in sorted) {
-      if (store.lessonStatus('listening_${e.id}').status != 'completed') return e;
+      if (store.lessonStatus('listening_${e.id}').status != 'completed') {
+        return e;
+      }
     }
     return sorted.isNotEmpty ? sorted.first : null;
   }
@@ -299,7 +467,9 @@ class PathwayCoordinator {
     ];
     final vocab = _vocabResult();
     if (vocab != null && vocab.wordsCovered.isNotEmpty) {
-      parts.add('Vocabulary covered today: ${vocab.wordsCovered.map((e) => e.fr).join(", ")}');
+      parts.add(
+        'Vocabulary covered today: ${vocab.wordsCovered.map((e) => e.fr).join(", ")}',
+      );
     }
     final grammar = session.stages[PathwayStage.grammar]!.resultJson;
     if (grammar?['topicTitle'] != null) {
@@ -308,11 +478,15 @@ class PathwayCoordinator {
     final listening = session.stages[PathwayStage.listening]!.resultJson;
     final attempted = (listening?['attempted'] as int?) ?? 0;
     if (attempted > 0) {
-      parts.add("Reading & listening: went through $attempted part(s) of today's passage.");
+      parts.add(
+        "Reading & listening: went through $attempted part(s) of today's passage.",
+      );
     }
     final writing = session.stages[PathwayStage.writing]!.resultJson;
     if (writing?['score'] != null) {
-      parts.add('Writing score today: ${(writing!['score'] as num).toStringAsFixed(1)}/10.');
+      parts.add(
+        'Writing score today: ${(writing!['score'] as num).toStringAsFixed(1)}/10.',
+      );
     }
     return parts.join('\n\n');
   }
