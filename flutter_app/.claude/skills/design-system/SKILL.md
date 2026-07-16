@@ -8,28 +8,43 @@ description: Color, typography, spacing, motion, and icon tokens for this app's 
 Full rationale lives in [`design.md`](../../../design.md) at the project root — read it if you
 need the "why," not just the "what." This skill is the token reference for day-to-day styling.
 
-## Color
+## Color — plug-and-play palettes
 
-Defined in `lib/config/theme.dart` as `Passeport`. Use these, never inline hex values:
+Colors are a swappable layer. Palettes live in `lib/design/palettes.dart` as classes with
+identical static-const slots; `lib/design/tokens.dart` picks the active one with ONE line:
 
-| Token | Hex | Use |
+```dart
+typedef _Palette = ProSystemAzure;   // ← swap this line, rebuild, whole app re-skins
+```
+
+**To adopt a new palette from a marketing mockup** (`marketing/color-palette/*.jpg`): copy an
+existing class in `palettes.dart`, rename it, fill the hex values from the mockup, flip the
+typedef. Never edit token values directly; never hardcode `Color(0x...)` in widgets.
+
+**Active palette: Pro System Azure** (`marketing/color-palette/pro_system_azure.jpg`).
+Screens reference tokens via `Passeport.*` (alias) or `DesignTokens.*`. Semantic names are
+canonical; Passeport-era names still resolve (parchment→canvas, card→surface, maroon→primary,
+brass→mastery, sage→success, sky→info, slate→muted):
+
+| Token (semantic) | Azure hex | Use |
 |---|---|---|
-| `Passeport.ink` | `#1B2A4A` | primary text, headings |
-| `Passeport.inkSoft` | `#25375C` | secondary dark text on light |
-| `Passeport.parchment` | `#FAF9F6` | app background |
-| `Passeport.parchmentDim` | `#EDF1F7` | subtle section backgrounds |
-| `Passeport.card` | `#FFFFFF` | card/sheet surfaces |
-| `Passeport.maroon` | `#C8433E` | primary action / accent |
-| `Passeport.maroonDeep` | `#A83229` | pressed/darker accent state |
-| `Passeport.brass` | `#6B8FC4` | secondary accent (icons, links) |
-| `Passeport.slate` / `slateDim` | `#95A0B2` / `#606C80` | tertiary text, disabled, captions |
-| `Passeport.hairline` | ink @ 12% alpha | borders on light surfaces |
-| `Passeport.hairlineLight` | parchment @ 16% alpha | borders on dark/inverted surfaces |
+| `ink` / `inkSoft` | `#1C1E21` / `#33383F` | primary text, headings / secondary dark text |
+| `canvas` / `canvasDim` | `#F8F9FA` / `#EEF0F2` | app background / subtle section background |
+| `surface` | `#FFFFFF` | card/sheet surfaces |
+| `primary` (+`Deep`,+`Soft`) | `#007BFF` | THE action color: buttons, links, active states |
+| `secondary` | `#17A2B8` | secondary CTAs, accents |
+| `success` (+`Soft`) | `#28A745` | valid, complete, speaking-ready |
+| `info` (+`Soft`) | `#17A2B8` | guidance, information |
+| `mastery` (+`Soft`) | `#FFC107` | demonstrated mastery only |
+| `warning` (+`Soft`) | `#FFC107` | cautions, alerts |
+| `danger` (+`Soft`) | `#DC3545` | errors, invalid, destructive |
+| `muted` / `mutedDim` | `#A0A0A0` / `#707070` | tertiary text, disabled, captions |
+| `hairline` | ink @ 9% alpha | borders on light surfaces |
+| `hairlineLight` | canvas @ 16% alpha | borders on dark/inverted surfaces |
 
-Do not introduce saturated primary colors (bright red/green/yellow) or candy-bright palettes —
-that reads as consumer-habit-app design, which this product deliberately avoids. Stay within the
-existing pastel/restrained range when adding new colors; extend the `Passeport` class rather than
-hardcoding new `Color(0x...)` literals in widgets.
+One primary per screen: azure marks the single dominant action; everything else stays neutral
+or uses its semantic state color. Don't recolor tiles decoratively — color = action or
+learning state. When adding a new slot, add it to EVERY palette class in `palettes.dart`.
 
 ## Typography
 

@@ -1,11 +1,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'palettes.dart';
+
+/// THE palette switch. Point this at any class in palettes.dart and the whole
+/// app re-skins — screens only ever see the semantic tokens below, never a
+/// palette directly, so swapping is one line + rebuild. See palettes.dart for
+/// the slot contract and how to add a palette from a marketing mockup.
+typedef _Palette = ProSystemAzure;
+
 /// Layer 1 of the design wiring (PILOT_PLAN.md Phase 0.2): pure constants.
-/// The Passeport identity — colors, type, spacing, radius, motion — with NO
-/// platform or widget knowledge. Layer 2 (AppTheme) maps these to Material/
-/// Cupertino themes; Layer 3 (widgets/adaptive) renders per platform.
-/// A visual redesign should only ever touch this file + the design skills.
+/// Semantic tokens — colors, type, spacing, radius, motion — with NO platform
+/// or widget knowledge. Colors come from the active palette (typedef above);
+/// Layer 2 (AppTheme) maps these to Material/Cupertino themes; Layer 3
+/// (widgets/adaptive) renders per platform. A palette swap should only ever
+/// touch the typedef; a structural redesign only this file + design skills.
 ///
 /// Typography rules (from ux-design/passeport style mockups):
 ///  - Serif (Playfair) is a DISPLAY voice only — the "Bonjour !" greeting,
@@ -16,32 +25,46 @@ import 'package:google_fonts/google_fonts.dart';
 ///    identically on iOS/Android/web (one vibe, no Roboto bleed-through).
 ///  - No monospace anywhere; labels/badges are letterspaced Inter.
 abstract final class DesignTokens {
-  // --- Palette — warm paper + navy ink + bordeaux + real gold (see mockups) ---
-  static const ink = Color(0xFF182338);
-  static const inkSoft = Color(0xFF293751);
-  static const parchment = Color(0xFFF7F7F4);
-  static const parchmentDim = Color(0xFFEEF1F5);
-  static const card = Color(0xFFFFFFFF);
-  static const maroon = Color(0xFFD1495B);
-  static const maroonDeep = Color(0xFFB53648);
-  static const brass = Color(0xFFD5A13D);
-  static const sage = Color(0xFF3D9E83);
-  static const sky = Color(0xFF5A7FC3);
-  static const slate = Color(0xFF9AA5B5);
-  static const slateDim = Color(0xFF667085);
+  // --- Colors — every value comes from the active palette (typedef above).
+  // Semantic names are canonical; the legacy names (parchment/card/maroon/
+  // brass/sage/sky/slate) are aliases kept while older call sites migrate.
+  static const ink = _Palette.ink;
+  static const inkSoft = _Palette.inkSoft;
+  static const canvas = _Palette.canvas;
+  static const canvasDim = _Palette.canvasDim;
+  static const surface = _Palette.surface;
+  static const primary = _Palette.primary;
+  static const primaryDeep = _Palette.primaryDeep;
+  static const primarySoft = _Palette.primarySoft;
+  static const secondary = _Palette.secondary;
+  static const success = _Palette.success;
+  static const successSoft = _Palette.successSoft;
+  static const info = _Palette.info;
+  static const infoSoft = _Palette.infoSoft;
+  static const mastery = _Palette.mastery;
+  static const masterySoft = _Palette.masterySoft;
+  static const warning = _Palette.warning;
+  static const warningSoft = _Palette.warningSoft;
+  static const danger = _Palette.danger;
+  static const dangerSoft = _Palette.dangerSoft;
+  static const muted = _Palette.muted;
+  static const mutedDim = _Palette.mutedDim;
   static const text = ink;
-  static const canvas = parchment;
-  static const surface = card;
-  static const primary = maroon;
-  static const success = sage;
-  static const info = sky;
-  static const mastery = brass;
-  static const primarySoft = Color(0xFFFBEAEC);
-  static const successSoft = Color(0xFFE5F4EF);
-  static const infoSoft = Color(0xFFEAF0FA);
-  static const masterySoft = Color(0xFFFAF2DF);
+
+  // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
+  static const parchment = canvas;
+  static const parchmentDim = canvasDim;
+  static const card = surface;
+  static const maroon = primary;
+  static const maroonDeep = primaryDeep;
+  static const brass = mastery;
+  static const sage = success;
+  static const sky = info;
+  static const slate = muted;
+  static const slateDim = mutedDim;
+
   static final hairline = ink.withValues(alpha: 0.09);
-  static final hairlineLight = parchment.withValues(alpha: 0.16);
+  static final hairlineLight = canvas.withValues(alpha: 0.16);
 
   /// Soft card shadow — depth via a whisper of ink, never Material elevation.
   static List<BoxShadow> get cardShadow => [

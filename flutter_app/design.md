@@ -58,17 +58,26 @@ The direction is **Guided Momentum**: professional enough for an immigration or 
 
 ### Color
 
-Use semantic tokens from `lib/design/tokens.dart` rather than inline colors:
+Color is a plug-and-play layer. Palettes live in `lib/design/palettes.dart` as classes with
+identical slots; `lib/design/tokens.dart` selects the active one with a single typedef line
+(`typedef _Palette = ProSystemAzure;`). To try a new direction from a marketing mockup
+(`marketing/color-palette/*.jpg`): add a palette class with the same slots, flip the typedef,
+rebuild. Nothing else in the app changes.
 
-- deep ink for text and high-trust surfaces;
-- a soft warm-neutral canvas;
-- white and tinted surfaces for grouping;
-- coral for the one primary action;
-- mint for success and speaking/listening readiness;
-- sky for guidance and information;
-- gold only for demonstrated mastery.
+**Active palette: Pro System Azure** (`marketing/color-palette/pro_system_azure.jpg`) —
+professional blue system, high-trust neutrals:
 
-Color communicates action or learning state. It is not used to make every tile different.
+- dark navy ink (`#1C1E21`) for text and headings;
+- off-white canvas (`#F8F9FA`), white surfaces for grouping;
+- azure blue (`#007BFF`) for the one primary action, links, active states;
+- vibrant teal (`#17A2B8`) for secondary call-to-actions, guidance, information;
+- emerald (`#28A745`) for success and speaking/listening readiness;
+- amber (`#FFC107`) for cautions and for demonstrated mastery;
+- crimson (`#DC3545`) for errors and destructive actions only;
+- grays (`#A0A0A0` / `#707070`) for tertiary text and disabled states.
+
+Use semantic tokens from `lib/design/tokens.dart` rather than inline colors. Color
+communicates action or learning state. It is not used to make every tile different.
 
 ### Typography
 

@@ -30,6 +30,24 @@ abstract final class Passeport {
   static final hairline = DesignTokens.hairline;
   static final hairlineLight = DesignTokens.hairlineLight;
 
+  // Semantic names (canonical since the plug-and-play palette layer) — prefer
+  // these over the legacy Passeport-era names above in new code.
+  static const canvas = DesignTokens.canvas;
+  static const canvasDim = DesignTokens.canvasDim;
+  static const surface = DesignTokens.surface;
+  static const primary = DesignTokens.primary;
+  static const primaryDeep = DesignTokens.primaryDeep;
+  static const secondary = DesignTokens.secondary;
+  static const success = DesignTokens.success;
+  static const info = DesignTokens.info;
+  static const mastery = DesignTokens.mastery;
+  static const warning = DesignTokens.warning;
+  static const warningSoft = DesignTokens.warningSoft;
+  static const danger = DesignTokens.danger;
+  static const dangerSoft = DesignTokens.dangerSoft;
+  static const muted = DesignTokens.muted;
+  static const mutedDim = DesignTokens.mutedDim;
+
   static TextStyle display(
     double size, {
     FontWeight weight = FontWeight.w500,
