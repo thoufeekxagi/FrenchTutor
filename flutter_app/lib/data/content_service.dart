@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/content_models.dart';
+import '../orchestration/models/content_descriptor.dart';
 
 class ContentService {
   ContentService._();
@@ -16,6 +17,7 @@ class ContentService {
   WritingPack? _writing;
   Roadmap? _roadmap;
   ResourcePack? _resources;
+  CompetencyFramework? _competencyFramework;
 
   Future<void> preload() async {
     await Future.wait([
@@ -29,19 +31,25 @@ class ContentService {
       _loadWriting(),
       _loadRoadmap(),
       _loadResources(),
+      _loadCompetencyFramework(),
     ]);
   }
 
   VocabPhase? vocabPhase(int n) {
     switch (n) {
-      case 1: return _phase1;
-      case 2: return _phase2;
-      case 3: return _phase3;
-      default: return null;
+      case 1:
+        return _phase1;
+      case 2:
+        return _phase2;
+      case 3:
+        return _phase3;
+      default:
+        return null;
     }
   }
 
-  List<VocabPhase> get vocabPhases => [_phase1, _phase2, _phase3].whereType<VocabPhase>().toList();
+  List<VocabPhase> get vocabPhases =>
+      [_phase1, _phase2, _phase3].whereType<VocabPhase>().toList();
 
   BilingualExample? vocabExamples(String entryId) => _vocabExamples?[entryId];
 
@@ -60,11 +68,50 @@ class ContentService {
   WritingPack? writingTasks() => _writing;
   Roadmap? roadmap() => _roadmap;
   ResourcePack? resources() => _resources;
+  CompetencyFramework? competencyFramework() => _competencyFramework;
+
+  Set<String> knownContentIds() {
+    final ids = <String>{};
+    for (final phase in vocabPhases) {
+      for (final theme in phase.themes) {
+        ids.addAll(theme.entries.map((entry) => entry.id));
+      }
+    }
+    final grammar = _grammar;
+    if (grammar != null) {
+      ids.addAll(grammar.lessons.map((lesson) => lesson.id));
+      ids.addAll(grammar.topics.map((topic) => topic.id));
+    }
+    final listening = _listening;
+    if (listening != null) {
+      ids.addAll(listening.exercises.map((exercise) => exercise.id));
+      ids.addAll(
+        listening.exercises.map((exercise) => 'reading_${exercise.id}'),
+      );
+    }
+    ids.addAll(
+      _writing?.tasks.map((task) => task.id) ?? const Iterable<String>.empty(),
+    );
+    ids.addAll(
+      _resources?.speakingTopics.map((topic) => topic.id) ??
+          const Iterable<String>.empty(),
+    );
+    return ids;
+  }
 
   ReadingPassage? readingPassage({required ListeningExercise fromListening}) {
-    final segments = fromListening.script.split('\n').where((l) => l.trim().isNotEmpty).map((line) {
-      return ReadingSegment(fr: line, en: '', grammarNote: '', pronunciationTip: '');
-    }).toList();
+    final segments = fromListening.script
+        .split('\n')
+        .where((l) => l.trim().isNotEmpty)
+        .map((line) {
+          return ReadingSegment(
+            fr: line,
+            en: '',
+            grammarNote: '',
+            pronunciationTip: '',
+          );
+        })
+        .toList();
     return ReadingPassage(
       id: 'reading_${fromListening.id}',
       title: fromListening.title,
@@ -80,9 +127,13 @@ class ContentService {
     buf.writeln('Grammar lesson: ${lesson.title} — ${lesson.subtitle}');
     buf.writeln('Usage: ${lesson.usage.join("; ")}');
     for (final c in lesson.conjugations) {
-      buf.writeln('${c.verb} (${c.group}): ${c.rows.map((r) => "${r.pronoun} ${r.form}").join(", ")}');
+      buf.writeln(
+        '${c.verb} (${c.group}): ${c.rows.map((r) => "${r.pronoun} ${r.form}").join(", ")}',
+      );
     }
-    buf.writeln('Examples: ${lesson.examples.map((e) => "${e.fr} = ${e.en}").join("; ")}');
+    buf.writeln(
+      'Examples: ${lesson.examples.map((e) => "${e.fr} = ${e.en}").join("; ")}',
+    );
     return buf.toString();
   }
 
@@ -104,7 +155,9 @@ class ContentService {
     final buf = StringBuffer();
     buf.writeln('French connectors (${pack.connectors.length} total):');
     for (final c in pack.connectors) {
-      buf.writeln('${c.fr} (${c.en}) [${c.category}${c.core ? ", core" : ""}] — e.g. ${c.example.fr}');
+      buf.writeln(
+        '${c.fr} (${c.en}) [${c.category}${c.core ? ", core" : ""}] — e.g. ${c.example.fr}',
+      );
     }
     return buf.toString();
   }
@@ -131,9 +184,12 @@ class ContentService {
     final json = await _loadJson('vocab_phase$n.json');
     final phase = VocabPhase.fromJson(json);
     switch (n) {
-      case 1: _phase1 = phase;
-      case 2: _phase2 = phase;
-      case 3: _phase3 = phase;
+      case 1:
+        _phase1 = phase;
+      case 2:
+        _phase2 = phase;
+      case 3:
+        _phase3 = phase;
     }
   }
 
@@ -141,7 +197,9 @@ class ContentService {
     final json = await _loadJson('vocab_examples.json');
     final map = <String, BilingualExample>{};
     for (final entry in json.entries) {
-      map[entry.key] = BilingualExample.fromJson(entry.value as Map<String, dynamic>);
+      map[entry.key] = BilingualExample.fromJson(
+        entry.value as Map<String, dynamic>,
+      );
     }
     _vocabExamples = map;
   }
@@ -168,6 +226,12 @@ class ContentService {
 
   Future<void> _loadResources() async {
     _resources = ResourcePack.fromJson(await _loadJson('resources.json'));
+  }
+
+  Future<void> _loadCompetencyFramework() async {
+    _competencyFramework = CompetencyFramework.fromJson(
+      await _loadJson('competency_graph_v1.json'),
+    );
   }
 
   Future<Map<String, dynamic>> _loadJson(String filename) async {

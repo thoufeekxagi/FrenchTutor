@@ -1524,11 +1524,11 @@ This section is the resume point for future agents. Update it after every implem
 
 ### Current phase
 
-`O1: Competency foundation`
+`O2: Evidence ledger`
 
 ### Phase status
 
-- [ ] O1 Competency foundation
+- [x] O1 Competency foundation
 - [ ] O2 Evidence ledger
 - [ ] O3 Probabilistic twin updater v1
 - [ ] O4 Governed adaptive orchestrator v1
@@ -1569,17 +1569,26 @@ Resolve only when the corresponding phase requires them:
 
 ### Last completed work
 
-Planning only. No orchestration implementation has started.
+Phase O1 established the competency foundation:
+
+- typed competency-kind, performance-modality, evidence-support, and content-mapping models;
+- versioned `professional_intro_v1` competency graph spanning lexical, grammar, phonology, function, strategy, and discourse nodes;
+- mappings to existing vocabulary, grammar, listening, derived reading, writing, pronunciation-practice, and speaking content;
+- strict validation for identifiers, references, cycles, versions, content existence, mapping coverage, and weights;
+- ContentService loading and known-content indexing;
+- forward-only migration v3 with competency-framework, competency, and content-mapping tables;
+- typed transactional CompetencyStore persistence;
+- validator, parser, migration, and round-trip tests.
 
 ### Exact next action
 
-Implement Phase O1 beginning with:
+Implement Phase O2 beginning with:
 
-1. define competency/modality/support-level enums and pure Dart models;
-2. define a versioned competency JSON schema for one MVP theme;
-3. map that theme's existing vocabulary, grammar, listening, reading, writing, and speaking content;
-4. add content graph validation tests;
-5. add the forward-only database migration and repository tests only after the domain schema is validated.
+1. define typed evidence-event, error-event, evaluator, provenance, and task-result models;
+2. add append-only evidence and error migrations plus repository methods;
+3. define the evidence contract adapters without changing existing task completion semantics;
+4. connect one deterministic vocabulary result and one grammar result to evidence emission behind tests;
+5. preserve raw task evidence and prohibit screens or LLM services from updating learner state directly.
 
 ## 22. Definition of v1 success
 

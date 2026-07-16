@@ -55,6 +55,7 @@ bool _tableExists(CommonDatabase db, String name) {
 final Map<int, void Function(CommonDatabase)> _migrations = {
   1: _migrationV1,
   2: _migrationV2,
+  3: _migrationV3,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -246,6 +247,56 @@ void _migrationV2(CommonDatabase db) {
     )
     ''',
     'CREATE INDEX IF NOT EXISTS idx_operational_events_pending ON operational_events (uploaded_at, occurred_at)',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
+  }
+}
+
+void _migrationV3(CommonDatabase db) {
+  const statements = [
+    '''
+    CREATE TABLE IF NOT EXISTS competency_frameworks (
+      id TEXT PRIMARY KEY,
+      framework_version TEXT NOT NULL,
+      curriculum_version TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS competencies (
+      id TEXT PRIMARY KEY,
+      kind TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      difficulty_band TEXT NOT NULL,
+      prerequisite_ids_json TEXT NOT NULL DEFAULT '[]',
+      target_level_label TEXT,
+      exam_relevance_json TEXT NOT NULL DEFAULT '{}',
+      curriculum_version TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS content_competencies (
+      id TEXT PRIMARY KEY,
+      content_item_id TEXT NOT NULL,
+      competency_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      modality TEXT NOT NULL,
+      weight REAL NOT NULL,
+      curriculum_version TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_content_competencies_content ON content_competencies (content_item_id)',
+    'CREATE INDEX IF NOT EXISTS idx_content_competencies_competency ON content_competencies (competency_id)',
   ];
   for (final sql in statements) {
     db.execute(sql);
