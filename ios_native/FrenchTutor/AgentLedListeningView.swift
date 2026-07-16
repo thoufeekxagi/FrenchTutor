@@ -63,6 +63,14 @@ struct AgentLedListeningView: View {
     // Documented Gemini Live bug: dedupe identical tool calls fired in rapid succession.
     @State private var handledCallIds: Set<String> = []
 
+    // Same context-aware Flash-Lite intent judge as vocab's — keyword matcher kept only as
+    // the automatic fallback. See AgentLedVocabView for the full rationale on each piece.
+    private static let useLLMIntentJudge = true
+    @State private var utteranceSeq = 0
+    @State private var pendingIntentTask: Task<Void, Never>? = nil
+    @State private var lastTutorLine = ""
+    @State private var announceWorkItem: DispatchWorkItem? = nil
+
     init(passage: ReadingPassage, vocabSummary: VocabStageResult? = nil, onComplete: @escaping (ListeningStageResult) -> Void) {
         self.passage = passage
         self.vocabSummary = vocabSummary
@@ -288,7 +296,7 @@ struct AgentLedListeningView: View {
         gemini.onDisconnected = { if !finished { errorMessage = "Connection lost"; finishAndReturn() } }
         gemini.onError = { msg in errorMessage = msg }
         gemini.onUserTranscript = { text in recorder.logUser(text); handleUserTranscript(text) }
-        gemini.onTutorTranscript = { text in recorder.logTutor(text) }
+        gemini.onTutorTranscript = { text in recorder.logTutor(text); lastTutorLine = text }
         gemini.onAudioChunk = { data in
             lastAudioChunkAt = Date()
             audio.isOutputActive = true
@@ -322,14 +330,71 @@ struct AgentLedListeningView: View {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         hasAttempted = true
-        let intent = detectIntent(trimmed)
-        lastDetectedIntent = intent
-        if intent == .none { attemptCount += 1 }
-        logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue), attempts: \(attemptCount)")
+
+        guard Self.useLLMIntentJudge else {
+            applyIntent(mapKeywordIntent(detectIntent(trimmed)), utterance: trimmed, source: "keyword")
+            return
+        }
+
+        utteranceSeq += 1
+        let seq = utteranceSeq
+        let segmentIndexAtLaunch = segmentIndex
+        let card = currentCard
+        let tutorLine = lastTutorLine
+        let attempts = attemptCount
+        pendingIntentTask?.cancel()
+        logDebug("heard: \"\(trimmed)\" → judging…")
+
+        pendingIntentTask = Task {
+            var verdict: LessonAgentService.LiveNavIntent
+            var source = "judge"
+            do {
+                verdict = try await LessonAgentService.shared.classifyLiveIntent(
+                    utterance: trimmed,
+                    cardDescription: card.map { "passage segment \"\($0.segment.fr)\" = \"\($0.segment.en)\"" } ?? "(session already finished)",
+                    tutorLastLine: tutorLine,
+                    attemptCount: attempts
+                )
+            } catch {
+                verdict = mapKeywordIntent(detectIntent(trimmed))
+                source = "keyword-fallback"
+            }
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard seq == utteranceSeq, segmentIndexAtLaunch == segmentIndex, !finished else {
+                    logDebug("→ stale verdict (\(verdict.rawValue)) discarded")
+                    return
+                }
+                applyIntent(verdict, utterance: trimmed, source: source)
+            }
+        }
+    }
+
+    private func mapKeywordIntent(_ intent: ReadingUserIntent) -> LessonAgentService.LiveNavIntent {
         switch intent {
-        case .advance: advanceFromUserIntent()
-        case .back: goBackFromUserIntent()
-        case .again, .none: break
+        case .advance: return .advance
+        case .back: return .back
+        case .again: return .again
+        case .none: return .attempt
+        }
+    }
+
+    private func applyIntent(_ verdict: LessonAgentService.LiveNavIntent, utterance: String, source: String) {
+        logDebug("[\(source)] \"\(utterance)\" → \(verdict.rawValue), attempts: \(attemptCount)")
+        switch verdict {
+        case .attempt:
+            lastDetectedIntent = .none
+            attemptCount += 1
+        case .chat:
+            lastDetectedIntent = .none
+        case .again:
+            lastDetectedIntent = .again
+        case .advance:
+            lastDetectedIntent = .advance
+            advanceFromUserIntent()
+        case .back:
+            lastDetectedIntent = .back
+            goBackFromUserIntent()
         }
     }
 
@@ -343,9 +408,10 @@ struct AgentLedListeningView: View {
     private func advanceFromUserIntent() {
         guard currentCard != nil else { return }
         logDebug("→ user-driven advance")
+        cutTutorAudio()
         performAdvance()
         if let next = currentCard {
-            gemini.injectContext(Self.contextNote(for: next.segment, prefix: "The student has moved on to the next part of the passage"))
+            scheduleCardAnnouncement(Self.contextNote(for: next.segment, prefix: "The student has moved on to the next part of the passage") + " Announce the new segment briefly out loud, then teach it.")
         } else {
             wrapUp()
         }
@@ -354,10 +420,26 @@ struct AgentLedListeningView: View {
     private func goBackFromUserIntent() {
         guard segmentIndex > 0 else { return }
         logDebug("→ user-driven go back")
+        cutTutorAudio()
         performGoBack()
         if let card = currentCard {
-            gemini.injectContext(Self.contextNote(for: card.segment, prefix: "The student asked to go back to"))
+            scheduleCardAnnouncement(Self.contextNote(for: card.segment, prefix: "The student asked to go back to") + " Briefly re-introduce it out loud, then pick up teaching it again.")
         }
+    }
+
+    /// See AgentLedVocabView.cutTutorAudio — flushing local playback silences her instantly.
+    private func cutTutorAudio() {
+        audio.stopPlayback()
+        audio.isOutputActive = false
+        if callStatus == .tutorSpeaking { callStatus = .listening }
+    }
+
+    /// Debounced spoken card announcement — rapid skips only announce the landing segment.
+    private func scheduleCardAnnouncement(_ note: String) {
+        announceWorkItem?.cancel()
+        let item = DispatchWorkItem { gemini.injectContext(note, expectReply: true) }
+        announceWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: item)
     }
 
     private static func contextNote(for segment: ReadingSegment, prefix: String) -> String {
@@ -464,7 +546,7 @@ struct AgentLedListeningView: View {
     private func wrapUp() {
         guard !isWrappingUp else { return }
         isWrappingUp = true
-        gemini.injectContext("The student has now gone through the whole passage. Say a short warm closing line (one sentence) congratulating them, then stop talking.")
+        gemini.injectContext("The student has now gone through the whole passage. Say a short warm closing line (one sentence) congratulating them, then stop talking.", expectReply: true)
     }
 
     private func finishAndReturn() {
@@ -472,6 +554,8 @@ struct AgentLedListeningView: View {
         finished = true
         timer?.invalidate()
         speakingWatchdog?.invalidate()
+        pendingIntentTask?.cancel()
+        announceWorkItem?.cancel()
         audio.stopStreaming()
         gemini.disconnect()
         callStatus = .ended

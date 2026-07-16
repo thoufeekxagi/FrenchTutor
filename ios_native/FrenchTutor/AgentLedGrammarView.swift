@@ -62,6 +62,14 @@ struct AgentLedGrammarView: View {
     @State private var lastDetectedIntent: GrammarUserIntent = .none
     @State private var handledCallIds: Set<String> = []
 
+    // Same context-aware Flash-Lite intent judge as vocab's — keyword matcher kept only as
+    // the automatic fallback. See AgentLedVocabView for the full rationale on each piece.
+    private static let useLLMIntentJudge = true
+    @State private var utteranceSeq = 0
+    @State private var pendingIntentTask: Task<Void, Never>? = nil
+    @State private var lastTutorLine = ""
+    @State private var announceWorkItem: DispatchWorkItem? = nil
+
     @State private var recentTranscriptBuffer = ""
     @State private var spokenSentenceMatched = false
     @State private var sentencePulse = false
@@ -291,7 +299,7 @@ struct AgentLedGrammarView: View {
         gemini.onDisconnected = { if !finished { errorMessage = "Connection lost"; finishAndReturn() } }
         gemini.onError = { msg in errorMessage = msg }
         gemini.onUserTranscript = { text in recorder.logUser(text); handleUserTranscript(text) }
-        gemini.onTutorTranscript = { text in recorder.logTutor(text) }
+        gemini.onTutorTranscript = { text in recorder.logTutor(text); lastTutorLine = text }
         gemini.onAudioChunk = { data in
             lastAudioChunkAt = Date()
             audio.isOutputActive = true
@@ -326,13 +334,67 @@ struct AgentLedGrammarView: View {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         hasAttempted = true
-        let intent = detectIntent(trimmed)
-        lastDetectedIntent = intent
-        logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue)")
+
+        guard Self.useLLMIntentJudge else {
+            applyIntent(mapKeywordIntent(detectIntent(trimmed)), utterance: trimmed, source: "keyword")
+            return
+        }
+
+        utteranceSeq += 1
+        let seq = utteranceSeq
+        let cardIndexAtLaunch = cardIndex
+        let card = currentCard
+        let tutorLine = lastTutorLine
+        pendingIntentTask?.cancel()
+        logDebug("heard: \"\(trimmed)\" → judging…")
+
+        pendingIntentTask = Task {
+            var verdict: LessonAgentService.LiveNavIntent
+            var source = "judge"
+            do {
+                verdict = try await LessonAgentService.shared.classifyLiveIntent(
+                    utterance: trimmed,
+                    cardDescription: card.map { "grammar practice sentence \"\($0.card.fr)\" = \"\($0.card.en)\"" } ?? "(session already finished)",
+                    tutorLastLine: tutorLine,
+                    attemptCount: hasAttempted ? 1 : 0
+                )
+            } catch {
+                verdict = mapKeywordIntent(detectIntent(trimmed))
+                source = "keyword-fallback"
+            }
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard seq == utteranceSeq, cardIndexAtLaunch == cardIndex, !finished else {
+                    logDebug("→ stale verdict (\(verdict.rawValue)) discarded")
+                    return
+                }
+                applyIntent(verdict, utterance: trimmed, source: source)
+            }
+        }
+    }
+
+    private func mapKeywordIntent(_ intent: GrammarUserIntent) -> LessonAgentService.LiveNavIntent {
         switch intent {
-        case .advance: advanceFromUserIntent()
-        case .back: goBackFromUserIntent()
-        case .again, .none: break
+        case .advance: return .advance
+        case .back: return .back
+        case .again: return .again
+        case .none: return .attempt
+        }
+    }
+
+    private func applyIntent(_ verdict: LessonAgentService.LiveNavIntent, utterance: String, source: String) {
+        logDebug("[\(source)] \"\(utterance)\" → \(verdict.rawValue)")
+        switch verdict {
+        case .attempt, .chat:
+            lastDetectedIntent = .none
+        case .again:
+            lastDetectedIntent = .again
+        case .advance:
+            lastDetectedIntent = .advance
+            advanceFromUserIntent()
+        case .back:
+            lastDetectedIntent = .back
+            goBackFromUserIntent()
         }
     }
 
@@ -347,9 +409,10 @@ struct AgentLedGrammarView: View {
     private func advanceFromUserIntent() {
         guard currentCard != nil else { return }
         logDebug("→ user-driven advance")
+        cutTutorAudio()
         performAdvance()
         if let next = currentCard {
-            gemini.injectContext("The student has moved on to the next sentence: \"\(next.card.fr)\" (\(next.card.en)). Grammar note: \(next.card.note) \(Self.pacingReminder)")
+            scheduleCardAnnouncement("The student has moved on to the next sentence: \"\(next.card.fr)\" (\(next.card.en)). Grammar note: \(next.card.note) Announce the new sentence briefly out loud, then teach it. \(Self.pacingReminder)")
         } else {
             wrapUp()
         }
@@ -358,10 +421,26 @@ struct AgentLedGrammarView: View {
     private func goBackFromUserIntent() {
         guard cardIndex > 0 else { return }
         logDebug("→ user-driven go back")
+        cutTutorAudio()
         performGoBack()
         if let card = currentCard {
-            gemini.injectContext("The student asked to go back to: \"\(card.card.fr)\" (\(card.card.en)). Grammar note: \(card.card.note) \(Self.pacingReminder)")
+            scheduleCardAnnouncement("The student asked to go back to: \"\(card.card.fr)\" (\(card.card.en)). Grammar note: \(card.card.note) Briefly re-introduce it out loud, then pick up teaching it again. \(Self.pacingReminder)")
         }
+    }
+
+    /// See AgentLedVocabView.cutTutorAudio — flushing local playback silences her instantly.
+    private func cutTutorAudio() {
+        audio.stopPlayback()
+        audio.isOutputActive = false
+        if callStatus == .tutorSpeaking { callStatus = .listening }
+    }
+
+    /// Debounced spoken card announcement — rapid skips only announce the landing card.
+    private func scheduleCardAnnouncement(_ note: String) {
+        announceWorkItem?.cancel()
+        let item = DispatchWorkItem { gemini.injectContext(note, expectReply: true) }
+        announceWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: item)
     }
 
     private func performAdvance() {
@@ -485,7 +564,7 @@ struct AgentLedGrammarView: View {
     private func wrapUp() {
         guard !isWrappingUp else { return }
         isWrappingUp = true
-        gemini.injectContext("The student has now gone through today's grammar practice. Say a short warm closing line (one sentence) congratulating them, then stop talking.")
+        gemini.injectContext("The student has now gone through today's grammar practice. Say a short warm closing line (one sentence) congratulating them, then stop talking.", expectReply: true)
     }
 
     private func finishAndReturn() {
@@ -493,6 +572,8 @@ struct AgentLedGrammarView: View {
         finished = true
         timer?.invalidate()
         speakingWatchdog?.invalidate()
+        pendingIntentTask?.cancel()
+        announceWorkItem?.cancel()
         audio.stopStreaming()
         gemini.disconnect()
         callStatus = .ended

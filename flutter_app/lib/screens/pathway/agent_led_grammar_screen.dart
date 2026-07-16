@@ -15,6 +15,7 @@ import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
+import '../../services/lesson_agent_service.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
 import '../../widgets/passeport_card.dart';
@@ -95,16 +96,30 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
   final Set<String> _handledCallIds = {};
 
+  // Same context-aware Flash-Lite intent judge as vocab's — keyword matcher kept only as
+  // the automatic fallback. See AgentLedVocabScreen for the full rationale on each piece.
+  static const _useLLMIntentJudge = true;
+  int _utteranceSeq = 0;
+  int _attemptCount = 0;
+  String _lastTutorLine = '';
+  Timer? _announceTimer;
+  DateTime _lastCardMoveAt = DateTime.fromMillisecondsSinceEpoch(0);
+
   String _recentTranscriptBuffer = '';
   bool _spokenSentenceMatched = false;
   bool _sentencePulse = false;
 
-  static const _pacingReminder =
-      "Reminder: this is a total beginner — explain primarily in English, using French only for "
-      "the target sentence itself, not full French explanations. Keep grammar SIMPLE — no "
-      "advanced tense talk beyond the note shown, this is intentionally basic for now. Do at "
-      "least one full pass (say the sentence, have them repeat it, react, explain the grammar "
-      "note) before you even suggest moving on.";
+  // Drift enforcement — see AgentLedVocabScreen._watchForTutorDrift for the full rationale.
+  // For sentence cards, "teaching ahead" = saying a future card's full French sentence twice
+  // in one turn (quoting it once inside an offer is fine).
+  String _tutorTurnTranscript = '';
+  DateTime _lastDriftCorrectionAt = DateTime.fromMillisecondsSinceEpoch(0);
+
+  // One compact line appended to every card-change note — full rules live in the system
+  // prompt; injections stay lean.
+  static const _noteReminder =
+      'Explain in English, keep grammar simple — reciting French is practice, never a cue to '
+      'switch into French-led talk. NEVER suggest moving on; the student alone decides.';
 
   _GrammarSessionCard? get _currentCard => _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
 
@@ -164,6 +179,17 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           setState(() => _errorMessage = 'Microphone permission denied');
         }
       });
+      // Marie opens the call — she greets and introduces the first sentence; the student
+      // never has to speak first.
+      final first = _currentCard;
+      if (first != null) {
+        _gemini.injectContext(
+          'The call has just connected. Greet the student warmly in one short sentence, then '
+          'introduce the first sentence on their screen: "${first.card.fr}" (${first.card.en}) '
+          'and begin teaching it.',
+          expectReply: true,
+        );
+      }
     };
 
     _gemini.onDisconnected = () {
@@ -182,7 +208,10 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       _handleUserTranscript(text);
     };
 
-    _gemini.onTutorTranscript = (text) => _recorder.logTutor(text);
+    _gemini.onTutorTranscript = (text) {
+      _recorder.logTutor(text);
+      _lastTutorLine = text;
+    };
 
     _gemini.onAudioChunk = (data) {
       _lastAudioChunkAt = DateTime.now();
@@ -195,6 +224,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
+      _tutorTurnTranscript = '';
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
       if (_isWrappingUp) _finish(completed: true);
     };
@@ -202,6 +232,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _gemini.onInterrupted = () {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
+      _tutorTurnTranscript = '';
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
     };
 
@@ -223,30 +254,131 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   void _handleUserTranscript(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
-    _hasAttempted = true;
-    final intent = _detectIntent(trimmed);
-    _lastDetectedIntent = intent;
-    _logDebug('heard: "$trimmed" → intent: ${intent.name}');
-    switch (intent) {
-      case _GrammarUserIntent.advance:
-        _advanceFromUserIntent();
-      case _GrammarUserIntent.back:
-        _goBackFromUserIntent();
-      case _GrammarUserIntent.again:
-      case _GrammarUserIntent.none:
-        break;
+    // Deterministic echo guard (see looksLikeTutorEcho): Marie's own voice picked up by the
+    // mic must never count as the student speaking — let alone as navigation consent.
+    if (looksLikeTutorEcho(trimmed, _lastTutorLine) ||
+        looksLikeTutorEcho(trimmed, _tutorTurnTranscript)) {
+      _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
+      return;
     }
+    _hasAttempted = true;
+
+    if (!_useLLMIntentJudge) {
+      _applyIntent(_mapKeywordIntent(_detectIntent(trimmed)), utterance: trimmed, source: 'keyword');
+      return;
+    }
+
+    _utteranceSeq += 1;
+    final seq = _utteranceSeq;
+    final cardIndexAtLaunch = _cardIndex;
+    final card = _currentCard;
+    _logDebug('heard: "$trimmed" → judging…');
+
+    () async {
+      LiveIntentVerdict verdict;
+      var source = 'judge';
+      try {
+        verdict = await LessonAgentService.shared.classifyLiveIntent(
+          utterance: trimmed,
+          cardDescription: card != null
+              ? 'grammar practice sentence "${card.card.fr}" = "${card.card.en}"'
+              : '(session already finished)',
+          tutorLastLine: _lastTutorLine,
+          attemptCount: _attemptCount,
+          cardPosition: _cardIndex + 1,
+          cardCount: _sessionPlan.length,
+        );
+      } catch (_) {
+        verdict = _mapKeywordIntent(_detectIntent(trimmed));
+        source = 'keyword-fallback';
+      }
+      if (!mounted || _finished) return;
+      if (seq != _utteranceSeq || cardIndexAtLaunch != _cardIndex) {
+        _logDebug('→ stale verdict (${verdict.intent.name}) discarded');
+        return;
+      }
+      _applyIntent(verdict, utterance: trimmed, source: source);
+    }();
+  }
+
+  LiveIntentVerdict _mapKeywordIntent(_GrammarUserIntent intent) {
+    switch (intent) {
+      case _GrammarUserIntent.advance: return LiveIntentVerdict(intent: LiveNavIntent.advance);
+      case _GrammarUserIntent.back: return LiveIntentVerdict(intent: LiveNavIntent.back);
+      case _GrammarUserIntent.again: return LiveIntentVerdict(intent: LiveNavIntent.again);
+      case _GrammarUserIntent.none: return LiveIntentVerdict(intent: LiveNavIntent.attempt);
+    }
+  }
+
+  void _applyIntent(LiveIntentVerdict verdict, {required String utterance, required String source}) {
+    _logDebug('[$source] "$utterance" → ${verdict.intent.name}'
+        '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}');
+
+    final isNavigation = verdict.intent == LiveNavIntent.advance ||
+        verdict.intent == LiveNavIntent.back ||
+        verdict.intent == LiveNavIntent.goto;
+    if (isNavigation && DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
+      _logDebug('→ navigation ignored (cooldown after recent card move)');
+      return;
+    }
+
+    switch (verdict.intent) {
+      case LiveNavIntent.attempt:
+        _lastDetectedIntent = _GrammarUserIntent.none;
+        _attemptCount += 1;
+        _maybeUnlockOffer();
+      case LiveNavIntent.chat:
+        _lastDetectedIntent = _GrammarUserIntent.none;
+      case LiveNavIntent.again:
+        _lastDetectedIntent = _GrammarUserIntent.again;
+      case LiveNavIntent.advance:
+        _lastDetectedIntent = _GrammarUserIntent.advance;
+        if (!verdict.explicit && !_offerUnlocked) {
+          _refusePrematureConsent();
+        } else {
+          _advanceFromUserIntent();
+        }
+      case LiveNavIntent.back:
+        _lastDetectedIntent = _GrammarUserIntent.back;
+        _goBackFromUserIntent();
+      case LiveNavIntent.goto:
+        _goToCard(verdict.cardNumber);
+    }
+  }
+
+  /// Offer permission — same mechanism as vocab's, fixed threshold of 2 passes per
+  /// sentence. See AgentLedVocabScreen for the full rationale.
+  static const _offerThreshold = 2;
+  bool _offerUnlocked = false;
+
+  void _maybeUnlockOffer() {
+    if (_offerUnlocked || _attemptCount < _offerThreshold) return;
+    if (_currentCard == null) return;
+    _offerUnlocked = true;
+    _logDebug('→ practice threshold reached ($_attemptCount/$_offerThreshold)');
+  }
+
+  void _refusePrematureConsent() {
+    final card = _currentCard;
+    if (card == null) return;
+    _logDebug('→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)');
+    _gemini.injectContext(
+        'The card did NOT move — "${card.card.fr}" needs more practice. You should never have '
+        'suggested moving on. Smoothly continue practicing this sentence and never suggest '
+        'advancing again.');
   }
 
   void _advanceFromUserIntent() {
     if (_currentCard == null) return;
     _logDebug('→ user-driven advance');
+    _cutTutorAudio();
     _performAdvance();
     final next = _currentCard;
     if (next != null) {
-      _gemini.injectContext(
-        'The student has moved on to the next sentence: "${next.card.fr}" (${next.card.en}). '
-        'Grammar note: ${next.card.note} $_pacingReminder',
+      _scheduleCardAnnouncement(
+        'The student accepted — the screen now shows: "${next.card.fr}" (${next.card.en}). '
+        'Grammar note: ${next.card.note} If you just offered this sentence, continue smoothly '
+        'from that (no cold re-introduction): say it aloud and have them repeat. $_noteReminder',
       );
     } else {
       _wrapUp();
@@ -256,14 +388,69 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   void _goBackFromUserIntent() {
     if (_cardIndex <= 0) return;
     _logDebug('→ user-driven go back');
+    _cutTutorAudio();
     _performGoBack();
     final card = _currentCard;
     if (card != null) {
-      _gemini.injectContext(
-        'The student asked to go back to: "${card.card.fr}" (${card.card.en}). '
-        'Grammar note: ${card.card.note} $_pacingReminder',
+      _scheduleCardAnnouncement(
+        'The student asked to go back — the screen now shows: "${card.card.fr}" '
+        '(${card.card.en}). Grammar note: ${card.card.note} Re-anchor it briefly and have '
+        'them try it once. $_noteReminder',
       );
     }
+  }
+
+  /// Jump straight to a specific card by 1-based number — "go to the third sentence".
+  void _goToCard(int? cardNumber) {
+    if (cardNumber == null) {
+      _logDebug('→ goto ignored: no card number');
+      return;
+    }
+    final target = cardNumber - 1;
+    if (target < 0 || target >= _sessionPlan.length) {
+      _logDebug('→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})');
+      return;
+    }
+    if (target == _cardIndex) {
+      _logDebug('→ goto ignored: already on card $cardNumber');
+      return;
+    }
+    _logDebug('→ user-driven jump to card $cardNumber');
+    _cutTutorAudio();
+    _lastCardMoveAt = DateTime.now();
+    setState(() {
+      _cardIndex = target;
+      _resetPerCardState();
+    });
+    final card = _currentCard;
+    if (card != null) {
+      _scheduleCardAnnouncement(
+        'The student jumped to sentence $cardNumber — the screen now shows: "${card.card.fr}" '
+        '(${card.card.en}). Grammar note: ${card.card.note} Announce it briefly, then teach '
+        'it. $_noteReminder',
+      );
+    }
+  }
+
+  /// See AgentLedVocabScreen._cutTutorAudio — flushing local playback silences her instantly.
+  void _cutTutorAudio() {
+    // Discard the REST of her in-flight reply too (audio still streaming from the server),
+    // not just what's queued locally — otherwise the user hears one second of her answering
+    // the old card, a chop, then the announcement: the stutter. One clean reply instead.
+    _gemini.suppressCurrentReply();
+    _audio.stopPlayback();
+    _audio.isOutputActive = false;
+    if (mounted && _callStatus == CallStatus.tutorSpeaking) {
+      setState(() => _callStatus = CallStatus.listening);
+    }
+  }
+
+  /// Debounced spoken card announcement — rapid skips only announce the landing card.
+  void _scheduleCardAnnouncement(String note) {
+    _announceTimer?.cancel();
+    _announceTimer = Timer(const Duration(milliseconds: 600), () {
+      if (!_finished) _gemini.injectContext(note, expectReply: true);
+    });
   }
 
   /// The actual card-advance side effects (grading, index, reset) — shared by the accepted
@@ -273,6 +460,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       _drillResults.add(_lastDetectedIntent != _GrammarUserIntent.again);
       _wasGraded = true;
     }
+    _lastCardMoveAt = DateTime.now();
     setState(() {
       _cardIndex += 1;
       _resetPerCardState();
@@ -280,6 +468,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   }
 
   void _performGoBack() {
+    _lastCardMoveAt = DateTime.now();
     setState(() {
       _cardIndex -= 1;
       _resetPerCardState();
@@ -382,17 +571,24 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
   void _resetPerCardState() {
     _hasAttempted = false;
+    _attemptCount = 0;
     _wasGraded = false;
     _lastDetectedIntent = _GrammarUserIntent.none;
     _spokenSentenceMatched = false;
     _recentTranscriptBuffer = '';
     _handledCallIds.clear();
+    _offerUnlocked = false;
+    // Cleared on card change so a "go back" can't false-trip the drift enforcer on
+    // mentions of a sentence that was legitimately current moments ago.
+    _tutorTurnTranscript = '';
   }
 
   /// Watches her live speech transcript for the current sentence — the moment it appears is a
   /// reliable "she's saying it right now" signal, since output transcription streams in
   /// lockstep with the audio itself. Triggers a brief highlight pulse on the French text.
+  /// Also feeds the drift enforcer, which watches the same stream for future-card teaching.
   void _handleTranscriptDelta(String delta) {
+    _watchForTutorDrift(delta);
     final card = _currentCard;
     if (_spokenSentenceMatched || card == null) return;
     _recentTranscriptBuffer += delta;
@@ -409,12 +605,79 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     });
   }
 
+  /// See AgentLedVocabScreen._watchForTutorDrift — same enforcer, sentence-card thresholds.
+  void _watchForTutorDrift(String delta) {
+    if (_currentCard == null) return;
+    _tutorTurnTranscript += delta;
+    if (_tutorTurnTranscript.length > 1500) {
+      _tutorTurnTranscript = _tutorTurnTranscript.substring(_tutorTurnTranscript.length - 1500);
+    }
+    if (DateTime.now().difference(_lastDriftCorrectionAt).inMilliseconds < 8000) return;
+    final folded = foldFrench(_tutorTurnTranscript);
+    if (DateTime.now().difference(_lastCardMoveAt).inMilliseconds > 12000) {
+      const offerPhrases = [
+        'next word', 'next one', 'move on', 'moving on', 'ready for the next',
+        'try the next', 'shall we continue', 'want to continue', 'ready to continue',
+        'mot suivant', 'passons au', 'on passe au', 'prochain mot',
+        'next sentence', 'next part', 'next segment',
+      ];
+      if (offerPhrases.any(folded.contains)) {
+        _correctIllegalOffer();
+        return;
+      }
+    }
+    for (var i = _cardIndex + 1; i < _sessionPlan.length; i++) {
+      final future = _sessionPlan[i].card;
+      final fr = foldFrench(future.fr);
+      if (fr.isEmpty) continue;
+      final hits = fr.allMatches(folded).length;
+      if (hits >= 2) {
+        _correctTutorDrift(future);
+        return;
+      }
+    }
+  }
+
+  /// She suggested moving on — banned. Cut + corrective, same machinery as drift.
+  void _correctIllegalOffer() {
+    final current = _currentCard;
+    if (current == null) return;
+    _lastDriftCorrectionAt = DateTime.now();
+    _tutorTurnTranscript = '';
+    _logDebug('→ ILLEGAL OFFER: Marie suggested moving on — cutting her off');
+    _cutTutorAudio();
+    _gemini.injectContext(
+      'STOP — you suggested moving on, which you must NEVER do. The student decides when to '
+      'move, alone. Resume practicing the current sentence right now, warmly, as if you had '
+      'never asked.',
+      expectReply: true,
+    );
+  }
+
+  void _correctTutorDrift(GrammarPracticeCard future) {
+    final current = _currentCard;
+    if (current == null) return;
+    _lastDriftCorrectionAt = DateTime.now();
+    _tutorTurnTranscript = '';
+    _logDebug('→ DRIFT: Marie started teaching "${future.fr}" while "${current.card.fr}" is on screen — cutting her off');
+    _cutTutorAudio();
+    _gemini.injectContext(
+      'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
+      'screen still shows "${current.card.fr}" (${current.card.en}), and only the student\'s own '
+      'words move the card. You may OFFER the next sentence and then wait silently for their '
+      'answer — never teach it. Pick up "${current.card.fr}" again now, briefly, as if nothing '
+      'happened.',
+      expectReply: true,
+    );
+  }
+
   void _wrapUp() {
     if (_isWrappingUp) return;
     _isWrappingUp = true;
     _gemini.injectContext(
       'The student has now gone through today\'s grammar practice. Say a short warm closing line '
       '(one sentence) congratulating them, then stop talking.',
+      expectReply: true,
     );
   }
 
@@ -423,6 +686,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _finished = true;
     _timer?.cancel();
     _speakingWatchdog?.cancel();
+    _announceTimer?.cancel();
     _audio.stopStreaming();
     _audio.dispose();
     _gemini.disconnect();
@@ -735,7 +999,9 @@ GRAMMAR STAGE — this is a focused grammar session on ONE tense/topic ("$tenseT
 
 CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of your own explaining, encouragement, instructions, and questions should be in English — French should only appear as the sentence itself, never as your own explanatory language.
 
-CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go back. The app watches the student's own words directly and moves the card itself the instant they say something like "next" or "go back" — zero involvement from you. You'll simply be told the new current sentence afterward and should react to it naturally.
+CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go back. The app watches the student's own words directly and moves the card itself when they say something like "next" or "go back" — zero involvement from you. You'll simply be told the new current sentence afterward and should react to it naturally.
+
+ABSOLUTE RULE — NEVER SUGGEST MOVING ON: not "ready for the next sentence?", not "shall we continue?" — nothing of the kind, ever. The student decides alone; their screen tells them how. Your only job is practicing the current sentence until the app tells you the card changed. The app monitors your speech and will cut you off and correct you if you suggest advancing. Never say, explain, or drill any sentence that is not the current card on screen — the student cannot see it yet.
 
 You have exactly one tool: mark_drill_result, for recording whether the student's spoken answer to the current sentence was correct. It's a proposal — the app only accepts it once it's confirmed the student actually attempted the sentence. A rejection is not an error; never mention it, just keep teaching naturally.
 

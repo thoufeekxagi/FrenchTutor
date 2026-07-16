@@ -132,16 +132,39 @@ class AudioStreamingService {
     _micStreamController = null;
   }
 
+  /// Barge-in (mic open while Marie speaks) was tried and REJECTED after device testing:
+  /// Gemini Live's server-side VAD treats ANY sound during her generation — background
+  /// noise, friends talking, a cough — as the student interrupting, killing her audio
+  /// mid-word and making her stutter and restart. Unmanageably ugly. So the mic stays
+  /// gated while she talks: she always finishes her sentence, and the student replies in
+  /// the natural gap. Voice navigation stays fast anyway — the student's transcript
+  /// flushes to the intent judge on its own debounce (see GeminiLiveService), never
+  /// waiting on Marie — and the on-screen Back/Next buttons work mid-speech for anyone
+  /// who truly can't wait.
+  static const allowBargeIn = false;
+
   void _handleMicChunk(Uint8List chunk) {
-    final blockedByOutput = isOutputActive;
-    final withinTailGrace = DateTime.now().isBefore(
-      _scheduledPlaybackEndTime.add(Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round())),
-    );
-    if (blockedByOutput || withinTailGrace) return;
+    if (!allowBargeIn) {
+      final blockedByOutput = isOutputActive;
+      final withinTailGrace = DateTime.now().isBefore(
+        _scheduledPlaybackEndTime.add(Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round())),
+      );
+      if (blockedByOutput || withinTailGrace) return;
+    }
     _audioChunkCallback?.call(chunk);
   }
 
-  Future<void> _ensurePlayerStarted() async {
+  /// Latched so concurrent callers (audio chunks arrive in bursts, each calling
+  /// `playAudioChunk` unawaited) share ONE open/start sequence instead of racing
+  /// `openPlayer` — the race leaves the player wedged and everything after plays silence.
+  Future<void>? _playerStartLatch;
+
+  Future<void> _ensurePlayerStarted() {
+    if (_isPlayerStarted) return Future.value();
+    return _playerStartLatch ??= _startPlayer().whenComplete(() => _playerStartLatch = null);
+  }
+
+  Future<void> _startPlayer() async {
     if (_isPlayerStarted) return;
     await _configureSessionIfNeeded();
     if (!_player.isStopped) {
@@ -207,15 +230,16 @@ class AudioStreamingService {
 
   Future<void> stopPlayback() async {
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
-    // interruption keep draining and playing after the model was told to stop (barge-in).
+    // interruption keep draining and playing after the model was told to stop (barge-in /
+    // card-change cut). The player itself is deliberately LEFT RUNNING: tearing it down here
+    // (stopPlayer + restart on the next chunk) is what froze Marie's voice for the rest of
+    // the call — the restart raced the very next burst of incoming chunks, openPlayer was
+    // re-entered while already open, and every subsequent feed failed silently. Clearing our
+    // own queue already stops her within the player's ~340ms internal buffer, which is the
+    // "as fast as we can" the interruption needs, with zero restart fragility.
     _playbackQueue.clear();
-    try {
-      if (!_player.isStopped) await _player.stopPlayer();
-    } catch (_) {}
-    _isPlayerStarted = false;
-    // Discards everything queued, so the tracked playback timeline is now stale — without
-    // this reset the mic gate would keep blocking uploads until a time that no longer
-    // corresponds to any audio actually playing.
+    // The tracked timeline is now stale — without this reset the mic gate would keep
+    // blocking uploads until a time that no longer corresponds to any audio actually playing.
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
   }
 
@@ -239,5 +263,6 @@ class AudioStreamingService {
       if (!_player.isStopped) await _player.stopPlayer();
       await _player.closePlayer();
     } catch (_) {}
+    _isPlayerStarted = false;
   }
 }

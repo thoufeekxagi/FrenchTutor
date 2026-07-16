@@ -152,15 +152,26 @@ CONTEXT is provided, jump straight into practicing that material instead of a ge
         ProgressService(store: LearningStore()).learnerProfileSummary()
     }
 
-    /// Sends a silent context note mid-call so Marie can be redirected toward a new topic
-    /// without ending the conversation. She's instructed to absorb it, not reply to it.
-    func injectContext(_ note: String) {
+    /// Sends a context note mid-call so Marie can be redirected toward a new topic without
+    /// ending the conversation. By default it's silent — she absorbs it and doesn't reply.
+    /// With `expectReply: true` the note is framed as something to react to out loud NOW and
+    /// the turn is closed so she actually generates a response — used for card changes, where
+    /// she should announce what's newly on screen ("now the word is…") instead of going quiet
+    /// or, worse, finishing a sentence about a card that's no longer there.
+    func injectContext(_ note: String, expectReply: Bool = false) {
         guard isSetupComplete, !note.isEmpty else { return }
-        let framed = "(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à ceci, utilise-le seulement pour orienter la suite de la conversation) : \(note)"
+        let framed: String
+        if expectReply {
+            framed = "(Note from the app, not the student — the on-screen card just changed and " +
+                "your audio may have been cut off mid-sentence. Do NOT finish or refer back to " +
+                "your previous thought. React to this note now, briefly: ) \(note)"
+        } else {
+            framed = "(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à ceci, utilise-le seulement pour orienter la suite de la conversation) : \(note)"
+        }
         let msg: [String: Any] = [
             "clientContent": [
                 "turns": [["role": "user", "parts": [["text": framed]]]],
-                "turnComplete": false
+                "turnComplete": expectReply
             ]
         ]
         send(msg)

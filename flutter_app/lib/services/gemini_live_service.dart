@@ -50,6 +50,18 @@ class GeminiLiveService {
   String _currentTutorTranscript = '';
   bool _isIntentionalDisconnect = false;
 
+  // Orphaned-reply suppression. When the app moves a card while Marie is mid-reply, that
+  // reply is answering a world that no longer exists ("okay, here's the word…" for the OLD
+  // card). Cutting playback alone produced an ugly start-chop-restart stutter: the user
+  // heard the orphan's first second, then silence, then the real announcement. Instead the
+  // whole stale generation is discarded — audio chunks AND transcript — so the user hears
+  // one clean reply: the announcement. Cleared when the server signals the old generation
+  // ended (interrupted / turnComplete), with a watchdog timer as backstop.
+  bool _isModelGenerating = false;
+  bool _suppressStaleReply = false;
+  bool _suppressPreInjection = false;
+  Timer? _suppressWatchdog;
+
   static const systemPrompt = '''
 You are Marie, a warm, encouraging French tutor speaking to a student on a phone call. The student is working toward CLB 7 on the TEF/TCF Canada exam over a 6-month study plan — they are NOT necessarily a complete beginner, so calibrate your level from the STUDENT PROFILE you're given below rather than assuming. A student early in the plan needs slow, simple French with lots of English scaffolding; a student further along should be pushed with faster French, tougher vocabulary, and less hand-holding. Re-calibrate every call using the profile, don't default to "beginner mode" out of habit.
 
@@ -116,6 +128,8 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
 
   void disconnect() {
     _isIntentionalDisconnect = true;
+    _inputFlushTimer?.cancel();
+    _suppressWatchdog?.cancel();
     _sub?.cancel();
     _channel?.sink.close();
     _channel = null;
@@ -167,20 +181,58 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     }
   }
 
-  /// Sends a silent context note mid-call so Marie can be redirected toward a new topic
-  /// without ending the conversation. She's instructed to absorb it, not reply to it.
-  void injectContext(String note) {
+  /// Call at the moment the app invalidates Marie's in-flight reply (card move, drift cut).
+  /// If she's mid-generation, the rest of that generation is discarded — never played,
+  /// never surfaced as transcript — so her next audible words are her response to the
+  /// follow-up injection, with no stutter. If she's silent, incoming strays are dropped
+  /// only until the next spoken injection goes out, so the announcement reply itself is
+  /// never at risk.
+  void suppressCurrentReply() {
+    if (_isModelGenerating) {
+      _suppressStaleReply = true;
+      // Backstop: if neither interrupted nor turnComplete ever arrives for the stale
+      // generation (connection hiccup), don't mute her forever.
+      _suppressWatchdog?.cancel();
+      _suppressWatchdog = Timer(const Duration(seconds: 4), () {
+        _suppressStaleReply = false;
+      });
+    } else {
+      _suppressPreInjection = true;
+    }
+  }
+
+  void _clearStaleSuppression() {
+    _isModelGenerating = false;
+    _suppressStaleReply = false;
+    _suppressWatchdog?.cancel();
+  }
+
+  /// Sends a context note mid-call so Marie can be redirected toward a new topic without
+  /// ending the conversation. By default it's silent — she absorbs it and doesn't reply.
+  /// With `expectReply: true` the note is framed as something to react to out loud NOW and
+  /// the turn is closed so she actually generates a response — used for card changes, where
+  /// she should announce what's newly on screen ("now the word is…") instead of going quiet
+  /// or, worse, finishing a sentence about a card that's no longer there. Also used as the
+  /// session kickoff so SHE opens the call instead of waiting for the student to speak first.
+  void injectContext(String note, {bool expectReply = false}) {
     if (!_isSetupComplete || note.isEmpty) return;
-    final framed =
-        "(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à ceci, utilise-le seulement pour orienter la suite de la conversation) : $note";
+    final framed = expectReply
+        ? '(Note from the app, not the student — the on-screen card just changed or the '
+            'session needs you to speak. Your audio may have been cut off mid-sentence; do '
+            'NOT finish or refer back to your previous thought. React to this note now, '
+            'briefly: ) $note'
+        : '(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à '
+            'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     _send({
       'clientContent': {
         'turns': [
           {'role': 'user', 'parts': [{'text': framed}]},
         ],
-        'turnComplete': false,
+        'turnComplete': expectReply,
       },
     });
+    // The reply this injection triggers is wanted — stop dropping stray chunks now.
+    if (expectReply) _suppressPreInjection = false;
   }
 
   Future<void> _sendSetup() async {
@@ -314,6 +366,14 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
 
     final interrupted = serverContent['interrupted'];
     if (interrupted == true) {
+      final wasSuppressed = _suppressStaleReply;
+      _clearStaleSuppression();
+      // A suppressed generation officially never happened — don't surface its partial
+      // transcript as a spoken tutor line.
+      if (wasSuppressed) {
+        _currentTutorTranscript = '';
+        return;
+      }
       if (_currentTutorTranscript.isNotEmpty) {
         final t = _currentTutorTranscript;
         _currentTutorTranscript = '';
@@ -328,6 +388,15 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
       final t = inputTranscription['text'] as String?;
       if (t != null && t.isNotEmpty) {
         _currentUserTranscript += t;
+        // THE core sync fix: the student's transcript used to be delivered only when the
+        // MODEL's reply started streaming (or on turnComplete) — so with Marie instructed
+        // to wait silently, a spoken "next" sat in this buffer indefinitely and the card
+        // never moved. Input transcription streams in near-realtime while the student
+        // talks, so flush on a short trailing debounce instead: the utterance reaches the
+        // intent judge ~800ms after they stop speaking, with zero dependence on whether
+        // or when Marie replies.
+        _inputFlushTimer?.cancel();
+        _inputFlushTimer = Timer(const Duration(milliseconds: 800), _flushUserTranscript);
       }
     }
 
@@ -335,20 +404,20 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     if (outputTranscription is Map) {
       final t = outputTranscription['text'] as String?;
       if (t != null && t.isNotEmpty) {
-        onTranscriptDelta?.call(t);
-        if (_currentUserTranscript.isNotEmpty) {
-          final userTranscript = _currentUserTranscript;
-          _currentUserTranscript = '';
-          onUserTranscript?.call(userTranscript);
+        _isModelGenerating = true;
+        if (!_suppressStaleReply && !_suppressPreInjection) {
+          onTranscriptDelta?.call(t);
+          _flushUserTranscript();
+          _currentTutorTranscript += t;
         }
-        _currentTutorTranscript += t;
       }
     }
 
     final modelTurn = serverContent['modelTurn'];
     if (modelTurn is Map) {
+      _isModelGenerating = true;
       final parts = modelTurn['parts'];
-      if (parts is List) {
+      if (parts is List && !_suppressStaleReply && !_suppressPreInjection) {
         for (final part in parts) {
           if (part is! Map) continue;
           final inlineData = part['inlineData'];
@@ -366,10 +435,14 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
 
     final turnComplete = serverContent['turnComplete'];
     if (turnComplete == true) {
-      if (_currentUserTranscript.isNotEmpty) {
-        final userTranscript = _currentUserTranscript;
-        _currentUserTranscript = '';
-        onUserTranscript?.call(userTranscript);
+      final wasSuppressed = _suppressStaleReply;
+      _clearStaleSuppression();
+      _flushUserTranscript();
+      if (wasSuppressed) {
+        // The stale generation ended naturally before the follow-up injection landed —
+        // swallow it whole; the announcement reply will be its own fresh turn.
+        _currentTutorTranscript = '';
+        return;
       }
       if (_currentTutorTranscript.isNotEmpty) {
         final tutorTranscript = _currentTutorTranscript;
@@ -378,5 +451,15 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
       }
       onTurnComplete?.call();
     }
+  }
+
+  Timer? _inputFlushTimer;
+
+  void _flushUserTranscript() {
+    _inputFlushTimer?.cancel();
+    if (_currentUserTranscript.isEmpty) return;
+    final t = _currentUserTranscript;
+    _currentUserTranscript = '';
+    onUserTranscript?.call(t);
   }
 }

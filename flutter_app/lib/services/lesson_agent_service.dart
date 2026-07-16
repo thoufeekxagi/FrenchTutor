@@ -8,15 +8,20 @@ import '../config/api_keys.dart';
 import '../models/content_models.dart';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
-/// wrong quiz answers — all via OpenRouter free-tier text models. Voice (TTS/STT)
-/// is handled separately by LessonSpeechService; this service is text-only.
+/// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
+///
+/// Primary provider is Gemini Flash-Lite, chosen by live head-to-head benchmarking
+/// (July 2026) against the OpenRouter free tier on this app's actual prompt shapes:
+/// ~0.85s vs ~9s median for the session-planning JSON call, and the OpenRouter free
+/// tier's rate limits reject roughly half of a real session's calls outright — so
+/// OpenRouter is now the fallback, not the default.
 class AgentError implements Exception {
   const AgentError._(this.message);
 
   final String message;
 
   static const missingKey =
-      AgentError._('AI feedback unavailable — add an OpenRouter key in Settings.');
+      AgentError._('AI feedback unavailable — add a Gemini or OpenRouter key in Settings.');
   static const requestFailed =
       AgentError._('The AI tutor is busy right now. Try again in a moment.');
   static const badResponse = AgentError._('The AI tutor gave an unexpected response.');
@@ -73,28 +78,65 @@ class GrammarSessionPlan {
   final String focusNote;
 }
 
+/// What the student's utterance means for a live session, judged with full card
+/// context instead of keyword matching. `attempt` = they practiced the target;
+/// `chat` = conversation/question/echo — neither is a navigation command.
+/// `goto` carries a 1-based card number ("go to the third card").
+enum LiveNavIntent { advance, back, again, attempt, chat, goto }
+
+class LiveIntentVerdict {
+  LiveIntentVerdict({required this.intent, this.cardNumber, this.explicit = true});
+
+  final LiveNavIntent intent;
+
+  /// 1-based target card, only set when [intent] is [LiveNavIntent.goto].
+  final int? cardNumber;
+
+  /// True when the utterance itself is a navigation command ("next word", "skip");
+  /// false when it's mere agreement to the tutor's own offer ("yes", "oui", "sure").
+  /// The app honors explicit commands unconditionally (user sovereignty) but honors
+  /// consent only if the tutor's offer was legal — i.e. enough practice had happened.
+  final bool explicit;
+}
+
 class LessonAgentService {
   LessonAgentService._();
 
   static final LessonAgentService shared = LessonAgentService._();
 
-  /// Single fixed model, no fallback chain — MVP keeps this simple. Picked by live
-  /// head-to-head testing against the other free-tier candidates on the app's actual
-  /// prompt shapes: fastest turnaround (~3-4s vs. 8-13s) and the only one that returned
-  /// clean JSON with no stray leading/trailing whitespace to strip.
-  /// Overridable from Settings via the "openrouter_model_override" preference.
-  Future<String> get _model async {
+  /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
+  /// Google's newest Flash-Lite so we inherit upgrades for free.
+  static const _geminiTextModel = 'gemini-flash-lite-latest';
+
+  /// Fallback OpenRouter model, used only when the Gemini call fails or no Gemini key
+  /// is configured. Setting the "openrouter_model_override" preference forces ALL
+  /// traffic through OpenRouter with that model — the escape hatch if Gemini
+  /// misbehaves in the field.
+  Future<String> get _openRouterModel async {
     final prefs = await SharedPreferences.getInstance();
     final override = prefs.getString('openrouter_model_override');
     if (override != null && override.isNotEmpty) return override;
     return 'nvidia/nemotron-3-super-120b-a12b:free';
   }
 
-  Future<String> get _apiKey async {
+  Future<bool> get _forceOpenRouter async {
+    final prefs = await SharedPreferences.getInstance();
+    final override = prefs.getString('openrouter_model_override');
+    return override != null && override.isNotEmpty;
+  }
+
+  Future<String> get _openRouterApiKey async {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString('openrouter_api_key');
     if (stored != null && stored.isNotEmpty) return stored;
     return ApiKeys.openRouterKey;
+  }
+
+  Future<String> get _geminiApiKey async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getString('gemini_api_key');
+    if (stored != null && stored.isNotEmpty) return stored;
+    return ApiKeys.geminiKey;
   }
 
   static String extractJSON(String raw) {
@@ -181,6 +223,56 @@ Silently audit a French pronunciation attempt (student never sees this). They we
       {'role': 'user', 'content': user},
     ]);
     return _parseMistakeJudgment(raw);
+  }
+
+  /// The context-aware replacement for the screens' keyword `_detectIntent`. One call per
+  /// completed student utterance during a live session — Flash-Lite is fast enough
+  /// (~0.7s measured) that this sits inside the natural turn-taking gap. Callers keep
+  /// the keyword matcher as the fallback when this throws or times out.
+  ///
+  /// Consent rule (the student was clear about this): navigation must be EXPLICIT.
+  /// A bare "yes" advances only when it directly answers the tutor's own move-on
+  /// question; anything ambiguous stays put. The card + tutor-last-line context is what
+  /// makes it not tunnel-visioned: "yes, next to the station" is an answer, not a
+  /// command, and an echo of the tutor's own voice is nothing at all.
+  Future<LiveIntentVerdict> classifyLiveIntent({
+    required String utterance,
+    required String cardDescription,
+    required String tutorLastLine,
+    required int attemptCount,
+    required int cardPosition,
+    required int cardCount,
+  }) async {
+    const system = '''
+You classify one utterance from a student in a live voice French lesson. The app — not the tutor — moves the on-screen card based on your verdict. Reply with ONLY compact JSON: {"intent": "advance"|"back"|"again"|"attempt"|"chat"|"goto", "card": number_or_null, "explicit": boolean}.
+- "advance": an EXPLICIT request to move to the next card ("next", "next word", "got it, let's move on", "suivant") — set "explicit": true. A bare "yes"/"oui"/"sure" counts ONLY if the tutor's last line directly asked whether to move on — never otherwise — and is "explicit": false (it's consent to the tutor's offer, not the student's own command). "explicit" is true for every other navigation verdict (back/goto/again).
+- "back": an explicit request to return to the previous card.
+- "goto": an explicit request to jump to a specific card by number or position ("go to the third card", "back to card 2", "the first one", "the last card") — set "card" to the 1-based target number, using the card position/count given.
+- "again": they want the current item repeated or re-explained.
+- "attempt": they are practicing/attempting the current target (saying the French word or sentence, possibly imperfectly — speech recognition is noisy, be lenient).
+- "chat": anything else — a question, an answer to a non-navigation question, small talk. Words like "next"/"oui"/"continue" inside a longer sentence about something else (e.g. "the bakery is next to the station") are NOT commands.
+ECHO RULE (critical): the mic sometimes picks up the tutor's own voice, so compare the utterance to the tutor's last line word by word. If it repeats the tutor's NON-TARGET words — her prompts or questions like "ready for the next?" — it is an echo: "chat", NEVER navigation, even though it contains command-like words. Repeating only the target French word/sentence itself is the student practicing: "attempt".
+Moving the card without the student's clear consent is the worst failure mode. When genuinely ambiguous, ALWAYS prefer "attempt" or "chat" over any navigation verdict. "card" is null except for "goto".''';
+    final user = '''
+CURRENT CARD (number $cardPosition of $cardCount): $cardDescription
+TUTOR'S LAST LINE: ${tutorLastLine.isEmpty ? '(none yet)' : tutorLastLine}
+GENUINE ATTEMPTS ON THIS CARD SO FAR: $attemptCount
+STUDENT SAID: $utterance''';
+    final raw = await _complete(messages: [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': user},
+    ], maxTokens: 60, timeout: const Duration(seconds: 4));
+    final obj = _decodeObject(raw);
+    final intentRaw = obj['intent'] as String?;
+    final intent = LiveNavIntent.values.where((v) => v.name == intentRaw).firstOrNull;
+    if (intent == null) throw AgentError.badJSON(raw);
+    final cardValue = obj['card'];
+    final cardNumber = cardValue is int ? cardValue : (cardValue is double ? cardValue.toInt() : null);
+    return LiveIntentVerdict(
+      intent: intent,
+      cardNumber: cardNumber,
+      explicit: obj['explicit'] as bool? ?? true,
+    );
   }
 
   /// Runs once, briefly, before a vocab session starts — looks at recurring mistakes and
@@ -339,18 +431,93 @@ You are a French grammar tutor. The student answered a drill question incorrectl
 
   // MARK: - Networking
 
-  Future<String> _complete({required List<Map<String, String>> messages, int maxTokens = 1024}) async {
-    final key = await _apiKey;
-    if (key.isEmpty) throw AgentError.missingKey;
-    final model = await _model;
-    return _request(model: model, messages: messages, maxTokens: maxTokens, apiKey: key);
+  /// Provider chain: Gemini Flash-Lite first, OpenRouter as fallback. An explicit
+  /// "openrouter_model_override" preference skips Gemini entirely (field escape hatch).
+  Future<String> _complete({
+    required List<Map<String, String>> messages,
+    int maxTokens = 1024,
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
+    final orKey = await _openRouterApiKey;
+    if (await _forceOpenRouter) {
+      if (orKey.isEmpty) throw AgentError.missingKey;
+      return _requestOpenRouter(
+          model: await _openRouterModel, messages: messages, maxTokens: maxTokens, apiKey: orKey, timeout: timeout);
+    }
+    final geminiKey = await _geminiApiKey;
+    if (geminiKey.isNotEmpty) {
+      try {
+        return await _requestGemini(messages: messages, maxTokens: maxTokens, apiKey: geminiKey, timeout: timeout);
+      } catch (e) {
+        // Only swallow the Gemini error if there's an OpenRouter key to fall back to.
+        if (orKey.isEmpty) rethrow;
+      }
+    }
+    if (orKey.isEmpty) throw AgentError.missingKey;
+    return _requestOpenRouter(
+        model: await _openRouterModel, messages: messages, maxTokens: maxTokens, apiKey: orKey, timeout: timeout);
   }
 
-  Future<String> _request({
+  Future<String> _requestGemini({
+    required List<Map<String, String>> messages,
+    required int maxTokens,
+    required String apiKey,
+    required Duration timeout,
+  }) async {
+    final uri = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$apiKey');
+
+    // Same OpenAI-shaped message arrays all callers already build, mapped to Gemini's
+    // schema: system messages become systemInstruction, assistant becomes "model".
+    final systemText =
+        messages.where((m) => m['role'] == 'system').map((m) => m['content'] ?? '').join('\n\n');
+    final contents = messages
+        .where((m) => m['role'] != 'system')
+        .map((m) => {
+              'role': m['role'] == 'assistant' ? 'model' : 'user',
+              'parts': [{'text': m['content'] ?? ''}],
+            })
+        .toList();
+    final body = <String, dynamic>{
+      'contents': contents,
+      'generationConfig': {'temperature': 0.4, 'maxOutputTokens': maxTokens},
+    };
+    if (systemText.isNotEmpty) {
+      body['systemInstruction'] = {'parts': [{'text': systemText}]};
+    }
+
+    http.Response response;
+    try {
+      response = await http
+          .post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(body))
+          .timeout(timeout);
+    } catch (_) {
+      throw AgentError.requestFailed;
+    }
+    if (response.statusCode < 200 || response.statusCode > 299) throw AgentError.requestFailed;
+
+    try {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final candidates = json['candidates'] as List?;
+      final content =
+          (candidates?.isNotEmpty == true ? candidates!.first as Map<String, dynamic> : null)?['content']
+              as Map<String, dynamic>?;
+      final parts = content?['parts'] as List?;
+      final text = parts?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '').join() ?? '';
+      if (text.isEmpty) throw AgentError.badResponse;
+      return text.trim();
+    } catch (e) {
+      if (e is AgentError) rethrow;
+      throw AgentError.badResponse;
+    }
+  }
+
+  Future<String> _requestOpenRouter({
     required String model,
     required List<Map<String, String>> messages,
     required int maxTokens,
     required String apiKey,
+    required Duration timeout,
   }) async {
     final uri = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
     http.Response response;
@@ -374,7 +541,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
           'temperature': 0.4,
           'max_tokens': maxTokens,
         }),
-      );
+      ).timeout(timeout);
     } catch (_) {
       throw AgentError.requestFailed;
     }

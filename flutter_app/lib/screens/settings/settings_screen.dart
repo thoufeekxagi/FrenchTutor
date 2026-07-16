@@ -27,6 +27,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   double _narrationRate = 0.42;
   int _newCardsPerDay = 20;
+  int _practicePasses = 5;
   DateTime _roadmapStartDate = DateTime.now();
   String _modelOverride = '';
   String _openRouterKey = '';
@@ -52,6 +53,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       _narrationRate = prefs.getDouble('lesson_narration_rate') ?? 0.42;
       _newCardsPerDay = prefs.getInt('srs_new_cards_per_day') ?? 20;
+      _practicePasses = (prefs.getInt('practice_passes_per_word') ?? 5).clamp(2, 10);
       _modelOverride = prefs.getString('openrouter_model_override') ?? '';
       _openRouterKey = prefs.getString('openrouter_api_key') ?? '';
       _notetakerEnabled = prefs.getBool('notetaker_enabled') ?? false;
@@ -267,6 +269,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ],
+                const SizedBox(height: 8),
+                // How many honest attempts a NEW word needs in a live session before
+                // Marie is allowed to offer moving on (familiar words need two fewer).
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Practice passes per word: $_practicePasses',
+                            style: Passeport.body(12.5).copyWith(color: Passeport.text),
+                          ),
+                          Text(
+                            'How many times you repeat a new word before Marie may suggest the next one',
+                            style: Passeport.mono(10).copyWith(color: Passeport.slateDim),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _StepperButton(
+                      icon: CupertinoIcons.minus,
+                      onTap: _practicePasses > 2
+                          ? () {
+                              setState(() => _practicePasses -= 1);
+                              _saveInt('practice_passes_per_word', _practicePasses);
+                            }
+                          : null,
+                    ),
+                    const SizedBox(width: 8),
+                    _StepperButton(
+                      icon: CupertinoIcons.plus,
+                      onTap: _practicePasses < 10
+                          ? () {
+                              setState(() => _practicePasses += 1);
+                              _saveInt('practice_passes_per_word', _practicePasses);
+                            }
+                          : null,
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

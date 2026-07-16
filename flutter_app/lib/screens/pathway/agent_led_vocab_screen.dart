@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/api_keys.dart';
 import '../../config/theme.dart';
@@ -98,6 +99,29 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   final Set<String> _handledCallIds = {};
 
+  // Context-aware navigation: every completed utterance is classified by Flash-Lite (with
+  // the current card + Marie's last line as context) instead of keyword matching, so "yes,
+  // next to the station" reads as an answer while "next word please" reads as a command.
+  // The keyword matcher below is DISABLED but kept as the automatic fallback when the judge
+  // errors or times out. Flip to false to restore pure on-device keyword navigation.
+  static const _useLLMIntentJudge = true;
+
+  // Stale-verdict guard: only the newest utterance's classification may act, and only on
+  // the card it was launched for. "next… wait, go back" cancels the in-flight "next".
+  int _utteranceSeq = 0;
+
+  // Marie's most recent full spoken line — judge context for echo detection and for
+  // reading a bare "yes" as the answer to her own "ready to move on?" question.
+  String _lastTutorLine = '';
+
+  // Card-change announcements are debounced: a rapid "next next next" cancels the queued
+  // announcement for each skipped card so Marie only ever introduces the landing card.
+  Timer? _announceTimer;
+
+  // Consent cooldown: after any card move, further navigation verdicts are ignored for a
+  // beat — a duplicate/late transcript of the same command must never move twice.
+  DateTime _lastCardMoveAt = DateTime.fromMillisecondsSinceEpoch(0);
+
   /// Words failed ('again') during THIS session — they loop back at the end
   /// until passed, instead of silently vanishing until tomorrow.
   final Set<String> _againGradedThisSession = {};
@@ -107,20 +131,53 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
   bool _spokenWordMatched = false;
   bool _wordPulse = false;
 
-  static const _pacingReminder =
-      "Reminder: this is a total beginner — explain primarily in English, using French only for "
-      "the target word and its example sentence, not full French explanations. Do at least 4-5 "
-      "full passes (say the word, have them repeat, react, walk through the example sentence) "
-      "before you even suggest moving on — never propose it after just one or two repeats.";
+  // Drift enforcement: her spoken transcript streams word-by-word in lockstep with her
+  // audio, so the app can SEE her start teaching a future word while the screen still shows
+  // the current one — the exact "she asks 'ready for the next?' then answers herself and
+  // teaches fromage" failure. Prompts alone degrade over a session; when this buffer shows
+  // real teaching of a not-yet-current card (its example sentence, or repeated drilling of
+  // its word), her audio is cut and a corrective note pulls her back. Offering the next
+  // word by name once is allowed and won't trip this.
+  String _tutorTurnTranscript = '';
+  DateTime _lastDriftCorrectionAt = DateTime.fromMillisecondsSinceEpoch(0);
+
+  // One compact line appended to every card-change note. The full rules live in the
+  // system prompt; injections stay LEAN — re-stating everything on every card was bloat
+  // that buried the one thing each note actually needs to say.
+  static const _noteReminder =
+      'Explain in English only — reciting French is practice, never a cue to switch into '
+      'French-led talk. NEVER suggest moving on; the student alone decides when.';
+
+  // Offer permission: Marie may not offer moving on until the app has counted enough
+  // honest attempts (judge verdict "attempt") on the current card. She used to decide
+  // this herself and would offer after ONE repetition — prompt rules alone don't hold.
+  // The app now owns the counter and grants permission with a silent note; a bare "yes"
+  // to a premature offer is refused (explicit commands and buttons always work).
+  bool _offerUnlocked = false;
+
+  /// Practice passes required on a NEW word before Marie may offer moving on —
+  /// user-settable in Settings ("practice_passes_per_word"), default 5. Familiar words
+  /// need two fewer (min 2).
+  int _practicePasses = 5;
+
+  int get _offerThreshold {
+    final card = _currentCard;
+    if (card == null) return 0;
+    final isNew = _isNewById[card.entry.id] == true;
+    return isNew ? _practicePasses : (_practicePasses - 2).clamp(2, _practicePasses);
+  }
 
   _VocabSessionCard? get _currentCard => _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
 
-  // Adaptive app-side floor (P0.6): a brand-new word earns real practice
-  // (4 passes), a familiar one a quick confirmation (2), a mature one a single
-  // recall — not four ritual repetitions of a word the learner already owns.
+  // App-side floor on advancing. Under the LLM judge the session is self-paced — advance
+  // verdicts only come from EXPLICIT student commands, so honoring them fast matters more
+  // than ritual repetition, and the floor is simply "never skip a word you never even
+  // tried". In keyword-fallback mode the adaptive P0.6 floor stays (new=4, mature=1,
+  // else 2), because dumb matching can't tell a reflexive "yes" from real consent.
   int get _minAttemptsRequired {
     final card = _currentCard;
     if (card == null) return 0;
+    if (_useLLMIntentJudge) return 1;
     final state = _store.srsState(card.entry.id);
     if (state == null || state.reps == 0) return 4;
     if (state.isKnown) return 1;
@@ -142,6 +199,10 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     });
     _store = ref.read(learningStoreProvider);
     _recorder = SessionRecorder(storage: ref.read(storageServiceProvider), stage: 'vocab', topic: 'Vocabulary');
+    SharedPreferences.getInstance().then((prefs) {
+      final n = prefs.getInt('practice_passes_per_word');
+      if (n != null && mounted) setState(() => _practicePasses = n.clamp(2, 10));
+    });
     _sessionPlan = widget.vocabQueue.map((e) => _VocabSessionCard(e)).toList();
     _isNewById = {
       for (final entry in widget.vocabQueue) entry.id: (_store.srsState(entry.id)?.reps ?? 0) == 0,
@@ -187,6 +248,21 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
           setState(() => _errorMessage = 'Microphone permission denied');
         }
       });
+      // Marie opens the call — the Live API won't speak until it receives a turn, so
+      // without this she'd sit silent until the student talked first. She greets and
+      // introduces the first card; the student never has to prompt her.
+      final first = _currentCard;
+      if (first != null) {
+        final example = widget.examplesByWordId[first.entry.id];
+        final exampleNote =
+            example != null ? ' Example sentence to teach through: "${example.fr}" (${example.en}).' : '';
+        _gemini.injectContext(
+          'The call has just connected. Greet the student warmly in one short sentence, then '
+          'introduce the first word on their screen: ${first.entry.fr} = ${first.entry.en}.$exampleNote '
+          'Begin teaching it with step 1.',
+          expectReply: true,
+        );
+      }
     };
 
     _gemini.onDisconnected = () {
@@ -205,7 +281,10 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
       _handleUserTranscript(text);
     };
 
-    _gemini.onTutorTranscript = (text) => _recorder.logTutor(text);
+    _gemini.onTutorTranscript = (text) {
+      _recorder.logTutor(text);
+      _lastTutorLine = text;
+    };
 
     _gemini.onAudioChunk = (data) {
       _lastAudioChunkAt = DateTime.now();
@@ -218,6 +297,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
+      _tutorTurnTranscript = '';
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
       if (_isWrappingUp) _finish(completed: true);
     };
@@ -225,6 +305,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _gemini.onInterrupted = () {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
+      _tutorTurnTranscript = '';
       if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
     };
 
@@ -244,50 +325,172 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
   // MARK: - The gate: everything below decides whether Marie's proposals get honored
 
   /// Runs on every completed chunk of the student's own speech. Marks that *something*
-  /// happened this card, detects an explicit navigational intent if present, and fires the
-  /// invisible background judge.
+  /// happened this card, then asks the Flash-Lite judge what the utterance actually means
+  /// given the card and conversation — falling back to the keyword matcher if the judge is
+  /// unavailable. Navigation is still decided and executed by the app alone.
   void _handleUserTranscript(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
-    _hasAttempted = true;
-    final intent = _detectIntent(trimmed);
-    // Always reflect the MOST RECENT utterance, never let a stale "again"/"back" from an
-    // earlier turn linger and silently block future advances.
-    _lastDetectedIntent = intent;
-    if (intent == _UserIntent.none) {
-      _attemptCount += 1;
-      _lastAttemptText = trimmed;
+    // Deterministic echo guard (see looksLikeTutorEcho): Marie's own voice picked up by the
+    // mic must never count as the student speaking — let alone as navigation consent.
+    if (looksLikeTutorEcho(trimmed, _lastTutorLine) ||
+        looksLikeTutorEcho(trimmed, _tutorTurnTranscript)) {
+      _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
+      return;
     }
-    _logDebug('heard: "$trimmed" → intent: ${intent.name}, attempts: $_attemptCount');
+    _hasAttempted = true;
 
-    switch (intent) {
-      case _UserIntent.advance:
-        if (_attemptCount < _minAttemptsRequired) {
-          _logDebug('→ advance blocked: only $_attemptCount/$_minAttemptsRequired attempts so far');
+    if (!_useLLMIntentJudge) {
+      _applyIntent(_mapKeywordIntent(_detectIntent(trimmed)), utterance: trimmed, source: 'keyword');
+      return;
+    }
+
+    // A newer utterance always supersedes an in-flight classification — "next… wait,
+    // go back" must never execute the stale "next" after the "go back" arrives.
+    _utteranceSeq += 1;
+    final seq = _utteranceSeq;
+    final cardIndexAtLaunch = _cardIndex;
+    final card = _currentCard;
+    _logDebug('heard: "$trimmed" → judging…');
+
+    () async {
+      LiveIntentVerdict verdict;
+      var source = 'judge';
+      try {
+        String cardDescription;
+        if (card != null) {
+          final example = widget.examplesByWordId[card.entry.id];
+          cardDescription = 'vocabulary word "${card.entry.fr}" = "${card.entry.en}"'
+              '${example != null ? ', example sentence "${example.fr}"' : ''}';
         } else {
-          _advanceFromUserIntent();
+          cardDescription = '(session already finished)';
         }
-      case _UserIntent.back:
-        _goBackFromUserIntent();
-      case _UserIntent.again:
-      case _UserIntent.none:
-        break;
+        verdict = await LessonAgentService.shared.classifyLiveIntent(
+          utterance: trimmed,
+          cardDescription: cardDescription,
+          tutorLastLine: _lastTutorLine,
+          attemptCount: _attemptCount,
+          cardPosition: _cardIndex + 1,
+          cardCount: _sessionPlan.length,
+        );
+      } catch (_) {
+        // Judge down/slow — the session must not freeze. The old keyword matcher
+        // takes this one utterance, exactly as it always did.
+        verdict = _mapKeywordIntent(_detectIntent(trimmed));
+        source = 'keyword-fallback';
+      }
+      if (!mounted || _finished) return;
+      // Stale guard: the world may have moved on while we were classifying.
+      if (seq != _utteranceSeq || cardIndexAtLaunch != _cardIndex) {
+        _logDebug('→ stale verdict (${verdict.intent.name}) discarded');
+        return;
+      }
+      _applyIntent(verdict, utterance: trimmed, source: source);
+    }();
+  }
+
+  /// Bridges the old keyword enum onto the judge's richer verdict space — the fallback
+  /// path. Keyword matching can't tell an attempt from chatter, so `none` maps to
+  /// `attempt`, matching the old behavior where every non-command utterance counted.
+  LiveIntentVerdict _mapKeywordIntent(_UserIntent intent) {
+    switch (intent) {
+      case _UserIntent.advance: return LiveIntentVerdict(intent: LiveNavIntent.advance);
+      case _UserIntent.back: return LiveIntentVerdict(intent: LiveNavIntent.back);
+      case _UserIntent.again: return LiveIntentVerdict(intent: LiveNavIntent.again);
+      case _UserIntent.none: return LiveIntentVerdict(intent: LiveNavIntent.attempt);
     }
   }
 
-  /// Executes an advance the app itself decided on — from detected speech intent or a direct
+  /// The single place a classified utterance becomes action — judge and fallback paths
+  /// converge here, so the two can never drift apart.
+  void _applyIntent(LiveIntentVerdict verdict, {required String utterance, required String source}) {
+    _logDebug('[$source] "$utterance" → ${verdict.intent.name}'
+        '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}, attempts: $_attemptCount');
+
+    final isNavigation = verdict.intent == LiveNavIntent.advance ||
+        verdict.intent == LiveNavIntent.back ||
+        verdict.intent == LiveNavIntent.goto;
+    // Consent cooldown: a duplicate/late transcript of a command that already moved the
+    // card must never move it a second time.
+    if (isNavigation &&
+        DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
+      _logDebug('→ navigation ignored (cooldown after recent card move)');
+      return;
+    }
+
+    switch (verdict.intent) {
+      case LiveNavIntent.attempt:
+        _lastDetectedIntent = _UserIntent.none;
+        _attemptCount += 1;
+        _lastAttemptText = utterance;
+        _maybeUnlockOffer();
+      case LiveNavIntent.chat:
+        _lastDetectedIntent = _UserIntent.none;
+      case LiveNavIntent.again:
+        _lastDetectedIntent = _UserIntent.again;
+      case LiveNavIntent.advance:
+        _lastDetectedIntent = _UserIntent.advance;
+        if (_attemptCount < _minAttemptsRequired) {
+          // The one unbreakable app-side rule: never skip a word with zero attempts.
+          _logDebug('→ advance blocked: only $_attemptCount/$_minAttemptsRequired attempts so far');
+        } else if (!verdict.explicit && !_offerUnlocked) {
+          // A bare "yes" consenting to an offer Marie wasn't allowed to make yet. The
+          // student's own explicit "next"/button always works — this only refuses
+          // premature-offer consent, which is Marie's failure, not the student's choice.
+          _refusePrematureConsent();
+        } else {
+          _advanceFromUserIntent();
+        }
+      case LiveNavIntent.back:
+        _lastDetectedIntent = _UserIntent.back;
+        _goBackFromUserIntent();
+      case LiveNavIntent.goto:
+        _goToCard(verdict.cardNumber);
+    }
+  }
+
+  /// Practice threshold reached. Marie is NOT told — offers are banned outright (she abused
+  /// the permission within hours of shipping it). The flag now only (a) flips the on-screen
+  /// chip to "ready when you are" so the STUDENT knows, and (b) lets a bare "yes" count as
+  /// consent, covering the rare legitimate case where the student asks "should I move on?"
+  /// themselves and answers her reply.
+  void _maybeUnlockOffer() {
+    if (_offerUnlocked || _attemptCount < _offerThreshold) return;
+    if (_currentCard == null) return;
+    _offerUnlocked = true;
+    _logDebug('→ practice threshold reached ($_attemptCount/$_offerThreshold), chip flipped');
+  }
+
+  /// Marie suggested moving on (banned) and the student reflexively said "yes" — the card
+  /// stays put, and she's silently told to keep practicing instead of waiting on an answer.
+  void _refusePrematureConsent() {
+    final card = _currentCard;
+    if (card == null) return;
+    _logDebug('→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)');
+    _gemini.injectContext(
+        'The card did NOT move — "${card.entry.fr}" needs more practice '
+        '($_attemptCount of $_offerThreshold attempts so far). You should never have suggested '
+        'moving on. Smoothly continue practicing this word and never suggest advancing again.');
+  }
+
+  /// Executes an advance the app itself decided on — from the judge's verdict or a direct
   /// UI tap, the two are identical from here. No model involved in the decision at all.
   void _advanceFromUserIntent() {
     if (_currentCard == null) return;
     _logDebug('→ user-driven advance');
+    _cutTutorAudio();
     _performAdvance();
     final next = _currentCard;
     if (next != null) {
-      final example = widget.examplesByWordId[next.entry.id];
-      final exampleNote = example != null ? ' Example sentence to teach through: "${example.fr}" (${example.en}).' : '';
-      _gemini.injectContext(
-        'The student has moved on to the next word: ${next.entry.fr} = ${next.entry.en}.$exampleNote $_pacingReminder',
-      );
+      // Continuity matters here: she usually just OFFERED this exact word ("want to try
+      // fromage — cheese?") and the student accepted. A cold "the next word is fromage,
+      // it means cheese" re-introduction right after that sounds broken — she should pick
+      // up from her own offer as one continuous conversation.
+      _scheduleCardAnnouncement(
+          'The student accepted — the screen now shows: ${next.entry.fr} = ${next.entry.en}.'
+          '${_exampleNote(next)} If you just offered this word, continue smoothly from that '
+          '(no cold re-introduction): say "${next.entry.fr}" aloud with its meaning and have '
+          'them repeat it. $_noteReminder');
     } else {
       _wrapUp();
     }
@@ -296,15 +499,79 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
   void _goBackFromUserIntent() {
     if (_cardIndex <= 0) return;
     _logDebug('→ user-driven go back');
+    _cutTutorAudio();
     _performGoBack();
     final card = _currentCard;
     if (card != null) {
-      final example = widget.examplesByWordId[card.entry.id];
-      final exampleNote = example != null ? ' Example sentence to teach through: "${example.fr}" (${example.en}).' : '';
-      _gemini.injectContext(
-        'The student asked to go back to: ${card.entry.fr} = ${card.entry.en}.$exampleNote $_pacingReminder',
-      );
+      _scheduleCardAnnouncement(
+          'The student asked to go back — the screen now shows: ${card.entry.fr} = '
+          '${card.entry.en}.${_exampleNote(card)} Re-anchor it briefly ("We\'re back on '
+          '${card.entry.fr} — ${card.entry.en}") and have them try it once. $_noteReminder');
     }
+  }
+
+  /// Jump straight to a specific card by 1-based number — "go to the third card".
+  /// Grading/judging of the card being left matches the back path (no silent grade).
+  void _goToCard(int? cardNumber) {
+    if (cardNumber == null) {
+      _logDebug('→ goto ignored: no card number');
+      return;
+    }
+    final target = cardNumber - 1;
+    if (target < 0 || target >= _sessionPlan.length) {
+      _logDebug('→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})');
+      return;
+    }
+    if (target == _cardIndex) {
+      _logDebug('→ goto ignored: already on card $cardNumber');
+      return;
+    }
+    _logDebug('→ user-driven jump to card $cardNumber');
+    _cutTutorAudio();
+    _fireBatchedJudge();
+    _lastCardMoveAt = DateTime.now();
+    setState(() {
+      _cardIndex = target;
+      _resetPerCardState();
+    });
+    final card = _currentCard;
+    if (card != null) {
+      _scheduleCardAnnouncement(
+          'The student jumped to word $cardNumber — the screen now shows: ${card.entry.fr} = '
+          '${card.entry.en}.${_exampleNote(card)} Announce it briefly ("Word $cardNumber: '
+          '${card.entry.fr} — ${card.entry.en}") and teach it. $_noteReminder');
+    }
+  }
+
+  String _exampleNote(_VocabSessionCard card) {
+    final example = widget.examplesByWordId[card.entry.id];
+    return example != null ? ' Example: "${example.fr}" (${example.en}).' : '';
+  }
+
+  /// "Next" means the student is done listening. Her speech arrives as audio chunks WE
+  /// play, so flushing the local playback queue silences her instantly — no round trip to
+  /// Google — and the mic reopens right away. The follow-up announcement then tells her
+  /// not to finish the amputated thought.
+  void _cutTutorAudio() {
+    // Discard the REST of her in-flight reply too (audio still streaming from the server),
+    // not just what's queued locally — otherwise the user hears one second of her answering
+    // the old card, a chop, then the announcement: the stutter. One clean reply instead.
+    _gemini.suppressCurrentReply();
+    _audio.stopPlayback();
+    _audio.isOutputActive = false;
+    if (mounted && _callStatus == CallStatus.tutorSpeaking) {
+      setState(() => _callStatus = CallStatus.listening);
+    }
+  }
+
+  /// Card announcements are spoken (expectReply), but debounced: a rapid "next next next"
+  /// cancels each skipped card's pending announcement so Marie only introduces where the
+  /// student actually landed.
+  void _scheduleCardAnnouncement(String note) {
+    _announceTimer?.cancel();
+    _announceTimer = Timer(const Duration(milliseconds: 600), () {
+      if (!_finished) _gemini.injectContext(note, expectReply: true);
+    });
   }
 
   /// The actual card-advance side effects (grading, index, reset) — shared by the accepted
@@ -321,6 +588,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     }
     _fireBatchedJudge();
     if (_currentCard != null) _reviewedCount += 1;
+    _lastCardMoveAt = DateTime.now();
     setState(() {
       _cardIndex += 1;
       _resetPerCardState();
@@ -329,6 +597,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   void _performGoBack() {
     _fireBatchedJudge();
+    _lastCardMoveAt = DateTime.now();
     setState(() {
       _cardIndex -= 1;
       _resetPerCardState();
@@ -448,12 +717,19 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _recentTranscriptBuffer = '';
     _lastAttemptText = null;
     _handledCallIds.clear();
+    _offerUnlocked = false;
+    // Must clear on card change: after a "go back", a word she legitimately taught earlier
+    // becomes a FUTURE word again — stale mentions of it in the buffer would false-trip
+    // the drift enforcer.
+    _tutorTurnTranscript = '';
   }
 
   /// Watches her live speech transcript for the current word — the moment it appears is a
   /// reliable "she's saying it right now" signal, since output transcription streams in
   /// lockstep with the audio itself. Triggers a brief highlight pulse on the French text.
+  /// Also feeds the drift enforcer, which watches the same stream for future-card teaching.
   void _handleTranscriptDelta(String delta) {
+    _watchForTutorDrift(delta);
     final card = _currentCard;
     if (_spokenWordMatched || card == null) return;
     _recentTranscriptBuffer += delta;
@@ -468,6 +744,86 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) setState(() => _wordPulse = false);
     });
+  }
+
+  /// The teeth behind the offer-only rule. Offering the next word is legitimate — naming it
+  /// once, even with its meaning ("want to try fromage, cheese?"). TEACHING it is not, and
+  /// the two are cheaply distinguishable in her live transcript: teaching means saying a
+  /// future word's example sentence (examples exist only to teach through) or drilling the
+  /// word repeatedly (3+ times in one turn). Either trips the enforcer: her audio is cut on
+  /// the spot and a corrective note pulls her back to the on-screen card.
+  void _watchForTutorDrift(String delta) {
+    if (_currentCard == null) return;
+    _tutorTurnTranscript += delta;
+    if (_tutorTurnTranscript.length > 1500) {
+      _tutorTurnTranscript = _tutorTurnTranscript.substring(_tutorTurnTranscript.length - 1500);
+    }
+    // Post-correction grace: she needs a beat to say the corrective line (which itself
+    // names the current word) without immediately re-tripping.
+    if (DateTime.now().difference(_lastDriftCorrectionAt).inMilliseconds < 8000) return;
+    final folded = foldFrench(_tutorTurnTranscript);
+
+    // Offers are BANNED — prompt rules alone leaked within hours ("want to try the next
+    // word?" at 2/5 practices), so her live speech is checked for move-on suggestions and
+    // cut on the spot. Grace after a card move: her legitimate announcement ("the next
+    // word is fromage") uses the same phrases.
+    if (DateTime.now().difference(_lastCardMoveAt).inMilliseconds > 12000) {
+      const offerPhrases = [
+        'next word', 'next one', 'move on', 'moving on', 'ready for the next',
+        'try the next', 'shall we continue', 'want to continue', 'ready to continue',
+        'mot suivant', 'passons au', 'on passe au', 'prochain mot',
+      ];
+      if (offerPhrases.any(folded.contains)) {
+        _correctIllegalOffer();
+        return;
+      }
+    }
+    for (var i = _cardIndex + 1; i < _sessionPlan.length; i++) {
+      final future = _sessionPlan[i].entry;
+      final fr = foldFrench(future.fr);
+      if (fr.isEmpty) continue;
+      final example = widget.examplesByWordId[future.id];
+      final saidExample = example != null && folded.contains(foldFrench(example.fr));
+      final wordHits = RegExp('\\b${RegExp.escape(fr)}\\b').allMatches(folded).length;
+      if (saidExample || wordHits >= 3) {
+        _correctTutorDrift(future);
+        return;
+      }
+    }
+  }
+
+  /// She suggested moving on — cut her off mid-word and pull her back. Same machinery as
+  /// the drift cut (audio flush + stale-reply suppression), so the recovery sounds clean.
+  void _correctIllegalOffer() {
+    final current = _currentCard;
+    if (current == null) return;
+    _lastDriftCorrectionAt = DateTime.now();
+    _tutorTurnTranscript = '';
+    _logDebug('→ ILLEGAL OFFER: Marie suggested moving on — cutting her off');
+    _cutTutorAudio();
+    _gemini.injectContext(
+      'STOP — you suggested moving on, which you must NEVER do. The student decides when to '
+      'move, alone, and their screen tells them how. Resume practicing "${current.entry.fr}" = '
+      '"${current.entry.en}" right now, warmly, as if you had never asked.',
+      expectReply: true,
+    );
+  }
+
+  void _correctTutorDrift(VocabEntry future) {
+    final current = _currentCard;
+    if (current == null) return;
+    _lastDriftCorrectionAt = DateTime.now();
+    _tutorTurnTranscript = '';
+    _logDebug('→ DRIFT: Marie started teaching "${future.fr}" while "${current.entry.fr}" is on screen — cutting her off');
+    _cutTutorAudio();
+    _gemini.injectContext(
+      'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
+      'screen still shows "${current.entry.fr}" = "${current.entry.en}", and only the student\'s '
+      'own words move the card. You may OFFER the next word by name and then wait silently for '
+      'their answer — never teach it. Pick up "${current.entry.fr}" again now, briefly, as if '
+      'nothing happened.',
+      expectReply: true,
+    );
   }
 
   /// Fires exactly once per word, right as the app leaves that card (forward or back) —
@@ -526,6 +882,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
           'Before wrapping up: the student struggled with ${retryCards.length} word(s) earlier — '
           'loop back through them one more time, starting with ${first.fr} = ${first.en}. '
           'Keep it light and encouraging: one quick recall attempt each, no full re-teach unless they miss it again.',
+          expectReply: true,
         );
         _logDebug('→ again-loop round $_againLoopRounds: ${retryCards.length} word(s) re-queued');
         return;
@@ -534,6 +891,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _isWrappingUp = true;
     _gemini.injectContext(
       'The student has now reviewed every word on today\'s list. Say a short warm closing line (one sentence) congratulating them, then stop talking.',
+      expectReply: true,
     );
   }
 
@@ -542,6 +900,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     _finished = true;
     _timer?.cancel();
     _speakingWatchdog?.cancel();
+    _announceTimer?.cancel();
     _audio.stopStreaming();
     _audio.dispose();
     _gemini.disconnect();
@@ -787,6 +1146,17 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
               ),
               const SizedBox(height: 4),
               Text(card.entry.phonetic, style: Passeport.mono(13).copyWith(color: Passeport.slateDim)),
+              const SizedBox(height: 10),
+              // The pacing made visible: attempts counted so far vs. the practice passes
+              // this word needs before Marie is allowed to offer moving on.
+              Text(
+                _offerUnlocked
+                    ? 'ready when you are — say "next"'
+                    : '${_attemptCount.clamp(0, _offerThreshold)} of $_offerThreshold practices',
+                style: Passeport.mono(10.5).copyWith(
+                  color: _offerUnlocked ? Passeport.brass : Passeport.slateDim,
+                ),
+              ),
             ],
           ),
         ),
@@ -903,11 +1273,22 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     // Marie's English/French ratio follows the learner's self-declared level —
     // a total beginner drowning in French and an intermediate being drip-fed
     // English both churn (PILOT_PLAN.md Phase 3).
+    // The student RECITING French (the target word, the example sentence) is practice, not
+    // conversation — the base prompt's "if the student speaks French, respond in French"
+    // rule must never fire on it, or one successful example recitation flips her into
+    // French-led speech at a beginner. Stated in both branches because she escalated
+    // exactly this way in testing.
+    const noEscalation =
+        ' ABSOLUTE RULE — RECITING IS NOT CONVERSING: when the student says the French word '
+        'or example sentence, that is them PRACTICING what you asked them to repeat, never a '
+        'signal that they can hold French conversation. Do not switch into French-led '
+        'explanations after a good recitation — stay at exactly the same English-led level '
+        'for the whole session, from first word to last.';
     final languageGuidance = switch (learnerLevel) {
       'conversational' =>
-        'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.',
+        'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.$noEscalation',
       _ =>
-        'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.',
+        'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.$noEscalation',
     };
     final parts = <String>[];
     parts.add('''
@@ -915,7 +1296,11 @@ VOCAB STAGE — this is a focused vocabulary session, nothing else. The student'
 
 $languageGuidance
 
-CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and the instant they say something like "next", "got it", "ready", or "go back", the app moves the card itself — instantly, on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take — you aren't taking one. Instead, teach the current word for as long as it takes, and when it feels like a natural moment, ask a genuine question like "does that feel good? Ready for the next one?" — this is real conversation, not a mechanism, since it's the student's own answer (heard by the app, not you) that actually moves things forward.
+CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and when they say something like "next", "got it", or "go back", the app moves the card itself — on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take — you aren't taking one.
+
+ABSOLUTE RULE — NEVER, EVER SUGGEST MOVING ON. Not "ready for the next word?", not "want to try the next one?", not "shall we continue?" — NOTHING of the kind, at any point, for any reason. The student is here to LEARN, not to be hurried along; their screen already tells them how to move on, and when they are ready THEY will say so or tap the button. You have exactly one job: keep practicing the current word — say it, have them repeat, react, work the example, again and again — until the app tells you the card changed. If you feel a pass went well, the correct next move is ANOTHER pass or a genuine question about the current word, never a suggestion to advance. The app monitors your speech and will cut your audio off and correct you the moment you suggest moving on. There is no number of repetitions after which suggesting becomes acceptable — the answer is always: it is not your call.
+
+Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen; the student's screen has not changed, so teaching ahead means teaching something they cannot see. Only once the app tells you the card has changed do you teach the new word.
 
 You have exactly one tool: mark_result, for recording how well the student did with the current word (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted the word. A rejection is not an error; never mention it to the student, just keep teaching naturally and try again once appropriate.
 

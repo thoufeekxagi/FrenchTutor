@@ -1,23 +1,39 @@
 import Foundation
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
-/// wrong quiz answers — all via OpenRouter free-tier text models. Voice (TTS/STT)
-/// is handled separately by LessonSpeechService; this service is text-only.
+/// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
+///
+/// Primary provider is Gemini Flash-Lite, chosen by live head-to-head benchmarking
+/// (July 2026) against the OpenRouter free tier on this app's actual prompt shapes:
+/// ~0.85s vs ~9s median for the session-planning JSON call, ~1.3s vs all-trials-429
+/// for the reading-passage call. The OpenRouter free tier's rate limits reject roughly
+/// half of a real session's calls outright, so it's now the fallback, not the default.
 final class LessonAgentService {
     static let shared = LessonAgentService()
     private init() {}
 
-    /// Single fixed model, no fallback chain — MVP keeps this simple. Picked by live
-    /// head-to-head testing against the other free-tier candidates on the app's actual
-    /// prompt shapes: fastest turnaround (~3-4s vs. 8-13s) and the only one that returned
-    /// clean JSON with no stray leading/trailing whitespace to strip.
-    /// Overridable from Settings via UserDefaults key "openrouter_model_override".
-    private var model: String {
+    /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
+    /// Google's newest Flash-Lite (currently 3.1) so we inherit upgrades for free.
+    private let geminiTextModel = "gemini-flash-lite-latest"
+
+    /// Fallback OpenRouter model, used only when the Gemini call fails or no Gemini key
+    /// is configured. Setting UserDefaults "openrouter_model_override" (Settings) forces
+    /// ALL traffic through OpenRouter with that model — the escape hatch if Gemini
+    /// misbehaves in the field.
+    private var openRouterModel: String {
         if let override = UserDefaults.standard.string(forKey: "openrouter_model_override"),
            !override.isEmpty {
             return override
         }
         return "nvidia/nemotron-3-super-120b-a12b:free"
+    }
+
+    private var forceOpenRouter: Bool {
+        if let override = UserDefaults.standard.string(forKey: "openrouter_model_override"),
+           !override.isEmpty {
+            return true
+        }
+        return false
     }
 
     enum AgentError: Error, LocalizedError {
@@ -28,7 +44,7 @@ final class LessonAgentService {
 
         var errorDescription: String? {
             switch self {
-            case .missingKey: return "AI feedback unavailable — add an OpenRouter key in Settings."
+            case .missingKey: return "AI feedback unavailable — add a Gemini or OpenRouter key in Settings."
             case .requestFailed: return "The AI tutor is busy right now. Try again in a moment."
             case .badResponse: return "The AI tutor gave an unexpected response."
             case .badJSON(let raw): return "LLM returned non-JSON: \(String(raw.prefix(200)))"
@@ -142,6 +158,60 @@ final class LessonAgentService {
             ["role": "user", "content": user]
         ])
         return try parseMistakeJudgment(raw)
+    }
+
+    /// What the student's utterance means for the live session, judged with full card
+    /// context instead of keyword matching. `attempt` = they practiced the target;
+    /// `chat` = conversation/question/echo — neither is a navigation command.
+    enum LiveNavIntent: String {
+        case advance, back, again, attempt, chat
+    }
+
+    /// The context-aware replacement for the views' keyword `detectIntent`. One call per
+    /// completed student utterance during a live session — Flash-Lite is fast enough
+    /// (~0.7s measured) that this sits inside the natural turn-taking gap. Callers keep
+    /// the keyword matcher as the fallback when this throws or times out.
+    ///
+    /// The context lines below are what make it not "tunnel visioned": "yes, next to the
+    /// station" is an answer, not a command, and only the card + tutor line let a model
+    /// see that. The tutor's last line also guards against speaker echo — if the mic
+    /// picked up Marie's own "on passe au suivant", the judge is told to call it `chat`.
+    func classifyLiveIntent(utterance: String, cardDescription: String, tutorLastLine: String, attemptCount: Int) async throws -> LiveNavIntent {
+        let system = """
+        You classify one utterance from a student in a live voice French lesson. The app — not \
+        the tutor — moves the on-screen card based on your verdict. Reply with ONLY compact JSON: \
+        {"intent": "advance"|"back"|"again"|"attempt"|"chat"}.
+        - "advance": they clearly want to move to the next card ("next", "got it, let's move on", \
+        a bare "yes"/"oui" directly answering the tutor's move-on question).
+        - "back": they clearly want to return to the previous card.
+        - "again": they want the current item repeated.
+        - "attempt": they are practicing/attempting the current target (saying the French word or \
+        sentence, possibly imperfectly — speech recognition is noisy, be lenient).
+        - "chat": anything else — a question, an answer to a non-navigation question, small talk. \
+        Words like "next"/"oui"/"continue" inside a longer sentence about something else (e.g. \
+        "the bakery is next to the station") are NOT commands. If the utterance merely echoes the \
+        tutor's own last line (mic picked up the tutor's voice), it is "chat".
+        When genuinely ambiguous, prefer "attempt" or "chat" over navigation — a wrong non-move is \
+        harmless, a wrong move is not.
+        """
+        let user = """
+        CURRENT CARD: \(cardDescription)
+        TUTOR'S LAST LINE: \(tutorLastLine.isEmpty ? "(none yet)" : tutorLastLine)
+        GENUINE ATTEMPTS ON THIS CARD SO FAR: \(attemptCount)
+        STUDENT SAID: \(utterance)
+        """
+        let raw = try await complete(messages: [
+            ["role": "system", "content": system],
+            ["role": "user", "content": user]
+        ], maxTokens: 60, timeout: 4)
+        let jsonString = Self.extractJSON(from: raw)
+        guard let data = jsonString.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let intentRaw = obj["intent"] as? String,
+              let intent = LiveNavIntent(rawValue: intentRaw) else {
+            throw AgentError.badJSON(raw)
+        }
+        return intent
     }
 
     struct SessionPlan {
@@ -335,13 +405,65 @@ final class LessonAgentService {
 
     // MARK: - Networking
 
-    private func complete(messages: [[String: String]], maxTokens: Int = 1024) async throws -> String {
+    /// Provider chain: Gemini Flash-Lite first, OpenRouter as fallback. An explicit
+    /// "openrouter_model_override" in Settings skips Gemini entirely (field escape hatch).
+    private func complete(messages: [[String: String]], maxTokens: Int = 1024, timeout: TimeInterval = 30) async throws -> String {
+        if forceOpenRouter {
+            guard !openRouterApiKey.isEmpty else { throw AgentError.missingKey }
+            return try await requestOpenRouter(model: openRouterModel, messages: messages, maxTokens: maxTokens, timeout: timeout)
+        }
+        if !geminiApiKey.isEmpty {
+            do {
+                return try await requestGemini(messages: messages, maxTokens: maxTokens, timeout: timeout)
+            } catch {
+                // Only swallow the Gemini error if there's an OpenRouter key to fall back to.
+                guard !openRouterApiKey.isEmpty else { throw error }
+            }
+        }
         guard !openRouterApiKey.isEmpty else { throw AgentError.missingKey }
-        return try await request(model: model, messages: messages, maxTokens: maxTokens)
+        return try await requestOpenRouter(model: openRouterModel, messages: messages, maxTokens: maxTokens, timeout: timeout)
     }
 
-    private func request(model: String, messages: [[String: String]], maxTokens: Int) async throws -> String {
+    private func requestGemini(messages: [[String: String]], maxTokens: Int, timeout: TimeInterval) async throws -> String {
+        var req = URLRequest(url: URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(geminiTextModel):generateContent?key=\(geminiApiKey)")!)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.timeoutInterval = timeout
+
+        // Same OpenAI-shaped message arrays all callers already build, mapped to Gemini's
+        // schema: system messages become systemInstruction, assistant becomes "model".
+        let systemText = messages.filter { $0["role"] == "system" }.compactMap { $0["content"] }.joined(separator: "\n\n")
+        let contents: [[String: Any]] = messages.filter { $0["role"] != "system" }.map {
+            ["role": $0["role"] == "assistant" ? "model" : "user",
+             "parts": [["text": $0["content"] ?? ""]]]
+        }
+        var body: [String: Any] = [
+            "contents": contents,
+            "generationConfig": ["temperature": 0.4, "maxOutputTokens": maxTokens]
+        ]
+        if !systemText.isEmpty {
+            body["systemInstruction"] = ["parts": [["text": systemText]]]
+        }
+        req.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await URLSession.shared.data(for: req)
+        guard let http = response as? HTTPURLResponse else { throw AgentError.badResponse }
+        guard (200...299).contains(http.statusCode) else { throw AgentError.requestFailed }
+
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let candidates = json["candidates"] as? [[String: Any]],
+              let content = candidates.first?["content"] as? [String: Any],
+              let parts = content["parts"] as? [[String: Any]] else {
+            throw AgentError.badResponse
+        }
+        let text = parts.compactMap { $0["text"] as? String }.joined()
+        guard !text.isEmpty else { throw AgentError.badResponse }
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func requestOpenRouter(model: String, messages: [[String: String]], maxTokens: Int, timeout: TimeInterval) async throws -> String {
         var req = URLRequest(url: URL(string: "https://openrouter.ai/api/v1/chat/completions")!)
+        req.timeoutInterval = timeout
         req.httpMethod = "POST"
         req.setValue("Bearer \(openRouterApiKey)", forHTTPHeaderField: "Authorization")
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")

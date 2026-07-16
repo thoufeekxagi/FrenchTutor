@@ -77,6 +77,27 @@ struct AgentLedVocabView: View {
     @State private var lastAttemptText: String? = nil
     @State private var pendingJudgeTask: Task<Void, Never>? = nil
 
+    // Context-aware navigation: every completed utterance is classified by Flash-Lite (with the
+    // current card + Marie's last line as context) instead of keyword matching, so "yes, next
+    // to the station" reads as an answer while "yes, next" reads as a command. The keyword
+    // matcher below is DISABLED but kept as the automatic fallback when the judge errors or
+    // times out. Flip this to false to restore pure on-device keyword navigation.
+    private static let useLLMIntentJudge = true
+
+    // Stale-verdict guards: only the newest utterance's classification may act, and only on
+    // the card it was launched for. "next… wait, go back" cancels the in-flight "next".
+    @State private var utteranceSeq = 0
+    @State private var pendingIntentTask: Task<Void, Never>? = nil
+
+    // Marie's most recent full spoken line — judge context for echo detection ("did the mic
+    // just feed her own words back?") and for reading a bare "yes" as the answer to her
+    // "ready to move on?" question.
+    @State private var lastTutorLine = ""
+
+    // Card-change announcements are debounced: a rapid "next next next" cancels the queued
+    // announcement for each skipped card so Marie only ever introduces the landing card.
+    @State private var announceWorkItem: DispatchWorkItem? = nil
+
     // Duplicate-call guard: Gemini Live is documented to occasionally fire the identical
     // tool call twice in rapid succession. Track handled IDs and no-op the repeat.
     @State private var handledCallIds: Set<String> = []
@@ -108,13 +129,14 @@ struct AgentLedVocabView: View {
         cardIndex < sessionPlan.count ? sessionPlan[cardIndex] : nil
     }
 
-    // Hard app-side floor, mirroring the pacing rule already stated in the system prompt.
-    // The prompt alone isn't reliable — the comment above `pacingReminder` documents that her
-    // adherence visibly degrades deeper into a session — so this is the backstop that actually
-    // guarantees the beginner pacing regardless of what she does or forgets. Flat 4 attempts
-    // for every word for now, NEW or FAMILIAR — revisit differentiating them later.
+    // Hard app-side floor on advancing. With the LLM judge the session is self-paced — the
+    // judge sees the attempt count and the conversation and decides what an utterance means —
+    // so the floor drops to 1: the only unbreakable rule is "you can't skip a word you never
+    // even tried". In keyword-fallback mode the old flat 4 stays, because dumb matching has no
+    // way to distinguish a reflexive "yes" from a considered "I've got this one".
     private var minAttemptsRequired: Int {
-        currentCard != nil ? 4 : 0
+        guard currentCard != nil else { return 0 }
+        return Self.useLLMIntentJudge ? 1 : 4
     }
 
     // Shown for every card, not just "new" words — an example is pre-generated for the whole
@@ -372,7 +394,7 @@ struct AgentLedVocabView: View {
         }
         gemini.onError = { msg in errorMessage = msg }
         gemini.onUserTranscript = { text in recorder.logUser(text); handleUserTranscript(text) }
-        gemini.onTutorTranscript = { text in recorder.logTutor(text) }
+        gemini.onTutorTranscript = { text in recorder.logTutor(text); lastTutorLine = text }
         gemini.onAudioChunk = { data in
             lastAudioChunkAt = Date()
             audio.isOutputActive = true
@@ -404,45 +426,102 @@ struct AgentLedVocabView: View {
     // MARK: - The gate: everything below decides whether Marie's proposals get honored
 
     /// Runs on every completed chunk of the student's own speech. Marks that *something*
-    /// happened this card (the broad "did they respond" signal the gate checks), detects an
-    /// explicit navigational intent if present, and fires the invisible background judge.
+    /// happened this card, then asks the Flash-Lite judge what the utterance actually means
+    /// given the card and conversation — falling back to the keyword matcher if the judge is
+    /// unavailable. Navigation is still decided and executed by the app alone; Marie is only
+    /// told about card changes after the fact.
     private func handleUserTranscript(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         hasAttempted = true
-        let intent = detectIntent(trimmed)
-        // Always reflect the MOST RECENT utterance, never let a stale "again"/"back" from an
-        // earlier turn linger and silently block future advances — that was the root cause of
-        // the "screen stuck while she keeps talking" bug: one ambiguous match years earlier in
-        // the same card would never get cleared by a later normal attempt.
-        lastDetectedIntent = intent
-        // Only count genuine attempts at the word itself — "next"/"again"/"go back" are nav
-        // commands, not practice, and shouldn't count toward the repetition a word still needs.
-        if intent == .none {
+
+        guard Self.useLLMIntentJudge else {
+            applyIntent(mapKeywordIntent(detectIntent(trimmed)), utterance: trimmed, source: "keyword")
+            return
+        }
+
+        // A newer utterance always supersedes an in-flight classification — "next… wait,
+        // go back" must never execute the stale "next" after the "go back" arrives.
+        utteranceSeq += 1
+        let seq = utteranceSeq
+        let cardIndexAtLaunch = cardIndex
+        let card = currentCard
+        let tutorLine = lastTutorLine
+        let attempts = attemptCount
+        pendingIntentTask?.cancel()
+        logDebug("heard: \"\(trimmed)\" → judging…")
+
+        pendingIntentTask = Task {
+            var verdict: LessonAgentService.LiveNavIntent
+            var source = "judge"
+            do {
+                verdict = try await LessonAgentService.shared.classifyLiveIntent(
+                    utterance: trimmed,
+                    cardDescription: card.map { c in
+                        var d = "vocabulary word \"\(c.entry.fr)\" = \"\(c.entry.en)\""
+                        if let ex = examplesByWordId[c.entry.id] { d += ", example sentence \"\(ex.fr)\"" }
+                        return d
+                    } ?? "(session already finished)",
+                    tutorLastLine: tutorLine,
+                    attemptCount: attempts
+                )
+            } catch {
+                // Judge down/slow — the session must not freeze. The old keyword matcher
+                // takes this one utterance, exactly as it always did.
+                verdict = mapKeywordIntent(detectIntent(trimmed))
+                source = "keyword-fallback"
+            }
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                // Stale guard: the world may have moved on while we were classifying.
+                guard seq == utteranceSeq, cardIndexAtLaunch == cardIndex, !finished else {
+                    logDebug("→ stale verdict (\(verdict.rawValue)) discarded")
+                    return
+                }
+                applyIntent(verdict, utterance: trimmed, source: source)
+            }
+        }
+    }
+
+    /// Bridges the old keyword enum onto the judge's richer verdict space — the fallback path.
+    /// Keyword matching can't tell an attempt from chatter, so `.none` maps to `.attempt`,
+    /// matching the old behavior where every non-command utterance counted as practice.
+    private func mapKeywordIntent(_ intent: UserIntent) -> LessonAgentService.LiveNavIntent {
+        switch intent {
+        case .advance: return .advance
+        case .back: return .back
+        case .again: return .again
+        case .none: return .attempt
+        }
+    }
+
+    /// The single place a classified utterance becomes action — judge and fallback paths
+    /// converge here, so the two can never drift apart.
+    private func applyIntent(_ verdict: LessonAgentService.LiveNavIntent, utterance: String, source: String) {
+        logDebug("[\(source)] \"\(utterance)\" → \(verdict.rawValue), attempts: \(attemptCount)")
+        switch verdict {
+        case .attempt:
+            lastDetectedIntent = .none
             attemptCount += 1
             // Remember the most recent genuine attempt only — judged once, in a single batched
-            // call, right when the app leaves this card. No per-utterance judge calls anymore,
-            // so there's no background judge task racing a fast card change.
-            lastAttemptText = trimmed
-        }
-        logDebug("heard: \"\(trimmed)\" → intent: \(intent.rawValue), attempts: \(attemptCount)")
-        // Navigation is 100% driven by the student's own words, decided and executed by the
-        // app right here — immediately, not after any delay, and not routed through Marie at
-        // all. She has no next_card/previous_card tool anymore; she only finds out the current
-        // word changed via the context note below and reacts to it in conversation.
-        switch intent {
+            // call, right when the app leaves this card.
+            lastAttemptText = utterance
+        case .chat:
+            lastDetectedIntent = .none
+        case .again:
+            lastDetectedIntent = .again
         case .advance:
+            lastDetectedIntent = .advance
             if attemptCount < minAttemptsRequired {
-                // Enforced here, not just in the prompt — she might ask "ready for the next
-                // one?" too early, and the student might reflexively answer "yes"/"sure" to a
-                // question, but the app itself still won't move until the real minimum practice
-                // has happened. This is what actually guarantees the beginner pace.
+                // The one unbreakable app-side rule: never skip a word with zero attempts,
+                // no matter how clear the command was.
                 logDebug("→ advance blocked: only \(attemptCount)/\(minAttemptsRequired) attempts so far")
             } else {
                 advanceFromUserIntent()
             }
-        case .back: goBackFromUserIntent()
-        case .again, .none: break
+        case .back:
+            lastDetectedIntent = .back
+            goBackFromUserIntent()
         }
     }
 
@@ -464,10 +543,11 @@ struct AgentLedVocabView: View {
     private func advanceFromUserIntent() {
         guard currentCard != nil else { return }
         logDebug("→ user-driven advance")
+        cutTutorAudio()
         performAdvance()
         if let next = currentCard {
             let example = examplesByWordId[next.entry.id].map { " Example sentence to teach through: \"\($0.fr)\" (\($0.en))." } ?? ""
-            gemini.injectContext("The student has moved on to the next word: \(next.entry.fr) = \(next.entry.en).\(example) \(Self.pacingReminder)")
+            scheduleCardAnnouncement("The student has moved on to the next word: \(next.entry.fr) = \(next.entry.en).\(example) Announce it briefly out loud — e.g. \"Now the word is \(next.entry.fr) — \(next.entry.en)\" — then teach it following the usual steps. \(Self.pacingReminder)")
         } else {
             wrapUp()
         }
@@ -476,11 +556,32 @@ struct AgentLedVocabView: View {
     private func goBackFromUserIntent() {
         guard cardIndex > 0 else { return }
         logDebug("→ user-driven go back")
+        cutTutorAudio()
         performGoBack()
         if let card = currentCard {
             let example = examplesByWordId[card.entry.id].map { " Example sentence to teach through: \"\($0.fr)\" (\($0.en))." } ?? ""
-            gemini.injectContext("The student asked to go back to: \(card.entry.fr) = \(card.entry.en).\(example) \(Self.pacingReminder)")
+            scheduleCardAnnouncement("The student asked to go back to a previous word: \(card.entry.fr) = \(card.entry.en).\(example) Briefly re-introduce it out loud — e.g. \"We're back on \(card.entry.fr) — \(card.entry.en)\" — then pick up teaching it again. \(Self.pacingReminder)")
         }
+    }
+
+    /// "Next" means the student is done listening. Her speech arrives as audio chunks WE play,
+    /// so flushing the local playback queue silences her instantly — no round trip to Google —
+    /// and the mic reopens right away. The follow-up announcement then tells her not to finish
+    /// the amputated thought.
+    private func cutTutorAudio() {
+        audio.stopPlayback()
+        audio.isOutputActive = false
+        if callStatus == .tutorSpeaking { callStatus = .listening }
+    }
+
+    /// Card announcements are spoken (expectReply), but debounced: a rapid "next next next"
+    /// cancels each skipped card's pending announcement so Marie only introduces where the
+    /// student actually landed.
+    private func scheduleCardAnnouncement(_ note: String) {
+        announceWorkItem?.cancel()
+        let item = DispatchWorkItem { gemini.injectContext(note, expectReply: true) }
+        announceWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: item)
     }
 
     /// The actual card-advance side effects (grading, index, reset) — shared by the accepted
@@ -661,7 +762,7 @@ struct AgentLedVocabView: View {
     private func wrapUp() {
         guard !isWrappingUp else { return }
         isWrappingUp = true
-        gemini.injectContext("The student has now reviewed every word on today's list. Say a short warm closing line (one sentence) congratulating them, then stop talking.")
+        gemini.injectContext("The student has now reviewed every word on today's list. Say a short warm closing line (one sentence) congratulating them, then stop talking.", expectReply: true)
     }
 
     private func finishAndReturn() {
@@ -670,6 +771,8 @@ struct AgentLedVocabView: View {
         timer?.invalidate()
         speakingWatchdog?.invalidate()
         pendingJudgeTask?.cancel()
+        pendingIntentTask?.cancel()
+        announceWorkItem?.cancel()
         audio.stopStreaming()
         gemini.disconnect()
         callStatus = .ended
