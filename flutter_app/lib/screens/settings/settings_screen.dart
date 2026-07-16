@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
+import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
 
 const availableModels = [
@@ -53,7 +55,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       _narrationRate = prefs.getDouble('lesson_narration_rate') ?? 0.42;
       _newCardsPerDay = prefs.getInt('srs_new_cards_per_day') ?? 20;
-      _practicePasses = (prefs.getInt('practice_passes_per_word') ?? 5).clamp(2, 10);
+      _practicePasses = (prefs.getInt('practice_passes_per_word') ?? 5).clamp(
+        2,
+        10,
+      );
       _modelOverride = prefs.getString('openrouter_model_override') ?? '';
       _openRouterKey = prefs.getString('openrouter_api_key') ?? '';
       _notetakerEnabled = prefs.getBool('notetaker_enabled') ?? false;
@@ -121,134 +126,188 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       body: PSContentColumn(
         child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        children: [
-          // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('Learning', color: Passeport.slateDim),
-                const SizedBox(height: 6),
-                _ChoiceRow(
-                  label: 'Goal',
-                  options: const [
-                    ('tef_canada', 'TEF Canada'),
-                    ('everyday', 'Everyday'),
-                    ('unsure', 'Exploring'),
-                  ],
-                  selected: _profile.goal,
-                  onChanged: (v) => _saveProfile((p) => p.goal = v),
-                ),
-                Divider(height: 16, color: Passeport.hairline),
-                _ChoiceRow(
-                  label: 'Session length',
-                  options: const [
-                    ('quick', 'Quick'),
-                    ('standard', 'Standard'),
-                    ('deep', 'Deep'),
-                  ],
-                  selected: _profile.sessionLength,
-                  onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
-                ),
-              ],
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          children: [
+            // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Learning', color: Passeport.slateDim),
+                  const SizedBox(height: 6),
+                  _ChoiceRow(
+                    label: 'Goal',
+                    options: const [
+                      ('tef_canada', 'TEF Canada'),
+                      ('everyday', 'Everyday'),
+                      ('unsure', 'Exploring'),
+                    ],
+                    selected: _profile.goal,
+                    onChanged: (v) => _saveProfile((p) => p.goal = v),
+                  ),
+                  Divider(height: 16, color: Passeport.hairline),
+                  _ChoiceRow(
+                    label: 'Session length',
+                    options: const [
+                      ('quick', 'Quick'),
+                      ('standard', 'Standard'),
+                      ('deep', 'Deep'),
+                    ],
+                    selected: _profile.sessionLength,
+                    onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // --- Roadmap ---
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('Roadmap', color: Passeport.slateDim),
-                const SizedBox(height: 10),
-                InkWell(
-                  onTap: _pickRoadmapStartDate,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Row(
+            // --- Roadmap ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Roadmap', color: Passeport.slateDim),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: _pickRoadmapStartDate,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Start date',
+                            style: Passeport.body(
+                              12.5,
+                            ).copyWith(color: Passeport.slateDim),
+                          ),
+                          const Spacer(),
+                          Text(
+                            DateFormat.yMMMd().format(_roadmapStartDate),
+                            style: Passeport.mono(
+                              12,
+                              weight: FontWeight.w500,
+                            ).copyWith(color: Passeport.maroon),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            CupertinoIcons.calendar,
+                            size: 14,
+                            color: Passeport.maroon,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // --- Lesson voice ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Lesson voice', color: Passeport.slateDim),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Narration rate',
+                    style: Passeport.body(
+                      12.5,
+                    ).copyWith(color: Passeport.slateDim),
+                  ),
+                  const SizedBox(height: 4),
+                  SliderTheme(
+                    data: SliderThemeData(
+                      activeTrackColor: Passeport.maroon,
+                      inactiveTrackColor: Passeport.maroon.withValues(
+                        alpha: 0.2,
+                      ),
+                      thumbColor: Passeport.maroon,
+                      overlayColor: Passeport.maroon.withValues(alpha: 0.12),
+                    ),
+                    child: Slider(
+                      value: _narrationRate,
+                      min: 0.3,
+                      max: 0.55,
+                      onChanged: (v) {
+                        setState(() => _narrationRate = v);
+                        _saveDouble('lesson_narration_rate', v);
+                      },
+                    ),
+                  ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
                         Text(
-                          'Start date',
+                          'New cards/day (labs): $_newCardsPerDay',
                           style: Passeport.body(
                             12.5,
-                          ).copyWith(color: Passeport.slateDim),
+                          ).copyWith(color: Passeport.text),
                         ),
                         const Spacer(),
-                        Text(
-                          DateFormat.yMMMd().format(_roadmapStartDate),
-                          style: Passeport.mono(
-                            12,
-                            weight: FontWeight.w500,
-                          ).copyWith(color: Passeport.maroon),
+                        _StepperButton(
+                          icon: CupertinoIcons.minus,
+                          onTap: _newCardsPerDay > 5
+                              ? () {
+                                  setState(() => _newCardsPerDay -= 5);
+                                  _saveInt(
+                                    'srs_new_cards_per_day',
+                                    _newCardsPerDay,
+                                  );
+                                }
+                              : null,
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          CupertinoIcons.calendar,
-                          size: 14,
-                          color: Passeport.maroon,
+                        const SizedBox(width: 8),
+                        _StepperButton(
+                          icon: CupertinoIcons.plus,
+                          onTap: _newCardsPerDay < 50
+                              ? () {
+                                  setState(() => _newCardsPerDay += 5);
+                                  _saveInt(
+                                    'srs_new_cards_per_day',
+                                    _newCardsPerDay,
+                                  );
+                                }
+                              : null,
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // --- Lesson voice ---
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('Lesson voice', color: Passeport.slateDim),
-                const SizedBox(height: 10),
-                Text(
-                  'Narration rate',
-                  style: Passeport.body(
-                    12.5,
-                  ).copyWith(color: Passeport.slateDim),
-                ),
-                const SizedBox(height: 4),
-                SliderTheme(
-                  data: SliderThemeData(
-                    activeTrackColor: Passeport.maroon,
-                    inactiveTrackColor: Passeport.maroon.withValues(alpha: 0.2),
-                    thumbColor: Passeport.maroon,
-                    overlayColor: Passeport.maroon.withValues(alpha: 0.12),
-                  ),
-                  child: Slider(
-                    value: _narrationRate,
-                    min: 0.3,
-                    max: 0.55,
-                    onChanged: (v) {
-                      setState(() => _narrationRate = v);
-                      _saveDouble('lesson_narration_rate', v);
-                    },
-                  ),
-                ),
-                if (kDebugMode) ...[
+                  ],
                   const SizedBox(height: 8),
+                  // How many honest attempts a NEW word needs in a live session before
+                  // Marie is allowed to offer moving on (familiar words need two fewer).
                   Row(
                     children: [
-                      Text(
-                        'New cards/day (labs): $_newCardsPerDay',
-                        style: Passeport.body(
-                          12.5,
-                        ).copyWith(color: Passeport.text),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Practice passes per word: $_practicePasses',
+                              style: Passeport.body(
+                                12.5,
+                              ).copyWith(color: Passeport.text),
+                            ),
+                            Text(
+                              'How many times you repeat a new word before Marie may suggest the next one',
+                              style: Passeport.mono(
+                                10,
+                              ).copyWith(color: Passeport.slateDim),
+                            ),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
                       _StepperButton(
                         icon: CupertinoIcons.minus,
-                        onTap: _newCardsPerDay > 5
+                        onTap: _practicePasses > 2
                             ? () {
-                                setState(() => _newCardsPerDay -= 5);
+                                setState(() => _practicePasses -= 1);
                                 _saveInt(
-                                  'srs_new_cards_per_day',
-                                  _newCardsPerDay,
+                                  'practice_passes_per_word',
+                                  _practicePasses,
                                 );
                               }
                             : null,
@@ -256,12 +315,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const SizedBox(width: 8),
                       _StepperButton(
                         icon: CupertinoIcons.plus,
-                        onTap: _newCardsPerDay < 50
+                        onTap: _practicePasses < 10
                             ? () {
-                                setState(() => _newCardsPerDay += 5);
+                                setState(() => _practicePasses += 1);
                                 _saveInt(
-                                  'srs_new_cards_per_day',
-                                  _newCardsPerDay,
+                                  'practice_passes_per_word',
+                                  _practicePasses,
                                 );
                               }
                             : null,
@@ -269,204 +328,215 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ],
-                const SizedBox(height: 8),
-                // How many honest attempts a NEW word needs in a live session before
-                // Marie is allowed to offer moving on (familiar words need two fewer).
-                Row(
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            if (kDebugMode) ...[
+              _PasseportCard(
+                child: GestureDetector(
+                  onTap: () => AppRouter.push(
+                    context,
+                    (_) => const OrchestrationLabScreen(),
+                  ),
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.lab_flask,
+                          size: 21,
+                          color: Passeport.brass,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Orchestration Lab',
+                                style: Passeport.body(
+                                  14,
+                                  weight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Preview personas, constraints, and competency paths',
+                                style: Passeport.body(
+                                  11.5,
+                                ).copyWith(color: Passeport.slateDim),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          CupertinoIcons.chevron_forward,
+                          size: 16,
+                          color: Passeport.slateDim,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+            // --- AI tutor (OpenRouter) — developer build only ---
+            if (kDebugMode)
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Practice passes per word: $_practicePasses',
-                            style: Passeport.body(12.5).copyWith(color: Passeport.text),
-                          ),
-                          Text(
-                            'How many times you repeat a new word before Marie may suggest the next one',
-                            style: Passeport.mono(10).copyWith(color: Passeport.slateDim),
-                          ),
-                        ],
+                    KickerText(
+                      'AI tutor (OpenRouter)',
+                      color: Passeport.slateDim,
+                    ),
+                    const SizedBox(height: 10),
+                    _SettingsRow(
+                      label: 'Key status',
+                      value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Preferred model',
+                      style: Passeport.body(
+                        12.5,
+                      ).copyWith(color: Passeport.slateDim),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Passeport.hairline),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ),
-                    _StepperButton(
-                      icon: CupertinoIcons.minus,
-                      onTap: _practicePasses > 2
-                          ? () {
-                              setState(() => _practicePasses -= 1);
-                              _saveInt('practice_passes_per_word', _practicePasses);
-                            }
-                          : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _StepperButton(
-                      icon: CupertinoIcons.plus,
-                      onTap: _practicePasses < 10
-                          ? () {
-                              setState(() => _practicePasses += 1);
-                              _saveInt('practice_passes_per_word', _practicePasses);
-                            }
-                          : null,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _modelOverride,
+                          isExpanded: true,
+                          style: Passeport.body(
+                            12.5,
+                          ).copyWith(color: Passeport.text),
+                          dropdownColor: Passeport.parchment,
+                          icon: const Icon(
+                            CupertinoIcons.chevron_down,
+                            color: Passeport.maroon,
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: '',
+                              child: Text(
+                                'Auto (fallback chain)',
+                                style: Passeport.body(12.5),
+                              ),
+                            ),
+                            ...availableModels.map(
+                              (model) => DropdownMenuItem(
+                                value: model,
+                                child: Text(
+                                  model,
+                                  style: Passeport.mono(11),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ],
+                          onChanged: (v) {
+                            if (v == null) return;
+                            setState(() => _modelOverride = v);
+                            _saveString('openrouter_model_override', v);
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
+              ),
+            if (kDebugMode) const SizedBox(height: 12),
 
-          // --- AI tutor (OpenRouter) — developer build only ---
-          if (kDebugMode)
+            // --- Notetaker ---
             _PasseportCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText(
-                    'AI tutor (OpenRouter)',
-                    color: Passeport.slateDim,
-                  ),
+                  KickerText('Notetaker', color: Passeport.slateDim),
                   const SizedBox(height: 10),
-                  _SettingsRow(
-                    label: 'Key status',
-                    value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
-                  ),
-                  Divider(height: 1, color: Passeport.hairline),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Preferred model',
-                    style: Passeport.body(
-                      12.5,
-                    ).copyWith(color: Passeport.slateDim),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Passeport.hairline),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _modelOverride,
-                        isExpanded: true,
-                        style: Passeport.body(
-                          12.5,
-                        ).copyWith(color: Passeport.text),
-                        dropdownColor: Passeport.parchment,
-                        icon: const Icon(
-                          CupertinoIcons.chevron_down,
-                          color: Passeport.maroon,
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: '',
-                            child: Text(
-                              'Auto (fallback chain)',
-                              style: Passeport.body(12.5),
-                            ),
-                          ),
-                          ...availableModels.map(
-                            (model) => DropdownMenuItem(
-                              value: model,
-                              child: Text(
-                                model,
-                                style: Passeport.mono(11),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ],
+                  Row(
+                    children: [
+                      Text('Floating notetaker', style: Passeport.body(12.5)),
+                      const Spacer(),
+                      Switch.adaptive(
+                        value: _notetakerEnabled,
+                        activeThumbColor: Passeport.maroon,
                         onChanged: (v) {
-                          if (v == null) return;
-                          setState(() => _modelOverride = v);
-                          _saveString('openrouter_model_override', v);
+                          setState(() => _notetakerEnabled = v);
+                          _saveBool('notetaker_enabled', v);
                         },
                       ),
-                    ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Shows a draggable note bubble during lessons so you can '
+                    'jot things down while listening or writing.',
+                    style: Passeport.body(
+                      11,
+                    ).copyWith(color: Passeport.slateDim),
                   ),
                 ],
               ),
             ),
-          if (kDebugMode) const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // --- Notetaker ---
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('Notetaker', color: Passeport.slateDim),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Text('Floating notetaker', style: Passeport.body(12.5)),
-                    const Spacer(),
-                    Switch.adaptive(
-                      value: _notetakerEnabled,
-                      activeThumbColor: Passeport.maroon,
-                      onChanged: (v) {
-                        setState(() => _notetakerEnabled = v);
-                        _saveBool('notetaker_enabled', v);
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Shows a draggable note bubble during lessons so you can '
-                  'jot things down while listening or writing.',
-                  style: Passeport.body(11).copyWith(color: Passeport.slateDim),
-                ),
-              ],
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Access', color: Passeport.slateDim),
+                  const SizedBox(height: 4),
+                  _SettingsRow(
+                    label: 'Founding pass',
+                    value: _entitlementLabel(_access.entitlement.status),
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _SettingsRow(
+                    label: 'Tracked speaking today',
+                    value:
+                        '${(_access.remainingSeconds / 60).ceil()} min remaining',
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _SettingsRow(
+                    label: 'Verification',
+                    value: _access.serverAuthoritative
+                        ? 'Cloud verified'
+                        : 'Local preview',
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('Access', color: Passeport.slateDim),
-                const SizedBox(height: 4),
-                _SettingsRow(
-                  label: 'Founding pass',
-                  value: _entitlementLabel(_access.entitlement.status),
-                ),
-                Divider(height: 1, color: Passeport.hairline),
-                _SettingsRow(
-                  label: 'Tracked speaking today',
-                  value:
-                      '${(_access.remainingSeconds / 60).ceil()} min remaining',
-                ),
-                Divider(height: 1, color: Passeport.hairline),
-                _SettingsRow(
-                  label: 'Verification',
-                  value: _access.serverAuthoritative
-                      ? 'Cloud verified'
-                      : 'Local preview',
-                ),
-              ],
+            // --- About & support ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('ParleSprint', color: Passeport.slateDim),
+                  const SizedBox(height: 4),
+                  _SettingsRow(label: 'Version', value: '0.9 pilot'),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _SettingsRow(
+                    label: 'Feedback',
+                    value: 'thoufeek@agiventures.ca',
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // --- About & support ---
-          _PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                KickerText('ParleSprint', color: Passeport.slateDim),
-                const SizedBox(height: 4),
-                _SettingsRow(label: 'Version', value: '0.9 pilot'),
-                Divider(height: 1, color: Passeport.hairline),
-                _SettingsRow(
-                  label: 'Feedback',
-                  value: 'thoufeek@agiventures.ca',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );

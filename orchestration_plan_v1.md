@@ -1578,7 +1578,10 @@ Phase O1 established the competency foundation:
 - ContentService loading and known-content indexing;
 - forward-only migration v3 with competency-framework, competency, and content-mapping tables;
 - typed transactional CompetencyStore persistence;
-- validator, parser, migration, and round-trip tests.
+- startup bootstrap that validates and synchronizes the graph before the app renders;
+- debug-only Orchestration Lab with six persona scenarios, time/voice/network constraints, and non-mutating path previews;
+- validator, parser, migration, runtime-idempotency, persona-constraint, and round-trip tests;
+- successful signed iOS build, direct wireless installation, and launch on the `kodekarbon` device.
 
 ### Exact next action
 

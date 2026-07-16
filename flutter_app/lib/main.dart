@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'data/content_service.dart';
 import 'data/database/pilot_infrastructure_store.dart';
+import 'data/database/competency_store.dart';
+import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
 import 'services/pilot_access_service.dart';
 
@@ -32,6 +34,10 @@ void main() {
           installationId: installationId,
         ).appStarted(platform: platform);
         await ContentService.shared.preload();
+        const OrchestrationBootstrapper().bootstrap(
+          content: ContentService.shared,
+          store: CompetencyStore(db),
+        );
 
         runApp(
           ProviderScope(

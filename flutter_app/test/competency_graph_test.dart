@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/data/content_service.dart';
 import 'package:french_tutor/data/database/competency_store.dart';
+import 'package:french_tutor/orchestration/dev/developer_path_preview.dart';
 import 'package:french_tutor/orchestration/models/competency.dart';
 import 'package:french_tutor/orchestration/models/content_descriptor.dart';
+import 'package:french_tutor/orchestration/runtime/orchestration_bootstrapper.dart';
 import 'package:french_tutor/orchestration/validation/competency_graph_validator.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -59,6 +61,55 @@ void main() {
         [1, 2, 3],
       );
     });
+
+    test('runtime bootstrap validates, persists, and becomes idempotent', () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final store = CompetencyStore(db);
+      const bootstrapper = OrchestrationBootstrapper();
+
+      final first = bootstrapper.bootstrap(
+        content: ContentService.shared,
+        store: store,
+      );
+      final second = bootstrapper.bootstrap(
+        content: ContentService.shared,
+        store: store,
+      );
+
+      expect(first.persisted, isTrue);
+      expect(second.persisted, isFalse);
+      expect(second.competencyCount, 6);
+      expect(second.mappingCount, 11);
+    });
+
+    test(
+      'developer personas produce constrained non-mutating path previews',
+      () {
+        final framework = ContentService.shared.competencyFramework()!;
+        final commuter = const DeveloperPathPreviewBuilder().build(
+          framework: framework,
+          persona: developerPersonaScenarios.first,
+        );
+        final intensive = const DeveloperPathPreviewBuilder().build(
+          framework: framework,
+          persona: developerPersonaScenarios[2],
+        );
+
+        expect(
+          commuter.tasks.any(
+            (task) =>
+                task.modality == PerformanceModality.controlledSpeaking ||
+                task.modality == PerformanceModality.spontaneousSpeaking ||
+                task.modality == PerformanceModality.pronunciationProduction,
+          ),
+          isFalse,
+        );
+        expect(commuter.totalMinutes, lessThanOrEqualTo(60));
+        expect(intensive.tasks.length, greaterThan(commuter.tasks.length));
+        expect(intensive.notes.first, contains('Preview only'));
+      },
+    );
 
     test('preserves modality and support-level wire names', () {
       expect(

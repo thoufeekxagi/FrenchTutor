@@ -4,6 +4,7 @@ import '../data/database/database_opener.dart';
 import '../data/database/storage_service.dart';
 import '../data/database/learning_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
+import '../data/database/competency_store.dart';
 import '../data/content_service.dart';
 import '../services/srs_service.dart';
 import '../services/progress_service.dart';
@@ -27,6 +28,10 @@ final pilotInfrastructureStoreProvider = Provider<PilotInfrastructureStore>((
   ref,
 ) {
   return PilotInfrastructureStore(ref.watch(databaseProvider));
+});
+
+final competencyStoreProvider = Provider<CompetencyStore>((ref) {
+  return CompetencyStore(ref.watch(databaseProvider));
 });
 
 final pilotAccessServiceProvider = Provider<PilotAccessService>((ref) {
