@@ -17,29 +17,40 @@ import 'package:google_fonts/google_fonts.dart';
 ///  - No monospace anywhere; labels/badges are letterspaced Inter.
 abstract final class DesignTokens {
   // --- Palette — warm paper + navy ink + bordeaux + real gold (see mockups) ---
-  static const ink = Color(0xFF1B2A4A);
-  static const inkSoft = Color(0xFF25375C);
-  static const parchment = Color(0xFFF7F4EC); // warm paper, not near-white
-  static const parchmentDim = Color(0xFFEFEAE0);
+  static const ink = Color(0xFF182338);
+  static const inkSoft = Color(0xFF293751);
+  static const parchment = Color(0xFFF7F7F4);
+  static const parchmentDim = Color(0xFFEEF1F5);
   static const card = Color(0xFFFFFFFF);
-  static const maroon = Color(0xFF8E3B3B); // deep bordeaux, per mockup chips
-  static const maroonDeep = Color(0xFF6E2C2C);
-  static const brass = Color(0xFFB08D4A); // real gold — was mistakenly blue
-  static const sage = Color(0xFF6F8F6F);
-  static const slate = Color(0xFF95A0B2);
-  static const slateDim = Color(0xFF606C80);
+  static const maroon = Color(0xFFD1495B);
+  static const maroonDeep = Color(0xFFB53648);
+  static const brass = Color(0xFFD5A13D);
+  static const sage = Color(0xFF3D9E83);
+  static const sky = Color(0xFF5A7FC3);
+  static const slate = Color(0xFF9AA5B5);
+  static const slateDim = Color(0xFF667085);
   static const text = ink;
-  static final hairline = ink.withValues(alpha: 0.10);
+  static const canvas = parchment;
+  static const surface = card;
+  static const primary = maroon;
+  static const success = sage;
+  static const info = sky;
+  static const mastery = brass;
+  static const primarySoft = Color(0xFFFBEAEC);
+  static const successSoft = Color(0xFFE5F4EF);
+  static const infoSoft = Color(0xFFEAF0FA);
+  static const masterySoft = Color(0xFFFAF2DF);
+  static final hairline = ink.withValues(alpha: 0.09);
   static final hairlineLight = parchment.withValues(alpha: 0.16);
 
   /// Soft card shadow — depth via a whisper of ink, never Material elevation.
   static List<BoxShadow> get cardShadow => [
-        BoxShadow(
-          color: ink.withValues(alpha: 0.06),
-          blurRadius: 14,
-          offset: const Offset(0, 3),
-        ),
-      ];
+    BoxShadow(
+      color: ink.withValues(alpha: 0.06),
+      blurRadius: 14,
+      offset: const Offset(0, 3),
+    ),
+  ];
 
   // --- Spacing (4pt base grid) ---
   static const space1 = 4.0;
@@ -81,20 +92,31 @@ abstract final class DesignTokens {
         ? (weight.value < FontWeight.w700.value ? FontWeight.w700 : weight)
         : (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight);
     return GoogleFonts.inter(
-        fontSize: size,
-        fontWeight: resolved,
-        color: ink,
-        letterSpacing: size >= 22 ? -0.5 : -0.2);
+      fontSize: size,
+      fontWeight: resolved,
+      color: ink,
+      letterSpacing: size >= 22 ? -0.5 : -0.2,
+    );
   }
 
   /// The UI voice — Inter everywhere (SF Pro look, identical cross-platform).
   static TextStyle body(double size, {FontWeight weight = FontWeight.w400}) {
-    return GoogleFonts.inter(fontSize: size, fontWeight: weight, color: ink, letterSpacing: -0.1);
+    return GoogleFonts.inter(
+      fontSize: size,
+      fontWeight: weight,
+      color: ink,
+      letterSpacing: -0.1,
+    );
   }
 
   /// Labels, badges, kickers, numbers — letterspaced Inter medium (the old
   /// JetBrains Mono techy look is gone; mockups use quiet spaced caps).
   static TextStyle mono(double size, {FontWeight weight = FontWeight.w500}) {
-    return GoogleFonts.inter(fontSize: size, fontWeight: weight, color: ink, letterSpacing: 0.4);
+    return GoogleFonts.inter(
+      fontSize: size,
+      fontWeight: weight,
+      color: ink,
+      letterSpacing: 0.4,
+    );
   }
 }

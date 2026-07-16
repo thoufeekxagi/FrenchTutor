@@ -117,7 +117,9 @@ class LessonSpeechService {
   // --- Narration text helpers ---
 
   static List<SpeechItem> speechItemsFromText(String narration) {
-    return _splitSentences(narration).map((s) => SpeechItem(text: s, language: _detectLanguage(s))).toList();
+    return _splitSentences(
+      narration,
+    ).map((s) => SpeechItem(text: s, language: _detectLanguage(s))).toList();
   }
 
   static List<SpeechItem> speechItemsFromLines(List<String> narrationLines) {
@@ -145,14 +147,56 @@ class LessonSpeechService {
 
   static const _frenchChars = 'éèêëàâçîïôûùœæÉÈÊËÀÂÇÎÏÔÛÙŒ';
   static const _frenchWords = {
-    'bonjour', 'merci', 'oui', 'non', 'je', 'vous', 'le',
-    'la', 'les', 'comment', 'avec', 'pour', 'suis',
-    'il', 'elle', 'nous', 'ils', 'elles', 'un', 'une',
-    'bien', 'mal', 'aussi', 'mais', 'et', 'ou', 'ne',
-    'pas', 'ai', 'as', 'a', 'avons', 'avez', 'ont',
-    'sont', 'être', 'avoir', 'aller', 'faire', 'dire',
-    'voir', 'savoir', 'pouvoir', 'vouloir', 'devoir',
-    'venir', 'prendre', 'donner', 'parler', 'travaille',
+    'bonjour',
+    'merci',
+    'oui',
+    'non',
+    'je',
+    'vous',
+    'le',
+    'la',
+    'les',
+    'comment',
+    'avec',
+    'pour',
+    'suis',
+    'il',
+    'elle',
+    'nous',
+    'ils',
+    'elles',
+    'un',
+    'une',
+    'bien',
+    'mal',
+    'aussi',
+    'mais',
+    'et',
+    'ou',
+    'ne',
+    'pas',
+    'ai',
+    'as',
+    'a',
+    'avons',
+    'avez',
+    'ont',
+    'sont',
+    'être',
+    'avoir',
+    'aller',
+    'faire',
+    'dire',
+    'voir',
+    'savoir',
+    'pouvoir',
+    'vouloir',
+    'devoir',
+    'venir',
+    'prendre',
+    'donner',
+    'parler',
+    'travaille',
   };
 
   static String _detectLanguage(String text) {

@@ -34,7 +34,8 @@ abstract final class AppTheme {
           TargetPlatform.macOS: const CupertinoPageTransitionsBuilder(),
           TargetPlatform.android: const ZoomPageTransitionsBuilder(),
           if (kIsWeb) ...{
-            for (final p in TargetPlatform.values) p: const FadeUpwardsPageTransitionsBuilder(),
+            for (final p in TargetPlatform.values)
+              p: const FadeUpwardsPageTransitionsBuilder(),
           },
         },
       ),
@@ -50,6 +51,53 @@ abstract final class AppTheme {
         centerTitle: isCupertino,
         titleTextStyle: DesignTokens.display(20),
       ),
+      dividerTheme: DividerThemeData(
+        color: DesignTokens.hairline,
+        thickness: 1,
+        space: 1,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: DesignTokens.card,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          borderSide: BorderSide(color: DesignTokens.hairline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          borderSide: BorderSide(color: DesignTokens.hairline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          borderSide: const BorderSide(color: DesignTokens.info, width: 1.5),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(44, 52),
+          backgroundColor: DesignTokens.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+          textStyle: DesignTokens.body(15, weight: FontWeight.w600),
+        ),
+      ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: DesignTokens.primary,
+        inactiveTrackColor: DesignTokens.primarySoft,
+        thumbColor: DesignTokens.primary,
+        overlayColor: DesignTokens.primary.withValues(alpha: 0.1),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: DesignTokens.primary,
+        linearTrackColor: DesignTokens.parchmentDim,
+      ),
       tabBarTheme: const TabBarThemeData(
         labelColor: DesignTokens.maroon,
         unselectedLabelColor: DesignTokens.slate,
@@ -59,7 +107,7 @@ abstract final class AppTheme {
         backgroundColor: DesignTokens.card,
         selectedItemColor: DesignTokens.maroon,
         unselectedItemColor: DesignTokens.slate,
-        elevation: 8,
+        elevation: 0,
       ),
     );
   }

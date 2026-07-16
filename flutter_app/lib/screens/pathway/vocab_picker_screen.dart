@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../flow/stage_outcome.dart';
 import '../../data/content_service.dart';
@@ -11,7 +11,6 @@ import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/srs_service.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import 'agent_led_vocab_screen.dart';
@@ -38,58 +37,93 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
 
   Set<String> get _knownIds {
     final store = ref.read(learningStoreProvider);
-    return store.allSRSStates().entries.where((e) => e.value.reps >= 3 && e.value.intervalDays >= 21).map((e) => e.key).toSet();
+    return store
+        .allSRSStates()
+        .entries
+        .where((e) => e.value.reps >= 3 && e.value.intervalDays >= 21)
+        .map((e) => e.key)
+        .toSet();
   }
 
   List<VocabPhase> get _allPhases => ContentService.shared.vocabPhases;
 
-  Future<List<VocabEntry>> get _autoQueue => SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
+  Future<List<VocabEntry>> get _autoQueue =>
+      SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        title: Text("Today's Words", style: Passeport.display(18)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text("Today's Words", style: DesignTokens.display(18)),
+        backgroundColor: DesignTokens.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.slateDim),
+          icon: const Icon(
+            CupertinoIcons.xmark,
+            size: 20,
+            color: DesignTokens.slateDim,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-                child: PSSegmented<_PickerMode>(
-                  segments: const [
-                    (value: _PickerMode.auto, label: 'Auto'),
-                    (value: _PickerMode.category, label: 'By Category'),
-                  ],
-                  selected: _mode,
-                  onChanged: (m) => setState(() => _mode = m),
-                ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: DesignTokens.contentMaxWidth,
               ),
-              Expanded(child: _mode == _PickerMode.auto ? _autoBody() : _categoryBody()),
-            ],
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      DesignTokens.screenMargin,
+                      DesignTokens.space3,
+                      DesignTokens.screenMargin,
+                      0,
+                    ),
+                    child: PSSegmented<_PickerMode>(
+                      segments: const [
+                        (value: _PickerMode.auto, label: 'Recommended'),
+                        (value: _PickerMode.category, label: 'By category'),
+                      ],
+                      selected: _mode,
+                      onChanged: (mode) => setState(() => _mode = mode),
+                    ),
+                  ),
+                  Expanded(
+                    child: _mode == _PickerMode.auto
+                        ? _autoBody()
+                        : _categoryBody(),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (_isPlanning)
             Container(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: DesignTokens.ink.withValues(alpha: 0.16),
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Passeport.card, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(
+                    color: DesignTokens.surface,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       PSProgressIndicator(),
                       const SizedBox(height: 10),
-                      Text("Personalizing today's session…", style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
+                      Text(
+                        "Personalizing today's session…",
+                        style: DesignTokens.mono(
+                          11,
+                        ).copyWith(color: DesignTokens.slateDim),
+                      ),
                     ],
                   ),
                 ),
@@ -107,30 +141,75 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       future: _autoQueue,
       builder: (context, snapshot) {
         final queue = snapshot.data ?? [];
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
         return Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+          padding: const EdgeInsets.fromLTRB(
+            DesignTokens.screenMargin,
+            DesignTokens.space6,
+            DesignTokens.screenMargin,
+            DesignTokens.space5,
+          ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(),
-              PasseportCard(
-                padding: 24,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(CupertinoIcons.sparkles, size: 30, color: Passeport.brass),
-                    const SizedBox(height: 10),
-                    Text('${queue.length} words today', style: Passeport.display(20, weight: FontWeight.w500)),
-                    const SizedBox(height: 8),
-                    Text(
-                      'A mix of words due for review plus new ones, in curriculum order — the same set Marie would pick for you.',
-                      style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+              Container(
+                width: 52,
+                height: 52,
+                decoration: const BoxDecoration(
+                  color: DesignTokens.infoSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  CupertinoIcons.rectangle_stack_fill,
+                  color: DesignTokens.info,
+                  size: 23,
                 ),
               ),
+              const SizedBox(height: DesignTokens.space5),
+              Text(
+                isLoading
+                    ? 'Building today’s word queue'
+                    : '${queue.length} words ready',
+                style: DesignTokens.display(26),
+              ),
+              const SizedBox(height: DesignTokens.space3),
+              Text(
+                'Due reviews come first, followed by new words in curriculum order. Marie can prioritize this real queue before practice starts.',
+                style: DesignTokens.body(
+                  15,
+                ).copyWith(color: DesignTokens.slateDim, height: 1.45),
+              ),
+              if (isLoading) ...[
+                const SizedBox(height: DesignTokens.space5),
+                const PSProgressIndicator(),
+              ] else if (queue.isEmpty) ...[
+                const SizedBox(height: DesignTokens.space4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(DesignTokens.space4),
+                  decoration: BoxDecoration(
+                    color: DesignTokens.infoSoft,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusCard,
+                    ),
+                  ),
+                  child: Text(
+                    'No words are due right now. Choose a category to practice specific words.',
+                    style: DesignTokens.body(14).copyWith(height: 1.4),
+                  ),
+                ),
+              ],
               const Spacer(),
-              _startButton(count: queue.length, onPressed: () => _beginSession(queue)),
+              PasseportPrimaryButton(
+                label: queue.isEmpty
+                    ? 'No recommended words yet'
+                    : 'Start ${queue.length}-word practice',
+                icon: CupertinoIcons.arrow_right,
+                onPressed: isLoading || queue.isEmpty
+                    ? null
+                    : () => _beginSession(queue),
+              ),
             ],
           ),
         );
@@ -140,7 +219,8 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
 
   // MARK: - Category mode
 
-  int _selectedCount(VocabTheme theme) => theme.entries.where((e) => _manualSelection.contains(e.id)).length;
+  int _selectedCount(VocabTheme theme) =>
+      theme.entries.where((e) => _manualSelection.contains(e.id)).length;
 
   Widget _categoryBody() {
     return Column(
@@ -154,12 +234,17 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Phase ${phase.phase} · ${phase.title}', color: Passeport.slateDim),
+                    KickerText(
+                      'Phase ${phase.phase} · ${phase.title}',
+                      color: DesignTokens.slateDim,
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: phase.themes.map((theme) => _categoryChip(theme)).toList(),
+                      children: phase.themes
+                          .map((theme) => _categoryChip(theme))
+                          .toList(),
                     ),
                   ],
                 ),
@@ -169,12 +254,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          color: Passeport.parchmentDim,
+          color: DesignTokens.canvas,
           child: _startButton(
             count: _manualSelection.length,
             onPressed: () {
-              final all = _allPhases.expand((p) => p.themes.expand((t) => t.entries)).toList();
-              _beginSession(all.where((e) => _manualSelection.contains(e.id)).toList());
+              final all = _allPhases
+                  .expand((p) => p.themes.expand((t) => t.entries))
+                  .toList();
+              _beginSession(
+                all.where((e) => _manualSelection.contains(e.id)).toList(),
+              );
             },
           ),
         ),
@@ -191,9 +280,11 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         width: 150,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: hasSelection ? Passeport.maroon : Passeport.card,
+          color: hasSelection ? DesignTokens.infoSoft : DesignTokens.surface,
           borderRadius: BorderRadius.circular(10),
-          border: hasSelection ? null : Border.all(color: Passeport.hairline),
+          border: hasSelection
+              ? null
+              : Border.all(color: DesignTokens.hairline),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -202,12 +293,19 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               theme.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Passeport.body(12.5, weight: FontWeight.w500).copyWith(color: hasSelection ? Passeport.parchment : Passeport.text),
+              style: DesignTokens.body(
+                12.5,
+                weight: FontWeight.w500,
+              ).copyWith(color: DesignTokens.ink),
             ),
             const SizedBox(height: 3),
             Text(
-              hasSelection ? '$selected of ${theme.entries.length} picked' : '${theme.entries.length} words',
-              style: Passeport.mono(9).copyWith(color: hasSelection ? Passeport.parchment.withValues(alpha: 0.85) : Passeport.slateDim),
+              hasSelection
+                  ? '$selected of ${theme.entries.length} picked'
+                  : '${theme.entries.length} words',
+              style: DesignTokens.body(11).copyWith(
+                color: hasSelection ? DesignTokens.info : DesignTokens.slateDim,
+              ),
             ),
           ],
         ),
@@ -216,13 +314,14 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   }
 
   void _showCategoryWordSheet(VocabTheme theme) {
-    showModalBottomSheet(
-      context: context,
+    showPSModalSheet(
+      context,
       isScrollControlled: true,
-      backgroundColor: Passeport.card,
       builder: (context) => StatefulBuilder(
         builder: (context, setSheetState) {
-          final allSelected = theme.entries.every((e) => _manualSelection.contains(e.id));
+          final allSelected = theme.entries.every(
+            (e) => _manualSelection.contains(e.id),
+          );
           return DraggableScrollableSheet(
             initialChildSize: 0.6,
             maxChildSize: 0.9,
@@ -249,20 +348,40 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                             });
                           });
                         },
-                        child: Text(allSelected ? 'Deselect All' : 'Select All'),
+                        child: Text(
+                          allSelected ? 'Deselect All' : 'Select All',
+                        ),
                       ),
                       const Spacer(),
-                      Text(theme.title, style: Passeport.display(15, weight: FontWeight.w500)),
+                      Text(
+                        theme.title,
+                        style: DesignTokens.display(
+                          15,
+                          weight: FontWeight.w500,
+                        ),
+                      ),
                       const Spacer(),
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Done')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Done'),
+                      ),
                     ],
                   ),
                 ),
                 Expanded(
                   child: GridView.builder(
                     controller: scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 170, mainAxisExtent: 56, crossAxisSpacing: 8, mainAxisSpacing: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 170,
+                          mainAxisExtent: 56,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
                     itemCount: theme.entries.length,
                     itemBuilder: (context, i) {
                       final entry = theme.entries[i];
@@ -278,7 +397,10 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     );
   }
 
-  Widget _wordChip(VocabEntry entry, void Function(void Function()) setSheetState) {
+  Widget _wordChip(
+    VocabEntry entry,
+    void Function(void Function()) setSheetState,
+  ) {
     final isKnown = _knownIds.contains(entry.id);
     final isSelected = _manualSelection.contains(entry.id);
     return GestureDetector(
@@ -296,9 +418,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
         decoration: BoxDecoration(
-          color: isSelected ? Passeport.maroon : Passeport.card,
+          color: isSelected ? DesignTokens.infoSoft : DesignTokens.surface,
           borderRadius: BorderRadius.circular(10),
-          border: isSelected ? null : Border.all(color: Passeport.hairline),
+          border: isSelected ? null : Border.all(color: DesignTokens.hairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,16 +433,29 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                     entry.fr,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Passeport.body(12.5, weight: FontWeight.w500).copyWith(color: isSelected ? Passeport.parchment : Passeport.text),
+                    style: DesignTokens.body(
+                      12.5,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.ink),
                   ),
                 ),
-                if (isKnown) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(CupertinoIcons.checkmark_seal_fill, size: 10, color: Colors.green)),
+                if (isKnown)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: Icon(
+                      CupertinoIcons.checkmark_seal_fill,
+                      size: 10,
+                      color: DesignTokens.success,
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.only(left: 4),
                   child: Icon(
-                    isSelected ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
+                    isSelected
+                        ? CupertinoIcons.checkmark_circle_fill
+                        : CupertinoIcons.circle,
                     size: 13,
-                    color: isSelected ? Passeport.parchment : Passeport.slate,
+                    color: isSelected ? DesignTokens.info : DesignTokens.slate,
                   ),
                 ),
               ],
@@ -329,7 +464,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               entry.en,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Passeport.mono(9.5).copyWith(color: isSelected ? Passeport.parchment.withValues(alpha: 0.85) : Passeport.slateDim),
+              style: DesignTokens.body(11).copyWith(
+                color: isSelected ? DesignTokens.info : DesignTokens.slateDim,
+              ),
             ),
           ],
         ),
@@ -341,7 +478,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
 
   Widget _startButton({required int count, required VoidCallback onPressed}) {
     return PasseportPrimaryButton(
-      label: count > 0 ? "Start with $count word${count == 1 ? '' : 's'}" : 'Pick some words first',
+      label: count > 0
+          ? "Start with $count word${count == 1 ? '' : 's'}"
+          : 'Pick some words first',
       onPressed: count > 0 ? onPressed : null,
     );
   }
@@ -362,7 +501,12 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       planResult = await LessonAgentService.shared
           .planVocabSession(
             candidateWords: words,
-            mistakeTags: mistakeTags.map((m) => (tag: m.tag, description: m.description, count: m.count)).toList(),
+            mistakeTags: mistakeTags
+                .map(
+                  (m) =>
+                      (tag: m.tag, description: m.description, count: m.count),
+                )
+                .toList(),
             recentDiary: diary.map((d) => d.summary).toList(),
           )
           .timeout(const Duration(seconds: 14));
@@ -377,7 +521,10 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       final prioritized = planResult.prioritizedWordIds;
       if (prioritized != null) {
         final byId = {for (final w in words) w.id: w};
-        chosenQueue = prioritized.map((id) => byId[id]).whereType<VocabEntry>().toList();
+        chosenQueue = prioritized
+            .map((id) => byId[id])
+            .whereType<VocabEntry>()
+            .toList();
       } else {
         chosenQueue = words;
       }

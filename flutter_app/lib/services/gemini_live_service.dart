@@ -37,7 +37,8 @@ class GeminiLiveService {
 
   /// Fires when the model calls one of the declared [tools]. `callId` must be echoed back
   /// via [sendToolResponse]. Never fires when [tools] is empty.
-  void Function(String name, Map<String, dynamic> args, String callId)? onToolCall;
+  void Function(String name, Map<String, dynamic> args, String callId)?
+  onToolCall;
 
   /// Fires with each incremental chunk of spoken output transcript AS IT STREAMS — a more
   /// reliable "she is saying this right now" signal than tool-call timing.
@@ -151,7 +152,12 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     _send({
       'clientContent': {
         'turns': [
-          {'role': 'user', 'parts': [{'text': text}]},
+          {
+            'role': 'user',
+            'parts': [
+              {'text': text},
+            ],
+          },
         ],
         'turnComplete': true,
       },
@@ -162,11 +168,13 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     var prompt = systemPrompt;
     final profile = await _learnerProfile();
     if (profile.isNotEmpty) {
-      prompt += '\n\nSTUDENT PROFILE — use this to calibrate level and pacing; never read it aloud:\n$profile';
+      prompt +=
+          '\n\nSTUDENT PROFILE — use this to calibrate level and pacing; never read it aloud:\n$profile';
     }
     final ctx = lessonContext;
     if (ctx != null && ctx.isNotEmpty) {
-      prompt += '\n\nLESSON CONTEXT — the student is currently studying this material; steer practice toward it while following ALL rules above:\n$ctx';
+      prompt +=
+          '\n\nLESSON CONTEXT — the student is currently studying this material; steer practice toward it while following ALL rules above:\n$ctx';
     }
     return prompt;
   }
@@ -218,15 +226,20 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     if (!_isSetupComplete || note.isEmpty) return;
     final framed = expectReply
         ? '(Note from the app, not the student — the on-screen card just changed or the '
-            'session needs you to speak. Your audio may have been cut off mid-sentence; do '
-            'NOT finish or refer back to your previous thought. React to this note now, '
-            'briefly: ) $note'
+              'session needs you to speak. Your audio may have been cut off mid-sentence; do '
+              'NOT finish or refer back to your previous thought. React to this note now, '
+              'briefly: ) $note'
         : '(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à '
-            'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
+              'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     _send({
       'clientContent': {
         'turns': [
-          {'role': 'user', 'parts': [{'text': framed}]},
+          {
+            'role': 'user',
+            'parts': [
+              {'text': framed},
+            ],
+          },
         ],
         'turnComplete': expectReply,
       },
@@ -239,7 +252,9 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     final generationConfig = <String, dynamic>{
       'responseModalities': ['AUDIO'],
       'speechConfig': {
-        'voiceConfig': {'prebuiltVoiceConfig': {'voiceName': _voiceName}},
+        'voiceConfig': {
+          'prebuiltVoiceConfig': {'voiceName': _voiceName},
+        },
       },
     };
     // Structured, tool-driven sessions (vocab/listening choreography) need disciplined
@@ -252,7 +267,11 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     final setupBody = <String, dynamic>{
       'model': _model,
       'generationConfig': generationConfig,
-      'systemInstruction': {'parts': [{'text': await _fullSystemPrompt()}]},
+      'systemInstruction': {
+        'parts': [
+          {'text': await _fullSystemPrompt()},
+        ],
+      },
       'outputAudioTranscription': <String, dynamic>{},
       'inputAudioTranscription': <String, dynamic>{},
       'realtimeInputConfig': {
@@ -354,7 +373,9 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
           final name = call['name'] as String?;
           final id = call['id'] as String?;
           if (name == null || id == null) continue;
-          final args = (call['args'] as Map?)?.cast<String, dynamic>() ?? <String, dynamic>{};
+          final args =
+              (call['args'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
           onToolCall?.call(name, args, id);
         }
       }
@@ -396,7 +417,10 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
         // intent judge ~800ms after they stop speaking, with zero dependence on whether
         // or when Marie replies.
         _inputFlushTimer?.cancel();
-        _inputFlushTimer = Timer(const Duration(milliseconds: 800), _flushUserTranscript);
+        _inputFlushTimer = Timer(
+          const Duration(milliseconds: 800),
+          _flushUserTranscript,
+        );
       }
     }
 

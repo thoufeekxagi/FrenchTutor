@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
@@ -15,7 +15,8 @@ class ConnectorsLabScreen extends ConsumerStatefulWidget {
   const ConnectorsLabScreen({super.key});
 
   @override
-  ConsumerState<ConnectorsLabScreen> createState() => _ConnectorsLabScreenState();
+  ConsumerState<ConnectorsLabScreen> createState() =>
+      _ConnectorsLabScreenState();
 }
 
 class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
@@ -30,21 +31,25 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
     final pack = ref.watch(contentServiceProvider).connectors();
 
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text('Connectors', style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text('Connectors', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
-          MarieToolbarButton(lessonContext: ref.read(contentServiceProvider).connectorsContext()),
+          MarieToolbarButton(
+            lessonContext: ref.read(contentServiceProvider).connectorsContext(),
+          ),
         ],
       ),
       body: pack == null
           ? Center(
               child: Text(
                 'Connectors content unavailable.',
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
             )
           : _buildContent(pack),
@@ -59,7 +64,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
       children: [
         Text(
           pack.tip,
-          style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
         ),
         const SizedBox(height: 16),
         PasseportPrimaryButton(
@@ -68,7 +73,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
         ),
         const SizedBox(height: 16),
         for (final category in categories) ...[
-          KickerText(category, color: Passeport.slateDim),
+          KickerText(category, color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           PasseportCard(
             padding: 10,
@@ -98,7 +103,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
     for (var i = 0; i < items.length; i++) {
       widgets.add(_connectorRow(items[i]));
       if (i < items.length - 1) {
-        widgets.add(Divider(color: Passeport.hairline, height: 1));
+        widgets.add(Divider(color: DesignTokens.hairline, height: 1));
       }
     }
     return widgets;
@@ -118,20 +123,22 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
                   children: [
                     Text(
                       connector.fr,
-                      style: Passeport.body(13.5, weight: FontWeight.w500),
+                      style: DesignTokens.body(13.5, weight: FontWeight.w500),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       connector.en,
-                      style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+                      style: DesignTokens.mono(
+                        10.5,
+                      ).copyWith(color: DesignTokens.slateDim),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   connector.example.fr,
-                  style: Passeport.body(11.5).copyWith(
-                    color: Passeport.slateDim,
+                  style: DesignTokens.body(11.5).copyWith(
+                    color: DesignTokens.slateDim,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -140,14 +147,23 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
           ),
           const SizedBox(width: 10),
           IconButton(
-            icon: Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.brass),
+            icon: Icon(
+              CupertinoIcons.speaker_2_fill,
+              size: 16,
+              color: DesignTokens.info,
+            ),
             onPressed: () {
               LessonSpeechService.shared.speak(
-                items: [SpeechItem(text: connector.example.fr, language: 'fr-FR')],
+                items: [
+                  SpeechItem(text: connector.example.fr, language: 'fr-FR'),
+                ],
               );
             },
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            constraints: const BoxConstraints(
+              minWidth: DesignTokens.minTapTarget,
+              minHeight: DesignTokens.minTapTarget,
+            ),
           ),
         ],
       ),
@@ -212,10 +228,9 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
     final pool = List<Connector>.from(widget.connectors)..shuffle(rng);
     final picked = pool.take(10).toList();
     _questions = picked.map((connector) {
-      final distractors = widget.connectors
-          .where((c) => c.id != connector.id)
-          .toList()
-        ..shuffle(rng);
+      final distractors =
+          widget.connectors.where((c) => c.id != connector.id).toList()
+            ..shuffle(rng);
       final choices = distractors.take(2).map((c) => c.fr).toList()
         ..add(connector.fr)
         ..shuffle(rng);
@@ -253,16 +268,16 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
   }
 
   Color _choiceColor(String choice, _QuizQuestion q) {
-    if (choice == q.connector.fr) return Passeport.brass;
-    if (choice == _selected) return Passeport.maroon;
-    return Passeport.slate;
+    if (choice == q.connector.fr) return DesignTokens.info;
+    if (choice == _selected) return DesignTokens.primary;
+    return DesignTokens.slate;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Passeport.parchmentDim,
+        color: DesignTokens.parchmentDim,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -273,7 +288,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Passeport.slate,
+              color: DesignTokens.slate,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -282,11 +297,16 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
             child: Row(
               children: [
-                Text('Connectors quiz', style: Passeport.display(18)),
+                Text('Connectors quiz', style: DesignTokens.display(18)),
                 const Spacer(),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Close', style: Passeport.body(14).copyWith(color: Passeport.maroon)),
+                  child: Text(
+                    'Close',
+                    style: DesignTokens.body(
+                      14,
+                    ).copyWith(color: DesignTokens.primary),
+                  ),
                 ),
               ],
             ),
@@ -312,7 +332,9 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
           Center(
             child: Text(
               '${_index + 1} / ${_questions.length}',
-              style: Passeport.mono(11).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.mono(
+                11,
+              ).copyWith(color: DesignTokens.slateDim),
             ),
           ),
           const SizedBox(height: 18),
@@ -322,35 +344,43 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
               children: [
                 Text(
                   'Which connector means:',
-                  style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+                  style: DesignTokens.body(
+                    12.5,
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   q.connector.en,
-                  style: Passeport.display(18, weight: FontWeight.w500),
+                  style: DesignTokens.display(18, weight: FontWeight.w500),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          ...q.choices.map((choice) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: _selected == null ? () => _answer(choice) : null,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _selected == null ? Passeport.text : _choiceColor(choice, q),
-                      backgroundColor: Passeport.card,
-                      side: BorderSide(color: Passeport.hairline),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      textStyle: Passeport.body(13.5, weight: FontWeight.w500),
+          ...q.choices.map(
+            (choice) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _selected == null ? () => _answer(choice) : null,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _selected == null
+                        ? DesignTokens.text
+                        : _choiceColor(choice, q),
+                    backgroundColor: DesignTokens.card,
+                    side: BorderSide(color: DesignTokens.hairline),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(choice),
+                    textStyle: DesignTokens.body(13.5, weight: FontWeight.w500),
                   ),
+                  child: Text(choice),
                 ),
-              )),
+              ),
+            ),
+          ),
           if (_selected != null) ...[
             const SizedBox(height: 8),
             PasseportPrimaryButton(
@@ -370,16 +400,22 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.checkmark_seal_fill, size: 36, color: Passeport.brass),
+            Icon(
+              CupertinoIcons.checkmark_seal_fill,
+              size: 36,
+              color: DesignTokens.info,
+            ),
             const SizedBox(height: 14),
             Text(
               '$_correctCount / ${_questions.length}',
-              style: Passeport.display(24, weight: FontWeight.w500),
+              style: DesignTokens.display(24, weight: FontWeight.w500),
             ),
             const SizedBox(height: 14),
             Text(
               'Great connectors score points on TEF writing and speaking tasks.',
-              style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.body(
+                13,
+              ).copyWith(color: DesignTokens.slateDim),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),

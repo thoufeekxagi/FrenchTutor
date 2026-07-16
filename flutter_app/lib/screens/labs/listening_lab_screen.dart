@@ -2,7 +2,7 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
@@ -17,10 +17,10 @@ class ListeningLabScreen extends ConsumerWidget {
     final store = ref.watch(learningStoreProvider);
 
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text('Listening', style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text('Listening', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -28,7 +28,9 @@ class ListeningLabScreen extends ConsumerWidget {
           ? Center(
               child: Text(
                 'Listening content unavailable.',
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
             )
           : ListView.separated(
@@ -42,10 +44,9 @@ class ListeningLabScreen extends ConsumerWidget {
                   exercise: exercise,
                   status: progress.status,
                   onTap: () {
-                    Navigator.push(
+                    AppRouter.push(
                       context,
-                      AppRouter.route(builder: (_) => ListeningExerciseScreen(exercise: exercise),
-                      ),
+                      (_) => ListeningExerciseScreen(exercise: exercise),
                     );
                   },
                 );
@@ -77,7 +78,7 @@ class _ListeningTile extends StatelessWidget {
             Expanded(
               child: Text(
                 exercise.title,
-                style: Passeport.body(15, weight: FontWeight.w500),
+                style: DesignTokens.body(15, weight: FontWeight.w500),
               ),
             ),
             const SizedBox(width: 8),
@@ -90,13 +91,17 @@ class _ListeningTile extends StatelessWidget {
             children: [
               Text(
                 '${exercise.questions.length} questions',
-                style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.mono(
+                  10.5,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
               if (exercise.dictation.isNotEmpty) ...[
                 const SizedBox(width: 8),
                 Text(
                   '${exercise.dictation.length} dictation',
-                  style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+                  style: DesignTokens.mono(
+                    10.5,
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
               ],
             ],
@@ -112,12 +117,15 @@ class _ListeningTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Passeport.brass.withValues(alpha: 0.15),
+        color: DesignTokens.info.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         'Phase $phase',
-        style: Passeport.mono(9, weight: FontWeight.w500).copyWith(color: Passeport.brass),
+        style: DesignTokens.mono(
+          9,
+          weight: FontWeight.w500,
+        ).copyWith(color: DesignTokens.info),
       ),
     );
   }
@@ -125,11 +133,19 @@ class _ListeningTile extends StatelessWidget {
   Widget _statusIcon(String status) {
     switch (status) {
       case 'completed':
-        return Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 20);
+        return const Icon(
+          CupertinoIcons.checkmark_circle_fill,
+          color: DesignTokens.success,
+          size: 20,
+        );
       case 'in_progress':
-        return Icon(CupertinoIcons.largecircle_fill_circle, color: Passeport.maroon, size: 20);
+        return Icon(
+          CupertinoIcons.largecircle_fill_circle,
+          color: DesignTokens.primary,
+          size: 20,
+        );
       default:
-        return Icon(CupertinoIcons.circle, color: Passeport.slate, size: 20);
+        return Icon(CupertinoIcons.circle, color: DesignTokens.slate, size: 20);
     }
   }
 }

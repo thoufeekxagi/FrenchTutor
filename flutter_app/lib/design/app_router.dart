@@ -10,20 +10,36 @@ import 'app_theme.dart';
 /// Screens must not construct MaterialPageRoute/PageRouteBuilder directly —
 /// grep-enforced during review (see PILOT_PLAN.md Phase 0.2).
 abstract final class AppRouter {
-  static Route<T> route<T>({required WidgetBuilder builder, bool fullscreenDialog = false}) {
+  static Route<T> route<T>({
+    required WidgetBuilder builder,
+    bool fullscreenDialog = false,
+  }) {
     if (AppTheme.isCupertino) {
-      return CupertinoPageRoute<T>(builder: builder, fullscreenDialog: fullscreenDialog);
+      return CupertinoPageRoute<T>(
+        builder: builder,
+        fullscreenDialog: fullscreenDialog,
+      );
     }
-    return MaterialPageRoute<T>(builder: builder, fullscreenDialog: fullscreenDialog);
+    return MaterialPageRoute<T>(
+      builder: builder,
+      fullscreenDialog: fullscreenDialog,
+    );
   }
 
-  static Future<T?> push<T>(BuildContext context, WidgetBuilder builder,
-      {bool fullscreenDialog = false}) {
-    return Navigator.of(context)
-        .push<T>(route<T>(builder: builder, fullscreenDialog: fullscreenDialog));
+  static Future<T?> push<T>(
+    BuildContext context,
+    WidgetBuilder builder, {
+    bool fullscreenDialog = false,
+  }) {
+    return Navigator.of(
+      context,
+    ).push<T>(route<T>(builder: builder, fullscreenDialog: fullscreenDialog));
   }
 
-  static Future<T?> pushReplacement<T>(BuildContext context, WidgetBuilder builder) {
+  static Future<T?> pushReplacement<T>(
+    BuildContext context,
+    WidgetBuilder builder,
+  ) {
     return Navigator.of(context).pushReplacement(route<T>(builder: builder));
   }
 }

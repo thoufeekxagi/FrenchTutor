@@ -2,7 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../data/content_service.dart';
 import '../../models/content_models.dart';
 import '../../services/lesson_agent_service.dart';
@@ -41,74 +41,117 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
   bool _isBuilding = false;
   String _buildingLabel = '';
 
-  bool get _hasPracticedWords => widget.vocabResult?.wordsCovered.isNotEmpty ?? false;
+  bool get _hasPracticedWords =>
+      widget.vocabResult?.wordsCovered.isNotEmpty ?? false;
 
   @override
   Widget build(BuildContext context) {
+    final practicedCount = widget.vocabResult?.wordsCovered.length ?? 0;
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
-      body: Stack(
-        children: [
-          SafeArea(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: DesignTokens.contentMaxWidth,
+            ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.all(DesignTokens.screenMargin),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(CupertinoIcons.book, size: 30, color: Passeport.brass),
-                  const SizedBox(height: 8),
-                  Text('Reading & Listening', style: Passeport.display(20, weight: FontWeight.w600)),
-                  const SizedBox(height: 8),
+                  const Spacer(),
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: const BoxDecoration(
+                      color: DesignTokens.infoSoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.book_fill,
+                      size: 25,
+                      color: DesignTokens.info,
+                    ),
+                  ),
+                  const SizedBox(height: DesignTokens.space5),
                   Text(
-                    'Want a short passage built from the words you just practiced, or from today\'s lesson?',
-                    style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-                    textAlign: TextAlign.center,
+                    'Choose the listening passage',
+                    style: DesignTokens.display(28),
                   ),
-                  const SizedBox(height: 18),
-                  Column(
-                    children: [
-                      PasseportPrimaryButton(
-                        label: _hasPracticedWords
-                            ? 'From the words I just practiced (${widget.vocabResult?.wordsCovered.length ?? 0})'
-                            : 'From the words I just practiced',
-                        onPressed: (!_hasPracticedWords || _isBuilding) ? null : _chooseFromPracticedWords,
-                      ),
-                      const SizedBox(height: 12),
-                      OutlinedButton(
-                        onPressed: _isBuilding ? null : _chooseFromTodaysLesson,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: BorderSide(color: Passeport.hairline),
-                          foregroundColor: Passeport.text,
-                          minimumSize: const Size.fromHeight(48),
+                  const SizedBox(height: DesignTokens.space3),
+                  Text(
+                    _hasPracticedWords
+                        ? 'Use the $practicedCount words you just practiced, or continue with today’s prepared lesson.'
+                        : 'No practiced words were captured. Continue with today’s prepared lesson.',
+                    style: DesignTokens.body(
+                      16,
+                    ).copyWith(color: DesignTokens.slateDim, height: 1.45),
+                  ),
+                  if (_isBuilding) ...[
+                    const SizedBox(height: DesignTokens.space6),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(DesignTokens.space4),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.infoSoft,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
                         ),
-                        child: Text("From today's lesson", style: Passeport.body(13, weight: FontWeight.w500)),
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          const PSProgressIndicator(),
+                          const SizedBox(width: DesignTokens.space3),
+                          Expanded(
+                            child: Text(
+                              _buildingLabel,
+                              style: DesignTokens.body(
+                                14,
+                                weight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  PasseportPrimaryButton(
+                    label: _hasPracticedWords
+                        ? 'Use my practiced words'
+                        : 'Use today’s lesson',
+                    icon: _hasPracticedWords
+                        ? CupertinoIcons.sparkles
+                        : CupertinoIcons.book_fill,
+                    onPressed: _isBuilding
+                        ? null
+                        : (_hasPracticedWords
+                              ? _chooseFromPracticedWords
+                              : _chooseFromTodaysLesson),
                   ),
+                  if (_hasPracticedWords) ...[
+                    const SizedBox(height: DesignTokens.space2),
+                    SizedBox(
+                      width: double.infinity,
+                      height: DesignTokens.minTapTarget,
+                      child: TextButton(
+                        onPressed: _isBuilding ? null : _chooseFromTodaysLesson,
+                        child: Text(
+                          'Use today’s lesson instead',
+                          style: DesignTokens.body(
+                            14,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: DesignTokens.inkSoft),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
-          if (_isBuilding)
-            Container(
-              color: Colors.black.withValues(alpha: 0.15),
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Passeport.card, borderRadius: BorderRadius.circular(14)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PSProgressIndicator(),
-                      const SizedBox(height: 10),
-                      Text(_buildingLabel, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -119,8 +162,11 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
       Navigator.of(context).pop(const PostVocabChoice(null));
       return;
     }
-    Navigator.of(context)
-        .pop(PostVocabChoice(ContentService.shared.readingPassage(fromListening: exercise)));
+    Navigator.of(context).pop(
+      PostVocabChoice(
+        ContentService.shared.readingPassage(fromListening: exercise),
+      ),
+    );
   }
 
   /// Fires exactly one LLM call (never repeated, never called again during teaching), raced
@@ -139,7 +185,9 @@ class _PostVocabChoiceScreenState extends State<PostVocabChoiceScreen> {
     });
     ReadingPassage? passage;
     try {
-      passage = await LessonAgentService.shared.buildReadingPassageFromVocab(words: words).timeout(const Duration(seconds: 14));
+      passage = await LessonAgentService.shared
+          .buildReadingPassageFromVocab(words: words)
+          .timeout(const Duration(seconds: 14));
     } catch (_) {
       passage = null;
     }

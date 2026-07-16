@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
@@ -17,10 +17,12 @@ class ListeningExerciseScreen extends ConsumerStatefulWidget {
   final ListeningExercise exercise;
 
   @override
-  ConsumerState<ListeningExerciseScreen> createState() => _ListeningExerciseScreenState();
+  ConsumerState<ListeningExerciseScreen> createState() =>
+      _ListeningExerciseScreenState();
 }
 
-class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScreen> {
+class _ListeningExerciseScreenState
+    extends ConsumerState<ListeningExerciseScreen> {
   bool _showScript = false;
   final Map<int, int> _answers = {};
   final Map<int, String> _dictationInputs = {};
@@ -30,7 +32,8 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
 
   ListeningExercise get exercise => widget.exercise;
 
-  String get _lessonContext => ref.read(contentServiceProvider).listeningExerciseContext(exercise);
+  String get _lessonContext =>
+      ref.read(contentServiceProvider).listeningExerciseContext(exercise);
 
   double get _score {
     if (exercise.questions.isEmpty) return 0;
@@ -41,7 +44,8 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   }
 
   bool get _allQuestionsAnswered {
-    return exercise.questions.isNotEmpty && _answers.length == exercise.questions.length;
+    return exercise.questions.isNotEmpty &&
+        _answers.length == exercise.questions.length;
   }
 
   @override
@@ -59,16 +63,17 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text(exercise.title, style: Passeport.display(18)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text(exercise.title, style: DesignTokens.display(18)),
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
+            onPressed: () =>
+                LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -105,7 +110,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Listen', color: Passeport.slateDim),
+          const KickerText('Listen', color: DesignTokens.slateDim),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -118,10 +123,7 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
           if (_showScript)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                exercise.script,
-                style: Passeport.body(13),
-              ),
+              child: Text(exercise.script, style: DesignTokens.body(13)),
             )
           else
             TextButton(
@@ -129,7 +131,10 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
                 'Show script',
-                style: Passeport.mono(11, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                style: DesignTokens.mono(
+                  11,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.primary),
               ),
             ),
         ],
@@ -138,28 +143,31 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   }
 
   Widget _speedButton(String label, IconData icon, double rate) {
-    return InkWell(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         LessonSpeechService.shared.speak(
           items: [SpeechItem(text: exercise.script, language: 'fr-FR')],
           rate: rate,
         );
       },
-      borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: Passeport.maroon.withValues(alpha: 0.1),
+          color: DesignTokens.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: Passeport.maroon),
+            Icon(icon, size: 14, color: DesignTokens.primary),
             const SizedBox(width: 6),
             Text(
               label,
-              style: Passeport.body(12.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+              style: DesignTokens.body(
+                12.5,
+                weight: FontWeight.w500,
+              ).copyWith(color: DesignTokens.primary),
             ),
           ],
         ),
@@ -174,14 +182,14 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Comprehension', color: Passeport.slateDim),
+          const KickerText('Comprehension', color: DesignTokens.slateDim),
           const SizedBox(height: 14),
           for (var qi = 0; qi < exercise.questions.length; qi++) ...[
             _questionBlock(qi, exercise.questions[qi]),
             if (qi < exercise.questions.length - 1)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Divider(color: Passeport.hairline, height: 1),
+                child: Divider(color: DesignTokens.hairline, height: 1),
               ),
           ],
         ],
@@ -195,19 +203,24 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
       children: [
         Text(
           question.q,
-          style: Passeport.body(13.5, weight: FontWeight.w500),
+          style: DesignTokens.body(13.5, weight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         for (var ci = 0; ci < question.choices.length; ci++)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: GestureDetector(
-              onTap: _answers[qi] == null ? () => setState(() => _answers[qi] = ci) : null,
+              onTap: _answers[qi] == null
+                  ? () => setState(() => _answers[qi] = ci)
+                  : null,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 9,
+                ),
                 decoration: BoxDecoration(
-                  color: Passeport.parchmentDim,
+                  color: DesignTokens.parchmentDim,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -215,14 +228,22 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
                     Expanded(
                       child: Text(
                         question.choices[ci],
-                        style: Passeport.body(12.5),
+                        style: DesignTokens.body(12.5),
                       ),
                     ),
                     if (_answers[qi] != null) ...[
                       if (ci == question.answerIndex)
-                        Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 18)
+                        const Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          color: DesignTokens.success,
+                          size: 18,
+                        )
                       else if (ci == _answers[qi])
-                        Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.maroon, size: 18),
+                        Icon(
+                          CupertinoIcons.xmark_circle_fill,
+                          color: DesignTokens.primary,
+                          size: 18,
+                        ),
                     ],
                   ],
                 ),
@@ -240,14 +261,14 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Dictation', color: Passeport.slateDim),
+          const KickerText('Dictation', color: DesignTokens.slateDim),
           const SizedBox(height: 14),
           for (var i = 0; i < exercise.dictation.length; i++) ...[
             _dictationBlock(i, exercise.dictation[i]),
             if (i < exercise.dictation.length - 1)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Divider(color: Passeport.hairline, height: 1),
+                child: Divider(color: DesignTokens.hairline, height: 1),
               ),
           ],
         ],
@@ -269,11 +290,18 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(CupertinoIcons.speaker_2_fill, size: 14, color: Passeport.brass),
+              Icon(
+                CupertinoIcons.speaker_2_fill,
+                size: 14,
+                color: DesignTokens.info,
+              ),
               const SizedBox(width: 6),
               Text(
                 'Play sentence ${i + 1}',
-                style: Passeport.mono(11, weight: FontWeight.w500).copyWith(color: Passeport.brass),
+                style: DesignTokens.mono(
+                  11,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.info),
               ),
             ],
           ),
@@ -281,13 +309,15 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         const SizedBox(height: 6),
         TextField(
           onChanged: (val) => _dictationInputs[i] = val,
-          style: Passeport.body(13),
-          cursorColor: Passeport.maroon,
+          style: DesignTokens.body(13),
+          cursorColor: DesignTokens.primary,
           decoration: InputDecoration(
             hintText: 'Type what you hear...',
-            hintStyle: Passeport.body(13).copyWith(color: Passeport.slate),
+            hintStyle: DesignTokens.body(
+              13,
+            ).copyWith(color: DesignTokens.slate),
             filled: true,
-            fillColor: Passeport.parchmentDim,
+            fillColor: DesignTokens.parchmentDim,
             contentPadding: const EdgeInsets.all(10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -297,23 +327,31 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
         ),
         const SizedBox(height: 6),
         GestureDetector(
-          onTap: _dictationChecking.contains(i) ? null : () => _checkDictation(i, sentence),
+          onTap: _dictationChecking.contains(i)
+              ? null
+              : () => _checkDictation(i, sentence),
           child: _dictationChecking.contains(i)
               ? const SizedBox(
                   width: 12,
                   height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Passeport.maroon),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: DesignTokens.primary,
+                  ),
                 )
               : Text(
                   'Check',
-                  style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                  style: DesignTokens.mono(
+                    10.5,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.primary),
                 ),
         ),
         if (_dictationFeedback[i] != null) ...[
           const SizedBox(height: 4),
           Text(
             _dictationFeedback[i]!,
-            style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+            style: DesignTokens.body(12).copyWith(color: DesignTokens.slateDim),
           ),
         ],
       ],
@@ -325,7 +363,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
   Future<void> _checkDictation(int index, String expected) async {
     final submitted = _dictationInputs[index] ?? '';
     if (submitted.trim().isEmpty) {
-      setState(() => _dictationFeedback[index] = 'Type your answer, then tap Check.');
+      setState(
+        () => _dictationFeedback[index] = 'Type your answer, then tap Check.',
+      );
       return;
     }
     if (_normalize(expected) == _normalize(submitted)) {
@@ -335,10 +375,9 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
 
     setState(() => _dictationChecking.add(index));
     try {
-      final feedback = await ref.read(lessonAgentServiceProvider).checkDictation(
-            expected: expected,
-            submitted: submitted,
-          );
+      final feedback = await ref
+          .read(lessonAgentServiceProvider)
+          .checkDictation(expected: expected, submitted: submitted);
       if (!mounted) return;
       setState(() {
         _dictationFeedback[index] = feedback;
@@ -364,7 +403,10 @@ class _ListeningExerciseScreenState extends ConsumerState<ListeningExerciseScree
 
   void _finish() {
     final store = ref.read(learningStoreProvider);
-    final minutes = DateTime.now().difference(_sessionStart).inMinutes.clamp(1, 999);
+    final minutes = DateTime.now()
+        .difference(_sessionStart)
+        .inMinutes
+        .clamp(1, 999);
     store.markHabit('listening', done: true, minutes: minutes);
     store.setLessonStatus(
       'listening_${exercise.id}',

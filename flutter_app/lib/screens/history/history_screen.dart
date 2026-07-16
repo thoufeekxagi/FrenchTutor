@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
-import '../../models/session.dart';
+import '../../design/tokens.dart';
 import '../../models/chat_message.dart';
+import '../../models/session.dart';
 import '../../providers/database_provider.dart';
+import '../../widgets/adaptive/adaptive.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key, required this.session});
@@ -17,112 +18,213 @@ class HistoryScreen extends ConsumerWidget {
     final messages = storage.getSessionMessages(sessionId: session.id);
 
     final startDate = DateTime.tryParse(session.startedAt);
-    final endDate =
-        session.endedAt != null ? DateTime.tryParse(session.endedAt!) : null;
+    final endDate = session.endedAt != null
+        ? DateTime.tryParse(session.endedAt!)
+        : null;
     final duration = (startDate != null && endDate != null)
         ? endDate.difference(startDate)
         : null;
-
     final dateText = startDate != null
         ? _formatDate(startDate)
         : session.startedAt;
-    final durationText = duration != null
-        ? _formatDuration(duration)
-        : null;
+    final durationText = duration != null ? _formatDuration(duration) : null;
 
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        backgroundColor: Passeport.parchment,
+        backgroundColor: DesignTokens.canvas,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.chevron_left, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              session.topic ?? 'Session',
-              style: Passeport.display(18),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+        leadingWidth: 60,
+        leading: Center(
+          child: Semantics(
+            button: true,
+            label: 'Back',
+            child: IconButton(
+              constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+              icon: const Icon(CupertinoIcons.chevron_left, size: 20),
+              onPressed: () => Navigator.pop(context),
             ),
-            if (durationText != null)
-              Text(
-                '$dateText  ·  $durationText',
-                style: Passeport.body(12).copyWith(color: Passeport.slateDim),
-              )
-            else
-              Text(
-                dateText,
-                style: Passeport.body(12).copyWith(color: Passeport.slateDim),
-              ),
-          ],
+          ),
         ),
       ),
-      body: messages.isEmpty
-          ? Center(
-              child: Text(
-                'No messages in this session',
-                style: Passeport.body(14).copyWith(color: Passeport.slate),
+      body: SafeArea(
+        top: false,
+        child: PSContentColumn(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  DesignTokens.screenMargin,
+                  DesignTokens.space2,
+                  DesignTokens.screenMargin,
+                  DesignTokens.space5,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      session.topic ?? 'Session',
+                      style: DesignTokens.display(28),
+                    ),
+                    const SizedBox(height: DesignTokens.space2),
+                    Text(
+                      durationText == null
+                          ? dateText
+                          : '$dateText · $durationText',
+                      style: DesignTokens.body(
+                        14,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                    const SizedBox(height: DesignTokens.space4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: DesignTokens.space3,
+                        vertical: DesignTokens.space2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.infoSoft,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusPill,
+                        ),
+                      ),
+                      child: Text(
+                        '${messages.length} message${messages.length == 1 ? '' : 's'} saved',
+                        style: DesignTokens.body(
+                          12,
+                          weight: FontWeight.w600,
+                        ).copyWith(color: DesignTokens.info),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return _buildMessageBubble(messages[index]);
-              },
-            ),
+              Expanded(
+                child: messages.isEmpty
+                    ? _emptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(
+                          DesignTokens.screenMargin,
+                          DesignTokens.space2,
+                          DesignTokens.screenMargin,
+                          32,
+                        ),
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          return _buildMessage(messages[index]);
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _emptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: const BoxDecoration(
+                color: DesignTokens.infoSoft,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                CupertinoIcons.text_bubble,
+                color: DesignTokens.info,
+                size: 25,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.space4),
+            Text('No transcript saved', style: DesignTokens.display(19)),
+            const SizedBox(height: DesignTokens.space2),
+            Text(
+              'This session does not contain any saved messages.',
+              textAlign: TextAlign.center,
+              style: DesignTokens.body(
+                14,
+              ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessage(ChatMessage message) {
     final isUser = message.isUser;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: DesignTokens.space5),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
-            CircleAvatar(
-              radius: 14,
-              backgroundColor: Passeport.brass.withValues(alpha: 0.15),
-              child: Icon(CupertinoIcons.book_fill, size: 14, color: Passeport.brass),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: DesignTokens.successSoft,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                CupertinoIcons.waveform,
+                size: 18,
+                color: DesignTokens.success,
+              ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: DesignTokens.space3),
           ],
           Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: isUser ? Passeport.maroon : Passeport.card,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(14),
-                  topRight: const Radius.circular(14),
-                  bottomLeft:
-                      isUser ? const Radius.circular(14) : const Radius.circular(4),
-                  bottomRight:
-                      isUser ? const Radius.circular(4) : const Radius.circular(14),
+            child: Column(
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isUser ? 'You' : 'Marie',
+                  style: DesignTokens.body(
+                    12,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
-                border: isUser
-                    ? null
-                    : Border.all(color: Passeport.hairline, width: 1),
-              ),
-              child: Text(
-                message.content,
-                style: Passeport.body(14).copyWith(
-                  color: isUser ? Passeport.parchment : Passeport.text,
+                const SizedBox(height: DesignTokens.space1),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.space4,
+                    vertical: DesignTokens.space3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isUser ? DesignTokens.primary : DesignTokens.surface,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusCard,
+                    ),
+                    boxShadow: isUser ? null : DesignTokens.cardShadow,
+                  ),
+                  child: Text(
+                    message.content,
+                    style: DesignTokens.body(15).copyWith(
+                      color: isUser ? DesignTokens.surface : DesignTokens.text,
+                      height: 1.45,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-          if (isUser) const SizedBox(width: 8),
+          if (isUser) const SizedBox(width: 48),
         ],
       ),
     );
@@ -130,8 +232,18 @@ class HistoryScreen extends ConsumerWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }

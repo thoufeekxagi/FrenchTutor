@@ -16,14 +16,15 @@ class StageRecord {
   Map<String, dynamic>? resultJson;
 
   Map<String, dynamic> toJson() => {
-        'status': status.name,
-        if (resultJson != null) 'result': resultJson,
-      };
+    'status': status.name,
+    if (resultJson != null) 'result': resultJson,
+  };
 
   factory StageRecord.fromJson(Map<String, dynamic> json) => StageRecord(
-        status: StageStatus.values.asNameMap()[json['status']] ?? StageStatus.pending,
-        resultJson: (json['result'] as Map?)?.cast<String, dynamic>(),
-      );
+    status:
+        StageStatus.values.asNameMap()[json['status']] ?? StageStatus.pending,
+    resultJson: (json['result'] as Map?)?.cast<String, dynamic>(),
+  );
 }
 
 /// One row of `daily_sessions` — the persisted, resumable Daily Path. Today's
@@ -42,7 +43,8 @@ class DailySession {
     this.readingPassageJson,
     this.startedAt,
     this.completedAt,
-  }) : stages = stages ?? {for (final s in PathwayStage.values) s: StageRecord()};
+  }) : stages =
+           stages ?? {for (final s in PathwayStage.values) s: StageRecord()};
 
   final String id;
   final String localDate; // YYYY-MM-DD device-local
@@ -57,25 +59,33 @@ class DailySession {
   DateTime? completedAt;
 
   bool get isComplete => PathwayStage.values.every(
-      (s) => stages[s]!.status == StageStatus.completed || stages[s]!.status == StageStatus.skipped);
+    (s) =>
+        stages[s]!.status == StageStatus.completed ||
+        stages[s]!.status == StageStatus.skipped,
+  );
 
   PathwayStage? get nextStage {
     for (final s in PathwayStage.values) {
       final status = stages[s]!.status;
-      if (status != StageStatus.completed && status != StageStatus.skipped) return s;
+      if (status != StageStatus.completed && status != StageStatus.skipped) {
+        return s;
+      }
     }
     return null;
   }
 
   String stagesToJson() => jsonEncode(
-      stages.map((stage, record) => MapEntry(stage.name, record.toJson())));
+    stages.map((stage, record) => MapEntry(stage.name, record.toJson())),
+  );
 
   static Map<PathwayStage, StageRecord> stagesFromJson(String json) {
     final decoded = (jsonDecode(json) as Map).cast<String, dynamic>();
     return {
       for (final s in PathwayStage.values)
         s: decoded[s.name] != null
-            ? StageRecord.fromJson((decoded[s.name] as Map).cast<String, dynamic>())
+            ? StageRecord.fromJson(
+                (decoded[s.name] as Map).cast<String, dynamic>(),
+              )
             : StageRecord(),
     };
   }

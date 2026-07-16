@@ -9,17 +9,17 @@ class StageOutcome<T> {
 
   /// Objective completion criteria were met.
   const StageOutcome.completed(T result, {String reason = 'finished'})
-      : this._(StageStatus.completed, result, reason);
+    : this._(StageStatus.completed, result, reason);
 
   /// The learner left or the connection dropped mid-stage. Partial evidence
   /// (already-graded cards, drills answered) may ride along in [result], but
   /// the stage stays incomplete and resumable.
   const StageOutcome.paused({T? result, String reason = 'paused'})
-      : this._(StageStatus.paused, result, reason);
+    : this._(StageStatus.paused, result, reason);
 
   /// Deliberate learner choice to skip the stage today.
   const StageOutcome.skipped({String reason = 'skipped'})
-      : this._(StageStatus.skipped, null, reason);
+    : this._(StageStatus.skipped, null, reason);
 
   final StageStatus status;
   final T? result;
@@ -46,5 +46,6 @@ class SpeakingResult {
   final int learnerUtteranceCount;
   final String endedReason;
 
-  bool get meetsThreshold => connected && learnerUtteranceCount >= 1 && durationSeconds >= 30;
+  bool get meetsThreshold =>
+      connected && learnerUtteranceCount >= 1 && durationSeconds >= 30;
 }

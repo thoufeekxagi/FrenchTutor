@@ -6,23 +6,18 @@ import 'package:intl/intl.dart';
 import '../../config/api_keys.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
+import '../../models/daily_session.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
 import '../history/history_screen.dart';
 import '../notes/notes_review_screen.dart';
 import '../session/session_screen.dart';
+import '../settings/settings_screen.dart';
 import 'daily_pathway_widget.dart';
 
-/// Home (2026-07 redesign): three calm blocks, in this order —
-///   1. Marie hero (navy) with topic pills inside it
-///   2. Today's French (compact pathway card, the only maroon CTA)
-///   3. Journal (recent sessions when they exist + review-notes row)
-/// No stat chip in the header, no empty-state filler cards. The eye should
-/// land on "Just talk to Marie", then Continue, then nothing else.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -43,7 +38,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
-      (_) => SessionScreen(apiKey: ApiKeys.geminiKey, lessonContext: lessonContext),
+      (_) => SessionScreen(
+        apiKey: ApiKeys.geminiKey,
+        lessonContext: lessonContext,
+      ),
       fullscreenDialog: true,
     );
     _reload();
@@ -59,22 +57,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: Passeport.parchment,
       body: SafeArea(
         child: PSContentColumn(
           child: RefreshIndicator(
             color: Passeport.maroon,
             onRefresh: () async => _reload(),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
               children: [
                 _header(),
-                const SizedBox(height: 18),
-                _marieHero(),
-                const SizedBox(height: 14),
+                const SizedBox(height: 22),
                 DailyPathwayWidget(onProgress: _reload),
-                const SizedBox(height: 14),
-                _journalCard(),
+                const SizedBox(height: 28),
+                _sectionTitle('Practice your way'),
+                const SizedBox(height: 10),
+                _mariePractice(),
+                const SizedBox(height: 28),
+                _sectionTitle('Your momentum'),
+                const SizedBox(height: 10),
+                _momentumCard(),
+                if (_sessions.isNotEmpty) ...[
+                  const SizedBox(height: 28),
+                  _sectionTitle('Recent practice'),
+                  const SizedBox(height: 10),
+                  _journalCard(),
+                ] else ...[
+                  const SizedBox(height: 16),
+                  _notesRow(),
+                ],
               ],
             ),
           ),
@@ -83,43 +94,80 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Header — kicker + greeting, nothing else. Stats live on Progress.
-  // ---------------------------------------------------------------------------
-
   Widget _header() {
     final goal = ref.read(learningStoreProvider).profile().goal;
     final goalLabel = switch (goal) {
       'tef_canada' => 'TEF Canada · CLB 7',
       'everyday' => 'Everyday French',
-      _ => 'Fundamentals',
+      _ => 'French foundations',
     };
 
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        KickerText(goalLabel, color: Passeport.slateDim),
-        const SizedBox(height: 4),
-        Text('Bonjour !', style: Passeport.display(30, weight: FontWeight.w700)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase(),
+                style: Passeport.body(
+                  10.5,
+                  weight: FontWeight.w700,
+                ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
+              ),
+              const SizedBox(height: 5),
+              Text('Bonjour', style: Passeport.display(32)),
+              const SizedBox(height: 4),
+              Text(
+                goalLabel,
+                style: Passeport.body(
+                  14,
+                  weight: FontWeight.w500,
+                ).copyWith(color: Passeport.slateDim),
+              ),
+            ],
+          ),
+        ),
+        Semantics(
+          button: true,
+          label: 'Open settings',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => AppRouter.push(context, (_) => const SettingsScreen()),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Passeport.card,
+                shape: BoxShape.circle,
+                boxShadow: DesignTokens.cardShadow,
+              ),
+              child: const Icon(
+                CupertinoIcons.person_fill,
+                size: 18,
+                color: Passeport.ink,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Marie hero — the call AND the topics are one thing, one card.
-  // ---------------------------------------------------------------------------
+  Widget _sectionTitle(String title) {
+    return Text(title, style: Passeport.display(20));
+  }
 
-  Widget _marieHero() {
-    final topics = ref.read(contentServiceProvider).resources()?.speakingTopics ?? [];
-
+  Widget _mariePractice() {
+    final topics =
+        ref.read(contentServiceProvider).resources()?.speakingTopics ?? [];
     return Container(
       decoration: BoxDecoration(
-        color: Passeport.ink,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: DesignTokens.cardShadow,
+        color: Passeport.infoSoft,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -128,71 +176,100 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               _openSession();
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Passeport.brass.withValues(alpha: 0.18),
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: Passeport.sky,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(CupertinoIcons.phone_fill, size: 20, color: Passeport.brass),
+                    child: const Center(
+                      child: Text(
+                        'M',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Just talk to Marie',
-                            style: Passeport.display(19, weight: FontWeight.w600)
-                                .copyWith(color: Colors.white)),
-                        const SizedBox(height: 2),
-                        Text('Live conversation, any topic',
-                            style: Passeport.body(12.5).copyWith(color: Passeport.slate)),
+                        Text(
+                          'Talk with Marie',
+                          style: Passeport.body(16, weight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Open conversation · choose any topic',
+                          style: Passeport.body(
+                            13,
+                          ).copyWith(color: Passeport.slateDim),
+                        ),
                       ],
                     ),
                   ),
-                  const Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Passeport.card,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.mic_fill,
+                      color: Passeport.maroon,
+                      size: 19,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
           if (topics.isNotEmpty) ...[
-            Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 12, 0, 14),
-              child: SingleChildScrollView(
+            Container(height: 1, color: Passeport.sky.withValues(alpha: 0.12)),
+            SizedBox(
+              height: 54,
+              child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (final topic in topics)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () {
-                            PSHaptics.light();
-                            _openSession(
-                              lessonContext:
-                                  ref.read(contentServiceProvider).speakingTopicContext(topic),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(topic.title,
-                                style: Passeport.body(12.5, weight: FontWeight.w500)
-                                    .copyWith(color: Passeport.parchment)),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(width: 10),
-                  ],
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 9,
                 ),
+                itemCount: topics.take(5).length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final topic = topics[index];
+                  return GestureDetector(
+                    onTap: () {
+                      PSHaptics.selection();
+                      _openSession(
+                        lessonContext: ref
+                            .read(contentServiceProvider)
+                            .speakingTopicContext(topic),
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      decoration: BoxDecoration(
+                        color: Passeport.card,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(
+                        topic.title,
+                        style: Passeport.body(12.5, weight: FontWeight.w600),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -201,46 +278,132 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Journal — sessions when they exist; the notes link always, as one row.
-  // ---------------------------------------------------------------------------
+  Widget _momentumCard() {
+    final today = ref.read(learningStoreProvider).dailySession();
+    final completed = PathwayStage.values.where((stage) {
+      final status = today.stages[stage]!.status;
+      return status == StageStatus.completed || status == StageStatus.skipped;
+    }).length;
+    final weekStart = DateTime.now().subtract(const Duration(days: 7));
+    final sessionsThisWeek = _sessions.where((session) {
+      return DateTime.tryParse(session.startedAt)?.isAfter(weekStart) ?? false;
+    }).length;
+
+    return PasseportCard(
+      padding: 18,
+      child: Row(
+        children: [
+          Expanded(
+            child: _Metric(
+              value: '$completed/5',
+              label: 'steps today',
+              color: completed == 5 ? Passeport.sage : Passeport.maroon,
+            ),
+          ),
+          Container(width: 1, height: 42, color: Passeport.hairline),
+          Expanded(
+            child: _Metric(
+              value: '$sessionsThisWeek',
+              label: sessionsThisWeek == 1
+                  ? 'session this week'
+                  : 'sessions this week',
+              color: Passeport.sky,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _journalCard() {
     return PasseportCard(
       padding: 6,
       child: Column(
         children: [
-          for (final session in _sessions.take(3))
+          for (final session in _sessions.take(2))
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => AppRouter.push(context, (_) => HistoryScreen(session: session)),
+              onTap: () => AppRouter.push(
+                context,
+                (_) => HistoryScreen(session: session),
+              ),
               child: _SessionRow(session: session),
             ),
-          if (_sessions.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Container(height: 1, color: Passeport.hairline),
-            ),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => AppRouter.push(context, (_) => const NotesReviewScreen()),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-              child: Row(
-                children: [
-                  const Icon(CupertinoIcons.square_pencil, size: 18, color: Passeport.brass),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text('Review notes',
-                        style: Passeport.body(14, weight: FontWeight.w500)),
-                  ),
-                  const Icon(CupertinoIcons.chevron_right, size: 14, color: Passeport.slate),
-                ],
-              ),
-            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Container(height: 1, color: Passeport.hairline),
           ),
+          _notesRow(inCard: true),
         ],
       ),
+    );
+  }
+
+  Widget _notesRow({bool inCard = false}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => AppRouter.push(context, (_) => const NotesReviewScreen()),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: inCard ? 12 : 16,
+          vertical: 13,
+        ),
+        decoration: inCard
+            ? null
+            : BoxDecoration(
+                color: Passeport.card,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: DesignTokens.cardShadow,
+              ),
+        child: Row(
+          children: [
+            const Icon(
+              CupertinoIcons.square_pencil,
+              size: 18,
+              color: Passeport.sky,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Review your notes',
+                style: Passeport.body(14, weight: FontWeight.w600),
+              ),
+            ),
+            const Icon(
+              CupertinoIcons.chevron_right,
+              size: 14,
+              color: Passeport.slate,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Metric extends StatelessWidget {
+  const _Metric({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  final String value;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: Passeport.display(24).copyWith(color: color)),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: Passeport.body(11.5).copyWith(color: Passeport.slateDim),
+        ),
+      ],
     );
   }
 }
@@ -253,18 +416,20 @@ class _SessionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
       child: Row(
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
-              color: Passeport.parchmentDim,
-              borderRadius: BorderRadius.circular(9),
+              color: Passeport.primarySoft,
+              borderRadius: BorderRadius.circular(11),
             ),
-            child: const Center(
-              child: Icon(CupertinoIcons.chat_bubble_fill, size: 14, color: Passeport.maroon),
+            child: const Icon(
+              CupertinoIcons.chat_bubble_fill,
+              size: 16,
+              color: Passeport.maroon,
             ),
           ),
           const SizedBox(width: 12),
@@ -276,27 +441,39 @@ class _SessionRow extends StatelessWidget {
                   session.topic ?? 'French practice',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Passeport.body(13.5, weight: FontWeight.w500),
+                  style: Passeport.body(13.5, weight: FontWeight.w600),
                 ),
-                const SizedBox(height: 1),
-                Text(_formatDate(session.startedAt),
-                    style: Passeport.body(11.5).copyWith(color: Passeport.slateDim)),
+                const SizedBox(height: 2),
+                Text(
+                  _formatDate(session.startedAt),
+                  style: Passeport.body(
+                    11.5,
+                  ).copyWith(color: Passeport.slateDim),
+                ),
               ],
             ),
           ),
           if (_stageLabel != null)
             Container(
-              margin: const EdgeInsets.only(right: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
-                color: Passeport.maroon.withValues(alpha: 0.1),
+                color: Passeport.infoSoft,
                 borderRadius: BorderRadius.circular(100),
               ),
-              child: Text(_stageLabel!,
-                  style: Passeport.body(10.5, weight: FontWeight.w500)
-                      .copyWith(color: Passeport.maroon)),
+              child: Text(
+                _stageLabel!,
+                style: Passeport.body(
+                  10.5,
+                  weight: FontWeight.w600,
+                ).copyWith(color: Passeport.sky),
+              ),
             ),
-          const Icon(CupertinoIcons.chevron_right, size: 13, color: Passeport.slate),
+          const Icon(
+            CupertinoIcons.chevron_right,
+            size: 13,
+            color: Passeport.slate,
+          ),
         ],
       ),
     );

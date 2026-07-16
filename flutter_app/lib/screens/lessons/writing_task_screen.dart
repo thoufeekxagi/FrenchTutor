@@ -3,7 +3,7 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../config/api_keys.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
@@ -36,7 +36,8 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
 
   WritingTask get task => widget.task;
 
-  String get _lessonContext => ref.read(contentServiceProvider).writingTaskContext(task);
+  String get _lessonContext =>
+      ref.read(contentServiceProvider).writingTaskContext(task);
 
   int get _wordCount {
     if (_content.trim().isEmpty) return 0;
@@ -46,7 +47,9 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   List<Connector> get _targetConnectorObjects {
     final pack = ref.read(contentServiceProvider).connectors();
     if (pack == null) return [];
-    return pack.connectors.where((c) => task.targetConnectors.contains(c.id)).toList();
+    return pack.connectors
+        .where((c) => task.targetConnectors.contains(c.id))
+        .toList();
   }
 
   bool _connectorUsed(Connector connector) {
@@ -74,16 +77,17 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     });
     final submittedText = _content;
     try {
-      final result = await ref.read(lessonAgentServiceProvider).gradeWriting(
-            task: task,
-            submission: submittedText,
-          );
+      final result = await ref
+          .read(lessonAgentServiceProvider)
+          .gradeWriting(task: task, submission: submittedText);
       if (!mounted) return;
       setState(() {
         _feedback = result;
         _isGrading = false;
       });
-      ref.read(learningStoreProvider).saveSubmission(
+      ref
+          .read(learningStoreProvider)
+          .saveSubmission(
             taskId: task.id,
             text: submittedText,
             feedback: result.improvedVersion,
@@ -100,16 +104,17 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text(task.title, style: Passeport.display(18)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text(task.title, style: DesignTokens.display(18)),
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
+            onPressed: () =>
+                LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -134,7 +139,9 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             const SizedBox(height: 8),
             Text(
               _errorText!,
-              style: Passeport.mono(11).copyWith(color: Passeport.maroon),
+              style: DesignTokens.mono(
+                11,
+              ).copyWith(color: DesignTokens.primary),
             ),
           ],
           const SizedBox(height: 16),
@@ -148,18 +155,26 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               child: TextButton.icon(
                 onPressed: () {
                   LessonSpeechService.shared.deactivate();
-                  Navigator.of(context).push(
-                    AppRouter.route(fullscreenDialog: true, builder: (_) => SessionScreen(
-                        apiKey: ApiKeys.geminiKey,
-                        lessonContext: _lessonContext,
-                      ),
+                  AppRouter.push(
+                    context,
+                    (_) => SessionScreen(
+                      apiKey: ApiKeys.geminiKey,
+                      lessonContext: _lessonContext,
                     ),
+                    fullscreenDialog: true,
                   );
                 },
-                icon: const Icon(CupertinoIcons.phone_fill, size: 16, color: Passeport.maroon),
+                icon: const Icon(
+                  CupertinoIcons.phone_fill,
+                  size: 16,
+                  color: DesignTokens.primary,
+                ),
                 label: Text(
                   'Discuss feedback with Marie',
-                  style: Passeport.mono(11, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                  style: DesignTokens.mono(
+                    11,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.primary),
                 ),
               ),
             ),
@@ -179,17 +194,23 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         children: [
           Row(
             children: [
-              const KickerText('Feedback', color: Passeport.slateDim),
+              const KickerText('Feedback', color: DesignTokens.slateDim),
               const Spacer(),
               Text(
                 '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
-                style: Passeport.display(16, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                style: DesignTokens.display(
+                  16,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.primary),
               ),
             ],
           ),
           if (feedback.strengths.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Strengths', style: Passeport.body(12, weight: FontWeight.w500)),
+            Text(
+              'Strengths',
+              style: DesignTokens.body(12, weight: FontWeight.w500),
+            ),
             const SizedBox(height: 4),
             for (final s in feedback.strengths)
               Padding(
@@ -197,16 +218,30 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(CupertinoIcons.checkmark, size: 12, color: Passeport.brass),
+                    const Icon(
+                      CupertinoIcons.checkmark,
+                      size: 12,
+                      color: DesignTokens.success,
+                    ),
                     const SizedBox(width: 6),
-                    Expanded(child: Text(s, style: Passeport.body(12).copyWith(color: Passeport.slateDim))),
+                    Expanded(
+                      child: Text(
+                        s,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: DesignTokens.slateDim),
+                      ),
+                    ),
                   ],
                 ),
               ),
           ],
           if (feedback.corrections.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Corrections', style: Passeport.body(12, weight: FontWeight.w500)),
+            Text(
+              'Corrections',
+              style: DesignTokens.body(12, weight: FontWeight.w500),
+            ),
             const SizedBox(height: 4),
             for (final c in feedback.corrections)
               Padding(
@@ -218,49 +253,86 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                       children: [
                         Text(
                           c.original,
-                          style: Passeport.body(11.5).copyWith(
-                            color: Passeport.maroon,
+                          style: DesignTokens.body(11.5).copyWith(
+                            color: DesignTokens.primary,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(CupertinoIcons.arrow_right, size: 9, color: Passeport.slate),
+                        const Icon(
+                          CupertinoIcons.arrow_right,
+                          size: 9,
+                          color: DesignTokens.slate,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           c.fixed,
-                          style: Passeport.body(11.5, weight: FontWeight.w500).copyWith(color: Passeport.brass),
+                          style: DesignTokens.body(
+                            11.5,
+                            weight: FontWeight.w500,
+                          ).copyWith(color: DesignTokens.info),
                         ),
                       ],
                     ),
                     if (c.why.isNotEmpty)
-                      Text(c.why, style: Passeport.mono(10).copyWith(color: Passeport.slateDim)),
+                      Text(
+                        c.why,
+                        style: DesignTokens.mono(
+                          10,
+                        ).copyWith(color: DesignTokens.slateDim),
+                      ),
                   ],
                 ),
               ),
           ],
           if (feedback.connectorFeedback.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Connectors', style: Passeport.body(12, weight: FontWeight.w500)),
+            Text(
+              'Connectors',
+              style: DesignTokens.body(12, weight: FontWeight.w500),
+            ),
             const SizedBox(height: 4),
-            Text(feedback.connectorFeedback, style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
+            Text(
+              feedback.connectorFeedback,
+              style: DesignTokens.body(
+                12,
+              ).copyWith(color: DesignTokens.slateDim),
+            ),
           ],
           if (feedback.improvedVersion.isNotEmpty) ...[
             const SizedBox(height: 12),
             Row(
               children: [
-                Text('Improved version', style: Passeport.body(12, weight: FontWeight.w500)),
+                Text(
+                  'Improved version',
+                  style: DesignTokens.body(12, weight: FontWeight.w500),
+                ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.brass),
+                  icon: const Icon(
+                    CupertinoIcons.speaker_2_fill,
+                    size: 16,
+                    color: DesignTokens.info,
+                  ),
                   onPressed: () => LessonSpeechService.shared.speak(
-                    items: LessonSpeechService.speechItemsFromText(feedback.improvedVersion),
+                    items: LessonSpeechService.speechItemsFromText(
+                      feedback.improvedVersion,
+                    ),
                   ),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
               ],
             ),
-            Text(feedback.improvedVersion, style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+            Text(
+              feedback.improvedVersion,
+              style: DesignTokens.body(
+                12.5,
+              ).copyWith(color: DesignTokens.slateDim),
+            ),
           ],
         ],
       ),
@@ -274,17 +346,16 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Prompt', color: Passeport.slateDim),
+          const KickerText('Prompt', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
-          Text(
-            task.promptFr,
-            style: Passeport.body(14),
-          ),
+          Text(task.promptFr, style: DesignTokens.body(14)),
           const SizedBox(height: 6),
           if (_showEnglish)
             Text(
               task.promptEn,
-              style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.body(
+                12.5,
+              ).copyWith(color: DesignTokens.slateDim),
             )
           else
             TextButton(
@@ -292,12 +363,15 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
                 'Show English',
-                style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                style: DesignTokens.mono(
+                  10.5,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.primary),
               ),
             ),
           if (task.rubricHints.isNotEmpty) ...[
             const SizedBox(height: 6),
-            Divider(color: Passeport.hairline, height: 1),
+            Divider(color: DesignTokens.hairline, height: 1),
             const SizedBox(height: 8),
             for (final hint in task.rubricHints)
               Padding(
@@ -305,11 +379,16 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('• ', style: TextStyle(color: Passeport.brass, fontSize: 13)),
+                    Text(
+                      '• ',
+                      style: TextStyle(color: DesignTokens.info, fontSize: 13),
+                    ),
                     Expanded(
                       child: Text(
                         hint,
-                        style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+                        style: DesignTokens.mono(
+                          10.5,
+                        ).copyWith(color: DesignTokens.slateDim),
                       ),
                     ),
                   ],
@@ -331,7 +410,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Target connectors', color: Passeport.slateDim),
+          const KickerText('Target connectors', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -339,16 +418,22 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             children: connectors.map((c) {
               final used = _connectorUsed(c);
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: used ? Passeport.brass : Passeport.maroon.withValues(alpha: 0.1),
+                  color: used
+                      ? DesignTokens.info
+                      : DesignTokens.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   c.fr,
-                  style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(
-                    color: used ? Colors.white : Passeport.maroon,
-                  ),
+                  style: DesignTokens.mono(
+                    10.5,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: used ? Colors.white : DesignTokens.primary),
                 ),
               );
             }).toList(),
@@ -367,12 +452,14 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         children: [
           Row(
             children: [
-              const KickerText('Your response', color: Passeport.slateDim),
+              const KickerText('Your response', color: DesignTokens.slateDim),
               const Spacer(),
               Text(
                 '$_wordCount / ${task.minWords} words',
-                style: Passeport.mono(10.5).copyWith(
-                  color: _wordCount >= task.minWords ? Passeport.brass : Passeport.slateDim,
+                style: DesignTokens.mono(10.5).copyWith(
+                  color: _wordCount >= task.minWords
+                      ? DesignTokens.info
+                      : DesignTokens.slateDim,
                 ),
               ),
             ],
@@ -381,7 +468,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
           Container(
             constraints: const BoxConstraints(minHeight: 180),
             decoration: BoxDecoration(
-              color: Passeport.parchmentDim,
+              color: DesignTokens.parchmentDim,
               borderRadius: BorderRadius.circular(8),
             ),
             child: TextField(
@@ -389,11 +476,13 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               onChanged: (val) => setState(() => _content = val),
               maxLines: null,
               minLines: 8,
-              style: Passeport.body(13.5),
-              cursorColor: Passeport.maroon,
+              style: DesignTokens.body(13.5),
+              cursorColor: DesignTokens.primary,
               decoration: InputDecoration(
                 hintText: 'Write your response here...',
-                hintStyle: Passeport.body(13.5).copyWith(color: Passeport.slate),
+                hintStyle: DesignTokens.body(
+                  13.5,
+                ).copyWith(color: DesignTokens.slate),
                 contentPadding: const EdgeInsets.all(12),
                 border: InputBorder.none,
               ),

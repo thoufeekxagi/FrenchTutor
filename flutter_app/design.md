@@ -1,231 +1,150 @@
-# Design Reference — One ParleSprint Vibe, Native Mechanics Everywhere
+# ParleSprint Product Design — Guided Momentum
 
-This is the permanent design reference for ParleSprint. The app is Flutter shipping to
-**iOS, Android, and web from one codebase**, and the product is deliberately **not** a gamified
-consumer app (no Duolingo-style streak guilt, mascots, or confetti) — it's positioned as a
-"hardcore but clean" tool for adult learners who want to actually learn French, closer in spirit
-to an exam-prep tool than a habit-loop game.
+This document is the product and visual authority for the Flutter app. It replaces earlier “Passeport” and gamified mockup interpretations when they conflict. The implementation ships one branded product across iOS, Android, and web; platform mechanics adapt where users expect them to.
 
-**The one-vibe rule (decided 2026-07):** the app must feel like the SAME premium product on every
-platform. Visual identity (palette, type, icons, cards, segmented pills, spinners' calm pacing,
-no-ripple taps) is **brand-first and identical everywhere**; only the *mechanics* that users feel
-in their hands adapt per platform (page-transition style + edge-swipe back on iOS, dialog frame,
-scroll always rubber-bands). Concretely: CupertinoIcons on ALL platforms, `NoSplash` on ALL
-platforms, the same hairline-bordered cards everywhere — but `CupertinoPageRoute` only on iOS.
+## 1. Product promise
 
-Two Claude skills are derived from this file: `design-system` (tokens: color, type, spacing,
-motion, iconography) and `ui-patterns` (navigation, components, screen flows, anti-patterns).
-Update this file first when the design direction changes, then regenerate the skills from it.
+**ParleSprint always knows the next most valuable thing a learner should practice—and can explain why.**
 
----
+The product is a serious adaptive French coach with light game energy. Its benchmark balance is the structure and clarity of Busuu plus the conversational warmth of Praktika. It must not copy either product. ParleSprint is ownable through:
 
-## 0. The implemented wiring (code map — keep in sync)
+- transparent competency-based recommendations;
+- a governed, resumable daily learning path;
+- live coaching with Marie;
+- TCF/TEF and real-life goals;
+- progress backed by learning evidence.
 
-The design system is CODE, not just prose. Three layers, already built:
+Every important recommendation answers four questions: what is next, why it matters, how long it takes, and what changes after completion.
 
-| Layer | File | Owns |
-|---|---|---|
-| 1. Tokens | `lib/design/tokens.dart` (`DesignTokens`) | palette, type ramp (Playfair display / system body / JetBrains mono), 4pt spacing, radii (8/10/14/pill), 44pt tap floor, motion (200/300/450ms, easeOutCubic, never elastic), web breakpoints (600/1024, 560pt content column) |
-| 2. Theme | `lib/design/app_theme.dart` (`AppTheme`, `AppScrollBehavior`) | ThemeData from tokens; per-platform `PageTransitionsTheme` (Cupertino on iOS/macOS, Zoom on Android, fade on web); `NoSplash` everywhere; bouncing scroll everywhere |
-| 3. Components | `lib/widgets/adaptive/adaptive.dart` + `lib/design/app_router.dart` | `AppRouter.push` (THE only way to navigate — raw `MaterialPageRoute` is banned), `showPSConfirmDialog`, `showPSActionSheet`, `showPSDatePicker` (Cupertino wheel everywhere), `PSSegmented` pills, `PSSwitch`, `PSProgressIndicator`, `PSHaptics` (no-op on web), `PSContentColumn` (centers content ≥600pt wide) |
+## 2. Information architecture
 
-`lib/config/theme.dart` (`Passeport`) is a thin back-compat alias over `DesignTokens` — existing
-screens reference it; new code should import the design layers directly.
+The intended primary destinations are:
 
-Rules enforced in review: no `Platform.isIOS` in screens; no raw `MaterialPageRoute`; no
-`Icons.*` (CupertinoIcons only); no elastic/overshoot curves; every tap target ≥44pt.
+1. **Today** — one recommended next session and calm daily momentum.
+2. **Path** — the learner competency map: ready, building, blocked, and next.
+3. **Practice** — learner-directed speaking, vocabulary, grammar, listening, and writing.
+4. **Progress** — evidence of growing ability and goal readiness.
 
----
+Settings belongs behind a profile control rather than occupying a primary tab. Until Path is implemented, the existing navigation may remain during migration, but new work must not deepen the old information architecture.
 
-## 1. Product design stance
+## 3. Screen-intent contract
 
-**Positioning:** premium, editorial, calm — a "passport/field journal" aesthetic, not a
-"playground." Visual ground truth: the mockups in `ux-design/passeport style/` (git). The
-`Passeport` identity as implemented (2026-07 retheme):
+Define this before changing a screen:
 
-- **Palette:** ink navy `#1B2A4A` (hero surfaces like the "Just talk to Marie" card), warm paper
-  `#F7F4EC` background, white cards, deep bordeaux `#8E3B3B` (chips, primary accents), real gold
-  `#B08D4A` (icons, progress, success), slate grays. The old blue "brass" and near-white
-  background are gone — gold and warm cream are what make the mockups read premium.
-- **Type:** serif (Playfair) is a DISPLAY voice only — the "Bonjour !" greeting, screen titles,
-  flashcard French words, all ≥22pt. `DesignTokens.display()` enforces the floor: below 22pt it
-  silently returns Inter semibold, so no call site can ship small serif ("Times New Roman app"
-  is the exact failure this guards against). ALL other text is **Inter** — SF Pro metrics,
-  identical on iOS/Android/web. No monospace anywhere; labels/kickers are letterspaced Inter.
-- **Cards:** white, 16pt radius, whisper-soft shadow (`DesignTokens.cardShadow`) — no borders,
-  no Material elevation. Chips are FILLED pills (bordeaux bg, white text), not tinted outlines.
-- One dominant action per screen (the Continue pattern); everything else is quiet.
+- **User arrived to:** the trigger and expectation.
+- **They must understand:** the single most important information.
+- **Primary action:** the one visually dominant action.
+- **Secondary action:** optional and visually quiet.
+- **Success state:** what changes after the action.
+- **Must not contain:** distractions, duplicate routes, or unsupported claims.
 
-**What we are explicitly avoiding**, backed by research into why these read as manipulative or
-juvenile for a serious/adult audience:
+If a screen has two primary intentions, split the flow or demote one. Visual polish cannot repair unclear intent.
 
-- **Streak mechanics as loss-aversion pressure.** Streaks reframe the goal from "learn French"
-  to "don't break the number" — critics describe this as a dark pattern exploiting loss aversion
-  rather than intrinsic motivation. If we show consistency at all, frame it as a calm log
-  ("12 sessions this month"), never a flame icon or a warning that it's about to reset.
-- **Anthropomorphized mascots driving guilt notifications.** Duolingo's owl is a deliberate
-  retention lever — sad-owl notifications create "anthropomorphic stakes." No mascot, no
-  character-voiced push copy.
-- **Badges/confetti/leaderboards as default-on flourishes.** Industry commentary treats these as
-  tools to use "selectively"; overused they read as noise once novelty wears off, which is the
-  wrong trade for a tool used daily for serious study. Reserve celebratory motion (if any) for
-  genuinely rare milestones, and keep it understated (a soft fade/scale, never confetti).
-- **Candy-color palettes and bubble/rounded "friendly" type.** These read as casual-consumer-habit
-  product design. Keep the existing restrained palette and serif/mono type pairing rather than
-  drifting toward saturated primaries and rounded display faces.
+## 4. Motivation model
 
-**Steelman / when to reconsider:** gamification isn't inherently wrong — it's a legitimate,
-proven retention tool (Duolingo's own scale is evidence). We're choosing to avoid it because it
-doesn't match this product's positioning (serious adult learner, exam/fluency goal), not because
-it's universally bad design.
+ParleSprint may use light game energy only when it represents real learning:
 
----
+- reachable checkpoints and a visible path;
+- `New → Building → Ready` competency states;
+- daily and weekly progress movement;
+- completion feedback, subtle motion, and haptics;
+- quiet milestones after evidence of mastery.
 
-## 2. Apple HIG — load-bearing facts
+Do not use XP economies, coins, lives, leaderboards, streak-loss pressure, guilt notifications, mascots, confetti, fake scarcity, or ornamental badges. Consistency can be shown as neutral history such as “3 sessions this week.”
 
-**Typography (SF Pro / Dynamic Type).**
-- SF Pro Text for text ≤19pt, SF Pro Display for text ≥20pt — Text has wider tracking/heavier
-  strokes for legibility at small sizes; Display has tighter tracking for headline sizes.
-- Dynamic Type scale (default/Large size): Large Title 34pt, Title 1 28pt, Title 2 22pt,
-  Title 3 20pt, Headline 17pt (semibold), **Body 17pt**, Callout 16pt, Subhead 15pt, Footnote
-  13pt, Caption 1 12pt, Caption 2 11pt. 11pt is the accessibility floor — never go smaller.
-- Supporting Dynamic Type (system font scaling) is not optional for an accessible app; test at
-  larger accessibility sizes, not just the default.
-- We use Playfair Display (serif) for display/headline roles and system/mono for everything else
-  — that's a deliberate deviation from SF Pro for brand voice, which is fine, but body text at
-  small sizes should still follow the *scale* (17pt body, 11pt floor) even if the *typeface*
-  differs from Apple's default.
+## 5. Visual direction
 
-**Layout / tap targets.**
-- Minimum tap target: **44×44pt** — this is Apple's own research-based floor; smaller targets
-  measurably increase tap-error rates, especially for anyone with reduced motor precision.
-- Standard iOS tab bar: ~49pt tall, icons ~25×25pt, **3–5 tabs** recommended (more tabs shrinks
-  each tap target and adds cognitive load — relevant since this app has 5 sections: Home, Labs,
-  Progress, History, Settings — that's at the upper edge of "still fine," don't add a 6th).
+The direction is **Guided Momentum**: professional enough for an immigration or exam goal, lively enough to invite daily practice.
 
-**Navigation model.**
-- Push/pop stack navigation (`CupertinoPageRoute`) for drilling into content — must preserve the
-  **edge swipe-to-pop back gesture**; this is one of the most-felt native cues and easy to break.
-- Sheets (modal presentation) for focused, self-contained tasks (e.g., starting a session,
-  editing settings) — not full-screen pushes for things the user should be able to dismiss with a
-  downward swipe.
-- Tab bar for top-level sections only; don't nest another tab bar inside a tab.
-- Action sheets (`CupertinoActionSheet`) for a set of mutually exclusive destructive/contextual
-  choices; alerts (`CupertinoAlertDialog`) for a single decision/confirmation, not for content.
+### Color
 
-**Materials & depth.**
-- iOS communicates hierarchy via **translucency/blur/vibrancy** (frosted glass — nav bars, tab
-  bars, sheets), not via Material-style cast shadows and elevation. Use `BackdropFilter` +
-  semi-transparent surfaces to approximate this instead of `Material`/`Card` elevation shadows.
-- Corner radii and blur should be consistent app-wide — treat them as tokens, not per-widget
-  choices (see `design-system` skill for the actual values in use).
+Use semantic tokens from `lib/design/tokens.dart` rather than inline colors:
 
-**Motion.**
-- Apple's own spring model (WWDC23 "Animate with springs") is parameterized by `duration` +
-  `bounce`; Apple explicitly warns **bounce above ~0.4 "may feel too exaggerated."** System
-  defaults sit in the low-bounce "smooth"/"snappy" range.
-- Prefer `Curves.easeOutCubic` or a low-bounce/near-critically-damped spring over
-  `Curves.elasticOut` or any heavy-overshoot curve — elastic/bouncy easing reads as cheap/toy-like
-  against iOS's crisp, barely-perceptible settle.
-- Scrollables must use **bouncing (rubber-band) physics**, never clamped — iOS always overshoots
-  and springs back at scroll boundaries; Android-style clamping is an immediate "not native" tell.
+- deep ink for text and high-trust surfaces;
+- a soft warm-neutral canvas;
+- white and tinted surfaces for grouping;
+- coral for the one primary action;
+- mint for success and speaking/listening readiness;
+- sky for guidance and information;
+- gold only for demonstrated mastery.
 
----
+Color communicates action or learning state. It is not used to make every tile different.
 
-## 3. Flutter-on-iOS anti-patterns (why the current app doesn't feel native)
+### Typography
 
-Confirmed by codebase audit: **zero Cupertino widgets** anywhere in the app; 20+ files use
-Material-only APIs (`MaterialPageRoute`, `ElevatedButton`, `BottomNavigationBar`,
-`Icons.chevron_right` etc.) inside a `MaterialApp`. Every item below is currently present or at
-risk in this codebase:
+Inter is the product typeface on every platform. Use scale, weight, line height, and spacing for hierarchy. Large titles are compact and confident; body copy remains readable at system text scaling. Avoid all-caps labels except very short metadata. Never render meaningful text below 11 points.
 
-1. **Material ripple (`InkWell`/`ListTile` splash)** — iOS has no ripple idiom at all; this is
-   one of the fastest "this is a ported Android app" tells. `labs_screen.dart`'s `ListTile` rows
-   currently get this by default.
-2. **Wrong font rendering** — plain `MaterialApp`/`ThemeData` does not automatically apply SF Pro;
-   it must be set explicitly via a `CupertinoThemeData`/`TextTheme` if we want system-font
-   fallback anywhere outside the serif/mono brand type.
-3. **Clamped scroll physics** — check any custom `ScrollBehavior` doesn't override to
-   `ClampingScrollPhysics`; default Cupertino widgets get bouncing physics automatically, but a
-   global Material `ScrollBehavior` can silently kill this.
-4. **Broken/missing swipe-to-pop** — `MaterialPageRoute` (used everywhere today, e.g.
-   `labs_screen.dart`) does not give the iOS edge-swipe-back gesture. Needs `CupertinoPageRoute`
-   (or a `PageTransitionsTheme` mapping iOS to `CupertinoPageTransitionsBuilder`) consistently,
-   not ad hoc custom `PageRouteBuilder`s that bypass the back-gesture detector.
-5. **Material dialogs/pickers/action sheets** — swap `AlertDialog`/Material date pickers for
-   `CupertinoAlertDialog`/`CupertinoDatePicker`/`CupertinoActionSheet`, or `.adaptive` variants.
-6. **Elevation/shadow-based depth** — replace `Material`/`Card` elevation with blur+vibrancy
-   (`BackdropFilter`) where hierarchy needs to read as "layered," e.g. nav bars, sheets.
-7. **Material `Switch`/`Checkbox`/`Radio`** — use `Switch.adaptive` or `CupertinoSwitch` explicitly;
-   the Material switch shape is an instant visual giveaway.
-8. **Generic Material icon set** (`Icons.chevron_right`, `Icons.headphones_rounded`, etc., seen
-   throughout `labs_screen.dart`) — replace with `CupertinoIcons` (SF Symbols-equivalent) for
-   visual consistency with the rest of iOS.
-9. **Over-bouncy animation curves** — see Motion above; audit any custom `AnimationController`
-   curves for elastic/heavy-overshoot easing.
+### Shape and depth
 
-**Root-cause fixes (apply once, app-wide, rather than per-screen):**
-- Wrap navigation in a `PageTransitionsTheme` mapping `TargetPlatform.iOS` →
-  `CupertinoPageTransitionsBuilder`, and migrate `MaterialPageRoute` call sites to
-  `CupertinoPageRoute` (or route through a shared `AppRoute.push(context, screen)` helper so this
-  is enforced centrally instead of per-callsite).
-- Add a shared `ScrollBehavior` override returning `BouncingScrollPhysics()`.
-- Prefer `.adaptive` constructors wherever Flutter provides them; fall back to explicit
-  `Cupertino*` widgets where it doesn't.
-- Swap `Icons.*` → `CupertinoIcons.*` app-wide.
+- Content surfaces: 16-point radius.
+- Controls: 12-point radius.
+- Pills: status, filters, and compact metadata only.
+- Prefer open layout and spacing over wrapping every section in a card.
+- Shadows are soft and rare. Borders are used for selection or separation, not on every object.
 
----
+The brand is not literal passport decoration. Do not add maps, wax seals, metallic buttons, paper textures, flags, or travel props merely to signal “French.”
 
-## 4. Competitor / reference landscape
+### Motion
 
-**Serious/non-gamified language learning apps** (researched: Babbel, Busuu, and general
-consumer-app critique of Duolingo's gamification):
-- **Babbel** — "feels like a classroom": structured, research-backed lessons, strong grammar and
-  speech-recognition focus, deliberately less game-like than Duolingo. Weaker on variety past
-  intermediate levels — a lesson for us on keeping mid/advanced content fresh without resorting
-  to game mechanics to paper over repetition.
-- **Busuu** — clean, minimal interface prioritizing clarity/speed/smooth navigation; lessons open
-  with a native-speaker video then mix comprehension/fill-in-blank/matching interactions. Note:
-  Busuu *does* use some gamification (streaks, daily challenges, leaderboard) — so it's a partial
-  reference for visual cleanliness, not a full reference for our no-gamification stance.
-- **General critique of the gamified model** (Duolingo specifically): reviewers explicitly say
-  it "prioritizes profit over instruction and streaks over speaking skills" and recommend
-  dedicated tools for people with concrete goals (career/exam/immigration) — this is direct
-  validation that a segment of serious learners wants exactly what we're building.
+Motion explains state change. Use calm 200–350 ms transitions with `easeOutCubic`, restrained fades, progress movement, and platform-native route behavior. Avoid elastic, overshooting, looping, or ornamental motion. Respect reduced-motion preferences when adding nonessential animation.
 
-**Takeaway for our app:** borrow Busuu's clarity/speed of navigation and Babbel's structured,
-classroom-like content framing, but keep zero gamification chrome (no streak flames, no
-leaderboard, no daily-challenge nagging) — closer to a well-made reference tool than either.
+## 6. Native mechanics
 
-**Flutter techniques for native polish — Wonderous (gskinner × Google Flutter team):**
-- Deliberately pushes parallax scrolling, hero-style transitions between detail screens, and
-  custom-shader visual effects to their limit — useful as a *technique* reference (how to
-  structure custom page transitions, parallax scroll effects), not as a *tone* reference (its
-  illustrated, vibrant style is the opposite of our restrained "passport" aesthetic).
-- Runs on Impeller by default on iOS — worth confirming this app's iOS build also uses Impeller
-  for animation performance parity.
+Brand content remains consistent across platforms. Mechanics adapt through shared infrastructure:
 
-**Flutter packages for native iOS feel:**
-- `cupertino_icons` — SF Symbols-equivalent icon set (already a Flutter default dependency; just
-  needs to actually be used instead of `Icons.*`).
-- `flutter_platform_widgets` — single-widget API that renders Cupertino on iOS / Material on
-  Android, avoiding manual `Platform.isIOS` branching, if the app ever needs to ship on Android.
-- `cupertino_native` / `adaptive_platform_ui` — newer packages hosting real UIKit controls via
-  platform views for pixel-perfect native rendering (incl. iOS 26+ Liquid Glass) — worth
-  evaluating if Cupertino-widget fidelity isn't enough, but adds platform-view complexity.
-- `flutter_animate` — chainable entrance/fade/scale effects for polish without hand-rolling
-  `AnimationController`s.
-- `flutter_slidable` — iOS-style swipe actions on list rows (e.g. archive/delete a history entry).
-- `shimmer` — loading placeholders; use sparingly and only for genuine network/DB fetch latency,
-  not as decoration.
+- iOS/macOS use Cupertino-style push transitions and edge-swipe behavior where safe;
+- Android uses its expected route transition and system dialog behavior;
+- branded icons use Cupertino icon geometry consistently;
+- dialogs, switches, pickers, and sheets adapt through shared widgets;
+- scroll physics and large-screen layout are controlled centrally;
+- screens do not branch on platform.
 
----
+Use `AppRouter` for navigation and shared adaptive primitives from `lib/widgets/adaptive/`.
 
-## 5. Source notes
+## 7. Core reference flow
 
-Anti-pattern and motion findings are backed by: Flutter issue tracker discussions on ripple/font/
-scroll-physics/back-gesture behavior, Apple's WWDC23 "Animate with springs" session, and
-Apple Developer Documentation (Typography, Tab Bars). Gamification-critique findings are backed
-by design-criticism pieces on Duolingo's streak/mascot mechanics and comparative reviews of
-Babbel/Busuu. Treat the "steelman" section as a genuine trade-off, not a settled argument —
-revisit if user research suggests otherwise.
+The first visual reference is iOS and covers:
+
+1. Today recommendation;
+2. live speaking session;
+3. honest session result;
+4. return to updated Today state.
+
+Today must present one next action with its reason, expected duration, and position in the daily path. Free conversation with Marie is a secondary practice option.
+
+The live session is the emotional peak: voice-first, minimal controls, obvious listening/speaking/muted state, readable transcript, and safe exit behavior.
+
+The result state reports only captured evidence such as connected duration, learner turns, completion threshold, and saved transcript. It never fabricates pronunciation scores or AI insight.
+
+## 8. Implemented design layers
+
+1. `lib/design/tokens.dart` — semantic color, typography, spacing, radius, motion, and responsive constants.
+2. `lib/design/app_theme.dart` — global Flutter theme and platform mechanics.
+3. `lib/widgets/` and `lib/widgets/adaptive/` — reusable branded and adaptive primitives.
+4. Screens — composition and state only; no independent mini design systems.
+
+`lib/config/theme.dart` remains a compatibility alias while older screens migrate.
+
+## 9. Accessibility and responsive behavior
+
+- Minimum interactive target: 44×44 points.
+- Support Dynamic Type/text scaling without clipped fixed-height layouts.
+- Maintain WCAG AA contrast for body text and controls.
+- Do not rely on color alone for learning status.
+- Include semantic labels for icon-only controls.
+- Use available width, not device-name checks, for responsive layout.
+- Center phone-style content on wide screens until dedicated tablet layouts exist.
+
+## 10. Delivery and visual QA
+
+For each migrated flow:
+
+1. record the screen-intent contract;
+2. implement default, loading, empty, error, interrupted, and completed states that apply;
+3. format and analyze the code;
+4. run focused widget and behavior tests;
+5. capture narrow-iPhone screenshots at default and large text scale;
+6. compare hierarchy, spacing, contrast, clipping, and interaction state;
+7. verify Android mechanics after the iOS reference converges.
+
+A UI change is incomplete if it only looks correct in one happy-path screenshot.

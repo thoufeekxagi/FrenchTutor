@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../config/theme.dart';
 
+import '../design/tokens.dart';
+
+/// Compact metadata label used to introduce a section.
 class KickerText extends StatelessWidget {
   const KickerText(this.text, {super.key, this.color});
 
@@ -11,10 +13,10 @@ class KickerText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text.toUpperCase(),
-      style: Passeport.mono(10, weight: FontWeight.w500).copyWith(
-        letterSpacing: 0.8,
-        color: color ?? Passeport.brass,
-      ),
+      style: DesignTokens.mono(
+        11,
+        weight: FontWeight.w600,
+      ).copyWith(color: color ?? DesignTokens.slateDim),
     );
   }
 }

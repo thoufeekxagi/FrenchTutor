@@ -24,7 +24,8 @@ void main() {
         )
       ''');
       db.execute(
-          "INSERT INTO vocab_srs VALUES ('word_1', 2.3, 3.0, 2, '2026-07-20T09:00:00', 1)");
+        "INSERT INTO vocab_srs VALUES ('word_1', 2.3, 3.0, 2, '2026-07-20T09:00:00', 1)",
+      );
 
       final store = LearningStore(db);
       final state = store.srsState('word_1');
@@ -62,8 +63,16 @@ void main() {
     });
 
     test('every grade appends to the review log', () {
-      srs.grade(entryId: 'w1', grade: SRSGrade.again, responseType: SRSResponseType.unaided);
-      srs.grade(entryId: 'w1', grade: SRSGrade.good, responseType: SRSResponseType.selfReported);
+      srs.grade(
+        entryId: 'w1',
+        grade: SRSGrade.again,
+        responseType: SRSResponseType.unaided,
+      );
+      srs.grade(
+        entryId: 'w1',
+        grade: SRSGrade.good,
+        responseType: SRSResponseType.selfReported,
+      );
       final reviews = store.reviewsOn(DateTime.now());
       expect(reviews.length, 2);
       expect(reviews.first.grade, SRSGrade.again);
@@ -72,7 +81,10 @@ void main() {
 
     test('again card becomes due within 10 minutes for same-session loop', () {
       final state = srs.grade(entryId: 'w1', grade: SRSGrade.again);
-      expect(state.dueAt!.isBefore(DateTime.now().add(const Duration(minutes: 11))), isTrue);
+      expect(
+        state.dueAt!.isBefore(DateTime.now().add(const Duration(minutes: 11))),
+        isTrue,
+      );
     });
 
     test('hard is progress with a shorter interval, never a reset', () {
@@ -114,7 +126,11 @@ void main() {
     test('end reason and utterances recorded; credit ledger accumulates', () {
       final store = LearningStore(sqlite3.openInMemory());
       final id = store.startAiSession(stage: 'speaking', topic: 'café');
-      store.endAiSession(id, endedReason: 'completed', learnerUtteranceCount: 4);
+      store.endAiSession(
+        id,
+        endedReason: 'completed',
+        learnerUtteranceCount: 4,
+      );
       // connected_at == ended_at in-test, so seconds may be 0 — the ledger
       // only records positive durations; just verify no crash and query path.
       expect(store.aiSecondsUsedToday(), greaterThanOrEqualTo(0));
@@ -133,17 +149,29 @@ void main() {
 
   group('Queue policy (P0.6/P0.7)', () {
     test('budgets follow session length, not a raw card-count setting', () {
-      expect(SRSService.policyFor('quick', firstEverSession: false),
-          (newBudget: 2, reviewBudget: 5, totalCap: 7));
-      expect(SRSService.policyFor('standard', firstEverSession: false),
-          (newBudget: 4, reviewBudget: 8, totalCap: 10));
-      expect(SRSService.policyFor('deep', firstEverSession: false),
-          (newBudget: 6, reviewBudget: 12, totalCap: 16));
+      expect(SRSService.policyFor('quick', firstEverSession: false), (
+        newBudget: 2,
+        reviewBudget: 5,
+        totalCap: 7,
+      ));
+      expect(SRSService.policyFor('standard', firstEverSession: false), (
+        newBudget: 4,
+        reviewBudget: 8,
+        totalCap: 10,
+      ));
+      expect(SRSService.policyFor('deep', firstEverSession: false), (
+        newBudget: 6,
+        reviewBudget: 12,
+        totalCap: 16,
+      ));
     });
 
     test('day one is capped at 3 new words regardless of ambition', () {
       expect(SRSService.policyFor('deep', firstEverSession: true).newBudget, 3);
-      expect(SRSService.policyFor('quick', firstEverSession: true).newBudget, 2);
+      expect(
+        SRSService.policyFor('quick', firstEverSession: true).newBudget,
+        2,
+      );
     });
 
     test('hasNoReviewHistory flips after the first grade', () {

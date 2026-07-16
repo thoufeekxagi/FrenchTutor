@@ -58,13 +58,29 @@ void main() {
   group('Speaking completion threshold', () {
     test('silent, short, or unconnected calls never meet it', () {
       const cancelled = SpeakingResult(
-          connected: false, durationSeconds: 0, learnerUtteranceCount: 0, endedReason: 'cancelled');
+        connected: false,
+        durationSeconds: 0,
+        learnerUtteranceCount: 0,
+        endedReason: 'cancelled',
+      );
       const silent = SpeakingResult(
-          connected: true, durationSeconds: 120, learnerUtteranceCount: 0, endedReason: 'completed');
+        connected: true,
+        durationSeconds: 120,
+        learnerUtteranceCount: 0,
+        endedReason: 'completed',
+      );
       const tooShort = SpeakingResult(
-          connected: true, durationSeconds: 10, learnerUtteranceCount: 2, endedReason: 'completed');
+        connected: true,
+        durationSeconds: 10,
+        learnerUtteranceCount: 2,
+        endedReason: 'completed',
+      );
       const real = SpeakingResult(
-          connected: true, durationSeconds: 95, learnerUtteranceCount: 6, endedReason: 'completed');
+        connected: true,
+        durationSeconds: 95,
+        learnerUtteranceCount: 6,
+        endedReason: 'completed',
+      );
 
       expect(cancelled.meetsThreshold, isFalse);
       expect(silent.meetsThreshold, isFalse);
@@ -75,7 +91,10 @@ void main() {
 
   group('StageOutcome', () {
     test('paused carries partial evidence without completing', () {
-      const outcome = StageOutcome<int>.paused(result: 3, reason: 'disconnected');
+      const outcome = StageOutcome<int>.paused(
+        result: 3,
+        reason: 'disconnected',
+      );
       expect(outcome.isCompleted, isFalse);
       expect(outcome.result, 3);
       expect(outcome.reason, 'disconnected');

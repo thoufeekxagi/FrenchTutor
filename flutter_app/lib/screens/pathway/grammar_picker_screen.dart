@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../flow/stage_outcome.dart';
 import '../../data/content_service.dart';
@@ -33,7 +33,8 @@ class GrammarPickerScreen extends ConsumerStatefulWidget {
   final VocabStageResult? vocabSummary;
 
   @override
-  ConsumerState<GrammarPickerScreen> createState() => _GrammarPickerScreenState();
+  ConsumerState<GrammarPickerScreen> createState() =>
+      _GrammarPickerScreenState();
 }
 
 class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
@@ -50,8 +51,12 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
   GrammarPack? get _pack => ContentService.shared.grammar();
 
   List<({String id, String title})> get _candidates {
-    final lessons = _pack?.lessons.map((l) => (id: l.id, title: l.title)).toList() ?? <({String id, String title})>[];
-    final topics = _pack?.topics.map((t) => (id: t.id, title: t.title)).toList() ?? <({String id, String title})>[];
+    final lessons =
+        _pack?.lessons.map((l) => (id: l.id, title: l.title)).toList() ??
+        <({String id, String title})>[];
+    final topics =
+        _pack?.topics.map((t) => (id: t.id, title: t.title)).toList() ??
+        <({String id, String title})>[];
     return [...lessons, ...topics];
   }
 
@@ -64,61 +69,106 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        title: Text('Grammar', style: Passeport.display(18)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text('Grammar', style: DesignTokens.display(18)),
+        backgroundColor: DesignTokens.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.slateDim),
+          icon: const Icon(
+            CupertinoIcons.xmark,
+            size: 20,
+            color: DesignTokens.slateDim,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-                child: PSSegmented<_PickerMode>(
-                  segments: const [
-                    (value: _PickerMode.auto, label: 'Auto'),
-                    (value: _PickerMode.manual, label: 'Choose'),
-                  ],
-                  selected: _mode,
-                  onChanged: (m) => setState(() => _mode = m),
-                ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: DesignTokens.contentMaxWidth,
               ),
-              Expanded(child: _mode == _PickerMode.auto ? _autoBody() : _manualBody()),
-            ],
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      DesignTokens.screenMargin,
+                      DesignTokens.space3,
+                      DesignTokens.screenMargin,
+                      0,
+                    ),
+                    child: PSSegmented<_PickerMode>(
+                      segments: const [
+                        (value: _PickerMode.auto, label: 'Recommended'),
+                        (value: _PickerMode.manual, label: 'Choose'),
+                      ],
+                      selected: _mode,
+                      onChanged: (mode) => setState(() => _mode = mode),
+                    ),
+                  ),
+                  Expanded(
+                    child: _mode == _PickerMode.auto
+                        ? _autoBody()
+                        : _manualBody(),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (_isPlanning || _generationFailed != null)
             Container(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: DesignTokens.ink.withValues(alpha: 0.16),
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   constraints: const BoxConstraints(maxWidth: 320),
-                  decoration: BoxDecoration(color: Passeport.card, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(
+                    color: DesignTokens.surface,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (_generationFailed != null) ...[
-                        const Icon(CupertinoIcons.exclamationmark_triangle_fill, size: 24, color: Passeport.maroon),
+                        const Icon(
+                          CupertinoIcons.exclamationmark_triangle_fill,
+                          size: 24,
+                          color: DesignTokens.primary,
+                        ),
                         const SizedBox(height: 8),
-                        Text("Couldn't build today's practice", style: Passeport.body(14, weight: FontWeight.w500)),
+                        Text(
+                          "Couldn't build today's practice",
+                          style: DesignTokens.body(14, weight: FontWeight.w500),
+                        ),
                         const SizedBox(height: 6),
-                        Text(_generationFailed!, style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim), textAlign: TextAlign.center),
+                        Text(
+                          _generationFailed!,
+                          style: DesignTokens.body(
+                            11,
+                          ).copyWith(color: DesignTokens.slateDim),
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 14),
                         SizedBox(
                           width: 200,
-                          child: PasseportPrimaryButton(label: 'Retry', onPressed: _generateCardsAndStart),
+                          child: PasseportPrimaryButton(
+                            label: 'Retry',
+                            onPressed: _generateCardsAndStart,
+                          ),
                         ),
                       ] else ...[
                         PSProgressIndicator(),
                         const SizedBox(height: 10),
-                        Text(_planningLabel, style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
+                        Text(
+                          _planningLabel,
+                          style: DesignTokens.mono(
+                            11,
+                          ).copyWith(color: DesignTokens.slateDim),
+                        ),
                       ],
                       if (_debugLog.isNotEmpty) ...[
                         const SizedBox(height: 12),
@@ -144,8 +194,13 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
   /// — a failure stops here with the real error visible and a Retry button.
   Future<void> _generateCardsAndStart() async {
     final title = _chosenLesson?.title ?? _chosenTopic?.title ?? 'Grammar';
-    final usage = _chosenLesson?.usage ?? _chosenTopic?.sections.map((s) => '${s.heading}: ${s.body}').toList() ?? <String>[];
-    final vocabWords = widget.vocabSummary?.wordsCovered.map((e) => e.fr).toList() ?? <String>[];
+    final usage =
+        _chosenLesson?.usage ??
+        _chosenTopic?.sections.map((s) => '${s.heading}: ${s.body}').toList() ??
+        <String>[];
+    final vocabWords =
+        widget.vocabSummary?.wordsCovered.map((e) => e.fr).toList() ??
+        <String>[];
 
     setState(() {
       _isPlanning = true;
@@ -153,10 +208,18 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       _debugLog.clear();
       _planningLabel = 'Building today\'s practice…';
     });
-    _logDebug('→ tense: "$title", vocab words: ${vocabWords.isEmpty ? "none" : vocabWords.join(", ")}');
+    _logDebug(
+      '→ tense: "$title", vocab words: ${vocabWords.isEmpty ? "none" : vocabWords.join(", ")}',
+    );
 
-    final transcript = SessionRecorder.recentVocabTranscript(ref.read(storageServiceProvider));
-    _logDebug(transcript.isEmpty ? '→ no recent vocab transcript found' : '→ vocab transcript: ${transcript.length} chars');
+    final transcript = SessionRecorder.recentVocabTranscript(
+      ref.read(storageServiceProvider),
+    );
+    _logDebug(
+      transcript.isEmpty
+          ? '→ no recent vocab transcript found'
+          : '→ vocab transcript: ${transcript.length} chars',
+    );
     _logDebug('→ sending request to LLM…');
 
     List<GrammarPracticeCard>? cards;
@@ -164,7 +227,12 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
     var timedOut = false;
     try {
       cards = await LessonAgentService.shared
-          .generateGrammarPracticeCards(tenseTitle: title, tenseUsage: usage, vocabWords: vocabWords, recentVocabTranscript: transcript)
+          .generateGrammarPracticeCards(
+            tenseTitle: title,
+            tenseUsage: usage,
+            vocabWords: vocabWords,
+            recentVocabTranscript: transcript,
+          )
           .timeout(_generationTimeout);
     } on TimeoutException {
       timedOut = true;
@@ -179,20 +247,29 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       _logDebug('→ received ${cards.length} card(s)');
       _openSession(cards, title);
     } else if (timedOut) {
-      _logDebug('→ TIMED OUT after ${_generationTimeout.inSeconds}s — no response from the LLM');
-      setState(() => _generationFailed =
-          'The request timed out after ${_generationTimeout.inSeconds}s with no response. Check your connection and the OpenRouter key in Settings, then retry.');
+      _logDebug(
+        '→ TIMED OUT after ${_generationTimeout.inSeconds}s — no response from the LLM',
+      );
+      setState(
+        () => _generationFailed =
+            'The request timed out after ${_generationTimeout.inSeconds}s with no response. Check your connection and the OpenRouter key in Settings, then retry.',
+      );
     } else {
       final rawSnippet = LessonAgentService.shared.lastRawResponse;
       if (rawSnippet.isNotEmpty) {
-        _logDebug('→ RAW LLM response: ${rawSnippet.substring(0, rawSnippet.length > 300 ? 300 : rawSnippet.length)}');
+        _logDebug(
+          '→ RAW LLM response: ${rawSnippet.substring(0, rawSnippet.length > 300 ? 300 : rawSnippet.length)}',
+        );
       }
       _logDebug('→ ERROR: $failureMessage');
       setState(() => _generationFailed = failureMessage ?? 'Unknown error');
     }
   }
 
-  Future<void> _openSession(List<GrammarPracticeCard> cards, String tenseTitle) async {
+  Future<void> _openSession(
+    List<GrammarPracticeCard> cards,
+    String tenseTitle,
+  ) async {
     // Await the agent screen's typed outcome and forward it up as this
     // picker's own result — one navigator layer, one pop, no callbacks.
     final outcome = await AppRouter.push<StageOutcome<GrammarStageResult>>(
@@ -227,7 +304,10 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       child: ListView.builder(
         controller: _debugScrollController,
         itemCount: _debugLog.length,
-        itemBuilder: (context, i) => Text(_debugLog[i], style: Passeport.mono(9).copyWith(color: Passeport.slateDim)),
+        itemBuilder: (context, i) => Text(
+          _debugLog[i],
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+        ),
       ),
     );
   }
@@ -236,29 +316,63 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
 
   Widget _autoBody() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.screenMargin,
+        DesignTokens.space6,
+        DesignTokens.screenMargin,
+        DesignTokens.space5,
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Spacer(),
-          PasseportCard(
-            padding: 24,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(CupertinoIcons.sparkles, size: 30, color: Passeport.brass),
-                const SizedBox(height: 10),
-                Text("Let Marie pick today's focus", style: Passeport.display(19, weight: FontWeight.w500)),
-                const SizedBox(height: 8),
-                Text(
-                  "Based on what you've been mixing up recently, or the next tense in the curriculum if nothing stands out.",
-                  style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+          Container(
+            width: 52,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: DesignTokens.infoSoft,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              CupertinoIcons.scope,
+              color: DesignTokens.info,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: DesignTokens.space5),
+          Text(
+            "Marie can choose today’s focus",
+            style: DesignTokens.display(26),
+          ),
+          const SizedBox(height: DesignTokens.space3),
+          Text(
+            "The planner uses recorded mistake tags and recent practice. If no pattern stands out, it chooses the next incomplete curriculum topic.",
+            style: DesignTokens.body(
+              15,
+            ).copyWith(color: DesignTokens.slateDim, height: 1.45),
+          ),
+          const SizedBox(height: DesignTokens.space4),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(DesignTokens.space4),
+            decoration: BoxDecoration(
+              color: DesignTokens.infoSoft,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            ),
+            child: Text(
+              '${_candidates.length} available grammar focuses',
+              style: DesignTokens.body(
+                14,
+                weight: FontWeight.w600,
+              ).copyWith(color: DesignTokens.inkSoft),
             ),
           ),
           const Spacer(),
-          PasseportPrimaryButton(label: 'Start', onPressed: _candidates.isEmpty ? null : _beginAutoSession),
+          PasseportPrimaryButton(
+            label: 'Choose my grammar focus',
+            icon: CupertinoIcons.arrow_right,
+            onPressed: _candidates.isEmpty ? null : _beginAutoSession,
+          ),
         ],
       ),
     );
@@ -279,7 +393,12 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       plan = await LessonAgentService.shared
           .planGrammarSession(
             candidates: _candidates,
-            mistakeTags: mistakeTags.map((m) => (tag: m.tag, description: m.description, count: m.count)).toList(),
+            mistakeTags: mistakeTags
+                .map(
+                  (m) =>
+                      (tag: m.tag, description: m.description, count: m.count),
+                )
+                .toList(),
             recentDiary: diary.map((d) => d.summary).toList(),
           )
           .timeout(const Duration(seconds: 14));
@@ -288,9 +407,14 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
     }
 
     if (!mounted) return;
-    final chosenId = plan?.chosenId ?? _incompleteFirst()?.id ?? (_candidates.isNotEmpty ? _candidates.first.id : null);
+    final chosenId =
+        plan?.chosenId ??
+        _incompleteFirst()?.id ??
+        (_candidates.isNotEmpty ? _candidates.first.id : null);
     setState(() {
-      _focusNote = (plan?.focusNote.isNotEmpty ?? false) ? plan!.focusNote : null;
+      _focusNote = (plan?.focusNote.isNotEmpty ?? false)
+          ? plan!.focusNote
+          : null;
     });
     _selectById(chosenId);
     await _generateCardsAndStart();
@@ -300,12 +424,17 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
   /// curriculum order rather than always restarting from the first tense.
   ({String id, String title})? _incompleteFirst() {
     final store = ref.read(learningStoreProvider);
-    final sortedLessons = [...(_pack?.lessons ?? <GrammarLesson>[])]..sort((a, b) => a.order.compareTo(b.order));
+    final sortedLessons = [...(_pack?.lessons ?? <GrammarLesson>[])]
+      ..sort((a, b) => a.order.compareTo(b.order));
     for (final lesson in sortedLessons) {
-      if (store.lessonStatus(lesson.id).status != 'completed') return (id: lesson.id, title: lesson.title);
+      if (store.lessonStatus(lesson.id).status != 'completed') {
+        return (id: lesson.id, title: lesson.title);
+      }
     }
     for (final topic in _pack?.topics ?? <GrammarTopic>[]) {
-      if (store.lessonStatus(topic.id).status != 'completed') return (id: topic.id, title: topic.title);
+      if (store.lessonStatus(topic.id).status != 'completed') {
+        return (id: topic.id, title: topic.title);
+      }
     }
     return _candidates.isNotEmpty ? _candidates.first : null;
   }
@@ -319,17 +448,21 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       children: [
         if (lessons.isNotEmpty) ...[
-          const KickerText('Tenses', color: Passeport.slateDim),
+          const KickerText('Tenses', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           for (final lesson in lessons)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: _pickRow(title: lesson.title, subtitle: lesson.subtitle, id: lesson.id),
+              child: _pickRow(
+                title: lesson.title,
+                subtitle: lesson.subtitle,
+                id: lesson.id,
+              ),
             ),
         ],
         if (topics.isNotEmpty) ...[
           const SizedBox(height: 8),
-          const KickerText('Topics', color: Passeport.slateDim),
+          const KickerText('Topics', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           for (final topic in topics)
             Padding(
@@ -341,8 +474,13 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
     );
   }
 
-  Widget _pickRow({required String title, String? subtitle, required String id}) {
-    final isDone = ref.read(learningStoreProvider).lessonStatus(id).status == 'completed';
+  Widget _pickRow({
+    required String title,
+    String? subtitle,
+    required String id,
+  }) {
+    final isDone =
+        ref.read(learningStoreProvider).lessonStatus(id).status == 'completed';
     return GestureDetector(
       onTap: () {
         _selectById(id);
@@ -353,18 +491,37 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
         padding: 14,
         child: Row(
           children: [
-            Icon(isDone ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle, color: isDone ? Passeport.brass : Passeport.slate, size: 20),
+            Icon(
+              isDone
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.circle,
+              color: isDone ? DesignTokens.mastery : DesignTokens.slate,
+              size: 20,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: Passeport.body(14, weight: FontWeight.w500)),
-                  if (subtitle != null) Text(subtitle, style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim)),
+                  Text(
+                    title,
+                    style: DesignTokens.body(14, weight: FontWeight.w500),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle,
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
                 ],
               ),
             ),
-            const Icon(CupertinoIcons.chevron_right, size: 16, color: Passeport.slate),
+            const Icon(
+              CupertinoIcons.chevron_right,
+              size: 16,
+              color: DesignTokens.slate,
+            ),
           ],
         ),
       ),

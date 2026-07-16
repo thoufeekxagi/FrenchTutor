@@ -1,7 +1,7 @@
 import '../../design/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
@@ -15,10 +15,10 @@ class WritingLabScreen extends ConsumerWidget {
     final pack = ref.watch(contentServiceProvider).writingTasks();
 
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text('Writing', style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
+        title: Text('Writing', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -26,7 +26,9 @@ class WritingLabScreen extends ConsumerWidget {
           ? Center(
               child: Text(
                 'Writing content unavailable.',
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
             )
           : ListView.separated(
@@ -38,10 +40,9 @@ class WritingLabScreen extends ConsumerWidget {
                 return _WritingTaskTile(
                   task: task,
                   onTap: () {
-                    Navigator.push(
+                    AppRouter.push(
                       context,
-                      AppRouter.route(builder: (_) => WritingTaskScreen(task: task),
-                      ),
+                      (_) => WritingTaskScreen(task: task),
                     );
                   },
                 );
@@ -70,7 +71,7 @@ class _WritingTaskTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     task.title,
-                    style: Passeport.body(15, weight: FontWeight.w500),
+                    style: DesignTokens.body(15, weight: FontWeight.w500),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -80,13 +81,17 @@ class _WritingTaskTile extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               '${task.minWords}+ words',
-              style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.mono(
+                10.5,
+              ).copyWith(color: DesignTokens.slateDim),
             ),
             if (task.targetConnectors.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
                 '${task.targetConnectors.length} target connectors',
-                style: Passeport.mono(10.5).copyWith(color: Passeport.brass),
+                style: DesignTokens.mono(
+                  10.5,
+                ).copyWith(color: DesignTokens.info),
               ),
             ],
           ],
@@ -99,12 +104,15 @@ class _WritingTaskTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Passeport.maroon.withValues(alpha: 0.1),
+        color: DesignTokens.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         type,
-        style: Passeport.mono(9, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+        style: DesignTokens.mono(
+          9,
+          weight: FontWeight.w500,
+        ).copyWith(color: DesignTokens.primary),
       ),
     );
   }

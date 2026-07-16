@@ -3,8 +3,12 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../orchestration/dev/developer_path_preview.dart';
+import '../../orchestration/models/error_event.dart';
+import '../../orchestration/planning/orchestrator.dart';
+import '../../orchestration/twin/evidence_observation_adapter.dart';
+import '../../orchestration/twin/twin_updater.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/kicker_text.dart';
@@ -44,101 +48,132 @@ class _OrchestrationLabScreenState
     final framework = ref.watch(competencyStoreProvider).framework();
     if (framework == null) {
       return Scaffold(
-        backgroundColor: Passeport.parchmentDim,
+        backgroundColor: DesignTokens.canvas,
         appBar: AppBar(
-          title: Text('Orchestration Lab', style: Passeport.display(20)),
+          title: Text('Orchestration Lab', style: DesignTokens.display(20)),
         ),
         body: Center(
           child: Text(
             'No persisted competency framework.',
-            style: Passeport.body(15).copyWith(color: Passeport.slateDim),
+            style: DesignTokens.body(15).copyWith(color: DesignTokens.slateDim),
           ),
         ),
       );
     }
+    final evidenceStore = ref.watch(evidenceStoreProvider);
+    final evidence = evidenceStore.evidenceEvents();
+    final errors = evidenceStore.errorEvents();
+    final learnerModel = O3ProbabilisticLearnerModel();
+    learnerModel.rebuild(
+      const EvidenceObservationAdapter().convert(
+        evidence: evidence,
+        framework: framework,
+      ),
+    );
+    final competencyStates = _plannerStates(
+      model: learnerModel,
+      errors: errors,
+      now: DateTime.now(),
+    );
     final preview = const DeveloperPathPreviewBuilder().build(
       framework: framework,
       persona: _persona,
+      competencyStates: competencyStates,
     );
 
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        backgroundColor: Passeport.parchmentDim,
-        title: Text('Orchestration Lab', style: Passeport.display(20)),
-        centerTitle: true,
-        elevation: 0,
-        scrolledUnderElevation: 0,
+        title: Text('Orchestration Lab', style: DesignTokens.display(20)),
       ),
       body: PSContentColumn(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.screenMargin,
+            vertical: DesignTokens.space2,
+          ),
           children: [
             PasseportCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Runtime', color: Passeport.slateDim),
-                  const SizedBox(height: 8),
+                  KickerText('Runtime', color: DesignTokens.slateDim),
+                  const SizedBox(height: DesignTokens.space2),
                   Text(
                     framework.curriculumVersion,
-                    style: Passeport.display(18, weight: FontWeight.w600),
+                    style: DesignTokens.display(18, weight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: DesignTokens.space2),
                   Text(
                     '${framework.competencies.length} competencies · '
                     '${framework.mappings.length} mappings · framework ${framework.frameworkVersion}',
-                    style: Passeport.mono(
+                    style: DesignTokens.mono(
                       11,
-                    ).copyWith(color: Passeport.slateDim),
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                  const SizedBox(height: DesignTokens.space1),
+                  Text(
+                    '${evidence.length} evidence events · '
+                    '${learnerModel.beliefs.length} modeled states · '
+                    '${errors.where((error) => error.resolvedByEvidenceId == null).length} open errors',
+                    style: DesignTokens.mono(
+                      11,
+                    ).copyWith(color: DesignTokens.slateDim),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: DesignTokens.space3),
             PasseportCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Scenario', color: Passeport.slateDim),
-                  const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: _choosePersona,
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _persona.name,
-                                  style: Passeport.body(
-                                    15,
-                                    weight: FontWeight.w600,
+                  KickerText('Scenario', color: DesignTokens.slateDim),
+                  const SizedBox(height: DesignTokens.space2),
+                  Semantics(
+                    button: true,
+                    label: 'Choose test persona, currently ${_persona.name}',
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _choosePersona,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minHeight: DesignTokens.minTapTarget,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _persona.name,
+                                    style: DesignTokens.body(
+                                      15,
+                                      weight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _persona.summary,
-                                  style: Passeport.body(
-                                    12,
-                                  ).copyWith(color: Passeport.slateDim),
-                                ),
-                              ],
+                                  const SizedBox(height: DesignTokens.space1),
+                                  Text(
+                                    _persona.summary,
+                                    style: DesignTokens.body(
+                                      12,
+                                    ).copyWith(color: DesignTokens.slateDim),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const Icon(
-                            CupertinoIcons.chevron_down,
-                            size: 16,
-                            color: Passeport.slateDim,
-                          ),
-                        ],
+                            const Icon(
+                              CupertinoIcons.chevron_down,
+                              size: 16,
+                              color: DesignTokens.slateDim,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: DesignTokens.space3),
                   PSSegmented<int>(
                     segments: const [
                       (value: 20, label: '20m'),
@@ -156,7 +191,7 @@ class _OrchestrationLabScreenState
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: DesignTokens.space3),
                   _ToggleRow(
                     label: 'Can speak aloud',
                     value: _persona.canSpeakAloud,
@@ -175,18 +210,20 @@ class _OrchestrationLabScreenState
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: DesignTokens.space5),
             Row(
               children: [
-                KickerText('Path preview', color: Passeport.slateDim),
+                KickerText('Path preview', color: DesignTokens.slateDim),
                 const Spacer(),
                 Text(
                   '${preview.totalMinutes} min',
-                  style: Passeport.mono(11).copyWith(color: Passeport.maroon),
+                  style: DesignTokens.mono(
+                    11,
+                  ).copyWith(color: DesignTokens.primary),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: DesignTokens.space2),
             for (final (index, task) in preview.tasks.indexed) ...[
               PasseportCard(
                 child: Row(
@@ -197,43 +234,56 @@ class _OrchestrationLabScreenState
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Passeport.brass.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(8),
+                        color: DesignTokens.infoSoft,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         '${index + 1}',
-                        style: Passeport.mono(11, weight: FontWeight.w600),
+                        style: DesignTokens.mono(11, weight: FontWeight.w600),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: DesignTokens.space3),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             task.competencyTitle,
-                            style: Passeport.body(14, weight: FontWeight.w600),
+                            style: DesignTokens.body(
+                              14,
+                              weight: FontWeight.w600,
+                            ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: DesignTokens.space1),
                           Text(
                             task.contentItemId,
-                            style: Passeport.mono(
+                            style: DesignTokens.mono(
                               11,
-                            ).copyWith(color: Passeport.slateDim),
+                            ).copyWith(color: DesignTokens.slateDim),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: DesignTokens.space1),
+                          Text(
+                            '${task.priority.name.toUpperCase()} · score ${task.score.toStringAsFixed(2)}',
+                            style: DesignTokens.mono(
+                              11,
+                              weight: FontWeight.w600,
+                            ).copyWith(color: DesignTokens.primary),
+                          ),
+                          const SizedBox(height: DesignTokens.space1),
                           Text(
                             '${task.modality.wireName} · ${task.role.name} · ${task.estimatedMinutes} min',
-                            style: Passeport.body(
+                            style: DesignTokens.body(
                               11,
-                            ).copyWith(color: Passeport.brass),
+                            ).copyWith(color: DesignTokens.info),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: DesignTokens.space1),
                           Text(
                             task.reason,
-                            style: Passeport.body(
+                            style: DesignTokens.body(
                               12,
-                            ).copyWith(color: Passeport.slateDim),
+                            ).copyWith(color: DesignTokens.slateDim),
                           ),
                         ],
                       ),
@@ -241,34 +291,85 @@ class _OrchestrationLabScreenState
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: DesignTokens.space2),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: DesignTokens.space3),
             PasseportCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Boundaries', color: Passeport.slateDim),
-                  const SizedBox(height: 8),
+                  KickerText('Boundaries', color: DesignTokens.slateDim),
+                  const SizedBox(height: DesignTokens.space2),
                   for (final note in preview.notes)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.only(
+                        bottom: DesignTokens.space2,
+                      ),
                       child: Text(
                         note,
-                        style: Passeport.body(
+                        style: DesignTokens.body(
                           12,
-                        ).copyWith(color: Passeport.slateDim),
+                        ).copyWith(color: DesignTokens.slateDim),
                       ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: DesignTokens.space6),
           ],
         ),
       ),
     );
   }
+}
+
+List<PlannerCompetencyState> _plannerStates({
+  required O3ProbabilisticLearnerModel model,
+  required List<ErrorEvent> errors,
+  required DateTime now,
+}) {
+  final beliefsByCompetency = <String, List<CompetencyBeliefState>>{};
+  for (final belief in model.beliefs.values) {
+    beliefsByCompetency.putIfAbsent(belief.competencyId, () => []).add(belief);
+  }
+  return beliefsByCompetency.entries
+      .map((entry) {
+        final beliefs = entry.value;
+        final belief =
+            beliefs.fold<double>(0, (sum, item) => sum + item.pKnown) /
+            beliefs.length;
+        final confidence =
+            beliefs.fold<double>(0, (sum, item) => sum + item.confidence) /
+            beliefs.length;
+        final lastObservedAt = beliefs
+            .map((item) => item.lastObservedAt)
+            .whereType<DateTime>()
+            .fold<DateTime?>(
+              null,
+              (latest, item) =>
+                  latest == null || item.isAfter(latest) ? item : latest,
+            );
+        final recentErrors = errors
+            .where(
+              (error) =>
+                  error.competencyId == entry.key &&
+                  error.resolvedByEvidenceId == null &&
+                  !error.occurredAt.isBefore(
+                    now.subtract(const Duration(days: 14)),
+                  ),
+            )
+            .length;
+        return PlannerCompetencyState(
+          competencyId: entry.key,
+          belief: belief,
+          uncertainty: 1 - confidence,
+          dueForReview:
+              lastObservedAt != null &&
+              lastObservedAt.isBefore(now.subtract(const Duration(days: 3))),
+          recentErrors: recentErrors,
+        );
+      })
+      .toList(growable: false);
 }
 
 class _ToggleRow extends StatelessWidget {
@@ -283,12 +384,11 @@ class _ToggleRow extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 48,
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: DesignTokens.minTapTarget),
     child: Row(
       children: [
-        Text(label, style: Passeport.body(14)),
-        const Spacer(),
+        Expanded(child: Text(label, style: DesignTokens.body(14))),
         PSSwitch(value: value, onChanged: onChanged),
       ],
     ),

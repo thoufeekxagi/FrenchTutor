@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/api_keys.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/agent_tool.dart';
@@ -54,7 +54,6 @@ class AgentLedGrammarScreen extends ConsumerStatefulWidget {
     required this.tenseTitle,
     this.focusNote,
     this.vocabSummary,
-
   });
 
   final List<GrammarPracticeCard> cards;
@@ -63,7 +62,8 @@ class AgentLedGrammarScreen extends ConsumerStatefulWidget {
   final VocabStageResult? vocabSummary;
 
   @override
-  ConsumerState<AgentLedGrammarScreen> createState() => _AgentLedGrammarScreenState();
+  ConsumerState<AgentLedGrammarScreen> createState() =>
+      _AgentLedGrammarScreenState();
 }
 
 class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
@@ -121,7 +121,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       'Explain in English, keep grammar simple — reciting French is practice, never a cue to '
       'switch into French-led talk. NEVER suggest moving on; the student alone decides.';
 
-  _GrammarSessionCard? get _currentCard => _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
+  _GrammarSessionCard? get _currentCard =>
+      _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
 
   @override
   void initState() {
@@ -131,14 +132,20 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       ref.read(notetakerStateProvider).currentContext = 'Grammar';
     });
     _store = ref.read(learningStoreProvider);
-    _topicId = 'grammar_${widget.tenseTitle.toLowerCase().replaceAll(' ', '_')}';
+    _topicId =
+        'grammar_${widget.tenseTitle.toLowerCase().replaceAll(' ', '_')}';
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
       stage: 'grammar',
       topic: 'Grammar — ${widget.tenseTitle}',
     );
     _sessionPlan = widget.cards.map((c) => _GrammarSessionCard(c)).toList();
-    final context = _buildContext(widget.tenseTitle, _sessionPlan, widget.focusNote, widget.vocabSummary);
+    final context = _buildContext(
+      widget.tenseTitle,
+      _sessionPlan,
+      widget.focusNote,
+      widget.vocabSummary,
+    );
     _gemini = GeminiLiveService(
       apiKey: ApiKeys.geminiKey,
       lessonContext: context,
@@ -225,7 +232,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
       _tutorTurnTranscript = '';
-      if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
+      if (mounted && _callStatus != CallStatus.muted) {
+        setState(() => _callStatus = CallStatus.listening);
+      }
       if (_isWrappingUp) _finish(completed: true);
     };
 
@@ -233,7 +242,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
       _tutorTurnTranscript = '';
-      if (mounted && _callStatus != CallStatus.muted) setState(() => _callStatus = CallStatus.listening);
+      if (mounted && _callStatus != CallStatus.muted) {
+        setState(() => _callStatus = CallStatus.listening);
+      }
     };
 
     _gemini.onToolCall = _handleToolCall;
@@ -264,7 +275,11 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _hasAttempted = true;
 
     if (!_useLLMIntentJudge) {
-      _applyIntent(_mapKeywordIntent(_detectIntent(trimmed)), utterance: trimmed, source: 'keyword');
+      _applyIntent(
+        _mapKeywordIntent(_detectIntent(trimmed)),
+        utterance: trimmed,
+        source: 'keyword',
+      );
       return;
     }
 
@@ -303,21 +318,33 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
   LiveIntentVerdict _mapKeywordIntent(_GrammarUserIntent intent) {
     switch (intent) {
-      case _GrammarUserIntent.advance: return LiveIntentVerdict(intent: LiveNavIntent.advance);
-      case _GrammarUserIntent.back: return LiveIntentVerdict(intent: LiveNavIntent.back);
-      case _GrammarUserIntent.again: return LiveIntentVerdict(intent: LiveNavIntent.again);
-      case _GrammarUserIntent.none: return LiveIntentVerdict(intent: LiveNavIntent.attempt);
+      case _GrammarUserIntent.advance:
+        return LiveIntentVerdict(intent: LiveNavIntent.advance);
+      case _GrammarUserIntent.back:
+        return LiveIntentVerdict(intent: LiveNavIntent.back);
+      case _GrammarUserIntent.again:
+        return LiveIntentVerdict(intent: LiveNavIntent.again);
+      case _GrammarUserIntent.none:
+        return LiveIntentVerdict(intent: LiveNavIntent.attempt);
     }
   }
 
-  void _applyIntent(LiveIntentVerdict verdict, {required String utterance, required String source}) {
-    _logDebug('[$source] "$utterance" → ${verdict.intent.name}'
-        '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}');
+  void _applyIntent(
+    LiveIntentVerdict verdict, {
+    required String utterance,
+    required String source,
+  }) {
+    _logDebug(
+      '[$source] "$utterance" → ${verdict.intent.name}'
+      '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}',
+    );
 
-    final isNavigation = verdict.intent == LiveNavIntent.advance ||
+    final isNavigation =
+        verdict.intent == LiveNavIntent.advance ||
         verdict.intent == LiveNavIntent.back ||
         verdict.intent == LiveNavIntent.goto;
-    if (isNavigation && DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
+    if (isNavigation &&
+        DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
       _logDebug('→ navigation ignored (cooldown after recent card move)');
       return;
     }
@@ -361,11 +388,14 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   void _refusePrematureConsent() {
     final card = _currentCard;
     if (card == null) return;
-    _logDebug('→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)');
+    _logDebug(
+      '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
+    );
     _gemini.injectContext(
-        'The card did NOT move — "${card.card.fr}" needs more practice. You should never have '
-        'suggested moving on. Smoothly continue practicing this sentence and never suggest '
-        'advancing again.');
+      'The card did NOT move — "${card.card.fr}" needs more practice. You should never have '
+      'suggested moving on. Smoothly continue practicing this sentence and never suggest '
+      'advancing again.',
+    );
   }
 
   void _advanceFromUserIntent() {
@@ -408,7 +438,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     }
     final target = cardNumber - 1;
     if (target < 0 || target >= _sessionPlan.length) {
-      _logDebug('→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})');
+      _logDebug(
+        '→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})',
+      );
       return;
     }
     if (target == _cardIndex) {
@@ -486,30 +518,81 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       final cleaned = t.replaceAll(RegExp(r'[.!?,]'), '').trim();
       final targetFr = foldFrench(card.card.fr);
       if (targetFr.isNotEmpty && cleaned == targetFr) {
-        _logDebug('→ intent suppressed: utterance is just today\'s sentence, treating as practice not a command');
+        _logDebug(
+          '→ intent suppressed: utterance is just today\'s sentence, treating as practice not a command',
+        );
         return _GrammarUserIntent.none;
       }
     }
 
-    const backKeywords = ['go back', 'back to the', 'back up', 'previous', 'the one before', 'last sentence', 'redo the last', 'revenons'];
-    const againKeywords = ['again', 'repeat', 'one more time', 'say it again', 'encore', 'repete', 'repète', 'une fois de plus'];
-    const advanceKeywords = ['next', 'move on', 'got it', 'i know this', 'i know', 'ready', 'continue', 'yes', 'yeah', 'yep', 'sure', 'sounds good', "let's go", "d'accord", 'suivant', 'on continue', 'oui'];
+    const backKeywords = [
+      'go back',
+      'back to the',
+      'back up',
+      'previous',
+      'the one before',
+      'last sentence',
+      'redo the last',
+      'revenons',
+    ];
+    const againKeywords = [
+      'again',
+      'repeat',
+      'one more time',
+      'say it again',
+      'encore',
+      'repete',
+      'repète',
+      'une fois de plus',
+    ];
+    const advanceKeywords = [
+      'next',
+      'move on',
+      'got it',
+      'i know this',
+      'i know',
+      'ready',
+      'continue',
+      'yes',
+      'yeah',
+      'yep',
+      'sure',
+      'sounds good',
+      "let's go",
+      "d'accord",
+      'suivant',
+      'on continue',
+      'oui',
+    ];
 
-    if (backKeywords.any((k) => t.contains(foldFrench(k)))) return _GrammarUserIntent.back;
-    if (againKeywords.any((k) => t.contains(foldFrench(k)))) return _GrammarUserIntent.again;
-    if (advanceKeywords.any((k) => t.contains(foldFrench(k)))) return _GrammarUserIntent.advance;
+    if (backKeywords.any((k) => t.contains(foldFrench(k)))) {
+      return _GrammarUserIntent.back;
+    }
+    if (againKeywords.any((k) => t.contains(foldFrench(k)))) {
+      return _GrammarUserIntent.again;
+    }
+    if (advanceKeywords.any((k) => t.contains(foldFrench(k)))) {
+      return _GrammarUserIntent.advance;
+    }
     return _GrammarUserIntent.none;
   }
 
   void _handleToolCall(String name, Map<String, dynamic> args, String callId) {
-    _logDebug('proposed: $name($args) [card ${_cardIndex + 1}, attempted=$_hasAttempted, intent=${_lastDetectedIntent.name}]');
+    _logDebug(
+      'proposed: $name($args) [card ${_cardIndex + 1}, attempted=$_hasAttempted, intent=${_lastDetectedIntent.name}]',
+    );
 
     // Documented Gemini Live bug: the identical tool call can arrive twice in rapid
     // succession. If we've already handled this exact call ID, don't re-apply its side
     // effects — just acknowledge so she isn't left waiting on a response.
     if (_handledCallIds.contains(callId)) {
       _logDebug('→ DUPLICATE call ID, ignoring side effects');
-      _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': true}, scheduling: 'SILENT');
+      _gemini.sendToolResponse(
+        callId: callId,
+        name: name,
+        result: {'ok': true},
+        scheduling: 'SILENT',
+      );
       return;
     }
     _handledCallIds.add(callId);
@@ -518,23 +601,36 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       case 'mark_drill_result':
         if (_lastDetectedIntent == _GrammarUserIntent.again) {
           _logDebug('→ REJECTED (intent=again)');
-          _gemini.sendToolResponse(callId: callId, name: name, result: {
-            'ok': false,
-            'reason': "The student asked to try again — don't grade yet.",
-          });
+          _gemini.sendToolResponse(
+            callId: callId,
+            name: name,
+            result: {
+              'ok': false,
+              'reason': "The student asked to try again — don't grade yet.",
+            },
+          );
           return;
         }
         if (!_hasAttempted || _currentCard == null) {
           _logDebug('→ REJECTED (no attempt yet)');
-          _gemini.sendToolResponse(callId: callId, name: name, result: {
-            'ok': false,
-            'reason': "The student hasn't attempted this sentence yet.",
-          });
+          _gemini.sendToolResponse(
+            callId: callId,
+            name: name,
+            result: {
+              'ok': false,
+              'reason': "The student hasn't attempted this sentence yet.",
+            },
+          );
           return;
         }
         if (_wasGraded) {
           _logDebug('→ already graded this instance, acknowledging only');
-          _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': true}, scheduling: 'SILENT');
+          _gemini.sendToolResponse(
+            callId: callId,
+            name: name,
+            result: {'ok': true},
+            scheduling: 'SILENT',
+          );
           return;
         }
         final correct = args['correct'] as bool?;
@@ -542,14 +638,28 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           _drillResults.add(correct);
           _wasGraded = true;
           _logDebug('→ ACCEPTED, correct=$correct');
-          _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': true}, scheduling: 'SILENT');
+          _gemini.sendToolResponse(
+            callId: callId,
+            name: name,
+            result: {'ok': true},
+            scheduling: 'SILENT',
+          );
         } else {
           _logDebug('→ REJECTED (bad correct arg)');
-          _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': false}, scheduling: 'SILENT');
+          _gemini.sendToolResponse(
+            callId: callId,
+            name: name,
+            result: {'ok': false},
+            scheduling: 'SILENT',
+          );
         }
       default:
         _logDebug('→ unknown tool $name');
-        _gemini.sendToolResponse(callId: callId, name: name, result: {'ok': false, 'error': 'unknown tool'});
+        _gemini.sendToolResponse(
+          callId: callId,
+          name: name,
+          result: {'ok': false, 'error': 'unknown tool'},
+        );
     }
   }
 
@@ -557,7 +667,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     final time = DateFormat.Hms().format(DateTime.now());
     setState(() {
       _debugLog.add('[$time] $message');
-      if (_debugLog.length > 40) _debugLog.removeRange(0, _debugLog.length - 40);
+      if (_debugLog.length > 40) {
+        _debugLog.removeRange(0, _debugLog.length - 40);
+      }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_debugScrollController.hasClients) return;
@@ -593,10 +705,15 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     if (_spokenSentenceMatched || card == null) return;
     _recentTranscriptBuffer += delta;
     if (_recentTranscriptBuffer.length > 300) {
-      _recentTranscriptBuffer = _recentTranscriptBuffer.substring(_recentTranscriptBuffer.length - 300);
+      _recentTranscriptBuffer = _recentTranscriptBuffer.substring(
+        _recentTranscriptBuffer.length - 300,
+      );
     }
     final target = foldFrench(card.card.fr);
-    if (target.isEmpty || !foldFrench(_recentTranscriptBuffer).contains(target)) return;
+    if (target.isEmpty ||
+        !foldFrench(_recentTranscriptBuffer).contains(target)) {
+      return;
+    }
     _spokenSentenceMatched = true;
     if (!mounted) return;
     setState(() => _sentencePulse = true);
@@ -610,16 +727,33 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     if (_currentCard == null) return;
     _tutorTurnTranscript += delta;
     if (_tutorTurnTranscript.length > 1500) {
-      _tutorTurnTranscript = _tutorTurnTranscript.substring(_tutorTurnTranscript.length - 1500);
+      _tutorTurnTranscript = _tutorTurnTranscript.substring(
+        _tutorTurnTranscript.length - 1500,
+      );
     }
-    if (DateTime.now().difference(_lastDriftCorrectionAt).inMilliseconds < 8000) return;
+    if (DateTime.now().difference(_lastDriftCorrectionAt).inMilliseconds <
+        8000) {
+      return;
+    }
     final folded = foldFrench(_tutorTurnTranscript);
     if (DateTime.now().difference(_lastCardMoveAt).inMilliseconds > 12000) {
       const offerPhrases = [
-        'next word', 'next one', 'move on', 'moving on', 'ready for the next',
-        'try the next', 'shall we continue', 'want to continue', 'ready to continue',
-        'mot suivant', 'passons au', 'on passe au', 'prochain mot',
-        'next sentence', 'next part', 'next segment',
+        'next word',
+        'next one',
+        'move on',
+        'moving on',
+        'ready for the next',
+        'try the next',
+        'shall we continue',
+        'want to continue',
+        'ready to continue',
+        'mot suivant',
+        'passons au',
+        'on passe au',
+        'prochain mot',
+        'next sentence',
+        'next part',
+        'next segment',
       ];
       if (offerPhrases.any(folded.contains)) {
         _correctIllegalOffer();
@@ -659,7 +793,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     if (current == null) return;
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
-    _logDebug('→ DRIFT: Marie started teaching "${future.fr}" while "${current.card.fr}" is on screen — cutting her off');
+    _logDebug(
+      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.card.fr}" is on screen — cutting her off',
+    );
     _cutTutorAudio();
     _gemini.injectContext(
       'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
@@ -691,9 +827,18 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _audio.dispose();
     _gemini.disconnect();
     if (_cardIndex > 0) {
-      final score = _drillResults.isEmpty ? null : _drillResults.where((r) => r).length / _drillResults.length;
-      _store.setLessonStatus(_topicId, (score ?? 1.0) >= 0.8 ? 'completed' : 'in_progress', score: score);
-      _store.saveDiaryEntry(stage: 'grammar', summary: 'Practiced ${widget.tenseTitle} in a live grammar session.');
+      final score = _drillResults.isEmpty
+          ? null
+          : _drillResults.where((r) => r).length / _drillResults.length;
+      _store.setLessonStatus(
+        _topicId,
+        (score ?? 1.0) >= 0.8 ? 'completed' : 'in_progress',
+        score: score,
+      );
+      _store.saveDiaryEntry(
+        stage: 'grammar',
+        summary: 'Practiced ${widget.tenseTitle} in a live grammar session.',
+      );
     }
     _recorder.finish(
       summary: _cardIndex > 0
@@ -709,11 +854,16 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     _teardown();
     if (!mounted || alreadyDone) return;
     setState(() => _callStatus = CallStatus.ended);
-    final result = GrammarStageResult(topicTitle: widget.tenseTitle, drillResults: _drillResults);
+    final result = GrammarStageResult(
+      topicTitle: widget.tenseTitle,
+      drillResults: _drillResults,
+    );
     final outcome = completed
         ? StageOutcome.completed(result, reason: reason)
         : StageOutcome<GrammarStageResult>.paused(
-            result: _drillResults.isNotEmpty ? result : null, reason: reason);
+            result: _drillResults.isNotEmpty ? result : null,
+            reason: reason,
+          );
     Navigator.of(context).pop(outcome);
   }
 
@@ -742,25 +892,36 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     if (shouldEnd && mounted) _finish(completed: false, reason: 'cancelled');
   }
 
-  String _formatDuration(int seconds) => '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+  String _formatDuration(int seconds) =>
+      '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   Color get _statusColor {
     switch (_callStatus) {
-      case CallStatus.connecting: return Colors.orange;
-      case CallStatus.listening: return Colors.green;
-      case CallStatus.tutorSpeaking: return Passeport.maroon;
-      case CallStatus.muted: return Passeport.slate;
-      case CallStatus.ended: return Passeport.slate.withValues(alpha: 0.5);
+      case CallStatus.connecting:
+        return DesignTokens.info;
+      case CallStatus.listening:
+        return DesignTokens.success;
+      case CallStatus.tutorSpeaking:
+        return DesignTokens.primary;
+      case CallStatus.muted:
+        return DesignTokens.slate;
+      case CallStatus.ended:
+        return DesignTokens.slate.withValues(alpha: 0.5);
     }
   }
 
   String get _statusText {
     switch (_callStatus) {
-      case CallStatus.connecting: return 'connecting…';
-      case CallStatus.listening: return 'listening';
-      case CallStatus.tutorSpeaking: return 'Marie is speaking';
-      case CallStatus.muted: return 'muted';
-      case CallStatus.ended: return 'ended';
+      case CallStatus.connecting:
+        return 'connecting…';
+      case CallStatus.listening:
+        return 'listening';
+      case CallStatus.tutorSpeaking:
+        return 'Marie is speaking';
+      case CallStatus.muted:
+        return 'muted';
+      case CallStatus.ended:
+        return 'ended';
     }
   }
 
@@ -776,27 +937,59 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-      backgroundColor: Passeport.parchmentDim,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _header(),
-                Expanded(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), child: _content())),
-                if (_errorMessage.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(_errorMessage, style: Passeport.mono(12).copyWith(color: Passeport.maroon)),
+        backgroundColor: DesignTokens.canvas,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: DesignTokens.contentMaxWidth,
                   ),
-                _debugPanel(),
-                _controls(),
-              ],
-            ),
-            FloatingNotetakerOverlay(state: notetaker),
-          ],
+                  child: Column(
+                    children: [
+                      _header(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: DesignTokens.screenMargin,
+                            vertical: DesignTokens.space4,
+                          ),
+                          child: _content(),
+                        ),
+                      ),
+                      if (_errorMessage.isNotEmpty)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: DesignTokens.screenMargin,
+                            vertical: DesignTokens.space2,
+                          ),
+                          padding: const EdgeInsets.all(DesignTokens.space3),
+                          decoration: BoxDecoration(
+                            color: DesignTokens.primarySoft,
+                            borderRadius: BorderRadius.circular(
+                              DesignTokens.radiusMedium,
+                            ),
+                          ),
+                          child: Text(
+                            _errorMessage,
+                            style: DesignTokens.body(13).copyWith(
+                              color: DesignTokens.inkSoft,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      _debugPanel(),
+                      _controls(),
+                    ],
+                  ),
+                ),
+              ),
+              FloatingNotetakerOverlay(state: notetaker),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -808,11 +1001,41 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
           child: Row(
             children: [
-              GestureDetector(onTap: _confirmEnd, child: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.ink)),
+              IconButton(
+                tooltip: 'End grammar practice',
+                onPressed: _confirmEnd,
+                icon: const Icon(
+                  CupertinoIcons.xmark,
+                  size: 20,
+                  color: DesignTokens.ink,
+                ),
+              ),
               const Spacer(),
-              Text(_formatDuration(_callDuration), style: Passeport.mono(13, weight: FontWeight.w500).copyWith(color: Passeport.slateDim)),
+              Text(
+                _formatDuration(_callDuration),
+                style: DesignTokens.mono(
+                  13,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
               const Spacer(),
-              Container(width: 10, height: 10, decoration: BoxDecoration(color: _statusColor, shape: BoxShape.circle)),
+              SizedBox(
+                width: DesignTokens.minTapTarget,
+                height: DesignTokens.minTapTarget,
+                child: Semantics(
+                  label: _statusText,
+                  child: Center(
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: _statusColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -820,16 +1043,28 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           padding: const EdgeInsets.only(top: 6, bottom: 12),
           child: Column(
             children: [
-              Text('Grammar — ${widget.tenseTitle}', style: Passeport.display(19, weight: FontWeight.w600)),
+              Text(
+                'Grammar — ${widget.tenseTitle}',
+                style: DesignTokens.display(19, weight: FontWeight.w600),
+              ),
               const SizedBox(height: 2),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(width: 7, height: 7, decoration: BoxDecoration(color: _statusColor, shape: BoxShape.circle)),
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: _statusColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                   const SizedBox(width: 5),
                   Text(
                     '${(_cardIndex + 1).clamp(1, _sessionPlan.isEmpty ? 1 : _sessionPlan.length)} of ${_sessionPlan.length} · $_statusText',
-                    style: Passeport.mono(11.5).copyWith(color: Passeport.slateDim),
+                    style: DesignTokens.mono(
+                      11.5,
+                    ).copyWith(color: DesignTokens.slateDim),
                   ),
                 ],
               ),
@@ -851,9 +1086,16 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(CupertinoIcons.checkmark_seal_fill, size: 30, color: Passeport.brass),
+            const Icon(
+              CupertinoIcons.checkmark_circle_fill,
+              size: 30,
+              color: DesignTokens.success,
+            ),
             const SizedBox(height: 10),
-            Text(_isWrappingUp ? 'Wrapping up…' : 'All done!', style: Passeport.body(14, weight: FontWeight.w500)),
+            Text(
+              _isWrappingUp ? 'Wrapping up…' : 'All done!',
+              style: DesignTokens.body(14, weight: FontWeight.w500),
+            ),
           ],
         ),
       );
@@ -865,20 +1107,31 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: Passeport.card,
+            color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _sentencePulse ? Passeport.brass : Colors.transparent, width: 2),
+            border: Border.all(
+              color: _sentencePulse
+                  ? DesignTokens.info
+                  : DesignTokens.surface.withValues(alpha: 0),
+              width: 2,
+            ),
           ),
           child: Column(
             children: [
-              Text(card.en, style: Passeport.display(20, weight: FontWeight.w500)),
+              Text(
+                card.en,
+                style: DesignTokens.display(20, weight: FontWeight.w500),
+              ),
               const SizedBox(height: 10),
               AnimatedScale(
                 scale: _sentencePulse ? 1.05 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 child: Text(
                   card.fr,
-                  style: Passeport.display(20, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                  style: DesignTokens.display(
+                    20,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.primary),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -891,9 +1144,12 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const KickerText('Grammar note', color: Passeport.slateDim),
+                const KickerText('Grammar note', color: DesignTokens.slateDim),
                 const SizedBox(height: 3),
-                Text(card.note, style: Passeport.body(13, weight: FontWeight.w500)),
+                Text(
+                  card.note,
+                  style: DesignTokens.body(13, weight: FontWeight.w500),
+                ),
               ],
             ),
           ),
@@ -901,7 +1157,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         const SizedBox(height: 16),
         Text(
           'Say the sentence out loud — Marie is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
-          style: Passeport.mono(10.5).copyWith(color: Passeport.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -914,15 +1170,16 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
                 label: const Text('Back'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: BorderSide(color: Passeport.hairline),
-                  foregroundColor: Passeport.text,
+                  side: BorderSide(color: DesignTokens.hairline),
+                  foregroundColor: DesignTokens.text,
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: PasseportPrimaryButton(
-                label: 'Next',
+                label: 'Next sentence',
+                icon: CupertinoIcons.arrow_right,
                 onPressed: _advanceFromUserIntent,
               ),
             ),
@@ -933,16 +1190,19 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   }
 
   Widget _debugPanel() {
+    if (_debugLog.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Container(
       height: 110,
-      color: Colors.black.withValues(alpha: 0.85),
+      color: DesignTokens.ink.withValues(alpha: 0.94),
       child: ListView.builder(
         controller: _debugScrollController,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         itemCount: _debugLog.length,
         itemBuilder: (context, i) => Text(
           _debugLog[i],
-          style: Passeport.mono(9.5).copyWith(color: Passeport.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
         ),
       ),
     );
@@ -955,31 +1215,63 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _controlButton(
-            icon: _callStatus == CallStatus.muted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
+            icon: _callStatus == CallStatus.muted
+                ? CupertinoIcons.mic_slash_fill
+                : CupertinoIcons.mic_fill,
             label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic on',
-            color: _callStatus == CallStatus.muted ? Passeport.slate : Passeport.maroon,
-            onTap: (_callStatus == CallStatus.connecting || _callStatus == CallStatus.ended) ? null : _toggleMute,
+            color: _callStatus == CallStatus.muted
+                ? DesignTokens.slate
+                : DesignTokens.success,
+            onTap:
+                (_callStatus == CallStatus.connecting ||
+                    _callStatus == CallStatus.ended)
+                ? null
+                : _toggleMute,
           ),
-          _controlButton(icon: CupertinoIcons.phone_down_fill, label: 'End', color: const Color(0xFFD93333), onTap: _confirmEnd),
+          _controlButton(
+            icon: CupertinoIcons.phone_down_fill,
+            label: 'End',
+            color: DesignTokens.inkSoft,
+            onTap: _confirmEnd,
+          ),
         ],
       ),
     );
   }
 
-  Widget _controlButton({required IconData icon, required String label, required Color color, required VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Icon(icon, color: Colors.white, size: 22),
+  Widget _controlButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback? onTap,
+  }) {
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Opacity(
+          opacity: onTap == null ? 0.45 : 1,
+          child: Column(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: Icon(icon, color: DesignTokens.surface, size: 22),
+              ),
+              const SizedBox(height: DesignTokens.space2),
+              Text(
+                label,
+                style: DesignTokens.body(
+                  11,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(label, style: Passeport.mono(10).copyWith(color: Passeport.slateDim)),
-        ],
+        ),
       ),
     );
   }
@@ -1016,15 +1308,21 @@ Keep grammar explanations SIMPLE — no advanced tense talk beyond the note show
     final lines = <String>[];
     for (var i = 0; i < plan.length; i++) {
       final session = plan[i];
-      lines.add('${i + 1}. ${session.card.fr} = ${session.card.en} — ${session.card.note}');
+      lines.add(
+        '${i + 1}. ${session.card.fr} = ${session.card.en} — ${session.card.note}',
+      );
     }
     parts.add("TODAY'S SENTENCES (${plan.length}):\n${lines.join('\n')}");
     if (focusNote != null && focusNote.isNotEmpty) {
-      parts.add('TODAY\'S FOCUS (mention this naturally near the start): $focusNote');
+      parts.add(
+        'TODAY\'S FOCUS (mention this naturally near the start): $focusNote',
+      );
     }
     if (vocabSummary != null && vocabSummary.wordsCovered.isNotEmpty) {
       final words = vocabSummary.wordsCovered.map((e) => e.fr).join(', ');
-      parts.add('VOCABULARY JUST COVERED (previous stage, these sentences reuse some of these words): $words');
+      parts.add(
+        'VOCABULARY JUST COVERED (previous stage, these sentences reuse some of these words): $words',
+      );
     }
     return parts.join('\n\n');
   }

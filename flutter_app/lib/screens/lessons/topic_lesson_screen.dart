@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -27,13 +27,15 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
   bool _drillsSubmitted = false;
   bool _isPlaying = false;
 
-  String get _lessonContext => ref.read(contentServiceProvider).grammarTopicContext(widget.topic);
+  String get _lessonContext =>
+      ref.read(contentServiceProvider).grammarTopicContext(widget.topic);
 
   double get _drillScore {
     if (widget.topic.drills.isEmpty) return 1.0;
     int correct = 0;
     for (int i = 0; i < widget.topic.drills.length; i++) {
-      if (_drillChecked[i] == true && _drillAnswers[i] == widget.topic.drills[i].answer) {
+      if (_drillChecked[i] == true &&
+          _drillAnswers[i] == widget.topic.drills[i].answer) {
         correct++;
       }
     }
@@ -87,17 +89,18 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text(widget.topic.title, style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
-        foregroundColor: Passeport.ink,
+        title: Text(widget.topic.title, style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
+            onPressed: () =>
+                LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -108,10 +111,12 @@ class _TopicLessonScreenState extends ConsumerState<TopicLessonScreen> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
             children: [
               // Topic sections
-              ...widget.topic.sections.map((section) => Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: _TopicSectionWidget(section: section),
-                  )),
+              ...widget.topic.sections.map(
+                (section) => Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: _TopicSectionWidget(section: section),
+                ),
+              ),
 
               // Drills
               if (widget.topic.drills.isNotEmpty) ...[
@@ -174,10 +179,10 @@ class _NarrationControlBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: Passeport.card,
+        color: DesignTokens.card,
         boxShadow: [
           BoxShadow(
-            color: Passeport.ink.withValues(alpha: 0.08),
+            color: DesignTokens.ink.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
@@ -187,26 +192,28 @@ class _NarrationControlBar extends StatelessWidget {
         top: false,
         child: Row(
           children: [
-            InkWell(
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: onToggle,
-              borderRadius: BorderRadius.circular(24),
               child: Container(
                 width: 44,
                 height: 44,
                 decoration: const BoxDecoration(
-                  color: Passeport.maroon,
+                  color: DesignTokens.primary,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
-                  color: Passeport.parchment,
+                  isPlaying
+                      ? CupertinoIcons.pause_fill
+                      : CupertinoIcons.play_fill,
+                  color: DesignTokens.parchment,
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Text(
               isPlaying ? 'Narrating…' : 'Play lesson',
-              style: Passeport.body(14, weight: FontWeight.w500),
+              style: DesignTokens.body(14, weight: FontWeight.w500),
             ),
           ],
         ),
@@ -236,45 +243,57 @@ class _TopicSectionWidget extends StatelessWidget {
               // Body text
               Text(
                 section.body,
-                style: Passeport.body(14).copyWith(height: 1.5),
+                style: DesignTokens.body(14).copyWith(height: 1.5),
               ),
               // Examples
               if (section.examples.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Container(height: 1, color: Passeport.hairline),
+                Container(height: 1, color: DesignTokens.hairline),
                 const SizedBox(height: 12),
-                ...section.examples.map((ex) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ex.fr,
-                                  style: Passeport.body(14, weight: FontWeight.w600),
+                ...section.examples.map(
+                  (ex) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                ex.fr,
+                                style: DesignTokens.body(
+                                  14,
+                                  weight: FontWeight.w600,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  ex.en,
-                                  style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                ex.en,
+                                style: DesignTokens.body(
+                                  13,
+                                ).copyWith(color: DesignTokens.slateDim),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            CupertinoIcons.speaker_2_fill,
+                            color: DesignTokens.info,
+                          ),
+                          onPressed: () {
+                            LessonSpeechService.shared.speak(
+                              items: [
+                                SpeechItem(text: ex.fr, language: 'fr-FR'),
                               ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(CupertinoIcons.speaker_2_fill, color: Passeport.brass),
-                            onPressed: () {
-                              LessonSpeechService.shared.speak(
-                                items: [SpeechItem(text: ex.fr, language: 'fr-FR')],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    )),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ],
           ),
@@ -318,7 +337,9 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
   Future<void> _explain() async {
     setState(() => _isExplaining = true);
     try {
-      final text = await ref.read(lessonAgentServiceProvider).quizFeedback(
+      final text = await ref
+          .read(lessonAgentServiceProvider)
+          .quizFeedback(
             question: drill.prompt,
             correctAnswer: drill.answer,
             studentAnswer: selectedAnswer ?? '',
@@ -346,7 +367,7 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
         children: [
           Text(
             drill.prompt,
-            style: Passeport.body(15, weight: FontWeight.w500),
+            style: DesignTokens.body(15, weight: FontWeight.w500),
           ),
           const SizedBox(height: 12),
           if (drill.type == 'fill' && drill.choices.isEmpty)
@@ -362,7 +383,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
                   onTap: _isExplaining ? null : _explain,
                   child: Text(
                     _isExplaining ? '…' : 'Explain',
-                    style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                    style: DesignTokens.mono(
+                      10.5,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.primary),
                   ),
                 ),
               ],
@@ -371,7 +395,9 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
               const SizedBox(height: 2),
               Text(
                 _explanation!,
-                style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
             ],
           ],
@@ -392,20 +418,22 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
           decoration: BoxDecoration(
             color: isChecked
                 ? (isCorrect
-                    ? const Color(0xFF3A7D44).withValues(alpha: 0.08)
-                    : Passeport.maroon.withValues(alpha: 0.08))
-                : Passeport.parchmentDim,
+                      ? DesignTokens.success.withValues(alpha: 0.08)
+                      : DesignTokens.primary.withValues(alpha: 0.08))
+                : DesignTokens.parchmentDim,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isChecked
-                  ? (isCorrect ? const Color(0xFF3A7D44) : Passeport.maroon)
-                  : Passeport.hairline,
+                  ? (isCorrect ? DesignTokens.success : DesignTokens.primary)
+                  : DesignTokens.hairline,
             ),
           ),
           child: Text(
             selectedAnswer ?? '...',
-            style: Passeport.body(14).copyWith(
-              color: selectedAnswer != null ? Passeport.text : Passeport.slate,
+            style: DesignTokens.body(14).copyWith(
+              color: selectedAnswer != null
+                  ? DesignTokens.text
+                  : DesignTokens.slate,
             ),
           ),
         ),
@@ -413,9 +441,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
           const SizedBox(height: 6),
           Text(
             'Correct: ${drill.answer}',
-            style: Passeport.body(13, weight: FontWeight.w500).copyWith(
-              color: const Color(0xFF3A7D44),
-            ),
+            style: DesignTokens.body(
+              13,
+              weight: FontWeight.w500,
+            ).copyWith(color: DesignTokens.success),
           ),
         ],
       ],
@@ -430,27 +459,29 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
         final isSelected = selectedAnswer == choice;
         final isCorrectAnswer = choice == drill.answer;
 
-        Color bg = Passeport.parchmentDim;
-        Color border = Passeport.hairline;
-        Color textColor = Passeport.text;
+        Color bg = DesignTokens.parchmentDim;
+        Color border = DesignTokens.hairline;
+        Color textColor = DesignTokens.text;
 
         if (isChecked) {
           if (isCorrectAnswer) {
-            bg = const Color(0xFF3A7D44).withValues(alpha: 0.1);
-            border = const Color(0xFF3A7D44);
-            textColor = const Color(0xFF3A7D44);
+            bg = DesignTokens.success.withValues(alpha: 0.1);
+            border = DesignTokens.success;
+            textColor = DesignTokens.success;
           } else if (isSelected && !isCorrectAnswer) {
-            bg = Passeport.maroon.withValues(alpha: 0.1);
-            border = Passeport.maroon;
-            textColor = Passeport.maroon;
+            bg = DesignTokens.primary.withValues(alpha: 0.1);
+            border = DesignTokens.primary;
+            textColor = DesignTokens.primary;
           }
         } else if (isSelected) {
-          bg = Passeport.brass.withValues(alpha: 0.12);
-          border = Passeport.brass;
+          bg = DesignTokens.info.withValues(alpha: 0.12);
+          border = DesignTokens.info;
         }
 
         return GestureDetector(
-          onTap: widget.onSelect != null ? () => widget.onSelect!(choice) : null,
+          onTap: widget.onSelect != null
+              ? () => widget.onSelect!(choice)
+              : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
@@ -460,7 +491,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
             ),
             child: Text(
               choice,
-              style: Passeport.body(14, weight: FontWeight.w500).copyWith(color: textColor),
+              style: DesignTokens.body(
+                14,
+                weight: FontWeight.w500,
+              ).copyWith(color: textColor),
             ),
           ),
         );
@@ -486,19 +520,21 @@ class _DrillResultBanner extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: passed
-            ? const Color(0xFF3A7D44).withValues(alpha: 0.08)
-            : Passeport.maroon.withValues(alpha: 0.08),
+            ? DesignTokens.success.withValues(alpha: 0.08)
+            : DesignTokens.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+          color: passed ? DesignTokens.success : DesignTokens.primary,
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Icon(
-            passed ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.info_circle,
-            color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+            passed
+                ? CupertinoIcons.checkmark_circle_fill
+                : CupertinoIcons.info_circle,
+            color: passed ? DesignTokens.success : DesignTokens.primary,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -507,8 +543,8 @@ class _DrillResultBanner extends StatelessWidget {
               passed
                   ? 'Topic complete! $pct% correct.'
                   : '$pct% correct. Need 80% to complete.',
-              style: Passeport.body(14, weight: FontWeight.w500).copyWith(
-                color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+              style: DesignTokens.body(14, weight: FontWeight.w500).copyWith(
+                color: passed ? DesignTokens.success : DesignTokens.primary,
               ),
             ),
           ),

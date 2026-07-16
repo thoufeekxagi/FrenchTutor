@@ -2,7 +2,7 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../providers/database_provider.dart';
@@ -20,11 +20,11 @@ class GrammarLabScreen extends ConsumerWidget {
 
     if (grammar == null) {
       return Scaffold(
-        backgroundColor: Passeport.parchment,
+        backgroundColor: DesignTokens.parchment,
         appBar: AppBar(
-          title: Text('Grammar', style: Passeport.display(20)),
-          backgroundColor: Passeport.parchment,
-          foregroundColor: Passeport.ink,
+          title: Text('Grammar', style: DesignTokens.display(20)),
+          backgroundColor: DesignTokens.parchment,
+          foregroundColor: DesignTokens.ink,
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
@@ -32,16 +32,17 @@ class GrammarLabScreen extends ConsumerWidget {
       );
     }
 
-    final lessons = List.of(grammar.lessons)..sort((a, b) => a.order.compareTo(b.order));
+    final lessons = List.of(grammar.lessons)
+      ..sort((a, b) => a.order.compareTo(b.order));
     final topics = grammar.topics;
     final progress = store.allLessonProgress();
 
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.parchment,
       appBar: AppBar(
-        title: Text('Grammar', style: Passeport.display(20)),
-        backgroundColor: Passeport.parchment,
-        foregroundColor: Passeport.ink,
+        title: Text('Grammar', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchment,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -58,7 +59,12 @@ class GrammarLabScreen extends ConsumerWidget {
               children: [
                 for (int i = 0; i < lessons.length; i++) ...[
                   if (i > 0)
-                    Divider(height: 1, color: Passeport.hairline, indent: 16, endIndent: 16),
+                    Divider(
+                      height: 1,
+                      color: DesignTokens.hairline,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
                   _LessonTile(
                     lesson: lessons[i],
                     status: progress[lessons[i].id]?.status ?? 'not_started',
@@ -78,7 +84,12 @@ class GrammarLabScreen extends ConsumerWidget {
                 children: [
                   for (int i = 0; i < topics.length; i++) ...[
                     if (i > 0)
-                      Divider(height: 1, color: Passeport.hairline, indent: 16, endIndent: 16),
+                      Divider(
+                        height: 1,
+                        color: DesignTokens.hairline,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
                     _TopicTile(
                       topic: topics[i],
                       status: progress[topics[i].id]?.status ?? 'not_started',
@@ -107,26 +118,26 @@ class _LessonTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       title: Text(
         lesson.title as String,
-        style: Passeport.body(15, weight: FontWeight.w500),
+        style: DesignTokens.body(15, weight: FontWeight.w500),
       ),
       subtitle: Text(
         lesson.subtitle as String,
-        style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+        style: DesignTokens.body(12).copyWith(color: DesignTokens.slateDim),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _StatusBadge(status: status),
           const SizedBox(width: 4),
-          Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
+          Icon(
+            CupertinoIcons.chevron_right,
+            color: DesignTokens.slate,
+            size: 20,
+          ),
         ],
       ),
       onTap: () {
-        Navigator.push(
-          context,
-          AppRouter.route(builder: (_) => GrammarLessonScreen(lesson: lesson),
-          ),
-        );
+        AppRouter.push(context, (_) => GrammarLessonScreen(lesson: lesson));
       },
     );
   }
@@ -144,22 +155,22 @@ class _TopicTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       title: Text(
         topic.title as String,
-        style: Passeport.body(15, weight: FontWeight.w500),
+        style: DesignTokens.body(15, weight: FontWeight.w500),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _StatusBadge(status: status),
           const SizedBox(width: 4),
-          Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
+          Icon(
+            CupertinoIcons.chevron_right,
+            color: DesignTokens.slate,
+            size: 20,
+          ),
         ],
       ),
       onTap: () {
-        Navigator.push(
-          context,
-          AppRouter.route(builder: (_) => TopicLessonScreen(topic: topic),
-          ),
-        );
+        AppRouter.push(context, (_) => TopicLessonScreen(topic: topic));
       },
     );
   }
@@ -173,9 +184,9 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (String label, Color color) = switch (status) {
-      'completed' => ('Done', const Color(0xFF4CAF50)),
-      'in_progress' => ('In Progress', Passeport.brass),
-      _ => ('New', Passeport.slate),
+      'completed' => ('Ready', DesignTokens.success),
+      'in_progress' => ('Building', DesignTokens.info),
+      _ => ('New', DesignTokens.slate),
     };
 
     return Container(
@@ -186,7 +197,10 @@ class _StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Passeport.mono(10, weight: FontWeight.w500).copyWith(color: color),
+        style: DesignTokens.mono(
+          10,
+          weight: FontWeight.w500,
+        ).copyWith(color: color),
       ),
     );
   }

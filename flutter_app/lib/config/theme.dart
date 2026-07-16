@@ -19,14 +19,21 @@ abstract final class Passeport {
   static const maroonDeep = DesignTokens.maroonDeep;
   static const brass = DesignTokens.brass;
   static const sage = DesignTokens.sage;
+  static const sky = DesignTokens.sky;
+  static const primarySoft = DesignTokens.primarySoft;
+  static const successSoft = DesignTokens.successSoft;
+  static const infoSoft = DesignTokens.infoSoft;
+  static const masterySoft = DesignTokens.masterySoft;
   static const slate = DesignTokens.slate;
   static const slateDim = DesignTokens.slateDim;
   static const text = DesignTokens.text;
   static final hairline = DesignTokens.hairline;
   static final hairlineLight = DesignTokens.hairlineLight;
 
-  static TextStyle display(double size, {FontWeight weight = FontWeight.w500}) =>
-      DesignTokens.display(size, weight: weight);
+  static TextStyle display(
+    double size, {
+    FontWeight weight = FontWeight.w500,
+  }) => DesignTokens.display(size, weight: weight);
 
   static TextStyle body(double size, {FontWeight weight = FontWeight.w400}) =>
       DesignTokens.body(size, weight: weight);

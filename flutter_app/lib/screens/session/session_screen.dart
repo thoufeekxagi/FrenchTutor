@@ -1,5 +1,6 @@
 import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/speaking_session_result.dart';
 
 enum CallStatus { connecting, listening, tutorSpeaking, muted, ended }
 
@@ -112,6 +114,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             recordId,
             endedReason: _endedReason,
             learnerUtteranceCount: _userUtteranceCount,
+            transcriptJson: jsonEncode(
+              _messages
+                  .map(
+                    (message) => {
+                      'role': message.isUser ? 'user' : 'assistant',
+                      'content': message.content,
+                    },
+                  )
+                  .toList(growable: false),
+            ),
           );
     }
     _saveSessionLocally();
@@ -261,20 +273,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             minutes: (_callDuration / 60).clamp(1, 999).round(),
           );
     }
-
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        Navigator.of(context).pop(
-          SpeakingResult(
-            connected: _connectedAt != null,
-            durationSeconds: _callDuration,
-            learnerUtteranceCount: _userUtteranceCount,
-            endedReason: _endedReason,
-          ),
-        );
-      }
-    });
   }
+
+  SpeakingResult get _result => SpeakingResult(
+    connected: _connectedAt != null,
+    durationSeconds: _callDuration,
+    learnerUtteranceCount: _userUtteranceCount,
+    endedReason: _endedReason,
+  );
+
+  void _finishResult() => Navigator.of(context).pop(_result);
 
   String _generateLocalSummary() {
     if (_messages.isEmpty) return 'No conversation recorded.';
@@ -375,11 +383,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   Color get _statusColor {
     switch (_callStatus) {
       case CallStatus.connecting:
-        return const Color(0xFFF29A19);
-      case CallStatus.listening:
-        return const Color(0xFF33C759);
-      case CallStatus.tutorSpeaking:
         return Passeport.brass;
+      case CallStatus.listening:
+        return Passeport.sage;
+      case CallStatus.tutorSpeaking:
+        return Passeport.sky;
       case CallStatus.muted:
         return Passeport.slate;
       case CallStatus.ended:
@@ -418,6 +426,21 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_callStatus == CallStatus.ended && _sessionSaved) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) _finishResult();
+        },
+        child: SpeakingSessionResultView(
+          durationSeconds: _callDuration,
+          learnerTurns: _userUtteranceCount,
+          meetsCompletionThreshold: _result.meetsThreshold,
+          isDailyPath: widget.stage == 'speaking',
+          onDone: _finishResult,
+        ),
+      );
+    }
     final notetaker = ref.watch(notetakerStateProvider);
     // Matches iOS's fullScreenCover, which has no swipe-to-dismiss gesture at all — without
     // this, Flutter's iOS edge-swipe-back gesture (still active even on a fullscreenDialog
@@ -431,7 +454,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-        backgroundColor: Passeport.parchmentDim,
+        backgroundColor: Passeport.parchment,
         body: SafeArea(
           child: Stack(
             children: [
@@ -466,81 +489,148 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   }
 
   Widget _callHeader() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-          child: Row(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      child: Column(
+        children: [
+          Row(
             children: [
-              GestureDetector(
-                onTap: _confirmEnd,
-                child: const Icon(CupertinoIcons.xmark, size: 20, color: Passeport.ink),
+              Semantics(
+                button: true,
+                label: 'End session',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _confirmEnd,
+                  child: const SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Icon(
+                      CupertinoIcons.xmark,
+                      size: 20,
+                      color: Passeport.ink,
+                    ),
+                  ),
+                ),
               ),
               const Spacer(),
               Text(
                 _formatDuration(_callDuration),
-                style: Passeport.mono(
-                  15,
-                  weight: FontWeight.w500,
-                ).copyWith(color: Passeport.slateDim),
-              ),
-              const Spacer(),
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: _statusColor,
-                  shape: BoxShape.circle,
+                style: Passeport.body(14, weight: FontWeight.w700).copyWith(
+                  color: Passeport.slateDim,
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
+              const Spacer(),
+              const SizedBox(width: 44),
             ],
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 12, bottom: 16),
-          child: Column(
-            children: [
-              Text(
-                'French Tutor',
-                style: Passeport.display(20, weight: FontWeight.w600),
+          const SizedBox(height: 4),
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: Passeport.infoSoft,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: _statusColor.withValues(alpha: 0.32),
+                width: 2,
               ),
-              const SizedBox(height: 2),
-              Text(
-                _statusText,
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+            ),
+            child: const Center(
+              child: Text(
+                'M',
+                style: TextStyle(
+                  color: Passeport.sky,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 9),
+          Text('Marie', style: Passeport.display(22)),
+          const SizedBox(height: 7),
+          AnimatedContainer(
+            duration: DesignTokens.durationFast,
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+            decoration: BoxDecoration(
+              color: _statusColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: _statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  _statusText,
+                  style: Passeport.body(
+                    12,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: Passeport.inkSoft),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _transcriptView() {
     if (_messages.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              CupertinoIcons.phone_fill,
-              size: 48,
-              color: Passeport.slate.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _callStatus == CallStatus.connecting
-                  ? 'Connecting to your tutor...'
-                  : 'Start speaking to begin',
-              style: Passeport.body(14).copyWith(color: Passeport.slateDim),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: const BoxDecoration(
+                  color: Passeport.successSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  CupertinoIcons.waveform,
+                  size: 24,
+                  color: Passeport.sage,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                _callStatus == CallStatus.connecting
+                    ? 'Preparing your session'
+                    : 'Marie is listening',
+                textAlign: TextAlign.center,
+                style: Passeport.body(16, weight: FontWeight.w700),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _callStatus == CallStatus.connecting
+                    ? 'This usually takes a moment.'
+                    : 'Speak naturally. You can pause, correct yourself, or ask for help.',
+                textAlign: TextAlign.center,
+                style: Passeport.body(
+                  13.5,
+                ).copyWith(color: Passeport.slateDim, height: 1.4),
+              ),
+            ],
+          ),
         ),
       );
     }
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: _messages.length,
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -550,36 +640,43 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   }
 
   Widget _callControls() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+      decoration: BoxDecoration(
+        color: Passeport.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Passeport.ink.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _controlButton(
-            icon: _callStatus == CallStatus.muted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
-            label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic On',
+            icon: _callStatus == CallStatus.muted
+                ? CupertinoIcons.mic_slash_fill
+                : CupertinoIcons.mic_fill,
+            label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
             color: _callStatus == CallStatus.muted
                 ? Passeport.slate
-                : Passeport.brass,
-            onTap:
-                (_callStatus == CallStatus.connecting ||
-                    _callStatus == CallStatus.ended)
-                ? null
-                : _toggleMute,
+                : Passeport.ink,
+            onTap: _callStatus == CallStatus.connecting ? null : _toggleMute,
           ),
           _controlButton(
-            icon: _isSpeakerOn ? CupertinoIcons.speaker_2_fill : CupertinoIcons.ear,
+            icon: _isSpeakerOn
+                ? CupertinoIcons.speaker_2_fill
+                : CupertinoIcons.ear,
             label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
-            color: _isSpeakerOn ? Passeport.brass : Passeport.slate,
-            onTap:
-                (_callStatus == CallStatus.connecting ||
-                    _callStatus == CallStatus.ended)
-                ? null
-                : _toggleSpeaker,
+            color: Passeport.ink,
+            onTap: _callStatus == CallStatus.connecting ? null : _toggleSpeaker,
           ),
           _controlButton(
             icon: CupertinoIcons.phone_down_fill,
-            label: 'End Call',
+            label: 'End',
             color: Passeport.maroon,
             onTap: _confirmEnd,
           ),
@@ -594,22 +691,40 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     required Color color,
     required VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Icon(icon, color: Colors.white, size: 24),
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: 76,
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: DesignTokens.durationFast,
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: onTap == null
+                      ? Passeport.slate.withValues(alpha: 0.35)
+                      : color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: Colors.white, size: 23),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                label,
+                style: Passeport.body(
+                  11.5,
+                  weight: FontWeight.w600,
+                ).copyWith(color: Passeport.slateDim),
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: Passeport.mono(11).copyWith(color: Passeport.slateDim),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -633,16 +748,22 @@ class _MessageBubble extends StatelessWidget {
         if (!isUser) const SizedBox(width: 8),
         Flexible(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             decoration: BoxDecoration(
-              color: isUser ? Passeport.maroon : Passeport.card,
-              borderRadius: BorderRadius.circular(14),
+              color: isUser ? Passeport.ink : Passeport.infoSoft,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(16),
+                topRight: const Radius.circular(16),
+                bottomLeft: Radius.circular(isUser ? 16 : 4),
+                bottomRight: Radius.circular(isUser ? 4 : 16),
+              ),
             ),
             child: Text(
               message.content,
-              style: Passeport.body(
-                13.5,
-              ).copyWith(color: isUser ? Colors.white : Passeport.text),
+              style: Passeport.body(14).copyWith(
+                color: isUser ? Colors.white : Passeport.text,
+                height: 1.35,
+              ),
             ),
           ),
         ),

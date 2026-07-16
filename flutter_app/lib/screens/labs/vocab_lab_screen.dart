@@ -2,7 +2,7 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../providers/database_provider.dart';
@@ -24,11 +24,11 @@ class VocabLabScreen extends ConsumerWidget {
     final phases = content.vocabPhases;
 
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.parchment,
       appBar: AppBar(
-        title: Text('Vocabulary', style: Passeport.display(20)),
-        backgroundColor: Passeport.parchment,
-        foregroundColor: Passeport.ink,
+        title: Text('Vocabulary', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchment,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -73,7 +73,12 @@ class _PhaseSection extends StatelessWidget {
             children: [
               for (int i = 0; i < phase.themes.length; i++) ...[
                 if (i > 0)
-                  Divider(height: 1, color: Passeport.hairline, indent: 16, endIndent: 16),
+                  Divider(
+                    height: 1,
+                    color: DesignTokens.hairline,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
                 _ThemeTile(
                   theme: phase.themes[i],
                   phaseNumber: phase.phase,
@@ -110,28 +115,41 @@ class _ThemeTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       title: Text(
         theme.title,
-        style: Passeport.body(15, weight: FontWeight.w500),
+        style: DesignTokens.body(15, weight: FontWeight.w500),
       ),
       subtitle: Row(
         children: [
           if (counts.due > 0) ...[
-            _CountBadge(label: '${counts.due} due', color: Passeport.maroon),
+            _CountBadge(
+              label: '${counts.due} due',
+              color: DesignTokens.primary,
+            ),
             const SizedBox(width: 6),
           ],
           if (counts.unseen > 0)
-            _CountBadge(label: '${counts.unseen} unseen', color: Passeport.brass),
+            _CountBadge(
+              label: '${counts.unseen} unseen',
+              color: DesignTokens.info,
+            ),
           if (allKnown)
-            _CountBadge(label: '$total mastered', color: const Color(0xFF4CAF50)),
+            _CountBadge(label: '$total mastered', color: DesignTokens.mastery),
         ],
       ),
       trailing: allKnown
-          ? const Icon(CupertinoIcons.checkmark_circle_fill, color: Color(0xFF4CAF50), size: 22)
-          : Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 20),
+          ? const Icon(
+              CupertinoIcons.checkmark_circle_fill,
+              color: DesignTokens.mastery,
+              size: 22,
+            )
+          : Icon(
+              CupertinoIcons.chevron_right,
+              color: DesignTokens.slate,
+              size: 20,
+            ),
       onTap: () {
-        Navigator.push(
+        AppRouter.push(
           context,
-          AppRouter.route(builder: (_) => FlashcardSessionScreen(phase: phaseNumber, theme: theme),
-          ),
+          (_) => FlashcardSessionScreen(phase: phaseNumber, theme: theme),
         );
       },
     );
@@ -154,7 +172,10 @@ class _CountBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Passeport.mono(10, weight: FontWeight.w500).copyWith(color: color),
+        style: DesignTokens.mono(
+          10,
+          weight: FontWeight.w500,
+        ).copyWith(color: color),
       ),
     );
   }

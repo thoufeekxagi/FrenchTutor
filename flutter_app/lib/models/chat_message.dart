@@ -6,8 +6,8 @@ class ChatMessage {
     required this.role,
     required this.content,
     DateTime? timestamp,
-  })  : id = id ?? const Uuid().v4(),
-        timestamp = timestamp ?? DateTime.now();
+  }) : id = id ?? const Uuid().v4(),
+       timestamp = timestamp ?? DateTime.now();
 
   final String id;
   final String role;

@@ -116,10 +116,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: Passeport.parchment,
       appBar: AppBar(
-        backgroundColor: Passeport.parchmentDim,
-        title: Text('Settings', style: Passeport.display(20)),
+        backgroundColor: Passeport.parchment,
+        title: Text('Settings', style: Passeport.display(22)),
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -168,9 +168,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   KickerText('Roadmap', color: Passeport.slateDim),
                   const SizedBox(height: 10),
-                  InkWell(
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: _pickRoadmapStartDate,
-                    borderRadius: BorderRadius.circular(8),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
@@ -574,19 +574,19 @@ class _ChoiceRow extends StatelessWidget {
             return GestureDetector(
               onTap: () => onChanged(o.$1),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 7,
-                ),
+                constraints: const BoxConstraints(minHeight: 44),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: isSelected ? Passeport.maroon : Passeport.parchmentDim,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
                   o.$2,
-                  style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(
-                    color: isSelected ? Passeport.parchment : Passeport.text,
-                  ),
+                  style: Passeport.body(
+                    11.5,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: isSelected ? Colors.white : Passeport.text),
                 ),
               ),
             );
@@ -609,11 +609,11 @@ class _PasseportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline),
+        color: Passeport.card,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: DesignTokens.cardShadow,
       ),
       child: child,
     );
@@ -631,17 +631,22 @@ class _SettingsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 11),
       child: Row(
         children: [
-          Text(
-            label,
-            style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+          Expanded(
+            child: Text(
+              label,
+              style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+            ),
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: Passeport.mono(
-              12,
-              weight: FontWeight.w500,
-            ).copyWith(color: Passeport.text),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: Passeport.body(
+                12,
+                weight: FontWeight.w600,
+              ).copyWith(color: Passeport.text),
+            ),
           ),
         ],
       ),
@@ -660,8 +665,8 @@ class _StepperButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: enabled
               ? Passeport.maroon.withValues(alpha: 0.1)

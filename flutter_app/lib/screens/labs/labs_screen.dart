@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import 'connectors_lab_screen.dart';
@@ -16,7 +16,7 @@ class LabsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.parchment,
       body: SafeArea(
         child: PSContentColumn(
           child: Padding(
@@ -25,10 +25,14 @@ class LabsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                Text('Practice', style: Passeport.display(24)),
+                Text('Practice', style: DesignTokens.display(24)),
                 const SizedBox(height: 4),
-                Text('Go deeper on one skill at a time',
-                    style: Passeport.body(14).copyWith(color: Passeport.slateDim)),
+                Text(
+                  'Go deeper on one skill at a time',
+                  style: DesignTokens.body(
+                    14,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: ListView(
@@ -37,31 +41,46 @@ class LabsScreen extends StatelessWidget {
                         icon: CupertinoIcons.square_stack_3d_up,
                         title: 'Vocabulary',
                         subtitle: 'Flashcards & spaced repetition',
-                        onTap: () => AppRouter.push(context, (_) => const VocabLabScreen()),
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const VocabLabScreen(),
+                        ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.book,
                         title: 'Grammar',
                         subtitle: 'Lessons & drills',
-                        onTap: () => AppRouter.push(context, (_) => const GrammarLabScreen()),
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const GrammarLabScreen(),
+                        ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.link,
                         title: 'Connectors',
                         subtitle: 'The logic words that hold French together',
-                        onTap: () => AppRouter.push(context, (_) => const ConnectorsLabScreen()),
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const ConnectorsLabScreen(),
+                        ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.headphones,
                         title: 'Listening',
                         subtitle: 'Comprehension passages',
-                        onTap: () => AppRouter.push(context, (_) => const ListeningLabScreen()),
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const ListeningLabScreen(),
+                        ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.pencil,
                         title: 'Writing',
                         subtitle: 'Essays with graded feedback',
-                        onTap: () => AppRouter.push(context, (_) => const WritingLabScreen()),
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const WritingLabScreen(),
+                        ),
                       ),
                     ],
                   ),
@@ -99,9 +118,9 @@ class _LabTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Passeport.card,
+          color: DesignTokens.card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Passeport.hairline, width: 1),
+          border: Border.all(color: DesignTokens.hairline, width: 1),
         ),
         child: Row(
           children: [
@@ -109,23 +128,35 @@ class _LabTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Passeport.brass.withValues(alpha: 0.12),
+                color: DesignTokens.info.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: Passeport.brass, size: 20),
+              child: Icon(icon, color: DesignTokens.info, size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: Passeport.body(15, weight: FontWeight.w500)),
+                  Text(
+                    title,
+                    style: DesignTokens.body(15, weight: FontWeight.w500),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: Passeport.body(12).copyWith(color: Passeport.slateDim)),
+                  Text(
+                    subtitle,
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
                 ],
               ),
             ),
-            const Icon(CupertinoIcons.chevron_right, color: Passeport.slate, size: 16),
+            const Icon(
+              CupertinoIcons.chevron_right,
+              color: DesignTokens.slate,
+              size: 16,
+            ),
           ],
         ),
       ),

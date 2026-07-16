@@ -23,7 +23,9 @@ class AudioStreamingService {
   // flutter_sound's default log level is extremely chatty (every internal method-channel call
   // and callback), which drowns out real errors in `flutter run` output — pinned to `error` so
   // only genuine problems show up.
-  final FlutterSoundRecorder _recorder = FlutterSoundRecorder(logLevel: Level.error);
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder(
+    logLevel: Level.error,
+  );
   final FlutterSoundPlayer _player = FlutterSoundPlayer(logLevel: Level.error);
 
   StreamController<Uint8List>? _micStreamController;
@@ -76,23 +78,28 @@ class AudioStreamingService {
   Future<void> _configureSessionIfNeeded() async {
     if (_isSessionConfigured) return;
     final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.defaultToSpeaker |
-          AVAudioSessionCategoryOptions.allowBluetooth |
-          AVAudioSessionCategoryOptions.allowBluetoothA2dp,
-      avAudioSessionMode: AVAudioSessionMode.voiceChat,
-      androidAudioAttributes: const AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        usage: AndroidAudioUsage.voiceCommunication,
+    await session.configure(
+      AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionCategoryOptions:
+            AVAudioSessionCategoryOptions.defaultToSpeaker |
+            AVAudioSessionCategoryOptions.allowBluetooth |
+            AVAudioSessionCategoryOptions.allowBluetoothA2dp,
+        avAudioSessionMode: AVAudioSessionMode.voiceChat,
+        androidAudioAttributes: const AndroidAudioAttributes(
+          contentType: AndroidAudioContentType.speech,
+          usage: AndroidAudioUsage.voiceCommunication,
+        ),
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-    ));
+    );
     await session.setActive(true);
     _isSessionConfigured = true;
   }
 
-  Future<void> startStreaming({required void Function(List<int> chunk) onChunk}) async {
+  Future<void> startStreaming({
+    required void Function(List<int> chunk) onChunk,
+  }) async {
     if (_isStreaming) return;
     _audioChunkCallback = onChunk;
     await _configureSessionIfNeeded();
@@ -147,7 +154,9 @@ class AudioStreamingService {
     if (!allowBargeIn) {
       final blockedByOutput = isOutputActive;
       final withinTailGrace = DateTime.now().isBefore(
-        _scheduledPlaybackEndTime.add(Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round())),
+        _scheduledPlaybackEndTime.add(
+          Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round()),
+        ),
       );
       if (blockedByOutput || withinTailGrace) return;
     }
@@ -161,7 +170,9 @@ class AudioStreamingService {
 
   Future<void> _ensurePlayerStarted() {
     if (_isPlayerStarted) return Future.value();
-    return _playerStartLatch ??= _startPlayer().whenComplete(() => _playerStartLatch = null);
+    return _playerStartLatch ??= _startPlayer().whenComplete(
+      () => _playerStartLatch = null,
+    );
   }
 
   Future<void> _startPlayer() async {
@@ -199,8 +210,12 @@ class AudioStreamingService {
     final frameCount = bytes.length / 2; // 16-bit mono samples
     final bufferDurationSeconds = frameCount / _outputSampleRate;
     final now = DateTime.now();
-    final base = _scheduledPlaybackEndTime.isAfter(now) ? _scheduledPlaybackEndTime : now;
-    _scheduledPlaybackEndTime = base.add(Duration(milliseconds: (bufferDurationSeconds * 1000).round()));
+    final base = _scheduledPlaybackEndTime.isAfter(now)
+        ? _scheduledPlaybackEndTime
+        : now;
+    _scheduledPlaybackEndTime = base.add(
+      Duration(milliseconds: (bufferDurationSeconds * 1000).round()),
+    );
 
     _playbackQueue.add(bytes);
     _drainPlaybackQueue();

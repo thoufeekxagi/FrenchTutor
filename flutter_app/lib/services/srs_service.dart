@@ -33,10 +33,14 @@ class SRSService {
       case SRSGrade.hard:
         // Correct but effortful (e.g. needed a hint): shorter interval than
         // good, slight ease penalty, but still progress — never a reset.
-        state.intervalDays = state.reps == 0 ? 1 : (state.intervalDays * 1.2).clamp(1, double.infinity);
+        state.intervalDays = state.reps == 0
+            ? 1
+            : (state.intervalDays * 1.2).clamp(1, double.infinity);
         state.ease = (state.ease - 0.15).clamp(1.3, double.infinity);
         state.reps += 1;
-        state.dueAt = now.add(Duration(seconds: (state.intervalDays * 86400).round()));
+        state.dueAt = now.add(
+          Duration(seconds: (state.intervalDays * 86400).round()),
+        );
       case SRSGrade.good:
         if (state.reps == 0) {
           state.intervalDays = 1;
@@ -46,23 +50,39 @@ class SRSService {
           state.intervalDays = state.intervalDays * state.ease;
         }
         state.reps += 1;
-        state.dueAt = now.add(Duration(seconds: (state.intervalDays * 86400).round()));
+        state.dueAt = now.add(
+          Duration(seconds: (state.intervalDays * 86400).round()),
+        );
       case SRSGrade.easy:
-        state.intervalDays = (state.intervalDays < 1 ? 1 : state.intervalDays) * state.ease * 1.3;
+        state.intervalDays =
+            (state.intervalDays < 1 ? 1 : state.intervalDays) *
+            state.ease *
+            1.3;
         state.ease += 0.05;
         state.reps += 1;
-        state.dueAt = now.add(Duration(seconds: (state.intervalDays * 86400).round()));
+        state.dueAt = now.add(
+          Duration(seconds: (state.intervalDays * 86400).round()),
+        );
     }
 
     state.lastGrade = grade;
     state.lastReviewedAt = now;
     state.introducedOn ??= store.dayString(now);
     store.upsertSRS(state);
-    store.logReview(entryId: entryId, grade: grade, responseType: responseType, sessionId: sessionId);
+    store.logReview(
+      entryId: entryId,
+      grade: grade,
+      responseType: responseType,
+      sessionId: sessionId,
+    );
     return state;
   }
 
-  Future<List<VocabEntry>> buildQueue({required int phase, String? themeId, int limit = 40}) async {
+  Future<List<VocabEntry>> buildQueue({
+    required int phase,
+    String? themeId,
+    int limit = 40,
+  }) async {
     final phaseContent = ContentService.shared.vocabPhase(phase);
     if (phaseContent == null) return [];
 
@@ -95,7 +115,12 @@ class SRSService {
   List<VocabEntry> allEntries({required int phase, required String themeId}) {
     final phaseContent = ContentService.shared.vocabPhase(phase);
     if (phaseContent == null) return [];
-    return phaseContent.themes.firstWhere((t) => t.id == themeId, orElse: () => VocabTheme(id: '', title: '', entries: [])).entries;
+    return phaseContent.themes
+        .firstWhere(
+          (t) => t.id == themeId,
+          orElse: () => VocabTheme(id: '', title: '', entries: []),
+        )
+        .entries;
   }
 
   /// The single queue policy for the guided Daily Path (PILOT_PLAN.md P0.6/P0.7):
@@ -113,13 +138,19 @@ class SRSService {
     };
     // Day one: three words, one small win — never a flood.
     if (firstEverSession) {
-      return (newBudget: 3.clamp(0, base.newBudget), reviewBudget: base.reviewBudget, totalCap: base.totalCap);
+      return (
+        newBudget: 3.clamp(0, base.newBudget),
+        reviewBudget: base.reviewBudget,
+        totalCap: base.totalCap,
+      );
     }
     return base;
   }
 
   Future<List<VocabEntry>> dailyMixedQueue() async {
-    final allEntries = ContentService.shared.vocabPhases.expand((p) => p.themes.expand((t) => t.entries)).toList();
+    final allEntries = ContentService.shared.vocabPhases
+        .expand((p) => p.themes.expand((t) => t.entries))
+        .toList();
     final states = store.allSRSStates();
     final now = DateTime.now();
     final policy = policyFor(
@@ -138,21 +169,32 @@ class SRSService {
       }
     }
 
-    final newBudget = (policy.newBudget - store.newEntriesIntroducedToday()).clamp(0, policy.newBudget);
+    final newBudget = (policy.newBudget - store.newEntriesIntroducedToday())
+        .clamp(0, policy.newBudget);
     final queue = [...due.take(policy.reviewBudget), ...unseen.take(newBudget)];
     return queue.take(policy.totalCap).toList();
   }
 
   List<VocabEntry> knownSample({int limit = 6}) {
-    final allEntries = ContentService.shared.vocabPhases.expand((p) => p.themes.expand((t) => t.entries)).toList();
+    final allEntries = ContentService.shared.vocabPhases
+        .expand((p) => p.themes.expand((t) => t.entries))
+        .toList();
     final states = store.allSRSStates();
-    final knownIds = states.entries.where((e) => e.value.reps >= 2).map((e) => e.key).toSet();
-    final knownEntries = allEntries.where((e) => knownIds.contains(e.id)).toList();
+    final knownIds = states.entries
+        .where((e) => e.value.reps >= 2)
+        .map((e) => e.key)
+        .toSet();
+    final knownEntries = allEntries
+        .where((e) => knownIds.contains(e.id))
+        .toList();
     knownEntries.shuffle();
     return knownEntries.take(limit).toList();
   }
 
-  ({int due, int unseen, int known}) counts({required int phase, String? themeId}) {
+  ({int due, int unseen, int known}) counts({
+    required int phase,
+    String? themeId,
+  }) {
     final phaseContent = ContentService.shared.vocabPhase(phase);
     if (phaseContent == null) return (due: 0, unseen: 0, known: 0);
 

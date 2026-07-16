@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -17,7 +17,8 @@ class GrammarLessonScreen extends ConsumerStatefulWidget {
   final GrammarLesson lesson;
 
   @override
-  ConsumerState<GrammarLessonScreen> createState() => _GrammarLessonScreenState();
+  ConsumerState<GrammarLessonScreen> createState() =>
+      _GrammarLessonScreenState();
 }
 
 class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
@@ -27,13 +28,15 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
   bool _drillsSubmitted = false;
   bool _isPlaying = false;
 
-  String get _lessonContext => ref.read(contentServiceProvider).grammarLessonContext(widget.lesson);
+  String get _lessonContext =>
+      ref.read(contentServiceProvider).grammarLessonContext(widget.lesson);
 
   double get _drillScore {
     if (widget.lesson.drills.isEmpty) return 1.0;
     int correct = 0;
     for (int i = 0; i < widget.lesson.drills.length; i++) {
-      if (_drillChecked[i] == true && _drillAnswers[i] == widget.lesson.drills[i].answer) {
+      if (_drillChecked[i] == true &&
+          _drillAnswers[i] == widget.lesson.drills[i].answer) {
         correct++;
       }
     }
@@ -69,7 +72,9 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
       setState(() => _isPlaying = true);
     } else {
       speech.speak(
-        items: LessonSpeechService.speechItemsFromLines(widget.lesson.narration),
+        items: LessonSpeechService.speechItemsFromLines(
+          widget.lesson.narration,
+        ),
         onFinished: () {
           if (mounted) setState(() => _isPlaying = false);
         },
@@ -87,17 +92,18 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text(widget.lesson.title, style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
-        foregroundColor: Passeport.ink,
+        title: Text(widget.lesson.title, style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            onPressed: () => LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(CupertinoIcons.mic_fill, color: Passeport.brass),
+            onPressed: () =>
+                LessonQAOverlay.show(context, lessonContext: _lessonContext),
+            icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
           ),
           MarieToolbarButton(lessonContext: _lessonContext),
         ],
@@ -107,128 +113,147 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
           ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
             children: [
-          // Subtitle
-          Text(
-            widget.lesson.subtitle,
-            style: Passeport.body(15).copyWith(color: Passeport.slateDim),
-          ),
-          const SizedBox(height: 20),
-
-          // Usage card
-          if (widget.lesson.usage.isNotEmpty) ...[
-            const KickerText('Usage'),
-            const SizedBox(height: 8),
-            PasseportCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: widget.lesson.usage.map((point) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('  •  ', style: Passeport.body(14).copyWith(color: Passeport.brass)),
-                        Expanded(
-                          child: Text(point, style: Passeport.body(14)),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+              // Subtitle
+              Text(
+                widget.lesson.subtitle,
+                style: DesignTokens.body(
+                  15,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 20),
 
-          // Conjugation tables
-          if (widget.lesson.conjugations.isNotEmpty) ...[
-            const KickerText('Conjugations'),
-            const SizedBox(height: 8),
-            ...widget.lesson.conjugations.map((conj) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _ConjugationTable(conjugation: conj),
-                )),
-            const SizedBox(height: 8),
-          ],
+              // Usage card
+              if (widget.lesson.usage.isNotEmpty) ...[
+                const KickerText('Usage'),
+                const SizedBox(height: 8),
+                PasseportCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.lesson.usage.map((point) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '  •  ',
+                              style: DesignTokens.body(
+                                14,
+                              ).copyWith(color: DesignTokens.info),
+                            ),
+                            Expanded(
+                              child: Text(point, style: DesignTokens.body(14)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
-          // Examples
-          if (widget.lesson.examples.isNotEmpty) ...[
-            const KickerText('Examples'),
-            const SizedBox(height: 8),
-            PasseportCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: widget.lesson.examples.map((ex) {
+              // Conjugation tables
+              if (widget.lesson.conjugations.isNotEmpty) ...[
+                const KickerText('Conjugations'),
+                const SizedBox(height: 8),
+                ...widget.lesson.conjugations.map(
+                  (conj) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _ConjugationTable(conjugation: conj),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+
+              // Examples
+              if (widget.lesson.examples.isNotEmpty) ...[
+                const KickerText('Examples'),
+                const SizedBox(height: 8),
+                PasseportCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.lesson.examples.map((ex) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ex.fr,
+                                    style: DesignTokens.body(
+                                      14,
+                                      weight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    ex.en,
+                                    style: DesignTokens.body(
+                                      13,
+                                    ).copyWith(color: DesignTokens.slateDim),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                CupertinoIcons.speaker_2_fill,
+                                color: DesignTokens.info,
+                              ),
+                              onPressed: () {
+                                LessonSpeechService.shared.speak(
+                                  items: [
+                                    SpeechItem(text: ex.fr, language: 'fr-FR'),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // Drills
+              if (widget.lesson.drills.isNotEmpty) ...[
+                const KickerText('Practice'),
+                const SizedBox(height: 8),
+                ...List.generate(widget.lesson.drills.length, (i) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                ex.fr,
-                                style: Passeport.body(14, weight: FontWeight.w600),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                ex.en,
-                                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(CupertinoIcons.speaker_2_fill, color: Passeport.brass),
-                          onPressed: () {
-                            LessonSpeechService.shared.speak(
-                              items: [SpeechItem(text: ex.fr, language: 'fr-FR')],
-                            );
-                          },
-                        ),
-                      ],
+                    child: _DrillWidget(
+                      drill: widget.lesson.drills[i],
+                      selectedAnswer: _drillAnswers[i],
+                      isChecked: _drillChecked[i] ?? false,
+                      lessonContext: _lessonContext,
+                      onSelect: _drillsSubmitted
+                          ? null
+                          : (answer) {
+                              setState(() => _drillAnswers[i] = answer);
+                            },
                     ),
                   );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-
-          // Drills
-          if (widget.lesson.drills.isNotEmpty) ...[
-            const KickerText('Practice'),
-            const SizedBox(height: 8),
-            ...List.generate(widget.lesson.drills.length, (i) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _DrillWidget(
-                  drill: widget.lesson.drills[i],
-                  selectedAnswer: _drillAnswers[i],
-                  isChecked: _drillChecked[i] ?? false,
-                  lessonContext: _lessonContext,
-                  onSelect: _drillsSubmitted
-                      ? null
-                      : (answer) {
-                          setState(() => _drillAnswers[i] = answer);
-                        },
-                ),
-              );
-            }),
-            const SizedBox(height: 8),
-            if (!_drillsSubmitted)
-              PasseportPrimaryButton(
-                label: 'Check Answers',
-                onPressed: _allDrillsAnswered ? _submitDrills : null,
-              )
-            else
-              _DrillResultBanner(score: _drillScore),
-            const SizedBox(height: 32),
-          ],
-          const SizedBox(height: 64),
-        ],
+                }),
+                const SizedBox(height: 8),
+                if (!_drillsSubmitted)
+                  PasseportPrimaryButton(
+                    label: 'Check Answers',
+                    onPressed: _allDrillsAnswered ? _submitDrills : null,
+                  )
+                else
+                  _DrillResultBanner(score: _drillScore),
+                const SizedBox(height: 32),
+              ],
+              const SizedBox(height: 64),
+            ],
           ),
           Positioned(
             left: 0,
@@ -258,10 +283,10 @@ class _NarrationControlBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: Passeport.card,
+        color: DesignTokens.card,
         boxShadow: [
           BoxShadow(
-            color: Passeport.ink.withValues(alpha: 0.08),
+            color: DesignTokens.ink.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
@@ -271,26 +296,28 @@ class _NarrationControlBar extends StatelessWidget {
         top: false,
         child: Row(
           children: [
-            InkWell(
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: onToggle,
-              borderRadius: BorderRadius.circular(24),
               child: Container(
                 width: 44,
                 height: 44,
                 decoration: const BoxDecoration(
-                  color: Passeport.maroon,
+                  color: DesignTokens.primary,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
-                  color: Passeport.parchment,
+                  isPlaying
+                      ? CupertinoIcons.pause_fill
+                      : CupertinoIcons.play_fill,
+                  color: DesignTokens.parchment,
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Text(
               isPlaying ? 'Narrating…' : 'Play lesson',
-              style: Passeport.body(14, weight: FontWeight.w500),
+              style: DesignTokens.body(14, weight: FontWeight.w500),
             ),
           ],
         ),
@@ -317,20 +344,21 @@ class _ConjugationTable extends StatelessWidget {
             children: [
               Text(
                 conjugation.verb,
-                style: Passeport.display(18, weight: FontWeight.w600),
+                style: DesignTokens.display(18, weight: FontWeight.w600),
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Passeport.brass.withValues(alpha: 0.12),
+                  color: DesignTokens.info.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   conjugation.group,
-                  style: Passeport.mono(10, weight: FontWeight.w500).copyWith(
-                    color: Passeport.brass,
-                  ),
+                  style: DesignTokens.mono(
+                    10,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.info),
                 ),
               ),
             ],
@@ -338,10 +366,7 @@ class _ConjugationTable extends StatelessWidget {
           const SizedBox(height: 12),
           // Rows
           Table(
-            columnWidths: const {
-              0: FlexColumnWidth(2),
-              1: FlexColumnWidth(3),
-            },
+            columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(3)},
             children: conjugation.rows.map((row) {
               return TableRow(
                 children: [
@@ -349,16 +374,17 @@ class _ConjugationTable extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Text(
                       row.pronoun,
-                      style: Passeport.body(14, weight: FontWeight.w500).copyWith(
-                        color: Passeport.slateDim,
-                      ),
+                      style: DesignTokens.body(
+                        14,
+                        weight: FontWeight.w500,
+                      ).copyWith(color: DesignTokens.slateDim),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Text(
                       row.form,
-                      style: Passeport.body(14, weight: FontWeight.w500),
+                      style: DesignTokens.body(14, weight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -405,7 +431,9 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
   Future<void> _explain() async {
     setState(() => _isExplaining = true);
     try {
-      final text = await ref.read(lessonAgentServiceProvider).quizFeedback(
+      final text = await ref
+          .read(lessonAgentServiceProvider)
+          .quizFeedback(
             question: drill.prompt,
             correctAnswer: drill.answer,
             studentAnswer: selectedAnswer ?? '',
@@ -433,7 +461,7 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
         children: [
           Text(
             drill.prompt,
-            style: Passeport.body(15, weight: FontWeight.w500),
+            style: DesignTokens.body(15, weight: FontWeight.w500),
           ),
           const SizedBox(height: 12),
           if (drill.type == 'fill' && drill.choices.isEmpty)
@@ -449,7 +477,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
                   onTap: _isExplaining ? null : _explain,
                   child: Text(
                     _isExplaining ? '…' : 'Explain',
-                    style: Passeport.mono(10.5, weight: FontWeight.w500).copyWith(color: Passeport.maroon),
+                    style: DesignTokens.mono(
+                      10.5,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.primary),
                   ),
                 ),
               ],
@@ -458,7 +489,9 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
               const SizedBox(height: 2),
               Text(
                 _explanation!,
-                style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.slateDim),
               ),
             ],
           ],
@@ -479,20 +512,22 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
           decoration: BoxDecoration(
             color: isChecked
                 ? (isCorrect
-                    ? const Color(0xFF3A7D44).withValues(alpha: 0.08)
-                    : Passeport.maroon.withValues(alpha: 0.08))
-                : Passeport.parchmentDim,
+                      ? DesignTokens.success.withValues(alpha: 0.08)
+                      : DesignTokens.primary.withValues(alpha: 0.08))
+                : DesignTokens.parchmentDim,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isChecked
-                  ? (isCorrect ? const Color(0xFF3A7D44) : Passeport.maroon)
-                  : Passeport.hairline,
+                  ? (isCorrect ? DesignTokens.success : DesignTokens.primary)
+                  : DesignTokens.hairline,
             ),
           ),
           child: Text(
             selectedAnswer ?? '...',
-            style: Passeport.body(14).copyWith(
-              color: selectedAnswer != null ? Passeport.text : Passeport.slate,
+            style: DesignTokens.body(14).copyWith(
+              color: selectedAnswer != null
+                  ? DesignTokens.text
+                  : DesignTokens.slate,
             ),
           ),
         ),
@@ -500,9 +535,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
           const SizedBox(height: 6),
           Text(
             'Correct: ${drill.answer}',
-            style: Passeport.body(13, weight: FontWeight.w500).copyWith(
-              color: const Color(0xFF3A7D44),
-            ),
+            style: DesignTokens.body(
+              13,
+              weight: FontWeight.w500,
+            ).copyWith(color: DesignTokens.success),
           ),
         ],
       ],
@@ -517,27 +553,29 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
         final isSelected = selectedAnswer == choice;
         final isCorrectAnswer = choice == drill.answer;
 
-        Color bg = Passeport.parchmentDim;
-        Color border = Passeport.hairline;
-        Color textColor = Passeport.text;
+        Color bg = DesignTokens.parchmentDim;
+        Color border = DesignTokens.hairline;
+        Color textColor = DesignTokens.text;
 
         if (isChecked) {
           if (isCorrectAnswer) {
-            bg = const Color(0xFF3A7D44).withValues(alpha: 0.1);
-            border = const Color(0xFF3A7D44);
-            textColor = const Color(0xFF3A7D44);
+            bg = DesignTokens.success.withValues(alpha: 0.1);
+            border = DesignTokens.success;
+            textColor = DesignTokens.success;
           } else if (isSelected && !isCorrectAnswer) {
-            bg = Passeport.maroon.withValues(alpha: 0.1);
-            border = Passeport.maroon;
-            textColor = Passeport.maroon;
+            bg = DesignTokens.primary.withValues(alpha: 0.1);
+            border = DesignTokens.primary;
+            textColor = DesignTokens.primary;
           }
         } else if (isSelected) {
-          bg = Passeport.brass.withValues(alpha: 0.12);
-          border = Passeport.brass;
+          bg = DesignTokens.info.withValues(alpha: 0.12);
+          border = DesignTokens.info;
         }
 
         return GestureDetector(
-          onTap: widget.onSelect != null ? () => widget.onSelect!(choice) : null,
+          onTap: widget.onSelect != null
+              ? () => widget.onSelect!(choice)
+              : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
@@ -547,7 +585,10 @@ class _DrillWidgetState extends ConsumerState<_DrillWidget> {
             ),
             child: Text(
               choice,
-              style: Passeport.body(14, weight: FontWeight.w500).copyWith(color: textColor),
+              style: DesignTokens.body(
+                14,
+                weight: FontWeight.w500,
+              ).copyWith(color: textColor),
             ),
           ),
         );
@@ -573,19 +614,21 @@ class _DrillResultBanner extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: passed
-            ? const Color(0xFF3A7D44).withValues(alpha: 0.08)
-            : Passeport.maroon.withValues(alpha: 0.08),
+            ? DesignTokens.success.withValues(alpha: 0.08)
+            : DesignTokens.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+          color: passed ? DesignTokens.success : DesignTokens.primary,
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Icon(
-            passed ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.info_circle,
-            color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+            passed
+                ? CupertinoIcons.checkmark_circle_fill
+                : CupertinoIcons.info_circle,
+            color: passed ? DesignTokens.success : DesignTokens.primary,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -594,8 +637,8 @@ class _DrillResultBanner extends StatelessWidget {
               passed
                   ? 'Lesson complete! $pct% correct.'
                   : '$pct% correct. Need 80% to complete.',
-              style: Passeport.body(14, weight: FontWeight.w500).copyWith(
-                color: passed ? const Color(0xFF3A7D44) : Passeport.maroon,
+              style: DesignTokens.body(14, weight: FontWeight.w500).copyWith(
+                color: passed ? DesignTokens.success : DesignTokens.primary,
               ),
             ),
           ),

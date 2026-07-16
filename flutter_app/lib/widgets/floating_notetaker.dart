@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../data/database/storage_service.dart';
+import 'adaptive/adaptive.dart';
 
 /// Shared state for the floating notetaker bubble.
 /// Ported from iOS FloatingNotetaker — manages draft text, position, and expansion.
@@ -18,8 +19,9 @@ class NotetakerState extends ChangeNotifier {
   set isEnabled(bool value) {
     _isEnabled = value;
     notifyListeners();
-    SharedPreferences.getInstance()
-        .then((p) => p.setBool('notetaker.enabled', value));
+    SharedPreferences.getInstance().then(
+      (p) => p.setBool('notetaker.enabled', value),
+    );
   }
 
   bool _isExpanded = false;
@@ -72,11 +74,17 @@ class NotetakerState extends ChangeNotifier {
   }
 
   void _autosaveIfNeeded() {
-    final wordCount =
-        _draftText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+    final wordCount = _draftText
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .length;
     if (wordCount > 0 && wordCount - _lastAutosavedWordCount >= 5) {
       _lastAutosavedWordCount = wordCount;
-      _draftNoteId = storage.saveNote(id: _draftNoteId, tag: _currentContext, text: _draftText);
+      _draftNoteId = storage.saveNote(
+        id: _draftNoteId,
+        tag: _currentContext,
+        text: _draftText,
+      );
     }
   }
 
@@ -104,10 +112,7 @@ class NotetakerState extends ChangeNotifier {
 /// A draggable floating action button that expands to a note-taking card.
 /// Mount this as an overlay inside a Stack on screens that need it.
 class FloatingNotetakerOverlay extends StatefulWidget {
-  const FloatingNotetakerOverlay({
-    super.key,
-    required this.state,
-  });
+  const FloatingNotetakerOverlay({super.key, required this.state});
 
   final NotetakerState state;
 
@@ -222,7 +227,9 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
           ],
         ),
         child: Icon(
-          _state.isExpanded ? CupertinoIcons.chevron_down : CupertinoIcons.pencil,
+          _state.isExpanded
+              ? CupertinoIcons.chevron_down
+              : CupertinoIcons.pencil,
           size: 20,
           color: Passeport.parchment,
         ),
@@ -230,30 +237,15 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
     );
   }
 
-  void _showContextMenu() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Notetaker'),
-        content: const Text('Hide the floating notetaker?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              _state.isEnabled = false;
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              'Hide',
-              style: TextStyle(color: Passeport.maroon),
-            ),
-          ),
-        ],
-      ),
+  Future<void> _showContextMenu() async {
+    final shouldHide = await showPSConfirmDialog(
+      context,
+      title: 'Hide notetaker?',
+      message: 'You can turn it on again from Settings.',
+      confirmLabel: 'Hide',
+      destructive: true,
     );
+    if (shouldHide) _state.isEnabled = false;
   }
 
   Widget _buildExpandedCard() {
@@ -280,22 +272,27 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: Passeport.maroon.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   _state.currentContext.toUpperCase(),
-                  style: Passeport.mono(9.5, weight: FontWeight.w500)
-                      .copyWith(color: Passeport.maroon),
+                  style: Passeport.mono(
+                    9.5,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: Passeport.maroon),
                 ),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: () => _state.collapse(),
-                child: Icon(CupertinoIcons.xmark, size: 16, color: Passeport.slateDim),
+                child: Icon(
+                  CupertinoIcons.xmark,
+                  size: 16,
+                  color: Passeport.slateDim,
+                ),
               ),
             ],
           ),
@@ -335,8 +332,12 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Passeport.maroon,
                 foregroundColor: Passeport.parchment,
-                disabledBackgroundColor: Passeport.maroon.withValues(alpha: 0.4),
-                disabledForegroundColor: Passeport.parchment.withValues(alpha: 0.5),
+                disabledBackgroundColor: Passeport.maroon.withValues(
+                  alpha: 0.4,
+                ),
+                disabledForegroundColor: Passeport.parchment.withValues(
+                  alpha: 0.5,
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -345,8 +346,10 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               ),
               child: Text(
                 'Save note',
-                style: Passeport.body(12.5, weight: FontWeight.w500)
-                    .copyWith(color: Passeport.parchment),
+                style: Passeport.body(
+                  12.5,
+                  weight: FontWeight.w500,
+                ).copyWith(color: Passeport.parchment),
               ),
             ),
           ),

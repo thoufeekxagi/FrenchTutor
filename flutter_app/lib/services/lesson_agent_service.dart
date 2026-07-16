@@ -20,14 +20,19 @@ class AgentError implements Exception {
 
   final String message;
 
-  static const missingKey =
-      AgentError._('AI feedback unavailable — add a Gemini or OpenRouter key in Settings.');
-  static const requestFailed =
-      AgentError._('The AI tutor is busy right now. Try again in a moment.');
-  static const badResponse = AgentError._('The AI tutor gave an unexpected response.');
+  static const missingKey = AgentError._(
+    'AI feedback unavailable — add a Gemini or OpenRouter key in Settings.',
+  );
+  static const requestFailed = AgentError._(
+    'The AI tutor is busy right now. Try again in a moment.',
+  );
+  static const badResponse = AgentError._(
+    'The AI tutor gave an unexpected response.',
+  );
 
-  static AgentError badJSON(String raw) =>
-      AgentError._('LLM returned non-JSON: ${raw.substring(0, raw.length > 200 ? 200 : raw.length)}');
+  static AgentError badJSON(String raw) => AgentError._(
+    'LLM returned non-JSON: ${raw.substring(0, raw.length > 200 ? 200 : raw.length)}',
+  );
 
   @override
   String toString() => message;
@@ -85,7 +90,11 @@ class GrammarSessionPlan {
 enum LiveNavIntent { advance, back, again, attempt, chat, goto }
 
 class LiveIntentVerdict {
-  LiveIntentVerdict({required this.intent, this.cardNumber, this.explicit = true});
+  LiveIntentVerdict({
+    required this.intent,
+    this.cardNumber,
+    this.explicit = true,
+  });
 
   final LiveNavIntent intent;
 
@@ -175,20 +184,30 @@ class LessonAgentService {
     const system = '''
 You are a friendly, encouraging bilingual (English/French) French tutor helping a student preparing for the TEF/TCF Canada exam (target CLB 7). The student is mid-lesson; use the LESSON CONTEXT to ground your answer. Keep answers under 120 words, spoken-style — no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
     final messages = <Map<String, String>>[
-      {'role': 'system', 'content': '$system\n\nLESSON CONTEXT:\n$lessonContext'},
+      {
+        'role': 'system',
+        'content': '$system\n\nLESSON CONTEXT:\n$lessonContext',
+      },
     ];
     for (final turn in history) {
-      messages.add({'role': turn.role == 'user' ? 'user' : 'assistant', 'content': turn.text});
+      messages.add({
+        'role': turn.role == 'user' ? 'user' : 'assistant',
+        'content': turn.text,
+      });
     }
     messages.add({'role': 'user', 'content': question});
     return _complete(messages: messages);
   }
 
-  Future<WritingFeedback> gradeWriting({required WritingTask task, required String submission}) async {
+  Future<WritingFeedback> gradeWriting({
+    required WritingTask task,
+    required String submission,
+  }) async {
     const system = '''
 You are a strict but encouraging TEF Canada writing examiner. Grade the student's submission against the task using a TEF-style rubric (task completion, grammar/conjugation accuracy, vocabulary range, use of logical connectors, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string}''';
-    final user = '''
+    final user =
+        '''
 TASK: ${task.title}
 PROMPT: ${task.promptFr}
 MINIMUM WORDS: ${task.minWords}
@@ -196,10 +215,12 @@ TARGET CONNECTORS: ${task.targetConnectors.join(', ')}
 
 STUDENT SUBMISSION:
 $submission''';
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
     return _parseWritingFeedback(raw);
   }
 
@@ -217,11 +238,14 @@ $submission''';
     // lever on this service's total token spend.
     const system = '''
 Silently audit a French pronunciation attempt (student never sees this). They were asked to say a French word aloud; below is what speech recognition captured (imperfect — be lenient on transcription noise, but flag real errors: wrong verb form, confused similar word, wrong word, silence). Reply with ONLY compact JSON, no markdown, no commentary: {"correct": boolean, "tag": string_or_null, "description": string_or_null}. tag = short stable snake_case slug for the error type (e.g. "nasal_vowel_confusion"), reused across words so it can be tracked over time. Both null when correct is true.''';
-    final user = 'TARGET WORD: $targetWord\nSPEECH RECOGNITION CAPTURED: $studentSaid';
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    final user =
+        'TARGET WORD: $targetWord\nSPEECH RECOGNITION CAPTURED: $studentSaid';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
     return _parseMistakeJudgment(raw);
   }
 
@@ -253,21 +277,30 @@ You classify one utterance from a student in a live voice French lesson. The app
 - "chat": anything else — a question, an answer to a non-navigation question, small talk. Words like "next"/"oui"/"continue" inside a longer sentence about something else (e.g. "the bakery is next to the station") are NOT commands.
 ECHO RULE (critical): the mic sometimes picks up the tutor's own voice, so compare the utterance to the tutor's last line word by word. If it repeats the tutor's NON-TARGET words — her prompts or questions like "ready for the next?" — it is an echo: "chat", NEVER navigation, even though it contains command-like words. Repeating only the target French word/sentence itself is the student practicing: "attempt".
 Moving the card without the student's clear consent is the worst failure mode. When genuinely ambiguous, ALWAYS prefer "attempt" or "chat" over any navigation verdict. "card" is null except for "goto".''';
-    final user = '''
+    final user =
+        '''
 CURRENT CARD (number $cardPosition of $cardCount): $cardDescription
 TUTOR'S LAST LINE: ${tutorLastLine.isEmpty ? '(none yet)' : tutorLastLine}
 GENUINE ATTEMPTS ON THIS CARD SO FAR: $attemptCount
 STUDENT SAID: $utterance''';
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ], maxTokens: 60, timeout: const Duration(seconds: 4));
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 60,
+      timeout: const Duration(seconds: 4),
+    );
     final obj = _decodeObject(raw);
     final intentRaw = obj['intent'] as String?;
-    final intent = LiveNavIntent.values.where((v) => v.name == intentRaw).firstOrNull;
+    final intent = LiveNavIntent.values
+        .where((v) => v.name == intentRaw)
+        .firstOrNull;
     if (intent == null) throw AgentError.badJSON(raw);
     final cardValue = obj['card'];
-    final cardNumber = cardValue is int ? cardValue : (cardValue is double ? cardValue.toInt() : null);
+    final cardNumber = cardValue is int
+        ? cardValue
+        : (cardValue is double ? cardValue.toInt() : null);
     return LiveIntentVerdict(
       intent: intent,
       cardNumber: cardNumber,
@@ -286,19 +319,27 @@ STUDENT SAID: $utterance''';
   }) async {
     const system = '''
 You are quietly planning a French vocabulary practice session before it starts — the student won't see this reasoning, only the short focus note you write. Given the candidate word list, the student's recurring mistake patterns, and recent session notes, decide: (1) a one-sentence, warm, specific focus note for how today's session should be framed (e.g. referencing a specific recurring mistake if relevant), and (2) optionally reorder the word IDs to front-load anything especially relevant to their recent struggles — or return null to keep the given order if no reordering is warranted. Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings_or_null}. The prioritized_word_ids, if provided, must be a permutation of the exact candidate IDs given — never invent new ones.''';
-    final wordList = candidateWords.map((w) => '${w.id}: ${w.fr} (${w.en})').join('; ');
+    final wordList = candidateWords
+        .map((w) => '${w.id}: ${w.fr} (${w.en})')
+        .join('; ');
     var user = 'CANDIDATE WORDS: $wordList';
     if (mistakeTags.isNotEmpty) {
-      user += '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
+      user +=
+          '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
     }
     if (recentDiary.isNotEmpty) {
       user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
     }
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
-    return _parseSessionPlan(raw, validIds: candidateWords.map((w) => w.id).toSet());
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
+    return _parseSessionPlan(
+      raw,
+      validIds: candidateWords.map((w) => w.id).toSet(),
+    );
   }
 
   /// Runs once, briefly, before a grammar session starts, when the student picks "Auto" in
@@ -315,15 +356,18 @@ You are quietly picking which ONE French grammar point a beginner should practic
     final list = candidates.map((c) => '${c.id}: ${c.title}').join('; ');
     var user = 'CANDIDATES: $list';
     if (mistakeTags.isNotEmpty) {
-      user += '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
+      user +=
+          '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
     }
     if (recentDiary.isNotEmpty) {
       user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
     }
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
     return _parseGrammarSessionPlan(
       raw,
       validIds: candidates.map((c) => c.id).toSet(),
@@ -339,17 +383,22 @@ You are quietly picking which ONE French grammar point a beginner should practic
   /// offline-authored content — the model is never called again during the teaching session
   /// itself. Grammar notes are intentionally kept simple (no conjugation tables, no advanced
   /// tense discussion) for this first version.
-  Future<ReadingPassage> buildReadingPassageFromVocab({required List<VocabEntry> words}) async {
+  Future<ReadingPassage> buildReadingPassageFromVocab({
+    required List<VocabEntry> words,
+  }) async {
     const system = '''
 You are quietly assembling a short French reading/listening passage for a total beginner preparing for TEF/TCF Canada, using ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", etc. as needed for grammatical French) — do not introduce unrelated advanced vocabulary. Write 4-8 short segments (a word or a very short phrase each) that together form a simple, coherent short passage or dialogue when read in order. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation or subjunctive — this is intentionally basic for a first pass. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"title": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
 Each segment's "fr" must be the exact short phrase as it appears in the passage (in order, so concatenating them with spaces reproduces the full passage), "en" its English meaning, "grammar_note" one simple English sentence explaining why that word/word order is used, and "pronunciation_tip" one simple English sentence with a pronunciation pointer.''';
     final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
     final user = 'VOCABULARY WORDS TO REUSE: $wordList';
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ], maxTokens: 1400);
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 1400,
+    );
     return _parseReadingPassage(raw);
   }
 
@@ -374,9 +423,12 @@ Each segment's "fr" must be the exact short phrase as it appears in the passage 
     final wordList = words.isEmpty ? '' : ' using words: ${words.join(', ')}';
     final user =
         '$count beginner French sentences in $tenseTitle$wordList. Pure JSON only: {"cards":[{"fr":"...","en":"...","note":"..."}]}';
-    final raw = await _complete(messages: [
-      {'role': 'user', 'content': user},
-    ], maxTokens: 800);
+    final raw = await _complete(
+      messages: [
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 800,
+    );
     lastRawResponse = raw;
     return _parseGrammarPracticeCards(raw);
   }
@@ -390,27 +442,35 @@ Each segment's "fr" must be the exact short phrase as it appears in the passage 
   }) async {
     const system = '''
 You are a friendly French tutor grading a one-to-two sentence micro writing exercise. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape: {"score_out_of_10": number, "comment": string}. The comment should be one short encouraging sentence, spoken-style with no markdown, since it will be read aloud.''';
-    final user = '''
+    final user =
+        '''
 TASK: $prompt
 TARGET WORDS: ${targetWords.join(', ')}
 
 STUDENT SUBMISSION:
 $submission''';
-    final raw = await _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
     return _parseMicroWritingFeedback(raw);
   }
 
-  Future<String> checkDictation({required String expected, required String submitted}) async {
+  Future<String> checkDictation({
+    required String expected,
+    required String submitted,
+  }) async {
     const system = '''
 You are a French dictation checker. Compare the EXPECTED sentence to the STUDENT'S TYPED version. In under 60 words, spoken-style with no markdown, tell the student what they got right and point out any missed accents, silent letters, or misheard words.''';
     final user = 'EXPECTED: $expected\nSTUDENT WROTE: $submitted';
-    return _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    return _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
   }
 
   Future<String> quizFeedback({
@@ -423,10 +483,12 @@ You are a French dictation checker. Compare the EXPECTED sentence to the STUDENT
 You are a French grammar tutor. The student answered a drill question incorrectly. In under 80 words, spoken-style with no markdown, explain why the correct answer is right and why their answer was wrong, using the LESSON CONTEXT for grounding.''';
     final user =
         'LESSON CONTEXT:\n$lessonContext\n\nQUESTION: $question\nCORRECT ANSWER: $correctAnswer\nSTUDENT ANSWER: $studentAnswer';
-    return _complete(messages: [
-      {'role': 'system', 'content': system},
-      {'role': 'user', 'content': user},
-    ]);
+    return _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+    );
   }
 
   // MARK: - Networking
@@ -442,12 +504,22 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     if (await _forceOpenRouter) {
       if (orKey.isEmpty) throw AgentError.missingKey;
       return _requestOpenRouter(
-          model: await _openRouterModel, messages: messages, maxTokens: maxTokens, apiKey: orKey, timeout: timeout);
+        model: await _openRouterModel,
+        messages: messages,
+        maxTokens: maxTokens,
+        apiKey: orKey,
+        timeout: timeout,
+      );
     }
     final geminiKey = await _geminiApiKey;
     if (geminiKey.isNotEmpty) {
       try {
-        return await _requestGemini(messages: messages, maxTokens: maxTokens, apiKey: geminiKey, timeout: timeout);
+        return await _requestGemini(
+          messages: messages,
+          maxTokens: maxTokens,
+          apiKey: geminiKey,
+          timeout: timeout,
+        );
       } catch (e) {
         // Only swallow the Gemini error if there's an OpenRouter key to fall back to.
         if (orKey.isEmpty) rethrow;
@@ -455,7 +527,12 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     }
     if (orKey.isEmpty) throw AgentError.missingKey;
     return _requestOpenRouter(
-        model: await _openRouterModel, messages: messages, maxTokens: maxTokens, apiKey: orKey, timeout: timeout);
+      model: await _openRouterModel,
+      messages: messages,
+      maxTokens: maxTokens,
+      apiKey: orKey,
+      timeout: timeout,
+    );
   }
 
   Future<String> _requestGemini({
@@ -465,45 +542,68 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     required Duration timeout,
   }) async {
     final uri = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$apiKey');
+      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$apiKey',
+    );
 
     // Same OpenAI-shaped message arrays all callers already build, mapped to Gemini's
     // schema: system messages become systemInstruction, assistant becomes "model".
-    final systemText =
-        messages.where((m) => m['role'] == 'system').map((m) => m['content'] ?? '').join('\n\n');
+    final systemText = messages
+        .where((m) => m['role'] == 'system')
+        .map((m) => m['content'] ?? '')
+        .join('\n\n');
     final contents = messages
         .where((m) => m['role'] != 'system')
-        .map((m) => {
-              'role': m['role'] == 'assistant' ? 'model' : 'user',
-              'parts': [{'text': m['content'] ?? ''}],
-            })
+        .map(
+          (m) => {
+            'role': m['role'] == 'assistant' ? 'model' : 'user',
+            'parts': [
+              {'text': m['content'] ?? ''},
+            ],
+          },
+        )
         .toList();
     final body = <String, dynamic>{
       'contents': contents,
       'generationConfig': {'temperature': 0.4, 'maxOutputTokens': maxTokens},
     };
     if (systemText.isNotEmpty) {
-      body['systemInstruction'] = {'parts': [{'text': systemText}]};
+      body['systemInstruction'] = {
+        'parts': [
+          {'text': systemText},
+        ],
+      };
     }
 
     http.Response response;
     try {
       response = await http
-          .post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode(body))
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
           .timeout(timeout);
     } catch (_) {
       throw AgentError.requestFailed;
     }
-    if (response.statusCode < 200 || response.statusCode > 299) throw AgentError.requestFailed;
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw AgentError.requestFailed;
+    }
 
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final candidates = json['candidates'] as List?;
       final content =
-          (candidates?.isNotEmpty == true ? candidates!.first as Map<String, dynamic> : null)?['content']
+          (candidates?.isNotEmpty == true
+                  ? candidates!.first as Map<String, dynamic>
+                  : null)?['content']
               as Map<String, dynamic>?;
       final parts = content?['parts'] as List?;
-      final text = parts?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '').join() ?? '';
+      final text =
+          parts
+              ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
+              .join() ??
+          '';
       if (text.isEmpty) throw AgentError.badResponse;
       return text.trim();
     } catch (e) {
@@ -522,31 +622,34 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final uri = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
     http.Response response;
     try {
-      response = await http.post(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $apiKey',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/frenchtutor-app',
-          'X-Title': 'FrenchTutor Passeport',
-        },
-        // Without an explicit cap, a large batch response (e.g. 25 example sentences in one
-        // JSON array) can get cut off mid-object by the model's own default completion length,
-        // producing invalid JSON that fails to parse entirely — silently dropping every example
-        // in the whole session, not just the ones past the cutoff. Callers with bigger expected
-        // outputs (batch generation) pass a larger explicit value.
-        body: jsonEncode({
-          'model': model,
-          'messages': messages,
-          'temperature': 0.4,
-          'max_tokens': maxTokens,
-        }),
-      ).timeout(timeout);
+      response = await http
+          .post(
+            uri,
+            headers: {
+              'Authorization': 'Bearer $apiKey',
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://github.com/frenchtutor-app',
+              'X-Title': 'FrenchTutor Passeport',
+            },
+            // Without an explicit cap, a large batch response (e.g. 25 example sentences in one
+            // JSON array) can get cut off mid-object by the model's own default completion length,
+            // producing invalid JSON that fails to parse entirely — silently dropping every example
+            // in the whole session, not just the ones past the cutoff. Callers with bigger expected
+            // outputs (batch generation) pass a larger explicit value.
+            body: jsonEncode({
+              'model': model,
+              'messages': messages,
+              'temperature': 0.4,
+              'max_tokens': maxTokens,
+            }),
+          )
+          .timeout(timeout);
     } catch (_) {
       throw AgentError.requestFailed;
     }
 
-    if (response.statusCode == 429 || (response.statusCode >= 500 && response.statusCode <= 599)) {
+    if (response.statusCode == 429 ||
+        (response.statusCode >= 500 && response.statusCode <= 599)) {
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
@@ -556,7 +659,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final choices = json['choices'] as List?;
-      final first = choices?.isNotEmpty == true ? choices!.first as Map<String, dynamic> : null;
+      final first = choices?.isNotEmpty == true
+          ? choices!.first as Map<String, dynamic>
+          : null;
       final message = first?['message'] as Map<String, dynamic>?;
       final content = message?['content'] as String?;
       if (content == null || content.isEmpty) throw AgentError.badResponse;
@@ -570,7 +675,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
   WritingFeedback _parseWritingFeedback(String raw) {
     final obj = _decodeObject(raw);
     final score = _asDouble(obj['score_out_of_10']);
-    final strengths = (obj['strengths'] as List?)?.map((e) => e.toString()).toList() ?? <String>[];
+    final strengths =
+        (obj['strengths'] as List?)?.map((e) => e.toString()).toList() ??
+        <String>[];
     final correctionsRaw = (obj['corrections'] as List?) ?? [];
     final corrections = correctionsRaw.map((c) {
       final m = c as Map<String, dynamic>;
@@ -615,12 +722,14 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final segments = segmentsRaw
         .map((s) => s as Map<String, dynamic>)
         .where((s) => (s['fr'] as String?)?.isNotEmpty == true)
-        .map((s) => ReadingSegment(
-              fr: s['fr'] as String,
-              en: s['en'] as String? ?? '',
-              grammarNote: s['grammar_note'] as String? ?? '',
-              pronunciationTip: s['pronunciation_tip'] as String? ?? '',
-            ))
+        .map(
+          (s) => ReadingSegment(
+            fr: s['fr'] as String,
+            en: s['en'] as String? ?? '',
+            grammarNote: s['grammar_note'] as String? ?? '',
+            pronunciationTip: s['pronunciation_tip'] as String? ?? '',
+          ),
+        )
         .toList();
     if (segments.isEmpty) throw AgentError.badResponse;
     final rawFullText = obj['full_text'] as String?;
@@ -643,12 +752,14 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       final card = cardsRaw[i] as Map<String, dynamic>;
       final fr = card['fr'] as String?;
       if (fr == null || fr.isEmpty) continue;
-      cards.add(GrammarPracticeCard(
-        id: 'generated-$i-${const Uuid().v4().substring(0, 6)}',
-        fr: fr,
-        en: card['en'] as String? ?? '',
-        note: card['note'] as String? ?? '',
-      ));
+      cards.add(
+        GrammarPracticeCard(
+          id: 'generated-$i-${const Uuid().v4().substring(0, 6)}',
+          fr: fr,
+          en: card['en'] as String? ?? '',
+          note: card['note'] as String? ?? '',
+        ),
+      );
     }
     if (cards.isEmpty) throw AgentError.badResponse;
     return cards;
@@ -657,7 +768,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
   SessionPlan _parseSessionPlan(String raw, {required Set<String> validIds}) {
     final obj = _decodeObject(raw);
     final focusNote = obj['focus_note'] as String? ?? '';
-    var prioritized = (obj['prioritized_word_ids'] as List?)?.map((e) => e.toString()).toList();
+    var prioritized = (obj['prioritized_word_ids'] as List?)
+        ?.map((e) => e.toString())
+        .toList();
     // Guard against a hallucinated/incomplete reordering — only trust it if it's an exact
     // permutation of the real candidate IDs, otherwise fall back to the given order.
     if (prioritized != null && prioritized.toSet() != validIds) {
@@ -675,7 +788,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final focusNote = obj['focus_note'] as String? ?? '';
     final chosenId = obj['chosen_id'] as String?;
     // Guard against a hallucinated ID the same way vocab guards a hallucinated reordering.
-    final validChosenId = (chosenId != null && validIds.contains(chosenId)) ? chosenId : fallbackId;
+    final validChosenId = (chosenId != null && validIds.contains(chosenId))
+        ? chosenId
+        : fallbackId;
     return GrammarSessionPlan(chosenId: validChosenId, focusNote: focusNote);
   }
 

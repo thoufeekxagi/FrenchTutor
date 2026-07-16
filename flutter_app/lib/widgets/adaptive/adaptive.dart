@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../design/app_theme.dart';
 import '../../design/tokens.dart';
@@ -22,7 +22,7 @@ class PSSwitch extends StatelessWidget {
     return Switch.adaptive(
       value: value,
       onChanged: onChanged,
-      activeTrackColor: DesignTokens.maroon,
+      activeTrackColor: DesignTokens.primary,
     );
   }
 }
@@ -65,11 +65,18 @@ Future<bool> showPSConfirmDialog(
       title: Text(title),
       content: Text(message),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(cancelLabel)),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(cancelLabel),
+        ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(confirmLabel,
-              style: destructive ? const TextStyle(color: DesignTokens.maroonDeep) : null),
+          child: Text(
+            confirmLabel,
+            style: destructive
+                ? const TextStyle(color: DesignTokens.primary)
+                : null,
+          ),
         ),
       ],
     ),
@@ -113,17 +120,47 @@ Future<T?> showPSActionSheet<T>(
           if (title != null)
             Padding(
               padding: const EdgeInsets.all(DesignTokens.space4),
-              child: Text(title, style: DesignTokens.body(13).copyWith(color: DesignTokens.slateDim)),
+              child: Text(
+                title,
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
             ),
           for (final a in actions)
             ListTile(
-              title: Text(a.label,
-                  style: a.destructive ? const TextStyle(color: DesignTokens.maroonDeep) : null),
+              title: Text(
+                a.label,
+                style: a.destructive
+                    ? const TextStyle(color: DesignTokens.primary)
+                    : null,
+              ),
               onTap: () => Navigator.of(context).pop(a.value),
             ),
         ],
       ),
     ),
+  );
+}
+
+/// Branded modal sheet with platform-native presentation mechanics.
+Future<T?> showPSModalSheet<T>(
+  BuildContext context, {
+  required WidgetBuilder builder,
+  bool isScrollControlled = false,
+}) {
+  if (AppTheme.isCupertino) {
+    return showCupertinoModalPopup<T>(
+      context: context,
+      builder: (context) =>
+          Material(type: MaterialType.transparency, child: builder(context)),
+    );
+  }
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: isScrollControlled,
+    backgroundColor: Colors.transparent,
+    builder: builder,
   );
 }
 
@@ -135,7 +172,7 @@ class PSProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppTheme.isCupertino
         ? const CupertinoActivityIndicator()
-        : const CircularProgressIndicator(color: DesignTokens.maroon);
+        : const CircularProgressIndicator(color: DesignTokens.primary);
   }
 }
 
@@ -158,7 +195,12 @@ abstract final class PSHaptics {
 /// Brand segmented control — same quiet pill selector on every platform
 /// (replaces Material's SegmentedButton, whose outlined look breaks the vibe).
 class PSSegmented<T> extends StatelessWidget {
-  const PSSegmented({super.key, required this.segments, required this.selected, required this.onChanged});
+  const PSSegmented({
+    super.key,
+    required this.segments,
+    required this.selected,
+    required this.onChanged,
+  });
 
   final List<({T value, String label})> segments;
   final T selected;
@@ -167,7 +209,7 @@ class PSSegmented<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(DesignTokens.space1),
       decoration: BoxDecoration(
         color: DesignTokens.parchmentDim,
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -176,26 +218,55 @@ class PSSegmented<T> extends StatelessWidget {
         children: segments.map((seg) {
           final isSelected = seg.value == selected;
           return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                PSHaptics.selection();
-                onChanged(seg.value);
-              },
-              child: AnimatedContainer(
-                duration: DesignTokens.durationFast,
-                curve: DesignTokens.curveStandard,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? DesignTokens.card : Colors.transparent,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
-                  border: Border.all(
-                      color: isSelected ? DesignTokens.hairline : Colors.transparent),
-                ),
-                child: Text(
-                  seg.label,
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.body(13, weight: isSelected ? FontWeight.w600 : FontWeight.w400)
-                      .copyWith(color: isSelected ? DesignTokens.ink : DesignTokens.slateDim),
+            child: Semantics(
+              button: true,
+              selected: isSelected,
+              label: seg.label,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  PSHaptics.selection();
+                  onChanged(seg.value);
+                },
+                child: AnimatedContainer(
+                  duration: DesignTokens.durationFast,
+                  curve: DesignTokens.curveStandard,
+                  constraints: const BoxConstraints(
+                    minHeight: DesignTokens.minTapTarget,
+                  ),
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.space2,
+                    vertical: DesignTokens.space2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? DesignTokens.surface
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusSmall,
+                    ),
+                    border: Border.all(
+                      color: isSelected
+                          ? DesignTokens.hairline
+                          : Colors.transparent,
+                    ),
+                  ),
+                  child: Text(
+                    seg.label,
+                    textAlign: TextAlign.center,
+                    style:
+                        DesignTokens.body(
+                          13,
+                          weight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ).copyWith(
+                          color: isSelected
+                              ? DesignTokens.text
+                              : DesignTokens.slateDim,
+                        ),
+                  ),
                 ),
               ),
             ),
@@ -215,38 +286,46 @@ Future<DateTime?> showPSDatePicker(
   required DateTime last,
 }) async {
   DateTime selected = initial;
-  final confirmed = await showModalBottomSheet<bool>(
-    context: context,
-    backgroundColor: DesignTokens.card,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusCard)),
-    ),
-    builder: (context) => SafeArea(
-      child: SizedBox(
-        height: 300,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CupertinoButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text('Done',
-                      style: DesignTokens.body(15, weight: FontWeight.w600)
-                          .copyWith(color: DesignTokens.maroon)),
-                ),
-              ],
-            ),
-            Expanded(
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.date,
-                initialDateTime: initial,
-                minimumDate: first,
-                maximumDate: last,
-                onDateTimeChanged: (d) => selected = d,
+  final confirmed = await showPSModalSheet<bool>(
+    context,
+    builder: (context) => DecoratedBox(
+      decoration: const BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(DesignTokens.radiusCard),
+        ),
+      ),
+      child: SafeArea(
+        child: SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: Text(
+                      'Done',
+                      style: DesignTokens.body(
+                        15,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: initial,
+                  minimumDate: first,
+                  maximumDate: last,
+                  onDateTimeChanged: (d) => selected = d,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),
@@ -267,7 +346,9 @@ class PSContentColumn extends StatelessWidget {
     if (width < DesignTokens.breakpointMedium) return child;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: DesignTokens.contentMaxWidth),
+        constraints: const BoxConstraints(
+          maxWidth: DesignTokens.contentMaxWidth,
+        ),
         child: child,
       ),
     );

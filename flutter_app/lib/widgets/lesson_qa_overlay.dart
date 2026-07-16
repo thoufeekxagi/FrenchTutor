@@ -1,15 +1,21 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
+
+import '../design/tokens.dart';
 import '../providers/database_provider.dart';
 import '../services/lesson_speech_service.dart';
+import 'adaptive/adaptive.dart';
 
 /// Bottom-sheet voice Q&A used by every lab: mic → STT → LessonAgentService → TTS reply.
 /// Uses the app-wide `LessonSpeechService.shared` instance so narration and Q&A share one
 /// audio-session owner.
 class LessonQAOverlay extends ConsumerStatefulWidget {
-  const LessonQAOverlay({super.key, required this.lessonContext, this.sttLocale = 'en-US'});
+  const LessonQAOverlay({
+    super.key,
+    required this.lessonContext,
+    this.sttLocale = 'en-US',
+  });
 
   final String lessonContext;
   final String sttLocale;
@@ -17,17 +23,17 @@ class LessonQAOverlay extends ConsumerStatefulWidget {
   @override
   ConsumerState<LessonQAOverlay> createState() => _LessonQAOverlayState();
 
-  /// Shows this overlay as a bottom sheet, matching the iOS `.sheet(...).presentationDetents([.medium])`.
+  /// Shows this overlay as an adaptive bottom sheet.
   static Future<void> show(
     BuildContext context, {
     required String lessonContext,
     String sttLocale = 'en-US',
-  }) {
-    return showModalBottomSheet(
-      context: context,
+  }) async {
+    await showPSModalSheet<void>(
+      context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => LessonQAOverlay(lessonContext: lessonContext, sttLocale: sttLocale),
+      builder: (_) =>
+          LessonQAOverlay(lessonContext: lessonContext, sttLocale: sttLocale),
     );
   }
 }
@@ -88,7 +94,9 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
       _errorText = null;
     });
     try {
-      final reply = await ref.read(lessonAgentServiceProvider).askQuestion(
+      final reply = await ref
+          .read(lessonAgentServiceProvider)
+          .askQuestion(
             lessonContext: widget.lessonContext,
             question: question,
             history: List.of(_history),
@@ -101,7 +109,9 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
         _partialTranscript = '';
         _isThinking = false;
       });
-      _speech.speak(items: [SpeechItem(text: reply, language: 'en-US')]);
+      _speech.speak(
+        items: [SpeechItem(text: reply, language: 'en-US')],
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -114,134 +124,186 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
   void _replay() {
     final answer = _answer;
     if (answer == null) return;
-    _speech.speak(items: [SpeechItem(text: answer, language: 'en-US')]);
+    _speech.speak(
+      items: [SpeechItem(text: answer, language: 'en-US')],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: DecoratedBox(
         decoration: const BoxDecoration(
-          color: Passeport.card,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(DesignTokens.radiusCard),
+          ),
         ),
         child: SafeArea(
           top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 8),
-              Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Passeport.hairline,
-                  borderRadius: BorderRadius.circular(2),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.screenMargin,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: DesignTokens.space2),
+                Container(
+                  width: 36,
+                  height: DesignTokens.space1,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.hairline,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusPill,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Text(
-                    "Ask Marie's assistant",
-                    style: Passeport.display(15, weight: FontWeight.w500),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: _close,
-                    icon: const Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.slate, size: 20),
-                  ),
-                ],
-              ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 160),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_partialTranscript.isNotEmpty || _isListening)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            _partialTranscript.isEmpty ? 'Listening…' : _partialTranscript,
-                            style: Passeport.body(13.5).copyWith(
-                              color: Passeport.slateDim,
-                              fontStyle: FontStyle.italic,
+                const SizedBox(height: DesignTokens.space3),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "Ask Marie's assistant",
+                        style: DesignTokens.display(18),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Close',
+                      onPressed: _close,
+                      constraints: const BoxConstraints(
+                        minWidth: DesignTokens.minTapTarget,
+                        minHeight: DesignTokens.minTapTarget,
+                      ),
+                      icon: const Icon(
+                        CupertinoIcons.xmark_circle_fill,
+                        color: DesignTokens.slate,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 160),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_partialTranscript.isNotEmpty || _isListening)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              _partialTranscript.isEmpty
+                                  ? 'Listening…'
+                                  : _partialTranscript,
+                              style: DesignTokens.body(14).copyWith(
+                                color: DesignTokens.slateDim,
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ),
-                        ),
-                      if (_answer != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(CupertinoIcons.sparkles, size: 13, color: Passeport.brass),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(_answer!, style: Passeport.body(13.5).copyWith(color: Passeport.text)),
-                              ),
-                            ],
+                        if (_answer != null)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: DesignTokens.space3,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.sparkles,
+                                  size: 16,
+                                  color: DesignTokens.info,
+                                ),
+                                const SizedBox(width: DesignTokens.space2),
+                                Expanded(
+                                  child: Text(
+                                    _answer!,
+                                    style: DesignTokens.body(
+                                      14,
+                                    ).copyWith(color: DesignTokens.text),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      if (_errorText != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            _errorText!,
-                            style: Passeport.mono(11).copyWith(color: Passeport.maroon),
+                        if (_errorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: DesignTokens.space3,
+                            ),
+                            child: Text(
+                              _errorText!,
+                              style: DesignTokens.body(
+                                12,
+                              ).copyWith(color: DesignTokens.primary),
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_answer != null) ...[
-                    IconButton(
-                      onPressed: _replay,
-                      icon: const Icon(CupertinoIcons.speaker_2_fill, size: 16, color: Passeport.slateDim),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Passeport.parchmentDim,
-                        shape: const CircleBorder(),
-                        fixedSize: const Size(44, 44),
+                const SizedBox(height: DesignTokens.space4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_answer != null) ...[
+                      IconButton(
+                        tooltip: 'Replay answer',
+                        onPressed: _replay,
+                        icon: const Icon(
+                          CupertinoIcons.speaker_2_fill,
+                          size: 18,
+                          color: DesignTokens.slateDim,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: DesignTokens.parchmentDim,
+                          shape: const CircleBorder(),
+                          fixedSize: const Size.square(
+                            DesignTokens.minTapTarget,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: DesignTokens.space4),
+                    ],
+                    Semantics(
+                      button: true,
+                      label: _isListening
+                          ? 'Stop listening'
+                          : 'Ask with microphone',
+                      child: IconButton(
+                        onPressed: _isThinking ? null : _toggleMic,
+                        style: IconButton.styleFrom(
+                          backgroundColor: _isThinking
+                              ? DesignTokens.slate
+                              : DesignTokens.primary,
+                          disabledBackgroundColor: DesignTokens.slate,
+                          foregroundColor: DesignTokens.surface,
+                          disabledForegroundColor: DesignTokens.surface,
+                          fixedSize: const Size.square(64),
+                          shape: const CircleBorder(),
+                        ),
+                        icon: Icon(
+                          _isListening
+                              ? CupertinoIcons.mic_fill
+                              : CupertinoIcons.mic,
+                          size: 22,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    if (_isThinking) ...[
+                      const SizedBox(width: DesignTokens.space4),
+                      const SizedBox.square(
+                        dimension: DesignTokens.minTapTarget,
+                        child: Center(child: PSProgressIndicator()),
+                      ),
+                    ],
                   ],
-                  GestureDetector(
-                    onTap: _isThinking ? null : _toggleMic,
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: _isThinking ? Passeport.slate : Passeport.brass,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        _isListening ? CupertinoIcons.mic_fill : CupertinoIcons.mic,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                  if (_isThinking) ...[
-                    const SizedBox(width: 16),
-                    const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Passeport.maroon),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
+                ),
+                const SizedBox(height: DesignTokens.space3),
+              ],
+            ),
           ),
         ),
       ),

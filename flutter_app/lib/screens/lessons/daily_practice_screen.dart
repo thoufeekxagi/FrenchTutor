@@ -2,7 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -16,7 +16,8 @@ class DailyPracticeScreen extends ConsumerStatefulWidget {
   const DailyPracticeScreen({super.key});
 
   @override
-  ConsumerState<DailyPracticeScreen> createState() => _DailyPracticeScreenState();
+  ConsumerState<DailyPracticeScreen> createState() =>
+      _DailyPracticeScreenState();
 }
 
 class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
@@ -48,10 +49,16 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
     final srs = ref.read(srsServiceProvider);
     final pool = srs.knownSample(limit: 5);
     final content = ref.read(contentServiceProvider);
-    final allEntries = content.vocabPhases.expand((p) => p.themes.expand((t) => t.entries)).toList();
+    final allEntries = content.vocabPhases
+        .expand((p) => p.themes.expand((t) => t.entries))
+        .toList();
 
     _quizPool = pool.map((entry) {
-      final distractors = (allEntries.where((e) => e.id != entry.id).toList()..shuffle()).take(2).map((e) => e.en).toList();
+      final distractors =
+          (allEntries.where((e) => e.id != entry.id).toList()..shuffle())
+              .take(2)
+              .map((e) => e.en)
+              .toList();
       final choices = [...distractors, entry.en]..shuffle();
       return _QuizItem(entry: entry, choices: choices);
     }).toList();
@@ -96,11 +103,11 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
         title: const Text('Daily Practice'),
-        backgroundColor: Passeport.parchment,
-        foregroundColor: Passeport.text,
+        backgroundColor: DesignTokens.parchment,
+        foregroundColor: DesignTokens.text,
         elevation: 0,
       ),
       body: SafeArea(
@@ -126,7 +133,12 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
             children: [
               const KickerText("TODAY'S REVIEW"),
               const Spacer(),
-              Text('${_index + 1} / ${_queue.length}', style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
+              Text(
+                '${_index + 1} / ${_queue.length}',
+                style: DesignTokens.mono(
+                  11,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
             ],
           ),
         ),
@@ -137,12 +149,26 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
             padding: 28,
             child: Column(
               children: [
-                Text(entry.en, style: Passeport.display(24), textAlign: TextAlign.center),
+                Text(
+                  entry.en,
+                  style: DesignTokens.display(24),
+                  textAlign: TextAlign.center,
+                ),
                 if (_isRevealed) ...[
                   const SizedBox(height: 16),
-                  Text(entry.fr, style: Passeport.display(22).copyWith(color: Passeport.maroon)),
+                  Text(
+                    entry.fr,
+                    style: DesignTokens.display(
+                      22,
+                    ).copyWith(color: DesignTokens.primary),
+                  ),
                   const SizedBox(height: 6),
-                  Text(entry.phonetic, style: Passeport.mono(13).copyWith(color: Passeport.slateDim)),
+                  Text(
+                    entry.phonetic,
+                    style: DesignTokens.mono(
+                      13,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
                 ],
               ],
             ),
@@ -154,11 +180,29 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
           child: _isRevealed
               ? Row(
                   children: [
-                    Expanded(child: _gradeButton('Again', Passeport.slate, SRSGrade.again)),
+                    Expanded(
+                      child: _gradeButton(
+                        'Again',
+                        DesignTokens.slate,
+                        SRSGrade.again,
+                      ),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _gradeButton('Good', Passeport.brass, SRSGrade.good)),
+                    Expanded(
+                      child: _gradeButton(
+                        'Good',
+                        DesignTokens.info,
+                        SRSGrade.good,
+                      ),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _gradeButton('Easy', Passeport.maroon, SRSGrade.easy)),
+                    Expanded(
+                      child: _gradeButton(
+                        'Easy',
+                        DesignTokens.primary,
+                        SRSGrade.easy,
+                      ),
+                    ),
                   ],
                 )
               : PasseportPrimaryButton(
@@ -180,7 +224,10 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 0,
       ),
-      child: Text(title, style: Passeport.body(13.5, weight: FontWeight.w500)),
+      child: Text(
+        title,
+        style: DesignTokens.body(13.5, weight: FontWeight.w500),
+      ),
     );
   }
 
@@ -197,7 +244,12 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
             children: [
               const KickerText('QUICK RECALL CHECK'),
               const Spacer(),
-              Text('${_quizIndex + 1} / ${_quizPool.length}', style: Passeport.mono(11).copyWith(color: Passeport.slateDim)),
+              Text(
+                '${_quizIndex + 1} / ${_quizPool.length}',
+                style: DesignTokens.mono(
+                  11,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
             ],
           ),
           const SizedBox(height: 18),
@@ -205,52 +257,74 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('What does this mean?', style: Passeport.body(12.5).copyWith(color: Passeport.slateDim)),
+                Text(
+                  'What does this mean?',
+                  style: DesignTokens.body(
+                    12.5,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
                 const SizedBox(height: 6),
-                Text(item.entry.fr, style: Passeport.display(20)),
+                Text(item.entry.fr, style: DesignTokens.display(20)),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          ...item.choices.map((choice) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _quizSelected == null ? () => _answerQuiz(choice) : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Passeport.card,
-                      foregroundColor: _quizSelected == null
-                          ? Passeport.text
-                          : choice == item.entry.en
-                              ? Passeport.brass
-                              : choice == _quizSelected
-                                  ? Passeport.maroon
-                                  : Passeport.slate,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(color: Passeport.hairline),
+          ...item.choices.map(
+            (choice) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _quizSelected == null
+                      ? () => _answerQuiz(choice)
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DesignTokens.card,
+                    foregroundColor: _quizSelected == null
+                        ? DesignTokens.text
+                        : choice == item.entry.en
+                        ? DesignTokens.info
+                        : choice == _quizSelected
+                        ? DesignTokens.primary
+                        : DesignTokens.slate,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: DesignTokens.hairline),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        choice,
+                        style: DesignTokens.body(13.5, weight: FontWeight.w500),
                       ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(choice, style: Passeport.body(13.5, weight: FontWeight.w500)),
-                        if (_quizSelected != null && choice == item.entry.en) ...[
-                          const SizedBox(width: 8),
-                          Icon(CupertinoIcons.checkmark_circle_fill, color: Passeport.brass, size: 18),
-                        ],
-                        if (_quizSelected != null && choice == _quizSelected && choice != item.entry.en) ...[
-                          const SizedBox(width: 8),
-                          Icon(CupertinoIcons.xmark_circle_fill, color: Passeport.maroon, size: 18),
-                        ],
+                      if (_quizSelected != null && choice == item.entry.en) ...[
+                        const SizedBox(width: 8),
+                        const Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          color: DesignTokens.success,
+                          size: 18,
+                        ),
                       ],
-                    ),
+                      if (_quizSelected != null &&
+                          choice == _quizSelected &&
+                          choice != item.entry.en) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          CupertinoIcons.xmark_circle_fill,
+                          color: DesignTokens.primary,
+                          size: 18,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-              )),
+              ),
+            ),
+          ),
           if (_quizSelected != null)
             PasseportPrimaryButton(
               label: _quizIndex + 1 < _quizPool.length ? 'Next' : 'Finish',
@@ -268,19 +342,27 @@ class _DailyPracticeScreenState extends ConsumerState<DailyPracticeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.checkmark_seal_fill, size: 36, color: Passeport.brass),
+            Icon(
+              CupertinoIcons.checkmark_seal_fill,
+              size: 36,
+              color: DesignTokens.info,
+            ),
             const SizedBox(height: 14),
-            Text('Daily practice complete', style: Passeport.display(19)),
+            Text('Daily practice complete', style: DesignTokens.display(19)),
             const SizedBox(height: 8),
             if (_reviewedEntries.isNotEmpty)
               Text(
                 '${_reviewedEntries.length} words reviewed${_quizPool.isEmpty ? '.' : ' · $_quizCorrect/${_quizPool.length} recall correct.'}',
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
               )
             else
               Text(
                 'No new or due words right now — come back tomorrow, or study a specific theme in the Vocabulary lab.',
-                style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
                 textAlign: TextAlign.center,
               ),
             const SizedBox(height: 20),

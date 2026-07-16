@@ -2,7 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
+import '../../design/tokens.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
@@ -20,10 +20,12 @@ class FlashcardSessionScreen extends ConsumerStatefulWidget {
   final VocabTheme theme;
 
   @override
-  ConsumerState<FlashcardSessionScreen> createState() => _FlashcardSessionScreenState();
+  ConsumerState<FlashcardSessionScreen> createState() =>
+      _FlashcardSessionScreenState();
 }
 
-class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen> {
+class _FlashcardSessionScreenState
+    extends ConsumerState<FlashcardSessionScreen> {
   List<VocabEntry> _queue = [];
   int _currentIndex = 0;
   bool _isRevealed = false;
@@ -40,12 +42,18 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
   String? _sayItHint;
 
   static const _diacriticMap = {
-    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
-    'à': 'a', 'â': 'a',
+    'é': 'e',
+    'è': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'à': 'a',
+    'â': 'a',
     'ç': 'c',
-    'î': 'i', 'ï': 'i',
+    'î': 'i',
+    'ï': 'i',
     'ô': 'o',
-    'û': 'u', 'ù': 'u',
+    'û': 'u',
+    'ù': 'u',
     'œ': 'oe',
   };
 
@@ -71,7 +79,10 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
 
   Future<void> _loadQueue() async {
     final srs = ref.read(srsServiceProvider);
-    final queue = await srs.buildQueue(phase: widget.phase, themeId: widget.theme.id);
+    final queue = await srs.buildQueue(
+      phase: widget.phase,
+      themeId: widget.theme.id,
+    );
     if (!mounted) return;
     setState(() {
       _queue = queue;
@@ -131,9 +142,10 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
           hint = "Didn't catch that — try again.";
         } else if (foldedTranscript.contains(foldedTarget) ||
             foldedTarget.contains(foldedTranscript)) {
-          hint = 'Nice — that sounds right! 🎉';
+          hint = 'That matches the target.';
         } else {
-          hint = 'Close — target: "${entry.fr}". This is just a hint, not graded.';
+          hint =
+              'Close — target: "${entry.fr}". This is just a hint, not graded.';
         }
         setState(() {
           _isListeningBack = false;
@@ -181,19 +193,19 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchmentDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
-        title: Text(widget.theme.title, style: Passeport.display(20)),
-        backgroundColor: Passeport.parchmentDim,
-        foregroundColor: Passeport.ink,
+        title: Text(widget.theme.title, style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.parchmentDim,
+        foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
       body: _isLoading
           ? const Center(child: PSProgressIndicator())
           : _showSummary
-              ? _buildSummary()
-              : _buildSession(),
+          ? _buildSummary()
+          : _buildSession(),
     );
   }
 
@@ -210,7 +222,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
             // Counter
             Text(
               '${_currentIndex + 1} / ${_queue.length}',
-              style: Passeport.mono(13).copyWith(color: Passeport.slate),
+              style: DesignTokens.mono(13).copyWith(color: DesignTokens.slate),
             ),
             // Progress bar
             const SizedBox(height: 8),
@@ -219,8 +231,8 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
               child: LinearProgressIndicator(
                 value: (_currentIndex + 1) / _queue.length,
                 minHeight: 4,
-                backgroundColor: Passeport.hairline,
-                valueColor: const AlwaysStoppedAnimation(Passeport.brass),
+                backgroundColor: DesignTokens.hairline,
+                valueColor: const AlwaysStoppedAnimation(DesignTokens.info),
               ),
             ),
             const Spacer(),
@@ -268,13 +280,13 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
                           Positioned(
                             top: 16,
                             right: 16,
-                            child: _swipeBadge('AGAIN', Passeport.maroon),
+                            child: _swipeBadge('AGAIN', DesignTokens.primary),
                           ),
                         if (grade == SRSGrade.good)
                           Positioned(
                             top: 16,
                             left: 16,
-                            child: _swipeBadge('GOOD', Passeport.brass),
+                            child: _swipeBadge('GOOD', DesignTokens.info),
                           ),
                         if (grade == SRSGrade.easy)
                           Positioned(
@@ -282,7 +294,7 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
                             left: 0,
                             right: 0,
                             child: Center(
-                              child: _swipeBadge('EASY', const Color(0xFF3A7D44)),
+                              child: _swipeBadge('EASY', DesignTokens.success),
                             ),
                           ),
                       ],
@@ -297,12 +309,16 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
             if (!_isRevealed)
               Text(
                 'Tap to reveal',
-                style: Passeport.body(13).copyWith(color: Passeport.slate),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slate),
               )
             else ...[
               Text(
                 'Swipe: left = Again, right = Good, up = Easy',
-                style: Passeport.body(12).copyWith(color: Passeport.slate),
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.slate),
               ),
               const SizedBox(height: 12),
               _buildSayItButton(entry),
@@ -311,7 +327,9 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
                 Text(
                   _sayItHint!,
                   textAlign: TextAlign.center,
-                  style: Passeport.mono(12).copyWith(color: Passeport.slateDim),
+                  style: DesignTokens.mono(
+                    12,
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
               ],
             ],
@@ -328,12 +346,12 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       constraints: const BoxConstraints(minHeight: 220),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Passeport.card,
+        color: DesignTokens.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Passeport.hairline, width: 1),
+        border: Border.all(color: DesignTokens.hairline, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Passeport.ink.withValues(alpha: 0.06),
+            color: DesignTokens.ink.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -345,32 +363,29 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
           // French word
           Text(
             entry.fr,
-            style: Passeport.display(28, weight: FontWeight.w600),
+            style: DesignTokens.display(28, weight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           // Phonetic
           Text(
             entry.phonetic,
-            style: Passeport.body(16).copyWith(
-              color: Passeport.slate,
-              fontStyle: FontStyle.italic,
-            ),
+            style: DesignTokens.body(
+              16,
+            ).copyWith(color: DesignTokens.slate, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center,
           ),
           // Reveal divider and English
           if (_isRevealed) ...[
             const SizedBox(height: 20),
-            Container(
-              height: 1,
-              color: Passeport.hairline,
-            ),
+            Container(height: 1, color: DesignTokens.hairline),
             const SizedBox(height: 20),
             Text(
               entry.en,
-              style: Passeport.body(20, weight: FontWeight.w500).copyWith(
-                color: Passeport.brass,
-              ),
+              style: DesignTokens.body(
+                20,
+                weight: FontWeight.w500,
+              ).copyWith(color: DesignTokens.info),
               textAlign: TextAlign.center,
             ),
           ],
@@ -415,24 +430,23 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
     String? tooltip,
     bool active = false,
   }) {
-    final button = Material(
-      color: active ? Passeport.maroon.withValues(alpha: 0.12) : Passeport.card,
-      shape: CircleBorder(
-        side: BorderSide(
-          color: active ? Passeport.maroon : Passeport.hairline,
-          width: 1,
-        ),
-      ),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Icon(
-            icon,
-            size: 22,
-            color: active ? Passeport.maroon : Passeport.ink,
+    final button = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: active ? DesignTokens.primarySoft : DesignTokens.surface,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: active ? DesignTokens.primary : DesignTokens.hairline,
           ),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: active ? DesignTokens.primary : DesignTokens.ink,
         ),
       ),
     );
@@ -449,7 +463,10 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
       ),
       child: Text(
         label,
-        style: Passeport.mono(13, weight: FontWeight.w700).copyWith(color: color),
+        style: DesignTokens.mono(
+          13,
+          weight: FontWeight.w700,
+        ).copyWith(color: color),
       ),
     );
   }
@@ -462,18 +479,24 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Icon(CupertinoIcons.checkmark_circle_fill, size: 64, color: Passeport.brass),
+            Icon(
+              CupertinoIcons.checkmark_circle_fill,
+              size: 64,
+              color: DesignTokens.info,
+            ),
             const SizedBox(height: 20),
             Text(
               'Session Complete',
-              style: Passeport.display(24, weight: FontWeight.w600),
+              style: DesignTokens.display(24, weight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             Text(
               _reviewedCount > 0
                   ? '$_reviewedCount card${_reviewedCount == 1 ? '' : 's'} reviewed'
                   : 'No cards due right now',
-              style: Passeport.body(16).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.body(
+                16,
+              ).copyWith(color: DesignTokens.slateDim),
             ),
             const Spacer(),
             PasseportPrimaryButton(
@@ -485,9 +508,10 @@ class _FlashcardSessionScreenState extends ConsumerState<FlashcardSessionScreen>
               onPressed: _loadAllWords,
               child: Text(
                 'Review all words anyway',
-                style: Passeport.body(14, weight: FontWeight.w500).copyWith(
-                  color: Passeport.brass,
-                ),
+                style: DesignTokens.body(
+                  14,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.info),
               ),
             ),
             const SizedBox(height: 32),

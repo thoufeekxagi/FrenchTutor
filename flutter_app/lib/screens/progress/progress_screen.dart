@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme.dart';
-import '../../widgets/adaptive/adaptive.dart';
 import '../../data/content_service.dart';
+import '../../design/tokens.dart';
+import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/progress_service.dart';
-import '../../models/content_models.dart';
+import '../../widgets/adaptive/adaptive.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -39,220 +39,307 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     final skills = progress.skillProgress();
     final store = ref.read(learningStoreProvider);
     final monthPrefix = store.dayString(DateTime.now()).substring(0, 7);
-    final activeDays = store.activeDays().where((d) => d.startsWith(monthPrefix)).length;
-    final recalledIds = store.entriesRecalledSince(DateTime.now().subtract(const Duration(days: 7))).toSet();
+    final activeDays = store
+        .activeDays()
+        .where((d) => d.startsWith(monthPrefix))
+        .length;
+    final recalledIds = store
+        .entriesRecalledSince(DateTime.now().subtract(const Duration(days: 7)))
+        .toSet();
     final recalledWords = ContentService.shared.vocabPhases
-        .expand((ph) => ph.themes.expand((t) => t.entries))
-        .where((e) => recalledIds.contains(e.id))
+        .expand((phase) => phase.themes.expand((theme) => theme.entries))
+        .where((entry) => recalledIds.contains(entry.id))
         .take(6)
         .toList();
 
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: PSContentColumn(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          children: [
-            const SizedBox(height: 24),
-            Text('Progress', style: Passeport.display(24)),
-            const SizedBox(height: 4),
-            Text(
-              'Your learning journey',
-              style: Passeport.body(14).copyWith(color: Passeport.slateDim),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              DesignTokens.screenMargin,
+              DesignTokens.space6,
+              DesignTokens.screenMargin,
+              40,
             ),
-            const SizedBox(height: 28),
-
-            // --- Evidence, not streaks: what the learner can actually do ---
-            _buildEvidenceCard(activeDays, recalledIds.length, recalledWords),
-            const SizedBox(height: 24),
-
-            // --- Today's habits ---
-            if (habits.isNotEmpty) ...[
+            children: [
+              Text('Progress', style: DesignTokens.display(30)),
+              const SizedBox(height: DesignTokens.space2),
               Text(
-                "TODAY'S HABITS",
-                style: Passeport.mono(10, weight: FontWeight.w600)
-                    .copyWith(color: Passeport.slateDim, letterSpacing: 1.2),
+                'See the evidence behind your growing French.',
+                style: DesignTokens.body(
+                  16,
+                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
               ),
-              const SizedBox(height: 10),
-              _buildHabitsCard(habits),
-              const SizedBox(height: 24),
-            ],
+              const SizedBox(height: 28),
 
-            // --- Skill progress ---
-            Text(
-              'SKILL PROGRESS',
-              style: Passeport.mono(10, weight: FontWeight.w600)
-                  .copyWith(color: Passeport.slateDim, letterSpacing: 1.2),
-            ),
-            const SizedBox(height: 10),
-            ...skills.map((skill) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _buildSkillRow(skill),
-                )),
-            const SizedBox(height: 12),
-
-            // --- Roadmap month ---
-            if (_currentMonth != null) ...[
-              Text(
-                'ROADMAP',
-                style: Passeport.mono(10, weight: FontWeight.w600)
-                    .copyWith(color: Passeport.slateDim, letterSpacing: 1.2),
+              // --- Evidence, not streaks: what the learner can actually do ---
+              _buildEvidenceSummary(
+                activeDays,
+                recalledIds.length,
+                recalledWords,
               ),
-              const SizedBox(height: 10),
-              _buildRoadmapCard(_currentMonth!),
-            ],
+              const SizedBox(height: 32),
 
-            const SizedBox(height: 32),
-          ],
-        ),
+              // --- Today's habits ---
+              if (habits.isNotEmpty) ...[
+                _sectionHeading(
+                  'Today',
+                  'Small actions that keep your learning moving.',
+                ),
+                const SizedBox(height: DesignTokens.space4),
+                _buildHabits(habits),
+                const SizedBox(height: 32),
+              ],
+
+              // --- Skill progress ---
+              _sectionHeading(
+                'Skills',
+                'Measured from the work you have completed.',
+              ),
+              const SizedBox(height: DesignTokens.space5),
+              ...skills.map(_buildSkill),
+
+              // --- Roadmap month ---
+              if (_currentMonth != null) ...[
+                const SizedBox(height: 28),
+                _sectionHeading(
+                  'Current focus',
+                  'Where this month is taking you.',
+                ),
+                const SizedBox(height: DesignTokens.space4),
+                _buildRoadmap(_currentMonth!),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEvidenceCard(int activeDays, int recalledCount, List<VocabEntry> sampleWords) {
+  Widget _sectionHeading(String title, String description) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: DesignTokens.display(20)),
+        const SizedBox(height: DesignTokens.space1),
+        Text(
+          description,
+          style: DesignTokens.body(
+            14,
+          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEvidenceSummary(
+    int activeDays,
+    int recalledCount,
+    List<VocabEntry> sampleWords,
+  ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(DesignTokens.space5),
       decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('This week', style: Passeport.display(16, weight: FontWeight.w600)),
-          const SizedBox(height: 6),
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: DesignTokens.surface,
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.radiusMedium,
+                  ),
+                ),
+                child: const Icon(
+                  CupertinoIcons.sparkles,
+                  color: DesignTokens.info,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: DesignTokens.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your week in evidence',
+                      style: DesignTokens.display(18),
+                    ),
+                    const SizedBox(height: DesignTokens.space1),
+                    Text(
+                      '$activeDays study day${activeDays == 1 ? '' : 's'} this month',
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: DesignTokens.space5),
           Text(
             recalledCount > 0
-                ? 'You recalled $recalledCount word${recalledCount == 1 ? '' : 's'} from memory, unaided.'
-                : 'Your first recalled words will show up here.',
-            style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                ? 'You recalled $recalledCount word${recalledCount == 1 ? '' : 's'} from memory without help.'
+                : 'Recall a word without help and your first evidence will appear here.',
+            style: DesignTokens.body(
+              16,
+              weight: FontWeight.w600,
+            ).copyWith(height: 1.4),
           ),
           if (sampleWords.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: DesignTokens.space4),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: DesignTokens.space2,
+              runSpacing: DesignTokens.space2,
               children: sampleWords
-                  .map((w) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Passeport.brass.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(100),
+                  .map(
+                    (word) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: DesignTokens.space3,
+                        vertical: DesignTokens.space2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusPill,
                         ),
-                        child: Text(w.fr,
-                            style: Passeport.mono(11, weight: FontWeight.w500)
-                                .copyWith(color: Passeport.inkSoft)),
-                      ))
+                      ),
+                      child: Text(
+                        word.fr,
+                        style: DesignTokens.body(13, weight: FontWeight.w600),
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
-          const SizedBox(height: 12),
-          Text(
-            '$activeDays study day${activeDays == 1 ? '' : 's'} this month',
-            style: Passeport.mono(11).copyWith(color: Passeport.slateDim),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildHabitsCard(
-      List<({DailyHabit habit, bool done, int minutes})> habits) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
-      ),
-      child: Column(
-        children: habits.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          final isLast = index == habits.length - 1;
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              border: isLast
-                  ? null
-                  : Border(bottom: BorderSide(color: Passeport.hairline, width: 1)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  item.done ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
-                  size: 22,
-                  color: item.done ? Passeport.maroon : Passeport.slate,
+  Widget _buildHabits(
+    List<({DailyHabit habit, bool done, int minutes})> habits,
+  ) {
+    return Column(
+      children: habits.map((item) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: DesignTokens.space3),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: DesignTokens.minTapTarget,
+                height: DesignTokens.minTapTarget,
+                child: Icon(
+                  item.done
+                      ? CupertinoIcons.checkmark_circle_fill
+                      : CupertinoIcons.circle,
+                  size: 25,
+                  color: item.done ? DesignTokens.success : DesignTokens.slate,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    item.habit.title,
-                    style: Passeport.body(14).copyWith(
-                      color: item.done ? Passeport.slateDim : Passeport.text,
-                      decoration: item.done ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
+              ),
+              const SizedBox(width: DesignTokens.space2),
+              Expanded(
+                child: Text(
+                  item.habit.title,
+                  style: DesignTokens.body(15, weight: FontWeight.w500)
+                      .copyWith(
+                        color: item.done
+                            ? DesignTokens.slateDim
+                            : DesignTokens.text,
+                        decoration: item.done
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
                 ),
-                Text(
-                  '${item.minutes} min',
-                  style: Passeport.mono(12).copyWith(color: Passeport.slateDim),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+              ),
+              const SizedBox(width: DesignTokens.space3),
+              Text(
+                '${item.minutes} min',
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildSkillRow(SkillProgress skill) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
-      ),
+  Widget _buildSkill(SkillProgress skill) {
+    final percentage = (skill.fraction * 100).round();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: DesignTokens.space5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            _iconForSkill(skill.name),
-            size: 24,
-            color: Passeport.brass,
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: DesignTokens.successSoft,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+            ),
+            child: Icon(
+              _iconForSkill(skill.name),
+              size: 21,
+              color: DesignTokens.success,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: DesignTokens.space3),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(skill.name, style: Passeport.body(14, weight: FontWeight.w600)),
+                    Expanded(
+                      child: Text(
+                        skill.name,
+                        style: DesignTokens.body(15, weight: FontWeight.w600),
+                      ),
+                    ),
                     Text(
-                      '${(skill.fraction * 100).round()}%',
-                      style: Passeport.mono(12).copyWith(color: Passeport.slateDim),
+                      '$percentage%',
+                      style: DesignTokens.body(
+                        13,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.slateDim),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: DesignTokens.space2),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
                   child: LinearProgressIndicator(
                     value: skill.fraction,
-                    minHeight: 6,
-                    backgroundColor: Passeport.parchmentDim,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Passeport.maroon),
+                    minHeight: 7,
+                    backgroundColor: DesignTokens.parchmentDim,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      DesignTokens.success,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: DesignTokens.space2),
                 Text(
                   skill.detail,
-                  style: Passeport.body(11).copyWith(color: Passeport.slateDim),
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.slateDim, height: 1.35),
                 ),
               ],
             ),
@@ -262,44 +349,45 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     );
   }
 
-  Widget _buildRoadmapCard(RoadmapMonth month) {
+  Widget _buildRoadmap(RoadmapMonth month) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(DesignTokens.space5),
       decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
+        color: DesignTokens.successSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: Passeport.brass.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
             ),
-            child: Center(
-              child: Text(
-                '${month.month}',
-                style: Passeport.display(18, weight: FontWeight.w700)
-                    .copyWith(color: Passeport.brass),
-              ),
+            alignment: Alignment.center,
+            child: Text(
+              '${month.month}',
+              style: DesignTokens.display(
+                20,
+              ).copyWith(color: DesignTokens.success),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: DesignTokens.space4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Month ${month.month}',
-                  style: Passeport.body(14, weight: FontWeight.w600),
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: DesignTokens.space1),
                 Text(
                   month.title,
-                  style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+                  style: DesignTokens.body(16, weight: FontWeight.w600),
                 ),
               ],
             ),
