@@ -96,6 +96,26 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
     widget.onProgress?.call();
   }
 
+  /// Test-phase escape hatch: wipes today's pathway state (stage statuses,
+  /// frozen word list, cached scene) and mints a fresh plan. Earned SRS
+  /// grades and evidence stay — only the day's plan starts over.
+  Future<void> _retakeToday() async {
+    final confirmed = await showPSConfirmDialog(
+      context,
+      title: 'Retake today’s plan?',
+      message:
+          'Today’s stages, word list, and scene reset so you can run the day '
+          'again from scratch. Progress you earned stays saved.',
+      confirmLabel: 'Retake',
+      destructive: true,
+    );
+    if (!confirmed || !mounted) return;
+    _coordinator.store.resetDailySession();
+    _coordinator.reload();
+    setState(() {});
+    widget.onProgress?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     _coordinator.reload();
@@ -126,6 +146,30 @@ class _DailyPathwayWidgetState extends ConsumerState<DailyPathwayWidget> {
                 ).copyWith(color: Passeport.slateDim, letterSpacing: 1.1),
               ),
               const Spacer(),
+              // Test-phase: rerun the whole day fresh (new words, new scene).
+              GestureDetector(
+                onTap: _retakeToday,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        CupertinoIcons.arrow_counterclockwise,
+                        size: 13,
+                        color: Passeport.slateDim,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'Retake',
+                        style: Passeport.body(
+                          12,
+                          weight: FontWeight.w600,
+                        ).copyWith(color: Passeport.slateDim),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Text(
                 '$completed of ${PathwayStage.values.length}',
                 style: Passeport.body(12, weight: FontWeight.w600).copyWith(

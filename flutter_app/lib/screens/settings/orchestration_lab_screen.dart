@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../orchestration/dev/developer_path_preview.dart';
+import '../../orchestration/models/competency_state.dart';
 import '../../orchestration/models/error_event.dart';
+import '../../orchestration/models/learning_plan.dart';
 import '../../orchestration/planning/orchestrator.dart';
 import '../../orchestration/twin/evidence_observation_adapter.dart';
 import '../../orchestration/twin/twin_updater.dart';
@@ -25,6 +27,46 @@ class OrchestrationLabScreen extends ConsumerStatefulWidget {
 class _OrchestrationLabScreenState
     extends ConsumerState<OrchestrationLabScreen> {
   DeveloperPersonaScenario _persona = developerPersonaScenarios[2];
+  List<CompetencyState>? _persistedStates;
+  PlanSnapshot? _persistedPlan;
+  bool _persisting = false;
+
+  String get _today {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _persistSnapshot() async {
+    setState(() => _persisting = true);
+    final framework = ref.read(competencyStoreProvider).framework();
+    if (framework == null) {
+      setState(() => _persisting = false);
+      return;
+    }
+    final service = ref.read(orchestrationServiceProvider);
+    final states = service.refreshCompetencyStates(
+      framework: framework,
+      evidenceStore: ref.read(evidenceStoreProvider),
+      stateStore: ref.read(competencyStateStoreProvider),
+    );
+    final plan = service.ensureTodayPlan(
+      framework: framework,
+      competencyStates: states,
+      errors: ref.read(evidenceStoreProvider).errorEvents(),
+      planStore: ref.read(planStoreProvider),
+      localDate: _today,
+      availableMinutes: _persona.availableMinutes,
+      canSpeakAloud: _persona.canSpeakAloud,
+      networkAvailable: _persona.networkAvailable,
+      goal: 'tef_canada',
+    );
+    if (!mounted) return;
+    setState(() {
+      _persistedStates = states;
+      _persistedPlan = plan;
+      _persisting = false;
+    });
+  }
 
   Future<void> _choosePersona() async {
     final selected = await showPSActionSheet<DeveloperPersonaScenario>(
@@ -207,6 +249,98 @@ class _OrchestrationLabScreenState
                           _persona = _persona.copyWith(networkAvailable: value),
                     ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: DesignTokens.space3),
+            PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Persisted state', color: DesignTokens.slateDim),
+                  const SizedBox(height: DesignTokens.space2),
+                  Text(
+                    'Rebuilds learner_competency_states from the evidence '
+                    'ledger and persists it, then generates/loads today\'s '
+                    'immutable plan snapshot. Evidence count below is the '
+                    'per-competency repetition signal.',
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                  const SizedBox(height: DesignTokens.space3),
+                  Semantics(
+                    button: true,
+                    label: 'Persist competency states and generate today\'s plan',
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _persisting ? null : _persistSnapshot,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minHeight: DesignTokens.minTapTarget,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _persisting
+                                    ? 'Persisting…'
+                                    : 'Persist & generate today\'s plan',
+                                style: DesignTokens.body(
+                                  14,
+                                  weight: FontWeight.w600,
+                                ).copyWith(color: DesignTokens.primary),
+                              ),
+                            ),
+                            const Icon(
+                              CupertinoIcons.arrow_2_circlepath,
+                              size: 16,
+                              color: DesignTokens.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_persistedPlan case final plan?) ...[
+                    const SizedBox(height: DesignTokens.space3),
+                    Text(
+                      'Plan ${plan.localDate} · ${plan.status.name} · '
+                      '${plan.tasks.length} tasks · ${plan.totalMinutes} min',
+                      style: DesignTokens.mono(
+                        11,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                    const SizedBox(height: DesignTokens.space1),
+                    Text(
+                      plan.explanation,
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ],
+                  if (_persistedStates case final states? when states.isNotEmpty) ...[
+                    const SizedBox(height: DesignTokens.space3),
+                    for (final state in [...states]
+                      ..sort(
+                        (a, b) => b.evidenceCount.compareTo(a.evidenceCount),
+                      ))
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: DesignTokens.space1,
+                        ),
+                        child: Text(
+                          '${state.competencyId} · ${state.modality.wireName} — '
+                          '${state.evidenceCount}x · mastery '
+                          '${(state.masteryEstimate * 100).toStringAsFixed(0)}% · '
+                          '${state.transferStatus.wireName}'
+                          '${state.nextReviewAt != null ? ' · next review ${state.nextReviewAt!.toLocal().toString().split(' ').first}' : ''}',
+                          style: DesignTokens.mono(
+                            10,
+                          ).copyWith(color: DesignTokens.slateDim),
+                        ),
+                      ),
+                  ],
                 ],
               ),
             ),

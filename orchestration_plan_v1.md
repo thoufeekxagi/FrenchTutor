@@ -1524,21 +1524,21 @@ This section is the resume point for future agents. Update it after every implem
 
 ### Current phase
 
-`O3/O4: Learner-state persistence and governed plan snapshots`
+`O5: Plan executor and home integration (not started); O3/O4 persistence is now done`
 
 ### Phase status
 
 - [x] O1 Competency foundation
 - [x] O2 Evidence ledger
-- [ ] O3 Probabilistic twin updater v1 — online/rebuild baseline complete; persistence, review scheduling, transfer, and calibration remain
-- [ ] O4 Governed adaptive orchestrator v1 — constrained live-state baseline complete; proposal validation and immutable plan persistence remain
-- [ ] O4.5 Adaptive policy shadow evaluation
-- [ ] O5 Plan executor and home integration
-- [ ] O6 Connected vertical loop
-- [ ] O7 Secure AI control plane
-- [ ] O8 Cloud sync and identity
-- [ ] O9 Pilot instrumentation and calibration
-- [ ] O10 Paid access
+- [x] O3 Probabilistic twin updater v1 — online/rebuild baseline, retention/review scheduling, and transfer detection are implemented and persisted; pyBKT parity/calibration fixture outside the Flutter runtime remains open
+- [x] O4 Governed adaptive orchestrator v1 — constrained utility baseline, reason-code explainer, offline fallback plan, and immutable plan snapshot persistence (with explicit replan) are implemented; LLM proposal validation against approved candidate IDs remains open
+- [ ] O4.5 Adaptive policy shadow evaluation — not started
+- [ ] O5 Plan executor and home integration — not started; `pathway_coordinator.dart` still owns the fixed five-stage flow, deliberately untouched so shipped navigation keeps working while the new plan model is exercised only via the Orchestration Lab
+- [ ] O6 Connected vertical loop — not started
+- [ ] O7 Secure AI control plane — not started (server/ is still the legacy voice-tutor monolith)
+- [ ] O8 Cloud sync and identity — not started (no Supabase project/auth yet)
+- [ ] O9 Pilot instrumentation and calibration — not started
+- [ ] O10 Paid access — not started; explicitly deferred until pilot evidence exists, per section 2.3/10
 
 ### Decisions made
 
@@ -1569,29 +1569,34 @@ Resolve only when the corresponding phase requires them:
 
 ### Last completed work
 
-Phase O2 and the O3/O4 runtime baselines now provide:
+Phase O2, and O3/O4 through persistence, now provide:
 
 - immutable typed evidence, error, evaluator-provenance, and task-result contracts;
-- forward-only migration v4 with append-only evidence/error tables, indexes, and update/delete guards;
+- forward-only migration v5 adding `learner_competency_states`, `learning_plans` (immutable, replan-linked), `plan_tasks`, and append-only `assessment_snapshots`, on top of v4's evidence/error tables;
 - transactional evidence persistence with duplicate rejection and atomic rollback;
 - a versioned evaluator-confidence cap policy;
 - vocabulary, grammar, listening, writing, and speaking result adapters that preserve attempts and withhold untrusted mastery claims;
 - pathway-coordinator evidence emission without changing existing task completion thresholds;
 - contextual competency-by-modality BKT beliefs, explicit confidence, forgetting, and deterministic rebuilds;
 - evidence-to-observation validation against the authoritative competency mappings;
+- `RetentionPolicy` (deterministic `next_review_at`/review urgency from mastery × confidence) and `TransferDetector` (the five `TransferStatus` states, citing the real evidence ids that justify each one);
+- `CompetencyStateRebuilder`, tying BKT rebuild + retention + transfer into the persistable `CompetencyState` cache, and `CompetencyStateStore` for its rebuildable persistence;
 - a deterministic constrained utility planner with time, voice, network, prerequisite, weakness, uncertainty, review, error, transfer, and goal signals;
-- a debug Orchestration Lab driven by the real evidence ledger, rebuilt learner beliefs, and planner decision traces;
-- focused contract, repository, adapter, learner-model, planner, graph, and lab tests.
+- `PlanExplainer` (fixed reason-code templates per section 8.6) and `FallbackPlanFactory` (deterministic offline default when the baseline planner has nothing eligible);
+- `PlanStore`: immutable plan snapshot persistence, task-progress transitions, and explicit `replan` that atomically retires the prior plan and links the new one — enforced via `PlanImmutableException` once a plan is replaced;
+- `OrchestrationService`, the single facade wiring rebuild → context projection → planning → explanation → persistence, exposed only through the debug Orchestration Lab (which now also surfaces persisted per-competency evidence counts as a repetition/mastery view) — deliberately **not** wired into `pathway_coordinator.dart`'s live navigation yet;
+- focused contract, repository, adapter, learner-model, retention, transfer, rebuilder, plan-store, explainer, fallback-factory, planner, graph, and lab tests (92 passing).
 
 ### Exact next action
 
-Harden and persist the O3/O4 runtime:
+O5, the plan executor:
 
-1. add derived competency-state and immutable learning-plan snapshot migrations/repositories;
-2. persist rebuild provenance, review urgency, and model/policy versions;
-3. add bounded transfer detection and error-resolution projection;
-4. add the SRS policy boundary and offline fallback-plan contract;
-5. validate bounded LLM plan proposals against approved candidate IDs without allowing direct state writes.
+1. build `execution/task_registry.dart` mapping task type → existing screen, without importing screens into the core planner;
+2. build `execution/plan_executor.dart`/`task_runner.dart` to replace `pathway_coordinator.dart`'s fixed five-stage sequence with `OrchestrationService.ensureTodayPlan` + `PlanStore` task transitions, preserving exact-resumption semantics;
+3. add a plan-based home UI (Must/Should/Bonus, today's priority, why-it-matters) alongside the existing fixed tiles until parity is proven, then cut over;
+4. only after O5 is proven: validate bounded LLM plan proposals against approved candidate IDs (O4's `llm_proposal_policy.dart`) and begin O4.5 shadow evaluation.
+
+O7-O10 (server auth, Supabase, RevenueCat) remain intentionally not started — they require external infrastructure/accounts and are gated behind pilot evidence per sections 2.3 and 10.
 
 ## 22. Definition of v1 success
 

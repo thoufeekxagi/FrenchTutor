@@ -28,9 +28,17 @@ import '../../widgets/floating_notetaker.dart';
 import '../session/session_screen.dart' show CallStatus;
 
 class VocabStageResult {
-  VocabStageResult({required this.wordsCovered, required this.reviewedCount});
+  VocabStageResult({
+    required this.wordsCovered,
+    required this.reviewedCount,
+    this.plannedWordIds = const [],
+  });
   final List<VocabEntry> wordsCovered;
   final int reviewedCount;
+
+  /// The full word list this session was started with — persisted so an
+  /// interrupted session can offer "continue with the remaining words" later.
+  final List<String> plannedWordIds;
 }
 
 /// One word in the session plan — straight through in the given order, no interleaved
@@ -86,6 +94,11 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   int _cardIndex = 0;
   int _reviewedCount = 0;
+
+  /// Exactly which words got real practice this sitting — insertion-ordered so
+  /// credit follows the ACTUAL session (the planner may reorder the queue, and
+  /// back/goto moves make position-based counting lie).
+  final Set<String> _practicedIds = <String>{};
 
   final List<String> _debugLog = [];
   final ScrollController _debugScrollController = ScrollController();
@@ -486,6 +499,11 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
         _goBackFromUserIntent();
       case LiveNavIntent.goto:
         _goToCard(verdict.cardNumber);
+      case LiveNavIntent.finish:
+        // Spoken "let's finish this lesson" = the End button. All words done →
+        // clean completion; otherwise the same save-and-continue-later sheet.
+        _cutTutorAudio();
+        _confirmEnd();
     }
   }
 
@@ -639,6 +657,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
       _wasGraded = true;
       _againGradedThisSession.remove(card.entry.id);
     }
+    if (_hasAttempted && card != null) _practicedIds.add(card.entry.id);
     _fireBatchedJudge();
     if (_currentCard != null) _reviewedCount += 1;
     _lastCardMoveAt = DateTime.now();
@@ -960,20 +979,21 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     }
   }
 
-  /// She suggested moving on — cut her off mid-word and pull her back. Same machinery as
-  /// the drift cut (audio flush + stale-reply suppression), so the recovery sounds clean.
+  /// She suggested moving on — GENTLY corrected. No audio cut: chopping her mid-question
+  /// was audible and wobbly in headphones, and the offer is harmless anyway (a reflexive
+  /// "yes" to it is refused, the card physically can't move). She finishes her sentence
+  /// naturally and a silent note pulls her back; the drift enforcer still hard-cuts the
+  /// one unrecoverable case — actually teaching a card that isn't on screen.
   void _correctIllegalOffer() {
     final current = _currentCard;
     if (current == null) return;
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
-    _logDebug('→ ILLEGAL OFFER: Marie suggested moving on — cutting her off');
-    _cutTutorAudio();
+    _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'STOP — you suggested moving on, which you must NEVER do. The student decides when to '
-      'move, alone, and their screen tells them how. Resume practicing "${current.entry.fr}" = '
-      '"${current.entry.en}" right now, warmly, as if you had never asked.',
-      expectReply: true,
+      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'an answer to that question: continue practicing "${current.entry.fr}" = '
+      '"${current.entry.en}" as if you had not asked.',
     );
   }
 
@@ -1097,22 +1117,49 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
 
   /// The only place this screen exits — pops exactly once with a typed
   /// outcome; the PathwayCoordinator decides what it means for the day.
+  /// Credits the card the student is standing on when the session ends: a real
+  /// attempt on it counts as practice (graded conservatively), merely landing
+  /// on it does not — so word 5-of-10 goes back in the pending pile unless it
+  /// was actually tried.
+  void _settleCurrentCard() {
+    final card = _currentCard;
+    if (card == null || !_hasAttempted) return;
+    if (!_wasGraded) {
+      SRSService(store: _store).grade(
+        entryId: card.entry.id,
+        grade: SRSGrade.hard,
+        responseType: SRSResponseType.auto,
+      );
+      _wasGraded = true;
+    }
+    if (_practicedIds.add(card.entry.id)) _reviewedCount += 1;
+  }
+
+  /// Word ids from today's plan that have not been practiced yet.
+  List<String> get _remainingWordIds => widget.vocabQueue
+      .map((e) => e.id)
+      .where((id) => !_practicedIds.contains(id))
+      .toList();
+
   void _finish({required bool completed, String reason = 'finished'}) {
     final alreadyDone = _finished;
+    if (!alreadyDone) _settleCurrentCard();
     _teardown();
     if (!mounted || alreadyDone) return;
     setState(() => _callStatus = CallStatus.ended);
-    final coveredWords = widget.vocabQueue.take(_reviewedCount).toList();
+    final coveredWords = widget.vocabQueue
+        .where((e) => _practicedIds.contains(e.id))
+        .toList();
     final result = VocabStageResult(
       wordsCovered: coveredWords,
-      reviewedCount: _reviewedCount,
+      reviewedCount: coveredWords.length,
+      plannedWordIds: widget.vocabQueue.map((e) => e.id).toList(),
     );
+    // Always carry the result on a pause — even zero-progress: the planned
+    // word list is what lets Today offer "continue where you left off".
     final outcome = completed
         ? StageOutcome.completed(result, reason: reason)
-        : StageOutcome<VocabStageResult>.paused(
-            result: _reviewedCount > 0 ? result : null,
-            reason: reason,
-          );
+        : StageOutcome<VocabStageResult>.paused(result: result, reason: reason);
     Navigator.of(context).pop(outcome);
   }
 
@@ -1130,15 +1177,32 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen> {
     }
   }
 
+  /// State-aware End: finishing the last word and tapping End IS completion —
+  /// no "are you sure you want to quit" for someone who just did the work.
+  /// Mid-session, the exit is framed as saving, never abandoning: practiced
+  /// words keep their credit and Today offers the remaining ones later.
   Future<void> _confirmEnd() async {
+    final remainingAfterThisCard = _remainingWordIds
+        .where((id) => id != (_hasAttempted ? _currentCard?.entry.id : null))
+        .length;
+    if (remainingAfterThisCard == 0) {
+      _finish(completed: true, reason: 'finished');
+      return;
+    }
+    final done = widget.vocabQueue.length - remainingAfterThisCard;
     final shouldEnd = await showPSConfirmDialog(
       context,
-      title: 'End vocabulary practice?',
-      message: "Words you've already reviewed are saved.",
-      confirmLabel: 'End',
-      destructive: true,
+      title: 'Save & continue later?',
+      message:
+          '$done of ${widget.vocabQueue.length} words practiced — they\'re '
+          'saved. The remaining $remainingAfterThisCard will be waiting on '
+          'Today when you come back.',
+      confirmLabel: 'Save & exit',
+      destructive: false,
     );
-    if (shouldEnd && mounted) _finish(completed: false, reason: 'cancelled');
+    if (shouldEnd && mounted) {
+      _finish(completed: false, reason: 'saved_for_later');
+    }
   }
 
   void _showAllWordsSheet() {
@@ -1655,9 +1719,11 @@ $languageGuidance
 
 CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and when they say something like "next", "got it", or "go back", the app moves the card itself — on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take — you aren't taking one.
 
-ABSOLUTE RULE — NEVER, EVER SUGGEST MOVING ON. Not "ready for the next word?", not "want to try the next one?", not "shall we continue?" — NOTHING of the kind, at any point, for any reason. The student is here to LEARN, not to be hurried along; their screen already tells them how to move on, and when they are ready THEY will say so or tap the button. You have exactly one job: keep practicing the current word — say it, have them repeat, react, work the example, again and again — until the app tells you the card changed. If you feel a pass went well, the correct next move is ANOTHER pass or a genuine question about the current word, never a suggestion to advance. The app monitors your speech and will cut your audio off and correct you the moment you suggest moving on. There is no number of repetitions after which suggesting becomes acceptable — the answer is always: it is not your call.
+THE CARD IS A ROOM — this is how the whole session works. The student chose this word; you are both in its room, and you stay there together until THEY walk out. From your point of view there is no schedule, no word list, no "rest of the lesson" — the next word does not exist until the app tells you the card changed. The student is here to learn, not to be moved along: some students want two passes, some want ten, and both are exactly right. Their screen tells them how to move on when they choose; it is never your topic.
 
-Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen; the student's screen has not changed, so teaching ahead means teaching something they cannot see. Only once the app tells you the card has changed do you teach the new word.
+END EVERY TURN INSIDE THE ROOM: each thing you say ends with an invitation about THIS word — "try it once more", "now say it in the example sentence", "how would you ask for one at the bakery?" You never run out of material for a single word: pronunciation details, the example sentence, a tiny roleplay using it, a related everyday phrase, its gender and article, a memory trick, hearing them use it in their own sentence. If a pass went well, the natural next move is a warmer, slightly harder pass — never a question about what comes next. Never ask "ready for the next word?", "shall we continue?", or anything of the kind: pacing is the student's alone, and any answer to such a question is ignored by the app anyway.
+
+Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen — the student cannot see it, and the app will cut your audio off if you teach ahead. Only once the app tells you the card has changed do you teach the new word.
 
 You have exactly one tool: mark_result, for recording how well the student did with the current word (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted the word. A rejection is not an error; never mention it to the student, just keep teaching naturally and try again once appropriate.
 
@@ -1666,8 +1732,8 @@ CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SINGLE WORD, DO NOT SKIP OR REORD
   2. Ask the student to repeat it, and give them a real beat of silence to actually try.
   3. React briefly to their attempt (encouragement, or a light correction).
   4. THEN walk through the example sentence already shown on their screen — say it in French, then give the English translation, and briefly point out how today's word is being used inside it. Never skip this step and never do it before step 1-3.
-  5. ONLY NOW ask a genuine question about moving on — e.g. "Does that feel good? Ready for the next word, or want to try it once more?" — and wait for their actual answer next turn. Never ask this before you've done steps 1 through 4.
-This student is a true beginner, so err toward MORE practice, not less. Some words below are marked NEW (never studied before) — do at least 4 to 5 full passes of steps 1-4 before step 5, not one or two; this is real practice time, not a formality. Others are marked FAMILIAR (already studied) — 2 passes is enough. Above all, follow the student's own lead within this order: if they ask to hear a word again, repeat it (bilingually, in English primarily) as many times as they want before moving to step 5; if they say they already know it, don't force the full 4-5 passes, but still walk through the example sentence at least once — never skip straight from step 1 to step 5.''',
+Then LOOP — back to another pass, a deeper angle, a tiny roleplay with the word. There is no step 5 and no "moving on" question: the loop continues until the student themselves says next or the app tells you the card changed.
+This student is a true beginner, so err toward MORE practice, not less — this is real practice time, not a formality. Follow the student's own lead within this order: if they ask to hear a word again, repeat it (bilingually, in English primarily) as many times as they want; if they say they already know it, still walk through the example sentence at least once.''',
     );
 
     final lines = plan

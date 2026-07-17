@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show showDialog;
 import 'package:flutter/widgets.dart';
 
 import '../config/api_keys.dart';
@@ -15,7 +16,9 @@ import '../screens/pathway/agent_led_vocab_screen.dart';
 import '../screens/pathway/agent_led_grammar_screen.dart';
 import '../screens/pathway/grammar_picker_screen.dart';
 import '../screens/pathway/pathway_writing_screen.dart';
-import '../screens/pathway/post_vocab_choice_screen.dart';
+import '../services/lesson_agent_service.dart';
+import '../services/srs_service.dart';
+import '../widgets/adaptive/adaptive.dart';
 import '../screens/pathway/vocab_picker_screen.dart';
 import '../screens/session/session_screen.dart';
 import 'stage_outcome.dart';
@@ -93,6 +96,15 @@ class PathwayCoordinator {
   // ---------------------------------------------------------------------------
 
   Future<void> _runVocab(BuildContext context) async {
+    // Snapshot BEFORE the screen runs: a day's vocab can span several sittings
+    // (save-and-continue-later), and each sitting only reports its own words —
+    // credit from earlier sittings must merge, never be overwritten.
+    final prior = session.stages[PathwayStage.vocab]!.resultJson;
+    final priorPracticed =
+        (prior?['wordIds'] as List?)?.cast<String>() ?? const <String>[];
+    final priorPlanned =
+        (prior?['plannedWordIds'] as List?)?.cast<String>() ?? const <String>[];
+
     final outcome = await AppRouter.push<StageOutcome<VocabStageResult>>(
       context,
       (_) => const VocabPickerScreen(),
@@ -103,10 +115,20 @@ class PathwayCoordinator {
       outcome,
       toJson: (r) {
         // Persist the covered word ids: writing targets and the speaking
-        // roleplay rebuild VocabEntry objects from these.
+        // roleplay rebuild VocabEntry objects from these. plannedWordIds is
+        // the day's chosen set — what "continue where you left off" reads.
+        final practiced = {
+          ...priorPracticed,
+          ...r.wordsCovered.map((e) => e.id),
+        }.toList();
+        final planned = {
+          ...priorPlanned,
+          ...r.plannedWordIds,
+        }.toList();
         return {
-          'wordIds': r.wordsCovered.map((e) => e.id).toList(),
-          'reviewedCount': r.reviewedCount,
+          'wordIds': practiced,
+          'plannedWordIds': planned,
+          'reviewedCount': practiced.length,
         };
       },
     );
@@ -171,40 +193,28 @@ class PathwayCoordinator {
   }
 
   Future<void> _runListening(BuildContext context) async {
-    // The passage is chosen once (post-vocab choice screen) and then frozen in
-    // the daily record — never regenerated after an interruption.
+    // The scene is written ONCE per day by the orchestration (Flash-Lite
+    // two-role script from today's words) and frozen in the daily record.
+    // A cached passage WITHOUT a script (legacy lab mapping, pre-script
+    // generations from testing) is stale — regenerated, never replayed:
+    // that was the "same croissant/€5 lab content forever" bug.
     var passage = _persistedPassage();
+    final hasScript =
+        passage?.segments.any((s) => (s.characterFr ?? '').isNotEmpty) ??
+        false;
+    if (!hasScript) passage = null;
+
+    passage ??= await _generateScene(context);
     if (passage == null) {
-      final chosen = await AppRouter.push<PostVocabChoice>(
-        context,
-        (_) => PostVocabChoiceScreen(
-          vocabResult: _vocabResult(),
-          fallbackExercise: _fallbackListeningExercise(),
-        ),
-        fullscreenDialog: true,
-      );
-      if (chosen == null) {
-        // Backed out of the choice — stage stays pending, nothing recorded.
-        session.stages[PathwayStage.listening]!.status = StageStatus.pending;
-        session.currentStage = null;
-        _save();
-        return;
-      }
-      passage = chosen.passage;
-      if (passage == null) {
-        // Nothing to read today (no vocab covered, no lab exercise): a real
-        // empty state, recorded as skipped rather than invented content.
-        session.stages[PathwayStage.listening]!.status = StageStatus.skipped;
-        session.stages[PathwayStage.listening]!.resultJson = {
-          'reason': 'no_content',
-        };
-        _maybeFinishDay();
-        _save();
-        return;
-      }
-      session.readingPassageJson = passage.toJson();
+      // Generation failed (offline, rate limit): the stage stays pending and
+      // can be retried — lab content is never silently substituted as a scene.
+      session.stages[PathwayStage.listening]!.status = StageStatus.pending;
+      session.currentStage = null;
       _save();
+      return;
     }
+    session.readingPassageJson = passage.toJson();
+    _save();
 
     if (!context.mounted) return;
     final outcome = await AppRouter.push<StageOutcome<ListeningStageResult>>(
@@ -431,16 +441,49 @@ class PathwayCoordinator {
     }
   }
 
-  ListeningExercise? _fallbackListeningExercise() {
-    final pack = ContentService.shared.listening();
-    final sorted = [...(pack?.exercises ?? <ListeningExercise>[])]
-      ..sort((a, b) => a.phase.compareTo(b.phase));
-    for (final e in sorted) {
-      if (store.lessonStatus('listening_${e.id}').status != 'completed') {
-        return e;
+  /// Writes today's scene via Flash-Lite. Scene words: today's covered vocab
+  /// when there is any; otherwise (vocab skipped — a first-class flow) the
+  /// learner's mixed SRS queue; last resort, the first content words. The
+  /// scene ALWAYS comes from the LLM — lab exercises are never mapped in.
+  Future<ReadingPassage?> _generateScene(BuildContext context) async {
+    var words = _vocabResult()?.wordsCovered ?? const <VocabEntry>[];
+    if (words.isEmpty) {
+      try {
+        words = await SRSService(store: store).dailyMixedQueue();
+      } catch (_) {
+        words = const [];
       }
     }
-    return sorted.isNotEmpty ? sorted.first : null;
+    if (words.isEmpty) {
+      words = ContentService.shared.vocabPhases
+          .expand((p) => p.themes.expand((t) => t.entries))
+          .take(6)
+          .toList();
+    }
+    if (words.isEmpty) return null;
+    words = words.take(6).toList();
+
+    if (!context.mounted) return null;
+    // Small blocking indicator while the script is written (~1-3s).
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: PSProgressIndicator(),
+      ),
+    );
+    ReadingPassage? passage;
+    try {
+      passage = await LessonAgentService.shared
+          .buildReadingPassageFromVocab(words: words)
+          .timeout(const Duration(seconds: 25));
+    } catch (_) {
+      passage = null;
+    }
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+    return passage;
   }
 
   List<VocabEntry> _entriesByIds(List<String> ids) {

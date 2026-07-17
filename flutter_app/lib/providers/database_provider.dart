@@ -6,6 +6,9 @@ import '../data/database/learning_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../data/database/competency_store.dart';
 import '../data/database/evidence_store.dart';
+import '../data/database/competency_state_store.dart';
+import '../data/database/plan_store.dart';
+import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
 import '../services/srs_service.dart';
 import '../services/progress_service.dart';
@@ -37,6 +40,18 @@ final competencyStoreProvider = Provider<CompetencyStore>((ref) {
 
 final evidenceStoreProvider = Provider<EvidenceStore>((ref) {
   return EvidenceStore(ref.watch(databaseProvider));
+});
+
+final competencyStateStoreProvider = Provider<CompetencyStateStore>((ref) {
+  return CompetencyStateStore(ref.watch(databaseProvider));
+});
+
+final planStoreProvider = Provider<PlanStore>((ref) {
+  return PlanStore(ref.watch(databaseProvider));
+});
+
+final orchestrationServiceProvider = Provider<OrchestrationService>((ref) {
+  return const OrchestrationService();
 });
 
 final pilotAccessServiceProvider = Provider<PilotAccessService>((ref) {

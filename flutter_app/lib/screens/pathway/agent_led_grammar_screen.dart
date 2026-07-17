@@ -370,6 +370,10 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
         _goBackFromUserIntent();
       case LiveNavIntent.goto:
         _goToCard(verdict.cardNumber);
+      case LiveNavIntent.finish:
+        // Spoken "let's finish" = the End button.
+        _cutTutorAudio();
+        _confirmEnd();
     }
   }
 
@@ -772,19 +776,18 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     }
   }
 
-  /// She suggested moving on — banned. Cut + corrective, same machinery as drift.
+  /// She suggested moving on — GENTLY corrected: no audio cut (audible/wobbly), just a
+  /// silent note; a reflexive "yes" to the slipped offer is refused anyway. The drift
+  /// enforcer still hard-cuts real teaching-ahead.
   void _correctIllegalOffer() {
     final current = _currentCard;
     if (current == null) return;
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
-    _logDebug('→ ILLEGAL OFFER: Marie suggested moving on — cutting her off');
-    _cutTutorAudio();
+    _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'STOP — you suggested moving on, which you must NEVER do. The student decides when to '
-      'move, alone. Resume practicing the current sentence right now, warmly, as if you had '
-      'never asked.',
-      expectReply: true,
+      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'an answer to that question: continue practicing "${current.card.fr}" (${current.card.en}) as if you had not asked.',
     );
   }
 
@@ -1293,17 +1296,17 @@ CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET:
 
 CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go back. The app watches the student's own words directly and moves the card itself when they say something like "next" or "go back" — zero involvement from you. You'll simply be told the new current sentence afterward and should react to it naturally.
 
-ABSOLUTE RULE — NEVER SUGGEST MOVING ON: not "ready for the next sentence?", not "shall we continue?" — nothing of the kind, ever. The student decides alone; their screen tells them how. Your only job is practicing the current sentence until the app tells you the card changed. The app monitors your speech and will cut you off and correct you if you suggest advancing. Never say, explain, or drill any sentence that is not the current card on screen — the student cannot see it yet.
+THE SENTENCE IS A ROOM — grammar is the hardest stage, so you go DEEPER here than anywhere else, and you never leave the current sentence until the student walks out. From your point of view there is no list and no next sentence; it does not exist until the app tells you the card changed. NEVER suggest moving on — not "ready for the next sentence?", not "shall we continue?", nothing, ever. The student decides alone; their screen tells them how. Never say, explain, or drill any sentence that is not the current card on screen — the student cannot see it, and the app will cut you off if you teach ahead.
+
+TEACH THE SENTENCE LIKE A WATCHMAKER — word by word, connection by connection:
+  1. Say the full French sentence clearly, with its English meaning.
+  2. Have them repeat the whole thing once; react warmly.
+  3. Now take it APART: walk through it word by word — what each word is, what it means alone, and HOW it connects to its neighbors (why this verb ending for this subject, why the article agrees, why the words sit in this order). One small piece per turn, in plain English, having them say each piece back.
+  4. Rebuild it: have them say the full sentence again now that they know how it works.
+  5. Make it interactive and theirs: ask a micro-question about it ("which word makes it past tense?"), swap ONE word to show the pattern flexing (keeping the same tense and structure of THIS sentence), or ask them to answer a tiny question using it.
+END EVERY TURN INSIDE THE ROOM — with an invitation about THIS sentence: say it again, answer with it, spot the pattern in it. If a pass went well, go one layer deeper on the same sentence; there is always another layer. Keep every explanation to one small idea per turn — this student is a beginner, and grammar sticks through connection, not coverage.
 
 You have exactly one tool: mark_drill_result, for recording whether the student's spoken answer to the current sentence was correct. It's a proposal — the app only accepts it once it's confirmed the student actually attempted the sentence. A rejection is not an error; never mention it, just keep teaching naturally.
-
-CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SENTENCE:
-  1. Say the French sentence clearly, paired with its English meaning.
-  2. Ask the student to repeat it, and give them a real beat of silence to actually try.
-  3. React briefly to their attempt.
-  4. THEN explain the grammar note already shown on screen, in plain simple English.
-  5. ONLY NOW ask if they're ready to move on, and wait for their actual answer.
-Keep grammar explanations SIMPLE — no advanced tense talk beyond the note shown, this is intentionally basic for now; a harder/dynamic-difficulty version comes later.
 ''');
     final lines = <String>[];
     for (var i = 0; i < plan.length; i++) {

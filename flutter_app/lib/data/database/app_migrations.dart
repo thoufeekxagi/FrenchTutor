@@ -57,6 +57,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   2: _migrationV2,
   3: _migrationV3,
   4: _migrationV4,
+  5: _migrationV5,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -376,6 +377,116 @@ void _migrationV4(CommonDatabase db) {
     CREATE TRIGGER IF NOT EXISTS error_events_no_delete
     BEFORE DELETE ON error_events BEGIN
       SELECT RAISE(ABORT, 'error_events is append-only');
+    END
+    ''',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
+  }
+}
+
+void _migrationV5(CommonDatabase db) {
+  const statements = [
+    // --- Derived competency-by-modality belief cache. Rebuildable from
+    // evidence_events at any time; never a source of truth on its own. ---
+    '''
+    CREATE TABLE IF NOT EXISTS learner_competency_states (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      competency_id TEXT NOT NULL,
+      modality TEXT NOT NULL,
+      mastery_estimate REAL NOT NULL CHECK (mastery_estimate BETWEEN 0 AND 1),
+      confidence REAL NOT NULL CHECK (confidence BETWEEN 0 AND 1),
+      retention_strength REAL NOT NULL CHECK (retention_strength BETWEEN 0 AND 1),
+      evidence_count INTEGER NOT NULL DEFAULT 0,
+      transfer_status TEXT NOT NULL,
+      last_observed_at TEXT,
+      last_success_at TEXT,
+      next_review_at TEXT,
+      learner_model_type TEXT NOT NULL,
+      model_version TEXT NOT NULL,
+      model_state_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT,
+      UNIQUE(user_id, competency_id, modality)
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_learner_states_review ON learner_competency_states (next_review_at)',
+    'CREATE INDEX IF NOT EXISTS idx_learner_states_competency ON learner_competency_states (competency_id, modality)',
+
+    // --- Immutable plan snapshots. A plan is generated once; starting a
+    // task locks it. Replanning creates a new row, never a rewrite. ---
+    '''
+    CREATE TABLE IF NOT EXISTS learning_plans (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      local_date TEXT NOT NULL,
+      available_minutes INTEGER NOT NULL,
+      environment_json TEXT NOT NULL,
+      primary_priority TEXT NOT NULL,
+      explanation TEXT NOT NULL,
+      planner_version TEXT NOT NULL,
+      input_snapshot_json TEXT NOT NULL,
+      status TEXT NOT NULL,
+      replaces_plan_id TEXT,
+      replan_reason TEXT,
+      started_at TEXT,
+      completed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_learning_plans_date ON learning_plans (local_date)',
+    'CREATE INDEX IF NOT EXISTS idx_learning_plans_status ON learning_plans (status)',
+    '''
+    CREATE TABLE IF NOT EXISTS plan_tasks (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      plan_id TEXT NOT NULL,
+      sequence INTEGER NOT NULL,
+      content_item_id TEXT NOT NULL,
+      requirement TEXT NOT NULL,
+      estimated_minutes INTEGER NOT NULL,
+      reason_code TEXT NOT NULL,
+      reason_detail_json TEXT NOT NULL,
+      target_competency_ids_json TEXT NOT NULL,
+      status TEXT NOT NULL,
+      started_at TEXT,
+      completed_at TEXT,
+      result_summary_json TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_plan_tasks_plan ON plan_tasks (plan_id, sequence)',
+    'CREATE INDEX IF NOT EXISTS idx_plan_tasks_status ON plan_tasks (status)',
+
+    // --- Versioned, dated assessment summaries. Never overwritten. ---
+    '''
+    CREATE TABLE IF NOT EXISTS assessment_snapshots (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      assessment_type TEXT NOT NULL,
+      summary_json TEXT NOT NULL,
+      source_evidence_ids_json TEXT NOT NULL DEFAULT '[]',
+      model_version TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_assessment_snapshots_type ON assessment_snapshots (assessment_type, created_at)',
+    '''
+    CREATE TRIGGER IF NOT EXISTS assessment_snapshots_no_update
+    BEFORE UPDATE ON assessment_snapshots BEGIN
+      SELECT RAISE(ABORT, 'assessment_snapshots is append-only');
+    END
+    ''',
+    '''
+    CREATE TRIGGER IF NOT EXISTS assessment_snapshots_no_delete
+    BEFORE DELETE ON assessment_snapshots BEGIN
+      SELECT RAISE(ABORT, 'assessment_snapshots is append-only');
     END
     ''',
   ];

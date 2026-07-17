@@ -329,16 +329,28 @@ class ConstrainedUtilityPolicy implements TaskSelectionPolicy {
     return a.modality.index.compareTo(b.modality.index);
   }
 
-  int _minutesFor(PerformanceModality modality) => switch (modality) {
-    PerformanceModality.listeningRecognition => 10,
-    PerformanceModality.readingRecognition => 7,
-    PerformanceModality.controlledWriting => 12,
-    PerformanceModality.spontaneousWriting => 18,
-    PerformanceModality.controlledSpeaking => 12,
-    PerformanceModality.spontaneousSpeaking => 18,
-    PerformanceModality.pronunciationProduction => 8,
-  };
+  int _minutesFor(PerformanceModality modality) => minutesForModality(modality);
 }
+
+/// Authored per-modality time estimate. Shared by every policy — including
+/// the offline [FallbackPlanFactory] — so a task's estimated length never
+/// depends on which selector chose it.
+int minutesForModality(PerformanceModality modality) => switch (modality) {
+  PerformanceModality.listeningRecognition => 10,
+  PerformanceModality.readingRecognition => 7,
+  PerformanceModality.controlledWriting => 12,
+  PerformanceModality.spontaneousWriting => 18,
+  PerformanceModality.controlledSpeaking => 12,
+  PerformanceModality.spontaneousSpeaking => 18,
+  PerformanceModality.pronunciationProduction => 8,
+};
+
+/// True for tasks that can run with no network — every modality except
+/// spontaneous (Gemini Live) speaking. Shared context-allow logic lives on
+/// [ConstrainedUtilityPolicy._contextAllows]; this narrower helper is for
+/// offline-only selection where there is no live [PlanningContext].
+bool isOfflineSafeModality(PerformanceModality modality) =>
+    modality != PerformanceModality.spontaneousSpeaking;
 
 class Orchestrator {
   const Orchestrator({this.policy = const ConstrainedUtilityPolicy()});

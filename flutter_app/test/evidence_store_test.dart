@@ -165,14 +165,14 @@ void main() {
       expect(store.errorEvents(), hasLength(1));
     });
 
-    test('runs forward-only migrations through version 4 once', () {
+    test('runs forward-only migrations through version 5 once', () {
       EvidenceStore(db);
 
       expect(
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3, 4],
+        [1, 2, 3, 4, 5],
       );
     });
   });

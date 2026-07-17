@@ -319,6 +319,18 @@ class LearningStore {
     return session;
   }
 
+  /// Soft-deletes today's row so the next [dailySession] call mints a fresh
+  /// plan — the "Retake today's plan" test-phase escape hatch. Evidence and
+  /// SRS grades already recorded are untouched; only the day's pathway state
+  /// (stage statuses, frozen word list/passage) starts over.
+  void resetDailySession({DateTime? on}) {
+    final date = dayString(on ?? DateTime.now());
+    _db.execute(
+      'UPDATE daily_sessions SET deleted_at = ?, updated_at = ? WHERE local_date = ? AND deleted_at IS NULL',
+      [_now(), _now(), date],
+    );
+  }
+
   void saveDailySession(DailySession session) {
     _db.execute(
       '''

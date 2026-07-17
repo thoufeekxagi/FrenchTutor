@@ -45,6 +45,13 @@ class _ReadingSessionCard {
 
 enum _ReadingUserIntent { advance, again, back, none }
 
+/// The app-owned micro-state inside one beat. LEARN: the coach teaches the
+/// student's line and they rehearse it. PLAY: the character delivers their
+/// side and the student answers for real. "Next" walks learn → play → next
+/// beat's learn; the app directs Marie explicitly at every transition — she
+/// never decides the structure herself.
+enum _BeatPhase { learn, play }
+
 /// Daily Pathway stage 2 — rebuilt against the same rule as AgentLedVocabScreen: Marie
 /// teaches, the app owns every navigation decision. Walks through a pre-built ReadingPassage
 /// (either LLM-assembled once from the vocab just practiced, or mapped offline from an
@@ -81,7 +88,6 @@ class _AgentLedListeningScreenState
   Timer? _speakingWatchdog;
   String _errorMessage = '';
   bool _finished = false;
-  bool _isWrappingUp = false;
 
   DateTime _lastAudioChunkAt = DateTime.now();
 
@@ -177,15 +183,16 @@ class _AgentLedListeningScreenState
           setState(() => _errorMessage = 'Microphone permission denied');
         }
       });
-      // Marie opens the call — she greets and introduces the first segment; the student
-      // never has to speak first.
+      // The app directs from the very first turn: Marie opens as the coach, sets the
+      // scene, and teaches beat 1's line. The student never has to speak first.
       final first = _currentCard;
       if (first != null) {
-        _gemini.injectContext(
-          'The call has just connected. Greet the student warmly in one short sentence, then '
-          'introduce the first part of the passage on their screen: "${first.segment.fr}"'
-          '${first.segment.en.isEmpty ? '' : ' = ${first.segment.en}'} and begin teaching it.',
-          expectReply: true,
+        _direct(
+          'As the COACH, in English: welcome the student, set the scene in one or two vivid '
+          'sentences (scenario: "${widget.passage.title}" — where they are, who they\'re '
+          'playing, what they want), then give them their first line — "${first.segment.fr}"'
+          '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'} — and ask them to '
+          'try it.',
         );
       }
     };
@@ -226,7 +233,6 @@ class _AgentLedListeningScreenState
       if (mounted && _callStatus != CallStatus.muted) {
         setState(() => _callStatus = CallStatus.listening);
       }
-      if (_isWrappingUp) _finish(completed: true);
     };
 
     _gemini.onInterrupted = () {
@@ -287,8 +293,11 @@ class _AgentLedListeningScreenState
         verdict = await LessonAgentService.shared.classifyLiveIntent(
           utterance: trimmed,
           cardDescription: card != null
-              ? 'passage segment "${card.segment.fr}" = "${card.segment.en}"'
-              : '(session already finished)',
+              ? 'the student\'s line at this beat of a roleplay scene they are acting out: '
+                    '"${card.segment.fr}" = "${card.segment.en}" — saying this line (even '
+                    'imperfectly) is them performing the scene, an attempt, never a command'
+              : '(scene already finished — a finale run-through may be in progress; the '
+                    'student speaking French lines is performing, not commanding)',
           tutorLastLine: _lastTutorLine,
           attemptCount: _attemptCount,
           cardPosition: _segmentIndex + 1,
@@ -345,10 +354,17 @@ class _AgentLedListeningScreenState
         _lastDetectedIntent = _ReadingUserIntent.none;
         _attemptCount += 1;
         _maybeUnlockOffer();
+        // During the finale the app runs the script: each learner line the
+        // student delivers advances the runner to the next character line.
+        if (_finaleBeat != null) _advanceFinale();
       case LiveNavIntent.chat:
         _lastDetectedIntent = _ReadingUserIntent.none;
       case LiveNavIntent.again:
         _lastDetectedIntent = _ReadingUserIntent.again;
+        // Replay the current phase: re-teach the line, or re-deliver the
+        // character's side — app-directed either way.
+        _cutTutorAudio();
+        _directCurrentPhase();
       case LiveNavIntent.advance:
         _lastDetectedIntent = _ReadingUserIntent.advance;
         if (!verdict.explicit && !_offerUnlocked) {
@@ -361,6 +377,10 @@ class _AgentLedListeningScreenState
         _goBackFromUserIntent();
       case LiveNavIntent.goto:
         _goToCard(verdict.cardNumber);
+      case LiveNavIntent.finish:
+        // Spoken "let's finish" = the End button.
+        _cutTutorAudio();
+        _confirmEnd();
     }
   }
 
@@ -389,61 +409,126 @@ class _AgentLedListeningScreenState
     );
   }
 
-  // One compact line appended to every card-change note — full rules live in the system
-  // prompt; injections stay lean.
-  static const _noteReminder =
-      'Explain in English — reciting French is practice, never a cue to switch into '
-      'French-led talk. NEVER suggest moving on; the student alone decides.';
+  // ---------------------------------------------------------------------------
+  // The scene director: the app owns the script; Marie executes one
+  // instruction per turn. All structure transitions flow through here.
+  // ---------------------------------------------------------------------------
 
+  _BeatPhase _phase = _BeatPhase.learn;
+
+  /// Finale runner: non-null once every beat is rehearsed and the whole scene
+  /// plays through. Value = the beat whose character line was just delivered;
+  /// each learner attempt advances it. Deterministic — no model discretion.
+  int? _finaleBeat;
+
+  /// Sends Marie her next single-turn instruction (debounced, same as card
+  /// announcements were, so rapid navigation only directs the landing state).
+  void _direct(String instruction) {
+    _announceTimer?.cancel();
+    _announceTimer = Timer(const Duration(milliseconds: 600), () {
+      if (_finished) return;
+      _gemini.injectContext(
+        'YOUR NEXT TURN, EXACTLY THIS AND NOTHING MORE: $instruction '
+        'Then stop completely and wait for the student.',
+        expectReply: true,
+      );
+    });
+  }
+
+  void _directCurrentPhase() {
+    final card = _currentCard;
+    if (card == null) return;
+    switch (_phase) {
+      case _BeatPhase.learn:
+        _directLearn(card.segment);
+      case _BeatPhase.play:
+        _directPlay(card.segment);
+    }
+  }
+
+  void _directLearn(ReadingSegment segment) {
+    final meaning = segment.en.isEmpty ? '' : ' = "${segment.en}"';
+    _direct(
+      'As the COACH, in English: set up beat ${_segmentIndex + 1} of the scene in one short '
+      'sentence, give the student their line — "${segment.fr}"$meaning — and ask them to try '
+      'it.',
+    );
+  }
+
+  void _directPlay(ReadingSegment segment) {
+    final character = segment.characterFr;
+    if (character != null && character.isNotEmpty) {
+      final characterMeaning = (segment.characterEn?.isNotEmpty ?? false)
+          ? ' (meaning: ${segment.characterEn})'
+          : '';
+      _direct(
+        'Scene time. As the CHARACTER, say exactly this French line and nothing else: '
+        '"$character"$characterMeaning.',
+      );
+    } else {
+      _direct(
+        'Scene time. As the CHARACTER, improvise ONE short, simple French line that '
+        'naturally prompts the student to answer with their line "${segment.fr}", and say '
+        'only that.',
+      );
+    }
+  }
+
+  /// "Next" walks the beat's phases: learn → play → next beat's learn.
   void _advanceFromUserIntent() {
-    if (_currentCard == null) return;
-    _logDebug('→ user-driven advance');
+    final card = _currentCard;
+    if (card == null) return;
     _cutTutorAudio();
+    if (_phase == _BeatPhase.learn) {
+      _logDebug('→ beat ${_segmentIndex + 1}: learn → play');
+      setState(() => _phase = _BeatPhase.play);
+      _directPlay(card.segment);
+      return;
+    }
+    _logDebug('→ user-driven advance to next beat');
     _performAdvance();
     final next = _currentCard;
     if (next != null) {
-      _scheduleCardAnnouncement(
-        '${_contextNote(next.segment, 'The student accepted — the screen now shows')} '
-        'If you just offered this part, continue smoothly from that (no cold '
-        're-introduction): say it aloud and have them repeat.',
-      );
+      _directLearn(next.segment);
     } else {
       _wrapUp();
     }
   }
 
+  /// "Back" mirrors it: play → this beat's learn → previous beat's learn.
   void _goBackFromUserIntent() {
+    _cutTutorAudio();
+    if (_phase == _BeatPhase.play) {
+      _logDebug('→ beat ${_segmentIndex + 1}: play → learn');
+      setState(() => _phase = _BeatPhase.learn);
+      _directCurrentPhase();
+      return;
+    }
     if (_segmentIndex <= 0) return;
     _logDebug('→ user-driven go back');
-    _cutTutorAudio();
     _performGoBack();
     final card = _currentCard;
-    if (card != null) {
-      _scheduleCardAnnouncement(
-        '${_contextNote(card.segment, 'The student asked to go back — the screen now shows')} '
-        'Re-anchor it briefly and have them try it once.',
-      );
-    }
+    if (card != null) _directLearn(card.segment);
   }
 
-  /// Jump straight to a specific segment by 1-based number — "go to the third part".
+  /// Jump straight to a specific beat by 1-based number — "go to the third part".
   void _goToCard(int? cardNumber) {
     if (cardNumber == null) {
-      _logDebug('→ goto ignored: no card number');
+      _logDebug('→ goto ignored: no beat number');
       return;
     }
     final target = cardNumber - 1;
     if (target < 0 || target >= _sessionPlan.length) {
       _logDebug(
-        '→ goto ignored: segment $cardNumber out of range (1-${_sessionPlan.length})',
+        '→ goto ignored: beat $cardNumber out of range (1-${_sessionPlan.length})',
       );
       return;
     }
     if (target == _segmentIndex) {
-      _logDebug('→ goto ignored: already on segment $cardNumber');
+      _logDebug('→ goto ignored: already on beat $cardNumber');
       return;
     }
-    _logDebug('→ user-driven jump to segment $cardNumber');
+    _logDebug('→ user-driven jump to beat $cardNumber');
     _cutTutorAudio();
     _lastCardMoveAt = DateTime.now();
     setState(() {
@@ -451,10 +536,36 @@ class _AgentLedListeningScreenState
       _resetPerCardState();
     });
     final card = _currentCard;
-    if (card != null) {
-      _scheduleCardAnnouncement(
-        '${_contextNote(card.segment, 'The student jumped to part $cardNumber — the screen now shows')} '
-        'Announce it briefly, then teach it.',
+    if (card != null) _directLearn(card.segment);
+  }
+
+  /// The finale runner — the app walks the whole script: character line,
+  /// student's line, next character line… until the scene is done.
+  void _advanceFinale() {
+    final next = (_finaleBeat ?? -1) + 1;
+    if (next < _sessionPlan.length) {
+      _finaleBeat = next;
+      _logDebug('→ finale: beat ${next + 1}/${_sessionPlan.length}');
+      final segment = _sessionPlan[next].segment;
+      final character = segment.characterFr;
+      if (character != null && character.isNotEmpty) {
+        _direct(
+          'FINALE, stay in CHARACTER, no coaching: say exactly this French line and nothing '
+          'else: "$character".',
+        );
+      } else {
+        _direct(
+          'FINALE, stay in CHARACTER, no coaching: say ONE short simple French line that '
+          'prompts the student\'s line "${segment.fr}", and only that.',
+        );
+      }
+    } else {
+      _finaleBeat = _sessionPlan.length;
+      _logDebug('→ finale complete');
+      _direct(
+        'The scene is complete! As the COACH, in English: congratulate the student warmly on '
+        'performing a whole real French conversation, and tell them to say "finish" whenever '
+        'they\'re ready to end.',
       );
     }
   }
@@ -472,19 +583,6 @@ class _AgentLedListeningScreenState
     }
   }
 
-  /// Debounced spoken card announcement — rapid skips only announce the landing segment.
-  void _scheduleCardAnnouncement(String note) {
-    _announceTimer?.cancel();
-    _announceTimer = Timer(const Duration(milliseconds: 600), () {
-      if (!_finished) _gemini.injectContext(note, expectReply: true);
-    });
-  }
-
-  static String _contextNote(ReadingSegment segment, String prefix) {
-    final meaning = segment.en.isEmpty ? '' : ' = ${segment.en}';
-    return '$prefix: "${segment.fr}"$meaning. Grammar note: ${segment.grammarNote} '
-        'Pronunciation tip: ${segment.pronunciationTip} $_noteReminder';
-  }
 
   /// The actual card-advance side effects (grading, index, reset) — shared by the accepted
   /// tool-call path and the direct-tap path so they can never drift apart.
@@ -677,6 +775,8 @@ class _AgentLedListeningScreenState
     _lastDetectedIntent = _ReadingUserIntent.none;
     _handledCallIds.clear();
     _offerUnlocked = false;
+    // Every beat starts in LEARN: coach teaches the line before the scene plays.
+    _phase = _BeatPhase.learn;
     // Cleared on card change so a "go back" can't false-trip the drift enforcer on
     // mentions of a segment that was legitimately current moments ago.
     _tutorTurnTranscript = '';
@@ -736,19 +836,18 @@ class _AgentLedListeningScreenState
     }
   }
 
-  /// She suggested moving on — banned. Cut + corrective, same machinery as drift.
+  /// She suggested moving on — GENTLY corrected: no audio cut (audible/wobbly), just a
+  /// silent note; a reflexive "yes" to the slipped offer is refused anyway. The drift
+  /// enforcer still hard-cuts real teaching-ahead.
   void _correctIllegalOffer() {
     final current = _currentCard;
     if (current == null) return;
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
-    _logDebug('→ ILLEGAL OFFER: Marie suggested moving on — cutting her off');
-    _cutTutorAudio();
+    _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'STOP — you suggested moving on, which you must NEVER do. The student decides when to '
-      'move, alone. Resume practicing the current part right now, warmly, as if you had '
-      'never asked.',
-      expectReply: true,
+      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'an answer to that question: continue practicing "${current.segment.fr}"  as if you had not asked.',
     );
   }
 
@@ -772,13 +871,30 @@ class _AgentLedListeningScreenState
     );
   }
 
+  /// The finale — the shareable moment: every beat is rehearsed, so now the whole scene
+  /// runs start to finish in character, no coaching, the student performing for real.
+  /// Deliberately NOT `_isWrappingUp` (which would end the call at the next turn
+  /// boundary): the finale is a real multi-turn conversation, and the student ends it
+  /// themselves by saying "finish" or tapping End — which now counts as completion since
+  /// every beat has been practiced.
+  bool _finaleStarted = false;
+
+  /// Every beat is rehearsed → the app now runs the whole script start to finish.
+  /// One combined first instruction (announce + first character line), then each
+  /// learner attempt advances `_advanceFinale` deterministically through the script.
   void _wrapUp() {
-    if (_isWrappingUp) return;
-    _isWrappingUp = true;
-    _gemini.injectContext(
-      "The student has now gone through the whole passage. Say a short warm closing line (one "
-      "sentence) congratulating them, then stop talking.",
-      expectReply: true,
+    if (_finaleStarted) return;
+    _finaleStarted = true;
+    _finaleBeat = 0;
+    _logDebug('→ finale: full scene run-through (app-directed)');
+    final first = _sessionPlan.first.segment;
+    final opener = (first.characterFr?.isNotEmpty ?? false)
+        ? 'then switch to the CHARACTER and say exactly: "${first.characterFr}"'
+        : 'then switch to the CHARACTER and say one short French line prompting '
+              '"${first.fr}"';
+    _direct(
+      'As the COACH, in English, one sentence: every line is rehearsed — now we play the '
+      'whole scene for real, no coaching; $opener.',
     );
   }
 
@@ -840,7 +956,17 @@ class _AgentLedListeningScreenState
     }
   }
 
+  /// State-aware End, mirroring vocab's: ending after the last beat (or during the
+  /// finale) IS completion — the student did the work; no quit-confirmation for that.
   Future<void> _confirmEnd() async {
+    final onLastWithAttempt =
+        _segmentIndex >= _sessionPlan.length - 1 && _hasAttempted;
+    if (_finaleStarted ||
+        _segmentIndex >= _sessionPlan.length ||
+        onLastWithAttempt) {
+      _finish(completed: true, reason: 'finished');
+      return;
+    }
     final shouldEnd = await showPSConfirmDialog(
       context,
       title: 'End this section?',
@@ -1042,10 +1168,16 @@ class _AgentLedListeningScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              KickerText(widget.passage.title, color: DesignTokens.slateDim),
+              KickerText(
+                'Scene · ${widget.passage.title}',
+                color: DesignTokens.slateDim,
+              ),
               const SizedBox(height: 4),
               Text(
-                widget.passage.fullText,
+                card != null
+                    ? 'Beat ${_segmentIndex + 1} of ${_sessionPlan.length} — '
+                          '${_phase == _BeatPhase.learn ? 'learn your line, then say "next" to play the beat' : 'the scene is live — answer with your line'}'
+                    : 'Scene complete',
                 style: DesignTokens.body(
                   13,
                 ).copyWith(color: DesignTokens.slateDim),
@@ -1054,25 +1186,65 @@ class _AgentLedListeningScreenState
           ),
         ),
         if (card != null) ...[
+          if (card.segment.characterFr?.isNotEmpty ?? false) ...[
+            const SizedBox(height: 14),
+            PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const KickerText('Marie says', color: DesignTokens.secondary),
+                  const SizedBox(height: 4),
+                  Text(
+                    card.segment.characterFr!,
+                    style: DesignTokens.body(
+                      15,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.secondary),
+                  ),
+                  if (card.segment.characterEn?.isNotEmpty ?? false)
+                    Text(
+                      card.segment.characterEn!,
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           PasseportCard(
             padding: 24,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  card.segment.fr,
-                  style: DesignTokens.display(
-                    22,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-                if (card.segment.en.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    card.segment.en,
-                    style: DesignTokens.display(16, weight: FontWeight.w500),
+                const KickerText('Your line', color: DesignTokens.slateDim),
+                const SizedBox(height: 8),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        card.segment.fr,
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.display(
+                          22,
+                          weight: FontWeight.w500,
+                        ).copyWith(color: DesignTokens.primary),
+                      ),
+                      if (card.segment.en.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          card.segment.en,
+                          textAlign: TextAlign.center,
+                          style: DesignTokens.display(
+                            16,
+                            weight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
+                ),
               ],
             ),
           ),
@@ -1115,18 +1287,23 @@ class _AgentLedListeningScreenState
           ),
           const SizedBox(height: 14),
           Text(
-            'Repeat it out loud — Marie is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+            _phase == _BeatPhase.learn
+                ? 'Practice your line out loud — Marie is listening. Say "next" (or tap Play) when you\'re ready to act the beat.'
+                : 'Marie is in character — answer her with your line. Say "next" for the next beat, or "again" to replay.',
             style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 14),
           // Same guaranteed navigation fallback as vocab — Back/Next always work, no
-          // dependency on speech recognition or the model.
+          // dependency on speech recognition or the model. Next is phase-aware:
+          // learn → play the beat, play → next beat.
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: _segmentIndex == 0 ? null : _goBackFromUserIntent,
+                  onPressed: _segmentIndex == 0 && _phase == _BeatPhase.learn
+                      ? null
+                      : _goBackFromUserIntent,
                   icon: const Icon(CupertinoIcons.chevron_left, size: 16),
                   label: const Text('Back'),
                   style: OutlinedButton.styleFrom(
@@ -1139,8 +1316,12 @@ class _AgentLedListeningScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: PasseportPrimaryButton(
-                  label: 'Next segment',
-                  icon: CupertinoIcons.arrow_right,
+                  label: _phase == _BeatPhase.learn
+                      ? 'Play the beat'
+                      : 'Next beat',
+                  icon: _phase == _BeatPhase.learn
+                      ? CupertinoIcons.play_fill
+                      : CupertinoIcons.arrow_right,
                   onPressed: _advanceFromUserIntent,
                 ),
               ),
@@ -1159,7 +1340,7 @@ class _AgentLedListeningScreenState
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  _isWrappingUp ? 'Wrapping up…' : 'All done!',
+                  _finaleStarted ? 'Scene finale — play it through!' : 'All done!',
                   style: DesignTokens.body(14, weight: FontWeight.w500),
                 ),
                 const SizedBox(height: 6),
@@ -1276,34 +1457,33 @@ class _AgentLedListeningScreenState
     }
     final parts = <String>[];
     parts.add('''
-READING & LISTENING STAGE — walking through a short French passage, one word or short phrase at a time, exactly the way the vocab stage teaches one word at a time. The student's screen ALREADY shows the current segment's French text and English meaning the instant it appears — you never need to reveal anything.
+ROLEPLAY SCENE STAGE — "${passage.title}". You are a DIRECTED ACTOR-COACH in a scripted scene the app runs beat by beat. The student plays themselves (the customer/visitor); you play two registers: the COACH (English — teaches, reacts, encourages) and the CHARACTER (French — the other role in the scene, one scripted line at a time).
 
-CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the current segment itself, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something. If you catch yourself explaining something in French, stop and say it in English instead.
+THE CONTRACT — THE APP DIRECTS, YOU PERFORM:
+1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction — one move — then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
+2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence — react to their attempt, fix gently if needed, encourage — then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene.
+3. NEVER read the script ahead, never say more than the single line the app asked for, never list the student's lines, never claim a learner line as yours. The script below is for your understanding only — the app feeds you each piece when it's time.
+4. NEVER suggest moving on or ask what's next — pacing belongs to the student and the app alone.
+5. If the student freezes after a character line (long silence), whisper a rescue in English: "psst — your line is: ..." with their current line, then stop.
+6. English is the coaching language; this student is a beginner. Their reciting of French lines is practice, never a cue to switch into French-led coaching.
 
-CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next segment or go back, and you have no tool to do that yourself. The app is watching the student's own words directly, and when they say something like "next", "got it", or "go back", the app moves the segment itself — with zero involvement from you. You'll simply be told the new current segment afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take.
-
-ABSOLUTE RULE — NEVER SUGGEST MOVING ON: not "ready for the next part?", not "shall we continue?" — nothing of the kind, ever. The student decides alone; their screen tells them how. Your only job is practicing the current segment until the app tells you it changed. The app monitors your speech and will cut you off and correct you if you suggest advancing. Never explain, drill, or walk through any segment that is not the current one on screen — the student cannot see it yet.
-
-You have exactly one tool: mark_segment_result, for recording how well the student did with the current segment (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted it. A rejection is not an error; never mention it to the student, just keep teaching naturally.
-
-CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SINGLE SEGMENT, DO NOT SKIP OR REORDER STEPS:
-  1. Read the French word/phrase slowly and clearly, pairing it with its English meaning.
-  2. Ask the student to repeat it, and give them a real beat of silence to actually try.
-  3. React briefly to their attempt (encouragement, or a light correction).
-  4. THEN explain the grammar note already shown on their screen (why this word/word order is used) AND the pronunciation tip already shown, in your own words, briefly.
-  5. ONLY NOW ask a genuine question about moving on — e.g. "Ready for the next part, or want to try it once more?" — and wait for their actual answer next turn.
-This student is a true beginner: do at least 2 full passes of steps 1-4 before step 5, not one. Keep grammar explanations SIMPLE — no conjugation tables, no advanced tense talk, this is intentionally basic; a harder version comes later.
+You have exactly one tool: mark_segment_result, for recording how well the student did with the current beat (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted it. A rejection is not an error; never mention it, just keep going.
 ''');
     final lines = <String>[];
     for (var i = 0; i < plan.length; i++) {
       final segment = plan[i].segment;
+      final character = (segment.characterFr?.isNotEmpty ?? false)
+          ? 'CHARACTER: "${segment.characterFr}"'
+                '${(segment.characterEn?.isNotEmpty ?? false) ? ' (${segment.characterEn})' : ''} → '
+          : '';
       final meaning = segment.en.isEmpty ? '' : ' = ${segment.en}';
       lines.add(
-        '${i + 1}. ${segment.fr}$meaning — grammar note: ${segment.grammarNote} pronunciation tip: ${segment.pronunciationTip}',
+        'Beat ${i + 1}: ${character}STUDENT: "${segment.fr}"$meaning — grammar note: ${segment.grammarNote} pronunciation tip: ${segment.pronunciationTip}',
       );
     }
-    parts.add('FULL PASSAGE TEXT: ${passage.fullText}');
-    parts.add('SEGMENTS IN ORDER (${plan.length}):\n${lines.join('\n')}');
+    parts.add(
+      'THE SCRIPT (for your understanding only — the app feeds you each beat):\n${lines.join('\n')}',
+    );
     if (vocabSummary != null && vocabSummary.wordsCovered.isNotEmpty) {
       final words = vocabSummary.wordsCovered.map((e) => e.fr).join(', ');
       parts.add(

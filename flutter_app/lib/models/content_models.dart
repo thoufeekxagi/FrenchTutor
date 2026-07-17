@@ -382,24 +382,35 @@ class MultipleChoiceQuestion {
 
 // MARK: - Reading passage
 
+/// One beat of a scene (or one segment of a legacy passage). `fr`/`en` are the
+/// LEARNER's line; `characterFr`/`characterEn`, when present, are the other
+/// role's line that prompts it — the full two-role script beat, so the app can
+/// direct the scene deterministically instead of trusting a live model to
+/// improvise structure. Legacy passages without character lines still load.
 class ReadingSegment {
   ReadingSegment({
     required this.fr,
     required this.en,
     required this.grammarNote,
     required this.pronunciationTip,
+    this.characterFr,
+    this.characterEn,
   });
 
   final String fr;
   final String en;
   final String grammarNote;
   final String pronunciationTip;
+  final String? characterFr;
+  final String? characterEn;
 
   factory ReadingSegment.fromJson(Map<String, dynamic> json) => ReadingSegment(
     fr: json['fr'] as String,
     en: json['en'] as String,
     grammarNote: json['grammarNote'] as String,
     pronunciationTip: json['pronunciationTip'] as String,
+    characterFr: json['characterFr'] as String?,
+    characterEn: json['characterEn'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -407,6 +418,8 @@ class ReadingSegment {
     'en': en,
     'grammarNote': grammarNote,
     'pronunciationTip': pronunciationTip,
+    if (characterFr != null) 'characterFr': characterFr,
+    if (characterEn != null) 'characterEn': characterEn,
   };
 }
 

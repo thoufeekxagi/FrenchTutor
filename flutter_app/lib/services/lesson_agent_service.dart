@@ -87,7 +87,8 @@ class GrammarSessionPlan {
 /// context instead of keyword matching. `attempt` = they practiced the target;
 /// `chat` = conversation/question/echo — neither is a navigation command.
 /// `goto` carries a 1-based card number ("go to the third card").
-enum LiveNavIntent { advance, back, again, attempt, chat, goto }
+/// `finish` = they want to end the lesson ("let's finish this lesson", "I'm done").
+enum LiveNavIntent { advance, back, again, attempt, chat, goto, finish }
 
 class LiveIntentVerdict {
   LiveIntentVerdict({
@@ -268,7 +269,8 @@ Silently audit a French pronunciation attempt (student never sees this). They we
     required int cardCount,
   }) async {
     const system = '''
-You classify one utterance from a student in a live voice French lesson. The app — not the tutor — moves the on-screen card based on your verdict. Reply with ONLY compact JSON: {"intent": "advance"|"back"|"again"|"attempt"|"chat"|"goto", "card": number_or_null, "explicit": boolean}.
+You classify one utterance from a student in a live voice French lesson. The app — not the tutor — moves the on-screen card based on your verdict. Reply with ONLY compact JSON: {"intent": "advance"|"back"|"again"|"attempt"|"chat"|"goto"|"finish", "card": number_or_null, "explicit": boolean}.
+- "finish": an EXPLICIT request to end the whole lesson/session ("let's finish this lesson", "I'm done for today", "end the session") — NOT merely finishing the current word.
 - "advance": an EXPLICIT request to move to the next card ("next", "next word", "got it, let's move on", "suivant") — set "explicit": true. A bare "yes"/"oui"/"sure" counts ONLY if the tutor's last line directly asked whether to move on — never otherwise — and is "explicit": false (it's consent to the tutor's offer, not the student's own command). "explicit" is true for every other navigation verdict (back/goto/again).
 - "back": an explicit request to return to the previous card.
 - "goto": an explicit request to jump to a specific card by number or position ("go to the third card", "back to card 2", "the first one", "the last card") — set "card" to the 1-based target number, using the card position/count given.
@@ -387,9 +389,10 @@ You are quietly picking which ONE French grammar point a beginner should practic
     required List<VocabEntry> words,
   }) async {
     const system = '''
-You are quietly assembling a short French reading/listening passage for a total beginner preparing for TEF/TCF Canada, using ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", etc. as needed for grammatical French) — do not introduce unrelated advanced vocabulary. Write 4-8 short segments (a word or a very short phrase each) that together form a simple, coherent short passage or dialogue when read in order. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation or subjunctive — this is intentionally basic for a first pass. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
-{"title": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
-Each segment's "fr" must be the exact short phrase as it appears in the passage (in order, so concatenating them with spaces reproduces the full passage), "en" its English meaning, "grammar_note" one simple English sentence explaining why that word/word order is used, and "pronunciation_tip" one simple English sentence with a pronunciation pointer.''';
+You are quietly writing a complete two-role ROLEPLAY SCRIPT for a total beginner preparing for TEF/TCF Canada — a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director — every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French) — do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
+Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation — this is intentionally basic. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+{"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
+"title" is the scenario in a few words (e.g. "At the bakery"). "character_fr"/"character_en" are the character's line and its English meaning; "learner_fr"/"learner_en" the learner's reply and meaning; "grammar_note" one simple English sentence explaining the learner line's word order/agreement; "pronunciation_tip" one simple English pronunciation pointer for the learner line.''';
     final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
     final user = 'VOCABULARY WORDS TO REUSE: $wordList';
     final raw = await _complete(
@@ -718,16 +721,23 @@ You are a French grammar tutor. The student answered a drill question incorrectl
   ReadingPassage _parseReadingPassage(String raw) {
     final obj = _decodeObject(raw);
     final title = obj['title'] as String? ?? 'Reading passage';
-    final segmentsRaw = (obj['segments'] as List?) ?? [];
-    final segments = segmentsRaw
+    // New script shape ("beats" with both roles' lines) with fallback to the
+    // legacy "segments" shape so older cached content keeps loading.
+    final beatsRaw =
+        (obj['beats'] as List?) ?? (obj['segments'] as List?) ?? [];
+    final segments = beatsRaw
         .map((s) => s as Map<String, dynamic>)
-        .where((s) => (s['fr'] as String?)?.isNotEmpty == true)
+        .where(
+          (s) => ((s['learner_fr'] ?? s['fr']) as String?)?.isNotEmpty == true,
+        )
         .map(
           (s) => ReadingSegment(
-            fr: s['fr'] as String,
-            en: s['en'] as String? ?? '',
+            fr: (s['learner_fr'] ?? s['fr']) as String,
+            en: (s['learner_en'] ?? s['en']) as String? ?? '',
             grammarNote: s['grammar_note'] as String? ?? '',
             pronunciationTip: s['pronunciation_tip'] as String? ?? '',
+            characterFr: s['character_fr'] as String?,
+            characterEn: s['character_en'] as String?,
           ),
         )
         .toList();

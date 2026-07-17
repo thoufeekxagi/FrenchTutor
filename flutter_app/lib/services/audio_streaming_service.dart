@@ -243,16 +243,32 @@ class AudioStreamingService {
     }
   }
 
+  int _muteGeneration = 0;
+
   Future<void> stopPlayback() async {
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
     // interruption keep draining and playing after the model was told to stop (barge-in /
     // card-change cut). The player itself is deliberately LEFT RUNNING: tearing it down here
     // (stopPlayer + restart on the next chunk) is what froze Marie's voice for the rest of
     // the call — the restart raced the very next burst of incoming chunks, openPlayer was
-    // re-entered while already open, and every subsequent feed failed silently. Clearing our
-    // own queue already stops her within the player's ~340ms internal buffer, which is the
-    // "as fast as we can" the interruption needs, with zero restart fragility.
+    // re-entered while already open, and every subsequent feed failed silently.
     _playbackQueue.clear();
+    // Gentle cut: the player's internal buffer (~340ms) still holds already-fed audio, and
+    // letting it play out sounded like a wobbly mid-word chop in headphones. Muting the
+    // player silences that tail cleanly (a volume change, not a buffer tear), then volume
+    // is restored once the tail has drained silently — well before the next wanted reply
+    // (~1.5s+ away behind the announcement debounce). The generation counter makes a rapid
+    // second cut extend the mute instead of the first cut's restore unmuting it early.
+    final generation = ++_muteGeneration;
+    try {
+      await _player.setVolume(0);
+    } catch (_) {}
+    Future.delayed(const Duration(milliseconds: 450), () async {
+      if (generation != _muteGeneration) return;
+      try {
+        await _player.setVolume(1.0);
+      } catch (_) {}
+    });
     // The tracked timeline is now stale — without this reset the mic gate would keep
     // blocking uploads until a time that no longer corresponds to any audio actually playing.
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);

@@ -8,6 +8,7 @@ import '../../design/app_router.dart';
 import '../../flow/stage_outcome.dart';
 import '../../data/content_service.dart';
 import '../../models/content_models.dart';
+import '../../models/daily_session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/srs_service.dart';
@@ -50,6 +51,90 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   Future<List<VocabEntry>> get _autoQueue =>
       SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
 
+  /// Today's interrupted session, if any — planned words minus practiced ones.
+  /// Non-null makes the "continue where you left off" card appear up top; the
+  /// regular picker below stays available for "brand new words instead".
+  ({List<VocabEntry> remaining, List<VocabEntry> planned})? get _resumable {
+    final record = ref
+        .read(learningStoreProvider)
+        .dailySession()
+        .stages[PathwayStage.vocab]!;
+    if (record.status != StageStatus.paused) return null;
+    final json = record.resultJson;
+    final plannedIds =
+        (json?['plannedWordIds'] as List?)?.cast<String>() ?? const <String>[];
+    if (plannedIds.isEmpty) return null;
+    final practiced = ((json?['wordIds'] as List?)?.cast<String>() ?? const [])
+        .toSet();
+    final remainingIds = plannedIds
+        .where((id) => !practiced.contains(id))
+        .toList();
+    if (remainingIds.isEmpty) return null;
+    final byId = {
+      for (final e in _allPhases.expand(
+        (p) => p.themes.expand((t) => t.entries),
+      ))
+        e.id: e,
+    };
+    List<VocabEntry> entries(List<String> ids) =>
+        ids.map((id) => byId[id]).whereType<VocabEntry>().toList();
+    final remaining = entries(remainingIds);
+    if (remaining.isEmpty) return null;
+    return (remaining: remaining, planned: entries(plannedIds));
+  }
+
+  Widget _resumeCard(
+    ({List<VocabEntry> remaining, List<VocabEntry> planned}) resumable,
+  ) {
+    final done = resumable.planned.length - resumable.remaining.length;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.screenMargin,
+        DesignTokens.space3,
+        DesignTokens.screenMargin,
+        0,
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: DesignTokens.primarySoft,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const KickerText('In progress', color: DesignTokens.primaryDeep),
+            const SizedBox(height: 4),
+            Text(
+              '$done of ${resumable.planned.length} words practiced earlier '
+              'today — pick up where you left off.',
+              style: DesignTokens.body(13.5),
+            ),
+            const SizedBox(height: 12),
+            PasseportPrimaryButton(
+              label: 'Continue — ${resumable.remaining.length} words left',
+              onPressed: () => _beginSession(resumable.remaining),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                onPressed: () => _beginSession(resumable.planned),
+                child: Text(
+                  'Restart the full set',
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.primaryDeep),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +163,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               ),
               child: Column(
                 children: [
+                  if (_resumable case final resumable?) _resumeCard(resumable),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
                       DesignTokens.screenMargin,
