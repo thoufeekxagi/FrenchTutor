@@ -58,6 +58,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   3: _migrationV3,
   4: _migrationV4,
   5: _migrationV5,
+  6: _migrationV6,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -488,6 +489,58 @@ void _migrationV5(CommonDatabase db) {
     BEFORE DELETE ON assessment_snapshots BEGIN
       SELECT RAISE(ABORT, 'assessment_snapshots is append-only');
     END
+    ''',
+  ];
+  for (final sql in statements) {
+    db.execute(sql);
+  }
+}
+
+/// v1 declared `local_date TEXT NOT NULL UNIQUE` on `daily_sessions`, which
+/// blocks `resetDailySession()`'s soft-delete-then-recreate flow: the old
+/// (deleted) row still holds the date, so inserting today's fresh row hits
+/// the UNIQUE constraint and throws. SQLite can't drop a column constraint
+/// in place, so this recreates the table with the constraint replaced by a
+/// partial unique index that only applies to live rows.
+void _migrationV6(CommonDatabase db) {
+  const statements = [
+    'ALTER TABLE daily_sessions RENAME TO daily_sessions_pre_v6',
+    '''
+    CREATE TABLE daily_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      local_date TEXT NOT NULL,
+      planned_length TEXT NOT NULL DEFAULT 'standard',
+      current_stage TEXT,
+      current_item_index INTEGER NOT NULL DEFAULT 0,
+      stages_json TEXT NOT NULL DEFAULT '{}',
+      vocab_entry_ids_json TEXT,
+      grammar_lesson_id TEXT,
+      reading_passage_json TEXT,
+      started_at TEXT,
+      completed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    '''
+    INSERT INTO daily_sessions
+      (id, user_id, local_date, planned_length, current_stage,
+       current_item_index, stages_json, vocab_entry_ids_json,
+       grammar_lesson_id, reading_passage_json, started_at, completed_at,
+       created_at, updated_at, deleted_at)
+    SELECT
+      id, user_id, local_date, planned_length, current_stage,
+      current_item_index, stages_json, vocab_entry_ids_json,
+      grammar_lesson_id, reading_passage_json, started_at, completed_at,
+      created_at, updated_at, deleted_at
+    FROM daily_sessions_pre_v6
+    ''',
+    'DROP TABLE daily_sessions_pre_v6',
+    '''
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_sessions_active_date
+    ON daily_sessions (local_date) WHERE deleted_at IS NULL
     ''',
   ];
   for (final sql in statements) {

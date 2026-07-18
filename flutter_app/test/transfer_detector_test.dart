@@ -109,6 +109,52 @@ void main() {
     expect(result.status, TransferStatus.crossModalSupported);
   });
 
+  test('a hinted writing success does not unlock transfer the way unaided does', () {
+    // Mirrors the writing() adapter's hint-aware demotion: reusing today's
+    // vocab correctly in writing only counts as proof of transfer if it was
+    // produced without leaning on the hint ladder first.
+    final hinted = detector.detect(
+      competencyId: 'competency',
+      evidence: [
+        event(
+          id: 'read',
+          modality: PerformanceModality.readingRecognition,
+          support: EvidenceSupportLevel.recognition,
+          at: occurredAt,
+        ),
+        event(
+          id: 'write-hinted',
+          modality: PerformanceModality.controlledWriting,
+          support: EvidenceSupportLevel.hintedProduction,
+          correctness: 0.9,
+          at: occurredAt.add(const Duration(days: 1)),
+        ),
+      ],
+    );
+    expect(hinted.status, TransferStatus.crossModalSupported);
+
+    final unaided = detector.detect(
+      competencyId: 'competency',
+      evidence: [
+        event(
+          id: 'read',
+          modality: PerformanceModality.readingRecognition,
+          support: EvidenceSupportLevel.recognition,
+          at: occurredAt,
+        ),
+        event(
+          id: 'write-unaided',
+          modality: PerformanceModality.controlledWriting,
+          support: EvidenceSupportLevel.unaidedProduction,
+          correctness: 0.9,
+          at: occurredAt.add(const Duration(days: 1)),
+        ),
+      ],
+    );
+    expect(unaided.status, TransferStatus.crossModalProductive);
+    expect(unaided.citedEvidenceIds, ['write-unaided']);
+  });
+
   test('spontaneous transfer evidence outranks everything else', () {
     final result = detector.detect(
       competencyId: 'competency',

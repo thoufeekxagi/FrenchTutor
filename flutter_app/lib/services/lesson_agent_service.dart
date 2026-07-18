@@ -61,6 +61,17 @@ class MicroWritingFeedback {
   final String comment;
 }
 
+/// One rung of the Socratic hint ladder for in-progress writing. Never
+/// contains the corrected sentence — only a nudge scoped to [tier]. The app
+/// tracks how many rungs a learner has climbed, not the service; each call
+/// is stateless and just asked to answer at a given tier.
+class WritingHint {
+  WritingHint({required this.tier, required this.message});
+
+  final int tier;
+  final String message;
+}
+
 class MistakeJudgment {
   MistakeJudgment({required this.isCorrect, this.tag, this.description});
 
@@ -461,6 +472,47 @@ $submission''';
     return _parseMicroWritingFeedback(raw);
   }
 
+  /// A single rung of the Socratic hint ladder — called on a debounced pause
+  /// while the learner is still typing, never on every keystroke. [tier] 1
+  /// names only the grammatical category of the most important issue; 2
+  /// narrows it to where in the sentence and what to check; 3 asks a leading
+  /// question that makes the fix obvious without stating it. The model is
+  /// never allowed to hand over the corrected form — that's enforced in the
+  /// prompt, not just requested, since a hint that reveals the answer would
+  /// undermine the whole reason this exists instead of a plain grammar-check.
+  Future<WritingHint> getWritingHint({
+    required String prompt,
+    required List<String> targetWords,
+    required String draft,
+    required int tier,
+  }) async {
+    if (tier < 1 || tier > 3) {
+      throw ArgumentError.value(tier, 'tier', 'must be 1, 2, or 3');
+    }
+    const system = '''
+You are a Socratic French writing coach. You never give the corrected sentence and never state the fix directly — you point the student toward the single most important issue in their draft so they can fix it themselves. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape: {"message": string}. The message is one short sentence, spoken-style, no markdown.
+Tier 1: name only the grammatical CATEGORY of the issue (e.g. "verb agreement", "the gender of the article"). Nothing more specific.
+Tier 2: narrow it to WHERE in the sentence and WHAT KIND of check to do, still without the answer (e.g. "look at the verb right after tu").
+Tier 3: ask a leading question that makes the correct form obvious without stating it (e.g. "what is the tu-form of être?").
+If the draft has no issue worth flagging yet, respond with a short encouraging confirmation instead, regardless of tier — do not invent a problem.''';
+    final user =
+        '''
+TASK: $prompt
+TARGET WORDS: ${targetWords.join(', ')}
+HINT TIER REQUESTED: $tier
+
+STUDENT'S DRAFT SO FAR:
+$draft''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 200,
+    );
+    return _parseWritingHint(raw, tier: tier);
+  }
+
   Future<String> checkDictation({
     required String expected,
     required String submitted,
@@ -492,6 +544,70 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         {'role': 'user', 'content': user},
       ],
     );
+  }
+
+  /// Natural-voice line synthesis via Gemini's dedicated TTS model — same voice family
+  /// as Marie (Puck), same API key, so replaying a scene line sounds like HER saying it
+  /// again, not a robot. On-device TTS was tried and rejected as robotic. Returns raw
+  /// 24kHz mono PCM16 (the live session player's native format). Callers cache by text —
+  /// scene lines are fixed strings, so each line costs one call ever.
+  Future<List<int>> synthesizeSpeech(String text, {bool slow = false}) async {
+    final key = await _geminiApiKey;
+    if (key.isEmpty) throw AgentError.missingKey;
+    final prompt = slow
+        ? 'Say this very slowly and clearly, for a beginner learning French: $text'
+        : text;
+    final uri = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=$key');
+    http.Response response;
+    try {
+      response = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'contents': [
+                {
+                  'parts': [
+                    {'text': prompt},
+                  ],
+                },
+              ],
+              'generationConfig': {
+                'responseModalities': ['AUDIO'],
+                'speechConfig': {
+                  'voiceConfig': {
+                    'prebuiltVoiceConfig': {'voiceName': 'Puck'},
+                  },
+                },
+              },
+            }),
+          )
+          .timeout(const Duration(seconds: 20));
+    } catch (_) {
+      throw AgentError.requestFailed;
+    }
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw AgentError.requestFailed;
+    }
+    try {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final parts =
+          ((json['candidates'] as List).first as Map<String, dynamic>)['content']
+              as Map<String, dynamic>;
+      final audio = <int>[];
+      for (final part in (parts['parts'] as List)) {
+        final inline = (part as Map<String, dynamic>)['inlineData'];
+        if (inline is Map && inline['data'] is String) {
+          audio.addAll(base64Decode(inline['data'] as String));
+        }
+      }
+      if (audio.isEmpty) throw AgentError.badResponse;
+      return audio;
+    } catch (e) {
+      if (e is AgentError) rethrow;
+      throw AgentError.badResponse;
+    }
   }
 
   // MARK: - Networking
@@ -706,6 +822,12 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final score = _asDouble(obj['score_out_of_10']);
     final comment = obj['comment'] as String? ?? '';
     return MicroWritingFeedback(scoreOutOf10: score, comment: comment);
+  }
+
+  WritingHint _parseWritingHint(String raw, {required int tier}) {
+    final obj = _decodeObject(raw);
+    final message = obj['message'] as String? ?? '';
+    return WritingHint(tier: tier, message: message);
   }
 
   MistakeJudgment _parseMistakeJudgment(String raw) {

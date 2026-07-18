@@ -264,7 +264,10 @@ class PathwayCoordinator {
       PathwayStage.writing,
       outcome,
       toJson: (r) {
-        return {if (r.score != null) 'score': r.score};
+        return {
+          if (r.score != null) 'score': r.score,
+          if (r.hintsUsed > 0) 'hintsUsed': r.hintsUsed,
+        };
       },
     );
     final result = outcome?.result;
@@ -276,6 +279,7 @@ class PathwayCoordinator {
           context: _evidenceContext(outcome!),
           contentItemId: 'w01',
           scoreOutOf10: result.score,
+          hintsUsed: result.hintsUsed,
         ),
       );
     }

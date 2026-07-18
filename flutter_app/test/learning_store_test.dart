@@ -120,6 +120,32 @@ void main() {
       expect(b.nextStage, PathwayStage.grammar);
       expect(b.isComplete, isFalse);
     });
+
+    test('retake resets today without colliding with the soft-deleted row', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      final original = store.dailySession();
+      original.currentStage = PathwayStage.grammar;
+      original.stages[PathwayStage.vocab]!.status = StageStatus.completed;
+      store.saveDailySession(original);
+
+      store.resetDailySession();
+      final fresh = store.dailySession();
+
+      expect(fresh.id, isNot(original.id));
+      expect(fresh.currentStage, isNull);
+      expect(fresh.stages[PathwayStage.vocab]!.status, StageStatus.pending);
+    });
+
+    test('retake can run more than once in the same day', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      store.dailySession();
+      store.resetDailySession();
+      final second = store.dailySession();
+      store.resetDailySession();
+      final third = store.dailySession();
+
+      expect(third.id, isNot(second.id));
+    });
   });
 
   group('AI sessions and credits', () {

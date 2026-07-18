@@ -119,6 +119,51 @@ class _AgentLedListeningScreenState
   String _tutorTurnTranscript = '';
   DateTime _lastDriftCorrectionAt = DateTime.fromMillisecondsSinceEpoch(0);
 
+  // Transcript reveal: the scene accumulates as a scrollable conversation. Beats up to
+  // this index have been reached and stay visible forever (scroll back anytime); future
+  // beats stay hidden until earned — the scene isn't spoiled by reading ahead.
+  int _revealedThrough = 0;
+  final ScrollController _sceneScrollController = ScrollController();
+
+  // Per-line natural-voice replay: Gemini TTS (Marie's voice family), synthesized once
+  // per line and cached — tap a bubble's speaker to rehear it instantly, long-press for
+  // a slow beginner-paced rendition. No round trip to the live session.
+  final Map<String, List<int>> _ttsCache = {};
+  final Set<String> _ttsLoading = {};
+
+  Future<void> _speakLine(String text, {bool slow = false}) async {
+    if (text.isEmpty) return;
+    final key = '$slow|$text';
+    if (_ttsLoading.contains(key)) return;
+    var bytes = _ttsCache[key];
+    if (bytes == null) {
+      _ttsLoading.add(key);
+      if (mounted) setState(() {});
+      try {
+        bytes = await LessonAgentService.shared.synthesizeSpeech(
+          text,
+          slow: slow,
+        );
+        _ttsCache[key] = bytes;
+      } catch (_) {
+        _logDebug('→ TTS failed for "$text"');
+        return;
+      } finally {
+        _ttsLoading.remove(key);
+        if (mounted) setState(() {});
+      }
+    }
+    // Don't talk over Marie — cut whatever she's saying, then play the line
+    // through the same 24kHz pipeline her voice uses.
+    _cutTutorAudio();
+    _audio.isOutputActive = true;
+    await _audio.playAudioChunk(bytes);
+    final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 250;
+    Timer(Duration(milliseconds: playbackMs), () {
+      _audio.isOutputActive = false;
+    });
+  }
+
   _ReadingSessionCard? get _currentCard =>
       _segmentIndex < _sessionPlan.length ? _sessionPlan[_segmentIndex] : null;
 
@@ -159,6 +204,7 @@ class _AgentLedListeningScreenState
     // Resources only — a disposed screen must never report learning results.
     _teardown();
     _debugScrollController.dispose();
+    _sceneScrollController.dispose();
     super.dispose();
   }
 
@@ -456,6 +502,15 @@ class _AgentLedListeningScreenState
   }
 
   void _directPlay(ReadingSegment segment) {
+    // Just-in-time knowledge: the expected reply (so she can grade/react and
+    // rescue a freeze) and a hint of the next beat (so "what's next?" gets a
+    // real answer) travel WITH the instruction — she never holds the script.
+    final next = _segmentIndex + 1 < _sessionPlan.length
+        ? _sessionPlan[_segmentIndex + 1].segment
+        : null;
+    final context =
+        ' (The student replies with: "${segment.fr}". If asked what comes '
+        'next: ${next != null ? 'their next line will be "${next.fr}"' : 'this is the last beat — after this the whole scene plays through'}.)';
     final character = segment.characterFr;
     if (character != null && character.isNotEmpty) {
       final characterMeaning = (segment.characterEn?.isNotEmpty ?? false)
@@ -463,13 +518,13 @@ class _AgentLedListeningScreenState
           : '';
       _direct(
         'Scene time. As the CHARACTER, say exactly this French line and nothing else: '
-        '"$character"$characterMeaning.',
+        '"$character"$characterMeaning.$context',
       );
     } else {
       _direct(
         'Scene time. As the CHARACTER, improvise ONE short, simple French line that '
         'naturally prompts the student to answer with their line "${segment.fr}", and say '
-        'only that.',
+        'only that.$context',
       );
     }
   }
@@ -533,6 +588,7 @@ class _AgentLedListeningScreenState
     _lastCardMoveAt = DateTime.now();
     setState(() {
       _segmentIndex = target;
+      if (_segmentIndex > _revealedThrough) _revealedThrough = _segmentIndex;
       _resetPerCardState();
     });
     final card = _currentCard;
@@ -592,7 +648,21 @@ class _AgentLedListeningScreenState
     _lastCardMoveAt = DateTime.now();
     setState(() {
       _segmentIndex += 1;
+      if (_segmentIndex > _revealedThrough) _revealedThrough = _segmentIndex;
       _resetPerCardState();
+    });
+    _scrollSceneToBottom();
+  }
+
+  /// New beats appear at the bottom of the transcript — follow them.
+  void _scrollSceneToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_sceneScrollController.hasClients) return;
+      _sceneScrollController.animateTo(
+        _sceneScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOut,
+      );
     });
   }
 
@@ -1036,6 +1106,7 @@ class _AgentLedListeningScreenState
                       _header(),
                       Expanded(
                         child: SingleChildScrollView(
+                          controller: _sceneScrollController,
                           padding: const EdgeInsets.symmetric(
                             horizontal: DesignTokens.screenMargin,
                             vertical: DesignTokens.space4,
@@ -1160,9 +1231,15 @@ class _AgentLedListeningScreenState
     );
   }
 
+  /// The scene as a scrollable conversation: beats accumulate as chat bubbles
+  /// (character left, learner right), past beats stay re-readable forever,
+  /// future beats stay hidden until earned. Every bubble carries a speaker —
+  /// tap to rehear the line in Marie's voice, long-press for a slow rendition.
   Widget _content() {
     final card = _currentCard;
+    final visibleThrough = _revealedThrough.clamp(0, _sessionPlan.length - 1);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PasseportCard(
           child: Column(
@@ -1176,7 +1253,9 @@ class _AgentLedListeningScreenState
               Text(
                 card != null
                     ? 'Beat ${_segmentIndex + 1} of ${_sessionPlan.length} — '
-                          '${_phase == _BeatPhase.learn ? 'learn your line, then say "next" to play the beat' : 'the scene is live — answer with your line'}'
+                          '${_phase == _BeatPhase.learn ? 'learn your line, then play the beat' : 'the scene is live — answer with your line'}'
+                    : _finaleStarted
+                    ? 'Finale — play the whole scene through!'
                     : 'Scene complete',
                 style: DesignTokens.body(
                   13,
@@ -1185,115 +1264,49 @@ class _AgentLedListeningScreenState
             ],
           ),
         ),
-        if (card != null) ...[
-          if (card.segment.characterFr?.isNotEmpty ?? false) ...[
-            const SizedBox(height: 14),
-            PasseportCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const KickerText('Marie says', color: DesignTokens.secondary),
-                  const SizedBox(height: 4),
-                  Text(
-                    card.segment.characterFr!,
-                    style: DesignTokens.body(
-                      15,
-                      weight: FontWeight.w500,
-                    ).copyWith(color: DesignTokens.secondary),
-                  ),
-                  if (card.segment.characterEn?.isNotEmpty ?? false)
-                    Text(
-                      card.segment.characterEn!,
-                      style: DesignTokens.body(
-                        12,
-                      ).copyWith(color: DesignTokens.slateDim),
-                    ),
-                ],
-              ),
-            ),
-          ],
-          const SizedBox(height: 14),
+        const SizedBox(height: 12),
+        for (var i = 0; i <= visibleThrough && i < _sessionPlan.length; i++)
+          _beatBubbles(i),
+        if (card == null) ...[
+          const SizedBox(height: 8),
           PasseportCard(
-            padding: 24,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const KickerText('Your line', color: DesignTokens.slateDim),
-                const SizedBox(height: 8),
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        card.segment.fr,
-                        textAlign: TextAlign.center,
-                        style: DesignTokens.display(
-                          22,
-                          weight: FontWeight.w500,
-                        ).copyWith(color: DesignTokens.primary),
-                      ),
-                      if (card.segment.en.isNotEmpty) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          card.segment.en,
-                          textAlign: TextAlign.center,
-                          style: DesignTokens.display(
-                            16,
-                            weight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ],
+                const Icon(
+                  CupertinoIcons.checkmark_circle_fill,
+                  size: 30,
+                  color: DesignTokens.success,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _finaleStarted
+                      ? 'Scene finale — play it through, then say "finish"!'
+                      : 'All done!',
+                  style: DesignTokens.body(14, weight: FontWeight.w500),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: PasseportPrimaryButton(
+                    label: 'Finish scene',
+                    icon: CupertinoIcons.arrow_right,
+                    onPressed: () => _finish(completed: true),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 14),
-          PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const KickerText(
-                      'Grammar note',
-                      color: DesignTokens.slateDim,
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      card.segment.grammarNote,
-                      style: DesignTokens.body(13),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const KickerText(
-                      'Pronunciation',
-                      color: DesignTokens.slateDim,
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      card.segment.pronunciationTip,
-                      style: DesignTokens.body(13),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
+        ] else ...[
+          const SizedBox(height: 10),
           Text(
             _phase == _BeatPhase.learn
-                ? 'Practice your line out loud — Marie is listening. Say "next" (or tap Play) when you\'re ready to act the beat.'
+                ? 'Practice your line out loud — Marie is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
                 : 'Marie is in character — answer her with your line. Say "next" for the next beat, or "again" to replay.',
             style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           // Same guaranteed navigation fallback as vocab — Back/Next always work, no
           // dependency on speech recognition or the model. Next is phase-aware:
           // learn → play the beat, play → next beat.
@@ -1327,36 +1340,127 @@ class _AgentLedListeningScreenState
               ),
             ],
           ),
-        ] else ...[
-          const SizedBox(height: 14),
-          PasseportCard(
+        ],
+      ],
+    );
+  }
+
+  /// One beat of the transcript: the character's bubble (left), the learner's
+  /// bubble (right), and — on the current beat only — the grammar/pronunciation
+  /// notes tucked underneath.
+  Widget _beatBubbles(int index) {
+    final segment = _sessionPlan[index].segment;
+    final isCurrent = index == _segmentIndex && _currentCard != null;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (segment.characterFr?.isNotEmpty ?? false)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _bubble(
+                fr: segment.characterFr!,
+                en: segment.characterEn,
+                isLearner: false,
+                isCurrent: isCurrent,
+              ),
+            ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerRight,
+            child: _bubble(
+              fr: segment.fr,
+              en: segment.en.isEmpty ? null : segment.en,
+              isLearner: true,
+              isCurrent: isCurrent,
+            ),
+          ),
+          if (isCurrent) ...[
+            const SizedBox(height: 6),
+            Text(
+              '${segment.grammarNote} ${segment.pronunciationTip}',
+              style: DesignTokens.body(
+                11.5,
+              ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _bubble({
+    required String fr,
+    String? en,
+    required bool isLearner,
+    required bool isCurrent,
+  }) {
+    final bg = isLearner ? DesignTokens.primarySoft : DesignTokens.surface;
+    final frColor = isLearner ? DesignTokens.primaryDeep : DesignTokens.text;
+    final loading = _ttsLoading.contains('false|$fr');
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 300),
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isCurrent
+              ? (isLearner ? DesignTokens.primary : DesignTokens.hairline)
+              : Colors.transparent,
+          width: isCurrent && isLearner ? 1.5 : 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  CupertinoIcons.checkmark_circle_fill,
-                  size: 30,
-                  color: DesignTokens.success,
-                ),
-                const SizedBox(height: 10),
                 Text(
-                  _finaleStarted ? 'Scene finale — play it through!' : 'All done!',
-                  style: DesignTokens.body(14, weight: FontWeight.w500),
+                  fr,
+                  style: DesignTokens.body(
+                    15,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: frColor),
                 ),
-                const SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: PasseportPrimaryButton(
-                    label: 'Continue',
-                    icon: CupertinoIcons.arrow_right,
-                    onPressed: () => _finish(completed: true),
+                if (en != null && en.isNotEmpty)
+                  Text(
+                    en,
+                    style: DesignTokens.body(
+                      11.5,
+                    ).copyWith(color: DesignTokens.slateDim),
                   ),
-                ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          // Tap = rehear in Marie's voice (cached after first play); hold = slow.
+          GestureDetector(
+            onTap: () => _speakLine(fr),
+            onLongPress: () => _speakLine(fr, slow: true),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(
+                      CupertinoIcons.speaker_2_fill,
+                      size: 16,
+                      color: isLearner
+                          ? DesignTokens.primary
+                          : DesignTokens.slateDim,
+                    ),
+            ),
+          ),
         ],
-      ],
+      ),
     );
   }
 
@@ -1461,28 +1565,19 @@ ROLEPLAY SCENE STAGE — "${passage.title}". You are a DIRECTED ACTOR-COACH in a
 
 THE CONTRACT — THE APP DIRECTS, YOU PERFORM:
 1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction — one move — then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
-2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence — react to their attempt, fix gently if needed, encourage — then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene.
-3. NEVER read the script ahead, never say more than the single line the app asked for, never list the student's lines, never claim a learner line as yours. The script below is for your understanding only — the app feeds you each piece when it's time.
+2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence — react to their attempt, fix gently if needed, encourage — then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. After a beat has been played through once, you may ALSO remind them once, neutrally, of their controls: "say next when you're ready, or again to hear it once more" — that reminder is the only thing you may ever say about moving; never any content suggestion.
+3. You do NOT have the script — the app hands you each line exactly when it's time, and sometimes a hint of what's coming (marked "if asked"). Never invent lines, never say more than the single line the app asked for, never claim a learner line as yours.
 4. NEVER suggest moving on or ask what's next — pacing belongs to the student and the app alone.
 5. If the student freezes after a character line (long silence), whisper a rescue in English: "psst — your line is: ..." with their current line, then stop.
 6. English is the coaching language; this student is a beginner. Their reciting of French lines is practice, never a cue to switch into French-led coaching.
 
 You have exactly one tool: mark_segment_result, for recording how well the student did with the current beat (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted it. A rejection is not an error; never mention it, just keep going.
 ''');
-    final lines = <String>[];
-    for (var i = 0; i < plan.length; i++) {
-      final segment = plan[i].segment;
-      final character = (segment.characterFr?.isNotEmpty ?? false)
-          ? 'CHARACTER: "${segment.characterFr}"'
-                '${(segment.characterEn?.isNotEmpty ?? false) ? ' (${segment.characterEn})' : ''} → '
-          : '';
-      final meaning = segment.en.isEmpty ? '' : ' = ${segment.en}';
-      lines.add(
-        'Beat ${i + 1}: ${character}STUDENT: "${segment.fr}"$meaning — grammar note: ${segment.grammarNote} pronunciation tip: ${segment.pronunciationTip}',
-      );
-    }
+    // Deliberately NO script here — Marie receives each line just-in-time from
+    // the app's per-turn instructions. She cannot read ahead, spoil, or replay
+    // beats she was never given; the app is the only holder of the scene.
     parts.add(
-      'THE SCRIPT (for your understanding only — the app feeds you each beat):\n${lines.join('\n')}',
+      'The scene has ${plan.length} beats. That count is all you know in advance.',
     );
     if (vocabSummary != null && vocabSummary.wordsCovered.isNotEmpty) {
       final words = vocabSummary.wordsCovered.map((e) => e.fr).join(', ');

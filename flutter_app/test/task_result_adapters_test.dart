@@ -103,6 +103,34 @@ void main() {
     expect(event.correctness, 0.85);
     expect(event.evaluator, EvidenceEvaluator.llmTextRubric);
     expect(event.evaluatorConfidence, 0.65);
+    expect(event.supportLevel, EvidenceSupportLevel.unaidedProduction);
+    expect(result.technicalMetadata['hintsUsed'], 0);
+  });
+
+  test('writing demotes support level once the hint ladder was used', () {
+    final result = adapters.writing(
+      context: context(),
+      contentItemId: 'write-1',
+      scoreOutOf10: 9,
+      hintsUsed: 2,
+    );
+
+    final event = result.competencyEvidence.single;
+    expect(event.supportLevel, EvidenceSupportLevel.hintedProduction);
+    expect(event.response!['hintsUsed'], 2);
+    expect(result.technicalMetadata['hintsUsed'], 2);
+  });
+
+  test('writing rejects a negative hint count', () {
+    expect(
+      () => adapters.writing(
+        context: context(),
+        contentItemId: 'write-1',
+        scoreOutOf10: 9,
+        hintsUsed: -1,
+      ),
+      throwsArgumentError,
+    );
   });
 
   test('speaking engagement explicitly emits no mastery evidence', () {

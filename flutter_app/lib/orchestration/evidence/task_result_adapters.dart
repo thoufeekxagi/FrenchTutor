@@ -180,6 +180,7 @@ class TaskResultAdapters {
     required TaskEvidenceContext context,
     required String contentItemId,
     required double? scoreOutOf10,
+    int hintsUsed = 0,
   }) {
     if (scoreOutOf10 != null &&
         (!scoreOutOf10.isFinite || scoreOutOf10 < 0 || scoreOutOf10 > 10)) {
@@ -189,23 +190,34 @@ class TaskResultAdapters {
         'must be between 0 and 10',
       );
     }
+    if (hintsUsed < 0) {
+      throw ArgumentError.value(hintsUsed, 'hintsUsed', 'must be >= 0');
+    }
     final evidence = <EvidenceEvent>[];
     if (scoreOutOf10 != null) {
       final mapping = _mapping(
         contentItemId,
         PerformanceModality.controlledWriting,
       );
+      // A learner who leaned on the Socratic hint ladder before verifying did
+      // not produce the sentence unaided — this is the same invariant the
+      // twin updater enforces ("hinted success cannot count as unaided
+      // success", plan section 7.2), applied at the point evidence is minted
+      // rather than left for the model to guess from a flat "unaided" tag.
+      final supportLevel = hintsUsed > 0
+          ? EvidenceSupportLevel.hintedProduction
+          : EvidenceSupportLevel.unaidedProduction;
       evidence.add(
         _event(
           context: context,
           mapping: mapping,
-          supportLevel: EvidenceSupportLevel.unaidedProduction,
+          supportLevel: supportLevel,
           evaluator: EvidenceEvaluator.llmTextRubric,
           proposedConfidence: 0.80,
           score: scoreOutOf10 / 10,
           correctness: scoreOutOf10 / 10,
           attemptNumber: 1,
-          response: {'scoreOutOf10': scoreOutOf10},
+          response: {'scoreOutOf10': scoreOutOf10, 'hintsUsed': hintsUsed},
         ),
       );
     }
@@ -219,6 +231,7 @@ class TaskResultAdapters {
       technicalMetadata: {
         'adapter': 'writing_v1',
         'confidencePolicyVersion': confidencePolicy.version,
+        'hintsUsed': hintsUsed,
       },
     );
   }

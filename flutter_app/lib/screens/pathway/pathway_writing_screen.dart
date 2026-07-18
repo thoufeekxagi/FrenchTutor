@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -15,9 +17,20 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/floating_notetaker.dart';
 
 class WritingStageResult {
-  WritingStageResult({this.score});
+  WritingStageResult({this.score, this.hintsUsed = 0});
   final double? score;
+  final int hintsUsed;
 }
+
+/// How long a pause in typing has to last before we treat it as "the learner
+/// finished a thought" and it's worth spending a hint call — not every
+/// keystroke. Long enough that normal typing rhythm never fires it, short
+/// enough that it still feels responsive once they actually stop.
+const _hintDebounceDelay = Duration(milliseconds: 1400);
+
+/// Below this many words a hint would have nothing real to react to — the
+/// draft is still just a word or two, not a checkable thought.
+const _minWordsForHint = 3;
 
 /// Daily Pathway stage 4 — plain typed micro-writing, no live call. Writing needs typed
 /// accuracy (spelling, connectors), not voice, so this deliberately has none of the
@@ -42,6 +55,13 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
   MicroWritingFeedback? _feedback;
   String? _errorText;
 
+  Timer? _hintDebounce;
+  String _textAtLastHintCheck = '';
+  int _hintTier = 0;
+  int _hintsUsed = 0;
+  WritingHint? _hint;
+  bool _isFetchingHint = false;
+
   String get _prompt =>
       'Write one or two sentences using: ${widget.targetWords.map((e) => e.fr).join(", ")}';
 
@@ -64,8 +84,65 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
 
   @override
   void dispose() {
+    _hintDebounce?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onDraftChanged(String value) {
+    setState(() => _submission = value);
+    _hintDebounce?.cancel();
+    if (_feedback != null) return; // already verified — stop coaching
+    _hintDebounce = Timer(_hintDebounceDelay, _maybeOfferHint);
+  }
+
+  Future<void> _maybeOfferHint() async {
+    if (!mounted || _feedback != null || _isFetchingHint) return;
+    final trimmed = _submission.trim();
+    final wordCount = trimmed.isEmpty ? 0 : trimmed.split(RegExp(r'\s+')).length;
+    if (wordCount < _minWordsForHint) {
+      if (_hint != null) setState(() => _hint = null);
+      return;
+    }
+    if (trimmed == _textAtLastHintCheck) return; // nothing changed since last look
+
+    setState(() {
+      _isFetchingHint = true;
+      _hintTier = 1; // a fresh pause always starts back at the gentlest rung
+    });
+    await _requestHint();
+    _textAtLastHintCheck = trimmed;
+  }
+
+  Future<void> _requestNextHintTier() async {
+    if (_isFetchingHint || _hintTier >= 3) return;
+    setState(() {
+      _isFetchingHint = true;
+      _hintTier += 1;
+    });
+    await _requestHint();
+  }
+
+  Future<void> _requestHint() async {
+    try {
+      final hint = await LessonAgentService.shared.getWritingHint(
+        prompt: _prompt,
+        targetWords: widget.targetWords.map((e) => e.fr).toList(),
+        draft: _submission,
+        tier: _hintTier,
+      );
+      if (!mounted) return;
+      setState(() {
+        _hint = hint;
+        _hintsUsed += 1;
+        _isFetchingHint = false;
+      });
+    } catch (_) {
+      // A hint is a nice-to-have coaching aid, not the graded path — a
+      // failure here should never block or interrupt writing.
+      if (!mounted) return;
+      setState(() => _isFetchingHint = false);
+    }
   }
 
   Future<void> _submit() async {
@@ -115,7 +192,10 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
     // Completed only when something was actually submitted and graded.
     final outcome = feedback != null
         ? StageOutcome.completed(
-            WritingStageResult(score: feedback.scoreOutOf10),
+            WritingStageResult(
+              score: feedback.scoreOutOf10,
+              hintsUsed: _hintsUsed,
+            ),
           )
         : const StageOutcome<WritingStageResult>.paused(reason: 'cancelled');
     Navigator.of(context).pop(outcome);
@@ -193,8 +273,7 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                             ),
                             child: TextField(
                               controller: _controller,
-                              onChanged: (value) =>
-                                  setState(() => _submission = value),
+                              onChanged: _onDraftChanged,
                               maxLines: null,
                               expands: true,
                               textAlignVertical: TextAlignVertical.top,
@@ -216,6 +295,15 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                             ),
                           ),
                         ),
+                        if (_isFetchingHint || _hint != null) ...[
+                          const SizedBox(height: DesignTokens.space3),
+                          _HintCard(
+                            hint: _hint,
+                            isLoading: _isFetchingHint,
+                            canAskForMore: _hintTier < 3,
+                            onAskForMore: _requestNextHintTier,
+                          ),
+                        ],
                         if (_errorText != null) ...[
                           const SizedBox(height: DesignTokens.space3),
                           Container(
@@ -251,12 +339,10 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                         ],
                         const SizedBox(height: DesignTokens.space3),
                         PasseportPrimaryButton(
-                          label: _isGrading
-                              ? 'Checking your writing…'
-                              : 'Check writing',
+                          label: _isGrading ? 'Verifying…' : 'Verify',
                           icon: _isGrading
                               ? null
-                              : CupertinoIcons.paperplane_fill,
+                              : CupertinoIcons.checkmark_seal,
                           onPressed: (_isGrading || _submission.trim().isEmpty)
                               ? null
                               : _submit,
@@ -298,6 +384,17 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                                   15,
                                 ).copyWith(height: 1.45),
                               ),
+                              if (_hintsUsed > 0) ...[
+                                const SizedBox(height: DesignTokens.space2),
+                                Text(
+                                  _hintsUsed == 1
+                                      ? 'Used 1 hint — counted as guided, not unaided.'
+                                      : 'Used $_hintsUsed hints — counted as guided, not unaided.',
+                                  style: DesignTokens.body(12).copyWith(
+                                    color: DesignTokens.slateDim,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -315,6 +412,75 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
             ),
           ),
           FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+        ],
+      ),
+    );
+  }
+}
+
+/// A single rung of Socratic coaching, shown after a typing pause. Never
+/// states the fix — only a nudge, escalating one rung per tap. Distinct from
+/// [_feedback] below it: this is ambient and ungraded, Verify is explicit
+/// and scored.
+class _HintCard extends StatelessWidget {
+  const _HintCard({
+    required this.hint,
+    required this.isLoading,
+    required this.canAskForMore,
+    required this.onAskForMore,
+  });
+
+  final WritingHint? hint;
+  final bool isLoading;
+  final bool canAskForMore;
+  final VoidCallback onAskForMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(DesignTokens.space3),
+      decoration: BoxDecoration(
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            CupertinoIcons.lightbulb_fill,
+            color: DesignTokens.info,
+            size: 18,
+          ),
+          const SizedBox(width: DesignTokens.space2),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isLoading || hint == null
+                      ? 'Marie is taking a look…'
+                      : hint!.message,
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                ),
+                if (!isLoading && hint != null && canAskForMore) ...[
+                  const SizedBox(height: DesignTokens.space1),
+                  GestureDetector(
+                    onTap: onAskForMore,
+                    child: Text(
+                      'Give me another clue',
+                      style: DesignTokens.body(
+                        12,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.info),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
