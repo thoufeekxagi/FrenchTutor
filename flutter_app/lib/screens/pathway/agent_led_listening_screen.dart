@@ -17,6 +17,7 @@ import '../../services/audio_streaming_service.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
@@ -24,6 +25,7 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/mic_mode_bar.dart';
 import '../session/session_screen.dart' show CallStatus;
 import 'agent_led_vocab_screen.dart' show VocabStageResult;
 
@@ -80,6 +82,8 @@ class _AgentLedListeningScreenState
     extends ConsumerState<AgentLedListeningScreen> with WidgetsBindingObserver {
   late GeminiLiveService _gemini;
   late AudioStreamingService _audio;
+  late MicController _mic;
+  MicMode _micMode = MicMode.auto;
   late LearningStore _store;
   late SessionRecorder _recorder;
   late List<_ReadingSessionCard> _sessionPlan;
@@ -199,6 +203,16 @@ class _AgentLedListeningScreenState
       learningStoreForProfile: _store,
     );
     _audio = AudioStreamingService();
+    _mic = MicController(
+      startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
+      stopStream: _audio.stopStreaming,
+      sendAudio: _gemini.sendAudioChunk,
+    );
+    MicModePrefs.load().then((saved) {
+      if (!mounted) return;
+      _mic.adoptSavedMode(saved);
+      setState(() => _micMode = saved);
+    });
     _setupCallbacks();
     _gemini.connect();
   }
@@ -221,13 +235,11 @@ class _AgentLedListeningScreenState
     if (_finished) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      if (_callStatus != CallStatus.muted) _audio.stopStreaming();
+      _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
-      if (_callStatus != CallStatus.muted) {
-        _audio.startStreaming(onChunk: _gemini.sendAudioChunk).catchError((e) {
-          if (mounted) setState(() => _errorMessage = 'Mic error: $e');
-        });
-      }
+      _mic.onAppResumed().catchError((e) {
+        if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+      });
     }
   }
 
@@ -244,7 +256,7 @@ class _AgentLedListeningScreenState
         if (!mounted) return;
         if (granted) {
           try {
-            await _audio.startStreaming(onChunk: _gemini.sendAudioChunk);
+            await _mic.onConnected();
           } catch (e) {
             setState(() => _errorMessage = 'Mic error: $e');
           }
@@ -414,8 +426,11 @@ class _AgentLedListeningScreenState
           cardCount: _sessionPlan.length,
         );
       } catch (_) {
-        verdict = _mapKeywordIntent(_detectIntent(trimmed));
-        source = 'keyword-fallback';
+        // Judge unavailable (P1.3 noise rule): when we cannot confidently read
+        // intent, NOTHING navigates — garbled bus noise must never move a card.
+        // The on-screen Back/Next buttons remain the manual path.
+        verdict = LiveIntentVerdict(intent: LiveNavIntent.chat);
+        source = 'judge-failed-no-nav';
       }
       if (!mounted || _finished) return;
       if (seq != _utteranceSeq || segmentIndexAtLaunch != _segmentIndex) {
@@ -1079,13 +1094,13 @@ class _AgentLedListeningScreenState
   Future<void> _toggleMute() async {
     if (_callStatus == CallStatus.muted) {
       try {
-        await _audio.startStreaming(onChunk: _gemini.sendAudioChunk);
+        await _mic.setMuted(false);
         setState(() => _callStatus = CallStatus.listening);
       } catch (e) {
         setState(() => _errorMessage = 'Failed to unmute: $e');
       }
     } else {
-      await _audio.stopStreaming();
+      await _mic.setMuted(true);
       setState(() => _callStatus = CallStatus.muted);
     }
   }
@@ -1551,34 +1566,70 @@ class _AgentLedListeningScreenState
   }
 
   Widget _controls() {
+    final callActive =
+        _callStatus != CallStatus.connecting &&
+        _callStatus != CallStatus.reconnecting &&
+        _callStatus != CallStatus.ended;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _controlButton(
-            icon: _callStatus == CallStatus.muted
-                ? CupertinoIcons.mic_slash_fill
-                : CupertinoIcons.mic_fill,
-            label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic on',
-            color: _callStatus == CallStatus.muted
-                ? DesignTokens.slate
-                : DesignTokens.success,
-            onTap:
-                (_callStatus == CallStatus.connecting ||
-                    _callStatus == CallStatus.ended)
-                ? null
-                : _toggleMute,
+          MicModeBar(
+            mode: _micMode,
+            isHolding: _mic.isHeld,
+            enabled: callActive,
+            onModeChanged: _setMicMode,
+            onHoldStart: _pttDown,
+            onHoldEnd: _pttUp,
           ),
-          _controlButton(
-            icon: CupertinoIcons.phone_down_fill,
-            label: 'End',
-            color: DesignTokens.inkSoft,
-            onTap: _confirmEnd,
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Mute only exists in Auto mode — in Hold mode the mic is already
+              // physically gated by the hold button.
+              if (_micMode == MicMode.auto)
+                _controlButton(
+                  icon: _callStatus == CallStatus.muted
+                      ? CupertinoIcons.mic_slash_fill
+                      : CupertinoIcons.mic_fill,
+                  label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic on',
+                  color: _callStatus == CallStatus.muted
+                      ? DesignTokens.slate
+                      : DesignTokens.success,
+                  onTap: callActive ? _toggleMute : null,
+                ),
+              _controlButton(
+                icon: CupertinoIcons.phone_down_fill,
+                label: 'End',
+                color: DesignTokens.inkSoft,
+                onTap: _confirmEnd,
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _setMicMode(MicMode mode) async {
+    await _mic.setMode(mode);
+    if (!mounted) return;
+    setState(() {
+      _micMode = mode;
+      if (_callStatus == CallStatus.muted) _callStatus = CallStatus.listening;
+    });
+  }
+
+  void _pttDown() {
+    _mic.pttDown();
+    if (mounted) setState(() {});
+  }
+
+  void _pttUp() {
+    _mic.pttUp();
+    if (mounted) setState(() {});
   }
 
   Widget _controlButton({

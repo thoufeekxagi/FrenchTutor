@@ -201,12 +201,25 @@ adopt the local DB (fill `user_id` columns). No profile UI beyond what exists.
   (RLS + edge function); pilot enforcement is client-side but written against the
   same usage_events data.
 
-### P1.3 Daily session overhaul (fallback + dual mode)
-- Reliability first: the LLM-driven Daily path is the product; the fallback becomes a
-  decent static-but-correct session (never mixed lab leftovers).
-- **Auto mode**: tutor advances cards herself at a set pace (tool-call driven).
-- **Manual / push-to-talk mode**: user holds to speak, swipes cards; no VAD dead air.
-  Mode chosen per-session, remembered in profile.
+### P1.3 Live mic modes + noise-safe navigation — CODE COMPLETE (2026-07-18)
+- [x] **Auto mode** (hands-free, server VAD — today's behavior) and **Hold / push-to-talk
+  mode** (mic streams ONLY while the hold button is pressed; on release a 3s silent-PCM
+  tail closes the utterance for server VAD). Noise physically cannot become an utterance
+  in Hold mode.
+- [x] One shared `MicController` (`lib/services/mic_mode.dart`, fully unit-tested) +
+  `MicModeBar` widget (compact Auto/Hold pill; wide hold button only in Hold mode) wired
+  into ALL FOUR live screens. Mode persists app-wide; switchable mid-call; mute exists
+  only in Auto (Hold already gates the mic); backgrounding-safe in both modes.
+- [x] **Noise rule for Auto mode**: when the LLM intent judge fails/times out, NOTHING
+  navigates (the old keyword fallback used to scan garbled noise for "next"/"oui" and
+  move the card — that path is dead). Cards move only on a confident judge verdict or a
+  button tap.
+- [ ] On-device probe: noisy environment (bus/street audio) in Auto → card never moves
+  without a clear command; Hold mode → speech only registers while held.
+
+### P1.3b Daily fallback content overhaul (still open)
+- The LLM-driven Daily path is the product; the static fallback becomes a decent
+  correct session (never mixed lab leftovers).
 
 ### P1.4 Post-session summary + word practice
 From the saved transcript + evidence rows: most-practiced words, hardest pronunciations

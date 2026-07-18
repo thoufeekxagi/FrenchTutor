@@ -17,7 +17,9 @@ import '../../utils/transcript_filter.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/mic_mode.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/speaking_session_result.dart';
 
 enum CallStatus { connecting, reconnecting, listening, tutorSpeaking, muted, ended }
@@ -67,6 +69,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   late final GeminiLiveService _gemini;
   late final AudioStreamingService _audio;
+  late final MicController _mic;
+  MicMode _micMode = MicMode.auto;
   final String _sessionId = const Uuid().v4();
 
   bool get _isRoleplay => widget.stage == 'speaking';
@@ -89,6 +93,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       lessonContext: widget.lessonContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
     );
+    _mic = MicController(
+      startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
+      stopStream: _audio.stopStreaming,
+      sendAudio: _gemini.sendAudioChunk,
+    );
+    MicModePrefs.load().then((saved) {
+      if (!mounted) return;
+      _mic.adoptSavedMode(saved);
+      setState(() => _micMode = saved);
+    });
     _setupCallbacks();
     _startCall();
   }
@@ -111,13 +125,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     if (_callStatus == CallStatus.ended || _sessionSaved) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      if (_callStatus != CallStatus.muted) _audio.stopStreaming();
+      _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
-      if (_callStatus != CallStatus.muted) {
-        _audio.startStreaming(onChunk: _gemini.sendAudioChunk).catchError((e) {
-          if (mounted) setState(() => _errorMessage = 'Mic error: $e');
-        });
-      }
+      _mic.onAppResumed().catchError((e) {
+        if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+      });
     }
   }
 
@@ -166,15 +178,34 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   Future<void> _toggleMute() async {
     if (_callStatus == CallStatus.muted) {
       try {
-        await _audio.startStreaming(onChunk: _gemini.sendAudioChunk);
+        await _mic.setMuted(false);
         setState(() => _callStatus = CallStatus.listening);
       } catch (e) {
         setState(() => _errorMessage = 'Failed to unmute: $e');
       }
     } else {
-      await _audio.stopStreaming();
+      await _mic.setMuted(true);
       setState(() => _callStatus = CallStatus.muted);
     }
+  }
+
+  Future<void> _setMicMode(MicMode mode) async {
+    await _mic.setMode(mode);
+    if (!mounted) return;
+    setState(() {
+      _micMode = mode;
+      if (_callStatus == CallStatus.muted) _callStatus = CallStatus.listening;
+    });
+  }
+
+  void _pttDown() {
+    _mic.pttDown();
+    if (mounted) setState(() {});
+  }
+
+  void _pttUp() {
+    _mic.pttUp();
+    if (mounted) setState(() {});
   }
 
   void _setupCallbacks() {
@@ -195,7 +226,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!mounted) return;
       if (granted) {
         try {
-          await _audio.startStreaming(onChunk: _gemini.sendAudioChunk);
+          await _mic.onConnected();
           // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
           // "what do you want to practice?" greetings broke the roleplay contract.
           _gemini.sendText(
@@ -717,32 +748,56 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _controlButton(
-            icon: _callStatus == CallStatus.muted
-                ? CupertinoIcons.mic_slash_fill
-                : CupertinoIcons.mic_fill,
-            label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
-            color: _callStatus == CallStatus.muted
-                ? Passeport.slate
-                : Passeport.ink,
-            onTap: _callStatus == CallStatus.connecting ? null : _toggleMute,
+          MicModeBar(
+            mode: _micMode,
+            isHolding: _mic.isHeld,
+            enabled:
+                _callStatus != CallStatus.connecting &&
+                _callStatus != CallStatus.reconnecting &&
+                _callStatus != CallStatus.ended,
+            onModeChanged: _setMicMode,
+            onHoldStart: _pttDown,
+            onHoldEnd: _pttUp,
           ),
-          _controlButton(
-            icon: _isSpeakerOn
-                ? CupertinoIcons.speaker_2_fill
-                : CupertinoIcons.ear,
-            label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
-            color: Passeport.ink,
-            onTap: _callStatus == CallStatus.connecting ? null : _toggleSpeaker,
-          ),
-          _controlButton(
-            icon: CupertinoIcons.phone_down_fill,
-            label: 'End',
-            color: Passeport.maroon,
-            onTap: _confirmEnd,
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Mute only exists in Auto mode — in Hold mode the mic is already
+              // physically gated by the hold button.
+              if (_micMode == MicMode.auto)
+                _controlButton(
+                  icon: _callStatus == CallStatus.muted
+                      ? CupertinoIcons.mic_slash_fill
+                      : CupertinoIcons.mic_fill,
+                  label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
+                  color: _callStatus == CallStatus.muted
+                      ? Passeport.slate
+                      : Passeport.ink,
+                  onTap: _callStatus == CallStatus.connecting
+                      ? null
+                      : _toggleMute,
+                ),
+              _controlButton(
+                icon: _isSpeakerOn
+                    ? CupertinoIcons.speaker_2_fill
+                    : CupertinoIcons.ear,
+                label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
+                color: Passeport.ink,
+                onTap: _callStatus == CallStatus.connecting
+                    ? null
+                    : _toggleSpeaker,
+              ),
+              _controlButton(
+                icon: CupertinoIcons.phone_down_fill,
+                label: 'End',
+                color: Passeport.maroon,
+                onTap: _confirmEnd,
+              ),
+            ],
           ),
         ],
       ),
