@@ -215,14 +215,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     // With service-level auto-reconnect (P0.4), onDisconnected now means the
-    // connection is gone for good (retries exhausted) — only then does the call end.
+    // connection is gone for good (retries exhausted) — end the call FOR the user:
+    // save the transcript and show the result screen, never a dead call UI they
+    // have to fight their way out of.
     _gemini.onDisconnected = () {
       if (!mounted || _sessionSaved) return;
       _endedReason = 'disconnected';
-      setState(() {
-        _errorMessage = 'Connection lost';
-        _callStatus = CallStatus.ended;
-      });
+      _errorMessage = 'Connection lost';
+      _endCall();
     };
 
     _gemini.onReconnecting = (attempt) {

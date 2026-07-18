@@ -34,7 +34,12 @@ on a spinner long enough to wonder if the app froze.
 
 ---
 
-## P0 — Pilot blockers (broken or trust-destroying) — IN PROGRESS on this branch
+## P0 — Pilot blockers (broken or trust-destroying) — CODE COMPLETE on this branch
+
+> Status 2026-07-18: all P0 code is implemented and unit-tested. Every acceptance
+> criterion below marked [x] is verified by tests/code inspection; the remaining [ ]
+> items are on-device probes (wifi-kill, backgrounding, foreign-language probes,
+> full daily-path run) that need a real phone build before P0 is declared DONE.
 
 ### P0.1 Language guardrail in every prompt
 
@@ -55,8 +60,8 @@ speaks it. Users can be from anywhere; one wrong-language reply destroys trust.
   their output is never shown or spoken.)
 
 **Acceptance.**
-- [ ] A test asserts the guardrail text is present in every `LivePrompts` variant and in
-      each user-facing lesson-agent system prompt.
+- [x] A test asserts the guardrail text is present in every `LivePrompts` variant and in
+      each user-facing lesson-agent system prompt. (`test/live_prompts_test.dart`)
 - [ ] Manual probe: speak/type Spanish and Malayalam to Marie in free talk and to the
       lesson Q&A; every reply is French/English only.
 
@@ -80,7 +85,7 @@ freeform-tutor instructions (e.g. "ask one follow-up question at a time" contrad
   agent_led_grammar).
 
 **Acceptance.**
-- [ ] Each screen constructs the service with its own type; a test pins the role-block
+- [x] Each screen constructs the service with its own type; a test pins the role-block
       markers per type (e.g. roleplay prompt contains role-lock rules, vocab prompt
       contains card-discipline rules).
 - [ ] No behavioral regression in vocab/listening choreography (manual run of each stage).
@@ -129,11 +134,15 @@ forever.
   - Handle server `goAway` by proactively reconnecting.
   - New callbacks: `onReconnecting(attempt)`, `onReconnected`; `onDisconnected` now fires
     only when reconnection is exhausted or the disconnect was intentional.
-- `SessionScreen`: `WidgetsBindingObserver` — on pause, stop mic streaming (keep call
-  timer honest); on resume, restart mic and let service reconnect if the socket died in
-  the background. New `CallStatus.reconnecting` UI state.
-- Agent-led screens: reconnection is transparent (service-level); their `onDisconnected`
-  now genuinely means "gone for good" and still pauses the stage safely.
+- ALL live screens (`SessionScreen` + the three agent-led stages): `WidgetsBindingObserver`
+  — on pause, stop mic streaming; on resume, restart mic (unless deliberately muted) and
+  let the service reconnect if the socket died in the background. New
+  `CallStatus.reconnecting` UI state on every live screen.
+- Agent-led screens additionally RE-ANCHOR the session on reconnect: vocab/grammar
+  re-announce the current card, listening re-directs the current beat/phase (or replays
+  the finale beat) — so even a fresh no-handle session knows exactly where it was.
+- `SessionScreen` on final disconnect auto-ends the call: transcript saved, result
+  screen shown — never a dead call UI.
 - Cancel/mid-call exits, resume, and honest completion thresholds already exist in the
   coordinator — verified, not rebuilt.
 

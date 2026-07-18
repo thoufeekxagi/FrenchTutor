@@ -67,7 +67,8 @@ class AgentLedGrammarScreen extends ConsumerStatefulWidget {
       _AgentLedGrammarScreenState();
 }
 
-class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
+class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
+    with WidgetsBindingObserver {
   late GeminiLiveService _gemini;
   late AudioStreamingService _audio;
   late LearningStore _store;
@@ -128,6 +129,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Deferred to after this frame — see pathway_writing_screen.dart for why.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Grammar';
@@ -161,10 +163,29 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Resources only — a disposed screen must never report learning results.
     _teardown();
     _debugScrollController.dispose();
     super.dispose();
+  }
+
+  /// P0.4 — same contract as SessionScreen's: mic never streams from a
+  /// backgrounded app, and restarts on return unless the student muted
+  /// deliberately.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_finished) return;
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      if (_callStatus != CallStatus.muted) _audio.stopStreaming();
+    } else if (state == AppLifecycleState.resumed) {
+      if (_callStatus != CallStatus.muted) {
+        _audio.startStreaming(onChunk: _gemini.sendAudioChunk).catchError((e) {
+          if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+        });
+      }
+    }
   }
 
   // MARK: - Callbacks
@@ -205,6 +226,37 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
       if (!_finished) {
         _errorMessage = 'Connection lost';
         _finish(completed: false, reason: 'disconnected');
+      }
+    };
+
+    _gemini.onReconnecting = (attempt) {
+      if (!mounted || _finished) return;
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
+      _logDebug('→ connection lost, reconnecting (attempt $attempt)');
+      setState(() {
+        _callStatus = CallStatus.reconnecting;
+        _errorMessage = '';
+      });
+    };
+
+    _gemini.onReconnected = () {
+      if (!mounted || _finished) return;
+      _logDebug('→ reconnected');
+      setState(() {
+        if (_callStatus == CallStatus.reconnecting) {
+          _callStatus = CallStatus.listening;
+        }
+        _errorMessage = '';
+      });
+      // Re-anchor Marie on the CURRENT sentence after the gap (see vocab screen).
+      final card = _currentCard;
+      if (card != null) {
+        _scheduleCardAnnouncement(
+          'The call connection dropped briefly and is now restored. The student\'s screen '
+          'still shows the sentence "${card.card.fr}" (${card.card.en}). Briefly pick it '
+          'back up as if nothing happened — do not re-greet, do not start over. $_noteReminder',
+        );
       }
     };
 

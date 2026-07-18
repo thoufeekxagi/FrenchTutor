@@ -76,7 +76,7 @@ class AgentLedListeningScreen extends ConsumerStatefulWidget {
 }
 
 class _AgentLedListeningScreenState
-    extends ConsumerState<AgentLedListeningScreen> {
+    extends ConsumerState<AgentLedListeningScreen> with WidgetsBindingObserver {
   late GeminiLiveService _gemini;
   late AudioStreamingService _audio;
   late LearningStore _store;
@@ -171,6 +171,7 @@ class _AgentLedListeningScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Deferred to after this frame — see pathway_writing_screen.dart for why.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Listening';
@@ -203,11 +204,30 @@ class _AgentLedListeningScreenState
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Resources only — a disposed screen must never report learning results.
     _teardown();
     _debugScrollController.dispose();
     _sceneScrollController.dispose();
     super.dispose();
+  }
+
+  /// P0.4 — same contract as SessionScreen's: mic never streams from a
+  /// backgrounded app, and restarts on return unless the student muted
+  /// deliberately.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_finished) return;
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      if (_callStatus != CallStatus.muted) _audio.stopStreaming();
+    } else if (state == AppLifecycleState.resumed) {
+      if (_callStatus != CallStatus.muted) {
+        _audio.startStreaming(onChunk: _gemini.sendAudioChunk).catchError((e) {
+          if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+        });
+      }
+    }
   }
 
   // MARK: - Callbacks
@@ -249,6 +269,40 @@ class _AgentLedListeningScreenState
       if (!_finished) {
         _errorMessage = 'Connection lost';
         _finish(completed: false, reason: 'disconnected');
+      }
+    };
+
+    _gemini.onReconnecting = (attempt) {
+      if (!mounted || _finished) return;
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
+      _logDebug('→ connection lost, reconnecting (attempt $attempt)');
+      setState(() {
+        _callStatus = CallStatus.reconnecting;
+        _errorMessage = '';
+      });
+    };
+
+    _gemini.onReconnected = () {
+      if (!mounted || _finished) return;
+      _logDebug('→ reconnected');
+      setState(() {
+        if (_callStatus == CallStatus.reconnecting) {
+          _callStatus = CallStatus.listening;
+        }
+        _errorMessage = '';
+      });
+      // Re-anchor the scene: re-direct the current beat/phase (or the finale beat)
+      // so Marie knows exactly where the script stands even on a fresh session.
+      if (_finaleBeat != null) {
+        final beat = _finaleBeat!;
+        if (beat < _sessionPlan.length) {
+          // Re-deliver the character line the student was answering.
+          _finaleBeat = beat - 1;
+          _advanceFinale();
+        }
+      } else {
+        _directCurrentPhase();
       }
     };
 
