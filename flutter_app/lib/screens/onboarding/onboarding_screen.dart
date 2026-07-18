@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
-import '../../design/app_router.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
-import '../main_tab_screen.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, required this.onFinished});
+
+  /// Called after the profile is saved. The hosting [AuthGate] re-evaluates
+  /// and shows the next gate (sign-in for a fresh learner, home if already
+  /// signed in) — onboarding never navigates on its own, so the gate always
+  /// stays mounted and in control.
+  final VoidCallback onFinished;
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -64,7 +68,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
     _previewer.stop();
     PSHaptics.success();
-    AppRouter.pushReplacement(context, (_) => const MainTabScreen());
+    widget.onFinished();
   }
 
   @override
@@ -214,10 +218,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           constraints: const BoxConstraints(minHeight: 68),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           decoration: BoxDecoration(
-            color: selected ? Passeport.ink : Passeport.card,
+            // Primary (palette blue) for selection — matches the app's action
+            // color everywhere else instead of the old near-black.
+            color: selected ? Passeport.primary : Passeport.card,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: selected ? Passeport.ink : Passeport.hairline,
+              color: selected ? Passeport.primary : Passeport.hairline,
             ),
           ),
           child: Row(
@@ -237,7 +243,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     Text(
                       detail,
                       style: Passeport.body(12.5).copyWith(
-                        color: selected ? Passeport.slate : Passeport.slateDim,
+                        color: selected ? Colors.white70 : Passeport.slateDim,
                       ),
                     ),
                   ],
@@ -248,7 +254,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 selected
                     ? CupertinoIcons.checkmark_circle_fill
                     : CupertinoIcons.circle,
-                color: selected ? Passeport.sage : Passeport.slate,
+                color: selected ? Colors.white : Passeport.slate,
                 size: 22,
               ),
             ],
@@ -485,7 +491,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ),
       ],
       footer: PasseportPrimaryButton(
-        label: 'Start today’s plan',
+        label: 'Continue',
         onPressed: _finish,
         icon: CupertinoIcons.arrow_right,
       ),

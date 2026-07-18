@@ -31,11 +31,11 @@ void main() {
     // sign-in method is actually invoked, which this file never does.
     await Supabase.initialize(
       url: 'https://test.supabase.co',
-      anonKey: 'test-anon-key',
+      publishableKey: 'sb_publishable_test_key',
     );
   });
 
-  testWidgets('first run with no session shows the sign-in screen', (
+  testWidgets('first run opens onboarding; sign-in waits until after it', (
     WidgetTester tester,
   ) async {
     // Build the real app against an isolated local database.
@@ -50,13 +50,14 @@ void main() {
       ),
     );
 
-    // Let theme and auth screen layout finish their first frame.
+    // Let theme and onboarding layout finish their first frame.
     await tester.pumpAndSettle();
 
-    // A signed-out fresh launch reaches sign-in FIRST, ahead of onboarding —
-    // the app has no way to know who's onboarding until it knows who's asking.
-    expect(find.text('Welcome'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
+    // Deliberate order: a fresh learner experiences the product first
+    // (goal/level/tutor onboarding) and is asked to create an account only
+    // at the END of onboarding — never an account wall up front.
+    expect(find.text('What should French unlock for you?'), findsOneWidget);
+    expect(find.text('Continue with Google'), findsNothing);
   });
 
   testWidgets('today plan exposes one recommended next action', (

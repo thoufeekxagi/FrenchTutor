@@ -26,14 +26,19 @@ class FrenchTutorApp extends StatelessWidget {
   }
 }
 
-/// The single decision point for what the user sees first, re-evaluated on
-/// every auth state change:
-///   - no session -> [AuthScreen]
-///   - session, but this device's local profile hasn't finished onboarding
-///     -> [OnboardingScreen] (onboarding completion is a local/per-device
-///     fact for now — no cross-device sync exists yet, see
-///     APP_STORE_AI_COMPLIANCE.md)
-///   - session + onboarded -> [MainTabScreen]
+/// The single decision point for what the user sees, re-evaluated on every
+/// auth state change AND when onboarding completes. Deliberate ORDER — the
+/// learner experiences value first, commits second:
+///   1. not onboarded -> [OnboardingScreen] (goal, level, tutor — no account
+///      wall in front of the product)
+///   2. onboarded but no session -> [AuthScreen] ("create an account to save
+///      your progress" — the natural close of onboarding)
+///   3. onboarded + session -> [MainTabScreen]
+///
+/// Everything renders INSIDE this gate (no pushReplacement out of it) so a
+/// later sign-out from Settings always lands back on the sign-in screen —
+/// with the old push-based flow the gate was unmounted after onboarding and
+/// sign-out navigated nowhere.
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
 
@@ -78,8 +83,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasSession) return const AuthScreen();
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
-    return onboarded ? const MainTabScreen() : const OnboardingScreen();
+    if (!onboarded) {
+      return OnboardingScreen(onFinished: () => setState(() {}));
+    }
+    if (!_hasSession) return const AuthScreen();
+    return const MainTabScreen();
   }
 }

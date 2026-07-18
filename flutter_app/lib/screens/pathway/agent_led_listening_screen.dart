@@ -24,6 +24,7 @@ import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../session/session_screen.dart' show CallStatus;
@@ -1110,27 +1111,7 @@ class _AgentLedListeningScreenState
                         ),
                       ),
                       if (_errorMessage.isNotEmpty)
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: DesignTokens.screenMargin,
-                            vertical: DesignTokens.space2,
-                          ),
-                          padding: const EdgeInsets.all(DesignTokens.space3),
-                          decoration: BoxDecoration(
-                            color: DesignTokens.primarySoft,
-                            borderRadius: BorderRadius.circular(
-                              DesignTokens.radiusMedium,
-                            ),
-                          ),
-                          child: Text(
-                            _errorMessage,
-                            style: DesignTokens.body(13).copyWith(
-                              color: DesignTokens.inkSoft,
-                              height: 1.35,
-                            ),
-                          ),
-                        ),
+                        ErrorNotice(message: _errorMessage),
                       _debugPanel(),
                       _controls(),
                     ],
@@ -1318,6 +1299,11 @@ class _AgentLedListeningScreenState
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: BorderSide(color: DesignTokens.hairline),
                     foregroundColor: DesignTokens.text,
+                    // Match PasseportPrimaryButton's corner radius so Back and
+                    // Next read as one control pair, not two design systems.
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),

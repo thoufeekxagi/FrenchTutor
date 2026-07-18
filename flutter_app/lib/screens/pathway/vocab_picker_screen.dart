@@ -325,12 +325,21 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                       color: DesignTokens.slateDim,
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: phase.themes
-                          .map((theme) => _categoryChip(theme))
-                          .toList(),
+                    // Two full-width columns — the old fixed 150px chips left
+                    // a dead strip of unused space down the right edge.
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final chipWidth = (constraints.maxWidth - 8) / 2;
+                        return Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: phase.themes
+                              .map(
+                                (theme) => _categoryChip(theme, chipWidth),
+                              )
+                              .toList(),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -357,13 +366,13 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     );
   }
 
-  Widget _categoryChip(VocabTheme theme) {
+  Widget _categoryChip(VocabTheme theme, double width) {
     final selected = _selectedCount(theme);
     final hasSelection = selected > 0;
     return GestureDetector(
       onTap: () => _showCategoryWordSheet(theme),
       child: Container(
-        width: 150,
+        width: width,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
           color: hasSelection ? DesignTokens.infoSoft : DesignTokens.surface,
@@ -412,8 +421,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             initialChildSize: 0.6,
             maxChildSize: 0.9,
             expand: false,
-            builder: (context, scrollController) => Column(
-              children: [
+            // The PS sheet wrapper is transparent by design — content brings
+            // its own surface. Without this the word grid floated see-through
+            // over the dimmed screen behind it.
+            builder: (context, scrollController) => Container(
+              decoration: const BoxDecoration(
+                color: DesignTokens.canvas,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
                   child: Row(
@@ -475,7 +492,8 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                     },
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           );
         },

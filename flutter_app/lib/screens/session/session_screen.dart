@@ -18,6 +18,7 @@ import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/mic_mode.dart';
+import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/speaking_session_result.dart';
@@ -579,20 +580,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   _callHeader(),
                   Expanded(child: _transcriptView()),
                   if (_errorMessage.isNotEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      color: Passeport.maroon.withValues(alpha: 0.1),
-                      child: Text(
-                        _errorMessage,
-                        style: Passeport.mono(
-                          12,
-                        ).copyWith(color: Passeport.maroon),
-                      ),
-                    ),
+                    ErrorNotice(message: _errorMessage),
                   _callControls(),
                 ],
               ),
