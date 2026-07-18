@@ -1,16 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/tutor_persona.dart';
 import 'audio_streaming_service.dart';
 import 'lesson_agent_service.dart';
 
 /// Plays each tutor's [TutorPersona.sampleLine] in their own voice, for the
-/// pickers in onboarding and Settings (P2.2). Each sample is synthesized once
-/// (Gemini TTS with that persona's voice) and cached for the screen's
-/// lifetime; starting a preview cuts any other preview. Failures (offline, no
-/// key) are quiet — a preview is a nice-to-have, never a blocker.
+/// pickers in onboarding and Settings (P2.2).
+///
+/// Samples ship BUNDLED in the app (`assets/audio/tutor_previews/<id>.pcm`,
+/// raw 24kHz mono PCM16 pre-generated with each persona's real voice) so a
+/// preview plays instantly, offline, with zero API calls — critical for
+/// onboarding, which runs before anything is warmed up. Live Gemini TTS is
+/// only a fallback for a persona whose bundled asset is missing. Starting a
+/// preview cuts any other preview; failures are quiet — a preview is a
+/// nice-to-have, never a blocker.
 class TutorVoicePreviewer extends ChangeNotifier {
   // Lazy: no audio machinery (and none of its timers/platform channels) exists
   // until a preview is actually played — screens that merely SHOW the picker
@@ -40,6 +46,20 @@ class TutorVoicePreviewer extends ChangeNotifier {
     stop();
     var bytes = _cache[persona.id];
     if (bytes == null) {
+      // Bundled asset first: instant, offline, free.
+      try {
+        final data = await rootBundle.load(
+          'assets/audio/tutor_previews/${persona.id}.pcm',
+        );
+        bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        _cache[persona.id] = bytes;
+      } catch (_) {
+        bytes = null;
+      }
+      if (_disposed) return;
+    }
+    if (bytes == null) {
+      // Fallback only if the asset is missing: live TTS.
       _loadingId = persona.id;
       notifyListeners();
       try {
