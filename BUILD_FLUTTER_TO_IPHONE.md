@@ -146,7 +146,28 @@ Run through these in order when a deploy doesn't work:
      build can sometimes leave stale state; `flutter clean` in `flutter_app/` before
      retrying if a second attempt also hangs.
 
-6. **Wi-Fi deploy is flaky / times out mid-transfer.**
+6. **Archive fails with `Exited with status code 127` / "Run Prepare Flutter Framework
+   Script" / `/packages/flutter_tools/bin/xcode_backend.sh: No such file or directory`.**
+   - This means `ios/Flutter/ephemeral/` and its siblings (`Flutter.podspec`,
+     `flutter_export_environment.sh`, `.flutter-plugins-dependencies`) are missing or
+     stale — usually because `flutter clean` was run (which deletes all of them) and
+     only `flutter pub get` was run afterward. **`pub get` alone is NOT enough to
+     recover from a `flutter clean`** — it regenerates `Generated.xcconfig` (so the
+     build number looks fixed) but does NOT redo the CocoaPods `pod install` /
+     ephemeral wiring Xcode's archive pipeline needs. The fix:
+     ```bash
+     cd flutter_app
+     flutter build ios --release --no-codesign
+     ```
+     This forces a full rebuild: regenerates everything `flutter clean` deleted,
+     re-runs `pod install`, and leaves the project in a state Xcode can actually
+     archive. Afterward, close and reopen `Runner.xcworkspace` before archiving
+     again — don't reuse an already-open Xcode window, it may be holding stale state.
+   - **The lesson for next time:** after any `flutter clean`, don't stop at
+     `flutter pub get` — run a real build (`flutter build ios ...`, or either of the
+     run scripts above) at least once before touching Xcode again.
+
+7. **Wi-Fi deploy is flaky / times out mid-transfer.**
    - Wireless installs are inherently slower and less reliable than USB. If it fails
      repeatedly, plug in via USB cable for that one run (`flutter run --release -d
      <device-id> ...` works identically over USB), then switch back to wireless once
