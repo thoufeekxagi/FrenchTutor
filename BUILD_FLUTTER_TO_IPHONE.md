@@ -108,6 +108,20 @@ use the scripts, or the manual command above with both keys included.
 
 ---
 
+## Before every Archive → TestFlight upload
+
+Run this once, right before opening Xcode:
+
+```bash
+cd flutter_app
+./bump_build_number.sh
+```
+
+It sets the build number to the current git commit count (always strictly
+increasing — can never collide with a previous upload) and regenerates
+`Generated.xcconfig`. Then open `Runner.xcworkspace` fresh and Archive as usual.
+Skip this and you risk the exact "Redundant Binary Upload" error covered below.
+
 ## Troubleshooting — "it fails to deploy" checklist
 
 Run through these in order when a deploy doesn't work:
