@@ -12,6 +12,7 @@ import '../../design/tokens.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
+import '../../models/profile.dart';
 import '../../models/srs_state.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
@@ -1822,12 +1823,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         'signal that they can hold French conversation. Do not switch into French-led '
         'explanations after a good recitation — stay at exactly the same English-led level '
         'for the whole session, from first word to last.';
-    final languageGuidance = switch (learnerLevel) {
-      'conversational' =>
-        'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.$noEscalation',
-      _ =>
-        'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.$noEscalation',
-    };
+    final languageGuidance = LearnerLevel.isConversational(learnerLevel)
+        ? 'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.$noEscalation'
+        : 'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.$noEscalation';
     final parts = <String>[];
     parts.add(
       '''

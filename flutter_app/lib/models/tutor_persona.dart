@@ -22,6 +22,7 @@ class TutorPersona {
     required this.isFemale,
     required this.voiceName,
     required this.tagline,
+    required this.sampleLine,
     required this.promptBlock,
   });
 
@@ -37,6 +38,12 @@ class TutorPersona {
   /// One-line description for pickers.
   final String tagline;
 
+  /// The spoken voice-preview sample (P2.2/onboarding v2): a few sentences in
+  /// this tutor's own words, synthesized once with their real voice so the
+  /// student can HEAR each tutor before choosing. Mixes French and English the
+  /// way the tutor actually teaches.
+  final String sampleLine;
+
   /// Identity + accent block composed into every live system prompt.
   final String promptBlock;
 
@@ -49,6 +56,10 @@ class TutorPersona {
     isFemale: true,
     voiceName: 'Aoede',
     tagline: 'Warm and patient, from Lyon',
+    sampleLine:
+        "Bonjour ! Je m'appelle Marie. Hi — I'm Marie, from Lyon. We'll take "
+        'French one small step at a time, and I promise: no rushing, ever. '
+        'On y va ?',
     promptBlock:
         'You are Marie, a warm, patient French tutor from Lyon, France. You speak '
         'standard metropolitan French with clear, textbook pronunciation — exactly '
@@ -62,6 +73,10 @@ class TutorPersona {
     isFemale: false,
     voiceName: 'Puck',
     tagline: 'Upbeat and direct, from Paris',
+    sampleLine:
+        "Salut ! Moi, c'est Julien. Hey — I'm Julien, from Paris. I like to "
+        "keep things moving, celebrate every win, and get you speaking out "
+        "loud from day one. Prêt ?",
     promptBlock:
         'You are Julien, an upbeat, encouraging French tutor from Paris, France. '
         'You speak standard metropolitan French with clear pronunciation, and you '
@@ -75,6 +90,10 @@ class TutorPersona {
     isFemale: true,
     voiceName: 'Leda',
     tagline: 'Friendly Québécoise, from Montréal',
+    sampleLine:
+        "Allô ! Moi, c'est Camille, de Montréal. Hi — I'm Camille. I'll teach "
+        "you the French people actually speak here in Canada, eh — c'est "
+        "correct if you make mistakes, that's how we learn. Bienvenue !",
     promptBlock:
         'You are Camille, a friendly French tutor from Montréal, Québec. You speak '
         'Québec French: use natural, everyday Québécois pronunciation and expressions '
@@ -91,6 +110,10 @@ class TutorPersona {
     isFemale: false,
     voiceName: 'Orus',
     tagline: 'Calm Québécois, from Québec City',
+    sampleLine:
+        "Bonjour, bonjour ! Je m'appelle Mathieu, de la ville de Québec. "
+        "Hi — I'm Mathieu. We'll go steady and calm, on jase en français un "
+        "peu chaque jour — a little chat in French every day. Ça te va ?",
     promptBlock:
         'You are Mathieu, a calm, steady French tutor from Québec City. You speak '
         'Québec French: use natural, everyday Québécois pronunciation and expressions '

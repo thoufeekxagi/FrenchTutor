@@ -6,6 +6,7 @@ import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
+import '../../services/tutor_voice_preview.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -25,14 +26,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String? _level;
   String _sessionLength = 'standard';
   TutorPersona? _tutorChoice;
+  late final TutorVoicePreviewer _previewer = TutorVoicePreviewer()
+    ..addListener(() {
+      if (mounted) setState(() {});
+    });
 
   @override
   void dispose() {
+    _previewer.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
   void _next() {
+    _previewer.stop();
     PSHaptics.selection();
     _pageController.nextPage(
       duration: DesignTokens.durationMedium,
@@ -49,6 +56,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
     ActiveTutor.set(_tutorChoice ?? TutorPersona.marie);
+    // The English/French mix is derived from level instead of being its own
+    // question (A1/A2 gentle, B1 balanced, B2 immersion) — adjustable anytime
+    // in Settings.
+    TutorTuning.saveLanguageMix(
+      LearnerLevel.defaultLanguageMix(_level ?? 'a1'),
+    );
+    _previewer.stop();
     PSHaptics.success();
     AppRouter.pushReplacement(context, (_) => const MainTabScreen());
   }
@@ -184,6 +198,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     required String detail,
     required bool selected,
     required VoidCallback onTap,
+    Widget? trailing,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -228,6 +243,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ],
                 ),
               ),
+              if (trailing != null) ...[trailing, const SizedBox(width: 10)],
               Icon(
                 selected
                     ? CupertinoIcons.checkmark_circle_fill
@@ -284,22 +300,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           'Choose the closest answer. The plan will adjust as you create real evidence.',
       children: [
         _choice(
-          label: 'Starting from zero',
-          detail: 'I need the essential words and patterns',
-          selected: _level == 'zero',
-          onTap: () => setState(() => _level = 'zero'),
+          label: 'A1 — Just starting',
+          detail: 'Little or no French yet; I need the essentials',
+          selected: _level == 'a1',
+          onTap: () => setState(() => _level = 'a1'),
         ),
         _choice(
-          label: 'I know some basics',
-          detail: 'I recognize common French but hesitate to use it',
-          selected: _level == 'basics',
-          onTap: () => setState(() => _level = 'basics'),
+          label: 'A2 — I know the basics',
+          detail: 'Simple phrases and everyday words, but I hesitate',
+          selected: _level == 'a2',
+          onTap: () => setState(() => _level = 'a2'),
         ),
         _choice(
-          label: 'I can hold a simple conversation',
-          detail: 'I want more range, accuracy, and confidence',
-          selected: _level == 'conversational',
-          onTap: () => setState(() => _level = 'conversational'),
+          label: 'B1 — I can hold a conversation',
+          detail: 'I manage everyday situations and want more range',
+          selected: _level == 'b1',
+          onTap: () => setState(() => _level = 'b1'),
+        ),
+        _choice(
+          label: 'B2 — I\'m comfortable, polishing',
+          detail: 'I discuss most topics and want exam-level accuracy',
+          selected: _level == 'b2',
+          onTap: () => setState(() => _level = 'b2'),
         ),
         const SizedBox(height: 12),
         Text(
@@ -325,6 +347,47 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
+  /// Round play/stop button on each tutor card — hears the tutor's sample in
+  /// their real voice before choosing.
+  Widget _previewButton(TutorPersona p) {
+    final loading = _previewer.loadingId == p.id;
+    final playing = _previewer.playingId == p.id;
+    return Semantics(
+      button: true,
+      label: playing
+          ? 'Stop ${p.displayName}\'s voice sample'
+          : 'Play ${p.displayName}\'s voice sample',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          PSHaptics.selection();
+          _previewer.play(p);
+        },
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: playing ? Passeport.maroon : Passeport.infoSoft,
+            shape: BoxShape.circle,
+          ),
+          child: loading
+              ? const Padding(
+                  padding: EdgeInsets.all(11),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Passeport.sky,
+                  ),
+                )
+              : Icon(
+                  playing ? CupertinoIcons.stop_fill : CupertinoIcons.play_fill,
+                  size: 16,
+                  color: playing ? Colors.white : Passeport.sky,
+                ),
+        ),
+      ),
+    );
+  }
+
   Widget _tutorStep() {
     Widget group(TutorAccent accent, String detailSuffix) {
       final pair = TutorPersona.byAccent(accent);
@@ -345,6 +408,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               detail: '${p.tagline} — $detailSuffix',
               selected: _tutorChoice?.id == p.id,
               onTap: () => setState(() => _tutorChoice = p),
+              trailing: _previewButton(p),
             ),
         ],
       );
@@ -354,9 +418,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       eyebrow: 'Your tutor',
       title: 'Who will you practice with?',
       subtitle:
-          'Pick an accent and a voice. France French is what most exams use; '
-          'Québec French is what you\'ll hear across Canada. You can switch '
-          'anytime in Settings.',
+          'Tap ▶ to hear each tutor, then choose. France French is what most '
+          'exams use; Québec French is what you\'ll hear across Canada. You '
+          'can switch tutors anytime in Settings.',
       children: [
         group(TutorAccent.france, 'standard metropolitan French'),
         const SizedBox(height: 10),

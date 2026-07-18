@@ -10,6 +10,7 @@ import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
+import '../../services/tutor_voice_preview.dart';
 import '../../providers/database_provider.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
@@ -38,6 +39,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   TutorPersona _persona = ActiveTutor.current;
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
+  late final TutorVoicePreviewer _previewer = TutorVoicePreviewer()
+    ..addListener(() {
+      if (mounted) setState(() {});
+    });
   late Profile _profile;
   late PilotAccessSnapshot _access;
 
@@ -47,6 +52,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _profile = ref.read(learningStoreProvider).profile();
     _access = ref.read(pilotAccessServiceProvider).snapshot();
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _previewer.dispose();
+    super.dispose();
   }
 
   void _saveProfile(void Function(Profile) mutate) {
@@ -149,6 +160,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             .copyWith(
                               color: selected ? Colors.white : Passeport.ink,
                             ),
+                      ),
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _previewer.play(p),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: _previewer.loadingId == p.id
+                            ? const SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Passeport.sky,
+                                ),
+                              )
+                            : Icon(
+                                _previewer.playingId == p.id
+                                    ? CupertinoIcons.stop_circle_fill
+                                    : CupertinoIcons.play_circle_fill,
+                                color: selected
+                                    ? Passeport.brass
+                                    : Passeport.sky,
+                                size: 19,
+                              ),
                       ),
                     ),
                     if (selected)

@@ -253,10 +253,25 @@ deleted, a retake is a new session.
 - [ ] On-device probe: each persona sounds distinct; Québec personas actually use QC
   register; persona survives app restart.
 
-### P2.2 Onboarding — DONE
+### P2.2 Onboarding — DONE, upgraded to v2 (2026-07-18)
 - [x] New "Who will you practice with?" step (page 3 of 4): both accents explained,
   four tutors with taglines; choice saved via ActiveTutor; final page references the
-  chosen tutor by name. Level/goal/session-length steps unchanged.
+  chosen tutor by name.
+- [x] **v2 — CEFR levels:** the level question is now A1/A2/B1/B2 with plain-English
+  descriptions, stored in the profile. `LearnerLevel` helper maps BOTH the CEFR and
+  legacy ('zero'/'basics'/'conversational') vocabularies everywhere — old installs
+  need no migration and can never crash on level reads.
+- [x] **v2 — tutor voice previews:** every tutor card has a ▶ button playing a 3–4
+  sentence sample in that tutor's REAL voice (Gemini TTS with per-persona voice
+  override; `TutorVoicePreviewer` — cached per screen, toggle to stop, quiet failure
+  offline, lazy audio so picker screens stay audio-free until first play). Same
+  preview buttons in the Settings persona grid.
+- [x] **v2 — one question removed:** English/French mix is DERIVED from level
+  (A1/A2→gentle, B1→balanced, B2→immersion) at onboarding finish, adjustable anytime
+  in Settings. Only questions that feed course-building remain: goal, CEFR level,
+  session length, tutor.
+- [ ] On-device probe: all four previews play in distinct voices; onboarding
+  completes and the daily plan respects the chosen level.
 
 ### P2.3 Tutor tuning in Settings — DONE
 - [x] "Your tutor" card: 2×2 persona grid (accent-labeled), English/French mix

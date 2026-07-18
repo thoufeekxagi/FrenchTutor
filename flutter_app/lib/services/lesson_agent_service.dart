@@ -567,7 +567,13 @@ You are a French grammar tutor. The student answered a drill question incorrectl
   /// native format). Callers cache by text — scene lines are fixed strings, so each
   /// line costs one call ever (per session; the cache is session-scoped, so a persona
   /// change never replays a stale voice).
-  Future<List<int>> synthesizeSpeech(String text, {bool slow = false}) async {
+  /// [voiceName] overrides the active persona's voice — used by tutor voice
+  /// previews, where each candidate tutor must speak with their OWN voice.
+  Future<List<int>> synthesizeSpeech(
+    String text, {
+    bool slow = false,
+    String? voiceName,
+  }) async {
     final key = await _geminiApiKey;
     if (key.isEmpty) throw AgentError.missingKey;
     final prompt = slow
@@ -594,7 +600,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
                 'speechConfig': {
                   'voiceConfig': {
                     'prebuiltVoiceConfig': {
-                      'voiceName': ActiveTutor.current.voiceName,
+                      'voiceName': voiceName ?? ActiveTutor.current.voiceName,
                     },
                   },
                 },
