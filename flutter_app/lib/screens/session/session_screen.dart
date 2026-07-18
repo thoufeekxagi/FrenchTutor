@@ -13,6 +13,7 @@ import '../../flow/stage_outcome.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
+import '../../utils/transcript_filter.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
@@ -250,6 +251,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     _gemini.onUserTranscript = (text) {
+      // French/English only (P0.1): other-language speech is omitted entirely —
+      // not displayed, not saved, not counted as practice.
+      if (!isFrenchEnglishTranscript(text)) return;
       _userUtteranceCount += 1;
       if (!mounted) return;
       _appendMessage(ChatMessage(role: 'user', content: text));

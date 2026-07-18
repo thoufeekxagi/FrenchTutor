@@ -19,9 +19,26 @@ void main() {
     test('guardrail states the French/English-only rule explicitly', () {
       expect(
         LivePrompts.languageGuardrail,
-        contains('only French and English'),
+        contains('French and English only'),
       );
       expect(LivePrompts.languageGuardrail, contains('NO EXCEPTIONS'));
+      // Strict pilot rule: no engaging with other languages at all.
+      expect(LivePrompts.languageGuardrail, contains('do NOT translate'));
+      expect(LivePrompts.languageGuardrail, contains('do NOT engage'));
+    });
+
+    test('every session type carries the content-safety policy', () {
+      for (final type in LiveSessionType.values) {
+        final prompt = LivePrompts.forSession(type);
+        expect(
+          prompt.contains(LivePrompts.contentSafety),
+          isTrue,
+          reason: 'content policy missing from $type',
+        );
+      }
+      expect(LivePrompts.contentSafety, contains('CONTENT POLICY'));
+      expect(LivePrompts.contentSafety, contains('never use profanity'));
+      expect(LivePrompts.contentSafety, contains('never repeat their words'));
     });
 
     test('every session type carries the shared persona base', () {
@@ -78,6 +95,14 @@ void main() {
         contains('ONLY in French and English'),
       );
       expect(LessonAgentService.languageGuardrail, contains('ABSOLUTE'));
+    });
+
+    test('text-brain guardrail carries the content policy', () {
+      expect(LessonAgentService.languageGuardrail, contains('CONTENT POLICY'));
+      expect(
+        LessonAgentService.languageGuardrail,
+        contains('never use profanity'),
+      );
     });
   });
 }

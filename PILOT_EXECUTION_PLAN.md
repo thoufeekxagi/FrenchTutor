@@ -17,10 +17,16 @@ on a spinner long enough to wonder if the app froze.
 
 ## Ground rules (apply to every tier)
 
-1. **Language guardrail is absolute.** The tutor understands input in any language but
-   produces output ONLY in French and English, in any session type, no matter what the
-   user says or asks. (Post-pilot, P4 adds per-profile support languages — the guardrail
-   is written to allow that extension, but the pilot ships strict.)
+1. **English and French only — strict.** The tutor speaks and writes ONLY French and
+   English and never ENGAGES with any other language (no translating, no acknowledging
+   its content). Other-language speech is also OMITTED from the transcript display and
+   session records (script-based client filter). Any native-language support is a
+   post-pilot feature (P4.2) — not designed into the pilot at all.
+1b. **Content policy is absolute (App Store readiness).** Family-friendly output always,
+   in every session type: no profanity, slurs, or sexual/violent/hateful content, in any
+   language. Offensive input is never repeated or engaged — the tutor stays calm and
+   redirects to the lesson. Lives as one shared `contentSafety` block composed into every
+   live prompt plus the text-brain guardrail.
 2. **The app directs, the model performs.** Structure (cards, beats, stage transitions)
    is owned by Dart code; the model gets one instruction per turn. Never hand the model
    the whole script and hope.
@@ -60,10 +66,16 @@ speaks it. Users can be from anywhere; one wrong-language reply destroys trust.
   their output is never shown or spoken.)
 
 **Acceptance.**
-- [x] A test asserts the guardrail text is present in every `LivePrompts` variant and in
-      each user-facing lesson-agent system prompt. (`test/live_prompts_test.dart`)
+- [x] A test asserts the guardrail + content-policy text is present in every `LivePrompts`
+      variant and in the lesson-agent guardrail. (`test/live_prompts_test.dart`)
+- [x] Non-Latin-script transcripts (Malayalam, Tamil, Hindi, Arabic, CJK, Cyrillic, …)
+      are omitted from display/records/intent-judging in all four live screens.
+      (`lib/utils/transcript_filter.dart`, `test/transcript_filter_test.dart`)
 - [ ] Manual probe: speak/type Spanish and Malayalam to Marie in free talk and to the
-      lesson Q&A; every reply is French/English only.
+      lesson Q&A; every reply is French/English only and the foreign lines never appear
+      in the transcript.
+- [ ] Manual probe: say something rude mid-session; Marie stays calm, never repeats it,
+      redirects to the lesson.
 
 ### P0.2 Per-session-type system prompts
 

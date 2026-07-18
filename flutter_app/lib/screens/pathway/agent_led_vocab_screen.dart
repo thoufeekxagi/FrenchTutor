@@ -22,6 +22,7 @@ import '../../services/session_recorder.dart';
 import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
 import '../../utils/text_fold.dart';
+import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -366,6 +367,13 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     };
 
     _gemini.onUserTranscript = (text) {
+      // French/English only (P0.1): other-language speech is omitted entirely —
+      // never displayed, never logged, never sent to the intent judge (it could
+      // only misfire on it).
+      if (!isFrenchEnglishTranscript(text)) {
+        _logDebug('→ omitted: non-French/English speech');
+        return;
+      }
       _recorder.logUser(text);
       _handleUserTranscript(text);
     };

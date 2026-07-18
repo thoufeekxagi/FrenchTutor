@@ -125,14 +125,18 @@ class LessonAgentService {
 
   static final LessonAgentService shared = LessonAgentService._();
 
-  /// Output-language guardrail for every prompt whose text reaches the student's
-  /// eyes or ears (PILOT_EXECUTION_PLAN.md P0.1). Invisible JSON judges/planners
-  /// don't carry it — their output is never shown. Mirrors LivePrompts.languageGuardrail.
+  /// Output-language + content guardrail for every prompt whose text reaches the
+  /// student's eyes or ears (PILOT_EXECUTION_PLAN.md P0.1/P0.6). Invisible JSON
+  /// judges/planners don't carry it — their output is never shown. Mirrors
+  /// LivePrompts.languageGuardrail + contentSafety.
   static const languageGuardrail =
-      ' LANGUAGE RULE — ABSOLUTE: your reply must be written ONLY in French and '
-      'English, whatever language the student used. Understand any language, but '
-      'never produce a single word in any other language, even when asked directly; '
-      'if asked, say in English that this course lives in French and English only.';
+      ' LANGUAGE RULE — ABSOLUTE: reply ONLY in French and English, never any other '
+      'language, whatever language the student used; never translate or engage with '
+      'other-language text — say in English that this course works in French and '
+      'English, and stay on the task. CONTENT POLICY — ABSOLUTE: keep every reply '
+      'family-friendly; never use profanity, slurs, or sexual, violent, hateful, or '
+      'otherwise inappropriate language; if the student\'s text contains offensive '
+      'content, never repeat it — respond calmly and stay on the lesson.';
 
   /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
   /// Google's newest Flash-Lite so we inherit upgrades for free.
