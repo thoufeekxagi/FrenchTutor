@@ -19,7 +19,10 @@ SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' "$SECRETS_FILE" | sed 's/^SUPABAS
 GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
 GOOGLE_WEB_CLIENT_ID=$(grep '^GOOGLE_WEB_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_WEB_CLIENT_ID=//')
 
-if ! flutter devices 2>&1 | grep -q "$DEVICE_ID"; then
+# 30s discovery window: a wireless iPhone that just locked takes a while to
+# reappear on the network — the default (short) check produced false "not
+# found" failures on back-to-back deploys.
+if ! flutter devices --device-timeout 30 2>&1 | grep -q "$DEVICE_ID"; then
   echo "kodekarbon ($DEVICE_ID) not found in 'flutter devices'." >&2
   echo "Check: phone unlocked, on the same Wi-Fi, Settings > General > VPN & Device Management trusts this Mac." >&2
   exit 1

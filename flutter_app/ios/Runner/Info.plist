@@ -30,23 +30,15 @@
 	<string>Parle needs microphone access so you can practice speaking French with your AI tutor.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Parle uses speech recognition to transcribe your French practice for review.</string>
-	<!--
-	  Google Sign-In URL scheme (native auth — see BUILD_FLUTTER_TO_IPHONE.md
-	  "Google Sign-In one-time setup"). REPLACE the string below with your
-	  actual iOS OAuth client ID's REVERSED form once it exists in Google
-	  Cloud Console — it looks like "com.googleusercontent.apps.123-abc"
-	  reversed to "com.googleusercontent.apps.123-abc" (Google gives you this
-	  exact reversed value directly on the client ID's details page — copy it
-	  verbatim, don't hand-construct it). Until replaced, this placeholder is
-	  inert: Google sign-in shows a friendly "not configured yet" message
-	  (AuthService.isGoogleConfigured) rather than using this broken scheme.
-	-->
+	<!-- Google Sign-In URL scheme: the REVERSED form of the iOS OAuth client
+	     ID (Google Cloud Console -> ParleSprint -> Clients -> ParleSprint iOS).
+	     See AUTH_SETUP_CHECKLIST.md. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.REPLACE_WITH_REVERSED_IOS_CLIENT_ID</string>
+				<string>com.googleusercontent.apps.292413403347-i0jbk1eqcftm7tosjn58m2o52ioe4bj9</string>
 			</array>
 		</dict>
 	</array>
