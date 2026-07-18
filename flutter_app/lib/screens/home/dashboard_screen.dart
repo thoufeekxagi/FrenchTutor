@@ -9,6 +9,7 @@ import '../../design/app_router.dart';
 import '../../models/daily_session.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
+import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
@@ -17,6 +18,7 @@ import '../notes/notes_review_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
 import 'daily_pathway_widget.dart';
+import 'daily_summary_card.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -27,6 +29,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Session> _sessions = [];
+  DailySummary? _summary;
 
   @override
   void initState() {
@@ -52,6 +55,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     Future(() => storage.getAllSessions()).then((loaded) {
       if (mounted) setState(() => _sessions = loaded);
     });
+    // Pure local reads (no LLM, no network) — cheap enough to recompute on
+    // every reload so the card is always honestly up to date.
+    try {
+      final summary = DailySummaryService(
+        store: ref.read(learningStoreProvider),
+      ).compute();
+      if (mounted) setState(() => _summary = summary);
+    } catch (_) {
+      // A summary must never take the dashboard down.
+    }
   }
 
   @override
@@ -69,6 +82,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 _header(),
                 const SizedBox(height: 22),
                 DailyPathwayWidget(onProgress: _reload),
+                if (_summary?.hasActivity == true) ...[
+                  const SizedBox(height: 12),
+                  DailySummaryCard(summary: _summary!),
+                ],
                 const SizedBox(height: 28),
                 _sectionTitle('Practice your way'),
                 const SizedBox(height: 10),
