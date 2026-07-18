@@ -14,6 +14,7 @@ import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
+import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/session_recorder.dart';
@@ -148,6 +149,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     );
     _gemini = GeminiLiveService(
       apiKey: ApiKeys.geminiKey,
+      sessionType: LiveSessionType.grammarStage,
       lessonContext: context,
       tools: AgentTool.grammarPalette,
       learningStoreForProfile: _store,
@@ -901,6 +903,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
   Color get _statusColor {
     switch (_callStatus) {
       case CallStatus.connecting:
+      case CallStatus.reconnecting:
         return DesignTokens.info;
       case CallStatus.listening:
         return DesignTokens.success;
@@ -917,6 +920,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen> {
     switch (_callStatus) {
       case CallStatus.connecting:
         return 'connecting…';
+      case CallStatus.reconnecting:
+        return 'reconnecting…';
       case CallStatus.listening:
         return 'listening';
       case CallStatus.tutorSpeaking:

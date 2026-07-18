@@ -12,13 +12,14 @@ import '../../models/chat_message.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
+import '../../prompts/live_prompts.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/speaking_session_result.dart';
 
-enum CallStatus { connecting, listening, tutorSpeaking, muted, ended }
+enum CallStatus { connecting, reconnecting, listening, tutorSpeaking, muted, ended }
 
 /// Free-form (or context-seeded) live voice call with Marie. Ported from SessionView.swift.
 /// `stage` is null for the unstructured "Just talk to Marie" call, or e.g. "speaking" for the
@@ -44,7 +45,8 @@ class SessionScreen extends ConsumerStatefulWidget {
   ConsumerState<SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends ConsumerState<SessionScreen> {
+class _SessionScreenState extends ConsumerState<SessionScreen>
+    with WidgetsBindingObserver {
   final List<ChatMessage> _messages = [];
   CallStatus _callStatus = CallStatus.connecting;
   String _errorMessage = '';
@@ -66,10 +68,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   late final AudioStreamingService _audio;
   final String _sessionId = const Uuid().v4();
 
+  bool get _isRoleplay => widget.stage == 'speaking';
+
   @override
   void initState() {
     super.initState();
     LessonSpeechService.shared.deactivate();
+    WidgetsBinding.instance.addObserver(this);
     // Deferred to after this frame — see pathway_writing_screen.dart for why.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Speaking';
@@ -77,6 +82,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     _audio = AudioStreamingService();
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
+      sessionType: _isRoleplay
+          ? LiveSessionType.speakingRoleplay
+          : LiveSessionType.freeTalk,
       lessonContext: widget.lessonContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
     );
@@ -86,10 +94,30 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _endCall();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// P0.4 — phone calls, app switches, lock screen. On pause the mic stops (never
+  /// stream a pocket recording); on resume it restarts unless the student had muted
+  /// deliberately. If the socket died in the background, the service's auto-reconnect
+  /// picks it up on its own.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_callStatus == CallStatus.ended || _sessionSaved) return;
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      if (_callStatus != CallStatus.muted) _audio.stopStreaming();
+    } else if (state == AppLifecycleState.resumed) {
+      if (_callStatus != CallStatus.muted) {
+        _audio.startStreaming(onChunk: _gemini.sendAudioChunk).catchError((e) {
+          if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+        });
+      }
+    }
   }
 
   void _startCall() {
@@ -167,8 +195,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       if (granted) {
         try {
           await _audio.startStreaming(onChunk: _gemini.sendAudioChunk);
+          // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
+          // "what do you want to practice?" greetings broke the roleplay contract.
           _gemini.sendText(
-            "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)",
+            _isRoleplay
+                ? '(Note from the app, not the student: the student just joined the '
+                      'roleplay call. Open the scene NOW exactly as your role rules say — '
+                      'one short English sentence to set the scene from today\'s material, '
+                      'then your first line in French, in character. Do not greet '
+                      'generically, do not ask what they want to practice.)'
+                : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)",
           );
         } catch (e) {
           setState(() => _errorMessage = 'Mic error: $e');
@@ -178,12 +214,33 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       }
     };
 
+    // With service-level auto-reconnect (P0.4), onDisconnected now means the
+    // connection is gone for good (retries exhausted) — only then does the call end.
     _gemini.onDisconnected = () {
       if (!mounted || _sessionSaved) return;
       _endedReason = 'disconnected';
       setState(() {
         _errorMessage = 'Connection lost';
         _callStatus = CallStatus.ended;
+      });
+    };
+
+    _gemini.onReconnecting = (attempt) {
+      if (!mounted) return;
+      // Don't play stale audio over the gap.
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
+      setState(() {
+        _callStatus = CallStatus.reconnecting;
+        _errorMessage = '';
+      });
+    };
+
+    _gemini.onReconnected = () {
+      if (!mounted) return;
+      setState(() {
+        _callStatus = CallStatus.listening;
+        _errorMessage = '';
       });
     };
 
@@ -383,6 +440,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   Color get _statusColor {
     switch (_callStatus) {
       case CallStatus.connecting:
+      case CallStatus.reconnecting:
         return Passeport.brass;
       case CallStatus.listening:
         return Passeport.sage;
@@ -399,6 +457,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     switch (_callStatus) {
       case CallStatus.connecting:
         return 'Connecting…';
+      case CallStatus.reconnecting:
+        return 'Reconnecting…';
       case CallStatus.listening:
         return 'Listening — speak in French';
       case CallStatus.tutorSpeaking:

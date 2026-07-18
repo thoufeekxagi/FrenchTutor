@@ -6,22 +6,35 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../data/database/learning_store.dart';
 import '../models/agent_tool.dart';
+import '../prompts/live_prompts.dart';
 import '../services/progress_service.dart';
 
 /// Ported from GeminiLiveService.swift — bidirectional audio+text streaming over the
 /// Gemini Live WebSocket, with tool-call support for the agent-led Daily Pathway stages.
+///
+/// Connection lifecycle (PILOT_EXECUTION_PLAN.md P0.4) is owned HERE so every live
+/// screen inherits it: connect timeout, automatic reconnection with backoff and Gemini
+/// session-resumption handles, and proactive reconnect on server goAway. Screens only
+/// hear `onDisconnected` when the connection is genuinely gone for good.
 class GeminiLiveService {
   GeminiLiveService({
     required this.apiKey,
+    this.sessionType = LiveSessionType.freeTalk,
     this.lessonContext,
     this.tools = const [],
     this.learningStoreForProfile,
+    this.autoReconnect = true,
   });
 
   final String apiKey;
+  final LiveSessionType sessionType;
   final String? lessonContext;
   final List<AgentTool> tools;
   final LearningStore? learningStoreForProfile;
+
+  /// Reconnect automatically on unintentional socket loss. On by default; tests and
+  /// one-shot probes can turn it off.
+  final bool autoReconnect;
 
   static const _model = 'models/gemini-3.1-flash-live-preview';
   static const _voiceName = 'Puck';
@@ -29,6 +42,13 @@ class GeminiLiveService {
   void Function()? onConnected;
   void Function()? onDisconnected;
   void Function(String message)? onError;
+
+  /// Reconnection is in progress (attempt 1-based). UI can show "Reconnecting…";
+  /// `onDisconnected` will NOT fire unless every attempt fails.
+  void Function(int attempt)? onReconnecting;
+
+  /// A reconnection attempt succeeded — the call continues.
+  void Function()? onReconnected;
   void Function(String text)? onUserTranscript;
   void Function(String text)? onTutorTranscript;
   void Function(List<int> pcmBytes)? onAudioChunk;
@@ -51,6 +71,22 @@ class GeminiLiveService {
   String _currentTutorTranscript = '';
   bool _isIntentionalDisconnect = false;
 
+  // Reconnection state (P0.4). The resumption handle lets Gemini continue the SAME
+  // conversation (context intact) across a new socket; when the server never granted
+  // one, the fresh session gets a silent context note instead so Marie doesn't
+  // re-greet mid-call.
+  static const _maxReconnectAttempts = 3;
+  static const _connectTimeout = Duration(seconds: 10);
+  int _reconnectAttempt = 0;
+  bool _isReconnecting = false;
+  bool _hasConnectedOnce = false;
+  bool _resumedWithHandle = false;
+  String? _resumptionHandle;
+  Timer? _reconnectTimer;
+  Timer? _connectTimeoutTimer;
+
+  bool get isConnected => _isSetupComplete;
+
   // Orphaned-reply suppression. When the app moves a card while Marie is mid-reply, that
   // reply is answering a world that no longer exists ("okay, here's the word…" for the OLD
   // card). Cutting playback alone produced an ugly start-chop-restart stutter: the user
@@ -63,33 +99,6 @@ class GeminiLiveService {
   bool _suppressPreInjection = false;
   Timer? _suppressWatchdog;
 
-  static const systemPrompt = '''
-You are Marie, a warm, encouraging French tutor speaking to a student on a phone call. The student is working toward CLB 7 on the TEF/TCF Canada exam over a 6-month study plan — they are NOT necessarily a complete beginner, so calibrate your level from the STUDENT PROFILE you're given below rather than assuming. A student early in the plan needs slow, simple French with lots of English scaffolding; a student further along should be pushed with faster French, tougher vocabulary, and less hand-holding. Re-calibrate every call using the profile, don't default to "beginner mode" out of habit.
-
-CRITICAL RULES — FOLLOW EXACTLY:
-1. Reply ONLY as if you are talking to the student. Never describe your plan, your thoughts, or what you are about to do. Never say "I will" or "My aim is" or "I realize".
-2. Match your pace to the student's level (see profile): slow and simple for someone early on; natural conversational speed for someone with more vocabulary/grammar under their belt.
-3. Keep every reply short: one to three sentences max. This is a voice call, not a lecture.
-4. You are fully bilingual and switch fluidly based on what the student needs:
-   - If the student speaks or asks in English (e.g. asking for clarification, grammar help, or says they're confused), answer clearly in English first, then give the French equivalent.
-   - If the student speaks in French, respond mostly in French, softly correcting mistakes by saying the correct French naturally, without lecturing.
-   - Always let the student's own language choice guide you — never force French if they are clearly asking a question in English.
-5. Ask one simple follow-up question at a time so the student keeps talking. Favor realistic, exam-relevant scenarios (roleplay a phone call, an opinion question, comparing two choices) over generic small talk once the profile shows they're past the basics.
-6. No markdown, no bullet points, no asterisks, no headers, no numbered lists. Just plain natural speech.
-7. If a LESSON CONTEXT block is provided below, that is what the student just studied or is currently working on — steer the conversation to practice exactly that material, using real-world use cases (not a dry recap).
-8. Be encouraging and patient. Use short warm fillers like "très bien", "parfait", "doucement", "pas de souci" — or push a little harder ("essayons quelque chose de plus difficile") once the student is ready.
-
-EXAMPLE OF A GOOD REPLY (student spoke French):
-"Très bien! On dit... 'je m'appelle'. Tu peux essayer de le dire?"
-
-EXAMPLE OF A GOOD REPLY (student asked in English):
-"Sure! 'My name is' in French is 'je m'appelle'. Want to try saying it?"
-
-EXAMPLE OF A BAD REPLY (NEVER DO THIS):
-"I will now focus on greetings. My aim is to teach 'bonjour' and 'salut'. First, I will explain..."
-
-START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROFILE. If a LESSON CONTEXT is provided, jump straight into practicing that material instead of a generic greeting.''';
-
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
     final uri = Uri.parse(
@@ -98,9 +107,18 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     try {
       _channel = WebSocketChannel.connect(uri);
     } catch (_) {
-      onError?.call('Invalid API key or URL');
+      _handleConnectionLoss('Invalid API key or URL');
       return;
     }
+    // A socket that never reaches setupComplete (bad network, server hiccup) used to
+    // hang on "Connecting…" forever — now it's a normal connection loss after 10s.
+    _connectTimeoutTimer?.cancel();
+    _connectTimeoutTimer = Timer(_connectTimeout, () {
+      if (!_isSetupComplete && !_isIntentionalDisconnect) {
+        _teardownSocket();
+        _handleConnectionLoss('Connection timed out');
+      }
+    });
     _sub = _channel!.stream.listen(
       (message) {
         if (message is String) {
@@ -110,18 +128,12 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
         }
       },
       onError: (error) {
-        _isSetupComplete = false;
-        if (!_isIntentionalDisconnect) {
-          onError?.call('Connection closed: $error');
-        }
-        onDisconnected?.call();
+        if (_isIntentionalDisconnect) return;
+        _handleConnectionLoss('Connection closed: $error');
       },
       onDone: () {
-        _isSetupComplete = false;
-        if (!_isIntentionalDisconnect) {
-          onError?.call('Connection closed');
-        }
-        onDisconnected?.call();
+        if (_isIntentionalDisconnect) return;
+        _handleConnectionLoss('Connection closed');
       },
     );
     await _sendSetup();
@@ -131,10 +143,45 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
     _isIntentionalDisconnect = true;
     _inputFlushTimer?.cancel();
     _suppressWatchdog?.cancel();
+    _reconnectTimer?.cancel();
+    _connectTimeoutTimer?.cancel();
+    _teardownSocket();
+    onDisconnected?.call();
+  }
+
+  void _teardownSocket() {
     _sub?.cancel();
+    _sub = null;
     _channel?.sink.close();
     _channel = null;
     _isSetupComplete = false;
+  }
+
+  /// Every unintentional path to a dead socket funnels here: stream error, stream done,
+  /// connect failure, connect timeout, server goAway. Decides between another attempt
+  /// and giving up for real.
+  void _handleConnectionLoss(String reason) {
+    _connectTimeoutTimer?.cancel();
+    _isSetupComplete = false;
+    if (!autoReconnect || _reconnectAttempt >= _maxReconnectAttempts) {
+      _isReconnecting = false;
+      _teardownSocket();
+      onError?.call(reason);
+      onDisconnected?.call();
+      return;
+    }
+    _reconnectAttempt += 1;
+    _isReconnecting = true;
+    onReconnecting?.call(_reconnectAttempt);
+    _teardownSocket();
+    // 1s / 2s / 4s backoff — long enough for a network blip, short enough that the
+    // student is still holding the phone to their ear.
+    final delay = Duration(seconds: 1 << (_reconnectAttempt - 1));
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(delay, () {
+      if (_isIntentionalDisconnect) return;
+      connect();
+    });
   }
 
   void sendAudioChunk(List<int> pcmBytes) {
@@ -165,7 +212,7 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
   }
 
   Future<String> _fullSystemPrompt() async {
-    var prompt = systemPrompt;
+    var prompt = LivePrompts.forSession(sessionType);
     final profile = await _learnerProfile();
     if (profile.isNotEmpty) {
       prompt +=
@@ -283,7 +330,13 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
           'silenceDurationMs': 2500,
         },
       },
+      // Always request resumption handles; on reconnect, present the last handle so
+      // the SAME conversation continues (Marie keeps her context) on the new socket.
+      'sessionResumption': _resumptionHandle == null
+          ? <String, dynamic>{}
+          : {'handle': _resumptionHandle},
     };
+    _resumedWithHandle = _isReconnecting && _resumptionHandle != null;
     if (tools.isNotEmpty) {
       setupBody['tools'] = [
         {'functionDeclarations': tools.map((t) => t.declaration).toList()},
@@ -360,7 +413,47 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
 
     if (json.containsKey('setupComplete')) {
       _isSetupComplete = true;
-      onConnected?.call();
+      _connectTimeoutTimer?.cancel();
+      _reconnectAttempt = 0;
+      if (!_hasConnectedOnce) {
+        // First successful setup — even if it took retries to get here, the screen
+        // hasn't seen onConnected yet (mic, session record, kickoff all hang off it).
+        _hasConnectedOnce = true;
+        _isReconnecting = false;
+        onConnected?.call();
+      } else if (_isReconnecting) {
+        _isReconnecting = false;
+        // Without a resumption handle this is a FRESH conversation — tell Marie
+        // silently so she picks up mid-call instead of re-greeting from zero.
+        if (!_resumedWithHandle) {
+          injectContext(
+            'The phone connection dropped briefly and has just been restored '
+            'mid-session. Continue naturally from wherever the conversation was — '
+            'do NOT greet the student again or restart.',
+          );
+        }
+        onReconnected?.call();
+      }
+      // A duplicate setupComplete (already connected, not reconnecting) is ignored.
+      return;
+    }
+
+    // Server is about to close this connection (maintenance, session time limit) —
+    // reconnect proactively instead of waiting for the drop mid-sentence.
+    if (json.containsKey('goAway')) {
+      if (!_isIntentionalDisconnect && autoReconnect) {
+        _teardownSocket();
+        _handleConnectionLoss('Server ending connection');
+      }
+      return;
+    }
+
+    final resumptionUpdate = json['sessionResumptionUpdate'];
+    if (resumptionUpdate is Map) {
+      if (resumptionUpdate['resumable'] == true &&
+          resumptionUpdate['newHandle'] is String) {
+        _resumptionHandle = resumptionUpdate['newHandle'] as String;
+      }
       return;
     }
 

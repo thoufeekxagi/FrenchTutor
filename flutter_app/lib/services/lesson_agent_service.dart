@@ -125,6 +125,15 @@ class LessonAgentService {
 
   static final LessonAgentService shared = LessonAgentService._();
 
+  /// Output-language guardrail for every prompt whose text reaches the student's
+  /// eyes or ears (PILOT_EXECUTION_PLAN.md P0.1). Invisible JSON judges/planners
+  /// don't carry it — their output is never shown. Mirrors LivePrompts.languageGuardrail.
+  static const languageGuardrail =
+      ' LANGUAGE RULE — ABSOLUTE: your reply must be written ONLY in French and '
+      'English, whatever language the student used. Understand any language, but '
+      'never produce a single word in any other language, even when asked directly; '
+      'if asked, say in English that this course lives in French and English only.';
+
   /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
   /// Google's newest Flash-Lite so we inherit upgrades for free.
   static const _geminiTextModel = 'gemini-flash-lite-latest';
@@ -198,7 +207,7 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
     final messages = <Map<String, String>>[
       {
         'role': 'system',
-        'content': '$system\n\nLESSON CONTEXT:\n$lessonContext',
+        'content': '$system$languageGuardrail\n\nLESSON CONTEXT:\n$lessonContext',
       },
     ];
     for (final turn in history) {
@@ -229,7 +238,7 @@ STUDENT SUBMISSION:
 $submission''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
     );
@@ -408,7 +417,7 @@ Write 4-8 beats in scene order (greeting → request → follow-up → thanks/go
     final user = 'VOCABULARY WORDS TO REUSE: $wordList';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
       maxTokens: 1400,
@@ -465,7 +474,7 @@ STUDENT SUBMISSION:
 $submission''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
     );
@@ -505,7 +514,7 @@ STUDENT'S DRAFT SO FAR:
 $draft''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
       maxTokens: 200,
@@ -522,7 +531,7 @@ You are a French dictation checker. Compare the EXPECTED sentence to the STUDENT
     final user = 'EXPECTED: $expected\nSTUDENT WROTE: $submitted';
     return _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
     );
@@ -540,7 +549,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         'LESSON CONTEXT:\n$lessonContext\n\nQUESTION: $question\nCORRECT ANSWER: $correctAnswer\nSTUDENT ANSWER: $studentAnswer';
     return _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
     );

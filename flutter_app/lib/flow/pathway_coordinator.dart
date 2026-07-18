@@ -153,6 +153,12 @@ class PathwayCoordinator {
     if (result != null && result.reviewedCount > 0) {
       store.markHabit('anki', minutes: 5);
     }
+    // P0.5 — the listening scene's only input is today's words, known right now.
+    // Kick generation off in the background so opening the listening stage later
+    // is instant instead of a 1-25s blocking spinner.
+    if (result != null && result.wordsCovered.isNotEmpty) {
+      _pregenerateSceneIfNeeded();
+    }
   }
 
   Future<void> _runGrammar(BuildContext context) async {
@@ -445,11 +451,41 @@ class PathwayCoordinator {
     }
   }
 
+  /// The single in-flight scene generation, shared between the background pre-gen
+  /// (after vocab) and the inline path (opening listening directly) so the scene is
+  /// never written twice for one day.
+  Future<ReadingPassage?>? _sceneGenFuture;
+
+  /// Background pre-generation (P0.5). No dialog, no context — result is persisted
+  /// straight into today's record; failures are silent (the inline path retries).
+  void _pregenerateSceneIfNeeded() {
+    final existing = _persistedPassage();
+    final hasScript =
+        existing?.segments.any((s) => (s.characterFr ?? '').isNotEmpty) ??
+        false;
+    if (hasScript || _sceneGenFuture != null) return;
+    _startSceneGeneration();
+  }
+
+  Future<ReadingPassage?> _startSceneGeneration() {
+    final future = _generateSceneData()
+        .then((passage) {
+          if (passage != null) {
+            session.readingPassageJson = passage.toJson();
+            _save();
+          }
+          return passage;
+        })
+        .whenComplete(() => _sceneGenFuture = null);
+    _sceneGenFuture = future;
+    return future;
+  }
+
   /// Writes today's scene via Flash-Lite. Scene words: today's covered vocab
   /// when there is any; otherwise (vocab skipped — a first-class flow) the
   /// learner's mixed SRS queue; last resort, the first content words. The
   /// scene ALWAYS comes from the LLM — lab exercises are never mapped in.
-  Future<ReadingPassage?> _generateScene(BuildContext context) async {
+  Future<ReadingPassage?> _generateSceneData() async {
     var words = _vocabResult()?.wordsCovered ?? const <VocabEntry>[];
     if (words.isEmpty) {
       try {
@@ -466,9 +502,19 @@ class PathwayCoordinator {
     }
     if (words.isEmpty) return null;
     words = words.take(6).toList();
+    try {
+      return await LessonAgentService.shared
+          .buildReadingPassageFromVocab(words: words)
+          .timeout(const Duration(seconds: 25));
+    } catch (_) {
+      return null;
+    }
+  }
 
+  /// Inline path: joins the in-flight pre-generation when there is one (never a
+  /// duplicate call), otherwise starts fresh — behind a small blocking indicator.
+  Future<ReadingPassage?> _generateScene(BuildContext context) async {
     if (!context.mounted) return null;
-    // Small blocking indicator while the script is written (~1-3s).
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -478,9 +524,7 @@ class PathwayCoordinator {
     );
     ReadingPassage? passage;
     try {
-      passage = await LessonAgentService.shared
-          .buildReadingPassageFromVocab(words: words)
-          .timeout(const Duration(seconds: 25));
+      passage = await (_sceneGenFuture ?? _startSceneGeneration());
     } catch (_) {
       passage = null;
     }
@@ -507,15 +551,27 @@ class PathwayCoordinator {
   }
 
   /// Rich context for the closing roleplay, rebuilt from the PERSISTED stage
-  /// results — survives restarts, unlike the old in-memory fields.
+  /// results — survives restarts, unlike the old in-memory fields. The role rules
+  /// themselves live in LivePrompts.speakingRoleplay (P0.3); this block supplies
+  /// only today's MATERIAL: words, grammar focus, and the scenario already rehearsed
+  /// so the roleplay continues today's world instead of inventing a new one.
   String _speakingContext() {
     final parts = <String>[
-      "DAILY PATHWAY — CLOSING ROLEPLAY: have a short natural conversation using today's material in a real-world scenario relevant to TEF/TCF Canada prep.",
+      "TODAY'S MATERIAL FOR THE CLOSING ROLEPLAY (build the scene from this):",
     ];
+    final sceneTitle = _persistedPassage()?.title;
+    if (sceneTitle != null && sceneTitle.isNotEmpty) {
+      parts.add(
+        'Scenario already rehearsed in the listening stage: "$sceneTitle" — '
+        'REUSE this scenario (or a natural variation of it) so the student gets to '
+        'perform it for real; you play the other character.',
+      );
+    }
     final vocab = _vocabResult();
     if (vocab != null && vocab.wordsCovered.isNotEmpty) {
       parts.add(
-        'Vocabulary covered today: ${vocab.wordsCovered.map((e) => e.fr).join(", ")}',
+        'Vocabulary covered today (weave these in naturally): '
+        '${vocab.wordsCovered.map((e) => '${e.fr} (${e.en})').join(", ")}',
       );
     }
     final grammar = session.stages[PathwayStage.grammar]!.resultJson;

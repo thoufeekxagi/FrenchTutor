@@ -14,6 +14,7 @@ import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
+import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/session_recorder.dart';
@@ -190,6 +191,7 @@ class _AgentLedListeningScreenState
     );
     _gemini = GeminiLiveService(
       apiKey: ApiKeys.geminiKey,
+      sessionType: LiveSessionType.listeningScene,
       lessonContext: context,
       tools: AgentTool.readingPalette,
       learningStoreForProfile: _store,
@@ -1053,6 +1055,7 @@ class _AgentLedListeningScreenState
   Color get _statusColor {
     switch (_callStatus) {
       case CallStatus.connecting:
+      case CallStatus.reconnecting:
         return DesignTokens.info;
       case CallStatus.listening:
         return DesignTokens.success;
@@ -1069,6 +1072,8 @@ class _AgentLedListeningScreenState
     switch (_callStatus) {
       case CallStatus.connecting:
         return 'connecting…';
+      case CallStatus.reconnecting:
+        return 'reconnecting…';
       case CallStatus.listening:
         return 'listening';
       case CallStatus.tutorSpeaking:
