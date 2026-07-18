@@ -238,28 +238,38 @@ deleted, a retake is a new session.
 
 ---
 
-## P2 — Differentiators (cheap because plumbing exists)
+## P2 — Differentiators — CODE COMPLETE (2026-07-18)
 
-### P2.1 Four personas (2M/2F, France + Québec)
-- Persona = voice (`_voiceName` is currently hardcoded 'Puck') + accent/register block
-  in the persona base prompt + display name/avatar.
-- 2 France French (1M/1F), 2 Québec French (1M/1F) — Québec persona prompt includes
-  authentic QC vocabulary/expressions and exam relevance (TEF Canada).
-- Persona picker in Settings + onboarding; persisted in profile; ALL live sessions and
-  the TTS replay voice follow it.
+### P2.1 Four personas (2M/2F, France + Québec) — DONE
+- [x] `lib/models/tutor_persona.dart`: Marie (France, F, Aoede), Julien (France, M,
+  Puck), Camille (Québec, F, Leda), Mathieu (Québec, M, Orus). Persona = display
+  identity + Gemini voice + accent/register prompt block (Québec blocks teach real QC
+  expressions, glossed in English, TEF-Canada framed).
+- [x] `ActiveTutor` app-wide holder (loaded at startup, sync-readable, listenable);
+  unknown/legacy ids fall back to Marie. A call CAPTURES its persona at dial time —
+  identity/voice never change mid-call, even across reconnects.
+- [x] Live calls and the TTS line-replay voice both follow the persona; all live-screen
+  labels (header, avatar initial, "X is speaking", hint texts) are persona-dynamic.
+- [ ] On-device probe: each persona sounds distinct; Québec personas actually use QC
+  register; persona survives app restart.
 
-### P2.2 Onboarding (3–4 screens max)
-Accent (France/Québec) → voice (the 2 personas of that accent) → level →
-English/French mix. Writes profile; skippable with sane defaults.
+### P2.2 Onboarding — DONE
+- [x] New "Who will you practice with?" step (page 3 of 4): both accents explained,
+  four tutors with taglines; choice saved via ActiveTutor; final page references the
+  chosen tutor by name. Level/goal/session-length steps unchanged.
 
-### P2.3 Tutor tuning in Settings
-- **English/French mix slider** (mostly-English scaffolding ↔ full immersion) — a
-  parameter interpolated into the persona base prompt.
-- **Voice speed control** — prompt-level pacing instruction + slow-TTS toggle reuse.
+### P2.3 Tutor tuning in Settings — DONE
+- [x] "Your tutor" card: 2×2 persona grid (accent-labeled), English/French mix
+  (Gentle/Balanced/Immersion) and speaking pace (Slower/Natural/Faster) pills.
+  Mix/pace are prompt lines composed into every live prompt, explicitly subordinate
+  to stage-specific language rules; garbage stored values fall back to defaults.
+  Applies from the next call (stated in the UI).
 
-### P2.4 One-step voice navigation polish
-Forward/back exactly one step everywhere with a natural spoken transition (intent judge
-already returns advance/back — tighten multi-step and goto edge cases).
+### P2.4 One-step voice navigation polish — VERIFIED, no changes needed
+Edge cases confirmed present in all three stage screens: goto is range-guarded and
+same-index-guarded, navigation has a 1.5s cooldown after any card move, advance/back
+walk exactly one step (learn↔play phases in the scene), bare-consent "yes" only
+honored after the practice threshold, and (P1.3) judge failure navigates nowhere.
 
 ---
 

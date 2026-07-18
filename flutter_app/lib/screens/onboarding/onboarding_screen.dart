@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/profile.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -23,6 +24,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String? _goal;
   String? _level;
   String _sessionLength = 'standard';
+  TutorPersona? _tutorChoice;
 
   @override
   void dispose() {
@@ -46,6 +48,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ..sessionLength = _sessionLength
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
+    ActiveTutor.set(_tutorChoice ?? TutorPersona.marie);
     PSHaptics.success();
     AppRouter.pushReplacement(context, (_) => const MainTabScreen());
   }
@@ -70,7 +73,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    '${_page + 1} of 3',
+                    '${_page + 1} of 4',
                     style: Passeport.body(
                       12,
                       weight: FontWeight.w600,
@@ -82,12 +85,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
-                children: List.generate(3, (index) {
+                children: List.generate(4, (index) {
                   return Expanded(
                     child: AnimatedContainer(
                       duration: DesignTokens.durationFast,
                       height: 4,
-                      margin: EdgeInsets.only(right: index == 2 ? 0 : 6),
+                      margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
                       decoration: BoxDecoration(
                         color: index <= _page
                             ? Passeport.maroon
@@ -104,7 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) => setState(() => _page = index),
-                children: [_goalStep(), _levelStep(), _firstSessionStep()],
+                children: [_goalStep(), _levelStep(), _tutorStep(), _firstSessionStep()],
               ),
             ),
           ],
@@ -172,6 +175,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   IconData get _stepIcon => switch (_page) {
     0 => CupertinoIcons.scope,
     1 => CupertinoIcons.slider_horizontal_3,
+    2 => CupertinoIcons.person_2_fill,
     _ => CupertinoIcons.sparkles,
   };
 
@@ -321,12 +325,57 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
+  Widget _tutorStep() {
+    Widget group(TutorAccent accent, String detailSuffix) {
+      final pair = TutorPersona.byAccent(accent);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${accent.label} French'.toUpperCase(),
+            style: Passeport.body(
+              10.5,
+              weight: FontWeight.w800,
+            ).copyWith(color: Passeport.maroon, letterSpacing: 1),
+          ),
+          const SizedBox(height: 8),
+          for (final p in pair)
+            _choice(
+              label: p.displayName,
+              detail: '${p.tagline} — $detailSuffix',
+              selected: _tutorChoice?.id == p.id,
+              onTap: () => setState(() => _tutorChoice = p),
+            ),
+        ],
+      );
+    }
+
+    return _step(
+      eyebrow: 'Your tutor',
+      title: 'Who will you practice with?',
+      subtitle:
+          'Pick an accent and a voice. France French is what most exams use; '
+          'Québec French is what you\'ll hear across Canada. You can switch '
+          'anytime in Settings.',
+      children: [
+        group(TutorAccent.france, 'standard metropolitan French'),
+        const SizedBox(height: 10),
+        group(TutorAccent.quebec, 'natural Québécois French'),
+      ],
+      footer: PasseportPrimaryButton(
+        label: 'Continue',
+        onPressed: _tutorChoice == null ? null : _next,
+        icon: CupertinoIcons.arrow_right,
+      ),
+    );
+  }
+
   Widget _firstSessionStep() {
     return _step(
       eyebrow: 'Ready to begin',
       title: 'One clear next step, every day.',
       subtitle:
-          'ParleSprint will connect vocabulary, grammar, comprehension, writing, and a short conversation with Marie.',
+          'ParleSprint will connect vocabulary, grammar, comprehension, writing, and a short conversation with ${(_tutorChoice ?? TutorPersona.marie).displayName}.',
       children: [
         _PromiseRow(
           icon: CupertinoIcons.scope,
@@ -336,7 +385,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _PromiseRow(
           icon: CupertinoIcons.waveform,
           title: 'Speaking built into the path',
-          detail: 'Marie helps you use what you just learned.',
+          detail:
+              '${(_tutorChoice ?? TutorPersona.marie).displayName} helps you use what you just learned.',
         ),
         _PromiseRow(
           icon: CupertinoIcons.chart_bar_alt_fill,

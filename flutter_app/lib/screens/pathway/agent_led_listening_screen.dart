@@ -1154,7 +1154,7 @@ class _AgentLedListeningScreenState
       case CallStatus.listening:
         return 'listening';
       case CallStatus.tutorSpeaking:
-        return 'Marie is speaking';
+        return '${_gemini.persona.displayName} is speaking';
       case CallStatus.muted:
         return 'muted';
       case CallStatus.ended:
@@ -1383,8 +1383,8 @@ class _AgentLedListeningScreenState
           const SizedBox(height: 10),
           Text(
             _phase == _BeatPhase.learn
-                ? 'Practice your line out loud — Marie is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
-                : 'Marie is in character — answer her with your line. Say "next" for the next beat, or "again" to replay.',
+                ? 'Practice your line out loud — ${_gemini.persona.displayName} is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
+                : '${_gemini.persona.displayName} is in character — answer with your line. Say "next" for the next beat, or "again" to replay.',
             style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
             textAlign: TextAlign.center,
           ),

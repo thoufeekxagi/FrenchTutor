@@ -1390,7 +1390,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       case CallStatus.listening:
         return 'listening';
       case CallStatus.tutorSpeaking:
-        return 'Marie is speaking';
+        return '${_gemini.persona.displayName} is speaking';
       case CallStatus.muted:
         return 'muted';
       case CallStatus.ended:
@@ -1642,7 +1642,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         ],
         const SizedBox(height: 16),
         Text(
-          'Repeat the word out loud — Marie is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+          'Repeat the word out loud — ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
           style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),

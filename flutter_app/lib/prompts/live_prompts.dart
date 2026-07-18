@@ -1,14 +1,19 @@
 /// The single home of every live-call system prompt (PILOT_EXECUTION_PLAN.md P0.1/P0.2).
 ///
-/// Every prompt is composed from three layers:
-///   1. the persona base — who Marie is and how she speaks, shared by all sessions;
-///   2. the language guardrail — absolute, appears in EVERY prompt;
-///   3. a role block specific to the session type.
+/// Every prompt is composed from these layers:
+///   1. the persona block — WHO the tutor is (name, origin, accent register; P2.1)
+///      plus the shared speech rules;
+///   2. the student's tuning — language mix and speaking pace (P2.3);
+///   3. the language guardrail — absolute, appears in EVERY prompt;
+///   4. the content-safety policy — absolute, appears in EVERY prompt;
+///   5. a role block specific to the session type.
 ///
 /// The per-day content payload (today's words, the scene script contract, the
 /// student profile) still travels separately as `lessonContext` — prompts here are
 /// static shape, context is dynamic material.
 library;
+
+import '../models/tutor_persona.dart';
 
 /// Which kind of live voice session a `GeminiLiveService` is powering. The prompt —
 /// not just the appended context — differs per type, because a freeform tutor's
@@ -50,9 +55,10 @@ This app works in French and English only. Every word you speak or write is Fren
 CONTENT POLICY — ABSOLUTE:
 Keep everything family-friendly at all times: never use profanity, slurs, insults, or sexual, violent, hateful, or otherwise inappropriate language — in ANY language, under any framing, even quoted or asked for as "vocabulary". If the student uses offensive language or requests inappropriate content, stay completely calm: never repeat their words, never scold or lecture, simply continue the lesson or redirect to it in one short friendly sentence. If garbled speech or background noise comes through, ignore it and continue naturally.''';
 
-  /// Who Marie is and how she talks — shared by every session type.
-  static const _personaBase = '''
-You are Marie, a warm, encouraging French tutor speaking to a student on a phone call. The student is working toward CLB 7 on the TEF/TCF Canada exam — they are NOT necessarily a complete beginner, so calibrate from the STUDENT PROFILE you're given rather than assuming. Early in the plan means slow, simple French with English scaffolding; further along means faster French, tougher vocabulary, less hand-holding.
+  /// Who the tutor is and how they talk — shared rules, persona-specific identity.
+  static String _personaBase(TutorPersona persona) =>
+      '''
+${persona.promptBlock} You are speaking to a student on a phone call. The student is working toward CLB 7 on the TEF/TCF Canada exam — they are NOT necessarily a complete beginner, so calibrate from the STUDENT PROFILE you're given rather than assuming. Early in the plan means slow, simple French with English scaffolding; further along means faster French, tougher vocabulary, less hand-holding.
 
 SPEECH RULES — FOLLOW EXACTLY:
 1. Reply ONLY as if talking to the student. Never describe your plan, your thoughts, or what you are about to do. Never say "I will" or "My aim is" or "I realize".
@@ -102,8 +108,14 @@ This session is structured and run by the app, not by you. The LESSON CONTEXT be
 4. Never ask open-ended follow-up questions that pull the session away from the current card, sentence, or beat.''';
 
   /// The composed system prompt for a session type. `lessonContext` and the student
-  /// profile are appended separately by GeminiLiveService.
-  static String forSession(LiveSessionType type) {
+  /// profile are appended separately by GeminiLiveService. [persona] defaults to
+  /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.
+  static String forSession(
+    LiveSessionType type, {
+    TutorPersona persona = TutorPersona.marie,
+    String languageMix = 'balanced',
+    String voiceSpeed = 'natural',
+  }) {
     final role = switch (type) {
       LiveSessionType.freeTalk => _freeTalkRole,
       LiveSessionType.speakingRoleplay => _roleplayRole,
@@ -111,6 +123,9 @@ This session is structured and run by the app, not by you. The LESSON CONTEXT be
       LiveSessionType.listeningScene ||
       LiveSessionType.grammarStage => _stageDiscipline,
     };
-    return '$_personaBase\n\n$languageGuardrail\n\n$contentSafety\n\n$role';
+    final tuning =
+        '${TutorTuning.mixPromptLine(languageMix)}\n'
+        '${TutorTuning.speedPromptLine(voiceSpeed)}';
+    return '${_personaBase(persona)}\n\n$tuning\n\n$languageGuardrail\n\n$contentSafety\n\n$role';
   }
 }

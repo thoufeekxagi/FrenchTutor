@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../config/api_keys.dart';
 import '../models/content_models.dart';
+import '../models/tutor_persona.dart';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
@@ -559,11 +560,13 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     );
   }
 
-  /// Natural-voice line synthesis via Gemini's dedicated TTS model — same voice family
-  /// as Marie (Puck), same API key, so replaying a scene line sounds like HER saying it
-  /// again, not a robot. On-device TTS was tried and rejected as robotic. Returns raw
-  /// 24kHz mono PCM16 (the live session player's native format). Callers cache by text —
-  /// scene lines are fixed strings, so each line costs one call ever.
+  /// Natural-voice line synthesis via Gemini's dedicated TTS model — the ACTIVE
+  /// PERSONA's voice (P2.1), same API key, so replaying a scene line sounds like the
+  /// student's own tutor saying it again, not a robot. On-device TTS was tried and
+  /// rejected as robotic. Returns raw 24kHz mono PCM16 (the live session player's
+  /// native format). Callers cache by text — scene lines are fixed strings, so each
+  /// line costs one call ever (per session; the cache is session-scoped, so a persona
+  /// change never replays a stale voice).
   Future<List<int>> synthesizeSpeech(String text, {bool slow = false}) async {
     final key = await _geminiApiKey;
     if (key.isEmpty) throw AgentError.missingKey;
@@ -590,7 +593,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
                 'responseModalities': ['AUDIO'],
                 'speechConfig': {
                   'voiceConfig': {
-                    'prebuiltVoiceConfig': {'voiceName': 'Puck'},
+                    'prebuiltVoiceConfig': {
+                      'voiceName': ActiveTutor.current.voiceName,
+                    },
                   },
                 },
               },

@@ -6,6 +6,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../data/database/learning_store.dart';
 import '../models/agent_tool.dart';
+import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../services/progress_service.dart';
 
@@ -37,7 +38,12 @@ class GeminiLiveService {
   final bool autoReconnect;
 
   static const _model = 'models/gemini-3.1-flash-live-preview';
-  static const _voiceName = 'Puck';
+
+  /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
+  /// was dialed with, even across reconnects — the voice and identity never
+  /// change mid-conversation.
+  final TutorPersona _persona = ActiveTutor.current;
+  TutorPersona get persona => _persona;
 
   void Function()? onConnected;
   void Function()? onDisconnected;
@@ -212,7 +218,12 @@ class GeminiLiveService {
   }
 
   Future<String> _fullSystemPrompt() async {
-    var prompt = LivePrompts.forSession(sessionType);
+    var prompt = LivePrompts.forSession(
+      sessionType,
+      persona: _persona,
+      languageMix: await TutorTuning.languageMix(),
+      voiceSpeed: await TutorTuning.voiceSpeed(),
+    );
     final profile = await _learnerProfile();
     if (profile.isNotEmpty) {
       prompt +=
@@ -276,7 +287,7 @@ class GeminiLiveService {
               'session needs you to speak. Your audio may have been cut off mid-sentence; do '
               'NOT finish or refer back to your previous thought. React to this note now, '
               'briefly: ) $note'
-        : '(Note de contexte silencieuse pour toi, Marie — ne réponds pas directement à '
+        : '(Note de contexte silencieuse pour toi — ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     _send({
       'clientContent': {
@@ -300,7 +311,7 @@ class GeminiLiveService {
       'responseModalities': ['AUDIO'],
       'speechConfig': {
         'voiceConfig': {
-          'prebuiltVoiceConfig': {'voiceName': _voiceName},
+          'prebuiltVoiceConfig': {'voiceName': _persona.voiceName},
         },
       },
     };

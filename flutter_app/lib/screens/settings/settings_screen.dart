@@ -9,6 +9,7 @@ import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
@@ -34,6 +35,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _modelOverride = '';
   String _openRouterKey = '';
   bool _notetakerEnabled = false;
+  TutorPersona _persona = ActiveTutor.current;
+  String _languageMix = 'balanced';
+  String _voiceSpeed = 'natural';
   late Profile _profile;
   late PilotAccessSnapshot _access;
 
@@ -66,6 +70,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (timestamp != null) {
         _roadmapStartDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
+    });
+    final mix = await TutorTuning.languageMix();
+    final speed = await TutorTuning.voiceSpeed();
+    if (!mounted) return;
+    setState(() {
+      _persona = ActiveTutor.current;
+      _languageMix = mix;
+      _voiceSpeed = speed;
     });
   }
 
@@ -101,6 +113,93 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('roadmap_start_date', picked.millisecondsSinceEpoch);
     }
+  }
+
+  /// 2×2 persona picker: one row per accent, one card per tutor.
+  Widget _personaGrid() {
+    Widget card(TutorPersona p) {
+      final selected = _persona.id == p.id;
+      return Expanded(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            setState(() => _persona = p);
+            ActiveTutor.set(p);
+          },
+          child: AnimatedContainer(
+            duration: DesignTokens.durationFast,
+            constraints: const BoxConstraints(minHeight: 84),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: selected ? Passeport.ink : Passeport.parchmentDim,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: selected ? Passeport.ink : Passeport.hairline,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        p.displayName,
+                        style: Passeport.body(14, weight: FontWeight.w700)
+                            .copyWith(
+                              color: selected ? Colors.white : Passeport.ink,
+                            ),
+                      ),
+                    ),
+                    if (selected)
+                      const Icon(
+                        CupertinoIcons.checkmark_circle_fill,
+                        color: Passeport.sage,
+                        size: 17,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${p.accent.label} French',
+                  style: Passeport.body(10.5, weight: FontWeight.w700)
+                      .copyWith(
+                        color: selected ? Passeport.brass : Passeport.maroon,
+                        letterSpacing: 0.4,
+                      ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  p.tagline,
+                  style: Passeport.body(10.5).copyWith(
+                    color: selected ? Passeport.slate : Passeport.slateDim,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget row(TutorAccent accent) {
+      final pair = TutorPersona.byAccent(accent);
+      return Row(
+        children: [
+          card(pair[0]),
+          const SizedBox(width: 10),
+          card(pair[1]),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        row(TutorAccent.france),
+        const SizedBox(height: 10),
+        row(TutorAccent.quebec),
+      ],
+    );
   }
 
   String _entitlementLabel(PilotEntitlementStatus status) {
@@ -155,6 +254,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                     selected: _profile.sessionLength,
                     onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // --- Tutor (P2.1/P2.3): persona, language mix, voice speed ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Your tutor', color: Passeport.slateDim),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Applies from your next call — a call in progress keeps '
+                    'the tutor it started with.',
+                    style: Passeport.body(
+                      11,
+                    ).copyWith(color: Passeport.slateDim),
+                  ),
+                  const SizedBox(height: 12),
+                  _personaGrid(),
+                  Divider(height: 22, color: Passeport.hairline),
+                  _ChoiceRow(
+                    label: 'English / French mix',
+                    options: const [
+                      ('gentle', 'Gentle'),
+                      ('balanced', 'Balanced'),
+                      ('immersive', 'Immersion'),
+                    ],
+                    selected: _languageMix,
+                    onChanged: (v) {
+                      setState(() => _languageMix = v);
+                      TutorTuning.saveLanguageMix(v);
+                    },
+                  ),
+                  Divider(height: 16, color: Passeport.hairline),
+                  _ChoiceRow(
+                    label: 'Tutor speaking pace',
+                    options: const [
+                      ('slower', 'Slower'),
+                      ('natural', 'Natural'),
+                      ('faster', 'Faster'),
+                    ],
+                    selected: _voiceSpeed,
+                    onChanged: (v) {
+                      setState(() => _voiceSpeed = v);
+                      TutorTuning.saveVoiceSpeed(v);
+                    },
                   ),
                 ],
               ),

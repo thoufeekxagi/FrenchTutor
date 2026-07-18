@@ -497,7 +497,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       case CallStatus.listening:
         return 'Listening — speak in French';
       case CallStatus.tutorSpeaking:
-        return 'Marie is speaking…';
+        return '${_gemini.persona.displayName} is speaking…';
       case CallStatus.muted:
         return 'Microphone muted';
       case CallStatus.ended:
@@ -631,10 +631,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 width: 2,
               ),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'M',
-                style: TextStyle(
+                _gemini.persona.initial,
+                style: const TextStyle(
                   color: Passeport.sky,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -643,7 +643,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             ),
           ),
           const SizedBox(height: 9),
-          Text('Marie', style: Passeport.display(22)),
+          Text(_gemini.persona.displayName, style: Passeport.display(22)),
           const SizedBox(height: 7),
           AnimatedContainer(
             duration: DesignTokens.durationFast,
@@ -704,7 +704,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               Text(
                 _callStatus == CallStatus.connecting
                     ? 'Preparing your session'
-                    : 'Marie is listening',
+                    : '${_gemini.persona.displayName} is listening',
                 textAlign: TextAlign.center,
                 style: Passeport.body(16, weight: FontWeight.w700),
               ),

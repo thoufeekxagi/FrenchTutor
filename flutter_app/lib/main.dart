@@ -8,6 +8,7 @@ import 'app.dart';
 import 'data/content_service.dart';
 import 'data/database/pilot_infrastructure_store.dart';
 import 'data/database/competency_store.dart';
+import 'models/tutor_persona.dart';
 import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
 import 'services/pilot_access_service.dart';
@@ -34,6 +35,9 @@ void main() {
           installationId: installationId,
         ).appStarted(platform: platform);
         await ContentService.shared.preload();
+        // The chosen tutor persona must be readable synchronously anywhere
+        // (P2.1) — loaded once here, updated only from Settings/Onboarding.
+        await ActiveTutor.load();
         const OrchestrationBootstrapper().bootstrap(
           content: ContentService.shared,
           store: CompetencyStore(db),
