@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
 import '../../orchestration/models/competency.dart';
+import 'learning_graph_view.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 
@@ -17,70 +18,79 @@ class PathScreen extends ConsumerWidget {
       backgroundColor: Passeport.parchment,
       body: SafeArea(
         child: PSContentColumn(
-          child: framework == null
-              ? const _EmptyPath()
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
-                  children: [
-                    Text('Your path', style: Passeport.display(30)),
-                    const SizedBox(height: 5),
-                    Text(
-                      'The abilities your daily plan is building toward.',
-                      style: Passeport.body(
-                        14.5,
-                      ).copyWith(color: Passeport.slateDim, height: 1.4),
-                    ),
-                    const SizedBox(height: 22),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Passeport.infoSoft,
-                        borderRadius: BorderRadius.circular(16),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+            children: [
+              Text('Your French map', style: Passeport.display(30)),
+              const SizedBox(height: 5),
+              Text(
+                'Explore the words you have practiced and how they connect.',
+                style: Passeport.body(
+                  14.5,
+                ).copyWith(color: Passeport.slateDim, height: 1.4),
+              ),
+              const SizedBox(height: 22),
+              LearningGraphView(
+                store: ref.watch(learningStoreProvider),
+                content: ref.watch(contentServiceProvider),
+              ),
+              const SizedBox(height: 32),
+              Text('Curriculum path', style: Passeport.display(22)),
+              const SizedBox(height: 12),
+              if (framework == null)
+                const _EmptyPath()
+              else ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Passeport.infoSoft,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        CupertinoIcons.sparkles,
+                        color: Passeport.sky,
+                        size: 21,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            CupertinoIcons.sparkles,
-                            color: Passeport.sky,
-                            size: 21,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Practice evidence will move competencies from New to Building to Ready. Until then, this map shows the real curriculum sequence without inventing scores.',
-                              style: Passeport.body(
-                                13,
-                              ).copyWith(color: Passeport.inkSoft, height: 1.4),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 26),
-                    for (final band in _bands(framework.competencies)) ...[
-                      _BandHeader(
-                        band: band,
-                        count: framework.competencies
-                            .where((item) => item.difficultyBand == band)
-                            .length,
-                      ),
-                      const SizedBox(height: 10),
-                      for (final competency in framework.competencies.where(
-                        (item) => item.difficultyBand == band,
-                      ))
-                        _CompetencyNode(
-                          competency: competency,
-                          titleById: {
-                            for (final item in framework.competencies)
-                              item.id: item.title,
-                          },
-                          isFoundation: competency.prerequisiteIds.isEmpty,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Practice evidence will move competencies from New to Building to Ready. Until then, this map shows the real curriculum sequence without inventing scores.',
+                          style: Passeport.body(
+                            13,
+                          ).copyWith(color: Passeport.inkSoft, height: 1.4),
                         ),
-                      const SizedBox(height: 16),
+                      ),
                     ],
-                  ],
+                  ),
                 ),
+                const SizedBox(height: 26),
+                for (final band in _bands(framework.competencies)) ...[
+                  _BandHeader(
+                    band: band,
+                    count: framework.competencies
+                        .where((item) => item.difficultyBand == band)
+                        .length,
+                  ),
+                  const SizedBox(height: 10),
+                  for (final competency in framework.competencies.where(
+                    (item) => item.difficultyBand == band,
+                  ))
+                    _CompetencyNode(
+                      competency: competency,
+                      titleById: {
+                        for (final item in framework.competencies)
+                          item.id: item.title,
+                      },
+                      isFoundation: competency.prerequisiteIds.isEmpty,
+                    ),
+                  const SizedBox(height: 16),
+                ],
+              ],
+            ],
+          ),
         ),
       ),
     );

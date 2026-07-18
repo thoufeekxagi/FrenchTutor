@@ -9,6 +9,7 @@ import 'grammar_lab_screen.dart';
 import 'listening_lab_screen.dart';
 import 'vocab_lab_screen.dart';
 import 'writing_lab_screen.dart';
+import '../mocks/mocks_screen.dart';
 
 class LabsScreen extends StatelessWidget {
   const LabsScreen({super.key});
@@ -37,6 +38,14 @@ class LabsScreen extends StatelessWidget {
                 Expanded(
                   child: ListView(
                     children: [
+                      _LabTile(
+                        icon: CupertinoIcons.stopwatch_fill,
+                        title: 'Speaking mock',
+                        subtitle:
+                            'Timed TEF / TCF practice with rubric feedback',
+                        onTap: () =>
+                            AppRouter.push(context, (_) => const MocksScreen()),
+                      ),
                       _LabTile(
                         icon: CupertinoIcons.square_stack_3d_up,
                         title: 'Vocabulary',

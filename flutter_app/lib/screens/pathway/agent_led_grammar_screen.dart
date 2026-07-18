@@ -103,9 +103,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
 
   final Set<String> _handledCallIds = {};
 
-  // Same context-aware Flash-Lite intent judge as vocab's — keyword matcher kept only as
-  // the automatic fallback. See AgentLedVocabScreen for the full rationale on each piece.
-  static const _useLLMIntentJudge = true;
+  // Same context-aware Flash-Lite intent judge as vocabulary.
   int _utteranceSeq = 0;
   int _attemptCount = 0;
   String _lastTutorLine = '';
@@ -348,15 +346,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     }
     _hasAttempted = true;
 
-    if (!_useLLMIntentJudge) {
-      _applyIntent(
-        _mapKeywordIntent(_detectIntent(trimmed)),
-        utterance: trimmed,
-        source: 'keyword',
-      );
-      return;
-    }
-
     _utteranceSeq += 1;
     final seq = _utteranceSeq;
     final cardIndexAtLaunch = _cardIndex;
@@ -391,19 +380,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       }
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
-  }
-
-  LiveIntentVerdict _mapKeywordIntent(_GrammarUserIntent intent) {
-    switch (intent) {
-      case _GrammarUserIntent.advance:
-        return LiveIntentVerdict(intent: LiveNavIntent.advance);
-      case _GrammarUserIntent.back:
-        return LiveIntentVerdict(intent: LiveNavIntent.back);
-      case _GrammarUserIntent.again:
-        return LiveIntentVerdict(intent: LiveNavIntent.again);
-      case _GrammarUserIntent.none:
-        return LiveIntentVerdict(intent: LiveNavIntent.attempt);
-    }
   }
 
   void _applyIntent(
@@ -586,76 +562,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       _cardIndex -= 1;
       _resetPerCardState();
     });
-  }
-
-  _GrammarUserIntent _detectIntent(String text) {
-    final t = foldFrench(text);
-
-    // Same ambiguity guard as vocab: if the utterance is nothing but the current sentence
-    // itself (the student practicing it), never misread that as a navigation command even if
-    // it happens to contain a word that overlaps a keyword below.
-    final card = _currentCard;
-    if (card != null) {
-      final cleaned = t.replaceAll(RegExp(r'[.!?,]'), '').trim();
-      final targetFr = foldFrench(card.card.fr);
-      if (targetFr.isNotEmpty && cleaned == targetFr) {
-        _logDebug(
-          '→ intent suppressed: utterance is just today\'s sentence, treating as practice not a command',
-        );
-        return _GrammarUserIntent.none;
-      }
-    }
-
-    const backKeywords = [
-      'go back',
-      'back to the',
-      'back up',
-      'previous',
-      'the one before',
-      'last sentence',
-      'redo the last',
-      'revenons',
-    ];
-    const againKeywords = [
-      'again',
-      'repeat',
-      'one more time',
-      'say it again',
-      'encore',
-      'repete',
-      'repète',
-      'une fois de plus',
-    ];
-    const advanceKeywords = [
-      'next',
-      'move on',
-      'got it',
-      'i know this',
-      'i know',
-      'ready',
-      'continue',
-      'yes',
-      'yeah',
-      'yep',
-      'sure',
-      'sounds good',
-      "let's go",
-      "d'accord",
-      'suivant',
-      'on continue',
-      'oui',
-    ];
-
-    if (backKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _GrammarUserIntent.back;
-    }
-    if (againKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _GrammarUserIntent.again;
-    }
-    if (advanceKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _GrammarUserIntent.advance;
-    }
-    return _GrammarUserIntent.none;
   }
 
   void _handleToolCall(String name, Map<String, dynamic> args, String callId) {

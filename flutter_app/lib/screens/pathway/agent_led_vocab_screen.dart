@@ -124,9 +124,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   // Context-aware navigation: every completed utterance is classified by Flash-Lite (with
   // the current card + Marie's last line as context) instead of keyword matching, so "yes,
   // next to the station" reads as an answer while "next word please" reads as a command.
-  // The keyword matcher below is DISABLED but kept as the automatic fallback when the judge
-  // errors or times out. Flip to false to restore pure on-device keyword navigation.
-  static const _useLLMIntentJudge = true;
 
   // Stale-verdict guard: only the newest utterance's classification may act, and only on
   // the card it was launched for. "next… wait, go back" cancels the in-flight "next".
@@ -194,20 +191,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   _VocabSessionCard? get _currentCard =>
       _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
 
-  // App-side floor on advancing. Under the LLM judge the session is self-paced — advance
-  // verdicts only come from EXPLICIT student commands, so honoring them fast matters more
-  // than ritual repetition, and the floor is simply "never skip a word you never even
-  // tried". In keyword-fallback mode the adaptive P0.6 floor stays (new=4, mature=1,
-  // else 2), because dumb matching can't tell a reflexive "yes" from real consent.
-  int get _minAttemptsRequired {
-    final card = _currentCard;
-    if (card == null) return 0;
-    if (_useLLMIntentJudge) return 1;
-    final state = _store.srsState(card.entry.id);
-    if (state == null || state.reps == 0) return 4;
-    if (state.isKnown) return 1;
-    return 2;
-  }
+  // App-side floor on advancing. Judge verdicts only come from explicit student
+  // commands, so the only hard floor is never skipping a word they have not tried.
+  int get _minAttemptsRequired => _currentCard == null ? 0 : 1;
 
   BilingualExample? get _currentExample {
     final card = _currentCard;
@@ -454,15 +440,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     }
     _hasAttempted = true;
 
-    if (!_useLLMIntentJudge) {
-      _applyIntent(
-        _mapKeywordIntent(_detectIntent(trimmed)),
-        utterance: trimmed,
-        source: 'keyword',
-      );
-      return;
-    }
-
     // A newer utterance always supersedes an in-flight classification — "next… wait,
     // go back" must never execute the stale "next" after the "go back" arrives.
     _utteranceSeq += 1;
@@ -509,24 +486,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     }();
   }
 
-  /// Bridges the old keyword enum onto the judge's richer verdict space — the fallback
-  /// path. Keyword matching can't tell an attempt from chatter, so `none` maps to
-  /// `attempt`, matching the old behavior where every non-command utterance counted.
-  LiveIntentVerdict _mapKeywordIntent(_UserIntent intent) {
-    switch (intent) {
-      case _UserIntent.advance:
-        return LiveIntentVerdict(intent: LiveNavIntent.advance);
-      case _UserIntent.back:
-        return LiveIntentVerdict(intent: LiveNavIntent.back);
-      case _UserIntent.again:
-        return LiveIntentVerdict(intent: LiveNavIntent.again);
-      case _UserIntent.none:
-        return LiveIntentVerdict(intent: LiveNavIntent.attempt);
-    }
-  }
-
-  /// The single place a classified utterance becomes action — judge and fallback paths
-  /// converge here, so the two can never drift apart.
+  /// The single place a classified utterance becomes action.
   void _applyIntent(
     LiveIntentVerdict verdict, {
     required String utterance,
@@ -754,86 +714,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       _cardIndex -= 1;
       _resetPerCardState();
     });
-  }
-
-  _UserIntent _detectIntent(String text) {
-    final t = foldFrench(text);
-
-    // Ambiguity guard: some vocab words we actually teach ("oui", "encore", "continuer") are
-    // themselves navigation keywords below. If the utterance is nothing but the target word
-    // itself, that's the student practicing THIS word, not issuing a command.
-    final card = _currentCard;
-    if (card != null) {
-      final cleaned = t.replaceAll(RegExp(r'[.!?,]'), '').trim();
-      final targetFr = foldFrench(card.entry.fr);
-      final targetEn = foldFrench(card.entry.en);
-      final words = cleaned.split(' ').where((w) => w.isNotEmpty).toList();
-      if (words.isNotEmpty &&
-          targetFr.isNotEmpty &&
-          words.every((w) => w == targetFr || w == targetEn)) {
-        _logDebug(
-          '→ intent suppressed: utterance is just today\'s word ("${card.entry.fr}"), treating as practice not a command',
-        );
-        return _UserIntent.none;
-      }
-    }
-
-    const backKeywords = [
-      'go back',
-      'back to the',
-      'back up',
-      'previous word',
-      'previous one',
-      'the one before',
-      'word before',
-      'last word',
-      'redo the last',
-      'go to the last',
-      'revenons',
-      'mot précédent',
-      'mot precedent',
-    ];
-    const againKeywords = [
-      'again',
-      'repeat',
-      'one more time',
-      'say it again',
-      'encore',
-      'repete',
-      'repète',
-      'une fois de plus',
-    ];
-    const advanceKeywords = [
-      'next',
-      'move on',
-      'got it',
-      'i know this',
-      'i know',
-      'ready',
-      'continue',
-      'yes',
-      'yeah',
-      'yep',
-      'sure',
-      'sounds good',
-      "let's go",
-      "d'accord",
-      'suivant',
-      'je sais',
-      'on continue',
-      'oui',
-    ];
-
-    if (backKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _UserIntent.back;
-    }
-    if (againKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _UserIntent.again;
-    }
-    if (advanceKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _UserIntent.advance;
-    }
-    return _UserIntent.none;
   }
 
   void _handleToolCall(String name, Map<String, dynamic> args, String callId) {

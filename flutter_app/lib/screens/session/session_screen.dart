@@ -22,7 +22,14 @@ import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/speaking_session_result.dart';
 
-enum CallStatus { connecting, reconnecting, listening, tutorSpeaking, muted, ended }
+enum CallStatus {
+  connecting,
+  reconnecting,
+  listening,
+  tutorSpeaking,
+  muted,
+  ended,
+}
 
 /// Free-form (or context-seeded) live voice call with Marie. Ported from SessionView.swift.
 /// `stage` is null for the unstructured "Just talk to Marie" call, or e.g. "speaking" for the
@@ -34,11 +41,17 @@ class SessionScreen extends ConsumerStatefulWidget {
     this.lessonContext,
     this.stage,
     this.dailySessionId,
+    this.examMode = false,
+    this.kickoffMessage,
+    this.durationLimitSeconds,
   });
 
   final String apiKey;
   final String? lessonContext;
   final String? stage;
+  final bool examMode;
+  final String? kickoffMessage;
+  final int? durationLimitSeconds;
 
   /// Set when this call is the Daily Pathway's speaking stage — links the
   /// ai_sessions record to today's pathway row.
@@ -87,7 +100,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _audio = AudioStreamingService();
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
-      sessionType: _isRoleplay
+      sessionType: widget.examMode
+          ? LiveSessionType.speakingExam
+          : _isRoleplay
           ? LiveSessionType.speakingRoleplay
           : LiveSessionType.freeTalk,
       lessonContext: widget.lessonContext,
@@ -230,13 +245,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
           // "what do you want to practice?" greetings broke the roleplay contract.
           _gemini.sendText(
-            _isRoleplay
-                ? '(Note from the app, not the student: the student just joined the '
-                      'roleplay call. Open the scene NOW exactly as your role rules say — '
-                      'one short English sentence to set the scene from today\'s material, '
-                      'then your first line in French, in character. Do not greet '
-                      'generically, do not ask what they want to practice.)'
-                : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)",
+            widget.kickoffMessage ??
+                (_isRoleplay
+                    ? '(Note from the app, not the student: the student just joined the '
+                          'roleplay call. Open the scene NOW exactly as your role rules say — '
+                          'one short English sentence to set the scene from today\'s material, '
+                          'then your first line in French, in character. Do not greet '
+                          'generically, do not ask what they want to practice.)'
+                    : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)"),
           );
         } catch (e) {
           setState(() => _errorMessage = 'Mic error: $e');
@@ -331,6 +347,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _callDuration += 1);
+      final limit = widget.durationLimitSeconds;
+      if (limit != null && _callDuration >= limit) {
+        _endedReason = 'completed';
+        _endCall();
+      }
     });
   }
 
@@ -609,7 +630,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               ),
               const Spacer(),
               Text(
-                _formatDuration(_callDuration),
+                widget.durationLimitSeconds == null
+                    ? _formatDuration(_callDuration)
+                    : _formatDuration(
+                        (widget.durationLimitSeconds! - _callDuration).clamp(
+                          0,
+                          widget.durationLimitSeconds!,
+                        ),
+                      ),
                 style: Passeport.body(14, weight: FontWeight.w700).copyWith(
                   color: Passeport.slateDim,
                   fontFeatures: const [FontFeature.tabularFigures()],

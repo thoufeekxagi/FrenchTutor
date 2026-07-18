@@ -295,6 +295,35 @@ class LearningStore {
     return rows.map((r) => r['entry_id'] as String).toList();
   }
 
+  Map<String, int> reviewCountsByEntry() {
+    final rows = _db.select('''
+      SELECT entry_id, COUNT(*) AS review_count
+      FROM vocab_reviews
+      GROUP BY entry_id
+    ''');
+    return {
+      for (final row in rows)
+        row['entry_id'] as String: row['review_count'] as int,
+    };
+  }
+
+  List<List<String>> reviewedEntryGroupsBySession() {
+    final rows = _db.select('''
+      SELECT session_id, entry_id
+      FROM vocab_reviews
+      WHERE session_id IS NOT NULL AND session_id != ''
+      ORDER BY reviewed_at
+    ''');
+    final groups = <String, List<String>>{};
+    for (final row in rows) {
+      final sessionId = row['session_id'] as String;
+      final entryId = row['entry_id'] as String;
+      final entries = groups.putIfAbsent(sessionId, () => <String>[]);
+      if (!entries.contains(entryId)) entries.add(entryId);
+    }
+    return groups.values.where((entries) => entries.length > 1).toList();
+  }
+
   // ---------------------------------------------------------------------------
   // Daily Path persistence — one row per local date, updated on every
   // meaningful transition so the learner can always resume exactly in place.

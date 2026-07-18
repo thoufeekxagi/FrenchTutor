@@ -79,7 +79,8 @@ class AgentLedListeningScreen extends ConsumerStatefulWidget {
 }
 
 class _AgentLedListeningScreenState
-    extends ConsumerState<AgentLedListeningScreen> with WidgetsBindingObserver {
+    extends ConsumerState<AgentLedListeningScreen>
+    with WidgetsBindingObserver {
   late GeminiLiveService _gemini;
   late AudioStreamingService _audio;
   late MicController _mic;
@@ -113,9 +114,7 @@ class _AgentLedListeningScreenState
   // Documented Gemini Live bug: dedupe identical tool calls fired in rapid succession.
   final Set<String> _handledCallIds = {};
 
-  // Same context-aware Flash-Lite intent judge as vocab's — keyword matcher kept only as
-  // the automatic fallback. See AgentLedVocabScreen for the full rationale on each piece.
-  static const _useLLMIntentJudge = true;
+  // Same context-aware Flash-Lite intent judge as vocabulary.
   int _utteranceSeq = 0;
   String _lastTutorLine = '';
   Timer? _announceTimer;
@@ -398,15 +397,6 @@ class _AgentLedListeningScreenState
     }
     _hasAttempted = true;
 
-    if (!_useLLMIntentJudge) {
-      _applyIntent(
-        _mapKeywordIntent(_detectIntent(trimmed)),
-        utterance: trimmed,
-        source: 'keyword',
-      );
-      return;
-    }
-
     _utteranceSeq += 1;
     final seq = _utteranceSeq;
     final segmentIndexAtLaunch = _segmentIndex;
@@ -444,19 +434,6 @@ class _AgentLedListeningScreenState
       }
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
-  }
-
-  LiveIntentVerdict _mapKeywordIntent(_ReadingUserIntent intent) {
-    switch (intent) {
-      case _ReadingUserIntent.advance:
-        return LiveIntentVerdict(intent: LiveNavIntent.advance);
-      case _ReadingUserIntent.back:
-        return LiveIntentVerdict(intent: LiveNavIntent.back);
-      case _ReadingUserIntent.again:
-        return LiveIntentVerdict(intent: LiveNavIntent.again);
-      case _ReadingUserIntent.none:
-        return LiveIntentVerdict(intent: LiveNavIntent.attempt);
-    }
   }
 
   void _applyIntent(
@@ -729,7 +706,6 @@ class _AgentLedListeningScreenState
     }
   }
 
-
   /// The actual card-advance side effects (grading, index, reset) — shared by the accepted
   /// tool-call path and the direct-tap path so they can never drift apart.
   void _performAdvance() {
@@ -762,80 +738,6 @@ class _AgentLedListeningScreenState
       _segmentIndex -= 1;
       _resetPerCardState();
     });
-  }
-
-  _ReadingUserIntent _detectIntent(String text) {
-    final t = foldFrench(text);
-
-    // Same ambiguity guard as vocab: if the utterance is just today's segment itself, that's
-    // a practice attempt, never navigation — even if the segment text happens to overlap a
-    // nav keyword (e.g. a passage segment that is itself "oui").
-    final card = _currentCard;
-    if (card != null) {
-      final cleaned = t.replaceAll(RegExp(r'[.!?,]'), '').trim();
-      final targetFr = foldFrench(card.segment.fr);
-      final targetEn = foldFrench(card.segment.en);
-      final words = cleaned.split(' ').where((w) => w.isNotEmpty).toList();
-      if (words.isNotEmpty &&
-          targetFr.isNotEmpty &&
-          words.every((w) => w == targetFr || w == targetEn)) {
-        _logDebug(
-          '→ intent suppressed: utterance is just the current segment ("${card.segment.fr}"), treating as practice not a command',
-        );
-        return _ReadingUserIntent.none;
-      }
-    }
-
-    const backKeywords = [
-      'go back',
-      'back to the',
-      'back up',
-      'previous',
-      'the one before',
-      'last part',
-      'redo the last',
-      'revenons',
-    ];
-    const againKeywords = [
-      'again',
-      'repeat',
-      'one more time',
-      'say it again',
-      'encore',
-      'repete',
-      'repète',
-      'une fois de plus',
-    ];
-    const advanceKeywords = [
-      'next',
-      'move on',
-      'got it',
-      'i know this',
-      'i know',
-      'ready',
-      'continue',
-      'yes',
-      'yeah',
-      'yep',
-      'sure',
-      'sounds good',
-      "let's go",
-      "d'accord",
-      'suivant',
-      'on continue',
-      'oui',
-    ];
-
-    if (backKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _ReadingUserIntent.back;
-    }
-    if (againKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _ReadingUserIntent.again;
-    }
-    if (advanceKeywords.any((k) => t.contains(foldFrench(k)))) {
-      return _ReadingUserIntent.advance;
-    }
-    return _ReadingUserIntent.none;
   }
 
   void _handleToolCall(String name, Map<String, dynamic> args, String callId) {

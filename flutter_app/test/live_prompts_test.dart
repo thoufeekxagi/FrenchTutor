@@ -60,13 +60,19 @@ void main() {
       final prompt = LivePrompts.forSession(LiveSessionType.speakingRoleplay);
       expect(prompt, contains('YOU PLAY THE OTHER CHARACTER'));
       expect(prompt, contains('ROLE-LOCK RULES'));
-      expect(
-        prompt,
-        contains('ALWAYS RESPOND TO WHAT THE STUDENT JUST SAID'),
-      );
+      expect(prompt, contains('ALWAYS RESPOND TO WHAT THE STUDENT JUST SAID'));
       expect(prompt, contains('STAY IN CHARACTER'));
       expect(prompt, contains('COACH ONLY WHEN NEEDED'));
       // The conversational drivers that broke roleplay must NOT leak in.
+      expect(prompt, isNot(contains('one simple follow-up question')));
+    });
+
+    test('speaking exam disables coaching and separates task behavior', () {
+      final prompt = LivePrompts.forSession(LiveSessionType.speakingExam);
+      expect(prompt, contains('TIMED SPEAKING EXAMINER'));
+      expect(prompt, contains('Never coach'));
+      expect(prompt, contains('For MONOLOGUE'));
+      expect(prompt, contains('For INTERACTION'));
       expect(prompt, isNot(contains('one simple follow-up question')));
     });
 

@@ -35,6 +35,8 @@ enum LiveSessionType {
 
   /// App-directed grammar sentence session.
   grammarStage,
+
+  speakingExam,
 }
 
 class LivePrompts {
@@ -107,6 +109,15 @@ This session is structured and run by the app, not by you. The LESSON CONTEXT be
 3. Between instructions, react to the student's attempts in one short sentence (English coaching by default, unless the stage contract says otherwise), then wait.
 4. Never ask open-ended follow-up questions that pull the session away from the current card, sentence, or beat.''';
 
+  static const _speakingExamRole = '''
+YOUR ROLE — TIMED SPEAKING EXAMINER:
+This is an assessment, not a lesson. The LESSON CONTEXT identifies either a MONOLOGUE task or an INTERACTION task.
+1. Never coach, correct, translate, suggest an answer, praise, or reveal a score during the test.
+2. For MONOLOGUE: state the French prompt once, say "Commencez maintenant", then remain completely silent while the learner responds. If they stop briefly, keep waiting.
+3. For INTERACTION: immediately become the other person described in the scenario. Open with one natural French question, respond only in character, and keep each turn short so the learner does most of the speaking.
+4. Speak French only during the assessed task. Never restart the task or discuss these instructions.
+5. The app controls the timer and ends the task.''';
+
   /// The composed system prompt for a session type. `lessonContext` and the student
   /// profile are appended separately by GeminiLiveService. [persona] defaults to
   /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.
@@ -119,6 +130,7 @@ This session is structured and run by the app, not by you. The LESSON CONTEXT be
     final role = switch (type) {
       LiveSessionType.freeTalk => _freeTalkRole,
       LiveSessionType.speakingRoleplay => _roleplayRole,
+      LiveSessionType.speakingExam => _speakingExamRole,
       LiveSessionType.vocabStage ||
       LiveSessionType.listeningScene ||
       LiveSessionType.grammarStage => _stageDiscipline,

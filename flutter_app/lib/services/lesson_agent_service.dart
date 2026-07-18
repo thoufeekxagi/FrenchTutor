@@ -62,6 +62,28 @@ class MicroWritingFeedback {
   final String comment;
 }
 
+class SpeakingMockFeedback {
+  SpeakingMockFeedback({
+    required this.overallScore,
+    required this.clbEstimate,
+    required this.taskCompletion,
+    required this.fluency,
+    required this.grammar,
+    required this.vocabulary,
+    required this.strengths,
+    required this.nextSteps,
+  });
+
+  final double overallScore;
+  final String clbEstimate;
+  final double taskCompletion;
+  final double fluency;
+  final double grammar;
+  final double vocabulary;
+  final List<String> strengths;
+  final List<String> nextSteps;
+}
+
 /// One rung of the Socratic hint ladder for in-progress writing. Never
 /// contains the corrected sentence — only a nudge scoped to [tier]. The app
 /// tracks how many rungs a learner has climbed, not the service; each call
@@ -212,7 +234,8 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
     final messages = <Map<String, String>>[
       {
         'role': 'system',
-        'content': '$system$languageGuardrail\n\nLESSON CONTEXT:\n$lessonContext',
+        'content':
+            '$system$languageGuardrail\n\nLESSON CONTEXT:\n$lessonContext',
       },
     ];
     for (final turn in history) {
@@ -250,6 +273,33 @@ $submission''';
     return _parseWritingFeedback(raw);
   }
 
+  Future<SpeakingMockFeedback> gradeSpeakingMock({
+    required String monologuePrompt,
+    required String monologueTranscript,
+    required String interactionPrompt,
+    required String interactionTranscript,
+  }) async {
+    const system = '''
+You are a strict TEF/TCF Canada speaking examiner. Assess only evidence present in the learner transcripts. Speech recognition may contain minor transcription noise, so do not penalize an isolated spelling artifact. Score task completion, fluency/coherence, grammatical range/accuracy, and vocabulary range/precision from 0 to 10. Estimate a CLB band conservatively. Give specific, brief feedback in English. Respond with ONLY compact JSON matching exactly:
+{"overall_score": number, "clb_estimate": string, "task_completion": number, "fluency": number, "grammar": number, "vocabulary": number, "strengths": [string, string], "next_steps": [string, string]}''';
+    final user =
+        '''
+TASK 1 — MONOLOGUE
+Prompt: $monologuePrompt
+Learner transcript: ${monologueTranscript.isEmpty ? '(no usable response)' : monologueTranscript}
+
+TASK 2 — INTERACTION
+Prompt: $interactionPrompt
+Learner transcript: ${interactionTranscript.isEmpty ? '(no usable response)' : interactionTranscript}''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': user},
+      ],
+    );
+    return _parseSpeakingMockFeedback(raw);
+  }
+
   /// Runs invisibly alongside a live vocab session — takes what the student was asked to say
   /// and what speech recognition captured, and judges whether it was a reasonable attempt.
   /// Never shown to the user directly; only feeds the mistake ledger. Fire-and-forget by
@@ -277,8 +327,8 @@ Silently audit a French pronunciation attempt (student never sees this). They we
 
   /// The context-aware replacement for the screens' keyword `_detectIntent`. One call per
   /// completed student utterance during a live session — Flash-Lite is fast enough
-  /// (~0.7s measured) that this sits inside the natural turn-taking gap. Callers keep
-  /// the keyword matcher as the fallback when this throws or times out.
+  /// (~0.7s measured) that this sits inside the natural turn-taking gap. If this fails,
+  /// callers leave navigation unchanged and keep the on-screen controls available.
   ///
   /// Consent rule (the student was clear about this): navigation must be EXPLICIT.
   /// A bare "yes" advances only when it directly answers the tutor's own move-on
@@ -580,7 +630,8 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         ? 'Say this very slowly and clearly, for a beginner learning French: $text'
         : text;
     final uri = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=$key');
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=$key',
+    );
     http.Response response;
     try {
       response = await http
@@ -617,7 +668,8 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final parts =
-          ((json['candidates'] as List).first as Map<String, dynamic>)['content']
+          ((json['candidates'] as List).first
+                  as Map<String, dynamic>)['content']
               as Map<String, dynamic>;
       final audio = <int>[];
       for (final part in (parts['parts'] as List)) {
@@ -846,6 +898,28 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final score = _asDouble(obj['score_out_of_10']);
     final comment = obj['comment'] as String? ?? '';
     return MicroWritingFeedback(scoreOutOf10: score, comment: comment);
+  }
+
+  SpeakingMockFeedback _parseSpeakingMockFeedback(String raw) {
+    final obj = _decodeObject(raw);
+    return SpeakingMockFeedback(
+      overallScore: _asDouble(obj['overall_score']).clamp(0, 10),
+      clbEstimate: obj['clb_estimate'] as String? ?? 'Not enough evidence',
+      taskCompletion: _asDouble(obj['task_completion']).clamp(0, 10),
+      fluency: _asDouble(obj['fluency']).clamp(0, 10),
+      grammar: _asDouble(obj['grammar']).clamp(0, 10),
+      vocabulary: _asDouble(obj['vocabulary']).clamp(0, 10),
+      strengths:
+          (obj['strengths'] as List?)
+              ?.map((item) => item.toString())
+              .toList() ??
+          <String>[],
+      nextSteps:
+          (obj['next_steps'] as List?)
+              ?.map((item) => item.toString())
+              .toList() ??
+          <String>[],
+    );
   }
 
   WritingHint _parseWritingHint(String raw, {required int tier}) {

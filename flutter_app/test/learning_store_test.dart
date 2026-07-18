@@ -79,6 +79,17 @@ void main() {
       expect(reviews.last.grade, SRSGrade.good);
     });
 
+    test('review groups preserve real same-session word connections', () {
+      srs.grade(entryId: 'w1', grade: SRSGrade.good, sessionId: 'session-a');
+      srs.grade(entryId: 'w2', grade: SRSGrade.hard, sessionId: 'session-a');
+      srs.grade(entryId: 'w3', grade: SRSGrade.good, sessionId: 'session-b');
+
+      expect(store.reviewedEntryGroupsBySession(), [
+        ['w1', 'w2'],
+      ]);
+      expect(store.reviewCountsByEntry(), {'w1': 1, 'w2': 1, 'w3': 1});
+    });
+
     test('again card becomes due within 10 minutes for same-session loop', () {
       final state = srs.grade(entryId: 'w1', grade: SRSGrade.again);
       expect(
