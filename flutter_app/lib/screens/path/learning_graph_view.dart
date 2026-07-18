@@ -9,6 +9,12 @@ import '../../data/database/learning_store.dart';
 import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
 
+/// The learner's knowledge map — an Obsidian-style constellation of every
+/// word they've practiced. Nodes glow brighter and grow larger with recall
+/// evidence; color marks the topic; edges connect words from the same theme
+/// or the same practice session. A brand-new learner gets a GRAYED-OUT demo
+/// constellation built from real course words to explore, replaced by their
+/// own map the moment they practice their first word.
 class LearningGraphView extends StatefulWidget {
   const LearningGraphView({
     super.key,
@@ -60,6 +66,7 @@ class _LearningGraphViewState extends State<LearningGraphView> {
         );
       });
     final shown = states.take(64).toList();
+
     final entries = <String, VocabEntry>{};
     final themes = <String, String>{};
     for (final phase in widget.content.vocabPhases) {
@@ -70,25 +77,79 @@ class _LearningGraphViewState extends State<LearningGraphView> {
         }
       }
     }
+
+    if (shown.isEmpty) {
+      return _buildDemoGraph(entries, themes);
+    }
+
     final nodes = <_GraphNode>[];
     for (var i = 0; i < shown.length; i++) {
       final state = shown[i];
       final entry = entries[state.entryId];
       if (entry == null) continue;
-      final angle = i * math.pi * (3 - math.sqrt(5));
-      final radius = 70 + 10 * math.sqrt(i + 1);
       nodes.add(
         _GraphNode(
           entry: entry,
           practiceCount: reviewCounts[state.entryId] ?? 1,
           theme: themes[state.entryId] ?? 'Vocabulary',
-          position: Offset(
-            _canvasSize.width / 2 + math.cos(angle) * radius,
-            _canvasSize.height / 2 + math.sin(angle) * radius,
-          ),
+          position: _seedPosition(i),
         ),
       );
     }
+    final edges = _connectNodes(nodes, useSessions: true);
+    _settle(nodes, edges);
+    return _GraphData(nodes, edges, isDemo: false);
+  }
+
+  /// A curated sample constellation for brand-new learners: real course words
+  /// across a few themes, with plausible varied practice counts — fully
+  /// explorable, deliberately gray, so the promise is visible before the
+  /// first word is ever practiced.
+  _GraphData _buildDemoGraph(
+    Map<String, VocabEntry> entries,
+    Map<String, String> themes,
+  ) {
+    final byTheme = <String, List<VocabEntry>>{};
+    for (final id in entries.keys) {
+      byTheme.putIfAbsent(themes[id] ?? 'Vocabulary', () => []);
+      byTheme[themes[id] ?? 'Vocabulary']!.add(entries[id]!);
+    }
+    final nodes = <_GraphNode>[];
+    var i = 0;
+    for (final theme in byTheme.keys.take(4)) {
+      for (final entry in byTheme[theme]!.take(7)) {
+        // Deterministic pseudo-varied practice counts (1..8) so the demo has
+        // believable big/small, bright/dim variety without any randomness.
+        final fakeCount = 1 + ((entry.id.hashCode & 0x7fffffff) % 8);
+        nodes.add(
+          _GraphNode(
+            entry: entry,
+            practiceCount: fakeCount,
+            theme: theme,
+            position: _seedPosition(i),
+          ),
+        );
+        i++;
+      }
+    }
+    final edges = _connectNodes(nodes, useSessions: false);
+    _settle(nodes, edges);
+    return _GraphData(nodes, edges, isDemo: true);
+  }
+
+  Offset _seedPosition(int i) {
+    final angle = i * math.pi * (3 - math.sqrt(5));
+    final radius = 70 + 10 * math.sqrt(i + 1);
+    return Offset(
+      _canvasSize.width / 2 + math.cos(angle) * radius,
+      _canvasSize.height / 2 + math.sin(angle) * radius,
+    );
+  }
+
+  List<_GraphEdge> _connectNodes(
+    List<_GraphNode> nodes, {
+    required bool useSessions,
+  }) {
     final byId = {for (final node in nodes) node.entry.id: node};
     final edgeKeys = <String>{};
     final edges = <_GraphEdge>[];
@@ -110,14 +171,15 @@ class _LearningGraphViewState extends State<LearningGraphView> {
         connect(group[i - 1].entry.id, group[i].entry.id, _EdgeKind.theme);
       }
     }
-    for (final group in widget.store.reviewedEntryGroupsBySession()) {
-      final visible = group.where(byId.containsKey).toList();
-      for (var i = 1; i < visible.length; i++) {
-        connect(visible[i - 1], visible[i], _EdgeKind.session);
+    if (useSessions) {
+      for (final group in widget.store.reviewedEntryGroupsBySession()) {
+        final visible = group.where(byId.containsKey).toList();
+        for (var i = 1; i < visible.length; i++) {
+          connect(visible[i - 1], visible[i], _EdgeKind.session);
+        }
       }
     }
-    _settle(nodes, edges);
-    return _GraphData(nodes, edges);
+    return edges;
   }
 
   void _settle(List<_GraphNode> nodes, List<_GraphEdge> edges) {
@@ -174,32 +236,13 @@ class _LearningGraphViewState extends State<LearningGraphView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_graph.nodes.isEmpty) {
-      return Container(
-        height: 320,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Passeport.card,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Passeport.hairline),
-        ),
-        child: Text(
-          'Practice your first words and their connections will appear here.',
-          textAlign: TextAlign.center,
-          style: Passeport.body(
-            15,
-          ).copyWith(color: Passeport.slateDim, height: 1.45),
-        ),
-      );
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           child: SizedBox(
-            height: 500,
+            height: 520,
             child: Stack(
               children: [
                 Positioned.fill(
@@ -225,24 +268,47 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                 Positioned(
                   top: 12,
                   right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Passeport.ink.withValues(alpha: 0.82),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Pinch · drag · tap',
-                      style: Passeport.body(
-                        12,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: Passeport.card),
+                  child: _chip('Pinch · drag · tap'),
+                ),
+                if (_graph.isDemo)
+                  Positioned(
+                    left: 12,
+                    right: 12,
+                    bottom: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 11,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Passeport.ink.withValues(alpha: 0.86),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.sparkles,
+                            size: 16,
+                            color: Passeport.brass,
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Text(
+                              'A preview of your map. Practice your first '
+                              'words and they light up here, in color.',
+                              style: Passeport.body(12.5).copyWith(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -254,7 +320,9 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                   key: const ValueKey('legend'),
                   padding: const EdgeInsets.only(top: 12),
                   child: Text(
-                    'Larger, brighter words have more recall evidence. Lines connect words from the same topic or practice session.',
+                    _graph.isDemo
+                        ? 'Every word you practice becomes a star on this map — brighter with every recall, connected to the words it lives with.'
+                        : 'Larger, brighter words have more recall evidence. Lines connect words from the same topic or practice session.',
                     style: Passeport.body(
                       13,
                     ).copyWith(color: Passeport.slateDim, height: 1.4),
@@ -312,7 +380,9 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                             ),
                           ),
                           Text(
-                            '${_selected!.practiceCount} practices',
+                            _graph.isDemo
+                                ? 'preview'
+                                : '${_selected!.practiceCount} practices',
                             style: Passeport.mono(
                               12,
                               weight: FontWeight.w700,
@@ -327,13 +397,32 @@ class _LearningGraphViewState extends State<LearningGraphView> {
       ],
     );
   }
+
+  Widget _chip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Passeport.ink.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Text(
+        label,
+        style: Passeport.body(
+          12,
+          weight: FontWeight.w600,
+        ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
+      ),
+    );
+  }
 }
 
 class _GraphData {
-  const _GraphData(this.nodes, this.edges);
+  const _GraphData(this.nodes, this.edges, {required this.isDemo});
 
   final List<_GraphNode> nodes;
   final List<_GraphEdge> edges;
+  final bool isDemo;
 }
 
 class _GraphNode {
@@ -363,59 +452,167 @@ class _GraphEdge {
 }
 
 class _LearningGraphPainter extends CustomPainter {
-  const _LearningGraphPainter({required this.graph, required this.selected});
+  _LearningGraphPainter({required this.graph, required this.selected})
+    : _themeColors = _assignThemeColors(graph);
 
   final _GraphData graph;
   final _GraphNode? selected;
+  final Map<String, Color> _themeColors;
+
+  /// Topic palette — cycled per theme so neighborhoods of the map share a
+  /// color family, exactly like Obsidian's folder-colored clusters.
+  static const _palette = <Color>[
+    Passeport.sky,
+    Passeport.brass,
+    Passeport.sage,
+    Passeport.mastery,
+    Passeport.maroon,
+  ];
+
+  static Map<String, Color> _assignThemeColors(_GraphData graph) {
+    final themes = <String>[];
+    for (final node in graph.nodes) {
+      if (!themes.contains(node.theme)) themes.add(node.theme);
+    }
+    return {
+      for (var i = 0; i < themes.length; i++)
+        themes[i]: _palette[i % _palette.length],
+    };
+  }
+
+  Color _nodeColor(_GraphNode node) {
+    if (graph.isDemo) return Passeport.slate;
+    return _themeColors[node.theme] ?? Passeport.sky;
+  }
+
+  bool _isRelated(_GraphNode node) {
+    if (selected == null) return true;
+    if (node == selected) return true;
+    return graph.edges.any(
+      (edge) =>
+          (edge.a == selected && edge.b == node) ||
+          (edge.b == selected && edge.a == node),
+    );
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = Passeport.ink);
+    // Deep space: near-black ink with a soft center glow so the map has
+    // depth instead of a flat backdrop.
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF11151C));
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = RadialGradient(
+          center: Alignment.center,
+          radius: 0.9,
+          colors: [
+            Colors.white.withValues(alpha: graph.isDemo ? 0.025 : 0.05),
+            Colors.transparent,
+          ],
+        ).createShader(Offset.zero & size),
+    );
+
+    // Edges: a wide blurred pass for glow, then a crisp core line.
     for (final edge in graph.edges) {
       final highlighted =
           selected == null || edge.a == selected || edge.b == selected;
+      final color = graph.isDemo
+          ? Passeport.slate
+          : (edge.kind == _EdgeKind.session
+                ? Passeport.brass
+                : Color.lerp(_nodeColor(edge.a), _nodeColor(edge.b), 0.5)!);
+      if (highlighted) {
+        canvas.drawLine(
+          edge.a.position,
+          edge.b.position,
+          Paint()
+            ..color = color.withValues(alpha: graph.isDemo ? 0.10 : 0.16)
+            ..strokeWidth = 3.5
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        );
+      }
       canvas.drawLine(
         edge.a.position,
         edge.b.position,
         Paint()
-          ..color =
-              (edge.kind == _EdgeKind.session ? Passeport.sky : Passeport.slate)
-                  .withValues(alpha: highlighted ? 0.38 : 0.1)
-          ..strokeWidth = edge.kind == _EdgeKind.session ? 1.5 : 0.8,
+          ..color = color.withValues(
+            alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07,
+          )
+          ..strokeWidth = edge.kind == _EdgeKind.session ? 1.4 : 0.9,
       );
     }
+
     for (final node in graph.nodes) {
       final strength = (math.log(node.practiceCount + 1) / math.log(8)).clamp(
         0.18,
         1.0,
       );
-      final related =
-          selected == null ||
-          node == selected ||
-          graph.edges.any(
-            (edge) =>
-                (edge.a == selected && edge.b == node) ||
-                (edge.b == selected && edge.a == node),
-          );
-      final color = Color.lerp(Passeport.slate, Passeport.sky, strength)!;
-      if (node == selected) {
-        canvas.drawCircle(
-          node.position,
-          node.radius + 8,
-          Paint()..color = Passeport.card.withValues(alpha: 0.2),
-        );
-      }
+      final related = _isRelated(node);
+      final color = _nodeColor(node);
+      final dimFactor = related ? 1.0 : 0.22;
+
+      // Outer luminous halo — the "glow" that makes practiced words feel
+      // alive. Scales with recall strength.
+      canvas.drawCircle(
+        node.position,
+        node.radius * 2.4,
+        Paint()
+          ..color = color.withValues(
+            alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor,
+          )
+          ..maskFilter = MaskFilter.blur(
+            BlurStyle.normal,
+            node.radius * 1.1,
+          ),
+      );
+      // Mid glow ring.
+      canvas.drawCircle(
+        node.position,
+        node.radius * 1.25,
+        Paint()
+          ..color = color.withValues(
+            alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor,
+          )
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
+      // Core: brightened toward white with strength, like a heating star.
+      final core = Color.lerp(
+        color,
+        Colors.white,
+        graph.isDemo ? 0.1 : 0.25 + 0.3 * strength,
+      )!;
       canvas.drawCircle(
         node.position,
         node.radius,
-        Paint()..color = color.withValues(alpha: related ? 1 : 0.24),
+        Paint()..color = core.withValues(alpha: dimFactor.clamp(0.24, 1.0)),
       );
+
+      if (node == selected) {
+        canvas.drawCircle(
+          node.position,
+          node.radius + 7,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.6
+            ..color = Colors.white.withValues(alpha: 0.85),
+        );
+      }
+
       if (node.practiceCount >= 2 || node == selected) {
         final painter = TextPainter(
           text: TextSpan(
             text: node.entry.fr,
             style: Passeport.body(12, weight: FontWeight.w600).copyWith(
-              color: Passeport.card.withValues(alpha: related ? 0.95 : 0.28),
+              color: Colors.white.withValues(
+                alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2,
+              ),
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  blurRadius: 4,
+                ),
+              ],
             ),
           ),
           textDirection: TextDirection.ltr,
