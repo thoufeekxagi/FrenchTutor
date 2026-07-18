@@ -1,7 +1,7 @@
 name: french_tutor
 description: AI French learning tutor — speak and learn French on the go.
 publish_to: 'none'
-version: 1.0.0+64
+version: 1.0.0+66
 
 environment:
   sdk: ^3.12.2
@@ -50,6 +50,17 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Build ALL iOS plugins via CocoaPods, never Swift Package Manager.
+  # permission_handler_apple's SPM manifest auto-detects permissions by
+  # locating the app's Info.plist at manifest-evaluation time — a lookup
+  # that is working-directory-dependent and CACHED by Xcode, and it
+  # evaluated to "microphone disabled" on this machine: the app could never
+  # show the iOS mic prompt. Under CocoaPods, the PERMISSION_MICROPHONE=1
+  # macro in ios/Podfile applies deterministically. flutter_sound and
+  # flutter_tts require CocoaPods anyway, so nothing is lost.
+  config:
+    enable-swift-package-manager: false
 
   assets:
     - assets/content/
