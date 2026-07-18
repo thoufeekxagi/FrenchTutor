@@ -143,6 +143,18 @@ class LearningStore {
     return fresh;
   }
 
+  /// Stamps the local profile row with the Supabase auth user id on first
+  /// sign-in (PILOT_PLAN.md Phase 5's "local rows adopt the new user_id"
+  /// step) — the local row's own `id` (and everything else about it) is
+  /// untouched; every OTHER local table already carries its own nullable
+  /// `user_id` column ready for the same stamp when sync is built.
+  void linkSupabaseUser(String supabaseUserId) {
+    _db.execute(
+      'UPDATE profiles SET user_id = ?, updated_at = ? WHERE deleted_at IS NULL',
+      [supabaseUserId, _now()],
+    );
+  }
+
   void saveProfile(Profile p) {
     _db.execute(
       '''

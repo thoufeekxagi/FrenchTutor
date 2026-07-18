@@ -1,7 +1,7 @@
 name: french_tutor
 description: AI French learning tutor — speak and learn French on the go.
 publish_to: 'none'
-version: 1.0.0+59
+version: 1.0.0+61
 
 environment:
   sdk: ^3.12.2
@@ -31,6 +31,14 @@ dependencies:
   intl: ^0.20.2
   audio_session: ^0.2.4
   logger: ^2.7.0
+  supabase_flutter: ^2.16.0
+  # Pinned to the 6.x line deliberately, NOT the latest 7.x: v7 is a ground-up
+  # API rewrite whose iOS ID-token retrieval path isn't fully documented yet,
+  # while 6.x is exactly the API Supabase's own official signInWithIdToken
+  # docs demonstrate. Revisit only once Supabase's docs/examples move to v7.
+  google_sign_in: ^6.3.0
+  sign_in_with_apple: ^8.1.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:

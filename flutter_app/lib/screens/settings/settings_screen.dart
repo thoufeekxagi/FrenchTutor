@@ -10,6 +10,7 @@ import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
+import '../../services/auth_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../../providers/database_provider.dart';
 import 'orchestration_lab_screen.dart';
@@ -236,6 +237,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         row(TutorAccent.quebec),
       ],
     );
+  }
+
+  Future<void> _confirmSignOut() async {
+    final shouldSignOut = await showPSConfirmDialog(
+      context,
+      title: 'Sign out?',
+      message:
+          'You can sign back in anytime with the same Apple, Google, or email account.',
+      confirmLabel: 'Sign out',
+      destructive: true,
+    );
+    if (shouldSignOut) {
+      await AuthService.shared.signOut();
+      // No manual navigation needed — AuthGate's own auth-state listener
+      // switches to the sign-in screen automatically once the session clears.
+    }
   }
 
   String _entitlementLabel(PilotEntitlementStatus status) {
@@ -697,6 +714,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     value: _access.serverAuthoritative
                         ? 'Cloud verified'
                         : 'Local preview',
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // --- Account ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Account', color: Passeport.slateDim),
+                  const SizedBox(height: 4),
+                  _SettingsRow(
+                    label: 'Signed in as',
+                    value:
+                        AuthService.shared.currentSession?.user.email ??
+                        'Signed in',
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _confirmSignOut,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Sign out',
+                        style: Passeport.body(
+                          13,
+                          weight: FontWeight.w600,
+                        ).copyWith(color: Passeport.danger),
+                      ),
+                    ),
                   ),
                 ],
               ),

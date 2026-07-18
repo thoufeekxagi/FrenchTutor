@@ -8,7 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:french_tutor/app.dart';
 import 'package:french_tutor/design/app_theme.dart';
@@ -17,7 +19,23 @@ import 'package:french_tutor/screens/home/daily_pathway_widget.dart';
 import 'package:french_tutor/widgets/speaking_session_result.dart';
 
 void main() {
-  testWidgets('first run opens ParleSprint onboarding', (
+  setUpAll(() async {
+    // supabase_flutter's session storage reads shared_preferences under the
+    // hood — the plugin has no platform-channel implementation in the test
+    // sandbox, so it needs its mock seeded first (same pattern used in
+    // mic_mode_test.dart / tutor_persona_test.dart).
+    SharedPreferences.setMockInitialValues({});
+    // AuthGate touches Supabase.instance on every build (auth is now the
+    // first gate, ahead of onboarding) — a fake-but-valid config is enough
+    // for a fresh, session-less client; no network call is made unless a
+    // sign-in method is actually invoked, which this file never does.
+    await Supabase.initialize(
+      url: 'https://test.supabase.co',
+      anonKey: 'test-anon-key',
+    );
+  });
+
+  testWidgets('first run with no session shows the sign-in screen', (
     WidgetTester tester,
   ) async {
     // Build the real app against an isolated local database.
@@ -32,11 +50,13 @@ void main() {
       ),
     );
 
-    // Let theme and onboarding layout finish their first frame.
+    // Let theme and auth screen layout finish their first frame.
     await tester.pumpAndSettle();
 
-    // Verify that a fresh learner reaches the intended first question.
-    expect(find.text('What should French unlock for you?'), findsOneWidget);
+    // A signed-out fresh launch reaches sign-in FIRST, ahead of onboarding —
+    // the app has no way to know who's onboarding until it knows who's asking.
+    expect(find.text('Welcome'), findsOneWidget);
+    expect(find.text('Continue with Google'), findsOneWidget);
   });
 
   testWidgets('today plan exposes one recommended next action', (

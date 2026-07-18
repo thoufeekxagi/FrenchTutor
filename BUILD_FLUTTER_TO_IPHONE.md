@@ -89,13 +89,26 @@ flutter devices
 # 2. Read the keys
 GEMINI_KEY=$(grep '^GEMINI_API_KEY=' secrets.local.properties | sed 's/^GEMINI_API_KEY=//')
 OPENROUTER_KEY=$(grep '^OPENROUTER_API_KEY=' secrets.local.properties | sed 's/^OPENROUTER_API_KEY=//')
+SUPABASE_URL=$(grep '^SUPABASE_URL=' secrets.local.properties | sed 's/^SUPABASE_URL=//')
+SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' secrets.local.properties | sed 's/^SUPABASE_ANON_KEY=//')
+GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' secrets.local.properties | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
+GOOGLE_WEB_CLIENT_ID=$(grep '^GOOGLE_WEB_CLIENT_ID=' secrets.local.properties | sed 's/^GOOGLE_WEB_CLIENT_ID=//')
 
 # 3. Build + install + launch (release mode)
 flutter run --release \
   -d 00008101-00124C4601EB001E \
   --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
-  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY"
+  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
+  --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+  --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+  --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID" \
+  --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID"
 ```
+
+See `AUTH_SETUP_CHECKLIST.md` for the one-time Google Cloud / Apple Developer / Supabase
+dashboard steps that make Google and Apple sign-in actually work end to end — the app
+builds and runs fine without them (Google sign-in just shows a "not configured yet"
+message), but real sign-in needs them done once.
 
 **Why the `--dart-define` flags matter, specifically:** the API keys are compiled INTO
 the binary at build time (`String.fromEnvironment` in `lib/config/api_keys.dart`), not

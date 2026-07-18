@@ -59,6 +59,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   4: _migrationV4,
   5: _migrationV5,
   6: _migrationV6,
+  7: _migrationV7,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -546,4 +547,12 @@ void _migrationV6(CommonDatabase db) {
   for (final sql in statements) {
     db.execute(sql);
   }
+}
+
+/// Future-proofing only (no redemption logic built yet — see
+/// APP_STORE_AI_COMPLIANCE.md / auth work): a nullable slot for a promo/
+/// referral code entered at sign-up, so adding that feature later is purely
+/// additive — never a migration that has to reconcile existing rows.
+void _migrationV7(CommonDatabase db) {
+  db.execute('ALTER TABLE profiles ADD COLUMN referred_by_code TEXT');
 }

@@ -188,9 +188,29 @@ voice speed (P2). Session *resume* is P0 and already held by the coordinator.
 
 ## P1 — Must exist before strangers get builds
 
-### P1.1 Minimal auth (moved earlier than PILOT_PLAN.md because rate limits need identity)
-Supabase project + email magic-link (or Sign in with Apple) only. On first sign-in,
-adopt the local DB (fill `user_id` columns). No profile UI beyond what exists.
+### P1.1 Minimal auth — CODE COMPLETE (2026-07-18)
+Supabase project live (`oxfnrsjskdjbroekxdco`, ca-central-1). Native Apple + Google +
+email/password, no browser redirect ever (signInWithIdToken flow, not the web OAuth
+flow — that was the root cause of the earlier "app kicks you out to a browser" bug).
+- [x] `profiles` table + RLS (select/update own row only, no client insert policy) +
+  auto-provisioning trigger on `auth.users` insert (security definer, revoked from
+  anon/authenticated RPC access) + `updated_at` trigger. Verified with `get_advisors`.
+- [x] `AuthService` (native Google/Apple/email, graceful "not configured" for Google
+  until its external setup is done, every native-cancel path treated as silence not
+  error) + `AuthScreen` (Passeport-styled, official Apple button, custom Google
+  button, forgot-password) + `AuthGate` (session → onboarded → home routing,
+  replacing the old always-local onboarding check).
+- [x] Local DB: migration v7 adds `referred_by_code` (nullable, future-proofing for
+  promo codes — no redemption logic yet) + `LearningStore.linkSupabaseUser()` stamps
+  `user_id` on every sign-in (idempotent, skips soft-deleted rows).
+- [x] iOS native: `Runner.entitlements` (Sign in with Apple) wired into all 3 build
+  configs; Info.plist has the Google URL-scheme slot ready (placeholder until the
+  external Google Cloud step). Verified with a full `flutter build ios --release`.
+- [x] Settings: sign-out row (with confirm dialog) — no dead end.
+- [ ] External, one-time, human-only steps (Google Cloud OAuth clients, Supabase
+  dashboard provider toggles, one Xcode capability click) — see
+  `AUTH_SETUP_CHECKLIST.md`. Apple + email sign-in already work with zero further
+  setup; only Google is gated on this.
 
 ### P1.2 Free hour + rate limits
 - Append-only `usage_events` table (already Supabase-shaped): one row per live-call

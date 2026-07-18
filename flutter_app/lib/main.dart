@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
+import 'config/api_keys.dart';
 import 'data/content_service.dart';
 import 'data/database/pilot_infrastructure_store.dart';
 import 'data/database/competency_store.dart';
@@ -26,6 +28,20 @@ void main() {
         ]);
       }
       try {
+        if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
+          throw StateError(
+            'Missing SUPABASE_URL / SUPABASE_ANON_KEY. Run via '
+            './run_with_keys.sh or ./run_release_with_keys.sh (see '
+            'BUILD_FLUTTER_TO_IPHONE.md) — a plain `flutter run` ships '
+            'without these and auth cannot work.',
+          );
+        }
+        await Supabase.initialize(
+          url: ApiKeys.supabaseUrl,
+          // The modern "publishable" key (sb_publishable_...), not the
+          // legacy anon JWT — see ApiKeys.supabaseAnonKey's doc comment.
+          publishableKey: ApiKeys.supabaseAnonKey,
+        );
         final db = await openAppDatabase();
         final infrastructure = PilotInfrastructureStore(db);
         final platform = _pilotPlatform();
