@@ -1,7 +1,7 @@
 name: french_tutor
 description: AI French learning tutor — speak and learn French on the go.
 publish_to: 'none'
-version: 1.0.0+57
+version: 1.0.0+59
 
 environment:
   sdk: ^3.12.2

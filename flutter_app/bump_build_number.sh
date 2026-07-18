@@ -17,6 +17,15 @@ fi
 sed -i '' -E "s/^version: ([0-9]+\.[0-9]+\.[0-9]+)\+[0-9]+/version: \1+$NEXT_BUILD/" pubspec.yaml
 echo "Bumped build number: $CURRENT -> $NEXT_BUILD"
 
-# Regenerate Xcode's Generated.xcconfig from the new pubspec so Archive picks it up.
-flutter pub get >/dev/null
-echo "Ready to Archive in Xcode."
+# `flutter pub get` alone does NOT reliably regenerate Generated.xcconfig (it only
+# updates it as a side effect of resolving NEW dependencies) — this bit us: pubspec.yaml
+# said +57 while Xcode kept archiving build 2. `flutter build ios --config-only` is the
+# command that actually forces Xcode's config to be rewritten, and unlike a real build
+# it takes seconds, not minutes.
+flutter build ios --config-only >/dev/null
+ACTUAL=$(grep '^FLUTTER_BUILD_NUMBER=' ios/Flutter/Generated.xcconfig | cut -d= -f2)
+if [ "$ACTUAL" != "$NEXT_BUILD" ]; then
+  echo "ERROR: Generated.xcconfig shows build $ACTUAL, expected $NEXT_BUILD — do not archive yet." >&2
+  exit 1
+fi
+echo "Generated.xcconfig confirmed at build $ACTUAL. Ready to Archive in Xcode."
