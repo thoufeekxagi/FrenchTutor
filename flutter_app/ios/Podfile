@@ -39,5 +39,17 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    # permission_handler compiles each permission's native code ONLY when its
+    # macro is defined — without PERMISSION_MICROPHONE=1 every mic permission
+    # request auto-returns "denied" WITHOUT ever showing the iOS prompt (and
+    # no Microphone row appears in the Settings app). This bit us on a fresh
+    # install: sessions reported "Microphone permission denied" though the
+    # user was never asked anything.
+    target.build_configurations.each do |config|
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_MICROPHONE=1',
+      ]
+    end
   end
 end
