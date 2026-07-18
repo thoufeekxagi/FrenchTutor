@@ -264,14 +264,19 @@ class _AgentLedListeningScreenState
           setState(() => _errorMessage = 'Microphone permission denied');
         }
       });
-      // The app directs from the very first turn: Marie opens as the coach, sets the
-      // scene, and teaches beat 1's line. The student never has to speak first.
+      // The app directs from the very first turn — and the SCENE speaks first:
+      // one English sentence of scene-setting, then the CHARACTER's opening
+      // French line (the shopkeeper asks first, like real life), and only then
+      // the coach explains and hands the student their reply. The student never
+      // has to speak first.
       final first = _currentCard;
       if (first != null) {
         _direct(
-          'As the COACH, in English: welcome the student, set the scene in one or two vivid '
-          'sentences (scenario: "${widget.passage.title}" — where they are, who they\'re '
-          'playing, what they want), then give them their first line — "${first.segment.fr}"'
+          'As the COACH, in ONE short English sentence, set the scene '
+          '(scenario: "${widget.passage.title}" — where the student is and who you\'ll play). '
+          'Then IMMEDIATELY become the CHARACTER and ${_characterLineDirection(first.segment)} '
+          'Then, as the COACH in English: in one short sentence say what the character just '
+          'said, give the student their reply line — "${first.segment.fr}"'
           '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'} — and ask them to '
           'try it.',
         );
@@ -571,12 +576,31 @@ class _AgentLedListeningScreenState
     }
   }
 
+  /// The character's opening move for a beat: their scripted French line, or an
+  /// improvised prompt when the script has no character side for this beat.
+  String _characterLineDirection(ReadingSegment segment) {
+    final character = segment.characterFr;
+    if (character != null && character.isNotEmpty) {
+      final characterMeaning = (segment.characterEn?.isNotEmpty ?? false)
+          ? ' (meaning: ${segment.characterEn})'
+          : '';
+      return 'say exactly this French line and nothing else: "$character"$characterMeaning.';
+    }
+    return 'improvise ONE short, simple French line that naturally prompts the student\'s '
+        'reply "${segment.fr}", and say only that.';
+  }
+
+  /// Every beat OPENS with the character's French line — the scene speaks
+  /// first, coaching comes second. This order is the product: hear the
+  /// shopkeeper, then learn what to say back.
   void _directLearn(ReadingSegment segment) {
     final meaning = segment.en.isEmpty ? '' : ' = "${segment.en}"';
     _direct(
-      'As the COACH, in English: set up beat ${_segmentIndex + 1} of the scene in one short '
-      'sentence, give the student their line — "${segment.fr}"$meaning — and ask them to try '
-      'it.',
+      'Beat ${_segmentIndex + 1} of the scene. As the CHARACTER, '
+      '${_characterLineDirection(segment)} '
+      'Then, as the COACH in English: in one short sentence say what the character just '
+      'said, give the student their reply line — "${segment.fr}"$meaning — and ask them '
+      'to try it.',
     );
   }
 
@@ -590,22 +614,9 @@ class _AgentLedListeningScreenState
     final context =
         ' (The student replies with: "${segment.fr}". If asked what comes '
         'next: ${next != null ? 'their next line will be "${next.fr}"' : 'this is the last beat — after this the whole scene plays through'}.)';
-    final character = segment.characterFr;
-    if (character != null && character.isNotEmpty) {
-      final characterMeaning = (segment.characterEn?.isNotEmpty ?? false)
-          ? ' (meaning: ${segment.characterEn})'
-          : '';
-      _direct(
-        'Scene time. As the CHARACTER, say exactly this French line and nothing else: '
-        '"$character"$characterMeaning.$context',
-      );
-    } else {
-      _direct(
-        'Scene time. As the CHARACTER, improvise ONE short, simple French line that '
-        'naturally prompts the student to answer with their line "${segment.fr}", and say '
-        'only that.$context',
-      );
-    }
+    _direct(
+      'Scene time. As the CHARACTER, ${_characterLineDirection(segment)}$context',
+    );
   }
 
   /// "Next" walks the beat's phases: learn → play → next beat's learn.
@@ -1682,7 +1693,8 @@ class _AgentLedListeningScreenState
 ROLEPLAY SCENE STAGE — "${passage.title}". You are a DIRECTED ACTOR-COACH in a scripted scene the app runs beat by beat. The student plays themselves (the customer/visitor); you play two registers: the COACH (English — teaches, reacts, encourages) and the CHARACTER (French — the other role in the scene, one scripted line at a time).
 
 THE CONTRACT — THE APP DIRECTS, YOU PERFORM:
-1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction — one move — then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
+1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction — in the exact ORDER it gives, when it has several parts — then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
+1b. THE SCENE SPEAKS FIRST: every beat opens with the CHARACTER's French line, and only AFTER it do you coach in English. Never explain a beat before the character has spoken it — the student must hear the French first, like real life. When an instruction says "as the CHARACTER ... then as the COACH", the character line always comes out of your mouth first.
 2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence — react to their attempt, fix gently if needed, encourage — then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. After a beat has been played through once, you may ALSO remind them once, neutrally, of their controls: "say next when you're ready, or again to hear it once more" — that reminder is the only thing you may ever say about moving; never any content suggestion.
 3. You do NOT have the script — the app hands you each line exactly when it's time, and sometimes a hint of what's coming (marked "if asked"). Never invent lines, never say more than the single line the app asked for, never claim a learner line as yours.
 4. NEVER suggest moving on or ask what's next — pacing belongs to the student and the app alone.
