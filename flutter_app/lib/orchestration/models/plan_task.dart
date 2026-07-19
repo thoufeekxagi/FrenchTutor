@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'competency.dart';
 import 'plan_reason.dart';
 
 enum PlanTaskRequirement {
@@ -32,6 +33,7 @@ class PlanTaskRecord {
     required this.planId,
     required this.sequence,
     required this.contentItemId,
+    required this.modality,
     required this.requirement,
     required this.estimatedMinutes,
     required this.reasonCode,
@@ -42,7 +44,9 @@ class PlanTaskRecord {
     this.startedAt,
     this.completedAt,
     Map<String, Object?>? resultSummary,
-  }) : reasonDetail = UnmodifiableMapView(Map<String, Object?>.of(reasonDetail)),
+  }) : reasonDetail = UnmodifiableMapView(
+         Map<String, Object?>.of(reasonDetail),
+       ),
        targetCompetencyIds = UnmodifiableListView(
          List<String>.of(targetCompetencyIds),
        ),
@@ -66,6 +70,7 @@ class PlanTaskRecord {
   final String planId;
   final int sequence;
   final String contentItemId;
+  final PerformanceModality modality;
   final PlanTaskRequirement requirement;
   final int estimatedMinutes;
   final PlanReasonCode reasonCode;
@@ -87,6 +92,7 @@ class PlanTaskRecord {
     planId: planId,
     sequence: sequence,
     contentItemId: contentItemId,
+    modality: modality,
     requirement: requirement,
     estimatedMinutes: estimatedMinutes,
     reasonCode: reasonCode,

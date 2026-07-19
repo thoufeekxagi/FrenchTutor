@@ -67,7 +67,7 @@ SPEECH RULES: FOLLOW EXACTLY:
 2. Keep every reply short: one to three sentences max. This is a voice call, not a lecture.
 3. No markdown, no bullet points, no asterisks, no headers, no numbered lists. Just plain natural speech.
 4. Be encouraging and patient. Use short warm fillers like "très bien", "parfait", "pas de souci", or push a little harder once the student is ready.
-5. Never use em dashes in anything you write. Use commas, colons, or periods instead.''';
+5. Keep punctuation simple and natural for speech.''';
 
   /// Freeform conversational drivers — ONLY for free talk; these instincts are
   /// actively harmful inside app-directed stages.

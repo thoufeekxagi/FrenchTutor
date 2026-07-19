@@ -36,9 +36,14 @@ const _minWordsForHint = 3;
 /// accuracy (spelling, connectors), not voice, so this deliberately has none of the
 /// audio-session complexity the other stages do. Ported from PathwayWritingView.swift.
 class PathwayWritingScreen extends ConsumerStatefulWidget {
-  const PathwayWritingScreen({super.key, required this.targetWords});
+  const PathwayWritingScreen({
+    super.key,
+    required this.targetWords,
+    this.writingTask,
+  });
 
   final List<VocabEntry> targetWords;
+  final WritingTask? writingTask;
 
   @override
   ConsumerState<PathwayWritingScreen> createState() =>
@@ -63,6 +68,7 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
   bool _isFetchingHint = false;
 
   String get _prompt =>
+      widget.writingTask?.promptFr ??
       'Write one or two sentences using: ${widget.targetWords.map((e) => e.fr).join(", ")}';
 
   @override
@@ -99,12 +105,16 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
   Future<void> _maybeOfferHint() async {
     if (!mounted || _feedback != null || _isFetchingHint) return;
     final trimmed = _submission.trim();
-    final wordCount = trimmed.isEmpty ? 0 : trimmed.split(RegExp(r'\s+')).length;
+    final wordCount = trimmed.isEmpty
+        ? 0
+        : trimmed.split(RegExp(r'\s+')).length;
     if (wordCount < _minWordsForHint) {
       if (_hint != null) setState(() => _hint = null);
       return;
     }
-    if (trimmed == _textAtLastHintCheck) return; // nothing changed since last look
+    if (trimmed == _textAtLastHintCheck) {
+      return; // nothing changed since last look
+    }
 
     setState(() {
       _isFetchingHint = true;
@@ -390,9 +400,9 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                                   _hintsUsed == 1
                                       ? 'Used 1 hint, counted as guided, not unaided.'
                                       : 'Used $_hintsUsed hints, counted as guided, not unaided.',
-                                  style: DesignTokens.body(12).copyWith(
-                                    color: DesignTokens.slateDim,
-                                  ),
+                                  style: DesignTokens.body(
+                                    12,
+                                  ).copyWith(color: DesignTokens.slateDim),
                                 ),
                               ],
                             ],

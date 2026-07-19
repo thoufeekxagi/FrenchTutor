@@ -1,0 +1,143 @@
+{
+  "missions": [
+    {
+      "id": "calibration_introduce_yourself",
+      "title": "Introduce yourself",
+      "scenario": "You meet a new colleague for the first time.",
+      "levelBand": "A1",
+      "primaryCompetencyId": "function_introduce_yourself_a1",
+      "supportingCompetencyIds": ["lex_identity_basics_a1"],
+      "goalIds": ["everyday", "tef_canada"],
+      "calibration": true,
+      "promptContext": "The learner is completing an A1 calibration. Practice a brief first meeting with a new colleague. Ask for a name, origin, and one simple personal detail. Use short French lines and English support only when the learner needs it. Do not claim a CEFR result or mastery.",
+      "steps": [
+        {
+          "id": "recognise_identity_words",
+          "contentItemId": "p1_pronouns_basics_je",
+          "modality": "reading_recognition",
+          "estimatedMinutes": 4,
+          "evidenceGoal": "Recognise basic first-person French."
+        },
+        {
+          "id": "understand_a_first_meeting",
+          "contentItemId": "l02",
+          "modality": "listening_recognition",
+          "estimatedMinutes": 6,
+          "evidenceGoal": "Understand personal details in a short introduction."
+        },
+        {
+          "id": "say_a_first_introduction",
+          "contentItemId": "introduce_yourself_a1",
+          "modality": "controlled_speaking",
+          "estimatedMinutes": 8,
+          "evidenceGoal": "Give a supported first introduction aloud."
+        }
+      ]
+    },
+    {
+      "id": "a2_handle_a_cafe_order",
+      "title": "Order at a café",
+      "scenario": "You order politely and respond to a price at a café.",
+      "levelBand": "A2",
+      "primaryCompetencyId": "function_handle_cafe_order_a2",
+      "supportingCompetencyIds": ["lex_cafe_requests_a2"],
+      "goalIds": ["everyday", "tef_canada"],
+      "promptContext": "The learner is practising a polite café order. Marie plays the server. Keep the exchange realistic, short, and tied to ordering, price, and thanks. Let the learner speak before offering a correction.",
+      "steps": [
+        {
+          "id": "understand_a_cafe_order",
+          "contentItemId": "l01",
+          "modality": "listening_recognition",
+          "estimatedMinutes": 6,
+          "evidenceGoal": "Understand an order and its price.",
+          "generatedScenario": true
+        },
+        {
+          "id": "make_a_cafe_order",
+          "contentItemId": "order_at_a_cafe_a2",
+          "modality": "controlled_speaking",
+          "estimatedMinutes": 8,
+          "evidenceGoal": "Make a polite request aloud."
+        }
+      ]
+    },
+    {
+      "id": "a2_describe_your_day",
+      "title": "Describe your day",
+      "scenario": "You tell a new colleague about your work and daily routine.",
+      "levelBand": "A2",
+      "primaryCompetencyId": "grammar_present_self_description",
+      "supportingCompetencyIds": ["phonology_french_r_work"],
+      "goalIds": ["everyday", "tef_canada"],
+      "promptContext": "The learner is practising an A2 workday description. Marie is a new colleague. Keep the grammar in the present tense and encourage one short answer at a time.",
+      "steps": [
+        {
+          "id": "build_present_tense_sentences",
+          "contentItemId": "present",
+          "modality": "controlled_speaking",
+          "estimatedMinutes": 8,
+          "evidenceGoal": "Build correct present-tense sentences with guided practice."
+        },
+        {
+          "id": "practise_work_word_pronunciation",
+          "contentItemId": "p1_verbs_travailler",
+          "modality": "pronunciation_production",
+          "estimatedMinutes": 6,
+          "evidenceGoal": "Practise a high-frequency work word aloud."
+        }
+      ]
+    },
+    {
+      "id": "b1_explain_work_experience",
+      "title": "Explain your work experience",
+      "scenario": "You answer a question about your professional experience.",
+      "levelBand": "B1",
+      "primaryCompetencyId": "discourse_professional_experience_sequence",
+      "supportingCompetencyIds": ["function_introduce_professionally"],
+      "goalIds": ["tef_canada"],
+      "promptContext": "The learner is practising a B1 professional introduction. Marie plays an interviewer. Ask one short follow-up at a time. The learner should connect present work, previous experience, and motivation. Coach briefly only when needed.",
+      "steps": [
+        {
+          "id": "understand_a_professional_interview",
+          "contentItemId": "l09",
+          "modality": "listening_recognition",
+          "estimatedMinutes": 10,
+          "evidenceGoal": "Identify experience and motivation in a professional answer."
+        },
+        {
+          "id": "describe_work_experience",
+          "contentItemId": "describe_work",
+          "modality": "spontaneous_speaking",
+          "estimatedMinutes": 12,
+          "evidenceGoal": "Connect work experience in a short response."
+        }
+      ]
+    },
+    {
+      "id": "b2_defend_an_opinion",
+      "title": "Defend an opinion",
+      "scenario": "You give a balanced opinion and respond to a challenge.",
+      "levelBand": "B2",
+      "primaryCompetencyId": "discourse_defend_opinion_b2",
+      "supportingCompetencyIds": ["strategy_manage_counterargument_b2"],
+      "goalIds": ["tef_canada", "everyday"],
+      "promptContext": "The learner is practising a B2 opinion task. Marie asks for a clear position, one example, and a response to one counterargument. Keep the conversation natural and do not award a score or claim exam readiness.",
+      "steps": [
+        {
+          "id": "read_an_opinion_model",
+          "contentItemId": "w06",
+          "modality": "controlled_writing",
+          "estimatedMinutes": 12,
+          "evidenceGoal": "Structure a clear written position with support."
+        },
+        {
+          "id": "defend_an_opinion_aloud",
+          "contentItemId": "give_opinion",
+          "modality": "spontaneous_speaking",
+          "estimatedMinutes": 12,
+          "evidenceGoal": "Give and support an opinion in conversation."
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/content_models.dart';
 import '../orchestration/models/content_descriptor.dart';
+import '../orchestration/models/mission.dart';
 
 class ContentService {
   ContentService._();
@@ -18,6 +19,7 @@ class ContentService {
   Roadmap? _roadmap;
   ResourcePack? _resources;
   CompetencyFramework? _competencyFramework;
+  MissionCatalog? _missionCatalog;
 
   Future<void> preload() async {
     await Future.wait([
@@ -32,6 +34,7 @@ class ContentService {
       _loadRoadmap(),
       _loadResources(),
       _loadCompetencyFramework(),
+      _loadMissionCatalog(),
     ]);
   }
 
@@ -69,6 +72,7 @@ class ContentService {
   Roadmap? roadmap() => _roadmap;
   ResourcePack? resources() => _resources;
   CompetencyFramework? competencyFramework() => _competencyFramework;
+  MissionCatalog? missionCatalog() => _missionCatalog;
 
   Set<String> knownContentIds() {
     final ids = <String>{};
@@ -232,6 +236,10 @@ class ContentService {
     _competencyFramework = CompetencyFramework.fromJson(
       await _loadJson('competency_graph_v1.json'),
     );
+  }
+
+  Future<void> _loadMissionCatalog() async {
+    _missionCatalog = MissionCatalog.fromJson(await _loadJson('missions.json'));
   }
 
   Future<Map<String, dynamic>> _loadJson(String filename) async {

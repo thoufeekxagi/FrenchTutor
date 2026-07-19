@@ -7,6 +7,7 @@ import 'package:french_tutor/orchestration/models/content_descriptor.dart';
 import 'package:french_tutor/orchestration/planning/orchestrator.dart';
 import 'package:french_tutor/orchestration/runtime/orchestration_bootstrapper.dart';
 import 'package:french_tutor/orchestration/validation/competency_graph_validator.dart';
+import 'package:french_tutor/orchestration/validation/mission_catalog_validator.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
@@ -19,8 +20,8 @@ void main() {
       final framework = ContentService.shared.competencyFramework();
 
       expect(framework, isNotNull);
-      expect(framework!.frameworkVersion, '1.1.0');
-      expect(framework.curriculumVersion, 'professional_intro_v1');
+      expect(framework!.frameworkVersion, '1.2.0');
+      expect(framework.curriculumVersion, 'applied_french_a1_b2_v1');
       expect(framework.competencies, isNotEmpty);
       expect(framework.mappings, isNotEmpty);
     });
@@ -29,6 +30,16 @@ void main() {
       final framework = ContentService.shared.competencyFramework()!;
       final issues = const CompetencyGraphValidator().validate(
         framework,
+        knownContentIds: ContentService.shared.knownContentIds(),
+      );
+
+      expect(issues, isEmpty, reason: issues.join('\n'));
+    });
+
+    test('loads only executable mission steps with mapped content', () {
+      final issues = const MissionCatalogValidator().validate(
+        ContentService.shared.missionCatalog()!,
+        framework: ContentService.shared.competencyFramework()!,
         knownContentIds: ContentService.shared.knownContentIds(),
       );
 
@@ -59,7 +70,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7, 8],
       );
     });
 
@@ -80,8 +91,8 @@ void main() {
 
       expect(first.persisted, isTrue);
       expect(second.persisted, isFalse);
-      expect(second.competencyCount, 6);
-      expect(second.mappingCount, 12);
+      expect(second.competencyCount, 12);
+      expect(second.mappingCount, 20);
     });
 
     test(

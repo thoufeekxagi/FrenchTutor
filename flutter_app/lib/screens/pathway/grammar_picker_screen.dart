@@ -28,9 +28,14 @@ enum _PickerMode { auto, manual }
 /// picks directly from every tense/topic already authored in assets/content/grammar.json).
 /// Ported from GrammarPickerView.swift.
 class GrammarPickerScreen extends ConsumerStatefulWidget {
-  const GrammarPickerScreen({super.key, this.vocabSummary});
+  const GrammarPickerScreen({
+    super.key,
+    this.vocabSummary,
+    this.selectedContentId,
+  });
 
   final VocabStageResult? vocabSummary;
+  final String? selectedContentId;
 
   @override
   ConsumerState<GrammarPickerScreen> createState() =>
@@ -58,6 +63,18 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
         _pack?.topics.map((t) => (id: t.id, title: t.title)).toList() ??
         <({String id, String title})>[];
     return [...lessons, ...topics];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final selectedContentId = widget.selectedContentId;
+    if (selectedContentId == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _selectById(selectedContentId);
+      _generateCardsAndStart();
+    });
   }
 
   @override

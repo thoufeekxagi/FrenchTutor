@@ -9,6 +9,7 @@ import '../models/agent_tool.dart';
 import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../services/progress_service.dart';
+import '../utils/generated_text.dart';
 
 /// Ported from GeminiLiveService.swift — bidirectional audio+text streaming over the
 /// Gemini Live WebSocket, with tool-call support for the agent-led Daily Pathway stages.
@@ -534,9 +535,10 @@ class GeminiLiveService {
       if (t != null && t.isNotEmpty) {
         _isModelGenerating = true;
         if (!_suppressStaleReply && !_suppressPreInjection) {
-          onTranscriptDelta?.call(t);
+          final normalized = normalizeGeneratedText(t);
+          onTranscriptDelta?.call(normalized);
           _flushUserTranscript();
-          _currentTutorTranscript += t;
+          _currentTutorTranscript += normalized;
         }
       }
     }

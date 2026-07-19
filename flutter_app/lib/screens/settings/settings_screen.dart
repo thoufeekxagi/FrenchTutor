@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
+import '../../data/database/account_deletion.dart';
 import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
@@ -40,6 +41,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   TutorPersona _persona = ActiveTutor.current;
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
+  bool _deletingAccount = false;
   late final TutorVoicePreviewer _previewer = TutorVoicePreviewer()
     ..addListener(() {
       if (mounted) setState(() {});
@@ -253,6 +255,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       // No manual navigation needed — AuthGate's own auth-state listener
       // switches to the sign-in screen automatically once the session clears.
     }
+  }
+
+  Future<void> _confirmDeleteAccount() async {
+    final shouldDelete = await showPSConfirmDialog(
+      context,
+      title: 'Delete account?',
+      message:
+          'This permanently deletes your account and all your learning '
+          'data, both on this device and on our servers. This can\'t be '
+          'undone.',
+      confirmLabel: 'Delete account',
+      destructive: true,
+    );
+    if (!shouldDelete || !mounted) return;
+
+    setState(() => _deletingAccount = true);
+    final result = await AuthService.shared.deleteAccount();
+    if (!mounted) return;
+
+    if (result.outcome != AuthOutcome.success) {
+      setState(() => _deletingAccount = false);
+      await showPSConfirmDialog(
+        context,
+        title: 'Couldn\'t delete account',
+        message:
+            result.message ??
+            'Something went wrong. Please try again, or email '
+                'thoufeek@agiventures.ca and we\'ll delete it for you.',
+        confirmLabel: 'OK',
+        cancelLabel: 'OK',
+      );
+      return;
+    }
+
+    // The server-side account is gone — now clear everything this device
+    // holds locally so no trace of the deleted account remains.
+    wipeLocalDatabase(ref.read(databaseProvider));
+    await clearLocalPreferences();
+    await AuthService.shared.signOut();
+    // No manual navigation needed — AuthGate's auth-state listener switches
+    // to the sign-in screen automatically once the session clears.
   }
 
   String _entitlementLabel(PilotEntitlementStatus status) {
@@ -747,6 +790,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           weight: FontWeight.w600,
                         ).copyWith(color: Passeport.danger),
                       ),
+                    ),
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _deletingAccount ? null : _confirmDeleteAccount,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.centerLeft,
+                      child: _deletingAccount
+                          ? Row(
+                              children: [
+                                const SizedBox(
+                                  width: 15,
+                                  height: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Passeport.danger,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Deleting account…',
+                                  style: Passeport.body(
+                                    13,
+                                    weight: FontWeight.w600,
+                                  ).copyWith(color: Passeport.danger),
+                                ),
+                              ],
+                            )
+                          : Text(
+                              'Delete account',
+                              style: Passeport.body(
+                                13,
+                                weight: FontWeight.w600,
+                              ).copyWith(color: Passeport.danger),
+                            ),
                     ),
                   ),
                 ],

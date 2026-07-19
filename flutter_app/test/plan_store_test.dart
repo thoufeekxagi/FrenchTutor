@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/data/database/plan_store.dart';
+import 'package:french_tutor/orchestration/models/competency.dart';
 import 'package:french_tutor/orchestration/models/learning_plan.dart';
 import 'package:french_tutor/orchestration/models/plan_reason.dart';
 import 'package:french_tutor/orchestration/models/plan_task.dart';
@@ -15,6 +16,7 @@ PlanTaskRecord _task({
   planId: planId,
   sequence: sequence,
   contentItemId: 'content-$id',
+  modality: PerformanceModality.readingRecognition,
   requirement: PlanTaskRequirement.must,
   estimatedMinutes: 10,
   reasonCode: PlanReasonCode.dueReview,
@@ -36,7 +38,8 @@ PlanSnapshot _plan({
   plannerVersion: 'test-v1',
   status: PlanSnapshotStatus.generated,
   replacesPlanId: replacesPlanId,
-  tasks: tasks ??
+  tasks:
+      tasks ??
       [
         _task(id: '$id-task-1', planId: id),
         _task(id: '$id-task-2', planId: id, sequence: 1),
@@ -78,7 +81,10 @@ void main() {
     store.savePlan(_plan(id: 'plan-1'));
     store.startTask('plan-1-task-1');
 
-    store.completeTask(taskId: 'plan-1-task-1', status: PlanTaskStatus.completed);
+    store.completeTask(
+      taskId: 'plan-1-task-1',
+      status: PlanTaskStatus.completed,
+    );
     expect(store.byId('plan-1')!.status, PlanSnapshotStatus.inProgress);
 
     store.completeTask(taskId: 'plan-1-task-2', status: PlanTaskStatus.skipped);

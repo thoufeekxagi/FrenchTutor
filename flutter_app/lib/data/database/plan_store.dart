@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:sqlite3/common.dart';
 
+import '../../orchestration/models/competency.dart';
 import '../../orchestration/models/learning_plan.dart';
 import '../../orchestration/models/plan_reason.dart';
 import '../../orchestration/models/plan_task.dart';
@@ -119,7 +120,8 @@ class PlanStore {
     Map<String, Object?>? resultSummary,
     DateTime? at,
   }) {
-    if (status != PlanTaskStatus.completed && status != PlanTaskStatus.skipped) {
+    if (status != PlanTaskStatus.completed &&
+        status != PlanTaskStatus.skipped) {
       throw ArgumentError.value(
         status,
         'status',
@@ -153,10 +155,9 @@ class PlanStore {
   }
 
   PlanSnapshot _planForTask(String taskId) {
-    final rows = _db.select(
-      'SELECT plan_id FROM plan_tasks WHERE id = ?',
-      [taskId],
-    );
+    final rows = _db.select('SELECT plan_id FROM plan_tasks WHERE id = ?', [
+      taskId,
+    ]);
     if (rows.isEmpty) {
       throw ArgumentError.value(taskId, 'taskId', 'not found');
     }
@@ -207,17 +208,18 @@ class PlanStore {
     final now = _now();
     _db.execute(
       '''INSERT INTO plan_tasks
-         (id, user_id, plan_id, sequence, content_item_id, requirement,
-          estimated_minutes, reason_code, reason_detail_json,
+         (id, user_id, plan_id, sequence, content_item_id, modality,
+          requirement, estimated_minutes, reason_code, reason_detail_json,
           target_competency_ids_json, status, started_at, completed_at,
           result_summary_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         task.id,
         task.userId,
         task.planId,
         task.sequence,
         task.contentItemId,
+        task.modality.wireName,
         task.requirement.name,
         task.estimatedMinutes,
         task.reasonCode.wireName,
@@ -265,6 +267,7 @@ class PlanStore {
     planId: row['plan_id'] as String,
     sequence: row['sequence'] as int,
     contentItemId: row['content_item_id'] as String,
+    modality: PerformanceModality.fromWireName(row['modality'] as String),
     requirement: PlanTaskRequirement.fromWireName(row['requirement'] as String),
     estimatedMinutes: row['estimated_minutes'] as int,
     reasonCode: PlanReasonCode.fromWireName(row['reason_code'] as String),

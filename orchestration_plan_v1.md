@@ -18,6 +18,8 @@ The MVP is successful when this statement is demonstrably true:
 
 > What the learner did yesterday visibly and correctly changes what ParleSprint asks them to do today.
 
+The learner-facing form of that decision is a **Today’s Mission**: one practical French ability, one meaningful scenario, a short sequence of exact selected activities, a transparent reason, and an evidence goal. The mission is selected by governed orchestration, executed by the pathway runtime, and practised with Marie. It is not a generic lesson list or an LLM-selected curriculum.
+
 This is not a plan for either an unconstrained AI tutor or a permanently fixed rule engine. It is a plan for a governed neuro-symbolic adaptive system: symbolic competency and policy constraints, probabilistic learner-state estimation, outcome-learning task policies, and generative AI where language intelligence creates value.
 
 ## 1. Non-negotiable product principles
@@ -61,32 +63,24 @@ Standalone LLM knowledge tracing is not authoritative in v1. Current long-term t
 
 ## 2. Initial target learner and scope
 
-### 2.1 Primary MVP learner
+### 2.1 Primary pilot learner
 
-A serious A2 or lower-B1 learner with a Canadian goal who:
+A learner who wants applied French speaking practice, from A1 through B2, with either an everyday or Canadian-exam goal. The level selected in onboarding is a starting prior, never an authoritative diagnosis.
 
-- studies approximately 45 to 180 minutes on a typical day;
-- currently combines disconnected apps, videos, tutors, or exam resources;
-- needs stronger productive French, not only recognition;
-- wants to understand what to practise next and why;
-- may not yet be ready for exam-only preparation.
+The first live vertical slice is A1: a learner can complete a short calibration mission, practise a first introduction, speak it with Marie, and receive a better next mission from real evidence. A2, B1 and B2 mission definitions and competency bands are included in the catalog, but breadth claims remain limited to authored and executable content.
 
-A0, A1, advanced B1, and B2 learners may participate in testing, but the MVP must not claim complete coverage for them.
+### 2.2 Pilot curriculum boundary
 
-### 2.2 MVP curriculum boundary
+Prove one complete evidence loop at every supported band, before claiming broad coverage:
 
-Prove the complete learning loop using a narrow, deep curriculum slice:
+- A1: survival interaction and simple introductions;
+- A2: predictable real-life transactions and requests;
+- B1: connected experience and problem-solving responses;
+- B2: supported opinion, argument and counterargument practice;
+- controlled vocabulary, grammar, listening, writing and speaking content that maps to each mission;
+- correction, retry, delayed review and cross-modal transfer.
 
-- two or three practical themes;
-- a controlled vocabulary set;
-- a small set of grammar competencies;
-- associated pronunciation targets;
-- authored listening and reading items;
-- micro-writing tasks;
-- targeted Gemini Live speaking tasks;
-- correction, retry, delayed review, and cross-modal transfer.
-
-Do not expand to broad A0-B2 content until the loop works reliably.
+The product must never claim that a catalog level equals demonstrated proficiency. A level band is a content-selection constraint; competency evidence and confidence determine what is next.
 
 ### 2.3 Out of scope for v1
 

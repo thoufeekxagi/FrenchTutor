@@ -7,8 +7,11 @@ import '../models/competency_state.dart';
 import '../models/content_descriptor.dart';
 import '../models/error_event.dart';
 import '../models/learning_plan.dart';
+import '../models/mission.dart';
 import '../models/plan_task.dart';
 import '../planning/fallback_plan_factory.dart';
+import '../planning/mission_plan_factory.dart';
+import '../planning/mission_selector.dart';
 import '../planning/orchestrator.dart';
 import '../planning/plan_explainer.dart';
 import '../planning/planner_context_builder.dart';
@@ -27,6 +30,8 @@ class OrchestrationService {
     this.rebuilder = const CompetencyStateRebuilder(),
     this.contextBuilder = const PlannerContextBuilder(),
     this.orchestrator = const Orchestrator(),
+    this.missionSelector = const MissionSelector(),
+    this.missionPlanFactory = const MissionPlanFactory(),
     this.explainer = const PlanExplainer(),
     this.fallbackFactory = const FallbackPlanFactory(),
     this.plannerVersion = 'constrained-utility-v1',
@@ -35,6 +40,8 @@ class OrchestrationService {
   final CompetencyStateRebuilder rebuilder;
   final PlannerContextBuilder contextBuilder;
   final Orchestrator orchestrator;
+  final MissionSelector missionSelector;
+  final MissionPlanFactory missionPlanFactory;
   final PlanExplainer explainer;
   final FallbackPlanFactory fallbackFactory;
   final String plannerVersion;
@@ -70,6 +77,8 @@ class OrchestrationService {
     required bool canSpeakAloud,
     required bool networkAvailable,
     required String goal,
+    MissionCatalog? missionCatalog,
+    String learnerLevel = 'a1',
     String? userId,
   }) {
     final existing = planStore.activePlanForDate(localDate, userId: userId);
@@ -84,6 +93,8 @@ class OrchestrationService {
       canSpeakAloud: canSpeakAloud,
       networkAvailable: networkAvailable,
       goal: goal,
+      missionCatalog: missionCatalog,
+      learnerLevel: learnerLevel,
       userId: userId,
     );
     planStore.savePlan(snapshot);
@@ -103,6 +114,8 @@ class OrchestrationService {
     required bool networkAvailable,
     required String goal,
     required String reason,
+    MissionCatalog? missionCatalog,
+    String learnerLevel = 'a1',
     String? userId,
   }) {
     final next = _generateSnapshot(
@@ -114,6 +127,8 @@ class OrchestrationService {
       canSpeakAloud: canSpeakAloud,
       networkAvailable: networkAvailable,
       goal: goal,
+      missionCatalog: missionCatalog,
+      learnerLevel: learnerLevel,
       userId: userId,
       replacesPlanId: current.id,
       replanReason: reason,
@@ -131,6 +146,8 @@ class OrchestrationService {
     required bool canSpeakAloud,
     required bool networkAvailable,
     required String goal,
+    MissionCatalog? missionCatalog,
+    String learnerLevel = 'a1',
     String? userId,
     String? replacesPlanId,
     String? replanReason,
@@ -143,7 +160,22 @@ class OrchestrationService {
       competencyStates: competencyStates,
       errors: errors,
     );
+    MissionRecommendation? mission;
     var runtimePlan = orchestrator.plan(framework: framework, context: context);
+    if (missionCatalog != null) {
+      mission = missionSelector.select(
+        catalog: missionCatalog,
+        level: learnerLevel,
+        goal: goal,
+        competencyStates: competencyStates,
+      );
+      final missionPlan = missionPlanFactory.build(
+        framework: framework,
+        recommendation: mission,
+        context: context,
+      );
+      if (missionPlan.tasks.isNotEmpty) runtimePlan = missionPlan;
+    }
     if (runtimePlan.tasks.isEmpty) {
       runtimePlan = fallbackFactory.build(
         framework: framework,
@@ -152,7 +184,8 @@ class OrchestrationService {
     }
 
     final competencies = {
-      for (final competency in framework.competencies) competency.id: competency,
+      for (final competency in framework.competencies)
+        competency.id: competency,
     };
     final id = _uuid.v4();
     final taskRecords = <PlanTaskRecord>[];
@@ -169,6 +202,7 @@ class OrchestrationService {
           planId: id,
           sequence: index,
           contentItemId: task.contentItemId,
+          modality: task.modality,
           requirement: _toRequirement(task.priority),
           estimatedMinutes: task.estimatedMinutes,
           reasonCode: explanation.code,
@@ -197,11 +231,22 @@ class OrchestrationService {
       primaryPriority: explanations.isEmpty
           ? 'insufficient_evidence'
           : explanations.first.code.wireName,
-      explanation: explanations.isEmpty
-          ? 'No eligible tasks fit the current time and context.'
-          : explanations.first.text,
+      explanation:
+          mission?.reason ??
+          (explanations.isEmpty
+              ? 'No eligible tasks fit the current time and context.'
+              : explanations.first.text),
       plannerVersion: plannerVersion,
-      inputSnapshot: {'goal': goal},
+      inputSnapshot: {
+        'goal': goal,
+        'learnerLevel': learnerLevel,
+        if (mission != null) ...{
+          'missionId': mission.mission.id,
+          'missionTitle': mission.mission.title,
+          'missionScenario': mission.mission.scenario,
+          'missionPromptContext': mission.mission.promptContext,
+        },
+      },
       status: PlanSnapshotStatus.generated,
       replacesPlanId: replacesPlanId,
       replanReason: replanReason,

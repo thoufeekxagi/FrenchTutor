@@ -1,6 +1,7 @@
 import '../../data/content_service.dart';
 import '../../data/database/competency_store.dart';
 import '../validation/competency_graph_validator.dart';
+import '../validation/mission_catalog_validator.dart';
 
 class OrchestrationBootstrapResult {
   const OrchestrationBootstrapResult({
@@ -21,9 +22,11 @@ class OrchestrationBootstrapResult {
 class OrchestrationBootstrapper {
   const OrchestrationBootstrapper({
     this.validator = const CompetencyGraphValidator(),
+    this.missionValidator = const MissionCatalogValidator(),
   });
 
   final CompetencyGraphValidator validator;
+  final MissionCatalogValidator missionValidator;
 
   OrchestrationBootstrapResult bootstrap({
     required ContentService content,
@@ -39,6 +42,18 @@ class OrchestrationBootstrapper {
     );
     if (issues.isNotEmpty) {
       throw StateError('Invalid competency framework:\n${issues.join('\n')}');
+    }
+    final missionCatalog = content.missionCatalog();
+    if (missionCatalog == null) {
+      throw StateError('Mission catalog was not preloaded');
+    }
+    final missionIssues = missionValidator.validate(
+      missionCatalog,
+      framework: framework,
+      knownContentIds: content.knownContentIds(),
+    );
+    if (missionIssues.isNotEmpty) {
+      throw StateError('Invalid mission catalog:\n${missionIssues.join('\n')}');
     }
 
     final current = store.framework();

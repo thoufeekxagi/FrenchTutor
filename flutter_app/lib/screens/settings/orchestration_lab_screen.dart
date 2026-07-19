@@ -59,6 +59,8 @@ class _OrchestrationLabScreenState
       canSpeakAloud: _persona.canSpeakAloud,
       networkAvailable: _persona.networkAvailable,
       goal: 'tef_canada',
+      missionCatalog: ref.read(contentServiceProvider).missionCatalog(),
+      learnerLevel: _persona.level.toLowerCase(),
     );
     if (!mounted) return;
     setState(() {
@@ -271,7 +273,8 @@ class _OrchestrationLabScreenState
                   const SizedBox(height: DesignTokens.space3),
                   Semantics(
                     button: true,
-                    label: 'Persist competency states and generate today\'s plan',
+                    label:
+                        'Persist competency states and generate today\'s plan',
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: _persisting ? null : _persistSnapshot,
@@ -319,12 +322,13 @@ class _OrchestrationLabScreenState
                       ).copyWith(color: DesignTokens.slateDim),
                     ),
                   ],
-                  if (_persistedStates case final states? when states.isNotEmpty) ...[
+                  if (_persistedStates case final states?
+                      when states.isNotEmpty) ...[
                     const SizedBox(height: DesignTokens.space3),
-                    for (final state in [...states]
-                      ..sort(
-                        (a, b) => b.evidenceCount.compareTo(a.evidenceCount),
-                      ))
+                    for (final state
+                        in [...states]..sort(
+                          (a, b) => b.evidenceCount.compareTo(a.evidenceCount),
+                        ))
                       Padding(
                         padding: const EdgeInsets.only(
                           bottom: DesignTokens.space1,

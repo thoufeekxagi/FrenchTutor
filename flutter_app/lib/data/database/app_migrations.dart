@@ -60,6 +60,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   5: _migrationV5,
   6: _migrationV6,
   7: _migrationV7,
+  8: _migrationV8,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -555,4 +556,10 @@ void _migrationV6(CommonDatabase db) {
 /// additive — never a migration that has to reconcile existing rows.
 void _migrationV7(CommonDatabase db) {
   db.execute('ALTER TABLE profiles ADD COLUMN referred_by_code TEXT');
+}
+
+void _migrationV8(CommonDatabase db) {
+  db.execute(
+    "ALTER TABLE plan_tasks ADD COLUMN modality TEXT NOT NULL DEFAULT 'reading_recognition'",
+  );
 }

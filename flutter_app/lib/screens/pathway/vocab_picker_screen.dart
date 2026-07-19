@@ -25,7 +25,9 @@ enum _PickerMode { auto, category }
 /// green check and are excluded from Auto mode by default, though they can still be manually
 /// re-picked. Ported from VocabPickerView.swift.
 class VocabPickerScreen extends ConsumerStatefulWidget {
-  const VocabPickerScreen({super.key});
+  const VocabPickerScreen({super.key, this.preferredEntryIds});
+
+  final List<String>? preferredEntryIds;
 
   @override
   ConsumerState<VocabPickerScreen> createState() => _VocabPickerScreenState();
@@ -48,8 +50,22 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
 
   List<VocabPhase> get _allPhases => ContentService.shared.vocabPhases;
 
-  Future<List<VocabEntry>> get _autoQueue =>
-      SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
+  Future<List<VocabEntry>> get _autoQueue async {
+    final preferredIds = widget.preferredEntryIds;
+    if (preferredIds != null) {
+      final byId = {
+        for (final entry in _allPhases.expand(
+          (phase) => phase.themes.expand((theme) => theme.entries),
+        ))
+          entry.id: entry,
+      };
+      return preferredIds
+          .map((id) => byId[id])
+          .whereType<VocabEntry>()
+          .toList();
+    }
+    return SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
+  }
 
   /// Today's interrupted session, if any — planned words minus practiced ones.
   /// Non-null makes the "continue where you left off" card appear up top; the
@@ -164,24 +180,27 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               child: Column(
                 children: [
                   if (_resumable case final resumable?) _resumeCard(resumable),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      DesignTokens.screenMargin,
-                      DesignTokens.space3,
-                      DesignTokens.screenMargin,
-                      0,
+                  if (widget.preferredEntryIds == null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        DesignTokens.screenMargin,
+                        DesignTokens.space3,
+                        DesignTokens.screenMargin,
+                        0,
+                      ),
+                      child: PSSegmented<_PickerMode>(
+                        segments: const [
+                          (value: _PickerMode.auto, label: 'Recommended'),
+                          (value: _PickerMode.category, label: 'By category'),
+                        ],
+                        selected: _mode,
+                        onChanged: (mode) => setState(() => _mode = mode),
+                      ),
                     ),
-                    child: PSSegmented<_PickerMode>(
-                      segments: const [
-                        (value: _PickerMode.auto, label: 'Recommended'),
-                        (value: _PickerMode.category, label: 'By category'),
-                      ],
-                      selected: _mode,
-                      onChanged: (mode) => setState(() => _mode = mode),
-                    ),
-                  ),
                   Expanded(
-                    child: _mode == _PickerMode.auto
+                    child:
+                        widget.preferredEntryIds != null ||
+                            _mode == _PickerMode.auto
                         ? _autoBody()
                         : _categoryBody(),
                   ),
@@ -261,7 +280,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               ),
               const SizedBox(height: DesignTokens.space3),
               Text(
-                'Due reviews come first, followed by new words in curriculum order. Marie can prioritize this real queue before practice starts.',
+                widget.preferredEntryIds == null
+                    ? 'Due reviews come first, followed by new words in curriculum order. Marie can prioritize this real queue before practice starts.'
+                    : 'These words were selected for your current mission. Finish them before moving to the next mission step.',
                 style: DesignTokens.body(
                   15,
                 ).copyWith(color: DesignTokens.slateDim, height: 1.45),
@@ -334,9 +355,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                           spacing: 8,
                           runSpacing: 8,
                           children: phase.themes
-                              .map(
-                                (theme) => _categoryChip(theme, chipWidth),
-                              )
+                              .map((theme) => _categoryChip(theme, chipWidth))
                               .toList(),
                         );
                       },
@@ -431,67 +450,67 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               ),
               child: Column(
                 children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
-                  child: Row(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setSheetState(() {
-                            setState(() {
-                              if (allSelected) {
-                                for (final e in theme.entries) {
-                                  _manualSelection.remove(e.id);
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
+                    child: Row(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            setSheetState(() {
+                              setState(() {
+                                if (allSelected) {
+                                  for (final e in theme.entries) {
+                                    _manualSelection.remove(e.id);
+                                  }
+                                } else {
+                                  for (final e in theme.entries) {
+                                    _manualSelection.add(e.id);
+                                  }
                                 }
-                              } else {
-                                for (final e in theme.entries) {
-                                  _manualSelection.add(e.id);
-                                }
-                              }
+                              });
                             });
-                          });
-                        },
-                        child: Text(
-                          allSelected ? 'Deselect All' : 'Select All',
+                          },
+                          child: Text(
+                            allSelected ? 'Deselect All' : 'Select All',
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        theme.title,
-                        style: DesignTokens.display(
-                          15,
-                          weight: FontWeight.w500,
+                        const Spacer(),
+                        Text(
+                          theme.title,
+                          style: DesignTokens.display(
+                            15,
+                            weight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Done'),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    controller: scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 14,
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Done'),
+                        ),
+                      ],
                     ),
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 170,
-                          mainAxisExtent: 56,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
-                    itemCount: theme.entries.length,
-                    itemBuilder: (context, i) {
-                      final entry = theme.entries[i];
-                      return _wordChip(entry, setSheetState);
-                    },
                   ),
-                ),
+                  Expanded(
+                    child: GridView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 14,
+                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 170,
+                            mainAxisExtent: 56,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                      itemCount: theme.entries.length,
+                      itemBuilder: (context, i) {
+                        final entry = theme.entries[i];
+                        return _wordChip(entry, setSheetState);
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -8,10 +8,11 @@ tier is DONE only when every acceptance criterion in it passes — no half-done 
 carried forward silently. When implementation deviates from this doc, update the doc
 in the same commit.
 
-**North-star for the pilot:** a paying beginner anywhere in the world can rely on one
-daily loop — learn a little, speak it with a tutor, resume exactly where they stopped —
-without ever hearing a language they didn't ask for, hitting a dead session, or waiting
-on a spinner long enough to wonder if the app froze.
+**North-star for the pilot:** a learner can rely on one evidence-backed daily mission:
+practice a practical French ability at the right level, speak it with a tutor, resume
+exactly where they stopped, and see real evidence shape the next mission — without ever
+hearing a language they did not ask for, hitting a dead session, or waiting on a spinner
+long enough to wonder if the app froze.
 
 ---
 

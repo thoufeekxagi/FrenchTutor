@@ -196,4 +196,32 @@ class AuthService {
       // client-side, which is what matters for the UI.
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Account deletion (Apple Guideline 5.1.1(v) — must be reachable in-app).
+  // ---------------------------------------------------------------------------
+
+  /// Permanently deletes the signed-in user's Supabase account via the
+  /// `delete-account` edge function. Unlike [signOut], failure here must be
+  /// surfaced to the caller — the UI should not wipe local data or sign the
+  /// user out unless this actually succeeds server-side, or a deleted-locally
+  /// but still-live-remotely account could be left behind.
+  Future<AuthResult> deleteAccount() async {
+    try {
+      final response = await _client.functions.invoke('delete-account');
+      if (response.status != 200) {
+        final error = response.data is Map ? response.data['error'] : null;
+        return AuthResult.failure(
+          error?.toString() ?? 'Account deletion failed (${response.status}).',
+        );
+      }
+      return AuthResult.success;
+    } on FunctionException catch (e) {
+      return AuthResult.failure(
+        e.details?.toString() ?? 'Account deletion failed: ${e.reasonPhrase}',
+      );
+    } catch (e) {
+      return AuthResult.failure('Account deletion failed: $e');
+    }
+  }
 }

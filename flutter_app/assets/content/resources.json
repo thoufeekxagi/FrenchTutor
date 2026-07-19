@@ -12,8 +12,20 @@
   ],
   "speakingTopics": [
     {
-      "id": "introduce_yourself",
+      "id": "introduce_yourself_a1",
       "title": "Introduce yourself",
+      "promptFr": "Dites votre prénom, votre pays et une information simple sur vous.",
+      "hints": ["Je m'appelle…", "Je viens de…", "J'habite à…"]
+    },
+    {
+      "id": "order_at_a_cafe_a2",
+      "title": "Order at a café",
+      "promptFr": "Commandez une boisson et quelque chose à manger. Demandez le prix et remerciez la personne.",
+      "hints": ["Je voudrais…", "C'est combien ?", "Merci beaucoup."]
+    },
+    {
+      "id": "introduce_yourself",
+      "title": "Introduce yourself professionally",
       "promptFr": "Présentez-vous : votre nom, votre origine, votre travail, votre famille.",
       "hints": ["Je m'appelle…", "Je viens de…", "Je travaille comme…", "Ma famille…"]
     },

@@ -17,7 +17,7 @@ import '../history/history_screen.dart';
 import '../notes/notes_review_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
-import 'daily_pathway_widget.dart';
+import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -81,7 +81,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 _header(),
                 const SizedBox(height: 22),
-                DailyPathwayWidget(onProgress: _reload),
+                TodayMissionWidget(onProgress: _reload),
                 if (_summary?.hasActivity == true) ...[
                   const SizedBox(height: 12),
                   DailySummaryCard(summary: _summary!),

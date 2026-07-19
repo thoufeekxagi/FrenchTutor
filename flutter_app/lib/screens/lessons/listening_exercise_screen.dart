@@ -11,6 +11,16 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/lesson_qa_overlay.dart';
 import '../../widgets/marie_toolbar_button.dart';
 
+class ListeningExerciseResult {
+  const ListeningExerciseResult({
+    required this.correct,
+    required this.attempted,
+  });
+
+  final int correct;
+  final int attempted;
+}
+
 class ListeningExerciseScreen extends ConsumerStatefulWidget {
   const ListeningExerciseScreen({super.key, required this.exercise});
 
@@ -413,6 +423,12 @@ class _ListeningExerciseScreenState
       _score >= 0.6 ? 'completed' : 'in_progress',
       score: _score,
     );
-    Navigator.pop(context);
+    Navigator.pop(
+      context,
+      ListeningExerciseResult(
+        correct: (_score * exercise.questions.length).round(),
+        attempted: exercise.questions.length,
+      ),
+    );
   }
 }

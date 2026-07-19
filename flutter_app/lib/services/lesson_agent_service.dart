@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../config/api_keys.dart';
 import '../models/content_models.dart';
+import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -159,9 +160,7 @@ class LessonAgentService {
       'English, and stay on the task. CONTENT POLICY: ABSOLUTE: keep every reply '
       'family-friendly; never use profanity, slurs, or sexual, violent, hateful, or '
       'otherwise inappropriate language; if the student\'s text contains offensive '
-      'content, never repeat it, respond calmly and stay on the lesson. '
-      'STYLE RULE: never use em dashes in any output; use commas, colons, or '
-      'periods instead.';
+      'content, never repeat it, respond calmly and stay on the lesson.';
 
   /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
   /// Google's newest Flash-Lite so we inherit upgrades for free.
@@ -476,6 +475,36 @@ Write 4-8 beats in scene order (greeting → request → follow-up → thanks/go
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
+      ],
+      maxTokens: 1400,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  Future<ReadingPassage> buildMissionRoleplay({
+    required String missionTitle,
+    required String scenario,
+    required String levelBand,
+    required String missionContext,
+    required String speakingPrompt,
+    required List<String> hints,
+  }) async {
+    const system = '''
+Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              '''
+MISSION: $missionTitle
+SCENARIO: $scenario
+LEVEL: $levelBand
+MISSION CONTEXT: $missionContext
+SPEAKING PROMPT: $speakingPrompt
+USEFUL STARTERS: ${hints.join('; ')}''',
+        },
       ],
       maxTokens: 1400,
     );
@@ -802,7 +831,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
               .join() ??
           '';
       if (text.isEmpty) throw AgentError.badResponse;
-      return text.trim();
+      return normalizeGeneratedText(text);
     } catch (e) {
       if (e is AgentError) rethrow;
       throw AgentError.badResponse;
@@ -862,7 +891,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       final message = first?['message'] as Map<String, dynamic>?;
       final content = message?['content'] as String?;
       if (content == null || content.isEmpty) throw AgentError.badResponse;
-      return content.trim();
+      return normalizeGeneratedText(content);
     } catch (e) {
       if (e is AgentError) rethrow;
       throw AgentError.badResponse;
