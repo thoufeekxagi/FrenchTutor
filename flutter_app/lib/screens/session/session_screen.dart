@@ -18,6 +18,7 @@ import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/mic_mode.dart';
+import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
@@ -163,7 +164,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
   }
 
-  void _startCall() {
+  Future<void> _startCall() async {
+    final accepted = await AiVoiceDisclosure.ensureAccepted(context);
+    if (!mounted) return;
+    if (!accepted) {
+      Navigator.of(context).maybePop();
+      return;
+    }
     _gemini.connect();
   }
 

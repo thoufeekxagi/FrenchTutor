@@ -24,6 +24,7 @@ import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
@@ -172,6 +173,16 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       setState(() => _micMode = saved);
     });
     _setupCallbacks();
+    _startCallWithConsent();
+  }
+
+  Future<void> _startCallWithConsent() async {
+    final accepted = await AiVoiceDisclosure.ensureAccepted(context);
+    if (!mounted) return;
+    if (!accepted) {
+      Navigator.of(context).maybePop();
+      return;
+    }
     _gemini.connect();
   }
 
