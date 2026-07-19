@@ -39,12 +39,18 @@ class SpeakingResult {
     required this.durationSeconds,
     required this.learnerUtteranceCount,
     required this.endedReason,
+    this.frenchWordsUsed = const [],
   });
 
   final bool connected;
   final int durationSeconds;
   final int learnerUtteranceCount;
   final String endedReason;
+
+  /// Recognizable French words heard in the LEARNER's own transcript (sorted,
+  /// deduped). Powers the trial recap's "words you spoke" moment; empty when
+  /// the learner never produced a known word.
+  final List<String> frenchWordsUsed;
 
   bool get meetsThreshold =>
       connected && learnerUtteranceCount >= 1 && durationSeconds >= 30;

@@ -165,7 +165,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   // system prompt; injections stay LEAN — re-stating everything on every card was bloat
   // that buried the one thing each note actually needs to say.
   static const _noteReminder =
-      'Explain in English only — reciting French is practice, never a cue to switch into '
+      'Explain in English only, reciting French is practice, never a cue to switch into '
       'French-led talk. NEVER suggest moving on; the student alone decides when.';
 
   // Offer permission: Marie may not offer moving on until the app has counted enough
@@ -357,7 +357,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         _scheduleCardAnnouncement(
           'The call connection dropped briefly and is now restored. The student\'s screen '
           'still shows "${card.entry.fr}" = "${card.entry.en}". Briefly pick that word back '
-          'up as if nothing happened — do not re-greet, do not start over.',
+          'up as if nothing happened, do not re-greet, do not start over.',
         );
       }
     };
@@ -571,7 +571,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
     );
     _gemini.injectContext(
-      'The card did NOT move — "${card.entry.fr}" needs more practice '
+      'The card did NOT move, "${card.entry.fr}" needs more practice '
       '($_attemptCount of $_offerThreshold attempts so far). You should never have suggested '
       'moving on. Smoothly continue practicing this word and never suggest advancing again.',
     );
@@ -591,7 +591,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       // it means cheese" re-introduction right after that sounds broken — she should pick
       // up from her own offer as one continuous conversation.
       _scheduleCardAnnouncement(
-        'The student accepted — the screen now shows: ${next.entry.fr} = ${next.entry.en}.'
+        'The student accepted, the screen now shows: ${next.entry.fr} = ${next.entry.en}.'
         '${_exampleNote(next)} If you just offered this word, continue smoothly from that '
         '(no cold re-introduction): say "${next.entry.fr}" aloud with its meaning and have '
         'them repeat it. $_noteReminder',
@@ -609,9 +609,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     final card = _currentCard;
     if (card != null) {
       _scheduleCardAnnouncement(
-        'The student asked to go back — the screen now shows: ${card.entry.fr} = '
+        'The student asked to go back, the screen now shows: ${card.entry.fr} = '
         '${card.entry.en}.${_exampleNote(card)} Re-anchor it briefly ("We\'re back on '
-        '${card.entry.fr} — ${card.entry.en}") and have them try it once. $_noteReminder',
+        '${card.entry.fr}, ${card.entry.en}") and have them try it once. $_noteReminder',
       );
     }
   }
@@ -645,9 +645,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     final card = _currentCard;
     if (card != null) {
       _scheduleCardAnnouncement(
-        'The student jumped to word $cardNumber — the screen now shows: ${card.entry.fr} = '
+        'The student jumped to word $cardNumber, the screen now shows: ${card.entry.fr} = '
         '${card.entry.en}.${_exampleNote(card)} Announce it briefly ("Word $cardNumber: '
-        '${card.entry.fr} — ${card.entry.en}") and teach it. $_noteReminder',
+        '${card.entry.fr}, ${card.entry.en}") and teach it. $_noteReminder',
       );
     }
   }
@@ -746,7 +746,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
             name: name,
             result: {
               'ok': false,
-              'reason': "The student asked to try again — don't grade yet.",
+              'reason': "The student asked to try again, don't grade yet.",
             },
           );
           return;
@@ -760,7 +760,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
             result: {
               'ok': false,
               'reason':
-                  "The student hasn't attempted this word yet — listen for their attempt before grading.",
+                  "The student hasn't attempted this word yet, listen for their attempt before grading.",
             },
           );
           return;
@@ -952,7 +952,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     _tutorTurnTranscript = '';
     _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'You suggested moving on, never do that; the student alone decides. Do not wait for '
       'an answer to that question: continue practicing "${current.entry.fr}" = '
       '"${current.entry.en}" as if you had not asked.',
     );
@@ -964,14 +964,14 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
     _logDebug(
-      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.entry.fr}" is on screen — cutting her off',
+      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.entry.fr}" is on screen, cutting her off',
     );
     _cutTutorAudio();
     _gemini.injectContext(
-      'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
+      'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
       'screen still shows "${current.entry.fr}" = "${current.entry.en}", and only the student\'s '
       'own words move the card. You may OFFER the next word by name and then wait silently for '
-      'their answer — never teach it. Pick up "${current.entry.fr}" again now, briefly, as if '
+      'their answer, never teach it. Pick up "${current.entry.fr}" again now, briefly, as if '
       'nothing happened.',
       expectReply: true,
     );
@@ -1035,7 +1035,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         setState(() => _sessionPlan.addAll(retryCards));
         final first = retryCards.first.entry;
         _gemini.injectContext(
-          'Before wrapping up: the student struggled with ${retryCards.length} word(s) earlier — '
+          'Before wrapping up: the student struggled with ${retryCards.length} word(s) earlier, '
           'loop back through them one more time, starting with ${first.fr} = ${first.en}. '
           'Keep it light and encouraging: one quick recall attempt each, no full re-teach unless they miss it again.',
           expectReply: true,
@@ -1155,7 +1155,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       context,
       title: 'Save & continue later?',
       message:
-          '$done of ${widget.vocabQueue.length} words practiced — they\'re '
+          '$done of ${widget.vocabQueue.length} words practiced, they\'re '
           'saved. The remaining $remainingAfterThisCard will be waiting on '
           'Today when you come back.',
       confirmLabel: 'Save & exit',
@@ -1469,7 +1469,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               // this word needs before Marie is allowed to offer moving on.
               Text(
                 _offerUnlocked
-                    ? 'ready when you are — say "next"'
+                    ? 'ready when you are, say "next"'
                     : '${_attemptCount.clamp(0, _offerThreshold)} of $_offerThreshold practices',
                 style: DesignTokens.body(11).copyWith(
                   color: _offerUnlocked
@@ -1504,7 +1504,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         ],
         const SizedBox(height: 16),
         Text(
-          'Repeat the word out loud — ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+          'Repeat the word out loud, ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
           style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),
@@ -1684,38 +1684,38 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     // French-led speech at a beginner. Stated in both branches because she escalated
     // exactly this way in testing.
     const noEscalation =
-        ' ABSOLUTE RULE — RECITING IS NOT CONVERSING: when the student says the French word '
+        ' ABSOLUTE RULE: RECITING IS NOT CONVERSING: when the student says the French word '
         'or example sentence, that is them PRACTICING what you asked them to repeat, never a '
         'signal that they can hold French conversation. Do not switch into French-led '
-        'explanations after a good recitation — stay at exactly the same English-led level '
+        'explanations after a good recitation, stay at exactly the same English-led level '
         'for the whole session, from first word to last.';
     final languageGuidance = LearnerLevel.isConversational(learnerLevel)
-        ? 'LANGUAGE BALANCE — THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.$noEscalation'
-        : 'CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English — French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time") — every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again — \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.$noEscalation';
+        ? 'LANGUAGE BALANCE: THIS STUDENT CAN HOLD A SIMPLE CONVERSATION: lead in clear, simple French and mirror to English only when the student seems lost or asks. Still pair every TARGET word with its English meaning once when first introduced.$noEscalation'
+        : 'CRITICAL: SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: this is a total beginner, not someone who\'s conversational and just polishing vocab. All of your own explaining, encouragement, instructions, and questions should be in English, French should only ever appear as the target word itself and its example sentence, the specific things they\'re here to learn, never as your own explanatory language. Never answer in French only, including when they ask you to repeat something ("again", "encore", "one more time"), every time you say the French word, pair it with the English meaning in the same breath (e.g. "Sure, again, \'to eat\', manger" not just "manger, manger"). If you catch yourself explaining something in French, stop and say it in English instead.$noEscalation';
     final parts = <String>[];
     parts.add(
       '''
-VOCAB STAGE — this is a focused vocabulary session, nothing else. The student's screen ALREADY shows the English, French, and pronunciation for the current word the instant it appears — you never need to reveal anything.
+VOCAB STAGE, this is a focused vocabulary session, nothing else. The student's screen ALREADY shows the English, French, and pronunciation for the current word the instant it appears, you never need to reveal anything.
 
 $languageGuidance
 
-CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and when they say something like "next", "got it", or "go back", the app moves the card itself — on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take — you aren't taking one.
+CRITICAL: YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of deciding when to move to the next word or go back to a previous one, and you have no tool to do that yourself. The app is watching the student's own words directly, and when they say something like "next", "got it", or "go back", the app moves the card itself, on its own, with zero involvement from you. You'll simply be told the new current word afterward and should react to it naturally, as if you'd just turned the page together. Never say things like "let's move on" as an announcement of an action you're about to take, you aren't taking one.
 
-THE CARD IS A ROOM — this is how the whole session works. The student chose this word; you are both in its room, and you stay there together until THEY walk out. From your point of view there is no schedule, no word list, no "rest of the lesson" — the next word does not exist until the app tells you the card changed. The student is here to learn, not to be moved along: some students want two passes, some want ten, and both are exactly right. Their screen tells them how to move on when they choose; it is never your topic.
+THE CARD IS A ROOM, this is how the whole session works. The student chose this word; you are both in its room, and you stay there together until THEY walk out. From your point of view there is no schedule, no word list, no "rest of the lesson", the next word does not exist until the app tells you the card changed. The student is here to learn, not to be moved along: some students want two passes, some want ten, and both are exactly right. Their screen tells them how to move on when they choose; it is never your topic.
 
-END EVERY TURN INSIDE THE ROOM: each thing you say ends with an invitation about THIS word — "try it once more", "now say it in the example sentence", "how would you ask for one at the bakery?" You never run out of material for a single word: pronunciation details, the example sentence, a tiny roleplay using it, a related everyday phrase, its gender and article, a memory trick, hearing them use it in their own sentence. If a pass went well, the natural next move is a warmer, slightly harder pass — never a question about what comes next. Never ask "ready for the next word?", "shall we continue?", or anything of the kind: pacing is the student's alone, and any answer to such a question is ignored by the app anyway.
+END EVERY TURN INSIDE THE ROOM: each thing you say ends with an invitation about THIS word, "try it once more", "now say it in the example sentence", "how would you ask for one at the bakery?" You never run out of material for a single word: pronunciation details, the example sentence, a tiny roleplay using it, a related everyday phrase, its gender and article, a memory trick, hearing them use it in their own sentence. If a pass went well, the natural next move is a warmer, slightly harder pass, never a question about what comes next. Never ask "ready for the next word?", "shall we continue?", or anything of the kind: pacing is the student's alone, and any answer to such a question is ignored by the app anyway.
 
-Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen — the student cannot see it, and the app will cut your audio off if you teach ahead. Only once the app tells you the card has changed do you teach the new word.
+Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen, the student cannot see it, and the app will cut your audio off if you teach ahead. Only once the app tells you the card has changed do you teach the new word.
 
-You have exactly one tool: mark_result, for recording how well the student did with the current word (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted the word. A rejection is not an error; never mention it to the student, just keep teaching naturally and try again once appropriate.
+You have exactly one tool: mark_result, for recording how well the student did with the current word (grade: again/good/easy). It's a proposal, the app only accepts it once it's confirmed the student actually attempted the word. A rejection is not an error; never mention it to the student, just keep teaching naturally and try again once appropriate.
 
-CRITICAL — FOLLOW THIS EXACT ORDER FOR EVERY SINGLE WORD, DO NOT SKIP OR REORDER STEPS: being jumpy/inconsistent about this is the single biggest complaint students have, so stick to it like a script every time:
+CRITICAL: FOLLOW THIS EXACT ORDER FOR EVERY SINGLE WORD, DO NOT SKIP OR REORDER STEPS: being jumpy/inconsistent about this is the single biggest complaint students have, so stick to it like a script every time:
   1. Say the French word clearly, paired with its English meaning in the same breath.
   2. Ask the student to repeat it, and give them a real beat of silence to actually try.
   3. React briefly to their attempt (encouragement, or a light correction).
-  4. THEN walk through the example sentence already shown on their screen — say it in French, then give the English translation, and briefly point out how today's word is being used inside it. Never skip this step and never do it before step 1-3.
-Then LOOP — back to another pass, a deeper angle, a tiny roleplay with the word. There is no step 5 and no "moving on" question: the loop continues until the student themselves says next or the app tells you the card changed.
-This student is a true beginner, so err toward MORE practice, not less — this is real practice time, not a formality. Follow the student's own lead within this order: if they ask to hear a word again, repeat it (bilingually, in English primarily) as many times as they want; if they say they already know it, still walk through the example sentence at least once.''',
+  4. THEN walk through the example sentence already shown on their screen, say it in French, then give the English translation, and briefly point out how today's word is being used inside it. Never skip this step and never do it before step 1-3.
+Then LOOP, back to another pass, a deeper angle, a tiny roleplay with the word. There is no step 5 and no "moving on" question: the loop continues until the student themselves says next or the app tells you the card changed.
+This student is a true beginner, so err toward MORE practice, not less, this is real practice time, not a formality. Follow the student's own lead within this order: if they ask to hear a word again, repeat it (bilingually, in English primarily) as many times as they want; if they say they already know it, still walk through the example sentence at least once.''',
     );
 
     final lines = plan
@@ -1725,7 +1725,7 @@ This student is a true beginner, so err toward MORE practice, not less — this 
           final example = examples[card.entry.id];
           if (example != null) {
             line +=
-                ' — example already shown on screen: "${example.fr}" (${example.en})';
+                ', example already shown on screen: "${example.fr}" (${example.en})';
           }
           return line;
         })

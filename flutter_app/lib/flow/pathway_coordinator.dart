@@ -562,7 +562,7 @@ class PathwayCoordinator {
     final sceneTitle = _persistedPassage()?.title;
     if (sceneTitle != null && sceneTitle.isNotEmpty) {
       parts.add(
-        'Scenario already rehearsed in the listening stage: "$sceneTitle" — '
+        'Scenario already rehearsed in the listening stage: "$sceneTitle", '
         'REUSE this scenario (or a natural variation of it) so the student gets to '
         'perform it for real; you play the other character.',
       );

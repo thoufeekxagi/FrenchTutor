@@ -221,8 +221,8 @@ class ProgressService {
     final streakDays = streak();
     lines.add(
       streakDays > 0
-          ? "On a $streakDays-day study streak — keep the momentum, don't restate the basics."
-          : "No active streak right now — a little extra encouragement helps.",
+          ? "On a $streakDays-day study streak, keep the momentum, don't restate the basics."
+          : "No active streak right now, a little extra encouragement helps.",
     );
 
     return lines.join(' ');

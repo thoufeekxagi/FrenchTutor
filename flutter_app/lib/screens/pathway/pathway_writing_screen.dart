@@ -388,8 +388,8 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                                 const SizedBox(height: DesignTokens.space2),
                                 Text(
                                   _hintsUsed == 1
-                                      ? 'Used 1 hint — counted as guided, not unaided.'
-                                      : 'Used $_hintsUsed hints — counted as guided, not unaided.',
+                                      ? 'Used 1 hint, counted as guided, not unaided.'
+                                      : 'Used $_hintsUsed hints, counted as guided, not unaided.',
                                   style: DesignTokens.body(12).copyWith(
                                     color: DesignTokens.slateDim,
                                   ),

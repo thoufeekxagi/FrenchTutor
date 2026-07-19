@@ -124,7 +124,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
   // One compact line appended to every card-change note — full rules live in the system
   // prompt; injections stay lean.
   static const _noteReminder =
-      'Explain in English, keep grammar simple — reciting French is practice, never a cue to '
+      'Explain in English, keep grammar simple, reciting French is practice, never a cue to '
       'switch into French-led talk. NEVER suggest moving on; the student alone decides.';
 
   _GrammarSessionCard? get _currentCard =>
@@ -144,7 +144,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
       stage: 'grammar',
-      topic: 'Grammar — ${widget.tenseTitle}',
+      topic: 'Grammar, ${widget.tenseTitle}',
     );
     _sessionPlan = widget.cards.map((c) => _GrammarSessionCard(c)).toList();
     final context = _buildContext(
@@ -267,7 +267,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         _scheduleCardAnnouncement(
           'The call connection dropped briefly and is now restored. The student\'s screen '
           'still shows the sentence "${card.card.fr}" (${card.card.en}). Briefly pick it '
-          'back up as if nothing happened — do not re-greet, do not start over. $_noteReminder',
+          'back up as if nothing happened, do not re-greet, do not start over. $_noteReminder',
         );
       }
     };
@@ -450,7 +450,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
     );
     _gemini.injectContext(
-      'The card did NOT move — "${card.card.fr}" needs more practice. You should never have '
+      'The card did NOT move, "${card.card.fr}" needs more practice. You should never have '
       'suggested moving on. Smoothly continue practicing this sentence and never suggest '
       'advancing again.',
     );
@@ -464,7 +464,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     final next = _currentCard;
     if (next != null) {
       _scheduleCardAnnouncement(
-        'The student accepted — the screen now shows: "${next.card.fr}" (${next.card.en}). '
+        'The student accepted, the screen now shows: "${next.card.fr}" (${next.card.en}). '
         'Grammar note: ${next.card.note} If you just offered this sentence, continue smoothly '
         'from that (no cold re-introduction): say it aloud and have them repeat. $_noteReminder',
       );
@@ -481,7 +481,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     final card = _currentCard;
     if (card != null) {
       _scheduleCardAnnouncement(
-        'The student asked to go back — the screen now shows: "${card.card.fr}" '
+        'The student asked to go back, the screen now shows: "${card.card.fr}" '
         '(${card.card.en}). Grammar note: ${card.card.note} Re-anchor it briefly and have '
         'them try it once. $_noteReminder',
       );
@@ -515,7 +515,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     final card = _currentCard;
     if (card != null) {
       _scheduleCardAnnouncement(
-        'The student jumped to sentence $cardNumber — the screen now shows: "${card.card.fr}" '
+        'The student jumped to sentence $cardNumber, the screen now shows: "${card.card.fr}" '
         '(${card.card.en}). Grammar note: ${card.card.note} Announce it briefly, then teach '
         'it. $_noteReminder',
       );
@@ -594,7 +594,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
             name: name,
             result: {
               'ok': false,
-              'reason': "The student asked to try again — don't grade yet.",
+              'reason': "The student asked to try again, don't grade yet.",
             },
           );
           return;
@@ -770,7 +770,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     _tutorTurnTranscript = '';
     _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'You suggested moving on, never do that; the student alone decides. Do not wait for '
       'an answer to that question: continue practicing "${current.card.fr}" (${current.card.en}) as if you had not asked.',
     );
   }
@@ -781,14 +781,14 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
     _logDebug(
-      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.card.fr}" is on screen — cutting her off',
+      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.card.fr}" is on screen, cutting her off',
     );
     _cutTutorAudio();
     _gemini.injectContext(
-      'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
+      'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
       'screen still shows "${current.card.fr}" (${current.card.en}), and only the student\'s own '
       'words move the card. You may OFFER the next sentence and then wait silently for their '
-      'answer — never teach it. Pick up "${current.card.fr}" again now, briefly, as if nothing '
+      'answer, never teach it. Pick up "${current.card.fr}" again now, briefly, as if nothing '
       'happened.',
       expectReply: true,
     );
@@ -1014,7 +1014,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
           child: Column(
             children: [
               Text(
-                'Grammar — ${widget.tenseTitle}',
+                'Grammar, ${widget.tenseTitle}',
                 style: DesignTokens.display(19, weight: FontWeight.w600),
               ),
               const SizedBox(height: 2),
@@ -1126,7 +1126,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         ],
         const SizedBox(height: 16),
         Text(
-          'Say the sentence out loud — ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+          'Say the sentence out loud, ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
           style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),
@@ -1298,29 +1298,29 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     }
     final parts = <String>[];
     parts.add('''
-GRAMMAR STAGE — this is a focused grammar session on ONE tense/topic ("$tenseTitle"), walked through one short French sentence at a time, exactly like the vocab session that just happened but for a full sentence instead of a single word. The student's screen ALREADY shows the English meaning, the French sentence, and a grammar note the instant it appears — you never need to reveal anything.
+GRAMMAR STAGE, this is a focused grammar session on ONE tense/topic ("$tenseTitle"), walked through one short French sentence at a time, exactly like the vocab session that just happened but for a full sentence instead of a single word. The student's screen ALREADY shows the English meaning, the French sentence, and a grammar note the instant it appears, you never need to reveal anything.
 
-CRITICAL — SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of your own explaining, encouragement, instructions, and questions should be in English — French should only appear as the sentence itself, never as your own explanatory language.
+CRITICAL: SPEAK PRIMARILY IN ENGLISH, THIS STUDENT DOES NOT SPEAK FRENCH YET: all of your own explaining, encouragement, instructions, and questions should be in English, French should only appear as the sentence itself, never as your own explanatory language.
 
-CRITICAL — YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go back. The app watches the student's own words directly and moves the card itself when they say something like "next" or "go back" — zero involvement from you. You'll simply be told the new current sentence afterward and should react to it naturally.
+CRITICAL: YOU DO NOT CONTROL PACING, THE STUDENT DOES: you have no tool to advance or go back. The app watches the student's own words directly and moves the card itself when they say something like "next" or "go back", zero involvement from you. You'll simply be told the new current sentence afterward and should react to it naturally.
 
-THE SENTENCE IS A ROOM — grammar is the hardest stage, so you go DEEPER here than anywhere else, and you never leave the current sentence until the student walks out. From your point of view there is no list and no next sentence; it does not exist until the app tells you the card changed. NEVER suggest moving on — not "ready for the next sentence?", not "shall we continue?", nothing, ever. The student decides alone; their screen tells them how. Never say, explain, or drill any sentence that is not the current card on screen — the student cannot see it, and the app will cut you off if you teach ahead.
+THE SENTENCE IS A ROOM, grammar is the hardest stage, so you go DEEPER here than anywhere else, and you never leave the current sentence until the student walks out. From your point of view there is no list and no next sentence; it does not exist until the app tells you the card changed. NEVER suggest moving on, not "ready for the next sentence?", not "shall we continue?", nothing, ever. The student decides alone; their screen tells them how. Never say, explain, or drill any sentence that is not the current card on screen, the student cannot see it, and the app will cut you off if you teach ahead.
 
-TEACH THE SENTENCE LIKE A WATCHMAKER — word by word, connection by connection:
+TEACH THE SENTENCE LIKE A WATCHMAKER, word by word, connection by connection:
   1. Say the full French sentence clearly, with its English meaning.
   2. Have them repeat the whole thing once; react warmly.
-  3. Now take it APART: walk through it word by word — what each word is, what it means alone, and HOW it connects to its neighbors (why this verb ending for this subject, why the article agrees, why the words sit in this order). One small piece per turn, in plain English, having them say each piece back.
+  3. Now take it APART: walk through it word by word, what each word is, what it means alone, and HOW it connects to its neighbors (why this verb ending for this subject, why the article agrees, why the words sit in this order). One small piece per turn, in plain English, having them say each piece back.
   4. Rebuild it: have them say the full sentence again now that they know how it works.
   5. Make it interactive and theirs: ask a micro-question about it ("which word makes it past tense?"), swap ONE word to show the pattern flexing (keeping the same tense and structure of THIS sentence), or ask them to answer a tiny question using it.
-END EVERY TURN INSIDE THE ROOM — with an invitation about THIS sentence: say it again, answer with it, spot the pattern in it. If a pass went well, go one layer deeper on the same sentence; there is always another layer. Keep every explanation to one small idea per turn — this student is a beginner, and grammar sticks through connection, not coverage.
+END EVERY TURN INSIDE THE ROOM, with an invitation about THIS sentence: say it again, answer with it, spot the pattern in it. If a pass went well, go one layer deeper on the same sentence; there is always another layer. Keep every explanation to one small idea per turn, this student is a beginner, and grammar sticks through connection, not coverage.
 
-You have exactly one tool: mark_drill_result, for recording whether the student's spoken answer to the current sentence was correct. It's a proposal — the app only accepts it once it's confirmed the student actually attempted the sentence. A rejection is not an error; never mention it, just keep teaching naturally.
+You have exactly one tool: mark_drill_result, for recording whether the student's spoken answer to the current sentence was correct. It's a proposal, the app only accepts it once it's confirmed the student actually attempted the sentence. A rejection is not an error; never mention it, just keep teaching naturally.
 ''');
     final lines = <String>[];
     for (var i = 0; i < plan.length; i++) {
       final session = plan[i];
       lines.add(
-        '${i + 1}. ${session.card.fr} = ${session.card.en} — ${session.card.note}',
+        '${i + 1}. ${session.card.fr} = ${session.card.en}, ${session.card.note}',
       );
     }
     parts.add("TODAY'S SENTENCES (${plan.length}):\n${lines.join('\n')}");

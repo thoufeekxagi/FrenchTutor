@@ -321,7 +321,7 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                   padding: const EdgeInsets.only(top: 12),
                   child: Text(
                     _graph.isDemo
-                        ? 'Every word you practice becomes a star on this map — brighter with every recall, connected to the words it lives with.'
+                        ? 'Every word you practice becomes a star on this map, brighter with every recall, connected to the words it lives with.'
                         : 'Larger, brighter words have more recall evidence. Lines connect words from the same topic or practice session.',
                     style: Passeport.body(
                       13,

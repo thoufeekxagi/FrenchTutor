@@ -248,7 +248,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
       _openSession(cards, title);
     } else if (timedOut) {
       _logDebug(
-        '→ TIMED OUT after ${_generationTimeout.inSeconds}s — no response from the LLM',
+        '→ TIMED OUT after ${_generationTimeout.inSeconds}s, no response from the LLM',
       );
       setState(
         () => _generationFailed =

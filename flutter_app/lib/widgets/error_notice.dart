@@ -35,7 +35,7 @@ class ErrorNotice extends StatelessWidget {
               children: [
                 Text(
                   'Microphone access is needed to practice speaking. Enable '
-                  'it in Settings, then come back — the session will pick up '
+                  'it in Settings, then come back, the session will pick up '
                   'right where you are.',
                   style: DesignTokens.body(
                     13,

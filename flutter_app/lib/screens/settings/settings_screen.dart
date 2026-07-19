@@ -321,7 +321,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   KickerText('Your tutor', color: Passeport.slateDim),
                   const SizedBox(height: 4),
                   Text(
-                    'Applies from your next call — a call in progress keeps '
+                    'Applies from your next call, a call in progress keeps '
                     'the tutor it started with.',
                     style: Passeport.body(
                       11,

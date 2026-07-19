@@ -60,7 +60,7 @@ class AuthService {
   Future<AuthResult> signInWithGoogle() async {
     if (!isGoogleConfigured) {
       return AuthResult.failure(
-        'Google sign-in isn\'t set up yet — use Apple or email for now.',
+        'Google sign-in isn\'t set up yet, use Apple or email for now.',
       );
     }
     try {

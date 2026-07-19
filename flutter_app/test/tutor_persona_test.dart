@@ -73,14 +73,14 @@ void main() {
         languageMix: 'gentle',
         voiceSpeed: 'slower',
       );
-      expect(gentle, contains('LANGUAGE MIX — GENTLE'));
+      expect(gentle, contains('LANGUAGE MIX: GENTLE'));
       expect(gentle, contains('speak noticeably slowly'));
       final immersive = LivePrompts.forSession(
         LiveSessionType.freeTalk,
         languageMix: 'immersive',
         voiceSpeed: 'faster',
       );
-      expect(immersive, contains('LANGUAGE MIX — IMMERSION'));
+      expect(immersive, contains('LANGUAGE MIX: IMMERSION'));
       expect(immersive, contains('brisk'));
       // Mix is a preference, never an override of stage rules.
       expect(immersive, contains('those win'));

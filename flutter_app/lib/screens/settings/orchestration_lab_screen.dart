@@ -75,7 +75,7 @@ class _OrchestrationLabScreenState
       actions: [
         for (final persona in developerPersonaScenarios)
           (
-            label: '${persona.name} — ${persona.summary}',
+            label: '${persona.name}, ${persona.summary}',
             value: persona,
             destructive: false,
           ),
@@ -330,7 +330,7 @@ class _OrchestrationLabScreenState
                           bottom: DesignTokens.space1,
                         ),
                         child: Text(
-                          '${state.competencyId} · ${state.modality.wireName} — '
+                          '${state.competencyId} · ${state.modality.wireName}, '
                           '${state.evidenceCount}x · mastery '
                           '${(state.masteryEstimate * 100).toStringAsFixed(0)}% · '
                           '${state.transferStatus.wireName}'

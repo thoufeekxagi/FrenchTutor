@@ -56,7 +56,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      completed ? 'Practice saved' : 'Good start—keep going',
+                      completed ? 'Practice saved' : 'Good start, keep going',
                       style: Passeport.display(30),
                     ),
                     const SizedBox(height: 10),

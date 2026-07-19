@@ -139,13 +139,13 @@ class _FlashcardSessionScreenState
         final foldedTarget = _fold(entry.fr);
         String hint;
         if (foldedTranscript.isEmpty) {
-          hint = "Didn't catch that — try again.";
+          hint = "Didn't catch that, try again.";
         } else if (foldedTranscript.contains(foldedTarget) ||
             foldedTarget.contains(foldedTranscript)) {
           hint = 'That matches the target.';
         } else {
           hint =
-              'Close — target: "${entry.fr}". This is just a hint, not graded.';
+              'Close, target: "${entry.fr}". This is just a hint, not graded.';
         }
         setState(() {
           _isListeningBack = false;

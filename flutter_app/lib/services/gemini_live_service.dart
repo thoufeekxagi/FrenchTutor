@@ -227,12 +227,12 @@ class GeminiLiveService {
     final profile = await _learnerProfile();
     if (profile.isNotEmpty) {
       prompt +=
-          '\n\nSTUDENT PROFILE — use this to calibrate level and pacing; never read it aloud:\n$profile';
+          '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$profile';
     }
     final ctx = lessonContext;
     if (ctx != null && ctx.isNotEmpty) {
       prompt +=
-          '\n\nLESSON CONTEXT — the student is currently studying this material; steer practice toward it while following ALL rules above:\n$ctx';
+          '\n\nLESSON CONTEXT, the student is currently studying this material; steer practice toward it while following ALL rules above:\n$ctx';
     }
     return prompt;
   }
@@ -283,11 +283,11 @@ class GeminiLiveService {
   void injectContext(String note, {bool expectReply = false}) {
     if (!_isSetupComplete || note.isEmpty) return;
     final framed = expectReply
-        ? '(Note from the app, not the student — the on-screen card just changed or the '
+        ? '(Note from the app, not the student, the on-screen card just changed or the '
               'session needs you to speak. Your audio may have been cut off mid-sentence; do '
               'NOT finish or refer back to your previous thought. React to this note now, '
               'briefly: ) $note'
-        : '(Note de contexte silencieuse pour toi — ne réponds pas directement à '
+        : '(Note de contexte silencieuse pour toi, ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     _send({
       'clientContent': {
@@ -439,7 +439,7 @@ class GeminiLiveService {
         if (!_resumedWithHandle) {
           injectContext(
             'The phone connection dropped briefly and has just been restored '
-            'mid-session. Continue naturally from wherever the conversation was — '
+            'mid-session. Continue naturally from wherever the conversation was, '
             'do NOT greet the student again or restart.',
           );
         }

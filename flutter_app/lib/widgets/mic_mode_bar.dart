@@ -83,7 +83,7 @@ class _MicModeBarState extends State<MicModeBar>
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          widget.isHolding ? 'Listening — release when done' : 'Hold to speak',
+          widget.isHolding ? 'Listening, release when done' : 'Hold to speak',
           style: DesignTokens.body(11.5, weight: FontWeight.w600).copyWith(
             color: widget.isHolding
                 ? DesignTokens.success

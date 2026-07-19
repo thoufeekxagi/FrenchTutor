@@ -273,11 +273,11 @@ class _AgentLedListeningScreenState
       if (first != null) {
         _direct(
           'As the COACH, in ONE short English sentence, set the scene '
-          '(scenario: "${widget.passage.title}" — where the student is and who you\'ll play). '
+          '(scenario: "${widget.passage.title}", where the student is and who you\'ll play). '
           'Then IMMEDIATELY become the CHARACTER and ${_characterLineDirection(first.segment)} '
           'Then, as the COACH in English: in one short sentence say what the character just '
-          'said, give the student their reply line — "${first.segment.fr}"'
-          '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'} — and ask them to '
+          'said, give the student their reply line, "${first.segment.fr}"'
+          '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'}, and ask them to '
           'try it.',
         );
       }
@@ -412,9 +412,9 @@ class _AgentLedListeningScreenState
           utterance: trimmed,
           cardDescription: card != null
               ? 'the student\'s line at this beat of a roleplay scene they are acting out: '
-                    '"${card.segment.fr}" = "${card.segment.en}" — saying this line (even '
+                    '"${card.segment.fr}" = "${card.segment.en}", saying this line (even '
                     'imperfectly) is them performing the scene, an attempt, never a command'
-              : '(scene already finished — a finale run-through may be in progress; the '
+              : '(scene already finished, a finale run-through may be in progress; the '
                     'student speaking French lines is performing, not commanding)',
           tutorLastLine: _lastTutorLine,
           attemptCount: _attemptCount,
@@ -511,7 +511,7 @@ class _AgentLedListeningScreenState
       '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
     );
     _gemini.injectContext(
-      'The card did NOT move — "${card.segment.fr}" needs more practice. You should never have '
+      'The card did NOT move, "${card.segment.fr}" needs more practice. You should never have '
       'suggested moving on. Smoothly continue practicing this part and never suggest '
       'advancing again.',
     );
@@ -577,7 +577,7 @@ class _AgentLedListeningScreenState
       'Beat ${_segmentIndex + 1} of the scene. As the CHARACTER, '
       '${_characterLineDirection(segment)} '
       'Then, as the COACH in English: in one short sentence say what the character just '
-      'said, give the student their reply line — "${segment.fr}"$meaning — and ask them '
+      'said, give the student their reply line, "${segment.fr}"$meaning, and ask them '
       'to try it.',
     );
   }
@@ -767,7 +767,7 @@ class _AgentLedListeningScreenState
             name: name,
             result: {
               'ok': false,
-              'reason': "The student asked to try again — don't grade yet.",
+              'reason': "The student asked to try again, don't grade yet.",
             },
           );
           return;
@@ -780,7 +780,7 @@ class _AgentLedListeningScreenState
             result: {
               'ok': false,
               'reason':
-                  "The student hasn't attempted this segment yet — listen for their attempt before grading.",
+                  "The student hasn't attempted this segment yet, listen for their attempt before grading.",
             },
           );
           return;
@@ -909,7 +909,7 @@ class _AgentLedListeningScreenState
     _tutorTurnTranscript = '';
     _logDebug('→ offer slipped: silent correction, no cut');
     _gemini.injectContext(
-      'You suggested moving on — never do that; the student alone decides. Do not wait for '
+      'You suggested moving on, never do that; the student alone decides. Do not wait for '
       'an answer to that question: continue practicing "${current.segment.fr}"  as if you had not asked.',
     );
   }
@@ -920,15 +920,15 @@ class _AgentLedListeningScreenState
     _lastDriftCorrectionAt = DateTime.now();
     _tutorTurnTranscript = '';
     _logDebug(
-      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.segment.fr}" is on screen — cutting her off',
+      '→ DRIFT: Marie started teaching "${future.fr}" while "${current.segment.fr}" is on screen, cutting her off',
     );
     _cutTutorAudio();
     _gemini.injectContext(
-      'STOP — you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
+      'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
       'screen still shows "${current.segment.fr}"'
       '${current.segment.en.isEmpty ? '' : ' = "${current.segment.en}"'}, and only the student\'s '
       'own words move the segment. You may OFFER the next part and then wait silently for their '
-      'answer — never teach it. Pick up "${current.segment.fr}" again now, briefly, as if nothing '
+      'answer, never teach it. Pick up "${current.segment.fr}" again now, briefly, as if nothing '
       'happened.',
       expectReply: true,
     );
@@ -956,7 +956,7 @@ class _AgentLedListeningScreenState
         : 'then switch to the CHARACTER and say one short French line prompting '
               '"${first.fr}"';
     _direct(
-      'As the COACH, in English, one sentence: every line is rehearsed — now we play the '
+      'As the COACH, in English, one sentence: every line is rehearsed, now we play the '
       'whole scene for real, no coaching; $opener.',
     );
   }
@@ -1228,10 +1228,10 @@ class _AgentLedListeningScreenState
               const SizedBox(height: 4),
               Text(
                 card != null
-                    ? 'Beat ${_segmentIndex + 1} of ${_sessionPlan.length} — '
+                    ? 'Beat ${_segmentIndex + 1} of ${_sessionPlan.length}, '
                           '${_phase == _BeatPhase.learn ? 'learn your line, then play the beat' : 'the scene is live — answer with your line'}'
                     : _finaleStarted
-                    ? 'Finale — play the whole scene through!'
+                    ? 'Finale, play the whole scene through!'
                     : 'Scene complete',
                 style: DesignTokens.body(
                   13,
@@ -1257,7 +1257,7 @@ class _AgentLedListeningScreenState
                 const SizedBox(height: 10),
                 Text(
                   _finaleStarted
-                      ? 'Scene finale — play it through, then say "finish"!'
+                      ? 'Scene finale, play it through, then say "finish"!'
                       : 'All done!',
                   style: DesignTokens.body(14, weight: FontWeight.w500),
                 ),
@@ -1277,8 +1277,8 @@ class _AgentLedListeningScreenState
           const SizedBox(height: 10),
           Text(
             _phase == _BeatPhase.learn
-                ? 'Practice your line out loud — ${_gemini.persona.displayName} is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
-                : '${_gemini.persona.displayName} is in character — answer with your line. Say "next" for the next beat, or "again" to replay.',
+                ? 'Practice your line out loud, ${_gemini.persona.displayName} is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
+                : '${_gemini.persona.displayName} is in character, answer with your line. Say "next" for the next beat, or "again" to replay.',
             style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
             textAlign: TextAlign.center,
           ),
@@ -1578,18 +1578,18 @@ class _AgentLedListeningScreenState
     }
     final parts = <String>[];
     parts.add('''
-ROLEPLAY SCENE STAGE — "${passage.title}". You are a DIRECTED ACTOR-COACH in a scripted scene the app runs beat by beat. The student plays themselves (the customer/visitor); you play two registers: the COACH (English — teaches, reacts, encourages) and the CHARACTER (French — the other role in the scene, one scripted line at a time).
+ROLEPLAY SCENE STAGE, "${passage.title}". You are a DIRECTED ACTOR-COACH in a scripted scene the app runs beat by beat. The student plays themselves (the customer/visitor); you play two registers: the COACH (English, teaches, reacts, encourages) and the CHARACTER (French, the other role in the scene, one scripted line at a time).
 
-THE CONTRACT — THE APP DIRECTS, YOU PERFORM:
-1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction — in the exact ORDER it gives, when it has several parts — then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
-1b. THE SCENE SPEAKS FIRST: every beat opens with the CHARACTER's French line, and only AFTER it do you coach in English. Never explain a beat before the character has spoken it — the student must hear the French first, like real life. When an instruction says "as the CHARACTER ... then as the COACH", the character line always comes out of your mouth first.
-2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence — react to their attempt, fix gently if needed, encourage — then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. After a beat has been played through once, you may ALSO remind them once, neutrally, of their controls: "say next when you're ready, or again to hear it once more" — that reminder is the only thing you may ever say about moving; never any content suggestion.
-3. You do NOT have the script — the app hands you each line exactly when it's time, and sometimes a hint of what's coming (marked "if asked"). Never invent lines, never say more than the single line the app asked for, never claim a learner line as yours.
-4. NEVER suggest moving on or ask what's next — pacing belongs to the student and the app alone.
-5. If the student freezes after a character line (long silence), whisper a rescue in English: "psst — your line is: ..." with their current line, then stop.
+THE CONTRACT: THE APP DIRECTS, YOU PERFORM:
+1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction, in the exact ORDER it gives, when it has several parts, then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
+1b. THE SCENE SPEAKS FIRST: every beat opens with the CHARACTER's French line, and only AFTER it do you coach in English. Never explain a beat before the character has spoken it, the student must hear the French first, like real life. When an instruction says "as the CHARACTER ... then as the COACH", the character line always comes out of your mouth first.
+2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence, react to their attempt, fix gently if needed, encourage, then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. After a beat has been played through once, you may ALSO remind them once, neutrally, of their controls: "say next when you're ready, or again to hear it once more", that reminder is the only thing you may ever say about moving; never any content suggestion.
+3. You do NOT have the script, the app hands you each line exactly when it's time, and sometimes a hint of what's coming (marked "if asked"). Never invent lines, never say more than the single line the app asked for, never claim a learner line as yours.
+4. NEVER suggest moving on or ask what's next, pacing belongs to the student and the app alone.
+5. If the student freezes after a character line (long silence), whisper a rescue in English: "psst, your line is: ..." with their current line, then stop.
 6. English is the coaching language; this student is a beginner. Their reciting of French lines is practice, never a cue to switch into French-led coaching.
 
-You have exactly one tool: mark_segment_result, for recording how well the student did with the current beat (grade: again/good/easy). It's a proposal — the app only accepts it once it's confirmed the student actually attempted it. A rejection is not an error; never mention it, just keep going.
+You have exactly one tool: mark_segment_result, for recording how well the student did with the current beat (grade: again/good/easy). It's a proposal, the app only accepts it once it's confirmed the student actually attempted it. A rejection is not an error; never mention it, just keep going.
 ''');
     // Deliberately NO script here — Marie receives each line just-in-time from
     // the app's per-turn instructions. She cannot read ahead, spoil, or replay

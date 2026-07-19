@@ -55,7 +55,7 @@ class PlanExplainer {
         PlanReasonCode.dueReview =>
           '${competency.title} is due for review.',
         PlanReasonCode.recentMistake =>
-          'A recent mistake with ${competency.title} — this follows it up.',
+          'A recent mistake with ${competency.title}, this follows it up.',
         PlanReasonCode.weakestSkill =>
           '${competency.title} is one of your weaker skills right now.',
         PlanReasonCode.crossSkillTransfer =>

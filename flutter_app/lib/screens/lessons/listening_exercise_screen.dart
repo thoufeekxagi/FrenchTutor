@@ -386,7 +386,7 @@ class _ListeningExerciseScreenState
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _dictationFeedback[index] = 'Not quite — expected: "$expected"';
+        _dictationFeedback[index] = 'Not quite, expected: "$expected"';
         _dictationChecking.remove(index);
       });
     }

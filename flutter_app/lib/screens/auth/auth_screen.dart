@@ -99,7 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
     await _run(() => AuthService.shared.sendPasswordReset(email));
     if (!mounted) return;
     if (_errorMessage == null) {
-      setState(() => _infoMessage = 'Password reset email sent — check your inbox.');
+      setState(() => _infoMessage = 'Password reset email sent, check your inbox.');
     }
   }
 

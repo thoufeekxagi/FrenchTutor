@@ -142,7 +142,7 @@ class DailySummaryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Fought back today — returning tomorrow',
+          'Fought back today, returning tomorrow',
           style: Passeport.body(
             11.5,
             weight: FontWeight.w700,

@@ -53,12 +53,65 @@ void main() {
     // Let theme and onboarding layout finish their first frame.
     await tester.pumpAndSettle();
 
-    // Deliberate order: a fresh learner experiences the product first
-    // (goal/level/tutor onboarding) and is asked to create an account only
-    // at the END of onboarding — never an account wall up front.
+    // Deliberate order: a fresh learner experiences the product first —
+    // a gradient welcome, then goal/level/tutor onboarding — and is asked to
+    // create an account only at the END of onboarding — never an account
+    // wall up front.
+    expect(find.text('ParleSprint'), findsOneWidget);
+    expect(find.text('Continue with Google'), findsNothing);
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
     expect(find.text('What should French unlock for you?'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
   });
+
+  testWidgets(
+    'full funnel: welcome → questions → preparing → sign-in gate '
+    '(trial auto-skipped without a Gemini key)',
+    (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: const FrenchTutorApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Continue')); // welcome
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Everyday French')); // goal
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('A1 · Just starting')); // level
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Build my plan'));
+      await tester.pumpAndSettle();
+
+      // Tutor step — pick the first France-accent tutor card.
+      await tester.tap(find.text('Marie'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+
+      // Preparing pane: page transition, then the 3.2s progress animation,
+      // then the 450ms beat on 100%. No trial key in tests → onboarding
+      // finishes straight into the sign-in gate.
+      await tester.pump(const Duration(milliseconds: 400)); // page slide
+      expect(find.textContaining('preparing your plan'), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 3300));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Continue with Google'), findsOneWidget);
+    },
+  );
 
   testWidgets('today plan exposes one recommended next action', (
     WidgetTester tester,
@@ -124,7 +177,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Good start—keep going'), findsOneWidget);
+    expect(find.text('Good start, keep going'), findsOneWidget);
     expect(
       find.textContaining('Nothing has been marked complete'),
       findsOneWidget,

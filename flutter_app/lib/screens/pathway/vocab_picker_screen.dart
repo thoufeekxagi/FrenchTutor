@@ -108,12 +108,12 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             const SizedBox(height: 4),
             Text(
               '$done of ${resumable.planned.length} words practiced earlier '
-              'today — pick up where you left off.',
+              'today, pick up where you left off.',
               style: DesignTokens.body(13.5),
             ),
             const SizedBox(height: 12),
             PasseportPrimaryButton(
-              label: 'Continue — ${resumable.remaining.length} words left',
+              label: 'Continue, ${resumable.remaining.length} words left',
               onPressed: () => _beginSession(resumable.remaining),
             ),
             Align(

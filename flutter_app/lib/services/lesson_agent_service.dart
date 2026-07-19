@@ -22,7 +22,7 @@ class AgentError implements Exception {
   final String message;
 
   static const missingKey = AgentError._(
-    'AI feedback unavailable — add a Gemini or OpenRouter key in Settings.',
+    'AI feedback unavailable, add a Gemini or OpenRouter key in Settings.',
   );
   static const requestFailed = AgentError._(
     'The AI tutor is busy right now. Try again in a moment.',
@@ -153,13 +153,15 @@ class LessonAgentService {
   /// judges/planners don't carry it — their output is never shown. Mirrors
   /// LivePrompts.languageGuardrail + contentSafety.
   static const languageGuardrail =
-      ' LANGUAGE RULE — ABSOLUTE: reply ONLY in French and English, never any other '
+      ' LANGUAGE RULE: ABSOLUTE: reply ONLY in French and English, never any other '
       'language, whatever language the student used; never translate or engage with '
-      'other-language text — say in English that this course works in French and '
-      'English, and stay on the task. CONTENT POLICY — ABSOLUTE: keep every reply '
+      'other-language text, say in English that this course works in French and '
+      'English, and stay on the task. CONTENT POLICY: ABSOLUTE: keep every reply '
       'family-friendly; never use profanity, slurs, or sexual, violent, hateful, or '
       'otherwise inappropriate language; if the student\'s text contains offensive '
-      'content, never repeat it — respond calmly and stay on the lesson.';
+      'content, never repeat it, respond calmly and stay on the lesson. '
+      'STYLE RULE: never use em dashes in any output; use commas, colons, or '
+      'periods instead.';
 
   /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
   /// Google's newest Flash-Lite so we inherit upgrades for free.
@@ -230,7 +232,7 @@ class LessonAgentService {
     List<({String role, String text})> history = const [],
   }) async {
     const system = '''
-You are a friendly, encouraging bilingual (English/French) French tutor helping a student preparing for the TEF/TCF Canada exam (target CLB 7). The student is mid-lesson; use the LESSON CONTEXT to ground your answer. Keep answers under 120 words, spoken-style — no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
+You are a friendly, encouraging bilingual (English/French) French tutor helping a student preparing for the TEF/TCF Canada exam (target CLB 7). The student is mid-lesson; use the LESSON CONTEXT to ground your answer. Keep answers under 120 words, spoken-style, no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
     final messages = <Map<String, String>>[
       {
         'role': 'system',
@@ -284,11 +286,11 @@ You are a strict TEF/TCF Canada speaking examiner. Assess only evidence present 
 {"overall_score": number, "clb_estimate": string, "task_completion": number, "fluency": number, "grammar": number, "vocabulary": number, "strengths": [string, string], "next_steps": [string, string]}''';
     final user =
         '''
-TASK 1 — MONOLOGUE
+TASK 1, MONOLOGUE
 Prompt: $monologuePrompt
 Learner transcript: ${monologueTranscript.isEmpty ? '(no usable response)' : monologueTranscript}
 
-TASK 2 — INTERACTION
+TASK 2, INTERACTION
 Prompt: $interactionPrompt
 Learner transcript: ${interactionTranscript.isEmpty ? '(no usable response)' : interactionTranscript}''';
     final raw = await _complete(
@@ -313,7 +315,7 @@ Learner transcript: ${interactionTranscript.isEmpty ? '(no usable response)' : i
     // so its fixed cost multiplies fast; every token trimmed here is the single biggest
     // lever on this service's total token spend.
     const system = '''
-Silently audit a French pronunciation attempt (student never sees this). They were asked to say a French word aloud; below is what speech recognition captured (imperfect — be lenient on transcription noise, but flag real errors: wrong verb form, confused similar word, wrong word, silence). Reply with ONLY compact JSON, no markdown, no commentary: {"correct": boolean, "tag": string_or_null, "description": string_or_null}. tag = short stable snake_case slug for the error type (e.g. "nasal_vowel_confusion"), reused across words so it can be tracked over time. Both null when correct is true.''';
+Silently audit a French pronunciation attempt (student never sees this). They were asked to say a French word aloud; below is what speech recognition captured (imperfect, be lenient on transcription noise, but flag real errors: wrong verb form, confused similar word, wrong word, silence). Reply with ONLY compact JSON, no markdown, no commentary: {"correct": boolean, "tag": string_or_null, "description": string_or_null}. tag = short stable snake_case slug for the error type (e.g. "nasal_vowel_confusion"), reused across words so it can be tracked over time. Both null when correct is true.''';
     final user =
         'TARGET WORD: $targetWord\nSPEECH RECOGNITION CAPTURED: $studentSaid';
     final raw = await _complete(
@@ -344,15 +346,15 @@ Silently audit a French pronunciation attempt (student never sees this). They we
     required int cardCount,
   }) async {
     const system = '''
-You classify one utterance from a student in a live voice French lesson. The app — not the tutor — moves the on-screen card based on your verdict. Reply with ONLY compact JSON: {"intent": "advance"|"back"|"again"|"attempt"|"chat"|"goto"|"finish", "card": number_or_null, "explicit": boolean}.
-- "finish": an EXPLICIT request to end the whole lesson/session ("let's finish this lesson", "I'm done for today", "end the session") — NOT merely finishing the current word.
-- "advance": an EXPLICIT request to move to the next card ("next", "next word", "got it, let's move on", "suivant") — set "explicit": true. A bare "yes"/"oui"/"sure" counts ONLY if the tutor's last line directly asked whether to move on — never otherwise — and is "explicit": false (it's consent to the tutor's offer, not the student's own command). "explicit" is true for every other navigation verdict (back/goto/again).
+You classify one utterance from a student in a live voice French lesson. The app, not the tutor, moves the on-screen card based on your verdict. Reply with ONLY compact JSON: {"intent": "advance"|"back"|"again"|"attempt"|"chat"|"goto"|"finish", "card": number_or_null, "explicit": boolean}.
+- "finish": an EXPLICIT request to end the whole lesson/session ("let's finish this lesson", "I'm done for today", "end the session"), NOT merely finishing the current word.
+- "advance": an EXPLICIT request to move to the next card ("next", "next word", "got it, let's move on", "suivant"), set "explicit": true. A bare "yes"/"oui"/"sure" counts ONLY if the tutor's last line directly asked whether to move on, never otherwise, and is "explicit": false (it's consent to the tutor's offer, not the student's own command). "explicit" is true for every other navigation verdict (back/goto/again).
 - "back": an explicit request to return to the previous card.
-- "goto": an explicit request to jump to a specific card by number or position ("go to the third card", "back to card 2", "the first one", "the last card") — set "card" to the 1-based target number, using the card position/count given.
+- "goto": an explicit request to jump to a specific card by number or position ("go to the third card", "back to card 2", "the first one", "the last card"), set "card" to the 1-based target number, using the card position/count given.
 - "again": they want the current item repeated or re-explained.
-- "attempt": they are practicing/attempting the current target (saying the French word or sentence, possibly imperfectly — speech recognition is noisy, be lenient).
-- "chat": anything else — a question, an answer to a non-navigation question, small talk. Words like "next"/"oui"/"continue" inside a longer sentence about something else (e.g. "the bakery is next to the station") are NOT commands.
-ECHO RULE (critical): the mic sometimes picks up the tutor's own voice, so compare the utterance to the tutor's last line word by word. If it repeats the tutor's NON-TARGET words — her prompts or questions like "ready for the next?" — it is an echo: "chat", NEVER navigation, even though it contains command-like words. Repeating only the target French word/sentence itself is the student practicing: "attempt".
+- "attempt": they are practicing/attempting the current target (saying the French word or sentence, possibly imperfectly, speech recognition is noisy, be lenient).
+- "chat": anything else, a question, an answer to a non-navigation question, small talk. Words like "next"/"oui"/"continue" inside a longer sentence about something else (e.g. "the bakery is next to the station") are NOT commands.
+ECHO RULE (critical): the mic sometimes picks up the tutor's own voice, so compare the utterance to the tutor's last line word by word. If it repeats the tutor's NON-TARGET words, her prompts or questions like "ready for the next?", it is an echo: "chat", NEVER navigation, even though it contains command-like words. Repeating only the target French word/sentence itself is the student practicing: "attempt".
 Moving the card without the student's clear consent is the worst failure mode. When genuinely ambiguous, ALWAYS prefer "attempt" or "chat" over any navigation verdict. "card" is null except for "goto".''';
     final user =
         '''
@@ -395,7 +397,7 @@ STUDENT SAID: $utterance''';
     required List<String> recentDiary,
   }) async {
     const system = '''
-You are quietly planning a French vocabulary practice session before it starts — the student won't see this reasoning, only the short focus note you write. Given the candidate word list, the student's recurring mistake patterns, and recent session notes, decide: (1) a one-sentence, warm, specific focus note for how today's session should be framed (e.g. referencing a specific recurring mistake if relevant), and (2) optionally reorder the word IDs to front-load anything especially relevant to their recent struggles — or return null to keep the given order if no reordering is warranted. Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings_or_null}. The prioritized_word_ids, if provided, must be a permutation of the exact candidate IDs given — never invent new ones.''';
+You are quietly planning a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. Given the candidate word list, the student's recurring mistake patterns, and recent session notes, decide: (1) a one-sentence, warm, specific focus note for how today's session should be framed (e.g. referencing a specific recurring mistake if relevant), and (2) optionally reorder the word IDs to front-load anything especially relevant to their recent struggles, or return null to keep the given order if no reordering is warranted. Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings_or_null}. The prioritized_word_ids, if provided, must be a permutation of the exact candidate IDs given, never invent new ones.''';
     final wordList = candidateWords
         .map((w) => '${w.id}: ${w.fr} (${w.en})')
         .join('; ');
@@ -429,7 +431,7 @@ You are quietly planning a French vocabulary practice session before it starts �
     required List<String> recentDiary,
   }) async {
     const system = '''
-You are quietly picking which ONE French grammar point a beginner should practice today — the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, the student's recurring mistake patterns, and recent session notes, choose the single most useful one to practice right now (e.g. if their mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given — never invent a new one.''';
+You are quietly picking which ONE French grammar point a beginner should practice today, the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, the student's recurring mistake patterns, and recent session notes, choose the single most useful one to practice right now (e.g. if their mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given, never invent a new one.''';
     final list = candidates.map((c) => '${c.id}: ${c.title}').join('; ');
     var user = 'CANDIDATES: $list';
     if (mistakeTags.isNotEmpty) {
@@ -464,8 +466,8 @@ You are quietly picking which ONE French grammar point a beginner should practic
     required List<VocabEntry> words,
   }) async {
     const system = '''
-You are quietly writing a complete two-role ROLEPLAY SCRIPT for a total beginner preparing for TEF/TCF Canada — a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director — every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French) — do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
-Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation — this is intentionally basic. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+You are quietly writing a complete two-role ROLEPLAY SCRIPT for a total beginner preparing for TEF/TCF Canada, a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director, every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French), do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
+Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation, this is intentionally basic. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
 "title" is the scenario in a few words (e.g. "At the bakery"). "character_fr"/"character_en" are the character's line and its English meaning; "learner_fr"/"learner_en" the learner's reply and meaning; "grammar_note" one simple English sentence explaining the learner line's word order/agreement; "pronunciation_tip" one simple English pronunciation pointer for the learner line.''';
     final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
@@ -554,11 +556,11 @@ $submission''';
       throw ArgumentError.value(tier, 'tier', 'must be 1, 2, or 3');
     }
     const system = '''
-You are a Socratic French writing coach. You never give the corrected sentence and never state the fix directly — you point the student toward the single most important issue in their draft so they can fix it themselves. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape: {"message": string}. The message is one short sentence, spoken-style, no markdown.
+You are a Socratic French writing coach. You never give the corrected sentence and never state the fix directly, you point the student toward the single most important issue in their draft so they can fix it themselves. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape: {"message": string}. The message is one short sentence, spoken-style, no markdown.
 Tier 1: name only the grammatical CATEGORY of the issue (e.g. "verb agreement", "the gender of the article"). Nothing more specific.
 Tier 2: narrow it to WHERE in the sentence and WHAT KIND of check to do, still without the answer (e.g. "look at the verb right after tu").
 Tier 3: ask a leading question that makes the correct form obvious without stating it (e.g. "what is the tu-form of être?").
-If the draft has no issue worth flagging yet, respond with a short encouraging confirmation instead, regardless of tier — do not invent a problem.''';
+If the draft has no issue worth flagging yet, respond with a short encouraging confirmation instead, regardless of tier, do not invent a problem.''';
     final user =
         '''
 TASK: $prompt

@@ -45,6 +45,9 @@ class SessionScreen extends ConsumerStatefulWidget {
     this.examMode = false,
     this.kickoffMessage,
     this.durationLimitSeconds,
+    this.wrapUpNote,
+    this.wrapUpLeadSeconds = 30,
+    this.popResultImmediately = false,
   });
 
   final String apiKey;
@@ -53,6 +56,17 @@ class SessionScreen extends ConsumerStatefulWidget {
   final bool examMode;
   final String? kickoffMessage;
   final int? durationLimitSeconds;
+
+  /// Optional app-injected context note sent [wrapUpLeadSeconds] before the
+  /// [durationLimitSeconds] cutoff, so the tutor lands the goodbye instead of
+  /// being cut mid-sentence. Only meaningful with a duration limit.
+  final String? wrapUpNote;
+  final int wrapUpLeadSeconds;
+
+  /// Pop with the [SpeakingResult] the moment the call ends instead of showing
+  /// the standard result view — for flows (the onboarding trial) that render
+  /// their own recap.
+  final bool popResultImmediately;
 
   /// Set when this call is the Daily Pathway's speaking stage — links the
   /// ai_sessions record to today's pathway row.
@@ -249,7 +263,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             widget.kickoffMessage ??
                 (_isRoleplay
                     ? '(Note from the app, not the student: the student just joined the '
-                          'roleplay call. Open the scene NOW exactly as your role rules say — '
+                          'roleplay call. Open the scene NOW exactly as your role rules say, '
                           'one short English sentence to set the scene from today\'s material, '
                           'then your first line in French, in character. Do not greet '
                           'generically, do not ask what they want to practice.)'
@@ -349,7 +363,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!mounted) return;
       setState(() => _callDuration += 1);
       final limit = widget.durationLimitSeconds;
-      if (limit != null && _callDuration >= limit) {
+      if (limit == null) return;
+      final note = widget.wrapUpNote;
+      if (note != null && _callDuration == limit - widget.wrapUpLeadSeconds) {
+        _gemini.sendText(note);
+      }
+      if (_callDuration >= limit) {
         _endedReason = 'completed';
         _endCall();
       }
@@ -394,7 +413,23 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     durationSeconds: _callDuration,
     learnerUtteranceCount: _userUtteranceCount,
     endedReason: _endedReason,
+    frenchWordsUsed: _learnerFrenchWords(),
   );
+
+  /// Known French words the LEARNER actually said, for the trial recap.
+  /// Elisions are split ("m'appelle" → "appelle") and 1-letter matches are
+  /// dropped — 'a' is also an English word and reads as noise on a recap.
+  List<String> _learnerFrenchWords() {
+    final words = <String>{};
+    for (final message in _messages.where((m) => m.isUser)) {
+      for (var word in message.content.toLowerCase().split(RegExp(r"[^a-zà-ÿ']+"))) {
+        final apostrophe = word.indexOf("'");
+        if (apostrophe >= 0) word = word.substring(apostrophe + 1);
+        if (word.length >= 2 && _frenchKeywords.contains(word)) words.add(word);
+      }
+    }
+    return words.toList()..sort();
+  }
 
   void _finishResult() => Navigator.of(context).pop(_result);
 
@@ -410,7 +445,19 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         '$userMessages exchanges from you, $tutorMessages responses from tutor. ';
 
     final allText = _messages.map((m) => m.content).join(' ').toLowerCase();
-    const frenchKeywords = {
+    final words = allText.split(' ').toSet();
+    final frenchUsed = words.intersection(_frenchKeywords).toList()..sort();
+    if (frenchUsed.isNotEmpty) {
+      summary += 'French words used: ${frenchUsed.take(10).join(', ')}. ';
+    }
+
+    summary += userMessages > 3
+        ? 'Good practice session, keep going!'
+        : 'Try speaking more next time for better practice.';
+    return summary;
+  }
+
+  static const _frenchKeywords = {
       'bonjour',
       'merci',
       'oui',
@@ -475,18 +522,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       'corriger',
       'expliquer',
       'traduire',
+      // Trial-lesson goodbye ("au revoir") — recap needs it to register.
+      'revoir',
     };
-    final words = allText.split(' ').toSet();
-    final frenchUsed = words.intersection(frenchKeywords).toList()..sort();
-    if (frenchUsed.isNotEmpty) {
-      summary += 'French words used: ${frenchUsed.take(10).join(', ')}. ';
-    }
-
-    summary += userMessages > 3
-        ? 'Good practice session — keep going!'
-        : 'Try speaking more next time for better practice.';
-    return summary;
-  }
 
   String _formatDuration(int seconds) {
     final m = seconds ~/ 60;
@@ -517,7 +555,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       case CallStatus.reconnecting:
         return 'Reconnecting…';
       case CallStatus.listening:
-        return 'Listening — speak in French';
+        return 'Listening. Speak in French';
       case CallStatus.tutorSpeaking:
         return '${_gemini.persona.displayName} is speaking…';
       case CallStatus.muted:
@@ -541,9 +579,25 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
   }
 
+  bool _poppedResult = false;
+
   @override
   Widget build(BuildContext context) {
     if (_callStatus == CallStatus.ended && _sessionSaved) {
+      if (widget.popResultImmediately) {
+        // The hosting flow (onboarding trial) renders its own recap — hand the
+        // result straight back. Post-frame: popping during build is illegal.
+        if (!_poppedResult) {
+          _poppedResult = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _finishResult();
+          });
+        }
+        return const Scaffold(
+          backgroundColor: Passeport.parchment,
+          body: SizedBox.expand(),
+        );
+      }
       return PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
@@ -636,28 +690,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             ],
           ),
           const SizedBox(height: 4),
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: Passeport.infoSoft,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: _statusColor.withValues(alpha: 0.32),
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                _gemini.persona.initial,
-                style: const TextStyle(
-                  color: Passeport.sky,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+          _avatarWithCountdownRing(),
           const SizedBox(height: 9),
           Text(_gemini.persona.displayName, style: Passeport.display(22)),
           const SizedBox(height: 7),
@@ -690,6 +723,64 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// The tutor avatar. On time-limited calls (trial, exam) a live ring drains
+  /// around it — calm in the app's primary color, warning-tinted for the final
+  /// stretch — so the limit is always visible without reading the clock.
+  Widget _avatarWithCountdownRing() {
+    final limit = widget.durationLimitSeconds;
+    final avatar = Container(
+      width: 54,
+      height: 54,
+      decoration: BoxDecoration(
+        color: Passeport.infoSoft,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: _statusColor.withValues(alpha: 0.32),
+          width: 2,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          _gemini.persona.initial,
+          style: const TextStyle(
+            color: Passeport.sky,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+    if (limit == null) return avatar;
+    final remaining = (limit - _callDuration).clamp(0, limit);
+    final closing = remaining <= widget.wrapUpLeadSeconds;
+    return SizedBox(
+      width: 66,
+      height: 66,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          TweenAnimationBuilder<double>(
+            duration: const Duration(seconds: 1),
+            curve: Curves.linear,
+            tween: Tween(end: remaining / limit),
+            builder: (context, value, _) => SizedBox(
+              width: 66,
+              height: 66,
+              child: CircularProgressIndicator(
+                value: value,
+                strokeWidth: 3,
+                strokeCap: StrokeCap.round,
+                color: closing ? Passeport.warning : Passeport.primary,
+                backgroundColor: Passeport.hairline,
+              ),
+            ),
+          ),
+          avatar,
         ],
       ),
     );

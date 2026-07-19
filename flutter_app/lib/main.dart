@@ -32,7 +32,7 @@ void main() {
           throw StateError(
             'Missing SUPABASE_URL / SUPABASE_ANON_KEY. Run via '
             './run_with_keys.sh or ./run_release_with_keys.sh (see '
-            'BUILD_FLUTTER_TO_IPHONE.md) — a plain `flutter run` ships '
+            'BUILD_FLUTTER_TO_IPHONE.md), a plain `flutter run` ships '
             'without these and auth cannot work.',
           );
         }

@@ -124,7 +124,7 @@ class ContentService {
 
   String grammarLessonContext(GrammarLesson lesson) {
     final buf = StringBuffer();
-    buf.writeln('Grammar lesson: ${lesson.title} — ${lesson.subtitle}');
+    buf.writeln('Grammar lesson: ${lesson.title}, ${lesson.subtitle}');
     buf.writeln('Usage: ${lesson.usage.join("; ")}');
     for (final c in lesson.conjugations) {
       buf.writeln(
@@ -156,7 +156,7 @@ class ContentService {
     buf.writeln('French connectors (${pack.connectors.length} total):');
     for (final c in pack.connectors) {
       buf.writeln(
-        '${c.fr} (${c.en}) [${c.category}${c.core ? ", core" : ""}] — e.g. ${c.example.fr}',
+        '${c.fr} (${c.en}) [${c.category}${c.core ? ", core" : ""}], e.g. ${c.example.fr}',
       );
     }
     return buf.toString();
