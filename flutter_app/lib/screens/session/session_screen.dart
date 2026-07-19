@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../config/theme.dart';
+import '../../data/database/learning_store.dart';
 import '../../models/chat_message.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/session.dart';
@@ -18,10 +19,13 @@ import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/mic_mode.dart';
+import '../../services/pilot_access_service.dart';
+import '../../services/referral_service.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
+import '../../widgets/report_problem_button.dart';
 import '../../widgets/speaking_session_result.dart';
 
 enum CallStatus {
@@ -186,25 +190,47 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     final recordId = _aiSessionRecordId;
     if (recordId != null) {
-      ref
-          .read(learningStoreProvider)
-          .endAiSession(
-            recordId,
-            endedReason: _endedReason,
-            learnerUtteranceCount: _userUtteranceCount,
-            transcriptJson: jsonEncode(
-              _messages
-                  .map(
-                    (message) => {
-                      'role': message.isUser ? 'user' : 'assistant',
-                      'content': message.content,
-                    },
-                  )
-                  .toList(growable: false),
-            ),
-          );
+      final store = ref.read(learningStoreProvider);
+      final usedSecondsBefore = store.aiSecondsUsedToday();
+      store.endAiSession(
+        recordId,
+        endedReason: _endedReason,
+        learnerUtteranceCount: _userUtteranceCount,
+        transcriptJson: jsonEncode(
+          _messages
+              .map(
+                (message) => {
+                  'role': message.isUser ? 'user' : 'assistant',
+                  'content': message.content,
+                },
+              )
+              .toList(growable: false),
+        ),
+      );
+      _consumeBonusMinutesIfNeeded(store, usedSecondsBefore);
     }
     _saveSessionLocally();
+  }
+
+  /// Whatever this session used beyond the base free daily allowance was
+  /// drawn from the invite-code bonus balance (see referral_service.dart) —
+  /// draw it down server-side to match. Fire-and-forget: worst case the
+  /// balance is very slightly stale until the next successful call.
+  void _consumeBonusMinutesIfNeeded(LearningStore store, int usedSecondsBefore) {
+    final usedSecondsAfter = store.aiSecondsUsedToday();
+    const baseLimit = PilotAccessService.dailyLimitSeconds;
+    final overageBefore = (usedSecondsBefore - baseLimit).clamp(
+      0,
+      usedSecondsBefore,
+    );
+    final overageAfter = (usedSecondsAfter - baseLimit).clamp(
+      0,
+      usedSecondsAfter,
+    );
+    final bonusSecondsUsed = overageAfter - overageBefore;
+    if (bonusSecondsUsed > 0) {
+      unawaited(ReferralService.shared.consumeBonusSeconds(bonusSecondsUsed));
+    }
   }
 
   Future<void> _toggleSpeaker() async {
@@ -693,7 +719,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 ),
               ),
               const Spacer(),
-              const SizedBox(width: 44),
+              ReportProblemButton(
+                sessionType: widget.stage ?? 'Free talk',
+                personaName: _gemini.persona.displayName,
+              ),
             ],
           ),
           const SizedBox(height: 4),

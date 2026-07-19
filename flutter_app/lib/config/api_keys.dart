@@ -20,4 +20,14 @@ abstract final class ApiKeys {
   /// setup step has been done yet.
   static const googleIosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID');
   static const googleWebClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
+
+  /// RevenueCat's public SDK keys (one per store — these are safe to embed,
+  /// same category as the Supabase anon key above: meaningless without a
+  /// RevenueCat project behind them). Empty until a RevenueCat account/project
+  /// exists — RevenueCatService reports "not configured" rather than crashing
+  /// when these are blank, same pattern as Google Sign-In above.
+  static const revenueCatIosKey = String.fromEnvironment('REVENUECAT_IOS_KEY');
+  static const revenueCatAndroidKey = String.fromEnvironment(
+    'REVENUECAT_ANDROID_KEY',
+  );
 }

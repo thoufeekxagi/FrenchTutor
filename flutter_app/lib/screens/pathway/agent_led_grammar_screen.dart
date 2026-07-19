@@ -25,6 +25,7 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/ai_voice_disclosure.dart';
+import '../../widgets/report_problem_button.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
@@ -1016,6 +1017,10 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
                     ),
                   ),
                 ),
+              ),
+              ReportProblemButton(
+                sessionType: 'Grammar, ${widget.tenseTitle}',
+                personaName: _gemini.persona.displayName,
               ),
             ],
           ),

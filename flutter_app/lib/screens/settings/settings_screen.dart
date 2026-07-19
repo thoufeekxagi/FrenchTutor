@@ -2,6 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -11,9 +12,10 @@ import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
-import '../../services/auth_service.dart';
-import '../../services/tutor_voice_preview.dart';
 import '../../providers/database_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/referral_service.dart';
+import '../../services/tutor_voice_preview.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
 
@@ -42,6 +44,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
   bool _deletingAccount = false;
+  ReferralStats? _referralStats;
+  int _bonusSecondsBalance = 0;
+  bool _redeeming = false;
+  final _redeemController = TextEditingController();
   late final TutorVoicePreviewer _previewer = TutorVoicePreviewer()
     ..addListener(() {
       if (mounted) setState(() {});
@@ -55,12 +61,73 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _profile = ref.read(learningStoreProvider).profile();
     _access = ref.read(pilotAccessServiceProvider).snapshot();
     _loadSettings();
+    _loadReferralInfo();
   }
 
   @override
   void dispose() {
     _previewer.dispose();
+    _redeemController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadReferralInfo() async {
+    final stats = await ReferralService.shared.myReferralStats();
+    final bonusSeconds = await ReferralService.shared.refreshBonusBalance();
+    if (!mounted) return;
+    setState(() {
+      _referralStats = stats;
+      _bonusSecondsBalance = bonusSeconds;
+    });
+  }
+
+  Future<void> _copyReferralCode() async {
+    final code = _referralStats?.code;
+    if (code == null) return;
+    await Clipboard.setData(ClipboardData(text: code));
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Invite code copied')));
+  }
+
+  Future<void> _redeemCode() async {
+    final code = _redeemController.text.trim();
+    if (code.isEmpty || _redeeming) return;
+    final installationId = ref
+        .read(pilotInfrastructureStoreProvider)
+        .installationId('app');
+    setState(() => _redeeming = true);
+    final result = await ReferralService.shared.redeem(
+      code,
+      installationId: installationId,
+    );
+    if (!mounted) return;
+    setState(() => _redeeming = false);
+
+    final message = switch (result.outcome) {
+      RedeemOutcome.success =>
+        'You and your friend each got ${result.bonusMinutes} bonus minutes!',
+      RedeemOutcome.alreadyRedeemed => 'You\'ve already redeemed an invite code.',
+      RedeemOutcome.deviceAlreadyUsed =>
+        'An invite code has already been redeemed on this device.',
+      RedeemOutcome.invalidCode => 'That code doesn\'t look right.',
+      RedeemOutcome.cannotRedeemOwnCode => 'That\'s your own code — share it with a friend instead.',
+      RedeemOutcome.codeLimitReached =>
+        'That code has already been used the maximum number of times.',
+      RedeemOutcome.networkError => 'Couldn\'t reach the server, try again in a moment.',
+    };
+    if (result.outcome == RedeemOutcome.success) {
+      _redeemController.clear();
+      setState(() => _bonusSecondsBalance = ReferralService.shared.cachedBonusSecondsBalance);
+    }
+    await showPSConfirmDialog(
+      context,
+      title: result.outcome == RedeemOutcome.success ? 'Invite redeemed!' : 'Couldn\'t redeem code',
+      message: message,
+      confirmLabel: 'OK',
+      cancelLabel: 'OK',
+    );
   }
 
   void _saveProfile(void Function(Profile) mutate) {
@@ -757,6 +824,125 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     value: _access.serverAuthoritative
                         ? 'Cloud verified'
                         : 'Local preview',
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // --- Invite a friend (referral bonus minutes) ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Invite a friend', color: Passeport.slateDim),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Share your code. When a friend redeems it, you both get '
+                    '120 bonus minutes.',
+                    style: Passeport.body(
+                      11,
+                    ).copyWith(color: Passeport.slateDim),
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _referralStats == null ? null : _copyReferralCode,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Passeport.parchmentDim,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _referralStats?.code ?? 'Loading…',
+                              style: Passeport.mono(
+                                16,
+                                weight: FontWeight.w700,
+                              ).copyWith(color: Passeport.maroon),
+                            ),
+                          ),
+                          const Icon(
+                            CupertinoIcons.doc_on_doc,
+                            size: 16,
+                            color: Passeport.slateDim,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _SettingsRow(
+                    label: 'Friends redeemed',
+                    value: _referralStats == null
+                        ? '—'
+                        : '${_referralStats!.successfulRedemptions} of ${_referralStats!.maxRedemptions}',
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _SettingsRow(
+                    label: 'Bonus balance',
+                    value: '${(_bonusSecondsBalance / 60).floor()} min',
+                  ),
+                  Divider(height: 16, color: Passeport.hairline),
+                  Text(
+                    'Have an invite code?',
+                    style: Passeport.body(
+                      12.5,
+                    ).copyWith(color: Passeport.slateDim),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _redeemController,
+                          textCapitalization: TextCapitalization.characters,
+                          style: Passeport.mono(14),
+                          decoration: InputDecoration(
+                            hintText: 'e.g. AB12CD',
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _redeeming ? null : _redeemCode,
+                        child: Container(
+                          height: 44,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Passeport.maroon,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: _redeeming
+                              ? const SizedBox(
+                                  width: 15,
+                                  height: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Redeem',
+                                  style: Passeport.body(
+                                    13,
+                                    weight: FontWeight.w700,
+                                  ).copyWith(color: Colors.white),
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
