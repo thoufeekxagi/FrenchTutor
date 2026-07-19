@@ -24,6 +24,7 @@ import '../../services/session_recorder.dart';
 import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
 import '../../utils/text_fold.dart';
+import '../../utils/voice_card_command.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
@@ -451,6 +452,11 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
+    final command = exactVoiceCardCommand(trimmed);
+    if (command != null) {
+      _applyExactVoiceCommand(command);
+      return;
+    }
     _hasAttempted = true;
 
     // A newer utterance always supersedes an in-flight classification — "next… wait,
@@ -499,6 +505,27 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     }();
   }
 
+  void _applyExactVoiceCommand(VoiceCardCommand command) {
+    _logDebug('→ exact voice command: ${command.name}');
+    switch (command) {
+      case VoiceCardCommand.next:
+        _advanceFromUserIntent();
+      case VoiceCardCommand.previous:
+        _goBackFromUserIntent();
+      case VoiceCardCommand.repeat:
+        final card = _currentCard;
+        if (card == null) return;
+        _cutTutorAudio();
+        _scheduleCardAnnouncement(
+          'Repeat the current word, ${card.entry.fr} = ${card.entry.en}. '
+          'Say it once, then stop and wait. $_noteReminder',
+        );
+      case VoiceCardCommand.finish:
+        _cutTutorAudio();
+        _confirmEnd();
+    }
+  }
+
   /// The single place a classified utterance becomes action.
   void _applyIntent(
     LiveIntentVerdict verdict, {
@@ -510,12 +537,26 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}, attempts: $_attemptCount',
     );
 
+    if (verdict.intent != LiveNavIntent.attempt &&
+        verdict.intent != LiveNavIntent.chat &&
+        source != 'exact-command') {
+      _logDebug(
+        '→ LLM command ignored, exact voice command or button required',
+      );
+      return;
+    }
     final isNavigation =
         verdict.intent == LiveNavIntent.advance ||
         verdict.intent == LiveNavIntent.back ||
         verdict.intent == LiveNavIntent.goto;
     // Consent cooldown: a duplicate/late transcript of a command that already moved the
     // card must never move it a second time.
+    if (isNavigation && source != 'exact-command') {
+      _logDebug(
+        '→ LLM navigation ignored, exact voice command or button required',
+      );
+      return;
+    }
     if (isNavigation &&
         DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
       _logDebug('→ navigation ignored (cooldown after recent card move)');
@@ -1599,19 +1640,16 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Mute only exists in Auto mode — in Hold mode the mic is already
-              // physically gated by the hold button.
-              if (_micMode == MicMode.auto)
-                _controlButton(
-                  icon: _callStatus == CallStatus.muted
-                      ? CupertinoIcons.mic_slash_fill
-                      : CupertinoIcons.mic_fill,
-                  label: _callStatus == CallStatus.muted ? 'Muted' : 'Mic on',
-                  color: _callStatus == CallStatus.muted
-                      ? DesignTokens.slate
-                      : DesignTokens.success,
-                  onTap: callActive ? _toggleMute : null,
-                ),
+              const SizedBox(width: 76),
+              MicPrimaryButton(
+                mode: _micMode,
+                isHolding: _mic.isHeld,
+                isMuted: _callStatus == CallStatus.muted,
+                enabled: callActive,
+                onAutoTap: _toggleMute,
+                onHoldStart: _pttDown,
+                onHoldEnd: _pttUp,
+              ),
               _controlButton(
                 icon: CupertinoIcons.phone_down_fill,
                 label: 'End',

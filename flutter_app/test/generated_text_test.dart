@@ -12,4 +12,16 @@ void main() {
       'Un choix, une réponse',
     );
   });
+
+  test(
+    'normalizes a completed transcript after its raw chunks are combined',
+    () {
+      const chunks = ['Ah, tu aimes ', 'lire ! C\'est ', 'noté.'];
+
+      expect(
+        normalizeGeneratedText(chunks.join()),
+        'Ah, tu aimes lire ! C\'est noté.',
+      );
+    },
+  );
 }

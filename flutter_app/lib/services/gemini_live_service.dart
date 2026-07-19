@@ -105,6 +105,7 @@ class GeminiLiveService {
   bool _suppressStaleReply = false;
   bool _suppressPreInjection = false;
   Timer? _suppressWatchdog;
+  String? _pendingSpokenContext;
 
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
@@ -262,6 +263,7 @@ class GeminiLiveService {
       _suppressWatchdog?.cancel();
       _suppressWatchdog = Timer(const Duration(seconds: 4), () {
         _suppressStaleReply = false;
+        _deliverPendingSpokenContext();
       });
     } else {
       _suppressPreInjection = true;
@@ -283,6 +285,10 @@ class GeminiLiveService {
   /// session kickoff so SHE opens the call instead of waiting for the student to speak first.
   void injectContext(String note, {bool expectReply = false}) {
     if (!_isSetupComplete || note.isEmpty) return;
+    if (expectReply && _suppressStaleReply) {
+      _pendingSpokenContext = note;
+      return;
+    }
     final framed = expectReply
         ? '(Note from the app, not the student, the on-screen card just changed or the '
               'session needs you to speak. Your audio may have been cut off mid-sentence; do '
@@ -305,6 +311,12 @@ class GeminiLiveService {
     });
     // The reply this injection triggers is wanted — stop dropping stray chunks now.
     if (expectReply) _suppressPreInjection = false;
+  }
+
+  void _deliverPendingSpokenContext() {
+    final note = _pendingSpokenContext;
+    _pendingSpokenContext = null;
+    if (note != null) injectContext(note, expectReply: true);
   }
 
   Future<void> _sendSetup() async {
@@ -498,10 +510,11 @@ class GeminiLiveService {
       // transcript as a spoken tutor line.
       if (wasSuppressed) {
         _currentTutorTranscript = '';
+        _deliverPendingSpokenContext();
         return;
       }
       if (_currentTutorTranscript.isNotEmpty) {
-        final t = _currentTutorTranscript;
+        final t = normalizeGeneratedText(_currentTutorTranscript);
         _currentTutorTranscript = '';
         onTutorTranscript?.call(t);
       }
@@ -535,10 +548,9 @@ class GeminiLiveService {
       if (t != null && t.isNotEmpty) {
         _isModelGenerating = true;
         if (!_suppressStaleReply && !_suppressPreInjection) {
-          final normalized = normalizeGeneratedText(t);
-          onTranscriptDelta?.call(normalized);
+          onTranscriptDelta?.call(t);
           _flushUserTranscript();
-          _currentTutorTranscript += normalized;
+          _currentTutorTranscript += t;
         }
       }
     }
@@ -572,10 +584,11 @@ class GeminiLiveService {
         // The stale generation ended naturally before the follow-up injection landed —
         // swallow it whole; the announcement reply will be its own fresh turn.
         _currentTutorTranscript = '';
+        _deliverPendingSpokenContext();
         return;
       }
       if (_currentTutorTranscript.isNotEmpty) {
-        final tutorTranscript = _currentTutorTranscript;
+        final tutorTranscript = normalizeGeneratedText(_currentTutorTranscript);
         _currentTutorTranscript = '';
         onTutorTranscript?.call(tutorTranscript);
       }

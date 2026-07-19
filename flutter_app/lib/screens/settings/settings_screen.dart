@@ -17,6 +17,7 @@ import '../../services/auth_service.dart';
 import '../../services/referral_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import 'orchestration_lab_screen.dart';
+import 'product_guide_screen.dart';
 import '../../widgets/kicker_text.dart';
 
 const availableModels = [
@@ -108,22 +109,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final message = switch (result.outcome) {
       RedeemOutcome.success =>
         'You and your friend each got ${result.bonusMinutes} bonus minutes!',
-      RedeemOutcome.alreadyRedeemed => 'You\'ve already redeemed an invite code.',
+      RedeemOutcome.alreadyRedeemed =>
+        'You\'ve already redeemed an invite code.',
       RedeemOutcome.deviceAlreadyUsed =>
         'An invite code has already been redeemed on this device.',
       RedeemOutcome.invalidCode => 'That code doesn\'t look right.',
-      RedeemOutcome.cannotRedeemOwnCode => 'That\'s your own code — share it with a friend instead.',
+      RedeemOutcome.cannotRedeemOwnCode =>
+        'That\'s your own code — share it with a friend instead.',
       RedeemOutcome.codeLimitReached =>
         'That code has already been used the maximum number of times.',
-      RedeemOutcome.networkError => 'Couldn\'t reach the server, try again in a moment.',
+      RedeemOutcome.networkError =>
+        'Couldn\'t reach the server, try again in a moment.',
     };
     if (result.outcome == RedeemOutcome.success) {
       _redeemController.clear();
-      setState(() => _bonusSecondsBalance = ReferralService.shared.cachedBonusSecondsBalance);
+      setState(
+        () => _bonusSecondsBalance =
+            ReferralService.shared.cachedBonusSecondsBalance,
+      );
     }
     await showPSConfirmDialog(
       context,
-      title: result.outcome == RedeemOutcome.success ? 'Invite redeemed!' : 'Couldn\'t redeem code',
+      title: result.outcome == RedeemOutcome.success
+          ? 'Invite redeemed!'
+          : 'Couldn\'t redeem code',
       message: message,
       confirmLabel: 'OK',
       cancelLabel: 'OK',
@@ -268,11 +277,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 3),
                 Text(
                   '${p.accent.label} French',
-                  style: Passeport.body(10.5, weight: FontWeight.w700)
-                      .copyWith(
-                        color: selected ? Passeport.brass : Passeport.maroon,
-                        letterSpacing: 0.4,
-                      ),
+                  style: Passeport.body(10.5, weight: FontWeight.w700).copyWith(
+                    color: selected ? Passeport.brass : Passeport.maroon,
+                    letterSpacing: 0.4,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -291,11 +299,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Widget row(TutorAccent accent) {
       final pair = TutorPersona.byAccent(accent);
       return Row(
-        children: [
-          card(pair[0]),
-          const SizedBox(width: 10),
-          card(pair[1]),
-        ],
+        children: [card(pair[0]), const SizedBox(width: 10), card(pair[1])],
       );
     }
 
@@ -390,6 +394,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
+            _PasseportCard(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () =>
+                    AppRouter.push(context, (_) => const ProductGuideScreen()),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Passeport.infoSoft,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.question_circle_fill,
+                        color: Passeport.info,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'How ParleSprint works',
+                            style: Passeport.body(15, weight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Mission, cards, voice controls, Marie, and evidence',
+                            style: Passeport.body(
+                              12,
+                            ).copyWith(color: Passeport.slateDim),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      CupertinoIcons.chevron_right,
+                      size: 16,
+                      color: Passeport.slateDim,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
             _PasseportCard(
               child: Column(

@@ -194,5 +194,6 @@ Run small, separated creative and audience experiments first. Do not scale from 
 - Keep Inter, semantic `DesignTokens`, and existing adaptive primitives.
 - One strong primary action per screen.
 - 44×44-point minimum touch targets.
+- Voice navigation moves a card only after one exact locally recognized command. Background noise, tutor echo, ambiguous language, imperfect transcription, and LLM intent results never navigate; physical controls remain available.
 - No literal Readle branding, copy, dark-theme clone, content scraping, emoji-heavy paywall, fake social proof, streak-loss pressure, or unsupported claims.
 - Preserve the existing persisted learning and orchestration behavior; visual polish must not replace real learning evidence.

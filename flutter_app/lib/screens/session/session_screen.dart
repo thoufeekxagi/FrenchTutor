@@ -216,7 +216,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   /// drawn from the invite-code bonus balance (see referral_service.dart) —
   /// draw it down server-side to match. Fire-and-forget: worst case the
   /// balance is very slightly stale until the next successful call.
-  void _consumeBonusMinutesIfNeeded(LearningStore store, int usedSecondsBefore) {
+  void _consumeBonusMinutesIfNeeded(
+    LearningStore store,
+    int usedSecondsBefore,
+  ) {
     final usedSecondsAfter = store.aiSecondsUsedToday();
     const baseLimit = PilotAccessService.dailyLimitSeconds;
     final overageBefore = (usedSecondsBefore - baseLimit).clamp(
@@ -455,7 +458,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   List<String> _learnerFrenchWords() {
     final words = <String>{};
     for (final message in _messages.where((m) => m.isUser)) {
-      for (var word in message.content.toLowerCase().split(RegExp(r"[^a-zà-ÿ']+"))) {
+      for (var word in message.content.toLowerCase().split(
+        RegExp(r"[^a-zà-ÿ']+"),
+      )) {
         final apostrophe = word.indexOf("'");
         if (apostrophe >= 0) word = word.substring(apostrophe + 1);
         if (word.length >= 2 && _frenchKeywords.contains(word)) words.add(word);
@@ -491,73 +496,73 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   static const _frenchKeywords = {
-      'bonjour',
-      'merci',
-      'oui',
-      'non',
-      'je',
-      'vous',
-      'le',
-      'la',
-      'les',
-      'comment',
-      'avec',
-      'pour',
-      'suis',
-      'appelle',
-      'salut',
-      'ça',
-      'va',
-      'très',
-      'bien',
-      'mal',
-      'aussi',
-      'mais',
-      'et',
-      'ou',
-      'ne',
-      'pas',
-      'ai',
-      'as',
-      'a',
-      'avons',
-      'avez',
-      'ont',
-      'sont',
-      'être',
-      'avoir',
-      'aller',
-      'faire',
-      'dire',
-      'voir',
-      'savoir',
-      'pouvoir',
-      'vouloir',
-      'devoir',
-      'falloir',
-      'venir',
-      'prendre',
-      'donner',
-      'parler',
-      'écouter',
-      'regarder',
-      'aimer',
-      'manger',
-      'boire',
-      'acheter',
-      'vendre',
-      'habiter',
-      'travailler',
-      'étudier',
-      'apprendre',
-      'comprendre',
-      'répéter',
-      'corriger',
-      'expliquer',
-      'traduire',
-      // Trial-lesson goodbye ("au revoir") — recap needs it to register.
-      'revoir',
-    };
+    'bonjour',
+    'merci',
+    'oui',
+    'non',
+    'je',
+    'vous',
+    'le',
+    'la',
+    'les',
+    'comment',
+    'avec',
+    'pour',
+    'suis',
+    'appelle',
+    'salut',
+    'ça',
+    'va',
+    'très',
+    'bien',
+    'mal',
+    'aussi',
+    'mais',
+    'et',
+    'ou',
+    'ne',
+    'pas',
+    'ai',
+    'as',
+    'a',
+    'avons',
+    'avez',
+    'ont',
+    'sont',
+    'être',
+    'avoir',
+    'aller',
+    'faire',
+    'dire',
+    'voir',
+    'savoir',
+    'pouvoir',
+    'vouloir',
+    'devoir',
+    'falloir',
+    'venir',
+    'prendre',
+    'donner',
+    'parler',
+    'écouter',
+    'regarder',
+    'aimer',
+    'manger',
+    'boire',
+    'acheter',
+    'vendre',
+    'habiter',
+    'travailler',
+    'étudier',
+    'apprendre',
+    'comprendre',
+    'répéter',
+    'corriger',
+    'expliquer',
+    'traduire',
+    // Trial-lesson goodbye ("au revoir") — recap needs it to register.
+    'revoir',
+  };
 
   String _formatDuration(int seconds) {
     final m = seconds ~/ 60;
@@ -909,21 +914,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Mute only exists in Auto mode — in Hold mode the mic is already
-              // physically gated by the hold button.
-              if (_micMode == MicMode.auto)
-                _controlButton(
-                  icon: _callStatus == CallStatus.muted
-                      ? CupertinoIcons.mic_slash_fill
-                      : CupertinoIcons.mic_fill,
-                  label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
-                  color: _callStatus == CallStatus.muted
-                      ? Passeport.slate
-                      : Passeport.ink,
-                  onTap: _callStatus == CallStatus.connecting
-                      ? null
-                      : _toggleMute,
-                ),
               _controlButton(
                 icon: _isSpeakerOn
                     ? CupertinoIcons.speaker_2_fill
@@ -933,6 +923,18 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 onTap: _callStatus == CallStatus.connecting
                     ? null
                     : _toggleSpeaker,
+              ),
+              MicPrimaryButton(
+                mode: _micMode,
+                isHolding: _mic.isHeld,
+                isMuted: _callStatus == CallStatus.muted,
+                enabled:
+                    _callStatus != CallStatus.connecting &&
+                    _callStatus != CallStatus.reconnecting &&
+                    _callStatus != CallStatus.ended,
+                onAutoTap: _toggleMute,
+                onHoldStart: _pttDown,
+                onHoldEnd: _pttUp,
               ),
               _controlButton(
                 icon: CupertinoIcons.phone_down_fill,

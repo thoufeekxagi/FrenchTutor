@@ -37,8 +37,13 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
   final _pageController = PageController();
+  late final AnimationController _brandController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..forward();
   int _page = 0;
   String? _goal;
   String? _level;
@@ -71,6 +76,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   void dispose() {
+    _brandController.dispose();
     _previewer.dispose();
     _pageController.dispose();
     super.dispose();
@@ -125,100 +131,102 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final showHeader = _page >= _pageGoal && _page <= _pageTutor;
     return Scaffold(
-      backgroundColor: Passeport.parchment,
-      body: SafeArea(
-        // Gradient pages paint edge-to-edge behind the status bar.
-        top: !_isGradientPage,
-        child: Column(
-          children: [
-            if (showHeader) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                child: Row(
+      backgroundColor: _isGradientPage
+          ? DesignTokens.primaryDeep
+          : DesignTokens.primary,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(gradient: _heroGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              if (showHeader) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                  child: Row(
+                    children: [
+                      Text(
+                        'PARLESPRINT',
+                        style: Passeport.body(
+                          11,
+                          weight: FontWeight.w800,
+                        ).copyWith(color: Colors.white, letterSpacing: 1.2),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'Step $_page of 3',
+                        style: Passeport.body(
+                          12,
+                          weight: FontWeight.w600,
+                        ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: List.generate(3, (index) {
+                      return Expanded(
+                        child: AnimatedContainer(
+                          duration: DesignTokens.durationFast,
+                          height: 4,
+                          margin: EdgeInsets.only(right: index == 2 ? 0 : 6),
+                          decoration: BoxDecoration(
+                            color: index < _page
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.28),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (index) => setState(() => _page = index),
                   children: [
-                    Text(
-                      'PARLESPRINT',
-                      style: Passeport.body(
-                        11,
-                        weight: FontWeight.w800,
-                      ).copyWith(color: Passeport.maroon, letterSpacing: 1.2),
+                    _welcomeStep(),
+                    _goalStep(),
+                    _levelStep(),
+                    _tutorStep(),
+                    _PreparingPane(
+                      active: _page == _pagePreparing,
+                      checkpoints: [
+                        'French',
+                        if (_level != null) LearnerLevel.displayLabel(_level!),
+                        switch (_goal) {
+                          'tef_canada' => 'TEF / TCF Canada',
+                          'everyday' => 'Everyday French',
+                          _ => 'Foundations',
+                        },
+                        'Tutor ${_tutor.displayName}',
+                      ],
+                      onComplete: () {
+                        if (!mounted || _page != _pagePreparing) return;
+                        if (_trialAvailable) {
+                          _next();
+                        } else {
+                          _finish();
+                        }
+                      },
                     ),
-                    const Spacer(),
-                    Text(
-                      'Step $_page of 3',
-                      style: Passeport.body(
-                        12,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: Passeport.slateDim),
-                    ),
+                    _trialStep(),
+                    _recapStep(),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  children: List.generate(3, (index) {
-                    return Expanded(
-                      child: AnimatedContainer(
-                        duration: DesignTokens.durationFast,
-                        height: 4,
-                        margin: EdgeInsets.only(right: index == 2 ? 0 : 6),
-                        decoration: BoxDecoration(
-                          color: index < _page
-                              ? Passeport.maroon
-                              : Passeport.parchmentDim,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
             ],
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index) => setState(() => _page = index),
-                children: [
-                  _welcomeStep(),
-                  _goalStep(),
-                  _levelStep(),
-                  _tutorStep(),
-                  _PreparingPane(
-                    active: _page == _pagePreparing,
-                    checkpoints: [
-                      'French',
-                      if (_level != null) LearnerLevel.displayLabel(_level!),
-                      switch (_goal) {
-                        'tef_canada' => 'TEF / TCF Canada',
-                        'everyday' => 'Everyday French',
-                        _ => 'Foundations',
-                      },
-                      'Tutor ${_tutor.displayName}',
-                    ],
-                    onComplete: () {
-                      if (!mounted || _page != _pagePreparing) return;
-                      if (_trialAvailable) {
-                        _next();
-                      } else {
-                        _finish();
-                      }
-                    },
-                  ),
-                  _trialStep(),
-                  _recapStep(),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  bool get _isGradientPage =>
-      _page == _pageWelcome || _page == _pagePreparing;
+  bool get _isGradientPage => _page == _pageWelcome || _page == _pagePreparing;
 
   // ---------------------------------------------------------------- page 0
   /// Gradient social-proof opener: wordmark, one strong promise inside a
@@ -231,36 +239,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Spacer(flex: 2),
-          Icon(
-            CupertinoIcons.bubble_left_bubble_right_fill,
-            color: Colors.white.withValues(alpha: 0.95),
-            size: 40,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'ParleSprint',
-            textAlign: TextAlign.center,
-            style: Passeport.display(28).copyWith(color: Colors.white),
-          ),
+          _AnimatedBrandMark(animation: _brandController),
           const Spacer(flex: 2),
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.22),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
             ),
             child: Column(
               children: [
                 Text(
                   '“The fastest way to speak French is to speak French.”',
                   textAlign: TextAlign.center,
-                  style: Passeport.display(23).copyWith(
-                    color: Colors.white,
-                    height: 1.35,
-                  ),
+                  style: Passeport.display(
+                    23,
+                  ).copyWith(color: Colors.white, height: 1.35),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -287,8 +282,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const SizedBox(width: 8),
               Text(
                 'Built for TEF / TCF Canada learners',
-                style: Passeport.body(13, weight: FontWeight.w600)
-                    .copyWith(color: Colors.white.withValues(alpha: 0.9)),
+                style: Passeport.body(
+                  13,
+                  weight: FontWeight.w600,
+                ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
               ),
             ],
           ),
@@ -323,7 +320,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     required Widget footer,
   }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 48),
       child: Column(
         children: [
           Expanded(
@@ -344,19 +341,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 22),
                   Text(
                     eyebrow.toUpperCase(),
-                    style: Passeport.body(
-                      10.5,
-                      weight: FontWeight.w800,
-                    ).copyWith(color: Passeport.sky, letterSpacing: 1),
+                    style: Passeport.body(10.5, weight: FontWeight.w800)
+                        .copyWith(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 1,
+                        ),
                   ),
                   const SizedBox(height: 7),
-                  Text(title, style: Passeport.display(30)),
+                  Text(
+                    title,
+                    style: Passeport.display(30).copyWith(color: Colors.white),
+                  ),
                   const SizedBox(height: 9),
                   Text(
                     subtitle,
-                    style: Passeport.body(
-                      15,
-                    ).copyWith(color: Passeport.slateDim, height: 1.45),
+                    style: Passeport.body(15).copyWith(
+                      color: Colors.white.withValues(alpha: 0.86),
+                      height: 1.45,
+                    ),
                   ),
                   const SizedBox(height: 26),
                   ...children,
@@ -759,7 +761,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       children: [
         _StatBar(
           label: 'Minutes with ${_tutor.displayName}',
-          value: minutes.toStringAsFixed(minutes == minutes.roundToDouble() ? 0 : 1),
+          value: minutes.toStringAsFixed(
+            minutes == minutes.roundToDouble() ? 0 : 1,
+          ),
           fraction: ((result?.durationSeconds ?? 0) / TrialCallGate.maxSeconds)
               .clamp(0.0, 1.0),
           color: Passeport.primary,
@@ -797,8 +801,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   child: Text(
                     word,
-                    style: Passeport.body(13, weight: FontWeight.w600)
-                        .copyWith(color: Passeport.primaryDeep),
+                    style: Passeport.body(
+                      13,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: Passeport.primaryDeep),
                   ),
                 ),
             ],
@@ -818,6 +824,76 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         onPressed: _finish,
         icon: CupertinoIcons.arrow_right,
       ),
+    );
+  }
+}
+
+class _AnimatedBrandMark extends StatelessWidget {
+  const _AnimatedBrandMark({required this.animation});
+
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        final wordProgress = Curves.easeOutCubic.transform(
+          Interval(0, 0.58).transform(animation.value),
+        );
+        final bubbleProgress = Curves.easeOutCubic.transform(
+          Interval(0.42, 1).transform(animation.value),
+        );
+        return Column(
+          children: [
+            SizedBox(
+              width: 104,
+              height: 48,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Transform.translate(
+                    offset: Offset(-22 * (1 - bubbleProgress), 0),
+                    child: Opacity(
+                      opacity: bubbleProgress,
+                      child: const Icon(
+                        CupertinoIcons.bubble_left_fill,
+                        color: Colors.white,
+                        size: 38,
+                      ),
+                    ),
+                  ),
+                  Transform.translate(
+                    offset: Offset(22 * (1 - bubbleProgress), 2),
+                    child: Opacity(
+                      opacity: bubbleProgress,
+                      child: const Icon(
+                        CupertinoIcons.bubble_right_fill,
+                        color: Colors.white,
+                        size: 38,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            ClipRect(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                widthFactor: wordProgress,
+                child: Transform.translate(
+                  offset: Offset(28 * (1 - wordProgress), 0),
+                  child: Text(
+                    'ParleSprint',
+                    style: Passeport.display(30).copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -843,17 +919,18 @@ class _PreparingPane extends StatefulWidget {
 
 class _PreparingPaneState extends State<_PreparingPane>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 3200),
-  )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        // A beat on 100% before moving on — an instant jump reads as fake.
-        Future.delayed(const Duration(milliseconds: 450), () {
-          if (mounted) widget.onComplete();
-        });
-      }
-    });
+  late final AnimationController _controller =
+      AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 3200),
+      )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // A beat on 100% before moving on — an instant jump reads as fake.
+          Future.delayed(const Duration(milliseconds: 450), () {
+            if (mounted) widget.onComplete();
+          });
+        }
+      });
 
   @override
   void initState() {
@@ -889,46 +966,47 @@ class _PreparingPaneState extends State<_PreparingPane>
         animation: _controller,
         builder: (context, _) {
           final t = Curves.easeInOutCubic.transform(_controller.value);
-          final visibleChips =
-              (t * (widget.checkpoints.length + 0.5)).floor();
+          final visibleChips = (t * (widget.checkpoints.length + 0.5)).floor();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(flex: 2),
               Text(
-                'Hang tight!\nWe\'re preparing your plan…',
+                'Creating your first lessons…',
                 textAlign: TextAlign.center,
-                style: Passeport.display(26).copyWith(
-                  color: Colors.white,
-                  height: 1.3,
-                ),
+                style: Passeport.display(
+                  26,
+                ).copyWith(color: Colors.white, height: 1.3),
               ),
               const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 120,
-                    height: 120,
+                    width: 152,
+                    height: 152,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         SizedBox(
-                          width: 120,
-                          height: 120,
+                          width: 152,
+                          height: 152,
                           child: CircularProgressIndicator(
                             value: t,
-                            strokeWidth: 9,
+                            strokeWidth: 11,
                             strokeCap: StrokeCap.round,
                             color: Colors.white,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.22),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.22,
+                            ),
                           ),
                         ),
                         Text(
                           '${(t * 100).round()} %',
-                          style: Passeport.body(22, weight: FontWeight.w800)
-                              .copyWith(color: Colors.white),
+                          style: Passeport.body(
+                            22,
+                            weight: FontWeight.w800,
+                          ).copyWith(color: Colors.white),
                         ),
                       ],
                     ),
@@ -995,10 +1073,10 @@ class _PreparingPaneState extends State<_PreparingPane>
                     const SizedBox(width: 7),
                     Text(
                       'Your plan adapts from real practice evidence',
-                      style: Passeport.body(12.5, weight: FontWeight.w600)
-                          .copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
+                      style: Passeport.body(
+                        12.5,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: Colors.white.withValues(alpha: 0.85)),
                     ),
                   ],
                 ),
@@ -1064,8 +1142,10 @@ class _StatBarState extends State<_StatBar> {
               ),
               Text(
                 widget.value,
-                style: Passeport.body(15, weight: FontWeight.w800)
-                    .copyWith(color: widget.color),
+                style: Passeport.body(
+                  15,
+                  weight: FontWeight.w800,
+                ).copyWith(color: widget.color),
               ),
             ],
           ),

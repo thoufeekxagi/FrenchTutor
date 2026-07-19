@@ -67,73 +67,55 @@ class _MicModeBarState extends State<MicModeBar>
 
   @override
   Widget build(BuildContext context) {
-    final isPtt = widget.mode == MicMode.pushToTalk;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: isPtt ? _holdLayout() : _autoLayout(),
-    );
-  }
-
-  Widget _autoLayout() {
-    return Row(children: [const Spacer(), _modePill()]);
-  }
-
-  Widget _holdLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          widget.isHolding ? 'Listening, release when done' : 'Hold to speak',
-          style: DesignTokens.body(11.5, weight: FontWeight.w600).copyWith(
-            color: widget.isHolding
-                ? DesignTokens.success
-                : DesignTokens.slateDim,
+      child: Stack(
+        children: [
+          Row(children: [const Spacer(), _modePill()]),
+          Offstage(
+            offstage: true,
+            child: _primaryButton(widget.mode == MicMode.pushToTalk),
           ),
-        ),
-        const SizedBox(height: 8),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Row(children: [const Spacer(), _modePill()]),
-            _holdButton(),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   /// Circular hold-to-talk button, sized to sit as a sibling of the End/Mute
   /// circles. The sweeping arc ring only exists while held — live recording
   /// feedback, not decoration.
-  Widget _holdButton() {
+  Widget _primaryButton(bool isPtt) {
     const buttonSize = 58.0;
     const ringSize = 74.0;
     return Semantics(
       button: true,
       enabled: widget.enabled,
-      label: widget.isHolding ? 'Release to send' : 'Hold to talk',
+      label: isPtt
+          ? (widget.isHolding ? 'Release to send' : 'Hold to talk')
+          : 'Microphone',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: widget.enabled
+        onTap: null,
+        onTapDown: isPtt && widget.enabled
             ? (_) {
                 HapticFeedback.lightImpact();
                 widget.onHoldStart();
               }
             : null,
-        onTapUp: widget.enabled
+        onTapUp: isPtt && widget.enabled
             ? (_) {
                 HapticFeedback.lightImpact();
                 widget.onHoldEnd();
               }
             : null,
-        onTapCancel: widget.enabled ? widget.onHoldEnd : null,
+        onTapCancel: isPtt && widget.enabled ? widget.onHoldEnd : null,
         child: SizedBox(
           width: ringSize,
           height: ringSize,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              if (widget.isHolding)
+              if (isPtt && widget.isHolding)
                 AnimatedBuilder(
                   animation: _spin,
                   builder: (context, _) => CustomPaint(
@@ -156,7 +138,9 @@ class _MicModeBarState extends State<MicModeBar>
                         ? DesignTokens.slate.withValues(alpha: 0.35)
                         : widget.isHolding
                         ? DesignTokens.success
-                        : DesignTokens.primary,
+                        : isPtt
+                        ? DesignTokens.primary
+                        : DesignTokens.ink,
                     shape: BoxShape.circle,
                     boxShadow: widget.isHolding
                         ? [
@@ -266,6 +250,90 @@ class _MicModeBarState extends State<MicModeBar>
 
 /// A sweeping arc that orbits the hold button while recording — the same
 /// "live" cue voice apps use, drawn in-palette.
+class MicPrimaryButton extends StatelessWidget {
+  const MicPrimaryButton({
+    super.key,
+    required this.mode,
+    required this.isHolding,
+    required this.isMuted,
+    required this.enabled,
+    required this.onAutoTap,
+    required this.onHoldStart,
+    required this.onHoldEnd,
+  });
+
+  final MicMode mode;
+  final bool isHolding;
+  final bool isMuted;
+  final bool enabled;
+  final VoidCallback onAutoTap;
+  final VoidCallback onHoldStart;
+  final VoidCallback onHoldEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final isPtt = mode == MicMode.pushToTalk;
+    final label = isPtt
+        ? (isHolding ? 'Release to send' : 'Hold to speak')
+        : (isMuted ? 'Unmute' : 'Mute');
+    final color = !enabled
+        ? DesignTokens.slate.withValues(alpha: 0.35)
+        : isPtt
+        ? (isHolding ? DesignTokens.success : DesignTokens.primary)
+        : (isMuted ? DesignTokens.slate : DesignTokens.ink);
+    final icon = isPtt
+        ? (isHolding ? CupertinoIcons.waveform : CupertinoIcons.mic_fill)
+        : (isMuted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: !isPtt && enabled ? onAutoTap : null,
+        onTapDown: isPtt && enabled
+            ? (_) {
+                HapticFeedback.lightImpact();
+                onHoldStart();
+              }
+            : null,
+        onTapUp: isPtt && enabled
+            ? (_) {
+                HapticFeedback.lightImpact();
+                onHoldEnd();
+              }
+            : null,
+        onTapCancel: isPtt && enabled ? onHoldEnd : null,
+        child: SizedBox(
+          width: 76,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: DesignTokens.durationFast,
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: Icon(icon, color: DesignTokens.surface, size: 23),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                label,
+                style: DesignTokens.body(11.5, weight: FontWeight.w600)
+                    .copyWith(
+                      color: isHolding
+                          ? DesignTokens.success
+                          : DesignTokens.slateDim,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RecordingRingPainter extends CustomPainter {
   const _RecordingRingPainter({required this.progress, required this.color});
 
