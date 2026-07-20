@@ -13,6 +13,7 @@ import 'data/database/competency_store.dart';
 import 'models/tutor_persona.dart';
 import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
+import 'services/lesson_speech_service.dart';
 import 'services/pilot_access_service.dart';
 
 void main() {
@@ -43,6 +44,7 @@ void main() {
           publishableKey: ApiKeys.supabaseAnonKey,
         );
         final db = await openAppDatabase();
+        LessonSpeechService.configure(db);
         final infrastructure = PilotInfrastructureStore(db);
         final platform = _pilotPlatform();
         final installationId = infrastructure.installationId(platform.name);

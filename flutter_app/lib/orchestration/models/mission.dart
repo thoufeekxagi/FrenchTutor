@@ -74,6 +74,7 @@ class MissionStepDefinition {
     required this.estimatedMinutes,
     required this.evidenceGoal,
     this.generatedScenario = false,
+    this.isGrammarPractice = false,
   });
 
   final String id;
@@ -83,6 +84,12 @@ class MissionStepDefinition {
   final String evidenceGoal;
   final bool generatedScenario;
 
+  /// A `controlledSpeaking` step that is really a guided grammar drill (its
+  /// `contentItemId` points into the grammar bank, not the speaking-topic
+  /// bank). Set explicitly per step instead of inferred from whether the id
+  /// happens to collide with a grammar lesson id.
+  final bool isGrammarPractice;
+
   factory MissionStepDefinition.fromJson(Map<String, dynamic> json) =>
       MissionStepDefinition(
         id: json['id'] as String,
@@ -91,5 +98,6 @@ class MissionStepDefinition {
         estimatedMinutes: json['estimatedMinutes'] as int,
         evidenceGoal: json['evidenceGoal'] as String,
         generatedScenario: json['generatedScenario'] as bool? ?? false,
+        isGrammarPractice: json['isGrammarPractice'] as bool? ?? false,
       );
 }

@@ -61,6 +61,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   6: _migrationV6,
   7: _migrationV7,
   8: _migrationV8,
+  9: _migrationV9,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -561,5 +562,28 @@ void _migrationV7(CommonDatabase db) {
 void _migrationV8(CommonDatabase db) {
   db.execute(
     "ALTER TABLE plan_tasks ADD COLUMN modality TEXT NOT NULL DEFAULT 'reading_recognition'",
+  );
+}
+
+/// Index of persisted Gemini TTS audio (lesson narration, vocab/flashcard
+/// sounds, roleplay lines): points at a file under the app's persistent
+/// support directory, not the OS-evictable temp dir, so a phrase is
+/// synthesized once and reused across app relaunches instead of burning a
+/// fresh Gemini round-trip every time it's replayed.
+void _migrationV9(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS tts_audio_cache (
+      cache_key TEXT PRIMARY KEY,
+      content_item_id TEXT,
+      voice_name TEXT NOT NULL,
+      slow INTEGER NOT NULL,
+      text TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_tts_audio_cache_content_item '
+    'ON tts_audio_cache (content_item_id)',
   );
 }

@@ -84,6 +84,11 @@ class OrchestrationService {
     final existing = planStore.activePlanForDate(localDate, userId: userId);
     if (existing != null) return existing;
 
+    // Never immediately repeat the mission a new day's plan would otherwise
+    // deterministically re-pick if competency scores haven't shifted yet —
+    // this is what made the daily mission feel "stuck" on the same content.
+    final lastMissionId = planStore.mostRecentMissionId(userId: userId);
+
     final snapshot = _generateSnapshot(
       framework: framework,
       competencyStates: competencyStates,
@@ -96,6 +101,7 @@ class OrchestrationService {
       missionCatalog: missionCatalog,
       learnerLevel: learnerLevel,
       userId: userId,
+      excludedMissionIds: lastMissionId == null ? const {} : {lastMissionId},
     );
     planStore.savePlan(snapshot);
     return snapshot;

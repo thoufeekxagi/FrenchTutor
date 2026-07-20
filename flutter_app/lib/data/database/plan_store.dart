@@ -96,6 +96,21 @@ class PlanStore {
     return _planFromRow(rows.first);
   }
 
+  /// The mission id from the most recently generated plan (any date, any
+  /// status), so a new day's plan can avoid immediately repeating it.
+  String? mostRecentMissionId({String? userId}) {
+    final rows = _db.select(
+      "SELECT input_snapshot_json FROM learning_plans WHERE user_id IS ? "
+      "AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 1",
+      [userId],
+    );
+    if (rows.isEmpty) return null;
+    final snapshot =
+        (jsonDecode(rows.first['input_snapshot_json'] as String) as Map)
+            .cast<String, Object?>();
+    return snapshot['missionId'] as String?;
+  }
+
   PlanSnapshot? byId(String id) {
     final rows = _db.select(
       'SELECT * FROM learning_plans WHERE id = ? AND deleted_at IS NULL',

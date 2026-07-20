@@ -53,7 +53,7 @@ class MissionTaskExecutor {
       case PerformanceModality.listeningRecognition:
         await _runListening(context: context, task: task, mission: mission);
       case PerformanceModality.controlledSpeaking:
-        if (_hasGrammarItem(task.contentItemId)) {
+        if (_isGrammarStep(task, mission)) {
           await _runGrammar(context: context, task: task);
         } else {
           await _runSpeaking(context: context, task: task, mission: mission);
@@ -350,10 +350,15 @@ ${scene.segments.map((segment) => 'CHARACTER: ${segment.characterFr}\nLEARNER: $
     return null;
   }
 
-  bool _hasGrammarItem(String id) {
-    final grammar = ContentService.shared.grammar();
-    return grammar?.lessons.any((item) => item.id == id) == true ||
-        grammar?.topics.any((item) => item.id == id) == true;
+  bool _isGrammarStep(PlanTaskRecord task, MissionDefinition mission) {
+    final step = mission.steps
+        .where(
+          (item) =>
+              item.contentItemId == task.contentItemId &&
+              item.modality == task.modality,
+        )
+        .firstOrNull;
+    return step?.isGrammarPractice == true;
   }
 
   WritingTask? _writingTask(String id) => ContentService.shared

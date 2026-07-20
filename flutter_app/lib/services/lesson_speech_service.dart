@@ -5,15 +5,21 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqlite3/common.dart';
 
+import '../data/database/tts_audio_cache_store.dart';
 import '../models/tutor_persona.dart';
 import 'audio_streaming_service.dart';
 import 'lesson_agent_service.dart';
 
 class SpeechItem {
-  SpeechItem({required this.text, required this.language});
+  SpeechItem({required this.text, required this.language, this.contentItemId});
   final String text;
   final String language; // "fr-FR" or "en-US"
+
+  /// Optional vocab/grammar/listening/writing item this line belongs to —
+  /// purely metadata for the cache index, never required for a cache hit.
+  final String? contentItemId;
 }
 
 /// TTS + STT for in-lesson narration and voice Q&A — Gemini only, by design.
@@ -33,6 +39,14 @@ class LessonSpeechService {
   LessonSpeechService._();
 
   static final LessonSpeechService shared = LessonSpeechService._();
+
+  /// Called once at app startup (see `main.dart`, alongside `ContentService.shared.preload()`)
+  /// so this singleton can index cached audio in the app database. Safe to leave
+  /// unconfigured (e.g. in tests) — the service just falls back to synthesizing every time.
+  static TtsAudioCacheStore? _cacheStore;
+  static void configure(CommonDatabase db) {
+    _cacheStore = TtsAudioCacheStore(db);
+  }
 
   AudioStreamingService? _geminiAudioLazy;
   AudioStreamingService get _geminiAudio =>
@@ -137,6 +151,7 @@ class LessonSpeechService {
       item.text,
       voiceName: persona.voiceName,
       slow: isSlow,
+      contentItemId: item.contentItemId,
     );
     if (!played) {
       // Gemini is the only voice engine here — no on-device fallback. Skip
@@ -149,20 +164,15 @@ class LessonSpeechService {
     String text, {
     required String voiceName,
     required bool slow,
+    String? contentItemId,
   }) async {
     try {
-      final cacheKey = _diskCacheKey(voiceName, slow, text);
-      var bytes = _synthCache[cacheKey];
-      bytes ??= await _readDiskCache(cacheKey);
-      if (bytes == null) {
-        bytes = await LessonAgentService.shared.synthesizeSpeech(
-          text,
-          slow: slow,
-          voiceName: voiceName,
-        );
-        unawaited(_writeDiskCache(cacheKey, bytes));
-      }
-      _synthCache[cacheKey] = bytes;
+      final bytes = await synthesize(
+        text,
+        voiceName: voiceName,
+        slow: slow,
+        contentItemId: contentItemId,
+      );
       final myIndex = _ttsIndex;
       await _geminiAudio.playAudioChunk(bytes);
       // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
@@ -182,19 +192,56 @@ class LessonSpeechService {
     _speakCurrent();
   }
 
+  /// Returns the PCM16 bytes for [text] in [voiceName], from cache when possible.
+  /// Used both by the queued narration path above and directly by callers that just want
+  /// one clip played on demand (vocab/grammar/listening speaker buttons, roleplay lines) —
+  /// every caller shares the same in-memory + persisted-disk + DB-indexed cache, so a given
+  /// line is ever synthesized once, never once per screen.
+  Future<List<int>> synthesize(
+    String text, {
+    required String voiceName,
+    bool slow = false,
+    String? contentItemId,
+  }) async {
+    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    var bytes = _synthCache[cacheKey];
+    bytes ??= await _readDiskCache(cacheKey);
+    if (bytes == null) {
+      bytes = await LessonAgentService.shared.synthesizeSpeech(
+        text,
+        slow: slow,
+        voiceName: voiceName,
+      );
+      unawaited(
+        _writeDiskCache(
+          cacheKey,
+          bytes,
+          voiceName: voiceName,
+          slow: slow,
+          text: text,
+          contentItemId: contentItemId,
+        ),
+      );
+    }
+    _synthCache[cacheKey] = bytes;
+    return bytes;
+  }
+
   // ---------------------------------------------------------------------------
-  // Disk cache — the same sentence in the same voice is spoken constantly
-  // (flashcards, replays, repeated lesson visits); persisting synthesized
-  // audio across app launches means most narration is instant instead of a
-  // fresh Gemini round-trip every time. Self-healing: a cache miss just
-  // re-synthesizes, so it's safe for the OS to clear this directory.
+  // Persistent cache — the same sentence in the same voice is spoken constantly
+  // (flashcards, replays, repeated lesson visits, roleplay lines heard again in a
+  // later session); persisting synthesized audio in the app's own support directory
+  // (NOT the OS-evictable temp dir) and indexing it in `tts_audio_cache` means most
+  // narration is instant instead of a fresh Gemini round-trip, and survives both app
+  // relaunches and the OS's temp-storage cleanup sweeps. Self-healing: a cache miss
+  // (missing row, or a row whose file somehow vanished) just re-synthesizes.
   // ---------------------------------------------------------------------------
 
   Directory? _cacheDirLazy;
 
   Future<Directory> get _cacheDir async {
     if (_cacheDirLazy != null) return _cacheDirLazy!;
-    final base = await getTemporaryDirectory();
+    final base = await getApplicationSupportDirectory();
     final dir = Directory('${base.path}/gemini_tts_cache');
     if (!await dir.exists()) await dir.create(recursive: true);
     return _cacheDirLazy = dir;
@@ -205,7 +252,8 @@ class LessonSpeechService {
 
   Future<List<int>?> _readDiskCache(String key) async {
     try {
-      final file = File('${(await _cacheDir).path}/$key.pcm');
+      final fileName = _cacheStore?.fileName(key) ?? '$key.pcm';
+      final file = File('${(await _cacheDir).path}/$fileName');
       if (await file.exists()) return await file.readAsBytes();
     } catch (_) {
       // A cache read failure just falls through to fresh synthesis.
@@ -213,10 +261,26 @@ class LessonSpeechService {
     return null;
   }
 
-  Future<void> _writeDiskCache(String key, List<int> bytes) async {
+  Future<void> _writeDiskCache(
+    String key,
+    List<int> bytes, {
+    required String voiceName,
+    required bool slow,
+    required String text,
+    String? contentItemId,
+  }) async {
     try {
-      final file = File('${(await _cacheDir).path}/$key.pcm');
+      final fileName = '$key.pcm';
+      final file = File('${(await _cacheDir).path}/$fileName');
       await file.writeAsBytes(bytes, flush: false);
+      _cacheStore?.record(
+        cacheKey: key,
+        voiceName: voiceName,
+        slow: slow,
+        text: text,
+        fileName: fileName,
+        contentItemId: contentItemId,
+      );
     } catch (_) {
       // Best-effort — narration already played from the in-memory bytes.
     }

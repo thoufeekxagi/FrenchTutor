@@ -76,7 +76,8 @@
           "contentItemId": "present",
           "modality": "controlled_speaking",
           "estimatedMinutes": 8,
-          "evidenceGoal": "Build correct present-tense sentences with guided practice."
+          "evidenceGoal": "Build correct present-tense sentences with guided practice.",
+          "isGrammarPractice": true
         },
         {
           "id": "practise_work_word_pronunciation",

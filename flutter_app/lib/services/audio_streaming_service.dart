@@ -31,6 +31,15 @@ class AudioStreamingService {
   StreamController<Uint8List>? _micStreamController;
   StreamSubscription<Uint8List>? _micSub;
 
+  /// Reacts to phone calls / other apps interrupting the session, and to
+  /// Bluetooth devices (AirPods etc.) connecting or disconnecting mid-call.
+  /// Without these, iOS silently leaves the session on whatever route it
+  /// fell back to (usually the speaker) after an interruption ends or a
+  /// Bluetooth device reconnects, instead of reclaiming the preferred route
+  /// the way native VoIP/Messages calls do.
+  StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
+  StreamSubscription<AudioDevicesChangedEvent>? _devicesChangedSub;
+
   bool _isStreaming = false;
   bool _isPlayerStarted = false;
   bool _isSessionConfigured = false;
@@ -76,25 +85,60 @@ class AudioStreamingService {
   /// (iOS otherwise picks the earpiece receiver for a `playAndRecord` category); `allowBluetooth`
   /// lets a connected Bluetooth headset/earbuds still take over routing normally.
   Future<void> _configureSessionIfNeeded() async {
-    if (_isSessionConfigured) return;
     final session = await AudioSession.instance;
-    await session.configure(
-      AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-        avAudioSessionCategoryOptions:
-            AVAudioSessionCategoryOptions.defaultToSpeaker |
-            AVAudioSessionCategoryOptions.allowBluetooth |
-            AVAudioSessionCategoryOptions.allowBluetoothA2dp,
-        avAudioSessionMode: AVAudioSessionMode.voiceChat,
-        androidAudioAttributes: const AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.speech,
-          usage: AndroidAudioUsage.voiceCommunication,
+    if (!_isSessionConfigured) {
+      await session.configure(
+        AudioSessionConfiguration(
+          avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+          avAudioSessionCategoryOptions:
+              AVAudioSessionCategoryOptions.defaultToSpeaker |
+              AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.allowBluetoothA2dp,
+          avAudioSessionMode: AVAudioSessionMode.voiceChat,
+          androidAudioAttributes: const AndroidAudioAttributes(
+            contentType: AndroidAudioContentType.speech,
+            usage: AndroidAudioUsage.voiceCommunication,
+          ),
+          androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
         ),
-        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      ),
-    );
+      );
+      _isSessionConfigured = true;
+    }
+    // Re-asserted every time (mic (re)start, app resume, unmute, PTT-down), not just on first
+    // configure — an interruption (phone call) or the app being backgrounded can leave the
+    // shared session on the wrong route by the time we come back, and re-activating is what
+    // makes the OS re-resolve routing against our configured options rather than leaving it
+    // wherever it fell back to.
     await session.setActive(true);
-    _isSessionConfigured = true;
+  }
+
+  /// Re-activating the session (rather than just observing) is what actually makes iOS/
+  /// Android re-evaluate which output device should carry audio — a route change on its own
+  /// does not force this, which is why a reconnecting Bluetooth device could otherwise sit
+  /// there "available" while the call stayed stuck on the speaker.
+  Future<void> _reclaimPreferredRoute() async {
+    if (!_isStreaming) return;
+    try {
+      final session = await AudioSession.instance;
+      await session.setActive(true);
+    } catch (_) {}
+  }
+
+  void _listenForRouteChanges(AudioSession session) {
+    _interruptionSub?.cancel();
+    _devicesChangedSub?.cancel();
+    _interruptionSub = session.interruptionEventStream.listen((event) {
+      // Only the end of an interruption needs action — a phone call ending, another app's
+      // audio yielding back, etc. iOS restores *a* route on its own by then, but not always
+      // the one we want (it can land back on the speaker even with AirPods connected), so
+      // reclaiming here nudges it to re-resolve against our configured options.
+      if (!event.begin) _reclaimPreferredRoute();
+    });
+    _devicesChangedSub = session.devicesChangedEventStream.listen((event) {
+      // A Bluetooth device connecting mid-call (e.g. AirPods reconnecting after a phone-call
+      // interruption) doesn't retroactively move already-flowing audio over on its own.
+      if (event.devicesAdded.isNotEmpty) _reclaimPreferredRoute();
+    });
   }
 
   Future<void> startStreaming({
@@ -103,6 +147,7 @@ class AudioStreamingService {
     if (_isStreaming) return;
     _audioChunkCallback = onChunk;
     await _configureSessionIfNeeded();
+    _listenForRouteChanges(await AudioSession.instance);
 
     if (!_recorder.isStopped) {
       await _recorder.stopRecorder();
@@ -284,6 +329,10 @@ class AudioStreamingService {
   void setSpeakerEnabled(bool enabled) {}
 
   Future<void> dispose() async {
+    await _interruptionSub?.cancel();
+    _interruptionSub = null;
+    await _devicesChangedSub?.cancel();
+    _devicesChangedSub = null;
     await stopStreaming();
     await stopPlayback();
     try {

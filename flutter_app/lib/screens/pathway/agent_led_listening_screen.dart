@@ -12,11 +12,13 @@ import '../../flow/stage_outcome.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/lesson_speech_service.dart';
 import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
@@ -128,31 +130,30 @@ class _AgentLedListeningScreenState
 
   // Per-line natural-voice replay: Gemini TTS (Marie's voice family), synthesized once
   // per line and cached — tap a bubble's speaker to rehear it instantly, long-press for
-  // a slow beginner-paced rendition. No round trip to the live session.
-  final Map<String, List<int>> _ttsCache = {};
+  // a slow beginner-paced rendition. No round trip to the live session. Cached through
+  // LessonSpeechService's shared, persisted store (not a screen-local map) so a line
+  // heard in an earlier session is instant here too, instead of re-synthesizing.
   final Set<String> _ttsLoading = {};
 
   Future<void> _speakLine(String text, {bool slow = false}) async {
     if (text.isEmpty) return;
     final key = '$slow|$text';
     if (_ttsLoading.contains(key)) return;
-    var bytes = _ttsCache[key];
-    if (bytes == null) {
-      _ttsLoading.add(key);
+    List<int> bytes;
+    _ttsLoading.add(key);
+    if (mounted) setState(() {});
+    try {
+      bytes = await LessonSpeechService.shared.synthesize(
+        text,
+        voiceName: ActiveTutor.current.voiceName,
+        slow: slow,
+      );
+    } catch (_) {
+      _logDebug('→ TTS failed for "$text"');
+      return;
+    } finally {
+      _ttsLoading.remove(key);
       if (mounted) setState(() {});
-      try {
-        bytes = await LessonAgentService.shared.synthesizeSpeech(
-          text,
-          slow: slow,
-        );
-        _ttsCache[key] = bytes;
-      } catch (_) {
-        _logDebug('→ TTS failed for "$text"');
-        return;
-      } finally {
-        _ttsLoading.remove(key);
-        if (mounted) setState(() {});
-      }
     }
     // Don't talk over Marie — cut whatever she's saying, then play the line
     // through the same 24kHz pipeline her voice uses.
