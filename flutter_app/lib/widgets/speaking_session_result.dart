@@ -125,7 +125,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              _evidenceText,
+                              _practiceText,
                               style: Passeport.body(
                                 13.5,
                                 weight: FontWeight.w500,
@@ -158,12 +158,12 @@ class SpeakingSessionResultView extends StatelessWidget {
     return 'Your conversation with Marie and its transcript are now in your journal.';
   }
 
-  String get _evidenceText {
+  String get _practiceText {
     if (isDailyPath && meetsCompletionThreshold) {
       return 'Daily path updated from real speaking time and learner turns.';
     }
     if (isDailyPath) {
-      return 'Resume later to add enough speaking evidence. Nothing has been marked complete yet.';
+      return 'Resume later for more speaking practice. Nothing has been marked complete yet.';
     }
     return 'Transcript saved to Recent practice. No pronunciation score was invented.';
   }

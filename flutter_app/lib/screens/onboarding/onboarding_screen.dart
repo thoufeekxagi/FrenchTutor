@@ -13,7 +13,6 @@ import '../../providers/database_provider.dart';
 import '../../services/trial_call_gate.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_primary_button.dart';
 import '../session/session_screen.dart';
 
 /// Onboarding funnel — Readle's proven anatomy, ParleSprint's palette:
@@ -315,7 +314,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   Widget _step({
     required String eyebrow,
     required String title,
-    required String subtitle,
+    String? subtitle,
     required List<Widget> children,
     required Widget footer,
   }) {
@@ -352,14 +351,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     title,
                     style: Passeport.display(30).copyWith(color: Colors.white),
                   ),
-                  const SizedBox(height: 9),
-                  Text(
-                    subtitle,
-                    style: Passeport.body(15).copyWith(
-                      color: Colors.white.withValues(alpha: 0.86),
-                      height: 1.45,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 9),
+                    Text(
+                      subtitle,
+                      style: Passeport.body(15).copyWith(
+                        color: Colors.white.withValues(alpha: 0.86),
+                        height: 1.45,
+                      ),
                     ),
-                  ),
+                  ],
                   const SizedBox(height: 26),
                   ...children,
                 ],
@@ -380,9 +381,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     _ => CupertinoIcons.phone_fill,
   };
 
+  Widget _onboardingButton({
+    required String label,
+    required VoidCallback? onPressed,
+    required IconData icon,
+  }) {
+    final enabled = onPressed != null;
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: enabled
+              ? Colors.white
+              : Colors.white.withValues(alpha: 0.28),
+          foregroundColor: enabled
+              ? DesignTokens.primaryDeep
+              : Colors.white.withValues(alpha: 0.52),
+          disabledBackgroundColor: Colors.white.withValues(alpha: 0.28),
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+          textStyle: Passeport.body(15, weight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
   Widget _choice({
     required String label,
-    required String detail,
+    String? detail,
     required bool selected,
     required VoidCallback onTap,
     Widget? trailing,
@@ -401,12 +433,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           constraints: const BoxConstraints(minHeight: 68),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           decoration: BoxDecoration(
-            // Primary (palette blue) for selection — matches the app's action
-            // color everywhere else instead of the old near-black.
-            color: selected ? Passeport.primary : Passeport.card,
+            color: Colors.white.withValues(alpha: selected ? 1 : 0.94),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: selected ? Passeport.primary : Passeport.hairline,
+              color: selected
+                  ? DesignTokens.primaryDeep
+                  : Colors.white.withValues(alpha: 0.72),
+              width: selected ? 2 : 1,
             ),
           ),
           child: Row(
@@ -419,16 +452,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       label,
                       style: Passeport.body(15, weight: FontWeight.w700)
                           .copyWith(
-                            color: selected ? Colors.white : Passeport.ink,
+                            color: selected
+                                ? DesignTokens.primaryDeep
+                                : Passeport.ink,
                           ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      detail,
-                      style: Passeport.body(12.5).copyWith(
-                        color: selected ? Colors.white70 : Passeport.slateDim,
+                    if (detail != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        detail,
+                        style: Passeport.body(12.5).copyWith(
+                          color: selected
+                              ? DesignTokens.primaryDeep.withValues(
+                                  alpha: 0.82,
+                                )
+                              : Passeport.slateDim,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -437,7 +478,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 selected
                     ? CupertinoIcons.checkmark_circle_fill
                     : CupertinoIcons.circle,
-                color: selected ? Colors.white : Passeport.slate,
+                color: selected ? DesignTokens.primaryDeep : Passeport.slate,
                 size: 22,
               ),
             ],
@@ -451,29 +492,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return _step(
       eyebrow: 'Your goal',
       title: 'What should French unlock for you?',
-      subtitle:
-          'Your answer shapes the examples, daily plan, and feedback you receive.',
       children: [
         _choice(
           label: 'TEF / TCF Canada',
-          detail: 'Build toward an immigration language score',
           selected: _goal == 'tef_canada',
           onTap: () => setState(() => _goal = 'tef_canada'),
         ),
         _choice(
           label: 'Everyday French',
-          detail: 'Speak with more confidence in daily life',
           selected: _goal == 'everyday',
           onTap: () => setState(() => _goal = 'everyday'),
         ),
         _choice(
           label: 'Build the foundations',
-          detail: 'Start broadly and choose a goal later',
           selected: _goal == 'unsure',
           onTap: () => setState(() => _goal = 'unsure'),
         ),
       ],
-      footer: PasseportPrimaryButton(
+      footer: _onboardingButton(
         label: 'Continue',
         onPressed: _goal == null ? null : _next,
         icon: CupertinoIcons.arrow_right,
@@ -485,37 +521,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return _step(
       eyebrow: 'Starting point',
       title: 'Where are you today?',
-      subtitle:
-          'Choose the closest answer. The plan will adjust as you create real evidence.',
       children: [
         _choice(
           label: 'A1 · Just starting',
-          detail: 'Little or no French yet; I need the essentials',
           selected: _level == 'a1',
           onTap: () => setState(() => _level = 'a1'),
         ),
         _choice(
           label: 'A2 · I know the basics',
-          detail: 'Simple phrases and everyday words, but I hesitate',
           selected: _level == 'a2',
           onTap: () => setState(() => _level = 'a2'),
         ),
         _choice(
           label: 'B1 · I can hold a conversation',
-          detail: 'I manage everyday situations and want more range',
           selected: _level == 'b1',
           onTap: () => setState(() => _level = 'b1'),
         ),
         _choice(
-          label: 'B2 · I\'m comfortable, polishing',
-          detail: 'I discuss most topics and want exam-level accuracy',
+          label: 'B2 · Polishing',
           selected: _level == 'b2',
           onTap: () => setState(() => _level = 'b2'),
         ),
         const SizedBox(height: 12),
         Text(
           'A comfortable daily session',
-          style: Passeport.body(13, weight: FontWeight.w600),
+          style: Passeport.body(
+            13,
+            weight: FontWeight.w600,
+          ).copyWith(color: Colors.white),
         ),
         const SizedBox(height: 9),
         PSSegmented<String>(
@@ -528,7 +561,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           onChanged: (value) => setState(() => _sessionLength = value),
         ),
       ],
-      footer: PasseportPrimaryButton(
+      footer: _onboardingButton(
         label: 'Build my plan',
         onPressed: _level == null ? null : _next,
         icon: CupertinoIcons.arrow_right,
@@ -578,23 +611,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   Widget _tutorStep() {
-    Widget group(TutorAccent accent, String detailSuffix) {
+    Widget group(TutorAccent accent) {
       final pair = TutorPersona.byAccent(accent);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '${accent.label} French'.toUpperCase(),
-            style: Passeport.body(
-              10.5,
-              weight: FontWeight.w800,
-            ).copyWith(color: Passeport.maroon, letterSpacing: 1),
+            style: Passeport.body(10.5, weight: FontWeight.w800).copyWith(
+              color: Colors.white.withValues(alpha: 0.82),
+              letterSpacing: 1,
+            ),
           ),
           const SizedBox(height: 8),
           for (final p in pair)
             _choice(
               label: p.displayName,
-              detail: '${p.tagline}, $detailSuffix',
+              detail: p.tagline,
               selected: _tutorChoice?.id == p.id,
               onTap: () => setState(() => _tutorChoice = p),
               trailing: _previewButton(p),
@@ -606,16 +639,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return _step(
       eyebrow: 'Your tutor',
       title: 'Who will you practice with?',
-      subtitle:
-          'Tap ▶ to hear each tutor, then choose. France French is what most '
-          'exams use; Québec French is what you\'ll hear across Canada. You '
-          'can switch tutors anytime in Settings.',
+      subtitle: 'Tap play to hear them. Switch anytime.',
       children: [
-        group(TutorAccent.france, 'standard metropolitan French'),
+        group(TutorAccent.france),
         const SizedBox(height: 10),
-        group(TutorAccent.quebec, 'natural Québécois French'),
+        group(TutorAccent.quebec),
       ],
-      footer: PasseportPrimaryButton(
+      footer: _onboardingButton(
         label: 'Continue',
         onPressed: _tutorChoice == null ? null : _next,
         icon: CupertinoIcons.arrow_right,
@@ -629,60 +659,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return _step(
       eyebrow: 'Your first lesson',
       title: '3 minutes with ${_tutor.displayName}. On us.',
-      subtitle:
-          'No account, no card. ${_tutor.displayName} calls you right now and '
-          'teaches your very first French conversation.',
+      subtitle: 'No account, no card.',
       children: [
         _PromiseRow(
           icon: CupertinoIcons.waveform,
           title: 'Speak from the first minute',
-          detail:
-              'Bonjour, ça va, je m\'appelle, you\'ll say them all out loud.',
         ),
-        _PromiseRow(
-          icon: CupertinoIcons.timer,
-          title: 'Exactly 3 minutes',
-          detail:
-              'A live ring counts down the call; ${_tutor.displayName} wraps '
-              'up with a proper au revoir.',
-        ),
+        _PromiseRow(icon: CupertinoIcons.timer, title: 'Exactly 3 minutes'),
         _PromiseRow(
           icon: CupertinoIcons.lock_shield_fill,
           title: 'Nothing saved until you say so',
-          detail: 'Create an account afterwards to keep your progress.',
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Passeport.successSoft,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            children: [
-              const Icon(
-                CupertinoIcons.mic_fill,
-                color: Passeport.sage,
-                size: 19,
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Text(
-                  'Your microphone is requested when the call starts, that\'s '
-                  'the whole point of a speaking tutor.',
-                  style: Passeport.body(
-                    12.5,
-                  ).copyWith(color: Passeport.inkSoft, height: 1.4),
-                ),
-              ),
-            ],
-          ),
         ),
       ],
       footer: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PasseportPrimaryButton(
+          _onboardingButton(
             label: _startingTrial
                 ? 'Calling ${_tutor.displayName}…'
                 : 'Start my free 3 minutes',
@@ -696,7 +688,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               style: Passeport.body(
                 14,
                 weight: FontWeight.w600,
-              ).copyWith(color: Passeport.slateDim),
+              ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
             ),
           ),
         ],
@@ -755,9 +747,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return _step(
       eyebrow: 'Your first call',
       title: 'You just spoke French.',
-      subtitle:
-          'That was a real conversation with ${_tutor.displayName}, here\'s '
-          'what three minutes produced.',
       children: [
         _StatBar(
           label: 'Minutes with ${_tutor.displayName}',
@@ -810,16 +799,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ],
           ),
         ],
-        const SizedBox(height: 16),
-        Text(
-          'Create an account on the next screen and these words become the '
-          'start of your training deck.',
-          style: Passeport.body(
-            13.5,
-          ).copyWith(color: Passeport.slateDim, height: 1.45),
-        ),
       ],
-      footer: PasseportPrimaryButton(
+      footer: _onboardingButton(
         label: 'Keep my progress',
         onPressed: _finish,
         icon: CupertinoIcons.arrow_right,
@@ -846,31 +827,43 @@ class _AnimatedBrandMark extends StatelessWidget {
         );
         return Column(
           children: [
+            // Two speech bubbles in conversation: the big one slides in from
+            // the left and settles up top; the small one slides in from the
+            // right and tucks in below it, overlapping about halfway — a
+            // clear big-speaks/small-replies pair, never two same-size
+            // shapes blended on top of each other.
             SizedBox(
               width: 104,
-              height: 48,
+              height: 60,
               child: Stack(
-                alignment: Alignment.center,
                 children: [
-                  Transform.translate(
-                    offset: Offset(-22 * (1 - bubbleProgress), 0),
-                    child: Opacity(
-                      opacity: bubbleProgress,
-                      child: const Icon(
-                        CupertinoIcons.bubble_left_fill,
-                        color: Colors.white,
-                        size: 38,
+                  Positioned(
+                    left: 18,
+                    top: 0,
+                    child: Transform.translate(
+                      offset: Offset(-60 * (1 - bubbleProgress), 0),
+                      child: Opacity(
+                        opacity: bubbleProgress,
+                        child: const Icon(
+                          CupertinoIcons.bubble_left_fill,
+                          color: Colors.white,
+                          size: 44,
+                        ),
                       ),
                     ),
                   ),
-                  Transform.translate(
-                    offset: Offset(22 * (1 - bubbleProgress), 2),
-                    child: Opacity(
-                      opacity: bubbleProgress,
-                      child: const Icon(
-                        CupertinoIcons.bubble_right_fill,
-                        color: Colors.white,
-                        size: 38,
+                  Positioned(
+                    left: 52,
+                    top: 28,
+                    child: Transform.translate(
+                      offset: Offset(60 * (1 - bubbleProgress), 0),
+                      child: Opacity(
+                        opacity: bubbleProgress,
+                        child: Icon(
+                          CupertinoIcons.bubble_right_fill,
+                          color: Colors.white.withValues(alpha: 0.85),
+                          size: 28,
+                        ),
                       ),
                     ),
                   ),
@@ -1072,7 +1065,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                     ),
                     const SizedBox(width: 7),
                     Text(
-                      'Your plan adapts from real practice evidence',
+                      'Your plan adapts as you practise',
                       style: Passeport.body(
                         12.5,
                         weight: FontWeight.w600,
@@ -1137,7 +1130,7 @@ class _StatBarState extends State<_StatBar> {
                   style: Passeport.body(
                     13,
                     weight: FontWeight.w600,
-                  ).copyWith(color: Passeport.inkSoft),
+                  ).copyWith(color: Colors.white),
                 ),
               ),
               Text(
@@ -1164,7 +1157,7 @@ class _StatBarState extends State<_StatBar> {
                 ),
                 builder: (context, animated, _) => Stack(
                   children: [
-                    Container(color: Passeport.parchmentDim),
+                    Container(color: Colors.white.withValues(alpha: 0.24)),
                     FractionallySizedBox(
                       alignment: Alignment.centerLeft,
                       widthFactor: animated,
@@ -1191,15 +1184,10 @@ class _StatBarState extends State<_StatBar> {
 }
 
 class _PromiseRow extends StatelessWidget {
-  const _PromiseRow({
-    required this.icon,
-    required this.title,
-    required this.detail,
-  });
+  const _PromiseRow({required this.icon, required this.title});
 
   final IconData icon;
   final String title;
-  final String detail;
 
   @override
   Widget build(BuildContext context) {
@@ -1222,13 +1210,12 @@ class _PromiseRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: Passeport.body(14, weight: FontWeight.w700)),
-                const SizedBox(height: 3),
                 Text(
-                  detail,
+                  title,
                   style: Passeport.body(
-                    12.5,
-                  ).copyWith(color: Passeport.slateDim, height: 1.35),
+                    14,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: Colors.white),
                 ),
               ],
             ),

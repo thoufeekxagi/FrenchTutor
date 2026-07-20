@@ -322,7 +322,7 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                   child: Text(
                     _graph.isDemo
                         ? 'Every word you practice becomes a star on this map, brighter with every recall, connected to the words it lives with.'
-                        : 'Larger, brighter words have more recall evidence. Lines connect words from the same topic or practice session.',
+                        : 'Larger, brighter words have been recalled more often. Lines connect words from the same topic or practice session.',
                     style: Passeport.body(
                       13,
                     ).copyWith(color: Passeport.slateDim, height: 1.4),

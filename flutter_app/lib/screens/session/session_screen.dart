@@ -18,6 +18,7 @@ import '../../utils/transcript_filter.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/app_tour.dart';
 import '../../services/mic_mode.dart';
 import '../../services/pilot_access_service.dart';
 import '../../services/referral_service.dart';
@@ -287,6 +288,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           );
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
+
+      // First-call walkthrough: Auto/Hold, the mic button, and End — shown
+      // once the call is actually live so every control is on screen.
+      if (!await AppTour.hasSeenCall()) {
+        if (mounted) AppTour.playCall(context);
+      }
 
       final granted = await _audio.requestPermission();
       if (!mounted) return;
@@ -899,16 +906,19 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MicModeBar(
-            mode: _micMode,
-            isHolding: _mic.isHeld,
-            enabled:
-                _callStatus != CallStatus.connecting &&
-                _callStatus != CallStatus.reconnecting &&
-                _callStatus != CallStatus.ended,
-            onModeChanged: _setMicMode,
-            onHoldStart: _pttDown,
-            onHoldEnd: _pttUp,
+          KeyedSubtree(
+            key: AppTour.micModeKey,
+            child: MicModeBar(
+              mode: _micMode,
+              isHolding: _mic.isHeld,
+              enabled:
+                  _callStatus != CallStatus.connecting &&
+                  _callStatus != CallStatus.reconnecting &&
+                  _callStatus != CallStatus.ended,
+              onModeChanged: _setMicMode,
+              onHoldStart: _pttDown,
+              onHoldEnd: _pttUp,
+            ),
           ),
           const SizedBox(height: 14),
           Row(
@@ -924,23 +934,29 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? null
                     : _toggleSpeaker,
               ),
-              MicPrimaryButton(
-                mode: _micMode,
-                isHolding: _mic.isHeld,
-                isMuted: _callStatus == CallStatus.muted,
-                enabled:
-                    _callStatus != CallStatus.connecting &&
-                    _callStatus != CallStatus.reconnecting &&
-                    _callStatus != CallStatus.ended,
-                onAutoTap: _toggleMute,
-                onHoldStart: _pttDown,
-                onHoldEnd: _pttUp,
+              KeyedSubtree(
+                key: AppTour.micButtonKey,
+                child: MicPrimaryButton(
+                  mode: _micMode,
+                  isHolding: _mic.isHeld,
+                  isMuted: _callStatus == CallStatus.muted,
+                  enabled:
+                      _callStatus != CallStatus.connecting &&
+                      _callStatus != CallStatus.reconnecting &&
+                      _callStatus != CallStatus.ended,
+                  onAutoTap: _toggleMute,
+                  onHoldStart: _pttDown,
+                  onHoldEnd: _pttUp,
+                ),
               ),
-              _controlButton(
-                icon: CupertinoIcons.phone_down_fill,
-                label: 'End',
-                color: Passeport.maroon,
-                onTap: _confirmEnd,
+              KeyedSubtree(
+                key: AppTour.endCallKey,
+                child: _controlButton(
+                  icon: CupertinoIcons.phone_down_fill,
+                  label: 'End',
+                  color: Passeport.maroon,
+                  onTap: _confirmEnd,
+                ),
               ),
             ],
           ),

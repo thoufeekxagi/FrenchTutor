@@ -8,13 +8,18 @@ import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/daily_session.dart';
 import '../../models/session.dart';
+import '../../orchestration/models/competency.dart';
 import '../../providers/database_provider.dart';
+import '../../services/app_tour.dart';
 import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../history/history_screen.dart';
+import '../labs/listening_lab_screen.dart';
+import '../labs/writing_lab_screen.dart';
 import '../notes/notes_review_screen.dart';
+import '../pathway/vocab_picker_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
 import 'today_mission_widget.dart';
@@ -35,6 +40,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
     _reload();
+    // First-open walkthrough — after the first frame so every spotlight
+    // target is laid out and measurable.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || await AppTour.hasSeenHome()) return;
+      if (mounted) AppTour.playHome(context);
+    });
   }
 
   Future<void> _openSession({String? lessonContext}) async {
@@ -81,7 +92,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 _header(),
                 const SizedBox(height: 22),
-                TodayMissionWidget(onProgress: _reload),
+                KeyedSubtree(
+                  key: AppTour.missionKey,
+                  child: TodayMissionWidget(onProgress: _reload),
+                ),
+                const SizedBox(height: 12),
+                KeyedSubtree(
+                  key: AppTour.keepPractisingKey,
+                  child: _keepPractising(),
+                ),
                 if (_summary?.hasActivity == true) ...[
                   const SizedBox(height: 12),
                   DailySummaryCard(summary: _summary!),
@@ -89,7 +108,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 28),
                 _sectionTitle('Practice your way'),
                 const SizedBox(height: 10),
-                _mariePractice(),
+                KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
                 const SizedBox(height: 28),
                 _sectionTitle('Your momentum'),
                 const SizedBox(height: 10),
@@ -151,7 +170,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           label: 'Open settings',
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => AppRouter.push(context, (_) => const SettingsScreen()),
+            onTap: () async {
+              await AppRouter.push(context, (_) => const SettingsScreen());
+              // Settings' "Replay the walkthrough" row lands back here.
+              if (mounted && AppTour.pendingHomeReplay) {
+                AppTour.pendingHomeReplay = false;
+                if (context.mounted) AppTour.playHome(context);
+              }
+            },
             child: Container(
               width: 44,
               height: 44,
@@ -290,6 +316,157 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  /// Keep practising — a permanent, mission-independent set of skill chips.
+  /// Every skill is always here, every day, regardless of what today's
+  /// mission planner picked and regardless of what's been completed. The
+  /// mission card above explains the mission; this section is simply "go
+  /// practice anything, as much as you want" — and the results still feed
+  /// the learner model, so extra practice still shapes what comes next.
+  ///
+  /// Each skill owns its OWN auto-vs-manual choice, made inside that skill's
+  /// screen (e.g. VocabPickerScreen's Auto/category picker), not a single
+  /// "Auto" chip out here deciding for every skill at once.
+  void _openPractice(PerformanceModality modality) {
+    switch (modality) {
+      case PerformanceModality.readingRecognition:
+        AppRouter.push(context, (_) => const VocabPickerScreen());
+      case PerformanceModality.listeningRecognition:
+        AppRouter.push(context, (_) => const ListeningLabScreen());
+      case PerformanceModality.controlledWriting:
+      case PerformanceModality.spontaneousWriting:
+        AppRouter.push(context, (_) => const WritingLabScreen());
+      case PerformanceModality.pronunciationProduction:
+        _openSession(
+          lessonContext:
+              'Focus this conversation on pronunciation coaching: minimal '
+              'pairs, liaison, nasal vowels, and mouth-position tips for '
+              'common English-speaker mistakes. Have the learner repeat '
+              'words and sentences aloud and correct them gently.',
+        );
+      case PerformanceModality.controlledSpeaking:
+      case PerformanceModality.spontaneousSpeaking:
+        _openSession();
+    }
+  }
+
+  Widget _keepPractising() {
+    final chips = [
+      (
+        icon: CupertinoIcons.square_stack_3d_up,
+        label: 'Vocabulary',
+        onTap: () => _openPractice(PerformanceModality.readingRecognition),
+      ),
+      (
+        icon: CupertinoIcons.mic_fill,
+        label: 'Pronunciation',
+        onTap: () =>
+            _openPractice(PerformanceModality.pronunciationProduction),
+      ),
+      (
+        icon: CupertinoIcons.headphones,
+        label: 'Listening',
+        onTap: () => _openPractice(PerformanceModality.listeningRecognition),
+      ),
+      (
+        icon: CupertinoIcons.book,
+        label: 'Reading',
+        onTap: () =>
+            AppRouter.push(context, (_) => const ListeningLabScreen()),
+      ),
+      (
+        icon: CupertinoIcons.pencil,
+        label: 'Writing',
+        onTap: () => _openPractice(PerformanceModality.controlledWriting),
+      ),
+      (
+        icon: CupertinoIcons.waveform,
+        label: 'Speaking',
+        onTap: () => _openPractice(PerformanceModality.spontaneousSpeaking),
+      ),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Passeport.infoSoft,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'KEEP PRACTISING',
+                  style: Passeport.body(
+                    10.5,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: Passeport.sky, letterSpacing: 0.9),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Practice any skill, any time. Your practice still informs what comes next.',
+                  style: Passeport.body(
+                    13,
+                  ).copyWith(color: Passeport.slateDim, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 44,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: chips.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final chip = chips[index];
+                return Semantics(
+                  button: true,
+                  label: chip.label,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      PSHaptics.light();
+                      chip.onTap();
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: Passeport.card,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(chip.icon, size: 16, color: Passeport.sky),
+                          const SizedBox(width: 7),
+                          Text(
+                            chip.label,
+                            style: Passeport.body(
+                              12.5,
+                              weight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -37,6 +37,11 @@ enum LiveSessionType {
   grammarStage,
 
   speakingExam,
+
+  /// One quick spoken question about the current lesson's material (the mic
+  /// button inside a lab screen), answered directly and briefly — not an
+  /// open conversation.
+  labAssistant,
 }
 
 class LivePrompts {
@@ -67,7 +72,7 @@ SPEECH RULES: FOLLOW EXACTLY:
 2. Keep every reply short: one to three sentences max. This is a voice call, not a lecture.
 3. No markdown, no bullet points, no asterisks, no headers, no numbered lists. Just plain natural speech.
 4. Be encouraging and patient. Use short warm fillers like "très bien", "parfait", "pas de souci", or push a little harder once the student is ready.
-5. Keep punctuation simple and natural for speech.''';
+5. Keep punctuation simple and natural for speech. Never use emojis or em dashes.''';
 
   /// Freeform conversational drivers — ONLY for free talk; these instincts are
   /// actively harmful inside app-directed stages.
@@ -109,6 +114,16 @@ This session is structured and run by the app, not by you. The LESSON CONTEXT be
 2. Never suggest moving on, never ask "what's next", never decide the next step of the structure: pacing belongs to the student and the app alone.
 3. Between instructions, react to the student's attempts in one short sentence (English coaching by default, unless the stage contract says otherwise), then wait.
 4. Never ask open-ended follow-up questions that pull the session away from the current card, sentence, or beat.''';
+
+  /// The lab "ask a quick question" mic button. One question, one short spoken
+  /// answer, then stop — never the start of an open conversation.
+  static const _labAssistantRole = '''
+YOUR ROLE: ONE QUICK QUESTION, THEN STOP:
+The student tapped a mic button while studying the material in LESSON CONTEXT to ask ONE quick question about it, not to start a conversation.
+1. Listen to the student's question, then answer it directly in one to three short sentences.
+2. Answer in whichever language fits the question (English for clarification/grammar-in-English, French for a French-language question), same rule as elsewhere: never any other language.
+3. After answering, STOP completely. Never ask a follow-up question, never invite more conversation, never say "anything else?" — the student taps the mic again if they want to ask something else.
+4. If their question is unclear or the audio was unclear, ask them once, briefly, to repeat it — do not guess and answer the wrong question.''';
 
   static const _speakingExamRole = '''
 YOUR ROLE: TIMED SPEAKING EXAMINER:
@@ -172,6 +187,7 @@ TRIAL RULES: ABSOLUTE:
       LiveSessionType.vocabStage ||
       LiveSessionType.listeningScene ||
       LiveSessionType.grammarStage => _stageDiscipline,
+      LiveSessionType.labAssistant => _labAssistantRole,
     };
     final tuning =
         '${TutorTuning.mixPromptLine(languageMix)}\n'

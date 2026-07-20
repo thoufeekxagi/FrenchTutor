@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sqlite3/common.dart';
@@ -5,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../orchestration/models/competency.dart';
 import '../../orchestration/models/competency_state.dart';
+import '../../services/sync_service.dart';
 import 'app_migrations.dart';
 
 const _uuid = Uuid();
@@ -15,11 +17,12 @@ const _uuid = Uuid();
 /// here to be replaced wholesale, so the cache can never drift from its
 /// source of truth.
 class CompetencyStateStore {
-  CompetencyStateStore(this._db) {
+  CompetencyStateStore(this._db, [this._sync]) {
     runAppMigrations(_db);
   }
 
   final CommonDatabase _db;
+  final SyncService? _sync;
 
   String _now() => DateTime.now().toUtc().toIso8601String();
 
@@ -68,6 +71,7 @@ class CompetencyStateStore {
       _db.execute('ROLLBACK');
       rethrow;
     }
+    unawaited(_sync?.syncCompetencyStates(states));
   }
 
   List<CompetencyState> all({String? userId}) => _db

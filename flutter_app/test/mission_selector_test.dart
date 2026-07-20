@@ -17,7 +17,7 @@ void main() {
 
     expect(recommendation.mission.id, 'calibration');
     expect(recommendation.estimatedMinutes, 10);
-    expect(recommendation.reason, contains('evidence'));
+    expect(recommendation.reason, contains('practice'));
   });
 
   test('selects a matching mission after calibration evidence exists', () {
@@ -56,6 +56,25 @@ void main() {
 
     expect(recommendation.mission.id, 'cafe');
   });
+
+  test('excludes the completed mission when choosing the next mission', () {
+    final recommendation = selector.select(
+      catalog: _catalog,
+      level: 'a1',
+      goal: 'everyday',
+      competencyStates: [
+        _state(
+          competencyId: 'identity',
+          masteryEstimate: 0.65,
+          confidence: 0.65,
+          evidenceCount: 4,
+        ),
+      ],
+      excludedMissionIds: {'cafe'},
+    );
+
+    expect(recommendation.mission.id, 'market');
+  });
 }
 
 final _catalog = MissionCatalog(
@@ -91,6 +110,16 @@ final _catalog = MissionCatalog(
       scenario: 'Café',
       levelBand: 'A2',
       primaryCompetencyId: 'cafe',
+      goalIds: ['everyday'],
+      promptContext: 'context',
+      steps: [],
+    ),
+    MissionDefinition(
+      id: 'market',
+      title: 'Shop at a market',
+      scenario: 'Market',
+      levelBand: 'A2',
+      primaryCompetencyId: 'market',
       goalIds: ['everyday'],
       promptContext: 'context',
       steps: [],

@@ -103,10 +103,61 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     return null;
   }
 
-  Future<void> _runNext() async {
+  PlanTaskRecord? _nextTaskFor(PlanSnapshot plan) {
+    for (final task in plan.tasks) {
+      if (task.status == PlanTaskStatus.active ||
+          task.status == PlanTaskStatus.pending) {
+        return task;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _advanceToNextMission(
+    PlanSnapshot completedPlan,
+    String completedMissionId,
+  ) async {
+    final framework = ref.read(competencyStoreProvider).framework();
+    final catalog = ref.read(contentServiceProvider).missionCatalog();
+    if (framework == null || catalog == null) return;
+    final profile = ref.read(learningStoreProvider).profile();
+    final service = ref.read(orchestrationServiceProvider);
+    final states = service.refreshCompetencyStates(
+      framework: framework,
+      evidenceStore: ref.read(evidenceStoreProvider),
+      stateStore: ref.read(competencyStateStoreProvider),
+    );
+    final nextPlan = service.replanToday(
+      framework: framework,
+      competencyStates: states,
+      errors: ref.read(evidenceStoreProvider).errorEvents(),
+      planStore: ref.read(planStoreProvider),
+      current: completedPlan,
+      availableMinutes: _minutesFor(profile.sessionLength),
+      canSpeakAloud: true,
+      networkAvailable: true,
+      goal: profile.goal,
+      reason: 'mission_completed',
+      missionCatalog: catalog,
+      learnerLevel: profile.level,
+      excludedMissionIds: {completedMissionId},
+    );
+    final missionId = nextPlan.inputSnapshot['missionId'] as String?;
+    final nextMission = missionId == null
+        ? null
+        : catalog.missions.where((item) => item.id == missionId).firstOrNull;
+    if (mounted) {
+      setState(() {
+        _plan = nextPlan;
+        _mission = nextMission;
+      });
+    }
+  }
+
+  Future<void> _runNext([PlanTaskRecord? selectedTask]) async {
     final plan = _plan;
     final mission = _mission;
-    final task = _nextTask;
+    final task = selectedTask ?? _nextTask;
     final framework = ref.read(competencyStoreProvider).framework();
     if (plan == null || mission == null || task == null || framework == null) {
       return;
@@ -123,7 +174,12 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         taskResultAdapters: TaskResultAdapters(framework: framework),
       ).run(context: context, task: task, mission: mission);
       final updated = ref.read(planStoreProvider).byId(plan.id);
-      if (mounted && updated != null) setState(() => _plan = updated);
+      if (updated == null) return;
+      if (_nextTaskFor(updated) == null) {
+        await _advanceToNextMission(updated, mission.id);
+      } else if (mounted) {
+        setState(() => _plan = updated);
+      }
       widget.onProgress?.call();
     } catch (_) {
       if (mounted) {
@@ -182,162 +238,171 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(DesignTokens.space5),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        boxShadow: DesignTokens.cardShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'TODAY’S MISSION',
-                style: DesignTokens.body(
-                  11,
-                  weight: FontWeight.w700,
-                ).copyWith(color: DesignTokens.slateDim, letterSpacing: 1.1),
-              ),
-              const Spacer(),
-              Text(
-                '$completed of ${plan.tasks.length}',
-                style: DesignTokens.body(
-                  12,
-                  weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.slateDim),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(DesignTokens.space5),
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            boxShadow: DesignTokens.cardShadow,
           ),
-          const SizedBox(height: DesignTokens.space4),
-          _MissionProgress(total: plan.tasks.length, completed: completed),
-          const SizedBox(height: DesignTokens.space5),
-          Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: DesignTokens.infoSoft,
-                  borderRadius: BorderRadius.circular(
-                    DesignTokens.radiusMedium,
+              Row(
+                children: [
+                  Text(
+                    'TODAY’S MISSION',
+                    style: DesignTokens.body(11, weight: FontWeight.w700)
+                        .copyWith(
+                          color: DesignTokens.slateDim,
+                          letterSpacing: 1.1,
+                        ),
                   ),
-                ),
-                child: Icon(
-                  _iconFor(task.modality),
-                  color: DesignTokens.info,
-                  size: 23,
-                ),
+                  const Spacer(),
+                  Text(
+                    '$completed of ${plan.tasks.length}',
+                    style: DesignTokens.body(
+                      12,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                ],
               ),
-              const SizedBox(width: DesignTokens.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      task.status == PlanTaskStatus.active
-                          ? 'CONTINUE MISSION'
-                          : 'NEXT MISSION STEP',
-                      style: DesignTokens.body(10.5, weight: FontWeight.w700)
-                          .copyWith(
-                            color: DesignTokens.primary,
-                            letterSpacing: 0.9,
-                          ),
+              const SizedBox(height: DesignTokens.space4),
+              _MissionProgress(total: plan.tasks.length, completed: completed),
+              const SizedBox(height: DesignTokens.space5),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.infoSoft,
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusMedium,
+                      ),
                     ),
-                    const SizedBox(height: DesignTokens.space1),
-                    Text(mission.title, style: DesignTokens.display(22)),
-                  ],
-                ),
+                    child: Icon(
+                      _iconFor(task.modality),
+                      color: DesignTokens.info,
+                      size: 23,
+                    ),
+                  ),
+                  const SizedBox(width: DesignTokens.space3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task.status == PlanTaskStatus.active
+                              ? 'CONTINUE MISSION'
+                              : 'NEXT MISSION STEP',
+                          style:
+                              DesignTokens.body(
+                                10.5,
+                                weight: FontWeight.w700,
+                              ).copyWith(
+                                color: DesignTokens.primary,
+                                letterSpacing: 0.9,
+                              ),
+                        ),
+                        const SizedBox(height: DesignTokens.space1),
+                        Text(mission.title, style: DesignTokens.display(22)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: DesignTokens.space3),
-          Text(
-            _taskLabel(task.modality),
-            style: DesignTokens.body(
-              15,
-              weight: FontWeight.w600,
-            ).copyWith(color: DesignTokens.inkSoft),
-          ),
-          const SizedBox(height: DesignTokens.space4),
-          Text(
-            'CHOSEN BECAUSE',
-            style: DesignTokens.body(
-              10.5,
-              weight: FontWeight.w700,
-            ).copyWith(color: DesignTokens.slateDim, letterSpacing: 0.9),
-          ),
-          const SizedBox(height: DesignTokens.space1),
-          Text(
-            plan.explanation,
-            style: DesignTokens.body(
-              15,
-            ).copyWith(color: DesignTokens.slateDim, height: 1.4),
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: DesignTokens.space3),
-            Text(
-              _error!,
-              style: DesignTokens.body(
-                13,
-                weight: FontWeight.w600,
-              ).copyWith(color: DesignTokens.danger),
-            ),
-          ],
-          const SizedBox(height: DesignTokens.space4),
-          Row(
-            children: [
-              const Icon(
-                CupertinoIcons.clock,
-                size: 16,
-                color: DesignTokens.slateDim,
-              ),
-              const SizedBox(width: DesignTokens.space2),
+              const SizedBox(height: DesignTokens.space3),
               Text(
-                '${task.estimatedMinutes} min',
+                _taskLabel(task.modality),
                 style: DesignTokens.body(
-                  13,
+                  15,
                   weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.inkSoft),
               ),
-              const SizedBox(width: DesignTokens.space4),
+              const SizedBox(height: DesignTokens.space4),
               Text(
-                'Step ${task.sequence + 1} of ${plan.tasks.length}',
+                'CHOSEN BECAUSE',
                 style: DesignTokens.body(
-                  13,
-                  weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.slateDim),
+                  10.5,
+                  weight: FontWeight.w700,
+                ).copyWith(color: DesignTokens.slateDim, letterSpacing: 0.9),
               ),
-            ],
-          ),
-          const SizedBox(height: DesignTokens.space5),
-          PasseportPrimaryButton(
-            label: task.status == PlanTaskStatus.active
-                ? 'Continue mission'
-                : 'Start mission',
-            icon: CupertinoIcons.arrow_right,
-            onPressed: _running ? null : _runNext,
-          ),
-          Center(
-            child: SizedBox(
-              height: DesignTokens.minTapTarget,
-              child: TextButton(
-                onPressed: _running ? null : _skipNext,
-                child: Text(
-                  'Skip for today',
+              const SizedBox(height: DesignTokens.space1),
+              Text(
+                plan.explanation,
+                style: DesignTokens.body(
+                  15,
+                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: DesignTokens.space3),
+                Text(
+                  _error!,
                   style: DesignTokens.body(
                     13,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.slateDim),
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.danger),
+                ),
+              ],
+              const SizedBox(height: DesignTokens.space4),
+              Row(
+                children: [
+                  const Icon(
+                    CupertinoIcons.clock,
+                    size: 16,
+                    color: DesignTokens.slateDim,
+                  ),
+                  const SizedBox(width: DesignTokens.space2),
+                  Text(
+                    '${task.estimatedMinutes} min',
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                  const SizedBox(width: DesignTokens.space4),
+                  Text(
+                    'Step ${task.sequence + 1} of ${plan.tasks.length}',
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                ],
+              ),
+              const SizedBox(height: DesignTokens.space5),
+              PasseportPrimaryButton(
+                label: task.status == PlanTaskStatus.active
+                    ? 'Continue mission'
+                    : 'Start mission',
+                icon: CupertinoIcons.arrow_right,
+                onPressed: _running ? null : _runNext,
+              ),
+              Center(
+                child: SizedBox(
+                  height: DesignTokens.minTapTarget,
+                  child: TextButton(
+                    onPressed: _running ? null : _skipNext,
+                    child: Text(
+                      'Skip for today',
+                      style: DesignTokens.body(
+                        13,
+                        weight: FontWeight.w500,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -439,7 +504,7 @@ class _MissionComplete extends StatelessWidget {
           Text('Mission complete', style: DesignTokens.display(22)),
           const SizedBox(height: DesignTokens.space1),
           Text(
-            '$title is saved with $stepCount completed step${stepCount == 1 ? '' : 's'}. Your next mission will use this evidence.',
+            '$title is saved with $stepCount completed step${stepCount == 1 ? '' : 's'}. Your next mission will build on this practice.',
             style: DesignTokens.body(
               14,
             ).copyWith(color: DesignTokens.slateDim, height: 1.4),

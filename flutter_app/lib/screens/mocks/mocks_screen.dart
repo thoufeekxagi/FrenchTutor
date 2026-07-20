@@ -406,7 +406,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
     return _page([
       _eyebrow('ASSESSMENT COMPLETE'),
       const SizedBox(height: DesignTokens.space2),
-      Text('Your speaking evidence', style: DesignTokens.display(28)),
+      Text('Your speaking progress', style: DesignTokens.display(28)),
       const SizedBox(height: DesignTokens.space5),
       Container(
         padding: const EdgeInsets.all(DesignTokens.space5),

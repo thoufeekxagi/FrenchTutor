@@ -452,9 +452,12 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
-    final command = exactVoiceCardCommand(trimmed);
-    if (command != null) {
-      _applyExactVoiceCommand(command);
+    // Voice control does exactly one thing here: advance. Back/repeat/end
+    // are button-only — matched against THIS screen's own "Next word" text,
+    // not a bare "next" a future vocabulary card could legitimately contain.
+    if (matchesAdvanceCommand(trimmed, nextPhrase: 'next word')) {
+      _logDebug('→ exact voice command: next');
+      _advanceFromUserIntent();
       return;
     }
     _hasAttempted = true;
@@ -503,27 +506,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       }
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
-  }
-
-  void _applyExactVoiceCommand(VoiceCardCommand command) {
-    _logDebug('→ exact voice command: ${command.name}');
-    switch (command) {
-      case VoiceCardCommand.next:
-        _advanceFromUserIntent();
-      case VoiceCardCommand.previous:
-        _goBackFromUserIntent();
-      case VoiceCardCommand.repeat:
-        final card = _currentCard;
-        if (card == null) return;
-        _cutTutorAudio();
-        _scheduleCardAnnouncement(
-          'Repeat the current word, ${card.entry.fr} = ${card.entry.en}. '
-          'Say it once, then stop and wait. $_noteReminder',
-        );
-      case VoiceCardCommand.finish:
-        _cutTutorAudio();
-        _confirmEnd();
-    }
   }
 
   /// The single place a classified utterance becomes action.
@@ -1561,7 +1543,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         ],
         const SizedBox(height: 16),
         Text(
-          'Repeat the word out loud, ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+          'Repeat the word out loud, ${_gemini.persona.displayName} is listening. Say "next word" when you\'re ready.',
           style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),

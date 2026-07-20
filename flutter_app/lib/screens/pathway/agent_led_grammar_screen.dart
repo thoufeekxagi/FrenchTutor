@@ -358,9 +358,12 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
-    final command = exactVoiceCardCommand(trimmed);
-    if (command != null) {
-      _applyExactVoiceCommand(command);
+    // Voice control does exactly one thing here: advance. Back/repeat/end
+    // are button-only — matched against THIS screen's own "Next sentence"
+    // text, not a bare "next" a future sentence could legitimately contain.
+    if (matchesAdvanceCommand(trimmed, nextPhrase: 'next sentence')) {
+      _logDebug('→ exact voice command: next');
+      _advanceFromUserIntent();
       return;
     }
     _hasAttempted = true;
@@ -399,27 +402,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       }
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
-  }
-
-  void _applyExactVoiceCommand(VoiceCardCommand command) {
-    _logDebug('→ exact voice command: ${command.name}');
-    switch (command) {
-      case VoiceCardCommand.next:
-        _advanceFromUserIntent();
-      case VoiceCardCommand.previous:
-        _goBackFromUserIntent();
-      case VoiceCardCommand.repeat:
-        final card = _currentCard;
-        if (card == null) return;
-        _cutTutorAudio();
-        _scheduleCardAnnouncement(
-          'Repeat the current sentence, ${card.card.fr}. '
-          'Say it once, then stop and wait. $_noteReminder',
-        );
-      case VoiceCardCommand.finish:
-        _cutTutorAudio();
-        _confirmEnd();
-    }
   }
 
   void _applyIntent(
@@ -1183,7 +1165,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         ],
         const SizedBox(height: 16),
         Text(
-          'Say the sentence out loud, ${_gemini.persona.displayName} is listening. Say "next" when you\'re ready, or "again" to hear it once more.',
+          'Say the sentence out loud, ${_gemini.persona.displayName} is listening. Say "next sentence" when you\'re ready.',
           style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
           textAlign: TextAlign.center,
         ),

@@ -30,10 +30,9 @@ class AiVoiceDisclosure {
           title: const Text('Before you talk to your tutor'),
           content: const Text(
             'To have a live conversation, your voice is streamed to '
-            "Google's Gemini AI, which generates your tutor's spoken "
-            'replies and grades your practice. Your written answers and '
-            'progress may also be sent to Gemini (or, if you\'ve set one '
-            'up, OpenRouter) for lesson generation and grading.\n\n'
+            "Google's Gemini AI, which powers your tutor's spoken replies "
+            'and reviews your practice. Your written answers and progress '
+            'may also be sent to Gemini to personalize your lessons.\n\n'
             "We never sell your data. See parlesprint.com/privacy for the "
             'full privacy policy.',
           ),

@@ -10,6 +10,7 @@ import 'screens/auth/auth_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'services/auth_service.dart';
+import 'design/tokens.dart';
 
 class FrenchTutorApp extends StatelessWidget {
   const FrenchTutorApp({super.key});
@@ -48,6 +49,7 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _hasSession = AuthService.shared.currentSession != null;
+  bool _restoring = false;
   StreamSubscription<AuthState>? _subscription;
 
   @override
@@ -70,6 +72,23 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         // A local DB hiccup must never block showing the signed-in user
         // their app — the link is retried on the next auth event regardless.
       }
+      // Restore every server-side learner record (vocab/session/mission/
+      // competency state) into the local cache BEFORE the app is shown, so
+      // a returning user on a fresh install or new device sees their real
+      // progress and the orchestration layer never plans against an empty
+      // learner model. Best-effort with a timeout: a slow/offline network
+      // must never strand the learner on a spinner forever — whatever is
+      // already local (possibly nothing, on a brand-new device) is what
+      // they see, and the outbox/hydrate pass retries on the next launch.
+      if (mounted) setState(() => _restoring = true);
+      ref
+          .read(syncServiceProvider)
+          .hydrateAfterSignIn()
+          .timeout(const Duration(seconds: 8), onTimeout: () {})
+          .catchError((_) {})
+          .whenComplete(() {
+            if (mounted) setState(() => _restoring = false);
+          });
     }
     if (!mounted) return;
     setState(() => _hasSession = session != null);
@@ -88,6 +107,31 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       return OnboardingScreen(onFinished: () => setState(() {}));
     }
     if (!_hasSession) return const AuthScreen();
+    if (_restoring) return const _RestoringProgressView();
     return const MainTabScreen();
+  }
+}
+
+/// Shown for the brief window between sign-in and local hydration finishing
+/// — keeps the learner from ever seeing a flash of an empty/cold-start home
+/// screen while their real progress is still being pulled from Supabase.
+class _RestoringProgressView extends StatelessWidget {
+  const _RestoringProgressView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('Restoring your progress…', style: DesignTokens.body(15)),
+          ],
+        ),
+      ),
+    );
   }
 }

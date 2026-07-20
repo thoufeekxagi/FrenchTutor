@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sqlite3/common.dart';
@@ -6,6 +7,7 @@ import '../../orchestration/models/competency.dart';
 import '../../orchestration/models/learning_plan.dart';
 import '../../orchestration/models/plan_reason.dart';
 import '../../orchestration/models/plan_task.dart';
+import '../../services/sync_service.dart';
 import 'app_migrations.dart';
 
 class PlanImmutableException implements Exception {
@@ -26,11 +28,12 @@ class PlanImmutableException implements Exception {
 /// replanning goes through [replan], which marks the prior plan `replaced`
 /// and inserts a new one linked to it — it never edits history.
 class PlanStore {
-  PlanStore(this._db) {
+  PlanStore(this._db, [this._sync]) {
     runAppMigrations(_db);
   }
 
   final CommonDatabase _db;
+  final SyncService? _sync;
 
   String _now() => DateTime.now().toUtc().toIso8601String();
 
@@ -46,6 +49,7 @@ class PlanStore {
       _db.execute('ROLLBACK');
       rethrow;
     }
+    unawaited(_sync?.syncPlan(plan));
   }
 
   /// Marks [replaces] `replaced` and persists [newPlan] linked to it via
@@ -74,6 +78,8 @@ class PlanStore {
       _db.execute('ROLLBACK');
       rethrow;
     }
+    unawaited(_sync?.markPlanReplaced(replaces.id));
+    unawaited(_sync?.syncPlan(newPlan));
   }
 
   /// The plan currently governing [localDate] — the latest non-replaced row,
@@ -112,6 +118,13 @@ class PlanStore {
       "WHERE id = ? AND status = 'generated'",
       [timestamp, _now(), plan.id],
     );
+    unawaited(
+      _sync?.syncPlanTask(
+        taskId: taskId,
+        status: 'active',
+        startedAt: DateTime.parse(timestamp),
+      ),
+    );
   }
 
   void completeTask({
@@ -141,6 +154,14 @@ class PlanStore {
         taskId,
       ],
     );
+    unawaited(
+      _sync?.syncPlanTask(
+        taskId: taskId,
+        status: status.name,
+        completedAt: DateTime.parse(timestamp),
+        resultSummary: resultSummary,
+      ),
+    );
 
     final remaining = _db.select(
       "SELECT COUNT(*) AS c FROM plan_tasks WHERE plan_id = ? AND status NOT IN ('completed', 'skipped')",
@@ -150,6 +171,13 @@ class PlanStore {
       _db.execute(
         "UPDATE learning_plans SET status = 'completed', completed_at = ?, updated_at = ? WHERE id = ?",
         [timestamp, _now(), plan.id],
+      );
+      unawaited(
+        _sync?.updatePlanStatus(
+          planId: plan.id,
+          status: 'completed',
+          completedAt: DateTime.parse(timestamp),
+        ),
       );
     }
   }

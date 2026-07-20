@@ -14,10 +14,17 @@ import '../services/srs_service.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
+import '../services/sync_service.dart';
 import '../widgets/floating_notetaker.dart';
 
 final databaseProvider = Provider<CommonDatabase>((ref) {
   throw UnimplementedError('Must be overridden at startup');
+});
+
+/// One shared gateway to Supabase for every store below — every local
+/// learning-data write also pushes here (best-effort, never blocking).
+final syncServiceProvider = Provider<SyncService>((ref) {
+  return SyncService(ref.watch(databaseProvider));
 });
 
 final storageServiceProvider = Provider<StorageService>((ref) {
@@ -25,7 +32,10 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 });
 
 final learningStoreProvider = Provider<LearningStore>((ref) {
-  return LearningStore(ref.watch(databaseProvider));
+  return LearningStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final pilotInfrastructureStoreProvider = Provider<PilotInfrastructureStore>((
@@ -39,15 +49,24 @@ final competencyStoreProvider = Provider<CompetencyStore>((ref) {
 });
 
 final evidenceStoreProvider = Provider<EvidenceStore>((ref) {
-  return EvidenceStore(ref.watch(databaseProvider));
+  return EvidenceStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final competencyStateStoreProvider = Provider<CompetencyStateStore>((ref) {
-  return CompetencyStateStore(ref.watch(databaseProvider));
+  return CompetencyStateStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final planStoreProvider = Provider<PlanStore>((ref) {
-  return PlanStore(ref.watch(databaseProvider));
+  return PlanStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final orchestrationServiceProvider = Provider<OrchestrationService>((ref) {

@@ -253,7 +253,7 @@ class _PathwayWritingScreenState extends ConsumerState<PathwayWritingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const KickerText(
-                        'Writing evidence',
+                        'Writing practice',
                         color: DesignTokens.info,
                       ),
                       const SizedBox(height: DesignTokens.space2),

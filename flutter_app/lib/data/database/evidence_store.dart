@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sqlite3/common.dart';
@@ -6,6 +7,7 @@ import '../../orchestration/models/competency.dart';
 import '../../orchestration/models/error_event.dart';
 import '../../orchestration/models/evidence_event.dart';
 import '../../orchestration/models/task_result.dart';
+import '../../services/sync_service.dart';
 import 'app_migrations.dart';
 
 class DuplicateEventIdException implements Exception {
@@ -19,11 +21,12 @@ class DuplicateEventIdException implements Exception {
 }
 
 class EvidenceStore {
-  EvidenceStore(this._db) {
+  EvidenceStore(this._db, [this._sync]) {
     runAppMigrations(_db);
   }
 
   final CommonDatabase _db;
+  final SyncService? _sync;
 
   void insertTaskResult(TaskResult result) {
     _db.execute('BEGIN');
@@ -72,6 +75,7 @@ class EvidenceStore {
         event.createdAt.toUtc().toIso8601String(),
       ],
     );
+    unawaited(_sync?.logEvidence(event));
   }
 
   List<EvidenceEvent> evidenceEvents({
@@ -139,6 +143,7 @@ class EvidenceStore {
         event.createdAt.toUtc().toIso8601String(),
       ],
     );
+    unawaited(_sync?.logError(event));
   }
 
   List<ErrorEvent> errorEvents({

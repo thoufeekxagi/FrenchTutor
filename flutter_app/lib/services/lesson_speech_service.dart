@@ -1,6 +1,14 @@
-import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:crypto/crypto.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+import '../models/tutor_persona.dart';
+import 'audio_streaming_service.dart';
+import 'lesson_agent_service.dart';
 
 class SpeechItem {
   SpeechItem({required this.text, required this.language});
@@ -8,23 +16,36 @@ class SpeechItem {
   final String language; // "fr-FR" or "en-US"
 }
 
-/// TTS + STT for in-lesson narration and voice Q&A. Fully on-device (flutter_tts +
-/// speech_to_text) so lessons work at $0 without OpenRouter/Gemini for the voice layer.
+/// TTS + STT for in-lesson narration and voice Q&A — Gemini only, by design.
+///
+/// Narration is synthesized by Gemini TTS in the learner's chosen tutor
+/// persona voice ([ActiveTutor.current]), and speech capture is transcribed
+/// by Gemini too. There is deliberately NO on-device speech engine anywhere
+/// in this service — no flutter_tts, no speech_to_text — a practice session
+/// must sound and listen like the tutor the learner picked, never a generic
+/// device voice/recognizer. If a Gemini call fails, the affected line is
+/// skipped rather than silently substituted with a device voice.
 ///
 /// Single-owner rule: this service and the future AudioStreamingService (Marie call) must
 /// never both hold the mic/audio session. Callers MUST call `deactivate()` before starting
 /// a live call, and this service deactivates itself when idle.
 class LessonSpeechService {
-  LessonSpeechService._() {
-    _tts.setCompletionHandler(_onUtteranceComplete);
-    _tts.setCancelHandler(() => isSpeaking = false);
-    _tts.setStartHandler(() => isSpeaking = true);
-  }
+  LessonSpeechService._();
 
   static final LessonSpeechService shared = LessonSpeechService._();
 
-  final FlutterTts _tts = FlutterTts();
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  AudioStreamingService? _geminiAudioLazy;
+  AudioStreamingService get _geminiAudio =>
+      _geminiAudioLazy ??= AudioStreamingService();
+  final Map<String, List<int>> _synthCache = {};
+  Timer? _completionTimer;
+
+  AudioStreamingService? _captureAudioLazy;
+  AudioStreamingService get _captureAudio =>
+      _captureAudioLazy ??= AudioStreamingService();
+  final List<int> _captureBuffer = [];
+  Timer? _captureAutoStopTimer;
+  void Function(String)? _onListenFinal;
 
   List<SpeechItem> _ttsQueue = [];
   int _ttsIndex = 0;
@@ -71,8 +92,11 @@ class LessonSpeechService {
 
   Future<void> pause() async {
     if (!isSpeaking || isPaused) return;
-    await _tts.pause();
     isPaused = true;
+    // Gemini playback is a fire-and-forget PCM buffer, not a resumable
+    // stream — stop cleanly now; resume() replays this item from the top.
+    _completionTimer?.cancel();
+    await _geminiAudioLazy?.stopPlayback();
   }
 
   Future<void> resume() async {
@@ -82,7 +106,9 @@ class LessonSpeechService {
   }
 
   Future<void> stop() async {
-    await _tts.stop();
+    _completionTimer?.cancel();
+    _completionTimer = null;
+    await _geminiAudioLazy?.stopPlayback();
     _ttsQueue = [];
     _ttsIndex = 0;
     isSpeaking = false;
@@ -103,15 +129,97 @@ class LessonSpeechService {
     final item = _ttsQueue[_ttsIndex];
     _onItemStart?.call(_ttsIndex);
 
-    await _tts.setLanguage(item.language);
-    await _tts.setSpeechRate(await rate);
-    await _tts.setPitch(1.0);
-    await _tts.speak(item.text);
+    final speakingRate = await rate;
+    final isSlow = speakingRate <= 0.36;
+    final persona = ActiveTutor.current;
+
+    final played = await _speakWithGemini(
+      item.text,
+      voiceName: persona.voiceName,
+      slow: isSlow,
+    );
+    if (!played) {
+      // Gemini is the only voice engine here — no on-device fallback. Skip
+      // this line rather than substitute a device voice, or hang forever.
+      _onUtteranceComplete();
+    }
+  }
+
+  Future<bool> _speakWithGemini(
+    String text, {
+    required String voiceName,
+    required bool slow,
+  }) async {
+    try {
+      final cacheKey = _diskCacheKey(voiceName, slow, text);
+      var bytes = _synthCache[cacheKey];
+      bytes ??= await _readDiskCache(cacheKey);
+      if (bytes == null) {
+        bytes = await LessonAgentService.shared.synthesizeSpeech(
+          text,
+          slow: slow,
+          voiceName: voiceName,
+        );
+        unawaited(_writeDiskCache(cacheKey, bytes));
+      }
+      _synthCache[cacheKey] = bytes;
+      final myIndex = _ttsIndex;
+      await _geminiAudio.playAudioChunk(bytes);
+      // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
+      final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
+      _completionTimer = Timer(Duration(milliseconds: playbackMs), () {
+        if (_ttsIndex != myIndex || isPaused) return;
+        _onUtteranceComplete();
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   void _onUtteranceComplete() {
     _ttsIndex += 1;
     _speakCurrent();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Disk cache — the same sentence in the same voice is spoken constantly
+  // (flashcards, replays, repeated lesson visits); persisting synthesized
+  // audio across app launches means most narration is instant instead of a
+  // fresh Gemini round-trip every time. Self-healing: a cache miss just
+  // re-synthesizes, so it's safe for the OS to clear this directory.
+  // ---------------------------------------------------------------------------
+
+  Directory? _cacheDirLazy;
+
+  Future<Directory> get _cacheDir async {
+    if (_cacheDirLazy != null) return _cacheDirLazy!;
+    final base = await getTemporaryDirectory();
+    final dir = Directory('${base.path}/gemini_tts_cache');
+    if (!await dir.exists()) await dir.create(recursive: true);
+    return _cacheDirLazy = dir;
+  }
+
+  String _diskCacheKey(String voiceName, bool slow, String text) =>
+      sha256.convert(utf8.encode('$voiceName|$slow|$text')).toString();
+
+  Future<List<int>?> _readDiskCache(String key) async {
+    try {
+      final file = File('${(await _cacheDir).path}/$key.pcm');
+      if (await file.exists()) return await file.readAsBytes();
+    } catch (_) {
+      // A cache read failure just falls through to fresh synthesis.
+    }
+    return null;
+  }
+
+  Future<void> _writeDiskCache(String key, List<int> bytes) async {
+    try {
+      final file = File('${(await _cacheDir).path}/$key.pcm');
+      await file.writeAsBytes(bytes, flush: false);
+    } catch (_) {
+      // Best-effort — narration already played from the in-memory bytes.
+    }
   }
 
   // --- Narration text helpers ---
@@ -209,10 +317,13 @@ class LessonSpeechService {
     return 'en-US';
   }
 
-  // --- STT ---
+  // --- STT (Gemini only — see class doc) ---
 
-  /// Starts listening; calls `onPartial` as transcription updates and `onFinal` once with the
-  /// final transcript after ~1.5s of silence or when `stopListening()` is called.
+  /// Starts capturing the mic; `onPartial` is never called (Gemini transcribes
+  /// once, on `stopListening()`, not incrementally) but is kept in the
+  /// signature so existing callers don't need to change. `onFinal` fires with
+  /// the transcript once capture stops, or `''` if nothing usable was heard.
+  /// Auto-stops after 6s so a forgotten mic can't run forever.
   Future<void> startListening({
     String locale = 'en-US',
     required void Function(String) onPartial,
@@ -224,37 +335,39 @@ class LessonSpeechService {
     }
     await stopListening();
 
-    final available = await _speech.initialize();
-    if (!available) {
+    final granted = await _captureAudio.requestPermission();
+    if (!granted) {
       onFinal('');
       return;
     }
 
     isListening = true;
-    var lastTranscript = '';
-    await _speech.listen(
-      onResult: (result) {
-        lastTranscript = result.recognizedWords;
-        onPartial(lastTranscript);
-        if (result.finalResult) {
-          isListening = false;
-          onFinal(lastTranscript);
-        }
-      },
-      listenOptions: stt.SpeechListenOptions(
-        partialResults: true,
-        pauseFor: const Duration(milliseconds: 1500),
-        listenFor: const Duration(seconds: 30),
-        localeId: locale,
-      ),
-    );
+    _captureBuffer.clear();
+    _onListenFinal = onFinal;
+    await _captureAudio.startStreaming(onChunk: _captureBuffer.addAll);
+    _captureAutoStopTimer?.cancel();
+    _captureAutoStopTimer = Timer(const Duration(seconds: 6), stopListening);
   }
 
   Future<void> stopListening() async {
-    if (_speech.isListening) {
-      await _speech.stop();
-    }
+    if (!isListening) return;
+    _captureAutoStopTimer?.cancel();
     isListening = false;
+    await _captureAudio.stopStreaming();
+    final bytes = List<int>.of(_captureBuffer);
+    _captureBuffer.clear();
+    final callback = _onListenFinal;
+    _onListenFinal = null;
+    if (bytes.isEmpty) {
+      callback?.call('');
+      return;
+    }
+    try {
+      final text = await LessonAgentService.shared.transcribeSpeech(bytes);
+      callback?.call(text);
+    } catch (_) {
+      callback?.call('');
+    }
   }
 
   /// MUST be called before starting a live Marie call (Phase 5) and in dispose of any lesson

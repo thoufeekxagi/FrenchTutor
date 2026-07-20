@@ -26,7 +26,7 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
       icon: CupertinoIcons.lightbulb_fill,
       title: 'Read “Chosen because”',
       body:
-          'This explanation comes from your learning evidence. It is not a generic recommendation.',
+          'This explanation comes from your recent practice and learning goals. It is not a generic recommendation.'
     ),
     _GuideStep(
       icon: CupertinoIcons.rectangle_stack_fill,
@@ -54,9 +54,9 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
     ),
     _GuideStep(
       icon: CupertinoIcons.chart_bar_square_fill,
-      title: 'Watch real evidence grow',
+      title: 'Watch your progress grow',
       body:
-          'Progress reflects completed work and supported evidence. More evidence is needed is an honest result, not a failure.',
+          'Progress reflects the work you complete. More practice is a normal part of learning, not a failure.'
     ),
   ];
 

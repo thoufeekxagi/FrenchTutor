@@ -41,6 +41,10 @@ dependencies:
   crypto: ^3.0.7
   url_launcher: ^6.3.1
   purchases_flutter: ^8.6.0
+  # Readle-style interactive walkthrough: dims the real screen, spotlights one
+  # live control at a time with a numbered card. Pure Flutter overlay — same
+  # behavior on iOS, Android, and web.
+  tutorial_coach_mark: ^1.2.13
 
 dev_dependencies:
   flutter_test:

@@ -71,6 +71,6 @@ class PlanExplainer {
         PlanReasonCode.skillMaintenance =>
           'Keeps ${competency.title} strong.',
         PlanReasonCode.insufficientEvidence =>
-          'More evidence is needed on ${competency.title} to know where you stand.',
+          'A little more practice with ${competency.title} will help show where you stand.',
       };
 }

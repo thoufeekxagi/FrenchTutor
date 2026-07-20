@@ -20,7 +20,6 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
-import '../../utils/voice_card_command.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
@@ -52,13 +51,6 @@ class _ReadingSessionCard {
 }
 
 enum _ReadingUserIntent { advance, again, back, none }
-
-/// The app-owned micro-state inside one beat. LEARN: the coach teaches the
-/// student's line and they rehearse it. PLAY: the character delivers their
-/// side and the student answers for real. "Next" walks learn → play → next
-/// beat's learn; the app directs Marie explicitly at every transition — she
-/// never decides the structure herself.
-enum _BeatPhase { learn, play }
 
 /// Daily Pathway stage 2 — rebuilt against the same rule as AgentLedVocabScreen: Marie
 /// teaches, the app owns every navigation decision. Walks through a pre-built ReadingPassage
@@ -409,11 +401,9 @@ class _AgentLedListeningScreenState
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
-    final command = exactVoiceCardCommand(trimmed);
-    if (command != null) {
-      _applyExactVoiceCommand(command);
-      return;
-    }
+    // No voice navigation in the roleplay: the student's speech here IS the
+    // scene (their lines could legitimately contain any command phrase), so
+    // moving forward is button-only — tap Next sentence.
     _hasAttempted = true;
 
     _utteranceSeq += 1;
@@ -453,22 +443,6 @@ class _AgentLedListeningScreenState
       }
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
-  }
-
-  void _applyExactVoiceCommand(VoiceCardCommand command) {
-    _logDebug('→ exact voice command: ${command.name}');
-    switch (command) {
-      case VoiceCardCommand.next:
-        _advanceFromUserIntent();
-      case VoiceCardCommand.previous:
-        _goBackFromUserIntent();
-      case VoiceCardCommand.repeat:
-        _cutTutorAudio();
-        _directCurrentPhase();
-      case VoiceCardCommand.finish:
-        _cutTutorAudio();
-        _confirmEnd();
-    }
   }
 
   void _applyIntent(
@@ -570,8 +544,6 @@ class _AgentLedListeningScreenState
   // instruction per turn. All structure transitions flow through here.
   // ---------------------------------------------------------------------------
 
-  _BeatPhase _phase = _BeatPhase.learn;
-
   /// Finale runner: non-null once every beat is rehearsed and the whole scene
   /// plays through. Value = the beat whose character line was just delivered;
   /// each learner attempt advances it. Deterministic — no model discretion.
@@ -594,12 +566,7 @@ class _AgentLedListeningScreenState
   void _directCurrentPhase() {
     final card = _currentCard;
     if (card == null) return;
-    switch (_phase) {
-      case _BeatPhase.learn:
-        _directLearn(card.segment);
-      case _BeatPhase.play:
-        _directPlay(card.segment);
-    }
+    _directLearn(card.segment);
   }
 
   /// The character's opening move for a beat: their scripted French line, or an
@@ -630,32 +597,13 @@ class _AgentLedListeningScreenState
     );
   }
 
-  void _directPlay(ReadingSegment segment) {
-    // Just-in-time knowledge: the expected reply (so she can grade/react and
-    // rescue a freeze) and a hint of the next beat (so "what's next?" gets a
-    // real answer) travel WITH the instruction — she never holds the script.
-    final next = _segmentIndex + 1 < _sessionPlan.length
-        ? _sessionPlan[_segmentIndex + 1].segment
-        : null;
-    final context =
-        ' (The student replies with: "${segment.fr}". If asked what comes '
-        'next: ${next != null ? 'their next line will be "${next.fr}"' : 'this is the last beat — after this the whole scene plays through'}.)';
-    _direct(
-      'Scene time. As the CHARACTER, ${_characterLineDirection(segment)}$context',
-    );
-  }
-
-  /// "Next" walks the beat's phases: learn → play → next beat's learn.
+  /// One tap = one whole beat: the character's line AND the student's reply
+  /// line arrive together (that's what _directLearn instructs), then the
+  /// next tap moves to the next beat. No second "play it again" click.
   void _advanceFromUserIntent() {
     final card = _currentCard;
     if (card == null) return;
     _cutTutorAudio();
-    if (_phase == _BeatPhase.learn) {
-      _logDebug('→ beat ${_segmentIndex + 1}: learn → play');
-      setState(() => _phase = _BeatPhase.play);
-      _directPlay(card.segment);
-      return;
-    }
     _logDebug('→ user-driven advance to next beat');
     _performAdvance();
     final next = _currentCard;
@@ -666,15 +614,8 @@ class _AgentLedListeningScreenState
     }
   }
 
-  /// "Back" mirrors it: play → this beat's learn → previous beat's learn.
   void _goBackFromUserIntent() {
     _cutTutorAudio();
-    if (_phase == _BeatPhase.play) {
-      _logDebug('→ beat ${_segmentIndex + 1}: play → learn');
-      setState(() => _phase = _BeatPhase.learn);
-      _directCurrentPhase();
-      return;
-    }
     if (_segmentIndex <= 0) return;
     _logDebug('→ user-driven go back');
     _performGoBack();
@@ -886,8 +827,6 @@ class _AgentLedListeningScreenState
     _lastDetectedIntent = _ReadingUserIntent.none;
     _handledCallIds.clear();
     _offerUnlocked = false;
-    // Every beat starts in LEARN: coach teaches the line before the scene plays.
-    _phase = _BeatPhase.learn;
     // Cleared on card change so a "go back" can't false-trip the drift enforcer on
     // mentions of a segment that was legitimately current moments ago.
     _tutorTurnTranscript = '';
@@ -1280,8 +1219,7 @@ class _AgentLedListeningScreenState
               const SizedBox(height: 4),
               Text(
                 card != null
-                    ? 'Beat ${_segmentIndex + 1} of ${_sessionPlan.length}, '
-                          '${_phase == _BeatPhase.learn ? 'learn your line, then play the beat' : 'the scene is live — answer with your line'}'
+                    ? 'Line ${_segmentIndex + 1} of ${_sessionPlan.length}'
                     : _finaleStarted
                     ? 'Finale, play the whole scene through!'
                     : 'Scene complete',
@@ -1309,7 +1247,7 @@ class _AgentLedListeningScreenState
                 const SizedBox(height: 10),
                 Text(
                   _finaleStarted
-                      ? 'Scene finale, play it through, then say "finish"!'
+                      ? 'Scene finale, play it through, then tap "Finish scene"!'
                       : 'All done!',
                   style: DesignTokens.body(14, weight: FontWeight.w500),
                 ),
@@ -1328,23 +1266,18 @@ class _AgentLedListeningScreenState
         ] else ...[
           const SizedBox(height: 10),
           Text(
-            _phase == _BeatPhase.learn
-                ? 'Practice your line out loud, ${_gemini.persona.displayName} is listening. Say "next" (or tap Play) when you\'re ready to act the beat. Tap 🔊 on any line to rehear it; hold for slow.'
-                : '${_gemini.persona.displayName} is in character, answer with your line. Say "next" for the next beat, or "again" to replay.',
+            'Say your line out loud, then tap Next sentence for the next part of the scene.',
             style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
-          // Same guaranteed navigation fallback as vocab — Back/Next always work, no
-          // dependency on speech recognition or the model. Next is phase-aware:
-          // learn → play the beat, play → next beat.
+          // Buttons are the ONLY navigation in the roleplay — no dependency
+          // on speech recognition or the model.
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: _segmentIndex == 0 && _phase == _BeatPhase.learn
-                      ? null
-                      : _goBackFromUserIntent,
+                  onPressed: _segmentIndex == 0 ? null : _goBackFromUserIntent,
                   icon: const Icon(CupertinoIcons.chevron_left, size: 16),
                   label: const Text('Back'),
                   style: OutlinedButton.styleFrom(
@@ -1362,12 +1295,8 @@ class _AgentLedListeningScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: PasseportPrimaryButton(
-                  label: _phase == _BeatPhase.learn
-                      ? 'Play the beat'
-                      : 'Next beat',
-                  icon: _phase == _BeatPhase.learn
-                      ? CupertinoIcons.play_fill
-                      : CupertinoIcons.arrow_right,
+                  label: 'Next sentence',
+                  icon: CupertinoIcons.arrow_right,
                   onPressed: _advanceFromUserIntent,
                 ),
               ),

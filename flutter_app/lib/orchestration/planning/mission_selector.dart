@@ -21,6 +21,7 @@ class MissionSelector {
     required String level,
     required String goal,
     required Iterable<CompetencyState> competencyStates,
+    Set<String> excludedMissionIds = const {},
   }) {
     final statesByCompetency = <String, List<CompetencyState>>{};
     for (final state in competencyStates) {
@@ -36,19 +37,20 @@ class MissionSelector {
     if (_needsCalibration(calibrationMission, statesByCompetency)) {
       return _recommend(
         calibrationMission,
-        'We need a little evidence to choose your next French practice well.',
+        'A little more practice will help choose your next French mission well.'
       );
     }
 
     final candidates = catalog.missions
         .where((mission) => !mission.calibration)
+        .where((mission) => !excludedMissionIds.contains(mission.id))
         .where((mission) => _matchesGoal(mission, goal))
         .where((mission) => _matchesLevel(mission.levelBand, level))
         .toList();
     if (candidates.isEmpty) {
       return _recommend(
         calibrationMission,
-        'This gives us the evidence needed to shape your next mission.',
+        'This practice helps shape your next mission.'
       );
     }
 
@@ -120,7 +122,7 @@ class MissionSelector {
       return '${mission.title} is due for review.';
     }
     if (states.any((state) => state.needsMoreEvidence)) {
-      return 'More evidence is needed to know how confidently you can do this.';
+      return 'A little more practice will help show how confidently you can do this.';
     }
     return 'This helps you apply a skill you are building in a real conversation.';
   }

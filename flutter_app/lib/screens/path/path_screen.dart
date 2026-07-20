@@ -57,7 +57,7 @@ class PathScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Practice evidence will move competencies from New to Building to Ready. Until then, this map shows the real curriculum sequence without inventing scores.',
+                          'Practice will move skills from New to Building to Ready. Until then, this map shows the real curriculum sequence without inventing scores.',
                           style: Passeport.body(
                             13,
                           ).copyWith(color: Passeport.inkSoft, height: 1.4),

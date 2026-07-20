@@ -1,24 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/api_keys.dart';
 import '../design/tokens.dart';
-import '../providers/database_provider.dart';
+import '../prompts/live_prompts.dart';
+import '../services/audio_streaming_service.dart';
+import '../services/gemini_live_service.dart';
 import '../services/lesson_speech_service.dart';
 import 'adaptive/adaptive.dart';
+import 'ai_voice_disclosure.dart';
 
-/// Bottom-sheet voice Q&A used by every lab: mic → STT → LessonAgentService → TTS reply.
-/// Uses the app-wide `LessonSpeechService.shared` instance so narration and Q&A share one
-/// audio-session owner.
+/// Bottom-sheet voice Q&A used by every lab: mic → Gemini Live (in the
+/// learner's chosen tutor voice) → spoken reply, one question at a time.
+///
+/// Gemini only, no on-device speech engine anywhere in this flow. If the
+/// live connection can't be established (offline, API error), the mic
+/// button surfaces a plain error and the learner can retry — it never
+/// silently switches to a device voice/recognizer.
 class LessonQAOverlay extends ConsumerStatefulWidget {
-  const LessonQAOverlay({
-    super.key,
-    required this.lessonContext,
-    this.sttLocale = 'en-US',
-  });
+  const LessonQAOverlay({super.key, required this.lessonContext});
 
   final String lessonContext;
-  final String sttLocale;
 
   @override
   ConsumerState<LessonQAOverlay> createState() => _LessonQAOverlayState();
@@ -27,13 +32,11 @@ class LessonQAOverlay extends ConsumerStatefulWidget {
   static Future<void> show(
     BuildContext context, {
     required String lessonContext,
-    String sttLocale = 'en-US',
   }) async {
     await showPSModalSheet<void>(
       context,
       isScrollControlled: true,
-      builder: (_) =>
-          LessonQAOverlay(lessonContext: lessonContext, sttLocale: sttLocale),
+      builder: (_) => LessonQAOverlay(lessonContext: lessonContext),
     );
   }
 }
@@ -41,92 +44,145 @@ class LessonQAOverlay extends ConsumerStatefulWidget {
 class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
   final LessonSpeechService _speech = LessonSpeechService.shared;
 
+  GeminiLiveService? _gemini;
+  AudioStreamingService? _audio;
+
   String _partialTranscript = '';
   String? _answer;
   String? _errorText;
   bool _isListening = false;
+  bool _isConnecting = false;
   bool _isThinking = false;
   final List<({String role, String text})> _history = [];
 
   @override
   void dispose() {
     _speech.stopListening();
+    _audio?.stopStreaming();
+    _audio?.dispose();
+    _gemini?.disconnect();
     super.dispose();
   }
 
   void _close() {
     _speech.stopListening();
+    _audio?.stopStreaming();
+    _gemini?.disconnect();
     Navigator.of(context).pop();
   }
 
   Future<void> _toggleMic() async {
     if (_isListening) {
-      await _speech.stopListening();
-      setState(() => _isListening = false);
+      await _audio?.stopStreaming();
+      if (mounted) setState(() => _isListening = false);
       return;
     }
-    await _speech.stop(); // don't listen while narration is speaking
     setState(() {
       _errorText = null;
-      _isListening = true;
+      _answer = null;
+      _partialTranscript = '';
     });
-    await _speech.startListening(
-      locale: widget.sttLocale,
-      onPartial: (text) {
-        if (mounted) setState(() => _partialTranscript = text);
-      },
-      onFinal: (finalText) {
-        if (!mounted) return;
-        setState(() => _isListening = false);
-        if (finalText.trim().isEmpty) {
-          setState(() => _partialTranscript = '');
-          return;
-        }
-        _ask(finalText);
-      },
-    );
+
+    if (_gemini == null) {
+      final accepted = await AiVoiceDisclosure.ensureAccepted(context);
+      if (!mounted) return;
+      if (!accepted) return;
+      setState(() => _isConnecting = true);
+      final connected = await _connectLive();
+      if (!mounted) return;
+      setState(() => _isConnecting = false);
+      if (!connected) {
+        setState(
+          () => _errorText = "Couldn't connect. Check your connection and try again.",
+        );
+        return;
+      }
+    }
+
+    final granted = await _audio!.requestPermission();
+    if (!mounted) return;
+    if (!granted) {
+      setState(() => _errorText = 'Microphone permission denied');
+      return;
+    }
+    setState(() => _isListening = true);
+    await _audio!.startStreaming(onChunk: _gemini!.sendAudioChunk);
   }
 
-  Future<void> _ask(String question) async {
-    setState(() {
-      _isThinking = true;
-      _answer = null;
-      _errorText = null;
-    });
-    try {
-      final reply = await ref
-          .read(lessonAgentServiceProvider)
-          .askQuestion(
-            lessonContext: widget.lessonContext,
-            question: question,
-            history: List.of(_history),
-          );
+  /// Opens one Gemini Live connection for this overlay's lifetime — a fresh
+  /// question just reuses it, no reconnect logic needed for a single sheet.
+  /// Returns whether it actually connected.
+  Future<bool> _connectLive() async {
+    final completer = Completer<bool>();
+    final audio = AudioStreamingService();
+    final gemini = GeminiLiveService(
+      apiKey: ApiKeys.geminiKey,
+      sessionType: LiveSessionType.labAssistant,
+      lessonContext: widget.lessonContext,
+      autoReconnect: false,
+    );
+    _audio = audio;
+    _gemini = gemini;
+
+    gemini.onConnected = () {
+      if (!completer.isCompleted) completer.complete(true);
+    };
+    gemini.onError = (msg) {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+        return;
+      }
+      if (mounted) setState(() => _isThinking = false);
+    };
+    gemini.onDisconnected = () {
+      if (!completer.isCompleted) completer.complete(false);
+    };
+    gemini.onUserTranscript = (text) {
+      if (mounted) setState(() => _partialTranscript = text);
+    };
+    gemini.onTutorTranscript = (text) {
       if (!mounted) return;
       setState(() {
-        _history.add((role: 'user', text: question));
-        _history.add((role: 'assistant', text: reply));
-        _answer = reply;
-        _partialTranscript = '';
-        _isThinking = false;
+        _history.add((role: 'user', text: _partialTranscript));
+        _history.add((role: 'assistant', text: text));
+        _answer = text;
       });
-      _speech.speak(
-        items: [SpeechItem(text: reply, language: 'en-US')],
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorText = e.toString();
-        _isThinking = false;
-      });
+    };
+    gemini.onAudioChunk = (bytes) {
+      audio.isOutputActive = true;
+      audio.playAudioChunk(bytes);
+    };
+    gemini.onTurnComplete = () {
+      audio.isOutputActive = false;
+      if (mounted) {
+        setState(() {
+          _isListening = false;
+          _isThinking = false;
+        });
+      }
+      audio.stopStreaming();
+    };
+
+    gemini.connect();
+    final connected = await completer.future.timeout(
+      const Duration(seconds: 6),
+      onTimeout: () => false,
+    );
+    if (!connected) {
+      gemini.disconnect();
+      await audio.dispose();
+      _gemini = null;
+      _audio = null;
+    } else {
+      setState(() => _isThinking = true);
     }
+    return connected;
   }
 
   void _replay() {
     final answer = _answer;
     if (answer == null) return;
-    _speech.speak(
-      items: [SpeechItem(text: answer, language: 'en-US')],
-    );
+    _speech.speak(items: [SpeechItem(text: answer, language: 'en-US')]);
   }
 
   @override
@@ -271,11 +327,15 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                       button: true,
                       label: _isListening
                           ? 'Stop listening'
+                          : _isConnecting
+                          ? 'Connecting'
                           : 'Ask with microphone',
                       child: IconButton(
-                        onPressed: _isThinking ? null : _toggleMic,
+                        onPressed: (_isThinking || _isConnecting)
+                            ? null
+                            : _toggleMic,
                         style: IconButton.styleFrom(
-                          backgroundColor: _isThinking
+                          backgroundColor: (_isThinking || _isConnecting)
                               ? DesignTokens.slate
                               : DesignTokens.primary,
                           disabledBackgroundColor: DesignTokens.slate,
@@ -292,7 +352,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                         ),
                       ),
                     ),
-                    if (_isThinking) ...[
+                    if (_isThinking || _isConnecting) ...[
                       const SizedBox(width: DesignTokens.space4),
                       const SizedBox.square(
                         dimension: DesignTokens.minTapTarget,

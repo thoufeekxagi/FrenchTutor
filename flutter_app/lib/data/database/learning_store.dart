@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:sqlite3/common.dart';
@@ -6,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../models/daily_session.dart';
 import '../../models/profile.dart';
 import '../../models/srs_state.dart';
+import '../../services/sync_service.dart';
 import 'app_migrations.dart';
 
 class LessonProgress {
@@ -57,12 +59,13 @@ class DiaryEntry {
 const _uuid = Uuid();
 
 class LearningStore {
-  LearningStore(this._db) {
+  LearningStore(this._db, [this._sync]) {
     runAppMigrations(_db);
     _migrateLegacy();
   }
 
   final CommonDatabase _db;
+  final SyncService? _sync;
 
   String _now() => DateTime.now().toUtc().toIso8601String();
 
@@ -172,6 +175,7 @@ class LearningStore {
         p.id,
       ],
     );
+    unawaited(_sync?.syncProfile(p));
   }
 
   /// True until the very first card is ever graded — day-one learners get a
@@ -239,6 +243,7 @@ class LearningStore {
         _now(),
       ],
     );
+    unawaited(_sync?.syncVocabCard(state));
   }
 
   /// Append one review to the immutable log.
@@ -248,20 +253,24 @@ class LearningStore {
     required SRSResponseType responseType,
     String? sessionId,
   }) {
+    final id = _uuid.v4();
+    final now = _now();
     _db.execute(
       '''
       INSERT INTO vocab_reviews (id, entry_id, grade, response_type, session_id, reviewed_at, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     ''',
-      [
-        _uuid.v4(),
-        entryId,
-        grade.name,
-        responseType.name,
-        sessionId,
-        _now(),
-        _now(),
-      ],
+      [id, entryId, grade.name, responseType.name, sessionId, now, now],
+    );
+    unawaited(
+      _sync?.logVocabReview(
+        reviewId: id,
+        entryId: entryId,
+        grade: grade.name,
+        responseType: responseType.name,
+        sessionId: sessionId,
+        reviewedAt: DateTime.parse(now),
+      ),
     );
   }
 
@@ -357,6 +366,7 @@ class LearningStore {
     ''',
       [session.id, date, session.stagesToJson(), _now(), _now()],
     );
+    unawaited(_sync?.syncDailySession(session));
     return session;
   }
 
@@ -399,6 +409,7 @@ class LearningStore {
         session.id,
       ],
     );
+    unawaited(_sync?.syncDailySession(session));
   }
 
   // ---------------------------------------------------------------------------
@@ -411,12 +422,22 @@ class LearningStore {
     String? topic,
   }) {
     final id = _uuid.v4();
+    final now = _now();
     _db.execute(
       '''
       INSERT INTO ai_sessions (id, daily_session_id, stage, topic, connected_at, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     ''',
-      [id, dailySessionId, stage, topic, _now(), _now(), _now()],
+      [id, dailySessionId, stage, topic, now, now, now],
+    );
+    unawaited(
+      _sync?.syncAiSessionStart(
+        id: id,
+        dailySessionId: dailySessionId,
+        stage: stage,
+        topic: topic,
+        connectedAt: DateTime.parse(now),
+      ),
     );
     return id;
   }
@@ -435,6 +456,16 @@ class LearningStore {
     ''',
       [_now(), endedReason, learnerUtteranceCount, transcriptJson, _now(), id],
     );
+    final endedAt = DateTime.now();
+    unawaited(
+      _sync?.syncAiSessionEnd(
+        id: id,
+        endedAt: endedAt,
+        endedReason: endedReason,
+        learnerUtteranceCount: learnerUtteranceCount,
+        transcriptJson: transcriptJson,
+      ),
+    );
 
     // Credit ledger entry from real timestamps (advisory until server-metered).
     final rows = _db.select(
@@ -448,12 +479,16 @@ class LearningStore {
           .difference(DateTime.parse(rows.first['connected_at'] as String))
           .inSeconds;
       if (seconds > 0) {
+        final localDate = dayString(DateTime.now());
         _db.execute(
           '''
           INSERT INTO credit_usage (id, local_date, seconds_used, ai_session_id, created_at)
           VALUES (?, ?, ?, ?, ?)
         ''',
-          [_uuid.v4(), dayString(DateTime.now()), seconds, id, _now()],
+          [_uuid.v4(), localDate, seconds, id, _now()],
+        );
+        unawaited(
+          _sync?.addCreditUsage(localDate: localDate, secondsUsed: seconds),
         );
       }
     }
@@ -491,6 +526,7 @@ class LearningStore {
          VALUES (?, ?, ?)''',
       [lessonId, status, score],
     );
+    unawaited(_sync?.syncLessonStatus(lessonId, status, score: score));
   }
 
   Map<String, LessonProgress> allLessonProgress() {
@@ -521,6 +557,14 @@ class LearningStore {
         minutes = daily_activity.minutes + excluded.minutes
     ''',
       [today, habitId, done ? 1 : 0, minutes],
+    );
+    unawaited(
+      _sync?.logHabit(
+        habitId: habitId,
+        done: done,
+        minutes: minutes,
+        date: today,
+      ),
     );
   }
 
@@ -557,6 +601,13 @@ class LearningStore {
       'INSERT INTO writing_submissions (task_id, text, feedback) VALUES (?, ?, ?)',
       [taskId, text, feedback],
     );
+    unawaited(
+      _sync?.logWritingSubmission(
+        taskId: taskId,
+        text: text,
+        feedback: feedback,
+      ),
+    );
   }
 
   List<WritingSubmission> submissions() {
@@ -583,6 +634,7 @@ class LearningStore {
          ON CONFLICT(tag) DO UPDATE SET count = count + 1, description = excluded.description''',
       [tag, description],
     );
+    unawaited(_sync?.logMistake(tag: tag, description: description));
   }
 
   List<MistakeTag> topMistakeTags({int limit = 5}) {
@@ -604,6 +656,7 @@ class LearningStore {
 
   void resolveMistakeTag(String tag) {
     _db.execute('UPDATE mistake_tags SET resolved = 1 WHERE tag = ?', [tag]);
+    unawaited(_sync?.resolveMistakeTag(tag));
   }
 
   // --- Session diary ---
@@ -614,6 +667,7 @@ class LearningStore {
       'INSERT INTO session_diary (date, stage, summary) VALUES (?, ?, ?)',
       [today, stage, summary],
     );
+    unawaited(_sync?.logDiaryEntry(stage: stage, summary: summary));
   }
 
   List<DiaryEntry> recentDiaryEntries({int limit = 10}) {

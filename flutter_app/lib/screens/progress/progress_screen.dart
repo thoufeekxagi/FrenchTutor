@@ -67,7 +67,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
               Text('Progress', style: DesignTokens.display(30)),
               const SizedBox(height: DesignTokens.space2),
               Text(
-                'See the evidence behind your growing French.',
+                'See the practice behind your growing French.',
                 style: DesignTokens.body(
                   16,
                 ).copyWith(color: DesignTokens.slateDim, height: 1.4),
@@ -172,7 +172,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your week in evidence',
+                      'Your week in practice',
                       style: DesignTokens.display(18),
                     ),
                     const SizedBox(height: DesignTokens.space1),
@@ -191,7 +191,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
           Text(
             recalledCount > 0
                 ? 'You recalled $recalledCount word${recalledCount == 1 ? '' : 's'} from memory without help.'
-                : 'Recall a word without help and your first evidence will appear here.',
+                : 'Recall a word without help and your first progress update will appear here.',
             style: DesignTokens.body(
               16,
               weight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
 import '../../data/database/account_deletion.dart';
 import '../../design/app_router.dart';
@@ -13,6 +14,7 @@ import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
+import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
 import '../../services/referral_service.dart';
 import '../../services/tutor_voice_preview.dart';
@@ -221,10 +223,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             constraints: const BoxConstraints(minHeight: 84),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: selected ? Passeport.ink : Passeport.parchmentDim,
+              // Selected = the same azure gradient as the onboarding hero,
+              // never an off-palette ink/brass combination.
+              color: selected ? null : Passeport.parchmentDim,
+              gradient: selected
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        DesignTokens.primaryDeep,
+                        DesignTokens.primary,
+                        DesignTokens.secondary,
+                      ],
+                    )
+                  : null,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: selected ? Passeport.ink : Passeport.hairline,
+                color: selected ? Colors.transparent : Passeport.hairline,
               ),
             ),
             child: Column(
@@ -260,7 +275,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ? CupertinoIcons.stop_circle_fill
                                     : CupertinoIcons.play_circle_fill,
                                 color: selected
-                                    ? Passeport.brass
+                                    ? Colors.white
                                     : Passeport.sky,
                                 size: 19,
                               ),
@@ -269,7 +284,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (selected)
                       const Icon(
                         CupertinoIcons.checkmark_circle_fill,
-                        color: Passeport.sage,
+                        color: Colors.white,
                         size: 17,
                       ),
                   ],
@@ -278,7 +293,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   '${p.accent.label} French',
                   style: Passeport.body(10.5, weight: FontWeight.w700).copyWith(
-                    color: selected ? Passeport.brass : Passeport.maroon,
+                    color: selected
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : Passeport.maroon,
                     letterSpacing: 0.4,
                   ),
                 ),
@@ -286,7 +303,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   p.tagline,
                   style: Passeport.body(10.5).copyWith(
-                    color: selected ? Passeport.slate : Passeport.slateDim,
+                    color: selected
+                        ? Colors.white.withValues(alpha: 0.75)
+                        : Passeport.slateDim,
                   ),
                 ),
               ],
@@ -424,7 +443,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Mission, cards, voice controls, Marie, and evidence',
+                            'Missions, cards, voice controls, Marie, and progress',
+                            style: Passeport.body(
+                              12,
+                            ).copyWith(color: Passeport.slateDim),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      CupertinoIcons.chevron_right,
+                      size: 16,
+                      color: Passeport.slateDim,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // --- Interactive walkthrough replay ---
+            _PasseportCard(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () async {
+                  await AppTour.reset();
+                  AppTour.pendingHomeReplay = true;
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Passeport.infoSoft,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.play_circle_fill,
+                        color: Passeport.info,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Replay the walkthrough',
+                            style: Passeport.body(15, weight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'The guided tour of Home plays now; the call tour plays on your next call',
                             style: Passeport.body(
                               12,
                             ).copyWith(color: Passeport.slateDim),
@@ -1020,6 +1091,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onTap: _confirmSignOut,
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 44),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Sign out',
@@ -1036,6 +1108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onTap: _deletingAccount ? null : _confirmDeleteAccount,
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 44),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       alignment: Alignment.centerLeft,
                       child: _deletingAccount
                           ? Row(
@@ -1085,6 +1158,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     label: 'Feedback',
                     value: 'thoufeek@agiventures.ca',
                   ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _LegalLinkRow(
+                    label: 'Privacy Policy',
+                    url: 'https://parlesprint.com/privacy',
+                  ),
+                  Divider(height: 1, color: Passeport.hairline),
+                  _LegalLinkRow(
+                    label: 'Terms of Service',
+                    url: 'https://parlesprint.com/terms',
+                  ),
                 ],
               ),
             ),
@@ -1122,6 +1205,7 @@ class _ChoiceRow extends StatelessWidget {
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
+          runSpacing: 8,
           children: options.map((o) {
             final isSelected = o.$1 == selected;
             return GestureDetector(
@@ -1169,6 +1253,56 @@ class _PasseportCard extends StatelessWidget {
         boxShadow: DesignTokens.cardShadow,
       ),
       child: child,
+    );
+  }
+}
+
+/// A tappable settings row that opens an external URL (App Store/Play Store
+/// review both expect a reachable privacy policy from inside the app, not
+/// just on the marketing site).
+class _LegalLinkRow extends StatelessWidget {
+  const _LegalLinkRow({required this.label, required this.url});
+  final String label;
+  final String url;
+
+  Future<void> _open() async {
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // No browser available on this device — nothing more we can do here.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _open,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: Passeport.body(
+                    12.5,
+                  ).copyWith(color: Passeport.text),
+                ),
+              ),
+              Icon(
+                CupertinoIcons.chevron_forward,
+                size: 14,
+                color: Passeport.slateDim,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

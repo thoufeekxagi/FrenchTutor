@@ -160,7 +160,8 @@ class LessonAgentService {
       'English, and stay on the task. CONTENT POLICY: ABSOLUTE: keep every reply '
       'family-friendly; never use profanity, slurs, or sexual, violent, hateful, or '
       'otherwise inappropriate language; if the student\'s text contains offensive '
-      'content, never repeat it, respond calmly and stay on the lesson.';
+      'content, never repeat it, respond calmly and stay on the lesson. '
+      'STYLE: never use emojis or em dashes in any output.';
 
   /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
   /// Google's newest Flash-Lite so we inherit upgrades for free.
@@ -490,7 +491,8 @@ Write 4-8 beats in scene order (greeting → request → follow-up → thanks/go
     required List<String> hints,
   }) async {
     const system = '''
-Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.''';
+Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.
+INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. The same mission practiced on different days must feel like a different real-life moment, a boulangerie, a market stall, a train station kiosk, a pharmacy, a neighbour's door, never the same generic café twice.''';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
@@ -717,6 +719,69 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     }
   }
 
+  /// One-shot speech-to-text for a short clip (a single word/phrase attempt),
+  /// e.g. the flashcard lab's "say it" check. [pcmBytes] is raw 16-bit PCM
+  /// mono at [sampleRateHz] — the same format AudioStreamingService captures
+  /// for the live call, reused here so the whole app has exactly one mic
+  /// pipeline. Gemini only, by design — no on-device speech recognizer
+  /// anywhere in a practice session.
+  Future<String> transcribeSpeech(
+    List<int> pcmBytes, {
+    int sampleRateHz = 16000,
+  }) async {
+    final key = await _geminiApiKey;
+    if (key.isEmpty) throw AgentError.missingKey;
+    if (pcmBytes.isEmpty) return '';
+    final uri = Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$key',
+    );
+    http.Response response;
+    try {
+      response = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'contents': [
+                {
+                  'parts': [
+                    {
+                      'text':
+                          'Transcribe exactly what is said in this short audio clip, in French or English, whichever was spoken. Reply with ONLY the transcribed text, nothing else. If nothing intelligible was said, reply with an empty string.',
+                    },
+                    {
+                      'inlineData': {
+                        'mimeType': 'audio/pcm;rate=$sampleRateHz',
+                        'data': base64Encode(pcmBytes),
+                      },
+                    },
+                  ],
+                },
+              ],
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+    } catch (_) {
+      throw AgentError.requestFailed;
+    }
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw AgentError.requestFailed;
+    }
+    try {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final candidates = json['candidates'] as List?;
+      if (candidates == null || candidates.isEmpty) return '';
+      final content = (candidates.first as Map<String, dynamic>)['content'];
+      final parts = (content as Map<String, dynamic>?)?['parts'] as List?;
+      final text = parts
+          ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
+          .join();
+      return text?.trim() ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   // MARK: - Networking
 
   /// Provider chain: Gemini Flash-Lite first, OpenRouter as fallback. An explicit
@@ -935,7 +1000,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     final obj = _decodeObject(raw);
     return SpeakingMockFeedback(
       overallScore: _asDouble(obj['overall_score']).clamp(0, 10),
-      clbEstimate: obj['clb_estimate'] as String? ?? 'Not enough evidence',
+      clbEstimate: obj['clb_estimate'] as String? ?? 'More practice needed',
       taskCompletion: _asDouble(obj['task_completion']).clamp(0, 10),
       fluency: _asDouble(obj['fluency']).clamp(0, 10),
       grammar: _asDouble(obj['grammar']).clamp(0, 10),

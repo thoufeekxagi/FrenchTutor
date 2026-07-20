@@ -117,6 +117,7 @@ class OrchestrationService {
     MissionCatalog? missionCatalog,
     String learnerLevel = 'a1',
     String? userId,
+    Set<String> excludedMissionIds = const {},
   }) {
     final next = _generateSnapshot(
       framework: framework,
@@ -130,6 +131,7 @@ class OrchestrationService {
       missionCatalog: missionCatalog,
       learnerLevel: learnerLevel,
       userId: userId,
+      excludedMissionIds: excludedMissionIds,
       replacesPlanId: current.id,
       replanReason: reason,
     );
@@ -149,6 +151,7 @@ class OrchestrationService {
     MissionCatalog? missionCatalog,
     String learnerLevel = 'a1',
     String? userId,
+    Set<String> excludedMissionIds = const {},
     String? replacesPlanId,
     String? replanReason,
   }) {
@@ -168,6 +171,7 @@ class OrchestrationService {
         level: learnerLevel,
         goal: goal,
         competencyStates: competencyStates,
+        excludedMissionIds: excludedMissionIds,
       );
       final missionPlan = missionPlanFactory.build(
         framework: framework,

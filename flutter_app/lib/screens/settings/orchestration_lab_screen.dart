@@ -157,7 +157,7 @@ class _OrchestrationLabScreenState
                   ),
                   const SizedBox(height: DesignTokens.space1),
                   Text(
-                    '${evidence.length} evidence events · '
+                    '${evidence.length} practice records · '
                     '${learnerModel.beliefs.length} modeled states · '
                     '${errors.where((error) => error.resolvedByEvidenceId == null).length} open errors',
                     style: DesignTokens.mono(
@@ -262,10 +262,9 @@ class _OrchestrationLabScreenState
                   KickerText('Persisted state', color: DesignTokens.slateDim),
                   const SizedBox(height: DesignTokens.space2),
                   Text(
-                    'Rebuilds learner_competency_states from the evidence '
-                    'ledger and persists it, then generates/loads today\'s '
-                    'immutable plan snapshot. Evidence count below is the '
-                    'per-competency repetition signal.',
+                    'Refreshes saved skill progress, then generates or loads '
+                    'today\'s plan. Practice count below is the per-skill '
+                    'repetition signal.',
                     style: DesignTokens.body(
                       12,
                     ).copyWith(color: DesignTokens.slateDim),

@@ -118,6 +118,13 @@ class PilotInfrastructureStore {
       'credit_usage',
       'entitlements',
       'operational_events',
+      'evidence_events',
+      'error_events',
+      'learner_competency_states',
+      'learning_plans',
+      'plan_tasks',
+      'lesson_progress',
+      'mistake_tags',
     };
     const operations = {'upsert', 'delete'};
     if (!tables.contains(tableName) || !operations.contains(operation)) {

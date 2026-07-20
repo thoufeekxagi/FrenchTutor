@@ -169,9 +169,9 @@ class DeveloperPathPreviewBuilder {
         ),
     ];
     final notes = <String>[
-      'Preview only: no learner evidence, mastery, or production plan is changed.',
+      'Preview only: no learner progress, mastery, or production plan is changed.',
       if (competencyStates.isEmpty)
-        'No graded evidence exists yet; the planner is using cold-start beliefs.',
+        'No graded practice result exists yet; the planner is using a starting estimate.',
       if (persona.level == 'A0' || persona.level == 'A1')
         'The current graph begins at A2; this persona needs an A0/A1 diagnostic bridge.',
       if (persona.level == 'B2')
