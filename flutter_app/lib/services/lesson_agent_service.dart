@@ -13,19 +13,29 @@ import '../models/tutor_persona.dart';
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
 ///
-/// Primary provider is Gemini Flash-Lite, chosen by live head-to-head benchmarking
-/// (July 2026) against the OpenRouter free tier on this app's actual prompt shapes:
-/// ~0.85s vs ~9s median for the session-planning JSON call, and the OpenRouter free
-/// tier's rate limits reject roughly half of a real session's calls outright — so
-/// OpenRouter is now the fallback, not the default.
+/// Text generation uses Gemini Flash-Lite.
 /// Thrown by any raw Gemini HTTP call in this file (TTS synthesis, text
 /// generation) instead of the generic [AgentError] so callers can tell a
 /// rate limit (429, back off longer and retry) apart from any other
 /// failure (back off briefly and retry, then give up).
 class GeminiHttpError implements Exception {
-  GeminiHttpError(this.statusCode);
+  GeminiHttpError(this.statusCode, {this.retryAfter});
+
+  factory GeminiHttpError.fromResponse(http.Response response) {
+    final retryMatch = RegExp(
+      r'Please retry in ([0-9.]+)s',
+    ).firstMatch(response.body);
+    final seconds = double.tryParse(retryMatch?.group(1) ?? '');
+    return GeminiHttpError(
+      response.statusCode,
+      retryAfter: seconds == null
+          ? null
+          : Duration(milliseconds: (seconds * 1000).ceil() + 500),
+    );
+  }
 
   final int statusCode;
+  final Duration? retryAfter;
 
   bool get isRateLimited => statusCode == 429;
 
@@ -39,7 +49,7 @@ class AgentError implements Exception {
   final String message;
 
   static const missingKey = AgentError._(
-    'AI feedback unavailable, add a Gemini or OpenRouter key in Settings.',
+    'AI feedback unavailable, add a Gemini key in Settings.',
   );
   static const requestFailed = AgentError._(
     'The AI tutor is busy right now. Try again in a moment.',
@@ -63,6 +73,7 @@ class WritingFeedback {
     required this.corrections,
     required this.connectorFeedback,
     required this.improvedVersion,
+    this.nextSteps = const [],
   });
 
   final double scoreOutOf10;
@@ -70,6 +81,12 @@ class WritingFeedback {
   final List<({String original, String fixed, String why})> corrections;
   final String connectorFeedback;
   final String improvedVersion;
+
+  /// 2-4 concrete, actionable tips for what to work on next — the
+  /// TCF-examiner-style "how to improve" a plain score/corrections list
+  /// doesn't give on its own. May be empty for older cached feedback
+  /// generated before this field existed.
+  final List<String> nextSteps;
 }
 
 class MicroWritingFeedback {
@@ -183,10 +200,6 @@ class LessonAgentService {
   /// Google's newest Flash-Lite so we inherit upgrades for free.
   static const _geminiTextModel = 'gemini-flash-lite-latest';
 
-  /// Fallback OpenRouter model, used only when the Gemini call fails or no Gemini key
-  /// is configured. Setting the "openrouter_model_override" preference forces ALL
-  /// traffic through OpenRouter with that model — the escape hatch if Gemini
-  /// misbehaves in the field.
   Future<String> get _openRouterModel async {
     final prefs = await SharedPreferences.getInstance();
     final override = prefs.getString('openrouter_model_override');
@@ -273,8 +286,11 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
   }) async {
     final system =
         '''
-You are a strict but encouraging French writing examiner. Grade the student's submission against the task, calibrated to their CEFR level ($levelBand) — do NOT hold an A1/A2 learner to a TEF B2 essay bar; judge them against what is realistic at their stated level (task completion, basic grammar/agreement accuracy, use of the vocabulary/connectors actually asked for, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
-{"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string}''';
+You are a professional French writing examiner grading like a TCF/TEF rater — strict but encouraging. Grade the student's submission against the task, calibrated to their CEFR level ($levelBand) — do NOT hold an A1/A2 learner to a B2 essay bar; judge them against what is realistic at their stated level (task completion, basic grammar/agreement accuracy, use of the vocabulary/connectors actually asked for, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+{"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string, "next_steps": [string,...]}
+LANGUAGE, ABSOLUTE RULE: this student is a beginner and reads explanations in English, not French. Every explanatory piece of text — every "strengths" entry, every "why", "connector_feedback", and every "next_steps" entry — MUST be written in English, always, no matter what language the student wrote their submission in. The ONLY French allowed anywhere in the response is inside "original", "fixed", and "improved_version" (the student's actual sentences), since those are the language content being corrected, not an explanation.
+"why" should read like a professional examiner's note: name the specific grammar rule or agreement broken, not just "this is wrong" — e.g. "The verb 's'appeler' needs two p's and two l's, and an apostrophe before 'appelle'." rather than a vague comment.
+"next_steps": 2 to 4 concrete, actionable tips for what this student should specifically practice next based on THIS submission (e.g. a recurring error pattern, a CEFR skill to work on) — not generic advice.''';
     final user =
         '''
 LEVEL: $levelBand
@@ -592,10 +608,7 @@ INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named charac
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
-        {
-          'role': 'user',
-          'content': 'SCENARIO: $scenario\nLEVEL: $levelBand',
-        },
+        {'role': 'user', 'content': 'SCENARIO: $scenario\nLEVEL: $levelBand'},
       ],
       maxTokens: 1400,
       temperature: 1.0,
@@ -611,18 +624,43 @@ INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named charac
   /// every call makes repeats structurally impossible even if the model's
   /// own creativity doesn't kick in.
   static const _storyCharacterNames = [
-    'Léa', 'Marc', 'Amadou', 'Sophie', 'Nadia', 'Julien', 'Camille', 'Karim',
-    'Élise', 'Thomas', 'Fatou', 'Antoine', 'Chloé', 'Hugo', 'Awa', 'Paul',
+    'Léa',
+    'Marc',
+    'Amadou',
+    'Sophie',
+    'Nadia',
+    'Julien',
+    'Camille',
+    'Karim',
+    'Élise',
+    'Thomas',
+    'Fatou',
+    'Antoine',
+    'Chloé',
+    'Hugo',
+    'Awa',
+    'Paul',
   ];
   static const _storySettings = [
-    'a small town in Brittany', 'a busy market in Montreal', 'a quiet suburb of Lyon',
-    'a ski resort in the Alps', 'a coastal village in Senegal', 'a university campus in Quebec City',
-    'a neighbourhood bakery', 'a train station', 'a community garden', 'a small office',
+    'a small town in Brittany',
+    'a busy market in Montreal',
+    'a quiet suburb of Lyon',
+    'a ski resort in the Alps',
+    'a coastal village in Senegal',
+    'a university campus in Quebec City',
+    'a neighbourhood bakery',
+    'a train station',
+    'a community garden',
+    'a small office',
   ];
   static const _storyTwists = [
-    'a small mistake that turns out fine', 'an unexpected act of kindness from a stranger',
-    'a plan that almost goes wrong', 'a funny misunderstanding', 'a surprising coincidence',
-    'a problem solved just in time', 'a small risk that pays off',
+    'a small mistake that turns out fine',
+    'an unexpected act of kindness from a stranger',
+    'a plan that almost goes wrong',
+    'a funny misunderstanding',
+    'a surprising coincidence',
+    'a problem solved just in time',
+    'a small risk that pays off',
   ];
 
   /// A short third-person narrative story (not a roleplay dialogue like the two methods
@@ -639,7 +677,8 @@ The TOPIC given is only a loose inspiration for the setting or a detail in the b
 This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience, never dealing in mature, violent, or otherwise inappropriate themes.
 INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and never write a story with the same title or opening sentence as one already suggested by the seed details below.''';
     final random = Random();
-    final name = _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
+    final name =
+        _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
     final setting = _storySettings[random.nextInt(_storySettings.length)];
     final twist = _storyTwists[random.nextInt(_storyTwists.length)];
     final raw = await _complete(
@@ -866,7 +905,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throw GeminiHttpError(response.statusCode);
+      throw GeminiHttpError.fromResponse(response);
     }
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -959,62 +998,37 @@ You are a French grammar tutor. The student answered a drill question incorrectl
 
   // MARK: - Networking
 
-  /// Provider chain: Gemini Flash-Lite first, OpenRouter as fallback. An explicit
-  /// "openrouter_model_override" preference skips Gemini entirely (field escape hatch).
   Future<String> _complete({
     required List<Map<String, String>> messages,
     int maxTokens = 1024,
     Duration timeout = const Duration(seconds: 30),
     double temperature = 0.4,
   }) async {
-    final orKey = await _openRouterApiKey;
     if (await _forceOpenRouter) {
-      if (orKey.isEmpty) throw AgentError.missingKey;
+      final openRouterKey = await _openRouterApiKey;
+      if (openRouterKey.isEmpty) throw AgentError.missingKey;
       return _requestOpenRouter(
         model: await _openRouterModel,
         messages: messages,
         maxTokens: maxTokens,
-        apiKey: orKey,
+        apiKey: openRouterKey,
         timeout: timeout,
         temperature: temperature,
       );
     }
     final geminiKey = await _geminiApiKey;
-    if (geminiKey.isNotEmpty) {
-      try {
-        return await _requestGeminiWithRetry(
-          messages: messages,
-          maxTokens: maxTokens,
-          apiKey: geminiKey,
-          timeout: timeout,
-          temperature: temperature,
-        );
-      } catch (e) {
-        // Only swallow the Gemini error if there's an OpenRouter key to fall back to.
-        if (orKey.isEmpty) rethrow;
-      }
-    }
-    if (orKey.isEmpty) throw AgentError.missingKey;
-    return _requestOpenRouter(
-      model: await _openRouterModel,
+    if (geminiKey.isEmpty) throw AgentError.missingKey;
+    return _requestGeminiWithRetry(
       messages: messages,
       maxTokens: maxTokens,
-      apiKey: orKey,
+      apiKey: geminiKey,
       timeout: timeout,
       temperature: temperature,
     );
   }
 
-  /// Every text-generation call (a story, a roleplay scene, a quiz, a
-  /// session plan) is one single HTTP round-trip with no retry today — a
-  /// transient network blip or a 429 rate limit (very plausible right after
-  /// this same session already fired several other Gemini calls: a story,
-  /// its quiz/keywords, a roleplay scene, prewarmed TTS) surfaces
-  /// immediately as "could not generate"/"could not start" with nothing the
-  /// user can do but manually retry. Mirrors `LessonSpeechService`'s TTS
-  /// retry fix: a couple of attempts with backoff, longer specifically after
-  /// a 429, before finally giving up (OpenRouter fallback, if configured,
-  /// still applies after these attempts are exhausted).
+  /// Text-generation calls retry transient Gemini failures. For rate limits,
+  /// Gemini's requested cooldown is used before the next attempt.
   Future<String> _requestGeminiWithRetry({
     required List<Map<String, String>> messages,
     required int maxTokens,
@@ -1034,9 +1048,11 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         );
       } catch (e) {
         if (attempt == maxAttempts) rethrow;
-        final isRateLimited = e is GeminiHttpError && e.isRateLimited;
+        final retryAfter = e is GeminiHttpError && e.isRateLimited
+            ? e.retryAfter
+            : null;
         await Future.delayed(
-          Duration(milliseconds: isRateLimited ? 2500 * attempt : 500 * attempt),
+          retryAfter ?? Duration(milliseconds: 500 * attempt),
         );
       }
     }
@@ -1099,7 +1115,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throw GeminiHttpError(response.statusCode);
+      throw GeminiHttpError.fromResponse(response);
     }
 
     try {
@@ -1144,11 +1160,6 @@ You are a French grammar tutor. The student answered a drill question incorrectl
               'HTTP-Referer': 'https://github.com/frenchtutor-app',
               'X-Title': 'FrenchTutor Passeport',
             },
-            // Without an explicit cap, a large batch response (e.g. 25 example sentences in one
-            // JSON array) can get cut off mid-object by the model's own default completion length,
-            // producing invalid JSON that fails to parse entirely — silently dropping every example
-            // in the whole session, not just the ones past the cutoff. Callers with bigger expected
-            // outputs (batch generation) pass a larger explicit value.
             body: jsonEncode({
               'model': model,
               'messages': messages,
@@ -1160,15 +1171,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     } catch (_) {
       throw AgentError.requestFailed;
     }
-
-    if (response.statusCode == 429 ||
-        (response.statusCode >= 500 && response.statusCode <= 599)) {
-      throw AgentError.requestFailed;
-    }
     if (response.statusCode < 200 || response.statusCode > 299) {
       throw AgentError.requestFailed;
     }
-
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final choices = json['choices'] as List?;
@@ -1202,12 +1207,16 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     }).toList();
     final connectorFeedback = obj['connector_feedback'] as String? ?? '';
     final improved = obj['improved_version'] as String? ?? '';
+    final nextSteps =
+        (obj['next_steps'] as List?)?.map((e) => e.toString()).toList() ??
+        <String>[];
     return WritingFeedback(
       scoreOutOf10: score,
       strengths: strengths,
       corrections: corrections,
       connectorFeedback: connectorFeedback,
       improvedVersion: improved,
+      nextSteps: nextSteps,
     );
   }
 
@@ -1223,7 +1232,9 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       promptEn: obj['prompt_en'] as String? ?? '',
       minWords: (obj['min_words'] as num?)?.toInt() ?? 5,
       targetConnectors:
-          (obj['target_connectors'] as List?)?.map((e) => e.toString()).toList() ??
+          (obj['target_connectors'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
           const [],
       rubricHints:
           (obj['rubric_hints'] as List?)?.map((e) => e.toString()).toList() ??

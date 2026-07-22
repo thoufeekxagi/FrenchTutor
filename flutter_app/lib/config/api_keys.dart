@@ -18,8 +18,12 @@ abstract final class ApiKeys {
   /// gracefully reports "not configured" (AuthService.isGoogleConfigured)
   /// rather than crashing when these are empty — e.g. before the Google Cloud
   /// setup step has been done yet.
-  static const googleIosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID');
-  static const googleWebClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
+  static const googleIosClientId = String.fromEnvironment(
+    'GOOGLE_IOS_CLIENT_ID',
+  );
+  static const googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+  );
 
   /// RevenueCat's public SDK keys (one per store — these are safe to embed,
   /// same category as the Supabase anon key above: meaningless without a

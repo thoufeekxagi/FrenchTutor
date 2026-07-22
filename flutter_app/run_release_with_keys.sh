@@ -21,15 +21,14 @@ GOOGLE_WEB_CLIENT_ID=$(grep '^GOOGLE_WEB_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^G
 REVENUECAT_IOS_KEY=$(grep '^REVENUECAT_IOS_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_IOS_KEY=//')
 REVENUECAT_ANDROID_KEY=$(grep '^REVENUECAT_ANDROID_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_ANDROID_KEY=//')
 
-# 30s discovery window: a wireless iPhone that just locked takes a while to
-# reappear on the network — the default (short) check produced false "not
-# found" failures on back-to-back deploys.
-if ! flutter devices --device-timeout 30 2>&1 | grep -q "$DEVICE_ID"; then
-  echo "kodekarbon ($DEVICE_ID) not found in 'flutter devices'." >&2
-  echo "Check: phone unlocked, on the same Wi-Fi, Settings > General > VPN & Device Management trusts this Mac." >&2
-  exit 1
-fi
-
+# No standalone "flutter devices" pre-check here on purpose — that scan
+# goes through wireless Bonjour/mDNS discovery independently of `flutter run`
+# and is flaky in its own right (observed failing 3+ times in a row, then
+# succeeding moments later with nothing else changed), so it was producing
+# false "not found" failures even when the phone was reachable fine.
+# `flutter run -d <id>` below does its own device resolution/wait
+# internally and is what run_with_keys.sh (the debug counterpart) has
+# always relied on directly, with no separate pre-check — same approach here.
 exec flutter run --release \
   -d "$DEVICE_ID" \
   --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \

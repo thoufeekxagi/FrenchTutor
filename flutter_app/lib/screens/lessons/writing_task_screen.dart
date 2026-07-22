@@ -1,21 +1,45 @@
+import 'dart:async';
+
 import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
+import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/audio_streaming_service.dart';
+import '../../services/gemini_live_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/session_recorder.dart';
+import '../../widgets/ai_voice_disclosure.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
-import '../../widgets/writing_guide_overlay.dart';
+import '../pathway/pathway_writing_screen.dart' show WritingStageResult;
 
 class WritingTaskScreen extends ConsumerStatefulWidget {
-  const WritingTaskScreen({super.key, required this.task});
+  const WritingTaskScreen({
+    super.key,
+    required this.task,
+    this.showFinishButton = false,
+  });
 
   final WritingTask task;
+
+  /// True when this screen is a step in a larger flow (a mission) that needs
+  /// the learner to explicitly finish and hand back a graded result — adds a
+  /// "Skip" leading button and, once feedback exists, a "Finish" button that
+  /// pops a `StageOutcome<WritingStageResult>`. False (the default, used by
+  /// the standalone Writing lab) shows neither; the learner just backs out
+  /// whenever they're done. Both modes are otherwise the exact same screen —
+  /// same prompt/rubric card, connectors, editor, live call, feedback — so a
+  /// mission's writing step never looks or behaves differently from the lab.
+  final bool showFinishButton;
 
   @override
   ConsumerState<WritingTaskScreen> createState() => _WritingTaskScreenState();
@@ -30,7 +54,39 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   String? _errorText;
   final DateTime _sessionStart = DateTime.now();
 
+  // Talk-with-Marie call — inline, not a modal: the editor stays visible and
+  // editable the whole time the call is live, so the learner can keep
+  // writing while she talks them through it, instead of a sheet blocking the
+  // draft behind a grey scrim.
+  GeminiLiveService? _gemini;
+  AudioStreamingService? _audio;
+  bool _callConnecting = false;
+  bool _callActive = false;
+  bool _callMuted = false;
+  bool _tutorSpeaking = false;
+  String? _callError;
+  String? _lastTutorLine;
+
+  late final SessionRecorder _recorder;
+
   WritingTask get task => widget.task;
+
+  @override
+  void initState() {
+    super.initState();
+    // Deferred to after this frame — setting currentContext synchronously
+    // here notifies FloatingNotetakerOverlay listeners mounted elsewhere
+    // (e.g. the tab-bar root) while this screen is still in its own initial
+    // build, which Flutter disallows.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Writing';
+    });
+    _recorder = SessionRecorder(
+      storage: ref.read(storageServiceProvider),
+      stage: 'writing',
+      topic: task.title,
+    );
+  }
 
   String get _lessonContext =>
       ref.read(contentServiceProvider).writingTaskContext(task);
@@ -53,7 +109,48 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     return _content.toLowerCase().contains(stem);
   }
 
-  void _openGuide() {
+  Future<void> _toggleCall() async {
+    if (_callActive || _callConnecting) {
+      _endCall();
+      return;
+    }
+    final accepted = await AiVoiceDisclosure.ensureAccepted(context);
+    if (!mounted || !accepted) return;
+    LessonSpeechService.shared.deactivate();
+    setState(() {
+      _callConnecting = true;
+      _callError = null;
+      _lastTutorLine = null;
+    });
+    final connected = await _connectLive();
+    if (!mounted) return;
+    if (!connected) {
+      setState(() {
+        _callConnecting = false;
+        _callError = "Couldn't connect. Check your connection and try again.";
+      });
+      return;
+    }
+    final granted = await _audio!.requestPermission();
+    if (!mounted) return;
+    if (!granted) {
+      setState(() {
+        _callConnecting = false;
+        _callError = 'Microphone permission denied';
+      });
+      _gemini?.disconnect();
+      _gemini = null;
+      return;
+    }
+    await _audio!.startStreaming(onChunk: _gemini!.sendAudioChunk);
+    if (!mounted) return;
+    setState(() {
+      _callConnecting = false;
+      _callActive = true;
+    });
+  }
+
+  Future<bool> _connectLive() async {
     final buf = StringBuffer(_lessonContext);
     buf.writeln();
     buf.writeln(
@@ -64,13 +161,96 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     if (_feedback != null) {
       buf.writeln('EXISTING GRADED FEEDBACK: ${_feedback!.improvedVersion}');
     }
-    WritingGuideOverlay.show(context, lessonContext: buf.toString());
+    final completer = Completer<bool>();
+    final audio = AudioStreamingService();
+    final gemini = GeminiLiveService(
+      apiKey: ApiKeys.geminiKey,
+      sessionType: LiveSessionType.writingGuide,
+      lessonContext: buf.toString(),
+      autoReconnect: false,
+    );
+    _audio = audio;
+    _gemini = gemini;
+
+    gemini.onConnected = () {
+      if (!completer.isCompleted) completer.complete(true);
+    };
+    gemini.onError = (msg) {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+        return;
+      }
+      if (mounted) setState(() => _callError = msg);
+    };
+    gemini.onDisconnected = () {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+        return;
+      }
+      if (mounted) setState(() => _callActive = false);
+    };
+    gemini.onUserTranscript = (text) {};
+    gemini.onTutorTranscript = (text) {
+      if (!mounted) return;
+      setState(() => _lastTutorLine = text);
+    };
+    gemini.onAudioChunk = (bytes) {
+      audio.isOutputActive = true;
+      _tutorSpeaking = true;
+      audio.playAudioChunk(bytes);
+    };
+    gemini.onTurnComplete = () {
+      audio.isOutputActive = false;
+      if (mounted) setState(() => _tutorSpeaking = false);
+    };
+
+    gemini.connect();
+    final connected = await completer.future.timeout(
+      const Duration(seconds: 6),
+      onTimeout: () => false,
+    );
+    if (!connected) {
+      gemini.disconnect();
+      await audio.dispose();
+      _gemini = null;
+      _audio = null;
+    }
+    return connected;
+  }
+
+  Future<void> _toggleMute() async {
+    if (_audio == null) return;
+    if (_callMuted) {
+      setState(() => _callMuted = false);
+      await _audio!.startStreaming(onChunk: _gemini!.sendAudioChunk);
+    } else {
+      await _audio!.stopStreaming();
+      if (mounted) setState(() => _callMuted = true);
+    }
+  }
+
+  void _endCall() {
+    _audio?.stopStreaming();
+    _audio?.dispose();
+    _gemini?.disconnect();
+    _audio = null;
+    _gemini = null;
+    setState(() {
+      _callActive = false;
+      _callConnecting = false;
+      _callMuted = false;
+      _tutorSpeaking = false;
+    });
   }
 
   @override
   void dispose() {
     _logMinutes();
+    _finishSession();
     _textController.dispose();
+    _audio?.stopStreaming();
+    _audio?.dispose();
+    _gemini?.disconnect();
     super.dispose();
   }
 
@@ -78,6 +258,16 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     final minutes = DateTime.now().difference(_sessionStart).inMinutes;
     if (minutes <= 0 || _content.isEmpty) return;
     ref.read(learningStoreProvider).markHabit('writing', minutes: minutes);
+  }
+
+  void _finishSession() {
+    if (_content.trim().isEmpty) return;
+    final feedback = _feedback;
+    _recorder.finish(
+      summary: feedback != null
+          ? 'Wrote "${task.title}", scored ${feedback.scoreOutOf10.toStringAsFixed(1)}/10.'
+          : 'Drafted "${task.title}" without submitting for grading.',
+    );
   }
 
   Future<void> _submit() async {
@@ -107,6 +297,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             text: submittedText,
             feedback: result.improvedVersion,
           );
+      _recorder.logUser(submittedText);
+      _recorder.logTutor(
+        '${result.scoreOutOf10.toStringAsFixed(1)}/10. ${result.improvedVersion}',
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -125,48 +319,115 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leadingWidth: widget.showFinishButton ? 72 : null,
+        leading: widget.showFinishButton
+            ? TextButton(
+                onPressed: _skip,
+                child: Text(
+                  'Skip',
+                  style: DesignTokens.body(
+                    14,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
+              )
+            : null,
         actions: [
+          if (_callActive) ...[
+            IconButton(
+              tooltip: _callMuted ? 'Unmute' : 'Mute',
+              onPressed: _toggleMute,
+              icon: Icon(
+                _callMuted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
+                color: DesignTokens.slateDim,
+              ),
+            ),
+          ],
           IconButton(
-            tooltip: 'Talk with Marie',
-            onPressed: _openGuide,
-            icon: const Icon(CupertinoIcons.phone_fill, color: DesignTokens.primary),
+            tooltip: _callActive
+                ? 'End call'
+                : _callConnecting
+                ? 'Connecting…'
+                : 'Talk with Marie',
+            onPressed: _callConnecting ? null : _toggleCall,
+            icon: _callConnecting
+                ? const SizedBox.square(
+                    dimension: 20,
+                    child: PSProgressIndicator(),
+                  )
+                : Icon(
+                    CupertinoIcons.phone_fill,
+                    color: _callActive ? DesignTokens.success : DesignTokens.primary,
+                  ),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+      body: Stack(
         children: [
-          _promptCard(),
-          const SizedBox(height: 16),
-          _connectorsCard(),
-          const SizedBox(height: 16),
-          _editorCard(),
-          if (_isGrading) ...[
-            const SizedBox(height: 16),
-            const Center(child: PSProgressIndicator()),
-          ],
-          if (_feedback != null) ...[
-            const SizedBox(height: 16),
-            _feedbackCard(_feedback!),
-          ],
-          if (_errorText != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              _errorText!,
-              style: DesignTokens.mono(
-                11,
-              ).copyWith(color: DesignTokens.primary),
-            ),
-          ],
-          const SizedBox(height: 16),
-          PasseportPrimaryButton(
-            label: _feedback == null ? 'Submit for grading' : 'Re-submit',
-            onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+          ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            children: [
+              if (_callActive || _callConnecting || _callError != null) ...[
+                _callStatusCard(),
+                const SizedBox(height: 16),
+              ],
+              _promptCard(),
+              const SizedBox(height: 16),
+              _connectorsCard(),
+              const SizedBox(height: 16),
+              _editorCard(),
+              if (_isGrading) ...[
+                const SizedBox(height: 16),
+                const Center(child: PSProgressIndicator()),
+              ],
+              if (_feedback != null) ...[
+                const SizedBox(height: 16),
+                _feedbackCard(_feedback!),
+              ],
+              if (_errorText != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _errorText!,
+                  style: DesignTokens.mono(
+                    11,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
+              ],
+              const SizedBox(height: 16),
+              PasseportPrimaryButton(
+                label: _feedback == null ? 'Submit for grading' : 'Re-submit',
+                onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+              ),
+              if (widget.showFinishButton && _feedback != null) ...[
+                const SizedBox(height: 12),
+                PasseportPrimaryButton(
+                  label: 'Finish',
+                  icon: CupertinoIcons.checkmark,
+                  onPressed: _finish,
+                ),
+              ],
+              const SizedBox(height: 24),
+            ],
           ),
-          const SizedBox(height: 24),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
         ],
       ),
     );
+  }
+
+  void _finish() {
+    final feedback = _feedback;
+    if (feedback == null) return;
+    Navigator.of(context).pop(
+      StageOutcome.completed(
+        WritingStageResult(score: feedback.scoreOutOf10),
+      ),
+    );
+  }
+
+  void _skip() {
+    Navigator.of(
+      context,
+    ).pop(const StageOutcome<WritingStageResult>.skipped());
   }
 
   // -- Feedback card --
@@ -183,28 +444,28 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               Text(
                 '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
                 style: DesignTokens.display(
-                  16,
-                  weight: FontWeight.w500,
+                  20,
+                  weight: FontWeight.w600,
                 ).copyWith(color: DesignTokens.primary),
               ),
             ],
           ),
           if (feedback.strengths.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Text(
               'Strengths',
-              style: DesignTokens.body(12, weight: FontWeight.w500),
+              style: DesignTokens.body(14, weight: FontWeight.w600),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             for (final s in feedback.strengths)
               Padding(
-                padding: const EdgeInsets.only(bottom: 2),
+                padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(
                       CupertinoIcons.checkmark,
-                      size: 12,
+                      size: 14,
                       color: DesignTokens.success,
                     ),
                     const SizedBox(width: 6),
@@ -212,8 +473,8 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                       child: Text(
                         s,
                         style: DesignTokens.body(
-                          12,
-                        ).copyWith(color: DesignTokens.slateDim),
+                          14,
+                        ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
                       ),
                     ),
                   ],
@@ -221,23 +482,24 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               ),
           ],
           if (feedback.corrections.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Text(
               'Corrections',
-              style: DesignTokens.body(12, weight: FontWeight.w500),
+              style: DesignTokens.body(14, weight: FontWeight.w600),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             for (final c in feedback.corrections)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           c.original,
-                          style: DesignTokens.body(11.5).copyWith(
+                          style: DesignTokens.body(13.5).copyWith(
                             color: DesignTokens.primary,
                             decoration: TextDecoration.lineThrough,
                           ),
@@ -245,58 +507,92 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                         const SizedBox(width: 6),
                         const Icon(
                           CupertinoIcons.arrow_right,
-                          size: 9,
+                          size: 11,
                           color: DesignTokens.slate,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           c.fixed,
                           style: DesignTokens.body(
-                            11.5,
-                            weight: FontWeight.w500,
+                            13.5,
+                            weight: FontWeight.w600,
                           ).copyWith(color: DesignTokens.info),
                         ),
                       ],
                     ),
                     if (c.why.isNotEmpty)
-                      Text(
-                        c.why,
-                        style: DesignTokens.mono(
-                          10,
-                        ).copyWith(color: DesignTokens.slateDim),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          c.why,
+                          style: DesignTokens.body(
+                            12.5,
+                          ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                        ),
                       ),
                   ],
                 ),
               ),
           ],
           if (feedback.connectorFeedback.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Text(
               'Connectors',
-              style: DesignTokens.body(12, weight: FontWeight.w500),
+              style: DesignTokens.body(14, weight: FontWeight.w600),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               feedback.connectorFeedback,
               style: DesignTokens.body(
-                12,
-              ).copyWith(color: DesignTokens.slateDim),
+                14,
+              ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
             ),
           ],
+          if (feedback.nextSteps.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              'Next steps',
+              style: DesignTokens.body(14, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 6),
+            for (final step in feedback.nextSteps)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      CupertinoIcons.arrow_up_right_circle_fill,
+                      size: 14,
+                      color: DesignTokens.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        step,
+                        style: DesignTokens.body(
+                          14,
+                        ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
           if (feedback.improvedVersion.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Row(
               children: [
                 Text(
                   'Improved version',
-                  style: DesignTokens.body(12, weight: FontWeight.w500),
+                  style: DesignTokens.body(14, weight: FontWeight.w600),
                 ),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(
                     CupertinoIcons.speaker_2_fill,
-                    size: 16,
-                    color: DesignTokens.info,
+                    size: 18,
+                    color: DesignTokens.primary,
                   ),
                   onPressed: () => LessonSpeechService.shared.speak(
                     items: LessonSpeechService.speechItemsFromText(
@@ -314,10 +610,57 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             Text(
               feedback.improvedVersion,
               style: DesignTokens.body(
-                12.5,
-              ).copyWith(color: DesignTokens.slateDim),
+                15,
+              ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  // -- Call status (inline, non-blocking) --
+
+  Widget _callStatusCard() {
+    return PasseportCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            CupertinoIcons.phone_fill,
+            size: 18,
+            color: _callError != null ? DesignTokens.primary : DesignTokens.success,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _callError != null
+                      ? _callError!
+                      : _callConnecting
+                      ? 'Connecting to Marie…'
+                      : _tutorSpeaking
+                      ? 'Marie is speaking…'
+                      : 'Listening — keep writing, she can hear you.',
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.inkSoft),
+                ),
+                if (_lastTutorLine != null && _callError == null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _lastTutorLine!,
+                    style: DesignTokens.body(
+                      12.5,
+                    ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );

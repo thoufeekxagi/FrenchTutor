@@ -51,8 +51,7 @@ class ListeningLabScreen extends ConsumerStatefulWidget {
   const ListeningLabScreen({super.key});
 
   @override
-  ConsumerState<ListeningLabScreen> createState() =>
-      _ListeningLabScreenState();
+  ConsumerState<ListeningLabScreen> createState() => _ListeningLabScreenState();
 }
 
 class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
@@ -101,7 +100,9 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         context,
         (_) => StoryReaderScreen(
           story: story,
-          enrichment: LessonAgentService.shared.buildStoryQuizAndKeywords(passage),
+          enrichment: LessonAgentService.shared.buildStoryQuizAndKeywords(
+            passage,
+          ),
           onEnriched: (quiz, keywords) => store.updateEnrichment(
             GeneratedStory(
               id: story.id,
@@ -113,10 +114,15 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           ),
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint(
+        'ListeningLabScreen: story generation failed: $error\n$stackTrace',
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not generate a story. Try again.')),
+          const SnackBar(
+            content: Text('Could not generate a story. Try again.'),
+          ),
         );
       }
     } finally {
@@ -155,7 +161,8 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     }
     final pool = [
       ..._storyTopicCategories.map(
-        (c) => 'something related to ${c.toLowerCase()} that could happen in daily life',
+        (c) =>
+            'something related to ${c.toLowerCase()} that could happen in daily life',
       ),
       ...profile.interests.map(
         (i) => 'something related to $i that could happen in daily life',
@@ -308,15 +315,18 @@ class _TopicChipRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
+                color: isSelected
+                    ? DesignTokens.primary
+                    : DesignTokens.canvasDim,
                 borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
               ),
               alignment: Alignment.center,
               child: Text(
                 option ?? 'Surprise me',
-                style: DesignTokens.body(12.5, weight: FontWeight.w600).copyWith(
-                  color: isSelected ? Colors.white : DesignTokens.slateDim,
-                ),
+                style: DesignTokens.body(12.5, weight: FontWeight.w600)
+                    .copyWith(
+                      color: isSelected ? Colors.white : DesignTokens.slateDim,
+                    ),
               ),
             ),
           );

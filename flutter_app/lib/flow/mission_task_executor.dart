@@ -19,11 +19,12 @@ import '../orchestration/models/task_result.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/lesson_speech_service.dart';
 import '../screens/lessons/story_reader_screen.dart';
+import '../screens/lessons/writing_task_screen.dart';
 import '../screens/pathway/agent_led_grammar_screen.dart';
 import '../screens/pathway/agent_led_listening_screen.dart';
 import '../screens/pathway/agent_led_vocab_screen.dart';
 import '../screens/pathway/grammar_picker_screen.dart';
-import '../screens/pathway/pathway_writing_screen.dart';
+import '../screens/pathway/pathway_writing_screen.dart' show WritingStageResult;
 import '../screens/pathway/vocab_picker_screen.dart';
 import '../screens/session/session_screen.dart';
 import 'stage_outcome.dart';
@@ -299,10 +300,12 @@ class MissionTaskExecutor {
       writingTask = fallback;
     }
     if (!context.mounted) return;
+    // Same screen as the standalone Writing lab (prompt/rubric card,
+    // connectors, live call with Marie, feedback) — a mission's writing step
+    // must never look or behave differently from practicing it directly.
     final outcome = await AppRouter.push<StageOutcome<WritingStageResult>>(
       context,
-      (_) =>
-          PathwayWritingScreen(targetWords: const [], writingTask: writingTask),
+      (_) => WritingTaskScreen(task: writingTask, showFinishButton: true),
       fullscreenDialog: true,
     );
     if (outcome == null || !outcome.isCompleted || outcome.result == null) {

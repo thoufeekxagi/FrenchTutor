@@ -6,15 +6,17 @@ import 'package:intl/intl.dart';
 import '../../config/api_keys.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
-import '../../models/daily_session.dart';
 import '../../models/session.dart';
 import '../../orchestration/models/competency.dart';
 import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
+import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/session_row.dart';
+import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/roleplay_lab_screen.dart';
@@ -116,7 +118,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 _momentumCard(),
                 if (_sessions.isNotEmpty) ...[
                   const SizedBox(height: 28),
-                  _sectionTitle('Recent practice'),
+                  Row(
+                    children: [
+                      _sectionTitle('Recent practice'),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => AppRouter.push(
+                          context,
+                          (_) => const AllHistoryScreen(),
+                        ),
+                        child: Text(
+                          'View all',
+                          style: Passeport.body(
+                            13.5,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: Passeport.sky),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   _journalCard(),
                 ] else ...[
@@ -480,11 +500,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _momentumCard() {
-    final today = ref.read(learningStoreProvider).dailySession();
-    final completed = PathwayStage.values.where((stage) {
-      final status = today.stages[stage]!.status;
-      return status == StageStatus.completed || status == StageStatus.skipped;
-    }).length;
+    final doneToday = DailyGoalService.categoriesToday(_sessions).length;
+    final goalTotal = DailyGoalService.categories.length;
     final weekStart = DateTime.now().subtract(const Duration(days: 7));
     final sessionsThisWeek = _sessions.where((session) {
       return DateTime.tryParse(session.startedAt)?.isAfter(weekStart) ?? false;
@@ -496,9 +513,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           Expanded(
             child: _Metric(
-              value: '$completed/5',
+              value: '$doneToday/$goalTotal',
               label: 'steps today',
-              color: completed == 5 ? Passeport.sage : Passeport.maroon,
+              color: doneToday == goalTotal ? Passeport.sage : Passeport.maroon,
             ),
           ),
           Container(width: 1, height: 42, color: Passeport.hairline),
@@ -528,7 +545,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 context,
                 (_) => HistoryScreen(session: session),
               ),
-              child: _SessionRow(session: session),
+              child: SessionRow(session: session),
             ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -609,99 +626,3 @@ class _Metric extends StatelessWidget {
   }
 }
 
-class _SessionRow extends StatelessWidget {
-  const _SessionRow({required this.session});
-
-  final Session session;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Passeport.primarySoft,
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: const Icon(
-              CupertinoIcons.chat_bubble_fill,
-              size: 16,
-              color: Passeport.maroon,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  session.topic ?? 'French practice',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Passeport.body(13.5, weight: FontWeight.w600),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatDate(session.startedAt),
-                  style: Passeport.body(
-                    11.5,
-                  ).copyWith(color: Passeport.slateDim),
-                ),
-              ],
-            ),
-          ),
-          if (_stageLabel != null)
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: Passeport.infoSoft,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Text(
-                _stageLabel!,
-                style: Passeport.body(
-                  10.5,
-                  weight: FontWeight.w600,
-                ).copyWith(color: Passeport.sky),
-              ),
-            ),
-          const Icon(
-            CupertinoIcons.chevron_right,
-            size: 13,
-            color: Passeport.slate,
-          ),
-        ],
-      ),
-    );
-  }
-
-  String? get _stageLabel {
-    switch (session.stage) {
-      case 'vocab':
-        return 'Vocab';
-      case 'grammar':
-        return 'Grammar';
-      case 'reading_listening':
-        return 'Reading';
-      case 'writing':
-        return 'Writing';
-      case 'speaking':
-        return 'Speaking';
-      default:
-        return null;
-    }
-  }
-
-  String _formatDate(String iso) {
-    try {
-      return DateFormat('MMM d').format(DateTime.parse(iso));
-    } catch (_) {
-      return iso;
-    }
-  }
-}

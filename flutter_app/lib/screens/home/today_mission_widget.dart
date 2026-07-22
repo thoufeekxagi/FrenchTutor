@@ -1,37 +1,30 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
-import '../../flow/mission_task_executor.dart';
-import '../../orchestration/evidence/task_result_adapters.dart';
-import '../../orchestration/models/competency.dart';
-import '../../orchestration/models/content_descriptor.dart';
-import '../../orchestration/models/mission.dart';
-import '../../orchestration/models/plan_task.dart';
-import '../../orchestration/models/learning_plan.dart';
-import '../../orchestration/planning/rotation_planner.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../services/daily_goal_service.dart';
+import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../labs/listening_lab_screen.dart';
+import '../labs/grammar_lab_screen.dart';
+import '../labs/roleplay_lab_screen.dart';
+import '../labs/writing_lab_screen.dart';
+import '../pathway/vocab_picker_screen.dart';
+import '../session/session_screen.dart';
 import '../subscription/paywall_screen.dart';
 
-/// The rotation planner doesn't participate in the competency graph at all
-/// (see plan: "Replace the mission/competency-catalog system with a simple
-/// daily content rotation") — an empty framework means `supports()` always
-/// reports false, so `TaskResultAdapters` gracefully skips evidence for
-/// every rotated task rather than needing thousands of content-competency
-/// mappings authored for a system that's no longer in the loop.
-const _noCompetencyFramework = CompetencyFramework(
-  frameworkVersion: 'none',
-  curriculumVersion: 'none',
-  competencies: [],
-  mappings: [],
-);
-
+/// "Today's mission" — not a generated multi-step lesson plan anymore, just
+/// a plain daily accountability check: touch each of [DailyGoalService.categories]
+/// once today. Backed entirely by the `sessions` table every practice
+/// screen writes to via `SessionRecorder`, so it advances the same whether
+/// a category was done through this card's own button or by going straight
+/// into Practice/Labs — there's no separate plan/task state to fall out of
+/// sync with what was actually practiced.
 class TodayMissionWidget extends ConsumerStatefulWidget {
   const TodayMissionWidget({super.key, this.onProgress});
 
@@ -42,11 +35,19 @@ class TodayMissionWidget extends ConsumerStatefulWidget {
 }
 
 class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
-  PlanSnapshot? _plan;
-  MissionDefinition? _mission;
-  String? _error;
   bool _loading = true;
   bool _running = false;
+  // Fatal — reading today's sessions itself failed, nothing to show but a
+  // retry. Distinct from [_actionError], which is a non-fatal inline notice
+  // (e.g. opening a category failed) shown alongside an otherwise-working card.
+  String? _loadError;
+  String? _actionError;
+  Set<String> _doneToday = {};
+  int _streak = 0;
+  // "Skip for today" just previews a different not-yet-done category for
+  // this visit — it never marks anything done, so it can't be used to fake
+  // the accountability check. Resets whenever _doneToday changes.
+  int _previewOffset = 0;
 
   @override
   void initState() {
@@ -54,132 +55,57 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     _load();
   }
 
-  Future<void> _load() async {
+  void _load() {
     if (mounted) setState(() => _loading = true);
     try {
-      final profile = ref.read(learningStoreProvider).profile();
-      final planStore = ref.read(planStoreProvider);
-      final now = DateTime.now();
-      final localDate =
-          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-
-      const planner = RotationPlanner();
-      final existingRaw = planStore.activePlanForDate(localDate);
-      // A persisted "active" plan with zero tasks is corrupt/stale (nothing
-      // to resume) — `.first` below would crash the whole screen on load.
-      // Treat it the same as "no plan yet" and generate a fresh one instead.
-      final existing = existingRaw != null && existingRaw.tasks.isNotEmpty
-          ? existingRaw
-          : null;
-      PlanSnapshot plan;
-      MissionDefinition mission;
-      if (existing != null) {
-        plan = existing;
-        final modalityName = existing.inputSnapshot['modality'] as String?;
-        final modality = modalityName == null
-            ? existing.tasks.first.modality
-            : PerformanceModality.values.firstWhere(
-                (m) => m.wireName == modalityName,
-                orElse: () => existing.tasks.first.modality,
-              );
-        mission = planner.buildMissionFor(
-          contentItemIds: existing.tasks.map((t) => t.contentItemId).toList(),
-          modality: modality,
-          learnerLevel: profile.level,
-        );
-      } else {
-        final result = planner.buildNext(
-          planStore: planStore,
-          learningStore: ref.read(learningStoreProvider),
-          content: ref.read(contentServiceProvider),
-          localDate: localDate,
-          availableMinutes: _minutesFor(profile.sessionLength),
-          learnerLevel: profile.level,
-        );
-        planStore.savePlan(result.plan);
-        plan = result.plan;
-        mission = result.mission;
-      }
+      final sessions = ref.read(storageServiceProvider).getAllSessions();
+      final done = DailyGoalService.categoriesToday(sessions);
       if (!mounted) return;
       setState(() {
-        _plan = plan;
-        _mission = mission;
-        _error = null;
+        _doneToday = done;
+        _streak = DailyGoalService.streak(sessions);
+        _previewOffset = 0;
+        _loadError = null;
         _loading = false;
       });
     } catch (e) {
-      // Any failure building today's plan used to crash this whole screen
-      // (an uncaught exception in an unawaited initState call) — surface it
-      // as the same retryable notice `_runNext` already shows for a failed
-      // mission step, instead of taking down the app.
-      debugPrint('TodayMissionWidget: failed to load today\'s plan: $e');
+      debugPrint('TodayMissionWidget: failed to load today\'s progress: $e');
       if (!mounted) return;
       setState(() {
-        _error = 'Could not load today\'s mission. Please try again.';
+        _loadError = 'Could not load today\'s progress. Please try again.';
         _loading = false;
       });
     }
   }
 
-  int _minutesFor(String length) => switch (length) {
-    'quick' => 12,
-    'deep' => 40,
-    _ => 20,
+  List<String> get _remainingCategories =>
+      DailyGoalService.categories.where((c) => !_doneToday.contains(c)).toList();
+
+  String? get _featuredCategory {
+    final remaining = _remainingCategories;
+    if (remaining.isEmpty) return null;
+    return remaining[_previewOffset % remaining.length];
+  }
+
+  void _skipForNow() {
+    final remaining = _remainingCategories;
+    if (remaining.length <= 1) return;
+    setState(() => _previewOffset = (_previewOffset + 1) % remaining.length);
+  }
+
+  String? _labLockKeyFor(String category) => switch (category) {
+    'Vocabulary' => 'vocabulary',
+    'Grammar' => 'grammar',
+    'Listening' => 'listening',
+    'Roleplay' => 'roleplay',
+    'Writing' => 'writing',
+    _ => null, // Speaking (Talk with Marie) is ungated, matching the dashboard.
   };
 
-  PlanTaskRecord? get _nextTask {
-    final plan = _plan;
-    if (plan == null) return null;
-    for (final task in plan.tasks) {
-      if (task.status == PlanTaskStatus.active ||
-          task.status == PlanTaskStatus.pending) {
-        return task;
-      }
-    }
-    return null;
-  }
-
-  PlanTaskRecord? _nextTaskFor(PlanSnapshot plan) {
-    for (final task in plan.tasks) {
-      if (task.status == PlanTaskStatus.active ||
-          task.status == PlanTaskStatus.pending) {
-        return task;
-      }
-    }
-    return null;
-  }
-
-  Future<void> _advanceToNextMission(PlanSnapshot completedPlan) async {
-    final profile = ref.read(learningStoreProvider).profile();
-    final planStore = ref.read(planStoreProvider);
-    const planner = RotationPlanner();
-    final result = planner.buildNext(
-      planStore: planStore,
-      learningStore: ref.read(learningStoreProvider),
-      content: ref.read(contentServiceProvider),
-      localDate: completedPlan.localDate,
-      availableMinutes: _minutesFor(profile.sessionLength),
-      learnerLevel: profile.level,
-      replacesPlanId: completedPlan.id,
-      replanReason: 'mission_completed',
-    );
-    planStore.replan(replaces: completedPlan, newPlan: result.plan);
-    if (mounted) {
-      setState(() {
-        _plan = result.plan;
-        _mission = result.mission;
-      });
-    }
-  }
-
-  Future<void> _runNext([PlanTaskRecord? selectedTask]) async {
-    final plan = _plan;
-    final mission = _mission;
-    final task = selectedTask ?? _nextTask;
-    if (plan == null || mission == null || task == null) {
-      return;
-    }
-    if (ref.read(subscriptionGateServiceProvider).isModalityLocked(task.modality)) {
+  Future<void> _openCategory(String category) async {
+    final lockKey = _labLockKeyFor(category);
+    if (lockKey != null &&
+        ref.read(subscriptionGateServiceProvider).isLabLocked(lockKey)) {
       final subscribed = await AppRouter.push<bool>(
         context,
         (_) => const PaywallScreen(),
@@ -189,49 +115,38 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     }
     setState(() {
       _running = true;
-      _error = null;
+      _actionError = null;
     });
     try {
-      await MissionTaskExecutor(
-        store: ref.read(learningStoreProvider),
-        planStore: ref.read(planStoreProvider),
-        evidenceStore: ref.read(evidenceStoreProvider),
-        taskResultAdapters: TaskResultAdapters(framework: _noCompetencyFramework),
-        sceneCacheStore: ref.read(generatedSceneCacheStoreProvider),
-      ).run(context: context, task: task, mission: mission);
-      final updated = ref.read(planStoreProvider).byId(plan.id);
-      if (updated == null) return;
-      if (_nextTaskFor(updated) == null) {
-        await _advanceToNextMission(updated);
-      } else if (mounted) {
-        setState(() => _plan = updated);
+      switch (category) {
+        case 'Vocabulary':
+          await AppRouter.push(context, (_) => const VocabPickerScreen());
+        case 'Grammar':
+          await AppRouter.push(context, (_) => const GrammarLabScreen());
+        case 'Listening':
+          await AppRouter.push(context, (_) => const ListeningLabScreen());
+        case 'Roleplay':
+          await AppRouter.push(context, (_) => const RoleplayLabScreen());
+        case 'Writing':
+          await AppRouter.push(context, (_) => const WritingLabScreen());
+        case 'Speaking':
+          LessonSpeechService.shared.deactivate();
+          await AppRouter.push(
+            context,
+            (_) => SessionScreen(apiKey: ApiKeys.geminiKey),
+            fullscreenDialog: true,
+          );
       }
+      _load();
       widget.onProgress?.call();
     } catch (e) {
-      debugPrint('TodayMissionWidget: mission step failed to start: $e');
+      debugPrint('TodayMissionWidget: could not open $category: $e');
       if (mounted) {
-        setState(() {
-          _error = 'This mission step could not start. Please try again.';
-        });
+        setState(() => _actionError = 'Could not open that. Please try again.');
       }
     } finally {
       if (mounted) setState(() => _running = false);
     }
-  }
-
-  void _skipNext() {
-    final plan = _plan;
-    final task = _nextTask;
-    if (plan == null || task == null) return;
-    ref
-        .read(planStoreProvider)
-        .completeTask(
-          taskId: task.id,
-          status: PlanTaskStatus.skipped,
-          resultSummary: {'reason': 'learner_skipped'},
-        );
-    setState(() => _plan = ref.read(planStoreProvider).byId(plan.id));
-    widget.onProgress?.call();
   }
 
   @override
@@ -239,34 +154,14 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     if (_loading) {
       return const Center(child: PSProgressIndicator());
     }
-    if (_error != null && _plan == null) {
-      return _MissionNotice(message: _error!, onRetry: _load);
+    if (_loadError != null) {
+      return _MissionNotice(message: _loadError!, onRetry: _load);
     }
-    final plan = _plan;
-    final mission = _mission;
-    if (plan == null || mission == null) {
-      return _MissionNotice(
-        message: 'Your learning plan is not ready yet. Please try again.',
-        onRetry: _load,
-      );
+    final featured = _featuredCategory;
+    if (featured == null) {
+      return _MissionComplete(streak: _streak);
     }
-    final completed = plan.tasks
-        .where(
-          (task) =>
-              task.status == PlanTaskStatus.completed ||
-              task.status == PlanTaskStatus.skipped,
-        )
-        .length;
-    final task = _nextTask;
-    if (task == null) {
-      return _MissionComplete(
-        title: mission.title,
-        stepCount: plan.tasks.length,
-      );
-    }
-    final locked = ref
-        .read(subscriptionGateServiceProvider)
-        .isModalityLocked(task.modality);
+    final doneCount = _doneToday.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -293,7 +188,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   ),
                   const Spacer(),
                   Text(
-                    '$completed of ${plan.tasks.length}',
+                    '$doneCount of ${DailyGoalService.categories.length}',
                     style: DesignTokens.body(
                       12,
                       weight: FontWeight.w600,
@@ -301,61 +196,30 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   ),
                 ],
               ),
-              // A stepper with a single node conveys nothing (just a lone
-              // dot) — only worth showing once there's an actual sequence.
-              if (plan.tasks.length > 1) ...[
-                const SizedBox(height: DesignTokens.space4),
-                _MissionProgress(total: plan.tasks.length, completed: completed),
-              ],
+              const SizedBox(height: DesignTokens.space4),
+              _MissionProgress(
+                categories: DailyGoalService.categories,
+                doneToday: _doneToday,
+                featured: featured,
+              ),
               const SizedBox(height: DesignTokens.space5),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: locked
-                              ? DesignTokens.canvasDim
-                              : DesignTokens.infoSoft,
-                          borderRadius: BorderRadius.circular(
-                            DesignTokens.radiusMedium,
-                          ),
-                        ),
-                        child: Icon(
-                          _iconFor(task.modality),
-                          color: locked ? DesignTokens.muted : DesignTokens.info,
-                          size: 23,
-                        ),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.infoSoft,
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusMedium,
                       ),
-                      if (locked)
-                        Positioned(
-                          right: -4,
-                          bottom: -4,
-                          child: Container(
-                            width: 22,
-                            height: 22,
-                            decoration: const BoxDecoration(
-                              color: DesignTokens.surface,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0x1A000000),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              CupertinoIcons.lock_fill,
-                              size: 12,
-                              color: DesignTokens.mutedDim,
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
+                    child: Icon(
+                      _iconFor(featured),
+                      color: DesignTokens.info,
+                      size: 23,
+                    ),
                   ),
                   const SizedBox(width: DesignTokens.space3),
                   Expanded(
@@ -363,20 +227,17 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          task.status == PlanTaskStatus.active
-                              ? 'CONTINUING'
-                              : 'NEXT STEP',
-                          style:
-                              DesignTokens.body(
-                                10.5,
-                                weight: FontWeight.w700,
-                              ).copyWith(
-                                color: DesignTokens.primary,
-                                letterSpacing: 0.9,
-                              ),
+                          'NEXT STEP',
+                          style: DesignTokens.body(
+                            10.5,
+                            weight: FontWeight.w700,
+                          ).copyWith(
+                            color: DesignTokens.primary,
+                            letterSpacing: 0.9,
+                          ),
                         ),
                         const SizedBox(height: DesignTokens.space1),
-                        Text(mission.title, style: DesignTokens.display(22)),
+                        Text(featured, style: DesignTokens.display(22)),
                       ],
                     ),
                   ),
@@ -384,75 +245,46 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               ),
               const SizedBox(height: DesignTokens.space3),
               Text(
-                _taskLabel(task.modality),
+                _taskLabel(featured),
                 style: DesignTokens.body(
                   15,
                   weight: FontWeight.w600,
                 ).copyWith(color: DesignTokens.inkSoft),
               ),
-              if (_error != null) ...[
+              if (_actionError != null) ...[
                 const SizedBox(height: DesignTokens.space3),
                 Text(
-                  _error!,
+                  _actionError!,
                   style: DesignTokens.body(
                     13,
                     weight: FontWeight.w600,
                   ).copyWith(color: DesignTokens.danger),
                 ),
               ],
-              const SizedBox(height: DesignTokens.space4),
-              Row(
-                children: [
-                  const Icon(
-                    CupertinoIcons.clock,
-                    size: 16,
-                    color: DesignTokens.slateDim,
-                  ),
-                  const SizedBox(width: DesignTokens.space2),
-                  Text(
-                    '${task.estimatedMinutes} min',
-                    style: DesignTokens.body(
-                      13,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: DesignTokens.slateDim),
-                  ),
-                  const SizedBox(width: DesignTokens.space4),
-                  Text(
-                    'Step ${task.sequence + 1} of ${plan.tasks.length}',
-                    style: DesignTokens.body(
-                      13,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: DesignTokens.slateDim),
-                  ),
-                ],
-              ),
               const SizedBox(height: DesignTokens.space5),
               PasseportPrimaryButton(
-                label: locked
-                    ? 'Unlock with subscription'
-                    : task.status == PlanTaskStatus.active
-                    ? 'Continue mission'
-                    : 'Start mission',
-                icon: locked ? CupertinoIcons.lock_fill : CupertinoIcons.arrow_right,
-                onPressed: _running ? null : _runNext,
+                label: 'Start',
+                icon: CupertinoIcons.arrow_right,
+                onPressed: _running ? null : () => _openCategory(featured),
                 isLoading: _running,
-                loadingLabel: 'Preparing your mission…',
+                loadingLabel: 'Opening…',
               ),
-              Center(
-                child: SizedBox(
-                  height: DesignTokens.minTapTarget,
-                  child: TextButton(
-                    onPressed: _running ? null : _skipNext,
-                    child: Text(
-                      'Skip for today',
-                      style: DesignTokens.body(
-                        13,
-                        weight: FontWeight.w500,
-                      ).copyWith(color: DesignTokens.slateDim),
+              if (_remainingCategories.length > 1)
+                Center(
+                  child: SizedBox(
+                    height: DesignTokens.minTapTarget,
+                    child: TextButton(
+                      onPressed: _running ? null : _skipForNow,
+                      child: Text(
+                        'Show something else',
+                        style: DesignTokens.body(
+                          13,
+                          weight: FontWeight.w500,
+                        ).copyWith(color: DesignTokens.slateDim),
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -460,70 +292,53 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     );
   }
 
-  IconData _iconFor(PerformanceModality modality) => switch (modality) {
-    PerformanceModality.readingRecognition => CupertinoIcons.rectangle_stack,
-    PerformanceModality.listeningRecognition => CupertinoIcons.headphones,
-    PerformanceModality.controlledWriting ||
-    PerformanceModality.spontaneousWriting => CupertinoIcons.pencil,
-    PerformanceModality.controlledSpeaking ||
-    PerformanceModality.spontaneousSpeaking => CupertinoIcons.waveform,
-    PerformanceModality.pronunciationProduction => CupertinoIcons.mic,
+  IconData _iconFor(String category) => switch (category) {
+    'Vocabulary' => CupertinoIcons.square_stack_3d_up,
+    'Grammar' => CupertinoIcons.book,
+    'Listening' => CupertinoIcons.headphones,
+    'Roleplay' => CupertinoIcons.bubble_left_bubble_right,
+    'Writing' => CupertinoIcons.pencil,
+    _ => CupertinoIcons.waveform,
   };
 
-  String _taskLabel(PerformanceModality modality) => switch (modality) {
-    PerformanceModality.readingRecognition =>
-      'Learn the words for this mission',
-    PerformanceModality.listeningRecognition =>
-      'Understand the scenario in context',
-    PerformanceModality.controlledWriting =>
-      'Build a supported written response',
-    PerformanceModality.spontaneousWriting =>
-      'Write independently in this scenario',
-    PerformanceModality.controlledSpeaking => 'Use the language with Marie',
-    PerformanceModality.spontaneousSpeaking => 'Respond naturally with Marie',
-    PerformanceModality.pronunciationProduction =>
-      'Practise the target sounds aloud',
+  String _taskLabel(String category) => switch (category) {
+    'Vocabulary' => 'Learn or review some words',
+    'Grammar' => 'Practice a grammar point',
+    'Listening' => 'Read or listen to a short story',
+    'Roleplay' => 'Have a live roleplay conversation',
+    'Writing' => 'Write a short passage',
+    _ => 'Talk with Marie',
   };
 }
 
 class _MissionProgress extends StatelessWidget {
-  const _MissionProgress({required this.total, required this.completed});
+  const _MissionProgress({
+    required this.categories,
+    required this.doneToday,
+    required this.featured,
+  });
 
-  final int total;
-  final int completed;
+  final List<String> categories;
+  final Set<String> doneToday;
+  final String featured;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        for (var index = 0; index < total; index++) ...[
+        for (var index = 0; index < categories.length; index++) ...[
           if (index > 0)
             Expanded(
               child: Container(
                 height: 3,
-                color: index <= completed
+                color: doneToday.contains(categories[index - 1])
                     ? DesignTokens.success
                     : DesignTokens.canvasDim,
               ),
             ),
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: index < completed
-                  ? DesignTokens.success
-                  : index == completed
-                  ? DesignTokens.primary
-                  : DesignTokens.canvasDim,
-              shape: BoxShape.circle,
-            ),
-            child: index < completed
-                ? const Icon(
-                    CupertinoIcons.checkmark,
-                    color: Colors.white,
-                    size: 14,
-                  )
-                : null,
+          _CategoryDot(
+            done: doneToday.contains(categories[index]),
+            isNext: categories[index] == featured,
           ),
         ],
       ],
@@ -531,11 +346,36 @@ class _MissionProgress extends StatelessWidget {
   }
 }
 
-class _MissionComplete extends StatelessWidget {
-  const _MissionComplete({required this.title, required this.stepCount});
+class _CategoryDot extends StatelessWidget {
+  const _CategoryDot({required this.done, required this.isNext});
 
-  final String title;
-  final int stepCount;
+  final bool done;
+  final bool isNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: done
+            ? DesignTokens.success
+            : isNext
+            ? DesignTokens.primary
+            : DesignTokens.canvasDim,
+        shape: BoxShape.circle,
+      ),
+      child: done
+          ? const Icon(CupertinoIcons.checkmark, color: Colors.white, size: 14)
+          : null,
+    );
+  }
+}
+
+class _MissionComplete extends StatelessWidget {
+  const _MissionComplete({required this.streak});
+
+  final int streak;
 
   @override
   Widget build(BuildContext context) {
@@ -555,12 +395,39 @@ class _MissionComplete extends StatelessWidget {
             size: 28,
           ),
           const SizedBox(height: DesignTokens.space3),
-          Text('Mission complete', style: DesignTokens.display(22)),
+          Text('Today’s mission is complete', style: DesignTokens.display(22)),
           const SizedBox(height: DesignTokens.space1),
           Text(
-            '$title is saved with $stepCount completed step${stepCount == 1 ? '' : 's'}. Your next mission will build on this practice.',
+            'You practiced all 6 skills today.',
             style: DesignTokens.body(
               14,
+            ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ),
+          if (streak > 0) ...[
+            const SizedBox(height: DesignTokens.space3),
+            Row(
+              children: [
+                const Icon(
+                  CupertinoIcons.flame_fill,
+                  size: 16,
+                  color: DesignTokens.success,
+                ),
+                const SizedBox(width: DesignTokens.space2),
+                Text(
+                  streak == 1 ? '1-day streak' : '$streak-day streak',
+                  style: DesignTokens.body(
+                    13.5,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.success),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: DesignTokens.space2),
+          Text(
+            'Want to keep going? Practice any skill in the Practice tab.',
+            style: DesignTokens.body(
+              13,
             ).copyWith(color: DesignTokens.slateDim, height: 1.4),
           ),
         ],

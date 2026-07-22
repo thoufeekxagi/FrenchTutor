@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../providers/database_provider.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/session_recorder.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../../widgets/passeport_card.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
@@ -28,7 +32,7 @@ class StoryReaderResult {
 /// ready here rather than regenerated on every open; either can still be
 /// empty if that generation call failed, in which case its tab falls back
 /// to a placeholder.
-class StoryReaderScreen extends StatefulWidget {
+class StoryReaderScreen extends ConsumerStatefulWidget {
   const StoryReaderScreen({
     super.key,
     required this.story,
@@ -61,10 +65,10 @@ class StoryReaderScreen extends StatefulWidget {
   onEnriched;
 
   @override
-  State<StoryReaderScreen> createState() => _StoryReaderScreenState();
+  ConsumerState<StoryReaderScreen> createState() => _StoryReaderScreenState();
 }
 
-class _StoryReaderScreenState extends State<StoryReaderScreen> {
+class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
   _StoryTab _tab = _StoryTab.story;
   int _currentSegment = 0;
   bool _isPlaying = false;
@@ -88,9 +92,19 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   GlobalKey _keyFor(int index) => _segmentKeys.putIfAbsent(index, GlobalKey.new);
 
+  late final SessionRecorder _recorder;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Story';
+    });
+    _recorder = SessionRecorder(
+      storage: ref.read(storageServiceProvider),
+      stage: 'story',
+      topic: _story.displayTitle,
+    );
     final enrichment = widget.enrichment;
     if (enrichment != null) {
       _enriching = true;
@@ -116,7 +130,26 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   @override
   void dispose() {
     LessonSpeechService.shared.stop();
+    _finishSession();
     super.dispose();
+  }
+
+  void _finishSession() {
+    if (_quizAnswers.isEmpty) {
+      _recorder.finish(summary: 'Read "${_story.displayTitle}".');
+      return;
+    }
+    final quiz = _story.quiz;
+    var correct = 0;
+    for (final entry in _quizAnswers.entries) {
+      if (entry.key < quiz.length && entry.value == quiz[entry.key].answerIndex) {
+        correct++;
+      }
+    }
+    _recorder.finish(
+      summary:
+          'Read "${_story.displayTitle}", scored $correct/${_quizAnswers.length} on the quiz.',
+    );
   }
 
   Future<void> _playAll({int fromIndex = 0}) async {
@@ -235,31 +268,36 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          _TabRow(
-            selected: _tab,
-            onSelect: (tab) => setState(() => _tab = tab),
+          Column(
+            children: [
+              _TabRow(
+                selected: _tab,
+                onSelect: (tab) => setState(() => _tab = tab),
+              ),
+              Divider(height: 1, color: DesignTokens.hairline),
+              Expanded(
+                child: switch (_tab) {
+                  _StoryTab.story => _storyView(),
+                  _StoryTab.grammar => _grammarView(),
+                  _StoryTab.quiz => _quizView(),
+                  _StoryTab.keywords => _keywordsView(),
+                },
+              ),
+              if (_tab == _StoryTab.story)
+                _AudioControlBar(
+                  isPlaying: _isPlaying,
+                  rate: _rate,
+                  onTogglePlayPause: _togglePlayPause,
+                  onStop: _stop,
+                  onPlaySentence: _playSelectedSentence,
+                  onCycleRate: _cycleRate,
+                  onContinue: widget.showFinishButton ? _finish : null,
+                ),
+            ],
           ),
-          Divider(height: 1, color: DesignTokens.hairline),
-          Expanded(
-            child: switch (_tab) {
-              _StoryTab.story => _storyView(),
-              _StoryTab.grammar => _grammarView(),
-              _StoryTab.quiz => _quizView(),
-              _StoryTab.keywords => _keywordsView(),
-            },
-          ),
-          if (_tab == _StoryTab.story)
-            _AudioControlBar(
-              isPlaying: _isPlaying,
-              rate: _rate,
-              onTogglePlayPause: _togglePlayPause,
-              onStop: _stop,
-              onPlaySentence: _playSelectedSentence,
-              onCycleRate: _cycleRate,
-              onContinue: widget.showFinishButton ? _finish : null,
-            ),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
         ],
       ),
     );

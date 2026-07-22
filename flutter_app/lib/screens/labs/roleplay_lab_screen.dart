@@ -91,7 +91,12 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       _loadRoleplays();
       await AppRouter.push(
         context,
-        (_) => AgentLedListeningScreen(passage: roleplay.passage),
+        (_) => AgentLedListeningScreen(
+                    passage: roleplay.passage,
+                    noteContext: 'Roleplay',
+                    sessionStage: 'roleplay',
+                    sessionTopic: roleplay.displayTitle,
+                  ),
         fullscreenDialog: true,
       );
     } catch (e) {
@@ -195,7 +200,12 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
                   roleplay: roleplay,
                   onTap: () => AppRouter.push(
                     context,
-                    (_) => AgentLedListeningScreen(passage: roleplay.passage),
+                    (_) => AgentLedListeningScreen(
+                    passage: roleplay.passage,
+                    noteContext: 'Roleplay',
+                    sessionStage: 'roleplay',
+                    sessionTopic: roleplay.displayTitle,
+                  ),
                     fullscreenDialog: true,
                   ),
                 ),
@@ -215,7 +225,12 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
                   isStarter: true,
                   onTap: () => AppRouter.push(
                     context,
-                    (_) => AgentLedListeningScreen(passage: roleplay.passage),
+                    (_) => AgentLedListeningScreen(
+                    passage: roleplay.passage,
+                    noteContext: 'Roleplay',
+                    sessionStage: 'roleplay',
+                    sessionTopic: roleplay.displayTitle,
+                  ),
                     fullscreenDialog: true,
                   ),
                 ),

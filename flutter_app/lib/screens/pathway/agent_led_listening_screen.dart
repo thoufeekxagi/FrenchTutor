@@ -66,10 +66,24 @@ class AgentLedListeningScreen extends ConsumerStatefulWidget {
     super.key,
     required this.passage,
     this.vocabSummary,
+    this.noteContext = 'Listening',
+    this.sessionStage = 'reading_listening',
+    this.sessionTopic = 'Reading & Listening',
   });
 
   final ReadingPassage passage;
   final VocabStageResult? vocabSummary;
+
+  /// Tag the floating notetaker uses for anything jotted down during this
+  /// screen — the Roleplay lab passes 'Roleplay' so its notes aren't
+  /// mislabeled 'Listening'.
+  final String noteContext;
+
+  /// `SessionRecorder` stage/topic — same rationale: the Roleplay lab passes
+  /// its own values so roleplay sessions show up correctly labeled in
+  /// history instead of as "Reading & Listening".
+  final String sessionStage;
+  final String sessionTopic;
 
   @override
   ConsumerState<AgentLedListeningScreen> createState() =>
@@ -172,13 +186,13 @@ class _AgentLedListeningScreenState
     WidgetsBinding.instance.addObserver(this);
     // Deferred to after this frame — see pathway_writing_screen.dart for why.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notetakerStateProvider).currentContext = 'Listening';
+      ref.read(notetakerStateProvider).currentContext = widget.noteContext;
     });
     _store = ref.read(learningStoreProvider);
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
-      stage: 'reading_listening',
-      topic: 'Reading & Listening',
+      stage: widget.sessionStage,
+      topic: widget.sessionTopic,
     );
     _sessionPlan = widget.passage.segments
         .map((s) => _ReadingSessionCard(s))

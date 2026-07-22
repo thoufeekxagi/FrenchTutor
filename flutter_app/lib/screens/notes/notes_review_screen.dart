@@ -28,7 +28,9 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
     'Vocabulary',
     'Grammar',
     'Listening',
+    'Roleplay',
     'Writing',
+    'Story',
     'Speaking',
     'General',
   ];
@@ -328,7 +330,10 @@ class _NoteRow extends StatelessWidget {
       case 'Grammar':
         return DesignTokens.infoSoft;
       case 'Writing':
+      case 'Story':
         return DesignTokens.primarySoft;
+      case 'Roleplay':
+        return DesignTokens.infoSoft;
       default:
         return DesignTokens.parchmentDim;
     }
@@ -342,8 +347,12 @@ class _NoteRow extends StatelessWidget {
         return CupertinoIcons.book;
       case 'Listening':
         return CupertinoIcons.headphones;
+      case 'Roleplay':
+        return CupertinoIcons.bubble_left_bubble_right;
       case 'Writing':
         return CupertinoIcons.pencil;
+      case 'Story':
+        return CupertinoIcons.book_fill;
       case 'Speaking':
         return CupertinoIcons.mic;
       default:

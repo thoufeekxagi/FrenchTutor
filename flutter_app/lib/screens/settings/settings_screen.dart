@@ -268,9 +268,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 _previewer.playingId == p.id
                                     ? CupertinoIcons.stop_circle_fill
                                     : CupertinoIcons.play_circle_fill,
-                                color: selected
-                                    ? Colors.white
-                                    : Passeport.sky,
+                                color: selected ? Colors.white : Passeport.sky,
                                 size: 19,
                               ),
                       ),
@@ -847,8 +845,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
             ],
 
-            // --- AI tutor (OpenRouter) — developer build only ---
-            if (kDebugMode)
+            if (kDebugMode) ...[
               _PasseportCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,64 +859,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       label: 'Key status',
                       value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
                     const SizedBox(height: 10),
-                    Text(
-                      'Preferred model',
-                      style: Passeport.body(
-                        12.5,
-                      ).copyWith(color: Passeport.slateDim),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Passeport.hairline),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _modelOverride,
-                          isExpanded: true,
-                          style: Passeport.body(
-                            12.5,
-                          ).copyWith(color: Passeport.text),
-                          dropdownColor: Passeport.parchment,
-                          icon: const Icon(
-                            CupertinoIcons.chevron_down,
-                            color: Passeport.maroon,
-                          ),
-                          items: [
-                            DropdownMenuItem(
-                              value: '',
-                              child: Text(
-                                'Auto (fallback chain)',
-                                style: Passeport.body(12.5),
-                              ),
-                            ),
-                            ...availableModels.map(
-                              (model) => DropdownMenuItem(
-                                value: model,
-                                child: Text(
-                                  model,
-                                  style: Passeport.mono(11),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ],
-                          onChanged: (v) {
-                            if (v == null) return;
-                            setState(() => _modelOverride = v);
-                            _saveString('openrouter_model_override', v);
-                          },
+                    DropdownButton<String>(
+                      value: _modelOverride,
+                      isExpanded: true,
+                      items: [
+                        const DropdownMenuItem(
+                          value: '',
+                          child: Text('Gemini (default)'),
                         ),
-                      ),
+                        ...availableModels.map(
+                          (model) => DropdownMenuItem(
+                            value: model,
+                            child: Text(model, overflow: TextOverflow.ellipsis),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() => _modelOverride = value);
+                        _saveString('openrouter_model_override', value);
+                      },
                     ),
                   ],
                 ),
               ),
-            if (kDebugMode) const SizedBox(height: 12),
+              const SizedBox(height: 12),
+            ],
 
             // --- Notetaker ---
             _PasseportCard(
@@ -937,7 +903,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         activeThumbColor: Passeport.maroon,
                         onChanged: (v) {
                           setState(
-                            () => ref.read(notetakerStateProvider).isEnabled = v,
+                            () =>
+                                ref.read(notetakerStateProvider).isEnabled = v,
                           );
                         },
                       ),
@@ -1320,9 +1287,7 @@ class _LegalLinkRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: Passeport.body(
-                    12.5,
-                  ).copyWith(color: Passeport.text),
+                  style: Passeport.body(12.5).copyWith(color: Passeport.text),
                 ),
               ),
               Icon(
