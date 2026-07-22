@@ -10,6 +10,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/lesson_qa_overlay.dart';
 import '../../widgets/marie_toolbar_button.dart';
+import '../../widgets/tts_play_button.dart';
 
 class ListeningExerciseResult {
   const ListeningExerciseResult({
@@ -290,31 +291,24 @@ class _ListeningExerciseScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Play sentence button (no-op for now)
-        GestureDetector(
-          onTap: () {
-            LessonSpeechService.shared.speak(
-              items: [SpeechItem(text: sentence, language: 'fr-FR')],
-            );
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                CupertinoIcons.speaker_2_fill,
-                size: 14,
-                color: DesignTokens.info,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Play sentence ${i + 1}',
-                style: DesignTokens.mono(
-                  11,
-                  weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.info),
-              ),
-            ],
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TtsPlayButton(
+              text: sentence,
+              contentItemId: exercise.id,
+              size: 24,
+              iconSize: 14,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Play sentence ${i + 1}',
+              style: DesignTokens.mono(
+                11,
+                weight: FontWeight.w500,
+              ).copyWith(color: DesignTokens.info),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         TextField(

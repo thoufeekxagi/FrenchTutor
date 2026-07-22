@@ -47,6 +47,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   String? _goal;
   String? _level;
   String _sessionLength = 'standard';
+  final Set<String> _interests = {};
   TutorPersona? _tutorChoice;
   bool _trialAvailable = false;
   bool _startingTrial = false;
@@ -62,8 +63,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   static const _pageWelcome = 0;
   static const _pageGoal = 1;
   static const _pageLevel = 2;
-  static const _pageTutor = 3;
-  static const _pagePreparing = 4;
+  static const _pageInterests = 3;
+  static const _pageTutor = 4;
+  static const _pagePreparing = 5;
 
   @override
   void initState() {
@@ -98,6 +100,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       ..goal = _goal ?? 'unsure'
       ..level = _level ?? 'unsure'
       ..sessionLength = _sessionLength
+      ..interests = _interests.toList()
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
     ActiveTutor.set(_tutorChoice ?? TutorPersona.marie);
@@ -114,17 +117,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   TutorPersona get _tutor => _tutorChoice ?? TutorPersona.marie;
 
-  /// The gradient identity — derived from the active palette, never from a
-  /// reference app. Used by both full-bleed moments (welcome, preparing).
-  static const _heroGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      DesignTokens.primaryDeep,
-      DesignTokens.primary,
-      DesignTokens.secondary,
-    ],
-  );
+  /// The gradient identity — shared with the sign-in and restoring-progress
+  /// screens via [DesignTokens.heroGradient] so they never drift apart.
+  static const _heroGradient = DesignTokens.heroGradient;
 
   @override
   Widget build(BuildContext context) {
@@ -143,16 +138,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
                   child: Row(
                     children: [
-                      Text(
-                        'PARLESPRINT',
-                        style: Passeport.body(
-                          11,
-                          weight: FontWeight.w800,
-                        ).copyWith(color: Colors.white, letterSpacing: 1.2),
-                      ),
+                      const _BrandWordmark(),
                       const Spacer(),
                       Text(
-                        'Step $_page of 3',
+                        'Step $_page of 4',
                         style: Passeport.body(
                           12,
                           weight: FontWeight.w600,
@@ -163,22 +152,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: List.generate(3, (index) {
-                      return Expanded(
-                        child: AnimatedContainer(
-                          duration: DesignTokens.durationFast,
-                          height: 4,
-                          margin: EdgeInsets.only(right: index == 2 ? 0 : 6),
-                          decoration: BoxDecoration(
-                            color: index < _page
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.28),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                      );
-                    }),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      height: 4,
+                      color: Colors.white.withValues(alpha: 0.28),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: AnimatedContainer(
+                              duration: DesignTokens.durationMedium,
+                              curve: DesignTokens.curveStandard,
+                              width:
+                                  constraints.maxWidth *
+                                  (_page / 4).clamp(0.0, 1.0),
+                              height: 4,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -191,6 +186,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     _welcomeStep(),
                     _goalStep(),
                     _levelStep(),
+                    _interestsStep(),
                     _tutorStep(),
                     _PreparingPane(
                       active: _page == _pagePreparing,
@@ -240,34 +236,47 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const Spacer(flex: 2),
           _AnimatedBrandMark(animation: _brandController),
           const Spacer(flex: 2),
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '“The fastest way to speak French is to speak French.”',
-                  textAlign: TextAlign.center,
-                  style: Passeport.display(
-                    23,
-                  ).copyWith(color: Colors.white, height: 1.35),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  'A live tutor who talks with you every day, '
-                  'not flashcards about someday.',
-                  textAlign: TextAlign.center,
-                  style: Passeport.body(15).copyWith(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    height: 1.45,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(26, 30, 26, 28),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.22),
                   ),
                 ),
-              ],
-            ),
+                child: Column(
+                  children: [
+                    Text(
+                      'The fastest way to speak French is to speak French.',
+                      textAlign: TextAlign.center,
+                      style: Passeport.display(
+                        23,
+                      ).copyWith(color: Colors.white, height: 1.35),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'A live tutor who talks with you every day, '
+                      'not flashcards about someday.',
+                      textAlign: TextAlign.center,
+                      style: Passeport.body(15).copyWith(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(left: 10, top: 2, child: _QuoteGlyph(opening: true)),
+              Positioned(
+                right: 10,
+                bottom: 2,
+                child: _QuoteGlyph(opening: false),
+              ),
+            ],
           ),
           const Spacer(flex: 2),
           Row(
@@ -377,6 +386,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   IconData get _stepIcon => switch (_page) {
     _pageGoal => CupertinoIcons.scope,
     _pageLevel => CupertinoIcons.slider_horizontal_3,
+    _pageInterests => CupertinoIcons.heart_fill,
     _pageTutor => CupertinoIcons.person_2_fill,
     _ => CupertinoIcons.phone_fill,
   };
@@ -463,9 +473,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         detail,
                         style: Passeport.body(12.5).copyWith(
                           color: selected
-                              ? DesignTokens.primaryDeep.withValues(
-                                  alpha: 0.82,
-                                )
+                              ? DesignTokens.primaryDeep.withValues(alpha: 0.82)
                               : Passeport.slateDim,
                         ),
                       ),
@@ -564,6 +572,83 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       footer: _onboardingButton(
         label: 'Build my plan',
         onPressed: _level == null ? null : _next,
+        icon: CupertinoIcons.arrow_right,
+      ),
+    );
+  }
+
+  static const _interestTopics = [
+    'Food',
+    'Travel',
+    'Movies & TV',
+    'Music',
+    'Sports',
+    'Family',
+    'Work',
+    'Books',
+    'Technology',
+    'Nature',
+  ];
+
+  /// Optional and short by design — one tap per pick, no descriptions, a
+  /// handful of words. Feeds personalized story topics later; skippable, so
+  /// it never blocks the funnel for a learner who doesn't care to answer.
+  Widget _interestsStep() {
+    return _step(
+      eyebrow: 'Make it yours',
+      title: 'What do you enjoy?',
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: _interestTopics.map((topic) {
+            final selected = _interests.contains(topic);
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                PSHaptics.selection();
+                setState(() {
+                  if (!_interests.remove(topic)) _interests.add(topic);
+                });
+              },
+              child: AnimatedContainer(
+                duration: DesignTokens.durationFast,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: selected ? 1 : 0.16),
+                  borderRadius: BorderRadius.circular(100),
+                  border: Border.all(
+                    color: selected
+                        ? DesignTokens.primaryDeep
+                        : Colors.white.withValues(alpha: 0.4),
+                    width: selected ? 2 : 1,
+                  ),
+                ),
+                child: Text(
+                  topic,
+                  style: Passeport.body(14, weight: FontWeight.w600).copyWith(
+                    color: selected ? DesignTokens.primaryDeep : Colors.white,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'So lessons match your interests',
+          style: Passeport.body(
+            12.5,
+            weight: FontWeight.w500,
+          ).copyWith(color: Colors.white.withValues(alpha: 0.72)),
+        ),
+      ],
+      footer: _onboardingButton(
+        label: 'Continue',
+        onPressed: _next,
         icon: CupertinoIcons.arrow_right,
       ),
     );
@@ -755,14 +840,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           ),
           fraction: ((result?.durationSeconds ?? 0) / TrialCallGate.maxSeconds)
               .clamp(0.0, 1.0),
-          color: Passeport.primary,
+          color: Passeport.mastery,
           delay: Duration.zero,
         ),
         _StatBar(
           label: 'Times you spoke',
           value: '${result?.learnerUtteranceCount ?? 0}',
           fraction: ((result?.learnerUtteranceCount ?? 0) / 10).clamp(0.0, 1.0),
-          color: Passeport.secondary,
+          color: Passeport.info,
           delay: const Duration(milliseconds: 250),
         ),
         _StatBar(
@@ -805,6 +890,51 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         onPressed: _finish,
         icon: CupertinoIcons.arrow_right,
       ),
+    );
+  }
+}
+
+/// Oversized decorative quotation mark, testimonial-style — sits inside the
+/// card near its corners, clear of the border, with a small gap before the
+/// paragraph text itself begins.
+class _QuoteGlyph extends StatelessWidget {
+  const _QuoteGlyph({required this.opening});
+
+  final bool opening;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Text(
+        opening ? '“' : '”',
+        style: Passeport.display(
+          64,
+        ).copyWith(color: Colors.white.withValues(alpha: 0.55), height: 1),
+      ),
+    );
+  }
+}
+
+/// Small header wordmark: the logo glyph + "ParleSprint" in small letters —
+/// replaces the all-caps text-only brand treatment.
+class _BrandWordmark extends StatelessWidget {
+  const _BrandWordmark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset('assets/images/logo_mark.png', width: 18, height: 22),
+        const SizedBox(width: 6),
+        Text(
+          'ParleSprint',
+          style: Passeport.body(
+            12.5,
+            weight: FontWeight.w700,
+          ).copyWith(color: Colors.white, letterSpacing: 0.1),
+        ),
+      ],
     );
   }
 }
@@ -1138,7 +1268,7 @@ class _StatBarState extends State<_StatBar> {
                 style: Passeport.body(
                   15,
                   weight: FontWeight.w800,
-                ).copyWith(color: widget.color),
+                ).copyWith(color: Colors.white),
               ),
             ],
           ),

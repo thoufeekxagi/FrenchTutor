@@ -17,6 +17,7 @@ import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
 import '../../services/referral_service.dart';
+import '../../services/subscription_gate_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import 'orchestration_lab_screen.dart';
 import 'product_guide_screen.dart';
@@ -42,7 +43,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   DateTime _roadmapStartDate = DateTime.now();
   String _modelOverride = '';
   String _openRouterKey = '';
-  bool _notetakerEnabled = false;
   TutorPersona _persona = ActiveTutor.current;
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
@@ -157,7 +157,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
       _modelOverride = prefs.getString('openrouter_model_override') ?? '';
       _openRouterKey = prefs.getString('openrouter_api_key') ?? '';
-      _notetakerEnabled = prefs.getBool('notetaker_enabled') ?? false;
       final timestamp = prefs.getInt('roadmap_start_date');
       if (timestamp != null) {
         _roadmapStartDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -186,11 +185,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _saveString(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
-  }
-
-  Future<void> _saveBool(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
   }
 
   Future<void> _pickRoadmapStartDate() async {
@@ -815,6 +809,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Developer', color: Passeport.slateDim),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text(
+                          'Force unlock premium',
+                          style: Passeport.body(12.5),
+                        ),
+                        const Spacer(),
+                        Switch.adaptive(
+                          value: DevSubscriptionOverride.enabled,
+                          activeThumbColor: Passeport.maroon,
+                          onChanged: (v) {
+                            DevSubscriptionOverride.set(v).then((_) {
+                              if (mounted) setState(() {});
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Bypasses subscription/invite-code checks for testing. '
+                      'Debug builds only — compiled out entirely from release.',
+                      style: Passeport.body(
+                        11.5,
+                      ).copyWith(color: Passeport.slateDim),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
             ],
 
             // --- AI tutor (OpenRouter) — developer build only ---
@@ -903,11 +933,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Text('Floating notetaker', style: Passeport.body(12.5)),
                       const Spacer(),
                       Switch.adaptive(
-                        value: _notetakerEnabled,
+                        value: ref.read(notetakerStateProvider).isEnabled,
                         activeThumbColor: Passeport.maroon,
                         onChanged: (v) {
-                          setState(() => _notetakerEnabled = v);
-                          _saveBool('notetaker_enabled', v);
+                          setState(
+                            () => ref.read(notetakerStateProvider).isEnabled = v,
+                          );
                         },
                       ),
                     ],

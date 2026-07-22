@@ -80,14 +80,29 @@ class OrchestrationService {
     MissionCatalog? missionCatalog,
     String learnerLevel = 'a1',
     String? userId,
+    bool difficultyBoost = false,
   }) {
     final existing = planStore.activePlanForDate(localDate, userId: userId);
     if (existing != null) return existing;
 
-    // Never immediately repeat the mission a new day's plan would otherwise
-    // deterministically re-pick if competency scores haven't shifted yet —
-    // this is what made the daily mission feel "stuck" on the same content.
-    final lastMissionId = planStore.mostRecentMissionId(userId: userId);
+    // Never immediately repeat a mission from recent history if competency
+    // scores haven't shifted yet — this is what made the daily mission feel
+    // "stuck" on the same content. A 1-mission lookback was trivially
+    // defeated by a small scenario pool, so this excludes recent history,
+    // not just the single most recent mission — but scaled to the actual
+    // catalog size, so a still-small catalog degrades gracefully (excluding
+    // more missions than exist would empty the pool outright) rather than
+    // breaking until the scenario bank is fully expanded.
+    final nonCalibrationCount =
+        missionCatalog?.missions.where((m) => !m.calibration).length ?? 0;
+    final exclusionLimit = nonCalibrationCount > 1
+        ? (nonCalibrationCount - 1).clamp(1, 40)
+        : 0;
+    final excludedMissionIds = exclusionLimit == 0
+        ? const <String>{}
+        : planStore
+              .recentMissionIds(userId: userId, limit: exclusionLimit)
+              .toSet();
 
     final snapshot = _generateSnapshot(
       framework: framework,
@@ -101,7 +116,8 @@ class OrchestrationService {
       missionCatalog: missionCatalog,
       learnerLevel: learnerLevel,
       userId: userId,
-      excludedMissionIds: lastMissionId == null ? const {} : {lastMissionId},
+      excludedMissionIds: excludedMissionIds,
+      difficultyBoost: difficultyBoost,
     );
     planStore.savePlan(snapshot);
     return snapshot;
@@ -124,7 +140,20 @@ class OrchestrationService {
     String learnerLevel = 'a1',
     String? userId,
     Set<String> excludedMissionIds = const {},
+    bool difficultyBoost = false,
   }) {
+    // Merge the caller's explicit exclusion (e.g. "don't repeat the mission
+    // that was just completed") with the same scaled recent-history window
+    // ensureTodayPlan uses, so mid-day replans get the same non-repeat
+    // guarantee as a fresh day's plan.
+    final nonCalibrationCount =
+        missionCatalog?.missions.where((m) => !m.calibration).length ?? 0;
+    final exclusionLimit = nonCalibrationCount > 1
+        ? (nonCalibrationCount - 1).clamp(1, 40)
+        : 0;
+    final recentIds = exclusionLimit == 0
+        ? const <String>{}
+        : planStore.recentMissionIds(userId: userId, limit: exclusionLimit).toSet();
     final next = _generateSnapshot(
       framework: framework,
       competencyStates: competencyStates,
@@ -137,7 +166,8 @@ class OrchestrationService {
       missionCatalog: missionCatalog,
       learnerLevel: learnerLevel,
       userId: userId,
-      excludedMissionIds: excludedMissionIds,
+      excludedMissionIds: {...excludedMissionIds, ...recentIds},
+      difficultyBoost: difficultyBoost,
       replacesPlanId: current.id,
       replanReason: reason,
     );
@@ -158,6 +188,7 @@ class OrchestrationService {
     String learnerLevel = 'a1',
     String? userId,
     Set<String> excludedMissionIds = const {},
+    bool difficultyBoost = false,
     String? replacesPlanId,
     String? replanReason,
   }) {
@@ -178,6 +209,7 @@ class OrchestrationService {
         goal: goal,
         competencyStates: competencyStates,
         excludedMissionIds: excludedMissionIds,
+        difficultyBoost: difficultyBoost,
       );
       final missionPlan = missionPlanFactory.build(
         framework: framework,

@@ -17,6 +17,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../history/history_screen.dart';
 import '../labs/listening_lab_screen.dart';
+import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../notes/notes_review_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
@@ -377,6 +378,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         label: 'Reading',
         onTap: () =>
             AppRouter.push(context, (_) => const ListeningLabScreen()),
+      ),
+      (
+        icon: CupertinoIcons.bubble_left_bubble_right,
+        label: 'Roleplay',
+        onTap: () =>
+            AppRouter.push(context, (_) => const RoleplayLabScreen()),
       ),
       (
         icon: CupertinoIcons.pencil,

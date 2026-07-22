@@ -83,7 +83,10 @@ class _AuthScreenState extends State<AuthScreen> {
     _run(
       () => _isSignUp
           ? AuthService.shared.signUpWithEmail(email: email, password: password)
-          : AuthService.shared.signInWithEmail(email: email, password: password),
+          : AuthService.shared.signInWithEmail(
+              email: email,
+              password: password,
+            ),
     );
   }
 
@@ -92,71 +95,91 @@ class _AuthScreenState extends State<AuthScreen> {
     if (email.isEmpty) {
       setState(() {
         _clearMessages();
-        _errorMessage = 'Enter your email above first, then tap "Forgot password?".';
+        _errorMessage =
+            'Enter your email above first, then tap "Forgot password?".';
       });
       return;
     }
     await _run(() => AuthService.shared.sendPasswordReset(email));
     if (!mounted) return;
     if (_errorMessage == null) {
-      setState(() => _infoMessage = 'Password reset email sent, check your inbox.');
+      setState(
+        () => _infoMessage = 'Password reset email sent, check your inbox.',
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Passeport.parchment,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _header(),
-              const SizedBox(height: 40),
-              _appleButton(),
-              const SizedBox(height: 12),
-              _googleButton(),
-              const SizedBox(height: 24),
-              _divider(),
-              const SizedBox(height: 20),
-              _modeToggle(),
-              const SizedBox(height: 18),
-              _emailField(),
-              const SizedBox(height: 12),
-              _passwordField(),
-              if (!_isSignUp) ...[
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: _loading ? null : _forgotPassword,
-                    child: Text(
-                      'Forgot password?',
-                      style: Passeport.body(
-                        12.5,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: Passeport.maroon),
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 18),
-              if (_errorMessage != null) _messageBanner(_errorMessage!, isError: true),
-              if (_infoMessage != null) _messageBanner(_infoMessage!, isError: false),
-              if (_errorMessage != null || _infoMessage != null)
-                const SizedBox(height: 12),
-              PasseportPrimaryButton(
-                label: _loading
-                    ? 'Please wait…'
-                    : (_isSignUp ? 'Create account' : 'Sign in'),
-                onPressed: _loading ? null : _submitEmail,
-              ),
-            ],
+    // A fixed, full-bleed backdrop behind a transparent Scaffold — not a
+    // DecoratedBox inside the Scaffold's own body — so the gradient always
+    // covers the entire physical screen. The Scaffold's body resizes when
+    // the keyboard opens (to keep fields above it); a gradient painted on
+    // that resizing body would shrink with it and expose a flat, seam-edged
+    // gap below. This backdrop sits outside that resize entirely.
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
           ),
         ),
-      ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _header(),
+                  const SizedBox(height: 40),
+                  _appleButton(),
+                  const SizedBox(height: 12),
+                  _googleButton(),
+                  const SizedBox(height: 24),
+                  _divider(),
+                  const SizedBox(height: 20),
+                  _modeToggle(),
+                  const SizedBox(height: 18),
+                  _emailField(),
+                  const SizedBox(height: 12),
+                  _passwordField(),
+                  if (!_isSignUp) ...[
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: _loading ? null : _forgotPassword,
+                        child: Text(
+                          'Forgot password?',
+                          style: Passeport.body(
+                            12.5,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  if (_errorMessage != null)
+                    _messageBanner(_errorMessage!, isError: true),
+                  if (_infoMessage != null)
+                    _messageBanner(_infoMessage!, isError: false),
+                  if (_errorMessage != null || _infoMessage != null)
+                    const SizedBox(height: 12),
+                  PasseportPrimaryButton(
+                    label: _loading
+                        ? 'Please wait…'
+                        : (_isSignUp ? 'Create account' : 'Sign in'),
+                    onPressed: _loading ? null : _submitEmail,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -164,19 +187,31 @@ class _AuthScreenState extends State<AuthScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'PARLESPRINT',
-          style: Passeport.body(
-            11,
-            weight: FontWeight.w800,
-          ).copyWith(color: Passeport.maroon, letterSpacing: 1.2),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/images/logo_mark.png', width: 18, height: 22),
+            const SizedBox(width: 6),
+            Text(
+              'ParleSprint',
+              style: Passeport.body(
+                12.5,
+                weight: FontWeight.w700,
+              ).copyWith(color: Colors.white, letterSpacing: 0.1),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
-        Text('Welcome', style: Passeport.display(30)),
+        Text(
+          'Welcome',
+          style: Passeport.display(30).copyWith(color: Colors.white),
+        ),
         const SizedBox(height: 6),
         Text(
           'Sign in to save your progress and pick up right where you left off.',
-          style: Passeport.body(14).copyWith(color: Passeport.slateDim, height: 1.4),
+          style: Passeport.body(
+            14,
+          ).copyWith(color: Colors.white.withValues(alpha: 0.86), height: 1.4),
         ),
       ],
     );
@@ -193,9 +228,6 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  /// No bundled Google logo asset (avoiding the risk of a hand-encoded,
-  /// possibly-malformed vector) — a clean brand-blue "G" monogram in a
-  /// bordered, Passeport-styled button reads as deliberate, not missing.
   Widget _googleButton() {
     return SizedBox(
       height: 52,
@@ -204,35 +236,21 @@ class _AuthScreenState extends State<AuthScreen> {
         style: OutlinedButton.styleFrom(
           backgroundColor: Passeport.surface,
           side: BorderSide(color: Passeport.hairline),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 20,
-              height: 20,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF4285F4),
-              ),
-              child: const Text(
-                'G',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            ),
+            Image.asset('assets/images/google_logo.png', width: 20, height: 20),
             const SizedBox(width: 10),
             Text(
               'Continue with Google',
-              style: Passeport.body(15, weight: FontWeight.w600).copyWith(
-                color: Passeport.ink,
-              ),
+              style: Passeport.body(
+                15,
+                weight: FontWeight.w600,
+              ).copyWith(color: Passeport.ink),
             ),
           ],
         ),
@@ -243,15 +261,17 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _divider() {
     return Row(
       children: [
-        Expanded(child: Divider(color: Passeport.hairline)),
+        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'or continue with email',
-            style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+            style: Passeport.body(
+              12,
+            ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
           ),
         ),
-        Expanded(child: Divider(color: Passeport.hairline)),
+        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
       ],
     );
   }

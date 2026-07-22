@@ -62,6 +62,10 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   7: _migrationV7,
   8: _migrationV8,
   9: _migrationV9,
+  10: _migrationV10,
+  11: _migrationV11,
+  12: _migrationV12,
+  13: _migrationV13,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -585,5 +589,85 @@ void _migrationV9(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_tts_audio_cache_content_item '
     'ON tts_audio_cache (content_item_id)',
+  );
+}
+
+/// Generated mission roleplay scenes are mission-level, not learner-level —
+/// the prompt going in (mission title/scenario/level/promptContext + a
+/// speaking topic) is identical for every learner who gets that mission, so
+/// one generated scene is reusable by everyone instead of re-prompting
+/// Gemini per learner per day. A small rotating pool per mission (see
+/// `GeneratedSceneCacheStore`) keeps repeat visits to the same mission
+/// feeling fresh without an unbounded, ever-growing table.
+void _migrationV10(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS generated_scene_cache (
+      id TEXT PRIMARY KEY,
+      mission_id TEXT NOT NULL,
+      scene_json TEXT NOT NULL,
+      times_used INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      last_used_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_generated_scene_cache_mission '
+    'ON generated_scene_cache (mission_id)',
+  );
+}
+
+/// Comma-joined topic picks from onboarding's interests step — feeds
+/// personalized story topics (see `LessonAgentService.buildPersonalStory`)
+/// instead of the generic rotating topic pool. Nullable/empty is a normal
+/// state (skipped, or a pre-existing profile from before this question
+/// existed), not an error.
+void _migrationV11(CommonDatabase db) {
+  db.execute('ALTER TABLE profiles ADD COLUMN interests TEXT');
+}
+
+/// A learner's personal library of AI-generated stories (replaces the old
+/// browsable list of hardcoded `listening.json` exercises in the Listening
+/// lab — see `GeneratedStory`/`GeneratedStoryStore`). Unlike
+/// `generated_scene_cache`, this data is learner-owned, so it follows the
+/// full sync-table convention (uuid pk, nullable user_id, soft delete) and
+/// gets pulled back down on sign-in via SyncService.
+void _migrationV12(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS generated_stories (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      title TEXT NOT NULL,
+      passage_json TEXT NOT NULL,
+      quiz_json TEXT NOT NULL DEFAULT '[]',
+      keywords_json TEXT NOT NULL DEFAULT '[]',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_generated_stories_created '
+    'ON generated_stories (created_at)',
+  );
+}
+
+/// A learner's personal library of AI-generated roleplay scenes — the
+/// Roleplay lab's analog of `generated_stories` (see `_migrationV12`), same
+/// full sync-table convention since this is per-user data too.
+void _migrationV13(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS generated_roleplays (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      title TEXT NOT NULL,
+      passage_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_generated_roleplays_created '
+    'ON generated_roleplays (created_at)',
   );
 }

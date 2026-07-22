@@ -15,7 +15,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:french_tutor/app.dart';
 import 'package:french_tutor/design/app_theme.dart';
 import 'package:french_tutor/providers/database_provider.dart';
-import 'package:french_tutor/screens/home/daily_pathway_widget.dart';
 import 'package:french_tutor/widgets/speaking_session_result.dart';
 
 void main() {
@@ -94,6 +93,11 @@ void main() {
       await tester.tap(find.text('Build my plan'));
       await tester.pumpAndSettle();
 
+      // Interests step — optional, skip without picking any.
+      expect(find.text('What do you enjoy?'), findsOneWidget);
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
       // Tutor step — pick the first France-accent tutor card.
       await tester.tap(find.text('Marie'));
       await tester.pumpAndSettle();
@@ -104,7 +108,7 @@ void main() {
       // then the 450ms beat on 100%. No trial key in tests → onboarding
       // finishes straight into the sign-in gate.
       await tester.pump(const Duration(milliseconds: 400)); // page slide
-      expect(find.textContaining('preparing your plan'), findsOneWidget);
+      expect(find.textContaining('Creating your first lessons'), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 3300));
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
@@ -112,28 +116,6 @@ void main() {
       expect(find.text('Continue with Google'), findsOneWidget);
     },
   );
-
-  testWidgets('today plan exposes one recommended next action', (
-    WidgetTester tester,
-  ) async {
-    final db = sqlite3.openInMemory();
-    addTearDown(db.dispose);
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
-        child: MaterialApp(
-          theme: AppTheme.themeData(),
-          home: const Scaffold(body: DailyPathwayWidget()),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('NEXT UP'), findsOneWidget);
-    expect(find.text('Build today’s vocabulary'), findsOneWidget);
-    expect(find.text('Start session'), findsOneWidget);
-    expect(find.text('Grammar'), findsNothing);
-  });
 
   testWidgets('completed speaking result reports real evidence', (
     WidgetTester tester,

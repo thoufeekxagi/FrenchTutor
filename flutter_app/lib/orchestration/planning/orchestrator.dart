@@ -337,7 +337,14 @@ class ConstrainedUtilityPolicy implements TaskSelectionPolicy {
 /// depends on which selector chose it.
 int minutesForModality(PerformanceModality modality) => switch (modality) {
   PerformanceModality.listeningRecognition => 10,
-  PerformanceModality.readingRecognition => 7,
+  // A single vocabulary word is reviewed in one batched screen alongside
+  // every other pending vocab task (see MissionTaskExecutor._runVocabulary),
+  // not one word per screen visit — 7 min/word made the planner's time
+  // budget exhaust after a single word, so a first mission could never
+  // include more than one. 2 min/word still lets other modalities compete
+  // for budget while allowing several words to fit into any realistic
+  // session length.
+  PerformanceModality.readingRecognition => 2,
   PerformanceModality.controlledWriting => 12,
   PerformanceModality.spontaneousWriting => 18,
   PerformanceModality.controlledSpeaking => 12,

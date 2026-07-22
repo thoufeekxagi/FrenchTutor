@@ -4,16 +4,81 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
 import '../../orchestration/models/competency.dart';
+import '../../orchestration/models/competency_state.dart';
 import 'learning_graph_view.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 
-class PathScreen extends ConsumerWidget {
+enum _MasteryTier { newSkill, building, ready }
+
+extension on _MasteryTier {
+  String get label => switch (this) {
+    _MasteryTier.newSkill => 'NEW',
+    _MasteryTier.building => 'BUILDING',
+    _MasteryTier.ready => 'READY',
+  };
+
+  Color foreground(BuildContext context) => switch (this) {
+    _MasteryTier.newSkill => Passeport.slateDim,
+    _MasteryTier.building => Passeport.sky,
+    _MasteryTier.ready => Passeport.sage,
+  };
+
+  Color background(BuildContext context) => switch (this) {
+    _MasteryTier.newSkill => Passeport.parchmentDim,
+    _MasteryTier.building => Passeport.infoSoft,
+    _MasteryTier.ready => Passeport.successSoft,
+  };
+}
+
+_MasteryTier _tierFor(CompetencyState? state) {
+  if (state == null || state.needsMoreEvidence) return _MasteryTier.newSkill;
+  if (state.masteryEstimate >= 0.75 && state.confidence >= 0.5) {
+    return _MasteryTier.ready;
+  }
+  return _MasteryTier.building;
+}
+
+/// Maps a profile's stored level (CEFR 'a1'..'b2', or legacy values like
+/// 'zero'/'conversational' — see `Profile.level` doc comment) to the
+/// uppercase band strings used in the competency graph content
+/// (`competency_graph_v1.json`'s `difficultyBand`), so the map can default
+/// to opening the band the learner is actually working in.
+String _currentBand(String level) => switch (level.toLowerCase()) {
+  'a1' || 'zero' || 'basics' => 'A1',
+  'a2' => 'A2',
+  'b1' || 'conversational' => 'B1',
+  'b2' => 'B2',
+  _ => 'A1',
+};
+
+class PathScreen extends ConsumerStatefulWidget {
   const PathScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PathScreen> createState() => _PathScreenState();
+}
+
+class _PathScreenState extends ConsumerState<PathScreen> {
+  Set<String>? _expandedBands;
+
+  @override
+  Widget build(BuildContext context) {
     final framework = ref.watch(competencyStoreProvider).framework();
+    final profile = ref.watch(learningStoreProvider).profile();
+    final states = ref.watch(competencyStateStoreProvider).all();
+    final bestStateByCompetency = <String, CompetencyState>{};
+    for (final state in states) {
+      final existing = bestStateByCompetency[state.competencyId];
+      if (existing == null || state.masteryEstimate > existing.masteryEstimate) {
+        bestStateByCompetency[state.competencyId] = state;
+      }
+    }
+    // Only the learner's current band starts open — everything else stays
+    // collapsed to a one-line header, so the screen reads as a real "you are
+    // here" map instead of the entire syllabus dumped at once.
+    _expandedBands ??= {_currentBand(profile.level)};
+
     return Scaffold(
       backgroundColor: Passeport.parchment,
       body: SafeArea(
@@ -57,7 +122,7 @@ class PathScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Practice will move skills from New to Building to Ready. Until then, this map shows the real curriculum sequence without inventing scores.',
+                          'Every skill moves from New to Building to Ready as you practice. Tap a level to expand it.',
                           style: Passeport.body(
                             13,
                           ).copyWith(color: Passeport.inkSoft, height: 1.4),
@@ -73,19 +138,34 @@ class PathScreen extends ConsumerWidget {
                     count: framework.competencies
                         .where((item) => item.difficultyBand == band)
                         .length,
+                    readyCount: framework.competencies
+                        .where((item) => item.difficultyBand == band)
+                        .where(
+                          (item) =>
+                              _tierFor(bestStateByCompetency[item.id]) ==
+                              _MasteryTier.ready,
+                        )
+                        .length,
+                    expanded: _expandedBands!.contains(band),
+                    onToggle: () => setState(() {
+                      final expanded = _expandedBands!;
+                      if (!expanded.remove(band)) expanded.add(band);
+                    }),
                   ),
-                  const SizedBox(height: 10),
-                  for (final competency in framework.competencies.where(
-                    (item) => item.difficultyBand == band,
-                  ))
-                    _CompetencyNode(
-                      competency: competency,
-                      titleById: {
-                        for (final item in framework.competencies)
-                          item.id: item.title,
-                      },
-                      isFoundation: competency.prerequisiteIds.isEmpty,
-                    ),
+                  if (_expandedBands!.contains(band)) ...[
+                    const SizedBox(height: 10),
+                    for (final competency in framework.competencies.where(
+                      (item) => item.difficultyBand == band,
+                    ))
+                      _CompetencyNode(
+                        competency: competency,
+                        titleById: {
+                          for (final item in framework.competencies)
+                            item.id: item.title,
+                        },
+                        tier: _tierFor(bestStateByCompetency[competency.id]),
+                      ),
+                  ],
                   const SizedBox(height: 16),
                 ],
               ],
@@ -106,28 +186,47 @@ class PathScreen extends ConsumerWidget {
 }
 
 class _BandHeader extends StatelessWidget {
-  const _BandHeader({required this.band, required this.count});
+  const _BandHeader({
+    required this.band,
+    required this.count,
+    required this.readyCount,
+    required this.expanded,
+    required this.onToggle,
+  });
 
   final String band;
   final int count;
+  final int readyCount;
+  final bool expanded;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          '$band FOUNDATION',
-          style: Passeport.body(
-            11,
-            weight: FontWeight.w700,
-          ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
-        ),
-        const Spacer(),
-        Text(
-          '$count abilities',
-          style: Passeport.body(12).copyWith(color: Passeport.slateDim),
-        ),
-      ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onToggle,
+      child: Row(
+        children: [
+          Icon(
+            expanded ? CupertinoIcons.chevron_down : CupertinoIcons.chevron_right,
+            size: 14,
+            color: Passeport.slateDim,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '$band FOUNDATION',
+            style: Passeport.body(
+              11,
+              weight: FontWeight.w700,
+            ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
+          ),
+          const Spacer(),
+          Text(
+            '$readyCount/$count ready',
+            style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -136,12 +235,12 @@ class _CompetencyNode extends StatelessWidget {
   const _CompetencyNode({
     required this.competency,
     required this.titleById,
-    required this.isFoundation,
+    required this.tier,
   });
 
   final Competency competency;
   final Map<String, String> titleById;
-  final bool isFoundation;
+  final _MasteryTier tier;
 
   @override
   Widget build(BuildContext context) {
@@ -161,14 +260,12 @@ class _CompetencyNode extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: isFoundation
-                    ? Passeport.successSoft
-                    : Passeport.infoSoft,
+                color: tier.background(context),
                 borderRadius: BorderRadius.circular(13),
               ),
               child: Icon(
                 _iconFor(competency.kind),
-                color: isFoundation ? Passeport.sage : Passeport.sky,
+                color: tier.foreground(context),
                 size: 20,
               ),
             ),
@@ -191,20 +288,14 @@ class _CompetencyNode extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: isFoundation
-                              ? Passeport.successSoft
-                              : Passeport.parchmentDim,
+                          color: tier.background(context),
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
-                          isFoundation
-                              ? 'START HERE'
-                              : competency.kind.name.toUpperCase(),
+                          tier.label,
                           style: Passeport.body(9.5, weight: FontWeight.w700)
                               .copyWith(
-                                color: isFoundation
-                                    ? Passeport.sage
-                                    : Passeport.slateDim,
+                                color: tier.foreground(context),
                                 letterSpacing: 0.7,
                               ),
                         ),

@@ -89,6 +89,24 @@ class TaskResultAdapters {
     required String contentItemId,
     required List<bool> drillResults,
   }) {
+    // A content item with no competency mapping (e.g. arbitrary rotated
+    // content, not part of the curated competency graph) simply doesn't
+    // produce evidence — mirrors listening's existing "not objectively
+    // graded" branch below, rather than throwing and blocking the task.
+    if (!supports(contentItemId, PerformanceModality.controlledSpeaking)) {
+      return TaskResult(
+        status: context.status,
+        attempts: drillResults.length,
+        learnerVisibleFeedback: drillResults.isEmpty
+            ? 'No grammar attempts recorded.'
+            : 'Grammar practice recorded.',
+        technicalMetadata: {
+          'adapter': 'grammar_v1',
+          'confidencePolicyVersion': confidencePolicy.version,
+          'evidenceWithheld': 'no_competency_mapping',
+        },
+      );
+    }
     final mapping = _mapping(
       contentItemId,
       PerformanceModality.controlledSpeaking,
@@ -132,7 +150,10 @@ class TaskResultAdapters {
         'Listening counts must satisfy 0 <= correct <= attempted',
       );
     }
-    if (!objectivelyGraded) {
+    final graded =
+        objectivelyGraded &&
+        supports(contentItemId, PerformanceModality.listeningRecognition);
+    if (!graded) {
       return TaskResult(
         status: context.status,
         attempts: attempted,
@@ -143,7 +164,9 @@ class TaskResultAdapters {
           'adapter': 'listening_v1',
           'contentItemId': contentItemId,
           'confidencePolicyVersion': confidencePolicy.version,
-          'evidenceWithheld': 'result_not_objectively_graded',
+          'evidenceWithheld': objectivelyGraded
+              ? 'no_competency_mapping'
+              : 'result_not_objectively_graded',
         },
       );
     }
@@ -194,7 +217,10 @@ class TaskResultAdapters {
       throw ArgumentError.value(hintsUsed, 'hintsUsed', 'must be >= 0');
     }
     final evidence = <EvidenceEvent>[];
-    if (scoreOutOf10 != null) {
+    final graded =
+        scoreOutOf10 != null &&
+        supports(contentItemId, PerformanceModality.controlledWriting);
+    if (graded) {
       final mapping = _mapping(
         contentItemId,
         PerformanceModality.controlledWriting,
@@ -232,6 +258,7 @@ class TaskResultAdapters {
         'adapter': 'writing_v1',
         'confidencePolicyVersion': confidencePolicy.version,
         'hintsUsed': hintsUsed,
+        if (scoreOutOf10 != null && !graded) 'evidenceWithheld': 'no_competency_mapping',
       },
     );
   }
@@ -245,7 +272,11 @@ class TaskResultAdapters {
     if (learnerUtteranceCount < 0 || durationSeconds < 0) {
       throw ArgumentError('Speaking counts must not be negative');
     }
-    _mapping(contentItemId, PerformanceModality.spontaneousSpeaking);
+    // No evidence is ever minted here regardless (see evidenceWithheld
+    // below) — this was only calling _mapping to validate a mapping exists,
+    // for no purpose the result was ever used for. Removed rather than
+    // guarded: validating something whose result nothing uses isn't a
+    // requirement, it was just an incidental throw waiting to happen.
     return TaskResult(
       status: context.status,
       attempts: learnerUtteranceCount,

@@ -7,6 +7,9 @@ import '../data/database/pilot_infrastructure_store.dart';
 import '../data/database/competency_store.dart';
 import '../data/database/evidence_store.dart';
 import '../data/database/competency_state_store.dart';
+import '../data/database/generated_scene_cache_store.dart';
+import '../data/database/generated_story_store.dart';
+import '../data/database/generated_roleplay_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
@@ -14,6 +17,7 @@ import '../services/srs_service.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
+import '../services/subscription_gate_service.dart';
 import '../services/sync_service.dart';
 import '../widgets/floating_notetaker.dart';
 
@@ -73,9 +77,37 @@ final orchestrationServiceProvider = Provider<OrchestrationService>((ref) {
   return const OrchestrationService();
 });
 
+final generatedSceneCacheStoreProvider = Provider<GeneratedSceneCacheStore>((
+  ref,
+) {
+  return GeneratedSceneCacheStore(ref.watch(databaseProvider));
+});
+
+final generatedStoryStoreProvider = Provider<GeneratedStoryStore>((ref) {
+  return GeneratedStoryStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
+});
+
+final generatedRoleplayStoreProvider = Provider<GeneratedRoleplayStore>((ref) {
+  return GeneratedRoleplayStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
+});
+
 final pilotAccessServiceProvider = Provider<PilotAccessService>((ref) {
   return PilotAccessService(
     store: ref.watch(learningStoreProvider),
+    infrastructure: ref.watch(pilotInfrastructureStoreProvider),
+  );
+});
+
+final subscriptionGateServiceProvider = Provider<SubscriptionGateService>((
+  ref,
+) {
+  return SubscriptionGateService(
     infrastructure: ref.watch(pilotInfrastructureStoreProvider),
   );
 });

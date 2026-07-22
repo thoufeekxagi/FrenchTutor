@@ -20,7 +20,6 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
-import '../../utils/voice_card_command.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
@@ -46,7 +45,7 @@ class _GrammarSessionCard {
   final GrammarPracticeCard card;
 }
 
-enum _GrammarUserIntent { advance, again, back, none }
+enum _GrammarUserIntent { again, none }
 
 /// Daily Pathway stage 2 — one chosen tense/topic, walked through EXACTLY the way
 /// AgentLedVocabScreen walks through vocab: one generated sentence card at a time (front =
@@ -358,14 +357,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
-    // Voice control does exactly one thing here: advance. Back/repeat/end
-    // are button-only — matched against THIS screen's own "Next sentence"
-    // text, not a bare "next" a future sentence could legitimately contain.
-    if (matchesAdvanceCommand(trimmed, nextPhrase: 'next sentence')) {
-      _logDebug('→ exact voice command: next');
-      _advanceFromUserIntent();
-      return;
-    }
+    // Navigation is strictly button-only — Back/Next sentence/End are never
+    // triggered by anything spoken, however phrased.
     _hasAttempted = true;
 
     _utteranceSeq += 1;
@@ -404,91 +397,33 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     }();
   }
 
+  /// Navigation (advance/back/goto) is strictly button-only in this screen —
+  /// Back/Next sentence/End are the only way to move a card; nothing
+  /// spoken, however phrased, ever moves it.
   void _applyIntent(
     LiveIntentVerdict verdict, {
     required String utterance,
     required String source,
   }) {
-    _logDebug(
-      '[$source] "$utterance" → ${verdict.intent.name}'
-      '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}',
-    );
-
-    if (verdict.intent != LiveNavIntent.attempt &&
-        verdict.intent != LiveNavIntent.chat &&
-        source != 'exact-command') {
-      _logDebug(
-        '→ LLM command ignored, exact voice command or button required',
-      );
-      return;
-    }
-    final isNavigation =
-        verdict.intent == LiveNavIntent.advance ||
-        verdict.intent == LiveNavIntent.back ||
-        verdict.intent == LiveNavIntent.goto;
-    if (isNavigation && source != 'exact-command') {
-      _logDebug(
-        '→ LLM navigation ignored, exact voice command or button required',
-      );
-      return;
-    }
-    if (isNavigation &&
-        DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
-      _logDebug('→ navigation ignored (cooldown after recent card move)');
-      return;
-    }
+    _logDebug('[$source] "$utterance" → ${verdict.intent.name}');
 
     switch (verdict.intent) {
       case LiveNavIntent.attempt:
         _lastDetectedIntent = _GrammarUserIntent.none;
         _attemptCount += 1;
-        _maybeUnlockOffer();
       case LiveNavIntent.chat:
         _lastDetectedIntent = _GrammarUserIntent.none;
       case LiveNavIntent.again:
         _lastDetectedIntent = _GrammarUserIntent.again;
       case LiveNavIntent.advance:
-        _lastDetectedIntent = _GrammarUserIntent.advance;
-        if (!verdict.explicit && !_offerUnlocked) {
-          _refusePrematureConsent();
-        } else {
-          _advanceFromUserIntent();
-        }
       case LiveNavIntent.back:
-        _lastDetectedIntent = _GrammarUserIntent.back;
-        _goBackFromUserIntent();
       case LiveNavIntent.goto:
-        _goToCard(verdict.cardNumber);
+        _logDebug('→ ignored: navigation is button-only, tap Back/Next sentence');
       case LiveNavIntent.finish:
         // Spoken "let's finish" = the End button.
         _cutTutorAudio();
         _confirmEnd();
     }
-  }
-
-  /// Offer permission — same mechanism as vocab's, fixed threshold of 2 passes per
-  /// sentence. See AgentLedVocabScreen for the full rationale.
-  static const _offerThreshold = 2;
-  bool _offerUnlocked = false;
-
-  void _maybeUnlockOffer() {
-    if (_offerUnlocked || _attemptCount < _offerThreshold) return;
-    if (_currentCard == null) return;
-    _offerUnlocked = true;
-    _logDebug('→ practice threshold reached ($_attemptCount/$_offerThreshold)');
-  }
-
-  void _refusePrematureConsent() {
-    final card = _currentCard;
-    if (card == null) return;
-    _logDebug(
-      '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
-    );
-    _gemini.injectContext(
-      'The card did NOT move, "${card.card.fr}" needs more practice. You should never have '
-      'suggested moving on. Smoothly continue practicing this sentence and never suggest '
-      'advancing again.',
-    );
   }
 
   void _advanceFromUserIntent() {
@@ -519,40 +454,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         'The student asked to go back, the screen now shows: "${card.card.fr}" '
         '(${card.card.en}). Grammar note: ${card.card.note} Re-anchor it briefly and have '
         'them try it once. $_noteReminder',
-      );
-    }
-  }
-
-  /// Jump straight to a specific card by 1-based number — "go to the third sentence".
-  void _goToCard(int? cardNumber) {
-    if (cardNumber == null) {
-      _logDebug('→ goto ignored: no card number');
-      return;
-    }
-    final target = cardNumber - 1;
-    if (target < 0 || target >= _sessionPlan.length) {
-      _logDebug(
-        '→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})',
-      );
-      return;
-    }
-    if (target == _cardIndex) {
-      _logDebug('→ goto ignored: already on card $cardNumber');
-      return;
-    }
-    _logDebug('→ user-driven jump to card $cardNumber');
-    _cutTutorAudio();
-    _lastCardMoveAt = DateTime.now();
-    setState(() {
-      _cardIndex = target;
-      _resetPerCardState();
-    });
-    final card = _currentCard;
-    if (card != null) {
-      _scheduleCardAnnouncement(
-        'The student jumped to sentence $cardNumber, the screen now shows: "${card.card.fr}" '
-        '(${card.card.en}). Grammar note: ${card.card.note} Announce it briefly, then teach '
-        'it. $_noteReminder',
       );
     }
   }
@@ -712,7 +613,6 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     _spokenSentenceMatched = false;
     _recentTranscriptBuffer = '';
     _handledCallIds.clear();
-    _offerUnlocked = false;
     // Cleared on card change so a "go back" can't false-trip the drift enforcer on
     // mentions of a sentence that was legitimately current moments ago.
     _tutorTurnTranscript = '';
@@ -788,7 +688,10 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       final fr = foldFrench(future.fr);
       if (fr.isEmpty) continue;
       final hits = fr.allMatches(folded).length;
-      if (hits >= 2) {
+      // Any single utterance of a future sentence is corrected immediately —
+      // waiting for a repeated pattern let the first, reported slip sail
+      // through.
+      if (hits >= 1) {
         _correctTutorDrift(future);
         return;
       }
@@ -821,9 +724,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     _cutTutorAudio();
     _gemini.injectContext(
       'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
-      'screen still shows "${current.card.fr}" (${current.card.en}), and only the student\'s own '
-      'words move the card. You may OFFER the next sentence and then wait silently for their '
-      'answer, never teach it. Pick up "${current.card.fr}" again now, briefly, as if nothing '
+      'screen still shows "${current.card.fr}" (${current.card.en}), and only a tap on their own '
+      '"Next sentence" button moves the card, never anything you say. Do not mention or offer '
+      '"${future.fr}" at all. Pick up "${current.card.fr}" again now, briefly, as if nothing '
       'happened.',
       expectReply: true,
     );

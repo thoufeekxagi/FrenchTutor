@@ -10,7 +10,10 @@
       "difficultyBand": "A1",
       "prerequisiteIds": [],
       "targetLevelLabel": "A1",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -19,9 +22,14 @@
       "title": "Introduce yourself simply",
       "description": "Give your name, origin and one simple personal detail in a first meeting.",
       "difficultyBand": "A1",
-      "prerequisiteIds": ["lex_identity_basics_a1"],
+      "prerequisiteIds": [
+        "lex_identity_basics_a1"
+      ],
       "targetLevelLabel": "A1",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -30,9 +38,14 @@
       "title": "Café requests",
       "description": "Understand and retrieve common words used to order food and drinks politely.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["function_introduce_yourself_a1"],
+      "prerequisiteIds": [
+        "function_introduce_yourself_a1"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -41,9 +54,14 @@
       "title": "Order at a café",
       "description": "Make a polite request, ask the price and close a short service interaction.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["lex_cafe_requests_a2"],
+      "prerequisiteIds": [
+        "lex_cafe_requests_a2"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -52,9 +70,14 @@
       "title": "Professional identity vocabulary",
       "description": "Understand and retrieve core words used to describe identity, work and professional experience.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["function_introduce_yourself_a1"],
+      "prerequisiteIds": [
+        "function_introduce_yourself_a1"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -63,9 +86,14 @@
       "title": "Present-tense self-description",
       "description": "Use être, habiter, venir and regular -er verbs to describe current identity and work.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["lex_professional_identity_core"],
+      "prerequisiteIds": [
+        "lex_professional_identity_core"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "foundation", "tefCanada": "foundation"},
+      "examRelevance": {
+        "tcfCanada": "foundation",
+        "tefCanada": "foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -74,9 +102,14 @@
       "title": "French R in work vocabulary",
       "description": "Produce an intelligible French R in high-frequency professional-introduction words.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["lex_professional_identity_core"],
+      "prerequisiteIds": [
+        "lex_professional_identity_core"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "supporting", "tefCanada": "supporting"},
+      "examRelevance": {
+        "tcfCanada": "supporting",
+        "tefCanada": "supporting"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -85,9 +118,15 @@
       "title": "Introduce yourself professionally",
       "description": "Give a short, coherent introduction covering name, origin, location and current work.",
       "difficultyBand": "A2",
-      "prerequisiteIds": ["lex_professional_identity_core", "grammar_present_self_description"],
+      "prerequisiteIds": [
+        "lex_professional_identity_core",
+        "grammar_present_self_description"
+      ],
       "targetLevelLabel": "A2",
-      "examRelevance": {"tcfCanada": "productive_foundation", "tefCanada": "productive_foundation"},
+      "examRelevance": {
+        "tcfCanada": "productive_foundation",
+        "tefCanada": "productive_foundation"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -96,9 +135,14 @@
       "title": "Identify professional details in speech",
       "description": "Extract role, duration, responsibilities and motivation from a professional introduction.",
       "difficultyBand": "B1",
-      "prerequisiteIds": ["function_introduce_professionally"],
+      "prerequisiteIds": [
+        "function_introduce_professionally"
+      ],
       "targetLevelLabel": "B1",
-      "examRelevance": {"tcfCanada": "listening", "tefCanada": "listening"},
+      "examRelevance": {
+        "tcfCanada": "listening",
+        "tefCanada": "listening"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -107,9 +151,14 @@
       "title": "Sequence professional experience",
       "description": "Connect current role, prior experience, responsibilities and motivation in a coherent response.",
       "difficultyBand": "B1",
-      "prerequisiteIds": ["function_introduce_professionally"],
+      "prerequisiteIds": [
+        "function_introduce_professionally"
+      ],
       "targetLevelLabel": "B1",
-      "examRelevance": {"tcfCanada": "speaking_writing", "tefCanada": "speaking_writing"},
+      "examRelevance": {
+        "tcfCanada": "speaking_writing",
+        "tefCanada": "speaking_writing"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -118,9 +167,14 @@
       "title": "Defend an opinion",
       "description": "State a position, support it with examples and respond to a challenge.",
       "difficultyBand": "B2",
-      "prerequisiteIds": ["discourse_professional_experience_sequence"],
+      "prerequisiteIds": [
+        "discourse_professional_experience_sequence"
+      ],
       "targetLevelLabel": "B2",
-      "examRelevance": {"tcfCanada": "speaking_writing", "tefCanada": "speaking_writing"},
+      "examRelevance": {
+        "tcfCanada": "speaking_writing",
+        "tefCanada": "speaking_writing"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     },
     {
@@ -129,32 +183,242 @@
       "title": "Manage a counterargument",
       "description": "Acknowledge and answer a contrasting point of view while maintaining a clear position.",
       "difficultyBand": "B2",
-      "prerequisiteIds": ["discourse_defend_opinion_b2"],
+      "prerequisiteIds": [
+        "discourse_defend_opinion_b2"
+      ],
       "targetLevelLabel": "B2",
-      "examRelevance": {"tcfCanada": "speaking", "tefCanada": "speaking"},
+      "examRelevance": {
+        "tcfCanada": "speaking",
+        "tefCanada": "speaking"
+      },
       "curriculumVersion": "applied_french_a1_b2_v1"
     }
   ],
   "mappings": [
-    {"id": "map_a1_identity_words", "contentItemId": "p1_pronouns_basics_je", "competencyId": "lex_identity_basics_a1", "role": "teaches", "modality": "reading_recognition", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_a1_identity_listening", "contentItemId": "l02", "competencyId": "function_introduce_yourself_a1", "role": "teaches", "modality": "listening_recognition", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_a1_introduction", "contentItemId": "introduce_yourself_a1", "competencyId": "function_introduce_yourself_a1", "role": "assesses", "modality": "controlled_speaking", "weight": 0.9, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_a2_cafe_listening", "contentItemId": "l01", "competencyId": "lex_cafe_requests_a2", "role": "teaches", "modality": "listening_recognition", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_a2_cafe_speaking", "contentItemId": "order_at_a_cafe_a2", "competencyId": "function_handle_cafe_order_a2", "role": "assesses", "modality": "controlled_speaking", "weight": 0.9, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_vocab_etre_identity", "contentItemId": "p1_verbs_etre", "competencyId": "lex_professional_identity_core", "role": "teaches", "modality": "reading_recognition", "weight": 0.5, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_vocab_travailler_identity", "contentItemId": "p1_verbs_travailler", "competencyId": "lex_professional_identity_core", "role": "teaches", "modality": "reading_recognition", "weight": 0.7, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_vocab_work_identity", "contentItemId": "p2_work_travail", "competencyId": "lex_professional_identity_core", "role": "practises", "modality": "reading_recognition", "weight": 0.7, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_vocab_experience_identity", "contentItemId": "p3_employment_experience", "competencyId": "lex_professional_identity_core", "role": "practises", "modality": "reading_recognition", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_present_self_description", "contentItemId": "present", "competencyId": "grammar_present_self_description", "role": "teaches", "modality": "controlled_writing", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_present_self_description_speaking", "contentItemId": "present", "competencyId": "grammar_present_self_description", "role": "practises", "modality": "controlled_speaking", "weight": 0.7, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_travailler_pronunciation", "contentItemId": "p1_verbs_travailler", "competencyId": "phonology_french_r_work", "role": "practises", "modality": "pronunciation_production", "weight": 0.4, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_speaking_introduction_function", "contentItemId": "introduce_yourself", "competencyId": "function_introduce_professionally", "role": "assesses", "modality": "controlled_speaking", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_listening_interview_details", "contentItemId": "l09", "competencyId": "strategy_listening_professional_details", "role": "assesses", "modality": "listening_recognition", "weight": 0.9, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_reading_interview_details", "contentItemId": "reading_l09", "competencyId": "strategy_listening_professional_details", "role": "practises", "modality": "reading_recognition", "weight": 0.5, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_writing_work_sequence", "contentItemId": "w01", "competencyId": "discourse_professional_experience_sequence", "role": "assesses", "modality": "controlled_writing", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_speaking_work_sequence", "contentItemId": "describe_work", "competencyId": "discourse_professional_experience_sequence", "role": "assesses", "modality": "spontaneous_speaking", "weight": 0.9, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_b2_opinion_writing", "contentItemId": "w06", "competencyId": "discourse_defend_opinion_b2", "role": "teaches", "modality": "controlled_writing", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_b2_opinion_speaking", "contentItemId": "give_opinion", "competencyId": "discourse_defend_opinion_b2", "role": "assesses", "modality": "spontaneous_speaking", "weight": 0.9, "curriculumVersion": "applied_french_a1_b2_v1"},
-    {"id": "map_b2_counterargument", "contentItemId": "advantages_disadvantages", "competencyId": "strategy_manage_counterargument_b2", "role": "assesses", "modality": "spontaneous_speaking", "weight": 0.8, "curriculumVersion": "applied_french_a1_b2_v1"}
+    {
+      "id": "map_a1_identity_words",
+      "contentItemId": "p1_pronouns_basics_je",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_listening",
+      "contentItemId": "l02",
+      "competencyId": "function_introduce_yourself_a1",
+      "role": "teaches",
+      "modality": "listening_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_introduction",
+      "contentItemId": "introduce_yourself_a1",
+      "competencyId": "function_introduce_yourself_a1",
+      "role": "assesses",
+      "modality": "controlled_speaking",
+      "weight": 0.9,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a2_cafe_listening",
+      "contentItemId": "l01",
+      "competencyId": "lex_cafe_requests_a2",
+      "role": "teaches",
+      "modality": "listening_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a2_cafe_speaking",
+      "contentItemId": "order_at_a_cafe_a2",
+      "competencyId": "function_handle_cafe_order_a2",
+      "role": "assesses",
+      "modality": "controlled_speaking",
+      "weight": 0.9,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_vocab_etre_identity",
+      "contentItemId": "p1_verbs_etre",
+      "competencyId": "lex_professional_identity_core",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.5,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_vocab_travailler_identity",
+      "contentItemId": "p1_verbs_travailler",
+      "competencyId": "lex_professional_identity_core",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.7,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_vocab_work_identity",
+      "contentItemId": "p2_work_travail",
+      "competencyId": "lex_professional_identity_core",
+      "role": "practises",
+      "modality": "reading_recognition",
+      "weight": 0.7,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_vocab_experience_identity",
+      "contentItemId": "p3_employment_experience",
+      "competencyId": "lex_professional_identity_core",
+      "role": "practises",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_present_self_description",
+      "contentItemId": "present",
+      "competencyId": "grammar_present_self_description",
+      "role": "teaches",
+      "modality": "controlled_writing",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_present_self_description_speaking",
+      "contentItemId": "present",
+      "competencyId": "grammar_present_self_description",
+      "role": "practises",
+      "modality": "controlled_speaking",
+      "weight": 0.7,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_travailler_pronunciation",
+      "contentItemId": "p1_verbs_travailler",
+      "competencyId": "phonology_french_r_work",
+      "role": "practises",
+      "modality": "pronunciation_production",
+      "weight": 0.4,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_speaking_introduction_function",
+      "contentItemId": "introduce_yourself",
+      "competencyId": "function_introduce_professionally",
+      "role": "assesses",
+      "modality": "controlled_speaking",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_listening_interview_details",
+      "contentItemId": "l09",
+      "competencyId": "strategy_listening_professional_details",
+      "role": "assesses",
+      "modality": "listening_recognition",
+      "weight": 0.9,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_reading_interview_details",
+      "contentItemId": "reading_l09",
+      "competencyId": "strategy_listening_professional_details",
+      "role": "practises",
+      "modality": "reading_recognition",
+      "weight": 0.5,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_writing_work_sequence",
+      "contentItemId": "w01",
+      "competencyId": "discourse_professional_experience_sequence",
+      "role": "assesses",
+      "modality": "controlled_writing",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_speaking_work_sequence",
+      "contentItemId": "describe_work",
+      "competencyId": "discourse_professional_experience_sequence",
+      "role": "assesses",
+      "modality": "spontaneous_speaking",
+      "weight": 0.9,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_b2_opinion_writing",
+      "contentItemId": "w06",
+      "competencyId": "discourse_defend_opinion_b2",
+      "role": "teaches",
+      "modality": "controlled_writing",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_b2_opinion_speaking",
+      "contentItemId": "give_opinion",
+      "competencyId": "discourse_defend_opinion_b2",
+      "role": "assesses",
+      "modality": "spontaneous_speaking",
+      "weight": 0.9,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_b2_counterargument",
+      "contentItemId": "advantages_disadvantages",
+      "competencyId": "strategy_manage_counterargument_b2",
+      "role": "assesses",
+      "modality": "spontaneous_speaking",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_words_tu",
+      "contentItemId": "p1_pronouns_basics_tu",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_words_il",
+      "contentItemId": "p1_pronouns_basics_il",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_words_elle",
+      "contentItemId": "p1_pronouns_basics_elle",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_words_nous",
+      "contentItemId": "p1_pronouns_basics_nous",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    },
+    {
+      "id": "map_a1_identity_words_vous",
+      "contentItemId": "p1_pronouns_basics_vous",
+      "competencyId": "lex_identity_basics_a1",
+      "role": "teaches",
+      "modality": "reading_recognition",
+      "weight": 0.8,
+      "curriculumVersion": "applied_french_a1_b2_v1"
+    }
   ]
 }

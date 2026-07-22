@@ -14,7 +14,7 @@ class NotetakerState extends ChangeNotifier {
 
   final StorageService storage;
 
-  bool _isEnabled = true;
+  bool _isEnabled = false;
   bool get isEnabled => _isEnabled;
   set isEnabled(bool value) {
     _isEnabled = value;
@@ -66,7 +66,7 @@ class NotetakerState extends ChangeNotifier {
 
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    _isEnabled = prefs.getBool('notetaker.enabled') ?? true;
+    _isEnabled = prefs.getBool('notetaker.enabled') ?? false;
     final dx = prefs.getDouble('notetaker.offsetX') ?? 0;
     final dy = prefs.getDouble('notetaker.offsetY') ?? 0;
     _offset = Offset(dx, dy);

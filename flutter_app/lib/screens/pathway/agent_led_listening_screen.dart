@@ -52,7 +52,7 @@ class _ReadingSessionCard {
   final ReadingSegment segment;
 }
 
-enum _ReadingUserIntent { advance, again, back, none }
+enum _ReadingUserIntent { again, none }
 
 /// Daily Pathway stage 2 — rebuilt against the same rule as AgentLedVocabScreen: Marie
 /// teaches, the app owns every navigation decision. Walks through a pre-built ReadingPassage
@@ -139,21 +139,18 @@ class _AgentLedListeningScreenState
     if (text.isEmpty) return;
     final key = '$slow|$text';
     if (_ttsLoading.contains(key)) return;
-    List<int> bytes;
     _ttsLoading.add(key);
     if (mounted) setState(() {});
-    try {
-      bytes = await LessonSpeechService.shared.synthesize(
-        text,
-        voiceName: ActiveTutor.current.voiceName,
-        slow: slow,
-      );
-    } catch (_) {
+    final bytes = await LessonSpeechService.shared.synthesizeWithRetry(
+      text,
+      voiceName: ActiveTutor.current.voiceName,
+      slow: slow,
+    );
+    _ttsLoading.remove(key);
+    if (mounted) setState(() {});
+    if (bytes == null) {
       _logDebug('→ TTS failed for "$text"');
       return;
-    } finally {
-      _ttsLoading.remove(key);
-      if (mounted) setState(() {});
     }
     // Don't talk over Marie — cut whatever she's saying, then play the line
     // through the same 24kHz pipeline her voice uses.
@@ -446,45 +443,23 @@ class _AgentLedListeningScreenState
     }();
   }
 
+  /// Navigation (advance/back/goto) is strictly button-only in the roleplay —
+  /// Back/Next sentence are the only way to move a card, full stop; nothing
+  /// spoken, however phrased, ever moves it. Only attempt/chat/again/finish
+  /// are ever acted on here.
   void _applyIntent(
     LiveIntentVerdict verdict, {
     required String utterance,
     required String source,
   }) {
     _logDebug(
-      '[$source] "$utterance" → ${verdict.intent.name}'
-      '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}, attempts: $_attemptCount',
+      '[$source] "$utterance" → ${verdict.intent.name}, attempts: $_attemptCount',
     );
-
-    if (verdict.intent != LiveNavIntent.attempt &&
-        verdict.intent != LiveNavIntent.chat &&
-        source != 'exact-command') {
-      _logDebug(
-        '→ LLM command ignored, exact voice command or button required',
-      );
-      return;
-    }
-    final isNavigation =
-        verdict.intent == LiveNavIntent.advance ||
-        verdict.intent == LiveNavIntent.back ||
-        verdict.intent == LiveNavIntent.goto;
-    if (isNavigation && source != 'exact-command') {
-      _logDebug(
-        '→ LLM navigation ignored, exact voice command or button required',
-      );
-      return;
-    }
-    if (isNavigation &&
-        DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
-      _logDebug('→ navigation ignored (cooldown after recent card move)');
-      return;
-    }
 
     switch (verdict.intent) {
       case LiveNavIntent.attempt:
         _lastDetectedIntent = _ReadingUserIntent.none;
         _attemptCount += 1;
-        _maybeUnlockOffer();
         // During the finale the app runs the script: each learner line the
         // student delivers advances the runner to the next character line.
         if (_finaleBeat != null) _advanceFinale();
@@ -497,47 +472,14 @@ class _AgentLedListeningScreenState
         _cutTutorAudio();
         _directCurrentPhase();
       case LiveNavIntent.advance:
-        _lastDetectedIntent = _ReadingUserIntent.advance;
-        if (!verdict.explicit && !_offerUnlocked) {
-          _refusePrematureConsent();
-        } else {
-          _advanceFromUserIntent();
-        }
       case LiveNavIntent.back:
-        _lastDetectedIntent = _ReadingUserIntent.back;
-        _goBackFromUserIntent();
       case LiveNavIntent.goto:
-        _goToCard(verdict.cardNumber);
+        _logDebug('→ ignored: navigation is button-only, tap Back/Next');
       case LiveNavIntent.finish:
         // Spoken "let's finish" = the End button.
         _cutTutorAudio();
         _confirmEnd();
     }
-  }
-
-  /// Offer permission — same mechanism as vocab's, fixed threshold of 2 passes per
-  /// segment. See AgentLedVocabScreen for the full rationale.
-  static const _offerThreshold = 2;
-  bool _offerUnlocked = false;
-
-  void _maybeUnlockOffer() {
-    if (_offerUnlocked || _attemptCount < _offerThreshold) return;
-    if (_currentCard == null) return;
-    _offerUnlocked = true;
-    _logDebug('→ practice threshold reached ($_attemptCount/$_offerThreshold)');
-  }
-
-  void _refusePrematureConsent() {
-    final card = _currentCard;
-    if (card == null) return;
-    _logDebug(
-      '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
-    );
-    _gemini.injectContext(
-      'The card did NOT move, "${card.segment.fr}" needs more practice. You should never have '
-      'suggested moving on. Smoothly continue practicing this part and never suggest '
-      'advancing again.',
-    );
   }
 
   // ---------------------------------------------------------------------------
@@ -620,35 +562,6 @@ class _AgentLedListeningScreenState
     if (_segmentIndex <= 0) return;
     _logDebug('→ user-driven go back');
     _performGoBack();
-    final card = _currentCard;
-    if (card != null) _directLearn(card.segment);
-  }
-
-  /// Jump straight to a specific beat by 1-based number — "go to the third part".
-  void _goToCard(int? cardNumber) {
-    if (cardNumber == null) {
-      _logDebug('→ goto ignored: no beat number');
-      return;
-    }
-    final target = cardNumber - 1;
-    if (target < 0 || target >= _sessionPlan.length) {
-      _logDebug(
-        '→ goto ignored: beat $cardNumber out of range (1-${_sessionPlan.length})',
-      );
-      return;
-    }
-    if (target == _segmentIndex) {
-      _logDebug('→ goto ignored: already on beat $cardNumber');
-      return;
-    }
-    _logDebug('→ user-driven jump to beat $cardNumber');
-    _cutTutorAudio();
-    _lastCardMoveAt = DateTime.now();
-    setState(() {
-      _segmentIndex = target;
-      if (_segmentIndex > _revealedThrough) _revealedThrough = _segmentIndex;
-      _resetPerCardState();
-    });
     final card = _currentCard;
     if (card != null) _directLearn(card.segment);
   }
@@ -827,15 +740,15 @@ class _AgentLedListeningScreenState
     _wasGraded = false;
     _lastDetectedIntent = _ReadingUserIntent.none;
     _handledCallIds.clear();
-    _offerUnlocked = false;
     // Cleared on card change so a "go back" can't false-trip the drift enforcer on
     // mentions of a segment that was legitimately current moments ago.
     _tutorTurnTranscript = '';
   }
 
-  /// See AgentLedVocabScreen._watchForTutorDrift — same enforcer. Passage segments are
-  /// short words/phrases like vocab words, so the same repeated-drilling threshold applies:
-  /// naming an upcoming segment once (an offer) is fine, saying it 3+ times is teaching it.
+  /// See AgentLedVocabScreen._watchForTutorDrift — same enforcer. A verbal
+  /// *offer* to move on ("ready for the next?") is handled separately by
+  /// `_correctIllegalOffer`; actually saying an upcoming segment's line is
+  /// corrected the first time it happens, not after a repeated pattern.
   void _watchForTutorDrift(String delta) {
     if (_currentCard == null) return;
     _tutorTurnTranscript += delta;
@@ -880,7 +793,10 @@ class _AgentLedListeningScreenState
       final hits = RegExp(
         '\\b${RegExp.escape(fr)}\\b',
       ).allMatches(folded).length;
-      if (hits >= 3) {
+      // Any single utterance of a future beat's line is corrected
+      // immediately — waiting for a repeated pattern let the very first,
+      // reported slip ("the agent assumed the next phrase") sail through.
+      if (hits >= 1) {
         _correctTutorDrift(future);
         return;
       }
@@ -914,10 +830,10 @@ class _AgentLedListeningScreenState
     _gemini.injectContext(
       'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
       'screen still shows "${current.segment.fr}"'
-      '${current.segment.en.isEmpty ? '' : ' = "${current.segment.en}"'}, and only the student\'s '
-      'own words move the segment. You may OFFER the next part and then wait silently for their '
-      'answer, never teach it. Pick up "${current.segment.fr}" again now, briefly, as if nothing '
-      'happened.',
+      '${current.segment.en.isEmpty ? '' : ' = "${current.segment.en}"'}, and only a tap on '
+      'their own "Next sentence" button moves the segment, never anything you say. Do not '
+      'mention or offer "${future.fr}" at all. Pick up "${current.segment.fr}" again now, '
+      'briefly, as if nothing happened.',
       expectReply: true,
     );
   }
@@ -962,12 +878,12 @@ class _AgentLedListeningScreenState
       _store.saveDiaryEntry(
         stage: 'reading',
         summary:
-            'Read through $_reviewedCount part(s) of "${widget.passage.title}" in a live reading/listening session.',
+            'Read through $_reviewedCount part(s) of "${widget.passage.displayTitle}" in a live reading/listening session.',
       );
     }
     _recorder.finish(
       summary: _reviewedCount > 0
-          ? 'Read through $_reviewedCount part(s) of "${widget.passage.title}".'
+          ? 'Read through $_reviewedCount part(s) of "${widget.passage.displayTitle}".'
           : 'Ended early.',
     );
   }
@@ -1214,7 +1130,7 @@ class _AgentLedListeningScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               KickerText(
-                'Scene · ${widget.passage.title}',
+                'Scene · ${widget.passage.displayTitle}',
                 color: DesignTokens.slateDim,
               ),
               const SizedBox(height: 4),
@@ -1265,12 +1181,6 @@ class _AgentLedListeningScreenState
             ),
           ),
         ] else ...[
-          const SizedBox(height: 10),
-          Text(
-            'Say your line out loud, then tap Next sentence for the next part of the scene.',
-            style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
-            textAlign: TextAlign.center,
-          ),
           const SizedBox(height: 12),
           // Buttons are the ONLY navigation in the roleplay — no dependency
           // on speech recognition or the model.
@@ -1562,7 +1472,7 @@ ROLEPLAY SCENE STAGE, "${passage.title}". You are a DIRECTED ACTOR-COACH in a sc
 THE CONTRACT: THE APP DIRECTS, YOU PERFORM:
 1. The app sends you an instruction for your next turn ("YOUR NEXT TURN, EXACTLY THIS..."). Execute exactly that instruction, in the exact ORDER it gives, when it has several parts, then STOP COMPLETELY and wait for the student. Never add extra steps, never continue past the instruction, never decide what happens next in the scene: the app decides.
 1b. THE SCENE SPEAKS FIRST: every beat opens with the CHARACTER's French line, and only AFTER it do you coach in English. Never explain a beat before the character has spoken it, the student must hear the French first, like real life. When an instruction says "as the CHARACTER ... then as the COACH", the character line always comes out of your mouth first.
-2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence, react to their attempt, fix gently if needed, encourage, then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. After a beat has been played through once, you may ALSO remind them once, neutrally, of their controls: "say next when you're ready, or again to hear it once more", that reminder is the only thing you may ever say about moving; never any content suggestion.
+2. When the student speaks and there is NO new app instruction, respond as the COACH in ONE short English sentence, react to their attempt, fix gently if needed, encourage, then stop and wait. During the finale, react in CHARACTER with one short French line instead if their line fits the scene. Moving to the next beat is a button on screen (labeled "Next sentence"), never something you tell the student to say or do — never mention it, hint at it, or remind them it exists.
 3. You do NOT have the script, the app hands you each line exactly when it's time, and sometimes a hint of what's coming (marked "if asked"). Never invent lines, never say more than the single line the app asked for, never claim a learner line as yours.
 4. NEVER suggest moving on or ask what's next, pacing belongs to the student and the app alone.
 5. If the student freezes after a character line (long silence), whisper a rescue in English: "psst, your line is: ..." with their current line, then stop.

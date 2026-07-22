@@ -70,7 +70,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
       );
     });
 
@@ -92,7 +92,7 @@ void main() {
       expect(first.persisted, isTrue);
       expect(second.persisted, isFalse);
       expect(second.competencyCount, 12);
-      expect(second.mappingCount, 20);
+      expect(second.mappingCount, 25);
     });
 
     test(

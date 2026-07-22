@@ -1,10 +1,8 @@
 import '../../widgets/adaptive/adaptive.dart';
-import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
-import '../../config/api_keys.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
@@ -12,9 +10,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
-import '../../widgets/lesson_qa_overlay.dart';
-import '../../widgets/marie_toolbar_button.dart';
-import '../session/session_screen.dart';
+import '../../widgets/writing_guide_overlay.dart';
 
 class WritingTaskScreen extends ConsumerStatefulWidget {
   const WritingTaskScreen({super.key, required this.task});
@@ -57,6 +53,20 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     return _content.toLowerCase().contains(stem);
   }
 
+  void _openGuide() {
+    final buf = StringBuffer(_lessonContext);
+    buf.writeln();
+    buf.writeln(
+      _content.trim().isEmpty
+          ? "STUDENT'S CURRENT DRAFT: (nothing written yet)"
+          : "STUDENT'S CURRENT DRAFT:\n${_content.trim()}",
+    );
+    if (_feedback != null) {
+      buf.writeln('EXISTING GRADED FEEDBACK: ${_feedback!.improvedVersion}');
+    }
+    WritingGuideOverlay.show(context, lessonContext: buf.toString());
+  }
+
   @override
   void dispose() {
     _logMinutes();
@@ -77,9 +87,14 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     });
     final submittedText = _content;
     try {
+      final level = ref.read(learningStoreProvider).profile().level;
       final result = await ref
           .read(lessonAgentServiceProvider)
-          .gradeWriting(task: task, submission: submittedText);
+          .gradeWriting(
+            task: task,
+            submission: submittedText,
+            levelBand: level,
+          );
       if (!mounted) return;
       setState(() {
         _feedback = result;
@@ -112,11 +127,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            onPressed: () =>
-                LessonQAOverlay.show(context, lessonContext: _lessonContext),
-            icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
+            tooltip: 'Talk with Marie',
+            onPressed: _openGuide,
+            icon: const Icon(CupertinoIcons.phone_fill, color: DesignTokens.primary),
           ),
-          MarieToolbarButton(lessonContext: _lessonContext),
         ],
       ),
       body: ListView(
@@ -149,36 +163,6 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
             label: _feedback == null ? 'Submit for grading' : 'Re-submit',
             onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
           ),
-          if (_feedback != null) ...[
-            const SizedBox(height: 12),
-            Center(
-              child: TextButton.icon(
-                onPressed: () {
-                  LessonSpeechService.shared.deactivate();
-                  AppRouter.push(
-                    context,
-                    (_) => SessionScreen(
-                      apiKey: ApiKeys.geminiKey,
-                      lessonContext: _lessonContext,
-                    ),
-                    fullscreenDialog: true,
-                  );
-                },
-                icon: const Icon(
-                  CupertinoIcons.phone_fill,
-                  size: 16,
-                  color: DesignTokens.primary,
-                ),
-                label: Text(
-                  'Discuss feedback with Marie',
-                  style: DesignTokens.mono(
-                    11,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-              ),
-            ),
-          ],
           const SizedBox(height: 24),
         ],
       ),

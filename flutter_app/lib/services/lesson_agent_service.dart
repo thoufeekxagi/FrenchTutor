@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +18,21 @@ import '../models/tutor_persona.dart';
 /// ~0.85s vs ~9s median for the session-planning JSON call, and the OpenRouter free
 /// tier's rate limits reject roughly half of a real session's calls outright — so
 /// OpenRouter is now the fallback, not the default.
+/// Thrown by any raw Gemini HTTP call in this file (TTS synthesis, text
+/// generation) instead of the generic [AgentError] so callers can tell a
+/// rate limit (429, back off longer and retry) apart from any other
+/// failure (back off briefly and retry, then give up).
+class GeminiHttpError implements Exception {
+  GeminiHttpError(this.statusCode);
+
+  final int statusCode;
+
+  bool get isRateLimited => statusCode == 429;
+
+  @override
+  String toString() => 'GeminiHttpError($statusCode)';
+}
+
 class AgentError implements Exception {
   const AgentError._(this.message);
 
@@ -253,12 +269,15 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
   Future<WritingFeedback> gradeWriting({
     required WritingTask task,
     required String submission,
+    required String levelBand,
   }) async {
-    const system = '''
-You are a strict but encouraging TEF Canada writing examiner. Grade the student's submission against the task using a TEF-style rubric (task completion, grammar/conjugation accuracy, vocabulary range, use of logical connectors, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+    final system =
+        '''
+You are a strict but encouraging French writing examiner. Grade the student's submission against the task, calibrated to their CEFR level ($levelBand) — do NOT hold an A1/A2 learner to a TEF B2 essay bar; judge them against what is realistic at their stated level (task completion, basic grammar/agreement accuracy, use of the vocabulary/connectors actually asked for, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string}''';
     final user =
         '''
+LEVEL: $levelBand
 TASK: ${task.title}
 PROMPT: ${task.promptFr}
 MINIMUM WORDS: ${task.minWords}
@@ -273,6 +292,46 @@ $submission''';
       ],
     );
     return _parseWritingFeedback(raw);
+  }
+
+  /// Generates one writing task calibrated to the learner's CEFR level and
+  /// actual known vocabulary — replaces reaching for the static bank (still
+  /// used as an offline fallback) so an A1 learner gets "one short sentence
+  /// with words you already know" instead of a fixed TEF-style essay prompt
+  /// meant for B2. [knownVocab] should be French words the learner has
+  /// actually mastered (see `ContentService.knownVocabWords`); an empty list
+  /// is fine for a brand-new learner, the model just leans on very common
+  /// beginner words instead.
+  Future<WritingTask> generateWritingTask({
+    required String levelBand,
+    required List<String> knownVocab,
+    String? topic,
+  }) async {
+    const system = '''
+Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
+"type" is a short label like "micro" or "email" or "opinion". "prompt_fr" is the instruction given to the student, in French; "prompt_en" its English translation. "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
+LEVEL CALIBRATION, FOLLOW EXACTLY:
+- A1: ask for exactly 1-2 very short sentences, built ONLY from the KNOWN VOCABULARY given below plus basic function words (articles, "je/tu/il", "être/avoir", "et"). min_words 5-10. target_connectors: empty list.
+- A2: ask for 3-4 short sentences on an everyday topic, mostly using the known vocabulary plus a few very common extra words. min_words 15-30. target_connectors: at most 1 simple connector (e.g. "et", "mais", "parce que").
+- B1: ask for a short paragraph (5-8 sentences), may introduce a couple of new but common words beyond the known list. min_words 40-70. target_connectors: 1-2.
+- B2: ask for a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
+Never ask for anything harder than the stated level allows, even if the topic invites it.''';
+    final vocabLine = knownVocab.isEmpty
+        ? 'KNOWN VOCABULARY: (none recorded yet — use only the most basic beginner words)'
+        : 'KNOWN VOCABULARY: ${knownVocab.take(40).join(', ')}';
+    final user =
+        '''
+LEVEL: $levelBand
+$vocabLine
+${topic == null || topic.isEmpty ? '' : 'TOPIC (loose inspiration only): $topic'}''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 600,
+    );
+    return _parseWritingTask(raw);
   }
 
   Future<SpeakingMockFeedback> gradeSpeakingMock({
@@ -491,7 +550,7 @@ Write 4-8 beats in scene order (greeting → request → follow-up → thanks/go
     required List<String> hints,
   }) async {
     const system = '''
-Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.
+Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.
 INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. The same mission practiced on different days must feel like a different real-life moment, a boulangerie, a market stall, a train station kiosk, a pharmacy, a neighbour's door, never the same generic café twice.''';
     final raw = await _complete(
       messages: [
@@ -511,6 +570,117 @@ USEFUL STARTERS: ${hints.join('; ')}''',
       maxTokens: 1400,
     );
     return _parseReadingPassage(raw);
+  }
+
+  /// The Roleplay lab's own generator — a learner picks (or randomizes) a
+  /// scenario like "café" or "airport" and gets a fresh scene to walk
+  /// through in `AgentLedListeningScreen`, same JSON contract as
+  /// `buildMissionRoleplay` above but with no mission fields to inject
+  /// (there's no mission here, just a scenario the learner chose). Generated
+  /// fresh every call, never pooled — a learner-picked scenario is a
+  /// personal one-off, not a fixed prompt shared across every learner the
+  /// way a mission's roleplay prompt is.
+  Future<ReadingPassage> buildStandaloneRoleplay({
+    required String scenario,
+    required String levelBand,
+  }) async {
+    const system = '''
+Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Do not award a score or claim mastery.
+The SCENARIO given is only a loose inspiration for the setting, not a rigid script — build an ordinary, realistic scene that fits it.
+This app's users are teens and adults (13+): keep the scene wholesome and educational, appropriate for a general audience, never mature, violent, or otherwise inappropriate.
+INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. Never reuse the same premise twice.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content': 'SCENARIO: $scenario\nLEVEL: $levelBand',
+        },
+      ],
+      maxTokens: 1400,
+      temperature: 1.0,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  /// First names and settings used to force real variety between generated
+  /// stories — chosen client-side (not left to the model) since a fixed-topic
+  /// prompt at a low-ish temperature can otherwise return the same or a
+  /// near-identical story every time it's called with the same topic/level.
+  /// Injecting a different concrete name+place+twist into the prompt on
+  /// every call makes repeats structurally impossible even if the model's
+  /// own creativity doesn't kick in.
+  static const _storyCharacterNames = [
+    'Léa', 'Marc', 'Amadou', 'Sophie', 'Nadia', 'Julien', 'Camille', 'Karim',
+    'Élise', 'Thomas', 'Fatou', 'Antoine', 'Chloé', 'Hugo', 'Awa', 'Paul',
+  ];
+  static const _storySettings = [
+    'a small town in Brittany', 'a busy market in Montreal', 'a quiet suburb of Lyon',
+    'a ski resort in the Alps', 'a coastal village in Senegal', 'a university campus in Quebec City',
+    'a neighbourhood bakery', 'a train station', 'a community garden', 'a small office',
+  ];
+  static const _storyTwists = [
+    'a small mistake that turns out fine', 'an unexpected act of kindness from a stranger',
+    'a plan that almost goes wrong', 'a funny misunderstanding', 'a surprising coincidence',
+    'a problem solved just in time', 'a small risk that pays off',
+  ];
+
+  /// A short third-person narrative story (not a roleplay dialogue like the two methods
+  /// above) — the Story Reader's Readle-style "read a bilingual story about a topic you
+  /// like" experience. Reuses `_parseReadingPassage`'s legacy "segments" shape (plain
+  /// fr/en per line, no character split) since that's exactly a narrative's shape.
+  Future<ReadingPassage> buildPersonalStory({
+    required String topic,
+    required String levelBand,
+  }) async {
+    const system = '''
+Write a short third-person narrative story in French for a language learner — NOT a dialogue, no characters talking to each other, just a narrator telling a small real-life story (like a short reading-app story). Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Le vélo emprunté" → English "The borrowed bike"), for a beginner who can't read the French title yet. Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending. Keep the language appropriate to the stated CEFR band. "grammar_note" is one simple English sentence about that sentence's grammar; "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
+The TOPIC given is only a loose inspiration for the setting or a detail in the background, not the subject of every sentence — do not make the story be "about" the topic word itself; it should read like an ordinary daily-life story that just happens to touch on it.
+This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience, never dealing in mature, violent, or otherwise inappropriate themes.
+INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and never write a story with the same title or opening sentence as one already suggested by the seed details below.''';
+    final random = Random();
+    final name = _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
+    final setting = _storySettings[random.nextInt(_storySettings.length)];
+    final twist = _storyTwists[random.nextInt(_storyTwists.length)];
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'TOPIC (loose inspiration only): $topic\nLEVEL: $levelBand\n'
+              'SEED DETAILS to build this specific story around: a main character named $name, '
+              'set in or around $setting, involving $twist. Use these seed details naturally; '
+              'do not just state them, weave them into a real small story.',
+        },
+      ],
+      maxTokens: 1400,
+      temperature: 1.0,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  /// Generates a story's Quiz and Keywords tabs together, right after
+  /// `buildPersonalStory` — one call instead of two round-trips, since both
+  /// draw on the same passage text. Grammar needs no separate call; it
+  /// already reads off each segment's `grammarNote`/`pronunciationTip`.
+  /// Best-effort by design: callers should fall back to empty lists on
+  /// failure rather than block the story from being created, since the
+  /// Story/Grammar tabs work fine on their own.
+  Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
+  buildStoryQuizAndKeywords(ReadingPassage passage) async {
+    const system = '''
+Given a short French story, write a comprehension quiz and a keyword glossary for a language learner. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 4 to 6 multiple-choice comprehension questions in English about events/details in the story, each with exactly 3 French-or-English choices as appropriate to the question and answerIndex pointing at the correct one (0-based). Only ask about things stated or clearly implied in the story.
+KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': 'STORY:\n${passage.fullText}'},
+      ],
+      maxTokens: 1400,
+    );
+    return _parseStoryQuizAndKeywords(raw);
   }
 
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
@@ -696,7 +866,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throw AgentError.requestFailed;
+      throw GeminiHttpError(response.statusCode);
     }
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -712,6 +882,11 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         }
       }
       if (audio.isEmpty) throw AgentError.badResponse;
+      // PCM16 mono is 2 bytes/sample — an odd length means a truncated or
+      // misaligned inline part got concatenated in, which then plays back as
+      // garbled/sped-up noise (every sample boundary after the shift is
+      // wrong). Reject rather than return/cache a corrupt buffer.
+      if (audio.length.isOdd) throw AgentError.badResponse;
       return audio;
     } catch (e) {
       if (e is AgentError) rethrow;
@@ -790,6 +965,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     required List<Map<String, String>> messages,
     int maxTokens = 1024,
     Duration timeout = const Duration(seconds: 30),
+    double temperature = 0.4,
   }) async {
     final orKey = await _openRouterApiKey;
     if (await _forceOpenRouter) {
@@ -800,16 +976,18 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         maxTokens: maxTokens,
         apiKey: orKey,
         timeout: timeout,
+        temperature: temperature,
       );
     }
     final geminiKey = await _geminiApiKey;
     if (geminiKey.isNotEmpty) {
       try {
-        return await _requestGemini(
+        return await _requestGeminiWithRetry(
           messages: messages,
           maxTokens: maxTokens,
           apiKey: geminiKey,
           timeout: timeout,
+          temperature: temperature,
         );
       } catch (e) {
         // Only swallow the Gemini error if there's an OpenRouter key to fall back to.
@@ -823,7 +1001,46 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       maxTokens: maxTokens,
       apiKey: orKey,
       timeout: timeout,
+      temperature: temperature,
     );
+  }
+
+  /// Every text-generation call (a story, a roleplay scene, a quiz, a
+  /// session plan) is one single HTTP round-trip with no retry today — a
+  /// transient network blip or a 429 rate limit (very plausible right after
+  /// this same session already fired several other Gemini calls: a story,
+  /// its quiz/keywords, a roleplay scene, prewarmed TTS) surfaces
+  /// immediately as "could not generate"/"could not start" with nothing the
+  /// user can do but manually retry. Mirrors `LessonSpeechService`'s TTS
+  /// retry fix: a couple of attempts with backoff, longer specifically after
+  /// a 429, before finally giving up (OpenRouter fallback, if configured,
+  /// still applies after these attempts are exhausted).
+  Future<String> _requestGeminiWithRetry({
+    required List<Map<String, String>> messages,
+    required int maxTokens,
+    required String apiKey,
+    required Duration timeout,
+    required double temperature,
+  }) async {
+    const maxAttempts = 3;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        return await _requestGemini(
+          messages: messages,
+          maxTokens: maxTokens,
+          apiKey: apiKey,
+          timeout: timeout,
+          temperature: temperature,
+        );
+      } catch (e) {
+        if (attempt == maxAttempts) rethrow;
+        final isRateLimited = e is GeminiHttpError && e.isRateLimited;
+        await Future.delayed(
+          Duration(milliseconds: isRateLimited ? 2500 * attempt : 500 * attempt),
+        );
+      }
+    }
+    throw AgentError.requestFailed; // unreachable, satisfies the analyzer
   }
 
   Future<String> _requestGemini({
@@ -831,6 +1048,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     required int maxTokens,
     required String apiKey,
     required Duration timeout,
+    double temperature = 0.4,
   }) async {
     final uri = Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$apiKey',
@@ -855,7 +1073,10 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         .toList();
     final body = <String, dynamic>{
       'contents': contents,
-      'generationConfig': {'temperature': 0.4, 'maxOutputTokens': maxTokens},
+      'generationConfig': {
+        'temperature': temperature,
+        'maxOutputTokens': maxTokens,
+      },
     };
     if (systemText.isNotEmpty) {
       body['systemInstruction'] = {
@@ -878,7 +1099,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throw AgentError.requestFailed;
+      throw GeminiHttpError(response.statusCode);
     }
 
     try {
@@ -909,6 +1130,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     required int maxTokens,
     required String apiKey,
     required Duration timeout,
+    double temperature = 0.4,
   }) async {
     final uri = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
     http.Response response;
@@ -930,7 +1152,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
             body: jsonEncode({
               'model': model,
               'messages': messages,
-              'temperature': 0.4,
+              'temperature': temperature,
               'max_tokens': maxTokens,
             }),
           )
@@ -989,6 +1211,26 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     );
   }
 
+  WritingTask _parseWritingTask(String raw) {
+    final obj = _decodeObject(raw);
+    final promptFr = obj['prompt_fr'] as String?;
+    if (promptFr == null || promptFr.isEmpty) throw AgentError.badResponse;
+    return WritingTask(
+      id: 'generated-${const Uuid().v4().substring(0, 8)}',
+      type: obj['type'] as String? ?? 'micro',
+      title: obj['title'] as String? ?? 'Writing practice',
+      promptFr: promptFr,
+      promptEn: obj['prompt_en'] as String? ?? '',
+      minWords: (obj['min_words'] as num?)?.toInt() ?? 5,
+      targetConnectors:
+          (obj['target_connectors'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
+      rubricHints:
+          (obj['rubric_hints'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
+    );
+  }
+
   MicroWritingFeedback _parseMicroWritingFeedback(String raw) {
     final obj = _decodeObject(raw);
     final score = _asDouble(obj['score_out_of_10']);
@@ -1037,6 +1279,7 @@ You are a French grammar tutor. The student answered a drill question incorrectl
   ReadingPassage _parseReadingPassage(String raw) {
     final obj = _decodeObject(raw);
     final title = obj['title'] as String? ?? 'Reading passage';
+    final titleEn = obj['title_en'] as String?;
     // New script shape ("beats" with both roles' lines) with fallback to the
     // legacy "segments" shape so older cached content keeps loading.
     final beatsRaw =
@@ -1065,9 +1308,55 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     return ReadingPassage(
       id: 'generated-${const Uuid().v4().substring(0, 8)}',
       title: title,
+      titleEn: titleEn,
       segments: segments,
       fullText: fullText,
     );
+  }
+
+  ({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})
+  _parseStoryQuizAndKeywords(String raw) {
+    final obj = _decodeObject(raw);
+    final quizRaw = (obj['quiz'] as List?) ?? [];
+    final quiz = <MultipleChoiceQuestion>[];
+    for (final q in quizRaw) {
+      final map = q as Map<String, dynamic>;
+      final question = map['q'] as String?;
+      final choices = (map['choices'] as List?)?.cast<String>() ?? const [];
+      final answerIndex = map['answerIndex'];
+      if (question == null ||
+          question.isEmpty ||
+          choices.isEmpty ||
+          answerIndex is! int ||
+          answerIndex < 0 ||
+          answerIndex >= choices.length) {
+        continue;
+      }
+      quiz.add(
+        MultipleChoiceQuestion(
+          q: question,
+          choices: choices,
+          answerIndex: answerIndex,
+        ),
+      );
+    }
+
+    final keywordsRaw = (obj['keywords'] as List?) ?? [];
+    final keywords = <VocabEntry>[];
+    for (var i = 0; i < keywordsRaw.length; i++) {
+      final map = keywordsRaw[i] as Map<String, dynamic>;
+      final fr = map['fr'] as String?;
+      if (fr == null || fr.isEmpty) continue;
+      keywords.add(
+        VocabEntry(
+          id: 'story-kw-$i-${const Uuid().v4().substring(0, 6)}',
+          en: map['en'] as String? ?? '',
+          fr: fr,
+          phonetic: map['phonetic'] as String? ?? '',
+        ),
+      );
+    }
+    return (quiz: quiz, keywords: keywords);
   }
 
   List<GrammarPracticeCard> _parseGrammarPracticeCards(String raw) {

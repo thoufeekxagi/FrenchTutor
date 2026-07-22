@@ -27,7 +27,10 @@ void main() {
     expect(plan.inputSnapshot['missionId'], 'calibration');
     expect(plan.inputSnapshot['missionTitle'], 'Introduce yourself');
     expect(plan.tasks.map((task) => task.contentItemId), ['read', 'speak']);
-    expect(plan.explanation, contains('evidence'));
+    expect(
+      plan.explanation,
+      'A little more practice will help choose your next French mission well.',
+    );
   });
 }
 

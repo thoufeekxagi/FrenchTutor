@@ -55,6 +55,13 @@ class VocabEntry {
     fr: json['fr'] as String,
     phonetic: json['phonetic'] as String,
   );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'en': en,
+    'fr': fr,
+    'phonetic': phonetic,
+  };
 }
 
 // MARK: - Grammar
@@ -378,6 +385,12 @@ class MultipleChoiceQuestion {
         choices: List<String>.from(json['choices']),
         answerIndex: json['answerIndex'] as int,
       );
+
+  Map<String, dynamic> toJson() => {
+    'q': q,
+    'choices': choices,
+    'answerIndex': answerIndex,
+  };
 }
 
 // MARK: - Reading passage
@@ -429,12 +442,19 @@ class ReadingPassage {
     required this.title,
     required this.segments,
     required this.fullText,
+    this.titleEn,
   });
 
   final String id;
   final String title;
   final List<ReadingSegment> segments;
   final String fullText;
+
+  /// A short (2-4 word) English gloss of [title], for A1/A2 learners who
+  /// can't yet read the French title on sight — shown as "French (English)"
+  /// wherever a title appears. Optional: older cached content and any
+  /// generation that didn't return one just show the French title alone.
+  final String? titleEn;
 
   factory ReadingPassage.fromJson(Map<String, dynamic> json) => ReadingPassage(
     id: json['id'] as String,
@@ -443,6 +463,7 @@ class ReadingPassage {
         .map((e) => ReadingSegment.fromJson(e))
         .toList(),
     fullText: json['fullText'] as String,
+    titleEn: json['titleEn'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -450,7 +471,69 @@ class ReadingPassage {
     'title': title,
     'segments': segments.map((s) => s.toJson()).toList(),
     'fullText': fullText,
+    if (titleEn != null) 'titleEn': titleEn,
   };
+
+  /// "French title (English gloss)" for display, or just the French title
+  /// if no gloss is available.
+  String get displayTitle =>
+      (titleEn != null && titleEn!.isNotEmpty) ? '$title ($titleEn)' : title;
+}
+
+/// A learner's own AI-generated story, saved to their personal library —
+/// the Story/Grammar tabs read straight off [passage]; [quiz]/[keywords] are
+/// generated once alongside it (see LessonAgentService.buildStoryQuizAndKeywords)
+/// so every tab is ready the moment the story is created, never regenerated
+/// on reopen. Either list may be empty if that generation call failed —
+/// callers should show a fallback rather than treat that as an error.
+class GeneratedStory {
+  GeneratedStory({
+    required this.id,
+    required this.passage,
+    required this.quiz,
+    required this.keywords,
+    required this.createdAt,
+  });
+
+  final String id;
+  final ReadingPassage passage;
+  final List<MultipleChoiceQuestion> quiz;
+  final List<VocabEntry> keywords;
+  final DateTime createdAt;
+
+  String get title => passage.title;
+
+  /// "French title (English gloss)" for display — see `ReadingPassage.displayTitle`.
+  String get displayTitle => passage.displayTitle;
+
+  /// The tts_audio_cache `content_item_id` tag for one segment of this
+  /// story's narration — shared by the prewarm call made right after
+  /// generation and the reader's live playback, so both sides agree on the
+  /// same tag (the actual cache hit only depends on voice+rate+text, but a
+  /// consistent tag makes the cache traceable back to its story).
+  String segmentContentId(int index) => '${id}_seg$index';
+}
+
+/// A learner's own AI-generated roleplay scene, saved to their personal
+/// library so it can be replayed later exactly like the Story library saves
+/// generated stories — walked through live in `AgentLedListeningScreen`,
+/// which acts as both the in-character roleplay partner and the tutor
+/// coaching each beat, same as any mission roleplay.
+class GeneratedRoleplay {
+  GeneratedRoleplay({
+    required this.id,
+    required this.passage,
+    required this.createdAt,
+  });
+
+  final String id;
+  final ReadingPassage passage;
+  final DateTime createdAt;
+
+  String get title => passage.title;
+
+  /// "French title (English gloss)" for display — see `ReadingPassage.displayTitle`.
+  String get displayTitle => passage.displayTitle;
 }
 
 // MARK: - Writing

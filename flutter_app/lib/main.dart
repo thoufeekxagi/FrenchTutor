@@ -15,6 +15,7 @@ import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
 import 'services/lesson_speech_service.dart';
 import 'services/pilot_access_service.dart';
+import 'services/subscription_gate_service.dart';
 
 void main() {
   runZonedGuarded(
@@ -56,6 +57,7 @@ void main() {
         // The chosen tutor persona must be readable synchronously anywhere
         // (P2.1) — loaded once here, updated only from Settings/Onboarding.
         await ActiveTutor.load();
+        await DevSubscriptionOverride.load();
         const OrchestrationBootstrapper().bootstrap(
           content: ContentService.shared,
           store: CompetencyStore(db),

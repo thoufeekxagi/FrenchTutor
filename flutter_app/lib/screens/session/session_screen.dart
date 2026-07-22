@@ -222,7 +222,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     int usedSecondsBefore,
   ) {
     final usedSecondsAfter = store.aiSecondsUsedToday();
-    const baseLimit = PilotAccessService.dailyLimitSeconds;
+    final entitlement = ref.read(pilotAccessServiceProvider).snapshot().entitlement;
+    final baseLimit = PilotAccessService.baseDailyLimitSeconds(entitlement);
     final overageBefore = (usedSecondsBefore - baseLimit).clamp(
       0,
       usedSecondsBefore,
@@ -345,7 +346,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onReconnected = () {
       if (!mounted) return;
       setState(() {
-        _callStatus = CallStatus.listening;
+        if (_callStatus != CallStatus.muted) {
+          _callStatus = CallStatus.listening;
+        }
         _errorMessage = '';
       });
     };
@@ -379,13 +382,21 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
-      if (mounted) setState(() => _callStatus = CallStatus.listening);
+      // A mute pressed while the tutor was mid-turn must stick — this fires
+      // a few seconds later, whenever that turn happens to finish, and was
+      // unconditionally overwriting the user's mute back to "listening"
+      // without them touching anything.
+      if (mounted && _callStatus != CallStatus.muted) {
+        setState(() => _callStatus = CallStatus.listening);
+      }
     };
 
     _gemini.onInterrupted = () {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
-      if (mounted) setState(() => _callStatus = CallStatus.listening);
+      if (mounted && _callStatus != CallStatus.muted) {
+        setState(() => _callStatus = CallStatus.listening);
+      }
     };
   }
 

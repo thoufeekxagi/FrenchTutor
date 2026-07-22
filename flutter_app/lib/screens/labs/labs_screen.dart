@@ -1,21 +1,26 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
+import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../subscription/paywall_screen.dart';
 import 'connectors_lab_screen.dart';
 import 'grammar_lab_screen.dart';
 import 'listening_lab_screen.dart';
+import 'roleplay_lab_screen.dart';
 import 'vocab_lab_screen.dart';
 import 'writing_lab_screen.dart';
 import '../mocks/mocks_screen.dart';
 
-class LabsScreen extends StatelessWidget {
+class LabsScreen extends ConsumerWidget {
   const LabsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gate = ref.read(subscriptionGateServiceProvider);
     return Scaffold(
       backgroundColor: DesignTokens.parchment,
       body: SafeArea(
@@ -43,52 +48,77 @@ class LabsScreen extends StatelessWidget {
                         title: 'Speaking mock',
                         subtitle:
                             'Timed TEF / TCF practice with rubric feedback',
-                        onTap: () =>
-                            AppRouter.push(context, (_) => const MocksScreen()),
+                        locked: gate.isLabLocked('speaking_mock'),
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('speaking_mock'),
+                          builder: (_) => const MocksScreen(),
+                        ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.square_stack_3d_up,
                         title: 'Vocabulary',
                         subtitle: 'Flashcards & spaced repetition',
-                        onTap: () => AppRouter.push(
+                        locked: gate.isLabLocked('vocabulary'),
+                        onTap: () => _open(
                           context,
-                          (_) => const VocabLabScreen(),
+                          locked: gate.isLabLocked('vocabulary'),
+                          builder: (_) => const VocabLabScreen(),
                         ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.book,
                         title: 'Grammar',
                         subtitle: 'Lessons & drills',
-                        onTap: () => AppRouter.push(
+                        locked: gate.isLabLocked('grammar'),
+                        onTap: () => _open(
                           context,
-                          (_) => const GrammarLabScreen(),
+                          locked: gate.isLabLocked('grammar'),
+                          builder: (_) => const GrammarLabScreen(),
                         ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.link,
                         title: 'Connectors',
                         subtitle: 'The logic words that hold French together',
-                        onTap: () => AppRouter.push(
+                        locked: gate.isLabLocked('connectors'),
+                        onTap: () => _open(
                           context,
-                          (_) => const ConnectorsLabScreen(),
+                          locked: gate.isLabLocked('connectors'),
+                          builder: (_) => const ConnectorsLabScreen(),
                         ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.headphones,
                         title: 'Listening',
                         subtitle: 'Comprehension passages',
-                        onTap: () => AppRouter.push(
+                        locked: gate.isLabLocked('listening'),
+                        onTap: () => _open(
                           context,
-                          (_) => const ListeningLabScreen(),
+                          locked: gate.isLabLocked('listening'),
+                          builder: (_) => const ListeningLabScreen(),
+                        ),
+                      ),
+                      _LabTile(
+                        icon: CupertinoIcons.bubble_left_bubble_right,
+                        title: 'Roleplay',
+                        subtitle: 'Live scenes: café, travel, directions & more',
+                        locked: gate.isLabLocked('roleplay'),
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('roleplay'),
+                          builder: (_) => const RoleplayLabScreen(),
                         ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.pencil,
                         title: 'Writing',
                         subtitle: 'Essays with graded feedback',
-                        onTap: () => AppRouter.push(
+                        locked: gate.isLabLocked('writing'),
+                        onTap: () => _open(
                           context,
-                          (_) => const WritingLabScreen(),
+                          locked: gate.isLabLocked('writing'),
+                          builder: (_) => const WritingLabScreen(),
                         ),
                       ),
                     ],
@@ -103,18 +133,36 @@ class LabsScreen extends StatelessWidget {
   }
 }
 
+void _open(
+  BuildContext context, {
+  required bool locked,
+  required WidgetBuilder builder,
+}) {
+  if (locked) {
+    AppRouter.push(
+      context,
+      (_) => const PaywallScreen(),
+      fullscreenDialog: true,
+    );
+    return;
+  }
+  AppRouter.push(context, builder);
+}
+
 class _LabTile extends StatelessWidget {
   const _LabTile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.locked = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final bool locked;
 
   @override
   Widget build(BuildContext context) {
@@ -133,14 +181,46 @@ class _LabTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: DesignTokens.info.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: DesignTokens.info, size: 20),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: locked
+                        ? DesignTokens.canvasDim
+                        : DesignTokens.info.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: locked ? DesignTokens.muted : DesignTokens.info,
+                    size: 20,
+                  ),
+                ),
+                if (locked)
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: const BoxDecoration(
+                        color: DesignTokens.surface,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Color(0x1A000000), blurRadius: 3),
+                        ],
+                      ),
+                      child: Icon(
+                        CupertinoIcons.lock_fill,
+                        size: 10,
+                        color: DesignTokens.mutedDim,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -161,10 +241,10 @@ class _LabTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              CupertinoIcons.chevron_right,
+            Icon(
+              locked ? CupertinoIcons.lock_fill : CupertinoIcons.chevron_right,
               color: DesignTokens.slate,
-              size: 16,
+              size: locked ? 14 : 16,
             ),
           ],
         ),

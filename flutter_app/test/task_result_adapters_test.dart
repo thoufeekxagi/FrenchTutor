@@ -149,15 +149,20 @@ void main() {
     );
   });
 
-  test('unsupported content and invalid evaluator confidence are rejected', () {
-    expect(
-      () => adapters.grammar(
-        context: context(),
-        contentItemId: 'unknown',
-        drillResults: [true],
-      ),
-      throwsStateError,
+  test('unmapped content withholds evidence instead of throwing', () {
+    // Content with no competency mapping (e.g. arbitrary rotated content
+    // outside the curated competency graph) degrades gracefully — the task
+    // itself still completes, evidence just isn't minted for it.
+    final result = adapters.grammar(
+      context: context(),
+      contentItemId: 'unknown',
+      drillResults: [true],
     );
+    expect(result.competencyEvidence, isEmpty);
+    expect(result.technicalMetadata['evidenceWithheld'], 'no_competency_mapping');
+  });
+
+  test('invalid evaluator confidence is rejected', () {
     expect(
       () => const EvaluatorConfidencePolicy().cap(
         EvidenceEvaluator.selfReport,

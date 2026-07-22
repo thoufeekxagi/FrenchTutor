@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +8,29 @@ import '../../design/tokens.dart';
 import '../../flow/mission_task_executor.dart';
 import '../../orchestration/evidence/task_result_adapters.dart';
 import '../../orchestration/models/competency.dart';
+import '../../orchestration/models/content_descriptor.dart';
 import '../../orchestration/models/mission.dart';
 import '../../orchestration/models/plan_task.dart';
 import '../../orchestration/models/learning_plan.dart';
+import '../../orchestration/planning/rotation_planner.dart';
+import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../subscription/paywall_screen.dart';
+
+/// The rotation planner doesn't participate in the competency graph at all
+/// (see plan: "Replace the mission/competency-catalog system with a simple
+/// daily content rotation") — an empty framework means `supports()` always
+/// reports false, so `TaskResultAdapters` gracefully skips evidence for
+/// every rotated task rather than needing thousands of content-competency
+/// mappings authored for a system that's no longer in the loop.
+const _noCompetencyFramework = CompetencyFramework(
+  frameworkVersion: 'none',
+  curriculumVersion: 'none',
+  competencies: [],
+  mappings: [],
+);
 
 class TodayMissionWidget extends ConsumerStatefulWidget {
   const TodayMissionWidget({super.key, this.onProgress});
@@ -36,53 +55,70 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
   }
 
   Future<void> _load() async {
-    final framework = ref.read(competencyStoreProvider).framework();
-    final catalog = ref.read(contentServiceProvider).missionCatalog();
-    if (framework == null || catalog == null) {
-      if (mounted) {
-        setState(() {
-          _error = 'Your learning plan is not ready yet. Please try again.';
-          _loading = false;
-        });
-      }
-      return;
-    }
-    final profile = ref.read(learningStoreProvider).profile();
-    final service = ref.read(orchestrationServiceProvider);
-    final states = service.refreshCompetencyStates(
-      framework: framework,
-      evidenceStore: ref.read(evidenceStoreProvider),
-      stateStore: ref.read(competencyStateStoreProvider),
-    );
-    final now = DateTime.now();
-    final localDate =
-        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-    final plan = service.ensureTodayPlan(
-      framework: framework,
-      competencyStates: states,
-      errors: ref.read(evidenceStoreProvider).errorEvents(),
-      planStore: ref.read(planStoreProvider),
-      localDate: localDate,
-      availableMinutes: _minutesFor(profile.sessionLength),
-      canSpeakAloud: true,
-      networkAvailable: true,
-      goal: profile.goal,
-      missionCatalog: catalog,
-      learnerLevel: profile.level,
-    );
-    final missionId = plan.inputSnapshot['missionId'] as String?;
-    final mission = missionId == null
-        ? null
-        : catalog.missions.where((item) => item.id == missionId).firstOrNull;
-    if (!mounted) return;
-    setState(() {
-      _plan = plan;
-      _mission = mission;
-      _error = mission == null
-          ? 'Your mission could not be resolved. Please try again.'
+    if (mounted) setState(() => _loading = true);
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      final planStore = ref.read(planStoreProvider);
+      final now = DateTime.now();
+      final localDate =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+      const planner = RotationPlanner();
+      final existingRaw = planStore.activePlanForDate(localDate);
+      // A persisted "active" plan with zero tasks is corrupt/stale (nothing
+      // to resume) — `.first` below would crash the whole screen on load.
+      // Treat it the same as "no plan yet" and generate a fresh one instead.
+      final existing = existingRaw != null && existingRaw.tasks.isNotEmpty
+          ? existingRaw
           : null;
-      _loading = false;
-    });
+      PlanSnapshot plan;
+      MissionDefinition mission;
+      if (existing != null) {
+        plan = existing;
+        final modalityName = existing.inputSnapshot['modality'] as String?;
+        final modality = modalityName == null
+            ? existing.tasks.first.modality
+            : PerformanceModality.values.firstWhere(
+                (m) => m.wireName == modalityName,
+                orElse: () => existing.tasks.first.modality,
+              );
+        mission = planner.buildMissionFor(
+          contentItemIds: existing.tasks.map((t) => t.contentItemId).toList(),
+          modality: modality,
+          learnerLevel: profile.level,
+        );
+      } else {
+        final result = planner.buildNext(
+          planStore: planStore,
+          learningStore: ref.read(learningStoreProvider),
+          content: ref.read(contentServiceProvider),
+          localDate: localDate,
+          availableMinutes: _minutesFor(profile.sessionLength),
+          learnerLevel: profile.level,
+        );
+        planStore.savePlan(result.plan);
+        plan = result.plan;
+        mission = result.mission;
+      }
+      if (!mounted) return;
+      setState(() {
+        _plan = plan;
+        _mission = mission;
+        _error = null;
+        _loading = false;
+      });
+    } catch (e) {
+      // Any failure building today's plan used to crash this whole screen
+      // (an uncaught exception in an unawaited initState call) — surface it
+      // as the same retryable notice `_runNext` already shows for a failed
+      // mission step, instead of taking down the app.
+      debugPrint('TodayMissionWidget: failed to load today\'s plan: $e');
+      if (!mounted) return;
+      setState(() {
+        _error = 'Could not load today\'s mission. Please try again.';
+        _loading = false;
+      });
+    }
   }
 
   int _minutesFor(String length) => switch (length) {
@@ -113,43 +149,25 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     return null;
   }
 
-  Future<void> _advanceToNextMission(
-    PlanSnapshot completedPlan,
-    String completedMissionId,
-  ) async {
-    final framework = ref.read(competencyStoreProvider).framework();
-    final catalog = ref.read(contentServiceProvider).missionCatalog();
-    if (framework == null || catalog == null) return;
+  Future<void> _advanceToNextMission(PlanSnapshot completedPlan) async {
     final profile = ref.read(learningStoreProvider).profile();
-    final service = ref.read(orchestrationServiceProvider);
-    final states = service.refreshCompetencyStates(
-      framework: framework,
-      evidenceStore: ref.read(evidenceStoreProvider),
-      stateStore: ref.read(competencyStateStoreProvider),
-    );
-    final nextPlan = service.replanToday(
-      framework: framework,
-      competencyStates: states,
-      errors: ref.read(evidenceStoreProvider).errorEvents(),
-      planStore: ref.read(planStoreProvider),
-      current: completedPlan,
+    final planStore = ref.read(planStoreProvider);
+    const planner = RotationPlanner();
+    final result = planner.buildNext(
+      planStore: planStore,
+      learningStore: ref.read(learningStoreProvider),
+      content: ref.read(contentServiceProvider),
+      localDate: completedPlan.localDate,
       availableMinutes: _minutesFor(profile.sessionLength),
-      canSpeakAloud: true,
-      networkAvailable: true,
-      goal: profile.goal,
-      reason: 'mission_completed',
-      missionCatalog: catalog,
       learnerLevel: profile.level,
-      excludedMissionIds: {completedMissionId},
+      replacesPlanId: completedPlan.id,
+      replanReason: 'mission_completed',
     );
-    final missionId = nextPlan.inputSnapshot['missionId'] as String?;
-    final nextMission = missionId == null
-        ? null
-        : catalog.missions.where((item) => item.id == missionId).firstOrNull;
+    planStore.replan(replaces: completedPlan, newPlan: result.plan);
     if (mounted) {
       setState(() {
-        _plan = nextPlan;
-        _mission = nextMission;
+        _plan = result.plan;
+        _mission = result.mission;
       });
     }
   }
@@ -158,9 +176,16 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     final plan = _plan;
     final mission = _mission;
     final task = selectedTask ?? _nextTask;
-    final framework = ref.read(competencyStoreProvider).framework();
-    if (plan == null || mission == null || task == null || framework == null) {
+    if (plan == null || mission == null || task == null) {
       return;
+    }
+    if (ref.read(subscriptionGateServiceProvider).isModalityLocked(task.modality)) {
+      final subscribed = await AppRouter.push<bool>(
+        context,
+        (_) => const PaywallScreen(),
+        fullscreenDialog: true,
+      );
+      if (subscribed != true || !mounted) return;
     }
     setState(() {
       _running = true;
@@ -171,17 +196,19 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         store: ref.read(learningStoreProvider),
         planStore: ref.read(planStoreProvider),
         evidenceStore: ref.read(evidenceStoreProvider),
-        taskResultAdapters: TaskResultAdapters(framework: framework),
+        taskResultAdapters: TaskResultAdapters(framework: _noCompetencyFramework),
+        sceneCacheStore: ref.read(generatedSceneCacheStoreProvider),
       ).run(context: context, task: task, mission: mission);
       final updated = ref.read(planStoreProvider).byId(plan.id);
       if (updated == null) return;
       if (_nextTaskFor(updated) == null) {
-        await _advanceToNextMission(updated, mission.id);
+        await _advanceToNextMission(updated);
       } else if (mounted) {
         setState(() => _plan = updated);
       }
       widget.onProgress?.call();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('TodayMissionWidget: mission step failed to start: $e');
       if (mounted) {
         setState(() {
           _error = 'This mission step could not start. Please try again.';
@@ -237,6 +264,9 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         stepCount: plan.tasks.length,
       );
     }
+    final locked = ref
+        .read(subscriptionGateServiceProvider)
+        .isModalityLocked(task.modality);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -271,26 +301,61 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: DesignTokens.space4),
-              _MissionProgress(total: plan.tasks.length, completed: completed),
+              // A stepper with a single node conveys nothing (just a lone
+              // dot) — only worth showing once there's an actual sequence.
+              if (plan.tasks.length > 1) ...[
+                const SizedBox(height: DesignTokens.space4),
+                _MissionProgress(total: plan.tasks.length, completed: completed),
+              ],
               const SizedBox(height: DesignTokens.space5),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: DesignTokens.infoSoft,
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.radiusMedium,
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: locked
+                              ? DesignTokens.canvasDim
+                              : DesignTokens.infoSoft,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusMedium,
+                          ),
+                        ),
+                        child: Icon(
+                          _iconFor(task.modality),
+                          color: locked ? DesignTokens.muted : DesignTokens.info,
+                          size: 23,
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      _iconFor(task.modality),
-                      color: DesignTokens.info,
-                      size: 23,
-                    ),
+                      if (locked)
+                        Positioned(
+                          right: -4,
+                          bottom: -4,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: const BoxDecoration(
+                              color: DesignTokens.surface,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x1A000000),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              CupertinoIcons.lock_fill,
+                              size: 12,
+                              color: DesignTokens.mutedDim,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(width: DesignTokens.space3),
                   Expanded(
@@ -299,8 +364,8 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                       children: [
                         Text(
                           task.status == PlanTaskStatus.active
-                              ? 'CONTINUE MISSION'
-                              : 'NEXT MISSION STEP',
+                              ? 'CONTINUING'
+                              : 'NEXT STEP',
                           style:
                               DesignTokens.body(
                                 10.5,
@@ -324,21 +389,6 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   15,
                   weight: FontWeight.w600,
                 ).copyWith(color: DesignTokens.inkSoft),
-              ),
-              const SizedBox(height: DesignTokens.space4),
-              Text(
-                'CHOSEN BECAUSE',
-                style: DesignTokens.body(
-                  10.5,
-                  weight: FontWeight.w700,
-                ).copyWith(color: DesignTokens.slateDim, letterSpacing: 0.9),
-              ),
-              const SizedBox(height: DesignTokens.space1),
-              Text(
-                plan.explanation,
-                style: DesignTokens.body(
-                  15,
-                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
               ),
               if (_error != null) ...[
                 const SizedBox(height: DesignTokens.space3),
@@ -378,11 +428,15 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               ),
               const SizedBox(height: DesignTokens.space5),
               PasseportPrimaryButton(
-                label: task.status == PlanTaskStatus.active
+                label: locked
+                    ? 'Unlock with subscription'
+                    : task.status == PlanTaskStatus.active
                     ? 'Continue mission'
                     : 'Start mission',
-                icon: CupertinoIcons.arrow_right,
+                icon: locked ? CupertinoIcons.lock_fill : CupertinoIcons.arrow_right,
                 onPressed: _running ? null : _runNext,
+                isLoading: _running,
+                loadingLabel: 'Preparing your mission…',
               ),
               Center(
                 child: SizedBox(

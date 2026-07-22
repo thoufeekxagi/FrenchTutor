@@ -38,4 +38,43 @@ void main() {
   test('never matches a phrase approved for a different screen', () {
     expect(matchesAdvanceCommand('next word', nextPhrase: 'next sentence'), false);
   });
+
+  test('accepts the command wrapped in filler words', () {
+    expect(
+      matchesAdvanceCommand('next word please', nextPhrase: 'next word'),
+      true,
+    );
+    expect(
+      matchesAdvanceCommand('please next word', nextPhrase: 'next word'),
+      true,
+    );
+    expect(
+      matchesAdvanceCommand('just next word', nextPhrase: 'next word'),
+      true,
+    );
+    expect(
+      matchesAdvanceCommand('next please', nextPhrase: 'next word'),
+      true,
+    );
+    expect(
+      matchesAdvanceCommand('ok next word', nextPhrase: 'next word'),
+      true,
+    );
+  });
+
+  test('still rejects the phrase merely mentioned inside other content', () {
+    expect(
+      matchesAdvanceCommand('can we go to the next word', nextPhrase: 'next word'),
+      false,
+    );
+    expect(
+      matchesAdvanceCommand('the next word is hard', nextPhrase: 'next word'),
+      false,
+    );
+    expect(
+      matchesAdvanceCommand('background noise next word hello',
+          nextPhrase: 'next word'),
+      false,
+    );
+  });
 }

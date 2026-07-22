@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 import '../config/api_keys.dart';
 import '../data/content_service.dart';
 import '../data/database/evidence_store.dart';
+import '../data/database/generated_scene_cache_store.dart';
+import '../data/database/generated_story_store.dart';
 import '../data/database/plan_store.dart';
 import '../data/database/learning_store.dart';
 import '../design/app_router.dart';
@@ -12,8 +16,9 @@ import '../orchestration/models/competency.dart';
 import '../orchestration/models/mission.dart';
 import '../orchestration/models/plan_task.dart';
 import '../orchestration/models/task_result.dart';
-import '../screens/lessons/listening_exercise_screen.dart';
 import '../services/lesson_agent_service.dart';
+import '../services/lesson_speech_service.dart';
+import '../screens/lessons/story_reader_screen.dart';
 import '../screens/pathway/agent_led_grammar_screen.dart';
 import '../screens/pathway/agent_led_listening_screen.dart';
 import '../screens/pathway/agent_led_vocab_screen.dart';
@@ -29,12 +34,14 @@ class MissionTaskExecutor {
     required this.planStore,
     required this.evidenceStore,
     required this.taskResultAdapters,
+    required this.sceneCacheStore,
   });
 
   final LearningStore store;
   final PlanStore planStore;
   final EvidenceStore evidenceStore;
   final TaskResultAdapters taskResultAdapters;
+  final GeneratedSceneCacheStore sceneCacheStore;
 
   Future<void> run({
     required BuildContext context,
@@ -61,7 +68,7 @@ class MissionTaskExecutor {
       case PerformanceModality.spontaneousSpeaking:
         await _runSpeaking(context: context, task: task, mission: mission);
       case PerformanceModality.controlledWriting:
-        await _runWriting(context: context, task: task);
+        await _runWriting(context: context, task: task, mission: mission);
       case PerformanceModality.spontaneousWriting:
         throw UnsupportedError(
           'Mission task ${task.contentItemId} has no exact executor yet.',
@@ -75,30 +82,57 @@ class MissionTaskExecutor {
     required BuildContext context,
     required PlanTaskRecord task,
   }) async {
+    // Every vocabulary word in today's plan is reviewed in ONE batched
+    // screen visit, not one screen per word (that's what produced a "mission
+    // with a single word" — the planner picks several readingRecognition
+    // tasks, but each used to trigger its own separate push). Gather every
+    // still-open sibling task of this modality in the same plan and complete
+    // them all together based on what the session actually covered.
+    final plan = planStore.byId(task.planId);
+    final siblingTasks =
+        plan?.tasks
+            .where(
+              (t) =>
+                  t.modality == PerformanceModality.readingRecognition &&
+                  (t.id == task.id ||
+                      t.status == PlanTaskStatus.pending ||
+                      t.status == PlanTaskStatus.active),
+            )
+            .toList() ??
+        [task];
+    final entryIds = siblingTasks
+        .map((t) => t.contentItemId)
+        .toSet()
+        .toList(growable: false);
+
     final outcome = await AppRouter.push<StageOutcome<VocabStageResult>>(
       context,
-      (_) => VocabPickerScreen(preferredEntryIds: [task.contentItemId]),
+      (_) => VocabPickerScreen(preferredEntryIds: entryIds),
       fullscreenDialog: true,
     );
     if (outcome == null || !outcome.isCompleted) return;
     final result = outcome.result;
     if (result == null) return;
-    final supportedIds = result.wordsCovered
-        .map((word) => word.id)
-        .where(
-          (id) => taskResultAdapters.supports(
-            id,
+    final coveredIds = result.wordsCovered.map((word) => word.id).toSet();
+
+    for (final sibling in siblingTasks) {
+      if (sibling.id != task.id) planStore.startTask(sibling.id);
+      final covered =
+          coveredIds.contains(sibling.contentItemId) &&
+          taskResultAdapters.supports(
+            sibling.contentItemId,
             PerformanceModality.readingRecognition,
-          ),
-        )
-        .toList(growable: false);
-    evidenceStore.insertTaskResult(
-      taskResultAdapters.vocabulary(
-        context: _context(task, TaskResultStatus.completed),
-        reviewedContentItemIds: supportedIds,
-      ),
-    );
-    _complete(task, {'reviewedCount': result.reviewedCount});
+          );
+      evidenceStore.insertTaskResult(
+        taskResultAdapters.vocabulary(
+          context: _context(sibling, TaskResultStatus.completed),
+          reviewedContentItemIds: covered
+              ? [sibling.contentItemId]
+              : const [],
+        ),
+      );
+      _complete(sibling, {'reviewedCount': covered ? 1 : 0});
+    }
   }
 
   Future<void> _runListening({
@@ -121,13 +155,61 @@ class MissionTaskExecutor {
       );
       return;
     }
-    final exercise = _listeningExercise(task.contentItemId);
-    if (exercise == null) {
-      throw StateError('Missing listening content ${task.contentItemId}');
-    }
-    final result = await AppRouter.push<ListeningExerciseResult>(
+    await _runGeneratedStoryReading(context: context, task: task, mission: mission);
+  }
+
+  /// The reading/listening step of a mission — an AI-generated bilingual
+  /// story built fresh for this mission's scenario (same generator and
+  /// Story/Grammar/Quiz/Keywords reader used by the learner-initiated story
+  /// library, see StoryReaderScreen), replacing the old fixed-script,
+  /// hardcoded-question `ListeningExerciseScreen`. Graded off the story's
+  /// own generated quiz, same shape as the exercise it replaces.
+  Future<void> _runGeneratedStoryReading({
+    required BuildContext context,
+    required PlanTaskRecord task,
+    required MissionDefinition mission,
+  }) async {
+    // Retry-on-transient-failure already lives in one place —
+    // LessonAgentService's Gemini call itself (see `_requestGeminiWithRetry`)
+    // — so this call site just makes the one call it needs, once. Retrying
+    // again here on top of that would mean up to 3x the actual HTTP
+    // requests for a single "start mission" tap, for no added reliability.
+    final passage = await LessonAgentService.shared.buildPersonalStory(
+      topic: mission.scenario,
+      levelBand: mission.levelBand,
+    );
+    // Quiz/keywords generation is a second Gemini round-trip — the story
+    // itself is shown the moment its passage is ready rather than making
+    // the learner wait through both calls before this step even opens; the
+    // reader fills in Quiz/Keywords itself once that call resolves (best
+    // effort: the Story/Grammar tabs still work without it, the mission
+    // step just won't be objectively gradable this time if it never
+    // resolves before the learner finishes).
+    final story = GeneratedStory(
+      id: newGeneratedStoryId(),
+      passage: passage,
+      quiz: const [],
+      keywords: const [],
+      createdAt: DateTime.now(),
+    );
+    unawaited(
+      LessonSpeechService.shared.prewarmNarration([
+        for (var i = 0; i < passage.segments.length; i++)
+          SpeechItem(
+            text: passage.segments[i].fr,
+            language: 'fr-FR',
+            contentItemId: story.segmentContentId(i),
+          ),
+      ]),
+    );
+    if (!context.mounted) return;
+    final result = await AppRouter.push<StoryReaderResult>(
       context,
-      (_) => ListeningExerciseScreen(exercise: exercise),
+      (_) => StoryReaderScreen(
+        story: story,
+        showFinishButton: true,
+        enrichment: LessonAgentService.shared.buildStoryQuizAndKeywords(passage),
+      ),
       fullscreenDialog: true,
     );
     if (result == null) return;
@@ -137,7 +219,7 @@ class MissionTaskExecutor {
         contentItemId: task.contentItemId,
         correct: result.correct,
         attempted: result.attempted,
-        objectivelyGraded: true,
+        objectivelyGraded: result.attempted > 0,
       ),
     );
     _complete(task, {'correct': result.correct, 'attempted': result.attempted});
@@ -199,11 +281,24 @@ class MissionTaskExecutor {
   Future<void> _runWriting({
     required BuildContext context,
     required PlanTaskRecord task,
+    required MissionDefinition mission,
   }) async {
-    final writingTask = _writingTask(task.contentItemId);
-    if (writingTask == null) {
-      throw StateError('Missing writing content ${task.contentItemId}');
+    WritingTask writingTask;
+    try {
+      writingTask = await LessonAgentService.shared.generateWritingTask(
+        levelBand: mission.levelBand,
+        knownVocab: ContentService.shared.knownVocabWords(store.allSRSStates()),
+      );
+    } catch (_) {
+      // Best-effort: fall back to the static bank rather than block the mission
+      // step if generation fails (offline, API error).
+      final fallback = _writingTask(task.contentItemId);
+      if (fallback == null) {
+        throw StateError('Missing writing content ${task.contentItemId}');
+      }
+      writingTask = fallback;
     }
+    if (!context.mounted) return;
     final outcome = await AppRouter.push<StageOutcome<WritingStageResult>>(
       context,
       (_) =>
@@ -298,6 +393,30 @@ PRONUNCIATION FOCUS: ${word.fr} (${word.phonetic}) means ${word.en}. Ask the lea
         return ReadingPassage.fromJson(cached!);
       } catch (_) {}
     }
+    // A mission's roleplay prompt (title/scenario/level/promptContext + speaking
+    // topic) is the same for every learner who gets this mission, so the generated
+    // scene is reusable across learners, not just across a single learner's re-visits.
+    // A small rotating pool per mission keeps repeat visits feeling fresh without
+    // calling Gemini again on every single mission visit by every learner.
+    if (sceneCacheStore.needsNewVariant(mission.id)) {
+      await _generateAndStoreVariant(mission: mission, topic: topic);
+    }
+    final resolved = sceneCacheStore.takeVariant(mission.id);
+    if (resolved == null) {
+      throw StateError('No roleplay scene available for ${mission.id}');
+    }
+    session.readingPassageJson = {
+      ...resolved.toJson(),
+      'missionId': mission.id,
+    };
+    store.saveDailySession(session);
+    return resolved;
+  }
+
+  Future<void> _generateAndStoreVariant({
+    required MissionDefinition mission,
+    required SpeakingTopic topic,
+  }) async {
     final scene = await LessonAgentService.shared.buildMissionRoleplay(
       missionTitle: mission.title,
       scenario: mission.scenario,
@@ -306,11 +425,10 @@ PRONUNCIATION FOCUS: ${word.fr} (${word.phonetic}) means ${word.en}. Ask the lea
       speakingPrompt: topic.promptFr,
       hints: topic.hints,
     );
-    session.readingPassageJson = {...scene.toJson(), 'missionId': mission.id};
-    store.saveDailySession(session);
-    return scene;
+    sceneCacheStore.store(mission.id, scene);
   }
 
+  /// Tops up [mission]'s scene pool in the background — called right after a
   String _sceneContext(ReadingPassage scene) => '''
 PERSISTED MISSION ROLEPLAY, stay in this exact scenario and respond to the learner's last line in character:
 ${scene.segments.map((segment) => 'CHARACTER: ${segment.characterFr}\nLEARNER: ${segment.fr}').join('\n')}''';
@@ -340,6 +458,12 @@ ${scene.segments.map((segment) => 'CHARACTER: ${segment.characterFr}\nLEARNER: $
       status: PlanTaskStatus.completed,
       resultSummary: resultSummary,
     );
+    // The single, generic "seen" record RotationPlanner excludes from its
+    // next pick — same table every modality already writes to via its own
+    // screen (lesson_progress), just recorded centrally here too so the
+    // rotation's exclusion works regardless of which screen a task went
+    // through.
+    store.setLessonStatus(task.contentItemId, 'completed');
   }
 
   SpeakingTopic? _missionTopic(MissionDefinition mission) {
@@ -371,11 +495,6 @@ ${scene.segments.map((segment) => 'CHARACTER: ${segment.characterFr}\nLEARNER: $
       .expand((phase) => phase.themes.expand((theme) => theme.entries))
       .where((entry) => entry.id == id)
       .firstOrNull;
-
-  ListeningExercise? _listeningExercise(String id) {
-    final exercises = ContentService.shared.listening()?.exercises ?? const [];
-    return exercises.where((exercise) => exercise.id == id).firstOrNull;
-  }
 
   SpeakingTopic? _speakingTopic(String id) {
     final topics =

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/content_models.dart';
+import '../models/srs_state.dart';
 import '../orchestration/models/content_descriptor.dart';
 import '../orchestration/models/mission.dart';
 
@@ -20,6 +21,8 @@ class ContentService {
   ResourcePack? _resources;
   CompetencyFramework? _competencyFramework;
   MissionCatalog? _missionCatalog;
+  List<GeneratedStory>? _starterStories;
+  List<GeneratedRoleplay>? _starterRoleplays;
 
   Future<void> preload() async {
     await Future.wait([
@@ -35,6 +38,8 @@ class ContentService {
       _loadResources(),
       _loadCompetencyFramework(),
       _loadMissionCatalog(),
+      _loadStarterStories(),
+      _loadStarterRoleplays(),
     ]);
   }
 
@@ -73,6 +78,17 @@ class ContentService {
   ResourcePack? resources() => _resources;
   CompetencyFramework? competencyFramework() => _competencyFramework;
   MissionCatalog? missionCatalog() => _missionCatalog;
+
+  /// A small pool of ready-made short stories bundled with the app — so a
+  /// brand-new learner's story library isn't empty before they've generated
+  /// anything themselves. Shown alongside, never mixed into, the learner's
+  /// own AI-generated stories (see ListeningLabScreen).
+  List<GeneratedStory> starterStories() => _starterStories ?? const [];
+
+  /// A small pool of ready-made roleplay scenes bundled with the app —
+  /// same rationale as [starterStories]: a brand-new learner's Roleplay lab
+  /// isn't empty before they've generated anything themselves.
+  List<GeneratedRoleplay> starterRoleplays() => _starterRoleplays ?? const [];
 
   Set<String> knownContentIds() {
     final ids = <String>{};
@@ -170,6 +186,23 @@ class ContentService {
     return entries.map((e) => '${e.fr} (${e.phonetic}) = ${e.en}').join('\n');
   }
 
+  /// French words the learner has actually mastered (`SRSState.isKnown`),
+  /// e.g. for seeding a dynamically generated writing task so an A1 learner
+  /// is only ever asked to reuse words they already know. Pass
+  /// `LearningStore.allSRSStates()` in — this layer knows the word content,
+  /// the store owns the review history, neither depends on the other.
+  List<String> knownVocabWords(Map<String, SRSState> srsStates) {
+    final words = <String>[];
+    for (final phase in vocabPhases) {
+      for (final theme in phase.themes) {
+        for (final entry in theme.entries) {
+          if (srsStates[entry.id]?.isKnown == true) words.add(entry.fr);
+        }
+      }
+    }
+    return words;
+  }
+
   String writingTaskContext(WritingTask task) {
     return 'Writing task: ${task.title}\nType: ${task.type}\nPrompt (FR): ${task.promptFr}\nPrompt (EN): ${task.promptEn}\nMin words: ${task.minWords}\nTarget connectors: ${task.targetConnectors.join(", ")}\nRubric: ${task.rubricHints.join("; ")}';
   }
@@ -240,6 +273,60 @@ class ContentService {
 
   Future<void> _loadMissionCatalog() async {
     _missionCatalog = MissionCatalog.fromJson(await _loadJson('missions.json'));
+  }
+
+  Future<void> _loadStarterStories() async {
+    final json = await _loadJson('starter_stories.json');
+    final storiesRaw = (json['stories'] as List?) ?? [];
+    _starterStories = storiesRaw.map((raw) {
+      final map = (raw as Map).cast<String, dynamic>();
+      final segmentsRaw = (map['segments'] as List)
+          .map((s) => ReadingSegment.fromJson((s as Map).cast()))
+          .toList();
+      final passage = ReadingPassage(
+        id: map['id'] as String,
+        title: map['title'] as String,
+        titleEn: map['titleEn'] as String?,
+        segments: segmentsRaw,
+        fullText: segmentsRaw.map((s) => s.fr).join(' '),
+      );
+      final quiz = ((map['quiz'] as List?) ?? [])
+          .map((q) => MultipleChoiceQuestion.fromJson((q as Map).cast()))
+          .toList();
+      final keywords = ((map['keywords'] as List?) ?? [])
+          .map((k) => VocabEntry.fromJson((k as Map).cast()))
+          .toList();
+      return GeneratedStory(
+        id: map['id'] as String,
+        passage: passage,
+        quiz: quiz,
+        keywords: keywords,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+      );
+    }).toList();
+  }
+
+  Future<void> _loadStarterRoleplays() async {
+    final json = await _loadJson('starter_roleplays.json');
+    final roleplaysRaw = (json['roleplays'] as List?) ?? [];
+    _starterRoleplays = roleplaysRaw.map((raw) {
+      final map = (raw as Map).cast<String, dynamic>();
+      final segmentsRaw = (map['segments'] as List)
+          .map((s) => ReadingSegment.fromJson((s as Map).cast()))
+          .toList();
+      final passage = ReadingPassage(
+        id: map['id'] as String,
+        title: map['title'] as String,
+        titleEn: map['titleEn'] as String?,
+        segments: segmentsRaw,
+        fullText: segmentsRaw.map((s) => s.fr).join(' '),
+      );
+      return GeneratedRoleplay(
+        id: map['id'] as String,
+        passage: passage,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+      );
+    }).toList();
   }
 
   Future<Map<String, dynamic>> _loadJson(String filename) async {

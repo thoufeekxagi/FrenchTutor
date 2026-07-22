@@ -111,6 +111,51 @@ class PlanStore {
     return snapshot['missionId'] as String?;
   }
 
+  /// Mission ids from the [limit] most recently generated plans (any date,
+  /// any status), so a new plan can avoid repeating anything from recent
+  /// history instead of only the single most recent mission — a 1-mission
+  /// lookback was trivially defeated by a small scenario pool.
+  List<String> recentMissionIds({String? userId, int limit = 40}) {
+    final rows = _db.select(
+      "SELECT input_snapshot_json FROM learning_plans WHERE user_id IS ? "
+      "AND deleted_at IS NULL ORDER BY created_at DESC LIMIT ?",
+      [userId, limit],
+    );
+    final ids = <String>[];
+    for (final row in rows) {
+      final snapshot =
+          (jsonDecode(row['input_snapshot_json'] as String) as Map)
+              .cast<String, Object?>();
+      final missionId = snapshot['missionId'] as String?;
+      if (missionId != null) ids.add(missionId);
+    }
+    return ids;
+  }
+
+  /// Count of missions (plans) completed on [localDate] — the same-day
+  /// signal used to escalate difficulty when a learner is practicing a lot
+  /// in one day (see `_advanceToNextMission` in today_mission_widget.dart).
+  int completedMissionCountForDate(String localDate, {String? userId}) {
+    final rows = _db.select(
+      "SELECT COUNT(*) AS c FROM learning_plans WHERE user_id IS ? "
+      "AND local_date = ? AND status = 'completed' AND deleted_at IS NULL",
+      [userId, localDate],
+    );
+    return rows.first['c'] as int;
+  }
+
+  /// Lifetime count of plans ever generated (any date, any status) — used
+  /// by [RotationPlanner] as a simple, stateless index into the fixed
+  /// modality rotation (`count % rotationLength`). No separate counter
+  /// table needed; this is just a count of what's already persisted.
+  int totalPlanCount({String? userId}) {
+    final rows = _db.select(
+      "SELECT COUNT(*) AS c FROM learning_plans WHERE user_id IS ? AND deleted_at IS NULL",
+      [userId],
+    );
+    return rows.first['c'] as int;
+  }
+
   PlanSnapshot? byId(String id) {
     final rows = _db.select(
       'SELECT * FROM learning_plans WHERE id = ? AND deleted_at IS NULL',

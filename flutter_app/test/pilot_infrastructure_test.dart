@@ -7,7 +7,7 @@ import 'package:sqlite3/sqlite3.dart';
 
 void main() {
   group('Pilot infrastructure', () {
-    test('creates stable installation identity and Phase 5 schema', () {
+    test('creates stable installation identity and current schema', () {
       final db = sqlite3.openInMemory();
       addTearDown(db.dispose);
       final infrastructure = PilotInfrastructureStore(db);
@@ -20,7 +20,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
       );
     });
 
@@ -130,14 +130,16 @@ void main() {
 
       expect(snapshot.serverAuthoritative, isFalse);
       expect(snapshot.usedSeconds, 900);
-      expect(snapshot.remainingSeconds, 2700);
+      // Free-tier daily allowance is 30 minutes (1800s), not the old flat
+      // 60 minutes — 900 used leaves 900 remaining, not 2700.
+      expect(snapshot.remainingSeconds, 900);
       expect(snapshot.canStartAiSession, isTrue);
 
       db.execute(
         '''INSERT INTO credit_usage
            (id, local_date, seconds_used, created_at)
            VALUES (?, date('now', 'localtime'), ?, ?)''',
-        ['credit-2', 2700, now],
+        ['credit-2', 900, now],
       );
       final exhausted = PilotAccessService(
         store: store,

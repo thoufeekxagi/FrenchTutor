@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/common.dart';
@@ -52,6 +53,14 @@ class LessonSpeechService {
   AudioStreamingService get _geminiAudio =>
       _geminiAudioLazy ??= AudioStreamingService();
   final Map<String, List<int>> _synthCache = {};
+  // Guards concurrent synthesize() calls for the same cache key from racing
+  // each other's disk-cache write — without this, two overlapping calls
+  // (e.g. auto-narration racing a manual replay tap) both miss the cache,
+  // both call Gemini, and both write the same file path at once, which can
+  // interleave into a corrupted/misaligned PCM buffer that then plays back
+  // as garbled noise FOREVER since the corrupt file is what gets replayed
+  // from the persisted disk cache from then on.
+  final Map<String, Future<List<int>>> _synthInFlight = {};
   Timer? _completionTimer;
 
   AudioStreamingService? _captureAudioLazy;
@@ -166,30 +175,116 @@ class LessonSpeechService {
     required bool slow,
     String? contentItemId,
   }) async {
-    try {
-      final bytes = await synthesize(
-        text,
+    final bytes = await synthesizeWithRetry(
+      text,
+      voiceName: voiceName,
+      slow: slow,
+      contentItemId: contentItemId,
+    );
+    if (bytes == null) return false;
+    final myIndex = _ttsIndex;
+    await _geminiAudio.playAudioChunk(bytes);
+    // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
+    final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
+    _completionTimer = Timer(Duration(milliseconds: playbackMs), () {
+      if (_ttsIndex != myIndex || isPaused) return;
+      _onUtteranceComplete();
+    });
+    return true;
+  }
+
+  /// Reading a whole story fires one fresh synthesis call per sentence in
+  /// quick succession (nothing's cached yet on a first read) — enough to hit
+  /// the TTS endpoint's per-minute rate limit partway through, which used to
+  /// fail every remaining sentence instantly with no audio and no retry (the
+  /// highlight still advanced from `_onItemStart`, so it looked like playback
+  /// was working while actually going silent). Retries a few times with
+  /// backoff before finally giving up on a line — longer backoff
+  /// specifically for a 429, since a fixed short delay won't have cleared by
+  /// the time it retries. Shared by live playback and [prewarmNarration].
+  Future<List<int>?> synthesizeWithRetry(
+    String text, {
+    required String voiceName,
+    required bool slow,
+    String? contentItemId,
+  }) async {
+    const maxAttempts = 3;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        return await synthesize(
+          text,
+          voiceName: voiceName,
+          slow: slow,
+          contentItemId: contentItemId,
+        );
+      } catch (e) {
+        debugPrint(
+          'LessonSpeechService: TTS synth failed (attempt $attempt/$maxAttempts): $e',
+        );
+        if (attempt == maxAttempts) return null;
+        // NOTE: deliberately no `isPaused` check here — this method is
+        // shared by the narration queue, on-demand speaker taps, and
+        // background prewarming, and `isPaused` is queue-only state. It has
+        // no meaning for the other two callers and was silently cutting
+        // their retries short after just one attempt whenever the queue
+        // happened to be paused for an unrelated reason.
+        final isRateLimited = e is GeminiHttpError && e.isRateLimited;
+        await Future.delayed(
+          Duration(milliseconds: isRateLimited ? 2500 * attempt : 400 * attempt),
+        );
+      }
+    }
+    return null;
+  }
+
+  /// Synthesizes and caches every line of a freshly generated story right
+  /// after it's written, one at a time (never in parallel — a burst of
+  /// simultaneous calls is exactly what trips the rate limit in the first
+  /// place), so opening it to read hits the persisted `tts_audio_cache`
+  /// (same on-device database the story itself is saved in) instead of
+  /// calling the TTS endpoint live for every sentence. Best-effort and
+  /// meant to be fired in the background right after generation — any line
+  /// that doesn't warm here just falls back to live synthesis (with the
+  /// same retry) the first time it's actually played, exactly like before
+  /// this existed, so a partial or total failure here is never fatal.
+  Future<void> prewarmNarration(List<SpeechItem> items) async {
+    final voiceName = ActiveTutor.current.voiceName;
+    for (final item in items) {
+      await synthesizeWithRetry(
+        item.text,
         voiceName: voiceName,
-        slow: slow,
-        contentItemId: contentItemId,
+        slow: false,
+        contentItemId: item.contentItemId,
       );
-      final myIndex = _ttsIndex;
-      await _geminiAudio.playAudioChunk(bytes);
-      // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
-      final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
-      _completionTimer = Timer(Duration(milliseconds: playbackMs), () {
-        if (_ttsIndex != myIndex || isPaused) return;
-        _onUtteranceComplete();
-      });
-      return true;
-    } catch (_) {
-      return false;
     }
   }
 
   void _onUtteranceComplete() {
     _ttsIndex += 1;
     _speakCurrent();
+  }
+
+  /// True if [text] in [voiceName]/[slow] is already synthesized and sitting in
+  /// cache (memory or the persisted disk+DB index) — a single cheap, synchronous
+  /// SQLite lookup, no disk or network I/O. Lets a play button decide instantly,
+  /// before the user even taps, whether it can show a plain "ready to play"
+  /// state or needs to show a generating indicator once tapped.
+  bool isCached(String text, {required String voiceName, bool slow = false}) {
+    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    if (_synthCache.containsKey(cacheKey)) return true;
+    return _cacheStore?.fileName(cacheKey) != null;
+  }
+
+  /// Plays already-resolved PCM16 bytes through this service's own audio
+  /// session — for callers that want to play a single clip on demand (a
+  /// speaker button) without going through the queued narration path above.
+  Future<void> playBytes(List<int> bytes) async {
+    // Cuts whatever this shared player is already sounding — without this,
+    // two on-demand taps (e.g. two different TtsPlayButton widgets on the
+    // same screen) queue back-to-back instead of the newer tap replacing
+    // the older one.
+    await _geminiAudio.stopPlayback();
+    await _geminiAudio.playAudioChunk(bytes);
   }
 
   /// Returns the PCM16 bytes for [text] in [voiceName], from cache when possible.
@@ -204,26 +299,58 @@ class LessonSpeechService {
     String? contentItemId,
   }) async {
     final cacheKey = _diskCacheKey(voiceName, slow, text);
-    var bytes = _synthCache[cacheKey];
-    bytes ??= await _readDiskCache(cacheKey);
-    if (bytes == null) {
-      bytes = await LessonAgentService.shared.synthesizeSpeech(
-        text,
-        slow: slow,
-        voiceName: voiceName,
-      );
-      unawaited(
-        _writeDiskCache(
-          cacheKey,
-          bytes,
-          voiceName: voiceName,
-          slow: slow,
-          text: text,
-          contentItemId: contentItemId,
-        ),
-      );
+    final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
+    if (cached != null) {
+      _synthCache[cacheKey] = cached;
+      return cached;
     }
+
+    // A second caller for the same line while the first is still in flight
+    // (auto-narration racing a manual replay, two screens sharing a cached
+    // sentence) awaits the SAME synthesis/write instead of kicking off its
+    // own — otherwise both would write the same disk-cache file path at
+    // once and could interleave into a corrupted buffer.
+    final inFlight = _synthInFlight[cacheKey];
+    if (inFlight != null) return inFlight;
+
+    final future = _synthesizeAndCache(
+      cacheKey,
+      text,
+      voiceName: voiceName,
+      slow: slow,
+      contentItemId: contentItemId,
+    );
+    _synthInFlight[cacheKey] = future;
+    try {
+      return await future;
+    } finally {
+      _synthInFlight.remove(cacheKey);
+    }
+  }
+
+  Future<List<int>> _synthesizeAndCache(
+    String cacheKey,
+    String text, {
+    required String voiceName,
+    required bool slow,
+    String? contentItemId,
+  }) async {
+    final bytes = await LessonAgentService.shared.synthesizeSpeech(
+      text,
+      slow: slow,
+      voiceName: voiceName,
+    );
     _synthCache[cacheKey] = bytes;
+    unawaited(
+      _writeDiskCache(
+        cacheKey,
+        bytes,
+        voiceName: voiceName,
+        slow: slow,
+        text: text,
+        contentItemId: contentItemId,
+      ),
+    );
     return bytes;
   }
 

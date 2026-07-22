@@ -66,6 +66,15 @@ abstract final class DesignTokens {
   static final hairline = ink.withValues(alpha: 0.09);
   static final hairlineLight = canvas.withValues(alpha: 0.16);
 
+  /// The shared full-bleed brand gradient — onboarding, sign-in, and any
+  /// other gate-flow screen that wants the same identity all draw from this
+  /// one definition instead of redeclaring it, so they never drift apart.
+  static const heroGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primaryDeep, primary, secondary],
+  );
+
   /// Soft card shadow — depth via a whisper of ink, never Material elevation.
   static List<BoxShadow> get cardShadow => [
     BoxShadow(

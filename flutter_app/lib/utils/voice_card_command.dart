@@ -7,12 +7,51 @@
 /// [transcript] matches [nextPhrase] if it's near-exact (~90% similarity by
 /// edit distance) — tolerant of STT noise ("necks word" for "next word"),
 /// never of unrelated phrasing.
+
+/// Common filler wrapped around the real command in real speech — "next
+/// word PLEASE", "JUST next word", "OK, next word" — none of it changes what
+/// the student is asking for, so it's stripped before comparing rather than
+/// counted as noise that should tank the match.
+const _fillerWords = {
+  'please',
+  'just',
+  'ok',
+  'okay',
+  'so',
+  'now',
+  'then',
+  'can',
+  'could',
+  'we',
+  'you',
+  'i',
+  'want',
+  'to',
+  'lets',
+  'let',
+};
+
 bool matchesAdvanceCommand(String transcript, {required String nextPhrase}) {
   final normalized = _normalize(transcript);
   final phrase = _normalize(nextPhrase);
   if (normalized.isEmpty || phrase.isEmpty) return false;
   if (normalized == phrase) return true;
-  return _similarity(normalized, phrase) >= 0.9;
+  if (_similarity(normalized, phrase) >= 0.9) return true;
+
+  // Strip filler, then strip whatever's left of the approved phrase itself
+  // (word by word, so "next" alone still counts without needing "word"
+  // too). If nothing but filler and phrase words is left over, it's a
+  // command ("next word please", "just next", "next, please"). If any
+  // other content word survives ("the next word IS HARD", "can we go to
+  // the next word"), it's the phrase being mentioned, not commanded — stays
+  // rejected, same as today.
+  final phraseTokens = phrase.split(' ').toSet();
+  final tokens = normalized.split(' ');
+  final matchedPhraseWord = tokens.any(phraseTokens.contains);
+  final leftover = tokens.where(
+    (t) => !_fillerWords.contains(t) && !phraseTokens.contains(t),
+  );
+  return matchedPhraseWord && leftover.isEmpty;
 }
 
 /// 1.0 = identical, 0.0 = completely different, by normalized edit distance.

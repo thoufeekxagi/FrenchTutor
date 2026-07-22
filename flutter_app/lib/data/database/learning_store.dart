@@ -127,6 +127,7 @@ class LearningStore {
     if (rows.isNotEmpty) {
       final r = rows.first;
       final onboardedRaw = r['onboarded_at'] as String?;
+      final interestsRaw = r['interests'] as String?;
       return Profile(
         id: r['id'] as String,
         goal: r['goal'] as String,
@@ -136,6 +137,9 @@ class LearningStore {
         onboardedAt: onboardedRaw != null
             ? DateTime.tryParse(onboardedRaw)
             : null,
+        interests: interestsRaw == null || interestsRaw.isEmpty
+            ? const []
+            : interestsRaw.split(',').where((s) => s.isNotEmpty).toList(),
       );
     }
     final fresh = Profile(id: _uuid.v4());
@@ -162,7 +166,7 @@ class LearningStore {
     _db.execute(
       '''
       UPDATE profiles SET goal = ?, level = ?, session_length = ?, reminder_time = ?,
-        onboarded_at = ?, updated_at = ?
+        onboarded_at = ?, interests = ?, updated_at = ?
       WHERE id = ?
     ''',
       [
@@ -171,6 +175,7 @@ class LearningStore {
         p.sessionLength,
         p.reminderTime,
         p.onboardedAt?.toIso8601String(),
+        p.interests.isEmpty ? null : p.interests.join(','),
         _now(),
         p.id,
       ],

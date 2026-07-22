@@ -24,7 +24,6 @@ import '../../services/session_recorder.dart';
 import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
 import '../../utils/text_fold.dart';
-import '../../utils/voice_card_command.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
@@ -57,7 +56,7 @@ class _VocabSessionCard {
   final VocabEntry entry;
 }
 
-enum _UserIntent { advance, again, back, none }
+enum _UserIntent { again, none }
 
 /// Daily Pathway stage 1 — a focused, agent-led vocabulary session, ported from
 /// AgentLedVocabView.swift, redesigned around one principle: Marie's tool calls are
@@ -194,10 +193,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
 
   _VocabSessionCard? get _currentCard =>
       _cardIndex < _sessionPlan.length ? _sessionPlan[_cardIndex] : null;
-
-  // App-side floor on advancing. Judge verdicts only come from explicit student
-  // commands, so the only hard floor is never skipping a word they have not tried.
-  int get _minAttemptsRequired => _currentCard == null ? 0 : 1;
 
   BilingualExample? get _currentExample {
     final card = _currentCard;
@@ -452,14 +447,8 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       _logDebug('→ ignored: "$trimmed" echoes Marie\'s own speech');
       return;
     }
-    // Voice control does exactly one thing here: advance. Back/repeat/end
-    // are button-only — matched against THIS screen's own "Next word" text,
-    // not a bare "next" a future vocabulary card could legitimately contain.
-    if (matchesAdvanceCommand(trimmed, nextPhrase: 'next word')) {
-      _logDebug('→ exact voice command: next');
-      _advanceFromUserIntent();
-      return;
-    }
+    // Navigation is strictly button-only — Back/Next word/End are never
+    // triggered by anything spoken, however phrased.
     _hasAttempted = true;
 
     // A newer utterance always supersedes an in-flight classification — "next… wait,
@@ -508,42 +497,18 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     }();
   }
 
-  /// The single place a classified utterance becomes action.
+  /// The single place a classified utterance becomes action. Navigation
+  /// (advance/back/goto) is strictly button-only — Back/Next word/End are
+  /// the only way to move a card; nothing spoken, however phrased, ever
+  /// moves it.
   void _applyIntent(
     LiveIntentVerdict verdict, {
     required String utterance,
     required String source,
   }) {
     _logDebug(
-      '[$source] "$utterance" → ${verdict.intent.name}'
-      '${verdict.cardNumber != null ? '(card ${verdict.cardNumber})' : ''}, attempts: $_attemptCount',
+      '[$source] "$utterance" → ${verdict.intent.name}, attempts: $_attemptCount',
     );
-
-    if (verdict.intent != LiveNavIntent.attempt &&
-        verdict.intent != LiveNavIntent.chat &&
-        source != 'exact-command') {
-      _logDebug(
-        '→ LLM command ignored, exact voice command or button required',
-      );
-      return;
-    }
-    final isNavigation =
-        verdict.intent == LiveNavIntent.advance ||
-        verdict.intent == LiveNavIntent.back ||
-        verdict.intent == LiveNavIntent.goto;
-    // Consent cooldown: a duplicate/late transcript of a command that already moved the
-    // card must never move it a second time.
-    if (isNavigation && source != 'exact-command') {
-      _logDebug(
-        '→ LLM navigation ignored, exact voice command or button required',
-      );
-      return;
-    }
-    if (isNavigation &&
-        DateTime.now().difference(_lastCardMoveAt).inMilliseconds < 1500) {
-      _logDebug('→ navigation ignored (cooldown after recent card move)');
-      return;
-    }
 
     switch (verdict.intent) {
       case LiveNavIntent.attempt:
@@ -556,25 +521,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       case LiveNavIntent.again:
         _lastDetectedIntent = _UserIntent.again;
       case LiveNavIntent.advance:
-        _lastDetectedIntent = _UserIntent.advance;
-        if (_attemptCount < _minAttemptsRequired) {
-          // The one unbreakable app-side rule: never skip a word with zero attempts.
-          _logDebug(
-            '→ advance blocked: only $_attemptCount/$_minAttemptsRequired attempts so far',
-          );
-        } else if (!verdict.explicit && !_offerUnlocked) {
-          // A bare "yes" consenting to an offer Marie wasn't allowed to make yet. The
-          // student's own explicit "next"/button always works — this only refuses
-          // premature-offer consent, which is Marie's failure, not the student's choice.
-          _refusePrematureConsent();
-        } else {
-          _advanceFromUserIntent();
-        }
       case LiveNavIntent.back:
-        _lastDetectedIntent = _UserIntent.back;
-        _goBackFromUserIntent();
       case LiveNavIntent.goto:
-        _goToCard(verdict.cardNumber);
+        _logDebug('→ ignored: navigation is button-only, tap Back/Next word');
       case LiveNavIntent.finish:
         // Spoken "let's finish this lesson" = the End button. All words done →
         // clean completion; otherwise the same save-and-continue-later sheet.
@@ -594,21 +543,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     _offerUnlocked = true;
     _logDebug(
       '→ practice threshold reached ($_attemptCount/$_offerThreshold), chip flipped',
-    );
-  }
-
-  /// Marie suggested moving on (banned) and the student reflexively said "yes" — the card
-  /// stays put, and she's silently told to keep practicing instead of waiting on an answer.
-  void _refusePrematureConsent() {
-    final card = _currentCard;
-    if (card == null) return;
-    _logDebug(
-      '→ consent refused: premature ($_attemptCount/$_offerThreshold attempts)',
-    );
-    _gemini.injectContext(
-      'The card did NOT move, "${card.entry.fr}" needs more practice '
-      '($_attemptCount of $_offerThreshold attempts so far). You should never have suggested '
-      'moving on. Smoothly continue practicing this word and never suggest advancing again.',
     );
   }
 
@@ -647,42 +581,6 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         'The student asked to go back, the screen now shows: ${card.entry.fr} = '
         '${card.entry.en}.${_exampleNote(card)} Re-anchor it briefly ("We\'re back on '
         '${card.entry.fr}, ${card.entry.en}") and have them try it once. $_noteReminder',
-      );
-    }
-  }
-
-  /// Jump straight to a specific card by 1-based number — "go to the third card".
-  /// Grading/judging of the card being left matches the back path (no silent grade).
-  void _goToCard(int? cardNumber) {
-    if (cardNumber == null) {
-      _logDebug('→ goto ignored: no card number');
-      return;
-    }
-    final target = cardNumber - 1;
-    if (target < 0 || target >= _sessionPlan.length) {
-      _logDebug(
-        '→ goto ignored: card $cardNumber out of range (1-${_sessionPlan.length})',
-      );
-      return;
-    }
-    if (target == _cardIndex) {
-      _logDebug('→ goto ignored: already on card $cardNumber');
-      return;
-    }
-    _logDebug('→ user-driven jump to card $cardNumber');
-    _cutTutorAudio();
-    _fireBatchedJudge();
-    _lastCardMoveAt = DateTime.now();
-    setState(() {
-      _cardIndex = target;
-      _resetPerCardState();
-    });
-    final card = _currentCard;
-    if (card != null) {
-      _scheduleCardAnnouncement(
-        'The student jumped to word $cardNumber, the screen now shows: ${card.entry.fr} = '
-        '${card.entry.en}.${_exampleNote(card)} Announce it briefly ("Word $cardNumber: '
-        '${card.entry.fr}, ${card.entry.en}") and teach it. $_noteReminder',
       );
     }
   }
@@ -968,7 +866,10 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       final wordHits = RegExp(
         '\\b${RegExp.escape(fr)}\\b',
       ).allMatches(folded).length;
-      if (saidExample || wordHits >= 3) {
+      // Any single utterance of a future word is corrected immediately —
+      // waiting for a repeated pattern let the first, reported slip sail
+      // through.
+      if (saidExample || wordHits >= 1) {
         _correctTutorDrift(future);
         return;
       }
@@ -1004,10 +905,10 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     _cutTutorAudio();
     _gemini.injectContext(
       'STOP, you started teaching "${future.fr}", but the app has NOT moved on: the student\'s '
-      'screen still shows "${current.entry.fr}" = "${current.entry.en}", and only the student\'s '
-      'own words move the card. You may OFFER the next word by name and then wait silently for '
-      'their answer, never teach it. Pick up "${current.entry.fr}" again now, briefly, as if '
-      'nothing happened.',
+      'screen still shows "${current.entry.fr}" = "${current.entry.en}", and only a tap on their '
+      'own "Next word" button moves the card, never anything you say. Do not mention or offer '
+      '"${future.fr}" at all. Pick up "${current.entry.fr}" again now, briefly, as if nothing '
+      'happened.',
       expectReply: true,
     );
   }
@@ -1508,7 +1409,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               // this word needs before Marie is allowed to offer moving on.
               Text(
                 _offerUnlocked
-                    ? 'ready when you are, say "next"'
+                    ? 'ready when you are — tap Next word'
                     : '${_attemptCount.clamp(0, _offerThreshold)} of $_offerThreshold practices',
                 style: DesignTokens.body(11).copyWith(
                   color: _offerUnlocked

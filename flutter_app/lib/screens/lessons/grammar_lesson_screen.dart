@@ -10,6 +10,7 @@ import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/lesson_qa_overlay.dart';
 import '../../widgets/marie_toolbar_button.dart';
+import '../../widgets/tts_play_button.dart';
 
 class GrammarLessonScreen extends ConsumerStatefulWidget {
   const GrammarLessonScreen({super.key, required this.lesson});
@@ -200,18 +201,9 @@ class _GrammarLessonScreenState extends ConsumerState<GrammarLessonScreen> {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(
-                                CupertinoIcons.speaker_2_fill,
-                                color: DesignTokens.info,
-                              ),
-                              onPressed: () {
-                                LessonSpeechService.shared.speak(
-                                  items: [
-                                    SpeechItem(text: ex.fr, language: 'fr-FR'),
-                                  ],
-                                );
-                              },
+                            TtsPlayButton(
+                              text: ex.fr,
+                              contentItemId: widget.lesson.id,
                             ),
                           ],
                         ),

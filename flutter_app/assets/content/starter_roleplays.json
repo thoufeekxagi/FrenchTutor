@@ -1,0 +1,238 @@
+{
+  "roleplays": [
+    {
+      "id": "starter-roleplay-cafe",
+      "title": "Au café du coin",
+      "titleEn": "At the corner café",
+      "segments": [
+        {
+          "characterFr": "Bonjour, bienvenue au Café du Coin. Qu'est-ce que je vous sers aujourd'hui ?",
+          "characterEn": "Hello, welcome to Café du Coin. What can I get for you today?",
+          "fr": "Je voudrais un café au lait et un croissant, s'il vous plaît.",
+          "en": "I would like a café au lait and a croissant, please.",
+          "grammarNote": "'Je voudrais' is the polite conditional form for 'I would like', softer than 'je veux'.",
+          "pronunciationTip": "Link 'un café' smoothly, the 'n' carries into 'café'."
+        },
+        {
+          "characterFr": "Très bien. C'est pour ici ou à emporter ?",
+          "characterEn": "Very well. Is that for here or to take away?",
+          "fr": "C'est pour ici, merci.",
+          "en": "It's for here, thank you.",
+          "grammarNote": "'Pour ici' and 'à emporter' are the two fixed café phrases for 'for here' and 'to go'.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "D'accord. Ça fait sept euros cinquante.",
+          "characterEn": "Alright. That comes to seven fifty.",
+          "fr": "Voilà, gardez la monnaie.",
+          "en": "Here you go, keep the change.",
+          "grammarNote": "'Gardez' is the polite imperative ('vous' form) of 'garder', to keep.",
+          "pronunciationTip": "'Monnaie' rhymes with English 'nay', not 'eye'."
+        },
+        {
+          "characterFr": "Merci beaucoup, c'est très gentil !",
+          "characterEn": "Thank you very much, that's very kind!",
+          "fr": "De rien, bonne journée !",
+          "en": "You're welcome, have a good day!",
+          "grammarNote": "'De rien' literally means 'of nothing', the standard reply to thanks.",
+          "pronunciationTip": ""
+        }
+      ]
+    },
+    {
+      "id": "starter-roleplay-train",
+      "title": "À la gare",
+      "titleEn": "At the train station",
+      "segments": [
+        {
+          "characterFr": "Bonjour, je peux vous aider ?",
+          "characterEn": "Hello, can I help you?",
+          "fr": "Oui, un billet pour Lyon, s'il vous plaît.",
+          "en": "Yes, one ticket for Lyon, please.",
+          "grammarNote": "'Un billet pour' + destination is the standard phrase for buying a ticket.",
+          "pronunciationTip": "'Lyon' has a nasal 'on' sound, not 'ee-on'."
+        },
+        {
+          "characterFr": "Aller simple ou aller-retour ?",
+          "characterEn": "One-way or round trip?",
+          "fr": "Aller-retour, pour ce week-end.",
+          "en": "Round trip, for this weekend.",
+          "grammarNote": "'Aller-retour' is a fixed compound noun, always used together.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Le train part à quatorze heures, quai numéro trois.",
+          "characterEn": "The train leaves at 2 pm, platform number three.",
+          "fr": "D'accord, merci. C'est direct ?",
+          "en": "Okay, thank you. Is it direct?",
+          "grammarNote": "24-hour time ('quatorze heures') is standard in French for schedules.",
+          "pronunciationTip": "'Quai' sounds like English 'kay'."
+        },
+        {
+          "characterFr": "Oui, c'est direct, deux heures de trajet.",
+          "characterEn": "Yes, it's direct, a two-hour trip.",
+          "fr": "Parfait, voilà pour le billet.",
+          "en": "Perfect, here you go for the ticket.",
+          "grammarNote": "'Voilà' introduces something being handed over or pointed out.",
+          "pronunciationTip": ""
+        }
+      ]
+    },
+    {
+      "id": "starter-roleplay-airport",
+      "title": "À l'aéroport",
+      "titleEn": "At the airport",
+      "segments": [
+        {
+          "characterFr": "Bonjour, votre passeport et votre billet, s'il vous plaît.",
+          "characterEn": "Hello, your passport and ticket, please.",
+          "fr": "Voici mon passeport et ma réservation.",
+          "en": "Here's my passport and my reservation.",
+          "grammarNote": "'Voici' points to something close at hand, like 'here is'.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Merci. Vous avez des bagages à enregistrer ?",
+          "characterEn": "Thank you. Do you have any bags to check?",
+          "fr": "Oui, juste une valise.",
+          "en": "Yes, just one suitcase.",
+          "grammarNote": "'À enregistrer' is 'to check in' (luggage), infinitive after 'à'.",
+          "pronunciationTip": "'Valise' stresses the last syllable: vah-LEEZ."
+        },
+        {
+          "characterFr": "Très bien, posez-la ici, s'il vous plaît.",
+          "characterEn": "Very well, place it here, please.",
+          "fr": "D'accord, la voilà.",
+          "en": "Okay, here it is.",
+          "grammarNote": "'Posez-la' is an imperative with an attached pronoun ('it').",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Votre porte d'embarquement est la douze, embarquement à seize heures.",
+          "characterEn": "Your boarding gate is twelve, boarding at 4 pm.",
+          "fr": "Merci beaucoup, bonne journée à vous aussi.",
+          "en": "Thank you very much, good day to you too.",
+          "grammarNote": "'À vous aussi' returns a wish politely, mirroring what was said.",
+          "pronunciationTip": ""
+        }
+      ]
+    },
+    {
+      "id": "starter-roleplay-directions",
+      "title": "Demander son chemin",
+      "titleEn": "Asking for directions",
+      "segments": [
+        {
+          "characterFr": "Bonjour, je peux vous aider ? Vous semblez perdu.",
+          "characterEn": "Hello, can I help you? You seem lost.",
+          "fr": "Oui, merci. Je cherche la bibliothèque municipale.",
+          "en": "Yes, thank you. I'm looking for the municipal library.",
+          "grammarNote": "'Je cherche' + noun is the direct way to say 'I'm looking for'.",
+          "pronunciationTip": "'Bibliothèque' has four syllables: bee-blee-oh-TEK."
+        },
+        {
+          "characterFr": "Ah, c'est facile. Continuez tout droit, puis tournez à gauche.",
+          "characterEn": "Ah, that's easy. Keep going straight, then turn left.",
+          "fr": "Tout droit, puis à gauche, d'accord.",
+          "en": "Straight ahead, then left, okay.",
+          "grammarNote": "'Tout droit' means 'straight ahead'; don't confuse with 'à droite' (to the right).",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "C'est à environ cinq minutes à pied, juste après la boulangerie.",
+          "characterEn": "It's about a five-minute walk, just past the bakery.",
+          "fr": "Parfait, c'est loin d'ici ?",
+          "en": "Perfect, is it far from here?",
+          "grammarNote": "'À pied' means 'on foot', a common way to describe walking distance.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Non, pas du tout, c'est tout près.",
+          "characterEn": "No, not at all, it's very close.",
+          "fr": "Merci infiniment pour votre aide !",
+          "en": "Thank you so much for your help!",
+          "grammarNote": "'Merci infiniment' is a stronger, warmer way to say 'thank you very much'.",
+          "pronunciationTip": ""
+        }
+      ]
+    },
+    {
+      "id": "starter-roleplay-shopping",
+      "title": "Dans un magasin de vêtements",
+      "titleEn": "At the clothing store",
+      "segments": [
+        {
+          "characterFr": "Bonjour, je peux vous renseigner ?",
+          "characterEn": "Hello, can I help you with anything?",
+          "fr": "Oui, je cherche un pull en taille moyenne.",
+          "en": "Yes, I'm looking for a sweater in medium size.",
+          "grammarNote": "'En taille' + size word describes clothing size.",
+          "pronunciationTip": "'Pull' is pronounced like English 'pool', not 'pull'."
+        },
+        {
+          "characterFr": "Nous en avons en bleu et en gris, vous préférez quelle couleur ?",
+          "characterEn": "We have them in blue and grey, which colour do you prefer?",
+          "fr": "Le bleu me plaît bien.",
+          "en": "I really like the blue one.",
+          "grammarNote": "'Me plaît' means 'pleases me', the standard way to say you like something.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Voici, la cabine d'essayage est juste là.",
+          "characterEn": "Here you go, the fitting room is right there.",
+          "fr": "Merci, je vais l'essayer.",
+          "en": "Thank you, I'll try it on.",
+          "grammarNote": "'Je vais' + infinitive expresses the near future, 'I'm going to'.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Alors, ça vous va bien ?",
+          "characterEn": "So, does it fit you well?",
+          "fr": "Oui, ça me va parfaitement, je le prends.",
+          "en": "Yes, it fits me perfectly, I'll take it.",
+          "grammarNote": "'Ça va' + indirect pronoun describes fit, not just general wellbeing.",
+          "pronunciationTip": ""
+        }
+      ]
+    },
+    {
+      "id": "starter-roleplay-restaurant",
+      "title": "Au restaurant",
+      "titleEn": "At the restaurant",
+      "segments": [
+        {
+          "characterFr": "Bonsoir, vous avez réservé une table ?",
+          "characterEn": "Good evening, do you have a table reservation?",
+          "fr": "Oui, au nom de Dubois, pour deux personnes.",
+          "en": "Yes, under the name Dubois, for two people.",
+          "grammarNote": "'Au nom de' means 'under the name of', standard for reservations.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Parfait, suivez-moi. Voici le menu du jour.",
+          "characterEn": "Perfect, follow me. Here's today's menu.",
+          "fr": "Merci, qu'est-ce que vous recommandez ?",
+          "en": "Thank you, what do you recommend?",
+          "grammarNote": "'Qu'est-ce que' is the full form for asking 'what', common in spoken French.",
+          "pronunciationTip": "'Recommandez' stresses the last syllable: ruh-koh-mahn-DAY."
+        },
+        {
+          "characterFr": "Le poisson du jour est excellent ce soir.",
+          "characterEn": "The fish of the day is excellent tonight.",
+          "fr": "D'accord, je vais prendre ça, avec de l'eau, s'il vous plaît.",
+          "en": "Okay, I'll have that, with water, please.",
+          "grammarNote": "'Je vais prendre' is the near-future way to order, softer than the plain present.",
+          "pronunciationTip": ""
+        },
+        {
+          "characterFr": "Excellent choix. Ce sera prêt dans quinze minutes.",
+          "characterEn": "Excellent choice. It will be ready in fifteen minutes.",
+          "fr": "Parfait, merci beaucoup.",
+          "en": "Perfect, thank you very much.",
+          "grammarNote": "'Ce sera' is the future tense of 'c'est', meaning 'it will be'.",
+          "pronunciationTip": ""
+        }
+      ]
+    }
+  ]
+}

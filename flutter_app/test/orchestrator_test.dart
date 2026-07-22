@@ -185,8 +185,14 @@ void main() {
 
       expect(plan.totalMinutes, lessThanOrEqualTo(8));
       expect(plan.tasks, hasLength(1));
-      expect(plan.tasks.single.estimatedMinutes, 7);
-      expect(plan.remainingMinutes, 1);
+      // readingRecognition costs 2 min/word (batched review, not 7 — see
+      // minutesForModality's doc comment); the only other mapping tied to
+      // the sole in-scope competency (foundation_listen, 10 min) doesn't
+      // fit even with the remaining budget, and nothing else is unlocked
+      // without an evidenced 'foundation' mastery to satisfy the
+      // 'conversation'/'transfer' prerequisite chain.
+      expect(plan.tasks.single.estimatedMinutes, 2);
+      expect(plan.remainingMinutes, 6);
     });
   });
 }

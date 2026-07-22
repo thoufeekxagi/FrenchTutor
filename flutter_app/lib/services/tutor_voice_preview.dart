@@ -29,21 +29,29 @@ class TutorVoicePreviewer extends ChangeNotifier {
   Timer? _playbackDoneTimer;
   bool _disposed = false;
 
+  // Bumped on every play()/stop() call. A play() in flight across an async
+  // gap (bundled-asset load OR live-TTS fallback) checks its own generation
+  // against this after each await and abandons itself if a newer call
+  // superseded it — otherwise two rapid taps on different personas both
+  // race past a load, both finish, and both end up queued back-to-back on
+  // the shared player instead of the second cancelling the first.
+  int _playGeneration = 0;
+
   /// Persona id currently being synthesized (spinner state), if any.
   String? get loadingId => _loadingId;
 
   /// Persona id currently sounding, if any.
   String? get playingId => _playingId;
 
-  /// Play [persona]'s sample. Tapping the tutor that is already playing stops
-  /// it instead (toggle).
+  /// Play [persona]'s sample. Tapping the tutor that is already sounding is a
+  /// no-op — a sample plays to completion on its own; only choosing a
+  /// DIFFERENT tutor cuts it. Re-tapping the same one used to restart it from
+  /// the beginning, which read as "it keeps replaying whether I want it to or
+  /// not."
   Future<void> play(TutorPersona persona) async {
-    if (_disposed || _loadingId != null) return;
-    if (_playingId == persona.id) {
-      stop();
-      return;
-    }
-    stop();
+    if (_disposed) return;
+    if (_playingId == persona.id) return;
+    final generation = ++_playGeneration;
     var bytes = _cache[persona.id];
     if (bytes == null) {
       // Bundled asset first: instant, offline, free.
@@ -56,7 +64,7 @@ class TutorVoicePreviewer extends ChangeNotifier {
       } catch (_) {
         bytes = null;
       }
-      if (_disposed) return;
+      if (_disposed || generation != _playGeneration) return;
     }
     if (bytes == null) {
       // Fallback only if the asset is missing: live TTS.
@@ -71,11 +79,15 @@ class TutorVoicePreviewer extends ChangeNotifier {
       } catch (_) {
         bytes = null;
       } finally {
-        _loadingId = null;
+        if (_loadingId == persona.id) _loadingId = null;
         if (!_disposed) notifyListeners();
       }
-      if (bytes == null || _disposed) return;
+      if (bytes == null || _disposed || generation != _playGeneration) return;
     }
+    // Cut whatever's currently sounding right at the moment this one is
+    // actually about to play — not speculatively before the load above,
+    // when there was nothing yet to cut.
+    stop();
     _playingId = persona.id;
     notifyListeners();
     await _audio.playAudioChunk(bytes);
@@ -89,6 +101,7 @@ class TutorVoicePreviewer extends ChangeNotifier {
   }
 
   void stop() {
+    _playGeneration++;
     _playbackDoneTimer?.cancel();
     _audioLazy?.stopPlayback();
     if (_playingId != null) {

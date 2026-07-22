@@ -5,11 +5,19 @@ import '../data/database/pilot_infrastructure_store.dart';
 import '../models/pilot_access.dart';
 import 'auth_service.dart';
 import 'referral_service.dart';
+import 'subscription_gate_service.dart';
 
 class PilotAccessService {
   PilotAccessService({required this.store, required this.infrastructure});
 
-  static const dailyLimitSeconds = 60 * 60;
+  /// Non-subscribed daily AI-talk-time allowance — counted across every
+  /// Gemini Live session that day, not per-session.
+  static const freeDailyLimitSeconds = 30 * 60;
+
+  /// Subscribed (RevenueCat purchase or invite-code grant) daily allowance.
+  /// Generous on purpose: paying learners shouldn't feel metered, and nobody
+  /// realistically talks 2 hours/day anyway.
+  static const subscribedDailyLimitSeconds = 120 * 60;
 
   // Apple/Google App Review's fixed demo login (see APP_STORE_CONNECT_PRIVACY.md).
   // A reviewer hitting the normal 60-min/day cap mid-review is a Guideline 2.1
@@ -66,10 +74,22 @@ class PilotAccessService {
     final bonusSeconds = ReferralService.shared.cachedBonusSecondsBalance;
     return PilotAccessSnapshot(
       entitlement: safeEntitlement,
-      dailyLimitSeconds: dailyLimitSeconds + bonusSeconds,
+      dailyLimitSeconds: baseDailyLimitSeconds(safeEntitlement) + bonusSeconds,
       usedSeconds: store.aiSecondsUsedToday(),
       serverAuthoritative: false,
     );
+  }
+
+  /// The base allowance (before bonus seconds) for a given entitlement —
+  /// exposed separately so callers computing bonus-minute overage (e.g.
+  /// session_screen.dart's post-call accounting) use the same tier this
+  /// snapshot was built from, not a stale flat constant.
+  static int baseDailyLimitSeconds(PilotEntitlement entitlement) {
+    final subscribed =
+        DevSubscriptionOverride.enabled ||
+        entitlement.status == PilotEntitlementStatus.active ||
+        entitlement.status == PilotEntitlementStatus.grace;
+    return subscribed ? subscribedDailyLimitSeconds : freeDailyLimitSeconds;
   }
 }
 

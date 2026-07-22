@@ -22,6 +22,7 @@ class MissionSelector {
     required String goal,
     required Iterable<CompetencyState> competencyStates,
     Set<String> excludedMissionIds = const {},
+    bool difficultyBoost = false,
   }) {
     final statesByCompetency = <String, List<CompetencyState>>{};
     for (final state in competencyStates) {
@@ -41,12 +42,39 @@ class MissionSelector {
       );
     }
 
-    final candidates = catalog.missions
+    // A learner who's been practicing a lot in one sitting gets nudged up a
+    // notch for the rest of that sitting — same idea as the ceiling below,
+    // just shifted, so "practiced a lot today" actually raises what's next.
+    final effectiveLevel = difficultyBoost
+        ? _levelIndex(level) + 1
+        : _levelIndex(level);
+
+    final pool = catalog.missions
         .where((mission) => !mission.calibration)
         .where((mission) => !excludedMissionIds.contains(mission.id))
         .where((mission) => _matchesGoal(mission, goal))
-        .where((mission) => _matchesLevel(mission.levelBand, level))
+        .where(
+          (mission) =>
+              !_isMastered(mission, statesByCompetency),
+        );
+
+    // Strict window first: a scenario more than one band below or above the
+    // learner's level is excluded outright — this is the level FLOOR that
+    // was missing, without it a lower-level scenario like an A2 café order
+    // stayed eligible for B1/B2 learners forever. Only if nothing in that
+    // window is available (e.g. right at the very top of the scale with an
+    // otherwise-empty pool) does an easy warm-up outside the window become
+    // reachable as a fallback, never as the default outcome.
+    var candidates = pool
+        .where(
+          (mission) => _withinWindow(mission.levelBand, effectiveLevel),
+        )
         .toList();
+    if (candidates.isEmpty) {
+      candidates = pool
+          .where((mission) => _matchesLevel(mission.levelBand, effectiveLevel))
+          .toList();
+    }
     if (candidates.isEmpty) {
       return _recommend(
         calibrationMission,
@@ -85,10 +113,20 @@ class MissionSelector {
   bool _matchesGoal(MissionDefinition mission, String goal) =>
       mission.goalIds.isEmpty || mission.goalIds.contains(goal);
 
-  bool _matchesLevel(String missionLevel, String learnerLevel) {
+  /// The wide, ceiling-only range kept as a last-resort fallback (see
+  /// [select]) for when the strict window below has nothing eligible.
+  bool _matchesLevel(String missionLevel, int learnerIndex) {
     final missionIndex = _levelIndex(missionLevel);
-    final learnerIndex = _levelIndex(learnerLevel);
     return missionIndex <= learnerIndex + 1;
+  }
+
+  /// The real default: a scenario must be within one band of the learner's
+  /// level in EITHER direction — this is what stops lower-level content
+  /// (e.g. an A2 café order) from staying eligible forever for a B1/B2
+  /// learner just because nothing ever excluded it on the low side.
+  bool _withinWindow(String missionLevel, int learnerIndex) {
+    final missionIndex = _levelIndex(missionLevel);
+    return (missionIndex - learnerIndex).abs() <= 1;
   }
 
   int _levelIndex(String value) => switch (value.toLowerCase()) {
@@ -98,6 +136,29 @@ class MissionSelector {
     'b2' => 3,
     _ => 0,
   };
+
+  /// A competency is solidly mastered — high confidence, high mastery, not
+  /// currently due for review — once evidence clearly supports it. Unlike
+  /// [_stateScore] (which only deranks a mastered mission), this REMOVES it
+  /// from the eligible pool outright; with only a handful of missions per
+  /// competency, deranking alone still let a mastered scenario win by
+  /// default when nothing else scored higher.
+  static const _masteryThreshold = 0.85;
+  static const _confidenceThreshold = 0.7;
+
+  bool _isMastered(
+    MissionDefinition mission,
+    Map<String, List<CompetencyState>> statesByCompetency,
+  ) {
+    final states = statesByCompetency[mission.primaryCompetencyId] ?? const [];
+    if (states.isEmpty) return false;
+    return states.every(
+      (state) =>
+          !state.dueForReview(DateTime.now()) &&
+          state.masteryEstimate >= _masteryThreshold &&
+          state.confidence >= _confidenceThreshold,
+    );
+  }
 
   double _stateScore(
     MissionDefinition mission,

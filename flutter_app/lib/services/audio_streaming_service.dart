@@ -58,6 +58,15 @@ class AudioStreamingService {
   final Queue<Uint8List> _playbackQueue = Queue<Uint8List>();
   bool _isDrainingPlaybackQueue = false;
 
+  /// A PCM16 sample is 2 bytes; Gemini's WebSocket chunk boundaries don't
+  /// respect that, so a chunk can arrive with an odd byte count, splitting a
+  /// sample across two chunks. Feeding a misaligned chunk straight to the
+  /// player shifts every sample after that point — the exact cause of
+  /// intermittent gargled/robotic playback. This carries the stray trailing
+  /// byte over to be prepended to the next chunk instead of ever feeding a
+  /// misaligned buffer to the player.
+  Uint8List? _pendingOddByte;
+
   /// While true, captured mic audio is not forwarded via the chunk callback. Used to
   /// prevent the mic from picking up the tutor's own speaker output and feeding it back to
   /// Gemini as an echo, since we don't use platform echo-cancellation (which would degrade
@@ -128,17 +137,57 @@ class AudioStreamingService {
     _interruptionSub?.cancel();
     _devicesChangedSub?.cancel();
     _interruptionSub = session.interruptionEventStream.listen((event) {
-      // Only the end of an interruption needs action — a phone call ending, another app's
-      // audio yielding back, etc. iOS restores *a* route on its own by then, but not always
-      // the one we want (it can land back on the speaker even with AirPods connected), so
-      // reclaiming here nudges it to re-resolve against our configured options.
-      if (!event.begin) _reclaimPreferredRoute();
+      if (event.begin) {
+        // Anything that takes audio focus away from us — a real incoming call,
+        // another app's sound, even the OS's own screenshot-shutter sound —
+        // fires this. Previously nothing happened here, so whatever briefly
+        // played through that conflict (including our own already-buffered
+        // audio getting forcibly ducked by iOS) sounded like an abrupt
+        // stutter/cut. Muting our own output cleanly the instant this starts
+        // means the interruption is silent on our end instead of glitchy.
+        try {
+          _player.setVolume(0);
+        } catch (_) {}
+      } else {
+        // iOS restores *a* route on its own by an interruption's end, but not always the
+        // one we want (it can land back on the speaker even with AirPods connected), so
+        // reclaiming here nudges it to re-resolve against our configured options.
+        _reclaimPreferredRoute();
+        _recoverFromInterruptionIfNeeded();
+      }
     });
     _devicesChangedSub = session.devicesChangedEventStream.listen((event) {
       // A Bluetooth device connecting mid-call (e.g. AirPods reconnecting after a phone-call
       // interruption) doesn't retroactively move already-flowing audio over on its own.
       if (event.devicesAdded.isNotEmpty) _reclaimPreferredRoute();
     });
+  }
+
+  /// A real interruption (an actual incoming phone/VoIP call, not just a
+  /// brief system sound) can leave flutter_sound's recorder silently
+  /// stopped underneath us on iOS — a route-reclaim alone doesn't restart
+  /// it, so the mic would stay dead for the rest of the call with no error
+  /// surfaced anywhere. Detect that and cleanly restart capture; always
+  /// restore volume regardless, since the mute above must never get stuck.
+  Future<void> _recoverFromInterruptionIfNeeded() async {
+    try {
+      if (_isStreaming && _recorder.isStopped) {
+        await _recorder.openRecorder();
+        await _recorder.startRecorder(
+          codec: Codec.pcm16,
+          toStream: _micStreamController!.sink,
+          sampleRate: _inputSampleRate,
+          numChannels: 1,
+        );
+      }
+    } catch (_) {
+      // Best-effort — if this fails the call continues audio-out-only rather
+      // than crashing; the user can still end/restart the call normally.
+    } finally {
+      try {
+        await _player.setVolume(1.0);
+      } catch (_) {}
+    }
   }
 
   Future<void> startStreaming({
@@ -246,9 +295,27 @@ class AudioStreamingService {
   /// `_playbackQueue` and fed to the player by the serialized drain loop below — never fed
   /// directly here — so bursty network delivery can't starve or race the player.
   Future<void> playAudioChunk(List<int> pcmBytes) async {
-    await _ensurePlayerStarted();
-    final bytes = Uint8List.fromList(pcmBytes);
+    var bytes = Uint8List.fromList(pcmBytes);
+    if (_pendingOddByte != null) {
+      bytes = Uint8List.fromList([..._pendingOddByte!, ...bytes]);
+      _pendingOddByte = null;
+    }
+    if (bytes.length.isOdd) {
+      _pendingOddByte = Uint8List.fromList([bytes.last]);
+      bytes = Uint8List.sublistView(bytes, 0, bytes.length - 1);
+    }
 
+    // Arm/extend the mic echo-gate's tail-grace window SYNCHRONOUSLY, before
+    // the await below — `_ensurePlayerStarted()` does real platform-channel
+    // I/O and can take real time on the very first chunk of a call, and the
+    // gate in `_handleMicChunk` must already reflect "audio will be playing
+    // until at least now + this buffer's duration" for that entire window.
+    // Arming this AFTER awaiting player startup left a gap where a fast
+    // turnComplete could flip `isOutputActive` false while this value was
+    // still at its stale/epoch default, opening the mic gate before the
+    // tutor's own reply had even started sounding — the tutor's voice would
+    // then get captured and sent back as if the user had said it.
+    //
     // Chunks arrive over the network faster than real-time playback, so this buffer's audio
     // won't actually finish sounding until whatever's already queued finishes, plus this
     // buffer's own duration. Extend the tracked timeline instead of resetting it.
@@ -262,6 +329,15 @@ class AudioStreamingService {
       Duration(milliseconds: (bufferDurationSeconds * 1000).round()),
     );
 
+    // This is genuinely new, wanted audio — cancel any mute a previous
+    // stopPlayback() left pending. Without this, switching straight from one
+    // clip to another (e.g. tapping a different voice-preview persona) fed
+    // the new bytes in while still muted from cutting the old one, and the
+    // new clip stayed silent until the old mute timer eventually expired.
+    _muteGeneration++;
+    unawaited(_player.setVolume(1.0).catchError((_) {}));
+
+    await _ensurePlayerStarted();
     _playbackQueue.add(bytes);
     _drainPlaybackQueue();
   }
@@ -298,17 +374,34 @@ class AudioStreamingService {
     // the call — the restart raced the very next burst of incoming chunks, openPlayer was
     // re-entered while already open, and every subsequent feed failed silently.
     _playbackQueue.clear();
-    // Gentle cut: the player's internal buffer (~340ms) still holds already-fed audio, and
-    // letting it play out sounded like a wobbly mid-word chop in headphones. Muting the
-    // player silences that tail cleanly (a volume change, not a buffer tear), then volume
-    // is restored once the tail has drained silently — well before the next wanted reply
-    // (~1.5s+ away behind the announcement debounce). The generation counter makes a rapid
-    // second cut extend the mute instead of the first cut's restore unmuting it early.
+    // A carried-over stray byte belonged to the utterance being cut — letting
+    // it prepend to whatever plays next would misalign that unrelated audio.
+    _pendingOddByte = null;
+
+    // How long whatever's already been fed to the player still has left to
+    // sound, BEFORE it gets reset below. Live-call chunks are short (the
+    // ~340ms internal buffer is what the 450ms floor covers), but a one-shot
+    // clip (TTS narration, a voice-preview sample) is fed to the player as
+    // ONE multi-second buffer in a single call — muting for only a fixed
+    // 450ms let its un-played remainder become audible again seconds before
+    // it had actually finished, which sounded like the old clip resuming
+    // and the new one starting on top of it. Mute for at least as long as
+    // there's real audio left to cover, not a flat guess.
+    final now = DateTime.now();
+    final remainingMs = _scheduledPlaybackEndTime.isAfter(now)
+        ? _scheduledPlaybackEndTime.difference(now).inMilliseconds
+        : 0;
+    final muteMs = remainingMs > 450 ? remainingMs + 50 : 450;
+
+    // Gentle cut: muting the player silences the tail cleanly (a volume change, not a
+    // buffer tear), then volume is restored once the tail has drained silently. The
+    // generation counter makes a rapid second cut extend the mute instead of the first
+    // cut's restore unmuting it early.
     final generation = ++_muteGeneration;
     try {
       await _player.setVolume(0);
     } catch (_) {}
-    Future.delayed(const Duration(milliseconds: 450), () async {
+    Future.delayed(Duration(milliseconds: muteMs), () async {
       if (generation != _muteGeneration) return;
       try {
         await _player.setVolume(1.0);

@@ -42,6 +42,11 @@ enum LiveSessionType {
   /// button inside a lab screen), answered directly and briefly — not an
   /// open conversation.
   labAssistant,
+
+  /// The Writing lab's inline "call" button: a live Socratic writing coach
+  /// that sees the learner's current draft and guides them toward the fix
+  /// themselves, never states the correction directly.
+  writingGuide,
 }
 
 class LivePrompts {
@@ -125,6 +130,19 @@ The student tapped a mic button while studying the material in LESSON CONTEXT to
 3. After answering, STOP completely. Never ask a follow-up question, never invite more conversation, never say "anything else?" — the student taps the mic again if they want to ask something else.
 4. If their question is unclear or the audio was unclear, ask them once, briefly, to repeat it — do not guess and answer the wrong question.''';
 
+  /// The Writing lab's inline call button. Same Socratic never-reveal-the-fix
+  /// rule as `LessonAgentService.getWritingHint`'s text hint ladder, but as a
+  /// live back-and-forth: the student can ask questions and keep writing
+  /// between turns, unlike labAssistant's single answer-then-stop.
+  static const _writingGuideRole = '''
+YOUR ROLE: LIVE WRITING GUIDE, NEVER GIVE THE ANSWER:
+The LESSON CONTEXT gives you the writing task and the student's CURRENT DRAFT as of when they opened this call. Your only job is to help them improve their own draft — you are a Socratic coach, not an editor.
+1. NEVER state the corrected sentence, the fixed word, or otherwise hand over the answer, even if asked directly. Redirect: point at the issue, don't solve it.
+2. When reacting to their draft or a question, follow this ladder depending on how stuck they seem: first name only the grammatical CATEGORY of the issue (e.g. "check the verb agreement there"), if they're still stuck narrow to WHERE in the sentence and what KIND of check to do, and only as a last resort ask a leading question that makes the correct form obvious without stating it.
+3. If the draft has nothing worth flagging yet, give one short specific encouragement instead of inventing a problem.
+4. Keep every turn short (one to two sentences), then stop and let them think or keep typing. This is a live call, not a lecture.
+5. If they paste or read out new text partway through the call, treat it as their updated draft and react to that instead of the original.''';
+
   static const _speakingExamRole = '''
 YOUR ROLE: TIMED SPEAKING EXAMINER:
 This is an assessment, not a lesson. The LESSON CONTEXT identifies either a MONOLOGUE task or an INTERACTION task.
@@ -188,6 +206,7 @@ TRIAL RULES: ABSOLUTE:
       LiveSessionType.listeningScene ||
       LiveSessionType.grammarStage => _stageDiscipline,
       LiveSessionType.labAssistant => _labAssistantRole,
+      LiveSessionType.writingGuide => _writingGuideRole,
     };
     final tuning =
         '${TutorTuning.mixPromptLine(languageMix)}\n'

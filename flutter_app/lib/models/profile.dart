@@ -8,6 +8,7 @@ class Profile {
     this.sessionLength = 'standard', // quick | standard | deep
     this.reminderTime,
     this.onboardedAt,
+    this.interests = const [],
   });
 
   final String id;
@@ -16,6 +17,12 @@ class Profile {
   String sessionLength;
   String? reminderTime; // 'HH:mm'
   DateTime? onboardedAt;
+
+  /// Free-pick topics from onboarding's interests step (e.g. "Food",
+  /// "Travel") — used to personalize generated story topics. Empty is
+  /// normal: the question is optional, and pre-existing profiles never
+  /// answered it.
+  List<String> interests;
 
   bool get isOnboarded => onboardedAt != null;
 }

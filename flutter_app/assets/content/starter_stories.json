@@ -1,0 +1,599 @@
+{
+  "stories": [
+    {
+      "id": "starter-borrowed-bike",
+      "title": "Le vélo emprunté",
+      "titleEn": "The borrowed bike",
+      "segments": [
+        {
+          "fr": "Léa habite dans un petit village près de Tours.",
+          "en": "Léa lives in a small village near Tours.",
+          "grammarNote": "The verb 'habiter' takes no preposition before 'dans' when naming where someone lives.",
+          "pronunciationTip": "'Tours' ends in a silent 's', it sounds like 'toor'."
+        },
+        {
+          "fr": "Un matin, elle emprunte le vélo de son frère pour aller au travail.",
+          "en": "One morning, she borrows her brother's bike to go to work.",
+          "grammarNote": "'Emprunter' means 'to borrow', not 'to lend' — that's 'prêter'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Le vélo est trop grand pour elle, mais elle n'a pas le choix.",
+          "en": "The bike is too big for her, but she has no choice.",
+          "grammarNote": "'Trop' before an adjective means 'too', showing excess.",
+          "pronunciationTip": "'Choix' rhymes with English 'swa', the final 'x' is silent."
+        },
+        {
+          "fr": "Sur la route, elle rencontre sa voisine qui rit en la voyant.",
+          "en": "On the road, she meets her neighbour, who laughs when she sees her.",
+          "grammarNote": "'En + present participle' ('en la voyant') expresses 'while doing something'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Léa arrive au travail en retard, mais de bonne humeur.",
+          "en": "Léa arrives at work late, but in a good mood.",
+          "grammarNote": "'En retard' is the fixed phrase for 'late'; never 'tard' alone here.",
+          "pronunciationTip": "'Humeur' has a nasal-free 'eu' sound, like the vowel in 'peur'."
+        },
+        {
+          "fr": "Le soir, elle achète son propre vélo, à sa taille.",
+          "en": "In the evening, she buys her own bike, her size.",
+          "grammarNote": "'Propre' before a noun means 'own'; after a noun it means 'clean'.",
+          "pronunciationTip": ""
+        }
+      ],
+      "quiz": [
+        {
+          "q": "Why does Léa borrow her brother's bike?",
+          "choices": [
+            "To go to work",
+            "To visit her neighbour",
+            "To sell it"
+          ],
+          "answerIndex": 0
+        },
+        {
+          "q": "What problem does Léa have with the bike?",
+          "choices": [
+            "It has a flat tire",
+            "It is too big for her",
+            "It is broken"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "Who does Léa meet on the road?",
+          "choices": [
+            "Her brother",
+            "Her boss",
+            "Her neighbour"
+          ],
+          "answerIndex": 2
+        },
+        {
+          "q": "What does Léa do that evening?",
+          "choices": [
+            "She returns the bike",
+            "She buys her own bike",
+            "She walks to work instead"
+          ],
+          "answerIndex": 1
+        }
+      ],
+      "keywords": [
+        {
+          "id": "kw1",
+          "fr": "emprunter",
+          "en": "to borrow",
+          "phonetic": "ahm-prun-TAY"
+        },
+        {
+          "id": "kw2",
+          "fr": "le vélo",
+          "en": "the bike",
+          "phonetic": "vay-LOH"
+        },
+        {
+          "id": "kw3",
+          "fr": "en retard",
+          "en": "late",
+          "phonetic": "ahn ruh-TAR"
+        },
+        {
+          "id": "kw4",
+          "fr": "la voisine",
+          "en": "the neighbour (female)",
+          "phonetic": "vwah-ZEEN"
+        },
+        {
+          "id": "kw5",
+          "fr": "de bonne humeur",
+          "en": "in a good mood",
+          "phonetic": "duh bun oo-MUR"
+        },
+        {
+          "id": "kw6",
+          "fr": "propre",
+          "en": "own / clean",
+          "phonetic": "PROH-pruh"
+        }
+      ]
+    },
+    {
+      "id": "starter-surprise-rain",
+      "title": "La pluie surprise",
+      "titleEn": "The surprise rain",
+      "segments": [
+        {
+          "fr": "Marc sort de chez lui sans regarder le ciel.",
+          "en": "Marc leaves his house without looking at the sky.",
+          "grammarNote": "'Sans + infinitive' means 'without doing something'.",
+          "pronunciationTip": "'Ciel' sounds like 'syel', the 'c' is soft before 'i'."
+        },
+        {
+          "fr": "Après dix minutes de marche, il commence à pleuvoir très fort.",
+          "en": "After ten minutes of walking, it starts to rain very hard.",
+          "grammarNote": "'Commencer à' + infinitive introduces the start of an action.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Marc n'a pas de parapluie, alors il court vers un café.",
+          "en": "Marc doesn't have an umbrella, so he runs toward a café.",
+          "grammarNote": "'Alors' links a cause to its result, like 'so' in English.",
+          "pronunciationTip": "'Parapluie' stresses the last syllable, 'plwee'."
+        },
+        {
+          "fr": "À l'intérieur, il commande un chocolat chaud pour se réchauffer.",
+          "en": "Inside, he orders a hot chocolate to warm himself up.",
+          "grammarNote": "'Se réchauffer' is reflexive: the action returns to the subject.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Une femme assise près de lui lui prête son parapluie.",
+          "en": "A woman sitting near him lends him her umbrella.",
+          "grammarNote": "'Prêter' means 'to lend'; the opposite of 'emprunter'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Marc la remercie chaleureusement et rentre chez lui au sec.",
+          "en": "Marc thanks her warmly and gets home dry.",
+          "grammarNote": "'Au sec' is a fixed expression meaning 'staying dry'.",
+          "pronunciationTip": "'Chaleureusement' is long, break it into 'sha-luh-ruh-zuh-mahn'."
+        }
+      ],
+      "quiz": [
+        {
+          "q": "Why does Marc get caught in the rain?",
+          "choices": [
+            "He left without checking the sky",
+            "He lost his umbrella",
+            "He was late for work"
+          ],
+          "answerIndex": 0
+        },
+        {
+          "q": "Where does Marc go to escape the rain?",
+          "choices": [
+            "A café",
+            "His office",
+            "A friend's house"
+          ],
+          "answerIndex": 0
+        },
+        {
+          "q": "What does Marc order inside?",
+          "choices": [
+            "A coffee",
+            "A hot chocolate",
+            "A tea"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "How does Marc get home dry?",
+          "choices": [
+            "He waits for the rain to stop",
+            "A woman lends him her umbrella",
+            "He calls a taxi"
+          ],
+          "answerIndex": 1
+        }
+      ],
+      "keywords": [
+        {
+          "id": "kw1",
+          "fr": "pleuvoir",
+          "en": "to rain",
+          "phonetic": "pluh-VWAHR"
+        },
+        {
+          "id": "kw2",
+          "fr": "le parapluie",
+          "en": "the umbrella",
+          "phonetic": "pah-rah-PLWEE"
+        },
+        {
+          "id": "kw3",
+          "fr": "se réchauffer",
+          "en": "to warm oneself up",
+          "phonetic": "suh ray-shoh-FAY"
+        },
+        {
+          "id": "kw4",
+          "fr": "prêter",
+          "en": "to lend",
+          "phonetic": "pray-TAY"
+        },
+        {
+          "id": "kw5",
+          "fr": "remercier",
+          "en": "to thank",
+          "phonetic": "ruh-mair-see-AY"
+        },
+        {
+          "id": "kw6",
+          "fr": "au sec",
+          "en": "staying dry",
+          "phonetic": "oh SEK"
+        }
+      ]
+    },
+    {
+      "id": "starter-birthday-cake",
+      "title": "Le gâteau d'anniversaire",
+      "titleEn": "The birthday cake",
+      "segments": [
+        {
+          "fr": "C'est l'anniversaire de Sophie, et sa mère prépare un gâteau.",
+          "en": "It's Sophie's birthday, and her mother is making a cake.",
+          "grammarNote": "'C'est' introduces a fact or situation, very common in spoken French.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Elle suit une vieille recette écrite par sa grand-mère.",
+          "en": "She follows an old recipe written by her grandmother.",
+          "grammarNote": "'Écrite' agrees in gender with 'recette' (feminine).",
+          "pronunciationTip": "'Grand-mère' links smoothly, sounds like 'grahn-mair'."
+        },
+        {
+          "fr": "Malheureusement, elle oublie le sucre dans la pâte.",
+          "en": "Unfortunately, she forgets the sugar in the batter.",
+          "grammarNote": "'Malheureusement' is an adverb built from 'malheureux' + '-ment'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Le gâteau sort du four, mais il n'est pas du tout sucré.",
+          "en": "The cake comes out of the oven, but it isn't sweet at all.",
+          "grammarNote": "'Pas du tout' strongly negates, stronger than plain 'pas'.",
+          "pronunciationTip": "'Four' rhymes with English 'poor', not 'flour'."
+        },
+        {
+          "fr": "Sophie rit et décide d'ajouter beaucoup de glaçage.",
+          "en": "Sophie laughs and decides to add lots of icing.",
+          "grammarNote": "'Décider de' + infinitive is how 'to decide to' is formed.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Finalement, tout le monde adore ce gâteau un peu spécial.",
+          "en": "In the end, everyone loves this slightly special cake.",
+          "grammarNote": "'Tout le monde' is singular in French even though it means 'everyone'.",
+          "pronunciationTip": ""
+        }
+      ],
+      "quiz": [
+        {
+          "q": "What is Sophie's mother making?",
+          "choices": [
+            "A birthday cake",
+            "A birthday card",
+            "A birthday gift"
+          ],
+          "answerIndex": 0
+        },
+        {
+          "q": "Whose recipe does she follow?",
+          "choices": [
+            "A cookbook's",
+            "Her grandmother's",
+            "A friend's"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "What mistake does she make?",
+          "choices": [
+            "She burns the cake",
+            "She forgets the sugar",
+            "She forgets the eggs"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "How does Sophie fix the cake?",
+          "choices": [
+            "She bakes a new one",
+            "She adds lots of icing",
+            "She adds fruit"
+          ],
+          "answerIndex": 1
+        }
+      ],
+      "keywords": [
+        {
+          "id": "kw1",
+          "fr": "le gâteau",
+          "en": "the cake",
+          "phonetic": "gah-TOH"
+        },
+        {
+          "id": "kw2",
+          "fr": "la recette",
+          "en": "the recipe",
+          "phonetic": "ruh-SET"
+        },
+        {
+          "id": "kw3",
+          "fr": "oublier",
+          "en": "to forget",
+          "phonetic": "oo-blee-AY"
+        },
+        {
+          "id": "kw4",
+          "fr": "le sucre",
+          "en": "the sugar",
+          "phonetic": "SOO-kruh"
+        },
+        {
+          "id": "kw5",
+          "fr": "le glaçage",
+          "en": "the icing",
+          "phonetic": "glah-SAHZH"
+        },
+        {
+          "id": "kw6",
+          "fr": "adorer",
+          "en": "to love",
+          "phonetic": "ah-doh-RAY"
+        }
+      ]
+    },
+    {
+      "id": "starter-late-train",
+      "title": "Le train en retard",
+      "titleEn": "The late train",
+      "segments": [
+        {
+          "fr": "Amadou attend son train sur le quai de la gare.",
+          "en": "Amadou is waiting for his train on the station platform.",
+          "grammarNote": "'Attendre' means 'to wait for' and needs no extra preposition.",
+          "pronunciationTip": "'Quai' sounds like English 'kay'."
+        },
+        {
+          "fr": "Une annonce dit que le train a vingt minutes de retard.",
+          "en": "An announcement says the train is twenty minutes late.",
+          "grammarNote": "'Avoir du retard' is how French expresses being late for transport.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Amadou décide d'acheter un café pour patienter.",
+          "en": "Amadou decides to buy a coffee to pass the time.",
+          "grammarNote": "'Patienter' means 'to wait patiently', a bit formal.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Il discute avec un autre voyageur qui va dans la même ville.",
+          "en": "He chats with another traveller who is going to the same city.",
+          "grammarNote": "'Même' before a noun means 'same'; after it means 'itself'.",
+          "pronunciationTip": "'Voyageur' has three syllables: vwah-yah-JUR."
+        },
+        {
+          "fr": "Le train arrive enfin, et tout le monde monte rapidement.",
+          "en": "The train finally arrives, and everyone gets on quickly.",
+          "grammarNote": "'Enfin' means 'finally', showing relief after waiting.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Amadou et son nouvel ami s'assoient ensemble pendant le trajet.",
+          "en": "Amadou and his new friend sit together during the trip.",
+          "grammarNote": "'S'asseoir' is reflexive and irregular; 's'assoient' is its 'ils/elles' form.",
+          "pronunciationTip": ""
+        }
+      ],
+      "quiz": [
+        {
+          "q": "Where is Amadou waiting?",
+          "choices": [
+            "At a bus stop",
+            "On the train platform",
+            "At the airport"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "How late is the train?",
+          "choices": [
+            "Ten minutes",
+            "Twenty minutes",
+            "One hour"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "What does Amadou buy while waiting?",
+          "choices": [
+            "A newspaper",
+            "A coffee",
+            "A ticket"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "What happens on the train?",
+          "choices": [
+            "He falls asleep",
+            "He sits with his new friend",
+            "He misses his stop"
+          ],
+          "answerIndex": 1
+        }
+      ],
+      "keywords": [
+        {
+          "id": "kw1",
+          "fr": "le quai",
+          "en": "the platform",
+          "phonetic": "KAY"
+        },
+        {
+          "id": "kw2",
+          "fr": "avoir du retard",
+          "en": "to be late (transport)",
+          "phonetic": "av-wahr doo ruh-TAR"
+        },
+        {
+          "id": "kw3",
+          "fr": "patienter",
+          "en": "to wait patiently",
+          "phonetic": "pah-syahn-TAY"
+        },
+        {
+          "id": "kw4",
+          "fr": "le voyageur",
+          "en": "the traveller",
+          "phonetic": "vwah-yah-JUR"
+        },
+        {
+          "id": "kw5",
+          "fr": "enfin",
+          "en": "finally",
+          "phonetic": "ahn-FAN"
+        },
+        {
+          "id": "kw6",
+          "fr": "le trajet",
+          "en": "the trip / journey",
+          "phonetic": "trah-ZHEH"
+        }
+      ]
+    },
+    {
+      "id": "starter-new-neighbour",
+      "title": "Le nouveau voisin",
+      "titleEn": "The new neighbour",
+      "segments": [
+        {
+          "fr": "Un nouveau voisin emménage dans l'appartement d'à côté.",
+          "en": "A new neighbour is moving into the apartment next door.",
+          "grammarNote": "'Emménager' means 'to move in'; 'déménager' means 'to move out'.",
+          "pronunciationTip": "'Emménage' and 'déménage' sound almost identical, listen for the first syllable."
+        },
+        {
+          "fr": "Il porte des boîtes toute la journée sans s'arrêter.",
+          "en": "He carries boxes all day long without stopping.",
+          "grammarNote": "'Sans s'arrêter' uses a reflexive infinitive after 'sans'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Le soir, il joue de la guitare, un peu trop fort.",
+          "en": "In the evening, he plays the guitar, a bit too loudly.",
+          "grammarNote": "'Jouer de' is used for musical instruments; 'jouer à' for games and sports.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Sa voisine frappe à la porte pour se plaindre poliment.",
+          "en": "His neighbour knocks on the door to complain politely.",
+          "grammarNote": "'Se plaindre' is reflexive and means 'to complain'.",
+          "pronunciationTip": "'Frappe' has a crisp, short 'a' sound."
+        },
+        {
+          "fr": "Le nouveau voisin s'excuse et lui offre une part de pizza.",
+          "en": "The new neighbour apologizes and offers her a slice of pizza.",
+          "grammarNote": "'S'excuser' is reflexive: literally 'to excuse oneself'.",
+          "pronunciationTip": ""
+        },
+        {
+          "fr": "Depuis ce jour-là, ils sont devenus de bons amis.",
+          "en": "Since that day, they have become good friends.",
+          "grammarNote": "'Depuis' + a point in time means 'since', showing a lasting result.",
+          "pronunciationTip": ""
+        }
+      ],
+      "quiz": [
+        {
+          "q": "What is the new neighbour doing all day?",
+          "choices": [
+            "Painting the walls",
+            "Carrying boxes",
+            "Cleaning the hallway"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "What does he do in the evening that bothers her?",
+          "choices": [
+            "He plays loud music on speakers",
+            "He plays the guitar loudly",
+            "He watches TV loudly"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "Why does the neighbour knock on his door?",
+          "choices": [
+            "To welcome him",
+            "To complain politely",
+            "To borrow sugar"
+          ],
+          "answerIndex": 1
+        },
+        {
+          "q": "How does the story end?",
+          "choices": [
+            "They stay strangers",
+            "They argue",
+            "They become good friends"
+          ],
+          "answerIndex": 2
+        }
+      ],
+      "keywords": [
+        {
+          "id": "kw1",
+          "fr": "emménager",
+          "en": "to move in",
+          "phonetic": "ahn-may-nah-ZHAY"
+        },
+        {
+          "id": "kw2",
+          "fr": "la boîte",
+          "en": "the box",
+          "phonetic": "BWAHT"
+        },
+        {
+          "id": "kw3",
+          "fr": "jouer de la guitare",
+          "en": "to play the guitar",
+          "phonetic": "zhoo-AY duh lah gee-TAR"
+        },
+        {
+          "id": "kw4",
+          "fr": "se plaindre",
+          "en": "to complain",
+          "phonetic": "suh PLAN-druh"
+        },
+        {
+          "id": "kw5",
+          "fr": "s'excuser",
+          "en": "to apologize",
+          "phonetic": "sex-koo-ZAY"
+        },
+        {
+          "id": "kw6",
+          "fr": "devenir amis",
+          "en": "to become friends",
+          "phonetic": "duhv-neer ah-MEE"
+        }
+      ]
+    }
+  ]
+}

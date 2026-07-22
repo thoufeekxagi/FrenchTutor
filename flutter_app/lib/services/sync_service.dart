@@ -6,6 +6,7 @@ import 'package:sqlite3/common.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/database/pilot_infrastructure_store.dart';
+import '../models/content_models.dart';
 import '../models/daily_session.dart';
 import '../models/profile.dart';
 import '../models/srs_state.dart';
@@ -126,22 +127,63 @@ class SyncService {
   // ---------------------------------------------------------------------------
 
   Future<void> syncDailySession(DailySession session) => _guarded((uid) async {
-    await _client.from('daily_session_state').upsert({
-      'id': session.id,
+    // The table's real uniqueness constraint is (user_id, local_date), not
+    // just `id` — a new local DailySession row (a fresh client-generated id,
+    // e.g. when the rotation planner regenerates today's plan) for a date
+    // that already has a synced row was hitting that constraint as a 23505
+    // conflict instead of updating it, since upsert() only dedupes against
+    // the column set you give it (the primary key, `id`, by default).
+    await _client
+        .from('daily_session_state')
+        .upsert({
+          'id': session.id,
+          'user_id': uid,
+          'local_date': session.localDate,
+          'planned_length': session.plannedLength,
+          'current_stage': session.currentStage?.name,
+          'current_item_index': session.currentItemIndex,
+          'stages_json': session.stagesToJson(),
+          'vocab_entry_ids_json': session.vocabEntryIds,
+          'grammar_lesson_id': session.grammarLessonId,
+          'reading_passage_json': session.readingPassageJson,
+          'started_at': session.startedAt?.toUtc().toIso8601String(),
+          'completed_at': session.completedAt?.toUtc().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        }, onConflict: 'user_id,local_date');
+  }, queueTable: 'daily_sessions', queueRowId: session.id);
+
+  // ---------------------------------------------------------------------------
+  // Generated story library
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncGeneratedStory(GeneratedStory story) => _guarded((uid) async {
+    await _client.from('generated_stories').upsert({
+      'id': story.id,
       'user_id': uid,
-      'local_date': session.localDate,
-      'planned_length': session.plannedLength,
-      'current_stage': session.currentStage?.name,
-      'current_item_index': session.currentItemIndex,
-      'stages_json': session.stagesToJson(),
-      'vocab_entry_ids_json': session.vocabEntryIds,
-      'grammar_lesson_id': session.grammarLessonId,
-      'reading_passage_json': session.readingPassageJson,
-      'started_at': session.startedAt?.toUtc().toIso8601String(),
-      'completed_at': session.completedAt?.toUtc().toIso8601String(),
+      'title': story.title,
+      'passage_json': story.passage.toJson(),
+      'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
+      'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
+      'created_at': story.createdAt.toUtc().toIso8601String(),
       'updated_at': DateTime.now().toUtc().toIso8601String(),
     });
-  }, queueTable: 'daily_sessions', queueRowId: session.id);
+  }, queueTable: 'generated_stories', queueRowId: story.id);
+
+  // ---------------------------------------------------------------------------
+  // Generated roleplay library
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncGeneratedRoleplay(GeneratedRoleplay roleplay) =>
+      _guarded((uid) async {
+        await _client.from('generated_roleplays').upsert({
+          'id': roleplay.id,
+          'user_id': uid,
+          'title': roleplay.title,
+          'passage_json': roleplay.passage.toJson(),
+          'created_at': roleplay.createdAt.toUtc().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        });
+      }, queueTable: 'generated_roleplays', queueRowId: roleplay.id);
 
   Future<void> syncAiSessionStart({
     required String id,
@@ -584,7 +626,57 @@ class SyncService {
       _hydrateLessonProgress(uid),
       _hydrateMistakeTags(uid),
       _hydrateEvents(uid),
+      _hydrateEntitlements(uid),
+      _hydrateGeneratedStories(uid),
+      _hydrateGeneratedRoleplays(uid),
     ]);
+  }
+
+  // Pulls the subscription flags the revenuecat-webhook edge function (and
+  // redeem_subscription_invite_code RPC) write onto `profiles` into the local
+  // `entitlements` table, so PilotAccessService's synchronous, offline-first
+  // snapshot() reflects real subscription state instead of only ever seeing
+  // the founding_access/localPreview default. subscription_active is treated
+  // as advisory, not authoritative: an invite-code grant has no server job
+  // that flips the flag back off once subscription_expires_at passes (unlike
+  // RevenueCat cancellations, which the webhook handles), so expiry is always
+  // re-checked against wall-clock time here too.
+  Future<void> _hydrateEntitlements(String uid) async {
+    final row = await _client
+        .from('profiles')
+        .select('subscription_active, subscription_product_id, subscription_expires_at')
+        .eq('id', uid)
+        .maybeSingle();
+    if (row == null) return;
+
+    final expiresAtRaw = row['subscription_expires_at'] as String?;
+    final expiresAt = expiresAtRaw != null ? DateTime.tryParse(expiresAtRaw) : null;
+    final notExpired = expiresAt == null || expiresAt.isAfter(DateTime.now().toUtc());
+    final isActive = (row['subscription_active'] as bool? ?? false) && notExpired;
+    final status = isActive ? 'active' : 'inactive';
+    final productId = (row['subscription_product_id'] as String?) ?? 'none';
+
+    final existing = _db.select(
+      'SELECT status, product_id, expires_at FROM entitlements '
+      "WHERE source = 'supabase_subscription' "
+      'ORDER BY verified_at DESC, updated_at DESC LIMIT 1',
+    );
+    if (existing.isNotEmpty) {
+      final e = existing.first;
+      if (e['status'] == status &&
+          e['product_id'] == productId &&
+          e['expires_at'] == expiresAtRaw) {
+        return; // Unchanged since last hydration — skip the redundant insert.
+      }
+    }
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''INSERT INTO entitlements
+         (id, user_id, product_id, status, source, expires_at, verified_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, 'supabase_subscription', ?, ?, ?, ?)''',
+      ['${uid}_subscription_$now', uid, productId, status, expiresAtRaw, now, now, now],
+    );
   }
 
   Future<void> _hydrateVocabCards(String uid) async {
@@ -663,6 +755,66 @@ class SyncService {
           r['started_at'],
           r['completed_at'],
           r['updated_at'],
+          r['updated_at'],
+        ],
+      );
+    }
+  }
+
+  Future<void> _hydrateGeneratedStories(String uid) async {
+    final rows = await _client
+        .from('generated_stories')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO generated_stories
+          (id, title, passage_json, quiz_json, keywords_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          title = excluded.title,
+          passage_json = excluded.passage_json,
+          quiz_json = excluded.quiz_json,
+          keywords_json = excluded.keywords_json,
+          updated_at = excluded.updated_at
+        WHERE excluded.updated_at > generated_stories.updated_at
+        ''',
+        [
+          r['id'],
+          r['title'],
+          _jsonOf(r['passage_json']),
+          _jsonOf(r['quiz_json']),
+          _jsonOf(r['keywords_json']),
+          r['created_at'],
+          r['updated_at'],
+        ],
+      );
+    }
+  }
+
+  Future<void> _hydrateGeneratedRoleplays(String uid) async {
+    final rows = await _client
+        .from('generated_roleplays')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO generated_roleplays
+          (id, title, passage_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          title = excluded.title,
+          passage_json = excluded.passage_json,
+          updated_at = excluded.updated_at
+        WHERE excluded.updated_at > generated_roleplays.updated_at
+        ''',
+        [
+          r['id'],
+          r['title'],
+          _jsonOf(r['passage_json']),
+          r['created_at'],
           r['updated_at'],
         ],
       );
