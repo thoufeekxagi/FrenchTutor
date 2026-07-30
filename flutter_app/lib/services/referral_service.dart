@@ -140,4 +140,24 @@ class ReferralService {
       // Best-effort — see doc comment above.
     }
   }
+
+  /// A premium learner who's hit the 2-hour daily voice cap can self-grant one
+  /// extra free hour, once per calendar day — the `grant_daily_extra_hour`
+  /// Postgres RPC enforces the once-per-day rule server-side (checked against
+  /// `learner_events`, which doubles as the audit log an admin can query) and
+  /// adds straight onto the same `bonus_seconds_balance` referral bonuses use,
+  /// so it's immediately usable, no waiting on a reply.
+  Future<bool> grantDailyExtraHour() async {
+    try {
+      final result = await _client.rpc('grant_daily_extra_hour');
+      final map = result as Map<String, dynamic>;
+      if (map['success'] == true) {
+        await refreshBonusBalance();
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
 }

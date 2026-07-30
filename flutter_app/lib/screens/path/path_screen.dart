@@ -83,92 +83,108 @@ class _PathScreenState extends ConsumerState<PathScreen> {
       backgroundColor: Passeport.parchment,
       body: SafeArea(
         child: PSContentColumn(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Your French map', style: Passeport.display(30)),
-              const SizedBox(height: 5),
-              Text(
-                'Explore the words you have practiced and how they connect.',
-                style: Passeport.body(
-                  14.5,
-                ).copyWith(color: Passeport.slateDim, height: 1.4),
+              // Fixed header: the fingerprint canvas stays put as the page
+              // scrolls — only its own contents pan/zoom, never the frame.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your French fingerprint', style: Passeport.display(28)),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Shaped by how you practice.',
+                      style: Passeport.body(
+                        14.5,
+                      ).copyWith(color: Passeport.slateDim, height: 1.4),
+                    ),
+                    const SizedBox(height: 18),
+                    FingerprintView(
+                      store: ref.watch(learningStoreProvider),
+                      content: ref.watch(contentServiceProvider),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 22),
-              LearningGraphView(
-                store: ref.watch(learningStoreProvider),
-                content: ref.watch(contentServiceProvider),
-              ),
-              const SizedBox(height: 32),
-              Text('Curriculum path', style: Passeport.display(22)),
-              const SizedBox(height: 12),
-              if (framework == null)
-                const _EmptyPath()
-              else ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Passeport.infoSoft,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        CupertinoIcons.sparkles,
-                        color: Passeport.sky,
-                        size: 21,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Every skill moves from New to Building to Ready as you practice. Tap a level to expand it.',
-                          style: Passeport.body(
-                            13,
-                          ).copyWith(color: Passeport.inkSoft, height: 1.4),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+                  children: [
+                    Text('Curriculum path', style: Passeport.display(22)),
+                    const SizedBox(height: 12),
+                    if (framework == null)
+                      const _EmptyPath()
+                    else ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Passeport.infoSoft,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              CupertinoIcons.sparkles,
+                              color: Passeport.sky,
+                              size: 21,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Every skill moves from New to Building to Ready as you practice. Tap a level to expand it.',
+                                style: Passeport.body(
+                                  13,
+                                ).copyWith(color: Passeport.inkSoft, height: 1.4),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      const SizedBox(height: 26),
+                      for (final band in _bands(framework.competencies)) ...[
+                        _BandHeader(
+                          band: band,
+                          count: framework.competencies
+                              .where((item) => item.difficultyBand == band)
+                              .length,
+                          readyCount: framework.competencies
+                              .where((item) => item.difficultyBand == band)
+                              .where(
+                                (item) =>
+                                    _tierFor(bestStateByCompetency[item.id]) ==
+                                    _MasteryTier.ready,
+                              )
+                              .length,
+                          expanded: _expandedBands!.contains(band),
+                          onToggle: () => setState(() {
+                            final expanded = _expandedBands!;
+                            if (!expanded.remove(band)) expanded.add(band);
+                          }),
+                        ),
+                        if (_expandedBands!.contains(band)) ...[
+                          const SizedBox(height: 10),
+                          for (final competency in framework.competencies.where(
+                            (item) => item.difficultyBand == band,
+                          ))
+                            _CompetencyNode(
+                              competency: competency,
+                              titleById: {
+                                for (final item in framework.competencies)
+                                  item.id: item.title,
+                              },
+                              tier: _tierFor(bestStateByCompetency[competency.id]),
+                            ),
+                        ],
+                        const SizedBox(height: 16),
+                      ],
                     ],
-                  ),
-                ),
-                const SizedBox(height: 26),
-                for (final band in _bands(framework.competencies)) ...[
-                  _BandHeader(
-                    band: band,
-                    count: framework.competencies
-                        .where((item) => item.difficultyBand == band)
-                        .length,
-                    readyCount: framework.competencies
-                        .where((item) => item.difficultyBand == band)
-                        .where(
-                          (item) =>
-                              _tierFor(bestStateByCompetency[item.id]) ==
-                              _MasteryTier.ready,
-                        )
-                        .length,
-                    expanded: _expandedBands!.contains(band),
-                    onToggle: () => setState(() {
-                      final expanded = _expandedBands!;
-                      if (!expanded.remove(band)) expanded.add(band);
-                    }),
-                  ),
-                  if (_expandedBands!.contains(band)) ...[
-                    const SizedBox(height: 10),
-                    for (final competency in framework.competencies.where(
-                      (item) => item.difficultyBand == band,
-                    ))
-                      _CompetencyNode(
-                        competency: competency,
-                        titleById: {
-                          for (final item in framework.competencies)
-                            item.id: item.title,
-                        },
-                        tier: _tierFor(bestStateByCompetency[competency.id]),
-                      ),
                   ],
-                  const SizedBox(height: 16),
-                ],
-              ],
+                ),
+              ),
             ],
           ),
         ),

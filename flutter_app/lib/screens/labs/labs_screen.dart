@@ -7,6 +7,7 @@ import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../subscription/paywall_screen.dart';
+import '../pathway/vocab_picker_screen.dart';
 import 'connectors_lab_screen.dart';
 import 'grammar_lab_screen.dart';
 import 'listening_lab_screen.dart';
@@ -20,7 +21,11 @@ class LabsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gate = ref.read(subscriptionGateServiceProvider);
+    // Must be watch, not read — this decides every lock badge on this
+    // screen, and a purchase invalidates this provider precisely so this
+    // rebuilds with fresh lock state instead of showing what was true when
+    // the tab was first opened.
+    final gate = ref.watch(subscriptionGateServiceProvider);
     return Scaffold(
       backgroundColor: DesignTokens.parchment,
       body: SafeArea(
@@ -56,13 +61,24 @@ class LabsScreen extends ConsumerWidget {
                         ),
                       ),
                       _LabTile(
-                        icon: CupertinoIcons.square_stack_3d_up,
+                        icon: CupertinoIcons.mic_fill,
                         title: 'Vocabulary',
-                        subtitle: 'Flashcards & spaced repetition',
+                        subtitle: 'Auto-pick or choose words, practice live with Marie',
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
                           locked: gate.isLabLocked('vocabulary'),
+                          builder: (_) => const VocabPickerScreen(),
+                        ),
+                      ),
+                      _LabTile(
+                        icon: CupertinoIcons.square_stack_3d_up,
+                        title: 'Flashcards',
+                        subtitle: 'Browse by category, spaced repetition',
+                        locked: gate.isLabLocked('flashcards'),
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('flashcards'),
                           builder: (_) => const VocabLabScreen(),
                         ),
                       ),

@@ -507,6 +507,34 @@ class LearningStore {
     return rows.first['s'] as int;
   }
 
+  /// Every learner turn ever spoken/typed across roleplay, speaking, and
+  /// pronunciation sessions (they all share `SessionScreen` and write here) —
+  /// the raw material for spotting which words a learner actually *used*,
+  /// not just reviewed as a flashcard.
+  List<String> spokenSessionTexts() {
+    final rows = _db.select(
+      "SELECT transcript_json FROM ai_sessions WHERE transcript_json IS NOT NULL AND deleted_at IS NULL",
+    );
+    final texts = <String>[];
+    for (final row in rows) {
+      final raw = row['transcript_json'] as String?;
+      if (raw == null || raw.isEmpty) continue;
+      try {
+        final turns = jsonDecode(raw) as List<dynamic>;
+        for (final turn in turns) {
+          final map = turn as Map<String, dynamic>;
+          if (map['role'] == 'user') {
+            final content = map['content'] as String?;
+            if (content != null && content.isNotEmpty) texts.add(content);
+          }
+        }
+      } catch (_) {
+        // Malformed/legacy transcript — skip rather than crash the map.
+      }
+    }
+    return texts;
+  }
+
   // --- Lesson progress ---
 
   LessonProgress lessonStatus(String lessonId) {

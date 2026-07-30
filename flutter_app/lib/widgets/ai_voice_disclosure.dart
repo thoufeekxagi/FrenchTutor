@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/theme.dart';
+import '../screens/onboarding/ai_consent_screen.dart';
 
-/// Apple Guideline 5.1.2(i) requires explicit, named, upfront consent before
-/// any personal data (here: microphone audio) leaves the device to a
-/// third-party AI processor — not consent buried in a general Terms of
-/// Service. This gate shows that disclosure once, the first time the user
-/// is about to start a live voice call, before the microphone ever opens.
+/// By the time any screen reaches this call, [AiConsentScreen] has already
+/// gated the whole app on the same consent flag, so in practice this is a
+/// no-op safety net (kept in case a future screen is reachable before that
+/// gate is re-checked). If it ever does need to ask, it uses the exact same
+/// plain-language copy and the exact same key as the app-level screen.
 class AiVoiceDisclosure {
   AiVoiceDisclosure._();
 
-  static const _prefsKey = 'ai_voice_disclosure_accepted_v1';
+  static const _prefsKey = AiConsentScreen.prefsKey;
 
   /// Returns true once the user has accepted (now, or on a previous call).
   /// Returns false if they decline — callers must not open the microphone
@@ -29,12 +30,8 @@ class AiVoiceDisclosure {
         child: AlertDialog(
           title: const Text('Before you talk to your tutor'),
           content: const Text(
-            'To have a live conversation, your voice is streamed to '
-            "Google's Gemini AI, which powers your tutor's spoken replies "
-            'and reviews your practice. Your written answers and progress '
-            'may also be sent to Gemini to personalize your lessons.\n\n'
-            "We never sell your data. See parlesprint.com/privacy for the "
-            'full privacy policy.',
+            'What you say and write is sent to Google to power your AI '
+            "tutor and give you feedback. We don't sell your data.",
           ),
           actions: [
             TextButton(

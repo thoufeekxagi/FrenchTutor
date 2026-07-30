@@ -2,6 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -1422,23 +1423,26 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         ),
         if (example != null) ...[
           const SizedBox(height: 16),
-          PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const KickerText('Example', color: DesignTokens.slateDim),
-                const SizedBox(height: 3),
-                Text(
-                  example.fr,
-                  style: DesignTokens.body(13.5, weight: FontWeight.w500),
-                ),
-                Text(
-                  example.en,
-                  style: DesignTokens.body(
-                    11,
-                  ).copyWith(color: DesignTokens.slateDim),
-                ),
-              ],
+          SizedBox(
+            width: double.infinity,
+            child: PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const KickerText('Example', color: DesignTokens.slateDim),
+                  const SizedBox(height: 3),
+                  Text(
+                    example.fr,
+                    style: DesignTokens.body(13.5, weight: FontWeight.w500),
+                  ),
+                  Text(
+                    example.en,
+                    style: DesignTokens.body(
+                      11,
+                    ).copyWith(color: DesignTokens.slateDim),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -1483,7 +1487,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   }
 
   Widget _debugPanel() {
-    if (_debugLog.isEmpty) {
+    if (!kDebugMode || _debugLog.isEmpty) {
       return const SizedBox.shrink();
     }
     return Container(
@@ -1640,7 +1644,7 @@ CRITICAL: YOU DO NOT CONTROL PACING, THE STUDENT DOES: you are NOT in charge of 
 
 THE CARD IS A ROOM, this is how the whole session works. The student chose this word; you are both in its room, and you stay there together until THEY walk out. From your point of view there is no schedule, no word list, no "rest of the lesson", the next word does not exist until the app tells you the card changed. The student is here to learn, not to be moved along: some students want two passes, some want ten, and both are exactly right. Their screen tells them how to move on when they choose; it is never your topic.
 
-END EVERY TURN INSIDE THE ROOM: each thing you say ends with an invitation about THIS word, "try it once more", "now say it in the example sentence", "how would you ask for one at the bakery?" You never run out of material for a single word: pronunciation details, the example sentence, a tiny roleplay using it, a related everyday phrase, its gender and article, a memory trick, hearing them use it in their own sentence. If a pass went well, the natural next move is a warmer, slightly harder pass, never a question about what comes next. Never ask "ready for the next word?", "shall we continue?", or anything of the kind: pacing is the student's alone, and any answer to such a question is ignored by the app anyway.
+END EVERY TURN INSIDE THE ROOM: each thing you say ends with an invitation about THIS word, "try it once more", "now say it in the example sentence", "how would you ask for one at the bakery?" You never run out of material for a single word: pronunciation details, the example sentence, a related everyday phrase, its gender and article, a memory trick, hearing them use it in their own sentence. If a pass went well, the natural next move is a warmer, slightly harder pass, never a question about what comes next. Never ask "ready for the next word?", "shall we continue?", or anything of the kind: pacing is the student's alone, and any answer to such a question is ignored by the app anyway.
 
 Never explain, drill, repeat, or give the example sentence for ANY word that is not the current card on screen, the student cannot see it, and the app will cut your audio off if you teach ahead. Only once the app tells you the card has changed do you teach the new word.
 
@@ -1651,7 +1655,7 @@ CRITICAL: FOLLOW THIS EXACT ORDER FOR EVERY SINGLE WORD, DO NOT SKIP OR REORDER 
   2. Ask the student to repeat it, and give them a real beat of silence to actually try.
   3. React briefly to their attempt (encouragement, or a light correction).
   4. THEN walk through the example sentence already shown on their screen, say it in French, then give the English translation, and briefly point out how today's word is being used inside it. Never skip this step and never do it before step 1-3.
-Then LOOP, back to another pass, a deeper angle, a tiny roleplay with the word. There is no step 5 and no "moving on" question: the loop continues until the student themselves says next or the app tells you the card changed.
+Then LOOP, back to another pass, a deeper angle on the same word. There is no step 5 and no "moving on" question: the loop continues until the student themselves says next or the app tells you the card changed.
 This student is a true beginner, so err toward MORE practice, not less, this is real practice time, not a formality. Follow the student's own lead within this order: if they ask to hear a word again, repeat it (bilingually, in English primarily) as many times as they want; if they say they already know it, still walk through the example sentence at least once.''',
     );
 

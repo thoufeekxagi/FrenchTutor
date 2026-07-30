@@ -147,6 +147,12 @@ class SRSService {
     return base;
   }
 
+  /// Below this, "Recommended" reads as broken (0 words ready) rather than
+  /// like a deliberately light day — the daily new-word budget is a pacing
+  /// device, not a promise to ever show nothing at all when the learner
+  /// explicitly asked to practice.
+  static const minimumAutoQueueSize = 5;
+
   Future<List<VocabEntry>> dailyMixedQueue() async {
     final allEntries = ContentService.shared.vocabPhases
         .expand((p) => p.themes.expand((t) => t.entries))
@@ -172,7 +178,27 @@ class SRSService {
     final newBudget = (policy.newBudget - store.newEntriesIntroducedToday())
         .clamp(0, policy.newBudget);
     final queue = [...due.take(policy.reviewBudget), ...unseen.take(newBudget)];
-    return queue.take(policy.totalCap).toList();
+    final capped = queue.take(policy.totalCap).toList();
+    if (capped.length >= minimumAutoQueueSize) return capped;
+
+    // Under the minimum — the daily new-word cap already got used up
+    // elsewhere today, but there's no reason to leave the learner staring
+    // at "0 words ready" when unseen words still exist in the bank. Top up
+    // with more unseen words beyond today's cap, then with known words for
+    // review, until the minimum is hit or the whole bank is truly spent.
+    final chosenIds = capped.map((e) => e.id).toSet();
+    final topUp = [...capped];
+    for (final entry in unseen) {
+      if (topUp.length >= minimumAutoQueueSize) break;
+      if (chosenIds.add(entry.id)) topUp.add(entry);
+    }
+    if (topUp.length < minimumAutoQueueSize) {
+      for (final entry in knownSample(limit: minimumAutoQueueSize)) {
+        if (topUp.length >= minimumAutoQueueSize) break;
+        if (chosenIds.add(entry.id)) topUp.add(entry);
+      }
+    }
+    return topUp;
   }
 
   List<VocabEntry> knownSample({int limit = 6}) {

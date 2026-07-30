@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/database/pilot_infrastructure_store.dart';
-import '../models/pilot_access.dart';
 import '../orchestration/models/competency.dart';
 import 'auth_service.dart';
 
@@ -59,7 +58,26 @@ class SubscriptionGateService {
   static const _reviewerEmail = 'admin@parlesprint.com';
 
   /// Labs tile identifiers that stay free — see labs_screen.dart.
-  static const freeLabIds = {'speaking_mock', 'vocabulary'};
+  static const freeLabIds = {'speaking_mock', 'vocabulary', 'flashcards'};
+
+  /// Otherwise-locked labs a free learner gets a real taste of, one per day
+  /// — never all of them at once. Gives free users daily exposure to every
+  /// paid skill (so they know what they're missing) while keeping the
+  /// total surface area small; a learner who gets Roleplay today and wants
+  /// it again tomorrow instead of Grammar is exactly the nudge this is for.
+  /// Deliberately NOT "Keep Practising left wide open" — that would remove
+  /// the reason to subscribe entirely.
+  static const _rotatingFreeLabIds = ['grammar', 'listening', 'roleplay', 'writing'];
+
+  /// Which of [_rotatingFreeLabIds] is free today — the same calendar day
+  /// (UTC) for every learner, changing at midnight UTC. Pure function of
+  /// wall-clock date, no state to store or sync.
+  static String get todaysFreeRotatingLabId {
+    final daysSinceEpoch =
+        DateTime.now().toUtc().millisecondsSinceEpoch ~/
+        Duration.millisecondsPerDay;
+    return _rotatingFreeLabIds[daysSinceEpoch % _rotatingFreeLabIds.length];
+  }
 
   final PilotInfrastructureStore infrastructure;
 
@@ -74,9 +92,7 @@ class SubscriptionGateService {
   bool isSubscribed() {
     if (DevSubscriptionOverride.enabled) return true;
     if (_isReviewerAccount) return true;
-    final entitlement = infrastructure.entitlement();
-    return entitlement.status == PilotEntitlementStatus.active ||
-        entitlement.status == PilotEntitlementStatus.grace;
+    return infrastructure.entitlement().isPaidActive;
   }
 
   /// True if a mission step of this modality should show a lock badge
@@ -92,6 +108,7 @@ class SubscriptionGateService {
   /// show a lock badge instead of being tappable.
   bool isLabLocked(String labId) {
     if (isSubscribed()) return false;
-    return !freeLabIds.contains(labId);
+    if (freeLabIds.contains(labId)) return false;
+    return labId != todaysFreeRotatingLabId;
   }
 }

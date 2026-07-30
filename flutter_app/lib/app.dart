@@ -8,8 +8,10 @@ import 'design/app_theme.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/main_tab_screen.dart';
+import 'screens/onboarding/ai_consent_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'services/auth_service.dart';
+import 'services/revenue_cat_service.dart';
 import 'design/tokens.dart';
 
 class FrenchTutorApp extends StatelessWidget {
@@ -32,9 +34,12 @@ class FrenchTutorApp extends StatelessWidget {
 /// learner experiences value first, commits second:
 ///   1. not onboarded -> [OnboardingScreen] (goal, level, tutor — no account
 ///      wall in front of the product)
-///   2. onboarded but no session -> [AuthScreen] ("create an account to save
-///      your progress" — the natural close of onboarding)
-///   3. onboarded + session -> [MainTabScreen]
+///   2. onboarded, AI data-use not yet accepted -> [AiConsentScreen] (must
+///      run before any feature can call the AI provider — Apple Guideline
+///      5.1.2(i))
+///   3. onboarded + consented but no session -> [AuthScreen] ("create an
+///      account to save your progress" — the natural close of onboarding)
+///   4. onboarded + consented + session -> [MainTabScreen]
 ///
 /// Everything renders INSIDE this gate (no pushReplacement out of it) so a
 /// later sign-out from Settings always lands back on the sign-in screen —
@@ -50,6 +55,7 @@ class AuthGate extends ConsumerStatefulWidget {
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _hasSession = AuthService.shared.currentSession != null;
   bool _restoring = false;
+  bool? _aiConsented;
   StreamSubscription<AuthState>? _subscription;
 
   @override
@@ -58,11 +64,23 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     _subscription = AuthService.shared.onAuthStateChange.listen(
       _onAuthStateChange,
     );
+    AiConsentScreen.hasConsented().then((value) {
+      if (mounted) setState(() => _aiConsented = value);
+    });
   }
 
   void _onAuthStateChange(AuthState state) {
     final session = state.session;
     if (session != null) {
+      // RevenueCat's SDK is otherwise never initialized anywhere in the app
+      // — without this, every paywall load silently sees zero packages
+      // forever (fetchOfferings() short-circuits on `!_initialized`), no
+      // matter what's configured in App Store Connect/RevenueCat. Using the
+      // Supabase user id as the RevenueCat appUserID is what lets the
+      // revenuecat-webhook edge function resolve a purchase back to the
+      // right `profiles` row. Idempotent (configure() no-ops once already
+      // initialized) — safe on every signed-in event.
+      RevenueCatService.shared.configure(appUserId: session.user.id);
       // Stamp the local profile with the Supabase user id (PILOT_PLAN.md
       // Phase 5's "local rows adopt the new user_id" step). Idempotent —
       // safe to run on every signed-in event, not just the very first one.
@@ -105,6 +123,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
     if (!onboarded) {
       return OnboardingScreen(onFinished: () => setState(() {}));
+    }
+    if (_aiConsented == null) return const _RestoringProgressView();
+    if (!_aiConsented!) {
+      return AiConsentScreen(
+        onAccepted: () => setState(() => _aiConsented = true),
+      );
     }
     if (!_hasSession) return const AuthScreen();
     if (_restoring) return const _RestoringProgressView();

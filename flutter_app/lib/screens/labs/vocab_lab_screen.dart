@@ -26,7 +26,7 @@ class VocabLabScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: DesignTokens.parchment,
       appBar: AppBar(
-        title: Text('Vocabulary', style: DesignTokens.display(20)),
+        title: Text('Flashcards', style: DesignTokens.display(20)),
         backgroundColor: DesignTokens.parchment,
         foregroundColor: DesignTokens.ink,
         elevation: 0,

@@ -9,6 +9,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/report_problem_button.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
 
@@ -267,6 +268,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          ReportProblemButton(sessionType: 'Story: ${_passage.displayTitle}'),
+        ],
       ),
       body: Stack(
         children: [

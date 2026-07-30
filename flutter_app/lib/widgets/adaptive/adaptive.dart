@@ -354,3 +354,36 @@ class PSContentColumn extends StatelessWidget {
     );
   }
 }
+
+/// Wraps a screen-bottom action (a primary button, usually) so it clears
+/// the home indicator on notched iPhones/iPads instead of sitting flush
+/// against it — a plain `Container`/`Padding` with a fixed vertical inset
+/// only clears devices with no inset at all, and reads as cut off on every
+/// other device. `SafeArea(top: false)` adds the real device inset, and the
+/// extra 8px on top of it is deliberate breathing room so the button still
+/// looks intentionally placed rather than merely "not clipped."
+class PSBottomActionBar extends StatelessWidget {
+  const PSBottomActionBar({
+    super.key,
+    required this.child,
+    this.backgroundColor,
+  });
+
+  final Widget child;
+  final Color? backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: backgroundColor ?? DesignTokens.canvas,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          child: child,
+        ),
+      ),
+    );
+  }
+}

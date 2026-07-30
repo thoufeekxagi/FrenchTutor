@@ -26,6 +26,8 @@ class TutorVoicePreviewer extends ChangeNotifier {
   final Map<String, List<int>> _cache = {};
   String? _loadingId;
   String? _playingId;
+  DateTime? _playStartedAt;
+  int? _playingDurationMs;
   Timer? _playbackDoneTimer;
   bool _disposed = false;
 
@@ -43,14 +45,24 @@ class TutorVoicePreviewer extends ChangeNotifier {
   /// Persona id currently sounding, if any.
   String? get playingId => _playingId;
 
-  /// Play [persona]'s sample. Tapping the tutor that is already sounding is a
-  /// no-op — a sample plays to completion on its own; only choosing a
-  /// DIFFERENT tutor cuts it. Re-tapping the same one used to restart it from
-  /// the beginning, which read as "it keeps replaying whether I want it to or
-  /// not."
+  /// True while a sample is loading or sounding — every preview button is
+  /// disabled for the duration so a tap on a different tutor's button can't
+  /// cut playback early; the current sample always finishes before the next
+  /// tap can register.
+  bool get isBusy => _playingId != null || _loadingId != null;
+
+  /// When the currently-playing sample started, and how long it runs for —
+  /// together these let the UI draw a progress ring that fills up to exactly
+  /// when the sample ends.
+  DateTime? get playStartedAt => _playStartedAt;
+  int? get playingDurationMs => _playingDurationMs;
+
+  /// Play [persona]'s sample. No-ops entirely while anything is already
+  /// loading or playing (see [isBusy]) — a sample always plays to
+  /// completion before another tap can start (or restart) one.
   Future<void> play(TutorPersona persona) async {
     if (_disposed) return;
-    if (_playingId == persona.id) return;
+    if (isBusy) return;
     final generation = ++_playGeneration;
     var bytes = _cache[persona.id];
     if (bytes == null) {
@@ -88,14 +100,18 @@ class TutorVoicePreviewer extends ChangeNotifier {
     // actually about to play — not speculatively before the load above,
     // when there was nothing yet to cut.
     stop();
-    _playingId = persona.id;
-    notifyListeners();
-    await _audio.playAudioChunk(bytes);
     // PCM16 mono at 24kHz — mark done when the buffer has actually sounded.
     final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 250;
+    _playingId = persona.id;
+    _playStartedAt = DateTime.now();
+    _playingDurationMs = playbackMs;
+    notifyListeners();
+    await _audio.playAudioChunk(bytes);
     _playbackDoneTimer = Timer(Duration(milliseconds: playbackMs), () {
       if (_disposed || _playingId != persona.id) return;
       _playingId = null;
+      _playStartedAt = null;
+      _playingDurationMs = null;
       notifyListeners();
     });
   }
@@ -106,6 +122,8 @@ class TutorVoicePreviewer extends ChangeNotifier {
     _audioLazy?.stopPlayback();
     if (_playingId != null) {
       _playingId = null;
+      _playStartedAt = null;
+      _playingDurationMs = null;
       if (!_disposed) notifyListeners();
     }
   }

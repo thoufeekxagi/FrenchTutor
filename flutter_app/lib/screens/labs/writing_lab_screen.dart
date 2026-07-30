@@ -47,9 +47,25 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
     }
   }
 
+  int _levelIndex(String value) => switch (value.toLowerCase()) {
+    'a1' || 'zero' || 'basics' => 0,
+    'a2' => 1,
+    'b1' || 'conversational' => 2,
+    'b2' => 3,
+    _ => 0,
+  };
+
   @override
   Widget build(BuildContext context) {
     final pack = ref.watch(contentServiceProvider).writingTasks();
+    final profile = ref.watch(learningStoreProvider).profile();
+    // Never show a task above the learner's level — the static bank isn't
+    // level-adaptive the way "New writing practice" already is, so this is
+    // the floor that keeps a B2 essay from reaching an A1 learner.
+    final learnerIndex = _levelIndex(profile.level);
+    final levelTasks = pack?.tasks
+        .where((task) => _levelIndex(task.levelBand) <= learnerIndex)
+        .toList();
 
     return Scaffold(
       backgroundColor: DesignTokens.parchmentDim,
@@ -84,7 +100,14 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
               ).copyWith(color: DesignTokens.slateDim),
             ),
             const SizedBox(height: 8),
-            for (final task in pack.tasks) ...[
+            if (levelTasks != null && levelTasks.isEmpty)
+              Text(
+                'No offline tasks at your level yet. Try "New writing practice" above for one made just for you.',
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ),
+            for (final task in levelTasks ?? const []) ...[
               _WritingTaskTile(
                 task: task,
                 onTap: () {

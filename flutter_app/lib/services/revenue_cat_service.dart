@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../config/api_keys.dart';
@@ -31,14 +31,27 @@ class RevenueCatService {
           (Platform.isAndroid && ApiKeys.revenueCatAndroidKey.isNotEmpty));
 
   Future<void> configure({required String appUserId}) async {
-    if (!isConfigured || _initialized) return;
+    if (_initialized) return;
+    if (!isConfigured) {
+      debugPrint(
+        'RevenueCatService: not configured — no API key for this platform '
+        '(pass --dart-define=REVENUECAT_IOS_KEY=... / '
+        '--dart-define=REVENUECAT_ANDROID_KEY=...). The paywall will show '
+        'zero packages until this is set.',
+      );
+      return;
+    }
     final apiKey = Platform.isIOS
         ? ApiKeys.revenueCatIosKey
         : ApiKeys.revenueCatAndroidKey;
-    await Purchases.configure(
-      PurchasesConfiguration(apiKey)..appUserID = appUserId,
-    );
-    _initialized = true;
+    try {
+      await Purchases.configure(
+        PurchasesConfiguration(apiKey)..appUserID = appUserId,
+      );
+      _initialized = true;
+    } catch (e) {
+      debugPrint('RevenueCatService: Purchases.configure failed — $e');
+    }
   }
 
   Future<bool> hasActiveEntitlement(String entitlementId) async {
@@ -51,11 +64,46 @@ class RevenueCatService {
     }
   }
 
-  Future<Offerings?> fetchOfferings() async {
+  /// The full active entitlement record (product id + expiration), so a
+  /// caller can show a real "renews on / days left" right after purchase
+  /// instead of waiting on the revenuecat-webhook -> Supabase sync round-trip.
+  Future<EntitlementInfo?> activeEntitlementInfo(String entitlementId) async {
     if (!_initialized) return null;
     try {
-      return await Purchases.getOfferings();
+      final info = await Purchases.getCustomerInfo();
+      return info.entitlements.active[entitlementId];
     } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Offerings?> fetchOfferings() async {
+    if (!_initialized) {
+      debugPrint(
+        'RevenueCatService.fetchOfferings: SDK not initialized (configure() '
+        'never succeeded) — returning null, paywall will show no packages.',
+      );
+      return null;
+    }
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (offerings.current == null) {
+        debugPrint(
+          'RevenueCatService.fetchOfferings: got a response but there is no '
+          '"current" offering — check the Offerings config in the '
+          'RevenueCat dashboard.',
+        );
+      } else if (offerings.current!.availablePackages.isEmpty) {
+        debugPrint(
+          'RevenueCatService.fetchOfferings: current offering '
+          '"${offerings.current!.identifier}" has zero packages attached — '
+          'check that its products are attached in the RevenueCat dashboard '
+          'and that they\'re in an approved/ready state in App Store Connect.',
+        );
+      }
+      return offerings;
+    } catch (e) {
+      debugPrint('RevenueCatService.fetchOfferings failed — $e');
       return null;
     }
   }

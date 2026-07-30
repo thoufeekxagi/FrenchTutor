@@ -7,6 +7,7 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../providers/database_provider.dart';
+import '../../services/ai_session_gate.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -97,6 +98,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
   }
 
   Future<void> _runTask({required bool interaction}) async {
+    if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) return;
     final stage = interaction
         ? 'mock_speaking_interaction'
         : 'mock_speaking_monologue';

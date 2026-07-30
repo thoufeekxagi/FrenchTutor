@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 
 import '../config/api_keys.dart';
 import '../data/content_service.dart';
@@ -16,6 +17,8 @@ import '../orchestration/models/competency.dart';
 import '../orchestration/models/mission.dart';
 import '../orchestration/models/plan_task.dart';
 import '../orchestration/models/task_result.dart';
+import '../providers/database_provider.dart';
+import '../services/ai_session_gate.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/lesson_speech_service.dart';
 import '../screens/lessons/story_reader_screen.dart';
@@ -337,6 +340,13 @@ class MissionTaskExecutor {
     }
     final scene = await _missionScene(mission: mission, topic: topic);
     if (!context.mounted) return;
+    final accessService = ProviderScope.containerOf(
+      context,
+    ).read(pilotAccessServiceProvider);
+    if (!await ensureAiSessionQuota(context, accessService) ||
+        !context.mounted) {
+      return;
+    }
     final result = await AppRouter.push<SpeakingResult>(
       context,
       (_) => SessionScreen(
@@ -363,6 +373,13 @@ class MissionTaskExecutor {
     final word = _vocabEntry(task.contentItemId);
     if (word == null) {
       throw StateError('Missing pronunciation content ${task.contentItemId}');
+    }
+    final accessService = ProviderScope.containerOf(
+      context,
+    ).read(pilotAccessServiceProvider);
+    if (!await ensureAiSessionQuota(context, accessService) ||
+        !context.mounted) {
+      return;
     }
     final result = await AppRouter.push<SpeakingResult>(
       context,

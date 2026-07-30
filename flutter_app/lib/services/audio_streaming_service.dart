@@ -45,6 +45,25 @@ class AudioStreamingService {
   bool _isSessionConfigured = false;
   void Function(List<int> chunk)? _audioChunkCallback;
 
+  /// Latched exactly like `_playerStartLatch` below — `startStreaming()` and
+  /// the interruption-recovery path can both want to open the recorder
+  /// close together in time (e.g. a real interruption landing right as a
+  /// call starts). flutter_sound's own `openRecorder()` guard only checks
+  /// its internal init flag, not "is another open already in flight", so
+  /// two overlapping calls both pass that check and both enter its
+  /// `_openAudioSession()` — the second trips `_openRecorderCompleter ==
+  /// null` internally and throws. Sharing one in-flight open here closes
+  /// that race instead of just swallowing the resulting error.
+  Future<void>? _recorderOpenLatch;
+  bool _isRecorderOpen = false;
+
+  Future<void> _ensureRecorderOpen() {
+    if (_isRecorderOpen) return Future.value();
+    return _recorderOpenLatch ??= _recorder.openRecorder().then((_) {
+      _isRecorderOpen = true;
+    }).whenComplete(() => _recorderOpenLatch = null);
+  }
+
   /// Gemini delivers audio over the WebSocket in irregular network bursts, not a steady
   /// real-time stream. Feeding each chunk to flutter_sound the instant it arrives — as the
   /// original code did — starves the player's small internal buffer between bursts (causing
@@ -172,7 +191,7 @@ class AudioStreamingService {
   Future<void> _recoverFromInterruptionIfNeeded() async {
     try {
       if (_isStreaming && _recorder.isStopped) {
-        await _recorder.openRecorder();
+        await _ensureRecorderOpen();
         await _recorder.startRecorder(
           codec: Codec.pcm16,
           toStream: _micStreamController!.sink,
@@ -201,7 +220,7 @@ class AudioStreamingService {
     if (!_recorder.isStopped) {
       await _recorder.stopRecorder();
     }
-    await _recorder.openRecorder();
+    await _ensureRecorderOpen();
 
     _micStreamController = StreamController<Uint8List>();
     _micSub = _micStreamController!.stream.listen(_handleMicChunk);
@@ -431,6 +450,7 @@ class AudioStreamingService {
     try {
       if (!_recorder.isStopped) await _recorder.stopRecorder();
       await _recorder.closeRecorder();
+      _isRecorderOpen = false;
     } catch (_) {}
     try {
       if (!_player.isStopped) await _player.stopPlayer();

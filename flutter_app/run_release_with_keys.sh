@@ -20,6 +20,9 @@ GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^G
 GOOGLE_WEB_CLIENT_ID=$(grep '^GOOGLE_WEB_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_WEB_CLIENT_ID=//')
 REVENUECAT_IOS_KEY=$(grep '^REVENUECAT_IOS_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_IOS_KEY=//')
 REVENUECAT_ANDROID_KEY=$(grep '^REVENUECAT_ANDROID_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_ANDROID_KEY=//')
+SENTRY_DSN=$(grep '^SENTRY_DSN=' "$SECRETS_FILE" | sed 's/^SENTRY_DSN=//')
+POSTHOG_API_KEY=$(grep '^POSTHOG_API_KEY=' "$SECRETS_FILE" | sed 's/^POSTHOG_API_KEY=//')
+POSTHOG_HOST=$(grep '^POSTHOG_HOST=' "$SECRETS_FILE" | sed 's/^POSTHOG_HOST=//')
 
 # No standalone "flutter devices" pre-check here on purpose — that scan
 # goes through wireless Bonjour/mDNS discovery independently of `flutter run`
@@ -38,4 +41,7 @@ exec flutter run --release \
   --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID" \
   --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \
   --dart-define=REVENUECAT_IOS_KEY="$REVENUECAT_IOS_KEY" \
-  --dart-define=REVENUECAT_ANDROID_KEY="$REVENUECAT_ANDROID_KEY"
+  --dart-define=REVENUECAT_ANDROID_KEY="$REVENUECAT_ANDROID_KEY" \
+  --dart-define=SENTRY_DSN="$SENTRY_DSN" \
+  --dart-define=POSTHOG_API_KEY="$POSTHOG_API_KEY" \
+  --dart-define=POSTHOG_HOST="$POSTHOG_HOST"

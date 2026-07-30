@@ -34,4 +34,21 @@ abstract final class ApiKeys {
   static const revenueCatAndroidKey = String.fromEnvironment(
     'REVENUECAT_ANDROID_KEY',
   );
+
+  /// Sentry's project DSN — safe to embed like the keys above (it identifies
+  /// where crash reports go, it isn't a credential that grants access to
+  /// anything). Empty until a Sentry project exists; main.dart skips
+  /// SentryFlutter.init entirely when blank, same "not configured" pattern.
+  static const sentryDsn = String.fromEnvironment('SENTRY_DSN');
+
+  /// PostHog project API key and ingestion host (e.g.
+  /// 'https://us.i.posthog.com' or 'https://eu.i.posthog.com', depending on
+  /// which region the project was created in). Same "empty means not
+  /// configured, skip setup entirely" pattern as every other optional key
+  /// above — main.dart never calls Posthog().setup when this is blank.
+  static const posthogApiKey = String.fromEnvironment('POSTHOG_API_KEY');
+  static const posthogHost = String.fromEnvironment(
+    'POSTHOG_HOST',
+    defaultValue: 'https://us.i.posthog.com',
+  );
 }

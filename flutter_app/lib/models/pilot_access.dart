@@ -21,10 +21,29 @@ class PilotEntitlement {
   final DateTime? expiresAt;
   final DateTime? verifiedAt;
 
+  /// Whether [expiresAt] (if set) has passed. A stored `active`/`grace`
+  /// status is never re-checked against wall-clock time on its own — a
+  /// sandbox purchase (or a real one) can expire long after the row was
+  /// written, and nothing else revisits it until the next sign-in triggers
+  /// a fresh server hydration. Callers deciding live access must gate on
+  /// this, not on `status` alone.
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
+
   bool get grantsAccess =>
-      status == PilotEntitlementStatus.localPreview ||
-      status == PilotEntitlementStatus.active ||
-      status == PilotEntitlementStatus.grace;
+      !isExpired &&
+      (status == PilotEntitlementStatus.localPreview ||
+          status == PilotEntitlementStatus.active ||
+          status == PilotEntitlementStatus.grace);
+
+  /// Narrower than [grantsAccess]: true only for a real, unexpired paid
+  /// subscription or invite-code grant — excludes `localPreview` (the
+  /// no-entitlement-row default), unlike [grantsAccess]. What
+  /// [SubscriptionGateService] and the daily AI-minutes tier should check.
+  bool get isPaidActive =>
+      !isExpired &&
+      (status == PilotEntitlementStatus.active ||
+          status == PilotEntitlementStatus.grace);
 }
 
 class PilotAccessSnapshot {

@@ -6,6 +6,7 @@ import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
@@ -102,6 +103,17 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     _ => null, // Speaking (Talk with Marie) is ungated, matching the dashboard.
   };
 
+  /// Whether tapping into today's featured category will show the paywall
+  /// first — surfaced as a lock badge so that's never a surprise, matching
+  /// the Practice tab and Keep Practising. Called from build(), so this must
+  /// watch (not read) the gate — otherwise this badge keeps showing
+  /// whatever was true when the widget first built, even after a purchase.
+  bool _isLocked(String category) {
+    final lockKey = _labLockKeyFor(category);
+    return lockKey != null &&
+        ref.watch(subscriptionGateServiceProvider).isLabLocked(lockKey);
+  }
+
   Future<void> _openCategory(String category) async {
     final lockKey = _labLockKeyFor(category);
     if (lockKey != null &&
@@ -130,6 +142,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         case 'Writing':
           await AppRouter.push(context, (_) => const WritingLabScreen());
         case 'Speaking':
+          if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) break;
           LessonSpeechService.shared.deactivate();
           await AppRouter.push(
             context,
@@ -206,20 +219,49 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: DesignTokens.infoSoft,
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.radiusMedium,
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: DesignTokens.infoSoft,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusMedium,
+                          ),
+                        ),
+                        child: Icon(
+                          _iconFor(featured),
+                          color: DesignTokens.info,
+                          size: 23,
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      _iconFor(featured),
-                      color: DesignTokens.info,
-                      size: 23,
-                    ),
+                      if (_isLocked(featured))
+                        Positioned(
+                          right: -4,
+                          bottom: -4,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: const BoxDecoration(
+                              color: DesignTokens.surface,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x1A000000),
+                                  blurRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              CupertinoIcons.lock_fill,
+                              size: 10,
+                              color: DesignTokens.mutedDim,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(width: DesignTokens.space3),
                   Expanded(
@@ -263,8 +305,10 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               ],
               const SizedBox(height: DesignTokens.space5),
               PasseportPrimaryButton(
-                label: 'Start',
-                icon: CupertinoIcons.arrow_right,
+                label: _isLocked(featured) ? 'Unlock to start' : 'Start',
+                icon: _isLocked(featured)
+                    ? CupertinoIcons.lock_fill
+                    : CupertinoIcons.arrow_right,
                 onPressed: _running ? null : () => _openCategory(featured),
                 isLoading: _running,
                 loadingLabel: 'Opening…',

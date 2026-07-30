@@ -6,45 +6,41 @@ import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../data/content_service.dart';
 import '../../data/database/learning_store.dart';
-import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
+import 'fingerprint_engine.dart';
 
-/// The learner's knowledge map — an Obsidian-style constellation of every
-/// word they've practiced. Nodes glow brighter and grow larger with recall
-/// evidence; color marks the topic; edges connect words from the same theme
-/// or the same practice session. A brand-new learner gets a GRAYED-OUT demo
-/// constellation built from real course words to explore, replaced by their
-/// own map the moment they practice their first word.
-class LearningGraphView extends StatefulWidget {
-  const LearningGraphView({
-    super.key,
-    required this.store,
-    required this.content,
-  });
+/// The learner's word fingerprint — a constellation built from real evidence
+/// across every modality (flashcard recall, spoken sessions, free writing),
+/// so its shape, density, and color mix are as personal as the words a
+/// learner actually chooses to use. Two learners never produce the same one:
+/// different starting words, different repeats, different modality mix.
+/// A brand-new learner sees a grayed-out demo constellation built from real
+/// course words, replaced by their own the moment they practice.
+class FingerprintView extends StatefulWidget {
+  const FingerprintView({super.key, required this.store, required this.content});
 
   final LearningStore store;
   final ContentService content;
 
   @override
-  State<LearningGraphView> createState() => _LearningGraphViewState();
+  State<FingerprintView> createState() => _FingerprintViewState();
 }
 
-class _LearningGraphViewState extends State<LearningGraphView> {
-  static const _canvasSize = Size(1100, 820);
+class _FingerprintViewState extends State<FingerprintView> {
   final TransformationController _transform = TransformationController();
-  late _GraphData _graph;
-  _GraphNode? _selected;
+  late FingerprintGraph _graph;
+  FingerprintNode? _selected;
 
   @override
   void initState() {
     super.initState();
-    _graph = _buildGraph();
+    _graph = buildFingerprintGraph(widget.store, widget.content);
   }
 
   @override
-  void didUpdateWidget(covariant LearningGraphView oldWidget) {
+  void didUpdateWidget(covariant FingerprintView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _graph = _buildGraph();
+    _graph = buildFingerprintGraph(widget.store, widget.content);
   }
 
   @override
@@ -53,176 +49,9 @@ class _LearningGraphViewState extends State<LearningGraphView> {
     super.dispose();
   }
 
-  _GraphData _buildGraph() {
-    final reviewCounts = widget.store.reviewCountsByEntry();
-    final states = widget.store.allSRSStates().values.toList()
-      ..sort((a, b) {
-        final byReviews = (reviewCounts[b.entryId] ?? 0).compareTo(
-          reviewCounts[a.entryId] ?? 0,
-        );
-        if (byReviews != 0) return byReviews;
-        return (b.lastReviewedAt ?? DateTime(1970)).compareTo(
-          a.lastReviewedAt ?? DateTime(1970),
-        );
-      });
-    final shown = states.take(64).toList();
-
-    final entries = <String, VocabEntry>{};
-    final themes = <String, String>{};
-    for (final phase in widget.content.vocabPhases) {
-      for (final theme in phase.themes) {
-        for (final entry in theme.entries) {
-          entries[entry.id] = entry;
-          themes[entry.id] = theme.title;
-        }
-      }
-    }
-
-    if (shown.isEmpty) {
-      return _buildDemoGraph(entries, themes);
-    }
-
-    final nodes = <_GraphNode>[];
-    for (var i = 0; i < shown.length; i++) {
-      final state = shown[i];
-      final entry = entries[state.entryId];
-      if (entry == null) continue;
-      nodes.add(
-        _GraphNode(
-          entry: entry,
-          practiceCount: reviewCounts[state.entryId] ?? 1,
-          theme: themes[state.entryId] ?? 'Vocabulary',
-          position: _seedPosition(i),
-        ),
-      );
-    }
-    final edges = _connectNodes(nodes, useSessions: true);
-    _settle(nodes, edges);
-    return _GraphData(nodes, edges, isDemo: false);
-  }
-
-  /// A curated sample constellation for brand-new learners: real course words
-  /// across a few themes, with plausible varied practice counts — fully
-  /// explorable, deliberately gray, so the promise is visible before the
-  /// first word is ever practiced.
-  _GraphData _buildDemoGraph(
-    Map<String, VocabEntry> entries,
-    Map<String, String> themes,
-  ) {
-    final byTheme = <String, List<VocabEntry>>{};
-    for (final id in entries.keys) {
-      byTheme.putIfAbsent(themes[id] ?? 'Vocabulary', () => []);
-      byTheme[themes[id] ?? 'Vocabulary']!.add(entries[id]!);
-    }
-    final nodes = <_GraphNode>[];
-    var i = 0;
-    for (final theme in byTheme.keys.take(4)) {
-      for (final entry in byTheme[theme]!.take(7)) {
-        // Deterministic pseudo-varied practice counts (1..8) so the demo has
-        // believable big/small, bright/dim variety without any randomness.
-        final fakeCount = 1 + ((entry.id.hashCode & 0x7fffffff) % 8);
-        nodes.add(
-          _GraphNode(
-            entry: entry,
-            practiceCount: fakeCount,
-            theme: theme,
-            position: _seedPosition(i),
-          ),
-        );
-        i++;
-      }
-    }
-    final edges = _connectNodes(nodes, useSessions: false);
-    _settle(nodes, edges);
-    return _GraphData(nodes, edges, isDemo: true);
-  }
-
-  Offset _seedPosition(int i) {
-    final angle = i * math.pi * (3 - math.sqrt(5));
-    final radius = 70 + 10 * math.sqrt(i + 1);
-    return Offset(
-      _canvasSize.width / 2 + math.cos(angle) * radius,
-      _canvasSize.height / 2 + math.sin(angle) * radius,
-    );
-  }
-
-  List<_GraphEdge> _connectNodes(
-    List<_GraphNode> nodes, {
-    required bool useSessions,
-  }) {
-    final byId = {for (final node in nodes) node.entry.id: node};
-    final edgeKeys = <String>{};
-    final edges = <_GraphEdge>[];
-
-    void connect(String a, String b, _EdgeKind kind) {
-      if (a == b || !byId.containsKey(a) || !byId.containsKey(b)) return;
-      final ids = [a, b]..sort();
-      final key = '${ids[0]}:${ids[1]}';
-      if (!edgeKeys.add(key)) return;
-      edges.add(_GraphEdge(byId[ids[0]]!, byId[ids[1]]!, kind));
-    }
-
-    final byTheme = <String, List<_GraphNode>>{};
-    for (final node in nodes) {
-      byTheme.putIfAbsent(node.theme, () => []).add(node);
-    }
-    for (final group in byTheme.values) {
-      for (var i = 1; i < group.length; i++) {
-        connect(group[i - 1].entry.id, group[i].entry.id, _EdgeKind.theme);
-      }
-    }
-    if (useSessions) {
-      for (final group in widget.store.reviewedEntryGroupsBySession()) {
-        final visible = group.where(byId.containsKey).toList();
-        for (var i = 1; i < visible.length; i++) {
-          connect(visible[i - 1], visible[i], _EdgeKind.session);
-        }
-      }
-    }
-    return edges;
-  }
-
-  void _settle(List<_GraphNode> nodes, List<_GraphEdge> edges) {
-    if (nodes.length < 2) return;
-    for (var iteration = 0; iteration < 140; iteration++) {
-      final forces = List<Offset>.filled(nodes.length, Offset.zero);
-      for (var i = 0; i < nodes.length; i++) {
-        for (var j = i + 1; j < nodes.length; j++) {
-          final delta = nodes[i].position - nodes[j].position;
-          final distance = math.max(24.0, delta.distance);
-          final direction = delta / distance;
-          final force = direction * (1500 / (distance * distance));
-          forces[i] += force;
-          forces[j] -= force;
-        }
-      }
-      for (final edge in edges) {
-        final a = nodes.indexOf(edge.a);
-        final b = nodes.indexOf(edge.b);
-        final delta = edge.b.position - edge.a.position;
-        final distance = math.max(1.0, delta.distance);
-        final target = edge.kind == _EdgeKind.session ? 95.0 : 130.0;
-        final force = delta / distance * ((distance - target) * 0.006);
-        forces[a] += force;
-        forces[b] -= force;
-      }
-      for (var i = 0; i < nodes.length; i++) {
-        final centerPull = Offset(
-          (_canvasSize.width / 2 - nodes[i].position.dx) * 0.0015,
-          (_canvasSize.height / 2 - nodes[i].position.dy) * 0.0015,
-        );
-        final next = nodes[i].position + (forces[i] + centerPull) * 0.75;
-        nodes[i].position = Offset(
-          next.dx.clamp(40, _canvasSize.width - 40),
-          next.dy.clamp(40, _canvasSize.height - 40),
-        );
-      }
-    }
-  }
-
   void _selectNode(TapDownDetails details) {
     final point = _transform.toScene(details.localPosition);
-    _GraphNode? nearest;
+    FingerprintNode? nearest;
     var nearestDistance = double.infinity;
     for (final node in _graph.nodes) {
       final distance = (node.position - point).distance;
@@ -256,59 +85,14 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                       minScale: 0.45,
                       maxScale: 3.5,
                       child: CustomPaint(
-                        size: _canvasSize,
-                        painter: _LearningGraphPainter(
-                          graph: _graph,
-                          selected: _selected,
-                        ),
+                        size: const Size(1100, 820),
+                        painter: _FingerprintPainter(graph: _graph, selected: _selected),
                       ),
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: _chip('Pinch · drag · tap'),
-                ),
-                if (_graph.isDemo)
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 11,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Passeport.ink.withValues(alpha: 0.86),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.12),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            CupertinoIcons.sparkles,
-                            size: 16,
-                            color: Passeport.brass,
-                          ),
-                          const SizedBox(width: 9),
-                          Expanded(
-                            child: Text(
-                              'A preview of your map. Practice your first '
-                              'words and they light up here, in color.',
-                              style: Passeport.body(12.5).copyWith(
-                                color: Colors.white.withValues(alpha: 0.85),
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                Positioned(top: 12, right: 12, child: _chip('Pinch · drag · tap')),
+                Positioned(top: 12, left: 12, child: _modalityLegend()),
               ],
             ),
           ),
@@ -321,11 +105,9 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                   padding: const EdgeInsets.only(top: 12),
                   child: Text(
                     _graph.isDemo
-                        ? 'Every word you practice becomes a star on this map, brighter with every recall, connected to the words it lives with.'
-                        : 'Larger, brighter words have been recalled more often. Lines connect words from the same topic or practice session.',
-                    style: Passeport.body(
-                      13,
-                    ).copyWith(color: Passeport.slateDim, height: 1.4),
+                        ? 'Preview. Practice a word to start yours.'
+                        : 'Bigger words mean more practice.',
+                    style: Passeport.body(13).copyWith(color: Passeport.slateDim, height: 1.4),
                   ),
                 )
               : Container(
@@ -343,16 +125,21 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              _selected!.entry.fr,
-                              style: Passeport.display(20),
-                            ),
+                            Text(_selected!.entry.fr, style: Passeport.display(20)),
                             const SizedBox(height: 4),
                             Text(
                               '${_selected!.entry.en} · ${_selected!.theme}',
-                              style: Passeport.body(
-                                13,
-                              ).copyWith(color: Passeport.slateDim),
+                              style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                for (final source in ModalitySource.values)
+                                  if ((_selected!.counts[source] ?? 0) > 0)
+                                    _sourcePill(source, _selected!.counts[source]!),
+                              ],
                             ),
                           ],
                         ),
@@ -363,30 +150,17 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                           GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => LessonSpeechService.shared.speak(
-                              items: [
-                                SpeechItem(
-                                  text: _selected!.entry.fr,
-                                  language: 'fr-FR',
-                                ),
-                              ],
+                              items: [SpeechItem(text: _selected!.entry.fr, language: 'fr-FR')],
                             ),
                             child: const SizedBox(
                               width: 44,
                               height: 44,
-                              child: Icon(
-                                CupertinoIcons.speaker_2_fill,
-                                color: Passeport.sky,
-                              ),
+                              child: Icon(CupertinoIcons.speaker_2_fill, color: Passeport.sky),
                             ),
                           ),
                           Text(
-                            _graph.isDemo
-                                ? 'preview'
-                                : '${_selected!.practiceCount} practices',
-                            style: Passeport.mono(
-                              12,
-                              weight: FontWeight.w700,
-                            ).copyWith(color: Passeport.sky),
+                            _graph.isDemo ? 'preview' : '${_selected!.total} total',
+                            style: Passeport.body(12, weight: FontWeight.w700).copyWith(color: Passeport.sky),
                           ),
                         ],
                       ),
@@ -395,6 +169,61 @@ class _LearningGraphViewState extends State<LearningGraphView> {
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _sourcePill(ModalitySource source, int count) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: _modalityColor(source).withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(color: _modalityColor(source), shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${_modalityLabel(source)} · $count',
+            style: Passeport.body(11.5, weight: FontWeight.w600).copyWith(color: Passeport.inkSoft),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _modalityLegend() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      decoration: BoxDecoration(
+        color: Passeport.ink.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final source in ModalitySource.values) ...[
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(color: _modalityColor(source), shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              _modalityLabel(source),
+              style: Passeport.body(10.5, weight: FontWeight.w600).copyWith(color: Colors.white.withValues(alpha: 0.82)),
+            ),
+            if (source != ModalitySource.values.last) const SizedBox(width: 10),
+          ],
+        ],
+      ),
     );
   }
 
@@ -408,120 +237,76 @@ class _LearningGraphViewState extends State<LearningGraphView> {
       ),
       child: Text(
         label,
-        style: Passeport.body(
-          12,
-          weight: FontWeight.w600,
-        ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
+        style: Passeport.body(12, weight: FontWeight.w600).copyWith(color: Colors.white.withValues(alpha: 0.8)),
       ),
     );
   }
 }
 
-class _GraphData {
-  const _GraphData(this.nodes, this.edges, {required this.isDemo});
+String _modalityLabel(ModalitySource source) => switch (source) {
+  ModalitySource.recall => 'Recall',
+  ModalitySource.speaking => 'Speaking',
+  ModalitySource.writing => 'Writing',
+};
 
-  final List<_GraphNode> nodes;
-  final List<_GraphEdge> edges;
-  final bool isDemo;
-}
+Color _modalityColor(ModalitySource source) => switch (source) {
+  ModalitySource.recall => Passeport.sky,
+  ModalitySource.speaking => Passeport.brass,
+  ModalitySource.writing => Passeport.sage,
+};
 
-class _GraphNode {
-  _GraphNode({
-    required this.entry,
-    required this.practiceCount,
-    required this.theme,
-    required this.position,
-  });
+class _FingerprintPainter extends CustomPainter {
+  _FingerprintPainter({required this.graph, required this.selected}) : _themeColors = _assignThemeColors(graph);
 
-  final VocabEntry entry;
-  final int practiceCount;
-  final String theme;
-  Offset position;
-
-  double get radius => 8 + math.min(12, math.sqrt(practiceCount) * 4);
-}
-
-enum _EdgeKind { theme, session }
-
-class _GraphEdge {
-  const _GraphEdge(this.a, this.b, this.kind);
-
-  final _GraphNode a;
-  final _GraphNode b;
-  final _EdgeKind kind;
-}
-
-class _LearningGraphPainter extends CustomPainter {
-  _LearningGraphPainter({required this.graph, required this.selected})
-    : _themeColors = _assignThemeColors(graph);
-
-  final _GraphData graph;
-  final _GraphNode? selected;
+  final FingerprintGraph graph;
+  final FingerprintNode? selected;
   final Map<String, Color> _themeColors;
 
-  /// Topic palette — cycled per theme so neighborhoods of the map share a
-  /// color family, exactly like Obsidian's folder-colored clusters.
+  /// A wider jewel-tone cycle than a plain "topic color" scheme needs, so
+  /// clusters read as distinct neighborhoods rather than a handful of repeats.
   static const _palette = <Color>[
+    Passeport.maroon,
     Passeport.sky,
     Passeport.brass,
     Passeport.sage,
-    Passeport.mastery,
-    Passeport.maroon,
+    Passeport.danger,
+    Passeport.primaryDeep,
   ];
 
-  static Map<String, Color> _assignThemeColors(_GraphData graph) {
+  static Map<String, Color> _assignThemeColors(FingerprintGraph graph) {
     final themes = <String>[];
     for (final node in graph.nodes) {
       if (!themes.contains(node.theme)) themes.add(node.theme);
     }
-    return {
-      for (var i = 0; i < themes.length; i++)
-        themes[i]: _palette[i % _palette.length],
-    };
+    return {for (var i = 0; i < themes.length; i++) themes[i]: _palette[i % _palette.length]};
   }
 
-  Color _nodeColor(_GraphNode node) {
+  Color _nodeColor(FingerprintNode node) {
     if (graph.isDemo) return Passeport.slate;
     return _themeColors[node.theme] ?? Passeport.sky;
   }
 
-  bool _isRelated(_GraphNode node) {
+  bool _isRelated(FingerprintNode node) {
     if (selected == null) return true;
     if (node == selected) return true;
     return graph.edges.any(
-      (edge) =>
-          (edge.a == selected && edge.b == node) ||
-          (edge.b == selected && edge.a == node),
+      (edge) => (edge.a == selected && edge.b == node) || (edge.b == selected && edge.a == node),
     );
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Deep space: near-black ink with a soft center glow so the map has
-    // depth instead of a flat backdrop.
-    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF11151C));
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()
-        ..shader = RadialGradient(
-          center: Alignment.center,
-          radius: 0.9,
-          colors: [
-            Colors.white.withValues(alpha: graph.isDemo ? 0.025 : 0.05),
-            Colors.transparent,
-          ],
-        ).createShader(Offset.zero & size),
-    );
+    _paintNebula(canvas, size);
 
-    // Edges: a wide blurred pass for glow, then a crisp core line.
     for (final edge in graph.edges) {
-      final highlighted =
-          selected == null || edge.a == selected || edge.b == selected;
+      final highlighted = selected == null || edge.a == selected || edge.b == selected;
       final color = graph.isDemo
           ? Passeport.slate
-          : (edge.kind == _EdgeKind.session
-                ? Passeport.brass
-                : Color.lerp(_nodeColor(edge.a), _nodeColor(edge.b), 0.5)!);
+          : switch (edge.kind) {
+              FingerprintEdgeKind.session => Passeport.brass,
+              FingerprintEdgeKind.cooccurrence => Passeport.sage,
+              FingerprintEdgeKind.theme => Color.lerp(_nodeColor(edge.a), _nodeColor(edge.b), 0.5)!,
+            };
       if (highlighted) {
         canvas.drawLine(
           edge.a.position,
@@ -532,61 +317,53 @@ class _LearningGraphPainter extends CustomPainter {
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
         );
       }
-      canvas.drawLine(
-        edge.a.position,
-        edge.b.position,
-        Paint()
-          ..color = color.withValues(
-            alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07,
-          )
-          ..strokeWidth = edge.kind == _EdgeKind.session ? 1.4 : 0.9,
-      );
+      final dashed = edge.kind == FingerprintEdgeKind.cooccurrence;
+      if (dashed) {
+        _drawDashedLine(
+          canvas,
+          edge.a.position,
+          edge.b.position,
+          Paint()
+            ..color = color.withValues(alpha: highlighted ? (graph.isDemo ? 0.30 : 0.5) : 0.08)
+            ..strokeWidth = 1.3,
+        );
+      } else {
+        canvas.drawLine(
+          edge.a.position,
+          edge.b.position,
+          Paint()
+            ..color = color.withValues(alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07)
+            ..strokeWidth = edge.kind == FingerprintEdgeKind.session ? 1.4 : 0.9,
+        );
+      }
     }
 
     for (final node in graph.nodes) {
-      final strength = (math.log(node.practiceCount + 1) / math.log(8)).clamp(
-        0.18,
-        1.0,
-      );
+      final strength = (math.log(node.total + 1) / math.log(8)).clamp(0.18, 1.0);
       final related = _isRelated(node);
       final color = _nodeColor(node);
       final dimFactor = related ? 1.0 : 0.22;
 
-      // Outer luminous halo — the "glow" that makes practiced words feel
-      // alive. Scales with recall strength.
       canvas.drawCircle(
         node.position,
         node.radius * 2.4,
         Paint()
-          ..color = color.withValues(
-            alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor,
-          )
-          ..maskFilter = MaskFilter.blur(
-            BlurStyle.normal,
-            node.radius * 1.1,
-          ),
+          ..color = color.withValues(alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, node.radius * 1.1),
       );
-      // Mid glow ring.
       canvas.drawCircle(
         node.position,
         node.radius * 1.25,
         Paint()
-          ..color = color.withValues(
-            alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor,
-          )
+          ..color = color.withValues(alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
       );
-      // Core: brightened toward white with strength, like a heating star.
-      final core = Color.lerp(
-        color,
-        Colors.white,
-        graph.isDemo ? 0.1 : 0.25 + 0.3 * strength,
-      )!;
-      canvas.drawCircle(
-        node.position,
-        node.radius,
-        Paint()..color = core.withValues(alpha: dimFactor.clamp(0.24, 1.0)),
-      );
+      final core = Color.lerp(color, Colors.white, graph.isDemo ? 0.1 : 0.25 + 0.3 * strength)!;
+      canvas.drawCircle(node.position, node.radius, Paint()..color = core.withValues(alpha: dimFactor.clamp(0.24, 1.0)));
+
+      if (!graph.isDemo && node.sources.length > 1) {
+        _paintModalityRing(canvas, node, dimFactor);
+      }
 
       if (node == selected) {
         canvas.drawCircle(
@@ -599,34 +376,96 @@ class _LearningGraphPainter extends CustomPainter {
         );
       }
 
-      if (node.practiceCount >= 2 || node == selected) {
+      if (node.total >= 3 || node == selected) {
         final painter = TextPainter(
           text: TextSpan(
             text: node.entry.fr,
             style: Passeport.body(12, weight: FontWeight.w600).copyWith(
-              color: Colors.white.withValues(
-                alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2,
-              ),
-              shadows: [
-                Shadow(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  blurRadius: 4,
-                ),
-              ],
+              color: Colors.white.withValues(alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2),
+              shadows: [Shadow(color: Colors.black.withValues(alpha: 0.7), blurRadius: 4)],
             ),
           ),
           textDirection: TextDirection.ltr,
           maxLines: 1,
         )..layout(maxWidth: 130);
-        painter.paint(
-          canvas,
-          node.position + Offset(-painter.width / 2, node.radius + 6),
-        );
+        painter.paint(canvas, node.position + Offset(-painter.width / 2, node.radius + 6));
       }
     }
   }
 
+  /// Two or three faint colored blobs whose position, hue, and size are
+  /// derived from this learner's own totals (`graph.seed`) — a quiet backdrop
+  /// signature that's part of what makes the whole canvas theirs alone.
+  void _paintNebula(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF0D1017));
+    final rand = math.Random(graph.seed);
+    final blobColors = graph.isDemo
+        ? [Passeport.slate, Passeport.slate, Passeport.slate]
+        : [Passeport.maroon, Passeport.sky, Passeport.brass, Passeport.sage, Passeport.danger];
+    for (var i = 0; i < 3; i++) {
+      final color = blobColors[rand.nextInt(blobColors.length)];
+      final cx = size.width * (0.15 + rand.nextDouble() * 0.7);
+      final cy = size.height * (0.15 + rand.nextDouble() * 0.7);
+      final radius = size.width * (0.22 + rand.nextDouble() * 0.18);
+      canvas.drawCircle(
+        Offset(cx, cy),
+        radius,
+        Paint()
+          ..shader = RadialGradient(
+            colors: [color.withValues(alpha: graph.isDemo ? 0.05 : 0.10), Colors.transparent],
+          ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: radius)),
+      );
+    }
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = RadialGradient(
+          center: Alignment.center,
+          radius: 0.9,
+          colors: [Colors.white.withValues(alpha: graph.isDemo ? 0.02 : 0.04), Colors.transparent],
+        ).createShader(Offset.zero & size),
+    );
+  }
+
+  /// A thin segmented ring, one arc per contributing modality, drawn just
+  /// outside the core — the Apple-Watch-rings idea, but reporting *how* a
+  /// word was earned rather than a fitness stat.
+  void _paintModalityRing(Canvas canvas, FingerprintNode node, double dimFactor) {
+    final sources = ModalitySource.values.where((s) => node.sources.contains(s)).toList();
+    if (sources.isEmpty) return;
+    final sweep = (2 * math.pi) / sources.length;
+    final ringRadius = node.radius + 4.5;
+    var start = -math.pi / 2;
+    for (final source in sources) {
+      canvas.drawArc(
+        Rect.fromCircle(center: node.position, radius: ringRadius),
+        start + 0.06,
+        sweep - 0.12,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.2
+          ..strokeCap = StrokeCap.round
+          ..color = _modalityColor(source).withValues(alpha: 0.85 * dimFactor),
+      );
+      start += sweep;
+    }
+  }
+
+  void _drawDashedLine(Canvas canvas, Offset a, Offset b, Paint paint) {
+    const dashLength = 5.0;
+    const gapLength = 4.0;
+    final total = (b - a).distance;
+    final direction = (b - a) / total;
+    var covered = 0.0;
+    while (covered < total) {
+      final segmentEnd = math.min(covered + dashLength, total);
+      canvas.drawLine(a + direction * covered, a + direction * segmentEnd, paint);
+      covered += dashLength + gapLength;
+    }
+  }
+
   @override
-  bool shouldRepaint(covariant _LearningGraphPainter oldDelegate) =>
+  bool shouldRepaint(covariant _FingerprintPainter oldDelegate) =>
       oldDelegate.graph != graph || oldDelegate.selected != selected;
 }

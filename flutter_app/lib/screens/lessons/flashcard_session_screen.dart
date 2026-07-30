@@ -8,6 +8,7 @@ import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
 import '../../models/srs_state.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/tts_play_button.dart';
 
 class FlashcardSessionScreen extends ConsumerStatefulWidget {
   const FlashcardSessionScreen({
@@ -110,13 +111,6 @@ class _FlashcardSessionScreenState
     final entry = _queue[_currentIndex];
     LessonSpeechService.shared.speak(
       items: [SpeechItem(text: entry.fr, language: 'fr-FR')],
-    );
-  }
-
-  void _speakWord(VocabEntry entry, {double? rate}) {
-    LessonSpeechService.shared.speak(
-      items: [SpeechItem(text: entry.fr, language: 'fr-FR')],
-      rate: rate,
     );
   }
 
@@ -398,18 +392,42 @@ class _FlashcardSessionScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _circleIconButton(
-          icon: CupertinoIcons.speedometer,
-          onTap: () => _speakWord(entry, rate: 0.3),
-          tooltip: 'Slow',
-        ),
+        _circleTtsButton(entry: entry, slow: true, tooltip: 'Slow'),
         const SizedBox(width: 16),
-        _circleIconButton(
-          icon: CupertinoIcons.speaker_2_fill,
-          onTap: () => _speakWord(entry, rate: 0.45),
-          tooltip: 'Normal',
-        ),
+        _circleTtsButton(entry: entry, slow: false, tooltip: 'Normal'),
       ],
+    );
+  }
+
+  /// Same circular container `_circleIconButton` uses, but with a real
+  /// `TtsPlayButton` inside instead of a static icon — this is what
+  /// actually shows the generating-ring/ready state while Gemini
+  /// synthesizes a word for the first time, instead of a silently
+  /// unresponsive-looking tap.
+  Widget _circleTtsButton({
+    required VocabEntry entry,
+    required bool slow,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: TtsPlayButton(
+          text: entry.fr,
+          slow: slow,
+          contentItemId: entry.id,
+          size: 48,
+          iconSize: 22,
+          color: DesignTokens.ink,
+        ),
+      ),
     );
   }
 

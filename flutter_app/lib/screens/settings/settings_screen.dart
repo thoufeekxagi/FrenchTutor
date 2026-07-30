@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+
 import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,15 +22,9 @@ import '../../services/auth_service.dart';
 import '../../services/referral_service.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../services/tutor_voice_preview.dart';
+import '../subscription/paywall_screen.dart';
 import 'orchestration_lab_screen.dart';
-import 'product_guide_screen.dart';
 import '../../widgets/kicker_text.dart';
-
-const availableModels = [
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemma-3-27b-it:free',
-  'mistralai/mistral-small-3.1-24b-instruct:free',
-];
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -41,8 +38,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int _newCardsPerDay = 20;
   int _practicePasses = 5;
   DateTime _roadmapStartDate = DateTime.now();
-  String _modelOverride = '';
-  String _openRouterKey = '';
   TutorPersona _persona = ActiveTutor.current;
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
@@ -57,6 +52,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   late Profile _profile;
   late PilotAccessSnapshot _access;
+  String _appVersion = '';
 
   @override
   void initState() {
@@ -65,6 +61,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _access = ref.read(pilotAccessServiceProvider).snapshot();
     _loadSettings();
     _loadReferralInfo();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (!mounted) return;
+    setState(() => _appVersion = '${info.version} (${info.buildNumber})');
   }
 
   @override
@@ -155,8 +158,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         2,
         10,
       );
-      _modelOverride = prefs.getString('openrouter_model_override') ?? '';
-      _openRouterKey = prefs.getString('openrouter_api_key') ?? '';
       final timestamp = prefs.getInt('roadmap_start_date');
       if (timestamp != null) {
         _roadmapStartDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -180,11 +181,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _saveInt(String key, int value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(key, value);
-  }
-
-  Future<void> _saveString(String key, String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value);
   }
 
   Future<void> _pickRoadmapStartDate() async {
@@ -390,6 +386,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     };
   }
 
+  /// Maps a raw RevenueCat/invite product id (e.g. "com.parlesprint.sub.
+  /// 12month", "invite:AB12CD") to a plan name a learner can actually read.
+  String _planName(String productId) {
+    if (productId.contains('12month')) return '12-Month Plan';
+    if (productId.contains('3month')) return '3-Month Plan';
+    if (productId.startsWith('invite:')) return 'Invite code access';
+    if (productId == 'app_review') return 'Reviewer access';
+    if (productId == 'founding_access') return 'Founding access';
+    return 'Free';
+  }
+
+  int _daysRemaining(DateTime expiresAt) {
+    final remaining = expiresAt.difference(DateTime.now());
+    if (remaining.isNegative) return 0;
+    return (remaining.inHours / 24).ceil();
+  }
+
+  Future<void> _openManageSubscriptions() async {
+    final url = Platform.isIOS
+        ? 'https://apps.apple.com/account/subscriptions'
+        : 'https://play.google.com/store/account/subscriptions';
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _openPaywall() async {
+    await AppRouter.push(
+      context,
+      (_) => const PaywallScreen(),
+      fullscreenDialog: true,
+    );
+    // `_access` is a plain snapshot taken once in initState, not something
+    // Riverpod re-fetches on its own — without this, Settings keeps showing
+    // "Free" after a successful purchase until the screen happens to be
+    // torn down and rebuilt some other way.
+    if (mounted) setState(() => _access = ref.read(pilotAccessServiceProvider).snapshot());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -405,54 +438,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
-            _PasseportCard(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () =>
-                    AppRouter.push(context, (_) => const ProductGuideScreen()),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Passeport.infoSoft,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.question_circle_fill,
-                        color: Passeport.info,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'How ParleSprint works',
-                            style: Passeport.body(15, weight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Missions, cards, voice controls, Marie, and progress',
-                            style: Passeport.body(
-                              12,
-                            ).copyWith(color: Passeport.slateDim),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      CupertinoIcons.chevron_right,
-                      size: 16,
-                      color: Passeport.slateDim,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
             // --- Interactive walkthrough replay ---
             _PasseportCard(
               child: GestureDetector(
@@ -505,6 +490,113 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 12),
+
+            // --- Subscription: plan, renewal/days left, upgrade/manage ---
+            // Placed right under the walkthrough replay, near the top —
+            // this is the single highest-intent action in Settings and
+            // shouldn't be buried below Learning/Tutor preferences.
+            Builder(
+              builder: (context) {
+                final entitlement = _access.entitlement;
+                final subscribed = entitlement.grantsAccess;
+                final expiresAt = entitlement.expiresAt;
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Passeport.card, Passeport.primarySoft],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Passeport.primary.withValues(alpha: 0.18),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.sparkles,
+                            size: 16,
+                            color: Passeport.primaryDeep,
+                          ),
+                          const SizedBox(width: 6),
+                          KickerText('Subscription', color: Passeport.primaryDeep),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      _SettingsRow(
+                        label: 'Plan',
+                        value: subscribed
+                            ? _planName(entitlement.productId)
+                            : 'Free',
+                      ),
+                      if (subscribed && expiresAt != null) ...[
+                        Divider(height: 1, color: Passeport.hairline),
+                        _SettingsRow(
+                          label: 'Renews',
+                          value: DateFormat.yMMMd().format(expiresAt),
+                        ),
+                        Divider(height: 1, color: Passeport.hairline),
+                        _SettingsRow(
+                          label: 'Days left',
+                          value: '${_daysRemaining(expiresAt)}',
+                        ),
+                      ],
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: subscribed
+                            ? _openManageSubscriptions
+                            : _openPaywall,
+                        child: Container(
+                          height: 46,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: subscribed
+                                ? Passeport.parchmentDim
+                                : Passeport.primary,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (!subscribed) ...[
+                                const Icon(
+                                  CupertinoIcons.sparkles,
+                                  size: 15,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 6),
+                              ],
+                              Text(
+                                subscribed
+                                    ? 'Manage subscription'
+                                    : 'Unlock full access',
+                                style: Passeport.body(
+                                  14,
+                                  weight: FontWeight.w700,
+                                ).copyWith(
+                                  color: subscribed
+                                      ? Passeport.slateDim
+                                      : Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+
             // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
             _PasseportCard(
               child: Column(
@@ -845,48 +937,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
             ],
 
-            if (kDebugMode) ...[
-              _PasseportCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    KickerText(
-                      'AI tutor (OpenRouter)',
-                      color: Passeport.slateDim,
-                    ),
-                    const SizedBox(height: 10),
-                    _SettingsRow(
-                      label: 'Key status',
-                      value: _openRouterKey.isEmpty ? 'Not set' : 'Configured',
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButton<String>(
-                      value: _modelOverride,
-                      isExpanded: true,
-                      items: [
-                        const DropdownMenuItem(
-                          value: '',
-                          child: Text('Gemini (default)'),
-                        ),
-                        ...availableModels.map(
-                          (model) => DropdownMenuItem(
-                            value: model,
-                            child: Text(model, overflow: TextOverflow.ellipsis),
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() => _modelOverride = value);
-                        _saveString('openrouter_model_override', value);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-
             // --- Notetaker ---
             _PasseportCard(
               child: Column(
@@ -1150,11 +1200,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   KickerText('ParleSprint', color: Passeport.slateDim),
                   const SizedBox(height: 4),
-                  _SettingsRow(label: 'Version', value: '0.9 pilot'),
+                  _SettingsRow(
+                    label: 'Version',
+                    value: _appVersion.isEmpty ? '—' : _appVersion,
+                  ),
                   Divider(height: 1, color: Passeport.hairline),
                   _SettingsRow(
                     label: 'Feedback',
-                    value: 'thoufeek@agiventures.ca',
+                    value: 'thoufeekbaber1@gmail.com',
                   ),
                   Divider(height: 1, color: Passeport.hairline),
                   _LegalLinkRow(

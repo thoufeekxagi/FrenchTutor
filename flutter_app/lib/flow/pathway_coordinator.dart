@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart' show showDialog;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 
 import '../config/api_keys.dart';
 import '../data/content_service.dart';
 import '../data/database/evidence_store.dart';
 import '../data/database/learning_store.dart';
 import '../design/app_router.dart';
+import '../providers/database_provider.dart';
+import '../services/ai_session_gate.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
 import '../orchestration/evidence/task_result_adapters.dart';
@@ -295,6 +298,13 @@ class PathwayCoordinator {
   }
 
   Future<void> _runSpeaking(BuildContext context) async {
+    final accessService = ProviderScope.containerOf(
+      context,
+    ).read(pilotAccessServiceProvider);
+    if (!await ensureAiSessionQuota(context, accessService) ||
+        !context.mounted) {
+      return;
+    }
     final result = await AppRouter.push<SpeakingResult>(
       context,
       (_) => SessionScreen(
@@ -504,7 +514,10 @@ class PathwayCoordinator {
     words = words.take(6).toList();
     try {
       return await LessonAgentService.shared
-          .buildReadingPassageFromVocab(words: words)
+          .buildReadingPassageFromVocab(
+            words: words,
+            levelBand: store.profile().level,
+          )
           .timeout(const Duration(seconds: 25));
     } catch (_) {
       return null;

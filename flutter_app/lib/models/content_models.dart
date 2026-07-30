@@ -558,6 +558,7 @@ class WritingTask {
     required this.minWords,
     required this.targetConnectors,
     required this.rubricHints,
+    this.levelBand = 'A2',
   });
 
   final String id;
@@ -569,6 +570,13 @@ class WritingTask {
   final List<String> targetConnectors;
   final List<String> rubricHints;
 
+  /// CEFR band ("A1"/"A2"/"B1"/"B2") this task is appropriate for — the
+  /// static offline bank shouldn't show a B2 essay to an A1 learner, unlike
+  /// the "New writing practice" button (which already generates fresh,
+  /// level-appropriate content live). Defaults to A2 for any task authored
+  /// before this field existed, rather than silently crashing on missing data.
+  final String levelBand;
+
   factory WritingTask.fromJson(Map<String, dynamic> json) => WritingTask(
     id: json['id'] as String,
     type: json['type'] as String,
@@ -578,6 +586,7 @@ class WritingTask {
     minWords: json['minWords'] as int,
     targetConnectors: List<String>.from(json['targetConnectors']),
     rubricHints: List<String>.from(json['rubricHints']),
+    levelBand: (json['levelBand'] as String?) ?? 'A2',
   );
 }
 

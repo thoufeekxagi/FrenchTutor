@@ -2,6 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -1352,7 +1353,7 @@ class _AgentLedListeningScreenState
   }
 
   Widget _debugPanel() {
-    if (_debugLog.isEmpty) {
+    if (!kDebugMode || _debugLog.isEmpty) {
       return const SizedBox.shrink();
     }
     return Container(

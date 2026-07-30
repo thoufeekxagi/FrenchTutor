@@ -9,6 +9,7 @@ import '../../design/app_router.dart';
 import '../../models/session.dart';
 import '../../orchestration/models/competency.dart';
 import '../../providers/database_provider.dart';
+import '../../services/ai_session_gate.dart';
 import '../../services/app_tour.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
@@ -25,6 +26,7 @@ import '../notes/notes_review_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
+import '../subscription/paywall_screen.dart';
 import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
 
@@ -52,6 +54,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _openSession({String? lessonContext}) async {
+    if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) return;
     LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
@@ -375,45 +378,89 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
+  /// Every Keep Practising chip funnels through here — [labId] is the same
+  /// identifier `SubscriptionGateService.isLabLocked` and the Practice tab
+  /// use, so a locked skill shows the paywall here exactly like it does
+  /// everywhere else. `null` means the skill is never lab-gated (Speaking/
+  /// Pronunciation are quota-gated by the daily AI-minutes cap instead).
+  Future<void> _openGated(String? labId, VoidCallback action) async {
+    if (labId != null &&
+        ref.read(subscriptionGateServiceProvider).isLabLocked(labId)) {
+      final subscribed = await AppRouter.push<bool>(
+        context,
+        (_) => const PaywallScreen(),
+        fullscreenDialog: true,
+      );
+      if (subscribed != true || !mounted) return;
+    }
+    action();
+  }
+
   Widget _keepPractising() {
+    final gate = ref.watch(subscriptionGateServiceProvider);
     final chips = [
       (
         icon: CupertinoIcons.square_stack_3d_up,
         label: 'Vocabulary',
-        onTap: () => _openPractice(PerformanceModality.readingRecognition),
+        labId: 'vocabulary',
+        onTap: () => _openGated(
+          'vocabulary',
+          () => _openPractice(PerformanceModality.readingRecognition),
+        ),
       ),
       (
         icon: CupertinoIcons.mic_fill,
         label: 'Pronunciation',
-        onTap: () =>
-            _openPractice(PerformanceModality.pronunciationProduction),
+        labId: null,
+        onTap: () => _openGated(
+          null,
+          () => _openPractice(PerformanceModality.pronunciationProduction),
+        ),
       ),
       (
         icon: CupertinoIcons.headphones,
         label: 'Listening',
-        onTap: () => _openPractice(PerformanceModality.listeningRecognition),
+        labId: 'listening',
+        onTap: () => _openGated(
+          'listening',
+          () => _openPractice(PerformanceModality.listeningRecognition),
+        ),
       ),
       (
         icon: CupertinoIcons.book,
         label: 'Reading',
-        onTap: () =>
-            AppRouter.push(context, (_) => const ListeningLabScreen()),
+        labId: 'listening',
+        onTap: () => _openGated(
+          'listening',
+          () => AppRouter.push(context, (_) => const ListeningLabScreen()),
+        ),
       ),
       (
         icon: CupertinoIcons.bubble_left_bubble_right,
         label: 'Roleplay',
-        onTap: () =>
-            AppRouter.push(context, (_) => const RoleplayLabScreen()),
+        labId: 'roleplay',
+        onTap: () => _openGated(
+          'roleplay',
+          () => AppRouter.push(context, (_) => const RoleplayLabScreen()),
+        ),
       ),
       (
         icon: CupertinoIcons.pencil,
         label: 'Writing',
-        onTap: () => _openPractice(PerformanceModality.controlledWriting),
+        labId: 'writing',
+        onTap: () => _openGated(
+          'writing',
+          () => _openPractice(PerformanceModality.controlledWriting),
+        ),
       ),
       (
         icon: CupertinoIcons.waveform,
         label: 'Speaking',
-        onTap: () => _openPractice(PerformanceModality.spontaneousSpeaking),
+        labId: null,
+        onTap: () => _openGated(
+          null,
+          () => _openPractice(PerformanceModality.spontaneousSpeaking),
+        ),
       ),
     ];
 
@@ -440,7 +487,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Practice any skill, any time. Your practice still informs what comes next.',
+                  'Practice any skill, any time — one locked skill unlocks '
+                  'free each day. Your practice still informs what comes next.',
                   style: Passeport.body(
                     13,
                   ).copyWith(color: Passeport.slateDim, height: 1.35),
@@ -458,9 +506,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final chip = chips[index];
+                final locked =
+                    chip.labId != null && gate.isLabLocked(chip.labId!);
                 return Semantics(
                   button: true,
-                  label: chip.label,
+                  label: locked ? '${chip.label} (subscribers only)' : chip.label,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -477,13 +527,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(chip.icon, size: 16, color: Passeport.sky),
+                          Icon(
+                            locked ? CupertinoIcons.lock_fill : chip.icon,
+                            size: locked ? 13 : 16,
+                            color: locked ? Passeport.slateDim : Passeport.sky,
+                          ),
                           const SizedBox(width: 7),
                           Text(
                             chip.label,
                             style: Passeport.body(
                               12.5,
                               weight: FontWeight.w600,
+                            ).copyWith(
+                              color: locked ? Passeport.slateDim : null,
                             ),
                           ),
                         ],

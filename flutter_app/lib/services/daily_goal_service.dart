@@ -41,7 +41,13 @@ class DailyGoalService {
     final key = _dateKey(day ?? DateTime.now());
     final done = <String>{};
     for (final session in sessions) {
-      final started = DateTime.tryParse(session.startedAt);
+      // `.toLocal()` matters here: locally-written timestamps have no `Z`
+      // and parse as local already, but sessions hydrated from the server
+      // (see commit 03b882c) come back UTC-tagged — without normalizing,
+      // those bucket by UTC calendar day while local ones bucket by local
+      // day, so the same session can land on "yesterday" or "tomorrow"
+      // depending on where it came from and skew which categories look done.
+      final started = DateTime.tryParse(session.startedAt)?.toLocal();
       if (started == null || _dateKey(started) != key) continue;
       final category = categoryFor(session.stage);
       if (category != null) done.add(category);

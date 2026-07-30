@@ -236,19 +236,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const Spacer(flex: 2),
           _AnimatedBrandMark(animation: _brandController),
           const Spacer(flex: 2),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(26, 30, 26, 28),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.22),
-                  ),
-                ),
-                child: Column(
+          Container(
+            padding: const EdgeInsets.fromLTRB(26, 32, 26, 36),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+            ),
+            child: Column(
+              children: [
+                // Quote marks bracket only this sentence — the Stack sizes to
+                // the Text alone, so the closing glyph hugs the end of the
+                // quote rather than floating near the bottom of the whole
+                // card (which used to land under the subtitle instead).
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
                     Text(
                       'The fastest way to speak French is to speak French.',
@@ -257,26 +259,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         23,
                       ).copyWith(color: Colors.white, height: 1.35),
                     ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'A live tutor who talks with you every day, '
-                      'not flashcards about someday.',
-                      textAlign: TextAlign.center,
-                      style: Passeport.body(15).copyWith(
-                        color: Colors.white.withValues(alpha: 0.92),
-                        height: 1.45,
-                      ),
+                    Positioned(
+                      left: -8,
+                      top: -16,
+                      child: _QuoteGlyph(opening: true),
+                    ),
+                    Positioned(
+                      right: -8,
+                      bottom: -16,
+                      child: _QuoteGlyph(opening: false),
                     ),
                   ],
                 ),
-              ),
-              Positioned(left: 10, top: 2, child: _QuoteGlyph(opening: true)),
-              Positioned(
-                right: 10,
-                bottom: 2,
-                child: _QuoteGlyph(opening: false),
-              ),
-            ],
+                const SizedBox(height: 22),
+                Text(
+                  'A live tutor who talks with you every day, '
+                  'not flashcards about someday.',
+                  textAlign: TextAlign.center,
+                  style: Passeport.body(15).copyWith(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
           ),
           const Spacer(flex: 2),
           Row(
@@ -654,42 +660,79 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     );
   }
 
-  /// Round play/stop button on each tutor card — hears the tutor's sample in
-  /// their real voice before choosing.
+  /// Round play button on each tutor card — hears the tutor's sample in
+  /// their real voice before choosing. A green ring fills in around it over
+  /// the sample's exact duration, so there's always a clear sense of when
+  /// it will finish; every preview button is disabled for that whole
+  /// stretch (see [TutorVoicePreviewer.isBusy]) so a stray second tap can't
+  /// cut the sample short or queue up another one.
   Widget _previewButton(TutorPersona p) {
     final loading = _previewer.loadingId == p.id;
     final playing = _previewer.playingId == p.id;
+    final busy = _previewer.isBusy;
     return Semantics(
       button: true,
       label: playing
-          ? 'Stop ${p.displayName}\'s voice sample'
+          ? '${p.displayName}\'s voice sample is playing'
           : 'Play ${p.displayName}\'s voice sample',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          PSHaptics.selection();
-          _previewer.play(p);
-        },
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: playing ? Passeport.maroon : Passeport.infoSoft,
-            shape: BoxShape.circle,
-          ),
-          child: loading
-              ? const Padding(
-                  padding: EdgeInsets.all(11),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Passeport.sky,
+        onTap: busy
+            ? null
+            : () {
+                PSHaptics.selection();
+                _previewer.play(p);
+              },
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (playing && _previewer.playingDurationMs != null)
+                TweenAnimationBuilder<double>(
+                  key: ValueKey(_previewer.playStartedAt),
+                  tween: Tween(begin: 0, end: 1),
+                  duration: Duration(
+                    milliseconds: _previewer.playingDurationMs!,
                   ),
-                )
-              : Icon(
-                  playing ? CupertinoIcons.stop_fill : CupertinoIcons.play_fill,
-                  size: 16,
-                  color: playing ? Colors.white : Passeport.sky,
+                  curve: Curves.linear,
+                  builder: (context, value, _) => SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: CircularProgressIndicator(
+                      value: value,
+                      strokeWidth: 3,
+                      color: Passeport.sage,
+                      backgroundColor: Colors.white.withValues(alpha: 0.25),
+                    ),
+                  ),
                 ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: playing ? Passeport.maroon : Passeport.infoSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: loading
+                    ? const Padding(
+                        padding: EdgeInsets.all(11),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Passeport.sky,
+                        ),
+                      )
+                    : Icon(
+                        playing
+                            ? CupertinoIcons.speaker_2_fill
+                            : CupertinoIcons.play_fill,
+                        size: 16,
+                        color: playing ? Colors.white : Passeport.sky,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -908,7 +951,7 @@ class _QuoteGlyph extends StatelessWidget {
       child: Text(
         opening ? '“' : '”',
         style: Passeport.display(
-          64,
+          38,
         ).copyWith(color: Colors.white.withValues(alpha: 0.55), height: 1),
       ),
     );

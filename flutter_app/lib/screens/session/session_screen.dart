@@ -21,6 +21,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/app_tour.dart';
 import '../../services/mic_mode.dart';
 import '../../services/pilot_access_service.dart';
+import '../../services/product_analytics.dart';
 import '../../services/referral_service.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
@@ -173,10 +174,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     final accepted = await AiVoiceDisclosure.ensureAccepted(context);
     if (!mounted) return;
     if (!accepted) {
-      Navigator.of(context).maybePop();
+      // `maybePop()` consults the screen's PopScope (canPop: false, meant to
+      // force an "End Call?" confirmation on an in-progress call) and gets
+      // redirected into `_confirmEnd()` instead of actually leaving — wrong
+      // here, since nothing has connected yet and there is nothing to
+      // confirm. A direct `pop()` bypasses that gate entirely, same as
+      // `_finishResult()` below already relies on to close this screen.
+      Navigator.of(context).pop();
       return;
     }
     _gemini.connect();
+    ProductAnalytics.capture('voice_session_started');
   }
 
   void _endCall() {
@@ -209,6 +217,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         ),
       );
       _consumeBonusMinutesIfNeeded(store, usedSecondsBefore);
+      ProductAnalytics.capture(
+        'voice_session_ended',
+        properties: {
+          'duration_seconds': store.aiSecondsUsedToday() - usedSecondsBefore,
+        },
+      );
     }
     _saveSessionLocally();
   }

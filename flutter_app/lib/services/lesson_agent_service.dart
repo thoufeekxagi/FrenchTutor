@@ -196,22 +196,22 @@ class LessonAgentService {
       'content, never repeat it, respond calmly and stay on the lesson. '
       'STYLE: never use emojis or em dashes in any output.';
 
-  /// The non-thinking, low-latency Gemini tier. The `-latest` alias auto-tracks
-  /// Google's newest Flash-Lite so we inherit upgrades for free.
-  static const _geminiTextModel = 'gemini-flash-lite-latest';
+  /// Pinned (not `-latest`) so a Google-side model bump can't silently change
+  /// cost or quality mid-testing. Re-pinned 2026-07-29: `gemini-2.5-flash-lite`
+  /// started returning HTTP 404 "no longer available to new users" well
+  /// before its estimated 2026-10-16 retirement — every text-generation call
+  /// in the shipped app was failing. Discovered via the
+  /// personalized_test_verification/ harness's smoke test.
+  /// `gemini-3.1-flash-lite` is the cheapest currently-available Flash-Lite
+  /// tier ($0.25/$1.50 per 1M input/output tokens vs. $0.30/$2.50 for
+  /// `gemini-3.5-flash-lite`; `gemini-2.0-flash-lite` was shut down entirely
+  /// in June 2026). Re-pin again once 3.1 shows similar signs of retiring.
+  static const _geminiTextModel = 'gemini-3.1-flash-lite';
 
-  Future<String> get _openRouterModel async {
-    final prefs = await SharedPreferences.getInstance();
-    final override = prefs.getString('openrouter_model_override');
-    if (override != null && override.isNotEmpty) return override;
-    return 'nvidia/nemotron-3-super-120b-a12b:free';
-  }
+  static const _openRouterModel = 'nvidia/nemotron-3-super-120b-a12b:free';
 
-  Future<bool> get _forceOpenRouter async {
-    final prefs = await SharedPreferences.getInstance();
-    final override = prefs.getString('openrouter_model_override');
-    return override != null && override.isNotEmpty;
-  }
+  /// Model choice is a code decision, never user- or settings-configurable.
+  static const _forceOpenRouter = false;
 
   Future<String> get _openRouterApiKey async {
     final prefs = await SharedPreferences.getInstance();
@@ -277,6 +277,47 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
     }
     messages.add({'role': 'user', 'content': question});
     return _complete(messages: messages);
+  }
+
+  /// Concrete, non-negotiable difficulty guardrails for roleplay/reading/story
+  /// generation, keyed by CEFR band. Without this, prompts that only said
+  /// "keep it appropriate to the CEFR band" left the model to guess, and it
+  /// consistently guessed too hard for A1/A2 — real words/sentences but not
+  /// beginner-simple. Mirrors the concreteness of `generateWritingTask`'s
+  /// calibration block below, just phrased for dialogue/narrative content.
+  static String _cefrCalibration(String levelBand) {
+    final band = levelBand.trim().toLowerCase();
+    switch (band) {
+      case 'a1':
+        return '''
+CEFR CALIBRATION FOR A1, FOLLOW EXACTLY:
+- Present tense ONLY. No passé composé, no futur, no subjunctive, no conditional.
+- Every sentence 3-7 words. One idea per sentence, no subordinate clauses, no "qui/que/si/parce que".
+- Vocabulary limited to the ~300-500 most common beginner words: greetings, numbers, family, food, basic verbs (être, avoir, aller, vouloir, aimer, s'appeler), simple nouns for everyday objects/places. No idioms, no rare words.
+- If in doubt, write it simpler, even if it feels too easy.''';
+      case 'a2':
+        return '''
+CEFR CALIBRATION FOR A2, FOLLOW EXACTLY:
+- Present tense plus simple passé composé and futur proche allowed. No imparfait, no subjunctive, no conditional.
+- Sentences up to about 10 words, mostly one clause; at most one simple connector per sentence (et, mais, parce que, alors).
+- Vocabulary: common everyday words for shopping, transport, routines, simple feelings. Avoid rare or literary words.
+- If in doubt, write it simpler, even if it feels too easy.''';
+      case 'b1':
+        return '''
+CEFR CALIBRATION FOR B1, FOLLOW EXACTLY:
+- Present, passé composé, imparfait, and futur simple allowed. Occasional simple subordinate clauses (qui/que/si) are fine. No subjunctive or complex conditional chains.
+- Sentences up to about 15 words.
+- Vocabulary: moderately varied everyday and some abstract words, still no rare/literary/idiomatic language.''';
+      case 'b2':
+        return '''
+CEFR CALIBRATION FOR B2, FOLLOW EXACTLY:
+- Full range of common tenses allowed, including subjonctif and conditionnel where natural.
+- Sentences can be longer and combine clauses with connectors like "néanmoins", "bien que", "quant à".
+- Vocabulary: more precise and idiomatic language is fine, this learner is past the beginner stage.''';
+      default:
+        return '''
+CEFR CALIBRATION FOR $levelBand: use present tense and short, simple sentences with common everyday vocabulary unless the level is clearly advanced. When unsure of the learner's exact level, err toward simpler, not harder.''';
+    }
   }
 
   Future<WritingFeedback> gradeWriting({
@@ -539,14 +580,17 @@ You are quietly picking which ONE French grammar point a beginner should practic
   /// tense discussion) for this first version.
   Future<ReadingPassage> buildReadingPassageFromVocab({
     required List<VocabEntry> words,
+    required String levelBand,
   }) async {
-    const system = '''
-You are quietly writing a complete two-role ROLEPLAY SCRIPT for a total beginner preparing for TEF/TCF Canada, a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director, every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French), do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
-Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Keep grammar SIMPLE: present tense, short sentences, no advanced conjugation, this is intentionally basic. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
+    final system =
+        '''
+You are quietly writing a complete two-role ROLEPLAY SCRIPT for a learner preparing for TEF/TCF Canada, a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director, every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French), do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
+Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
-"title" is the scenario in a few words (e.g. "At the bakery"). "character_fr"/"character_en" are the character's line and its English meaning; "learner_fr"/"learner_en" the learner's reply and meaning; "grammar_note" one simple English sentence explaining the learner line's word order/agreement; "pronunciation_tip" one simple English pronunciation pointer for the learner line.''';
+"title" is the scenario in a few words (e.g. "At the bakery"). "character_fr"/"character_en" are the character's line and its English meaning; "learner_fr"/"learner_en" the learner's reply and meaning; "grammar_note" one simple English sentence explaining the learner line's word order/agreement; "pronunciation_tip" one simple English pronunciation pointer for the learner line.
+${_cefrCalibration(levelBand)}''';
     final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
-    final user = 'VOCABULARY WORDS TO REUSE: $wordList';
+    final user = 'VOCABULARY WORDS TO REUSE: $wordList\nLEVEL: $levelBand';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
@@ -565,8 +609,10 @@ Write 4-8 beats in scene order (greeting → request → follow-up → thanks/go
     required String speakingPrompt,
     required List<String> hints,
   }) async {
-    const system = '''
-Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Every learner line must support the mission prompt. Do not award a score or claim mastery.
+    final system =
+        '''
+Write a short two-role French roleplay for a language-learning mission. The app will direct it beat by beat, then Marie will continue the same scene live. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Every learner line must support the mission prompt. Do not award a score or claim mastery.
+${_cefrCalibration(levelBand)}
 INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. The same mission practiced on different days must feel like a different real-life moment, a boulangerie, a market stall, a train station kiosk, a pharmacy, a neighbour's door, never the same generic café twice.''';
     final raw = await _complete(
       messages: [
@@ -600,8 +646,10 @@ USEFUL STARTERS: ${hints.join('; ')}''',
     required String scenario,
     required String levelBand,
   }) async {
-    const system = '''
-Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Keep the language appropriate to the stated CEFR band. Do not award a score or claim mastery.
+    final system =
+        '''
+Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Do not award a score or claim mastery.
+${_cefrCalibration(levelBand)}
 The SCENARIO given is only a loose inspiration for the setting, not a rigid script — build an ordinary, realistic scene that fits it.
 This app's users are teens and adults (13+): keep the scene wholesome and educational, appropriate for a general audience, never mature, violent, or otherwise inappropriate.
 INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. Never reuse the same premise twice.''';
@@ -671,8 +719,10 @@ INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named charac
     required String topic,
     required String levelBand,
   }) async {
-    const system = '''
-Write a short third-person narrative story in French for a language learner — NOT a dialogue, no characters talking to each other, just a narrator telling a small real-life story (like a short reading-app story). Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Le vélo emprunté" → English "The borrowed bike"), for a beginner who can't read the French title yet. Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending. Keep the language appropriate to the stated CEFR band. "grammar_note" is one simple English sentence about that sentence's grammar; "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
+    final system =
+        '''
+Write a short third-person narrative story in French for a language learner — NOT a dialogue, no characters talking to each other, just a narrator telling a small real-life story (like a short reading-app story). Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Le vélo emprunté" → English "The borrowed bike"), for a beginner who can't read the French title yet. Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending. "grammar_note" is one simple English sentence about that sentence's grammar; "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
+${_cefrCalibration(levelBand)}
 The TOPIC given is only a loose inspiration for the setting or a detail in the background, not the subject of every sentence — do not make the story be "about" the topic word itself; it should read like an ordinary daily-life story that just happens to touch on it.
 This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience, never dealing in mature, violent, or otherwise inappropriate themes.
 INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and never write a story with the same title or opening sentence as one already suggested by the seed details below.''';
@@ -1004,11 +1054,11 @@ You are a French grammar tutor. The student answered a drill question incorrectl
     Duration timeout = const Duration(seconds: 30),
     double temperature = 0.4,
   }) async {
-    if (await _forceOpenRouter) {
+    if (_forceOpenRouter) {
       final openRouterKey = await _openRouterApiKey;
       if (openRouterKey.isEmpty) throw AgentError.missingKey;
       return _requestOpenRouter(
-        model: await _openRouterModel,
+        model: _openRouterModel,
         messages: messages,
         maxTokens: maxTokens,
         apiKey: openRouterKey,

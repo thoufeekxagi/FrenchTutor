@@ -86,9 +86,7 @@ class PilotAccessService {
   /// snapshot was built from, not a stale flat constant.
   static int baseDailyLimitSeconds(PilotEntitlement entitlement) {
     final subscribed =
-        DevSubscriptionOverride.enabled ||
-        entitlement.status == PilotEntitlementStatus.active ||
-        entitlement.status == PilotEntitlementStatus.grace;
+        DevSubscriptionOverride.enabled || entitlement.isPaidActive;
     return subscribed ? subscribedDailyLimitSeconds : freeDailyLimitSeconds;
   }
 }

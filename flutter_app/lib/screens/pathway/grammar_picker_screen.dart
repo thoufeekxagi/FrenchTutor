@@ -2,6 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -187,7 +188,7 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
                           ).copyWith(color: DesignTokens.slateDim),
                         ),
                       ],
-                      if (_debugLog.isNotEmpty) ...[
+                      if (kDebugMode && _debugLog.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         _debugPanel(),
                       ],
@@ -385,10 +386,14 @@ class _GrammarPickerScreenState extends ConsumerState<GrammarPickerScreen> {
             ),
           ),
           const Spacer(),
-          PasseportPrimaryButton(
-            label: 'Choose my grammar focus',
-            icon: CupertinoIcons.arrow_right,
-            onPressed: _candidates.isEmpty ? null : _beginAutoSession,
+          SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 8),
+            child: PasseportPrimaryButton(
+              label: 'Choose my grammar focus',
+              icon: CupertinoIcons.arrow_right,
+              onPressed: _candidates.isEmpty ? null : _beginAutoSession,
+            ),
           ),
         ],
       ),

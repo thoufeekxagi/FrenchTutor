@@ -67,6 +67,14 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   String? _callError;
   String? _lastTutorLine;
 
+  // The initial connect message only ever carries a one-time snapshot of
+  // the draft — without this, Marie has no idea what's been typed since the
+  // call started, so asking her "can you see what I wrote?" got a made-up
+  // answer. Resent only when the draft actually changed, so a student who
+  // stops typing doesn't get silently re-sent the same text forever.
+  Timer? _draftSyncTimer;
+  String _lastSyncedContent = '';
+
   late final SessionRecorder _recorder;
 
   WritingTask get task => widget.task;
@@ -148,6 +156,29 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
       _callConnecting = false;
       _callActive = true;
     });
+    _lastSyncedContent = _content;
+    _draftSyncTimer = Timer.periodic(const Duration(seconds: 8), (_) {
+      _syncDraftIfChanged();
+    });
+  }
+
+  /// Silent context update, not a real conversational turn — Marie should
+  /// absorb the latest draft without commenting on it or replying to this
+  /// specific message, same "app note, not the student" convention used for
+  /// call kickoffs elsewhere (see session_screen.dart). Only fires when the
+  /// draft actually changed since the last send.
+  void _syncDraftIfChanged() {
+    if (_content == _lastSyncedContent) return;
+    _lastSyncedContent = _content;
+    _gemini?.sendText(
+      '(Note from the app, not the student: this is a silent background '
+      "update of the student's current draft, automatically sent while they "
+      'type — it is NOT a message from the student and does not need a '
+      'reply. Do not comment on it or acknowledge it in any way unless the '
+      'student explicitly asks you to read, check, or comment on their '
+      "draft — if they do ask, answer only what they asked, nothing extra.\n\n"
+      "STUDENT'S CURRENT DRAFT:\n${_content.trim().isEmpty ? '(nothing written yet)' : _content.trim()})",
+    );
   }
 
   Future<bool> _connectLive() async {
@@ -230,6 +261,8 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   }
 
   void _endCall() {
+    _draftSyncTimer?.cancel();
+    _draftSyncTimer = null;
     _audio?.stopStreaming();
     _audio?.dispose();
     _gemini?.disconnect();
@@ -248,6 +281,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     _logMinutes();
     _finishSession();
     _textController.dispose();
+    _draftSyncTimer?.cancel();
     _audio?.stopStreaming();
     _audio?.dispose();
     _gemini?.disconnect();
@@ -643,7 +677,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                       ? 'Connecting to Marie…'
                       : _tutorSpeaking
                       ? 'Marie is speaking…'
-                      : 'Listening — keep writing, she can hear you.',
+                      : 'Listening. Keep writing, she can hear you.',
                   style: DesignTokens.body(
                     13,
                     weight: FontWeight.w500,

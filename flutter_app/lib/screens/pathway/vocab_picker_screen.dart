@@ -308,14 +308,18 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 ),
               ],
               const Spacer(),
-              PasseportPrimaryButton(
-                label: queue.isEmpty
-                    ? 'No recommended words yet'
-                    : 'Start ${queue.length}-word practice',
-                icon: CupertinoIcons.arrow_right,
-                onPressed: isLoading || queue.isEmpty
-                    ? null
-                    : () => _beginSession(queue),
+              SafeArea(
+                top: false,
+                minimum: const EdgeInsets.only(bottom: 8),
+                child: PasseportPrimaryButton(
+                  label: queue.isEmpty
+                      ? 'No recommended words yet'
+                      : 'Start ${queue.length}-word practice',
+                  icon: CupertinoIcons.arrow_right,
+                  onPressed: isLoading || queue.isEmpty
+                      ? null
+                      : () => _beginSession(queue),
+                ),
               ),
             ],
           ),
@@ -366,9 +370,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             }).toList(),
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          color: DesignTokens.canvas,
+        PSBottomActionBar(
           child: _startButton(
             count: _manualSelection.length,
             onPressed: () {
