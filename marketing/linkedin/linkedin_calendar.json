@@ -1,0 +1,236 @@
+[
+  {
+    "date": "2026-07-21",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 1,
+    "topic": "why this product exists",
+    "text": "For the past several months I have been building a French learning app, and I want to start by explaining why.\n\nA lot of people preparing for TCF Canada or TEF Canada are not learning French for fun. They are doing it because a specific number on a specific test decides whether they get enough CRS points for Express Entry. That is a very different kind of studying than \"parlez-vous francais\" for a vacation. It is high stakes, it is timed, and it is stressful in a way that generic apps were never designed for.\n\nI kept hearing the same thing from people in this situation: the popular apps are fine for building vocabulary, but nobody built something around the actual exam, the actual scoring bands, the actual pressure of needing NCLC 7 or higher. So I started building ParleSprint for that specific person. More on the how over the next few weeks.",
+    "notes": "opening post, sets tone and audience"
+  },
+  {
+    "date": "2026-07-24",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 1,
+    "topic": "problem with existing apps",
+    "text": "Here is something that surprised me when I started digging into this space. Most French learning apps optimize for daily streaks and gamified vocabulary. That is a great model if your goal is \"stay conversational for a trip to Paris.\"\n\nIt is a much worse model if your goal is to move from B1 to C1 on a government-recognized exam in eight months because your immigration timeline depends on it. The skills you actually get tested on in TCF or TEF, structured listening comprehension, formal written expression, sustained spoken argument, are barely touched by the swipe-a-flashcard style of app.\n\nI am not saying those apps are bad. I am saying they were not built for this specific job, and a lot of people preparing for Canadian immigration are quietly aware of that gap and cobbling together YouTube channels, old textbooks, and tutors to fill it.",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-28",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 1,
+    "topic": "market observation - CRS points",
+    "text": "Something I have noticed watching Express Entry conversations online: French proficiency has quietly become one of the more \"controllable\" levers people have for their CRS score.\n\nYou cannot control the draw cutoffs. You cannot control what category-based rounds get invited next. But you can control how many hours you put into hitting a higher NCLC band. That is probably why French test prep has become such a serious, almost sport-like pursuit for a lot of applicants who did not grow up speaking French at all.\n\nI find that dynamic fascinating and a little bit unfair. People are optimizing a language exam the way others optimize a fitness plan, because the points math genuinely can move their file forward. Worth remembering that behind every CRS spreadsheet is someone doing verb conjugations at 11pm after a full work day.",
+    "notes": "no legal advice, just observation"
+  },
+  {
+    "date": "2026-07-31",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 1,
+    "topic": "founder mistake and lesson",
+    "text": "Small confession from the build. I spent almost three weeks early on building a beautiful spaced repetition engine for vocabulary. Smooth animations, nice curves, the works.\n\nThen I talked to five people actually studying for TCF and asked what they were most scared of. Not one of them said vocabulary. They all said the same thing in different words: \"I freeze during the oral expression section\" or \"I run out of things to say after 30 seconds.\"\n\nSo the thing I was most proud of building was solving a problem almost nobody in this audience was worried about. I shelved the polish and started rebuilding around speaking practice and structured response frameworks instead. Expensive lesson in listening before building, but a good one to learn at 65% done rather than at launch.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-04",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 1,
+    "topic": "product decision explained",
+    "text": "One decision I made that I want to explain: ParleSprint scores your spoken answers against the same rubric structure examiners use for TCF/TEF oral expression, not just \"good job\" feedback.\n\nThe reasoning is simple. If you are preparing for an exam that grades on specific criteria, generic encouragement does not tell you anything useful. Knowing you said a coherent sentence is not the same as knowing whether you used enough subordinate clauses or varied tenses to land in the B2 range versus C1.\n\nIt is a harder thing to build than a simple pronunciation checker, and it will not be perfect on day one. But I would rather ship something aimed at the actual scoring bands and improve it in the open than ship something easy that does not tell you anything you need to know before test day.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-07",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 1,
+    "topic": "waitlist conversation",
+    "text": "Had a call this week with someone on the waitlist, a nurse in the Philippines prepping for TEF while working night shifts. She told me her study window is basically 45 minutes a day, squeezed in after her shift ends and before her kids wake up.\n\nThat single conversation reshaped how I am thinking about session length in the app. I had been designing around 25 to 30 minute focused sessions because that felt \"serious\" for exam prep. She does not have that. Almost nobody prepping for these exams around a full time job and family does.\n\nSo the version launching in a couple weeks is built around short, high intensity sessions you can actually finish on a tired brain at 11pm. Thank you to everyone who has taken the time to talk to me so far, these conversations are shaping the product more than anything I could have guessed on my own.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-11",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 2,
+    "topic": "launch / beta live",
+    "text": "ParleSprint is live for its first small group of beta users as of this week.\n\nIt is not finished. There are rough edges, and I will be fixing things in real time based on what people run into. But after months of building around conversations with people actually preparing for TCF and TEF Canada, it felt more important to get it in front of real learners than to keep polishing in private.\n\nIf you are prepping for a Canadian French exam and want early access, send me a message. I read and respond to all of them myself right now, which will probably not be true forever, so enjoy the founder-era customer service while it lasts.",
+    "notes": "soft beta open, direct CTA"
+  },
+  {
+    "date": "2026-08-14",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 2,
+    "topic": "first beta reactions",
+    "text": "Three days into beta and the feedback has been a mix of genuinely useful and genuinely humbling.\n\nA user in Nigeria told me the listening comprehension module felt \"too clean,\" meaning the audio was clearer than what she expects on exam day, where accents and pacing are less forgiving. That is a completely fair note and one I would not have caught without her.\n\nAnother user found a bug where progress did not save properly after closing the app mid-session, which is about as basic a bug as it gets, and also exactly the kind of thing that only shows up once real people with real spotty wifi start using something. Grateful for both kinds of feedback, the ideas and the bug reports.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-18",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 2,
+    "topic": "conversation with RCIC",
+    "text": "Talked with an immigration consultant this week, mostly just to understand her world better rather than to pitch anything.\n\nWhat stuck with me was how often she said clients come to her having already spent money on test prep that did not match what they needed. Not because the resources were bad, but because nobody had explained the difference between general French fluency and what a specific test band actually requires.\n\nI am not in the business of giving immigration advice, that is squarely her job and people should talk to a licensed consultant for that. But it reinforced why I think there is real value in a tool that is honest about being narrowly focused: help you get better at French for this specific exam, and let the RCICs handle the actual application strategy.",
+    "notes": "no advice given, respects RCIC lane"
+  },
+  {
+    "date": "2026-08-21",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 2,
+    "topic": "numbers update",
+    "text": "Quick numbers update from the first week and a half of beta: just under 90 people have signed up, about 60 have completed at least one full practice session, and the average session length is 19 minutes, shorter than I originally designed for, which tracks with everything users have told me about squeezing this in around work and family.\n\nThe module people return to most is oral expression practice, which is also the one I almost did not build in the first version. Small reminder to myself to keep asking users what they need instead of assuming.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-25",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 2,
+    "topic": "surprising user behavior",
+    "text": "Something I did not expect: a decent number of beta users are studying in pairs. Two friends, a married couple, a pair of coworkers, all preparing for the same exam window and comparing notes.\n\nOne user asked me if there is a way to see a study partner's progress side by side, purely for accountability, not competition. I had built ParleSprint as a solo tool because that is how I assumed people study for something this personal and stressful. Turns out isolation is not always what people want when the stakes are this high.\n\nNo promises on when a shared progress view ships, but it is now on the list because of that one conversation, which is exactly how I want this to keep working.",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-28",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 2,
+    "topic": "problem with existing apps, part 2",
+    "text": "A beta user sent me a message that summed up something I have been trying to articulate for months. She said, \"Duolingo made me feel good at French. TCF made me feel like I had never studied it.\"\n\nThat gap between confidence built by casual apps and the reality of a formal proctored exam is, I think, the single biggest source of anxiety for people in this process. It is not that those apps failed her. It is that comfort with everyday phrases does not transfer cleanly to structured argumentation under a timer.\n\nClosing that specific gap, the distance between \"I can order a coffee in French\" and \"I can defend an opinion in French for four minutes while being graded on it,\" is basically the whole reason ParleSprint exists.",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-01",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 2,
+    "topic": "founder reflection, one month in",
+    "text": "One month since beta opened. Some days this feels like the most useful thing I have ever built, watching someone go from panicking about the oral section to sending me a message that says \"I did not freeze this time.\" Other days it is just fixing an audio playback bug at midnight and wondering if anyone will notice.\n\nBoth of those things are true at the same time, and I think that is just what building something real looks like once it leaves your laptop and meets actual people with actual deadlines. Thank you to everyone who has stuck with the rough edges so far.",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-04",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 2,
+    "topic": "specific feature iteration",
+    "text": "Rebuilt the written expression feedback this week after enough beta users flagged the same issue: the feedback was telling them what was wrong but not why it mattered for scoring.\n\nExample: knowing you used \"tu\" instead of \"vous\" in a formal letter is one note. Knowing that register mistakes like that are exactly what pulls a written response down a full band is a completely different, more useful note. Small wording change, but it came directly from watching four different people get confused by the same feedback screen and realizing the problem was mine, not theirs.",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-08",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 2,
+    "topic": "outreach to RCICs, non-salesy",
+    "text": "I have started reaching out to a handful of immigration consultants, not to sell anything, but to ask a genuine question: what do your clients get wrong most often about French test prep before they come to you?\n\nThe answers so far have been more useful than any market research I could have done alone. A few consultants mentioned clients underestimating how long it actually takes to move a full CLB level, treating it like a six week problem when it is often a six month one.\n\nIf you are an RCIC or work adjacent to this space and have observations to share, I would genuinely like to hear them. Not looking for a partnership pitch here, just trying to understand the full picture better.",
+    "notes": "genuine outreach, not salesy"
+  },
+  {
+    "date": "2026-09-11",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "founding member tier announced",
+    "text": "Starting today, ParleSprint has a small paid tier: Founding Member. It unlocks the full practice library and the exam-band scoring feedback that beta users have been asking to keep past the free limits.\n\nI thought about this for a while before flipping it on. The honest reason is that building the exam scoring engine, the audio review pipeline, and ongoing content takes real time and real cost, and I want this to be something I can keep improving for years, not a side project that quietly dies because it never had a business model.\n\nFounding members get a locked-in price for as long as they stay subscribed, as a thank you for showing up early when the product was still rough around the edges. Everyone else keeps free access to the core practice modules.",
+    "notes": "pricing pivot announcement"
+  },
+  {
+    "date": "2026-09-15",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 3,
+    "topic": "first testimonial",
+    "text": "First message I want to share from a founding member, lightly edited for privacy: \"I took a TEF practice test after six weeks on ParleSprint and scored high enough on the oral section for the first time. I actually said the words out loud in my kitchen: I think I can do this.\"\n\nI am not going to pretend one message means the product is finished or perfect. But that specific feeling, going from dread to \"I think I can do this,\" is the entire point of building this thing, and it is worth pausing to say so.",
+    "notes": "PLACEHOLDER TESTIMONIAL, this quote is not real. Do not post this until you have an actual message from a real founding member and have their permission to share it, lightly anonymized. If no real quote exists yet by this date, swap this slot for a value post instead."
+  },
+  {
+    "date": "2026-09-18",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "why paid tier, deeper reasoning",
+    "text": "A few people asked why I did not keep ParleSprint entirely free, especially given how expensive test prep already is for people in this situation.\n\nHere is the honest tradeoff. Free-forever tools tend to either get abandoned once the founder runs out of runway, or they monetize your data and attention instead of your subscription. I did not want either outcome for something people are trusting with a decision this important.\n\nThe core practice modules stay free indefinitely. The founding member tier is there for people who want the deeper scoring feedback and full content library, and it is what funds keeping the lights on and shipping improvements based on what users tell me. Seemed like the more honest version of sustainable, even if it is less simple than \"everything free forever.\"",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-22",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 3,
+    "topic": "user conversation lesson",
+    "text": "A founding member told me something last week that reframed how I think about the whole exam prep window. He said the hardest part was not the French, it was the uncertainty of not knowing if he was actually improving or just getting better at feeling comfortable.\n\nThat distinction, real improvement versus comfort, is quietly the thing most self-study tends to get wrong. You can feel confident about material you have simply seen many times without being any closer to performing under exam conditions.\n\nIt is part of why the practice sessions are built to feel a little uncomfortable on purpose, timed, scored, no do-overs mid-response. Comfortable practice and exam-day performance are not the same skill, and I would rather be honest about that now than have someone find out the hard way in the testing center.",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-25",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "industry observation, Express Entry reaction",
+    "text": "Watching the reaction to recent Express Entry draw patterns has been interesting from where I sit. A lot of people who assumed a general profile would eventually get invited are recalculating, and French proficiency keeps coming up as one of the more reliable ways to strengthen a file regardless of which category gets prioritized next.\n\nI am not an immigration authority and I am not going to speculate on future draws or policy, that is not my lane. But I will say this: whatever happens with the categories, the value of a genuinely higher French level does not expire. It is one of the few investments in this whole process that pays off no matter which way the draws move.",
+    "notes": "no legal/policy predictions, stays in French-learning lane"
+  },
+  {
+    "date": "2026-09-29",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 3,
+    "topic": "gratitude to early community",
+    "text": "I want to take a post to just say thank you. To the first person who filled out the waitlist form back in July when the app barely worked. To the beta users who reported bugs instead of just quietly leaving. To the founding members who paid for something still actively being improved.\n\nNone of this was inevitable. A lot of people give feedback for free that most companies pay research firms a lot of money to get, and I have been on the receiving end of that generosity for two months now. If you are one of those people reading this, you know who you are, and it mattered more than a like or a comment can really convey.",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-02",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "traction reflection",
+    "text": "Two months post-launch, here is where things stand honestly. Growth has been slow and mostly word of mouth, which is both humbling and exactly what I expected for a product this specific. This is not a mass market app, it is built for a narrow, high stakes audience, and that audience finds things through trust more than ads.\n\nWhat has surprised me is the retention. People preparing for these exams do not casually browse a French app for fun, they show up because they need to, and they keep showing up until test day. That kind of committed usage is rare and I do not take it for granted.",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-06",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 3,
+    "topic": "specific problem, listening comprehension",
+    "text": "A pattern I keep seeing in user sessions: people scoring well on reading comprehension and noticeably worse on listening, even at the same overall level.\n\nMy theory, based on conversations rather than any formal research, is that most self-study happens through text, articles, apps with written prompts, grammar books. Listening at natural speed, with regional accents and filler words, gets far less practice time simply because it is harder to create good material for and less pleasant to sit through when you are still learning.\n\nSo the next few weeks of development are going into expanding the listening library with a wider range of speakers and speeds, because it seems to be the quiet gap a lot of people do not realize they have until the exam room.",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-09",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "founder mistake, part 2",
+    "text": "Made a pricing mistake I should admit to. I initially set the founding member tier without a clear enough answer to \"what happens to my price after the founding window closes.\" A few people asked and I did not have a firm answer ready, which is not a great look when you are asking people to trust you with a subscription.\n\nFixed now: founding member pricing is locked for as long you remain subscribed, full stop, clearly stated on the pricing page. Small thing, but a good reminder that clarity is part of the product, not just a detail you can patch in later.",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-13",
+    "time": "10:00",
+    "day_of_week": "Tuesday",
+    "phase": 3,
+    "topic": "second testimonial / consultant feedback loop",
+    "text": "An RCIC I have been in occasional contact with mentioned she now tells clients to expect a real time investment for French prep rather than treating it as an afterthought squeezed in before their application deadline. She did not credit ParleSprint for that shift, and I am not claiming it did, but it was a good reminder that the more useful role for a tool like this might be helping people set realistic expectations early, not just cramming near the end.\n\nSeparately, a founding member mentioned she recommended the app to two coworkers going through the same process. Slow, word of mouth growth, one honest recommendation at a time, still feels like the right way for something this specific to spread.",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-16",
+    "time": "10:00",
+    "day_of_week": "Friday",
+    "phase": 3,
+    "topic": "what's coming next",
+    "text": "Looking ahead, here is what is on the roadmap: an expanded listening library, the shared study partner progress view a few beta users asked for back in August, and a deeper breakdown of written expression scoring so people can see exactly which sentence patterns are holding their band back.\n\nNone of this happens without the people who have been testing, complaining, and recommending ParleSprint since it was genuinely rough. Three months ago this was 65 percent of an idea running on my laptop. Today it is something real people are using to prepare for one of the more consequential exams of their lives. Excited for what the next few months build on top of that.",
+    "notes": "closing post of calendar, forward looking"
+  }
+]

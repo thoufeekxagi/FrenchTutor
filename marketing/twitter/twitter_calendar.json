@@ -1,0 +1,902 @@
+[
+  {
+    "date": "2026-07-20",
+    "day_number": 1,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Starting to post here about building ParleSprint, an app to help people prep for TCF/TEF Canada so they can hit the French score they need for immigration points. App is roughly 65% done. Let's see how this goes.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "Launch tweet"
+  },
+  {
+    "date": "2026-07-21",
+    "day_number": 2,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Spent yesterday fixing the audio recording pipeline. Turns out iOS and Android handle mic permissions completely differently and my code assumed they didn't. Fun times.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-22",
+    "day_number": 3,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "Quick TCF fact a lot of people don't know: the exam scores listening, reading, speaking, and writing separately. You can be strong in reading and still miss NCLC 7 because speaking dragged you down. Building ParleSprint around that exact problem.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-23",
+    "day_number": 4,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "For those who've taken TCF or TEF already: which section wrecked you the most? Speaking, writing, listening, or reading. Trying to figure out where to focus first.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "poll-style engagement"
+  },
+  {
+    "date": "2026-07-24",
+    "day_number": 5,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Learned the hard way this week that grading spoken French automatically is way harder than grading writing. Text you can diff against a rubric. Speech has pauses, filler words, accent variation. Still tuning this.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-25",
+    "day_number": 6,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Placement test is coming together. 20 questions, adapts difficulty as you go, spits out an estimated NCLC level at the end. Not perfect yet but it's usable on my own device now which feels like a milestone.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-26",
+    "day_number": 7,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "One week into tweeting about this. Nobody's watching yet and that's fine, honestly kind of nice to just write down what I did without an audience judging every decision.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-27",
+    "day_number": 8,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "The writing feedback loop works like this right now: you submit a paragraph, the app flags grammar issues, tone, and register, then gives you one thing to fix rather than fifteen. Overwhelming people with corrections just makes them quit.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-28",
+    "day_number": 9,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Mistake from this week: I built three units of content before testing the placement test logic properly. Now I'm going back to renumber difficulty tags on all of it. Build the skeleton first, then the content. Obvious in hindsight.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-29",
+    "day_number": 10,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "If you're aiming for NCLC 7, examiners are listening for connectors like 'cela dit', 'par ailleurs', 'quoi qu'il en soit', not just correct verbs. Fluency markers matter more than people think at that level.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-30",
+    "day_number": 11,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Got speaking feedback partially working today. You record a response to a prompt, it transcribes, scores fluency and vocabulary range, and gives you a rough band. Still slow (12 seconds per response) but it works.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-07-31",
+    "day_number": 12,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "Genuine question for anyone prepping for TCF/TEF right now: do you practice speaking out loud alone, or does it feel pointless without another person to respond to?",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-01",
+    "day_number": 13,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Sat outside yesterday and just planned content structure instead of coding. Sometimes the most productive thing is closing the laptop and using a notebook. Also my coffee went cold twice.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-02",
+    "day_number": 14,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Two weeks in. Placement test: done. Unit 1 and 2: done. Speaking feedback: rough but functional. Writing feedback: functional. Still need units 3 through 6 and a smoother onboarding flow before I'd let a stranger touch this.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-03",
+    "day_number": 15,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Almost shipped a bug where the app would tell someone they scored NCLC 9 when the max is effectively capped lower in practice for most learners. Score inflation in a language app is worse than no score at all. Glad I caught it before anyone saw it.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-04",
+    "day_number": 16,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "Small thing that trips up a lot of TCF writing test takers: the tasks are timed per section, not total. You can't borrow ten minutes from task 1 to finish task 3. Practicing under real time pressure matters more than practicing untimed.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-05",
+    "day_number": 17,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "Unit 3 is themed around workplace French today, since a lot of my future users are prepping for Canadian job interviews alongside the exam. Vocabulary like 'entretien d'embauche' and 'lettre de motivation' shows up constantly on TCF too.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-06",
+    "day_number": 18,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "If ParleSprint had to pick ONE thing to be really excellent at before anything else, what would you want it to be. Speaking practice, writing correction, or exam-style mock tests?",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-07",
+    "day_number": 19,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Onboarding flow redesign today. First version asked seven questions before you could even try the app. Cut it to two. Nobody wants a survey before they've seen any value.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-08",
+    "day_number": 20,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Real talk, some days this feels like it'll never be ready and some days I open the app and I'm surprised how far it's come. Today was a surprised day.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-09",
+    "day_number": 21,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "That's the pre launch stretch mostly done. Core app, placement test, first units, speaking and writing feedback all working end to end on my phone. Next step is opening this up to actual humans. Nervous and excited in equal measure.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "wraps pre-launch phase"
+  },
+  {
+    "date": "2026-08-10",
+    "day_number": 22,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Spent the morning triple checking the signup flow because in a few days I'm opening this to real people instead of just me clicking around at midnight.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-11",
+    "day_number": 23,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "ParleSprint beta is open. If you're prepping for TCF or TEF Canada and want early access, the waitlist link is in my bio. Small batch to start so I can actually read every piece of feedback.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "LAUNCH DAY - pin candidate"
+  },
+  {
+    "date": "2026-08-12",
+    "day_number": 24,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "First few beta signups came in overnight. I may have refreshed my email eight times before 7am. No shame.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-13",
+    "day_number": 25,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "First real user finished the placement test today. Watched the event logs like it was a sports match. It worked, mostly. One question rendered without an accent mark, already fixed.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-14",
+    "day_number": 26,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Learned that when a beta user says 'the app froze' it almost never means the app froze. Usually means a button didn't give any loading feedback so it looked frozen for two seconds. Adding spinners everywhere now.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-15",
+    "day_number": 27,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "For the beta folks and lurkers alike, what's more useful to you day to day, five minutes of speaking practice or fifteen minutes of writing correction? Trying to figure out default session length.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-16",
+    "day_number": 28,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "TCF listening section throws in a lot of Québécois and other regional accents, not just Parisian French. If your only practice audio is textbook standard French, the exam might genuinely surprise you.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-17",
+    "day_number": 29,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Waitlist plus beta users combined just crossed 50 people. Small number to some of you, feels enormous to me since three weeks ago it was one person testing on a cracked phone screen.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-18",
+    "day_number": 30,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "Adding a 'mistakes you keep making' panel this week. Instead of showing every error once and forgetting it, the app tracks patterns, so if you keep messing up subjunctive after 'il faut que', it starts surfacing that specifically.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-19",
+    "day_number": 31,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "A beta user emailed at 1am asking if the app was 'actually going to help her pass or if it was just another app.' Fair question. Told her the honest answer, it's a tool, the work is still hers. She said that's what she wanted to hear.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-20",
+    "day_number": 32,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Rebuilt the mock speaking test this week to match the actual TCF format more closely, three tasks with increasing complexity instead of one long freeform recording. Feels much closer to the real exam now.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-21",
+    "day_number": 33,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "A beta tester pointed out my example sentences were all in formal register even in the casual conversation unit. Two months of writing content and I never noticed I default to formal French. Fixing that across the board now.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-22",
+    "day_number": 34,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "Curious how many of you are studying for TCF/TEF while working full time versus having dedicated study time. Trying to design realistic daily session lengths, not fantasy ones.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-23",
+    "day_number": 35,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "One thing that helped a beta user a lot: recording yourself answering the same question three different ways. Forces you to actually use varied vocabulary instead of leaning on the same five phrases every time.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-24",
+    "day_number": 36,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "First unsolicited nice thing a user said, quote, 'this is the first app that actually corrected my writing instead of just telling me it was wrong.' Screenshotted it immediately, will treasure it forever.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "PLACEHOLDER QUOTE, not a real user message. Do not post until you have an actual unsolicited comment from a real beta user. If nothing real exists by this date, swap for a progress_update or lesson_learned tweet."
+  },
+  {
+    "date": "2026-08-25",
+    "day_number": 37,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Writing unit 4 this week, focused on formal letters and emails since that shows up directly on both TCF and TEF writing tasks. Also because half my beta users specifically asked for it.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-26",
+    "day_number": 38,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Somebody in the beta group asked if I have a team. Just me, a laptop, and increasingly concerning amounts of coffee. Might hire help eventually but not yet.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-27",
+    "day_number": 39,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Shipped a fix late last night that broke something else at 2am and a beta user hit it within twenty minutes of waking up. Reverted fast. Lesson: don't ship right before you go to sleep, you can't watch it.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-28",
+    "day_number": 40,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "New this week, a 'exam day simulation' mode that times you exactly like the real TCF, no pausing, no do overs. Beta users hated it and loved it in the same breath, which feels like a sign it's doing its job.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-29",
+    "day_number": 41,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "If you've taken TCF or TEF for immigration purposes, how many months did you actually study before test day? Trying to understand realistic prep timelines people are working with.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-30",
+    "day_number": 42,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "TEF Canada speaking section includes describing an image or situation to someone who can't see it. Practice describing things out loud, not just answering questions, it's a genuinely different skill.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-08-31",
+    "day_number": 43,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Beta group is now past 90 active users. A decent chunk logged in three or more days this week which is the number I actually care about, not signups.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-01",
+    "day_number": 44,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Redid the dashboard today so your estimated NCLC level updates live as you complete units instead of only showing your original placement test score forever. Small change, took way longer than expected.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-02",
+    "day_number": 45,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Took an actual day off this weekend for the first time since this started. Came back to three bug reports and somehow felt refreshed anyway.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-03",
+    "day_number": 46,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "A user in Quebec pointed out some of my vocabulary choices were very France-French and slightly odd for the Canadian context. Going through the content now to make sure it doesn't feel imported wholesale from a Paris textbook.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-04",
+    "day_number": 47,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "Adding TCF style 'expression orale' task cards this week, prompts modeled closely on the real task types like giving your opinion on a topic or convincing someone of something. Not the actual exam questions obviously, but the same structure.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-05",
+    "day_number": 48,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "Would it help more to see your writing corrected sentence by sentence as you type, or all at once after you submit the whole paragraph? Genuinely torn on this one.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-06",
+    "day_number": 49,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "First user told me they moved up an estimated half band level on our internal practice test after three weeks. Not an official score, just our own tracking, but it's the first evidence the loop might actually work.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-07",
+    "day_number": 50,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "For TCF reading, skim the questions before the passage, not after. Sounds obvious but almost nobody does it under time pressure and it saves real minutes.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-08",
+    "day_number": 51,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Cleaned up almost 40 bug reports from the last two weeks of beta feedback. Most were small, a few were embarrassing, all of them made the app better than my own testing ever would have.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-09",
+    "day_number": 52,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Someone asked why I'm building this instead of just using Duolingo or an exam prep book. Honestly, neither is built for the specific weirdness of TCF/TEF scoring bands. That gap is the whole reason this exists.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-10",
+    "day_number": 53,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Learned that showing users a raw percentage score stresses people out way more than showing them a band level with context. Switched most of the UI away from percentages this week.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-11",
+    "day_number": 54,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "New mock exam mode bundles a full listening, reading, writing, and speaking section back to back, timed like the real thing, roughly two hours total. First full dry run for a few beta users this week.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-12",
+    "day_number": 55,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "Anyone here done a full length TCF or TEF mock exam before test day? Curious whether it made you feel more confident going in, or more anxious.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-13",
+    "day_number": 56,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "First beta user completed the full mock exam mode start to finish without the app crashing once. Small thing to announce publicly, huge relief privately.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-14",
+    "day_number": 57,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Wrapping up the beta feedback heavy stretch. Content, speaking feedback, writing feedback, and mock exams all in a much better place than a month ago. Starting to think about what a paid tier actually looks like.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "wraps beta iteration phase, near day 25-56 boundary"
+  },
+  {
+    "date": "2026-09-15",
+    "day_number": 58,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Thinking through pricing this week, which might be the least fun part of building anything. Want it affordable for people who are already spending money on exam fees and immigration paperwork.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-16",
+    "day_number": 59,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "For people using free exam prep apps and tools right now, what would actually make you pay for one? Curious what crosses that line for language learners specifically.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-17",
+    "day_number": 60,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Almost priced this way too high because I was anchoring off generic language app pricing instead of thinking about who's actually using it, people already stretched thin by immigration costs. Adjusting down.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-18",
+    "day_number": 61,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Building the payment flow this week. Turns out handling subscriptions correctly, including cancellations and refunds, is its own small project on top of the actual app. Nobody warns you about this part.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-19",
+    "day_number": 62,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "Here's what the founding member tier will include, unlimited mock exams, priority on the speaking feedback queue, and a locked in price that won't go up later even as the app grows. Rewarding the people who show up early.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-20",
+    "day_number": 63,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Beta has now run long enough that I have real before and after data on a handful of users. Not a big sample, but the pattern is consistent, more speaking practice correlates with faster improvement than I expected.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-21",
+    "day_number": 64,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Wrote the pricing page copy about six times. Kept sounding either too corporate or too apologetic. Finally landed on just being direct about what it costs and why.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-22",
+    "day_number": 65,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "If ParleSprint launched a founding member tier around fifty dollars a year, locked in for life, would that feel like a fair deal for exam prep, or too high, too low? Genuinely asking.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-23",
+    "day_number": 66,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "For TEF Canada writing task 2, examiners want you to take a clear position and defend it, sitting on the fence between two opinions actually costs you points. Commit to a side even if it's not your real opinion.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-24",
+    "day_number": 67,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Payment integration is functional in testing. Charged myself a dollar about ten times to make sure refunds work properly before anyone real touches it.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-25",
+    "day_number": 68,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Realized this week I'd been building features nobody in beta actually asked for while a small annoying bug in the writing feedback sat ignored for two weeks. Fixed priorities, fixed the bug.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-26",
+    "day_number": 69,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Told a friend the founding member tier launches soon and she asked if I was scared. Yes. Also excited. Mostly scared.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-27",
+    "day_number": 70,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "It's live. Founding member tier, forty nine dollars a year, locked in for life, unlimited mock exams and priority speaking feedback. Link in bio if you want in on the ground floor.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "paid tier launch day"
+  },
+  {
+    "date": "2026-09-28",
+    "day_number": 71,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "First paying customer just came through. Sat and stared at the notification for a solid minute before doing anything else.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "first paying user"
+  },
+  {
+    "date": "2026-09-29",
+    "day_number": 72,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "The first paying user is someone who's been in the free beta since week one. Feels right that it was them, not a stranger. Sent a genuinely too-long thank you email.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-09-30",
+    "day_number": 73,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Small bump in signups since the paid tier launched, seems like some free users wanted to see the price exist before deciding the app was serious. Makes sense in hindsight.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-01",
+    "day_number": 74,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "For people who've bought exam prep tools before, what made a purchase feel worth it afterward versus regretted? Trying to make sure founding members feel like the first one.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-02",
+    "day_number": 75,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "If your speaking practice always happens alone in a quiet room, try practicing with background noise sometimes. Real exam rooms and interview settings are rarely silent, and it changes how flustered you get.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-03",
+    "day_number": 76,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Ten paying founding members now. Small number, but it's ten people who decided this was worth actual money before it was fully proven. That trust means a lot.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-04",
+    "day_number": 77,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "One founding member asked for a receipt formatted a specific way for a reimbursement claim. Realized my invoicing was way too basic for people expensing this through work or claiming it. Fixing that now.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-05",
+    "day_number": 78,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Someone asked if I'm going to quit my other work to do this full time. Not yet. Ten paying users is a great start, not a salary. One step at a time.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-06",
+    "day_number": 79,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Working through unit 6 this week, focused on debate style prompts since that's where I keep seeing beta users plateau, going from correct sentences to actually persuasive arguments.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-07",
+    "day_number": 80,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "New for founding members, a weekly progress email that summarizes what you practiced, where you improved, and one weak spot to focus on next week. Trying to build habits, not just features.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-08",
+    "day_number": 81,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "What's the single most frustrating part of studying for a language exam versus just learning a language for fun? Trying to keep the exam specific pain points front and center.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-09",
+    "day_number": 82,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Got a message from a founding member saying their mock speaking scores went up two levels since joining. Not an official TCF result, our internal scoring, but still the best message I've gotten so far.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-10",
+    "day_number": 83,
+    "time": "08:00",
+    "content_type": "french_tip",
+    "text": "Small but real tip, TCF Canada results are typically valid for two years for immigration purposes. Worth timing your test date around your actual application timeline, not just whenever you feel ready.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-11",
+    "day_number": 84,
+    "time": "08:00",
+    "content_type": "behind_the_scenes",
+    "text": "Realized today it's been almost three months since the first tweet in this whole thread of posts. Feels both like no time at all and like a completely different app than where it started.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-12",
+    "day_number": 85,
+    "time": "08:00",
+    "content_type": "progress_update",
+    "text": "Working on improving speaking feedback speed this week, currently takes about eight seconds to get a score back which is better than before but still feels slow when you're mid practice session.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-13",
+    "day_number": 86,
+    "time": "08:00",
+    "content_type": "lesson_learned",
+    "text": "Learned that founding members care more about consistency than new features right now. Pausing new unit development for a week to just make sure nothing breaks during their daily use.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-14",
+    "day_number": 87,
+    "time": "08:00",
+    "content_type": "audience_question",
+    "text": "Anyone who's already hit their target NCLC or CLB level, what's the one thing you wish you'd focused on earlier in your prep? Collecting these for future content.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-15",
+    "day_number": 88,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Fifteen founding members now, and the free beta list has grown past where I expected it to be at this point. Slow and steady is apparently just how this goes.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-16",
+    "day_number": 89,
+    "time": "08:00",
+    "content_type": "feature_explainer",
+    "text": "Planning a referral setup for founding members next, since most of the good beta signups so far came from word of mouth, not anything I posted here. Want to make that easier and worth their while.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": ""
+  },
+  {
+    "date": "2026-10-17",
+    "day_number": 90,
+    "time": "08:00",
+    "content_type": "milestone",
+    "text": "Three months of building this in public. Went from 65 percent built with zero users to a live app, a real beta community, and founding members who paid before there was any proof it would work. Thank you for reading along, and for the next quarter, onward.",
+    "is_thread": false,
+    "thread_continuation": "",
+    "notes": "90 day wrap up, merged with next-quarter planning beat"
+  }
+]

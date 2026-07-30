@@ -1,9 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+import { faqs } from "./faq-data";
+
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-const title = "Personalized French Practice with AI Feedback | ParleSprint";
-const description = "Learn French through one connected practice loop for vocabulary, grammar, listening, writing, and live AI speaking. Personalized for serious learners, including TEF and TCF Canada goals.";
+const title = "ParleSprint | The French Tutor That Remembers You";
+const description = "Speak French every day with Marie, a personal tutor who remembers every mistake and rebuilds tomorrow's lesson around it. Vocabulary, grammar, listening, writing, and real conversation in one daily loop, built toward TEF/TCF Canada readiness.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -13,21 +18,22 @@ export const metadata: Metadata = {
   category: "education",
   keywords: [
     "personalized French learning",
-    "AI French tutor",
+    "online French tutor",
     "French speaking practice",
     "learn French online",
     "French feedback app",
     "French for beginners",
     "TEF Canada preparation",
     "TCF Canada preparation",
-    "CLB 7 French",
-    "NCLC 7 French",
+    "French learning app iOS Android web",
+    "guided French learning path",
   ],
   authors: [{ name: "ParleSprint", url: siteUrl }],
   creator: "ParleSprint",
   publisher: "ParleSprint",
   alternates: { canonical: "/" },
   formatDetection: { email: false, address: false, telephone: false },
+  verification: { google: "oURbdVk_I8V02mwzpdcy65qxtzrNqLJWo1J9XK7WI4Q" },
   openGraph: {
     type: "website",
     locale: "en_CA",
@@ -45,7 +51,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#1b2a4a", colorScheme: "light" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#007bff", colorScheme: "light" };
 
 const structuredData = [
   {
@@ -61,12 +67,12 @@ const structuredData = [
     "@type": "SoftwareApplication",
     name: "ParleSprint",
     applicationCategory: "EducationalApplication",
-    operatingSystem: "iOS and Android",
+    operatingSystem: "iOS, Android, and Web",
     url: siteUrl,
     description,
     featureList: [
       "Personalized daily French pathway",
-      "Live AI French speaking practice",
+      "Live French speaking practice",
       "Spaced-repetition vocabulary",
       "Voice-led grammar practice",
       "French reading and listening practice",
@@ -74,15 +80,27 @@ const structuredData = [
       "TEF and TCF Canada-oriented preparation",
     ],
   },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  },
 ];
+
+const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-CA">
-      <body>
+    <html lang="en-CA" className={inter.variable}>
+      <body className="font-sans antialiased">
         {children}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       </body>
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }

@@ -1,0 +1,345 @@
+<title>ParleSprint Marketing Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel2: #1e2229;
+    --border: #2a2f3a;
+    --text: #e8eaed;
+    --muted: #8b93a7;
+    --accent: #5b8cff;
+    --reddit: #ff5722;
+    --twitter: #1da1f2;
+    --linkedin: #0a66c2;
+    --instagram: #e1306c;
+    --done: #2ecc71;
+    --today: #f5a623;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+  .stat b { color: var(--text); font-size: 16px; display: block; }
+  .controls {
+    display: flex;
+    gap: 8px;
+    padding: 12px 24px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 64px;
+    background: var(--bg);
+    z-index: 9;
+  }
+  .tab, .filter-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .tab.active, .filter-btn.active { color: var(--text); border-color: var(--accent); background: rgba(91,140,255,0.12); }
+  input#search {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    min-width: 200px;
+  }
+  main { padding: 20px 24px 80px; max-width: 900px; margin: 0 auto; }
+  .day-group { margin-bottom: 22px; }
+  .day-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .day-heading .date-label { color: var(--text); font-weight: 600; font-size: 14px; }
+  .day-heading.is-today .date-label { color: var(--today); }
+  .day-heading .badge-today {
+    background: var(--today); color: #1a1300; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--platform-color, var(--accent));
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .card.done { opacity: 0.45; }
+  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .card-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .platform-pill { padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .platform-pill.reddit { background: rgba(255,87,34,0.18); color: #ff8a5b; }
+  .platform-pill.twitter { background: rgba(29,161,242,0.18); color: #63c0ff; }
+  .platform-pill.linkedin { background: rgba(10,102,194,0.18); color: #6db2f2; }
+  .platform-pill.instagram { background: rgba(225,48,108,0.18); color: #f27ba0; }
+  .time-label { font-variant-numeric: tabular-nums; }
+  .done-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; user-select: none; }
+  .done-toggle input { width: 16px; height: 16px; accent-color: var(--done); cursor: pointer; }
+  .card-title { font-weight: 600; margin: 4px 0 6px; font-size: 14.5px; }
+  .card-body { white-space: pre-wrap; font-size: 13.5px; color: #cfd3dc; margin-bottom: 8px; }
+  .card-extra { font-size: 12.5px; color: var(--muted); background: var(--panel2); border-radius: 8px; padding: 8px 10px; margin-top: 6px; white-space: pre-wrap; }
+  .card-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .copy-btn {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { border-color: var(--accent); }
+  .empty-state { color: var(--muted); text-align: center; padding: 60px 20px; font-size: 14px; }
+  .hashtags { font-size: 12px; color: #7ea6ff; margin-top: 4px; }
+  .loading { color: var(--muted); padding: 40px; text-align: center; }
+</style>
+
+<header>
+  <div>
+    <h1>ParleSprint Marketing Tracker</h1>
+    <div class="sub">90-day organic posting plan. 20 minutes a day. No pitching, value first.</div>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="controls">
+  <button class="tab active" data-view="today">Today</button>
+  <button class="tab" data-view="upcoming">Upcoming</button>
+  <button class="tab" data-view="all">Full calendar</button>
+  <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+  <button class="filter-btn active" data-platform="all">All</button>
+  <button class="filter-btn" data-platform="reddit">Reddit</button>
+  <button class="filter-btn" data-platform="twitter">Twitter</button>
+  <button class="filter-btn" data-platform="linkedin">LinkedIn</button>
+  <button class="filter-btn" data-platform="instagram">Instagram</button>
+  <input id="search" type="text" placeholder="Search posts...">
+</div>
+
+<main id="main"><div class="loading">Loading calendar...</div></main>
+
+<script>
+const PLATFORM_COLOR = { reddit: '#ff5722', twitter: '#1da1f2', linkedin: '#0a66c2', instagram: '#e1306c' };
+const SOURCES = [
+  { platform: 'reddit', path: '../reddit/reddit_calendar.json' },
+  { platform: 'twitter', path: '../twitter/twitter_calendar.json' },
+  { platform: 'linkedin', path: '../linkedin/linkedin_calendar.json' },
+  { platform: 'instagram', path: '../instagram/instagram_calendar.json' },
+];
+
+let ALL_POSTS = [];
+let state = { view: 'today', platform: 'all', search: '' };
+
+function todayStr() {
+  const d = new Date();
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function loadDone() {
+  try { return JSON.parse(localStorage.getItem('parlesprint_done') || '{}'); } catch(e) { return {}; }
+}
+function saveDone(done) { localStorage.setItem('parlesprint_done', JSON.stringify(done)); }
+
+function normalize(platform, item, idx) {
+  const id = `${platform}_${item.date}_${idx}`;
+  let title = '', body = '', extra = '';
+  if (platform === 'reddit') {
+    title = `${item.subreddit || ''}: ${item.title || ''}`;
+    body = item.body || '';
+    extra = item.first_comment ? `First comment (post after trust / for link):\n${item.first_comment}` : '';
+  } else if (platform === 'twitter') {
+    title = `Day ${item.day_number || ''}: ${item.content_type || ''}`;
+    body = item.text || '';
+    extra = item.is_thread && item.thread_continuation ? `Thread continuation:\n${item.thread_continuation}` : '';
+  } else if (platform === 'linkedin') {
+    title = item.topic || 'LinkedIn post';
+    body = item.text || '';
+  } else if (platform === 'instagram') {
+    title = item.format || 'Instagram post';
+    body = item.caption || '';
+    extra = item.hashtags || '';
+  }
+  return {
+    id, platform, date: item.date, time: item.time || '',
+    title, body, extra, notes: item.notes || '', raw: item
+  };
+}
+
+async function loadAll() {
+  const results = await Promise.all(SOURCES.map(async s => {
+    try {
+      const res = await fetch(s.path);
+      if (!res.ok) throw new Error('missing');
+      const data = await res.json();
+      return data.map((item, idx) => normalize(s.platform, item, idx));
+    } catch (e) {
+      return [];
+    }
+  }));
+  ALL_POSTS = results.flat().sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+  render();
+}
+
+function render() {
+  const main = document.getElementById('main');
+  const done = loadDone();
+  let posts = ALL_POSTS.slice();
+
+  if (state.platform !== 'all') posts = posts.filter(p => p.platform === state.platform);
+  if (state.search.trim()) {
+    const q = state.search.toLowerCase();
+    posts = posts.filter(p => (p.title+p.body+p.extra).toLowerCase().includes(q));
+  }
+
+  const today = todayStr();
+  if (state.view === 'today') {
+    posts = posts.filter(p => p.date === today);
+  } else if (state.view === 'upcoming') {
+    posts = posts.filter(p => p.date >= today);
+  }
+
+  renderStats(done);
+
+  if (!posts.length) {
+    main.innerHTML = `<div class="empty-state">${state.view === 'today' ? 'Nothing scheduled for today. Check Upcoming or Full calendar.' : 'No posts match this filter.'}</div>`;
+    return;
+  }
+
+  const groups = {};
+  posts.forEach(p => { (groups[p.date] = groups[p.date] || []).push(p); });
+
+  const html = Object.keys(groups).sort().map(date => {
+    const isToday = date === today;
+    const items = groups[date].map(p => cardHtml(p, done)).join('');
+    return `<div class="day-group">
+      <div class="day-heading ${isToday ? 'is-today' : ''}">
+        <span class="date-label">${formatDate(date)}</span>
+        ${isToday ? '<span class="badge-today">TODAY</span>' : ''}
+      </div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  main.innerHTML = html;
+
+  main.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const id = e.target.dataset.id;
+      const d = loadDone();
+      d[id] = e.target.checked;
+      saveDone(d);
+      render();
+    });
+  });
+  main.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.dataset.text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = old, 1200);
+      });
+    });
+  });
+}
+
+function cardHtml(p, done) {
+  const isDone = !!done[p.id];
+  const copyText = (p.title ? p.title + '\n\n' : '') + p.body + (p.extra ? '\n\n' + p.extra : '');
+  return `<div class="card ${isDone ? 'done' : ''}" style="--platform-color:${PLATFORM_COLOR[p.platform]}">
+    <div class="card-top">
+      <div class="card-meta">
+        <span class="platform-pill ${p.platform}">${p.platform}</span>
+        <span class="time-label">${p.time}</span>
+      </div>
+      <label class="done-toggle">
+        <input type="checkbox" data-id="${escapeAttr(p.id)}" ${isDone ? 'checked' : ''}>
+        Posted
+      </label>
+    </div>
+    <div class="card-title">${escapeHtml(p.title)}</div>
+    <div class="card-body">${escapeHtml(p.body)}</div>
+    ${p.platform === 'instagram' && p.extra ? `<div class="hashtags">${escapeHtml(p.extra)}</div>` : ''}
+    ${p.platform !== 'instagram' && p.extra ? `<div class="card-extra">${escapeHtml(p.extra)}</div>` : ''}
+    ${p.notes ? `<div class="card-extra">Note: ${escapeHtml(p.notes)}</div>` : ''}
+    <div class="card-actions">
+      <button class="copy-btn" data-text="${escapeAttr(copyText)}">Copy post text</button>
+    </div>
+  </div>`;
+}
+
+function renderStats(done) {
+  const stats = document.getElementById('stats');
+  const total = ALL_POSTS.length;
+  const doneCount = ALL_POSTS.filter(p => done[p.id]).length;
+  const today = todayStr();
+  const todayCount = ALL_POSTS.filter(p => p.date === today).length;
+  stats.innerHTML = `
+    <div class="stat"><b>${total}</b>total posts</div>
+    <div class="stat"><b>${doneCount}</b>marked posted</div>
+    <div class="stat"><b>${todayCount}</b>scheduled today</div>
+  `;
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+}
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) { return escapeHtml(s).replace(/\n/g, '&#10;'); }
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.view = btn.dataset.view;
+    render();
+  });
+});
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.platform = btn.dataset.platform;
+    render();
+  });
+});
+document.getElementById('search').addEventListener('input', e => {
+  state.search = e.target.value;
+  render();
+});
+
+loadAll();
+</script>
