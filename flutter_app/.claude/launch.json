@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flutter-web-debug",
+      "runtimeExecutable": "./run_web_with_keys.sh",
+      "runtimeArgs": [],
+      "port": 8734
+    }
+  ]
+}

@@ -231,6 +231,10 @@ class GeminiLiveService {
       prompt +=
           '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$profile';
     }
+    final level = await _learnerLevel();
+    if (level != null) {
+      prompt += '\n\n${LivePrompts.levelGuidance(level)}';
+    }
     final ctx = lessonContext;
     if (ctx != null && ctx.isNotEmpty) {
       prompt +=
@@ -246,6 +250,19 @@ class GeminiLiveService {
       return await ProgressService(store: store).learnerProfileSummary();
     } catch (_) {
       return '';
+    }
+  }
+
+  /// The raw CEFR level string (e.g. 'a1'), normalized by [LivePrompts] —
+  /// null only when no store was wired in at all (see [learningStoreForProfile]),
+  /// never when the level is merely unrecognized (that falls back to A1).
+  Future<String?> _learnerLevel() async {
+    final store = learningStoreForProfile;
+    if (store == null) return null;
+    try {
+      return store.profile().level;
+    } catch (_) {
+      return null;
     }
   }
 

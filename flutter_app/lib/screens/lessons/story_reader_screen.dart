@@ -4,10 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/inline_call_bar.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/report_problem_button.dart';
 
@@ -40,9 +43,17 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     this.showFinishButton = false,
     this.enrichment,
     this.onEnriched,
+    this.grammarExplanation,
   });
 
   final GeneratedStory story;
+
+  /// Present only for a grammar-practice session (see
+  /// `LessonAgentService.buildGrammarExplanation`) — when set, this screen
+  /// opens on the Grammar tab instead of Story, and shows this explanation
+  /// ABOVE the per-sentence notes: grammar has to teach the rule first, the
+  /// story is the vehicle that demonstrates it, not the other way around.
+  final GrammarExplanation? grammarExplanation;
 
   /// True when this screen is a step in a larger flow (e.g. a mission) that
   /// needs the learner to explicitly finish and hand back a graded result —
@@ -69,8 +80,11 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
   ConsumerState<StoryReaderScreen> createState() => _StoryReaderScreenState();
 }
 
-class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
-  _StoryTab _tab = _StoryTab.story;
+class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
+    with WidgetsBindingObserver {
+  late _StoryTab _tab = widget.grammarExplanation != null
+      ? _StoryTab.grammar
+      : _StoryTab.story;
   int _currentSegment = 0;
   bool _isPlaying = false;
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
@@ -84,6 +98,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
   /// playing right now (for auto-scroll and the "now playing" highlight).
   int? _selectedSegment;
 
+  /// Which word (by index, split on whitespace) within the currently-playing
+  /// segment's French text the narration has reached — null when nothing is
+  /// playing, or once a segment's estimated timing runs past its last word.
+  /// Timing comes from `LessonSpeechService`'s `onWordBoundary`, estimated
+  /// from the known playback duration, not exact phoneme timing.
+  int? _currentWord;
+
   /// Starts as [StoryReaderScreen.story]; replaced once [StoryReaderScreen.enrichment]
   /// resolves, so the Quiz/Keywords tabs update without navigating away.
   late GeneratedStory _story = widget.story;
@@ -91,13 +112,49 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
 
   ReadingPassage get _passage => _story.passage;
 
+  String get _lessonContext {
+    final base = ref.read(contentServiceProvider).storyContext(_passage);
+    final explanation = widget.grammarExplanation;
+    if (explanation == null) return base;
+    // Marie needs the FULL taught explanation, not just the story — this is
+    // what lets her actually answer "how does this change from present to
+    // past" instead of only being able to talk about the story's sentences.
+    final buf = StringBuffer(base)
+      ..writeln()
+      ..writeln('GRAMMAR POINT BEING TAUGHT: ${explanation.title}')
+      ..writeln(explanation.summary)
+      ..writeln('Usage rules: ${explanation.usage.join('; ')}')
+      ..writeln('How it contrasts with other tenses: ${explanation.tenseContrast}');
+    for (final c in explanation.conjugations) {
+      buf.writeln(
+        '${c.verb} (${c.group}): ${c.rows.map((r) => "${r.pronoun} ${r.form}").join(', ')}',
+      );
+    }
+    return buf.toString();
+  }
+
   GlobalKey _keyFor(int index) => _segmentKeys.putIfAbsent(index, GlobalKey.new);
 
   late final SessionRecorder _recorder;
 
+  /// Marie's live-call button, inline in the AppBar — same
+  /// InlineCallController every other reading/exercise screen uses, so
+  /// asking her about the story happens right here without leaving the
+  /// page, not in a separate fullscreen call window.
+  late final InlineCallController _call;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _call = InlineCallController(
+      sessionType: LiveSessionType.labAssistant,
+      lessonContext: () => _lessonContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Story';
     });
@@ -128,8 +185,17 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
     }
   }
 
+  /// P0.4 pocket/lock-screen handling, same contract as every other live
+  /// call screen — forwarded straight to the shared controller.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _call.dispose();
     LessonSpeechService.shared.stop();
     _finishSession();
     super.dispose();
@@ -172,12 +238,22 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
       rate: _rate,
       onItemStart: (i) {
         if (!mounted) return;
-        setState(() => _currentSegment = fromIndex + i);
+        setState(() {
+          _currentSegment = fromIndex + i;
+          _currentWord = null;
+        });
         _scrollToCurrent();
+      },
+      onWordBoundary: (_, wordIndex) {
+        if (!mounted) return;
+        setState(() => _currentWord = wordIndex);
       },
       onFinished: () {
         if (!mounted) return;
-        setState(() => _isPlaying = false);
+        setState(() {
+          _isPlaying = false;
+          _currentWord = null;
+        });
       },
     );
   }
@@ -240,11 +316,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
       rate: _rate,
       onItemStart: (_) {
         if (!mounted) return;
+        setState(() => _currentWord = null);
         _scrollToCurrent();
+      },
+      onWordBoundary: (_, wordIndex) {
+        if (!mounted) return;
+        setState(() => _currentWord = wordIndex);
       },
       onFinished: () {
         if (!mounted) return;
-        setState(() => _isPlaying = false);
+        setState(() {
+          _isPlaying = false;
+          _currentWord = null;
+        });
       },
     );
   }
@@ -269,6 +353,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
+          InlineCallActions(controller: _call),
           ReportProblemButton(sessionType: 'Story: ${_passage.displayTitle}'),
         ],
       ),
@@ -276,6 +361,14 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
         children: [
           Column(
             children: [
+              if (_call.isLive || _call.error != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: InlineCallStatusCard(
+                    controller: _call,
+                    listeningLabel: 'Listening. Ask about the story anytime.',
+                  ),
+                ),
               _TabRow(
                 selected: _tab,
                 onSelect: (tab) => setState(() => _tab = tab),
@@ -365,13 +458,22 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
                     ),
                     const SizedBox(height: 6),
                   ],
-                  Text(
-                    segment.fr,
-                    style: DesignTokens.body(
-                      17,
-                      weight: FontWeight.w600,
-                    ).copyWith(height: 1.4),
-                  ),
+                  isPlayingNow
+                      ? _WordHighlightText(
+                          text: segment.fr,
+                          currentWord: _currentWord,
+                          style: DesignTokens.body(
+                            17,
+                            weight: FontWeight.w600,
+                          ).copyWith(height: 1.4),
+                        )
+                      : Text(
+                          segment.fr,
+                          style: DesignTokens.body(
+                            17,
+                            weight: FontWeight.w600,
+                          ).copyWith(height: 1.4),
+                        ),
                   const SizedBox(height: 4),
                   Text(
                     segment.en,
@@ -396,62 +498,79 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
       if (!seenNotes.add(segment.grammarNote)) continue;
       points.add(segment);
     }
-    if (points.isEmpty) {
+    final explanation = widget.grammarExplanation;
+    if (points.isEmpty && explanation == null) {
       return const _ComingSoon(label: 'Grammar');
     }
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.all(20),
-      itemCount: points.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        final segment = points[index];
-        return PasseportCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'From this story',
-                style: DesignTokens.mono(
-                  10.5,
-                  weight: FontWeight.w700,
-                ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
-              ),
-              const SizedBox(height: 8),
-              Text(segment.fr, style: DesignTokens.body(15, weight: FontWeight.w600)),
-              const SizedBox(height: 12),
-              Text(
-                segment.grammarNote,
-                style: DesignTokens.body(13.5).copyWith(
-                  color: DesignTokens.inkSoft,
-                  height: 1.4,
+      children: [
+        if (explanation != null) ...[
+          _GrammarExplanationCard(explanation: explanation),
+          const SizedBox(height: 20),
+          if (points.isNotEmpty)
+            Text(
+              'HOW THE STORY USES IT',
+              style: DesignTokens.mono(
+                10.5,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.slateDim, letterSpacing: 0.8),
+            ),
+          if (points.isNotEmpty) const SizedBox(height: 12),
+        ],
+        for (var i = 0; i < points.length; i++) ...[
+          if (i > 0) const SizedBox(height: 14),
+          PasseportCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'From this story',
+                  style: DesignTokens.mono(
+                    10.5,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
                 ),
-              ),
-              if (segment.pronunciationTip.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      CupertinoIcons.waveform,
-                      size: 15,
-                      color: DesignTokens.slateDim,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        segment.pronunciationTip,
-                        style: DesignTokens.body(
-                          12.5,
-                        ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                const SizedBox(height: 8),
+                Text(
+                  points[i].fr,
+                  style: DesignTokens.body(15, weight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  points[i].grammarNote,
+                  style: DesignTokens.body(
+                    13.5,
+                  ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                ),
+                if (points[i].pronunciationTip.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        CupertinoIcons.waveform,
+                        size: 15,
+                        color: DesignTokens.slateDim,
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          points[i].pronunciationTip,
+                          style: DesignTokens.body(12.5).copyWith(
+                            color: DesignTokens.slateDim,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ],
     );
   }
 
@@ -569,6 +688,245 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Renders a segment's French text with the word at [currentWord] (by index,
+/// split on whitespace) highlighted — the word-by-word playback indicator,
+/// distinct from the sentence-level "now playing" box the caller already
+/// draws around the whole segment. Splitting preserves the original spacing
+/// between words (joined back with single spaces) since French narration
+/// text here is never pre-formatted with multiple spaces or line breaks.
+/// The "teach the rule first" card — summary, explicit tense contrast,
+/// conjugation tables, and bilingual examples, all generated before the
+/// story existed (see `LessonAgentService.buildGrammarExplanation`). Shown
+/// at the top of the Grammar tab, above the per-sentence story notes.
+class _GrammarExplanationCard extends StatelessWidget {
+  const _GrammarExplanationCard({required this.explanation});
+
+  final GrammarExplanation explanation;
+
+  @override
+  Widget build(BuildContext context) {
+    return PasseportCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            explanation.title,
+            style: DesignTokens.display(20, weight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            explanation.summary,
+            style: DesignTokens.body(14).copyWith(height: 1.45),
+          ),
+          if (explanation.usage.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              'Usage',
+              style: DesignTokens.body(13, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 6),
+            for (final rule in explanation.usage)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '•  ',
+                      style: TextStyle(color: DesignTokens.info, fontSize: 13),
+                    ),
+                    Expanded(
+                      child: Text(
+                        rule,
+                        style: DesignTokens.body(
+                          13.5,
+                        ).copyWith(height: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+          if (explanation.tenseContrast.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: DesignTokens.infoSoft,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'How it changes',
+                    style: DesignTokens.body(
+                      12.5,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: DesignTokens.info),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    explanation.tenseContrast,
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (explanation.conjugations.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Conjugation',
+              style: DesignTokens.body(13, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            for (final conj in explanation.conjugations)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _ConjugationTable(conjugation: conj),
+              ),
+          ],
+          if (explanation.examples.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Examples',
+              style: DesignTokens.body(13, weight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            for (final ex in explanation.examples)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ex.fr,
+                      style: DesignTokens.body(14, weight: FontWeight.w600),
+                    ),
+                    Text(
+                      ex.en,
+                      style: DesignTokens.body(
+                        12.5,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ConjugationTable extends StatelessWidget {
+  const _ConjugationTable({required this.conjugation});
+
+  final Conjugation conjugation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: DesignTokens.parchmentDim,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                conjugation.verb,
+                style: DesignTokens.body(14, weight: FontWeight.w700),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: DesignTokens.info.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  conjugation.group,
+                  style: DesignTokens.mono(
+                    9.5,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.info),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (final row in conjugation.rows)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 64,
+                    child: Text(
+                      row.pronoun,
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ),
+                  Text(
+                    row.form,
+                    style: DesignTokens.body(13, weight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WordHighlightText extends StatelessWidget {
+  const _WordHighlightText({
+    required this.text,
+    required this.currentWord,
+    required this.style,
+  });
+
+  final String text;
+  final int? currentWord;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    final words = text.split(RegExp(r'\s+'));
+    return Text.rich(
+      TextSpan(
+        children: [
+          for (var i = 0; i < words.length; i++) ...[
+            if (i > 0) const TextSpan(text: ' '),
+            TextSpan(
+              text: words[i],
+              style: i == currentWord
+                  ? style.copyWith(
+                      backgroundColor: DesignTokens.primary.withValues(alpha: 0.22),
+                      color: DesignTokens.primaryDeep,
+                    )
+                  : style,
+            ),
+          ],
+        ],
+      ),
+      style: style,
     );
   }
 }

@@ -393,7 +393,7 @@ class LearningStore {
       UPDATE daily_sessions SET
         planned_length = ?, current_stage = ?, current_item_index = ?,
         stages_json = ?, vocab_entry_ids_json = ?, grammar_lesson_id = ?,
-        reading_passage_json = ?, started_at = ?, completed_at = ?, updated_at = ?
+        reading_passage_json = ?, writing_task_json = ?, started_at = ?, completed_at = ?, updated_at = ?
       WHERE id = ?
     ''',
       [
@@ -407,6 +407,9 @@ class LearningStore {
         session.grammarLessonId,
         session.readingPassageJson != null
             ? jsonEncode(session.readingPassageJson)
+            : null,
+        session.writingTaskJson != null
+            ? jsonEncode(session.writingTaskJson)
             : null,
         session.startedAt?.toIso8601String(),
         session.completedAt?.toIso8601String(),
@@ -758,6 +761,10 @@ class LearningStore {
       grammarLessonId: row['grammar_lesson_id'] as String?,
       readingPassageJson: row['reading_passage_json'] != null
           ? (jsonDecode(row['reading_passage_json'] as String) as Map)
+                .cast<String, dynamic>()
+          : null,
+      writingTaskJson: row['writing_task_json'] != null
+          ? (jsonDecode(row['writing_task_json'] as String) as Map)
                 .cast<String, dynamic>()
           : null,
       startedAt: parseDate(row['started_at']),

@@ -4,19 +4,17 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
-import '../../services/audio_streaming_service.dart';
-import '../../services/gemini_live_service.dart';
+import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
-import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/inline_call_bar.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -45,27 +43,23 @@ class WritingTaskScreen extends ConsumerStatefulWidget {
   ConsumerState<WritingTaskScreen> createState() => _WritingTaskScreenState();
 }
 
-class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
+class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
+    with WidgetsBindingObserver {
   bool _showEnglish = false;
   String _content = '';
   final _textController = TextEditingController();
   bool _isGrading = false;
   WritingFeedback? _feedback;
   String? _errorText;
+  bool _isGeneratingNext = false;
   final DateTime _sessionStart = DateTime.now();
 
   // Talk-with-Marie call — inline, not a modal: the editor stays visible and
   // editable the whole time the call is live, so the learner can keep
   // writing while she talks them through it, instead of a sheet blocking the
-  // draft behind a grey scrim.
-  GeminiLiveService? _gemini;
-  AudioStreamingService? _audio;
-  bool _callConnecting = false;
-  bool _callActive = false;
-  bool _callMuted = false;
-  bool _tutorSpeaking = false;
-  String? _callError;
-  String? _lastTutorLine;
+  // draft behind a grey scrim. Same InlineCallController every other
+  // reading/exercise screen with a live-call button now uses.
+  late final InlineCallController _call;
 
   // The initial connect message only ever carries a one-time snapshot of
   // the draft — without this, Marie has no idea what's been typed since the
@@ -82,6 +76,25 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _call = InlineCallController(
+      sessionType: LiveSessionType.writingGuide,
+      lessonContext: _buildLiveLessonContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () {
+        if (!mounted) return;
+        setState(() {});
+        if (_call.active && _draftSyncTimer == null) {
+          _lastSyncedContent = _content;
+          _draftSyncTimer = Timer.periodic(const Duration(seconds: 8), (_) {
+            _syncDraftIfChanged();
+          });
+        } else if (!_call.active && _draftSyncTimer != null) {
+          _draftSyncTimer?.cancel();
+          _draftSyncTimer = null;
+        }
+      },
+    );
     // Deferred to after this frame — setting currentContext synchronously
     // here notifies FloatingNotetakerOverlay listeners mounted elsewhere
     // (e.g. the tab-bar root) while this screen is still in its own initial
@@ -94,6 +107,16 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
       stage: 'writing',
       topic: task.title,
     );
+  }
+
+  /// P0.4 — locking the phone or backgrounding the app mid-call previously
+  /// left the mic streaming into a pocket, and the call had no auto-reconnect
+  /// at all, so a socket drop while backgrounded just silently ended the
+  /// call — the "it turns off in pocket" bug. Same contract as every other
+  /// live screen now, via the shared controller.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
   }
 
   String get _lessonContext =>
@@ -117,71 +140,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     return _content.toLowerCase().contains(stem);
   }
 
-  Future<void> _toggleCall() async {
-    if (_callActive || _callConnecting) {
-      _endCall();
-      return;
-    }
-    final accepted = await AiVoiceDisclosure.ensureAccepted(context);
-    if (!mounted || !accepted) return;
-    LessonSpeechService.shared.deactivate();
-    setState(() {
-      _callConnecting = true;
-      _callError = null;
-      _lastTutorLine = null;
-    });
-    final connected = await _connectLive();
-    if (!mounted) return;
-    if (!connected) {
-      setState(() {
-        _callConnecting = false;
-        _callError = "Couldn't connect. Check your connection and try again.";
-      });
-      return;
-    }
-    final granted = await _audio!.requestPermission();
-    if (!mounted) return;
-    if (!granted) {
-      setState(() {
-        _callConnecting = false;
-        _callError = 'Microphone permission denied';
-      });
-      _gemini?.disconnect();
-      _gemini = null;
-      return;
-    }
-    await _audio!.startStreaming(onChunk: _gemini!.sendAudioChunk);
-    if (!mounted) return;
-    setState(() {
-      _callConnecting = false;
-      _callActive = true;
-    });
-    _lastSyncedContent = _content;
-    _draftSyncTimer = Timer.periodic(const Duration(seconds: 8), (_) {
-      _syncDraftIfChanged();
-    });
-  }
-
-  /// Silent context update, not a real conversational turn — Marie should
-  /// absorb the latest draft without commenting on it or replying to this
-  /// specific message, same "app note, not the student" convention used for
-  /// call kickoffs elsewhere (see session_screen.dart). Only fires when the
-  /// draft actually changed since the last send.
-  void _syncDraftIfChanged() {
-    if (_content == _lastSyncedContent) return;
-    _lastSyncedContent = _content;
-    _gemini?.sendText(
-      '(Note from the app, not the student: this is a silent background '
-      "update of the student's current draft, automatically sent while they "
-      'type — it is NOT a message from the student and does not need a '
-      'reply. Do not comment on it or acknowledge it in any way unless the '
-      'student explicitly asks you to read, check, or comment on their '
-      "draft — if they do ask, answer only what they asked, nothing extra.\n\n"
-      "STUDENT'S CURRENT DRAFT:\n${_content.trim().isEmpty ? '(nothing written yet)' : _content.trim()})",
-    );
-  }
-
-  Future<bool> _connectLive() async {
+  /// Marie's live-call context is rebuilt fresh on every connect — unlike a
+  /// static lesson context, this one has to carry the CURRENT draft and any
+  /// existing feedback, both of which change while the screen is open.
+  String _buildLiveLessonContext() {
     final buf = StringBuffer(_lessonContext);
     buf.writeln();
     buf.writeln(
@@ -192,99 +154,36 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     if (_feedback != null) {
       buf.writeln('EXISTING GRADED FEEDBACK: ${_feedback!.improvedVersion}');
     }
-    final completer = Completer<bool>();
-    final audio = AudioStreamingService();
-    final gemini = GeminiLiveService(
-      apiKey: ApiKeys.geminiKey,
-      sessionType: LiveSessionType.writingGuide,
-      lessonContext: buf.toString(),
-      autoReconnect: false,
-    );
-    _audio = audio;
-    _gemini = gemini;
-
-    gemini.onConnected = () {
-      if (!completer.isCompleted) completer.complete(true);
-    };
-    gemini.onError = (msg) {
-      if (!completer.isCompleted) {
-        completer.complete(false);
-        return;
-      }
-      if (mounted) setState(() => _callError = msg);
-    };
-    gemini.onDisconnected = () {
-      if (!completer.isCompleted) {
-        completer.complete(false);
-        return;
-      }
-      if (mounted) setState(() => _callActive = false);
-    };
-    gemini.onUserTranscript = (text) {};
-    gemini.onTutorTranscript = (text) {
-      if (!mounted) return;
-      setState(() => _lastTutorLine = text);
-    };
-    gemini.onAudioChunk = (bytes) {
-      audio.isOutputActive = true;
-      _tutorSpeaking = true;
-      audio.playAudioChunk(bytes);
-    };
-    gemini.onTurnComplete = () {
-      audio.isOutputActive = false;
-      if (mounted) setState(() => _tutorSpeaking = false);
-    };
-
-    gemini.connect();
-    final connected = await completer.future.timeout(
-      const Duration(seconds: 6),
-      onTimeout: () => false,
-    );
-    if (!connected) {
-      gemini.disconnect();
-      await audio.dispose();
-      _gemini = null;
-      _audio = null;
-    }
-    return connected;
+    return buf.toString();
   }
 
-  Future<void> _toggleMute() async {
-    if (_audio == null) return;
-    if (_callMuted) {
-      setState(() => _callMuted = false);
-      await _audio!.startStreaming(onChunk: _gemini!.sendAudioChunk);
-    } else {
-      await _audio!.stopStreaming();
-      if (mounted) setState(() => _callMuted = true);
-    }
-  }
-
-  void _endCall() {
-    _draftSyncTimer?.cancel();
-    _draftSyncTimer = null;
-    _audio?.stopStreaming();
-    _audio?.dispose();
-    _gemini?.disconnect();
-    _audio = null;
-    _gemini = null;
-    setState(() {
-      _callActive = false;
-      _callConnecting = false;
-      _callMuted = false;
-      _tutorSpeaking = false;
-    });
+  /// Silent context update, not a real conversational turn — Marie should
+  /// absorb the latest draft without commenting on it or replying to this
+  /// specific message, same "app note, not the student" convention used for
+  /// call kickoffs elsewhere (see session_screen.dart). Only fires when the
+  /// draft actually changed since the last send.
+  void _syncDraftIfChanged() {
+    if (_content == _lastSyncedContent) return;
+    _lastSyncedContent = _content;
+    _call.gemini?.sendText(
+      '(Note from the app, not the student: this is a silent background '
+      "update of the student's current draft, automatically sent while they "
+      'type — it is NOT a message from the student and does not need a '
+      'reply. Do not comment on it or acknowledge it in any way unless the '
+      'student explicitly asks you to read, check, or comment on their '
+      "draft — if they do ask, answer only what they asked, nothing extra.\n\n"
+      "STUDENT'S CURRENT DRAFT:\n${_content.trim().isEmpty ? '(nothing written yet)' : _content.trim()})",
+    );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _logMinutes();
     _finishSession();
     _textController.dispose();
     _draftSyncTimer?.cancel();
-    _audio?.stopStreaming();
-    _audio?.dispose();
-    _gemini?.disconnect();
+    _call.dispose();
     super.dispose();
   }
 
@@ -344,6 +243,35 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     }
   }
 
+  /// Standalone-lab mode only (never shown mid-mission): once feedback is in,
+  /// re-grading the same draft isn't offered any more — the learner gets a
+  /// fresh, level-calibrated prompt instead, so "retry" always means new
+  /// practice, not resubmitting an edited copy of the graded one.
+  Future<void> _tryNewPrompt() async {
+    setState(() => _isGeneratingNext = true);
+    try {
+      final store = ref.read(learningStoreProvider);
+      final content = ref.read(contentServiceProvider);
+      final profile = store.profile();
+      final nextTask = await ref
+          .read(lessonAgentServiceProvider)
+          .generateWritingTask(
+            levelBand: profile.level,
+            knownVocab: content.knownVocabWords(store.allSRSStates()),
+          );
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => WritingTaskScreen(task: nextTask)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isGeneratingNext = false;
+        _errorText = "Couldn't generate a new prompt, try again.";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -365,43 +293,18 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 ),
               )
             : null,
-        actions: [
-          if (_callActive) ...[
-            IconButton(
-              tooltip: _callMuted ? 'Unmute' : 'Mute',
-              onPressed: _toggleMute,
-              icon: Icon(
-                _callMuted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill,
-                color: DesignTokens.slateDim,
-              ),
-            ),
-          ],
-          IconButton(
-            tooltip: _callActive
-                ? 'End call'
-                : _callConnecting
-                ? 'Connecting…'
-                : 'Talk with Marie',
-            onPressed: _callConnecting ? null : _toggleCall,
-            icon: _callConnecting
-                ? const SizedBox.square(
-                    dimension: 20,
-                    child: PSProgressIndicator(),
-                  )
-                : Icon(
-                    CupertinoIcons.phone_fill,
-                    color: _callActive ? DesignTokens.success : DesignTokens.primary,
-                  ),
-          ),
-        ],
+        actions: [InlineCallActions(controller: _call)],
       ),
       body: Stack(
         children: [
           ListView(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             children: [
-              if (_callActive || _callConnecting || _callError != null) ...[
-                _callStatusCard(),
+              if (_call.isLive || _call.error != null) ...[
+                InlineCallStatusCard(
+                  controller: _call,
+                  listeningLabel: 'Listening. Keep writing, she can hear you.',
+                ),
                 const SizedBox(height: 16),
               ],
               _promptCard(),
@@ -427,18 +330,25 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                 ),
               ],
               const SizedBox(height: 16),
-              PasseportPrimaryButton(
-                label: _feedback == null ? 'Submit for grading' : 'Re-submit',
-                onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
-              ),
-              if (widget.showFinishButton && _feedback != null) ...[
-                const SizedBox(height: 12),
+              if (_feedback == null)
+                PasseportPrimaryButton(
+                  label: 'Submit for grading',
+                  onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+                )
+              else if (widget.showFinishButton)
                 PasseportPrimaryButton(
                   label: 'Finish',
                   icon: CupertinoIcons.checkmark,
                   onPressed: _finish,
+                )
+              else
+                PasseportPrimaryButton(
+                  label: _isGeneratingNext
+                      ? 'Preparing your next prompt…'
+                      : 'Try a new prompt',
+                  icon: _isGeneratingNext ? null : CupertinoIcons.wand_stars,
+                  onPressed: _isGeneratingNext ? null : _tryNewPrompt,
                 ),
-              ],
               const SizedBox(height: 24),
             ],
           ),
@@ -452,16 +362,12 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
     final feedback = _feedback;
     if (feedback == null) return;
     Navigator.of(context).pop(
-      StageOutcome.completed(
-        WritingStageResult(score: feedback.scoreOutOf10),
-      ),
+      StageOutcome.completed(WritingStageResult(score: feedback.scoreOutOf10)),
     );
   }
 
   void _skip() {
-    Navigator.of(
-      context,
-    ).pop(const StageOutcome<WritingStageResult>.skipped());
+    Navigator.of(context).pop(const StageOutcome<WritingStageResult>.skipped());
   }
 
   // -- Feedback card --
@@ -559,9 +465,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           c.why,
-                          style: DesignTokens.body(
-                            12.5,
-                          ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                          style: DesignTokens.body(12.5).copyWith(
+                            color: DesignTokens.slateDim,
+                            height: 1.35,
+                          ),
                         ),
                       ),
                   ],
@@ -648,53 +555,6 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen> {
               ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  // -- Call status (inline, non-blocking) --
-
-  Widget _callStatusCard() {
-    return PasseportCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            CupertinoIcons.phone_fill,
-            size: 18,
-            color: _callError != null ? DesignTokens.primary : DesignTokens.success,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _callError != null
-                      ? _callError!
-                      : _callConnecting
-                      ? 'Connecting to Marie…'
-                      : _tutorSpeaking
-                      ? 'Marie is speaking…'
-                      : 'Listening. Keep writing, she can hear you.',
-                  style: DesignTokens.body(
-                    13,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.inkSoft),
-                ),
-                if (_lastTutorLine != null && _callError == null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    _lastTutorLine!,
-                    style: DesignTokens.body(
-                      12.5,
-                    ).copyWith(color: DesignTokens.slateDim, height: 1.35),
-                  ),
-                ],
-              ],
-            ),
-          ),
         ],
       ),
     );

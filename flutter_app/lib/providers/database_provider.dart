@@ -9,6 +9,7 @@ import '../data/database/evidence_store.dart';
 import '../data/database/competency_state_store.dart';
 import '../data/database/generated_scene_cache_store.dart';
 import '../data/database/generated_story_store.dart';
+import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
@@ -32,7 +33,7 @@ final syncServiceProvider = Provider<SyncService>((ref) {
 });
 
 final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService(ref.watch(databaseProvider));
+  return StorageService(ref.watch(databaseProvider), ref.watch(syncServiceProvider));
 });
 
 final learningStoreProvider = Provider<LearningStore>((ref) {
@@ -89,6 +90,14 @@ final generatedStoryStoreProvider = Provider<GeneratedStoryStore>((ref) {
     ref.watch(syncServiceProvider),
   );
 });
+
+final generatedGrammarStoryStoreProvider =
+    Provider<GeneratedGrammarStoryStore>((ref) {
+      return GeneratedGrammarStoryStore(
+        ref.watch(databaseProvider),
+        ref.watch(syncServiceProvider),
+      );
+    });
 
 final generatedRoleplayStoreProvider = Provider<GeneratedRoleplayStore>((ref) {
   return GeneratedRoleplayStore(

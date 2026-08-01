@@ -338,47 +338,57 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       child: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 24, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Passeport.infoSoft,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(_stepIcon, color: Passeport.sky, size: 22),
-                  ),
-                  const SizedBox(height: 22),
-                  Text(
-                    eyebrow.toUpperCase(),
-                    style: Passeport.body(10.5, weight: FontWeight.w800)
-                        .copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          letterSpacing: 1,
-                        ),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    title,
-                    style: Passeport.display(30).copyWith(color: Colors.white),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 9),
-                    Text(
-                      subtitle,
-                      style: Passeport.body(15).copyWith(
-                        color: Colors.white.withValues(alpha: 0.86),
-                        height: 1.45,
+            // On a short screen (e.g. the level step's 4 choices + session-
+            // length picker on an SE-sized phone) this content runs below
+            // the fold with zero visual hint that anything follows — the
+            // scrollbar makes that discoverable instead of it looking like
+            // the step just ends at whatever tile happens to land last.
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(top: 24, bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Passeport.infoSoft,
+                        borderRadius: BorderRadius.circular(14),
                       ),
+                      child: Icon(_stepIcon, color: Passeport.sky, size: 22),
                     ),
+                    const SizedBox(height: 22),
+                    Text(
+                      eyebrow.toUpperCase(),
+                      style: Passeport.body(10.5, weight: FontWeight.w800)
+                          .copyWith(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            letterSpacing: 1,
+                          ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      title,
+                      style: Passeport.display(
+                        30,
+                      ).copyWith(color: Colors.white),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 9),
+                      Text(
+                        subtitle,
+                        style: Passeport.body(15).copyWith(
+                          color: Colors.white.withValues(alpha: 0.86),
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 26),
+                    ...children,
                   ],
-                  const SizedBox(height: 26),
-                  ...children,
-                ],
+                ),
               ),
             ),
           ),

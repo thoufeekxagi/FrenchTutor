@@ -41,6 +41,7 @@ class DailySession {
     this.vocabEntryIds,
     this.grammarLessonId,
     this.readingPassageJson,
+    this.writingTaskJson,
     this.startedAt,
     this.completedAt,
   }) : stages =
@@ -55,6 +56,11 @@ class DailySession {
   List<String>? vocabEntryIds;
   String? grammarLessonId;
   Map<String, dynamic>? readingPassageJson;
+
+  /// Today's Daily Path writing prompt, frozen the same way [readingPassageJson]
+  /// is — generated once (level + known-vocab calibrated), then replayed on
+  /// resume instead of silently falling back to a generic hardcoded prompt.
+  Map<String, dynamic>? writingTaskJson;
   DateTime? startedAt;
   DateTime? completedAt;
 

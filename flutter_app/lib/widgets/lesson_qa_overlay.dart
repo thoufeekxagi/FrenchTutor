@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/api_keys.dart';
 import '../design/tokens.dart';
 import '../prompts/live_prompts.dart';
+import '../providers/database_provider.dart';
 import '../services/audio_streaming_service.dart';
 import '../services/gemini_live_service.dart';
 import '../services/lesson_speech_service.dart';
@@ -119,6 +120,10 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
       apiKey: ApiKeys.geminiKey,
       sessionType: LiveSessionType.labAssistant,
       lessonContext: widget.lessonContext,
+      // Was missing entirely — every lab's quick-question mic had no idea
+      // the student's CEFR level, so answers landed at the same generic
+      // difficulty for an A1 and a B2 learner alike.
+      learningStoreForProfile: ref.read(learningStoreProvider),
       autoReconnect: false,
     );
     _audio = audio;

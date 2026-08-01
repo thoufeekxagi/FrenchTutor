@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:uuid/uuid.dart';
 import '../data/database/storage_service.dart';
 import '../models/session.dart';
+import 'lesson_agent_service.dart';
 
 class SessionRecorder {
   SessionRecorder({
@@ -33,7 +36,10 @@ class SessionRecorder {
     );
   }
 
-  void finish({required String summary}) {
+  /// [autoNote] off skips the AI recap (used by non-conversational stages
+  /// like typed writing, where the "transcript" is just draft/feedback text,
+  /// not a real back-and-forth worth summarizing as vocab learned).
+  void finish({required String summary, bool autoNote = true}) {
     final now = DateTime.now().toIso8601String();
     _storage.saveSession(
       Session(
@@ -45,6 +51,27 @@ class SessionRecorder {
         stage: stage,
       ),
     );
+    if (autoNote) unawaited(_generateAutoNote());
+  }
+
+  /// Best-effort, never blocks or throws to the caller — `finish()` is
+  /// commonly called from `dispose()`, which can't await anything.
+  Future<void> _generateAutoNote() async {
+    try {
+      final turns = _storage.getSessionMessages(sessionId: sessionId);
+      if (turns.length < 2) return; // too thin to say anything real
+      final transcript = turns
+          .map((t) => '${t.role == 'user' ? 'Student' : 'Tutor'}: ${t.content}')
+          .join('\n');
+      final note = await LessonAgentService.shared.summarizeSessionForNotes(
+        transcript: transcript,
+        topic: topic,
+      );
+      if (note.isEmpty) return;
+      _storage.saveNote(tag: topic, text: note, source: 'ai', sessionId: sessionId);
+    } catch (_) {
+      // Ambient recap, not the graded path — a failure here is silent.
+    }
   }
 
   static String recentVocabTranscript(

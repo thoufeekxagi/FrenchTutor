@@ -76,6 +76,16 @@ class LessonSpeechService {
   void Function()? _onFinished;
   double? _rateOverride;
 
+  /// Fires with (item index, word index within that item's text) as playback
+  /// reaches each word — for word-by-word highlighting during story
+  /// narration. Gemini TTS returns a raw PCM buffer, not a platform voice
+  /// with native word-boundary events, so timing is estimated: each word's
+  /// slice of the item's known total playback duration is proportional to
+  /// its character length. Approximate, not exact — good enough to track
+  /// roughly where the voice is without needing per-phoneme timing data.
+  void Function(int itemIndex, int wordIndex)? _onWordBoundary;
+  final List<Timer> _wordTimers = [];
+
   bool isSpeaking = false;
   bool isPaused = false;
   bool isListening = false;
@@ -98,6 +108,7 @@ class LessonSpeechService {
     double? rate,
     void Function(int)? onItemStart,
     void Function()? onFinished,
+    void Function(int itemIndex, int wordIndex)? onWordBoundary,
   }) async {
     await stop();
     if (items.isEmpty) {
@@ -109,6 +120,7 @@ class LessonSpeechService {
     _rateOverride = rate;
     _onItemStart = onItemStart;
     _onFinished = onFinished;
+    _onWordBoundary = onWordBoundary;
     isPaused = false;
     await _speakCurrent();
   }
@@ -119,6 +131,10 @@ class LessonSpeechService {
     // Gemini playback is a fire-and-forget PCM buffer, not a resumable
     // stream — stop cleanly now; resume() replays this item from the top.
     _completionTimer?.cancel();
+    for (final t in _wordTimers) {
+      t.cancel();
+    }
+    _wordTimers.clear();
     await _geminiAudioLazy?.stopPlayback();
   }
 
@@ -131,6 +147,10 @@ class LessonSpeechService {
   Future<void> stop() async {
     _completionTimer?.cancel();
     _completionTimer = null;
+    for (final t in _wordTimers) {
+      t.cancel();
+    }
+    _wordTimers.clear();
     await _geminiAudioLazy?.stopPlayback();
     _ttsQueue = [];
     _ttsIndex = 0;
@@ -138,6 +158,7 @@ class LessonSpeechService {
     isPaused = false;
     _onFinished = null;
     _onItemStart = null;
+    _onWordBoundary = null;
   }
 
   Future<void> _speakCurrent() async {
@@ -190,7 +211,38 @@ class LessonSpeechService {
       if (_ttsIndex != myIndex || isPaused) return;
       _onUtteranceComplete();
     });
+    _scheduleWordBoundaries(text, playbackMs: playbackMs, itemIndex: myIndex);
     return true;
+  }
+
+  void _scheduleWordBoundaries(
+    String text, {
+    required int playbackMs,
+    required int itemIndex,
+  }) {
+    final onWordBoundary = _onWordBoundary;
+    if (onWordBoundary == null) return;
+    // Previous item's timers have either already fired or are now no-ops
+    // (guarded by the itemIndex check below) — clear the list so it doesn't
+    // grow for the whole length of a long story.
+    _wordTimers.clear();
+    final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    if (words.isEmpty) return;
+    // +1 per word for the space that follows it (except the last), so the
+    // proportion matches roughly how long each word actually takes to say.
+    final totalUnits = words.fold<int>(0, (sum, w) => sum + w.length + 1) - 1;
+    final msPerUnit = totalUnits > 0 ? playbackMs / totalUnits : 0.0;
+    var elapsedMs = 0.0;
+    for (var i = 0; i < words.length; i++) {
+      final wordIndex = i;
+      _wordTimers.add(
+        Timer(Duration(milliseconds: elapsedMs.round()), () {
+          if (_ttsIndex != itemIndex || isPaused) return;
+          onWordBoundary(itemIndex, wordIndex);
+        }),
+      );
+      elapsedMs += (words[i].length + 1) * msPerUnit;
+    }
   }
 
   /// Reading a whole story fires one fresh synthesis call per sentence in

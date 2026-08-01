@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/inline_call_controller.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/inline_call_bar.dart';
 import '../../widgets/lesson_qa_overlay.dart';
-import '../../widgets/marie_toolbar_button.dart';
 import '../../widgets/tts_play_button.dart';
 
 class ListeningExerciseResult {
@@ -33,13 +35,20 @@ class ListeningExerciseScreen extends ConsumerStatefulWidget {
 }
 
 class _ListeningExerciseScreenState
-    extends ConsumerState<ListeningExerciseScreen> {
+    extends ConsumerState<ListeningExerciseScreen>
+    with WidgetsBindingObserver {
   bool _showScript = false;
   final Map<int, int> _answers = {};
   final Map<int, String> _dictationInputs = {};
   final Map<int, String> _dictationFeedback = {};
   final Set<int> _dictationChecking = {};
   late DateTime _sessionStart;
+
+  /// Marie's live-call button, inline in the AppBar — same
+  /// InlineCallController every other reading/exercise screen uses, so
+  /// asking her about the audio happens right here, not in a separate
+  /// fullscreen call window.
+  late final InlineCallController _call;
 
   ListeningExercise get exercise => widget.exercise;
 
@@ -62,11 +71,29 @@ class _ListeningExerciseScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _sessionStart = DateTime.now();
+    _call = InlineCallController(
+      sessionType: LiveSessionType.labAssistant,
+      lessonContext: () => _lessonContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
+  /// P0.4 pocket/lock-screen handling, same contract as every other live
+  /// call screen — forwarded straight to the shared controller.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _call.dispose();
     LessonSpeechService.shared.deactivate();
     super.dispose();
   }
@@ -86,12 +113,19 @@ class _ListeningExerciseScreenState
                 LessonQAOverlay.show(context, lessonContext: _lessonContext),
             icon: const Icon(CupertinoIcons.mic_fill, color: DesignTokens.info),
           ),
-          MarieToolbarButton(lessonContext: _lessonContext),
+          InlineCallActions(controller: _call),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         children: [
+          if (_call.isLive || _call.error != null) ...[
+            InlineCallStatusCard(
+              controller: _call,
+              listeningLabel: 'Listening. Ask about the audio anytime.',
+            ),
+            const SizedBox(height: 16),
+          ],
           _playbackCard(),
           if (exercise.questions.isNotEmpty) ...[
             const SizedBox(height: 16),

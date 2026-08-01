@@ -264,9 +264,21 @@ class PathwayCoordinator {
   }
 
   Future<void> _runWriting(BuildContext context) async {
+    var task = _persistedWritingTask();
+    if (task == null) {
+      task = await _generateWritingTask(context);
+      if (task != null) {
+        session.writingTaskJson = task.toJson();
+        _save();
+      }
+    }
+    if (!context.mounted) return;
     final outcome = await AppRouter.push<StageOutcome<WritingStageResult>>(
       context,
-      (_) => PathwayWritingScreen(targetWords: _writingTargets()),
+      (_) => PathwayWritingScreen(
+        targetWords: _writingTargets(),
+        writingTask: task,
+      ),
       fullscreenDialog: true,
     );
     _applyOutcome(
@@ -554,6 +566,47 @@ class PathwayCoordinator {
         .expand((p) => p.themes.expand((t) => t.entries))
         .where((e) => wanted.contains(e.id))
         .toList();
+  }
+
+  WritingTask? _persistedWritingTask() {
+    final json = session.writingTaskJson;
+    if (json == null) return null;
+    try {
+      return WritingTask.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Generates today's writing prompt live, calibrated to the learner's
+  /// actual level and known vocabulary (mirrors [_generateScene]'s blocking
+  /// dialog). Returns null on failure (offline, rate limit, timeout) — the
+  /// caller falls back to the plain target-words prompt rather than blocking
+  /// the stage.
+  Future<WritingTask?> _generateWritingTask(BuildContext context) async {
+    if (!context.mounted) return null;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: PSProgressIndicator()),
+    );
+    WritingTask? task;
+    try {
+      task = await LessonAgentService.shared
+          .generateWritingTask(
+            levelBand: store.profile().level,
+            knownVocab: ContentService.shared.knownVocabWords(
+              store.allSRSStates(),
+            ),
+          )
+          .timeout(const Duration(seconds: 25));
+    } catch (_) {
+      task = null;
+    }
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+    return task;
   }
 
   List<VocabEntry> _writingTargets() {
