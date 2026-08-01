@@ -5,9 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:sqlite3/common.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
+import '../models/note.dart';
 import '../models/profile.dart';
 import '../models/srs_state.dart';
 import '../orchestration/models/competency_state.dart';
@@ -146,6 +148,7 @@ class SyncService {
           'vocab_entry_ids_json': session.vocabEntryIds,
           'grammar_lesson_id': session.grammarLessonId,
           'reading_passage_json': session.readingPassageJson,
+          'writing_task_json': session.writingTaskJson,
           'started_at': session.startedAt?.toUtc().toIso8601String(),
           'completed_at': session.completedAt?.toUtc().toIso8601String(),
           'updated_at': DateTime.now().toUtc().toIso8601String(),
@@ -170,6 +173,28 @@ class SyncService {
   }, queueTable: 'generated_stories', queueRowId: story.id);
 
   // ---------------------------------------------------------------------------
+  // Generated grammar-practice library
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncGeneratedGrammarStory(GeneratedGrammarStory story) =>
+      _guarded((uid) async {
+        await _client.from('generated_grammar_stories').upsert({
+          'id': story.id,
+          'user_id': uid,
+          'title': story.title,
+          'grammar_point': story.grammarPoint,
+          'level_band': story.levelBand,
+          'passage_json': story.passage.toJson(),
+          'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
+          'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
+          'explanation_json': story.explanation.toJson(),
+          'score': story.score,
+          'created_at': story.createdAt.toUtc().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        });
+      }, queueTable: 'generated_grammar_stories', queueRowId: story.id);
+
+  // ---------------------------------------------------------------------------
   // Generated roleplay library
   // ---------------------------------------------------------------------------
 
@@ -184,6 +209,31 @@ class SyncService {
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         });
       }, queueTable: 'generated_roleplays', queueRowId: roleplay.id);
+
+  // ---------------------------------------------------------------------------
+  // Floating notetaker — both self-typed notes and AI-generated session recaps
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncNote(Note note) => _guarded((uid) async {
+    if (note.uuid == null) return; // legacy row, not yet assigned an id
+    await _client.from('notes_state').upsert({
+      'id': note.uuid,
+      'user_id': uid,
+      'tag': note.tag,
+      'text': note.text,
+      'source': note.source,
+      'session_id': note.sessionId,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }, queueTable: 'notes_state', queueRowId: note.uuid ?? note.id.toString());
+
+  Future<void> deleteNote(String uuid) => _guarded((uid) async {
+    await _client
+        .from('notes_state')
+        .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('id', uuid)
+        .eq('user_id', uid);
+  }, queueTable: 'notes_state', queueRowId: uuid);
 
   Future<void> syncAiSessionStart({
     required String id,
@@ -628,7 +678,9 @@ class SyncService {
       _hydrateEvents(uid),
       _hydrateEntitlements(uid),
       _hydrateGeneratedStories(uid),
+      _hydrateGeneratedGrammarStories(uid),
       _hydrateGeneratedRoleplays(uid),
+      _hydrateNotes(uid),
     ]);
   }
 
@@ -727,12 +779,14 @@ class SyncService {
         INSERT INTO daily_sessions
           (id, local_date, planned_length, current_stage, current_item_index,
            stages_json, vocab_entry_ids_json, grammar_lesson_id, reading_passage_json,
-           started_at, completed_at, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           writing_task_json, started_at, completed_at, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           current_stage = excluded.current_stage,
           current_item_index = excluded.current_item_index,
           stages_json = excluded.stages_json,
+          reading_passage_json = excluded.reading_passage_json,
+          writing_task_json = excluded.writing_task_json,
           started_at = excluded.started_at,
           completed_at = excluded.completed_at,
           updated_at = excluded.updated_at
@@ -751,6 +805,9 @@ class SyncService {
           r['grammar_lesson_id'],
           r['reading_passage_json'] != null
               ? _jsonOf(r['reading_passage_json'])
+              : null,
+          r['writing_task_json'] != null
+              ? _jsonOf(r['writing_task_json'])
               : null,
           r['started_at'],
           r['completed_at'],
@@ -793,6 +850,46 @@ class SyncService {
     }
   }
 
+  Future<void> _hydrateGeneratedGrammarStories(String uid) async {
+    final rows = await _client
+        .from('generated_grammar_stories')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO generated_grammar_stories
+          (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          title = excluded.title,
+          grammar_point = excluded.grammar_point,
+          level_band = excluded.level_band,
+          passage_json = excluded.passage_json,
+          quiz_json = excluded.quiz_json,
+          keywords_json = excluded.keywords_json,
+          explanation_json = excluded.explanation_json,
+          score = excluded.score,
+          updated_at = excluded.updated_at
+        WHERE excluded.updated_at > generated_grammar_stories.updated_at
+        ''',
+        [
+          r['id'],
+          r['title'],
+          r['grammar_point'],
+          r['level_band'],
+          _jsonOf(r['passage_json']),
+          _jsonOf(r['quiz_json']),
+          _jsonOf(r['keywords_json']),
+          _jsonOf(r['explanation_json']),
+          r['score'],
+          r['created_at'],
+          r['updated_at'],
+        ],
+      );
+    }
+  }
+
   Future<void> _hydrateGeneratedRoleplays(String uid) async {
     final rows = await _client
         .from('generated_roleplays')
@@ -816,6 +913,43 @@ class SyncService {
           _jsonOf(r['passage_json']),
           r['created_at'],
           r['updated_at'],
+        ],
+      );
+    }
+  }
+
+  /// Conflict target is `uuid` (a unique partial index, see `_migrationV15`),
+  /// not the local autoincrement `id` — that id is never shared across
+  /// devices, only the client-generated uuid is. Pulls tombstones too
+  /// (`deleted_at`), so a delete on one device removes the note everywhere.
+  Future<void> _hydrateNotes(String uid) async {
+    final rows = await _client.from('notes_state').select().eq(
+      'user_id',
+      uid,
+    );
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO notes (uuid, tag, text, source, session_id, created_at, updated_at, deleted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(uuid) DO UPDATE SET
+          tag = excluded.tag,
+          text = excluded.text,
+          source = excluded.source,
+          session_id = excluded.session_id,
+          updated_at = excluded.updated_at,
+          deleted_at = excluded.deleted_at
+        WHERE excluded.updated_at > notes.updated_at
+        ''',
+        [
+          r['id'],
+          r['tag'],
+          r['text'],
+          r['source'] ?? 'user',
+          r['session_id'],
+          r['created_at'],
+          r['updated_at'],
+          r['deleted_at'],
         ],
       );
     }

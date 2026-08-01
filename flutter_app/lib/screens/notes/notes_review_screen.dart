@@ -289,6 +289,14 @@ class _NoteRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
+                      if (note.source == 'ai') ...[
+                        Icon(
+                          CupertinoIcons.sparkles,
+                          size: 13,
+                          color: DesignTokens.info,
+                        ),
+                        const SizedBox(width: DesignTokens.space1),
+                      ],
                       Expanded(
                         child: Text(
                           note.tag ?? 'General',

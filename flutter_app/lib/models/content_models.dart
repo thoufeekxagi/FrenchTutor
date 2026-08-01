@@ -142,6 +142,12 @@ class Conjugation {
     group: json['group'] as String,
     rows: (json['rows'] as List).map((e) => ConjRow.fromJson(e)).toList(),
   );
+
+  Map<String, dynamic> toJson() => {
+    'verb': verb,
+    'group': group,
+    'rows': rows.map((r) => r.toJson()).toList(),
+  };
 }
 
 class ConjRow {
@@ -152,6 +158,8 @@ class ConjRow {
 
   factory ConjRow.fromJson(Map<String, dynamic> json) =>
       ConjRow(pronoun: json['pronoun'] as String, form: json['form'] as String);
+
+  Map<String, dynamic> toJson() => {'pronoun': pronoun, 'form': form};
 }
 
 class BilingualExample {
@@ -162,6 +170,65 @@ class BilingualExample {
 
   factory BilingualExample.fromJson(Map<String, dynamic> json) =>
       BilingualExample(fr: json['fr'] as String, en: json['en'] as String);
+
+  Map<String, dynamic> toJson() => {'fr': fr, 'en': en};
+}
+
+/// A dynamically-generated grammar explanation — the "teach the rule first"
+/// half of a grammar practice session, grounding the story that follows it
+/// (see `LessonAgentService.buildGrammarExplanation`/`buildGrammarStory`) so
+/// both agree on the same rules instead of independently reinventing them.
+/// Reuses [Conjugation]/[BilingualExample] since the shape (verb table,
+/// bilingual examples) is identical to the old static lesson content, just
+/// generated fresh per session instead of loaded from JSON.
+class GrammarExplanation {
+  GrammarExplanation({
+    required this.title,
+    required this.summary,
+    required this.usage,
+    required this.tenseContrast,
+    required this.conjugations,
+    required this.examples,
+  });
+
+  final String title;
+
+  /// One short paragraph: what this tense/point is and when it's used.
+  final String summary;
+
+  /// Bullet-point usage rules.
+  final List<String> usage;
+
+  /// Explicit contrast against related tenses/forms (e.g. "unlike passé
+  /// composé, which marks a completed action, imparfait describes an
+  /// ongoing or habitual past state") — the "how it changes from present to
+  /// past" piece specifically asked for, not left implicit.
+  final String tenseContrast;
+  final List<Conjugation> conjugations;
+  final List<BilingualExample> examples;
+
+  factory GrammarExplanation.fromJson(Map<String, dynamic> json) =>
+      GrammarExplanation(
+        title: json['title'] as String,
+        summary: json['summary'] as String,
+        usage: List<String>.from(json['usage'] as List),
+        tenseContrast: json['tense_contrast'] as String? ?? '',
+        conjugations: (json['conjugations'] as List)
+            .map((e) => Conjugation.fromJson((e as Map).cast()))
+            .toList(),
+        examples: (json['examples'] as List)
+            .map((e) => BilingualExample.fromJson((e as Map).cast()))
+            .toList(),
+      );
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'summary': summary,
+    'usage': usage,
+    'tense_contrast': tenseContrast,
+    'conjugations': conjugations.map((c) => c.toJson()).toList(),
+    'examples': examples.map((e) => e.toJson()).toList(),
+  };
 }
 
 class Drill {
@@ -576,6 +643,18 @@ class WritingTask {
   /// level-appropriate content live). Defaults to A2 for any task authored
   /// before this field existed, rather than silently crashing on missing data.
   final String levelBand;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'type': type,
+    'title': title,
+    'promptFr': promptFr,
+    'promptEn': promptEn,
+    'minWords': minWords,
+    'targetConnectors': targetConnectors,
+    'rubricHints': rubricHints,
+    'levelBand': levelBand,
+  };
 
   factory WritingTask.fromJson(Map<String, dynamic> json) => WritingTask(
     id: json['id'] as String,

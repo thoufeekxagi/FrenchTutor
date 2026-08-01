@@ -189,6 +189,48 @@ TRIAL RULES: ABSOLUTE:
       'mini-lesson NOW: warm English greeting, introduce yourself, then '
       'straight into "Bonjour !".)';
 
+  /// Normalizes the many raw level strings this app has accumulated over time
+  /// (onboarding wrote 'a1'/'a2'/'b1'/'b2', but older/aliased profiles can
+  /// still hold 'zero', 'basics', 'conversational') into one clean CEFR
+  /// label, so every prompt-consuming call site (here, and the level index
+  /// used by writing_lab_screen.dart) agrees on the same four buckets.
+  static String normalizeLevel(String raw) => switch (raw.toLowerCase()) {
+    'a1' || 'zero' || 'basics' => 'A1',
+    'a2' => 'A2',
+    'b1' || 'conversational' => 'B1',
+    'b2' => 'B2',
+    _ => 'A1',
+  };
+
+  /// Explicit per-level teaching guidance — the piece that was missing before:
+  /// the base persona only ever said "calibrate from the student profile",
+  /// never gave the model an actual CEFR label or level-specific rule, so in
+  /// practice every call landed at roughly the same generic difficulty
+  /// regardless of level. This is appended to every live prompt right next
+  /// to the STUDENT PROFILE block.
+  static String levelGuidance(String cefr) => switch (normalizeLevel(cefr)) {
+    'A1' => '''
+STUDENT LEVEL: A1 (JUST STARTING). Assume near-zero vocabulary and treat this as the default unless the profile clearly shows otherwise.
+1. For any new French word or short phrase you introduce, or that comes up during a roleplay/exercise — even a simple one like "le pain" — say it, then immediately gloss it word-by-word in English (not just a full-sentence translation), so the student learns each piece, not just the gist.
+2. Skip the gloss only for words the student has clearly already used correctly themselves, or if they explicitly say something like "don't translate, I've got this" — then respect that for the rest of the call.
+3. Keep sentences short (3-6 words), repeat key words, celebrate every attempt, lots of English scaffolding.''',
+    'A2' => '''
+STUDENT LEVEL: A2 (BUILDING BASICS).
+1. Mostly simple, everyday French. Gloss new or less common words word-by-word in English the first time you use them in this call.
+2. You don't need to re-translate words the student has already used correctly earlier in the same call.
+3. Slightly longer sentences are fine; still avoid idioms or rare vocabulary without a quick gloss.''',
+    'B1' => '''
+STUDENT LEVEL: B1 (CONVERSATIONAL).
+1. Mostly French, noticeably less hand-holding than a beginner gets.
+2. Only gloss a word in English if it's genuinely new/uncommon or the student looks stuck — don't default to translating everything, that would feel condescending at this level.
+3. Push toward a more natural pace and slightly tougher vocabulary than A2.''',
+    'B2' => '''
+STUDENT LEVEL: B2 (POLISHING).
+1. French almost exclusively; only step into English for a genuinely tricky point the student can't get past.
+2. Faster pace, idiomatic language, minimal scaffolding — treat the student as functionally fluent who is refining nuance, not learning basics.''',
+    _ => '',
+  };
+
   /// The composed system prompt for a session type. `lessonContext` and the student
   /// profile are appended separately by GeminiLiveService. [persona] defaults to
   /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.

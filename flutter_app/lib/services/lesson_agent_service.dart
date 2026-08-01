@@ -772,6 +772,152 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     return _parseStoryQuizAndKeywords(raw);
   }
 
+  /// Grammar points offered by the Grammar lab's "Practice a tense" picker —
+  /// what the user asked for as "auto and tense they can choose to build and
+  /// learn". Deliberately a short, common-first list, not every possible
+  /// French tense/mood.
+  static const grammarPracticePoints = [
+    'Présent',
+    'Passé composé',
+    'Futur proche',
+    'Imparfait',
+    'Conditionnel présent',
+  ];
+
+  /// The CEFR band each grammar point first becomes available at — must
+  /// stay in lockstep with [_cefrCalibration]'s per-level tense allowances
+  /// (A1: présent only; A2: + passé composé/futur proche; B1: + imparfait;
+  /// conditionnel first appears at B1 too, matching real curricula). Without
+  /// this bound, an A1 learner could pick "Conditionnel présent" and the
+  /// prompt would carry two directly contradicting instructions at once —
+  /// the CEFR block saying "present tense only, no conditional" while the
+  /// grammar-point prompt demands a story built around the conditional.
+  static const Map<String, String> grammarPracticePointMinLevel = {
+    'Présent': 'a1',
+    'Passé composé': 'a2',
+    'Futur proche': 'a2',
+    'Imparfait': 'b1',
+    'Conditionnel présent': 'b1',
+  };
+
+  /// Grammar points available at [levelBand] or below it — the picker must
+  /// only ever offer these, never the full [grammarPracticePoints] list
+  /// regardless of level.
+  static List<String> grammarPracticePointsFor(String levelBand) {
+    final learnerIndex = _cefrIndex(levelBand);
+    return grammarPracticePoints
+        .where((p) => _cefrIndex(grammarPracticePointMinLevel[p]!) <= learnerIndex)
+        .toList();
+  }
+
+  static int _cefrIndex(String levelBand) => switch (levelBand.toLowerCase()) {
+    'a1' || 'zero' || 'basics' => 0,
+    'a2' => 1,
+    'b1' || 'conversational' => 2,
+    'b2' => 3,
+    _ => 0,
+  };
+
+  /// Generates a short story built AROUND one chosen grammar point/tense
+  /// (level-calibrated, same seeding technique as [buildPersonalStory]) — the
+  /// "grammar should be a story generator" rebuild: instead of a static
+  /// explanation-plus-drills page, the grammar point is taught by seeing it
+  /// used naturally, sentence by sentence, with each segment's `grammarNote`
+  /// explicitly tied to that point rather than a generic observation.
+  /// Generated FIRST, before the story — the "teach the rule, then show it
+  /// in context" ordering: grammar has to lead, the story is the vehicle
+  /// that demonstrates it, not the other way around. Deliberately explicit
+  /// about how the tense/form CHANGES relative to related tenses (the
+  /// `tenseContrast` field), not just what it looks like in isolation.
+  Future<GrammarExplanation> buildGrammarExplanation({
+    required String grammarPoint,
+    required String levelBand,
+  }) async {
+    final system =
+        '''
+You are a French grammar teacher writing a short, clear explanation of ONE grammar point for a language learner, BEFORE they read any story about it. Return ONLY compact JSON with this exact shape: {"title": string, "summary": string, "usage": [string, ...], "tense_contrast": string, "conjugations": [{"verb": string, "group": string, "rows": [{"pronoun": string, "form": string}, ...]}, ...], "examples": [{"fr": string, "en": string}, ...]}.
+"title" is the grammar point's name (e.g. "$grammarPoint"). "summary" is one short paragraph (2-3 sentences) explaining what it is and when it's used, in plain English. "usage" is 3-5 short bullet-point rules for how/when to use it. "tense_contrast" is the most important field: 2-3 sentences explicitly explaining HOW this changes from or relates to OTHER tenses the student likely already knows (e.g. how it differs from présent, or from passé composé, whichever comparison is most useful for "$grammarPoint") — never leave this implicit, spell out the actual difference in form and meaning. "conjugations" gives 2 full conjugation tables (one common regular verb, one common irregular verb) for "$grammarPoint", each with all 6 pronoun rows (je, tu, il/elle, nous, vous, ils/elles). "examples" gives 3-4 short bilingual example sentences using "$grammarPoint" naturally.
+${_cefrCalibration(levelBand)}''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content': 'GRAMMAR POINT: $grammarPoint\nLEVEL: $levelBand',
+        },
+      ],
+      maxTokens: 1200,
+    );
+    return GrammarExplanation.fromJson(_decodeObject(raw));
+  }
+
+  /// The story is grounded in [explanation] (its own summary/contrast/
+  /// conjugations, verbatim) so the two halves of a grammar session always
+  /// agree on the same rules instead of the story independently reinventing
+  /// them — see `buildGrammarExplanation`, generated first and passed in here.
+  Future<ReadingPassage> buildGrammarStory({
+    required String grammarPoint,
+    required String levelBand,
+    required GrammarExplanation explanation,
+  }) async {
+    final system =
+        '''
+Write a short third-person narrative story in French for a language learner that puts the grammar point "$grammarPoint" front and center — most sentences should naturally use that grammar point in context, not just mention it once. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title". Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending, using "$grammarPoint" as heavily and naturally as a real story allows. "grammar_note" MUST explain, in one simple English sentence, HOW that specific sentence uses "$grammarPoint" (which form, why that form, how it changes from the infinitive/base) — this is the whole point of the story, not an afterthought like in a generic reading passage. "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
+${_cefrCalibration(levelBand)}
+The student was JUST taught this explanation of "$grammarPoint" — every sentence you write must be consistent with it, using the SAME rules/forms, not a different or contradicting take:
+SUMMARY: ${explanation.summary}
+USAGE RULES: ${explanation.usage.join('; ')}
+HOW IT CONTRASTS WITH OTHER TENSES: ${explanation.tenseContrast}
+This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience.
+INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or opening sentence as one already suggested by the seed details below.''';
+    final random = Random();
+    final name =
+        _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
+    final setting = _storySettings[random.nextInt(_storySettings.length)];
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'GRAMMAR POINT: $grammarPoint\nLEVEL: $levelBand\n'
+              'SEED DETAILS to build this specific story around: a main character named $name, '
+              'set in or around $setting. Use these naturally, do not just state them.',
+        },
+      ],
+      maxTokens: 1400,
+      temperature: 1.0,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  /// The quiz half of the grammar-story rebuild — unlike
+  /// [buildStoryQuizAndKeywords]'s comprehension questions, every question
+  /// here tests the CHOSEN GRAMMAR POINT itself (conjugation/form-recognition
+  /// style, fill-in-the-blank on the story's own sentences), so the existing
+  /// 80%-to-pass gate (`grammar_lesson_screen.dart`'s drill threshold) is
+  /// actually gating grammar mastery, not just reading comprehension.
+  Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
+  buildGrammarQuiz({required ReadingPassage passage, required String grammarPoint}) async {
+    final system =
+        '''
+Given a short French story built specifically around the grammar point "$grammarPoint", write a quiz that TESTS THAT GRAMMAR POINT (not just story comprehension) plus a keyword glossary, same as for a regular story. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 5 to 6 questions: mostly "which form is correct" fill-in-the-blank questions (English question stem naming the subject/verb, exactly 3 French answer choices, only one grammatically correct for "$grammarPoint"), plus 1-2 questions asking how the story used that grammar point in a specific sentence. Base every question on "$grammarPoint" and the story's own sentences/vocabulary, never an unrelated grammar point.
+KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'GRAMMAR POINT: $grammarPoint\nSTORY:\n${passage.fullText}',
+        },
+      ],
+      maxTokens: 1400,
+    );
+    return _parseStoryQuizAndKeywords(raw);
+  }
+
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
   /// deck of `GrammarPracticeCard`s (one short French sentence in the chosen tense per card,
   /// its English meaning, and a one-line grammar note), reusing the vocabulary words the
@@ -900,6 +1046,38 @@ You are a French grammar tutor. The student answered a drill question incorrectl
         {'role': 'user', 'content': user},
       ],
     );
+  }
+
+  /// Auto-generated review note for the floating notetaker (source='ai'),
+  /// written right after a live session ends — a short recap of the new
+  /// words/phrases the transcript shows the student actually used or was
+  /// taught, so it reads like a real notetaker's own shorthand, not a
+  /// transcript dump. Sits alongside the student's own typed notes in the
+  /// same list. Returns '' (never throws to the caller) when the transcript
+  /// is too thin to say anything real about.
+  Future<String> summarizeSessionForNotes({
+    required String transcript,
+    required String topic,
+  }) async {
+    if (transcript.trim().isEmpty) return '';
+    const system = '''
+You are a French tutor's assistant writing a SHORT review note right after a live speaking session, the way a real tutor jots down what a student practiced — not a transcript dump, a few lines of real shorthand. Plain spoken-in-writing style, no markdown, no greeting, no headers or labels like "Words:" or "Hardest:" — just short natural sentences/lines a learner would actually read. Cover, only where the transcript genuinely supports it (never invent one to fill a slot):
+1. The 2-5 most useful new French words or short phrases from the transcript, each with a 1-3 word English gloss.
+2. Roughly how many times the student practiced/attempted something this session (exchanges, repeated phrases, corrected attempts) — a rough count or "a lot"/"a few", not a precise stat you're inventing.
+3. Which single word or phrase came up the most, if one clearly did.
+4. Which word or phrase seemed hardest for the student — repeated, mispronounced, or corrected more than once.
+5. Any specific pronunciation note the tutor actually gave in the transcript (e.g. a sound the student mispronounced and how to say it right) — only if the transcript actually contains one, never invented.
+Keep the whole note under 70 words total. If the transcript has nothing substantial to say anything real about (small talk, a dropped call, one word), respond with exactly: NONE''';
+    final user = 'TOPIC: $topic\n\nTRANSCRIPT:\n$transcript';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 220,
+    );
+    final trimmed = raw.trim();
+    return trimmed.toUpperCase() == 'NONE' ? '' : trimmed;
   }
 
   /// Natural-voice line synthesis via Gemini's dedicated TTS model — the ACTIVE

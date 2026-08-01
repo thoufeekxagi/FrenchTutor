@@ -14,7 +14,12 @@ cd "$(dirname "$0")"
 
 # --- 1. Build number -------------------------------------------------------
 NEXT_BUILD=$(git rev-list --count HEAD)
-NEXT_BUILD=$((NEXT_BUILD + 1)) # +1 for the commit this bump itself will become
+LAST_MSG=$(git log -1 --pretty=%s)
+if [[ "$LAST_MSG" != "Bump iOS build number to "*" [auto]" ]]; then
+  NEXT_BUILD=$((NEXT_BUILD + 1)) # +1 for the commit this bump itself will become
+  # (skipped when HEAD is already an auto-bump commit — its own count already accounts for it,
+  # otherwise re-running this script, e.g. on a retried push, bumps again every time)
+fi
 
 CURRENT=$(grep '^version:' pubspec.yaml | sed -E 's/^version: [0-9]+\.[0-9]+\.[0-9]+\+([0-9]+)$/\1/')
 if [ "$NEXT_BUILD" -le "$CURRENT" ]; then

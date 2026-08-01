@@ -15,6 +15,23 @@ class SRSService {
     return value > 0 ? value : 20;
   }
 
+  /// How many words the Daily Path's "Auto"/"Recommended" vocab queue shows
+  /// per practice — separate from [newCardsPerDay], which only governs the
+  /// standalone Flashcards lab. Was previously NOT user-facing at all: the
+  /// total was silently derived from the session-length setting (standard =
+  /// 10, fixed), which read as "stuck on the same 10 words" to a learner
+  /// practicing more than once a day. Default 5, adjustable 1-10 in Settings.
+  static Future<int> get autoQueueSize async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getInt('vocab_auto_queue_size') ?? 0;
+    return value > 0 ? value.clamp(1, 10) : 5;
+  }
+
+  static Future<void> setAutoQueueSize(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('vocab_auto_queue_size', value.clamp(1, 10));
+  }
+
   SRSState grade({
     required String entryId,
     required SRSGrade grade,
@@ -147,21 +164,32 @@ class SRSService {
     return base;
   }
 
-  /// Below this, "Recommended" reads as broken (0 words ready) rather than
-  /// like a deliberately light day — the daily new-word budget is a pacing
-  /// device, not a promise to ever show nothing at all when the learner
-  /// explicitly asked to practice.
-  static const minimumAutoQueueSize = 5;
-
   Future<List<VocabEntry>> dailyMixedQueue() async {
     final allEntries = ContentService.shared.vocabPhases
         .expand((p) => p.themes.expand((t) => t.entries))
         .toList();
     final states = store.allSRSStates();
     final now = DateTime.now();
-    final policy = policyFor(
+    final basePolicy = policyFor(
       store.profile().sessionLength,
       firstEverSession: store.hasNoReviewHistory(),
+    );
+
+    // The learner's own word-count preference is the real cap now, not the
+    // session-length-derived total — [autoQueueSize] scales the new/review
+    // split proportionally so a 5-word session isn't suddenly all-new or
+    // all-review, it's just a smaller version of the same mix.
+    final targetSize = await autoQueueSize;
+    final scale = basePolicy.totalCap == 0
+        ? 1.0
+        : targetSize / basePolicy.totalCap;
+    final policy = (
+      newBudget: (basePolicy.newBudget * scale).round().clamp(0, targetSize),
+      reviewBudget: (basePolicy.reviewBudget * scale).round().clamp(
+        0,
+        targetSize,
+      ),
+      totalCap: targetSize,
     );
 
     final due = <VocabEntry>[];
@@ -179,22 +207,23 @@ class SRSService {
         .clamp(0, policy.newBudget);
     final queue = [...due.take(policy.reviewBudget), ...unseen.take(newBudget)];
     final capped = queue.take(policy.totalCap).toList();
-    if (capped.length >= minimumAutoQueueSize) return capped;
+    if (capped.length >= targetSize) return capped;
 
-    // Under the minimum — the daily new-word cap already got used up
+    // Under the target — the daily new-word cap already got used up
     // elsewhere today, but there's no reason to leave the learner staring
     // at "0 words ready" when unseen words still exist in the bank. Top up
-    // with more unseen words beyond today's cap, then with known words for
-    // review, until the minimum is hit or the whole bank is truly spent.
+    // with more unseen words beyond today's cap (still fresh content, just
+    // past today's pacing budget), then with known words for review, until
+    // the target is hit or the whole bank is truly spent.
     final chosenIds = capped.map((e) => e.id).toSet();
     final topUp = [...capped];
     for (final entry in unseen) {
-      if (topUp.length >= minimumAutoQueueSize) break;
+      if (topUp.length >= targetSize) break;
       if (chosenIds.add(entry.id)) topUp.add(entry);
     }
-    if (topUp.length < minimumAutoQueueSize) {
-      for (final entry in knownSample(limit: minimumAutoQueueSize)) {
-        if (topUp.length >= minimumAutoQueueSize) break;
+    if (topUp.length < targetSize) {
+      for (final entry in knownSample(limit: targetSize)) {
+        if (topUp.length >= targetSize) break;
         if (chosenIds.add(entry.id)) topUp.add(entry);
       }
     }

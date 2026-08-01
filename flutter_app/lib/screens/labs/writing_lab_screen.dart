@@ -2,6 +2,7 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/database/learning_store.dart' show WritingSubmission;
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
@@ -116,6 +117,86 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
               ),
               const SizedBox(height: 12),
             ],
+          ],
+          _pastSubmissions(),
+        ],
+      ),
+    );
+  }
+
+  Widget _pastSubmissions() {
+    final submissions = ref.watch(learningStoreProvider).submissions();
+    if (submissions.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Past submissions',
+            style: DesignTokens.mono(
+              10.5,
+              weight: FontWeight.w500,
+            ).copyWith(color: DesignTokens.slateDim),
+          ),
+          const SizedBox(height: 8),
+          for (final s in submissions) ...[
+            _SubmissionTile(submission: s),
+            const SizedBox(height: 12),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SubmissionTile extends StatelessWidget {
+  const _SubmissionTile({required this.submission});
+
+  final WritingSubmission submission;
+
+  String get _dateLabel {
+    final parsed = DateTime.tryParse(submission.submittedAt);
+    if (parsed == null) return submission.submittedAt;
+    final local = parsed.toLocal();
+    return '${local.day}/${local.month}/${local.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PasseportCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  submission.text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(14),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _dateLabel,
+                style: DesignTokens.mono(
+                  10.5,
+                ).copyWith(color: DesignTokens.slateDim),
+              ),
+            ],
+          ),
+          if (submission.feedback.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              submission.feedback,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: DesignTokens.body(
+                12.5,
+              ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+            ),
           ],
         ],
       ),

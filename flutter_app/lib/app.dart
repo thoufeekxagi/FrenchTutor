@@ -54,7 +54,6 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _hasSession = AuthService.shared.currentSession != null;
-  bool _restoring = false;
   bool? _aiConsented;
   StreamSubscription<AuthState>? _subscription;
 
@@ -91,22 +90,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         // their app — the link is retried on the next auth event regardless.
       }
       // Restore every server-side learner record (vocab/session/mission/
-      // competency state) into the local cache BEFORE the app is shown, so
-      // a returning user on a fresh install or new device sees their real
-      // progress and the orchestration layer never plans against an empty
-      // learner model. Best-effort with a timeout: a slow/offline network
-      // must never strand the learner on a spinner forever — whatever is
-      // already local (possibly nothing, on a brand-new device) is what
-      // they see, and the outbox/hydrate pass retries on the next launch.
-      if (mounted) setState(() => _restoring = true);
+      // competency state) into the local cache — entirely in the background,
+      // never blocking the app on a spinner. This fires on EVERY auth event
+      // with a session (including a token refresh maybe an hour into an
+      // active lesson, not just the first sign-in), so it must never gate
+      // what's on screen: a returning user on a fresh install briefly sees
+      // whatever is already local (possibly nothing) and it fills in
+      // silently as soon as the pull lands, same "best-effort, eventually
+      // consistent" contract every other sync call in this app already has.
       ref
           .read(syncServiceProvider)
           .hydrateAfterSignIn()
           .timeout(const Duration(seconds: 8), onTimeout: () {})
-          .catchError((_) {})
-          .whenComplete(() {
-            if (mounted) setState(() => _restoring = false);
-          });
+          .catchError((_) {});
     }
     if (!mounted) return;
     setState(() => _hasSession = session != null);
@@ -131,14 +127,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       );
     }
     if (!_hasSession) return const AuthScreen();
-    if (_restoring) return const _RestoringProgressView();
     return const MainTabScreen();
   }
 }
 
-/// Shown for the brief window between sign-in and local hydration finishing
-/// — keeps the learner from ever seeing a flash of an empty/cold-start home
-/// screen while their real progress is still being pulled from Supabase.
+/// Shown only for the brief, purely-local SharedPreferences read that decides
+/// whether AI consent has already been given — never for network sync, which
+/// now always runs silently in the background instead of gating any screen.
 class _RestoringProgressView extends StatelessWidget {
   const _RestoringProgressView();
 

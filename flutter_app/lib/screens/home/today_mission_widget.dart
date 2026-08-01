@@ -146,7 +146,14 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
           LessonSpeechService.shared.deactivate();
           await AppRouter.push(
             context,
-            (_) => SessionScreen(apiKey: ApiKeys.geminiKey),
+            // Missing `stage: 'speaking'` was the actual "mission completion
+            // doesn't complete the mission" bug: SessionScreen persists
+            // whatever `stage` it's given verbatim (defaulting to null when
+            // omitted, same as the dashboard's stage-less free-talk call),
+            // and DailyGoalService only counts a session toward a category
+            // when its stage maps to one — a null stage silently never
+            // counted, so Speaking could never reach 6/6 from this button.
+            (_) => SessionScreen(apiKey: ApiKeys.geminiKey, stage: 'speaking'),
             fullscreenDialog: true,
           );
       }

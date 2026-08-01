@@ -207,6 +207,16 @@ class ContentService {
     return 'Writing task: ${task.title}\nType: ${task.type}\nPrompt (FR): ${task.promptFr}\nPrompt (EN): ${task.promptEn}\nMin words: ${task.minWords}\nTarget connectors: ${task.targetConnectors.join(", ")}\nRubric: ${task.rubricHints.join("; ")}';
   }
 
+  String storyContext(ReadingPassage passage) {
+    final buf = StringBuffer();
+    buf.writeln('Story: ${passage.title}${passage.titleEn != null ? " (${passage.titleEn})" : ""}');
+    buf.writeln('Full text (FR): ${passage.fullText}');
+    for (final s in passage.segments) {
+      if (s.grammarNote.isNotEmpty) buf.writeln('Grammar note: ${s.grammarNote}');
+    }
+    return buf.toString();
+  }
+
   String listeningExerciseContext(ListeningExercise exercise) {
     return 'Listening exercise: ${exercise.title}\nScript: ${exercise.script}\nQuestions: ${exercise.questions.length}\nDictation lines: ${exercise.dictation.length}';
   }

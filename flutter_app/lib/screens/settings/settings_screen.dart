@@ -20,6 +20,7 @@ import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
 import '../../services/referral_service.dart';
+import '../../services/srs_service.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../subscription/paywall_screen.dart';
@@ -36,6 +37,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   double _narrationRate = 0.42;
   int _newCardsPerDay = 20;
+  int _autoQueueSize = 5;
   int _practicePasses = 5;
   DateTime _roadmapStartDate = DateTime.now();
   TutorPersona _persona = ActiveTutor.current;
@@ -163,6 +165,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _roadmapStartDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
     });
+    final queueSize = await SRSService.autoQueueSize;
+    if (!mounted) return;
+    setState(() => _autoQueueSize = queueSize);
     final mix = await TutorTuning.languageMix();
     final speed = await TutorTuning.voiceSpeed();
     if (!mounted) return;
@@ -840,6 +845,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   'practice_passes_per_word',
                                   _practicePasses,
                                 );
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // --- Vocabulary practice ---
+            _PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KickerText('Vocabulary practice', color: Passeport.slateDim),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Words per practice: $_autoQueueSize',
+                              style: Passeport.body(
+                                12.5,
+                              ).copyWith(color: Passeport.text),
+                            ),
+                            Text(
+                              'How many words the Auto queue shows each time — smaller means less repetition if you practice more than once a day',
+                              style: Passeport.mono(
+                                10,
+                              ).copyWith(color: Passeport.slateDim),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _StepperButton(
+                        icon: CupertinoIcons.minus,
+                        onTap: _autoQueueSize > 1
+                            ? () {
+                                setState(() => _autoQueueSize -= 1);
+                                SRSService.setAutoQueueSize(_autoQueueSize);
+                              }
+                            : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _StepperButton(
+                        icon: CupertinoIcons.plus,
+                        onTap: _autoQueueSize < 10
+                            ? () {
+                                setState(() => _autoQueueSize += 1);
+                                SRSService.setAutoQueueSize(_autoQueueSize);
                               }
                             : null,
                       ),

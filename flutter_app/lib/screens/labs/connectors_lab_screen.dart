@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/inline_call_controller.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
-import '../../widgets/marie_toolbar_button.dart';
+import '../../widgets/inline_call_bar.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
   const ConnectorsLabScreen({super.key});
@@ -19,9 +21,35 @@ class ConnectorsLabScreen extends ConsumerStatefulWidget {
       _ConnectorsLabScreenState();
 }
 
-class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
+class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
+    with WidgetsBindingObserver {
+  /// Marie's live-call button, inline in the AppBar — same
+  /// InlineCallController every other reading/exercise screen uses.
+  late final InlineCallController _call;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _call = InlineCallController(
+      sessionType: LiveSessionType.labAssistant,
+      lessonContext: () => ref.read(contentServiceProvider).connectorsContext(),
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _call.dispose();
     LessonSpeechService.shared.deactivate();
     super.dispose();
   }
@@ -37,22 +65,32 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen> {
         backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
-        actions: [
-          MarieToolbarButton(
-            lessonContext: ref.read(contentServiceProvider).connectorsContext(),
+        actions: [InlineCallActions(controller: _call)],
+      ),
+      body: Column(
+        children: [
+          if (_call.isLive || _call.error != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+              child: InlineCallStatusCard(
+                controller: _call,
+                listeningLabel: 'Listening. Ask about connectors anytime.',
+              ),
+            ),
+          Expanded(
+            child: pack == null
+                ? Center(
+                    child: Text(
+                      'Connectors content unavailable.',
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  )
+                : _buildContent(pack),
           ),
         ],
       ),
-      body: pack == null
-          ? Center(
-              child: Text(
-                'Connectors content unavailable.',
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.slateDim),
-              ),
-            )
-          : _buildContent(pack),
     );
   }
 

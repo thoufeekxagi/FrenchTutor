@@ -208,127 +208,147 @@ class _FlashcardSessionScreenState
     final grade = _gradeFromDrag(_dragOffset);
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            // Counter
-            Text(
-              '${_currentIndex + 1} / ${_queue.length}',
-              style: DesignTokens.mono(13).copyWith(color: DesignTokens.slate),
-            ),
-            // Progress bar
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(3),
-              child: LinearProgressIndicator(
-                value: (_currentIndex + 1) / _queue.length,
-                minHeight: 4,
-                backgroundColor: DesignTokens.hairline,
-                valueColor: const AlwaysStoppedAnimation(DesignTokens.info),
-              ),
-            ),
-            const Spacer(),
-            // Card with gesture handling
-            GestureDetector(
-              onTap: () {
-                if (!_isRevealed) {
-                  setState(() => _isRevealed = true);
-                }
-              },
-              onPanStart: (_) {
-                if (_isRevealed) {
-                  setState(() => _isDragging = true);
-                }
-              },
-              onPanUpdate: (details) {
-                if (_isRevealed) {
-                  setState(() {
-                    _dragOffset += details.delta;
-                  });
-                }
-              },
-              onPanEnd: (_) {
-                if (!_isRevealed) return;
-                final g = _gradeFromDrag(_dragOffset);
-                if (g != null) {
-                  _gradeCard(g);
-                } else {
-                  setState(() {
-                    _dragOffset = Offset.zero;
-                    _isDragging = false;
-                  });
-                }
-              },
-              child: Transform.translate(
-                offset: _isRevealed ? _dragOffset : Offset.zero,
-                child: Transform.rotate(
-                  angle: _isRevealed ? _dragOffset.dx * 0.001 : 0,
-                  child: Stack(
-                    children: [
-                      _buildCard(entry),
-                      // Swipe hint badges
-                      if (_isRevealed && _isDragging) ...[
-                        if (grade == SRSGrade.again)
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: _swipeBadge('AGAIN', DesignTokens.primary),
-                          ),
-                        if (grade == SRSGrade.good)
-                          Positioned(
-                            top: 16,
-                            left: 16,
-                            child: _swipeBadge('GOOD', DesignTokens.info),
-                          ),
-                        if (grade == SRSGrade.easy)
-                          Positioned(
-                            bottom: 16,
-                            left: 0,
-                            right: 0,
-                            child: Center(
-                              child: _swipeBadge('EASY', DesignTokens.success),
-                            ),
-                          ),
-                      ],
-                    ],
+      // Every other lesson/pathway screen caps content at contentMaxWidth
+      // and centers it — this screen predates that pattern and was
+      // stretching the card edge-to-edge on wider screens/tablets/web
+      // instead of matching the rest of the app.
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: DesignTokens.contentMaxWidth,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                // Counter
+                Text(
+                  '${_currentIndex + 1} / ${_queue.length}',
+                  style: DesignTokens.mono(
+                    13,
+                  ).copyWith(color: DesignTokens.slate),
+                ),
+                // Progress bar
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: (_currentIndex + 1) / _queue.length,
+                    minHeight: 4,
+                    backgroundColor: DesignTokens.hairline,
+                    valueColor: const AlwaysStoppedAnimation(DesignTokens.info),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildSpeakerRow(entry),
-            const SizedBox(height: 12),
-            if (!_isRevealed)
-              Text(
-                'Tap to reveal',
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.slate),
-              )
-            else ...[
-              Text(
-                'Swipe: left = Again, right = Good, up = Easy',
-                style: DesignTokens.body(
-                  12,
-                ).copyWith(color: DesignTokens.slate),
-              ),
-              const SizedBox(height: 12),
-              _buildSayItButton(entry),
-              if (_sayItHint != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  _sayItHint!,
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.mono(
-                    12,
-                  ).copyWith(color: DesignTokens.slateDim),
+                const Spacer(),
+                // Card with gesture handling
+                GestureDetector(
+                  onTap: () {
+                    if (!_isRevealed) {
+                      setState(() => _isRevealed = true);
+                    }
+                  },
+                  onPanStart: (_) {
+                    if (_isRevealed) {
+                      setState(() => _isDragging = true);
+                    }
+                  },
+                  onPanUpdate: (details) {
+                    if (_isRevealed) {
+                      setState(() {
+                        _dragOffset += details.delta;
+                      });
+                    }
+                  },
+                  onPanEnd: (_) {
+                    if (!_isRevealed) return;
+                    final g = _gradeFromDrag(_dragOffset);
+                    if (g != null) {
+                      _gradeCard(g);
+                    } else {
+                      setState(() {
+                        _dragOffset = Offset.zero;
+                        _isDragging = false;
+                      });
+                    }
+                  },
+                  child: Transform.translate(
+                    offset: _isRevealed ? _dragOffset : Offset.zero,
+                    child: Transform.rotate(
+                      angle: _isRevealed ? _dragOffset.dx * 0.001 : 0,
+                      child: Stack(
+                        children: [
+                          _buildCard(entry),
+                          // Swipe hint badges
+                          if (_isRevealed && _isDragging) ...[
+                            if (grade == SRSGrade.again)
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: _swipeBadge(
+                                  'AGAIN',
+                                  DesignTokens.primary,
+                                ),
+                              ),
+                            if (grade == SRSGrade.good)
+                              Positioned(
+                                top: 16,
+                                left: 16,
+                                child: _swipeBadge('GOOD', DesignTokens.info),
+                              ),
+                            if (grade == SRSGrade.easy)
+                              Positioned(
+                                bottom: 16,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: _swipeBadge(
+                                    'EASY',
+                                    DesignTokens.success,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 16),
+                _buildSpeakerRow(entry),
+                const SizedBox(height: 12),
+                if (!_isRevealed)
+                  Text(
+                    'Tap to reveal',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.slate),
+                  )
+                else ...[
+                  Text(
+                    'Swipe: left = Again, right = Good, up = Easy',
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.slate),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildSayItButton(entry),
+                  if (_sayItHint != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _sayItHint!,
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.mono(
+                        12,
+                      ).copyWith(color: DesignTokens.slateDim),
+                    ),
+                  ],
+                ],
+                const Spacer(),
               ],
-            ],
-            const Spacer(),
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -491,49 +511,57 @@ class _FlashcardSessionScreenState
 
   Widget _buildSummary() {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(),
-            Icon(
-              CupertinoIcons.checkmark_circle_fill,
-              size: 64,
-              color: DesignTokens.info,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: DesignTokens.contentMaxWidth,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                Icon(
+                  CupertinoIcons.checkmark_circle_fill,
+                  size: 64,
+                  color: DesignTokens.info,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Session Complete',
+                  style: DesignTokens.display(24, weight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _reviewedCount > 0
+                      ? '$_reviewedCount card${_reviewedCount == 1 ? '' : 's'} reviewed'
+                      : 'No cards due right now',
+                  style: DesignTokens.body(
+                    16,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
+                const Spacer(),
+                PasseportPrimaryButton(
+                  label: 'Done',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: _loadAllWords,
+                  child: Text(
+                    'Review all words anyway',
+                    style: DesignTokens.body(
+                      14,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.info),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Session Complete',
-              style: DesignTokens.display(24, weight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _reviewedCount > 0
-                  ? '$_reviewedCount card${_reviewedCount == 1 ? '' : 's'} reviewed'
-                  : 'No cards due right now',
-              style: DesignTokens.body(
-                16,
-              ).copyWith(color: DesignTokens.slateDim),
-            ),
-            const Spacer(),
-            PasseportPrimaryButton(
-              label: 'Done',
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: _loadAllWords,
-              child: Text(
-                'Review all words anyway',
-                style: DesignTokens.body(
-                  14,
-                  weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.info),
-              ),
-            ),
-            const SizedBox(height: 32),
-          ],
+          ),
         ),
       ),
     );
