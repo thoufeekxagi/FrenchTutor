@@ -44,16 +44,23 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     this.enrichment,
     this.onEnriched,
     this.grammarExplanation,
+    this.grammarTabLabel = 'Grammar',
   });
 
   final GeneratedStory story;
 
-  /// Present only for a grammar-practice session (see
-  /// `LessonAgentService.buildGrammarExplanation`) — when set, this screen
-  /// opens on the Grammar tab instead of Story, and shows this explanation
-  /// ABOVE the per-sentence notes: grammar has to teach the rule first, the
-  /// story is the vehicle that demonstrates it, not the other way around.
+  /// Present for a grammar- or liaison-practice session (see
+  /// `LessonAgentService.buildGrammarExplanation`/`buildLiaisonExplanation`)
+  /// — when set, this explanation is shown ABOVE the per-sentence notes on
+  /// the Grammar/Liaison tab, and a cue card on the Story tab invites the
+  /// learner there: the rule is taught first, the story is the vehicle that
+  /// demonstrates it, but the story itself still leads on open.
   final GrammarExplanation? grammarExplanation;
+
+  /// The tab's label when [grammarExplanation] is set — "Grammar" by
+  /// default, "Liaison" for a liaison-practice session. Purely cosmetic;
+  /// both share the exact same tab/reader/explanation-card machinery.
+  final String grammarTabLabel;
 
   /// True when this screen is a step in a larger flow (e.g. a mission) that
   /// needs the learner to explicitly finish and hand back a graded result —
@@ -82,9 +89,9 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
 
 class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     with WidgetsBindingObserver {
-  late _StoryTab _tab = widget.grammarExplanation != null
-      ? _StoryTab.grammar
-      : _StoryTab.story;
+  // Story always leads, even for a grammar-practice session — the story is
+  // the point, grammar is a cue card away, not the landing screen.
+  _StoryTab _tab = _StoryTab.story;
   int _currentSegment = 0;
   bool _isPlaying = false;
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
@@ -154,6 +161,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       onChanged: () {
         if (mounted) setState(() {});
       },
+      // Closures, not direct tear-offs — `_recorder` isn't assigned yet at
+      // this point in initState, only by the time a call actually connects.
+      onUserTranscript: (text) => _recorder.logUser(text),
+      onTutorTranscript: (text) => _recorder.logTutor(text),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Story';
@@ -372,6 +383,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               _TabRow(
                 selected: _tab,
                 onSelect: (tab) => setState(() => _tab = tab),
+                grammarTabLabel: widget.grammarTabLabel,
               ),
               Divider(height: 1, color: DesignTokens.hairline),
               Expanded(
@@ -382,6 +394,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   _StoryTab.keywords => _keywordsView(),
                 },
               ),
+              if (_tab == _StoryTab.story && widget.grammarExplanation != null)
+                _GrammarCueCard(
+                  grammarPoint: widget.grammarExplanation!.title,
+                  tabLabel: widget.grammarTabLabel,
+                  onTap: () => setState(() => _tab = _StoryTab.grammar),
+                ),
               if (_tab == _StoryTab.story)
                 _AudioControlBar(
                   isPlaying: _isPlaying,
@@ -895,6 +913,63 @@ class _ConjugationTable extends StatelessWidget {
   }
 }
 
+/// Small tappable nudge shown at the bottom of the Story tab, only for a
+/// grammar-practice session — the story leads, this is a one-line invite to
+/// go read the grammar behind it, not a forced landing on the Grammar tab.
+class _GrammarCueCard extends StatelessWidget {
+  const _GrammarCueCard({
+    required this.grammarPoint,
+    required this.onTap,
+    this.tabLabel = 'Grammar',
+  });
+
+  final String grammarPoint;
+  final String tabLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: DesignTokens.infoSoft,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                CupertinoIcons.book_fill,
+                size: 18,
+                color: DesignTokens.info,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'See how $grammarPoint works in this story',
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w500,
+                  ).copyWith(color: DesignTokens.inkSoft),
+                ),
+              ),
+              const Icon(
+                CupertinoIcons.chevron_right,
+                size: 16,
+                color: DesignTokens.info,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _WordHighlightText extends StatelessWidget {
   const _WordHighlightText({
     required this.text,
@@ -932,24 +1007,28 @@ class _WordHighlightText extends StatelessWidget {
 }
 
 class _TabRow extends StatelessWidget {
-  const _TabRow({required this.selected, required this.onSelect});
+  const _TabRow({
+    required this.selected,
+    required this.onSelect,
+    this.grammarTabLabel = 'Grammar',
+  });
 
   final _StoryTab selected;
   final ValueChanged<_StoryTab> onSelect;
-
-  static const _labels = {
-    _StoryTab.story: 'Story',
-    _StoryTab.quiz: 'Quiz',
-    _StoryTab.keywords: 'Keywords',
-    _StoryTab.grammar: 'Grammar',
-  };
+  final String grammarTabLabel;
 
   @override
   Widget build(BuildContext context) {
+    final labels = {
+      _StoryTab.story: 'Story',
+      _StoryTab.grammar: grammarTabLabel,
+      _StoryTab.keywords: 'Keywords',
+      _StoryTab.quiz: 'Quiz',
+    };
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
-        children: _labels.entries.map((entry) {
+        children: labels.entries.map((entry) {
           final isSelected = entry.key == selected;
           return Expanded(
             child: GestureDetector(

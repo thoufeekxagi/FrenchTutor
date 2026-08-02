@@ -17,12 +17,10 @@ import 'referral_service.dart';
 /// Gemini Live API spend. Call this immediately before pushing SessionScreen,
 /// and only proceed if it returns true.
 ///
-/// Takes [PilotAccessService] directly (not `WidgetRef`) so the same gate
-/// works from both ConsumerWidgets (`ref.read(pilotAccessServiceProvider)`)
-/// and the plain-class coordinators that own most SessionScreen pushes
-/// (`PathwayCoordinator`, `MissionTaskExecutor`), which only have a
-/// `BuildContext` — those call sites read it via
-/// `ProviderScope.containerOf(context).read(pilotAccessServiceProvider)`.
+/// Takes [PilotAccessService] directly (not `WidgetRef`) rather than reading
+/// it internally, so this stays callable from any context that already has
+/// the service in hand (`ref.read(pilotAccessServiceProvider)`), not just
+/// `ConsumerWidget`s.
 Future<bool> ensureAiSessionQuota(
   BuildContext context,
   PilotAccessService accessService,
@@ -67,7 +65,7 @@ Future<bool> ensureAiSessionQuota(
     context,
     title: 'Daily voice limit reached',
     message:
-        "You've used your 2 hours of premium speaking practice for today — "
+        "You've used your 2 hours of premium speaking practice for today, "
         "it resets tomorrow. Want 1 more free hour right now?",
     confirmLabel: 'Get 1 more hour',
     cancelLabel: 'OK',
@@ -83,7 +81,7 @@ Future<bool> ensureAiSessionQuota(
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("You've got 1 more free hour today — go ahead."),
+          content: Text("You've got 1 more free hour today, go ahead."),
         ),
       );
     }

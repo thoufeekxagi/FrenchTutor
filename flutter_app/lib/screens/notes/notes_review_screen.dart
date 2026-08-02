@@ -19,14 +19,18 @@ class NotesReviewScreen extends ConsumerStatefulWidget {
   ConsumerState<NotesReviewScreen> createState() => _NotesReviewScreenState();
 }
 
+enum _SourceFilter { all, mine, ai }
+
 class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
   List<Note> _notes = [];
   bool _loading = true;
   String _filter = 'All';
+  _SourceFilter _sourceFilter = _SourceFilter.all;
 
   static const _knownTags = [
     'Vocabulary',
     'Grammar',
+    'Liaison',
     'Listening',
     'Roleplay',
     'Writing',
@@ -66,8 +70,21 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
   }
 
   List<Note> get _filteredNotes {
-    if (_filter == 'All') return _notes;
-    return _notes.where((note) => (note.tag ?? 'General') == _filter).toList();
+    var result = _notes;
+    if (_filter != 'All') {
+      result = result
+          .where((note) => (note.tag ?? 'General') == _filter)
+          .toList();
+    }
+    switch (_sourceFilter) {
+      case _SourceFilter.all:
+        break;
+      case _SourceFilter.mine:
+        result = result.where((note) => note.source != 'ai').toList();
+      case _SourceFilter.ai:
+        result = result.where((note) => note.source == 'ai').toList();
+    }
+    return result;
   }
 
   @override
@@ -117,6 +134,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                         ],
                       ),
                     ),
+                    _sourceFilterBar(),
                     if (tags.isNotEmpty) _filterBar(tags),
                     Expanded(
                       child: RefreshIndicator(
@@ -147,6 +165,70 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                   ],
                 ),
         ),
+      ),
+    );
+  }
+
+  /// "Your own notes vs. Marie's auto-generated recaps" — separate from the
+  /// tag/category filter below, since the two questions ("what was this
+  /// about" vs. "did I write this or did the AI") are independent of each
+  /// other.
+  Widget _sourceFilterBar() {
+    const options = [
+      (_SourceFilter.all, 'All'),
+      (_SourceFilter.mine, 'Mine'),
+      (_SourceFilter.ai, 'AI recaps'),
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.screenMargin,
+        0,
+        DesignTokens.screenMargin,
+        DesignTokens.space2,
+      ),
+      child: Row(
+        children: [
+          for (final option in options) ...[
+            if (option != options.first) const SizedBox(width: DesignTokens.space2),
+            Expanded(
+              child: Semantics(
+                button: true,
+                selected: _sourceFilter == option.$1,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                  onTap: () => setState(() => _sourceFilter = option.$1),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      minHeight: DesignTokens.minTapTarget,
+                    ),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.space3,
+                      vertical: DesignTokens.space2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _sourceFilter == option.$1
+                          ? DesignTokens.primary
+                          : DesignTokens.parchmentDim,
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusPill,
+                      ),
+                    ),
+                    child: Text(
+                      option.$2,
+                      style: DesignTokens.body(13, weight: FontWeight.w600)
+                          .copyWith(
+                            color: _sourceFilter == option.$1
+                                ? DesignTokens.surface
+                                : DesignTokens.inkSoft,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -336,6 +418,7 @@ class _NoteRow extends StatelessWidget {
         return DesignTokens.successSoft;
       case 'Vocabulary':
       case 'Grammar':
+      case 'Liaison':
         return DesignTokens.infoSoft;
       case 'Writing':
       case 'Story':
@@ -353,6 +436,8 @@ class _NoteRow extends StatelessWidget {
         return CupertinoIcons.square_stack_3d_up;
       case 'Grammar':
         return CupertinoIcons.book;
+      case 'Liaison':
+        return CupertinoIcons.waveform;
       case 'Listening':
         return CupertinoIcons.headphones;
       case 'Roleplay':

@@ -10,6 +10,9 @@ import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
 import '../models/note.dart';
+// Aliased — supabase_flutter's own `Session` (an auth session) would
+// otherwise collide with this app's practice-session model of the same name.
+import '../models/session.dart' as app_session;
 import '../models/profile.dart';
 import '../models/srs_state.dart';
 import '../orchestration/models/competency_state.dart';
@@ -209,6 +212,44 @@ class SyncService {
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         });
       }, queueTable: 'generated_roleplays', queueRowId: roleplay.id);
+
+  // ---------------------------------------------------------------------------
+  // Practice sessions + their transcripts — every completed practice/lesson,
+  // the exact data DailyGoalService reads for streak/momentum/"this week's
+  // practice". Previously had ZERO sync coverage (never pushed, never
+  // hydrated) — the cause of progress silently "starting from zero" after a
+  // reinstall.
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncSession(app_session.Session session, {required String updatedAt}) =>
+      _guarded((uid) async {
+        await _client.from('sessions_state').upsert({
+          'id': session.id,
+          'user_id': uid,
+          'started_at': session.startedAt,
+          'ended_at': session.endedAt,
+          'summary': session.summary,
+          'topic': session.topic,
+          'vocabulary_json': session.vocabulary,
+          'stage': session.stage,
+          'updated_at': updatedAt,
+        });
+      }, queueTable: 'sessions_state', queueRowId: session.id);
+
+  Future<void> syncMessage({
+    required String uuid,
+    required String sessionId,
+    required String role,
+    required String content,
+  }) => _guarded((uid) async {
+    await _client.from('chat_messages_state').upsert({
+      'id': uuid,
+      'user_id': uid,
+      'session_id': sessionId,
+      'role': role,
+      'content': content,
+    });
+  }, queueTable: 'chat_messages_state', queueRowId: uuid);
 
   // ---------------------------------------------------------------------------
   // Floating notetaker — both self-typed notes and AI-generated session recaps
@@ -666,22 +707,125 @@ class SyncService {
   Future<void> hydrateAfterSignIn() async {
     final uid = _userId;
     if (uid == null) return;
-    await Future.wait([
-      _hydrateVocabCards(uid),
-      _hydrateDailySessions(uid),
-      _hydrateAiSessions(uid),
-      _hydrateCreditUsage(uid),
-      _hydrateCompetencyStates(uid),
-      _hydrateLearningPlans(uid),
-      _hydrateLessonProgress(uid),
-      _hydrateMistakeTags(uid),
-      _hydrateEvents(uid),
-      _hydrateEntitlements(uid),
-      _hydrateGeneratedStories(uid),
-      _hydrateGeneratedGrammarStories(uid),
-      _hydrateGeneratedRoleplays(uid),
-      _hydrateNotes(uid),
-    ]);
+    // Each leg is wrapped so one failing pull (bad row, RLS hiccup, decode
+    // error) can never silently swallow the others — previously a single
+    // exception anywhere in this list, or the whole thing simply taking
+    // longer than the caller's 8s timeout, left NO trace anywhere (app.dart's
+    // `.catchError((_) {})` on the outer call is unconditional and silent).
+    // `debugPrint` here at least makes a real failure visible in device logs
+    // instead of just reading as "progress didn't come back".
+    final legs = <String, Future<void> Function()>{
+      'profile': () => _hydrateProfile(uid),
+      'vocabCards': () => _hydrateVocabCards(uid),
+      'dailySessions': () => _hydrateDailySessions(uid),
+      'sessions': () => _hydrateSessions(uid),
+      'messages': () => _hydrateMessages(uid),
+      'aiSessions': () => _hydrateAiSessions(uid),
+      'creditUsage': () => _hydrateCreditUsage(uid),
+      'competencyStates': () => _hydrateCompetencyStates(uid),
+      'learningPlans': () => _hydrateLearningPlans(uid),
+      'lessonProgress': () => _hydrateLessonProgress(uid),
+      'mistakeTags': () => _hydrateMistakeTags(uid),
+      'events': () => _hydrateEvents(uid),
+      'entitlements': () => _hydrateEntitlements(uid),
+      'generatedStories': () => _hydrateGeneratedStories(uid),
+      'generatedGrammarStories': () => _hydrateGeneratedGrammarStories(uid),
+      'generatedRoleplays': () => _hydrateGeneratedRoleplays(uid),
+      'notes': () => _hydrateNotes(uid),
+    };
+    await Future.wait(
+      legs.entries.map(
+        (e) => e.value().catchError((err) {
+          debugPrint('hydrateAfterSignIn: ${e.key} failed: $err');
+        }),
+      ),
+    );
+  }
+
+  /// The general profile fields (goal/level/session_length/reminder_time/
+  /// onboarded_at) — previously push-only, never pulled back on sign-in, so
+  /// a reinstalled device kept whatever onboarding defaults it was given
+  /// locally instead of the real remote profile.
+  Future<void> _hydrateProfile(String uid) async {
+    final rows = await _client.from('profiles').select().eq('id', uid).limit(1);
+    if (rows.isEmpty) return;
+    final r = rows.first;
+    _db.execute(
+      '''
+      UPDATE profiles SET
+        goal = ?, level = ?, session_length = ?, reminder_time = ?,
+        onboarded_at = ?, updated_at = ?
+      WHERE user_id = ? AND updated_at < ?
+      ''',
+      [
+        r['goal'],
+        r['level'],
+        r['session_length'],
+        r['reminder_time'],
+        r['onboarded_at'],
+        r['updated_at'],
+        uid,
+        r['updated_at'],
+      ],
+    );
+  }
+
+  /// Every completed practice session — the exact data `DailyGoalService`
+  /// reads for streak/momentum/"this week's practice". See `syncSession`'s
+  /// doc comment for why this mattered.
+  Future<void> _hydrateSessions(String uid) async {
+    final rows = await _client
+        .from('sessions_state')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO sessions
+          (id, started_at, ended_at, summary, topic, vocabulary, stage, updated_at, deleted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          ended_at = excluded.ended_at,
+          summary = excluded.summary,
+          topic = excluded.topic,
+          vocabulary = excluded.vocabulary,
+          stage = excluded.stage,
+          updated_at = excluded.updated_at,
+          deleted_at = excluded.deleted_at
+        WHERE excluded.updated_at > sessions.updated_at
+        ''',
+        [
+          r['id'],
+          r['started_at'],
+          r['ended_at'],
+          r['summary'],
+          r['topic'],
+          _jsonOf(r['vocabulary_json']),
+          r['stage'],
+          r['updated_at'],
+          r['deleted_at'],
+        ],
+      );
+    }
+  }
+
+  /// Every practice session's transcript turns — used for history review and
+  /// the auto-generated review notes.
+  Future<void> _hydrateMessages(String uid) async {
+    final rows = await _client
+        .from('chat_messages_state')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO messages (uuid, session_id, role, content, created_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(uuid) DO NOTHING
+        ''',
+        [r['id'], r['session_id'], r['role'], r['content'], r['created_at']],
+      );
+    }
   }
 
   // Pulls the subscription flags the revenuecat-webhook edge function (and

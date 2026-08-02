@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
 import '../../data/database/account_deletion.dart';
+import '../../data/database/local_data_reset.dart';
 import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
@@ -122,7 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         'An invite code has already been redeemed on this device.',
       RedeemOutcome.invalidCode => 'That code doesn\'t look right.',
       RedeemOutcome.cannotRedeemOwnCode =>
-        'That\'s your own code — share it with a friend instead.',
+        'That\'s your own code, share it with a friend instead.',
       RedeemOutcome.codeLimitReached =>
         'That code has already been used the maximum number of times.',
       RedeemOutcome.networkError =>
@@ -324,6 +325,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  /// Level drives every AI generation call in the app (grammar, writing,
+  /// story, reading, listening, and the live-call persona calibration) —
+  /// every one of those reads `profile().level` fresh at generation time,
+  /// so changing it here is enough to change all of them from the very next
+  /// session onward, nothing else needs updating. The confirmation exists so
+  /// a stray tap can't silently reset calibration mid-plan — this is a
+  /// deliberate "I've improved" or "this was too hard" decision, not a
+  /// cosmetic preference like language mix or voice speed.
+  Future<void> _confirmLevelChange(String newLevel) async {
+    if (newLevel == _profile.level) return;
+    final confirmed = await showPSConfirmDialog(
+      context,
+      title: 'Change your level to ${LearnerLevel.displayLabel(newLevel)}?',
+      message:
+          'This changes how everything is calibrated for you from now on: '
+          'grammar, writing, stories, reading, listening, and your live '
+          'sessions with your tutor will all match ${LearnerLevel.displayLabel(newLevel)} '
+          "going forward. It won't change anything you've already done.",
+      confirmLabel: 'Change to ${LearnerLevel.displayLabel(newLevel)}',
+    );
+    if (!confirmed || !mounted) return;
+    _saveProfile((p) => p.level = newLevel);
+  }
+
   Future<void> _confirmSignOut() async {
     final shouldSignOut = await showPSConfirmDialog(
       context,
@@ -333,11 +358,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       confirmLabel: 'Sign out',
       destructive: true,
     );
-    if (shouldSignOut) {
-      await AuthService.shared.signOut();
-      // No manual navigation needed — AuthGate's own auth-state listener
-      // switches to the sign-in screen automatically once the session clears.
-    }
+    if (!shouldSignOut) return;
+    // Push anything still queued while the session is still valid — once
+    // signed out there's no auth token left to push with, and the local
+    // cache is about to be wiped below, so this is the last chance.
+    await ref
+        .read(syncServiceProvider)
+        .drainOutbox(limit: 500)
+        .timeout(const Duration(seconds: 10), onTimeout: () {})
+        .catchError((_) {});
+    await AuthService.shared.signOut();
+    // Wipes the local cache so a different account signing in on this same
+    // device (shared phone, resold device, a reviewer switching accounts)
+    // never sees this account's data — local reads have no per-user
+    // scoping, so without this a second sign-in would see the first
+    // account's full history until Supabase sync happened to layer over it.
+    // Deliberately NOT the same helper "Delete account" uses
+    // (`wipeLocalDatabase` in account_deletion.dart) — that one also wipes
+    // `installations`, which is fine for a permanent deletion but would let
+    // a casual sign-out/sign-in cycle mint a fresh device fingerprint and
+    // defeat the referral-code one-redemption-per-device check. Sign-out
+    // keeps the device identity; only the account-scoped data is cleared.
+    wipeLocalUserData(ref.read(databaseProvider));
+    await clearLocalPreferences();
+    // No manual navigation needed — AuthGate's own auth-state listener
+    // switches to the sign-in screen automatically once the session clears.
   }
 
   Future<void> _confirmDeleteAccount() async {
@@ -610,6 +655,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   KickerText('Learning', color: Passeport.slateDim),
                   const SizedBox(height: 6),
                   _ChoiceRow(
+                    label: 'Level',
+                    options: [
+                      for (final level in LearnerLevel.cefrValues)
+                        (level, LearnerLevel.displayLabel(level)),
+                    ],
+                    selected: _profile.level,
+                    onChanged: _confirmLevelChange,
+                  ),
+                  Divider(height: 16, color: Passeport.hairline),
+                  _ChoiceRow(
                     label: 'Goal',
                     options: const [
                       ('tef_canada', 'TEF Canada'),
@@ -875,7 +930,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ).copyWith(color: Passeport.text),
                             ),
                             Text(
-                              'How many words the Auto queue shows each time — smaller means less repetition if you practice more than once a day',
+                              'How many words the Auto queue shows each time. Smaller means less repetition if you practice more than once a day',
                               style: Passeport.mono(
                                 10,
                               ).copyWith(color: Passeport.slateDim),
@@ -985,7 +1040,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Bypasses subscription/invite-code checks for testing. '
-                      'Debug builds only — compiled out entirely from release.',
+                      'Debug builds only, compiled out entirely from release.',
                       style: Passeport.body(
                         11.5,
                       ).copyWith(color: Passeport.slateDim),
@@ -1111,7 +1166,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SettingsRow(
                     label: 'Friends redeemed',
                     value: _referralStats == null
-                        ? '—'
+                        ? 'N/A'
                         : '${_referralStats!.successfulRedemptions} of ${_referralStats!.maxRedemptions}',
                   ),
                   Divider(height: 1, color: Passeport.hairline),
@@ -1261,7 +1316,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 4),
                   _SettingsRow(
                     label: 'Version',
-                    value: _appVersion.isEmpty ? '—' : _appVersion,
+                    value: _appVersion.isEmpty ? 'N/A' : _appVersion,
                   ),
                   Divider(height: 1, color: Passeport.hairline),
                   _SettingsRow(

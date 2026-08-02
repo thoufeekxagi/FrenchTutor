@@ -32,7 +32,7 @@ class ReportProblemButton extends StatelessWidget {
       scheme: 'mailto',
       path: _supportEmail,
       queryParameters: {
-        'subject': 'ParleSprint — report a problem',
+        'subject': 'ParleSprint: report a problem',
         'body': body,
       },
     );

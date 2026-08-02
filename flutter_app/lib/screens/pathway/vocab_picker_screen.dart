@@ -67,6 +67,17 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     return SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
   }
 
+  /// How many words the session actually ends up with — for a mission's
+  /// preferred set that's just its length; for the Auto tile, `_autoQueue`
+  /// now returns an oversized candidate POOL, so the real count is whatever
+  /// `SRSService.autoQueueSize` is currently set to (capped by how many the
+  /// pool actually has, for a very sparse bank).
+  Future<int> _autoQueueDisplayCount(int poolSize) async {
+    if (widget.preferredEntryIds != null) return poolSize;
+    final target = await SRSService.autoQueueSize;
+    return poolSize < target ? poolSize : target;
+  }
+
   /// Today's interrupted session, if any — planned words minus practiced ones.
   /// Non-null makes the "continue where you left off" card appear up top; the
   /// regular picker below stays available for "brand new words instead".
@@ -247,8 +258,28 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       builder: (context, snapshot) {
         final queue = snapshot.data ?? [];
         final isLoading = snapshot.connectionState == ConnectionState.waiting;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(
+        return FutureBuilder<int>(
+          future: _autoQueueDisplayCount(queue.length),
+          builder: (context, countSnapshot) {
+            final displayCount = countSnapshot.data ?? queue.length;
+            return _autoBodyContent(
+              queue: queue,
+              isLoading: isLoading,
+              displayCount: displayCount,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _autoBodyContent({
+    required List<VocabEntry> queue,
+    required bool isLoading,
+    required int displayCount,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
             DesignTokens.screenMargin,
             DesignTokens.space6,
             DesignTokens.screenMargin,
@@ -275,13 +306,13 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               Text(
                 isLoading
                     ? 'Building today’s word queue'
-                    : '${queue.length} words ready',
+                    : '$displayCount words ready',
                 style: DesignTokens.display(26),
               ),
               const SizedBox(height: DesignTokens.space3),
               Text(
                 widget.preferredEntryIds == null
-                    ? 'Due reviews come first, followed by new words in curriculum order. Marie can prioritize this real queue before practice starts.'
+                    ? 'A personalized mix, curated fresh from your due reviews and new words each time, never the same set on repeat.'
                     : 'These words were selected for your current mission. Finish them before moving to the next mission step.',
                 style: DesignTokens.body(
                   15,
@@ -314,18 +345,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 child: PasseportPrimaryButton(
                   label: queue.isEmpty
                       ? 'No recommended words yet'
-                      : 'Start ${queue.length}-word practice',
+                      : 'Start $displayCount-word practice',
                   icon: CupertinoIcons.arrow_right,
                   onPressed: isLoading || queue.isEmpty
                       ? null
-                      : () => _beginSession(queue),
+                      : () => _beginSession(queue, curateFromPool: true),
                 ),
               ),
             ],
           ),
         );
-      },
-    );
   }
 
   // MARK: - Category mode
@@ -610,22 +639,60 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     );
   }
 
+  /// Recent keywords the student ran into in a generated story or grammar
+  /// session — "AI and keywords working in tandem": the vocab curator below
+  /// is told to prefer reinforcing these over a cold, unconnected pick, the
+  /// same cross-feature callback the grammar/story generators already lean on.
+  List<String> _recentGeneratedKeywords() {
+    final stories = ref.read(generatedStoryStoreProvider).list().take(3);
+    final grammarStories = ref
+        .read(generatedGrammarStoryStoreProvider)
+        .list()
+        .take(3);
+    final seen = <String>{};
+    final keywords = <String>[];
+    for (final story in stories) {
+      for (final k in story.keywords) {
+        if (seen.add(k.fr)) keywords.add(k.fr);
+      }
+    }
+    for (final story in grammarStories) {
+      for (final k in story.keywords) {
+        if (seen.add(k.fr)) keywords.add(k.fr);
+      }
+    }
+    return keywords;
+  }
+
   /// Briefly personalizes the session before it starts — the planner call is raced against a
   /// short timeout so a slow/failed OpenRouter call never blocks getting into practice. Example
   /// sentences are pre-authored offline for the entire word bank and looked up instantly via
   /// ContentService, so there's nothing to wait on or fail for that part.
-  Future<void> _beginSession(List<VocabEntry> words) async {
+  ///
+  /// [curateFromPool] is only true for the Auto tile: [words] there is a
+  /// deliberately oversized candidate POOL (see `SRSService.dailyMixedQueue`),
+  /// and this call is what actually selects the real session size out of it.
+  /// Resuming a paused session or a manual category pick already IS the
+  /// exact intended set — those must never be curated/truncated further.
+  Future<void> _beginSession(
+    List<VocabEntry> words, {
+    bool curateFromPool = false,
+  }) async {
     if (words.isEmpty) return;
     setState(() => _isPlanning = true);
     final store = ref.read(learningStoreProvider);
     final mistakeTags = store.topMistakeTags();
     final diary = store.recentDiaryEntries();
+    final targetSize = curateFromPool
+        ? await SRSService.autoQueueSize
+        : words.length;
 
     SessionPlan? planResult;
     try {
       planResult = await LessonAgentService.shared
           .planVocabSession(
             candidateWords: words,
+            count: targetSize,
             mistakeTags: mistakeTags
                 .map(
                   (m) =>
@@ -633,6 +700,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 )
                 .toList(),
             recentDiary: diary.map((d) => d.summary).toList(),
+            recentKeywords: curateFromPool ? _recentGeneratedKeywords() : const [],
           )
           .timeout(const Duration(seconds: 14));
     } catch (_) {
@@ -651,12 +719,15 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             .whereType<VocabEntry>()
             .toList();
       } else {
-        chosenQueue = words;
+        // `words` is already shuffled by `dailyMixedQueue` for the Auto
+        // tile, so even this fallback gives a different set call to call —
+        // never the same deterministic slice every time.
+        chosenQueue = curateFromPool ? words.take(targetSize).toList() : words;
       }
     } else {
-      chosenQueue = words;
+      chosenQueue = curateFromPool ? words.take(targetSize).toList() : words;
     }
-    final sessionExamples = ContentService.shared.vocabExamplesFor(words);
+    final sessionExamples = ContentService.shared.vocabExamplesFor(chosenQueue);
 
     if (!mounted) return;
     setState(() => _isPlanning = false);

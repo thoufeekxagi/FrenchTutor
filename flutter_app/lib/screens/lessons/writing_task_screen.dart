@@ -18,7 +18,13 @@ import '../../widgets/inline_call_bar.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
-import '../pathway/pathway_writing_screen.dart' show WritingStageResult;
+
+/// Popped by this screen's `_finish()` — a plain score/hints carrier.
+class WritingStageResult {
+  WritingStageResult({this.score, this.hintsUsed = 0});
+  final double? score;
+  final int hintsUsed;
+}
 
 class WritingTaskScreen extends ConsumerStatefulWidget {
   const WritingTaskScreen({
@@ -51,7 +57,6 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   bool _isGrading = false;
   WritingFeedback? _feedback;
   String? _errorText;
-  bool _isGeneratingNext = false;
   final DateTime _sessionStart = DateTime.now();
 
   // Talk-with-Marie call — inline, not a modal: the editor stays visible and
@@ -94,6 +99,14 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
           _draftSyncTimer = null;
         }
       },
+      // Without this, "Talk with Marie" here counted for nothing — the
+      // call's conversation was displayed live but never logged, so it
+      // never contributed to this session's auto-generated review note.
+      // Wrapped in closures (not direct tear-offs) since `_recorder` isn't
+      // assigned yet at this point in initState — safe because these only
+      // ever run later, once a call is actually connected.
+      onUserTranscript: (text) => _recorder.logUser(text),
+      onTutorTranscript: (text) => _recorder.logTutor(text),
     );
     // Deferred to after this frame — setting currentContext synchronously
     // here notifies FloatingNotetakerOverlay listeners mounted elsewhere
@@ -168,11 +181,15 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     _call.gemini?.sendText(
       '(Note from the app, not the student: this is a silent background '
       "update of the student's current draft, automatically sent while they "
-      'type — it is NOT a message from the student and does not need a '
+      'type. It is NOT a message from the student and does not need a '
       'reply. Do not comment on it or acknowledge it in any way unless the '
       'student explicitly asks you to read, check, or comment on their '
-      "draft — if they do ask, answer only what they asked, nothing extra.\n\n"
+      "draft. If they do ask, answer only what they asked, nothing extra.\n\n"
       "STUDENT'S CURRENT DRAFT:\n${_content.trim().isEmpty ? '(nothing written yet)' : _content.trim()})",
+      // The API-level fix: without this, Gemini Live treated every 8-second
+      // sync as a completed user turn and answered it regardless of what
+      // this text said — this is what made Marie "keep talking" unprompted.
+      expectReply: false,
     );
   }
 
@@ -180,7 +197,9 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _logMinutes();
-    _finishSession();
+    // Only if grading never happened — a graded submission already finished
+    // the session the moment `_submit()` succeeded, see there for why.
+    if (!_sessionFinished) _finishSession();
     _textController.dispose();
     _draftSyncTimer?.cancel();
     _call.dispose();
@@ -194,6 +213,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   }
 
   void _finishSession() {
+    _sessionFinished = true;
     if (_content.trim().isEmpty) return;
     final feedback = _feedback;
     _recorder.finish(
@@ -234,6 +254,12 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
       _recorder.logTutor(
         '${result.scoreOutOf10.toStringAsFixed(1)}/10. ${result.improvedVersion}',
       );
+      // Grading IS completion — submitting marks the writing mission done
+      // right here, not only once the learner later taps "Done"/leaves the
+      // screen. A call left running mid-submit is over too: Marie's job was
+      // coaching toward this submission, and it just happened.
+      if (_call.isLive) unawaited(_call.end());
+      _finishSession();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -243,34 +269,17 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     }
   }
 
-  /// Standalone-lab mode only (never shown mid-mission): once feedback is in,
-  /// re-grading the same draft isn't offered any more — the learner gets a
-  /// fresh, level-calibrated prompt instead, so "retry" always means new
-  /// practice, not resubmitting an edited copy of the graded one.
-  Future<void> _tryNewPrompt() async {
-    setState(() => _isGeneratingNext = true);
-    try {
-      final store = ref.read(learningStoreProvider);
-      final content = ref.read(contentServiceProvider);
-      final profile = store.profile();
-      final nextTask = await ref
-          .read(lessonAgentServiceProvider)
-          .generateWritingTask(
-            levelBand: profile.level,
-            knownVocab: content.knownVocabWords(store.allSRSStates()),
-          );
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => WritingTaskScreen(task: nextTask)),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isGeneratingNext = false;
-        _errorText = "Couldn't generate a new prompt, try again.";
-      });
-    }
-  }
+  /// Once grading succeeds the writing mission is already complete (see
+  /// `_submit()`) — this only guards `dispose()` from double-logging a
+  /// second session-finish for the same screen visit.
+  bool _sessionFinished = false;
+
+  /// Standalone-lab mode's post-feedback completion — was "Try a new prompt"
+  /// before, which silently chained straight into another task with no clear
+  /// "you're done" moment, reading as confusing rather than a finish step.
+  /// Just closes this session out cleanly; "New writing practice" back on
+  /// the lab screen is already the way to start another one.
+  void _doneInLab() => Navigator.of(context).pop();
 
   @override
   Widget build(BuildContext context) {
@@ -335,19 +344,11 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                   label: 'Submit for grading',
                   onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
                 )
-              else if (widget.showFinishButton)
-                PasseportPrimaryButton(
-                  label: 'Finish',
-                  icon: CupertinoIcons.checkmark,
-                  onPressed: _finish,
-                )
               else
                 PasseportPrimaryButton(
-                  label: _isGeneratingNext
-                      ? 'Preparing your next prompt…'
-                      : 'Try a new prompt',
-                  icon: _isGeneratingNext ? null : CupertinoIcons.wand_stars,
-                  onPressed: _isGeneratingNext ? null : _tryNewPrompt,
+                  label: 'Done',
+                  icon: CupertinoIcons.checkmark,
+                  onPressed: widget.showFinishButton ? _finish : _doneInLab,
                 ),
               const SizedBox(height: 24),
             ],

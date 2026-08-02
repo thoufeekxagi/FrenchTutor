@@ -773,8 +773,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     );
   }
 
-  /// The only exit — pops exactly once with a typed outcome; the
-  /// PathwayCoordinator decides what it means for the day.
+  /// The only exit — pops exactly once with a typed outcome for whichever
+  /// caller pushed this screen.
   void _finish({required bool completed, String reason = 'finished'}) {
     final alreadyDone = _finished;
     _teardown();
