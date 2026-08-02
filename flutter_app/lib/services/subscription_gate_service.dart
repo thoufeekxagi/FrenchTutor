@@ -58,7 +58,12 @@ class SubscriptionGateService {
   static const _reviewerEmail = 'admin@parlesprint.com';
 
   /// Labs tile identifiers that stay free — see labs_screen.dart.
-  static const freeLabIds = {'speaking_mock', 'vocabulary', 'flashcards'};
+  static const freeLabIds = {
+    'speaking_mock',
+    'vocabulary',
+    'flashcards',
+    'alphabet',
+  };
 
   /// Otherwise-locked labs a free learner gets a real taste of, one per day
   /// — never all of them at once. Gives free users daily exposure to every
@@ -67,7 +72,13 @@ class SubscriptionGateService {
   /// it again tomorrow instead of Grammar is exactly the nudge this is for.
   /// Deliberately NOT "Keep Practising left wide open" — that would remove
   /// the reason to subscribe entirely.
-  static const _rotatingFreeLabIds = ['grammar', 'listening', 'roleplay', 'writing'];
+  static const _rotatingFreeLabIds = [
+    'grammar',
+    'listening',
+    'roleplay',
+    'writing',
+    'liaison',
+  ];
 
   /// Which of [_rotatingFreeLabIds] is free today — the same calendar day
   /// (UTC) for every learner, changing at midnight UTC. Pure function of

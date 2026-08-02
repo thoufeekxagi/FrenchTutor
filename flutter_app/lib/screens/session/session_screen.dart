@@ -20,6 +20,7 @@ import '../../services/gemini_live_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/app_tour.dart';
 import '../../services/mic_mode.dart';
+import '../../services/session_recorder.dart';
 import '../../services/pilot_access_service.dart';
 import '../../services/product_analytics.dart';
 import '../../services/referral_service.dart';
@@ -465,6 +466,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         content: msg.content,
       );
     }
+    // Every conversational call gets the same AI recap note the typed
+    // screens already do — this was the one live call screen (free talk,
+    // the Speaking mission tile, trial, mocks) that never generated one.
+    unawaited(
+      SessionRecorder.generateAutoNote(
+        storage: storage,
+        sessionId: _sessionId,
+        topic: widget.stage ?? 'Speaking',
+        stage: widget.stage,
+      ),
+    );
 
     if (_callDuration >= 45) {
       ref

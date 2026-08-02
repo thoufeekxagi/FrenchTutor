@@ -178,7 +178,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
       child: Padding(
         padding: const EdgeInsets.all(DesignTokens.space5),
         child: Text(
-          'Nothing practiced yet — it\'ll show up here once you do.',
+          'Nothing practiced yet. It\'ll show up here once you do.',
           textAlign: TextAlign.center,
           style: DesignTokens.body(14).copyWith(color: DesignTokens.slateDim),
         ),

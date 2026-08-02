@@ -27,9 +27,16 @@ import '../subscription/paywall_screen.dart';
 /// into Practice/Labs — there's no separate plan/task state to fall out of
 /// sync with what was actually practiced.
 class TodayMissionWidget extends ConsumerStatefulWidget {
-  const TodayMissionWidget({super.key, this.onProgress});
+  const TodayMissionWidget({super.key, this.onProgress, this.isActive = true});
 
   final VoidCallback? onProgress;
+
+  /// True while the Home tab is the visible one — see `DashboardScreen.isActive`
+  /// for why this exists: without it, completing a category from a different
+  /// tab (e.g. Practice) never refreshed this card's `_doneToday`/`_streak`
+  /// until the app fully restarted, since `IndexedStack` keeps this widget
+  /// alive and its `initState` only ever runs once.
+  final bool isActive;
 
   @override
   ConsumerState<TodayMissionWidget> createState() => _TodayMissionWidgetState();
@@ -54,6 +61,12 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant TodayMissionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) _load();
   }
 
   void _load() {

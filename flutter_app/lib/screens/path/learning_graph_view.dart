@@ -71,9 +71,18 @@ class _FingerprintViewState extends State<FingerprintView> {
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
-            height: 520,
+            height: 320,
             child: Stack(
               children: [
+                // The dark backdrop lives here, OUTSIDE the InteractiveViewer,
+                // so it's a fixed frame that never pans or zooms — only the
+                // graph drawn inside InteractiveViewer's child does. Previously
+                // the backdrop was painted as part of that same zoomable
+                // CustomPaint, so pinching/dragging moved the "background"
+                // right along with the dots instead of staying put.
+                const Positioned.fill(
+                  child: ColoredBox(color: Color(0xFF0D1017)),
+                ),
                 Positioned.fill(
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -397,7 +406,10 @@ class _FingerprintPainter extends CustomPainter {
   /// derived from this learner's own totals (`graph.seed`) — a quiet backdrop
   /// signature that's part of what makes the whole canvas theirs alone.
   void _paintNebula(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF0D1017));
+    // No solid fill here — the dark backdrop is now a static ColoredBox
+    // behind InteractiveViewer (see build() above), not part of this
+    // zoomable canvas. Painting it here too would make it visibly slide
+    // and resize under the fixed one as soon as the graph is panned/zoomed.
     final rand = math.Random(graph.seed);
     final blobColors = graph.isDemo
         ? [Passeport.slate, Passeport.slate, Passeport.slate]

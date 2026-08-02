@@ -142,6 +142,7 @@ Future<void> _runLevel({
           .toList();
       final plan = await LessonAgentService.shared.planVocabSession(
         candidateWords: candidates,
+        count: candidates.length,
         mistakeTags: mistakeTags,
         recentDiary: recentDiary,
       );

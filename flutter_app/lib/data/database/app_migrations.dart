@@ -80,6 +80,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   14: _migrationV14,
   15: _migrationV15,
   16: _migrationV16,
+  17: _migrationV17,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -775,5 +776,81 @@ void _migrationV16(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_generated_grammar_stories_created '
     'ON generated_grammar_stories (created_at)',
+  );
+}
+
+/// `sessions`/`messages` predate this versioned system (StorageService
+/// creates them inline via its own `CREATE TABLE IF NOT EXISTS`, same
+/// situation `notes` was in before `_migrationV15`) — this adds the columns
+/// needed to sync them to Supabase. Before this migration, NEITHER table had
+/// any sync coverage at all: `sessions` is exactly what streak/momentum/
+/// "this week's practice" reads (`DailyGoalService`), so a reinstall lost
+/// all of it silently — this is the fix for that. `messages` is every
+/// practice session's transcript (used for history review and the
+/// auto-generated notes), also previously unsynced.
+void _migrationV17(CommonDatabase db) {
+  // Unlike `notes` (which StorageService always creates before any query),
+  // `sessions`/`messages` may not exist yet at all when this runs — provider
+  // resolution order doesn't guarantee StorageService's own inline
+  // `CREATE TABLE IF NOT EXISTS` has run first. Create the full shape here
+  // too, so this migration is correct standalone; StorageService's own
+  // create is then just a no-op against the same shape.
+  if (!_tableExists(db, 'sessions')) {
+    db.execute('''
+      CREATE TABLE sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        started_at TEXT NOT NULL,
+        ended_at TEXT,
+        summary TEXT,
+        topic TEXT,
+        vocabulary TEXT DEFAULT '[]',
+        stage TEXT,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        deleted_at TEXT
+      )
+    ''');
+  } else {
+    if (!_columnExists(db, 'sessions', 'user_id')) {
+      db.execute('ALTER TABLE sessions ADD COLUMN user_id TEXT');
+    }
+    if (!_columnExists(db, 'sessions', 'updated_at')) {
+      // SQLite rejects a non-constant default (`datetime('now')`) on
+      // `ALTER TABLE ADD COLUMN` — that's only allowed in `CREATE TABLE`.
+      // Add it nullable with no default, then backfill existing rows with
+      // one fixed timestamp (every future write always sets a real value).
+      db.execute('ALTER TABLE sessions ADD COLUMN updated_at TEXT');
+      db.execute(
+        "UPDATE sessions SET updated_at = ? WHERE updated_at IS NULL",
+        [DateTime.now().toUtc().toIso8601String()],
+      );
+    }
+    if (!_columnExists(db, 'sessions', 'deleted_at')) {
+      db.execute('ALTER TABLE sessions ADD COLUMN deleted_at TEXT');
+    }
+  }
+
+  if (!_tableExists(db, 'messages')) {
+    db.execute('''
+      CREATE TABLE messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT,
+        user_id TEXT,
+        session_id TEXT NOT NULL,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    ''');
+  } else {
+    if (!_columnExists(db, 'messages', 'uuid')) {
+      db.execute('ALTER TABLE messages ADD COLUMN uuid TEXT');
+    }
+    if (!_columnExists(db, 'messages', 'user_id')) {
+      db.execute('ALTER TABLE messages ADD COLUMN user_id TEXT');
+    }
+  }
+  db.execute(
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_uuid ON messages (uuid) WHERE uuid IS NOT NULL',
   );
 }

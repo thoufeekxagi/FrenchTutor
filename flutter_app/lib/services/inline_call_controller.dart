@@ -31,6 +31,8 @@ class InlineCallController {
     required this.lessonContext,
     required this.learningStoreForProfile,
     required this.onChanged,
+    this.onUserTranscript,
+    this.onTutorTranscript,
   });
 
   final LiveSessionType sessionType;
@@ -44,6 +46,14 @@ class InlineCallController {
 
   /// Called after any field below changes — call `setState(() {})` here.
   final VoidCallback onChanged;
+
+  /// Forwards Marie's transcript turns to the host — without this, an inline
+  /// call's conversation was silently never logged anywhere (not even for
+  /// the auto-generated review note), unlike `SessionScreen`'s calls. Hosts
+  /// that own a `SessionRecorder` should wire these straight to
+  /// `logUser`/`logTutor` so the call counts toward that session's recap.
+  final void Function(String text)? onUserTranscript;
+  final void Function(String text)? onTutorTranscript;
 
   GeminiLiveService? gemini;
   AudioStreamingService? audio;
@@ -141,10 +151,13 @@ class InlineCallController {
       reconnecting = false;
       onChanged();
     };
-    g.onUserTranscript = (_) {};
+    g.onUserTranscript = (text) {
+      onUserTranscript?.call(text);
+    };
     g.onTutorTranscript = (text) {
       lastTutorLine = text;
       onChanged();
+      onTutorTranscript?.call(text);
     };
     g.onAudioChunk = (bytes) {
       a.isOutputActive = true;

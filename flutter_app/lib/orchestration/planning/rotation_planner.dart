@@ -207,15 +207,15 @@ class RotationPlanner {
 
   String _explanationFor(PerformanceModality modality) => switch (modality) {
     PerformanceModality.listeningRecognition =>
-      'Today rotates to listening — a fresh passage to understand.',
+      'Today rotates to listening: a fresh passage to understand.',
     PerformanceModality.readingRecognition =>
-      'Today rotates to vocabulary — new words to recognise.',
+      'Today rotates to vocabulary: new words to recognise.',
     PerformanceModality.controlledSpeaking =>
-      'Today rotates to grammar — a point worth practicing aloud.',
+      'Today rotates to grammar: a point worth practicing aloud.',
     PerformanceModality.spontaneousSpeaking =>
-      'Today rotates to roleplay — a short live conversation.',
+      'Today rotates to roleplay: a short live conversation.',
     PerformanceModality.controlledWriting =>
-      'Today rotates to writing — a short passage to compose.',
+      'Today rotates to writing: a short passage to compose.',
     _ => 'Today\'s practice.',
   };
 

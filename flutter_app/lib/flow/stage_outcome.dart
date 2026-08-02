@@ -2,8 +2,8 @@ import '../models/daily_session.dart';
 
 /// The typed value every pathway stage screen returns via `Navigator.pop`,
 /// exactly once. Screens never call parent callbacks and never decide what
-/// their exit means for the day — the PathwayCoordinator does (PILOT_PLAN.md
-/// P0.2/P0.3/P0.5). `dispose()` releases resources only.
+/// their exit means beyond their own scope — that's for whichever caller
+/// pushed them to interpret. `dispose()` releases resources only.
 class StageOutcome<T> {
   const StageOutcome._(this.status, this.result, this.reason);
 

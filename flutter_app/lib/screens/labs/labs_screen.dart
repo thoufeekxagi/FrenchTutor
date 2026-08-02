@@ -8,8 +8,10 @@ import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../subscription/paywall_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
+import 'alphabet_lab_screen.dart';
 import 'connectors_lab_screen.dart';
 import 'grammar_lab_screen.dart';
+import 'liaison_lab_screen.dart';
 import 'listening_lab_screen.dart';
 import 'roleplay_lab_screen.dart';
 import 'vocab_lab_screen.dart';
@@ -48,6 +50,18 @@ class LabsScreen extends ConsumerWidget {
                 Expanded(
                   child: ListView(
                     children: [
+                      _LabTile(
+                        icon: CupertinoIcons.textformat_abc,
+                        title: 'Learn the Alphabet',
+                        subtitle:
+                            'Start here if you\'re brand new: how each letter really sounds, about 40 to 50 minutes',
+                        locked: gate.isLabLocked('alphabet'),
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('alphabet'),
+                          builder: (_) => const AlphabetLabScreen(),
+                        ),
+                      ),
                       _LabTile(
                         icon: CupertinoIcons.stopwatch_fill,
                         title: 'Speaking mock',
@@ -91,6 +105,17 @@ class LabsScreen extends ConsumerWidget {
                           context,
                           locked: gate.isLabLocked('grammar'),
                           builder: (_) => const GrammarLabScreen(),
+                        ),
+                      ),
+                      _LabTile(
+                        icon: CupertinoIcons.waveform,
+                        title: 'Liaison',
+                        subtitle: 'How French words link together when spoken',
+                        locked: gate.isLabLocked('liaison'),
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('liaison'),
+                          builder: (_) => const LiaisonLabScreen(),
                         ),
                       ),
                       _LabTile(

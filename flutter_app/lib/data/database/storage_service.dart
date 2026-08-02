@@ -17,26 +17,37 @@ class StorageService {
   static const _uuid = Uuid();
 
   void _migrate() {
+    // Full shape kept in sync with `_migrationV17` in app_migrations.dart —
+    // whichever of the two runs first "wins" and the other is a no-op, same
+    // dual-definition pattern `notes`/`_migrationV15` already uses.
     _db.execute('''
       CREATE TABLE IF NOT EXISTS sessions (
         id TEXT PRIMARY KEY,
+        user_id TEXT,
         started_at TEXT NOT NULL,
         ended_at TEXT,
         summary TEXT,
         topic TEXT,
         vocabulary TEXT DEFAULT '[]',
-        stage TEXT
+        stage TEXT,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        deleted_at TEXT
       )
     ''');
     _db.execute('''
       CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT,
+        user_id TEXT,
         session_id TEXT NOT NULL,
         role TEXT NOT NULL,
         content TEXT NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     ''');
+    _db.execute(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_uuid ON messages (uuid) WHERE uuid IS NOT NULL',
+    );
     // Full shape kept in sync with `_migrationV15` in app_migrations.dart —
     // whichever of the two runs first "wins" and the other is a no-op, since
     // provider-resolution order isn't guaranteed (see that migration's doc
@@ -63,9 +74,11 @@ class StorageService {
 
   void saveSession(Session session) {
     final vocabJson = jsonEncode(session.vocabulary);
+    final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
-      '''INSERT OR REPLACE INTO sessions (id, started_at, ended_at, summary, topic, vocabulary, stage)
-         VALUES (?, ?, ?, ?, ?, ?, ?)''',
+      '''INSERT OR REPLACE INTO sessions
+         (id, started_at, ended_at, summary, topic, vocabulary, stage, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         session.id,
         session.startedAt,
@@ -74,8 +87,13 @@ class StorageService {
         session.topic,
         vocabJson,
         session.stage,
+        now,
       ],
     );
+    // Every completed practice session — this is the exact data
+    // streak/momentum/"this week's practice" reads (DailyGoalService), so
+    // losing this on reinstall was the "starts from zero" bug.
+    unawaited(_sync?.syncSession(session, updatedAt: now));
   }
 
   List<Session> getAllSessions() {
@@ -96,9 +114,18 @@ class StorageService {
     required String role,
     required String content,
   }) {
+    final uuid = _uuid.v4();
     _db.execute(
-      'INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)',
-      [sessionId, role, content],
+      'INSERT INTO messages (uuid, session_id, role, content) VALUES (?, ?, ?, ?)',
+      [uuid, sessionId, role, content],
+    );
+    unawaited(
+      _sync?.syncMessage(
+        uuid: uuid,
+        sessionId: sessionId,
+        role: role,
+        content: content,
+      ),
     );
   }
 

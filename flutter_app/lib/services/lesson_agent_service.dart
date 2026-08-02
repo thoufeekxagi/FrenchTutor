@@ -359,34 +359,107 @@ $submission''';
   /// actually mastered (see `ContentService.knownVocabWords`); an empty list
   /// is fine for a brand-new learner, the model just leans on very common
   /// beginner words instead.
+  /// A rotating pool of everyday scenarios to seed variety — without this,
+  /// two calls with the same level and roughly the same known-vocabulary
+  /// list (which barely changes day to day) converge on near-identical
+  /// prompts, since nothing else differs between requests. Picked at
+  /// random unless the caller supplies its own [topic].
+  static const _writingTopics = [
+    'describing your morning routine',
+    'talking about your favourite food',
+    'planning a weekend trip',
+    'describing your family',
+    'talking about the weather today',
+    'describing your home or neighbourhood',
+    'talking about a hobby you enjoy',
+    'describing a typical day at work or school',
+    'talking about your favourite season',
+    'describing a friend',
+    'talking about what you did yesterday',
+    'planning what to buy at the market',
+    'a small disagreement with a friend and how you resolved it',
+    'a surprising thing that happened on public transport',
+    'defending an unpopular opinion about a movie or a food',
+    'a mistake you made and what you learned from it',
+    'a place you want to visit and why, in your own words',
+    'convincing a friend to try something new',
+    'a childhood memory that still makes you laugh',
+    'describing your dream job and why it appeals to you',
+    'a time you helped a stranger, or a stranger helped you',
+    'comparing life in a city versus a small town',
+    'a tradition or celebration that matters to you and why',
+    'explaining a rule you disagree with',
+    'a decision you are currently torn about',
+    'describing your ideal weekend if money were no object',
+    'a skill you wish you had and why',
+    'a small act of kindness you witnessed recently',
+    'your reaction to an unexpected piece of good news',
+    'planning a surprise for someone you care about',
+  ];
+
   Future<WritingTask> generateWritingTask({
     required String levelBand,
     required List<String> knownVocab,
     String? topic,
+    List<({String tag, String description, int count})> mistakeTags = const [],
+    List<String> recentDiary = const [],
   }) async {
-    const system = '''
+    final system =
+        '''
 Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
-"type" is a short label like "micro" or "email" or "opinion". "prompt_fr" is the instruction given to the student, in French; "prompt_en" its English translation. "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
-LEVEL CALIBRATION, FOLLOW EXACTLY:
-- A1: ask for exactly 1-2 very short sentences, built ONLY from the KNOWN VOCABULARY given below plus basic function words (articles, "je/tu/il", "être/avoir", "et"). min_words 5-10. target_connectors: empty list.
-- A2: ask for 3-4 short sentences on an everyday topic, mostly using the known vocabulary plus a few very common extra words. min_words 15-30. target_connectors: at most 1 simple connector (e.g. "et", "mais", "parce que").
-- B1: ask for a short paragraph (5-8 sentences), may introduce a couple of new but common words beyond the known list. min_words 40-70. target_connectors: 1-2.
-- B2: ask for a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
-Never ask for anything harder than the stated level allows, even if the topic invites it.''';
+"type" is a short label like "micro" or "email" or "opinion". "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
+FORMAT RULE FOR "prompt_fr"/"prompt_en", ABSOLUTE — READ THIS TWICE: these two fields must be a QUESTION or an INSTRUCTION addressed directly TO the student (start with an imperative like "Écris...", "Décris...", "Raconte...", "Parle de...", or a direct question like "Où habites-tu ?"), asking them to produce their OWN original sentences. They must NEVER be a statement of fact, a narrated example, or anything that already reads as a complete, correct answer — if a student could just copy "prompt_fr" verbatim into the answer box and be done, you have generated it WRONG.
+BAD, NEVER DO THIS (this is an already-written answer, not a task): prompt_fr: "Je suis avec ma famille. Je suis content." / prompt_en: "I am with my family. I am happy."
+GOOD (this is an instruction the student must respond to): prompt_fr: "Écris deux phrases sur ta famille et comment tu te sens aujourd'hui." / prompt_en: "Write two sentences about your family and how you feel today."
+DYNAMISM, JUST AS IMPORTANT AS THE FORMAT RULE ABOVE: this must feel as varied and alive as this app's story generator, never a flat recycled "describe your morning" every time. Use the SEED DETAILS below (a character, a setting, a twist) as genuine creative fuel for an interesting, specific angle — a scenario, a small dilemma, an opinion to defend, a mystery to explain — not just a generic daily-routine description. Two prompts at the same level should never feel interchangeable.
+LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruction and the expected answer are, it NEVER means the task itself should feel dumbed-down, boring, or babyish. Even at A1, an interesting specific scenario beats a generic one; at B1/B2 actively push the student towards their level's ceiling of complexity/nuance, don't play it safe and default to the easiest version of the level:
+- A1: the instruction should be answerable in exactly 1-2 very short sentences, built ONLY from the KNOWN VOCABULARY given below plus basic function words (articles, "je/tu/il", "être/avoir", "et"). min_words 5-10. target_connectors: empty list.
+- A2: answerable in 3-4 short sentences on an everyday topic, mostly using the known vocabulary plus a few very common extra words. min_words 15-30. target_connectors: at most 1 simple connector (e.g. "et", "mais", "parce que").
+- B1: answerable in a short paragraph (5-8 sentences), may introduce a couple of new but common words beyond the known list. min_words 40-70. target_connectors: 1-2.
+- B2: answerable as a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
+Never ask for anything harder than the stated level allows, even if the topic invites it.
+INVENT A FRESH, SPECIFIC PROMPT EVERY TIME — never repeat the same scenario or phrasing as a previous call, even with the same vocabulary and level.
+${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}''';
     final vocabLine = knownVocab.isEmpty
         ? 'KNOWN VOCABULARY: (none recorded yet — use only the most basic beginner words)'
         : 'KNOWN VOCABULARY: ${knownVocab.take(40).join(', ')}';
-    final user =
-        '''
-LEVEL: $levelBand
-$vocabLine
-${topic == null || topic.isEmpty ? '' : 'TOPIC (loose inspiration only): $topic'}''';
+    final chosenTopic =
+        topic ?? _writingTopics[Random().nextInt(_writingTopics.length)];
+    // Same seeding technique as `buildPersonalStory` — this is what gives
+    // stories their variety, and was entirely missing here before, which is
+    // why writing prompts felt flat and repetitive by comparison.
+    final random = Random();
+    final seedName =
+        _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
+    final seedSetting = _storySettings[random.nextInt(_storySettings.length)];
+    final seedTwist = _storyTwists[random.nextInt(_storyTwists.length)];
+    final buf = StringBuffer()
+      ..writeln('LEVEL: $levelBand')
+      ..writeln(vocabLine)
+      ..writeln('TOPIC (loose inspiration only): $chosenTopic')
+      ..writeln(
+        'SEED DETAILS for a specific, creative angle (use naturally, do not just state them): '
+        'a person named $seedName, a setting around $seedSetting, involving $seedTwist.',
+      );
+    if (mistakeTags.isNotEmpty) {
+      buf.writeln(
+        'RECURRING MISTAKES (optional to touch on): '
+        '${mistakeTags.map((m) => m.description).take(3).join('; ')}',
+      );
+    }
+    if (recentDiary.isNotEmpty) {
+      buf.writeln(
+        'RECENT PRACTICE, for light context only, do not reference directly: '
+        '${recentDiary.take(2).join(' | ')}',
+      );
+    }
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
-        {'role': 'user', 'content': user},
+        {'role': 'user', 'content': buf.toString()},
       ],
       maxTokens: 600,
+      temperature: 0.95,
     );
     return _parseWritingTask(raw);
   }
@@ -507,17 +580,39 @@ STUDENT SAID: $utterance''';
   /// recent session history and decides what's worth emphasizing today, instead of always
   /// presenting the same fixed order. Callers should treat this as best-effort: on failure,
   /// fall back to the original candidate order with no focus note, no user-visible error.
+  /// Curates the actual set of words a practice session shows, from a
+  /// CANDIDATE POOL deliberately larger than [count] — this used to only
+  /// ever be handed a pre-sliced list of exactly the words about to be
+  /// shown (picked upstream in fixed curriculum order) and could merely
+  /// reorder them, so even a perfect AI call was just reshuffling the same
+  /// deterministic slice. Now it genuinely SELECTS which [count] words to
+  /// serve, out of a much wider pool, the way `buildGrammarStory` picks a
+  /// tense rather than being handed one. [recentKeywords] are words the
+  /// student recently ran into in a generated story or grammar session —
+  /// reinforcing those on purpose (not just "next in the textbook") is what
+  /// was asked for as "AI and keywords working in tandem".
   Future<SessionPlan> planVocabSession({
     required List<VocabEntry> candidateWords,
+    required int count,
     required List<({String tag, String description, int count})> mistakeTags,
     required List<String> recentDiary,
+    List<String> recentKeywords = const [],
   }) async {
-    const system = '''
-You are quietly planning a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. Given the candidate word list, the student's recurring mistake patterns, and recent session notes, decide: (1) a one-sentence, warm, specific focus note for how today's session should be framed (e.g. referencing a specific recurring mistake if relevant), and (2) optionally reorder the word IDs to front-load anything especially relevant to their recent struggles, or return null to keep the given order if no reordering is warranted. Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings_or_null}. The prioritized_word_ids, if provided, must be a permutation of the exact candidate IDs given, never invent new ones.''';
+    final system =
+        '''
+You are quietly curating a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. From the CANDIDATE WORDS pool, SELECT exactly $count of them to actually practice today — do not just take the first $count in the list, genuinely choose based on everything below. Then write a one-sentence, warm, specific focus note for how today's session should be framed.
+SELECTION PRIORITIES, IN ORDER:
+1. If RECENT KEYWORDS are given (words the student just ran into in a story or grammar lesson), prefer including a few of those among your $count if they're present in the candidate pool — reinforcing something they just encountered elsewhere in the app beats a cold, unconnected word every time.
+2. If RECURRING MISTAKES are given, favor words that would let them practice past that specific confusion.
+3. Otherwise, favor an interesting, varied, thematically-loose mix over "next in alphabetical/curriculum order" — avoid picking a set that feels like the same category every time.
+Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings}. "prioritized_word_ids" MUST contain exactly $count ids (or fewer only if the candidate pool itself has fewer than $count entries), every one of them must be an exact id from CANDIDATE WORDS, never invent a new one, and never repeat an id.''';
     final wordList = candidateWords
         .map((w) => '${w.id}: ${w.fr} (${w.en})')
         .join('; ');
     var user = 'CANDIDATE WORDS: $wordList';
+    if (recentKeywords.isNotEmpty) {
+      user += '\n\nRECENT KEYWORDS (seen in a recent story/grammar session, reinforce if present above): ${recentKeywords.join(', ')}';
+    }
     if (mistakeTags.isNotEmpty) {
       user +=
           '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
@@ -527,13 +622,15 @@ You are quietly planning a French vocabulary practice session before it starts, 
     }
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
+      temperature: 0.9,
     );
     return _parseSessionPlan(
       raw,
       validIds: candidateWords.map((w) => w.id).toSet(),
+      count: count,
     );
   }
 
@@ -546,7 +643,7 @@ You are quietly planning a French vocabulary practice session before it starts, 
     required List<({String tag, String description, int count})> mistakeTags,
     required List<String> recentDiary,
   }) async {
-    const system = '''
+    final system = '''
 You are quietly picking which ONE French grammar point a beginner should practice today, the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, the student's recurring mistake patterns, and recent session notes, choose the single most useful one to practice right now (e.g. if their mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given, never invent a new one.''';
     final list = candidates.map((c) => '${c.id}: ${c.title}').join('; ');
     var user = 'CANDIDATES: $list';
@@ -559,7 +656,7 @@ You are quietly picking which ONE French grammar point a beginner should practic
     }
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system},
+        {'role': 'system', 'content': system + languageGuardrail},
         {'role': 'user', 'content': user},
       ],
     );
@@ -775,7 +872,12 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
   /// Grammar points offered by the Grammar lab's "Practice a tense" picker —
   /// what the user asked for as "auto and tense they can choose to build and
   /// learn". Deliberately a short, common-first list, not every possible
-  /// French tense/mood.
+  /// French tense/mood. ALWAYS fully available regardless of level — a
+  /// learner can deliberately choose to get ahead of their level; what stays
+  /// bounded to their level is the story's own sentence/vocabulary
+  /// simplicity (see the "TENSE OVERRIDE" note in [buildGrammarStory]), not
+  /// which tenses they're allowed to pick. First in the list ("Présent") is
+  /// the default selection, not a hard floor.
   static const grammarPracticePoints = [
     'Présent',
     'Passé composé',
@@ -784,90 +886,25 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     'Conditionnel présent',
   ];
 
-  /// The CEFR band each grammar point first becomes available at — must
-  /// stay in lockstep with [_cefrCalibration]'s per-level tense allowances
-  /// (A1: présent only; A2: + passé composé/futur proche; B1: + imparfait;
-  /// conditionnel first appears at B1 too, matching real curricula). Without
-  /// this bound, an A1 learner could pick "Conditionnel présent" and the
-  /// prompt would carry two directly contradicting instructions at once —
-  /// the CEFR block saying "present tense only, no conditional" while the
-  /// grammar-point prompt demands a story built around the conditional.
-  static const Map<String, String> grammarPracticePointMinLevel = {
-    'Présent': 'a1',
-    'Passé composé': 'a2',
-    'Futur proche': 'a2',
-    'Imparfait': 'b1',
-    'Conditionnel présent': 'b1',
-  };
-
-  /// Grammar points available at [levelBand] or below it — the picker must
-  /// only ever offer these, never the full [grammarPracticePoints] list
-  /// regardless of level.
-  static List<String> grammarPracticePointsFor(String levelBand) {
-    final learnerIndex = _cefrIndex(levelBand);
-    return grammarPracticePoints
-        .where((p) => _cefrIndex(grammarPracticePointMinLevel[p]!) <= learnerIndex)
-        .toList();
-  }
-
-  static int _cefrIndex(String levelBand) => switch (levelBand.toLowerCase()) {
-    'a1' || 'zero' || 'basics' => 0,
-    'a2' => 1,
-    'b1' || 'conversational' => 2,
-    'b2' => 3,
-    _ => 0,
-  };
-
   /// Generates a short story built AROUND one chosen grammar point/tense
   /// (level-calibrated, same seeding technique as [buildPersonalStory]) — the
   /// "grammar should be a story generator" rebuild: instead of a static
   /// explanation-plus-drills page, the grammar point is taught by seeing it
   /// used naturally, sentence by sentence, with each segment's `grammarNote`
   /// explicitly tied to that point rather than a generic observation.
-  /// Generated FIRST, before the story — the "teach the rule, then show it
-  /// in context" ordering: grammar has to lead, the story is the vehicle
-  /// that demonstrates it, not the other way around. Deliberately explicit
-  /// about how the tense/form CHANGES relative to related tenses (the
-  /// `tenseContrast` field), not just what it looks like in isolation.
-  Future<GrammarExplanation> buildGrammarExplanation({
-    required String grammarPoint,
-    required String levelBand,
-  }) async {
-    final system =
-        '''
-You are a French grammar teacher writing a short, clear explanation of ONE grammar point for a language learner, BEFORE they read any story about it. Return ONLY compact JSON with this exact shape: {"title": string, "summary": string, "usage": [string, ...], "tense_contrast": string, "conjugations": [{"verb": string, "group": string, "rows": [{"pronoun": string, "form": string}, ...]}, ...], "examples": [{"fr": string, "en": string}, ...]}.
-"title" is the grammar point's name (e.g. "$grammarPoint"). "summary" is one short paragraph (2-3 sentences) explaining what it is and when it's used, in plain English. "usage" is 3-5 short bullet-point rules for how/when to use it. "tense_contrast" is the most important field: 2-3 sentences explicitly explaining HOW this changes from or relates to OTHER tenses the student likely already knows (e.g. how it differs from présent, or from passé composé, whichever comparison is most useful for "$grammarPoint") — never leave this implicit, spell out the actual difference in form and meaning. "conjugations" gives 2 full conjugation tables (one common regular verb, one common irregular verb) for "$grammarPoint", each with all 6 pronoun rows (je, tu, il/elle, nous, vous, ils/elles). "examples" gives 3-4 short bilingual example sentences using "$grammarPoint" naturally.
-${_cefrCalibration(levelBand)}''';
-    final raw = await _complete(
-      messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
-        {
-          'role': 'user',
-          'content': 'GRAMMAR POINT: $grammarPoint\nLEVEL: $levelBand',
-        },
-      ],
-      maxTokens: 1200,
-    );
-    return GrammarExplanation.fromJson(_decodeObject(raw));
-  }
-
-  /// The story is grounded in [explanation] (its own summary/contrast/
-  /// conjugations, verbatim) so the two halves of a grammar session always
-  /// agree on the same rules instead of the story independently reinventing
-  /// them — see `buildGrammarExplanation`, generated first and passed in here.
+  /// Generated FIRST — the explanation (see [buildGrammarExplanationFromStory])
+  /// is built FROM this story afterward, not the other way around, so the
+  /// explanation always teaches the actual verbs/sentences the student just
+  /// read instead of generic textbook examples unrelated to their story.
   Future<ReadingPassage> buildGrammarStory({
     required String grammarPoint,
     required String levelBand,
-    required GrammarExplanation explanation,
   }) async {
     final system =
         '''
 Write a short third-person narrative story in French for a language learner that puts the grammar point "$grammarPoint" front and center — most sentences should naturally use that grammar point in context, not just mention it once. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title". Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending, using "$grammarPoint" as heavily and naturally as a real story allows. "grammar_note" MUST explain, in one simple English sentence, HOW that specific sentence uses "$grammarPoint" (which form, why that form, how it changes from the infinitive/base) — this is the whole point of the story, not an afterthought like in a generic reading passage. "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
 ${_cefrCalibration(levelBand)}
-The student was JUST taught this explanation of "$grammarPoint" — every sentence you write must be consistent with it, using the SAME rules/forms, not a different or contradicting take:
-SUMMARY: ${explanation.summary}
-USAGE RULES: ${explanation.usage.join('; ')}
-HOW IT CONTRASTS WITH OTHER TENSES: ${explanation.tenseContrast}
+TENSE OVERRIDE, TAKES PRIORITY OVER THE CALIBRATION ABOVE: the student deliberately chose to practice "$grammarPoint" specifically, even if it's not the tense that calibration band would normally introduce — use "$grammarPoint" as the story's main tense regardless. Everything else from the calibration still applies in full: sentence length, vocabulary difficulty, and overall simplicity must still match the level exactly. A harder tense at a beginner level means SHORT, SIMPLE sentences that happen to use that tense, e.g. one clear action per sentence with common everyday vocabulary, not a complex plot just because the tense is advanced.
 This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience.
 INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or opening sentence as one already suggested by the seed details below.''';
     final random = Random();
@@ -889,6 +926,41 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or openi
       temperature: 1.0,
     );
     return _parseReadingPassage(raw);
+  }
+
+  /// Builds the grammar explanation FROM the story that was just generated —
+  /// the fix for "it's just parler, parler, everything the same": before,
+  /// this explanation was written before the story existed, so it always
+  /// reached for generic textbook verbs (parler, être) with no connection to
+  /// what the student actually just read. Now every part of it is grounded
+  /// in the story's own sentences: the conjugation table covers ONLY the
+  /// verbs that actually appear in [passage] in this tense (never an
+  /// invented one), and the summary/contrast explicitly point back at
+  /// specific sentences from the story by quoting them.
+  Future<GrammarExplanation> buildGrammarExplanationFromStory({
+    required String grammarPoint,
+    required String levelBand,
+    required ReadingPassage passage,
+  }) async {
+    final system =
+        '''
+You are a French grammar teacher. The student just read this exact story, which uses the grammar point "$grammarPoint" throughout. Now explain "$grammarPoint" to them using ONLY the story's own sentences and verbs as your teaching material — never invent an unrelated example verb like "parler" or "être" unless one of those is actually the verb used in the story. Return ONLY compact JSON with this exact shape: {"title": string, "summary": string, "usage": [string, ...], "tense_contrast": string, "conjugations": [{"verb": string, "group": string, "rows": [{"pronoun": string, "form": string}, ...]}, ...], "examples": [{"fr": string, "en": string}, ...]}.
+LANGUAGE, ABSOLUTE: "summary", every string in "usage", and "tense_contrast" MUST be written in English, plain teaching English, since this is explaining a grammar concept to a beginner who does not yet read French explanations. The ONLY French allowed in those three fields is a short quoted example dropped inline (e.g. "the story says 'Marc mange une crêpe', using the present tense of manger"). "conjugations" and "examples" are the exception: French forms/sentences there are expected and required, that is the whole point of those two fields.
+"title" is the grammar point's name (e.g. "$grammarPoint"). "summary" is 2-3 sentences explaining what it is and when it's used, and it MUST directly reference this specific story (quote or closely paraphrase one of its actual sentences as the illustration, not a made-up one). "usage" is 3-5 short bullet-point rules for how/when to use it, phrased plainly. "tense_contrast" explicitly explains HOW this changes from or relates to another tense the student likely knows, framed around the story's own action (e.g. "If Marc had already finished eating, the story would instead say '...'", adapting one of the story's real sentences into the contrasting tense as the example). "conjugations" gives one full conjugation table (all 6 pronoun rows: je, tu, il/elle, nous, vous, ils/elles) for EACH DISTINCT VERB that actually appears in the story in "$grammarPoint" — read the story carefully and use its real verbs, in their infinitive form as the "verb" field; do not add any verb that isn't actually in the story. "examples" gives 3-4 example sentences reusing or lightly adapting the story's OWN sentences (with their English meaning), not invented ones.
+${_cefrCalibration(levelBand)}''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'GRAMMAR POINT: $grammarPoint\nLEVEL: $levelBand\n'
+              'STORY:\n${passage.fullText}',
+        },
+      ],
+      maxTokens: 1300,
+    );
+    return GrammarExplanation.fromJson(_decodeObject(raw));
   }
 
   /// The quiz half of the grammar-story rebuild — unlike
@@ -918,6 +990,95 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     return _parseStoryQuizAndKeywords(raw);
   }
 
+  // ---------------------------------------------------------------------------
+  // Liaison practice — same "explanation, then a story grounded in it, then a
+  // quiz" shape as the grammar-story rebuild above, reusing the exact same
+  // GeneratedGrammarStory storage/sync/UI (saved with grammarPoint: 'Liaison'),
+  // but with dedicated prompts: liaison is a PRONUNCIATION rule (when a
+  // normally-silent final consonant gets pronounced because the next word
+  // starts with a vowel sound), not a tense, so there's no conjugation table
+  // and the "how it changes" framing doesn't apply — this teaches WHERE a
+  // liaison happens in a sentence and how it sounds instead.
+  // ---------------------------------------------------------------------------
+
+  Future<GrammarExplanation> buildLiaisonExplanation({
+    required String levelBand,
+  }) async {
+    final system =
+        '''
+You are teaching French liaison (pronunciation linking) to a beginner who finds it genuinely confusing. THE GOAL, ALWAYS: this is not an isolated grammar rule to memorize — it exists so the student can read an ordinary French sentence and understand how a native speaker actually SOUNDS when saying it, and start producing that same connected, natural speech themselves instead of choppy word-by-word French. Keep that goal in view in everything you write. Return ONLY compact JSON with this exact shape: {"title": string, "summary": string, "usage": [string, ...], "tense_contrast": string, "conjugations": [], "examples": [{"fr": string, "en": string}, ...]}.
+LANGUAGE, ABSOLUTE: "summary", every string in "usage", and "tense_contrast" MUST be written in plain English — the only French allowed there is a short quoted example inline. "examples" are French sentences with their English meaning, as normal.
+"title": "Liaison". "summary": 2-3 sentences in plain English explaining what liaison IS — a normally-silent final consonant (s, x, z, t, d, n, p, g) gets pronounced because the next word starts with a vowel sound or a silent h, linking the two words together (e.g. "les amis" is said like "lez-ami", not "les - amis") — frame this as the difference between reading French like a list of separate words and actually SPEAKING it the way a native does.
+"usage" MUST cover the FULL RANGE of liaison types appropriate to "$levelBand", not just one example or one category — draw from ALL of these, choosing which ones fit the level (more categories and more nuance as the level rises, never fewer than 4 distinct rules even at A1):
+- OBLIGATORY liaisons: after a determiner/article (les_amis, un_ami, des_enfants, ces_hommes), after a subject pronoun before its verb (nous_avons, vous_êtes, ils_ont, on_est), after a short/common adjective before its noun (un grand_homme, un petit_enfant), after numbers (deux_ans, trois_heures), after short one-syllable prepositions/adverbs (chez_elle, dans_un, très_intéressant, bien_arrivé).
+- FORBIDDEN liaisons (no linking, even though it looks like it should): after "et" (et_/il, never linked), after a singular noun before an adjective (un étudiant / anglais, not linked), before an aspirated h word (les / héros).
+- OPTIONAL/STYLE-DEPENDENT liaisons (B1/B2 only): after longer verbs or in compound tenses, more common in formal/careful speech than casual conversation — mention this exists but don't over-drill it below B1.
+At A1/A2, focus on the OBLIGATORY category only, in the simplest most common forms; introduce FORBIDDEN cases at A2/B1; introduce OPTIONAL/style nuance only at B1/B2.
+"tense_contrast" here should instead explain the single most common mistake an English speaker makes with liaison (usually: not linking at all, so every word sounds separate and choppy, OR over-linking where it's actually forbidden) and how it changes the sound of a sentence when done correctly versus not at all — give one concrete before/after sound comparison, and tie it back to the goal: this is what makes the difference between "reading French" and actually "speaking French".
+"conjugations" must be an empty array, always — liaison has no verb forms. "examples" gives 3-4 short French sentences that each contain a DIFFERENT type of liaison from the categories above (not the same category repeated), with their English meaning, so the range is visible even in the examples alone.
+${_cefrCalibration(levelBand)}''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': 'LEVEL: $levelBand'},
+      ],
+      maxTokens: 1200,
+    );
+    return GrammarExplanation.fromJson(_decodeObject(raw));
+  }
+
+  Future<ReadingPassage> buildLiaisonStory({
+    required String levelBand,
+    required GrammarExplanation explanation,
+  }) async {
+    final system =
+        '''
+Write a short third-person narrative story in French for a language learner that is rich in LIAISON opportunities — sentences that naturally contain word pairs where a liaison happens (an article/pronoun/number/short preposition immediately followed by a word starting with a vowel sound or silent h). Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title". Write 6 to 10 short sentences that together tell one small complete story with a beginning, a small turn, and an ending.
+THE GOAL: this story exists to make the student able to read an ordinary French sentence and know how it actually sounds spoken aloud, connected and natural, not word-by-word. In service of that, cover VARIED liaison types across the story, not the same one repeated in every sentence — spread across the sentences: at least one after a determiner/article, one after a subject pronoun before its verb, and (at A2+) one more type (a number, a short preposition/adverb, or a forbidden case where a liaison would be wrong) — pick whichever mix fits "$levelBand" and the explanation given below.
+"grammar_note" MUST identify the SPECIFIC liaison(s) in that sentence (or state there are none, if genuinely none fit naturally) and explain in plain English how it sounds, e.g. "les_élèves: the s links to élèves, sounds like 'lez-élèves', not 'les - élèves'" — if the sentence deliberately demonstrates a FORBIDDEN liaison spot, say so explicitly (e.g. "et_arrive is NOT linked — liaison never happens after et"). "pronunciation_tip" gives one more general pronunciation pointer for that sentence if useful, or an empty string.
+The student was just taught this explanation of liaison — every sentence must be consistent with it, using genuinely correct liaison spots (and genuinely correct non-liaison spots where forbidden), not invented or forced ones:
+SUMMARY: ${explanation.summary}
+USAGE RULES: ${explanation.usage.join('; ')}
+${_cefrCalibration(levelBand)}
+This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience.
+INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or opening sentence as one already suggested by the seed details below.''';
+    final random = Random();
+    final name =
+        _storyCharacterNames[random.nextInt(_storyCharacterNames.length)];
+    final setting = _storySettings[random.nextInt(_storySettings.length)];
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'LEVEL: $levelBand\n'
+              'SEED DETAILS to build this specific story around: a main character named $name, '
+              'set in or around $setting. Use these naturally, do not just state them.',
+        },
+      ],
+      maxTokens: 1400,
+      temperature: 1.0,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
+  buildLiaisonQuiz({required ReadingPassage passage}) async {
+    const system = '''
+Given a short French story written specifically to be rich in liaison examples, write a quiz that TESTS LIAISON RECOGNITION (not just story comprehension) plus a keyword glossary. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 5 to 6 questions, mostly "does this word pair have a liaison?" or "how is this pronounced?" style questions quoting an actual word pair from the story, with 3 answer choices (e.g. three different phonetic renderings, only one correct), plus 1-2 questions about a specific liaison the story used. Base every question on the story's own sentences.
+KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story, each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA).''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {'role': 'user', 'content': 'STORY:\n${passage.fullText}'},
+      ],
+      maxTokens: 1400,
+    );
+    return _parseStoryQuizAndKeywords(raw);
+  }
+
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
   /// deck of `GrammarPracticeCard`s (one short French sentence in the chosen tense per card,
   /// its English meaning, and a one-line grammar note), reusing the vocabulary words the
@@ -941,6 +1102,7 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
         '$count beginner French sentences in $tenseTitle$wordList. Pure JSON only: {"cards":[{"fr":"...","en":"...","note":"..."}]}';
     final raw = await _complete(
       messages: [
+        {'role': 'system', 'content': languageGuardrail},
         {'role': 'user', 'content': user},
       ],
       maxTokens: 800,
@@ -1619,15 +1781,30 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     return cards;
   }
 
-  SessionPlan _parseSessionPlan(String raw, {required Set<String> validIds}) {
+  SessionPlan _parseSessionPlan(
+    String raw, {
+    required Set<String> validIds,
+    int? count,
+  }) {
     final obj = _decodeObject(raw);
     final focusNote = obj['focus_note'] as String? ?? '';
     var prioritized = (obj['prioritized_word_ids'] as List?)
         ?.map((e) => e.toString())
+        .where(validIds.contains) // drop any hallucinated id
+        .toSet() // de-dupe
         .toList();
-    // Guard against a hallucinated/incomplete reordering — only trust it if it's an exact
-    // permutation of the real candidate IDs, otherwise fall back to the given order.
-    if (prioritized != null && prioritized.toSet() != validIds) {
+    if (count != null && prioritized != null) {
+      // Trust a genuine selection (any valid subset), just cap it at the
+      // requested count — this is a real curation now, not a permutation
+      // that must cover every candidate.
+      if (prioritized.isEmpty) {
+        prioritized = null;
+      } else if (prioritized.length > count) {
+        prioritized = prioritized.take(count).toList();
+      }
+    } else if (prioritized != null && prioritized.toSet() != validIds) {
+      // Legacy contract (planGrammarSession-style callers with no `count`):
+      // only trust it if it's an exact permutation of the real candidates.
       prioritized = null;
     }
     return SessionPlan(focusNote: focusNote, prioritizedWordIds: prioritized);

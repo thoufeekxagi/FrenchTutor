@@ -226,7 +226,10 @@ class LessonSpeechService {
     // (guarded by the itemIndex check below) — clear the list so it doesn't
     // grow for the whole length of a long story.
     _wordTimers.clear();
-    final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    final words = text
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
     if (words.isEmpty) return;
     // +1 per word for the space that follows it (except the last), so the
     // proportion matches roughly how long each word actually takes to say.
@@ -282,7 +285,9 @@ class LessonSpeechService {
         // happened to be paused for an unrelated reason.
         final isRateLimited = e is GeminiHttpError && e.isRateLimited;
         await Future.delayed(
-          Duration(milliseconds: isRateLimited ? 2500 * attempt : 400 * attempt),
+          Duration(
+            milliseconds: isRateLimited ? 2500 * attempt : 400 * attempt,
+          ),
         );
       }
     }
@@ -309,6 +314,35 @@ class LessonSpeechService {
         contentItemId: item.contentItemId,
       );
     }
+  }
+
+  /// Same as [prewarmNarration], but runs up to [concurrency] requests at
+  /// once instead of one at a time — for a large one-off batch (e.g. every
+  /// letter of the alphabet, ~30 short clips) where strictly sequential
+  /// synthesis is safe but slow, and the caller needs it to finish faster
+  /// without firing all items simultaneously and risking a rate-limit burst.
+  /// Each worker still goes through [synthesizeWithRetry], so an individual
+  /// clip's failure/backoff behavior is identical to the sequential path.
+  Future<void> prewarmNarrationBounded(
+    List<SpeechItem> items, {
+    int concurrency = 4,
+  }) async {
+    final voiceName = ActiveTutor.current.voiceName;
+    var next = 0;
+    Future<void> worker() async {
+      while (true) {
+        if (next >= items.length) return;
+        final item = items[next++];
+        await synthesizeWithRetry(
+          item.text,
+          voiceName: voiceName,
+          slow: false,
+          contentItemId: item.contentItemId,
+        );
+      }
+    }
+
+    await Future.wait(List.generate(concurrency, (_) => worker()));
   }
 
   void _onUtteranceComplete() {

@@ -1014,7 +1014,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   }
 
   /// The only place this screen exits — pops exactly once with a typed
-  /// outcome; the PathwayCoordinator decides what it means for the day.
+  /// outcome for whichever caller pushed it.
   /// Credits the card the student is standing on when the session ends: a real
   /// attempt on it counts as practice (graded conservatively), merely landing
   /// on it does not — so word 5-of-10 goes back in the pending pile unless it
@@ -1410,7 +1410,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               // this word needs before Marie is allowed to offer moving on.
               Text(
                 _offerUnlocked
-                    ? 'ready when you are — tap Next word'
+                    ? 'ready when you are, tap Next word'
                     : '${_attemptCount.clamp(0, _offerThreshold)} of $_offerThreshold practices',
                 style: DesignTokens.body(11).copyWith(
                   color: _offerUnlocked

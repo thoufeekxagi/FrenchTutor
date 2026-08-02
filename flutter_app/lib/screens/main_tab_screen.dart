@@ -21,20 +21,25 @@ class MainTabScreen extends ConsumerStatefulWidget {
 class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   int _currentIndex = 0;
 
-  static const _screens = [
-    DashboardScreen(),
-    PathScreen(),
-    LabsScreen(),
-    ProgressScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final notetaker = ref.watch(notetakerStateProvider);
+    // Built fresh every rebuild (not a static const list) so `isActive` can
+    // be threaded down — every tab stays alive forever inside IndexedStack,
+    // so completing something on one tab (e.g. Practice) and switching back
+    // to Today previously never re-read the sessions table: `DashboardScreen`
+    // /`TodayMissionWidget` only ever reloaded via their OWN internal
+    // push-and-await calls, never just from becoming visible again.
+    final screens = [
+      DashboardScreen(isActive: _currentIndex == 0),
+      const PathScreen(),
+      const LabsScreen(),
+      const ProgressScreen(),
+    ];
     return Scaffold(
       body: Stack(
         children: [
-          IndexedStack(index: _currentIndex, children: _screens),
+          IndexedStack(index: _currentIndex, children: screens),
           FloatingNotetakerOverlay(state: notetaker),
         ],
       ),

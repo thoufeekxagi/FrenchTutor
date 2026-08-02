@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,7 @@ import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/alphabet_prewarm.dart';
 import '../../services/trial_call_gate.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../../widgets/adaptive/adaptive.dart';
@@ -110,6 +113,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     TutorTuning.saveLanguageMix(
       LearnerLevel.defaultLanguageMix(_level ?? 'a1'),
     );
+    // Right here, not when the learner later taps into "Learn the
+    // Alphabet" — both the level and the tutor voice are already locked in
+    // at this exact moment, so this is the earliest point the alphabet's
+    // sounds can be prewarmed for the voice that will actually be used.
+    unawaited(AlphabetPrewarm.maybeStart(isBeginner: _level == 'a1'));
     _previewer.stop();
     PSHaptics.success();
     widget.onFinished();

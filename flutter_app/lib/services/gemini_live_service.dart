@@ -202,7 +202,18 @@ class GeminiLiveService {
     });
   }
 
-  void sendText(String text) {
+  /// [expectReply] controls the API-level `turnComplete` flag — this is
+  /// Gemini Live's OWN turn-taking signal, separate from anything the prompt
+  /// text says. Sending `turnComplete: true` tells the model "the user's
+  /// turn just ended, you may speak now" regardless of what the text itself
+  /// asks for — a text body saying "don't reply" while `turnComplete: true`
+  /// is still set was exactly the writing-guide's "Marie keeps talking over
+  /// silent draft updates" bug: the API mechanically triggered a response
+  /// every 8 seconds no matter what the English instructions said. Defaults
+  /// to `true` since every existing caller before this fix wanted a reply
+  /// (a call kickoff, a wrap-up warning); pass `false` for a genuinely
+  /// silent background update, like a periodic draft sync.
+  void sendText(String text, {bool expectReply = true}) {
     if (!_isSetupComplete) return;
     _send({
       'clientContent': {
@@ -214,7 +225,7 @@ class GeminiLiveService {
             ],
           },
         ],
-        'turnComplete': true,
+        'turnComplete': expectReply,
       },
     });
   }

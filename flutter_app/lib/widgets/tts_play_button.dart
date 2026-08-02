@@ -41,14 +41,19 @@ class TtsPlayButton extends StatefulWidget {
   final Color? color;
 
   @override
-  State<TtsPlayButton> createState() => _TtsPlayButtonState();
+  State<TtsPlayButton> createState() => TtsPlayButtonState();
 }
 
 enum _Phase { idle, generating, playing }
 
-class _TtsPlayButtonState extends State<TtsPlayButton> {
+class TtsPlayButtonState extends State<TtsPlayButton> {
   _Phase _phase = _Phase.idle;
   List<int>? _readyBytes;
+
+  /// Lets another tappable element (e.g. a big letter card the speaker icon
+  /// sits inside) trigger the exact same play/cache/debounce behavior as
+  /// tapping the icon itself, via a `GlobalKey<TtsPlayButtonState>`.
+  Future<void> trigger() => _onTap();
 
   Future<void> _onTap() async {
     if (_phase != _Phase.idle) return;

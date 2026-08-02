@@ -164,6 +164,17 @@ class SRSService {
     return base;
   }
 
+  /// Returns a CANDIDATE POOL, deliberately bigger than what actually gets
+  /// practiced — the caller (see `vocab_picker_screen.dart._beginSession`)
+  /// hands this whole pool to `LessonAgentService.planVocabSession` to
+  /// genuinely CURATE the final `autoQueueSize` selection, or falls back to
+  /// taking the front of this list if that call fails. Both due and unseen
+  /// entries are shuffled before picking, which was the root cause of "same
+  /// five words every time": the old version always walked the vocab bank
+  /// in fixed curriculum order and took the first N, so both the direct
+  /// result AND the AI-reorder fallback landed on an identical deterministic
+  /// slice call after call. Shuffling here means even a total AI failure now
+  /// produces a different, genuinely varied set each time.
   Future<List<VocabEntry>> dailyMixedQueue() async {
     final allEntries = ContentService.shared.vocabPhases
         .expand((p) => p.themes.expand((t) => t.entries))
@@ -202,11 +213,22 @@ class SRSService {
         unseen.add(entry);
       }
     }
+    due.shuffle();
+    unseen.shuffle();
 
+    // Pool budgets are a multiple of the pacing budgets, not equal to them —
+    // this is what actually gives the curator (or the shuffle fallback)
+    // something to choose FROM, instead of handing over exactly the words
+    // that will be shown.
+    const poolMultiplier = 4;
     final newBudget = (policy.newBudget - store.newEntriesIntroducedToday())
         .clamp(0, policy.newBudget);
-    final queue = [...due.take(policy.reviewBudget), ...unseen.take(newBudget)];
-    final capped = queue.take(policy.totalCap).toList();
+    final queue = [
+      ...due.take(policy.reviewBudget * poolMultiplier),
+      ...unseen.take(newBudget * poolMultiplier),
+    ];
+    final poolCap = targetSize * poolMultiplier;
+    final capped = queue.take(poolCap).toList();
     if (capped.length >= targetSize) return capped;
 
     // Under the target — the daily new-word cap already got used up
@@ -218,12 +240,12 @@ class SRSService {
     final chosenIds = capped.map((e) => e.id).toSet();
     final topUp = [...capped];
     for (final entry in unseen) {
-      if (topUp.length >= targetSize) break;
+      if (topUp.length >= poolCap) break;
       if (chosenIds.add(entry.id)) topUp.add(entry);
     }
     if (topUp.length < targetSize) {
-      for (final entry in knownSample(limit: targetSize)) {
-        if (topUp.length >= targetSize) break;
+      for (final entry in knownSample(limit: poolCap)) {
+        if (topUp.length >= poolCap) break;
         if (chosenIds.add(entry.id)) topUp.add(entry);
       }
     }

@@ -19,6 +19,8 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
+import '../labs/grammar_lab_screen.dart';
+import '../labs/liaison_lab_screen.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
@@ -31,7 +33,14 @@ import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, this.isActive = true});
+
+  /// True while this is the visible tab. `MainTabScreen` keeps every tab
+  /// alive forever inside an `IndexedStack`, so this is the only signal this
+  /// screen gets that it's been switched back to — without it, completing a
+  /// practice session on another tab and returning here showed stale
+  /// "recent practice"/momentum data until the next full app restart.
+  final bool isActive;
 
   @override
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
@@ -51,6 +60,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       if (!mounted || await AppTour.hasSeenHome()) return;
       if (mounted) AppTour.playHome(context);
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant DashboardScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) _reload();
   }
 
   Future<void> _openSession({String? lessonContext}) async {
@@ -100,7 +115,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 22),
                 KeyedSubtree(
                   key: AppTour.missionKey,
-                  child: TodayMissionWidget(onProgress: _reload),
+                  child: TodayMissionWidget(
+                    isActive: widget.isActive,
+                    onProgress: _reload,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 KeyedSubtree(
@@ -436,6 +454,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ),
       (
+        icon: CupertinoIcons.book,
+        label: 'Grammar',
+        labId: 'grammar',
+        onTap: () => _openGated(
+          'grammar',
+          () => AppRouter.push(context, (_) => const GrammarLabScreen()),
+        ),
+      ),
+      (
+        icon: CupertinoIcons.waveform,
+        label: 'Liaison',
+        labId: 'liaison',
+        onTap: () => _openGated(
+          'liaison',
+          () => AppRouter.push(context, (_) => const LiaisonLabScreen()),
+        ),
+      ),
+      (
         icon: CupertinoIcons.bubble_left_bubble_right,
         label: 'Roleplay',
         labId: 'roleplay',
@@ -487,7 +523,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Practice any skill, any time — one locked skill unlocks '
+                  'Practice any skill, any time. One locked skill unlocks '
                   'free each day. Your practice still informs what comes next.',
                   style: Passeport.body(
                     13,

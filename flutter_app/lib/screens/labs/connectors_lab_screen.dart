@@ -11,6 +11,7 @@ import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/session_recorder.dart';
 import '../../widgets/inline_call_bar.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
@@ -27,10 +28,21 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
   /// InlineCallController every other reading/exercise screen uses.
   late final InlineCallController _call;
 
+  /// Logs the inline call's transcript so asking Marie about connectors
+  /// here contributes to an auto-generated review note, same as every
+  /// other screen with a live call — this screen previously had no
+  /// SessionRecorder at all, so that conversation went entirely unlogged.
+  late final SessionRecorder _recorder;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _recorder = SessionRecorder(
+      storage: ref.read(storageServiceProvider),
+      stage: 'grammar',
+      topic: 'Connectors',
+    );
     _call = InlineCallController(
       sessionType: LiveSessionType.labAssistant,
       lessonContext: () => ref.read(contentServiceProvider).connectorsContext(),
@@ -38,6 +50,8 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
       onChanged: () {
         if (mounted) setState(() {});
       },
+      onUserTranscript: (text) => _recorder.logUser(text),
+      onTutorTranscript: (text) => _recorder.logTutor(text),
     );
   }
 
@@ -50,6 +64,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _call.dispose();
+    _recorder.finish(summary: 'Reviewed connectors.');
     LessonSpeechService.shared.deactivate();
     super.dispose();
   }
