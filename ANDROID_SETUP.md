@@ -5,6 +5,15 @@ Companion to `BUILD_FLUTTER_TO_IPHONE.md` (iOS) and `AUTH_SETUP_CHECKLIST.md`
 running on Android, including the exact problems hit while setting this up on
 a fresh machine, so the next person doesn't have to rediscover them.
 
+**Before doing anything else on a new machine, run:**
+```bash
+cd flutter_app && ./android_preflight_check.sh
+```
+It's read-only — checks Flutter/Dart version, the Android toolchain, and
+scans every installed plugin for the exact Kotlin-incompatibility bug class
+that broke this project's build once already (section 1 below), so you find
+out in 10 seconds instead of after a failed 15-minute Gradle build.
+
 ---
 
 ## 1. Toolchain requirements
@@ -69,15 +78,55 @@ using the script verbatim.
 
 ---
 
-## 3. Emulator setup (lightweight, no Play Store bloat)
+## 3. Emulator setup (lightweight, no Play Store bloat, works on Windows/macOS/Linux)
 
-Create an AVD using a plain `google_apis` (not `google_apis_playstore`)
-x86_64 image — this has Google Play Services (needed for Google Sign-In) but
-skips the Play Store app itself, keeping it lightweight:
+The whole point of this section: pick the newest stable image and the right
+acceleration for your OS *up front*, so you never end up debugging a stale,
+under-accelerated emulator the way this branch's setup originally did. Don't
+copy a hardcoded API-level number from an old doc (including an older version
+of this one) without checking it's still current — Android API levels move
+fast and pinning to whatever was "latest" months ago is exactly how you end
+up on old, more bug-prone system images.
+
+### Step 0 — find your SDK tools (OS-specific paths)
+
+| OS | Default SDK location | `sdkmanager` / `avdmanager` / `emulator` live in |
+|---|---|---|
+| Linux | `~/Android` or `~/Android/Sdk` | `cmdline-tools/latest/bin/`, `emulator/` |
+| macOS | `~/Library/Android/sdk` | same subfolders |
+| Windows | `%LOCALAPPDATA%\Android\Sdk` | same subfolders (`.bat` scripts instead of extension-less) |
+
+If you already installed Android Studio at any point, it created this for
+you. If not, download just the **command-line tools** package from
+[developer.android.com/studio](https://developer.android.com/studio) —
+scroll to "Command line tools only" — you do **not** need the full Android
+Studio IDE to build or run this app; everything in this doc is pure CLI.
+
+### Step 1 — install the newest stable system image (not Play Store)
+
+List what's actually available right now rather than trusting any hardcoded
+version number:
 
 ```bash
-sdkmanager --install "system-images;android-34;google_apis;x86_64"
-avdmanager create avd -n my_test_avd -k "system-images;android-34;google_apis;x86_64" -d pixel_6
+sdkmanager --list | grep "system-images.*google_apis;"
+```
+
+Pick the **highest-numbered stable API level** (skip anything with a
+pre-release/preview tag) with tag `google_apis` — not `google_apis_playstore`
+(that variant bundles the full Play Store app, which is unnecessary weight
+for local testing and slower to boot). Match the ABI to your machine:
+`x86_64` for Intel/AMD, `arm64-v8a` for Apple Silicon Macs.
+
+```bash
+sdkmanager --install "system-images;android-<HIGHEST_STABLE>;google_apis;<ABI>"
+avdmanager create avd -n my_test_avd -k "system-images;android-<HIGHEST_STABLE>;google_apis;<ABI>" -d pixel_6
+```
+
+Also make sure the emulator engine itself is current (this is separate from
+the system image and updates independently):
+
+```bash
+sdkmanager --update
 ```
 
 ### The one real gotcha: boot with `-no-snapshot`
@@ -102,15 +151,37 @@ a truly clean disk, then drop it for all subsequent boots. Once it's booted
 successfully one time, plain `emulator -avd my_test_avd` (letting it use its
 saved snapshot) boots in seconds from then on.
 
-If you have a discrete GPU (NVIDIA on a hybrid/Optimus laptop, for example),
-drop `-gpu swiftshader_indirect` in favor of real acceleration:
+### Hardware acceleration (matters a lot for boot speed — don't skip this)
 
-```bash
-__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia \
-  emulator -avd my_test_avd -no-snapshot -gpu host -no-audio
-```
+Without it, boots take minutes instead of seconds. What "on" looks like
+differs per OS:
 
-(Remove `-no-audio` if you actually want to hear TTS/audio previews play
+- **Linux**: needs `/dev/kvm` to exist and your user in the `kvm` group
+  (`groups` should list it; if not, `sudo usermod -aG kvm $USER` then log out
+  and back in). Verify with `emulator -accel-check` — it should say "KVM ...
+  is installed and usable." If you have a discrete GPU on a hybrid laptop
+  (NVIDIA Optimus, for example), route the emulator's rendering to it instead
+  of the integrated GPU:
+  ```bash
+  __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia \
+    emulator -avd my_test_avd -no-snapshot -gpu host -no-audio
+  ```
+  Otherwise, plain software rendering is still far better than nothing:
+  ```bash
+  emulator -avd my_test_avd -no-snapshot -gpu swiftshader_indirect -no-audio
+  ```
+- **macOS**: hardware acceleration (Apple's Hypervisor.Framework) is used
+  automatically — nothing to configure. Just run
+  `emulator -avd my_test_avd -no-snapshot -gpu auto -no-audio`. Apple
+  Silicon Macs need an `arm64-v8a` system image (see Step 1); Intel Macs need
+  `x86_64`.
+- **Windows**: acceleration comes from either Windows Hypervisor Platform
+  (WHPX, the modern default — make sure it's enabled in "Turn Windows
+  features on or off") or the older Intel HAXM on machines that don't support
+  WHPX. `emulator -accel-check` tells you which one is active. Same command
+  otherwise: `emulator -avd my_test_avd -no-snapshot -gpu auto -no-audio`.
+
+(Drop `-no-audio` on any OS if you actually want to hear TTS/audio previews
 through your speakers — needed for anything in the alphabet/liaison labs or
 tutor voice previews.)
 
@@ -160,3 +231,64 @@ Android`, a real gap in the `sign_in_with_apple` wiring for Android's
 web-based fallback flow (Apple's native picker is iOS-only by design; Android
 requires routing through a web OAuth flow that isn't configured yet). Email/
 password and Google both work end-to-end on Android as of this branch.
+
+---
+
+## 5. Full troubleshooting log from setting this up the first time
+
+Kept in detail on purpose — several of these looked like different bugs
+before turning out to be the same root cause, or looked like real bugs and
+turned out to be nothing. Recognizing the *symptom* quickly is the whole
+value of this section.
+
+**Symptom: `flutter pub get` fails with a Dart SDK version error.**
+Your Flutter is older than this project's `environment: sdk:` constraint.
+`flutter upgrade`. Not a project bug.
+
+**Symptom: `assembleDebug`/`assembleRelease` fails on
+`:sentry_flutter:compileDebugKotlin` with `Language version 1.6 is no longer
+supported`.** Covered in section 1 — already fixed on this branch by bumping
+`sentry_flutter`. If a *different* plugin throws the same shape of error
+later, `android_preflight_check.sh` section 4 is built to catch it — run it
+against the new plugin's cached `android/build.gradle`.
+
+**Symptom: emulator boots forever, `adb devices` stuck on `offline`, log
+frozen at `Activated packet streamer for bluetooth emulation`.** This is the
+init/SELinux bug from section 3 — fix is `-no-snapshot` (and `-wipe-data`
+once if it's a truly fresh AVD). Do **not** chase this as a disk-speed or
+RAM problem — that was a real dead end the first time this was diagnosed:
+several minutes were spent checking `vmstat` I/O-wait and killing IDE/build
+processes to "free up resources," which helped a little (any real resource
+contention on a busy machine will genuinely slow *any* boot down) but was
+not the actual root cause. The actual fix that made it boot in ~10 seconds
+was `-no-snapshot`, nothing about RAM or disk.
+
+**Symptom: `-no-window` (headless) hangs at the exact same
+"packet streamer" line, but a windowed boot of the identical AVD eventually
+gets further.** Headless mode has its own separate, documented flakiness on
+some Linux setups unrelated to the init bug above. If you need headless
+(CI, no display), test that specifically rather than assuming it behaves
+like windowed mode.
+
+**Symptom: Google Sign-In shows `PlatformException(sign_in_failed,
+ApiException: 10, ...)` after picking an account.** `ApiException: 10` is
+Google's own `DEVELOPER_ERROR` — it means no Android-type OAuth client is
+registered for this app's package name + SHA-1 combination yet. Section 4
+above is the fix. It is **not** fixed by adding a Google account to the
+emulator, and it is **not** fixed by the Web OAuth client that iOS/Supabase
+already use — Android needs its own, additional client registration, purely
+for Google's own bookkeeping (no ID from it is ever used in app code).
+
+**Symptom: a shell script using `set -euo pipefail` reports a check as
+failed even though the underlying command clearly succeeded (e.g. `flutter
+doctor` shows the checkmark you're grepping for, but the script still says
+FAIL).** This is a real, general bash gotcha, not specific to Flutter:
+`grep -q` exits the instant it finds its first match, closing the pipe it's
+reading from. If the producer on the other end (here, `flutter doctor`) is
+still writing when that happens, it receives `SIGPIPE`, and under
+`pipefail`, that shows up as the whole pipeline "failing" even though
+`grep -q` itself succeeded. Fix: capture the producer's output into a
+variable first (`OUT=$(cmd)`), then test the variable
+(`[[ "$OUT" == *pattern* ]]`), instead of piping live into `grep -q`. Worth
+knowing before writing more tooling like `android_preflight_check.sh` — it's
+an easy trap to fall into again.
