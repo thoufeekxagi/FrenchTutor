@@ -1,25 +1,24 @@
 # Phase 3: Database & Storage for Web
 
-**Status**: Not started. Can run in parallel with Phase 2.
+**Status**: Smaller than originally scoped — see Phase 1 audit finding below. Can run in parallel with Phase 2.
 
-## Current state
+## Current state (updated after Phase 1 audit)
 
-`lib/data/database/storage_service.dart` and `learning_store.dart` use Drift on top of native SQLite
-(`sqlite3_flutter_libs`). This is genuinely the best-case subsystem for web support: Drift ships an official
-web backend (`drift/wasm`, backed by IndexedDB/OPFS), and it uses the **same generated schema, same queries,
-same migrations** as native. A web-compatible `web/sqlite3.wasm` file is already sitting in this repo's `web/`
-directory from earlier exploration — confirm it's current with the Drift version in `pubspec.yaml` before
-relying on it.
+`lib/data/database/storage_service.dart` and `learning_store.dart` use Drift on top of native SQLite. The
+conditional-import split this phase calls for **already exists**: `lib/data/database/database_opener.dart`
+exports `database_opener_native.dart` (native `sqlite3` + `path_provider`) or `database_opener_web.dart`
+(`sqlite3.wasm` + `IndexedDbFileSystem`) depending on platform, and `web/sqlite3.wasm` is already checked in.
+`lib/providers/database_provider.dart` already imports the conditional `database_opener.dart`, not a specific
+platform file — meaning the wiring looks correct on paper.
 
-## Recommended approach
+**What's actually left for this phase is verification, not implementation**: run a real web build, open the
+database, run `app_migrations.dart`'s full migration chain, and read/write a row through
+`storage_service.dart`/`learning_store.dart`, end to end, in a browser. Drift migrations are backend-agnostic
+by design, but this repo's migration history is long enough that an explicit pass is worth the hour it takes,
+rather than assuming it "should just work" because the opener file looks right.
 
-1. Locate (or create) the single place the app constructs its Drift `QueryExecutor`/database connection.
-2. Give it a conditional-import split: native connection factory (existing behavior, untouched) vs a
-   `drift/wasm` factory for web. Every `AppDatabase`/DAO/query in the rest of the codebase is unaffected —
-   Drift's generated code doesn't care which executor it's talking to.
-3. Verify migrations in `app_migrations.dart` run cleanly against the wasm backend — Drift migrations are
-   backend-agnostic by design, but worth an explicit test pass since this repo's migration history is now
-   fairly long.
+If that verification pass turns up nothing, this phase is close to done already — don't invent new
+architecture here where none is needed.
 
 ## Open architectural question: how much do we even need local-first on web?
 

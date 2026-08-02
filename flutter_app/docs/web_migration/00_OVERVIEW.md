@@ -13,7 +13,7 @@ for the abstraction rule this plan follows.
 
 | Phase | File | What it covers | Status |
 |---|---|---|---|
-| 1 | [01_phase1_compatibility_audit.md](01_phase1_compatibility_audit.md) | File-by-file audit: what's shared as-is, what needs a thin platform shim, what needs real new code | **Not started** |
+| 1 | [01_phase1_compatibility_audit.md](01_phase1_compatibility_audit.md) | File-by-file audit: what's shared as-is, what needs a thin platform shim, what needs real new code | **Complete** — key finding: a Drift web (wasm/IndexedDB) database opener already exists in the codebase, unwired-but-ready; the real remaining gap is voice/audio (Phase 4) and web payments (Phase 2) |
 | 2 | [02_phase2_auth_and_payments.md](02_phase2_auth_and_payments.md) | Web sign-in (Supabase OAuth) and web payments (Stripe vs RevenueCat Web Billing) | Not started |
 | 3 | [03_phase3_database_and_storage.md](03_phase3_database_and_storage.md) | Drift web backend (IndexedDB via `drift/wasm`), sync-vs-local-cache tradeoff | Not started |
 | 4 | [04_phase4_voice_and_realtime.md](04_phase4_voice_and_realtime.md) | The live voice call (Gemini Live) on web — the one subsystem that's a real rewrite, not a port | Not started |
