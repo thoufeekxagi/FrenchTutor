@@ -1,6 +1,6 @@
-# Phase 3: Database & Storage for Web
+# Phase 4: Database & Storage for Web
 
-**Status**: Smaller than originally scoped — see Phase 1 audit finding below. Can run in parallel with Phase 2.
+**Status**: Smaller than originally scoped — see Phase 1 audit finding below. Can run in parallel with Phase 3.
 
 ## Current state (updated after Phase 1 audit)
 

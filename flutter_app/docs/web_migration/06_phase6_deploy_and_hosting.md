@@ -1,6 +1,6 @@
-# Phase 5: Deploy & Hosting
+# Phase 6: Deploy & Hosting
 
-**Status**: Not started. Only start this once Phase 4 (voice) is functionally complete — there is no value in
+**Status**: Not started. Only start this once Phase 5 (voice) is functionally complete — there is no value in
 deploying a "high-end web app" whose flagship feature doesn't work; that undermines the whole pitch to users
 landing on it from the marketing site.
 
@@ -18,7 +18,7 @@ landing on it from the marketing site.
 - `flutter build web --release` with the same `--dart-define` keys currently passed by
   `run_web_with_keys.sh` / `bump_build_number.sh`'s Xcode config-generation step — same secrets source
   (`secrets.local.properties` locally; Vercel environment variables in production), same keys
-  (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GEMINI_API_KEY`, etc., plus whatever Phase 2/4 additions Stripe or
+  (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GEMINI_API_KEY`, etc., plus whatever Phase 3/4 additions Stripe or
   new audio config require).
 - Output of `flutter build web` is static (HTML/JS/wasm) — deploys to Vercel as a static site. No server
   runtime needed unless a phase above introduces one (e.g. a Stripe webhook handler, which would be a small

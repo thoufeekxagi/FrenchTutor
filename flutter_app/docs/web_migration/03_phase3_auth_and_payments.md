@@ -1,4 +1,4 @@
-# Phase 2: Auth & Payments for Web
+# Phase 3: Auth & Payments for Web
 
 **Status**: Not started. Depends on Phase 1 audit confirming exact touch points in `ai_session_gate.dart`,
 `subscription_gate_service.dart`, and wherever `google_sign_in`/`sign_in_with_apple` are invoked.
