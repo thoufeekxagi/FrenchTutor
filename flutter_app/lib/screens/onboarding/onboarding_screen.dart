@@ -132,6 +132,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final showHeader = _page >= _pageGoal && _page <= _pageTutor;
+    // On wide web viewports this reads as a full-bleed mobile wizard
+    // stretched edge to edge if left unconstrained — center it as a fixed-
+    // width card instead, the way Notion/Linear present first-run setup on
+    // desktop. Steps themselves are unchanged; only the outer width differs.
+    final isDesktop =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
     return Scaffold(
       backgroundColor: _isGradientPage
           ? DesignTokens.primaryDeep
@@ -139,90 +145,98 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: _heroGradient),
         child: SafeArea(
-          child: Column(
-            children: [
-              if (showHeader) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                  child: Row(
-                    children: [
-                      const _BrandWordmark(),
-                      const Spacer(),
-                      Text(
-                        'Step $_page of 4',
-                        style: Passeport.body(
-                          12,
-                          weight: FontWeight.w600,
-                        ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Container(
-                      height: 4,
-                      color: Colors.white.withValues(alpha: 0.28),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Align(
-                            alignment: Alignment.centerLeft,
-                            child: AnimatedContainer(
-                              duration: DesignTokens.durationMedium,
-                              curve: DesignTokens.curveStandard,
-                              width:
-                                  constraints.maxWidth *
-                                  (_page / 4).clamp(0.0, 1.0),
-                              height: 4,
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (index) => setState(() => _page = index),
-                  children: [
-                    _welcomeStep(),
-                    _goalStep(),
-                    _levelStep(),
-                    _interestsStep(),
-                    _tutorStep(),
-                    _PreparingPane(
-                      active: _page == _pagePreparing,
-                      checkpoints: [
-                        'French',
-                        if (_level != null) LearnerLevel.displayLabel(_level!),
-                        switch (_goal) {
-                          'tef_canada' => 'TEF / TCF Canada',
-                          'everyday' => 'Everyday French',
-                          _ => 'Foundations',
-                        },
-                        'Tutor ${_tutor.displayName}',
-                      ],
-                      onComplete: () {
-                        if (!mounted || _page != _pagePreparing) return;
-                        if (_trialAvailable) {
-                          _next();
-                        } else {
-                          _finish();
-                        }
-                      },
-                    ),
-                    _trialStep(),
-                    _recapStep(),
-                  ],
-                ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isDesktop ? 480 : double.infinity,
               ),
-            ],
+              child: Column(
+                children: [
+                  if (showHeader) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                      child: Row(
+                        children: [
+                          const _BrandWordmark(),
+                          const Spacer(),
+                          Text(
+                            'Step $_page of 4',
+                            style: Passeport.body(12, weight: FontWeight.w600)
+                                .copyWith(
+                                  color: Colors.white.withValues(alpha: 0.78),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Container(
+                          height: 4,
+                          color: Colors.white.withValues(alpha: 0.28),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: AnimatedContainer(
+                                  duration: DesignTokens.durationMedium,
+                                  curve: DesignTokens.curveStandard,
+                                  width:
+                                      constraints.maxWidth *
+                                      (_page / 4).clamp(0.0, 1.0),
+                                  height: 4,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (index) => setState(() => _page = index),
+                      children: [
+                        _welcomeStep(),
+                        _goalStep(),
+                        _levelStep(),
+                        _interestsStep(),
+                        _tutorStep(),
+                        _PreparingPane(
+                          active: _page == _pagePreparing,
+                          checkpoints: [
+                            'French',
+                            if (_level != null)
+                              LearnerLevel.displayLabel(_level!),
+                            switch (_goal) {
+                              'tef_canada' => 'TEF / TCF Canada',
+                              'everyday' => 'Everyday French',
+                              _ => 'Foundations',
+                            },
+                            'Tutor ${_tutor.displayName}',
+                          ],
+                          onComplete: () {
+                            if (!mounted || _page != _pagePreparing) return;
+                            if (_trialAvailable) {
+                              _next();
+                            } else {
+                              _finish();
+                            }
+                          },
+                        ),
+                        _trialStep(),
+                        _recapStep(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

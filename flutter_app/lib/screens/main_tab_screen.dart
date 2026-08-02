@@ -5,11 +5,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../providers/database_provider.dart';
 import '../widgets/adaptive/adaptive.dart';
+import '../widgets/desktop_app_shell.dart';
 import '../widgets/floating_notetaker.dart';
 import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
 import 'path/path_screen.dart';
 import 'progress/progress_screen.dart';
+
+/// Primary navigation destinations, defined once and shared between the
+/// mobile bottom tab bar and the desktop sidebar (`DesktopAppShell`) so
+/// neither shell can drift out of sync with the other.
+const _destinations = [
+  NavDestination(
+    icon: CupertinoIcons.house,
+    activeIcon: CupertinoIcons.house_fill,
+    label: 'Today',
+  ),
+  NavDestination(
+    icon: CupertinoIcons.map,
+    activeIcon: CupertinoIcons.map_fill,
+    label: 'Path',
+  ),
+  NavDestination(
+    icon: CupertinoIcons.square_grid_2x2,
+    activeIcon: CupertinoIcons.square_grid_2x2_fill,
+    label: 'Practice',
+  ),
+  NavDestination(
+    icon: CupertinoIcons.chart_bar_square,
+    activeIcon: CupertinoIcons.chart_bar_square_fill,
+    label: 'Progress',
+  ),
+];
 
 class MainTabScreen extends ConsumerStatefulWidget {
   const MainTabScreen({super.key});
@@ -36,13 +63,26 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       const LabsScreen(),
       const ProgressScreen(),
     ];
+    final body = Stack(
+      children: [
+        IndexedStack(index: _currentIndex, children: screens),
+        FloatingNotetakerOverlay(state: notetaker),
+      ],
+    );
+
+    final isDesktop =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+    if (isDesktop) {
+      return DesktopAppShell(
+        destinations: _destinations,
+        currentIndex: _currentIndex,
+        onSelect: (index) => setState(() => _currentIndex = index),
+        body: body,
+      );
+    }
+
     return Scaffold(
-      body: Stack(
-        children: [
-          IndexedStack(index: _currentIndex, children: screens),
-          FloatingNotetakerOverlay(state: notetaker),
-        ],
-      ),
+      body: body,
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
           color: Passeport.card.withValues(alpha: 0.96),
@@ -59,27 +99,13 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
           inactiveColor: Passeport.slateDim,
           iconSize: 24,
           height: 54,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.house),
-              activeIcon: Icon(CupertinoIcons.house_fill),
-              label: 'Today',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.map),
-              activeIcon: Icon(CupertinoIcons.map_fill),
-              label: 'Path',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.square_grid_2x2),
-              activeIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
-              label: 'Practice',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chart_bar_square),
-              activeIcon: Icon(CupertinoIcons.chart_bar_square_fill),
-              label: 'Progress',
-            ),
+          items: [
+            for (final d in _destinations)
+              BottomNavigationBarItem(
+                icon: Icon(d.icon),
+                activeIcon: Icon(d.activeIcon),
+                label: d.label,
+              ),
           ],
         ),
       ),

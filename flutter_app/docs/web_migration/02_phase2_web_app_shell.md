@@ -1,7 +1,17 @@
 # Phase 2: Web App Shell (Desktop Navigation & Layout)
 
-**Status**: Not started. Should land early — every other web screen gets embedded into whatever shell this
-phase builds, so get the shell right before wiring real content into it.
+**Status**: First pass implemented. `lib/widgets/desktop_app_shell.dart` (`DesktopAppShell`, `_DesktopSidebar`,
+`_DesktopTopBar`, shared `NavDestination` model) is wired into `main_tab_screen.dart`, activating at
+`DesignTokens.breakpointExpanded` (1024px) and sharing the exact same `_currentIndex` state and destination
+list the mobile bottom tab bar uses — no duplicated navigation state. `onboarding_screen.dart` now centers
+itself as a fixed 480px-wide card on wide viewports instead of stretching full-bleed, matching how
+Notion/Linear present first-run setup on desktop (a lighter fix than a full bespoke desktop onboarding
+redesign, which is still open per the decisions below). Verified via `test/desktop_app_shell_smoke_test.dart`
+(sidebar renders destinations, tapping switches body) and a real browser check at 1440px width for onboarding
+centering — could not verify the post-auth sidebar shell live in-browser since reaching it requires signing
+in, which needs real credentials this session won't enter; the widget test covers it at the component level
+instead. Search bar, richer desktop-only dashboard content, and per-item unread/notification dots are NOT
+implemented — still open per the decisions below.
 
 ## The problem this phase solves
 
