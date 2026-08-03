@@ -1,8 +1,60 @@
 # Phase 5: Voice / Live Call for Web
 
-**Status**: Not started. This is the hardest phase — budget it as its own scoped effort, not a checkbox
-alongside the others. Do not attempt this before Phases 1-3 are stable; you want a solid, tested foundation
-under this before tackling the riskiest subsystem.
+**Status**: Interface extracted and web implementation written; compiles and playback verified in a real
+browser. **Mic capture is NOT yet verified on real hardware** — see "What still needs your hands" below.
+
+Built:
+
+- `lib/services/audio_streaming_service.dart` is now an **abstract interface** with a factory constructor, so
+  all 8 existing call sites (`session_screen`, `inline_call_controller`, `lesson_speech_service`,
+  `tutor_voice_preview`, `lesson_qa_overlay`, the three `agent_led_*` screens) construct
+  `AudioStreamingService()` exactly as before and are completely unchanged. The surface is precisely the 8
+  members those callers actually use: `requestPermission`, `startStreaming`, `stopStreaming`,
+  `playAudioChunk`, `stopPlayback`, `isOutputActive`, `setSpeakerEnabled`, `dispose`.
+- `audio_streaming_service_native.dart` — the original flutter_sound/audio_session implementation, moved
+  **verbatim** (class renamed to `NativeAudioStreamingService`, `@override` annotations added, nothing else).
+  Every hard-won comment and race fix is preserved. `flutter test` still 192/193 with the same single known
+  pre-existing failure, confirming no behaviour change.
+- `audio_streaming_service_web.dart` — new Web Audio API implementation:
+  - Two `AudioContext`s constructed at 16000 and 24000 Hz so **the browser does all resampling** and there is
+    no hand-written interpolation anywhere.
+  - Capture via an **AudioWorklet** (not the deprecated `ScriptProcessorNode`), with the processor JS injected
+    from a Blob URL so there is no separate `web/*.js` asset to keep in sync. The worklet runs on the audio
+    render thread, so frames keep arriving evenly while Flutter lays out a lesson screen; a main-thread
+    ScriptProcessorNode drops frames under exactly that load, audible as clipped words.
+  - Playback uses Web Audio's **sample-accurate scheduling** (`_nextStartTime` cursor) instead of the native
+    implementation's hand-managed drain loop — gapless playback of network-bursty chunks falls out for free.
+  - Carries the same two non-obvious behaviours as native: the **odd-byte carry** across chunk boundaries (a
+    split PCM16 sample shifts every following sample: gargled audio), and the **playback tail grace** so the
+    mic does not reopen into the tutor's still-playing voice. Barge-in stays disabled for the same VAD reason.
+- `audio_streaming_service_stub.dart` — loud `UnsupportedError` fallback for a platform matching neither
+  conditional-import condition.
+- `package:web` promoted from a transitive to an explicitly declared dependency, since it is now imported
+  directly.
+- `lib/dev/web_audio_check.dart` — dev-only entrypoint to verify this by hand on real hardware.
+
+Verified so far: `flutter analyze` clean; `flutter test` 192/193 (native unchanged); `flutter build web
+--release` compiles the whole app including the web audio implementation; and in a real browser the **playback
+path runs end to end** — a synthesised 1.5s 440Hz tone pushed through `playAudioChunk` in 38 network-sized
+slices queued all 72000 bytes with zero errors or exceptions.
+
+### What still needs your hands
+
+The sandboxed browser used for verification has **no microphone and no WebGL**, so two things are unproven and
+must be checked on a real machine before Phase 5 can be called done:
+
+```
+flutter run -d chrome -t lib/dev/web_audio_check.dart
+```
+
+1. **Playback quality** — press "Play test tone". It should be ONE clean continuous 440Hz tone. Gaps, clicks,
+   or overlapping tones mean the scheduling cursor is wrong.
+2. **Mic capture** — press "Start mic capture", grant permission, speak. Chunk count and the level meter should
+   both move, and on stop the byte total should be roughly `16000 * 2 * seconds`. A byte count far below that
+   means frames are being dropped or the output-gate is closing the mic when it should not.
+3. **Then the real thing**: a full live call on web, end to end, and an honest judgement on whether browser
+   latency is acceptable versus native. That judgement is the actual remaining decision here and it needs
+   ears, not tests.
 
 ## Why this one is different from every other phase
 

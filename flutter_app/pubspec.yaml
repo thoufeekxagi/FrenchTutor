@@ -48,6 +48,10 @@ dependencies:
   # behavior on iOS, Android, and web.
   tutorial_coach_mark: ^1.2.13
   package_info_plus: ^8.1.2
+  # Web Audio API bindings for the web-only live-call audio implementation
+  # (lib/services/audio_streaming_service_web.dart). Was already present
+  # transitively; declared explicitly because we now import it directly.
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
