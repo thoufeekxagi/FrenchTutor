@@ -1,7 +1,21 @@
 # Phase 3: Auth & Payments for Web
 
-**Status**: Not started. Depends on Phase 1 audit confirming exact touch points in `ai_session_gate.dart`,
-`subscription_gate_service.dart`, and wherever `google_sign_in`/`sign_in_with_apple` are invoked.
+**Status**: **Auth done for web. Payments NOT started.**
+
+Auth, done:
+- Email/password sign-up, sign-in, and password reset already worked on web with zero changes — they are pure
+  Supabase calls. This is what makes the web app deployable today.
+- Google sign-in now works on web via Supabase's OAuth redirect (`signInWithOAuth`, `redirectTo:
+  Uri.base.origin`). Native keeps its existing no-browser `signInWithIdToken` account-picker flow, untouched.
+  The branch lives inside `AuthService` itself, which IS the leaf seam for "trigger a sign-in", rather than
+  being pushed up into any screen. Needs the console config in `DEPLOY_WEB.md` sections 3-4.
+- `isGoogleConfigured` no longer requires the iOS client ID on web, where it is irrelevant.
+- Apple sign-in is **hidden on web** (`AuthService.isAppleAvailable`) because it needs an Apple Developer
+  Service ID and registered return URL we have not set up. Showing a button that always fails is worse than
+  not showing it. Native is unaffected. Decision still open on whether web ever gets Apple sign-in.
+
+Payments, not started: RevenueCat is iOS/Android only, so **no entitlement path exists on web at all**. Nobody
+can subscribe from the web app. The Stripe vs RevenueCat Web Billing decision below is still unmade.
 
 ## Auth
 

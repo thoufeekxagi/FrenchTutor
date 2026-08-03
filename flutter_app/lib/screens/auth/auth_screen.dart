@@ -134,8 +134,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   _header(),
                   const SizedBox(height: 40),
-                  _appleButton(),
-                  const SizedBox(height: 12),
+                  // Hidden on web until an Apple Service ID is registered —
+                  // see AuthService.isAppleAvailable.
+                  if (AuthService.shared.isAppleAvailable) ...[
+                    _appleButton(),
+                    const SizedBox(height: 12),
+                  ],
                   _googleButton(),
                   const SizedBox(height: 24),
                   _divider(),

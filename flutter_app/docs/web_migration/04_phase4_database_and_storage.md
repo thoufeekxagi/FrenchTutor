@@ -1,6 +1,15 @@
 # Phase 4: Database & Storage for Web
 
-**Status**: Smaller than originally scoped — see Phase 1 audit finding below. Can run in parallel with Phase 3.
+**Status**: **Complete and verified in a real browser.**
+
+The conditional-import opener already existed (`database_opener.dart` → `database_opener_web.dart`), and this
+session confirmed it actually works end to end rather than just reading correctly: a `--release` web build was
+loaded in a browser and IndexedDB afterwards contained the `parlesprint` database with **200 blocks / 819,200
+bytes across the `blocks` and `files` object stores**. That is a real SQLite file with the full migration chain
+applied and content seeded, persisted through `IndexedDbFileSystem`.
+
+No code changes were needed. The decision below about possibly skipping local storage on web is therefore moot
+for now: offline-first works on web as-is, with the same schema, queries, and migrations as native.
 
 ## Current state (updated after Phase 1 audit)
 

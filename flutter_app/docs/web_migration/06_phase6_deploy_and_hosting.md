@@ -1,8 +1,24 @@
 # Phase 6: Deploy & Hosting
 
-**Status**: Not started. Only start this once Phase 5 (voice) is functionally complete — there is no value in
-deploying a "high-end web app" whose flagship feature doesn't work; that undermines the whole pitch to users
-landing on it from the marketing site.
+**Status**: **Config written and committed; the deploy itself needs your Vercel/Supabase/Google consoles.**
+
+See **[`DEPLOY_WEB.md`](DEPLOY_WEB.md)** for the actual step-by-step. Committed in `flutter_app/`:
+
+- `vercel.json` — build/output config, SPA rewrites, cache headers, and security headers (including
+  `Permissions-Policy: microphone=(self)` so live calls are allowed and camera/geolocation are not).
+- `install_flutter_vercel.sh` — installs a **pinned** Flutter SDK (3.44.4), since Vercel's build image has
+  none. Pinned on purpose: an unpinned SDK lets a Flutter release break production with no change on our side.
+- `build_web_vercel.sh` — `flutter build web --release` with every `--dart-define` sourced from Vercel env
+  vars, failing fast with a clear message if `SUPABASE_URL`/`SUPABASE_ANON_KEY` are missing.
+
+Set **Root Directory = `flutter_app`** in Vercel; the config is not at the repo root.
+
+**Blocking issue for public launch**, documented at the bottom of `DEPLOY_WEB.md`: `--dart-define` values are
+compiled into the JS bundle and publicly readable. `SUPABASE_ANON_KEY` is fine by design; `GEMINI_API_KEY` and
+`OPENROUTER_API_KEY` are not, and would be extractable and billable by anyone. Fine for a private/invite-only
+deploy, not for open signup. Fix is to move those calls behind a Supabase edge function.
+
+CI is still not set up — a web-breaking change can currently reach production unnoticed.
 
 ## Domain / site structure
 

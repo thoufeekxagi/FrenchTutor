@@ -14,11 +14,11 @@ for the abstraction rule this plan follows.
 | Phase | File | What it covers | Status |
 |---|---|---|---|
 | 1 | [01_phase1_compatibility_audit.md](01_phase1_compatibility_audit.md) | File-by-file audit: what's shared as-is, what needs a thin platform shim, what needs real new code | **Complete** — key finding: a Drift web (wasm/IndexedDB) database opener already exists in the codebase, unwired-but-ready; the real remaining gap is voice/audio (Phase 5) and web payments (Phase 3) |
-| 2 | [02_phase2_web_app_shell.md](02_phase2_web_app_shell.md) | Desktop navigation shell (sidebar + top bar, ElevenLabs-style) replacing a stretched mobile layout | Not started |
-| 3 | [03_phase3_auth_and_payments.md](03_phase3_auth_and_payments.md) | Web sign-in (Supabase OAuth) and web payments (Stripe vs RevenueCat Web Billing) | Not started |
-| 4 | [04_phase4_database_and_storage.md](04_phase4_database_and_storage.md) | Drift web backend (IndexedDB via `drift/wasm`), sync-vs-local-cache tradeoff | Not started |
-| 5 | [05_phase5_voice_and_realtime.md](05_phase5_voice_and_realtime.md) | The live voice call (Gemini Live) on web — the one subsystem that's a real rewrite, not a port | Not started |
-| 6 | [06_phase6_deploy_and_hosting.md](06_phase6_deploy_and_hosting.md) | Vercel deploy pipeline, domain structure, dart-define/secrets handling | Not started |
+| 2 | [02_phase2_web_app_shell.md](02_phase2_web_app_shell.md) | Desktop navigation shell (sidebar + top bar, ElevenLabs-style) replacing a stretched mobile layout | **Done** (shell + layout primitives; individual screen bodies not yet migrated) |
+| 3 | [03_phase3_auth_and_payments.md](03_phase3_auth_and_payments.md) | Web sign-in (Supabase OAuth) and web payments (Stripe vs RevenueCat Web Billing) | **Auth done**; payments not started |
+| 4 | [04_phase4_database_and_storage.md](04_phase4_database_and_storage.md) | Drift web backend (IndexedDB via `drift/wasm`), sync-vs-local-cache tradeoff | **Done, verified in-browser** (800KB/200 blocks persisted) |
+| 5 | [05_phase5_voice_and_realtime.md](05_phase5_voice_and_realtime.md) | The live voice call (Gemini Live) on web — the one subsystem that's a real rewrite, not a port | Interface + Web Audio impl written, playback verified; **mic needs your hardware** |
+| 6 | [06_phase6_deploy_and_hosting.md](06_phase6_deploy_and_hosting.md) | Vercel deploy pipeline, domain structure, dart-define/secrets handling | **Config committed** — see [DEPLOY_WEB.md](DEPLOY_WEB.md); needs your consoles |
 
 Work through phases roughly in order. Phase 2 (the app shell) should land early since every other web screen
 gets embedded into it. Phases 3 and 4 can then run in parallel with each other, but both should land before
