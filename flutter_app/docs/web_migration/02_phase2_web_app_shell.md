@@ -1,17 +1,41 @@
 # Phase 2: Web App Shell (Desktop Navigation & Layout)
 
-**Status**: First pass implemented. `lib/widgets/desktop_app_shell.dart` (`DesktopAppShell`, `_DesktopSidebar`,
-`_DesktopTopBar`, shared `NavDestination` model) is wired into `main_tab_screen.dart`, activating at
-`DesignTokens.breakpointExpanded` (1024px) and sharing the exact same `_currentIndex` state and destination
-list the mobile bottom tab bar uses — no duplicated navigation state. `onboarding_screen.dart` now centers
-itself as a fixed 480px-wide card on wide viewports instead of stretching full-bleed, matching how
-Notion/Linear present first-run setup on desktop (a lighter fix than a full bespoke desktop onboarding
-redesign, which is still open per the decisions below). Verified via `test/desktop_app_shell_smoke_test.dart`
-(sidebar renders destinations, tapping switches body) and a real browser check at 1440px width for onboarding
-centering — could not verify the post-auth sidebar shell live in-browser since reaching it requires signing
-in, which needs real credentials this session won't enter; the widget test covers it at the component level
-instead. Search bar, richer desktop-only dashboard content, and per-item unread/notification dots are NOT
-implemented — still open per the decisions below.
+**Status**: Implemented and visually verified.
+
+**Decision recorded (important)**: ElevenLabs UI / shadcn are **React-only** and cannot run in Flutter — there
+is no Flutter port and no way to embed React components in a widget tree. The founder chose to keep the single
+Flutter codebase and *imitate* the reference's design language in hand-written Flutter instead of splitting
+into a second React codebase. So: borrow the reference's **structure and density**, never its palette; every
+colour and type value still comes from `DesignTokens`.
+
+Built:
+
+- `lib/widgets/web/web_app_shell.dart` — `WebAppShell` (sidebar + top bar), `NavDestination` (shared
+  destination model), `WebIconButton`. Activates at `DesignTokens.breakpointExpanded` (1024px). Sidebar has a
+  gradient brand mark, a quiet spaced-caps group label, and nav rows with hover + active states; the top bar
+  carries the current section title plus an actions slot (currently a real Settings button).
+- `lib/widgets/web/web_layout.dart` — the reusable web layout vocabulary: `WebPage` (scrollable, max-width
+  1120, centred), `WebPageHeader`, `WebSectionHeader` (+ optional "View all" action), `WebTextAction`,
+  `WebCard` (hairline border, hover tint/shadow), `WebCardGrid` (responsive columns, **equal tile heights per
+  row** — a `Wrap` leaves card bottoms ragged, which is the most obvious "not designed" tell in a card grid),
+  `WebChip`.
+- `main_tab_screen.dart` now holds one `_destinations` list and one `_currentIndex` shared by both the mobile
+  bottom tab bar and the desktop sidebar. Nothing is duplicated per platform.
+- `onboarding_screen.dart` centres as a fixed 480px card on wide viewports instead of stretching full-bleed.
+- `lib/dev/web_preview.dart` — **dev-only separate entrypoint** (`flutter run -d chrome -t
+  lib/dev/web_preview.dart`) that renders the shell and every primitive against representative content. It
+  exists because the real shell only appears after sign-in, which makes design iteration slow and impossible
+  to verify without credentials. Doubles as the living style reference for `widgets/web/`.
+
+Verified: `flutter analyze` clean; `flutter test` 192/193 (the one failure is the known pre-existing
+`widget_test.dart` funnel test, unrelated); `test/web_app_shell_smoke_test.dart` covers render + tab switching;
+and a real browser pass at 1440×900 confirmed layout, uniform card rows, working sidebar navigation (active
+pill + top bar title update) and hover affordances.
+
+Still NOT built, deliberately — see open decisions below: the top-bar global search (would be dead UI until
+search exists), a richer desktop-only dashboard distinct from mobile's, a tablet-width intermediate layout,
+and migrating the individual screens' internals to use `WebPage`/`WebCard` (the shell wraps them today, but
+each screen's own body is still its mobile layout).
 
 ## The problem this phase solves
 

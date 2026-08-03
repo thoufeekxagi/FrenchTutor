@@ -3,17 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../design/app_router.dart';
 import '../providers/database_provider.dart';
 import '../widgets/adaptive/adaptive.dart';
-import '../widgets/desktop_app_shell.dart';
 import '../widgets/floating_notetaker.dart';
+import '../widgets/web/web_app_shell.dart';
 import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
 import 'path/path_screen.dart';
 import 'progress/progress_screen.dart';
+import 'settings/settings_screen.dart';
 
 /// Primary navigation destinations, defined once and shared between the
-/// mobile bottom tab bar and the desktop sidebar (`DesktopAppShell`) so
+/// mobile bottom tab bar and the desktop sidebar (`WebAppShell`) so
 /// neither shell can drift out of sync with the other.
 const _destinations = [
   NavDestination(
@@ -73,10 +75,17 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
     final isDesktop =
         MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
     if (isDesktop) {
-      return DesktopAppShell(
+      return WebAppShell(
         destinations: _destinations,
         currentIndex: _currentIndex,
         onSelect: (index) => setState(() => _currentIndex = index),
+        topBarActions: [
+          WebIconButton(
+            icon: CupertinoIcons.gear,
+            tooltip: 'Settings',
+            onTap: () => AppRouter.push(context, (_) => const SettingsScreen()),
+          ),
+        ],
         body: body,
       );
     }
