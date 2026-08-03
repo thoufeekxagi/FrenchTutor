@@ -125,6 +125,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   TutorPersona get _tutor => _tutorChoice ?? TutorPersona.marie;
 
+  /// THE web-styling switch for this screen.
+  ///
+  /// Mobile onboarding is a full-bleed brand gradient with white text and
+  /// translucent tiles: correct for a phone, wrong for a browser. The reference
+  /// design we match on web (ElevenLabs / shadcn) is a light neutral canvas with
+  /// contained white cards, hairline borders and dark text. That is a styling
+  /// difference, not a layout one, which is why rearranging gradient-styled
+  /// widgets never got there.
+  ///
+  /// Every web-only visual choice in this file is gated on this one getter, so
+  /// the mobile appearance is provably untouched and the web variants are easy
+  /// to find. See docs/web_migration/07_web_ui_redesign.md.
+  bool get _web =>
+      MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+
   /// The gradient identity — shared with the sign-in and restoring-progress
   /// screens via [DesignTokens.heroGradient] so they never drift apart.
   static const _heroGradient = DesignTokens.heroGradient;
@@ -137,7 +152,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           ? DesignTokens.primaryDeep
           : DesignTokens.primary,
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: _heroGradient),
+        decoration: BoxDecoration(
+          gradient: _web ? null : _heroGradient,
+          color: _web ? DesignTokens.canvas : null,
+        ),
         child: SafeArea(
           child: Column(
             children: [
@@ -151,13 +169,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
                         child: Row(
                           children: [
-                            const _BrandWordmark(),
+                            _BrandWordmark(onLightBackground: _web),
                             const Spacer(),
                             Text(
                               'Step $_page of 4',
                               style: Passeport.body(12, weight: FontWeight.w600)
                                   .copyWith(
-                                    color: Colors.white.withValues(alpha: 0.78),
+                                    color: _web
+                                        ? DesignTokens.mutedDim
+                                        : Colors.white.withValues(alpha: 0.78),
                                   ),
                             ),
                           ],
@@ -169,7 +189,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           borderRadius: BorderRadius.circular(100),
                           child: Container(
                             height: 4,
-                            color: Colors.white.withValues(alpha: 0.28),
+                            color: _web
+                                ? DesignTokens.canvasDim
+                                : Colors.white.withValues(alpha: 0.28),
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 return Align(
@@ -181,7 +203,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                         constraints.maxWidth *
                                         (_page / 4).clamp(0.0, 1.0),
                                     height: 4,
-                                    color: Colors.white,
+                                    color: _web
+                                        ? DesignTokens.primary
+                                        : Colors.white,
                                   ),
                                 );
                               },
@@ -243,6 +267,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   /// Gradient social-proof opener: wordmark, one strong promise inside a
   /// frosted quote card, a laurel trust line, one button. No decisions.
   Widget _welcomeStep() {
+    if (_web) return _webWelcomeStep();
     return Container(
       decoration: const BoxDecoration(gradient: _heroGradient),
       padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
@@ -347,6 +372,177 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     );
   }
 
+  /// Web welcome pane: a split hero. Left is the promise, right is a contained
+  /// card with the social proof. Neutral canvas, dark text, one azure action —
+  /// the mobile version's full-bleed gradient with white text is kept for
+  /// phones only.
+  Widget _webWelcomeStep() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 980),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 56),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _BrandWordmark(onLightBackground: true),
+                      const SizedBox(height: DesignTokens.space6),
+                      Text(
+                        'The fastest way to speak French is to speak French.',
+                        style: Passeport.display(40).copyWith(height: 1.12),
+                      ),
+                      const SizedBox(height: DesignTokens.space4),
+                      Text(
+                        'A live tutor who talks with you every day, not '
+                        'flashcards about someday.',
+                        style: Passeport.body(
+                          16,
+                        ).copyWith(color: DesignTokens.mutedDim, height: 1.55),
+                      ),
+                      const SizedBox(height: DesignTokens.space6),
+                      SizedBox(
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          onPressed: _next,
+                          icon: const Icon(
+                            CupertinoIcons.arrow_right,
+                            size: 17,
+                          ),
+                          label: const Text('Get started'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: DesignTokens.primary,
+                            foregroundColor: DesignTokens.surface,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 28),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                DesignTokens.radiusMedium,
+                              ),
+                            ),
+                            textStyle: Passeport.body(
+                              15,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
+                      Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.checkmark_seal_fill,
+                            size: 15,
+                            color: DesignTokens.success,
+                          ),
+                          const SizedBox(width: DesignTokens.space2),
+                          Text(
+                            'Built for TEF / TCF Canada learners',
+                            style: Passeport.body(
+                              13,
+                              weight: FontWeight.w600,
+                            ).copyWith(color: DesignTokens.mutedDim),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: DesignTokens.surface,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusCard,
+                    ),
+                    border: Border.all(color: DesignTokens.hairline),
+                    boxShadow: DesignTokens.cardShadow,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: DesignTokens.heroGradient,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusMedium,
+                          ),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.mic_fill,
+                          size: 20,
+                          color: DesignTokens.surface,
+                        ),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
+                      Text(
+                        'Three minutes, out loud, every day.',
+                        style: Passeport.display(19).copyWith(height: 1.3),
+                      ),
+                      const SizedBox(height: DesignTokens.space3),
+                      Text(
+                        'Answer four quick questions and your tutor is ready. '
+                        'No account needed to try it.',
+                        style: Passeport.body(
+                          14,
+                        ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
+                      Divider(height: 1, color: DesignTokens.hairline),
+                      const SizedBox(height: DesignTokens.space4),
+                      for (final line in const [
+                        'A real conversation, not multiple choice',
+                        'Corrections as you speak',
+                        'Your own plan, rebuilt daily',
+                      ]) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: DesignTokens.space3,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                CupertinoIcons.checkmark_alt,
+                                size: 15,
+                                color: DesignTokens.primary,
+                              ),
+                              const SizedBox(width: DesignTokens.space3),
+                              Expanded(
+                                child: Text(
+                                  line,
+                                  style: Passeport.body(13.5).copyWith(
+                                    color: DesignTokens.inkSoft,
+                                    height: 1.45,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // ------------------------------------------------------------- pages 1-3
   Widget _step({
     required String eyebrow,
@@ -436,9 +632,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     );
   }
 
-  /// Desktop arrangement of [_step]: question on the left, answers on the
-  /// right, the whole pair centred and capped so it never sprawls on an
-  /// ultrawide monitor.
+  /// Desktop arrangement of [_step], styled to the web reference rather than
+  /// the mobile gradient: a neutral page with one contained white card, hairline
+  /// border, dark text, and a single azure action. Question on the left, answers
+  /// on the right.
   Widget _wideStep(
     String eyebrow,
     String title,
@@ -447,81 +644,82 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     Widget footer,
   ) {
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1000),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(48, 24, 48, 40),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left: the question. Sticky, not scrolling — on desktop there is
-              // room to keep it visible while the eye works down the choices.
-              Expanded(
-                flex: 5,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8, right: 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Passeport.infoSoft,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(_stepIcon, color: Passeport.sky, size: 22),
-                      ),
-                      const SizedBox(height: 22),
-                      Text(
-                        eyebrow.toUpperCase(),
-                        style: Passeport.body(10.5, weight: FontWeight.w800)
-                            .copyWith(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              letterSpacing: 1,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(32, 8, 32, 40),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: Container(
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+              border: Border.all(color: DesignTokens.hairline),
+              boxShadow: DesignTokens.cardShadow,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left: the question. Dark ink on white, not white on gradient.
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: DesignTokens.primarySoft,
+                            borderRadius: BorderRadius.circular(
+                              DesignTokens.radiusMedium,
                             ),
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        title,
-                        style: Passeport.display(
-                          34,
-                        ).copyWith(color: Colors.white),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          subtitle,
-                          style: Passeport.body(15).copyWith(
-                            color: Colors.white.withValues(alpha: 0.86),
-                            height: 1.5,
+                          ),
+                          child: Icon(
+                            _stepIcon,
+                            color: DesignTokens.primary,
+                            size: 21,
                           ),
                         ),
+                        const SizedBox(height: DesignTokens.space5),
+                        Text(
+                          eyebrow.toUpperCase(),
+                          style: Passeport.mono(
+                            11,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: DesignTokens.muted),
+                        ),
+                        const SizedBox(height: DesignTokens.space2),
+                        Text(title, style: Passeport.display(30)),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: DesignTokens.space3),
+                          Text(
+                            subtitle,
+                            style: Passeport.body(15).copyWith(
+                              color: DesignTokens.mutedDim,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
                       ],
+                    ),
+                  ),
+                ),
+                // Right: the answers, with this step's action beneath them.
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ...children,
+                      const SizedBox(height: DesignTokens.space4),
+                      footer,
                     ],
                   ),
                 ),
-              ),
-              // Right: the answers, plus this step's action pinned beneath them.
-              Expanded(
-                flex: 6,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.only(top: 8, bottom: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: children,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    footer,
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -550,14 +748,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         icon: Icon(icon, size: 18),
         label: Text(label),
         style: ElevatedButton.styleFrom(
-          backgroundColor: enabled
-              ? Colors.white
+          backgroundColor: _web
+              ? (enabled ? DesignTokens.primary : DesignTokens.canvasDim)
+              : (enabled ? Colors.white : Colors.white.withValues(alpha: 0.28)),
+          foregroundColor: _web
+              ? (enabled ? DesignTokens.surface : DesignTokens.muted)
+              : (enabled
+                    ? DesignTokens.primaryDeep
+                    : Colors.white.withValues(alpha: 0.52)),
+          disabledBackgroundColor: _web
+              ? DesignTokens.canvasDim
               : Colors.white.withValues(alpha: 0.28),
-          foregroundColor: enabled
-              ? DesignTokens.primaryDeep
+          disabledForegroundColor: _web
+              ? DesignTokens.muted
               : Colors.white.withValues(alpha: 0.52),
-          disabledBackgroundColor: Colors.white.withValues(alpha: 0.28),
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
@@ -592,8 +796,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: selected
-                  ? DesignTokens.primaryDeep
-                  : Colors.white.withValues(alpha: 0.72),
+                  ? DesignTokens.primary
+                  : (_web
+                        ? DesignTokens.hairline
+                        : Colors.white.withValues(alpha: 0.72)),
               width: selected ? 2 : 1,
             ),
           ),
@@ -1100,21 +1306,32 @@ class _QuoteGlyph extends StatelessWidget {
 /// Small header wordmark: the logo glyph + "ParleSprint" in small letters —
 /// replaces the all-caps text-only brand treatment.
 class _BrandWordmark extends StatelessWidget {
-  const _BrandWordmark();
+  const _BrandWordmark({this.onLightBackground = false});
+
+  /// The onboarding header sits on the brand gradient on phones and on a
+  /// neutral canvas on web, so the wordmark needs both an inverted and a
+  /// standard treatment. The logo mark itself is a white-on-transparent PNG,
+  /// hence the tint rather than a second asset.
+  final bool onLightBackground;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset('assets/images/logo_mark.png', width: 18, height: 22),
+        Image.asset(
+          'assets/images/logo_mark.png',
+          width: 18,
+          height: 22,
+          color: onLightBackground ? DesignTokens.ink : null,
+        ),
         const SizedBox(width: 6),
         Text(
           'ParleSprint',
-          style: Passeport.body(
-            12.5,
-            weight: FontWeight.w700,
-          ).copyWith(color: Colors.white, letterSpacing: 0.1),
+          style: Passeport.body(12.5, weight: FontWeight.w700).copyWith(
+            color: onLightBackground ? DesignTokens.ink : Colors.white,
+            letterSpacing: 0.1,
+          ),
         ),
       ],
     );
