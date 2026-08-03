@@ -20,20 +20,19 @@ class InlineCallActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (controller.active) ...[
-          IconButton(
-            tooltip: controller.muted ? 'Unmute' : 'Mute',
+        if (controller.active)
+          _CallActionButton(
+            label: controller.muted ? 'Unmute' : 'Mute',
             onPressed: controller.toggleMute,
-            icon: Icon(
+            child: Icon(
               controller.muted
                   ? CupertinoIcons.mic_slash_fill
                   : CupertinoIcons.mic_fill,
               color: DesignTokens.slateDim,
             ),
           ),
-        ],
-        IconButton(
-          tooltip: controller.active
+        _CallActionButton(
+          label: controller.active
               ? 'End call'
               : controller.connecting
               ? 'Connecting…'
@@ -41,7 +40,7 @@ class InlineCallActions extends StatelessWidget {
           onPressed: controller.connecting
               ? null
               : () => controller.toggle(context),
-          icon: controller.connecting
+          child: controller.connecting
               ? const SizedBox.square(
                   dimension: 20,
                   child: PSProgressIndicator(),
@@ -58,6 +57,32 @@ class InlineCallActions extends StatelessWidget {
   }
 }
 
+class _CallActionButton extends StatelessWidget {
+  const _CallActionButton({
+    required this.label,
+    required this.onPressed,
+    required this.child,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox(width: 44, height: 44, child: Center(child: child)),
+      ),
+    );
+  }
+}
+
 /// The inline call's status card — "Connecting…", "Marie is speaking…",
 /// "Reconnecting…", or her last transcript line. Only meaningful to show
 /// while the call is active/connecting/erroring; callers gate visibility
@@ -67,10 +92,12 @@ class InlineCallStatusCard extends StatelessWidget {
     super.key,
     required this.controller,
     this.listeningLabel = 'Listening.',
+    this.showLastTutorLine = true,
   });
 
   final InlineCallController controller;
   final String listeningLabel;
+  final bool showLastTutorLine;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +124,8 @@ class InlineCallStatusCard extends StatelessWidget {
                     weight: FontWeight.w500,
                   ).copyWith(color: DesignTokens.inkSoft),
                 ),
-                if (controller.lastTutorLine != null &&
+                if (showLastTutorLine &&
+                    controller.lastTutorLine != null &&
                     controller.error == null) ...[
                   const SizedBox(height: 4),
                   Text(

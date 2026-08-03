@@ -1386,6 +1386,107 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     }
   }
 
+  /// One-shot image understanding for Live Vision Scan: a photo, gallery
+  /// image, or rasterized PDF page, optionally paired with an on-device OCR
+  /// hint the model can correct against. Deliberately terse and reactive —
+  /// this powers a "point the camera at a sign and get one quiet answer"
+  /// flow, not an open-ended conversation, so the system prompt forbids
+  /// follow-up questions and small talk.
+  Future<String> describeImage({
+    required List<int> imageBytes,
+    String mimeType = 'image/jpeg',
+    String? ocrHint,
+    String? conversationContext,
+  }) async {
+    final key = await _geminiApiKey;
+    if (key.isEmpty) throw AgentError.missingKey;
+    if (imageBytes.isEmpty) return '';
+    const system =
+        '''You are a bilingual (English/French) travel companion helping a French learner understand something they just photographed while out and about (a sign, menu, notice, or document). Look at the image directly.
+
+Reply with ONE short, direct answer: what it says and/or means, translated/explained briefly. Under 60 words. No markdown, no bullet lists, no asterisks. Do not ask follow-up questions, do not offer to keep chatting, do not greet the student. Just answer what's shown.''';
+    final promptParts = <String>[system];
+    if (ocrHint != null && ocrHint.trim().isNotEmpty) {
+      promptParts.add(
+        'ON-DEVICE OCR EXTRACTED THIS TEXT FROM THE IMAGE (may contain errors, use the image itself as ground truth): ${ocrHint.trim()}',
+      );
+    }
+    if (conversationContext != null && conversationContext.trim().isNotEmpty) {
+      promptParts.add(
+        'EARLIER IN THIS SCAN SESSION: ${conversationContext.trim()}',
+      );
+    }
+    final uri = Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$key',
+    );
+    http.Response response;
+    try {
+      response = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'contents': [
+                {
+                  'parts': [
+                    {'text': promptParts.join('\n\n')},
+                    {
+                      'inlineData': {
+                        'mimeType': mimeType,
+                        'data': base64Encode(imageBytes),
+                      },
+                    },
+                  ],
+                },
+              ],
+            }),
+          )
+          .timeout(const Duration(seconds: 20));
+    } catch (_) {
+      throw AgentError.requestFailed;
+    }
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw AgentError.requestFailed;
+    }
+    try {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final candidates = json['candidates'] as List?;
+      if (candidates == null || candidates.isEmpty) return '';
+      final content = (candidates.first as Map<String, dynamic>)['content'];
+      final parts = (content as Map<String, dynamic>?)?['parts'] as List?;
+      final text = parts
+          ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
+          .join();
+      return text?.trim() ?? '';
+    } catch (_) {
+      throw AgentError.badResponse;
+    }
+  }
+
+  Future<String> answerVisionScanChat({
+    required String question,
+    List<Map<String, String>> conversation = const [],
+  }) async {
+    const system =
+        '''You are the text-chat companion inside a French learner's photo scan session. Answer questions about the signs, menus, notices, or documents the student has uploaded and the summaries in the conversation. Be direct and practical. You may answer in English or French, and include a French phrase when it helps the learner. Keep the answer under 120 words. Do not use markdown headings, bullet lists, emojis, or em dashes.''';
+    final messages = <Map<String, String>>[
+      {'role': 'system', 'content': '$system$languageGuardrail'},
+      ...conversation.where(
+        (message) =>
+            (message['content'] ?? '').trim().isNotEmpty &&
+            (message['role'] == 'user' || message['role'] == 'assistant'),
+      ),
+      {'role': 'user', 'content': question.trim()},
+    ];
+    final reply = await _complete(
+      messages: messages,
+      maxTokens: 320,
+      timeout: const Duration(seconds: 25),
+      temperature: 0.35,
+    );
+    return reply.trim();
+  }
+
   // MARK: - Networking
 
   Future<String> _complete({

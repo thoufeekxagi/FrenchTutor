@@ -6,41 +6,43 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/alphabet_data.dart';
 import 'lesson_speech_service.dart';
 
-/// Fires once, right when onboarding finishes and both the learner's level
-/// and their chosen tutor voice are known, so every alphabet/accent sound
-/// is already synthesized and cached by the time a brand-new beginner
-/// actually opens "Learn the Alphabet" — instead of only starting the
-/// prewarm once they're already sitting on that screen waiting on it.
+/// Seeds the complete bundled alphabet catalog right when onboarding finishes
+/// and both the learner's level and chosen tutor voice are known. The catalog
+/// contains all 26 letters, five accents, and all four tutor voices, so a
+/// voice change never needs a Gemini request.
 ///
-/// Only worth doing for a true beginner (A1): nobody past that level is
-/// likely to ever open this lesson, so there's no reason to spend Gemini
-/// calls warming it for them. Guarded so it only ever runs once per
-/// install — a rerun would just be a wasted synchronous cache-hit sweep
-/// (harmless), not a correctness bug, but there's no reason to repeat it.
+/// Only worth doing for a true beginner (A1): nobody past that level is likely
+/// to open this lesson, and the assets remain available as a deterministic
+/// fallback if the background copy is interrupted.
 class AlphabetPrewarm {
   AlphabetPrewarm._();
 
-  static const _prefsKey = 'alphabet_prewarm_started_v1';
+  static const _prefsKey = 'alphabet_prewarm_bundled_v1';
 
   static Future<void> maybeStart({required bool isBeginner}) async {
     if (!isBeginner) return;
+    final prefs = await _prefs();
+    if (prefs == null || (prefs.getBool(_prefsKey) ?? false)) return;
+
+    unawaited(() async {
+      try {
+        final items = alphabetPrewarmItems();
+        final seeded = await LessonSpeechService.shared.prewarmBundled(items);
+        if (seeded == items.length) await prefs.setBool(_prefsKey, true);
+      } catch (e) {
+        // The bundled assets remain available for direct loading on the
+        // alphabet screen, so a background seed failure is not fatal.
+        debugPrint('AlphabetPrewarm: bundled seed failed: $e');
+      }
+    }());
+  }
+
+  static Future<SharedPreferences?> _prefs() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(_prefsKey) ?? false) return;
-      // Marked before the work even starts, not after it completes — this
-      // is a "run once ever" gate, not a completion flag. If the app is
-      // killed mid-prewarm, whatever didn't finish just falls back to the
-      // same on-demand generate-on-tap path every other screen already
-      // has; it's a lost head start, not a broken feature.
-      await prefs.setBool(_prefsKey, true);
+      return await SharedPreferences.getInstance();
     } catch (e) {
       debugPrint('AlphabetPrewarm: prefs unavailable, skipping: $e');
-      return;
+      return null;
     }
-    unawaited(
-      LessonSpeechService.shared.prewarmNarrationBounded(
-        alphabetPrewarmItems(),
-      ),
-    );
   }
 }

@@ -10,6 +10,7 @@ import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
 import 'path/path_screen.dart';
 import 'progress/progress_screen.dart';
+import 'scan/scan_screen.dart';
 
 class MainTabScreen extends ConsumerStatefulWidget {
   const MainTabScreen({super.key});
@@ -34,6 +35,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       DashboardScreen(isActive: _currentIndex == 0),
       const PathScreen(),
       const LabsScreen(),
+      const ScanScreen(),
       const ProgressScreen(),
     ];
     return Scaffold(
@@ -74,6 +76,11 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
               icon: Icon(CupertinoIcons.square_grid_2x2),
               activeIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
               label: 'Practice',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.camera_on_rectangle),
+              activeIcon: Icon(CupertinoIcons.camera_on_rectangle_fill),
+              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chart_bar_square),

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/common.dart';
@@ -14,13 +15,25 @@ import 'audio_streaming_service.dart';
 import 'lesson_agent_service.dart';
 
 class SpeechItem {
-  SpeechItem({required this.text, required this.language, this.contentItemId});
+  SpeechItem({
+    required this.text,
+    required this.language,
+    this.contentItemId,
+    this.voiceName,
+    this.assetPath,
+  });
   final String text;
   final String language; // "fr-FR" or "en-US"
 
   /// Optional vocab/grammar/listening/writing item this line belongs to —
   /// purely metadata for the cache index, never required for a cache hit.
   final String? contentItemId;
+
+  /// Optional voice override used by offline pre-generated catalogs.
+  final String? voiceName;
+
+  /// Optional bundled PCM asset used by offline pre-generated catalogs.
+  final String? assetPath;
 }
 
 /// TTS + STT for in-lesson narration and voice Q&A — Gemini only, by design.
@@ -53,6 +66,7 @@ class LessonSpeechService {
   AudioStreamingService get _geminiAudio =>
       _geminiAudioLazy ??= AudioStreamingService();
   final Map<String, List<int>> _synthCache = {};
+  final Map<String, Future<List<int>?>> _bundledInFlight = {};
   // Guards concurrent synthesize() calls for the same cache key from racing
   // each other's disk-cache write — without this, two overlapping calls
   // (e.g. auto-narration racing a manual replay tap) both miss the cache,
@@ -345,6 +359,43 @@ class LessonSpeechService {
     await Future.wait(List.generate(concurrency, (_) => worker()));
   }
 
+  /// Copies pre-generated PCM assets into the same persistent cache used by
+  /// ordinary Gemini narration. This seeds every requested voice variant while
+  /// keeping the runtime playback path identical and making the local SQLite
+  /// cache index authoritative after the first preload.
+  Future<int> prewarmBundled(
+    List<SpeechItem> items, {
+    int concurrency = 4,
+  }) async {
+    var next = 0;
+    Future<int> worker() async {
+      var seeded = 0;
+      while (true) {
+        if (next >= items.length) return seeded;
+        final item = items[next++];
+        final assetPath = item.assetPath;
+        final voiceName = item.voiceName;
+        if (assetPath == null || voiceName == null) continue;
+        final bytes = await loadBundledAudio(
+          assetPath,
+          text: item.text,
+          voiceName: voiceName,
+          contentItemId: item.contentItemId,
+        );
+        if (bytes != null) seeded++;
+      }
+    }
+
+    final seeded = await Future.wait(
+      List.generate(concurrency, (_) => worker()),
+    );
+    var total = 0;
+    for (final count in seeded) {
+      total += count;
+    }
+    return total;
+  }
+
   void _onUtteranceComplete() {
     _ttsIndex += 1;
     _speakCurrent();
@@ -359,6 +410,71 @@ class LessonSpeechService {
     final cacheKey = _diskCacheKey(voiceName, slow, text);
     if (_synthCache.containsKey(cacheKey)) return true;
     return _cacheStore?.fileName(cacheKey) != null;
+  }
+
+  /// Loads one pre-generated PCM asset, copies it into the persistent cache,
+  /// and returns it for immediate playback. A missing asset is a hard miss —
+  /// this method never calls Gemini, which keeps the alphabet lesson fully
+  /// deterministic and prevents an English pronunciation fallback.
+  Future<List<int>?> loadBundledAudio(
+    String assetPath, {
+    required String text,
+    required String voiceName,
+    bool slow = false,
+    String? contentItemId,
+  }) async {
+    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
+    if (cached != null) {
+      _synthCache[cacheKey] = cached;
+      return cached;
+    }
+
+    final inFlight = _bundledInFlight[cacheKey];
+    if (inFlight != null) return inFlight;
+    final future = _loadBundledAndCache(
+      assetPath,
+      cacheKey: cacheKey,
+      text: text,
+      voiceName: voiceName,
+      slow: slow,
+      contentItemId: contentItemId,
+    );
+    _bundledInFlight[cacheKey] = future;
+    try {
+      return await future;
+    } finally {
+      _bundledInFlight.remove(cacheKey);
+    }
+  }
+
+  Future<List<int>?> _loadBundledAndCache(
+    String assetPath, {
+    required String cacheKey,
+    required String text,
+    required String voiceName,
+    required bool slow,
+    String? contentItemId,
+  }) async {
+    try {
+      final data = await rootBundle.load(assetPath);
+      final bytes = data.buffer
+          .asUint8List(data.offsetInBytes, data.lengthInBytes)
+          .toList(growable: false);
+      if (bytes.isEmpty || bytes.length.isOdd) return null;
+      _synthCache[cacheKey] = bytes;
+      await _writeDiskCache(
+        cacheKey,
+        bytes,
+        voiceName: voiceName,
+        slow: slow,
+        text: text,
+        contentItemId: contentItemId,
+      );
+      return bytes;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Plays already-resolved PCM16 bytes through this service's own audio

@@ -30,6 +30,10 @@
 	<string>ParleSprint needs microphone access so you can practice speaking French with your AI tutor.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>ParleSprint uses speech recognition to transcribe your French practice for review.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>ParleSprint needs camera access so you can photograph signs, menus, and documents to get an instant explanation.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ParleSprint needs photo library access so you can pick an existing photo to get an instant explanation.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- Google Sign-In URL scheme: the REVERSED form of the iOS OAuth client

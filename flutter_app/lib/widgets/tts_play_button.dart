@@ -28,6 +28,7 @@ class TtsPlayButton extends StatefulWidget {
     required this.text,
     this.slow = false,
     this.contentItemId,
+    this.bundledAssetPath,
     this.size = 40,
     this.iconSize = 20,
     this.color,
@@ -36,6 +37,11 @@ class TtsPlayButton extends StatefulWidget {
   final String text;
   final bool slow;
   final String? contentItemId;
+
+  /// Optional pre-generated PCM asset. When supplied, the button never calls
+  /// Gemini; a missing asset is treated as an unavailable clip instead of
+  /// falling back to live synthesis.
+  final String? bundledAssetPath;
   final double size;
   final double iconSize;
   final Color? color;
@@ -57,13 +63,28 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
 
   Future<void> _onTap() async {
     if (_phase != _Phase.idle) return;
-    final voiceName = ActiveTutor.current.voiceName;
 
     if (_readyBytes != null) {
       await _play(_readyBytes!);
       return;
     }
 
+    final bundledAssetPath = widget.bundledAssetPath;
+    if (bundledAssetPath != null) {
+      final bytes = await LessonSpeechService.shared.loadBundledAudio(
+        bundledAssetPath,
+        text: widget.text,
+        voiceName: ActiveTutor.current.voiceName,
+        slow: widget.slow,
+        contentItemId: widget.contentItemId,
+      );
+      if (bytes == null) return;
+      _readyBytes = bytes;
+      if (mounted) await _play(bytes);
+      return;
+    }
+
+    final voiceName = ActiveTutor.current.voiceName;
     final alreadyCached = LessonSpeechService.shared.isCached(
       widget.text,
       voiceName: voiceName,
@@ -93,6 +114,15 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
     setState(() => _phase = _Phase.idle);
   }
 
+  @override
+  void didUpdateWidget(covariant TtsPlayButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text ||
+        oldWidget.bundledAssetPath != widget.bundledAssetPath) {
+      _readyBytes = null;
+    }
+  }
+
   Future<void> _play(List<int> bytes) async {
     if (!mounted) return;
     setState(() => _phase = _Phase.playing);
@@ -111,7 +141,10 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
       height: widget.size,
       child: switch (_phase) {
         _Phase.generating => Center(
-          child: SpinningRing(size: widget.size * 0.75, color: DesignTokens.success),
+          child: SpinningRing(
+            size: widget.size * 0.75,
+            color: DesignTokens.success,
+          ),
         ),
         _Phase.idle || _Phase.playing => IconButton(
           onPressed: _phase == _Phase.idle ? _onTap : null,

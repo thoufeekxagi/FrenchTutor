@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import '../../data/alphabet_data.dart';
 import '../../design/tokens.dart';
 import '../../models/session.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
@@ -38,22 +39,14 @@ class _AlphabetLabScreenState extends ConsumerState<AlphabetLabScreen> {
   void initState() {
     super.initState();
     // This is the very first thing a brand-new user opens, so it can't feel
-    // slow: every letter and accent name gets synthesized and cached to the
-    // local database right away, in the background, the moment this screen
-    // opens — by the time the student actually taps into a deck, every
-    // speaker button just plays instantly from cache instead of waiting on
-    // a live Gemini round-trip. One-time cost per install; after that this
-    // never calls Gemini for these sounds again, same as any other cached
-    // narration in the app.
-    // Bounded concurrency, not one-at-a-time — this screen's whole point is
-    // to be the fast, ready-to-go landing spot for a brand-new user, and by
-    // now onboarding has likely already prewarmed most of this anyway (see
-    // AlphabetPrewarm), so this mostly just mops up whatever a rushed
-    // onboarding didn't finish before the user got here.
+    // slow: every pre-generated letter and accent clip is copied into the
+    // persistent local cache in the background. By the time the student taps
+    // a deck, the speaker button can play from the local catalog with no live
+    // network request. Every tutor voice variant is seeded together.
+    // Ensure every bundled voice variant is indexed in the persistent cache.
+    // This is a local asset copy only; no Gemini request is made here.
     unawaited(
-      LessonSpeechService.shared.prewarmNarrationBounded(
-        alphabetPrewarmItems(),
-      ),
+      LessonSpeechService.shared.prewarmBundled(alphabetPrewarmItems()),
     );
   }
 
@@ -284,7 +277,7 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
       )
       ..writeln('Letters/marks in this deck and how each is said:');
     for (final l in _letters) {
-      buf.writeln('${l.letter}: said "${l.phonetic}". ${l.note}');
+      buf.writeln('${l.letter}: said "${alphabetSpokenText(l)}". ${l.note}');
     }
     return buf.toString();
   }
@@ -373,9 +366,16 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
                     itemCount: _letters.length,
                     itemBuilder: (context, i) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: _CompactLetterCard(
-                        letter: _letters[i],
-                        contentItemId: alphabetAudioId(_letters[i]),
+                      child: ValueListenableBuilder<TutorPersona>(
+                        valueListenable: ActiveTutor.notifier,
+                        builder: (context, persona, _) => _CompactLetterCard(
+                          letter: _letters[i],
+                          contentItemId: alphabetAudioId(_letters[i]),
+                          assetPath: alphabetAudioAssetPath(
+                            _letters[i],
+                            persona,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -398,10 +398,15 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
 /// card used to be a whole empty screen) so 2-3 fit on one screen at once
 /// and the whole deck is one continuous scroll, not a swipe-per-letter.
 class _CompactLetterCard extends StatefulWidget {
-  const _CompactLetterCard({required this.letter, required this.contentItemId});
+  const _CompactLetterCard({
+    required this.letter,
+    required this.contentItemId,
+    required this.assetPath,
+  });
 
   final AlphabetLetter letter;
   final String contentItemId;
+  final String assetPath;
 
   @override
   State<_CompactLetterCard> createState() => _CompactLetterCardState();
@@ -443,23 +448,20 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // TtsPlayButton already debounces (disabled while
-                    // generating/playing, so a second tap mid-playback is
-                    // ignored until the sound finishes) and plays from the
-                    // prewarmed cache instantly once it's been synthesized
-                    // once, exactly what a fast, no-double-trigger button
-                    // needs here. The letter badge above triggers this same
-                    // instance via `_ttsKey`.
+                    // TtsPlayButton already debounces while the bundled
+                    // French clip is loading or playing. The letter badge
+                    // above triggers this same instance via `_ttsKey`.
                     TtsPlayButton(
                       key: _ttsKey,
-                      text: letter.letter,
+                      text: alphabetSpokenText(letter),
+                      bundledAssetPath: widget.assetPath,
                       contentItemId: widget.contentItemId,
                       size: 28,
                       iconSize: 15,
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      '"${letter.phonetic}"',
+                      '"${alphabetSpokenText(letter)}"',
                       style: DesignTokens.body(
                         14,
                         weight: FontWeight.w600,
@@ -516,7 +518,7 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
         ..shuffle(random);
       final choices = [letter, ...distractors.take(2)]..shuffle(random);
       return _Question(
-        prompt: 'Which one is said like "${letter.phonetic}"?',
+        prompt: 'Which one is said like "${alphabetSpokenText(letter)}"?',
         choices: choices.map((c) => c.letter).toList(),
         answer: letter.letter,
       );

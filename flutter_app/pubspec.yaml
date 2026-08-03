@@ -1,7 +1,7 @@
 name: french_tutor
 description: AI French learning tutor — speak and learn French on the go.
 publish_to: 'none'
-version: 1.0.0+93
+version: 1.0.0+98
 
 environment:
   sdk: ^3.12.2
@@ -48,6 +48,13 @@ dependencies:
   # behavior on iOS, Android, and web.
   tutorial_coach_mark: ^1.2.13
   package_info_plus: ^8.1.2
+  # Live Vision Scan: camera capture, gallery/PDF import, on-device OCR, and
+  # Gemini image understanding for reading signs/menus/documents on the go.
+  camera: ^0.11.1
+  image_picker: ^1.1.2
+  file_picker: ^8.3.7
+  google_mlkit_text_recognition: ^0.15.0
+  pdfx: ^2.9.1
 
 dev_dependencies:
   flutter_test:
@@ -76,4 +83,5 @@ flutter:
   assets:
     - assets/content/
     - assets/audio/tutor_previews/
+    - assets/audio/alphabet/
     - assets/images/
