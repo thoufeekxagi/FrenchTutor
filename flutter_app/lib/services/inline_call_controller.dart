@@ -184,6 +184,12 @@ class InlineCallController {
     return connected;
   }
 
+  void sendText(String text) {
+    final trimmed = text.trim();
+    if (!isLive || trimmed.isEmpty) return;
+    gemini?.sendText(trimmed);
+  }
+
   Future<void> toggleMute() async {
     if (audio == null) return;
     if (muted) {

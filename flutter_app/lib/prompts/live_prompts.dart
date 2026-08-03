@@ -47,6 +47,12 @@ enum LiveSessionType {
   /// that sees the learner's current draft and guides them toward the fix
   /// themselves, never states the correction directly.
   writingGuide,
+
+  /// Live Vision Scan's "call" button: the learner has been (and may keep)
+  /// photographing signs/menus/documents while out and about, and wants to
+  /// talk through what they mean. Reactive only, like [labAssistant], but
+  /// spans multiple photos across one call instead of a single question.
+  visionScan,
 }
 
 class LivePrompts {
@@ -144,6 +150,18 @@ The LESSON CONTEXT gives you the writing task and the student's CURRENT DRAFT, r
 5. When they ask for help, follow this ladder depending on how stuck they seem: first name only the grammatical CATEGORY of the issue (e.g. "check the verb agreement there"), if they're still stuck narrow to WHERE in the sentence and what KIND of check to do, and only as a last resort ask a leading question that makes the correct form obvious without stating it.
 6. Keep every reply short (one to two sentences), answer the one thing asked, then go straight back to silence. This is a live call they can ask for help on, not a running commentary.
 7. If they paste or read out new text partway through the call and then ask about it, treat it as their updated draft and react to that instead of the original.''';
+
+  /// Live Vision Scan's call: the LESSON CONTEXT carries whatever the most
+  /// recent photo's OCR+Gemini pass produced, and gets REPLACED (via
+  /// `injectContext`) each time the student sends another photo mid-call.
+  static const _visionScanRole = '''
+YOUR ROLE: REACTIVE TRAVEL COMPANION FOR PHOTOS, NEVER CHATTY:
+The student is out and about (often traveling) and just showed you a photo of something (a sign, menu, notice, or document) — the LESSON CONTEXT holds what was read off it. Each time they send another photo, a new note tells you.
+1. React ONLY to what's in the most recent photo/note. Explain briefly what it says and/or means.
+2. Keep it short: one to three sentences. Never ask a follow-up question, never invite more conversation, never say "anything else?" or "what would you like to know?".
+3. If the student then asks a spoken question about the photo, answer that directly and briefly, then go quiet again.
+4. Between photos, stay completely silent — do not fill the gap with chatter, do not narrate that you're waiting.
+5. If a new photo's note arrives while you were mid-sentence about the previous one, drop the old thought immediately and react to the new one instead.''';
 
   static const _speakingExamRole = '''
 YOUR ROLE: TIMED SPEAKING EXAMINER:
@@ -251,6 +269,7 @@ STUDENT LEVEL: B2 (POLISHING).
       LiveSessionType.grammarStage => _stageDiscipline,
       LiveSessionType.labAssistant => _labAssistantRole,
       LiveSessionType.writingGuide => _writingGuideRole,
+      LiveSessionType.visionScan => _visionScanRole,
     };
     final tuning =
         '${TutorTuning.mixPromptLine(languageMix)}\n'
