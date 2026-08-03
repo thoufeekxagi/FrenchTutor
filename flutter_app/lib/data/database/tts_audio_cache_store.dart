@@ -2,12 +2,11 @@ import 'package:sqlite3/common.dart';
 
 import 'app_migrations.dart';
 
-/// Index for persisted Gemini TTS audio files — see `_migrationV9` in
-/// `app_migrations.dart`. Stores only the file name (the audio bytes live on
-/// disk under the app's persistent support directory); this table exists so
-/// a cached line can be looked up and reused across app relaunches, and
-/// optionally traced back to the vocab/grammar/listening/writing item it
-/// belongs to.
+/// Index for persisted Gemini TTS audio files and bundled catalog clips — see
+/// `_migrationV9` in `app_migrations.dart`. Stores only the file name (the
+/// audio bytes live on disk under the app's persistent support directory); this
+/// table exists so a cached line can be looked up and reused across app
+/// relaunches, and optionally traced back to the content item it belongs to.
 class TtsAudioCacheStore {
   TtsAudioCacheStore(this._db) {
     runAppMigrations(_db);

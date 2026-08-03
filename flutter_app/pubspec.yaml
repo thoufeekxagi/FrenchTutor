@@ -76,4 +76,5 @@ flutter:
   assets:
     - assets/content/
     - assets/audio/tutor_previews/
+    - assets/audio/alphabet/
     - assets/images/

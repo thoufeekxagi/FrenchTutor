@@ -1,3 +1,4 @@
+import '../models/tutor_persona.dart';
 import '../services/lesson_speech_service.dart';
 
 /// The French alphabet, letter by letter — deliberately STATIC, hand-written
@@ -312,31 +313,79 @@ const List<AlphabetLetter> frenchAccents = [
   ),
 ];
 
+/// Text used to create the shipped clip. These are French letter names, not
+/// the English-looking one-character strings that made Gemini sometimes say
+/// "Q" as the English name "cue". The generation prompt also explicitly
+/// requires French, but keeping this mapping here makes the intended source
+/// pronunciation auditable and stable.
+const _alphabetAudioSlugs = {
+  'É': 'e_acute',
+  'È': 'e_grave',
+  'Ê': 'e_circumflex',
+  'Ç': 'c_cedilla',
+  'Ë': 'e_diaeresis',
+};
+
+const _frenchSpokenNames = {
+  'A': 'a',
+  'B': 'bé',
+  'C': 'cé',
+  'D': 'dé',
+  'E': 'e',
+  'F': 'effe',
+  'G': 'gé',
+  'H': 'ache',
+  'I': 'i',
+  'J': 'ji',
+  'K': 'ka',
+  'L': 'elle',
+  'M': 'emme',
+  'N': 'enne',
+  'O': 'o',
+  'P': 'pé',
+  'Q': 'ku',
+  'R': 'ère',
+  'S': 'esse',
+  'T': 'té',
+  'U': 'u',
+  'V': 'vé',
+  'W': 'double vé',
+  'X': 'ixe',
+  'Y': 'i grec',
+  'Z': 'zède',
+  'É': 'accent aigu',
+  'È': 'accent grave',
+  'Ê': 'accent circonflexe',
+  'Ç': 'cédille',
+  'Ë': 'tréma',
+};
+
+String alphabetSpokenText(AlphabetLetter letter) =>
+    _frenchSpokenNames[letter.letter] ?? letter.letter;
+
 /// The cache id every screen must use for a given letter/accent's spoken
 /// name, so the same sound is never synthesized under two different keys —
 /// shared by [AlphabetLabScreen]'s own decks and [alphabetPrewarmItems]
 /// below.
 String alphabetAudioId(AlphabetLetter letter) => frenchAccents.contains(letter)
-    ? 'alphabet_accent_${letter.letter}'
+    ? 'alphabet_accent_${_alphabetAudioSlugs[letter.letter] ?? letter.letter}'
     : 'alphabet_letter_${letter.letter}';
+
+String alphabetAudioAssetPath(AlphabetLetter letter, TutorPersona persona) =>
+    'assets/audio/alphabet/${persona.id}/${alphabetAudioId(letter)}.pcm';
 
 /// Every distinct sound the "Learn the Alphabet" decks ever play (all 26
 /// letters plus the 5 accent marks — Consonants/Vowels are just subsets of
-/// the same 26, so nothing extra is needed for them). Used to prewarm the
-/// TTS cache in the background as early as onboarding, well before the
-/// learner ever opens the lesson itself, instead of only starting once
-/// they're already sitting on the screen waiting.
+/// the same 26, so nothing extra is needed for them). Every one of the four
+/// tutor voices is included so changing tutors never triggers live generation.
 List<SpeechItem> alphabetPrewarmItems() => [
-  for (final letter in frenchAlphabet)
-    SpeechItem(
-      text: letter.letter,
-      language: 'fr-FR',
-      contentItemId: alphabetAudioId(letter),
-    ),
-  for (final letter in frenchAccents)
-    SpeechItem(
-      text: letter.letter,
-      language: 'fr-FR',
-      contentItemId: alphabetAudioId(letter),
-    ),
+  for (final persona in TutorPersona.all)
+    for (final letter in [...frenchAlphabet, ...frenchAccents])
+      SpeechItem(
+        text: alphabetSpokenText(letter),
+        language: 'fr-FR',
+        contentItemId: alphabetAudioId(letter),
+        voiceName: persona.voiceName,
+        assetPath: alphabetAudioAssetPath(letter, persona),
+      ),
 ];
