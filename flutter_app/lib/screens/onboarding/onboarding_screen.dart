@@ -132,12 +132,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final showHeader = _page >= _pageGoal && _page <= _pageTutor;
-    // On wide web viewports this reads as a full-bleed mobile wizard
-    // stretched edge to edge if left unconstrained — center it as a fixed-
-    // width card instead, the way Notion/Linear present first-run setup on
-    // desktop. Steps themselves are unchanged; only the outer width differs.
-    final isDesktop =
-        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
     return Scaffold(
       backgroundColor: _isGradientPage
           ? DesignTokens.primaryDeep
@@ -145,98 +139,98 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: _heroGradient),
         child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: isDesktop ? 480 : double.infinity,
-              ),
-              child: Column(
-                children: [
-                  if (showHeader) ...[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                      child: Row(
-                        children: [
-                          const _BrandWordmark(),
-                          const Spacer(),
-                          Text(
-                            'Step $_page of 4',
-                            style: Passeport.body(12, weight: FontWeight.w600)
-                                .copyWith(
-                                  color: Colors.white.withValues(alpha: 0.78),
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Container(
-                          height: 4,
-                          color: Colors.white.withValues(alpha: 0.28),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return Align(
-                                alignment: Alignment.centerLeft,
-                                child: AnimatedContainer(
-                                  duration: DesignTokens.durationMedium,
-                                  curve: DesignTokens.curveStandard,
-                                  width:
-                                      constraints.maxWidth *
-                                      (_page / 4).clamp(0.0, 1.0),
-                                  height: 4,
-                                  color: Colors.white,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                  Expanded(
-                    child: PageView(
-                      controller: _pageController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      onPageChanged: (index) => setState(() => _page = index),
-                      children: [
-                        _welcomeStep(),
-                        _goalStep(),
-                        _levelStep(),
-                        _interestsStep(),
-                        _tutorStep(),
-                        _PreparingPane(
-                          active: _page == _pagePreparing,
-                          checkpoints: [
-                            'French',
-                            if (_level != null)
-                              LearnerLevel.displayLabel(_level!),
-                            switch (_goal) {
-                              'tef_canada' => 'TEF / TCF Canada',
-                              'everyday' => 'Everyday French',
-                              _ => 'Foundations',
-                            },
-                            'Tutor ${_tutor.displayName}',
+          child: Column(
+            children: [
+              if (showHeader) ...[
+                // Header gutter must match _wideStep's so the progress bar
+                // lines up with the content beneath it on desktop.
+                _HeaderGutter(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                        child: Row(
+                          children: [
+                            const _BrandWordmark(),
+                            const Spacer(),
+                            Text(
+                              'Step $_page of 4',
+                              style: Passeport.body(12, weight: FontWeight.w600)
+                                  .copyWith(
+                                    color: Colors.white.withValues(alpha: 0.78),
+                                  ),
+                            ),
                           ],
-                          onComplete: () {
-                            if (!mounted || _page != _pagePreparing) return;
-                            if (_trialAvailable) {
-                              _next();
-                            } else {
-                              _finish();
-                            }
-                          },
                         ),
-                        _trialStep(),
-                        _recapStep(),
-                      ],
-                    ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Container(
+                            height: 4,
+                            color: Colors.white.withValues(alpha: 0.28),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: AnimatedContainer(
+                                    duration: DesignTokens.durationMedium,
+                                    curve: DesignTokens.curveStandard,
+                                    width:
+                                        constraints.maxWidth *
+                                        (_page / 4).clamp(0.0, 1.0),
+                                    height: 4,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+              ],
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (index) => setState(() => _page = index),
+                  children: [
+                    _welcomeStep(),
+                    _goalStep(),
+                    _levelStep(),
+                    _interestsStep(),
+                    _tutorStep(),
+                    _PreparingPane(
+                      active: _page == _pagePreparing,
+                      checkpoints: [
+                        'French',
+                        if (_level != null) LearnerLevel.displayLabel(_level!),
+                        switch (_goal) {
+                          'tef_canada' => 'TEF / TCF Canada',
+                          'everyday' => 'Everyday French',
+                          _ => 'Foundations',
+                        },
+                        'Tutor ${_tutor.displayName}',
+                      ],
+                      onComplete: () {
+                        if (!mounted || _page != _pagePreparing) return;
+                        if (_trialAvailable) {
+                          _next();
+                        } else {
+                          _finish();
+                        }
+                      },
+                    ),
+                    _trialStep(),
+                    _recapStep(),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -252,97 +246,103 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return Container(
       decoration: const BoxDecoration(gradient: _heroGradient),
       padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Spacer(flex: 2),
-          _AnimatedBrandMark(animation: _brandController),
-          const Spacer(flex: 2),
-          Container(
-            padding: const EdgeInsets.fromLTRB(26, 32, 26, 36),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-            ),
-            child: Column(
-              children: [
-                // Quote marks bracket only this sentence — the Stack sizes to
-                // the Text alone, so the closing glyph hugs the end of the
-                // quote rather than floating near the bottom of the whole
-                // card (which used to land under the subtitle instead).
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Text(
-                      'The fastest way to speak French is to speak French.',
-                      textAlign: TextAlign.center,
-                      style: Passeport.display(
-                        23,
-                      ).copyWith(color: Colors.white, height: 1.35),
-                    ),
-                    Positioned(
-                      left: -8,
-                      top: -16,
-                      child: _QuoteGlyph(opening: true),
-                    ),
-                    Positioned(
-                      right: -8,
-                      bottom: -16,
-                      child: _QuoteGlyph(opening: false),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-                Text(
-                  'A live tutor who talks with you every day, '
-                  'not flashcards about someday.',
-                  textAlign: TextAlign.center,
-                  style: Passeport.body(15).copyWith(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    height: 1.45,
+      // A hero column centred at a readable width is the right desktop shape
+      // for a splash (unlike the question steps, which get two columns) — but
+      // it must be capped, or the quote card and button stretch the full width
+      // of a browser window and stop reading as a composed screen.
+      child: _CenteredHero(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Spacer(flex: 2),
+            _AnimatedBrandMark(animation: _brandController),
+            const Spacer(flex: 2),
+            Container(
+              padding: const EdgeInsets.fromLTRB(26, 32, 26, 36),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+              ),
+              child: Column(
+                children: [
+                  // Quote marks bracket only this sentence — the Stack sizes to
+                  // the Text alone, so the closing glyph hugs the end of the
+                  // quote rather than floating near the bottom of the whole
+                  // card (which used to land under the subtitle instead).
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Text(
+                        'The fastest way to speak French is to speak French.',
+                        textAlign: TextAlign.center,
+                        style: Passeport.display(
+                          23,
+                        ).copyWith(color: Colors.white, height: 1.35),
+                      ),
+                      Positioned(
+                        left: -8,
+                        top: -16,
+                        child: _QuoteGlyph(opening: true),
+                      ),
+                      Positioned(
+                        right: -8,
+                        bottom: -16,
+                        child: _QuoteGlyph(opening: false),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 22),
+                  Text(
+                    'A live tutor who talks with you every day, '
+                    'not flashcards about someday.',
+                    textAlign: TextAlign.center,
+                    style: Passeport.body(15).copyWith(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(flex: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.checkmark_seal_fill,
+                  size: 16,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Built for TEF / TCF Canada learners',
+                  style: Passeport.body(
+                    13,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
                 ),
               ],
             ),
-          ),
-          const Spacer(flex: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                CupertinoIcons.checkmark_seal_fill,
-                size: 16,
-                color: Colors.white.withValues(alpha: 0.9),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Built for TEF / TCF Canada learners',
-                style: Passeport.body(
-                  13,
-                  weight: FontWeight.w600,
-                ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _next,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: DesignTokens.primaryDeep,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _next,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: DesignTokens.primaryDeep,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  textStyle: Passeport.body(15, weight: FontWeight.w700),
                 ),
-                textStyle: Passeport.body(15, weight: FontWeight.w700),
+                child: const Text('Continue'),
               ),
-              child: const Text('Continue'),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -355,6 +355,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     required List<Widget> children,
     required Widget footer,
   }) {
+    // A browser window is far wider than it is tall, so the phone layout (hero
+    // text stacked above the choices, both in one narrow column) leaves the
+    // sides empty and pushes the choices below the fold. Constraining the whole
+    // wizard to a phone-width strip instead — which is what was tried first —
+    // just reads as a phone screenshot pasted onto a gradient, and clipped
+    // content during PageView transitions on top of that.
+    //
+    // On a wide viewport the hero text and the choices become two columns:
+    // the question stays put on the left while the answers sit at a
+    // comfortable reading width on the right. Same widgets, same copy, same
+    // gradient — only the arrangement changes, and only above the breakpoint.
+    final isWide =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+    if (isWide) return _wideStep(eyebrow, title, subtitle, children, footer);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 48),
       child: Column(
@@ -417,6 +432,98 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 12),
           footer,
         ],
+      ),
+    );
+  }
+
+  /// Desktop arrangement of [_step]: question on the left, answers on the
+  /// right, the whole pair centred and capped so it never sprawls on an
+  /// ultrawide monitor.
+  Widget _wideStep(
+    String eyebrow,
+    String title,
+    String? subtitle,
+    List<Widget> children,
+    Widget footer,
+  ) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(48, 24, 48, 40),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left: the question. Sticky, not scrolling — on desktop there is
+              // room to keep it visible while the eye works down the choices.
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 40),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Passeport.infoSoft,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(_stepIcon, color: Passeport.sky, size: 22),
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        eyebrow.toUpperCase(),
+                        style: Passeport.body(10.5, weight: FontWeight.w800)
+                            .copyWith(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              letterSpacing: 1,
+                            ),
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        title,
+                        style: Passeport.display(
+                          34,
+                        ).copyWith(color: Colors.white),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          subtitle,
+                          style: Passeport.body(15).copyWith(
+                            color: Colors.white.withValues(alpha: 0.86),
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              // Right: the answers, plus this step's action pinned beneath them.
+              Expanded(
+                flex: 6,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(top: 8, bottom: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: children,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    footer,
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1426,6 +1533,55 @@ class _PromiseRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Aligns the onboarding header (wordmark, step counter, progress bar) with the
+/// step content below it. On phones that means no change at all; on a wide
+/// viewport it applies the same 1000px cap and 48px gutter `_wideStep` uses, so
+/// the progress bar starts and ends exactly where the columns do instead of
+/// stretching the full width of the browser window.
+class _HeaderGutter extends StatelessWidget {
+  const _HeaderGutter({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+    if (!isWide) return child;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Centres a hero/splash column at a readable width on desktop and leaves it
+/// untouched on phones. Used by the onboarding welcome pane, where a single
+/// centred column is the right desktop shape but an uncapped one is not.
+class _CenteredHero extends StatelessWidget {
+  const _CenteredHero({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+    if (!isWide) return child;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: child,
       ),
     );
   }

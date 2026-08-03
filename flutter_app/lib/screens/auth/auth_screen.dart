@@ -129,56 +129,58 @@ class _AuthScreenState extends State<AuthScreen> {
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _header(),
-                  const SizedBox(height: 40),
-                  // Hidden on web until an Apple Service ID is registered —
-                  // see AuthService.isAppleAvailable.
-                  if (AuthService.shared.isAppleAvailable) ...[
-                    _appleButton(),
+              child: _AuthFrame(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _header(),
+                    const SizedBox(height: 40),
+                    // Hidden on web until an Apple Service ID is registered —
+                    // see AuthService.isAppleAvailable.
+                    if (AuthService.shared.isAppleAvailable) ...[
+                      _appleButton(),
+                      const SizedBox(height: 12),
+                    ],
+                    _googleButton(),
+                    const SizedBox(height: 24),
+                    _divider(),
+                    const SizedBox(height: 20),
+                    _modeToggle(),
+                    const SizedBox(height: 18),
+                    _emailField(),
                     const SizedBox(height: 12),
-                  ],
-                  _googleButton(),
-                  const SizedBox(height: 24),
-                  _divider(),
-                  const SizedBox(height: 20),
-                  _modeToggle(),
-                  const SizedBox(height: 18),
-                  _emailField(),
-                  const SizedBox(height: 12),
-                  _passwordField(),
-                  if (!_isSignUp) ...[
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: _loading ? null : _forgotPassword,
-                        child: Text(
-                          'Forgot password?',
-                          style: Passeport.body(
-                            12.5,
-                            weight: FontWeight.w600,
-                          ).copyWith(color: Colors.white),
+                    _passwordField(),
+                    if (!_isSignUp) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: _loading ? null : _forgotPassword,
+                          child: Text(
+                            'Forgot password?',
+                            style: Passeport.body(
+                              12.5,
+                              weight: FontWeight.w600,
+                            ).copyWith(color: Colors.white),
+                          ),
                         ),
                       ),
+                    ],
+                    const SizedBox(height: 18),
+                    if (_errorMessage != null)
+                      _messageBanner(_errorMessage!, isError: true),
+                    if (_infoMessage != null)
+                      _messageBanner(_infoMessage!, isError: false),
+                    if (_errorMessage != null || _infoMessage != null)
+                      const SizedBox(height: 12),
+                    PasseportPrimaryButton(
+                      label: _loading
+                          ? 'Please wait…'
+                          : (_isSignUp ? 'Create account' : 'Sign in'),
+                      onPressed: _loading ? null : _submitEmail,
                     ),
                   ],
-                  const SizedBox(height: 18),
-                  if (_errorMessage != null)
-                    _messageBanner(_errorMessage!, isError: true),
-                  if (_infoMessage != null)
-                    _messageBanner(_infoMessage!, isError: false),
-                  if (_errorMessage != null || _infoMessage != null)
-                    const SizedBox(height: 12),
-                  PasseportPrimaryButton(
-                    label: _loading
-                        ? 'Please wait…'
-                        : (_isSignUp ? 'Create account' : 'Sign in'),
-                    onPressed: _loading ? null : _submitEmail,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -356,6 +358,49 @@ class _AuthScreenState extends State<AuthScreen> {
       child: Text(
         text,
         style: Passeport.body(12.5).copyWith(color: color, height: 1.35),
+      ),
+    );
+  }
+}
+
+/// Frames the sign-in form for the platform it is on.
+///
+/// On a phone the form is the screen: full-width fields and buttons on the
+/// gradient, which is correct there. In a browser that same layout stretches
+/// the email field and the Sign in button across the entire window, which reads
+/// as a broken page rather than a designed one.
+///
+/// On a wide viewport the form becomes a centred card at a fixed, form-sized
+/// width, vertically centred on the gradient — the shape every web app people
+/// already trust uses for sign-in. Nothing inside the form changes; the copy
+/// and controls are identical on both platforms.
+class _AuthFrame extends StatelessWidget {
+  const _AuthFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    if (size.width < DesignTokens.breakpointMedium) return child;
+
+    return Center(
+      child: ConstrainedBox(
+        // Form-sized, not page-sized. Wider than this and the fields start
+        // looking like a spreadsheet row.
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(32, 36, 32, 32),
+          decoration: BoxDecoration(
+            // A translucent panel rather than opaque white: the form controls
+            // and copy are all styled for the gradient behind them, so an
+            // opaque card would strand white text on white.
+            color: Colors.white.withValues(alpha: 0.13),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+          ),
+          child: child,
+        ),
       ),
     );
   }
