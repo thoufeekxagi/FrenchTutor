@@ -34,6 +34,21 @@
 </head>
 <body>
   <!--
+    Opt-in escape hatch for hardware with a failed/absent real GPU (seen on a
+    machine reporting 7MB VRAM and no loaded graphics kext — consistent with
+    a dead discrete GPU): CanvasKit's WebGL probe on that hardware doesn't
+    fail cleanly, it creates a context that is then immediately marked
+    "lost", which hits an engine bug (LateInitializationError in its
+    onContextLost handler) instead of the graceful CPU-rendering fallback
+    that already works fine when WebGL is reported absent outright.
+
+    Visiting with ?forceCpuCanvas=1 once (it's remembered via localStorage)
+    makes every canvas.getContext('webgl'/'webgl2') call return null BEFORE
+    Flutter's own feature detection runs, so it concludes "no WebGL" and
+    takes that same clean CPU path. Off by default: this trades away GPU
+    acceleration, so it must never affect a visitor with an actually-working
+    GPU.
+
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
     or to give the user feedback during the initialization process.
@@ -41,6 +56,23 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.has('forceCpuCanvas')) {
+        localStorage.setItem('forceCpuCanvas', params.get('forceCpuCanvas'));
+      }
+      if (localStorage.getItem('forceCpuCanvas') === '1') {
+        var real = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function (type, attrs) {
+          if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+            return null;
+          }
+          return real.call(this, type, attrs);
+        };
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
