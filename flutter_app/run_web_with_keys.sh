@@ -22,8 +22,13 @@ SENTRY_DSN=$(grep '^SENTRY_DSN=' "$SECRETS_FILE" | sed 's/^SENTRY_DSN=//')
 POSTHOG_API_KEY=$(grep '^POSTHOG_API_KEY=' "$SECRETS_FILE" | sed 's/^POSTHOG_API_KEY=//')
 POSTHOG_HOST=$(grep '^POSTHOG_HOST=' "$SECRETS_FILE" | sed 's/^POSTHOG_HOST=//')
 
+# --no-web-resources-cdn: loads CanvasKit from this build's own bundled copy
+# instead of Google's CDN. Without it the app is a blank white screen for
+# anyone whose browser/network/ad-blocker can't reach that CDN — confirmed
+# live testing in Safari.
 exec flutter run \
   -d web-server --web-port 8734 --web-hostname 127.0.0.1 \
+  --no-web-resources-cdn \
   --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
   --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \

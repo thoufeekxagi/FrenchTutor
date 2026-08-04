@@ -28,7 +28,14 @@ require SUPABASE_ANON_KEY
 : "${POSTHOG_API_KEY:=}"
 : "${POSTHOG_HOST:=}"
 
+# --no-web-resources-cdn: without this, the build loads its rendering engine
+# (CanvasKit) from Google's CDN at runtime instead of the copy already
+# bundled in this build. That fails with a blank white screen and no visible
+# error for any visitor whose browser/network/ad-blocker can't reach the CDN
+# (confirmed live: this is exactly what happened testing in Safari). Costs
+# nothing to disable since the engine ships locally either way.
 flutter build web --release \
+  --no-web-resources-cdn \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
   --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \

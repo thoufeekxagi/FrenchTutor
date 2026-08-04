@@ -18,6 +18,35 @@ compiled into the JS bundle and publicly readable. `SUPABASE_ANON_KEY` is fine b
 `OPENROUTER_API_KEY` are not, and would be extractable and billable by anyone. Fine for a private/invite-only
 deploy, not for open signup. Fix is to move those calls behind a Supabase edge function.
 
+## Real bug found and fixed: blank white screen from CanvasKit CDN dependency
+
+Live-tested in Safari on the founder's Mac and found the actual cause of an early "just a blank white page"
+report. `flutter build web` by default loads its rendering engine (CanvasKit) from `www.gstatic.com` at
+**runtime**, not from the copy it already bundles locally in `build/web/canvaskit/`. If that CDN request fails
+for any reason — ad blocker, corporate network, some VPNs, an offline dev machine — the app silently never
+paints anything. No error banner, no console message visible without deliberately hooking `window.onerror`.
+
+Fixed with the `--no-web-resources-cdn` flag (confirmed via Flutter SDK source:
+`useLocalCanvasKit = !useCdn`, wired to `buildConfig.useLocalCanvasKit` in the generated
+`flutter_bootstrap.js`). Now baked into `build_web_vercel.sh` and `run_web_with_keys.sh` so every build and
+every local dev run gets it, not just this one debugging session.
+
+Diagnosis method, in case a similar silent-blank-page report recurs: `window.onerror` and
+`unhandledrejection` don't fire until something is hooked *before* the failure happens, so add a small inline
+`<script>` at the top of `build/web/index.html` that writes to `localStorage` on error, reload, then read
+`localStorage.getItem(...)` after — this survives a full page reload, unlike an in-memory JS variable set via
+one-off `do JavaScript` calls (which get wiped by navigation).
+
+## Separate, unrelated finding: transient WebGL context loss is not an app bug
+
+While debugging the above, encountered a second, different failure signature
+(`LateInitializationError` inside the engine's `onContextLost` handler) that persisted even after the CDN fix.
+Isolated it with a minimal test — a bare `document.createElement('canvas').getContext('webgl2')`, no Flutter
+code involved — which came back with `isContextLost() === true` immediately. That proves it was the browser's
+WebGL context budget being exhausted (heavy tab count / GPU load on the test machine at the time), not
+anything in this codebase. Quitting and relaunching the browser (or restarting the machine) clears it. Noting
+this here so it isn't mistaken for an app bug and re-debugged from scratch next time it's seen.
+
 CI is still not set up — a web-breaking change can currently reach production unnoticed.
 
 ## Domain / site structure
