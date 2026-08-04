@@ -17,7 +17,10 @@ abstract final class AppTheme {
   static ThemeData themeData() {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: DesignTokens.parchment,
+      // `parchment` is an alias of `canvas`, so this is already the neutral
+      // canvas the web reference design is built on — no per-platform branch
+      // needed here. Screens that set their own background use the same token.
+      scaffoldBackgroundColor: DesignTokens.canvas,
       colorScheme: const ColorScheme.light(
         primary: DesignTokens.maroon,
         secondary: DesignTokens.brass,
@@ -44,12 +47,18 @@ abstract final class AppTheme {
       splashFactory: NoSplash.splashFactory,
       highlightColor: DesignTokens.ink.withValues(alpha: 0.06),
       appBarTheme: AppBarTheme(
-        backgroundColor: DesignTokens.parchment,
+        // On web an app bar is a toolbar: white, left-aligned title, separated
+        // from the content by a hairline rather than by colour. Mobile keeps the
+        // parchment iOS-style bar.
+        backgroundColor: kIsWeb ? DesignTokens.surface : DesignTokens.parchment,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: isCupertino,
-        titleTextStyle: DesignTokens.display(20),
+        titleTextStyle: DesignTokens.display(kIsWeb ? 17 : 20),
+        shape: kIsWeb
+            ? Border(bottom: BorderSide(color: DesignTokens.hairline))
+            : null,
       ),
       dividerTheme: DividerThemeData(
         color: DesignTokens.hairline,

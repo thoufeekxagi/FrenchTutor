@@ -103,6 +103,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
       body: SafeArea(
         top: false,
         child: PSContentColumn(
+          measure: PSMeasure.reading,
           child: _loading
               ? const Center(child: PSProgressIndicator())
               : _notes.isEmpty
@@ -189,7 +190,8 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
       child: Row(
         children: [
           for (final option in options) ...[
-            if (option != options.first) const SizedBox(width: DesignTokens.space2),
+            if (option != options.first)
+              const SizedBox(width: DesignTokens.space2),
             Expanded(
               child: Semantics(
                 button: true,

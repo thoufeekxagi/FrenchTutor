@@ -470,7 +470,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // Riverpod re-fetches on its own — without this, Settings keeps showing
     // "Free" after a successful purchase until the screen happens to be
     // torn down and rebuilt some other way.
-    if (mounted) setState(() => _access = ref.read(pilotAccessServiceProvider).snapshot());
+    if (mounted) {
+      setState(() => _access = ref.read(pilotAccessServiceProvider).snapshot());
+    }
   }
 
   @override
@@ -485,6 +487,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         scrolledUnderElevation: 0,
       ),
       body: PSContentColumn(
+        measure: PSMeasure.reading,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
@@ -574,7 +577,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             color: Passeport.primaryDeep,
                           ),
                           const SizedBox(width: 6),
-                          KickerText('Subscription', color: Passeport.primaryDeep),
+                          KickerText(
+                            'Subscription',
+                            color: Passeport.primaryDeep,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -627,14 +633,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 subscribed
                                     ? 'Manage subscription'
                                     : 'Unlock full access',
-                                style: Passeport.body(
-                                  14,
-                                  weight: FontWeight.w700,
-                                ).copyWith(
-                                  color: subscribed
-                                      ? Passeport.slateDim
-                                      : Colors.white,
-                                ),
+                                style:
+                                    Passeport.body(
+                                      14,
+                                      weight: FontWeight.w700,
+                                    ).copyWith(
+                                      color: subscribed
+                                          ? Passeport.slateDim
+                                          : Colors.white,
+                                    ),
                               ),
                             ],
                           ),

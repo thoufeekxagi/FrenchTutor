@@ -21,6 +21,8 @@ import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
 import '../design/app_theme.dart';
+import '../widgets/adaptive/adaptive.dart';
+import '../widgets/passeport_card.dart';
 import '../widgets/web/web_app_shell.dart';
 import '../widgets/web/web_layout.dart';
 
@@ -260,6 +262,47 @@ class _PreviewBody extends StatelessWidget {
                 ),
               ],
             ],
+          ),
+        ),
+        const SizedBox(height: DesignTokens.space6),
+        // The real shared primitives the interior screens use, so their web
+        // restyle is verifiable here without signing in.
+        const WebSectionHeader(title: 'Shared primitives (real widgets)'),
+        PSContentColumn(
+          measure: PSMeasure.content,
+          child: PasseportCard(
+            padding: DesignTokens.space5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'PasseportCard inside PSContentColumn',
+                  style: Passeport.display(16),
+                ),
+                const SizedBox(height: DesignTokens.space2),
+                Text(
+                  'On web this card carries a hairline border and no shadow, and '
+                  'the column caps at 1080 instead of 560. These are the two '
+                  'changes that restyle every interior screen.',
+                  style: Passeport.body(
+                    13.5,
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: DesignTokens.space4),
+        PSContentColumn(
+          measure: PSMeasure.reading,
+          child: PasseportCard(
+            padding: DesignTokens.space5,
+            child: Text(
+              'PSMeasure.reading (720) — for prose and single-column forms such '
+              'as Settings, Notes and the story reader, where a 1080 measure '
+              'would make lines too long to track comfortably.',
+              style: Passeport.body(13.5).copyWith(height: 1.5),
+            ),
           ),
         ),
         const SizedBox(height: DesignTokens.space6),
