@@ -17,8 +17,9 @@ class DevSubscriptionOverride {
   static const _prefsKey = 'dev_force_pro_unlock';
 
   static bool _enabled = false;
+  static const _compileTimeUnlock = bool.fromEnvironment('DEV_UNLOCK_ALL');
 
-  static bool get enabled => kDebugMode && _enabled;
+  static bool get enabled => kDebugMode && (_enabled || _compileTimeUnlock);
 
   static Future<void> load() async {
     if (!kDebugMode) return;

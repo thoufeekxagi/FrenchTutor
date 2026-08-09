@@ -385,7 +385,7 @@ class PSContentColumn extends StatelessWidget {
         constraints: BoxConstraints(
           maxWidth: kIsWeb ? measure.webMaxWidth : DesignTokens.contentMaxWidth,
         ),
-        child: child,
+        child: SizedBox(width: double.infinity, child: child),
       ),
     );
   }

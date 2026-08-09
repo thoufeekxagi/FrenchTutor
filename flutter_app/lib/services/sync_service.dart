@@ -307,7 +307,7 @@ class SyncService {
           'ended_at': endedAt.toUtc().toIso8601String(),
           'ended_reason': endedReason,
           'learner_utterance_count': learnerUtteranceCount,
-          if (transcriptJson != null) 'transcript_json': transcriptJson,
+          'transcript_json': ?transcriptJson,
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         })
         .eq('id', id);
@@ -604,7 +604,7 @@ class SyncService {
             'started_at': startedAt.toUtc().toIso8601String(),
           if (completedAt != null)
             'completed_at': completedAt.toUtc().toIso8601String(),
-          if (resultSummary != null) 'result_summary_json': resultSummary,
+          'result_summary_json': ?resultSummary,
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         })
         .eq('id', taskId);

@@ -16,3 +16,6 @@
 **/ios/Runner.xcworkspace/
 **/ios/Runner/GeneratedPluginRegistrant.h
 **/ios/Runner/GeneratedPluginRegistrant.m
+server/__pycache__/
+server/venv/
+server/*.db

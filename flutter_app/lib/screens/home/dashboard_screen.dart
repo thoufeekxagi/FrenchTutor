@@ -17,6 +17,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
+import '../../widgets/web/web_practice_grid.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
 import '../labs/grammar_lab_screen.dart';
@@ -69,7 +70,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _openSession({String? lessonContext}) async {
-    if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) return;
+    if (!await ensureAiSessionQuota(
+          context,
+          ref.read(pilotAccessServiceProvider),
+        ) ||
+        !mounted) {
+      return;
+    }
     LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
@@ -416,89 +423,92 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _keepPractising() {
     final gate = ref.watch(subscriptionGateServiceProvider);
-    final chips = [
-      (
+    final chips = <WebPracticeShortcut>[
+      WebPracticeShortcut(
         icon: CupertinoIcons.square_stack_3d_up,
         label: 'Vocabulary',
-        labId: 'vocabulary',
+        locked: gate.isLabLocked('vocabulary'),
         onTap: () => _openGated(
           'vocabulary',
           () => _openPractice(PerformanceModality.readingRecognition),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.mic_fill,
         label: 'Pronunciation',
-        labId: null,
+        locked: false,
         onTap: () => _openGated(
           null,
           () => _openPractice(PerformanceModality.pronunciationProduction),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.headphones,
         label: 'Listening',
-        labId: 'listening',
+        locked: gate.isLabLocked('listening'),
         onTap: () => _openGated(
           'listening',
           () => _openPractice(PerformanceModality.listeningRecognition),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.book,
         label: 'Reading',
-        labId: 'listening',
+        locked: gate.isLabLocked('listening'),
         onTap: () => _openGated(
           'listening',
           () => AppRouter.push(context, (_) => const ListeningLabScreen()),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.book,
         label: 'Grammar',
-        labId: 'grammar',
+        locked: gate.isLabLocked('grammar'),
         onTap: () => _openGated(
           'grammar',
           () => AppRouter.push(context, (_) => const GrammarLabScreen()),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.waveform,
         label: 'Liaison',
-        labId: 'liaison',
+        locked: gate.isLabLocked('liaison'),
         onTap: () => _openGated(
           'liaison',
           () => AppRouter.push(context, (_) => const LiaisonLabScreen()),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.bubble_left_bubble_right,
         label: 'Roleplay',
-        labId: 'roleplay',
+        locked: gate.isLabLocked('roleplay'),
         onTap: () => _openGated(
           'roleplay',
           () => AppRouter.push(context, (_) => const RoleplayLabScreen()),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.pencil,
         label: 'Writing',
-        labId: 'writing',
+        locked: gate.isLabLocked('writing'),
         onTap: () => _openGated(
           'writing',
           () => _openPractice(PerformanceModality.controlledWriting),
         ),
       ),
-      (
+      WebPracticeShortcut(
         icon: CupertinoIcons.waveform,
         label: 'Speaking',
-        labId: null,
+        locked: false,
         onTap: () => _openGated(
           null,
           () => _openPractice(PerformanceModality.spontaneousSpeaking),
         ),
       ),
     ];
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return WebPracticeGrid(items: chips);
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -542,11 +552,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final chip = chips[index];
-                final locked =
-                    chip.labId != null && gate.isLabLocked(chip.labId!);
+                final locked = chip.locked;
                 return Semantics(
                   button: true,
-                  label: locked ? '${chip.label} (subscribers only)' : chip.label,
+                  label: locked
+                      ? '${chip.label} (subscribers only)'
+                      : chip.label,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -571,12 +582,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           const SizedBox(width: 7),
                           Text(
                             chip.label,
-                            style: Passeport.body(
-                              12.5,
-                              weight: FontWeight.w600,
-                            ).copyWith(
-                              color: locked ? Passeport.slateDim : null,
-                            ),
+                            style: Passeport.body(12.5, weight: FontWeight.w600)
+                                .copyWith(
+                                  color: locked ? Passeport.slateDim : null,
+                                ),
                           ),
                         ],
                       ),
@@ -717,4 +726,3 @@ class _Metric extends StatelessWidget {
     );
   }
 }
-

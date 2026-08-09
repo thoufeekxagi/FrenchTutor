@@ -41,7 +41,7 @@ release can break production with no change on your side. When you upgrade Flutt
 
 | Variable | Effect if omitted |
 |---|---|
-| `GOOGLE_WEB_CLIENT_ID` | Google sign-in button reports "not set up yet"; email/password still works |
+| `GOOGLE_WEB_CLIENT_ID` | Not required by the browser OAuth path; Google provider credentials belong in Supabase/Google Cloud |
 | `GEMINI_API_KEY` | No live tutor calls or TTS. **See the security note before setting this.** |
 | `OPENROUTER_API_KEY` | No LLM fallback |
 | `SENTRY_DSN` | No crash reporting |
@@ -98,7 +98,7 @@ Vercel projects so a landing-page content change can never break the app build, 
 | Mic capture unverified on real hardware | Live calls may not work on web until checked | `05_phase5_voice_and_realtime.md` |
 | No payments on web | Nobody can subscribe from the web app; RevenueCat is iOS/Android only | `03_phase3_auth_and_payments.md` |
 | Apple sign-in hidden on web | Needs an Apple Service ID; Google and email cover it | `03_phase3_auth_and_payments.md` |
-| Screens still use mobile layouts | Sidebar/top bar are desktop-shaped, but each screen's body is still the phone layout | `02_phase2_web_app_shell.md` |
+| Some interior screens still use mobile layouts | Sidebar/top bar and the first live lesson surfaces are desktop-shaped; remaining labs/interior pages still need their web pass | `07_web_ui_redesign.md` |
 | No CI on web builds | A web-breaking change can reach production unnoticed | `06_phase6_deploy_and_hosting.md` |
 
 Verify the mic before announcing web calls work:

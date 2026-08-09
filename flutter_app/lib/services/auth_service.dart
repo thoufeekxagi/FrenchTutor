@@ -42,15 +42,11 @@ class AuthService {
 
   SupabaseClient get _client => Supabase.instance.client;
 
-  /// True once real Google OAuth client IDs have been configured (Google
-  /// Cloud Console — see BUILD_FLUTTER_TO_IPHONE.md). Until then the Google
-  /// button in the UI stays visible but returns a friendly explanation
-  /// instead of attempting a sign-in that would fail with an obscure native
-  /// error.
-  /// On web only the web client ID is relevant — the iOS client ID is for the
-  /// native SDK, which is not used there (see [signInWithGoogle]).
+  /// Web Google sign-in uses Supabase's OAuth redirect, so the browser does
+  /// not need a Google client ID. Native sign-in still requires both client
+  /// IDs before the SDK account picker can be used.
   bool get isGoogleConfigured => kIsWeb
-      ? ApiKeys.googleWebClientId.isNotEmpty
+      ? true
       : ApiKeys.googleIosClientId.isNotEmpty &&
             ApiKeys.googleWebClientId.isNotEmpty;
 
@@ -68,7 +64,21 @@ class AuthService {
   // Google — native account picker, signInWithIdToken (no browser, ever).
   // ---------------------------------------------------------------------------
 
+  bool get _hasPlaceholderSupabaseUrl {
+    final uri = Uri.tryParse(ApiKeys.supabaseUrl.trim());
+    return uri == null ||
+        uri.host == 'example.supabase.co' ||
+        uri.host == 'your-project.supabase.co';
+  }
+
   Future<AuthResult> signInWithGoogle() async {
+    if (kIsWeb && _hasPlaceholderSupabaseUrl) {
+      return AuthResult.failure(
+        'Supabase is not configured for this web build. Copy '
+        'secrets.local.properties.example, add the real project URL and '
+        'publishable key, then restart the web app.',
+      );
+    }
     if (!isGoogleConfigured) {
       return AuthResult.failure(
         'Google sign-in isn\'t set up yet, use Apple or email for now.',

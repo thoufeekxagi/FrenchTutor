@@ -31,6 +31,7 @@ import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/web/web_lesson_layout.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../session/session_screen.dart' show CallStatus;
 import 'agent_led_vocab_screen.dart' show VocabStageResult;
@@ -998,49 +999,81 @@ class _AgentLedListeningScreenState
   @override
   Widget build(BuildContext context) {
     final notetaker = ref.watch(notetakerStateProvider);
-    // Matches iOS's fullScreenCover (no swipe-to-dismiss). See session_screen.dart for why
-    // canPop stays permanently false — _confirmEnd()'s own Navigator.pop() still works since
-    // it's a direct pop, not a system-initiated one.
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _confirmEnd();
       },
-      child: Scaffold(
-        backgroundColor: DesignTokens.canvas,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: DesignTokens.contentMaxWidth,
-                  ),
-                  child: Column(
-                    children: [
-                      _header(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _sceneScrollController,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: DesignTokens.screenMargin,
-                            vertical: DesignTokens.space4,
-                          ),
-                          child: _content(),
-                        ),
-                      ),
-                      if (_errorMessage.isNotEmpty)
-                        ErrorNotice(message: _errorMessage),
-                      _debugPanel(),
-                      _controls(),
-                    ],
-                  ),
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= DesignTokens.breakpointExpanded) {
+            final total = _sessionPlan.length;
+            final completed = _reviewedCount > total ? total : _reviewedCount;
+            return WebLessonLayout(
+              title: 'Reading & Listening',
+              stageLabel: 'Daily path · Stage 3',
+              currentStep: completed,
+              totalSteps: total,
+              progress: total == 0 ? 0 : completed / total,
+              status: _statusText,
+              statusColor: _statusColor,
+              duration: _formatDuration(_callDuration),
+              stepIndex: 2,
+              onExit: _confirmEnd,
+              trailing: ReportProblemButton(
+                sessionType: 'Listening practice',
+                personaName: _gemini.persona.displayName,
               ),
-              FloatingNotetakerOverlay(state: notetaker),
-            ],
-          ),
-        ),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _content(),
+                  if (_errorMessage.isNotEmpty)
+                    ErrorNotice(message: _errorMessage),
+                ],
+              ),
+              debugPanel: _debugPanel(),
+              controls: _controls(),
+              overlay: FloatingNotetakerOverlay(state: notetaker),
+            );
+          }
+          return Scaffold(
+            backgroundColor: DesignTokens.canvas,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: DesignTokens.contentMaxWidth,
+                      ),
+                      child: Column(
+                        children: [
+                          _header(),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              controller: _sceneScrollController,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: DesignTokens.screenMargin,
+                                vertical: DesignTokens.space4,
+                              ),
+                              child: _content(),
+                            ),
+                          ),
+                          if (_errorMessage.isNotEmpty)
+                            ErrorNotice(message: _errorMessage),
+                          _debugPanel(),
+                          _controls(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  FloatingNotetakerOverlay(state: notetaker),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

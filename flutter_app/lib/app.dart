@@ -52,7 +52,8 @@ class AuthGate extends ConsumerStatefulWidget {
   ConsumerState<AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends ConsumerState<AuthGate> {
+class _AuthGateState extends ConsumerState<AuthGate>
+    with WidgetsBindingObserver {
   bool _hasSession = AuthService.shared.currentSession != null;
   bool? _aiConsented;
   StreamSubscription<AuthState>? _subscription;
@@ -60,9 +61,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _subscription = AuthService.shared.onAuthStateChange.listen(
       _onAuthStateChange,
     );
+    if (_hasSession) _drainSync();
     AiConsentScreen.hasConsented().then((value) {
       if (mounted) setState(() => _aiConsented = value);
     });
@@ -106,10 +109,27 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
     if (!mounted) return;
     setState(() => _hasSession = session != null);
+    if (session != null) _drainSync();
+  }
+
+  void _drainSync() {
+    unawaited(
+      ref
+          .read(syncServiceProvider)
+          .drainOutbox(limit: 100)
+          .timeout(const Duration(seconds: 8), onTimeout: () {})
+          .catchError((_) {}),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _drainSync();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _subscription?.cancel();
     super.dispose();
   }

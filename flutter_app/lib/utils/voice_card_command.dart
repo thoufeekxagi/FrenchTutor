@@ -7,6 +7,7 @@
 /// [transcript] matches [nextPhrase] if it's near-exact (~90% similarity by
 /// edit distance) — tolerant of STT noise ("necks word" for "next word"),
 /// never of unrelated phrasing.
+library;
 
 /// Common filler wrapped around the real command in real speech — "next
 /// word PLEASE", "JUST next word", "OK, next word" — none of it changes what

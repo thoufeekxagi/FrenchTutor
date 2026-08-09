@@ -30,6 +30,7 @@ import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/speaking_session_result.dart';
+import '../../widgets/web/web_call_layout.dart';
 
 enum CallStatus {
   connecting,
@@ -184,6 +185,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       Navigator.of(context).pop();
       return;
     }
+    if (widget.apiKey.trim().isEmpty) {
+      setState(() {
+        _callStatus = CallStatus.ended;
+        _errorMessage =
+            'Live tutor is not enabled for this build. For local testing, '
+            'run ALLOW_UNSAFE_WEB_AI_KEYS=1 ./run_web_with_keys.sh.';
+      });
+      return;
+    }
     _gemini.connect();
     ProductAnalytics.capture('voice_session_started');
   }
@@ -237,7 +247,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     int usedSecondsBefore,
   ) {
     final usedSecondsAfter = store.aiSecondsUsedToday();
-    final entitlement = ref.read(pilotAccessServiceProvider).snapshot().entitlement;
+    final entitlement = ref
+        .read(pilotAccessServiceProvider)
+        .snapshot()
+        .entitlement;
     final baseLimit = PilotAccessService.baseDailyLimitSeconds(entitlement);
     final overageBefore = (usedSecondsBefore - baseLimit).clamp(
       0,
@@ -706,24 +719,40 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _confirmEnd();
       },
-      child: Scaffold(
-        backgroundColor: Passeport.parchment,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Column(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= DesignTokens.breakpointExpanded) {
+            return WebCallLayout(
+              persona: _gemini.persona.displayName,
+              status: _statusText,
+              statusColor: _statusColor,
+              duration: _formatDuration(_callDuration),
+              onExit: _confirmEnd,
+              transcript: _transcriptView(),
+              error: _errorMessage.isEmpty ? null : _errorMessage,
+              controls: _callControls(),
+            );
+          }
+          return Scaffold(
+            backgroundColor: Passeport.parchment,
+            body: SafeArea(
+              child: Stack(
                 children: [
-                  _callHeader(),
-                  Expanded(child: _transcriptView()),
-                  if (_errorMessage.isNotEmpty)
-                    ErrorNotice(message: _errorMessage),
-                  _callControls(),
+                  Column(
+                    children: [
+                      _callHeader(),
+                      Expanded(child: _transcriptView()),
+                      if (_errorMessage.isNotEmpty)
+                        ErrorNotice(message: _errorMessage),
+                      _callControls(),
+                    ],
+                  ),
+                  FloatingNotetakerOverlay(state: notetaker),
                 ],
               ),
-              FloatingNotetakerOverlay(state: notetaker),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_layout.dart';
+import '../../widgets/web/web_practice_grid.dart';
 import '../subscription/paywall_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import 'alphabet_lab_screen.dart';
@@ -28,6 +31,9 @@ class LabsScreen extends ConsumerWidget {
     // rebuilds with fresh lock state instead of showing what was true when
     // the tab was first opened.
     final gate = ref.watch(subscriptionGateServiceProvider);
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return _webPracticePage(context, gate);
+    }
     return Scaffold(
       backgroundColor: DesignTokens.parchment,
       body: SafeArea(
@@ -77,7 +83,8 @@ class LabsScreen extends ConsumerWidget {
                       _LabTile(
                         icon: CupertinoIcons.mic_fill,
                         title: 'Vocabulary',
-                        subtitle: 'Auto-pick or choose words, practice live with Marie',
+                        subtitle:
+                            'Auto-pick or choose words, practice live with Marie',
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
@@ -143,7 +150,8 @@ class LabsScreen extends ConsumerWidget {
                       _LabTile(
                         icon: CupertinoIcons.bubble_left_bubble_right,
                         title: 'Roleplay',
-                        subtitle: 'Live scenes: café, travel, directions & more',
+                        subtitle:
+                            'Live scenes: café, travel, directions & more',
                         locked: gate.isLabLocked('roleplay'),
                         onTap: () => _open(
                           context,
@@ -168,6 +176,130 @@ class LabsScreen extends ConsumerWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _webPracticePage(BuildContext context, SubscriptionGateService gate) {
+    final items = <WebPracticeShortcut>[
+      WebPracticeShortcut(
+        icon: CupertinoIcons.textformat_abc,
+        label: 'Alphabet',
+        locked: gate.isLabLocked('alphabet'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('alphabet'),
+          builder: (_) => const AlphabetLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.stopwatch_fill,
+        label: 'Speaking mock',
+        locked: gate.isLabLocked('speaking_mock'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('speaking_mock'),
+          builder: (_) => const MocksScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.mic_fill,
+        label: 'Vocabulary',
+        locked: gate.isLabLocked('vocabulary'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('vocabulary'),
+          builder: (_) => const VocabPickerScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.square_stack_3d_up,
+        label: 'Flashcards',
+        locked: gate.isLabLocked('flashcards'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('flashcards'),
+          builder: (_) => const VocabLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.book,
+        label: 'Grammar',
+        locked: gate.isLabLocked('grammar'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('grammar'),
+          builder: (_) => const GrammarLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.waveform,
+        label: 'Liaison',
+        locked: gate.isLabLocked('liaison'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('liaison'),
+          builder: (_) => const LiaisonLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.link,
+        label: 'Connectors',
+        locked: gate.isLabLocked('connectors'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('connectors'),
+          builder: (_) => const ConnectorsLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.headphones,
+        label: 'Listening',
+        locked: gate.isLabLocked('listening'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('listening'),
+          builder: (_) => const ListeningLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.bubble_left_bubble_right,
+        label: 'Roleplay',
+        locked: gate.isLabLocked('roleplay'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('roleplay'),
+          builder: (_) => const RoleplayLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.pencil,
+        label: 'Writing',
+        locked: gate.isLabLocked('writing'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('writing'),
+          builder: (_) => const WritingLabScreen(),
+        ),
+      ),
+    ];
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: WebPage(
+          header: const WebPageHeader(
+            title: 'Practice',
+            subtitle: 'Choose a focused way to build your French.',
+          ),
+          children: [
+            WebPracticeGrid(
+              heading: 'PRACTICE LIBRARY',
+              description:
+                  'Short, focused ways to practise one skill at a time.',
+              items: items,
+            ),
+          ],
         ),
       ),
     );

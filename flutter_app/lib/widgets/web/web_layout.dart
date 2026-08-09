@@ -55,15 +55,18 @@ class WebPage extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (header != null) ...[
-                header!,
-                const SizedBox(height: DesignTokens.space6),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (header != null) ...[
+                  header!,
+                  const SizedBox(height: DesignTokens.space6),
+                ],
+                ...children,
               ],
-              ...children,
-            ],
+            ),
           ),
         ),
       ),

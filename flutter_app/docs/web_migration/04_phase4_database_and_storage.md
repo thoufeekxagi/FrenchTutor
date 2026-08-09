@@ -1,6 +1,6 @@
 # Phase 4: Database & Storage for Web
 
-**Status**: **Complete and verified in a real browser.**
+**Status**: **IndexedDB persistence verified in a real browser; sync lifecycle hardening remains before public launch.**
 
 The conditional-import opener already existed (`database_opener.dart` → `database_opener_web.dart`), and this
 session confirmed it actually works end to end rather than just reading correctly: a `--release` web build was
@@ -8,8 +8,10 @@ loaded in a browser and IndexedDB afterwards contained the `parlesprint` databas
 bytes across the `blocks` and `files` object stores**. That is a real SQLite file with the full migration chain
 applied and content seeded, persisted through `IndexedDbFileSystem`.
 
-No code changes were needed. The decision below about possibly skipping local storage on web is therefore moot
-for now: offline-first works on web as-is, with the same schema, queries, and migrations as native.
+The database opener needs no separate web data model: offline-first works on web as-is, with the same schema,
+queries, and migrations as native. The app now drains pending sync work on auth and browser resume, but browser
+close is not a reliable final-flush signal. The outbox still needs pre-request durability and complete retry
+coverage before public launch.
 
 ## Current state (updated after Phase 1 audit)
 

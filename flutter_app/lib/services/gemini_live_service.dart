@@ -109,6 +109,14 @@ class GeminiLiveService {
 
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
+    if (apiKey.trim().isEmpty) {
+      onError?.call(
+        'Live tutor is not enabled for this build. For local testing, run '
+        'ALLOW_UNSAFE_WEB_AI_KEYS=1 ./run_web_with_keys.sh.',
+      );
+      onDisconnected?.call();
+      return;
+    }
     final uri = Uri.parse(
       'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=$apiKey',
     );

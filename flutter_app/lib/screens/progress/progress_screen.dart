@@ -177,7 +177,9 @@ class ProgressScreen extends ConsumerWidget {
       final category = DailyGoalService.categoryFor(session.stage);
       if (category != null) counts[category] = (counts[category] ?? 0) + 1;
     }
-    return counts.entries.map((e) => (category: e.key, count: e.value)).toList();
+    return counts.entries
+        .map((e) => (category: e.key, count: e.value))
+        .toList();
   }
 
   // --- Sections -------------------------------------------------------
@@ -361,7 +363,9 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategoryBreakdown(List<({String category, int count})> categories) {
+  Widget _buildCategoryBreakdown(
+    List<({String category, int count})> categories,
+  ) {
     final total = categories.fold<int>(0, (sum, c) => sum + c.count);
     if (total == 0) {
       return Container(
@@ -389,7 +393,11 @@ class ProgressScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: DesignTokens.space4),
             child: Row(
               children: [
-                Icon(_iconForCategory(c.category), size: 18, color: DesignTokens.primary),
+                Icon(
+                  _iconForCategory(c.category),
+                  size: 18,
+                  color: DesignTokens.primary,
+                ),
                 const SizedBox(width: DesignTokens.space3),
                 SizedBox(
                   width: 84,
@@ -400,7 +408,9 @@ class ProgressScreen extends ConsumerWidget {
                 ),
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusSmall,
+                    ),
                     child: LinearProgressIndicator(
                       value: fraction,
                       minHeight: 8,
@@ -529,20 +539,27 @@ class _WeekActivityChart extends StatelessWidget {
                       height: barHeight,
                       decoration: BoxDecoration(
                         color: entry.categoriesDone > 0
-                            ? (isToday ? DesignTokens.primary : DesignTokens.primarySoft)
+                            ? (isToday
+                                  ? DesignTokens.primary
+                                  : DesignTokens.primarySoft)
                             : DesignTokens.canvasDim,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusSmall,
+                        ),
                       ),
                     ),
                     const SizedBox(height: DesignTokens.space2),
                     Text(
                       DateFormat('EEEEE').format(entry.day),
-                      style: DesignTokens.body(
-                        11,
-                        weight: isToday ? FontWeight.w700 : FontWeight.w500,
-                      ).copyWith(
-                        color: isToday ? DesignTokens.primary : DesignTokens.slateDim,
-                      ),
+                      style:
+                          DesignTokens.body(
+                            11,
+                            weight: isToday ? FontWeight.w700 : FontWeight.w500,
+                          ).copyWith(
+                            color: isToday
+                                ? DesignTokens.primary
+                                : DesignTokens.slateDim,
+                          ),
                     ),
                   ],
                 ),

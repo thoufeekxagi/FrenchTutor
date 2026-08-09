@@ -1,7 +1,7 @@
 # Web UI Redesign — the ElevenLabs / shadcn pass
 
-**Status**: In progress. Onboarding and the app shell are done. Interior screens are the remaining work; the
-checklist at the bottom tracks them.
+**Status**: In progress. Onboarding, gate flows, and the first live lesson surfaces are now web-shaped. The
+remaining checklist covers the wider signed-in interior.
 
 ## The thing that took two failed attempts to understand
 
@@ -90,7 +90,9 @@ Done:
 - [x] **Onboarding steps** (goal / level / interests / tutor) — `_wideStep()`: contained card, question left,
       answers right, dark ink, azure action. Header, progress bar, choice tiles and buttons all have web
       variants gated on `_web`.
-- [x] **Sign-in** — `_AuthFrame` in `auth_screen.dart`: centred form-width card instead of full-window fields.
+- [x] **Sign-in** — desktop split layout with contained form and browser OAuth path.
+- [x] **AI consent** — desktop privacy explanation with contained consent card.
+- [x] **Live lesson shell** — desktop route rail and session chrome reused by vocabulary, grammar, and listening.
 
 Remaining — each needs a `_web` pass using the primitives above:
 

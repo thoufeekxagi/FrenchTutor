@@ -9,7 +9,7 @@ Auth, done:
   Uri.base.origin`). Native keeps its existing no-browser `signInWithIdToken` account-picker flow, untouched.
   The branch lives inside `AuthService` itself, which IS the leaf seam for "trigger a sign-in", rather than
   being pushed up into any screen. Needs the console config in `DEPLOY_WEB.md` sections 3-4.
-- `isGoogleConfigured` no longer requires the iOS client ID on web, where it is irrelevant.
+- `isGoogleConfigured` no longer blocks web OAuth on a Google client ID. Supabase owns the provider configuration; the browser only needs the OAuth redirect path.
 - Apple sign-in is **hidden on web** (`AuthService.isAppleAvailable`) because it needs an Apple Developer
   Service ID and registered return URL we have not set up. Showing a button that always fails is worse than
   not showing it. Native is unaffected. Decision still open on whether web ever gets Apple sign-in.

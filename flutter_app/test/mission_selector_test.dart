@@ -80,7 +80,7 @@ void main() {
   // primaryCompetencyId needs evidence too, or the selector (correctly)
   // keeps recommending calibration itself, same as the shared _catalog
   // tests above already account for.
-  final _calibDone = _state(
+  final calibDone = _state(
     competencyId: 'calib',
     masteryEstimate: 0.7,
     confidence: 0.7,
@@ -95,7 +95,7 @@ void main() {
       catalog: _levelWindowCatalog,
       level: 'b2',
       goal: 'everyday',
-      competencyStates: [_calibDone],
+      competencyStates: [calibDone],
     );
 
     expect(recommendation.mission.id, 'b2_match');
@@ -106,7 +106,7 @@ void main() {
       catalog: _a2OnlyCatalog,
       level: 'b1',
       goal: 'everyday',
-      competencyStates: [_calibDone],
+      competencyStates: [calibDone],
     );
 
     // Nothing within one band of B1 exists in this catalog, so the A2
@@ -155,7 +155,7 @@ void main() {
       modelVersion: 'test',
       nextReviewAt: DateTime.now().subtract(const Duration(days: 1)),
     );
-    final states = [_calibDone, dueForBoosted];
+    final states = [calibDone, dueForBoosted];
 
     final withoutBoost = selector.select(
       catalog: _boostCatalog,

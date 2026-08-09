@@ -1,42 +1,75 @@
 #!/bin/bash
-# Local-only helper (same pattern as run_with_keys.sh, for the web target) — reads keys
-# from secrets.local.properties so a plain `flutter run -d web-server` doesn't hit the
-# "Bad state: Missing SUPABASE_URL / SUPABASE_ANON_KEY" startup crash.
+# Local-only web runner. Builds a release bundle with your local .env keys
+# baked in (NEVER commit the build/ dir), serves it on http://127.0.0.1:8734,
+# and works in any browser (Firefox, Chrome, Safari). Use like `bun dev`.
+#
+#   ./run_web_with_keys.sh
+#
+# Then open http://127.0.0.1:8734 in Firefox. Ctrl-C to stop.
 set -euo pipefail
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
-SECRETS_FILE="secrets.local.properties"
-if [ ! -f "$SECRETS_FILE" ]; then
-  echo "Missing $SECRETS_FILE — copy secrets.local.properties.example to $SECRETS_FILE and fill in real keys." >&2
+CONFIG_FILE="$SCRIPT_DIR/../.env"
+if [ ! -f "$CONFIG_FILE" ]; then
+  CONFIG_FILE="$SCRIPT_DIR/secrets.local.properties"
+fi
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Missing ../.env and secrets.local.properties. Add real Supabase values before starting web." >&2
   exit 1
 fi
-GEMINI_KEY=$(grep '^GEMINI_API_KEY=' "$SECRETS_FILE" | sed 's/^GEMINI_API_KEY=//')
-OPENROUTER_KEY=$(grep '^OPENROUTER_API_KEY=' "$SECRETS_FILE" | sed 's/^OPENROUTER_API_KEY=//')
-SUPABASE_URL=$(grep '^SUPABASE_URL=' "$SECRETS_FILE" | sed 's/^SUPABASE_URL=//')
-SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' "$SECRETS_FILE" | sed 's/^SUPABASE_ANON_KEY=//')
-GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
-GOOGLE_WEB_CLIENT_ID=$(grep '^GOOGLE_WEB_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_WEB_CLIENT_ID=//')
-REVENUECAT_IOS_KEY=$(grep '^REVENUECAT_IOS_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_IOS_KEY=//')
-REVENUECAT_ANDROID_KEY=$(grep '^REVENUECAT_ANDROID_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_ANDROID_KEY=//')
-SENTRY_DSN=$(grep '^SENTRY_DSN=' "$SECRETS_FILE" | sed 's/^SENTRY_DSN=//')
-POSTHOG_API_KEY=$(grep '^POSTHOG_API_KEY=' "$SECRETS_FILE" | sed 's/^POSTHOG_API_KEY=//')
-POSTHOG_HOST=$(grep '^POSTHOG_HOST=' "$SECRETS_FILE" | sed 's/^POSTHOG_HOST=//')
 
-# --no-web-resources-cdn: loads CanvasKit from this build's own bundled copy
-# instead of Google's CDN. Without it the app is a blank white screen for
-# anyone whose browser/network/ad-blocker can't reach that CDN — confirmed
-# live testing in Safari.
-exec flutter run \
-  -d web-server --web-port 8734 --web-hostname 127.0.0.1 \
-  --no-web-resources-cdn \
-  --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
-  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
+read_key() {
+  local key="$1"
+  local value
+  value=$(sed -n -E "s/^[[:space:]]*(export[[:space:]]+)?${key}[[:space:]]*=[[:space:]]*//p" "$CONFIG_FILE" | head -n 1)
+  value="${value%$'\r'}"
+  value="${value#\"}"; value="${value%\"}"
+  value="${value#\'}"; value="${value%\'}"
+  printf '%s' "$value"
+}
+
+SUPABASE_URL=$(read_key SUPABASE_URL)
+SUPABASE_ANON_KEY=$(read_key SUPABASE_ANON_KEY)
+GOOGLE_WEB_CLIENT_ID=$(read_key GOOGLE_WEB_CLIENT_ID)
+GEMINI_KEY=$(read_key GEMINI_API_KEY)
+OPENROUTER_KEY=$(read_key OPENROUTER_API_KEY)
+SENTRY_DSN=$(read_key SENTRY_DSN)
+POSTHOG_API_KEY=$(read_key POSTHOG_API_KEY)
+POSTHOG_HOST=$(read_key POSTHOG_HOST)
+
+if [[ "$SUPABASE_URL" == "https://example.supabase.co" ||
+      "$SUPABASE_URL" == *"your-project"* ||
+      -z "$SUPABASE_ANON_KEY" ||
+      "$SUPABASE_ANON_KEY" == your-* ]]; then
+  echo "Invalid Supabase web configuration. Fill the real SUPABASE_URL and SUPABASE_ANON_KEY in $CONFIG_FILE." >&2
+  exit 1
+fi
+
+if [ -z "$GEMINI_KEY" ] || [[ "$GEMINI_KEY" == your-* ]]; then
+  echo "Missing GEMINI_API_KEY in $CONFIG_FILE. Local web testing needs it for AI calls." >&2
+  exit 1
+fi
+
+PORT="${WEB_PORT:-8734}"
+HOST="${WEB_HOST:-127.0.0.1}"
+BUILD_DIR="$SCRIPT_DIR/build/web"
+
+echo "Building Flutter web (release) with local keys..."
+flutter build web --release --no-web-resources-cdn \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
-  --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID" \
+  --dart-define=DEV_UNLOCK_ALL=true \
   --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \
-  --dart-define=REVENUECAT_IOS_KEY="$REVENUECAT_IOS_KEY" \
-  --dart-define=REVENUECAT_ANDROID_KEY="$REVENUECAT_ANDROID_KEY" \
+  --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
+  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   --dart-define=SENTRY_DSN="$SENTRY_DSN" \
   --dart-define=POSTHOG_API_KEY="$POSTHOG_API_KEY" \
   --dart-define=POSTHOG_HOST="$POSTHOG_HOST"
+
+echo
+echo "Serving on http://$HOST:$PORT  (Ctrl-C to stop)"
+echo "Open in Firefox: http://$HOST:$PORT"
+echo
+cd "$BUILD_DIR"
+exec python3 -m http.server "$PORT" --bind "$HOST"

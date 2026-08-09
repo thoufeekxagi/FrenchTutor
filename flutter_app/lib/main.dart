@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
@@ -20,95 +19,84 @@ import 'services/pilot_access_service.dart';
 import 'services/subscription_gate_service.dart';
 
 void main() {
-  // SentryFlutter.init wraps runZonedGuarded below via appRunner rather than
-  // replacing it — it auto-wires FlutterError.onError and platform-dispatcher
-  // errors on top, while the existing zone handler and try/catch below still
-  // run exactly as before. An empty DSN (no Sentry project configured yet)
-  // makes the SDK a silent no-op, same "not configured" pattern as every
-  // other optional key in ApiKeys.
+  // SentryFlutter.init owns the appRunner error zone and wires Flutter errors
+  // automatically. The startup try/catch below still renders a visible error
+  // screen for failures before the app can mount. An empty DSN makes the SDK a
+  // silent no-op, matching the other optional keys in ApiKeys.
   SentryFlutter.init(
     (options) {
       options.dsn = ApiKeys.sentryDsn;
       // Crash/error reporting only — no performance-trace overhead needed here.
       options.tracesSampleRate = 0.0;
     },
-    appRunner: () => runZonedGuarded(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
-        // Portrait-only on phones for the pilot — no landscape call/lesson
-        // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
-        if (!kIsWeb) {
-          await SystemChrome.setPreferredOrientations([
-            DeviceOrientation.portraitUp,
-            DeviceOrientation.portraitDown,
-          ]);
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Portrait-only on phones for the pilot — no landscape call/lesson
+      // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
+      if (!kIsWeb) {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+      try {
+        if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
+          throw StateError(
+            'Missing SUPABASE_URL / SUPABASE_ANON_KEY. Run via '
+            './run_with_keys.sh or ./run_release_with_keys.sh (see '
+            'BUILD_FLUTTER_TO_IPHONE.md), a plain `flutter run` ships '
+            'without these and auth cannot work.',
+          );
         }
-        try {
-          if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
-            throw StateError(
-              'Missing SUPABASE_URL / SUPABASE_ANON_KEY. Run via '
-              './run_with_keys.sh or ./run_release_with_keys.sh (see '
-              'BUILD_FLUTTER_TO_IPHONE.md), a plain `flutter run` ships '
-              'without these and auth cannot work.',
-            );
-          }
-          await Supabase.initialize(
-            url: ApiKeys.supabaseUrl,
-            // The modern "publishable" key (sb_publishable_...), not the
-            // legacy anon JWT — see ApiKeys.supabaseAnonKey's doc comment.
-            publishableKey: ApiKeys.supabaseAnonKey,
-          );
-          // Product-usage analytics (not crash reporting — that's Sentry
-          // above). Empty key means no PostHog project is wired yet, so this
-          // is a silent no-op, matching every other optional key's pattern.
-          if (ApiKeys.posthogApiKey.isNotEmpty) {
-            final config = PostHogConfig(ApiKeys.posthogApiKey)
-              ..host = ApiKeys.posthogHost
-              ..captureApplicationLifecycleEvents = true
-              ..debug = kDebugMode;
-            await Posthog().setup(config);
-          }
-          final db = await openAppDatabase();
-          LessonSpeechService.configure(db);
-          final infrastructure = PilotInfrastructureStore(db);
-          final platform = _pilotPlatform();
-          final installationId = infrastructure.installationId(platform.name);
-          if (ApiKeys.posthogApiKey.isNotEmpty) {
-            await Posthog().identify(userId: installationId);
-          }
-          PilotTelemetry(
-            infrastructure: infrastructure,
-            installationId: installationId,
-          ).appStarted(platform: platform);
-          await ContentService.shared.preload();
-          // The chosen tutor persona must be readable synchronously anywhere
-          // (P2.1) — loaded once here, updated only from Settings/Onboarding.
-          await ActiveTutor.load();
-          await DevSubscriptionOverride.load();
-          const OrchestrationBootstrapper().bootstrap(
-            content: ContentService.shared,
-            store: CompetencyStore(db),
-          );
+        await Supabase.initialize(
+          url: ApiKeys.supabaseUrl,
+          // The modern "publishable" key (sb_publishable_...), not the
+          // legacy anon JWT — see ApiKeys.supabaseAnonKey's doc comment.
+          publishableKey: ApiKeys.supabaseAnonKey,
+        );
+        // Product-usage analytics (not crash reporting — that's Sentry
+        // above). Empty key means no PostHog project is wired yet, so this
+        // is a silent no-op, matching every other optional key's pattern.
+        if (ApiKeys.posthogApiKey.isNotEmpty) {
+          final config = PostHogConfig(ApiKeys.posthogApiKey)
+            ..host = ApiKeys.posthogHost
+            ..captureApplicationLifecycleEvents = true
+            ..debug = kDebugMode;
+          await Posthog().setup(config);
+        }
+        final db = await openAppDatabase();
+        LessonSpeechService.configure(db);
+        final infrastructure = PilotInfrastructureStore(db);
+        final platform = _pilotPlatform();
+        final installationId = infrastructure.installationId(platform.name);
+        if (ApiKeys.posthogApiKey.isNotEmpty) {
+          await Posthog().identify(userId: installationId);
+        }
+        PilotTelemetry(
+          infrastructure: infrastructure,
+          installationId: installationId,
+        ).appStarted(platform: platform);
+        await ContentService.shared.preload();
+        // The chosen tutor persona must be readable synchronously anywhere
+        // (P2.1) — loaded once here, updated only from Settings/Onboarding.
+        await ActiveTutor.load();
+        await DevSubscriptionOverride.load();
+        const OrchestrationBootstrapper().bootstrap(
+          content: ContentService.shared,
+          store: CompetencyStore(db),
+        );
 
-          runApp(
-            ProviderScope(
-              overrides: [databaseProvider.overrideWithValue(db)],
-              child: const FrenchTutorApp(),
-            ),
-          );
-        } catch (error, stackTrace) {
-          await Sentry.captureException(error, stackTrace: stackTrace);
-          runApp(_StartupErrorApp(error: error, stackTrace: stackTrace));
-        }
-      },
-      (error, stackTrace) {
-        // Catches anything thrown asynchronously outside the try/catch above (e.g. a
-        // dangling Future from a plugin's platform channel) so the app can never go
-        // silently blank — always show something rather than nothing.
-        debugPrint('Uncaught zone error: $error\n$stackTrace');
-        Sentry.captureException(error, stackTrace: stackTrace);
-      },
-    ),
+        runApp(
+          ProviderScope(
+            overrides: [databaseProvider.overrideWithValue(db)],
+            child: const FrenchTutorApp(),
+          ),
+        );
+      } catch (error, stackTrace) {
+        await Sentry.captureException(error, stackTrace: stackTrace);
+        runApp(_StartupErrorApp(error: error, stackTrace: stackTrace));
+      }
+    },
   );
 }
 
