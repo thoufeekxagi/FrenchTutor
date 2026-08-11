@@ -16,7 +16,7 @@ class KickerText extends StatelessWidget {
       style: DesignTokens.mono(
         11,
         weight: FontWeight.w600,
-      ).copyWith(color: color ?? DesignTokens.slateDim),
+      ).copyWith(color: color ?? DesignTokens.mutedDim),
     );
   }
 }

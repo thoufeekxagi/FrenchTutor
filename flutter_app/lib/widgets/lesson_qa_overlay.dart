@@ -94,7 +94,8 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
       setState(() => _isConnecting = false);
       if (!connected) {
         setState(
-          () => _errorText = "Couldn't connect. Check your connection and try again.",
+          () => _errorText =
+              "Couldn't connect. Check your connection and try again.",
         );
         return;
       }
@@ -187,7 +188,9 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
   void _replay() {
     final answer = _answer;
     if (answer == null) return;
-    _speech.speak(items: [SpeechItem(text: answer, language: 'en-US')]);
+    _speech.speak(
+      items: [SpeechItem(text: answer, language: 'en-US')],
+    );
   }
 
   @override
@@ -239,7 +242,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                       ),
                       icon: const Icon(
                         CupertinoIcons.xmark_circle_fill,
-                        color: DesignTokens.slate,
+                        color: DesignTokens.muted,
                         size: 20,
                       ),
                     ),
@@ -259,7 +262,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                                   ? 'Listening…'
                                   : _partialTranscript,
                               style: DesignTokens.body(14).copyWith(
-                                color: DesignTokens.slateDim,
+                                color: DesignTokens.mutedDim,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -316,10 +319,10 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                         icon: const Icon(
                           CupertinoIcons.speaker_2_fill,
                           size: 18,
-                          color: DesignTokens.slateDim,
+                          color: DesignTokens.mutedDim,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: DesignTokens.parchmentDim,
+                          backgroundColor: DesignTokens.canvasDim,
                           shape: const CircleBorder(),
                           fixedSize: const Size.square(
                             DesignTokens.minTapTarget,
@@ -341,9 +344,9 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                             : _toggleMic,
                         style: IconButton.styleFrom(
                           backgroundColor: (_isThinking || _isConnecting)
-                              ? DesignTokens.slate
+                              ? DesignTokens.muted
                               : DesignTokens.primary,
-                          disabledBackgroundColor: DesignTokens.slate,
+                          disabledBackgroundColor: DesignTokens.muted,
                           foregroundColor: DesignTokens.surface,
                           disabledForegroundColor: DesignTokens.surface,
                           fixedSize: const Size.square(64),

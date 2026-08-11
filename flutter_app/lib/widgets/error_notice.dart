@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../config/theme.dart';
+import '../design/app_styles.dart';
 
 /// The in-call error banner, shared by every live screen. Most errors are
 /// plain text — but a denied microphone permission gets a real recovery path:

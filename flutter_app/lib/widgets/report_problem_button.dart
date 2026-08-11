@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../config/theme.dart';
+import '../design/app_styles.dart';
 
 /// Opens the device's own mail app with a pre-filled draft to support —
 /// required in-call affordance for AI-generated content per Apple's 2026
@@ -54,11 +54,7 @@ class ReportProblemButton extends StatelessWidget {
         child: const SizedBox(
           width: 44,
           height: 44,
-          child: Icon(
-            CupertinoIcons.flag,
-            size: 19,
-            color: Passeport.slateDim,
-          ),
+          child: Icon(CupertinoIcons.flag, size: 19, color: AppStyles.mutedDim),
         ),
       ),
     );

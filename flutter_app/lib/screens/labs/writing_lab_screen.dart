@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/learning_store.dart' show WritingSubmission;
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
-import '../../widgets/passeport_card.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/learning_card.dart';
+import '../../widgets/primary_action_button.dart';
 import '../lessons/writing_task_screen.dart';
 
 class WritingLabScreen extends ConsumerStatefulWidget {
@@ -59,18 +59,20 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Writing', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         children: [
-          PasseportPrimaryButton(
-            label: _isGenerating ? 'Preparing your task…' : 'New writing practice',
+          PrimaryActionButton(
+            label: _isGenerating
+                ? 'Preparing your task…'
+                : 'New writing practice',
             icon: _isGenerating ? null : CupertinoIcons.wand_stars,
             onPressed: _isGenerating ? null : _startNewPractice,
           ),
@@ -78,7 +80,9 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
             const SizedBox(height: 8),
             Text(
               _errorText!,
-              style: DesignTokens.mono(11).copyWith(color: DesignTokens.primary),
+              style: DesignTokens.mono(
+                11,
+              ).copyWith(color: DesignTokens.primary),
             ),
           ],
           const SizedBox(height: 16),
@@ -101,7 +105,7 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
             style: DesignTokens.mono(
               10.5,
               weight: FontWeight.w500,
-            ).copyWith(color: DesignTokens.slateDim),
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
           const SizedBox(height: 8),
           for (final s in submissions) ...[
@@ -128,7 +132,7 @@ class _SubmissionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -147,7 +151,7 @@ class _SubmissionTile extends StatelessWidget {
                 _dateLabel,
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),
@@ -159,7 +163,7 @@ class _SubmissionTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.body(
                 12.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
             ),
           ],
         ],

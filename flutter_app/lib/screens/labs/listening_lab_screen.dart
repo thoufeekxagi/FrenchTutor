@@ -14,7 +14,7 @@ import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../lessons/story_reader_screen.dart';
 
 // Fixed topic categories the learner can tap to steer generation, alongside
@@ -178,10 +178,10 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     final starterStories = ref.watch(contentServiceProvider).starterStories();
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Listening', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -200,7 +200,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           ),
           const SizedBox(height: 20),
           if (stories.isNotEmpty) ...[
-            const KickerText('Your stories', color: DesignTokens.slateDim),
+            const KickerText('Your stories', color: DesignTokens.mutedDim),
             const SizedBox(height: 10),
             for (final story in stories)
               Padding(
@@ -218,7 +218,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
             _EmptyLibraryNote(),
           if (starterStories.isNotEmpty) ...[
             const SizedBox(height: 8),
-            const KickerText('Starter stories', color: DesignTokens.slateDim),
+            const KickerText('Starter stories', color: DesignTokens.mutedDim),
             const SizedBox(height: 10),
             for (final story in starterStories)
               Padding(
@@ -252,7 +252,7 @@ class _GenerateStoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: Container(
@@ -279,7 +279,7 @@ class _GenerateStoryTile extends StatelessWidget {
               : selectedTopic != null
               ? 'A fresh bilingual story with a $selectedTopic twist'
               : 'A fresh bilingual story, generated for you',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
         ),
         trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
         onTap: generating ? null : onTap,
@@ -325,7 +325,7 @@ class _TopicChipRow extends StatelessWidget {
                 option ?? 'Surprise me',
                 style: DesignTokens.body(12.5, weight: FontWeight.w600)
                     .copyWith(
-                      color: isSelected ? Colors.white : DesignTokens.slateDim,
+                      color: isSelected ? Colors.white : DesignTokens.mutedDim,
                     ),
               ),
             ),
@@ -349,7 +349,7 @@ class _StoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       padding: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -369,7 +369,7 @@ class _StoryTile extends StatelessWidget {
                     : DateFormat('MMM d, HH:mm').format(story.createdAt),
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               if (story.quiz.isNotEmpty) ...[
                 const SizedBox(width: 8),
@@ -377,7 +377,7 @@ class _StoryTile extends StatelessWidget {
                   '${story.quiz.length} questions',
                   style: DesignTokens.mono(
                     10.5,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
               if (story.keywords.isNotEmpty) ...[
@@ -386,7 +386,7 @@ class _StoryTile extends StatelessWidget {
                   '${story.keywords.length} keywords',
                   style: DesignTokens.mono(
                     10.5,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
             ],
@@ -410,14 +410,14 @@ class _EmptyLibraryNote extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.book,
-            color: DesignTokens.slateDim,
+            color: DesignTokens.mutedDim,
             size: 28,
           ),
           const SizedBox(height: 10),
           Text(
             'No stories of your own yet, generate one above, or try a starter story below',
             textAlign: TextAlign.center,
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.slateDim),
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),

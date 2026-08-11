@@ -76,7 +76,7 @@ class HistoryScreen extends ConsumerWidget {
                           : '$dateText · $durationText',
                       style: DesignTokens.body(
                         14,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                     const SizedBox(height: DesignTokens.space4),
                     Container(
@@ -152,7 +152,7 @@ class HistoryScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: DesignTokens.body(
                 14,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
             ),
           ],
         ),
@@ -198,7 +198,7 @@ class HistoryScreen extends ConsumerWidget {
                   style: DesignTokens.body(
                     12,
                     weight: FontWeight.w600,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: DesignTokens.space1),
                 Container(
@@ -211,7 +211,7 @@ class HistoryScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(
                       DesignTokens.radiusCard,
                     ),
-                    boxShadow: isUser ? null : DesignTokens.cardShadow,
+                    boxShadow: isUser ? null : DesignTokens.surfaceShadow,
                   ),
                   child: Text(
                     message.content,

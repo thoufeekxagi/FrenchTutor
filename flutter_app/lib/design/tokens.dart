@@ -7,7 +7,7 @@ import 'palettes.dart';
 /// app re-skins — screens only ever see the semantic tokens below, never a
 /// palette directly, so swapping is one line + rebuild. See palettes.dart for
 /// the slot contract and how to add a palette from a marketing mockup.
-typedef _Palette = ProSystemAzure;
+typedef _Palette = ConfidentMomentum;
 
 /// Layer 1 of the design wiring (PILOT_PLAN.md Phase 0.2): pure constants.
 /// Semantic tokens — colors, type, spacing, radius, motion — with NO platform
@@ -26,8 +26,6 @@ typedef _Palette = ProSystemAzure;
 ///  - No monospace anywhere; labels/badges are letterspaced Inter.
 abstract final class DesignTokens {
   // --- Colors — every value comes from the active palette (typedef above).
-  // Semantic names are canonical; the legacy names (parchment/card/maroon/
-  // brass/sage/sky/slate) are aliases kept while older call sites migrate.
   static const ink = _Palette.ink;
   static const inkSoft = _Palette.inkSoft;
   static const canvas = _Palette.canvas;
@@ -51,18 +49,7 @@ abstract final class DesignTokens {
   static const mutedDim = _Palette.mutedDim;
   static const text = ink;
 
-  // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
-  static const parchment = canvas;
-  static const parchmentDim = canvasDim;
-  static const card = surface;
-  static const maroon = primary;
-  static const maroonDeep = primaryDeep;
-  static const brass = mastery;
-  static const sage = success;
-  static const sky = info;
-  static const slate = muted;
-  static const slateDim = mutedDim;
-
+  // Legacy aliases (ParleSprint era) — migrate call sites, don't add new uses.
   static final hairline = ink.withValues(alpha: 0.09);
   static final hairlineLight = canvas.withValues(alpha: 0.16);
 
@@ -76,11 +63,11 @@ abstract final class DesignTokens {
   );
 
   /// Soft card shadow — depth via a whisper of ink, never Material elevation.
-  static List<BoxShadow> get cardShadow => [
+  static List<BoxShadow> get surfaceShadow => [
     BoxShadow(
       color: ink.withValues(alpha: 0.06),
-      blurRadius: 14,
-      offset: const Offset(0, 3),
+      blurRadius: 24,
+      offset: const Offset(0, 8),
     ),
   ];
 
@@ -91,16 +78,19 @@ abstract final class DesignTokens {
   static const space4 = 16.0;
   static const space5 = 20.0;
   static const space6 = 24.0;
+  static const space7 = 28.0;
+  static const space8 = 32.0;
   static const screenMargin = 20.0;
 
   // --- Radius ---
-  static const radiusSmall = 8.0;
-  static const radiusMedium = 12.0;
-  static const radiusCard = 16.0;
+  static const radiusSmall = 10.0;
+  static const radiusMedium = 14.0;
+  static const radiusCard = 20.0;
+  static const radiusLarge = 28.0;
   static const radiusPill = 100.0;
 
   // --- Hit targets (Apple HIG minimum) ---
-  static const minTapTarget = 44.0;
+  static const minTapTarget = 48.0;
 
   // --- Motion: iOS-calibrated — quick, low-bounce, never elastic ---
   static const durationFast = Duration(milliseconds: 200);
@@ -119,11 +109,11 @@ abstract final class DesignTokens {
   /// Display voice — Inter, heavier and tighter at hero sizes. The serif
   /// experiment is fully retired (2026-07): every platform, every screen,
   /// onboarding included, renders the same SF-style sans.
-  static TextStyle display(double size, {FontWeight weight = FontWeight.w500}) {
+  static TextStyle display(double size, {FontWeight weight = FontWeight.w700}) {
     final resolved = size >= 22
         ? (weight.value < FontWeight.w700.value ? FontWeight.w700 : weight)
         : (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight);
-    return GoogleFonts.inter(
+    return GoogleFonts.plusJakartaSans(
       fontSize: size,
       fontWeight: resolved,
       color: ink,
@@ -143,12 +133,15 @@ abstract final class DesignTokens {
 
   /// Labels, badges, kickers, numbers — letterspaced Inter medium (the old
   /// JetBrains Mono techy look is gone; mockups use quiet spaced caps).
-  static TextStyle mono(double size, {FontWeight weight = FontWeight.w500}) {
+  static TextStyle label(double size, {FontWeight weight = FontWeight.w700}) {
     return GoogleFonts.inter(
       fontSize: size,
       fontWeight: weight,
       color: ink,
-      letterSpacing: 0.4,
+      letterSpacing: 0.35,
     );
   }
+
+  static TextStyle mono(double size, {FontWeight weight = FontWeight.w600}) =>
+      label(size, weight: weight);
 }

@@ -71,7 +71,7 @@ class SessionRow extends StatelessWidget {
                   formatDate(session.startedAt),
                   style: DesignTokens.body(
                     11.5,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
             ),
@@ -95,7 +95,7 @@ class SessionRow extends StatelessWidget {
           const Icon(
             CupertinoIcons.chevron_right,
             size: 13,
-            color: DesignTokens.slate,
+            color: DesignTokens.muted,
           ),
         ],
       ),

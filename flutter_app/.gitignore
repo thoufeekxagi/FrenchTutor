@@ -48,6 +48,11 @@ app.*.map.json
 # secrets.local.properties.example for the template a new dev copies from.
 secrets.local.properties
 
+# Android release signing credentials stay local to each developer machine.
+/android/key.properties
+/android/*.jks
+/android/*.keystore
+
 # Local API keys for --dart-define-from-file (never commit real keys)
 dart_defines.json
 

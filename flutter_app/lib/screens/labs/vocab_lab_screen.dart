@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../providers/database_provider.dart';
 import '../lessons/flashcard_session_screen.dart';
@@ -24,10 +24,10 @@ class VocabLabScreen extends ConsumerWidget {
     final phases = content.vocabPhases;
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchment,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
         title: Text('Flashcards', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchment,
+        backgroundColor: DesignTokens.canvas,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -67,7 +67,7 @@ class _PhaseSection extends StatelessWidget {
         const SizedBox(height: 16),
         KickerText(label),
         const SizedBox(height: 10),
-        PasseportCard(
+        LearningCard(
           padding: 0,
           child: Column(
             children: [
@@ -143,7 +143,7 @@ class _ThemeTile extends StatelessWidget {
             )
           : Icon(
               CupertinoIcons.chevron_right,
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               size: 20,
             ),
       onTap: () {

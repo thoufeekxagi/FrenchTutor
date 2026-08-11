@@ -29,7 +29,7 @@ class LabsScreen extends ConsumerWidget {
     // the tab was first opened.
     final gate = ref.watch(subscriptionGateServiceProvider);
     return Scaffold(
-      backgroundColor: DesignTokens.parchment,
+      backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: PSContentColumn(
           child: Padding(
@@ -44,7 +44,7 @@ class LabsScreen extends ConsumerWidget {
                   'Go deeper on one skill at a time',
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
@@ -77,7 +77,8 @@ class LabsScreen extends ConsumerWidget {
                       _LabTile(
                         icon: CupertinoIcons.mic_fill,
                         title: 'Vocabulary',
-                        subtitle: 'Auto-pick or choose words, practice live with Marie',
+                        subtitle:
+                            'Auto-pick or choose words, practice live with Marie',
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
@@ -143,7 +144,8 @@ class LabsScreen extends ConsumerWidget {
                       _LabTile(
                         icon: CupertinoIcons.bubble_left_bubble_right,
                         title: 'Roleplay',
-                        subtitle: 'Live scenes: café, travel, directions & more',
+                        subtitle:
+                            'Live scenes: café, travel, directions & more',
                         locked: gate.isLabLocked('roleplay'),
                         onTap: () => _open(
                           context,
@@ -216,7 +218,7 @@ class _LabTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: DesignTokens.card,
+          color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: DesignTokens.hairline, width: 1),
         ),
@@ -247,11 +249,14 @@ class _LabTile extends StatelessWidget {
                     child: Container(
                       width: 18,
                       height: 18,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: DesignTokens.surface,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(color: Color(0x1A000000), blurRadius: 3),
+                          BoxShadow(
+                            color: DesignTokens.ink.withValues(alpha: 0.10),
+                            blurRadius: 3,
+                          ),
                         ],
                       ),
                       child: Icon(
@@ -277,14 +282,14 @@ class _LabTile extends StatelessWidget {
                     subtitle,
                     style: DesignTokens.body(
                       12,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
             ),
             Icon(
               locked ? CupertinoIcons.lock_fill : CupertinoIcons.chevron_right,
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               size: locked ? 14 : 16,
             ),
           ],

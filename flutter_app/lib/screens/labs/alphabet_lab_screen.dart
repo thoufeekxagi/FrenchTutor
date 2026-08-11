@@ -17,8 +17,8 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/inline_call_bar.dart';
-import '../../widgets/passeport_card.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/learning_card.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../widgets/tts_play_button.dart';
 
 /// One-time, static (not AI-generated — accuracy matters more here than
@@ -54,10 +54,10 @@ class _AlphabetLabScreenState extends ConsumerState<AlphabetLabScreen> {
   Widget build(BuildContext context) {
     final store = ref.watch(learningStoreProvider);
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Learn the Alphabet', style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -70,7 +70,7 @@ class _AlphabetLabScreenState extends ConsumerState<AlphabetLabScreen> {
               'or accents on their own. Each deck takes about 10-15 minutes.',
               style: DesignTokens.body(
                 13.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
             ),
             const SizedBox(height: 20),
             for (final deck in _decks) ...[
@@ -169,7 +169,7 @@ class _DeckTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: DesignTokens.card,
+          color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: DesignTokens.hairline, width: 1),
         ),
@@ -210,14 +210,14 @@ class _DeckTile extends StatelessWidget {
                     deck.subtitle,
                     style: DesignTokens.body(
                       12,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
             ),
             Icon(
               CupertinoIcons.chevron_right,
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               size: 16,
             ),
           ],
@@ -382,7 +382,7 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: PasseportPrimaryButton(
+                  child: PrimaryActionButton(
                     label: 'Take the quick review',
                     icon: CupertinoIcons.checkmark_seal,
                     onPressed: _startQuiz,
@@ -422,7 +422,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
   @override
   Widget build(BuildContext context) {
     final letter = widget.letter;
-    return PasseportCard(
+    return LearningCard(
       padding: 14,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,7 +482,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                   style: DesignTokens.body(
                     12.5,
                     weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
             ),
@@ -544,7 +544,7 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
         const SizedBox(height: 4),
         Text(
           'Just the ones worth double-checking.',
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 20),
         for (var i = 0; i < _questions.length; i++) ...[
@@ -560,7 +560,7 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
         ],
         const SizedBox(height: 8),
         if (!_submitted)
-          PasseportPrimaryButton(
+          PrimaryActionButton(
             label: 'Check answers',
             onPressed: allAnswered
                 ? () => setState(() => _submitted = true)
@@ -584,7 +584,7 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
             ),
           ),
           const SizedBox(height: 12),
-          PasseportPrimaryButton(
+          PrimaryActionButton(
             label: 'Done',
             icon: CupertinoIcons.checkmark,
             onPressed: () => widget.onFinished(_score),
@@ -622,7 +622,7 @@ class _QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -637,7 +637,7 @@ class _QuestionCard extends StatelessWidget {
             children: question.choices.map((choice) {
               final isSelected = selected == choice;
               final isCorrect = choice == question.answer;
-              Color bg = DesignTokens.parchmentDim;
+              Color bg = DesignTokens.canvasDim;
               Color border = DesignTokens.hairline;
               if (checked) {
                 if (isCorrect) {

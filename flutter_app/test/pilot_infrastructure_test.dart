@@ -116,11 +116,12 @@ void main() {
       final store = LearningStore(db);
       final infrastructure = PilotInfrastructureStore(db);
       final now = DateTime.now().toUtc().toIso8601String();
+      final localDate = DateTime.now().toIso8601String().substring(0, 10);
       db.execute(
         '''INSERT INTO credit_usage
            (id, local_date, seconds_used, created_at)
-           VALUES (?, date('now', 'localtime'), ?, ?)''',
-        ['credit-1', 900, now],
+           VALUES (?, ?, ?, ?)''',
+        ['credit-1', localDate, 900, now],
       );
 
       final snapshot = PilotAccessService(
@@ -138,8 +139,8 @@ void main() {
       db.execute(
         '''INSERT INTO credit_usage
            (id, local_date, seconds_used, created_at)
-           VALUES (?, date('now', 'localtime'), ?, ?)''',
-        ['credit-2', 900, now],
+           VALUES (?, ?, ?, ?)''',
+        ['credit-2', localDate, 900, now],
       );
       final exhausted = PilotAccessService(
         store: store,

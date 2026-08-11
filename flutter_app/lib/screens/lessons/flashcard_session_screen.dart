@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../providers/database_provider.dart';
 import '../../models/content_models.dart';
 import '../../models/srs_state.dart';
@@ -187,10 +187,10 @@ class _FlashcardSessionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text(widget.theme.title, style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -228,7 +228,7 @@ class _FlashcardSessionScreenState
                   '${_currentIndex + 1} / ${_queue.length}',
                   style: DesignTokens.mono(
                     13,
-                  ).copyWith(color: DesignTokens.slate),
+                  ).copyWith(color: DesignTokens.muted),
                 ),
                 // Progress bar
                 const SizedBox(height: 8),
@@ -323,14 +323,14 @@ class _FlashcardSessionScreenState
                     'Tap to reveal',
                     style: DesignTokens.body(
                       13,
-                    ).copyWith(color: DesignTokens.slate),
+                    ).copyWith(color: DesignTokens.muted),
                   )
                 else ...[
                   Text(
                     'Swipe: left = Again, right = Good, up = Easy',
                     style: DesignTokens.body(
                       12,
-                    ).copyWith(color: DesignTokens.slate),
+                    ).copyWith(color: DesignTokens.muted),
                   ),
                   const SizedBox(height: 12),
                   _buildSayItButton(entry),
@@ -341,7 +341,7 @@ class _FlashcardSessionScreenState
                       textAlign: TextAlign.center,
                       style: DesignTokens.mono(
                         12,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ],
@@ -360,7 +360,7 @@ class _FlashcardSessionScreenState
       constraints: const BoxConstraints(minHeight: 220),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: DesignTokens.card,
+        color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: DesignTokens.hairline, width: 1),
         boxShadow: [
@@ -386,7 +386,7 @@ class _FlashcardSessionScreenState
             entry.phonetic,
             style: DesignTokens.body(
               16,
-            ).copyWith(color: DesignTokens.slate, fontStyle: FontStyle.italic),
+            ).copyWith(color: DesignTokens.muted, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center,
           ),
           // Reveal divider and English
@@ -540,10 +540,10 @@ class _FlashcardSessionScreenState
                       : 'No cards due right now',
                   style: DesignTokens.body(
                     16,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const Spacer(),
-                PasseportPrimaryButton(
+                PrimaryActionButton(
                   label: 'Done',
                   onPressed: () => Navigator.of(context).pop(),
                 ),

@@ -10,7 +10,7 @@ import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../session/session_screen.dart';
 
 enum _MockStep { overview, reading, taskOne, taskTwo, scoring, results }
@@ -98,7 +98,12 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
   }
 
   Future<void> _runTask({required bool interaction}) async {
-    if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) return;
+    if (!await ensureAiSessionQuota(
+          context,
+          ref.read(pilotAccessServiceProvider),
+        ) ||
+        !mounted)
+      return;
     final stage = interaction
         ? 'mock_speaking_interaction'
         : 'mock_speaking_monologue';
@@ -248,7 +253,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         'A short reading warm-up followed by two timed speaking tasks. There is no coaching during the assessment; feedback comes after you finish.',
         style: DesignTokens.body(
           16,
-        ).copyWith(color: DesignTokens.slateDim, height: 1.5),
+        ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
       ),
       const SizedBox(height: 28),
       _stageRow(
@@ -275,7 +280,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         ),
       ),
       const SizedBox(height: 32),
-      PasseportPrimaryButton(
+      PrimaryActionButton(
         label: 'Begin mock',
         icon: CupertinoIcons.play_fill,
         onPressed: () => setState(() => _step = _MockStep.reading),
@@ -330,7 +335,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
             : 'The examiner reads the prompt once, then stays silent. Keep speaking until the timer ends.',
         style: DesignTokens.body(
           15,
-        ).copyWith(color: DesignTokens.slateDim, height: 1.45),
+        ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
       ),
       const SizedBox(height: DesignTokens.space5),
       Container(
@@ -352,7 +357,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         children: [
           const Icon(
             CupertinoIcons.timer,
-            color: DesignTokens.slateDim,
+            color: DesignTokens.mutedDim,
             size: 20,
           ),
           const SizedBox(width: DesignTokens.space2),
@@ -361,12 +366,12 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
             style: DesignTokens.body(
               14,
               weight: FontWeight.w600,
-            ).copyWith(color: DesignTokens.slateDim),
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),
       const SizedBox(height: 32),
-      PasseportPrimaryButton(
+      PrimaryActionButton(
         label: 'Start task $taskNumber',
         icon: CupertinoIcons.mic_fill,
         onPressed: () => _runTask(interaction: interaction),
@@ -388,7 +393,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
       Text(
         'Comparing both transcripts with the speaking rubric.',
         textAlign: TextAlign.center,
-        style: DesignTokens.body(15).copyWith(color: DesignTokens.slateDim),
+        style: DesignTokens.body(15).copyWith(color: DesignTokens.mutedDim),
       ),
       if (_error.isNotEmpty) ...[
         const SizedBox(height: DesignTokens.space5),
@@ -398,7 +403,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
           style: DesignTokens.body(14).copyWith(color: DesignTokens.danger),
         ),
         const SizedBox(height: DesignTokens.space4),
-        PasseportPrimaryButton(label: 'Retry scoring', onPressed: _score),
+        PrimaryActionButton(label: 'Retry scoring', onPressed: _score),
       ],
     ]);
   }
@@ -426,7 +431,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
                     'Estimated level',
                     style: DesignTokens.body(
                       13,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                   const SizedBox(height: DesignTokens.space1),
                   Text(feedback.clbEstimate, style: DesignTokens.display(25)),
@@ -474,10 +479,10 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         style: DesignTokens.body(
           14,
           weight: FontWeight.w600,
-        ).copyWith(color: DesignTokens.slateDim),
+        ).copyWith(color: DesignTokens.mutedDim),
       ),
       const SizedBox(height: 28),
-      PasseportPrimaryButton(label: 'Retake mock', onPressed: _restart),
+      PrimaryActionButton(label: 'Retake mock', onPressed: _restart),
     ]);
   }
 
@@ -519,7 +524,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
                   detail,
                   style: DesignTokens.body(
                     13,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
             ),

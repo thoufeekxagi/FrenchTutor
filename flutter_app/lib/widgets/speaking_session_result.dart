@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
-import '../config/theme.dart';
-import 'passeport_primary_button.dart';
+import '../design/app_styles.dart';
+import 'primary_action_button.dart';
 
 class SpeakingSessionResultView extends StatelessWidget {
   const SpeakingSessionResultView({
@@ -24,7 +24,7 @@ class SpeakingSessionResultView extends StatelessWidget {
   Widget build(BuildContext context) {
     final completed = !isDailyPath || meetsCompletionThreshold;
     return ColoredBox(
-      color: Passeport.parchment,
+      color: AppStyles.canvas,
       child: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
@@ -42,37 +42,37 @@ class SpeakingSessionResultView extends StatelessWidget {
                       height: 64,
                       decoration: BoxDecoration(
                         color: completed
-                            ? Passeport.successSoft
-                            : Passeport.infoSoft,
+                            ? AppStyles.successSoft
+                            : AppStyles.infoSoft,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         completed
                             ? CupertinoIcons.checkmark_alt
                             : CupertinoIcons.pause_fill,
-                        color: completed ? Passeport.sage : Passeport.sky,
+                        color: completed ? AppStyles.success : AppStyles.info,
                         size: 28,
                       ),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       completed ? 'Practice saved' : 'Good start, keep going',
-                      style: Passeport.display(30),
+                      style: AppStyles.display(30),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       _description,
-                      style: Passeport.body(
+                      style: AppStyles.body(
                         16,
-                      ).copyWith(color: Passeport.slateDim, height: 1.45),
+                      ).copyWith(color: AppStyles.mutedDim, height: 1.45),
                     ),
                     const SizedBox(height: 30),
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       decoration: BoxDecoration(
-                        color: Passeport.card,
+                        color: AppStyles.surface,
                         borderRadius: BorderRadius.circular(18),
-                        boxShadow: DesignTokens.cardShadow,
+                        boxShadow: DesignTokens.surfaceShadow,
                       ),
                       child: Row(
                         children: [
@@ -86,7 +86,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                           Container(
                             width: 1,
                             height: 54,
-                            color: Passeport.hairline,
+                            color: AppStyles.hairline,
                           ),
                           Expanded(
                             child: _ResultMetric(
@@ -106,8 +106,8 @@ class SpeakingSessionResultView extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isDailyPath && meetsCompletionThreshold
-                            ? Passeport.successSoft
-                            : Passeport.infoSoft,
+                            ? AppStyles.successSoft
+                            : AppStyles.infoSoft,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -118,18 +118,18 @@ class SpeakingSessionResultView extends StatelessWidget {
                                 ? CupertinoIcons.arrow_up_right
                                 : CupertinoIcons.book_fill,
                             color: isDailyPath && meetsCompletionThreshold
-                                ? Passeport.sage
-                                : Passeport.sky,
+                                ? AppStyles.success
+                                : AppStyles.info,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               _practiceText,
-                              style: Passeport.body(
+                              style: AppStyles.body(
                                 13.5,
                                 weight: FontWeight.w500,
-                              ).copyWith(color: Passeport.inkSoft, height: 1.4),
+                              ).copyWith(color: AppStyles.inkSoft, height: 1.4),
                             ),
                           ),
                         ],
@@ -137,7 +137,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                     ),
                     const Spacer(),
                     const SizedBox(height: 32),
-                    PasseportPrimaryButton(label: 'Done', onPressed: onDone),
+                    PrimaryActionButton(label: 'Done', onPressed: onDone),
                   ],
                 ),
               ),
@@ -190,13 +190,13 @@ class _ResultMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Passeport.sky, size: 19),
+        Icon(icon, color: AppStyles.info, size: 19),
         const SizedBox(height: 8),
-        Text(value, style: Passeport.display(24)),
+        Text(value, style: AppStyles.display(24)),
         const SizedBox(height: 3),
         Text(
           label,
-          style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+          style: AppStyles.body(12).copyWith(color: AppStyles.mutedDim),
         ),
       ],
     );

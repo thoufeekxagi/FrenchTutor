@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/theme.dart';
 import '../providers/database_provider.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
@@ -45,50 +44,39 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
           FloatingNotetakerOverlay(state: notetaker),
         ],
       ),
-      bottomNavigationBar: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Passeport.card.withValues(alpha: 0.96),
-          border: Border(top: BorderSide(color: Passeport.hairline)),
-        ),
-        child: CupertinoTabBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            PSHaptics.selection();
-            setState(() => _currentIndex = index);
-          },
-          backgroundColor: Colors.transparent,
-          activeColor: Passeport.maroon,
-          inactiveColor: Passeport.slateDim,
-          iconSize: 24,
-          height: 54,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.house),
-              activeIcon: Icon(CupertinoIcons.house_fill),
-              label: 'Today',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.map),
-              activeIcon: Icon(CupertinoIcons.map_fill),
-              label: 'Path',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.square_grid_2x2),
-              activeIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
-              label: 'Practice',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.camera_on_rectangle),
-              activeIcon: Icon(CupertinoIcons.camera_on_rectangle_fill),
-              label: 'Scan',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chart_bar_square),
-              activeIcon: Icon(CupertinoIcons.chart_bar_square_fill),
-              label: 'Progress',
-            ),
-          ],
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          PSHaptics.selection();
+          setState(() => _currentIndex = index);
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(CupertinoIcons.house),
+            selectedIcon: Icon(CupertinoIcons.house_fill),
+            label: 'Today',
+          ),
+          NavigationDestination(
+            icon: Icon(CupertinoIcons.map),
+            selectedIcon: Icon(CupertinoIcons.map_fill),
+            label: 'Path',
+          ),
+          NavigationDestination(
+            icon: Icon(CupertinoIcons.square_grid_2x2),
+            selectedIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
+            label: 'Practice',
+          ),
+          NavigationDestination(
+            icon: Icon(CupertinoIcons.camera_on_rectangle),
+            selectedIcon: Icon(CupertinoIcons.camera_on_rectangle_fill),
+            label: 'Scan',
+          ),
+          NavigationDestination(
+            icon: Icon(CupertinoIcons.chart_bar_square),
+            selectedIcon: Icon(CupertinoIcons.chart_bar_square_fill),
+            label: 'Progress',
+          ),
+        ],
       ),
     );
   }

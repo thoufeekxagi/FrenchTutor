@@ -14,7 +14,7 @@ import '../../orchestration/twin/twin_updater.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 
 class OrchestrationLabScreen extends ConsumerStatefulWidget {
   const OrchestrationLabScreen({super.key});
@@ -99,7 +99,7 @@ class _OrchestrationLabScreenState
         body: Center(
           child: Text(
             'No persisted competency framework.',
-            style: DesignTokens.body(15).copyWith(color: DesignTokens.slateDim),
+            style: DesignTokens.body(15).copyWith(color: DesignTokens.mutedDim),
           ),
         ),
       );
@@ -137,11 +137,11 @@ class _OrchestrationLabScreenState
             vertical: DesignTokens.space2,
           ),
           children: [
-            PasseportCard(
+            LearningCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Runtime', color: DesignTokens.slateDim),
+                  KickerText('Runtime', color: DesignTokens.mutedDim),
                   const SizedBox(height: DesignTokens.space2),
                   Text(
                     framework.curriculumVersion,
@@ -153,7 +153,7 @@ class _OrchestrationLabScreenState
                     '${framework.mappings.length} mappings · framework ${framework.frameworkVersion}',
                     style: DesignTokens.mono(
                       11,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                   const SizedBox(height: DesignTokens.space1),
                   Text(
@@ -162,17 +162,17 @@ class _OrchestrationLabScreenState
                     '${errors.where((error) => error.resolvedByEvidenceId == null).length} open errors',
                     style: DesignTokens.mono(
                       11,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: DesignTokens.space3),
-            PasseportCard(
+            LearningCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Scenario', color: DesignTokens.slateDim),
+                  KickerText('Scenario', color: DesignTokens.mutedDim),
                   const SizedBox(height: DesignTokens.space2),
                   Semantics(
                     button: true,
@@ -202,7 +202,7 @@ class _OrchestrationLabScreenState
                                     _persona.summary,
                                     style: DesignTokens.body(
                                       12,
-                                    ).copyWith(color: DesignTokens.slateDim),
+                                    ).copyWith(color: DesignTokens.mutedDim),
                                   ),
                                 ],
                               ),
@@ -210,7 +210,7 @@ class _OrchestrationLabScreenState
                             const Icon(
                               CupertinoIcons.chevron_down,
                               size: 16,
-                              color: DesignTokens.slateDim,
+                              color: DesignTokens.mutedDim,
                             ),
                           ],
                         ),
@@ -255,11 +255,11 @@ class _OrchestrationLabScreenState
               ),
             ),
             const SizedBox(height: DesignTokens.space3),
-            PasseportCard(
+            LearningCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Persisted state', color: DesignTokens.slateDim),
+                  KickerText('Persisted state', color: DesignTokens.mutedDim),
                   const SizedBox(height: DesignTokens.space2),
                   Text(
                     'Refreshes saved skill progress, then generates or loads '
@@ -267,7 +267,7 @@ class _OrchestrationLabScreenState
                     'repetition signal.',
                     style: DesignTokens.body(
                       12,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                   const SizedBox(height: DesignTokens.space3),
                   Semantics(
@@ -311,14 +311,14 @@ class _OrchestrationLabScreenState
                       '${plan.tasks.length} tasks · ${plan.totalMinutes} min',
                       style: DesignTokens.mono(
                         11,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                     const SizedBox(height: DesignTokens.space1),
                     Text(
                       plan.explanation,
                       style: DesignTokens.body(
                         12,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                   if (_persistedStates case final states?
@@ -340,7 +340,7 @@ class _OrchestrationLabScreenState
                           '${state.nextReviewAt != null ? ' · next review ${state.nextReviewAt!.toLocal().toString().split(' ').first}' : ''}',
                           style: DesignTokens.mono(
                             10,
-                          ).copyWith(color: DesignTokens.slateDim),
+                          ).copyWith(color: DesignTokens.mutedDim),
                         ),
                       ),
                   ],
@@ -350,7 +350,7 @@ class _OrchestrationLabScreenState
             const SizedBox(height: DesignTokens.space5),
             Row(
               children: [
-                KickerText('Path preview', color: DesignTokens.slateDim),
+                KickerText('Path preview', color: DesignTokens.mutedDim),
                 const Spacer(),
                 Text(
                   '${preview.totalMinutes} min',
@@ -362,7 +362,7 @@ class _OrchestrationLabScreenState
             ),
             const SizedBox(height: DesignTokens.space2),
             for (final (index, task) in preview.tasks.indexed) ...[
-              PasseportCard(
+              LearningCard(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -398,7 +398,7 @@ class _OrchestrationLabScreenState
                             task.contentItemId,
                             style: DesignTokens.mono(
                               11,
-                            ).copyWith(color: DesignTokens.slateDim),
+                            ).copyWith(color: DesignTokens.mutedDim),
                           ),
                           const SizedBox(height: DesignTokens.space1),
                           Text(
@@ -420,7 +420,7 @@ class _OrchestrationLabScreenState
                             task.reason,
                             style: DesignTokens.body(
                               12,
-                            ).copyWith(color: DesignTokens.slateDim),
+                            ).copyWith(color: DesignTokens.mutedDim),
                           ),
                         ],
                       ),
@@ -431,11 +431,11 @@ class _OrchestrationLabScreenState
               const SizedBox(height: DesignTokens.space2),
             ],
             const SizedBox(height: DesignTokens.space3),
-            PasseportCard(
+            LearningCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  KickerText('Boundaries', color: DesignTokens.slateDim),
+                  KickerText('Boundaries', color: DesignTokens.mutedDim),
                   const SizedBox(height: DesignTokens.space2),
                   for (final note in preview.notes)
                     Padding(
@@ -446,7 +446,7 @@ class _OrchestrationLabScreenState
                         note,
                         style: DesignTokens.body(
                           12,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ),
                 ],

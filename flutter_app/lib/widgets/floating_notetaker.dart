@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/theme.dart';
+import '../design/app_styles.dart';
 import '../data/database/storage_service.dart';
 import 'adaptive/adaptive.dart';
 
@@ -216,11 +216,11 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
         width: _bubbleSize,
         height: _bubbleSize,
         decoration: BoxDecoration(
-          color: Passeport.maroon,
+          color: AppStyles.primary,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Passeport.ink.withValues(alpha: 0.25),
+              color: AppStyles.ink.withValues(alpha: 0.25),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -231,7 +231,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               ? CupertinoIcons.chevron_down
               : CupertinoIcons.pencil,
           size: 20,
-          color: Passeport.parchment,
+          color: AppStyles.canvas,
         ),
       ),
     );
@@ -253,12 +253,12 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
       width: 280,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Passeport.card,
+        color: AppStyles.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Passeport.hairline, width: 1),
+        border: Border.all(color: AppStyles.hairline, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Passeport.ink.withValues(alpha: 0.15),
+            color: AppStyles.ink.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -274,15 +274,15 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Passeport.maroon.withValues(alpha: 0.1),
+                  color: AppStyles.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   _state.currentContext.toUpperCase(),
-                  style: Passeport.mono(
+                  style: AppStyles.mono(
                     9.5,
                     weight: FontWeight.w500,
-                  ).copyWith(color: Passeport.maroon),
+                  ).copyWith(color: AppStyles.primary),
                 ),
               ),
               const Spacer(),
@@ -291,7 +291,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
                 child: Icon(
                   CupertinoIcons.xmark,
                   size: 16,
-                  color: Passeport.slateDim,
+                  color: AppStyles.mutedDim,
                 ),
               ),
             ],
@@ -307,10 +307,10 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               maxLines: null,
               expands: true,
               textAlignVertical: TextAlignVertical.top,
-              style: Passeport.body(13),
+              style: AppStyles.body(13),
               decoration: InputDecoration(
                 hintText: "Type what you're hearing or reading…",
-                hintStyle: Passeport.body(13).copyWith(color: Passeport.slate),
+                hintStyle: AppStyles.body(13).copyWith(color: AppStyles.muted),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 isDense: true,
@@ -330,12 +330,12 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
                   ? null
                   : () => _state.commitDraft(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Passeport.maroon,
-                foregroundColor: Passeport.parchment,
-                disabledBackgroundColor: Passeport.maroon.withValues(
+                backgroundColor: AppStyles.primary,
+                foregroundColor: AppStyles.canvas,
+                disabledBackgroundColor: AppStyles.primary.withValues(
                   alpha: 0.4,
                 ),
-                disabledForegroundColor: Passeport.parchment.withValues(
+                disabledForegroundColor: AppStyles.canvas.withValues(
                   alpha: 0.5,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 9),
@@ -346,10 +346,10 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
               ),
               child: Text(
                 'Save note',
-                style: Passeport.body(
+                style: AppStyles.body(
                   12.5,
                   weight: FontWeight.w500,
-                ).copyWith(color: Passeport.parchment),
+                ).copyWith(color: AppStyles.canvas),
               ),
             ),
           ),

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 
 class ProductGuideScreen extends StatefulWidget {
   const ProductGuideScreen({super.key});
@@ -26,7 +26,7 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
       icon: CupertinoIcons.lightbulb_fill,
       title: 'Read “Chosen because”',
       body:
-          'This explanation comes from your recent practice and learning goals. It is not a generic recommendation.'
+          'This explanation comes from your recent practice and learning goals. It is not a generic recommendation.',
     ),
     _GuideStep(
       icon: CupertinoIcons.rectangle_stack_fill,
@@ -56,7 +56,7 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
       icon: CupertinoIcons.chart_bar_square_fill,
       title: 'Watch your progress grow',
       body:
-          'Progress reflects the work you complete. More practice is a normal part of learning, not a failure.'
+          'Progress reflects the work you complete. More practice is a normal part of learning, not a failure.',
     ),
   ];
 
@@ -188,10 +188,10 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
                 style: DesignTokens.body(
                   13,
                   weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               const SizedBox(height: 12),
-              PasseportPrimaryButton(
+              PrimaryActionButton(
                 label: _index == _steps.length - 1
                     ? 'Start practising'
                     : 'Next',

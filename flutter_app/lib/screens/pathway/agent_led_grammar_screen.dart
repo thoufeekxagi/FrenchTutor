@@ -22,9 +22,9 @@ import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/error_notice.dart';
@@ -205,6 +205,8 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
     if (_finished) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
       _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
@@ -419,7 +421,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       case LiveNavIntent.advance:
       case LiveNavIntent.back:
       case LiveNavIntent.goto:
-        _logDebug('→ ignored: navigation is button-only, tap Back/Next sentence');
+        _logDebug(
+          '→ ignored: navigation is button-only, tap Back/Next sentence',
+        );
       case LiveNavIntent.finish:
         // Spoken "let's finish" = the End button.
         _cutTutorAudio();
@@ -831,9 +835,9 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
       case CallStatus.tutorSpeaking:
         return DesignTokens.primary;
       case CallStatus.muted:
-        return DesignTokens.slate;
+        return DesignTokens.muted;
       case CallStatus.ended:
-        return DesignTokens.slate.withValues(alpha: 0.5);
+        return DesignTokens.muted.withValues(alpha: 0.5);
     }
   }
 
@@ -925,7 +929,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
                 style: DesignTokens.mono(
                   13,
                   weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               const Spacer(),
               SizedBox(
@@ -977,7 +981,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
                     '${(_cardIndex + 1).clamp(1, _sessionPlan.isEmpty ? 1 : _sessionPlan.length)} of ${_sessionPlan.length} · $_statusText',
                     style: DesignTokens.mono(
                       11.5,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
@@ -989,13 +993,13 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
   }
 
   // Card layout mirrors AgentLedVocabScreen's exactly: English meaning on top (the "front"),
-  // the French sentence big and maroon below (the "back", pulses when Marie says it), and the
+  // the French sentence large in the primary color below (the "back", pulses when Marie says it), and the
   // grammar note in an "Example"-style card underneath — same shape as vocab's example
   // sentence card, just carrying the grammar explanation instead.
   Widget _content() {
     final session = _currentCard;
     if (session == null) {
-      return PasseportCard(
+      return LearningCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1053,11 +1057,11 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         ),
         if (card.note.isNotEmpty) ...[
           const SizedBox(height: 16),
-          PasseportCard(
+          LearningCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const KickerText('Grammar note', color: DesignTokens.slateDim),
+                const KickerText('Grammar note', color: DesignTokens.mutedDim),
                 const SizedBox(height: 3),
                 Text(
                   card.note,
@@ -1070,7 +1074,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         const SizedBox(height: 16),
         Text(
           'Say the sentence out loud, ${_gemini.persona.displayName} is listening. Say "next sentence" when you\'re ready.',
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -1085,7 +1089,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   side: BorderSide(color: DesignTokens.hairline),
                   foregroundColor: DesignTokens.text,
-                  // Match PasseportPrimaryButton's corner radius so Back and
+                  // Match PrimaryActionButton's corner radius so Back and
                   // Next read as one control pair, not two design systems.
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1095,7 +1099,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: PasseportPrimaryButton(
+              child: PrimaryActionButton(
                 label: 'Next sentence',
                 icon: CupertinoIcons.arrow_right,
                 onPressed: _advanceFromUserIntent,
@@ -1120,7 +1124,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         itemCount: _debugLog.length,
         itemBuilder: (context, i) => Text(
           _debugLog[i],
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
         ),
       ),
     );
@@ -1218,7 +1222,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
                 label,
                 style: DesignTokens.body(
                   11,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),

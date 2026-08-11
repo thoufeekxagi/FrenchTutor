@@ -14,7 +14,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../pathway/agent_led_listening_screen.dart';
 
 // Fixed scenario categories the learner can tap to steer generation,
@@ -23,10 +23,13 @@ import '../pathway/agent_led_listening_screen.dart';
 // generator; the chip label stays short.
 const _roleplayScenarioCategories = {
   'Café': 'ordering food and drinks at a café, chatting with the server',
-  'Travel': 'a travel scenario, like checking into a hotel or asking about a train or bus',
-  'Airport': 'checking in for a flight, going through security, or boarding at an airport',
+  'Travel':
+      'a travel scenario, like checking into a hotel or asking about a train or bus',
+  'Airport':
+      'checking in for a flight, going through security, or boarding at an airport',
   'Directions': 'asking a stranger for directions to a nearby place',
-  'Shopping': 'shopping for clothes or groceries, asking about sizes, prices, or availability',
+  'Shopping':
+      'shopping for clothes or groceries, asking about sizes, prices, or availability',
 };
 
 // Fallback pool for when nothing's picked and there's no relevant onboarding
@@ -92,18 +95,20 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       await AppRouter.push(
         context,
         (_) => AgentLedListeningScreen(
-                    passage: roleplay.passage,
-                    noteContext: 'Roleplay',
-                    sessionStage: 'roleplay',
-                    sessionTopic: roleplay.displayTitle,
-                  ),
+          passage: roleplay.passage,
+          noteContext: 'Roleplay',
+          sessionStage: 'roleplay',
+          sessionTopic: roleplay.displayTitle,
+        ),
         fullscreenDialog: true,
       );
     } catch (e) {
       debugPrint('RoleplayLabScreen: scene generation failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not generate a scene. Try again.')),
+          const SnackBar(
+            content: Text('Could not generate a scene. Try again.'),
+          ),
         );
       }
     } finally {
@@ -155,9 +160,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     }
     final pool = [
       ..._roleplayScenarioCategories.values,
-      ...profile.interests.map(
-        (i) => 'a roleplay scenario related to $i',
-      ),
+      ...profile.interests.map((i) => 'a roleplay scenario related to $i'),
       ..._roleplayScenarios,
     ];
     return pool[Random().nextInt(pool.length)];
@@ -166,13 +169,15 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   @override
   Widget build(BuildContext context) {
     final roleplays = _roleplays ?? const [];
-    final starterRoleplays = ref.watch(contentServiceProvider).starterRoleplays();
+    final starterRoleplays = ref
+        .watch(contentServiceProvider)
+        .starterRoleplays();
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Roleplay', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -187,11 +192,12 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
           const SizedBox(height: 10),
           _ScenarioChipRow(
             selected: _selectedScenario,
-            onSelect: (scenario) => setState(() => _selectedScenario = scenario),
+            onSelect: (scenario) =>
+                setState(() => _selectedScenario = scenario),
           ),
           const SizedBox(height: 20),
           if (roleplays.isNotEmpty) ...[
-            const KickerText('Your roleplays', color: DesignTokens.slateDim),
+            const KickerText('Your roleplays', color: DesignTokens.mutedDim),
             const SizedBox(height: 10),
             for (final roleplay in roleplays)
               Padding(
@@ -201,11 +207,11 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
                   onTap: () => AppRouter.push(
                     context,
                     (_) => AgentLedListeningScreen(
-                    passage: roleplay.passage,
-                    noteContext: 'Roleplay',
-                    sessionStage: 'roleplay',
-                    sessionTopic: roleplay.displayTitle,
-                  ),
+                      passage: roleplay.passage,
+                      noteContext: 'Roleplay',
+                      sessionStage: 'roleplay',
+                      sessionTopic: roleplay.displayTitle,
+                    ),
                     fullscreenDialog: true,
                   ),
                 ),
@@ -215,7 +221,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
             _EmptyRoleplayLibraryNote(),
           if (starterRoleplays.isNotEmpty) ...[
             const SizedBox(height: 8),
-            const KickerText('Starter roleplays', color: DesignTokens.slateDim),
+            const KickerText('Starter roleplays', color: DesignTokens.mutedDim),
             const SizedBox(height: 10),
             for (final roleplay in starterRoleplays)
               Padding(
@@ -226,11 +232,11 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
                   onTap: () => AppRouter.push(
                     context,
                     (_) => AgentLedListeningScreen(
-                    passage: roleplay.passage,
-                    noteContext: 'Roleplay',
-                    sessionStage: 'roleplay',
-                    sessionTopic: roleplay.displayTitle,
-                  ),
+                      passage: roleplay.passage,
+                      noteContext: 'Roleplay',
+                      sessionStage: 'roleplay',
+                      sessionTopic: roleplay.displayTitle,
+                    ),
                     fullscreenDialog: true,
                   ),
                 ),
@@ -255,7 +261,7 @@ class _StartRoleplayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: Container(
@@ -285,7 +291,7 @@ class _StartRoleplayTile extends StatelessWidget {
               : selectedScenario != null
               ? 'A fresh $selectedScenario scene'
               : 'A fresh live scene, generated for you',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
         ),
         trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
         onTap: generating ? null : onTap,
@@ -320,15 +326,18 @@ class _ScenarioChipRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
+                color: isSelected
+                    ? DesignTokens.primary
+                    : DesignTokens.canvasDim,
                 borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
               ),
               alignment: Alignment.center,
               child: Text(
                 option ?? 'Surprise me',
-                style: DesignTokens.body(12.5, weight: FontWeight.w600).copyWith(
-                  color: isSelected ? Colors.white : DesignTokens.slateDim,
-                ),
+                style: DesignTokens.body(12.5, weight: FontWeight.w600)
+                    .copyWith(
+                      color: isSelected ? Colors.white : DesignTokens.mutedDim,
+                    ),
               ),
             ),
           );
@@ -351,7 +360,7 @@ class _RoleplayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       padding: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -367,7 +376,9 @@ class _RoleplayTile extends StatelessWidget {
             isStarter
                 ? 'Ready to play'
                 : DateFormat('MMM d, HH:mm').format(roleplay.createdAt),
-            style: DesignTokens.mono(10.5).copyWith(color: DesignTokens.slateDim),
+            style: DesignTokens.mono(
+              10.5,
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
         ),
         trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
@@ -388,14 +399,14 @@ class _EmptyRoleplayLibraryNote extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.bubble_left_bubble_right,
-            color: DesignTokens.slateDim,
+            color: DesignTokens.mutedDim,
             size: 28,
           ),
           const SizedBox(height: 10),
           Text(
             'No roleplays of your own yet, start one above, or try a starter scene below',
             textAlign: TextAlign.center,
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.slateDim),
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),

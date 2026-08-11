@@ -224,6 +224,8 @@ class InlineCallController {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       if (!muted) {
+        audio?.stopPlayback();
+        audio?.isOutputActive = false;
         audio?.stopStreaming();
         pausedForLifecycle = true;
       }

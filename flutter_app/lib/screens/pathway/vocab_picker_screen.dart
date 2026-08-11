@@ -13,7 +13,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/srs_service.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import 'agent_led_vocab_screen.dart';
 
 enum _PickerMode { auto, category }
@@ -139,7 +139,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               style: DesignTokens.body(13.5),
             ),
             const SizedBox(height: 12),
-            PasseportPrimaryButton(
+            PrimaryActionButton(
               label: 'Continue, ${resumable.remaining.length} words left',
               onPressed: () => _beginSession(resumable.remaining),
             ),
@@ -175,7 +175,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
           icon: const Icon(
             CupertinoIcons.xmark,
             size: 20,
-            color: DesignTokens.slateDim,
+            color: DesignTokens.mutedDim,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -238,7 +238,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                         "Personalizing today's session…",
                         style: DesignTokens.mono(
                           11,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ],
                   ),
@@ -280,81 +280,79 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-            DesignTokens.screenMargin,
-            DesignTokens.space6,
-            DesignTokens.screenMargin,
-            DesignTokens.space5,
+        DesignTokens.screenMargin,
+        DesignTokens.space6,
+        DesignTokens.screenMargin,
+        DesignTokens.space5,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(),
+          Container(
+            width: 52,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: DesignTokens.infoSoft,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              CupertinoIcons.rectangle_stack_fill,
+              color: DesignTokens.info,
+              size: 23,
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Spacer(),
-              Container(
-                width: 52,
-                height: 52,
-                decoration: const BoxDecoration(
-                  color: DesignTokens.infoSoft,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  CupertinoIcons.rectangle_stack_fill,
-                  color: DesignTokens.info,
-                  size: 23,
-                ),
-              ),
-              const SizedBox(height: DesignTokens.space5),
-              Text(
-                isLoading
-                    ? 'Building today’s word queue'
-                    : '$displayCount words ready',
-                style: DesignTokens.display(26),
-              ),
-              const SizedBox(height: DesignTokens.space3),
-              Text(
-                widget.preferredEntryIds == null
-                    ? 'A personalized mix, curated fresh from your due reviews and new words each time, never the same set on repeat.'
-                    : 'These words were selected for your current mission. Finish them before moving to the next mission step.',
-                style: DesignTokens.body(
-                  15,
-                ).copyWith(color: DesignTokens.slateDim, height: 1.45),
-              ),
-              if (isLoading) ...[
-                const SizedBox(height: DesignTokens.space5),
-                const PSProgressIndicator(),
-              ] else if (queue.isEmpty) ...[
-                const SizedBox(height: DesignTokens.space4),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(DesignTokens.space4),
-                  decoration: BoxDecoration(
-                    color: DesignTokens.infoSoft,
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusCard,
-                    ),
-                  ),
-                  child: Text(
-                    'No words are due right now. Choose a category to practice specific words.',
-                    style: DesignTokens.body(14).copyWith(height: 1.4),
-                  ),
-                ),
-              ],
-              const Spacer(),
-              SafeArea(
-                top: false,
-                minimum: const EdgeInsets.only(bottom: 8),
-                child: PasseportPrimaryButton(
-                  label: queue.isEmpty
-                      ? 'No recommended words yet'
-                      : 'Start $displayCount-word practice',
-                  icon: CupertinoIcons.arrow_right,
-                  onPressed: isLoading || queue.isEmpty
-                      ? null
-                      : () => _beginSession(queue, curateFromPool: true),
-                ),
-              ),
-            ],
+          const SizedBox(height: DesignTokens.space5),
+          Text(
+            isLoading
+                ? 'Building today’s word queue'
+                : '$displayCount words ready',
+            style: DesignTokens.display(26),
           ),
-        );
+          const SizedBox(height: DesignTokens.space3),
+          Text(
+            widget.preferredEntryIds == null
+                ? 'A personalized mix, curated fresh from your due reviews and new words each time, never the same set on repeat.'
+                : 'These words were selected for your current mission. Finish them before moving to the next mission step.',
+            style: DesignTokens.body(
+              15,
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
+          ),
+          if (isLoading) ...[
+            const SizedBox(height: DesignTokens.space5),
+            const PSProgressIndicator(),
+          ] else if (queue.isEmpty) ...[
+            const SizedBox(height: DesignTokens.space4),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(DesignTokens.space4),
+              decoration: BoxDecoration(
+                color: DesignTokens.infoSoft,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+              ),
+              child: Text(
+                'No words are due right now. Choose a category to practice specific words.',
+                style: DesignTokens.body(14).copyWith(height: 1.4),
+              ),
+            ),
+          ],
+          const Spacer(),
+          SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 8),
+            child: PrimaryActionButton(
+              label: queue.isEmpty
+                  ? 'No recommended words yet'
+                  : 'Start $displayCount-word practice',
+              icon: CupertinoIcons.arrow_right,
+              onPressed: isLoading || queue.isEmpty
+                  ? null
+                  : () => _beginSession(queue, curateFromPool: true),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // MARK: - Category mode
@@ -376,7 +374,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                   children: [
                     KickerText(
                       'Phase ${phase.phase} · ${phase.title}',
-                      color: DesignTokens.slateDim,
+                      color: DesignTokens.mutedDim,
                     ),
                     const SizedBox(height: 8),
                     // Two full-width columns — the old fixed 150px chips left
@@ -449,7 +447,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                   ? '$selected of ${theme.entries.length} picked'
                   : '${theme.entries.length} words',
               style: DesignTokens.body(11).copyWith(
-                color: hasSelection ? DesignTokens.info : DesignTokens.slateDim,
+                color: hasSelection ? DesignTokens.info : DesignTokens.mutedDim,
               ),
             ),
           ],
@@ -609,7 +607,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                         ? CupertinoIcons.checkmark_circle_fill
                         : CupertinoIcons.circle,
                     size: 13,
-                    color: isSelected ? DesignTokens.info : DesignTokens.slate,
+                    color: isSelected ? DesignTokens.info : DesignTokens.muted,
                   ),
                 ),
               ],
@@ -619,7 +617,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.body(11).copyWith(
-                color: isSelected ? DesignTokens.info : DesignTokens.slateDim,
+                color: isSelected ? DesignTokens.info : DesignTokens.mutedDim,
               ),
             ),
           ],
@@ -631,7 +629,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   // MARK: - Shared
 
   Widget _startButton({required int count, required VoidCallback onPressed}) {
-    return PasseportPrimaryButton(
+    return PrimaryActionButton(
       label: count > 0
           ? "Start with $count word${count == 1 ? '' : 's'}"
           : 'Pick some words first',
@@ -700,7 +698,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 )
                 .toList(),
             recentDiary: diary.map((d) => d.summary).toList(),
-            recentKeywords: curateFromPool ? _recentGeneratedKeywords() : const [],
+            recentKeywords: curateFromPool
+                ? _recentGeneratedKeywords()
+                : const [],
           )
           .timeout(const Duration(seconds: 14));
     } catch (_) {

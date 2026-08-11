@@ -135,7 +135,7 @@ class _MicModeBarState extends State<MicModeBar>
                   height: buttonSize,
                   decoration: BoxDecoration(
                     color: !widget.enabled
-                        ? DesignTokens.slate.withValues(alpha: 0.35)
+                        ? DesignTokens.muted.withValues(alpha: 0.35)
                         : widget.isHolding
                         ? DesignTokens.success
                         : isPtt
@@ -173,7 +173,7 @@ class _MicModeBarState extends State<MicModeBar>
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: DesignTokens.slate.withValues(alpha: 0.12),
+        color: DesignTokens.muted.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(
@@ -231,13 +231,13 @@ class _MicModeBarState extends State<MicModeBar>
               Icon(
                 icon,
                 size: 13,
-                color: selected ? DesignTokens.primary : DesignTokens.slateDim,
+                color: selected ? DesignTokens.primary : DesignTokens.mutedDim,
               ),
               const SizedBox(width: 5),
               Text(
                 label,
                 style: DesignTokens.body(12, weight: FontWeight.w600).copyWith(
-                  color: selected ? DesignTokens.ink : DesignTokens.slateDim,
+                  color: selected ? DesignTokens.ink : DesignTokens.mutedDim,
                 ),
               ),
             ],
@@ -277,10 +277,10 @@ class MicPrimaryButton extends StatelessWidget {
         ? (isHolding ? 'Release to send' : 'Hold to speak')
         : (isMuted ? 'Unmute' : 'Mute');
     final color = !enabled
-        ? DesignTokens.slate.withValues(alpha: 0.35)
+        ? DesignTokens.muted.withValues(alpha: 0.35)
         : isPtt
         ? (isHolding ? DesignTokens.success : DesignTokens.primary)
-        : (isMuted ? DesignTokens.slate : DesignTokens.ink);
+        : (isMuted ? DesignTokens.muted : DesignTokens.ink);
     final icon = isPtt
         ? (isHolding ? CupertinoIcons.waveform : CupertinoIcons.mic_fill)
         : (isMuted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill);
@@ -323,7 +323,7 @@ class MicPrimaryButton extends StatelessWidget {
                     .copyWith(
                       color: isHolding
                           ? DesignTokens.success
-                          : DesignTokens.slateDim,
+                          : DesignTokens.mutedDim,
                     ),
               ),
             ],

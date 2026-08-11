@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-import '../../config/theme.dart';
+import '../../design/app_styles.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 
 /// The one-and-only entry screen: Apple, Google, and email/password, no
 /// exceptions, no browser tabs — every path here resolves inside the app or
@@ -153,7 +153,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         onTap: _loading ? null : _forgotPassword,
                         child: Text(
                           'Forgot password?',
-                          style: Passeport.body(
+                          style: AppStyles.body(
                             12.5,
                             weight: FontWeight.w600,
                           ).copyWith(color: Colors.white),
@@ -168,7 +168,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     _messageBanner(_infoMessage!, isError: false),
                   if (_errorMessage != null || _infoMessage != null)
                     const SizedBox(height: 12),
-                  PasseportPrimaryButton(
+                  PrimaryActionButton(
                     label: _loading
                         ? 'Please wait…'
                         : (_isSignUp ? 'Create account' : 'Sign in'),
@@ -194,7 +194,7 @@ class _AuthScreenState extends State<AuthScreen> {
             const SizedBox(width: 6),
             Text(
               'ParleSprint',
-              style: Passeport.body(
+              style: AppStyles.body(
                 12.5,
                 weight: FontWeight.w700,
               ).copyWith(color: Colors.white, letterSpacing: 0.1),
@@ -204,12 +204,12 @@ class _AuthScreenState extends State<AuthScreen> {
         const SizedBox(height: 8),
         Text(
           'Welcome',
-          style: Passeport.display(30).copyWith(color: Colors.white),
+          style: AppStyles.display(30).copyWith(color: Colors.white),
         ),
         const SizedBox(height: 6),
         Text(
           'Sign in to save your progress and pick up right where you left off.',
-          style: Passeport.body(
+          style: AppStyles.body(
             14,
           ).copyWith(color: Colors.white.withValues(alpha: 0.86), height: 1.4),
         ),
@@ -234,8 +234,8 @@ class _AuthScreenState extends State<AuthScreen> {
       child: OutlinedButton(
         onPressed: _loading ? null : _submitGoogle,
         style: OutlinedButton.styleFrom(
-          backgroundColor: Passeport.surface,
-          side: BorderSide(color: Passeport.hairline),
+          backgroundColor: AppStyles.surface,
+          side: BorderSide(color: AppStyles.hairline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -247,10 +247,10 @@ class _AuthScreenState extends State<AuthScreen> {
             const SizedBox(width: 10),
             Text(
               'Continue with Google',
-              style: Passeport.body(
+              style: AppStyles.body(
                 15,
                 weight: FontWeight.w600,
-              ).copyWith(color: Passeport.ink),
+              ).copyWith(color: AppStyles.ink),
             ),
           ],
         ),
@@ -266,7 +266,7 @@ class _AuthScreenState extends State<AuthScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'or continue with email',
-            style: Passeport.body(
+            style: AppStyles.body(
               12,
             ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
           ),
@@ -296,22 +296,22 @@ class _AuthScreenState extends State<AuthScreen> {
   InputDecoration _fieldDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      labelStyle: Passeport.body(13).copyWith(color: Passeport.slateDim),
-      prefixIcon: Icon(icon, size: 19, color: Passeport.slateDim),
+      labelStyle: AppStyles.body(13).copyWith(color: AppStyles.mutedDim),
+      prefixIcon: Icon(icon, size: 19, color: AppStyles.mutedDim),
       filled: true,
-      fillColor: Passeport.surface,
+      fillColor: AppStyles.surface,
       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Passeport.hairline),
+        borderSide: BorderSide(color: AppStyles.hairline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Passeport.hairline),
+        borderSide: BorderSide(color: AppStyles.hairline),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Passeport.maroon, width: 1.5),
+        borderSide: const BorderSide(color: AppStyles.primary, width: 1.5),
       ),
     );
   }
@@ -323,7 +323,7 @@ class _AuthScreenState extends State<AuthScreen> {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       autocorrect: false,
-      style: Passeport.body(14.5),
+      style: AppStyles.body(14.5),
       decoration: _fieldDecoration('Email', CupertinoIcons.mail),
     );
   }
@@ -335,13 +335,13 @@ class _AuthScreenState extends State<AuthScreen> {
       obscureText: true,
       textInputAction: TextInputAction.done,
       onSubmitted: (_) => _submitEmail(),
-      style: Passeport.body(14.5),
+      style: AppStyles.body(14.5),
       decoration: _fieldDecoration('Password', CupertinoIcons.lock),
     );
   }
 
   Widget _messageBanner(String text, {required bool isError}) {
-    final color = isError ? Passeport.danger : Passeport.success;
+    final color = isError ? AppStyles.danger : AppStyles.success;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -351,7 +351,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
       child: Text(
         text,
-        style: Passeport.body(12.5).copyWith(color: color, height: 1.35),
+        style: AppStyles.body(12.5).copyWith(color: color, height: 1.35),
       ),
     );
   }

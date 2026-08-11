@@ -10,7 +10,7 @@ import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
 import '../labs/roleplay_lab_screen.dart';
@@ -92,8 +92,9 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     }
   }
 
-  List<String> get _remainingCategories =>
-      DailyGoalService.categories.where((c) => !_doneToday.contains(c)).toList();
+  List<String> get _remainingCategories => DailyGoalService.categories
+      .where((c) => !_doneToday.contains(c))
+      .toList();
 
   String? get _featuredCategory {
     final remaining = _remainingCategories;
@@ -155,7 +156,12 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         case 'Writing':
           await AppRouter.push(context, (_) => const WritingLabScreen());
         case 'Speaking':
-          if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) break;
+          if (!await ensureAiSessionQuota(
+                context,
+                ref.read(pilotAccessServiceProvider),
+              ) ||
+              !mounted)
+            break;
           LessonSpeechService.shared.deactivate();
           await AppRouter.push(
             context,
@@ -204,7 +210,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
           decoration: BoxDecoration(
             color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-            boxShadow: DesignTokens.cardShadow,
+            boxShadow: DesignTokens.surfaceShadow,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +221,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                     'TODAY’S MISSION',
                     style: DesignTokens.body(11, weight: FontWeight.w700)
                         .copyWith(
-                          color: DesignTokens.slateDim,
+                          color: DesignTokens.mutedDim,
                           letterSpacing: 1.1,
                         ),
                   ),
@@ -225,7 +231,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                     style: DesignTokens.body(
                       12,
                       weight: FontWeight.w600,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
@@ -264,12 +270,14 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                           child: Container(
                             width: 18,
                             height: 18,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: DesignTokens.surface,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x1A000000),
+                                  color: DesignTokens.ink.withValues(
+                                    alpha: 0.10,
+                                  ),
                                   blurRadius: 3,
                                 ),
                               ],
@@ -290,13 +298,14 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                       children: [
                         Text(
                           'NEXT STEP',
-                          style: DesignTokens.body(
-                            10.5,
-                            weight: FontWeight.w700,
-                          ).copyWith(
-                            color: DesignTokens.primary,
-                            letterSpacing: 0.9,
-                          ),
+                          style:
+                              DesignTokens.body(
+                                10.5,
+                                weight: FontWeight.w700,
+                              ).copyWith(
+                                color: DesignTokens.primary,
+                                letterSpacing: 0.9,
+                              ),
                         ),
                         const SizedBox(height: DesignTokens.space1),
                         Text(featured, style: DesignTokens.display(22)),
@@ -324,7 +333,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                 ),
               ],
               const SizedBox(height: DesignTokens.space5),
-              PasseportPrimaryButton(
+              PrimaryActionButton(
                 label: _isLocked(featured) ? 'Unlock to start' : 'Start',
                 icon: _isLocked(featured)
                     ? CupertinoIcons.lock_fill
@@ -344,7 +353,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                         style: DesignTokens.body(
                           13,
                           weight: FontWeight.w500,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ),
                   ),
@@ -465,7 +474,7 @@ class _MissionComplete extends StatelessWidget {
             'You practiced all 6 skills today.',
             style: DesignTokens.body(
               14,
-            ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
           ),
           if (streak > 0) ...[
             const SizedBox(height: DesignTokens.space3),
@@ -492,7 +501,7 @@ class _MissionComplete extends StatelessWidget {
             'Want to keep going? Practice any skill in the Practice tab.',
             style: DesignTokens.body(
               13,
-            ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
           ),
         ],
       ),
@@ -521,10 +530,7 @@ class _MissionNotice extends StatelessWidget {
           const SizedBox(height: DesignTokens.space3),
           SizedBox(
             width: 160,
-            child: PasseportPrimaryButton(
-              label: 'Try again',
-              onPressed: onRetry,
-            ),
+            child: PrimaryActionButton(label: 'Try again', onPressed: onRetry),
           ),
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../design/tokens.dart';
 import '../services/inline_call_controller.dart';
 import 'adaptive/adaptive.dart';
-import 'passeport_card.dart';
+import 'learning_card.dart';
 
 /// AppBar `actions` for an inline Marie call (mute + phone toggle) — the
 /// same two icons `writing_task_screen.dart` has always had, now shared so
@@ -28,7 +28,7 @@ class InlineCallActions extends StatelessWidget {
               controller.muted
                   ? CupertinoIcons.mic_slash_fill
                   : CupertinoIcons.mic_fill,
-              color: DesignTokens.slateDim,
+              color: DesignTokens.mutedDim,
             ),
           ),
         _CallActionButton(
@@ -101,7 +101,7 @@ class InlineCallStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -132,7 +132,7 @@ class InlineCallStatusCard extends StatelessWidget {
                     controller.lastTutorLine!,
                     style: DesignTokens.body(
                       12.5,
-                    ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                    ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
                   ),
                 ],
               ],

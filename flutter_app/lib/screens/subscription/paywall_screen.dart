@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../config/theme.dart';
+import '../../design/app_styles.dart';
 import '../../models/pilot_access.dart';
 import '../../providers/database_provider.dart';
 import '../../services/product_analytics.dart';
 import '../../services/revenue_cat_service.dart';
 import '../../services/subscription_invite_service.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 
 /// The entitlement identifier configured in the RevenueCat dashboard (both
 /// the 3-month and 12-month products are attached to this one entitlement).
@@ -177,7 +177,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   Widget _buildLoading() {
     return const Center(
-      child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white)),
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(Colors.white),
+      ),
     );
   }
 
@@ -208,8 +210,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 end: Alignment.bottomRight,
                 colors: [DesignTokens.surface, DesignTokens.primarySoft],
               ),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusCard * 1.25),
-              boxShadow: DesignTokens.cardShadow,
+              borderRadius: BorderRadius.circular(
+                DesignTokens.radiusCard * 1.25,
+              ),
+              boxShadow: DesignTokens.surfaceShadow,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -225,22 +229,20 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 ],
                 if (packages.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: DesignTokens.space2,
-                    ),
+                    padding: const EdgeInsets.only(bottom: DesignTokens.space2),
                     child: Text(
                       // Real, honest urgency — no fabricated "was" price.
                       // This genuinely is today's price, and it genuinely
                       // won't stay this low forever.
                       'These are our launch prices. They go up as we add '
                       'more features.',
-                      style: Passeport.body(
+                      style: AppStyles.body(
                         12,
                       ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ),
                 const SizedBox(height: DesignTokens.space1),
-                PasseportPrimaryButton(
+                PrimaryActionButton(
                   label: _purchasing ? 'Processing…' : _ctaLabel(),
                   onPressed: _purchasing ? null : _purchase,
                 ),
@@ -256,9 +258,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     const SizedBox(width: DesignTokens.space1),
                     Text(
                       'Secure via App Store · Cancel anytime',
-                      style: Passeport.body(12).copyWith(
-                        color: DesignTokens.mutedDim,
-                      ),
+                      style: AppStyles.body(
+                        12,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -295,15 +297,19 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 end: Alignment.bottomRight,
                 colors: [DesignTokens.surface, DesignTokens.primarySoft],
               ),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusCard * 1.25),
-              boxShadow: DesignTokens.cardShadow,
+              borderRadius: BorderRadius.circular(
+                DesignTokens.radiusCard * 1.25,
+              ),
+              boxShadow: DesignTokens.surfaceShadow,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   'Subscriptions aren\'t available on this device yet. If you have an invite code, you can redeem it below.',
-                  style: Passeport.body(15).copyWith(color: DesignTokens.mutedDim),
+                  style: AppStyles.body(
+                    15,
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: DesignTokens.space5),
                 _buildRedeemSection(forceOpen: true),
@@ -333,9 +339,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           onPressed: () => setState(() => _showRedeem = true),
           child: Text(
             'Have an invite code?',
-            style: Passeport.body(14, weight: FontWeight.w600).copyWith(
-              color: DesignTokens.primary,
-            ),
+            style: AppStyles.body(
+              14,
+              weight: FontWeight.w600,
+            ).copyWith(color: DesignTokens.primary),
           ),
         ),
       );
@@ -345,9 +352,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       children: [
         Text(
           'Invite code',
-          style: Passeport.body(13, weight: FontWeight.w600).copyWith(
-            color: DesignTokens.mutedDim,
-          ),
+          style: AppStyles.body(
+            13,
+            weight: FontWeight.w600,
+          ).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: DesignTokens.space2),
         Row(
@@ -357,7 +365,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               child: TextField(
                 controller: _codeController,
                 textCapitalization: TextCapitalization.characters,
-                style: Passeport.mono(14),
+                style: AppStyles.mono(14),
                 decoration: InputDecoration(
                   hintText: 'e.g. AB12CD',
                   isDense: true,
@@ -387,9 +395,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: DesignTokens.primary,
-                  borderRadius: BorderRadius.circular(
-                    DesignTokens.radiusSmall,
-                  ),
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
                 ),
                 child: _redeeming
                     ? const SizedBox(
@@ -402,7 +408,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       )
                     : Text(
                         'Apply',
-                        style: Passeport.body(
+                        style: AppStyles.body(
                           13,
                           weight: FontWeight.w700,
                         ).copyWith(color: Colors.white),
@@ -415,7 +421,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           const SizedBox(height: DesignTokens.space2),
           Text(
             _redeemMessage!,
-            style: Passeport.body(13).copyWith(color: DesignTokens.mutedDim),
+            style: AppStyles.body(13).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ],
@@ -441,16 +447,16 @@ class _Header extends StatelessWidget {
       children: [
         Text(
           'Full access to\nParleSprint',
-          style: Passeport.display(30).copyWith(color: Colors.white),
+          style: AppStyles.display(30).copyWith(color: Colors.white),
         ),
         const SizedBox(height: DesignTokens.space2),
         Text(
           hasTrial
               ? 'Start your 7-day free trial. Cancel anytime.'
               : 'Unlock every mission, lab, and speaking session.',
-          style: Passeport.body(15).copyWith(
-            color: Colors.white.withValues(alpha: 0.85),
-          ),
+          style: AppStyles.body(
+            15,
+          ).copyWith(color: Colors.white.withValues(alpha: 0.85)),
         ),
       ],
     );
@@ -491,7 +497,7 @@ class _BenefitsList extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: Passeport.body(15).copyWith(color: Colors.white),
+                    style: AppStyles.body(15).copyWith(color: Colors.white),
                   ),
                 ),
               ],
@@ -526,7 +532,8 @@ class _PlanCard extends StatelessWidget {
   /// Required content per App Store Review Guideline 3.1.2; a previous
   /// submission was rejected for omitting this.
   String get _termsLine => switch (package.packageType) {
-    PackageType.annual => '1 Year subscription. Billed annually. Cancel anytime.',
+    PackageType.annual =>
+      '1 Year subscription. Billed annually. Cancel anytime.',
     PackageType.threeMonth =>
       '3 Month subscription. Billed every 3 months. Cancel anytime.',
     _ => 'Auto-renewing subscription. Cancel anytime.',
@@ -540,7 +547,9 @@ class _PlanCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: selected ? DesignTokens.primarySoft.withValues(alpha: 0.35) : DesignTokens.canvasDim,
+          color: selected
+              ? DesignTokens.primarySoft.withValues(alpha: 0.35)
+              : DesignTokens.canvasDim,
           borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
           border: Border.all(
             color: selected ? DesignTokens.primary : DesignTokens.hairline,
@@ -566,7 +575,7 @@ class _PlanCard extends StatelessWidget {
                     children: [
                       Text(
                         _title,
-                        style: Passeport.body(16, weight: FontWeight.w600),
+                        style: AppStyles.body(16, weight: FontWeight.w600),
                       ),
                       const SizedBox(width: DesignTokens.space2),
                       const _Badge(label: 'Launch price'),
@@ -580,21 +589,22 @@ class _PlanCard extends StatelessWidget {
                   if (hasTrial)
                     Text(
                       '7 days free, then ${package.storeProduct.priceString}',
-                      style: Passeport.body(14).copyWith(
-                        color: DesignTokens.mutedDim,
-                      ),
+                      style: AppStyles.body(
+                        14,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     )
                   else
                     Text(
                       package.storeProduct.priceString,
-                      style: Passeport.body(14, weight: FontWeight.w600).copyWith(
-                        color: DesignTokens.primaryDeep,
-                      ),
+                      style: AppStyles.body(
+                        14,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.primaryDeep),
                     ),
                   const SizedBox(height: 3),
                   Text(
                     _termsLine,
-                    style: Passeport.body(
+                    style: AppStyles.body(
                       11.5,
                     ).copyWith(color: DesignTokens.mutedDim),
                   ),
@@ -622,9 +632,10 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Passeport.body(11, weight: FontWeight.w700).copyWith(
-          color: DesignTokens.primaryDeep,
-        ),
+        style: AppStyles.body(
+          11,
+          weight: FontWeight.w700,
+        ).copyWith(color: DesignTokens.primaryDeep),
       ),
     );
   }
@@ -638,7 +649,7 @@ class _LegalLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Passeport.body(12).copyWith(
+    final style = AppStyles.body(12).copyWith(
       color: Colors.white.withValues(alpha: 0.7),
       decoration: TextDecoration.underline,
       decorationColor: Colors.white.withValues(alpha: 0.4),
@@ -654,7 +665,9 @@ class _LegalLinks extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space2),
           child: Text(
             '·',
-            style: Passeport.body(12).copyWith(color: Colors.white.withValues(alpha: 0.5)),
+            style: AppStyles.body(
+              12,
+            ).copyWith(color: Colors.white.withValues(alpha: 0.5)),
           ),
         ),
         GestureDetector(

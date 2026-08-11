@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../config/theme.dart';
+import '../design/app_styles.dart';
 
-class PasseportPrimaryButton extends StatelessWidget {
-  const PasseportPrimaryButton({
+class PrimaryActionButton extends StatelessWidget {
+  const PrimaryActionButton({
     super.key,
     required this.label,
     required this.onPressed,
@@ -28,20 +28,20 @@ class PasseportPrimaryButton extends StatelessWidget {
     final labelWidget = Text(isLoading ? (loadingLabel ?? label) : label);
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Passeport.maroon,
+          backgroundColor: AppStyles.primary,
           disabledBackgroundColor: isLoading
-              ? Passeport.maroon
-              : Passeport.slate.withValues(alpha: 0.35),
+              ? AppStyles.primary
+              : AppStyles.muted.withValues(alpha: 0.35),
           disabledForegroundColor: isLoading ? Colors.white : null,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: Passeport.body(15, weight: FontWeight.w600),
+          textStyle: AppStyles.body(15, weight: FontWeight.w600),
           elevation: 0,
         ),
         child: isLoading

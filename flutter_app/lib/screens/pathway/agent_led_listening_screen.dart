@@ -24,9 +24,9 @@ import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/error_notice.dart';
@@ -253,6 +253,8 @@ class _AgentLedListeningScreenState
     if (_finished) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
       _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
@@ -972,9 +974,9 @@ class _AgentLedListeningScreenState
       case CallStatus.tutorSpeaking:
         return DesignTokens.primary;
       case CallStatus.muted:
-        return DesignTokens.slate;
+        return DesignTokens.muted;
       case CallStatus.ended:
-        return DesignTokens.slate.withValues(alpha: 0.5);
+        return DesignTokens.muted.withValues(alpha: 0.5);
     }
   }
 
@@ -1067,7 +1069,7 @@ class _AgentLedListeningScreenState
                 style: DesignTokens.mono(
                   13,
                   weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               const Spacer(),
               SizedBox(
@@ -1119,7 +1121,7 @@ class _AgentLedListeningScreenState
                     '${(_segmentIndex + 1).clamp(1, _sessionPlan.isEmpty ? 1 : _sessionPlan.length)} of ${_sessionPlan.length} · $_statusText',
                     style: DesignTokens.mono(
                       11.5,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
@@ -1140,13 +1142,13 @@ class _AgentLedListeningScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PasseportCard(
+        LearningCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               KickerText(
                 'Scene · ${widget.passage.displayTitle}',
-                color: DesignTokens.slateDim,
+                color: DesignTokens.mutedDim,
               ),
               const SizedBox(height: 4),
               Text(
@@ -1157,7 +1159,7 @@ class _AgentLedListeningScreenState
                     : 'Scene complete',
                 style: DesignTokens.body(
                   13,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),
@@ -1167,7 +1169,7 @@ class _AgentLedListeningScreenState
           _beatBubbles(i),
         if (card == null) ...[
           const SizedBox(height: 8),
-          PasseportCard(
+          LearningCard(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1186,7 +1188,7 @@ class _AgentLedListeningScreenState
                 const SizedBox(height: 6),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: PasseportPrimaryButton(
+                  child: PrimaryActionButton(
                     label: 'Finish scene',
                     icon: CupertinoIcons.arrow_right,
                     onPressed: () => _finish(completed: true),
@@ -1210,7 +1212,7 @@ class _AgentLedListeningScreenState
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: BorderSide(color: DesignTokens.hairline),
                     foregroundColor: DesignTokens.text,
-                    // Match PasseportPrimaryButton's corner radius so Back and
+                    // Match PrimaryActionButton's corner radius so Back and
                     // Next read as one control pair, not two design systems.
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1220,7 +1222,7 @@ class _AgentLedListeningScreenState
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: PasseportPrimaryButton(
+                child: PrimaryActionButton(
                   label: 'Next sentence',
                   icon: CupertinoIcons.arrow_right,
                   onPressed: _advanceFromUserIntent,
@@ -1270,7 +1272,7 @@ class _AgentLedListeningScreenState
               '${segment.grammarNote} ${segment.pronunciationTip}',
               style: DesignTokens.body(
                 11.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
             ),
           ],
         ],
@@ -1320,7 +1322,7 @@ class _AgentLedListeningScreenState
                     en,
                     style: DesignTokens.body(
                       11.5,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
               ],
             ),
@@ -1343,7 +1345,7 @@ class _AgentLedListeningScreenState
                       size: 16,
                       color: isLearner
                           ? DesignTokens.primary
-                          : DesignTokens.slateDim,
+                          : DesignTokens.mutedDim,
                     ),
             ),
           ),
@@ -1365,7 +1367,7 @@ class _AgentLedListeningScreenState
         itemCount: _debugLog.length,
         itemBuilder: (context, i) => Text(
           _debugLog[i],
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
         ),
       ),
     );
@@ -1463,7 +1465,7 @@ class _AgentLedListeningScreenState
                 label,
                 style: DesignTokens.body(
                   11,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),

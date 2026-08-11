@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/api_keys.dart';
-import '../../config/theme.dart';
+import '../../design/app_styles.dart';
 import '../../design/app_router.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/profile.dart';
@@ -150,7 +150,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       const Spacer(),
                       Text(
                         'Step $_page of 4',
-                        style: Passeport.body(
+                        style: AppStyles.body(
                           12,
                           weight: FontWeight.w600,
                         ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
@@ -263,7 +263,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     Text(
                       'The fastest way to speak French is to speak French.',
                       textAlign: TextAlign.center,
-                      style: Passeport.display(
+                      style: AppStyles.display(
                         23,
                       ).copyWith(color: Colors.white, height: 1.35),
                     ),
@@ -284,7 +284,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   'A live tutor who talks with you every day, '
                   'not flashcards about someday.',
                   textAlign: TextAlign.center,
-                  style: Passeport.body(15).copyWith(
+                  style: AppStyles.body(15).copyWith(
                     color: Colors.white.withValues(alpha: 0.92),
                     height: 1.45,
                   ),
@@ -304,7 +304,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               const SizedBox(width: 8),
               Text(
                 'Built for TEF / TCF Canada learners',
-                style: Passeport.body(
+                style: AppStyles.body(
                   13,
                   weight: FontWeight.w600,
                 ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
@@ -323,7 +323,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
-                textStyle: Passeport.body(15, weight: FontWeight.w700),
+                textStyle: AppStyles.body(15, weight: FontWeight.w700),
               ),
               child: const Text('Continue'),
             ),
@@ -349,54 +349,51 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             // On a short screen (e.g. the level step's 4 choices + session-
             // length picker on an SE-sized phone) this content runs below
             // the fold with zero visual hint that anything follows — the
-            // scrollbar makes that discoverable instead of it looking like
-            // the step just ends at whatever tile happens to land last.
-            child: Scrollbar(
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 24, bottom: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Passeport.infoSoft,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(_stepIcon, color: Passeport.sky, size: 22),
+            // content remains scrollable on compact devices. PageView keeps
+            // neighboring steps alive, so each child must opt out of the
+            // shared PrimaryScrollController to avoid multi-position errors.
+            child: SingleChildScrollView(
+              primary: false,
+              padding: const EdgeInsets.only(top: 24, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppStyles.infoSoft,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    const SizedBox(height: 22),
-                    Text(
-                      eyebrow.toUpperCase(),
-                      style: Passeport.body(10.5, weight: FontWeight.w800)
-                          .copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            letterSpacing: 1,
-                          ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      title,
-                      style: Passeport.display(
-                        30,
-                      ).copyWith(color: Colors.white),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 9),
-                      Text(
-                        subtitle,
-                        style: Passeport.body(15).copyWith(
-                          color: Colors.white.withValues(alpha: 0.86),
-                          height: 1.45,
+                    child: Icon(_stepIcon, color: AppStyles.info, size: 22),
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    eyebrow.toUpperCase(),
+                    style: AppStyles.body(10.5, weight: FontWeight.w800)
+                        .copyWith(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 1,
                         ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    title,
+                    style: AppStyles.display(30).copyWith(color: Colors.white),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 9),
+                    Text(
+                      subtitle,
+                      style: AppStyles.body(15).copyWith(
+                        color: Colors.white.withValues(alpha: 0.86),
+                        height: 1.45,
                       ),
-                    ],
-                    const SizedBox(height: 26),
-                    ...children,
+                    ),
                   ],
-                ),
+                  const SizedBox(height: 26),
+                  ...children,
+                ],
               ),
             ),
           ),
@@ -440,7 +437,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: Passeport.body(15, weight: FontWeight.w700),
+          textStyle: AppStyles.body(15, weight: FontWeight.w700),
         ),
       ),
     );
@@ -484,21 +481,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   children: [
                     Text(
                       label,
-                      style: Passeport.body(15, weight: FontWeight.w700)
+                      style: AppStyles.body(15, weight: FontWeight.w700)
                           .copyWith(
                             color: selected
                                 ? DesignTokens.primaryDeep
-                                : Passeport.ink,
+                                : AppStyles.ink,
                           ),
                     ),
                     if (detail != null) ...[
                       const SizedBox(height: 3),
                       Text(
                         detail,
-                        style: Passeport.body(12.5).copyWith(
+                        style: AppStyles.body(12.5).copyWith(
                           color: selected
                               ? DesignTokens.primaryDeep.withValues(alpha: 0.82)
-                              : Passeport.slateDim,
+                              : AppStyles.mutedDim,
                         ),
                       ),
                     ],
@@ -510,7 +507,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 selected
                     ? CupertinoIcons.checkmark_circle_fill
                     : CupertinoIcons.circle,
-                color: selected ? DesignTokens.primaryDeep : Passeport.slate,
+                color: selected ? DesignTokens.primaryDeep : AppStyles.muted,
                 size: 22,
               ),
             ],
@@ -577,7 +574,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         const SizedBox(height: 12),
         Text(
           'A comfortable daily session',
-          style: Passeport.body(
+          style: AppStyles.body(
             13,
             weight: FontWeight.w600,
           ).copyWith(color: Colors.white),
@@ -653,7 +650,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 ),
                 child: Text(
                   topic,
-                  style: Passeport.body(14, weight: FontWeight.w600).copyWith(
+                  style: AppStyles.body(14, weight: FontWeight.w600).copyWith(
                     color: selected ? DesignTokens.primaryDeep : Colors.white,
                   ),
                 ),
@@ -664,7 +661,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         const SizedBox(height: 14),
         Text(
           'So lessons match your interests',
-          style: Passeport.body(
+          style: AppStyles.body(
             12.5,
             weight: FontWeight.w500,
           ).copyWith(color: Colors.white.withValues(alpha: 0.72)),
@@ -721,7 +718,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     child: CircularProgressIndicator(
                       value: value,
                       strokeWidth: 3,
-                      color: Passeport.sage,
+                      color: AppStyles.success,
                       backgroundColor: Colors.white.withValues(alpha: 0.25),
                     ),
                   ),
@@ -730,7 +727,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: playing ? Passeport.maroon : Passeport.infoSoft,
+                  color: playing ? AppStyles.primary : AppStyles.infoSoft,
                   shape: BoxShape.circle,
                 ),
                 child: loading
@@ -738,7 +735,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         padding: EdgeInsets.all(11),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Passeport.sky,
+                          color: AppStyles.info,
                         ),
                       )
                     : Icon(
@@ -746,7 +743,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                             ? CupertinoIcons.speaker_2_fill
                             : CupertinoIcons.play_fill,
                         size: 16,
-                        color: playing ? Colors.white : Passeport.sky,
+                        color: playing ? Colors.white : AppStyles.info,
                       ),
               ),
             ],
@@ -764,7 +761,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         children: [
           Text(
             '${accent.label} French'.toUpperCase(),
-            style: Passeport.body(10.5, weight: FontWeight.w800).copyWith(
+            style: AppStyles.body(10.5, weight: FontWeight.w800).copyWith(
               color: Colors.white.withValues(alpha: 0.82),
               letterSpacing: 1,
             ),
@@ -831,7 +828,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             onPressed: _startingTrial ? null : _finish,
             child: Text(
               'Skip for now',
-              style: Passeport.body(
+              style: AppStyles.body(
                 14,
                 weight: FontWeight.w600,
               ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
@@ -901,21 +898,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           ),
           fraction: ((result?.durationSeconds ?? 0) / TrialCallGate.maxSeconds)
               .clamp(0.0, 1.0),
-          color: Passeport.mastery,
+          color: AppStyles.mastery,
           delay: Duration.zero,
         ),
         _StatBar(
           label: 'Times you spoke',
           value: '${result?.learnerUtteranceCount ?? 0}',
           fraction: ((result?.learnerUtteranceCount ?? 0) / 10).clamp(0.0, 1.0),
-          color: Passeport.info,
+          color: AppStyles.info,
           delay: const Duration(milliseconds: 250),
         ),
         _StatBar(
           label: 'French words heard from you',
           value: '${words.length}',
           fraction: (words.length / 8).clamp(0.0, 1.0),
-          color: Passeport.success,
+          color: AppStyles.success,
           delay: const Duration(milliseconds: 500),
         ),
         if (words.isNotEmpty) ...[
@@ -931,15 +928,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: Passeport.primarySoft,
+                    color: AppStyles.primarySoft,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     word,
-                    style: Passeport.body(
+                    style: AppStyles.body(
                       13,
                       weight: FontWeight.w600,
-                    ).copyWith(color: Passeport.primaryDeep),
+                    ).copyWith(color: AppStyles.primaryDeep),
                   ),
                 ),
             ],
@@ -968,7 +965,7 @@ class _QuoteGlyph extends StatelessWidget {
     return IgnorePointer(
       child: Text(
         opening ? '“' : '”',
-        style: Passeport.display(
+        style: AppStyles.display(
           38,
         ).copyWith(color: Colors.white.withValues(alpha: 0.55), height: 1),
       ),
@@ -990,7 +987,7 @@ class _BrandWordmark extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           'ParleSprint',
-          style: Passeport.body(
+          style: AppStyles.body(
             12.5,
             weight: FontWeight.w700,
           ).copyWith(color: Colors.white, letterSpacing: 0.1),
@@ -1070,7 +1067,7 @@ class _AnimatedBrandMark extends StatelessWidget {
                   offset: Offset(28 * (1 - wordProgress), 0),
                   child: Text(
                     'ParleSprint',
-                    style: Passeport.display(30).copyWith(color: Colors.white),
+                    style: AppStyles.display(30).copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -1158,7 +1155,7 @@ class _PreparingPaneState extends State<_PreparingPane>
               Text(
                 'Creating your first lessons…',
                 textAlign: TextAlign.center,
-                style: Passeport.display(
+                style: AppStyles.display(
                   26,
                 ).copyWith(color: Colors.white, height: 1.3),
               ),
@@ -1187,7 +1184,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                         ),
                         Text(
                           '${(t * 100).round()} %',
-                          style: Passeport.body(
+                          style: AppStyles.body(
                             22,
                             weight: FontWeight.w800,
                           ).copyWith(color: Colors.white),
@@ -1227,7 +1224,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                                     Flexible(
                                       child: Text(
                                         widget.checkpoints[i],
-                                        style: Passeport.body(
+                                        style: AppStyles.body(
                                           13.5,
                                           weight: FontWeight.w600,
                                         ).copyWith(color: Colors.white),
@@ -1257,7 +1254,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                     const SizedBox(width: 7),
                     Text(
                       'Your plan adapts as you practise',
-                      style: Passeport.body(
+                      style: AppStyles.body(
                         12.5,
                         weight: FontWeight.w600,
                       ).copyWith(color: Colors.white.withValues(alpha: 0.85)),
@@ -1318,7 +1315,7 @@ class _StatBarState extends State<_StatBar> {
               Expanded(
                 child: Text(
                   widget.label,
-                  style: Passeport.body(
+                  style: AppStyles.body(
                     13,
                     weight: FontWeight.w600,
                   ).copyWith(color: Colors.white),
@@ -1326,7 +1323,7 @@ class _StatBarState extends State<_StatBar> {
               ),
               Text(
                 widget.value,
-                style: Passeport.body(
+                style: AppStyles.body(
                   15,
                   weight: FontWeight.w800,
                 ).copyWith(color: Colors.white),
@@ -1391,10 +1388,10 @@ class _PromiseRow extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Passeport.infoSoft,
+              color: AppStyles.infoSoft,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Passeport.sky, size: 19),
+            child: Icon(icon, color: AppStyles.info, size: 19),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1403,7 +1400,7 @@ class _PromiseRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Passeport.body(
+                  style: AppStyles.body(
                     14,
                     weight: FontWeight.w700,
                   ).copyWith(color: Colors.white),

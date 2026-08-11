@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 /// slots (the palette contract below). `tokens.dart` selects one via a single
 /// typedef line:
 ///
-///     typedef _Palette = ProSystemAzure;   // ← swap this line, re-run, done
+///     typedef _Palette = ConfidentMomentum;   // ← swap this line, re-run, done
 ///
 /// Because the slots are `static const`, the whole chain stays const —
 /// no call site anywhere in the app changes when the palette does.
@@ -31,52 +31,29 @@ import 'package:flutter/widgets.dart';
 
 /// ACTIVE — "Pro System Azure" (marketing/color-palette/pro_system_azure.jpg).
 /// Professional azure-blue system: Dribbble-quality spec, high-trust neutrals.
-abstract final class ProSystemAzure {
-  static const ink = Color(0xFF1C1E21); // Dark Navy — text, headings
-  static const inkSoft = Color(0xFF33383F);
-  static const canvas = Color(0xFFF8F9FA); // Off-White Base
-  static const canvasDim = Color(0xFFEEF0F2);
+abstract final class ConfidentMomentum {
+  static const ink = Color(0xFF172033); // Dark Navy — text, headings
+  static const inkSoft = Color(0xFF35415A);
+  static const canvas = Color(0xFFF6F8FC);
+  static const canvasDim = Color(0xFFEDF1F8);
   static const surface = Color(0xFFFFFFFF);
-  static const primary = Color(0xFF007BFF); // Primary Azure Blue
-  static const primaryDeep = Color(0xFF0063CE);
-  static const primarySoft = Color(0xFFE5F1FF);
-  static const secondary = Color(0xFF17A2B8); // Vibrant Teal
-  static const success = Color(0xFF28A745); // Success Emerald
-  static const successSoft = Color(0xFFE7F6EC);
-  static const info = Color(0xFF17A2B8); // teal doubles as info
-  static const infoSoft = Color(0xFFE4F5F8);
-  static const mastery = Color(0xFFFFC107); // Amber — demonstrated mastery
-  static const masterySoft = Color(0xFFFFF6DC);
-  static const warning = Color(0xFFFFC107); // Warning Amber
-  static const warningSoft = Color(0xFFFFF6DC);
-  static const danger = Color(0xFFDC3545); // Error Crimson
-  static const dangerSoft = Color(0xFFFBE9EB);
-  static const muted = Color(0xFFA0A0A0); // Surface Gray — captions, disabled
-  static const mutedDim = Color(0xFF707070); // Dark Gray
+  static const primary = Color(0xFF2474FF); // Primary Azure Blue
+  static const primaryDeep = Color(0xFF1658D7);
+  static const primarySoft = Color(0xFFE8F0FF);
+  static const secondary = Color(0xFF18A6A1); // Vibrant Teal
+  static const success = Color(0xFF31B36B); // Success Emerald
+  static const successSoft = Color(0xFFE7F7EE);
+  static const info = Color(0xFF18A6A1); // teal doubles as info
+  static const infoSoft = Color(0xFFE4F7F6);
+  static const mastery = Color(0xFFFFB547); // Amber — demonstrated mastery
+  static const masterySoft = Color(0xFFFFF3DE);
+  static const warning = Color(0xFFFFB547); // Warning Amber
+  static const warningSoft = Color(0xFFFFF3DE);
+  static const danger = Color(0xFFFF6368); // Error Crimson
+  static const dangerSoft = Color(0xFFFFE9EA);
+  static const muted = Color(0xFF94A0B8); // Surface Gray — captions, disabled
+  static const mutedDim = Color(0xFF657089); // Dark Gray
 }
 
-/// Previous identity — warm paper + navy ink + bordeaux + gold ("Passeport
+/// Previous identity — warm paper + navy ink + bordeaux + gold ("ParleSprint
 /// heritage"). Kept so a one-line typedef flip can restore it for comparison.
-abstract final class PasseportHeritage {
-  static const ink = Color(0xFF182338);
-  static const inkSoft = Color(0xFF293751);
-  static const canvas = Color(0xFFF7F7F4);
-  static const canvasDim = Color(0xFFEEF1F5);
-  static const surface = Color(0xFFFFFFFF);
-  static const primary = Color(0xFFD1495B);
-  static const primaryDeep = Color(0xFFB53648);
-  static const primarySoft = Color(0xFFFBEAEC);
-  static const secondary = Color(0xFF5A7FC3);
-  static const success = Color(0xFF3D9E83);
-  static const successSoft = Color(0xFFE5F4EF);
-  static const info = Color(0xFF5A7FC3);
-  static const infoSoft = Color(0xFFEAF0FA);
-  static const mastery = Color(0xFFD5A13D);
-  static const masterySoft = Color(0xFFFAF2DF);
-  static const warning = Color(0xFFD5A13D);
-  static const warningSoft = Color(0xFFFAF2DF);
-  static const danger = Color(0xFFB53648);
-  static const dangerSoft = Color(0xFFFBEAEC);
-  static const muted = Color(0xFF9AA5B5);
-  static const mutedDim = Color(0xFF667085);
-}

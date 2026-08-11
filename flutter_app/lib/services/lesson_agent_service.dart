@@ -404,8 +404,7 @@ $submission''';
     List<({String tag, String description, int count})> mistakeTags = const [],
     List<String> recentDiary = const [],
   }) async {
-    final system =
-        '''
+    final system = '''
 Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
 "type" is a short label like "micro" or "email" or "opinion". "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
 FORMAT RULE FOR "prompt_fr"/"prompt_en", ABSOLUTE — READ THIS TWICE: these two fields must be a QUESTION or an INSTRUCTION addressed directly TO the student (start with an imperative like "Écris...", "Décris...", "Raconte...", "Parle de...", or a direct question like "Où habites-tu ?"), asking them to produce their OWN original sentences. They must NEVER be a statement of fact, a narrated example, or anything that already reads as a complete, correct answer — if a student could just copy "prompt_fr" verbatim into the answer box and be done, you have generated it WRONG.
@@ -611,7 +610,8 @@ Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_wor
         .join('; ');
     var user = 'CANDIDATE WORDS: $wordList';
     if (recentKeywords.isNotEmpty) {
-      user += '\n\nRECENT KEYWORDS (seen in a recent story/grammar session, reinforce if present above): ${recentKeywords.join(', ')}';
+      user +=
+          '\n\nRECENT KEYWORDS (seen in a recent story/grammar session, reinforce if present above): ${recentKeywords.join(', ')}';
     }
     if (mistakeTags.isNotEmpty) {
       user +=
@@ -679,8 +679,7 @@ You are quietly picking which ONE French grammar point a beginner should practic
     required List<VocabEntry> words,
     required String levelBand,
   }) async {
-    final system =
-        '''
+    final system = '''
 You are quietly writing a complete two-role ROLEPLAY SCRIPT for a learner preparing for TEF/TCF Canada, a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director, every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French), do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
 Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
 {"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
@@ -970,7 +969,10 @@ ${_cefrCalibration(levelBand)}''';
   /// 80%-to-pass gate (`grammar_lesson_screen.dart`'s drill threshold) is
   /// actually gating grammar mastery, not just reading comprehension.
   Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
-  buildGrammarQuiz({required ReadingPassage passage, required String grammarPoint}) async {
+  buildGrammarQuiz({
+    required ReadingPassage passage,
+    required String grammarPoint,
+  }) async {
     final system =
         '''
 Given a short French story built specifically around the grammar point "$grammarPoint", write a quiz that TESTS THAT GRAMMAR POINT (not just story comprehension) plus a keyword glossary, same as for a regular story. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
@@ -1649,7 +1651,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
               'Authorization': 'Bearer $apiKey',
               'Content-Type': 'application/json',
               'HTTP-Referer': 'https://github.com/frenchtutor-app',
-              'X-Title': 'FrenchTutor Passeport',
+              'X-Title': 'ParleSprint',
             },
             body: jsonEncode({
               'model': model,

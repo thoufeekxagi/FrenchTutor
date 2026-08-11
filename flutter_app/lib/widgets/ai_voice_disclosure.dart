@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../config/theme.dart';
+import '../design/app_styles.dart';
 import '../screens/onboarding/ai_consent_screen.dart';
 
 /// By the time any screen reaches this call, [AiConsentScreen] has already

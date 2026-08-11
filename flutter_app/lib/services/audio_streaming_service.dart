@@ -3,6 +3,8 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:permission_handler/permission_handler.dart';
@@ -59,9 +61,12 @@ class AudioStreamingService {
 
   Future<void> _ensureRecorderOpen() {
     if (_isRecorderOpen) return Future.value();
-    return _recorderOpenLatch ??= _recorder.openRecorder().then((_) {
-      _isRecorderOpen = true;
-    }).whenComplete(() => _recorderOpenLatch = null);
+    return _recorderOpenLatch ??= _recorder
+        .openRecorder()
+        .then((_) {
+          _isRecorderOpen = true;
+        })
+        .whenComplete(() => _recorderOpenLatch = null);
   }
 
   /// Gemini delivers audio over the WebSocket in irregular network bursts, not a steady
@@ -211,6 +216,19 @@ class AudioStreamingService {
 
   Future<void> startStreaming({
     required void Function(List<int> chunk) onChunk,
+  }) {
+    if (_isStreaming) return Future.value();
+    return _streamStartLatch ??= _startStreaming(
+      onChunk: onChunk,
+    ).whenComplete(() => _streamStartLatch = null);
+  }
+
+  /// Lifecycle and mic-mode callbacks can request capture during the same
+  /// platform-channel startup window. Share the in-flight recorder start.
+  Future<void>? _streamStartLatch;
+
+  Future<void> _startStreaming({
+    required void Function(List<int> chunk) onChunk,
   }) async {
     if (_isStreaming) return;
     _audioChunkCallback = onChunk;
@@ -304,7 +322,9 @@ class AudioStreamingService {
       // that underran the player and produced an audible cutoff. 16384 (~340ms) gives the
       // serialized playback queue above enough headroom to smooth over Gemini's bursty
       // WebSocket delivery without the extra latency becoming perceptible in conversation.
-      bufferSize: 16384,
+      bufferSize: defaultTargetPlatform == TargetPlatform.android
+          ? 32768
+          : 16384,
     );
     _isPlayerStarted = true;
   }

@@ -26,9 +26,9 @@ import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/error_notice.dart';
@@ -283,6 +283,8 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
     if (_finished) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
+      _audio.stopPlayback();
+      _audio.isOutputActive = false;
       _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
@@ -1151,7 +1153,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                                 entry.en,
                                 style: DesignTokens.body(
                                   12.5,
-                                ).copyWith(color: DesignTokens.slateDim),
+                                ).copyWith(color: DesignTokens.mutedDim),
                               ),
                               Text(
                                 entry.fr,
@@ -1167,7 +1169,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                           entry.phonetic,
                           style: DesignTokens.mono(
                             11,
-                          ).copyWith(color: DesignTokens.slateDim),
+                          ).copyWith(color: DesignTokens.mutedDim),
                         ),
                       ],
                     ),
@@ -1194,9 +1196,9 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       case CallStatus.tutorSpeaking:
         return DesignTokens.primary;
       case CallStatus.muted:
-        return DesignTokens.slate;
+        return DesignTokens.muted;
       case CallStatus.ended:
-        return DesignTokens.slate.withValues(alpha: 0.5);
+        return DesignTokens.muted.withValues(alpha: 0.5);
     }
   }
 
@@ -1288,7 +1290,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                 style: DesignTokens.mono(
                   13,
                   weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               const Spacer(),
               IconButton(
@@ -1332,7 +1334,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                     '${(_cardIndex + 1).clamp(1, _sessionPlan.isEmpty ? 1 : _sessionPlan.length)} of ${_sessionPlan.length} · $_statusText',
                     style: DesignTokens.mono(
                       11.5,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
@@ -1346,7 +1348,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   Widget _content() {
     final card = _currentCard;
     if (card == null) {
-      return PasseportCard(
+      return LearningCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1403,7 +1405,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                 card.entry.phonetic,
                 style: DesignTokens.mono(
                   13,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               const SizedBox(height: 10),
               // The pacing made visible: attempts counted so far vs. the practice passes
@@ -1415,7 +1417,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                 style: DesignTokens.body(11).copyWith(
                   color: _offerUnlocked
                       ? DesignTokens.success
-                      : DesignTokens.slateDim,
+                      : DesignTokens.mutedDim,
                 ),
               ),
             ],
@@ -1425,11 +1427,11 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            child: PasseportCard(
+            child: LearningCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const KickerText('Example', color: DesignTokens.slateDim),
+                  const KickerText('Example', color: DesignTokens.mutedDim),
                   const SizedBox(height: 3),
                   Text(
                     example.fr,
@@ -1439,7 +1441,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                     example.en,
                     style: DesignTokens.body(
                       11,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
@@ -1449,7 +1451,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         const SizedBox(height: 16),
         Text(
           'Repeat the word out loud, ${_gemini.persona.displayName} is listening. Say "next word" when you\'re ready.',
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -1464,7 +1466,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   side: BorderSide(color: DesignTokens.hairline),
                   foregroundColor: DesignTokens.text,
-                  // Match PasseportPrimaryButton's corner radius so Back and
+                  // Match PrimaryActionButton's corner radius so Back and
                   // Next read as one control pair, not two design systems.
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1474,7 +1476,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: PasseportPrimaryButton(
+              child: PrimaryActionButton(
                 label: 'Next word',
                 icon: CupertinoIcons.arrow_right,
                 onPressed: _advanceFromUserIntent,
@@ -1499,7 +1501,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         itemCount: _debugLog.length,
         itemBuilder: (context, i) => Text(
           _debugLog[i],
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
         ),
       ),
     );
@@ -1597,7 +1599,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
                 label,
                 style: DesignTokens.body(
                   11,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),

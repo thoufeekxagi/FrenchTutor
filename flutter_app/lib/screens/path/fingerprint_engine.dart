@@ -66,13 +66,79 @@ class FingerprintGraph {
 const Size _canvasSize = Size(1100, 820);
 
 final _stopWords = <String>{
-  'le', 'la', 'les', 'l', 'un', 'une', 'des', 'de', 'du', 'au', 'aux', 'et',
-  'à', 'a', 'en', 'ce', 'cet', 'cette', 'ces', 'mon', 'ma', 'mes', 'ton',
-  'ta', 'tes', 'son', 'sa', 'ses', 'notre', 'nos', 'votre', 'vos', 'leur',
-  'leurs', 'que', 'qui', 'pour', 'avec', 'dans', 'sur', 'est', 'es', 'ai',
-  'as', 'avons', 'avez', 'ont', 'je', 'tu', 'il', 'elle', 'on', 'nous',
-  'vous', 'ils', 'elles', 'se', 'ne', 'pas', 'y', 'd', 'n', 'qu', 'c', 'j',
-  'm', 't', 's', 'être', 'suis', 'ça', 'très', 'plus',
+  'le',
+  'la',
+  'les',
+  'l',
+  'un',
+  'une',
+  'des',
+  'de',
+  'du',
+  'au',
+  'aux',
+  'et',
+  'à',
+  'a',
+  'en',
+  'ce',
+  'cet',
+  'cette',
+  'ces',
+  'mon',
+  'ma',
+  'mes',
+  'ton',
+  'ta',
+  'tes',
+  'son',
+  'sa',
+  'ses',
+  'notre',
+  'nos',
+  'votre',
+  'vos',
+  'leur',
+  'leurs',
+  'que',
+  'qui',
+  'pour',
+  'avec',
+  'dans',
+  'sur',
+  'est',
+  'es',
+  'ai',
+  'as',
+  'avons',
+  'avez',
+  'ont',
+  'je',
+  'tu',
+  'il',
+  'elle',
+  'on',
+  'nous',
+  'vous',
+  'ils',
+  'elles',
+  'se',
+  'ne',
+  'pas',
+  'y',
+  'd',
+  'n',
+  'qu',
+  'c',
+  'j',
+  'm',
+  't',
+  's',
+  'être',
+  'suis',
+  'ça',
+  'très',
+  'plus',
 };
 
 List<String> _tokenize(String text) {
@@ -90,7 +156,10 @@ List<String> _tokenize(String text) {
 /// Builds the learner's word fingerprint from every place they've actually
 /// produced or reviewed French: flashcard recall, spoken session transcripts
 /// (roleplay + pronunciation share the same session log), and free writing.
-FingerprintGraph buildFingerprintGraph(LearningStore store, ContentService content) {
+FingerprintGraph buildFingerprintGraph(
+  LearningStore store,
+  ContentService content,
+) {
   final entries = <String, VocabEntry>{};
   final themes = <String, String>{};
   for (final phase in content.vocabPhases) {
@@ -135,7 +204,10 @@ FingerprintGraph buildFingerprintGraph(LearningStore store, ContentService conte
 
   final recallCounts = store.reviewCountsByEntry();
   final speakingGroups = <Set<String>>[];
-  final speakingCounts = countAndGroup(store.spokenSessionTexts(), speakingGroups);
+  final speakingCounts = countAndGroup(
+    store.spokenSessionTexts(),
+    speakingGroups,
+  );
   final writingGroups = <Set<String>>[];
   final writingCounts = countAndGroup(
     store.submissions().map((s) => s.text).toList(),
@@ -152,16 +224,25 @@ FingerprintGraph buildFingerprintGraph(LearningStore store, ContentService conte
 
   final lastReviewed = <String, DateTime>{};
   for (final state in store.allSRSStates().values) {
-    if (state.lastReviewedAt != null) lastReviewed[state.entryId] = state.lastReviewedAt!;
+    if (state.lastReviewedAt != null)
+      lastReviewed[state.entryId] = state.lastReviewedAt!;
   }
 
   final ranked = touchedIds.toList()
     ..sort((a, b) {
-      final totalA = (recallCounts[a] ?? 0) + (speakingCounts[a] ?? 0) + (writingCounts[a] ?? 0);
-      final totalB = (recallCounts[b] ?? 0) + (speakingCounts[b] ?? 0) + (writingCounts[b] ?? 0);
+      final totalA =
+          (recallCounts[a] ?? 0) +
+          (speakingCounts[a] ?? 0) +
+          (writingCounts[a] ?? 0);
+      final totalB =
+          (recallCounts[b] ?? 0) +
+          (speakingCounts[b] ?? 0) +
+          (writingCounts[b] ?? 0);
       final byTotal = totalB.compareTo(totalA);
       if (byTotal != 0) return byTotal;
-      return (lastReviewed[b] ?? DateTime(1970)).compareTo(lastReviewed[a] ?? DateTime(1970));
+      return (lastReviewed[b] ?? DateTime(1970)).compareTo(
+        lastReviewed[a] ?? DateTime(1970),
+      );
     });
   final shown = ranked.take(90).toList();
 
@@ -192,7 +273,10 @@ FingerprintGraph buildFingerprintGraph(LearningStore store, ContentService conte
   return FingerprintGraph(nodes, edges, isDemo: false);
 }
 
-FingerprintGraph _buildDemoGraph(Map<String, VocabEntry> entries, Map<String, String> themes) {
+FingerprintGraph _buildDemoGraph(
+  Map<String, VocabEntry> entries,
+  Map<String, String> themes,
+) {
   final byTheme = <String, List<VocabEntry>>{};
   for (final id in entries.keys) {
     byTheme.putIfAbsent(themes[id] ?? 'Vocabulary', () => []).add(entries[id]!);
@@ -217,7 +301,12 @@ FingerprintGraph _buildDemoGraph(Map<String, VocabEntry> entries, Map<String, St
       i++;
     }
   }
-  final edges = _connectNodes(nodes, sessionGroups: const [], speakingGroups: const [], writingGroups: const []);
+  final edges = _connectNodes(
+    nodes,
+    sessionGroups: const [],
+    speakingGroups: const [],
+    writingGroups: const [],
+  );
   _settle(nodes, edges);
   return FingerprintGraph(nodes, edges, isDemo: true);
 }
@@ -255,7 +344,11 @@ List<FingerprintEdge> _connectNodes(
   }
   for (final group in byTheme.values) {
     for (var i = 1; i < group.length; i++) {
-      connect(group[i - 1].entry.id, group[i].entry.id, FingerprintEdgeKind.theme);
+      connect(
+        group[i - 1].entry.id,
+        group[i].entry.id,
+        FingerprintEdgeKind.theme,
+      );
     }
   }
   for (final group in sessionGroups) {

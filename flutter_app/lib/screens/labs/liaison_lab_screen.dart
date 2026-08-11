@@ -10,9 +10,9 @@ import '../../data/database/generated_grammar_story_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../providers/database_provider.dart';
 import '../../services/session_recorder.dart';
 import '../lessons/story_reader_screen.dart';
@@ -77,9 +77,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
     try {
       final learningStore = ref.read(learningStoreProvider);
       final agent = ref.read(lessonAgentServiceProvider);
-      final explanation = await agent.buildLiaisonExplanation(
-        levelBand: level,
-      );
+      final explanation = await agent.buildLiaisonExplanation(levelBand: level);
       final passage = await agent.buildLiaisonStory(
         levelBand: level,
         explanation: explanation,
@@ -204,10 +202,10 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
     final history = _history ?? const [];
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchment,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
         title: Text('Liaison', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchment,
+        backgroundColor: DesignTokens.canvas,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -218,7 +216,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
           const SizedBox(height: 8),
           const KickerText('Practice liaison'),
           const SizedBox(height: 10),
-          PasseportCard(
+          LearningCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -226,7 +224,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                   'When a silent consonant links to the next word (like "les_amis"), it changes how a sentence sounds. Generate a story built to practice it, then pass the quiz at 80% or better.',
                   style: DesignTokens.body(
                     13,
-                  ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -260,7 +258,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                PasseportPrimaryButton(
+                PrimaryActionButton(
                   label: _isGenerating
                       ? 'Building your story…'
                       : 'Generate practice story',
@@ -281,7 +279,10 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
           ),
           const SizedBox(height: 24),
           if (history.isNotEmpty) ...[
-            const KickerText('Your liaison practice', color: DesignTokens.slateDim),
+            const KickerText(
+              'Your liaison practice',
+              color: DesignTokens.mutedDim,
+            ),
             const SizedBox(height: 10),
             for (final entry in history)
               Padding(
@@ -312,7 +313,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                 textAlign: TextAlign.center,
                 style: DesignTokens.body(
                   13,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ),
           const SizedBox(height: 32),
@@ -330,7 +331,7 @@ class _LiaisonHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return LearningCard(
       padding: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -356,7 +357,7 @@ class _LiaisonHistoryTile extends StatelessWidget {
                 DateFormat('MMM d, HH:mm').format(story.createdAt),
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
               if (story.score != null) ...[
                 const SizedBox(width: 8),

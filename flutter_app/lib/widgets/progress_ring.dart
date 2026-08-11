@@ -7,7 +7,12 @@ import 'package:flutter/widgets.dart';
 /// generating in the background and there's no real percentage to report
 /// (Gemini TTS synthesis has no progress callback, just "done" or "not yet").
 class SpinningRing extends StatefulWidget {
-  const SpinningRing({super.key, required this.size, required this.color, this.strokeWidth = 3});
+  const SpinningRing({
+    super.key,
+    required this.size,
+    required this.color,
+    this.strokeWidth = 3,
+  });
 
   final double size;
   final Color color;

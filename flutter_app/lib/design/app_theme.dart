@@ -17,12 +17,12 @@ abstract final class AppTheme {
   static ThemeData themeData() {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: DesignTokens.parchment,
+      scaffoldBackgroundColor: DesignTokens.canvas,
       colorScheme: const ColorScheme.light(
-        primary: DesignTokens.maroon,
-        secondary: DesignTokens.brass,
-        surface: DesignTokens.card,
-        onPrimary: DesignTokens.parchment,
+        primary: DesignTokens.primary,
+        secondary: DesignTokens.secondary,
+        surface: DesignTokens.surface,
+        onPrimary: Colors.white,
         onSecondary: DesignTokens.ink,
         onSurface: DesignTokens.ink,
       ),
@@ -44,7 +44,7 @@ abstract final class AppTheme {
       splashFactory: NoSplash.splashFactory,
       highlightColor: DesignTokens.ink.withValues(alpha: 0.06),
       appBarTheme: AppBarTheme(
-        backgroundColor: DesignTokens.parchment,
+        backgroundColor: DesignTokens.canvas,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -58,7 +58,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: DesignTokens.card,
+        fillColor: DesignTokens.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
@@ -88,6 +88,52 @@ abstract final class AppTheme {
           textStyle: DesignTokens.body(15, weight: FontWeight.w600),
         ),
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(48, 56),
+          backgroundColor: DesignTokens.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+          textStyle: DesignTokens.body(15, weight: FontWeight.w700),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(48, 52),
+          foregroundColor: DesignTokens.primary,
+          side: BorderSide(color: DesignTokens.hairline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+          textStyle: DesignTokens.body(14, weight: FontWeight.w700),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          foregroundColor: DesignTokens.primary,
+          textStyle: DesignTokens.body(14, weight: FontWeight.w700),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? DesignTokens.primary
+              : DesignTokens.canvasDim,
+        ),
+        thumbColor: const WidgetStatePropertyAll(Colors.white),
+      ),
+      listTileTheme: ListTileThemeData(
+        iconColor: DesignTokens.primary,
+        textColor: DesignTokens.ink,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        ),
+      ),
       sliderTheme: SliderThemeData(
         activeTrackColor: DesignTokens.primary,
         inactiveTrackColor: DesignTokens.primarySoft,
@@ -96,18 +142,84 @@ abstract final class AppTheme {
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: DesignTokens.primary,
-        linearTrackColor: DesignTokens.parchmentDim,
+        linearTrackColor: DesignTokens.canvasDim,
       ),
       tabBarTheme: const TabBarThemeData(
-        labelColor: DesignTokens.maroon,
-        unselectedLabelColor: DesignTokens.slate,
-        indicatorColor: DesignTokens.maroon,
+        labelColor: DesignTokens.primary,
+        unselectedLabelColor: DesignTokens.muted,
+        indicatorColor: DesignTokens.primary,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: DesignTokens.card,
-        selectedItemColor: DesignTokens.maroon,
-        unselectedItemColor: DesignTokens.slate,
+        backgroundColor: DesignTokens.surface,
+        selectedItemColor: DesignTokens.primary,
+        unselectedItemColor: DesignTokens.mutedDim,
         elevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        color: DesignTokens.surface,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          side: BorderSide(color: DesignTokens.hairline),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 72,
+        elevation: 0,
+        backgroundColor: DesignTokens.surface,
+        indicatorColor: DesignTokens.primarySoft,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) =>
+              DesignTokens.body(
+                11,
+                weight: states.contains(WidgetState.selected)
+                    ? FontWeight.w700
+                    : FontWeight.w500,
+              ).copyWith(
+                color: states.contains(WidgetState.selected)
+                    ? DesignTokens.primary
+                    : DesignTokens.mutedDim,
+              ),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? DesignTokens.primary
+                : DesignTokens.mutedDim,
+            size: 23,
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: DesignTokens.surface,
+        selectedColor: DesignTokens.primarySoft,
+        side: BorderSide(color: DesignTokens.hairline),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        ),
+        labelStyle: DesignTokens.body(13, weight: FontWeight.w600),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: DesignTokens.surface,
+        modalBackgroundColor: DesignTokens.surface,
+        showDragHandle: true,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: DesignTokens.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: DesignTokens.ink,
+        contentTextStyle: DesignTokens.body(14).copyWith(color: Colors.white),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        ),
       ),
     );
   }

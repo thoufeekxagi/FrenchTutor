@@ -7,9 +7,9 @@ import '../../models/content_models.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/inline_call_bar.dart';
@@ -74,10 +74,10 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
     final pack = ref.watch(contentServiceProvider).connectors();
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Connectors', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [InlineCallActions(controller: _call)],
@@ -99,7 +99,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                       'Connectors content unavailable.',
                       style: DesignTokens.body(
                         13,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   )
                 : _buildContent(pack),
@@ -117,18 +117,18 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
       children: [
         Text(
           pack.tip,
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        PasseportPrimaryButton(
+        PrimaryActionButton(
           label: 'Take the 10-question quiz',
           onPressed: () => _showQuiz(pack.connectors),
         ),
         const SizedBox(height: 16),
         for (final category in categories) ...[
-          KickerText(category, color: DesignTokens.slateDim),
+          KickerText(category, color: DesignTokens.mutedDim),
           const SizedBox(height: 8),
-          PasseportCard(
+          LearningCard(
             padding: 10,
             child: Column(
               children: _buildCategoryRows(
@@ -183,7 +183,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                       connector.en,
                       style: DesignTokens.mono(
                         10.5,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -191,7 +191,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                 Text(
                   connector.example.fr,
                   style: DesignTokens.body(11.5).copyWith(
-                    color: DesignTokens.slateDim,
+                    color: DesignTokens.mutedDim,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -323,14 +323,14 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
   Color _choiceColor(String choice, _QuizQuestion q) {
     if (choice == q.connector.fr) return DesignTokens.info;
     if (choice == _selected) return DesignTokens.primary;
-    return DesignTokens.slate;
+    return DesignTokens.muted;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: DesignTokens.parchmentDim,
+        color: DesignTokens.canvasDim,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -341,7 +341,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -387,11 +387,11 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
               '${_index + 1} / ${_questions.length}',
               style: DesignTokens.mono(
                 11,
-              ).copyWith(color: DesignTokens.slateDim),
+              ).copyWith(color: DesignTokens.mutedDim),
             ),
           ),
           const SizedBox(height: 18),
-          PasseportCard(
+          LearningCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -399,7 +399,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
                   'Which connector means:',
                   style: DesignTokens.body(
                     12.5,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -421,7 +421,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
                     foregroundColor: _selected == null
                         ? DesignTokens.text
                         : _choiceColor(choice, q),
-                    backgroundColor: DesignTokens.card,
+                    backgroundColor: DesignTokens.surface,
                     side: BorderSide(color: DesignTokens.hairline),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -436,7 +436,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
           ),
           if (_selected != null) ...[
             const SizedBox(height: 8),
-            PasseportPrimaryButton(
+            PrimaryActionButton(
               label: _index + 1 < _questions.length ? 'Next' : 'See results',
               onPressed: _next,
             ),
@@ -468,13 +468,13 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
               'Great connectors score points on TEF writing and speaking tasks.',
               style: DesignTokens.body(
                 13,
-              ).copyWith(color: DesignTokens.slateDim),
+              ).copyWith(color: DesignTokens.mutedDim),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 60),
-              child: PasseportPrimaryButton(
+              child: PrimaryActionButton(
                 label: 'Done',
                 onPressed: () => Navigator.pop(context),
               ),

@@ -12,7 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/progress_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/session_row.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
@@ -64,7 +64,7 @@ class ProgressScreen extends ConsumerWidget {
                 'See the practice behind your growing French.',
                 style: DesignTokens.body(
                   16,
-                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
               ),
               const SizedBox(height: 28),
 
@@ -177,7 +177,9 @@ class ProgressScreen extends ConsumerWidget {
       final category = DailyGoalService.categoryFor(session.stage);
       if (category != null) counts[category] = (counts[category] ?? 0) + 1;
     }
-    return counts.entries.map((e) => (category: e.key, count: e.value)).toList();
+    return counts.entries
+        .map((e) => (category: e.key, count: e.value))
+        .toList();
   }
 
   // --- Sections -------------------------------------------------------
@@ -192,7 +194,7 @@ class ProgressScreen extends ConsumerWidget {
           description,
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       ],
     );
@@ -202,7 +204,7 @@ class ProgressScreen extends ConsumerWidget {
     ({int streak, int sessionsThisWeek, int minutesThisWeek}) week,
     List<({DateTime day, int categoriesDone})> days,
   ) {
-    return PasseportCard(
+    return LearningCard(
       padding: DesignTokens.space5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +234,7 @@ class ProgressScreen extends ConsumerWidget {
             label,
             style: DesignTokens.body(
               12.5,
-            ).copyWith(color: DesignTokens.slateDim),
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),
@@ -330,7 +332,7 @@ class ProgressScreen extends ConsumerWidget {
                       style: DesignTokens.body(
                         13,
                         weight: FontWeight.w600,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -340,7 +342,7 @@ class ProgressScreen extends ConsumerWidget {
                   child: LinearProgressIndicator(
                     value: skill.fraction,
                     minHeight: 7,
-                    backgroundColor: DesignTokens.parchmentDim,
+                    backgroundColor: DesignTokens.canvasDim,
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       DesignTokens.success,
                     ),
@@ -351,7 +353,7 @@ class ProgressScreen extends ConsumerWidget {
                   skill.detail,
                   style: DesignTokens.body(
                     13,
-                  ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
                 ),
               ],
             ),
@@ -361,7 +363,9 @@ class ProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategoryBreakdown(List<({String category, int count})> categories) {
+  Widget _buildCategoryBreakdown(
+    List<({String category, int count})> categories,
+  ) {
     final total = categories.fold<int>(0, (sum, c) => sum + c.count);
     if (total == 0) {
       return Container(
@@ -375,12 +379,12 @@ class ProgressScreen extends ConsumerWidget {
           'Practice a session in any category and it will show up here.',
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       );
     }
 
-    return PasseportCard(
+    return LearningCard(
       padding: DesignTokens.space5,
       child: Column(
         children: categories.map((c) {
@@ -389,7 +393,11 @@ class ProgressScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: DesignTokens.space4),
             child: Row(
               children: [
-                Icon(_iconForCategory(c.category), size: 18, color: DesignTokens.primary),
+                Icon(
+                  _iconForCategory(c.category),
+                  size: 18,
+                  color: DesignTokens.primary,
+                ),
                 const SizedBox(width: DesignTokens.space3),
                 SizedBox(
                   width: 84,
@@ -400,11 +408,13 @@ class ProgressScreen extends ConsumerWidget {
                 ),
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusSmall,
+                    ),
                     child: LinearProgressIndicator(
                       value: fraction,
                       minHeight: 8,
-                      backgroundColor: DesignTokens.parchmentDim,
+                      backgroundColor: DesignTokens.canvasDim,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         DesignTokens.primary,
                       ),
@@ -441,17 +451,16 @@ class ProgressScreen extends ConsumerWidget {
           'Your practice sessions will appear here once you complete one.',
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       );
     }
-    return PasseportCard(
+    return LearningCard(
       padding: DesignTokens.space2,
       child: Column(
         children: [
           for (var i = 0; i < recent.length; i++) ...[
-            if (i > 0)
-              const Divider(height: 1, color: DesignTokens.parchmentDim),
+            if (i > 0) const Divider(height: 1, color: DesignTokens.canvasDim),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => AppRouter.push(
@@ -529,20 +538,27 @@ class _WeekActivityChart extends StatelessWidget {
                       height: barHeight,
                       decoration: BoxDecoration(
                         color: entry.categoriesDone > 0
-                            ? (isToday ? DesignTokens.primary : DesignTokens.primarySoft)
+                            ? (isToday
+                                  ? DesignTokens.primary
+                                  : DesignTokens.primarySoft)
                             : DesignTokens.canvasDim,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusSmall,
+                        ),
                       ),
                     ),
                     const SizedBox(height: DesignTokens.space2),
                     Text(
                       DateFormat('EEEEE').format(entry.day),
-                      style: DesignTokens.body(
-                        11,
-                        weight: isToday ? FontWeight.w700 : FontWeight.w500,
-                      ).copyWith(
-                        color: isToday ? DesignTokens.primary : DesignTokens.slateDim,
-                      ),
+                      style:
+                          DesignTokens.body(
+                            11,
+                            weight: isToday ? FontWeight.w700 : FontWeight.w500,
+                          ).copyWith(
+                            color: isToday
+                                ? DesignTokens.primary
+                                : DesignTokens.mutedDim,
+                          ),
                     ),
                   ],
                 ),

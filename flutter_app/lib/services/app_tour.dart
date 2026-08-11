@@ -21,7 +21,9 @@ class AppTour {
 
   // Home targets — attached in dashboard_screen.dart.
   static final missionKey = GlobalKey(debugLabel: 'tour_mission');
-  static final keepPractisingKey = GlobalKey(debugLabel: 'tour_keep_practising');
+  static final keepPractisingKey = GlobalKey(
+    debugLabel: 'tour_keep_practising',
+  );
   static final marieKey = GlobalKey(debugLabel: 'tour_marie');
 
   // Call targets — attached in session_screen.dart.
@@ -237,7 +239,7 @@ class _TourCard extends StatelessWidget {
                   style: DesignTokens.body(
                     13,
                     weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ),
               FilledButton(

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/api_keys.dart';
-import '../../config/theme.dart';
+import '../../design/app_styles.dart';
 import '../../design/app_router.dart';
 import '../../models/session.dart';
 import '../../orchestration/models/competency.dart';
@@ -15,7 +15,7 @@ import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/passeport_card.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/session_row.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
@@ -69,7 +69,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _openSession({String? lessonContext}) async {
-    if (!await ensureAiSessionQuota(context, ref.read(pilotAccessServiceProvider)) || !mounted) return;
+    if (!await ensureAiSessionQuota(
+          context,
+          ref.read(pilotAccessServiceProvider),
+        ) ||
+        !mounted)
+      return;
     LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
@@ -102,11 +107,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: AppStyles.canvas,
       body: SafeArea(
         child: PSContentColumn(
           child: RefreshIndicator(
-            color: Passeport.maroon,
+            color: AppStyles.primary,
             onRefresh: () async => _reload(),
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
@@ -150,10 +155,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         child: Text(
                           'View all',
-                          style: Passeport.body(
+                          style: AppStyles.body(
                             13.5,
                             weight: FontWeight.w600,
-                          ).copyWith(color: Passeport.sky),
+                          ).copyWith(color: AppStyles.info),
                         ),
                       ),
                     ],
@@ -189,20 +194,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Text(
                 DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase(),
-                style: Passeport.body(
+                style: AppStyles.body(
                   10.5,
                   weight: FontWeight.w700,
-                ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
+                ).copyWith(color: AppStyles.mutedDim, letterSpacing: 1),
               ),
               const SizedBox(height: 5),
-              Text('Bonjour', style: Passeport.display(32)),
+              Text('Bonjour', style: AppStyles.display(32)),
               const SizedBox(height: 4),
               Text(
                 goalLabel,
-                style: Passeport.body(
+                style: AppStyles.body(
                   14,
                   weight: FontWeight.w500,
-                ).copyWith(color: Passeport.slateDim),
+                ).copyWith(color: AppStyles.mutedDim),
               ),
             ],
           ),
@@ -224,14 +229,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Passeport.card,
+                color: AppStyles.surface,
                 shape: BoxShape.circle,
-                boxShadow: DesignTokens.cardShadow,
+                boxShadow: DesignTokens.surfaceShadow,
               ),
               child: const Icon(
                 CupertinoIcons.person_fill,
                 size: 18,
-                color: Passeport.ink,
+                color: AppStyles.ink,
               ),
             ),
           ),
@@ -241,7 +246,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _sectionTitle(String title) {
-    return Text(title, style: Passeport.display(20));
+    return Text(title, style: AppStyles.display(20));
   }
 
   Widget _mariePractice() {
@@ -249,7 +254,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ref.read(contentServiceProvider).resources()?.speakingTopics ?? [];
     return Container(
       decoration: BoxDecoration(
-        color: Passeport.infoSoft,
+        color: AppStyles.infoSoft,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -268,7 +273,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     width: 48,
                     height: 48,
                     decoration: const BoxDecoration(
-                      color: Passeport.sky,
+                      color: AppStyles.info,
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
@@ -289,14 +294,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       children: [
                         Text(
                           'Talk with Marie',
-                          style: Passeport.body(16, weight: FontWeight.w700),
+                          style: AppStyles.body(16, weight: FontWeight.w700),
                         ),
                         const SizedBox(height: 3),
                         Text(
                           'Open conversation · choose any topic',
-                          style: Passeport.body(
+                          style: AppStyles.body(
                             13,
-                          ).copyWith(color: Passeport.slateDim),
+                          ).copyWith(color: AppStyles.mutedDim),
                         ),
                       ],
                     ),
@@ -305,12 +310,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     width: 44,
                     height: 44,
                     decoration: const BoxDecoration(
-                      color: Passeport.card,
+                      color: AppStyles.surface,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       CupertinoIcons.mic_fill,
-                      color: Passeport.maroon,
+                      color: AppStyles.primary,
                       size: 19,
                     ),
                   ),
@@ -319,7 +324,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
           if (topics.isNotEmpty) ...[
-            Container(height: 1, color: Passeport.sky.withValues(alpha: 0.12)),
+            Container(height: 1, color: AppStyles.info.withValues(alpha: 0.12)),
             SizedBox(
               height: 54,
               child: ListView.separated(
@@ -345,12 +350,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 13),
                       decoration: BoxDecoration(
-                        color: Passeport.card,
+                        color: AppStyles.surface,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
                         topic.title,
-                        style: Passeport.body(12.5, weight: FontWeight.w600),
+                        style: AppStyles.body(12.5, weight: FontWeight.w600),
                       ),
                     ),
                   );
@@ -503,7 +508,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: Passeport.infoSoft,
+        color: AppStyles.infoSoft,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -516,18 +521,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Text(
                   'KEEP PRACTISING',
-                  style: Passeport.body(
+                  style: AppStyles.body(
                     10.5,
                     weight: FontWeight.w700,
-                  ).copyWith(color: Passeport.sky, letterSpacing: 0.9),
+                  ).copyWith(color: AppStyles.info, letterSpacing: 0.9),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Practice any skill, any time. One locked skill unlocks '
                   'free each day. Your practice still informs what comes next.',
-                  style: Passeport.body(
+                  style: AppStyles.body(
                     13,
-                  ).copyWith(color: Passeport.slateDim, height: 1.35),
+                  ).copyWith(color: AppStyles.mutedDim, height: 1.35),
                 ),
               ],
             ),
@@ -546,7 +551,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     chip.labId != null && gate.isLabLocked(chip.labId!);
                 return Semantics(
                   button: true,
-                  label: locked ? '${chip.label} (subscribers only)' : chip.label,
+                  label: locked
+                      ? '${chip.label} (subscribers only)'
+                      : chip.label,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -557,7 +564,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: Passeport.card,
+                        color: AppStyles.surface,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Row(
@@ -566,17 +573,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           Icon(
                             locked ? CupertinoIcons.lock_fill : chip.icon,
                             size: locked ? 13 : 16,
-                            color: locked ? Passeport.slateDim : Passeport.sky,
+                            color: locked ? AppStyles.mutedDim : AppStyles.info,
                           ),
                           const SizedBox(width: 7),
                           Text(
                             chip.label,
-                            style: Passeport.body(
-                              12.5,
-                              weight: FontWeight.w600,
-                            ).copyWith(
-                              color: locked ? Passeport.slateDim : null,
-                            ),
+                            style: AppStyles.body(12.5, weight: FontWeight.w600)
+                                .copyWith(
+                                  color: locked ? AppStyles.mutedDim : null,
+                                ),
                           ),
                         ],
                       ),
@@ -599,7 +604,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       return DateTime.tryParse(session.startedAt)?.isAfter(weekStart) ?? false;
     }).length;
 
-    return PasseportCard(
+    return LearningCard(
       padding: 18,
       child: Row(
         children: [
@@ -607,17 +612,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: _Metric(
               value: '$doneToday/$goalTotal',
               label: 'steps today',
-              color: doneToday == goalTotal ? Passeport.sage : Passeport.maroon,
+              color: doneToday == goalTotal
+                  ? AppStyles.success
+                  : AppStyles.primary,
             ),
           ),
-          Container(width: 1, height: 42, color: Passeport.hairline),
+          Container(width: 1, height: 42, color: AppStyles.hairline),
           Expanded(
             child: _Metric(
               value: '$sessionsThisWeek',
               label: sessionsThisWeek == 1
                   ? 'session this week'
                   : 'sessions this week',
-              color: Passeport.sky,
+              color: AppStyles.info,
             ),
           ),
         ],
@@ -626,7 +633,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _journalCard() {
-    return PasseportCard(
+    return LearningCard(
       padding: 6,
       child: Column(
         children: [
@@ -641,7 +648,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Container(height: 1, color: Passeport.hairline),
+            child: Container(height: 1, color: AppStyles.hairline),
           ),
           _notesRow(inCard: true),
         ],
@@ -661,28 +668,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         decoration: inCard
             ? null
             : BoxDecoration(
-                color: Passeport.card,
+                color: AppStyles.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: DesignTokens.cardShadow,
+                boxShadow: DesignTokens.surfaceShadow,
               ),
         child: Row(
           children: [
             const Icon(
               CupertinoIcons.square_pencil,
               size: 18,
-              color: Passeport.sky,
+              color: AppStyles.info,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Review your notes',
-                style: Passeport.body(14, weight: FontWeight.w600),
+                style: AppStyles.body(14, weight: FontWeight.w600),
               ),
             ),
             const Icon(
               CupertinoIcons.chevron_right,
               size: 14,
-              color: Passeport.slate,
+              color: AppStyles.muted,
             ),
           ],
         ),
@@ -706,15 +713,14 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value, style: Passeport.display(24).copyWith(color: color)),
+        Text(value, style: AppStyles.display(24).copyWith(color: color)),
         const SizedBox(height: 2),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: Passeport.body(11.5).copyWith(color: Passeport.slateDim),
+          style: AppStyles.body(11.5).copyWith(color: AppStyles.mutedDim),
         ),
       ],
     );
   }
 }
-
