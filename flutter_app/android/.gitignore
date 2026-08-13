@@ -12,3 +12,8 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+# Exception: shared-debug.keystore is intentionally committed — a fixed,
+# public-password debug-only keystore shared by the whole team so every
+# machine/emulator produces the same SHA-1 and never needs re-whitelisting
+# in Google Cloud Console. It cannot sign a Play Store release.
+!app/shared-debug.keystore
