@@ -35,7 +35,7 @@ class LabsScreen extends ConsumerWidget {
       return _webPracticePage(context, gate);
     }
     return Scaffold(
-      backgroundColor: DesignTokens.parchment,
+      backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: PSContentColumn(
           child: Padding(
@@ -44,18 +44,26 @@ class LabsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                Text('Practice', style: DesignTokens.display(24)),
+                Text('Practice', style: DesignTokens.display(30)),
                 const SizedBox(height: 4),
                 Text(
-                  'Go deeper on one skill at a time',
+                  'Choose one skill. Leave with evidence.',
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: ListView(
                     children: [
+                      _RecommendedPractice(
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('vocabulary'),
+                          builder: (_) => const VocabPickerScreen(),
+                        ),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
                       _LabTile(
                         icon: CupertinoIcons.textformat_abc,
                         title: 'Learn the Alphabet',
@@ -322,6 +330,89 @@ void _open(
   AppRouter.push(context, builder);
 }
 
+class _RecommendedPractice extends StatelessWidget {
+  const _RecommendedPractice({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Review six words from yesterday',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(DesignTokens.space4),
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            border: Border.all(color: DesignTokens.hairline),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                ),
+                child: const Icon(
+                  CupertinoIcons.arrow_counterclockwise,
+                  color: DesignTokens.primary,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: DesignTokens.space3),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recommended for you',
+                      style: TextStyle(
+                        color: DesignTokens.mutedDim,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.7,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Review 6 words from yesterday',
+                      style: TextStyle(
+                        color: DesignTokens.ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Spaced repetition · 8 min',
+                      style: TextStyle(
+                        color: DesignTokens.mutedDim,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                CupertinoIcons.chevron_right,
+                color: DesignTokens.mutedDim,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LabTile extends StatelessWidget {
   const _LabTile({
     required this.icon,
@@ -348,7 +439,7 @@ class _LabTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: DesignTokens.card,
+          color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: DesignTokens.hairline, width: 1),
         ),
@@ -379,11 +470,14 @@ class _LabTile extends StatelessWidget {
                     child: Container(
                       width: 18,
                       height: 18,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: DesignTokens.surface,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(color: Color(0x1A000000), blurRadius: 3),
+                          BoxShadow(
+                            color: DesignTokens.ink.withValues(alpha: 0.1),
+                            blurRadius: 3,
+                          ),
                         ],
                       ),
                       child: Icon(
@@ -409,14 +503,14 @@ class _LabTile extends StatelessWidget {
                     subtitle,
                     style: DesignTokens.body(
                       12,
-                    ).copyWith(color: DesignTokens.slateDim),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ],
               ),
             ),
             Icon(
               locked ? CupertinoIcons.lock_fill : CupertinoIcons.chevron_right,
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               size: locked ? 14 : 16,
             ),
           ],

@@ -56,7 +56,7 @@ abstract final class Passeport {
   static TextStyle body(double size, {FontWeight weight = FontWeight.w400}) =>
       DesignTokens.body(size, weight: weight);
 
-  static TextStyle mono(double size, {FontWeight weight = FontWeight.w400}) =>
+  static TextStyle mono(double size, {FontWeight weight = FontWeight.w600}) =>
       DesignTokens.mono(size, weight: weight);
 
   static ThemeData themeData() => AppTheme.themeData();

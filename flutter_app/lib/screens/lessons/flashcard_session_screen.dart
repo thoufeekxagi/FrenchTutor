@@ -215,8 +215,12 @@ class _FlashcardSessionScreenState
       child: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: DesignTokens.contentMaxWidth,
+          constraints: BoxConstraints(
+            maxWidth:
+                MediaQuery.sizeOf(context).width >=
+                    DesignTokens.breakpointExpanded
+                ? 680
+                : DesignTokens.contentMaxWidth,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),

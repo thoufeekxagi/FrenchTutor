@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../lessons/flashcard_session_screen.dart';
 
@@ -32,17 +33,19 @@ class VocabLabScreen extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        itemCount: phases.length,
-        itemBuilder: (context, phaseIndex) {
-          final phase = phases[phaseIndex];
-          return _PhaseSection(
-            label: _phaseLabels[phase.phase] ?? 'Phase ${phase.phase}',
-            phase: phase,
-            srs: srs,
-          );
-        },
+      body: WebConstrainedView(
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          itemCount: phases.length,
+          itemBuilder: (context, phaseIndex) {
+            final phase = phases[phaseIndex];
+            return _PhaseSection(
+              label: _phaseLabels[phase.phase] ?? 'Phase ${phase.phase}',
+              phase: phase,
+              srs: srs,
+            );
+          },
+        ),
       ),
     );
   }

@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
 import '../../orchestration/models/competency.dart';
+import '../../orchestration/models/content_descriptor.dart';
 import '../../orchestration/models/competency_state.dart';
 import 'learning_graph_view.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_layout.dart';
 
 enum _MasteryTier { newSkill, building, ready }
 
@@ -70,7 +72,8 @@ class _PathScreenState extends ConsumerState<PathScreen> {
     final bestStateByCompetency = <String, CompetencyState>{};
     for (final state in states) {
       final existing = bestStateByCompetency[state.competencyId];
-      if (existing == null || state.masteryEstimate > existing.masteryEstimate) {
+      if (existing == null ||
+          state.masteryEstimate > existing.masteryEstimate) {
         bestStateByCompetency[state.competencyId] = state;
       }
     }
@@ -79,6 +82,10 @@ class _PathScreenState extends ConsumerState<PathScreen> {
     // here" map instead of the entire syllabus dumped at once.
     _expandedBands ??= {_currentBand(profile.level)};
 
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return _webPath(framework, bestStateByCompetency);
+    }
+
     return Scaffold(
       backgroundColor: Passeport.parchment,
       body: SafeArea(
@@ -86,25 +93,48 @@ class _PathScreenState extends ConsumerState<PathScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fixed header: the fingerprint canvas stays put as the page
-              // scrolls — only its own contents pan/zoom, never the frame.
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Your French fingerprint', style: Passeport.display(28)),
-                    const SizedBox(height: 5),
+                    Text('Your path', style: DesignTokens.display(30)),
+                    const SizedBox(height: DesignTokens.space1),
                     Text(
-                      'Shaped by how you practice.',
-                      style: Passeport.body(
-                        14.5,
-                      ).copyWith(color: Passeport.slateDim, height: 1.4),
+                      '${_currentBand(profile.level)} · ${profile.goal == 'tef_canada' ? 'TEF Canada' : 'Everyday French'}',
+                      style: DesignTokens.body(
+                        15,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
-                    const SizedBox(height: 18),
-                    FingerprintView(
-                      store: ref.watch(learningStoreProvider),
-                      content: ref.watch(contentServiceProvider),
+                    const SizedBox(height: DesignTokens.space4),
+                    Container(
+                      padding: const EdgeInsets.all(DesignTokens.space4),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
+                        ),
+                        border: Border.all(color: DesignTokens.hairline),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${_currentBand(profile.level)} Intermediate',
+                              style: DesignTokens.body(
+                                15,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Speaking · Building',
+                            style: DesignTokens.label(
+                              11,
+                            ).copyWith(color: DesignTokens.secondary),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -113,7 +143,7 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
                   children: [
-                    Text('Curriculum path', style: Passeport.display(22)),
+                    Text('Curriculum path', style: DesignTokens.display(22)),
                     const SizedBox(height: 12),
                     if (framework == null)
                       const _EmptyPath()
@@ -128,17 +158,18 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(
-                              CupertinoIcons.sparkles,
-                              color: Passeport.sky,
+                              CupertinoIcons.info_circle_fill,
+                              color: DesignTokens.secondary,
                               size: 21,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Every skill moves from New to Building to Ready as you practice. Tap a level to expand it.',
-                                style: Passeport.body(
-                                  13,
-                                ).copyWith(color: Passeport.inkSoft, height: 1.4),
+                                'Complete the next skill in order. Your state moves from New to Building to Ready as evidence accumulates.',
+                                style: Passeport.body(13).copyWith(
+                                  color: Passeport.inkSoft,
+                                  height: 1.4,
+                                ),
                               ),
                             ),
                           ],
@@ -176,7 +207,9 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                                 for (final item in framework.competencies)
                                   item.id: item.title,
                               },
-                              tier: _tierFor(bestStateByCompetency[competency.id]),
+                              tier: _tierFor(
+                                bestStateByCompetency[competency.id],
+                              ),
                             ),
                         ],
                         const SizedBox(height: 16),
@@ -187,6 +220,112 @@ class _PathScreenState extends ConsumerState<PathScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _webPath(
+    CompetencyFramework? framework,
+    Map<String, CompetencyState> bestStateByCompetency,
+  ) {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: WebPage(
+          header: const WebPageHeader(
+            title: 'Your French fingerprint',
+            subtitle: 'A live map of the evidence behind your French.',
+          ),
+          children: [
+            WebCard(
+              padding: const EdgeInsets.all(DesignTokens.space6),
+              child: FingerprintView(
+                store: ref.watch(learningStoreProvider),
+                content: ref.watch(contentServiceProvider),
+              ),
+            ),
+            const SizedBox(height: DesignTokens.space6),
+            const WebSectionHeader(title: 'Curriculum path'),
+            WebCard(
+              padding: const EdgeInsets.all(DesignTokens.space6),
+              child: framework == null
+                  ? const _EmptyPath()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(DesignTokens.space4),
+                          decoration: BoxDecoration(
+                            color: DesignTokens.infoSoft,
+                            borderRadius: BorderRadius.circular(
+                              DesignTokens.radiusMedium,
+                            ),
+                          ),
+                          child: const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                CupertinoIcons.sparkles,
+                                color: DesignTokens.info,
+                                size: 21,
+                              ),
+                              SizedBox(width: DesignTokens.space3),
+                              Expanded(
+                                child: Text(
+                                  'Every skill moves from New to Building to Ready as you practice. Open a level to see its next skills.',
+                                  style: TextStyle(height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: DesignTokens.space5),
+                        for (final band in _bands(framework.competencies)) ...[
+                          _BandHeader(
+                            band: band,
+                            count: framework.competencies
+                                .where((item) => item.difficultyBand == band)
+                                .length,
+                            readyCount: framework.competencies
+                                .where((item) => item.difficultyBand == band)
+                                .where(
+                                  (item) =>
+                                      _tierFor(
+                                        bestStateByCompetency[item.id],
+                                      ) ==
+                                      _MasteryTier.ready,
+                                )
+                                .length,
+                            expanded: _expandedBands!.contains(band),
+                            onToggle: () => setState(() {
+                              final expanded = _expandedBands!;
+                              if (!expanded.remove(band)) expanded.add(band);
+                            }),
+                          ),
+                          if (_expandedBands!.contains(band)) ...[
+                            const SizedBox(height: DesignTokens.space3),
+                            for (final competency
+                                in framework.competencies.where(
+                                  (item) => item.difficultyBand == band,
+                                ))
+                              _CompetencyNode(
+                                competency: competency,
+                                titleById: {
+                                  for (final item in framework.competencies)
+                                    item.id: item.title,
+                                },
+                                tier: _tierFor(
+                                  bestStateByCompetency[competency.id],
+                                ),
+                              ),
+                          ],
+                          const SizedBox(height: DesignTokens.space3),
+                        ],
+                      ],
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -224,7 +363,9 @@ class _BandHeader extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            expanded ? CupertinoIcons.chevron_down : CupertinoIcons.chevron_right,
+            expanded
+                ? CupertinoIcons.chevron_down
+                : CupertinoIcons.chevron_right,
             size: 14,
             color: Passeport.slateDim,
           ),

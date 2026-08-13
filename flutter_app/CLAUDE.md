@@ -39,7 +39,7 @@ that's a sign the abstraction boundary is in the wrong place. Go back to
 
 - No em dashes anywhere in UI copy or AI-generated output — it reads as AI-generated. Use periods, commas, or
   parentheses instead.
-- Palette: active theme is `ProSystemAzure` (azure/teal/navy) — see `lib/theme/palettes.dart`.
+- Palette: active theme is `NorthstarStudio` (cobalt/teal/navy) — see `lib/design/palettes.dart`.
 - Copy the *structure* of reference apps (Readle) for UX patterns; never copy their colors.
 - `flutter analyze` and `flutter test` must be clean (module of the one known pre-existing failure above)
   before any branch merges to `master`.

@@ -17,6 +17,7 @@ import '../../services/session_recorder.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/tts_play_button.dart';
 
@@ -68,31 +69,33 @@ class _AlphabetLabScreenState extends ConsumerState<AlphabetLabScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Text(
-              'Start with the full alphabet, then drill consonants, vowels, '
-              'or accents on their own. Each deck takes about 10-15 minutes.',
-              style: DesignTokens.body(
-                13.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.4),
-            ),
-            const SizedBox(height: 20),
-            for (final deck in _decks) ...[
-              _DeckTile(
-                deck: deck,
-                completed: store.lessonStatus(deck.id).status == 'completed',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => _AlphabetDeckScreen(deck: deck),
+      body: WebConstrainedView(
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              Text(
+                'Start with the full alphabet, then drill consonants, vowels, '
+                'or accents on their own. Each deck takes about 10-15 minutes.',
+                style: DesignTokens.body(
+                  13.5,
+                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              for (final deck in _decks) ...[
+                _DeckTile(
+                  deck: deck,
+                  completed: store.lessonStatus(deck.id).status == 'completed',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => _AlphabetDeckScreen(deck: deck),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

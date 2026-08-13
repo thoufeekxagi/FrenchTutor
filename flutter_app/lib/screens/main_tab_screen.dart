@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/theme.dart';
 import '../design/app_router.dart';
+import '../design/tokens.dart';
 import '../providers/database_provider.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
@@ -81,8 +81,8 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
         onSelect: (index) => setState(() => _currentIndex = index),
         topBarActions: [
           WebIconButton(
-            icon: CupertinoIcons.gear,
-            tooltip: 'Settings',
+            icon: CupertinoIcons.person,
+            tooltip: 'Profile',
             onTap: () => AppRouter.push(context, (_) => const SettingsScreen()),
           ),
         ],
@@ -94,8 +94,8 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       body: body,
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
-          color: Passeport.card.withValues(alpha: 0.96),
-          border: Border(top: BorderSide(color: Passeport.hairline)),
+          color: DesignTokens.surface.withValues(alpha: 0.96),
+          border: Border(top: BorderSide(color: DesignTokens.hairline)),
         ),
         child: CupertinoTabBar(
           currentIndex: _currentIndex,
@@ -104,8 +104,8 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
             setState(() => _currentIndex = index);
           },
           backgroundColor: Colors.transparent,
-          activeColor: Passeport.maroon,
-          inactiveColor: Passeport.slateDim,
+          activeColor: DesignTokens.primary,
+          inactiveColor: DesignTokens.mutedDim,
           iconSize: 24,
           height: 54,
           items: [

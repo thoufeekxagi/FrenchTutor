@@ -22,57 +22,68 @@ class SpeakingSessionResultView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completed = !isDailyPath || meetsCompletionThreshold;
     return ColoredBox(
-      color: Passeport.parchment,
+      color: DesignTokens.canvas,
       child: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+            padding: const EdgeInsets.fromLTRB(
+              DesignTokens.space5,
+              DesignTokens.space5,
+              DesignTokens.space5,
+              DesignTokens.space4,
+            ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 44,
+                minHeight: constraints.maxHeight - 40,
               ),
               child: IntrinsicHeight(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: completed
-                            ? Passeport.successSoft
-                            : Passeport.infoSoft,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        completed
-                            ? CupertinoIcons.checkmark_alt
-                            : CupertinoIcons.pause_fill,
-                        color: completed ? Passeport.sage : Passeport.sky,
-                        size: 28,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Semantics(
+                        button: true,
+                        label: 'Close result',
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onDone,
+                          child: const SizedBox(
+                            width: DesignTokens.minTapTarget,
+                            height: DesignTokens.minTapTarget,
+                            child: Icon(CupertinoIcons.xmark),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: DesignTokens.space4),
+                    Text('Session complete', style: DesignTokens.display(30)),
+                    const SizedBox(height: DesignTokens.space2),
                     Text(
-                      completed ? 'Practice saved' : 'Good start, keep going',
-                      style: Passeport.display(30),
+                      'Speaking · argumentation',
+                      style: DesignTokens.body(
+                        14,
+                      ).copyWith(color: DesignTokens.secondary),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: DesignTokens.space5),
                     Text(
                       _description,
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         16,
-                      ).copyWith(color: Passeport.slateDim, height: 1.45),
+                      ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: DesignTokens.space5),
                     Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: DesignTokens.space4,
+                      ),
                       decoration: BoxDecoration(
-                        color: Passeport.card,
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: DesignTokens.cardShadow,
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
+                        ),
+                        border: Border.all(color: DesignTokens.hairline),
                       ),
                       child: Row(
                         children: [
@@ -80,63 +91,82 @@ class SpeakingSessionResultView extends StatelessWidget {
                             child: _ResultMetric(
                               value: _formatDuration(durationSeconds),
                               label: 'connected',
-                              icon: CupertinoIcons.clock_fill,
+                              icon: CupertinoIcons.clock,
                             ),
                           ),
-                          Container(
-                            width: 1,
-                            height: 54,
-                            color: Passeport.hairline,
-                          ),
+                          _metricDivider(),
                           Expanded(
                             child: _ResultMetric(
                               value: '$learnerTurns',
                               label: learnerTurns == 1
-                                  ? 'French turn'
-                                  : 'French turns',
+                                  ? 'learner turn'
+                                  : 'learner turns',
                               icon: CupertinoIcons.waveform,
+                            ),
+                          ),
+                          _metricDivider(),
+                          const Expanded(
+                            child: _ResultMetric(
+                              value: 'Saved',
+                              label: 'transcript',
+                              icon: CupertinoIcons.doc_text,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: DesignTokens.space6),
+                    Text('What changes next', style: DesignTokens.display(20)),
+                    const SizedBox(height: DesignTokens.space2),
+                    Text(
+                      _practiceText,
+                      style: DesignTokens.body(
+                        14,
+                      ).copyWith(color: DesignTokens.inkSoft, height: 1.45),
+                    ),
+                    const SizedBox(height: DesignTokens.space4),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(DesignTokens.space4),
                       decoration: BoxDecoration(
-                        color: isDailyPath && meetsCompletionThreshold
-                            ? Passeport.successSoft
-                            : Passeport.infoSoft,
-                        borderRadius: BorderRadius.circular(16),
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
+                        ),
+                        border: Border.all(color: DesignTokens.hairline),
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            isDailyPath && meetsCompletionThreshold
-                                ? CupertinoIcons.arrow_up_right
-                                : CupertinoIcons.book_fill,
-                            color: isDailyPath && meetsCompletionThreshold
-                                ? Passeport.sage
-                                : Passeport.sky,
+                          const Icon(
+                            CupertinoIcons.book,
+                            color: DesignTokens.primary,
                             size: 20,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _practiceText,
-                              style: Passeport.body(
-                                13.5,
-                                weight: FontWeight.w500,
-                              ).copyWith(color: Passeport.inkSoft, height: 1.4),
+                          const SizedBox(width: DesignTokens.space3),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Next: Grammar · 12 min',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  'Strengthen the structures you used today',
+                                  style: TextStyle(
+                                    color: DesignTokens.mutedDim,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                     const Spacer(),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: DesignTokens.space8),
                     PasseportPrimaryButton(label: 'Done', onPressed: onDone),
                   ],
                 ),
@@ -146,6 +176,10 @@ class SpeakingSessionResultView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _metricDivider() {
+    return Container(width: 1, height: 48, color: DesignTokens.hairline);
   }
 
   String get _description {
@@ -190,13 +224,14 @@ class _ResultMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Passeport.sky, size: 19),
-        const SizedBox(height: 8),
-        Text(value, style: Passeport.display(24)),
-        const SizedBox(height: 3),
+        Icon(icon, color: DesignTokens.secondary, size: 18),
+        const SizedBox(height: DesignTokens.space2),
+        Text(value, style: DesignTokens.display(20)),
+        const SizedBox(height: DesignTokens.space1),
         Text(
           label,
-          style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+          textAlign: TextAlign.center,
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
         ),
       ],
     );

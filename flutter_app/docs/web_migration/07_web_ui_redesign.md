@@ -1,7 +1,6 @@
 # Web UI Redesign — the ElevenLabs / shadcn pass
 
-**Status**: In progress. Onboarding, gate flows, and the first live lesson surfaces are now web-shaped. The
-remaining checklist covers the wider signed-in interior.
+**Status**: In progress. Onboarding, gate flows, live lessons, and the signed-in primary destinations are now web-shaped. The remaining interior routes use the shared bounded web frame while their existing learning behavior remains shared; bespoke route-level composition can continue incrementally without reintroducing stretched mobile layouts.
 
 ## The thing that took two failed attempts to understand
 
@@ -64,13 +63,13 @@ For genuinely shared web furniture, use the primitives in `lib/widgets/web/`:
 ## Rules for matching the reference
 
 Borrow structure and density. **Never borrow their palette** — colours always come from `DesignTokens`
-(active palette `ProSystemAzure`). Concretely:
+(active palette `NorthstarStudio`). Concretely:
 
 - Page background `DesignTokens.canvas`; cards `DesignTokens.surface`.
-- Every card: `Border.all(color: DesignTokens.hairline)`, `radiusCard` (16), `cardShadow` at most.
-- Headings `Passeport.display(...)` in `ink`. Secondary text `Passeport.body(...)` in `mutedDim`. Eyebrows and
-  group labels `Passeport.mono(11)` in `muted`.
-- One azure action per screen: filled `primary` background, `surface` foreground, `radiusMedium` (12).
+- Every card: `Border.all(color: DesignTokens.hairline)`, `radiusCard` (18), `surfaceShadow` at most.
+- Headings `DesignTokens.display(...)` in `ink`. Secondary text `DesignTokens.body(...)` in `mutedDim`. Eyebrows and
+  group labels `DesignTokens.label(11)` in `muted`.
+- One cobalt action per screen: filled `primary` background, `surface` foreground, `radiusMedium` (12).
   Everything else stays neutral.
 - Generous whitespace: card padding 32-40, section gaps `space6`.
 - Hover states on anything clickable. A web app without hover affordances feels dead — that is what

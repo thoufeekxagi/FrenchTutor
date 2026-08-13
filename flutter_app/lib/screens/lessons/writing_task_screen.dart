@@ -18,6 +18,7 @@ import '../../widgets/inline_call_bar.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 /// Popped by this screen's `_finish()` — a plain score/hints carrier.
 class WritingStageResult {
@@ -304,57 +305,61 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
             : null,
         actions: [InlineCallActions(controller: _call)],
       ),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            children: [
-              if (_call.isLive || _call.error != null) ...[
-                InlineCallStatusCard(
-                  controller: _call,
-                  listeningLabel: 'Listening. Keep writing, she can hear you.',
-                ),
+      body: WebConstrainedView(
+        maxWidth: 920,
+        child: Stack(
+          children: [
+            ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              children: [
+                if (_call.isLive || _call.error != null) ...[
+                  InlineCallStatusCard(
+                    controller: _call,
+                    listeningLabel:
+                        'Listening. Keep writing, she can hear you.',
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                _promptCard(),
                 const SizedBox(height: 16),
-              ],
-              _promptCard(),
-              const SizedBox(height: 16),
-              _connectorsCard(),
-              const SizedBox(height: 16),
-              _editorCard(),
-              if (_isGrading) ...[
+                _connectorsCard(),
                 const SizedBox(height: 16),
-                const Center(child: PSProgressIndicator()),
-              ],
-              if (_feedback != null) ...[
+                _editorCard(),
+                if (_isGrading) ...[
+                  const SizedBox(height: 16),
+                  const Center(child: PSProgressIndicator()),
+                ],
+                if (_feedback != null) ...[
+                  const SizedBox(height: 16),
+                  _feedbackCard(_feedback!),
+                ],
+                if (_errorText != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorText!,
+                    style: DesignTokens.mono(
+                      11,
+                    ).copyWith(color: DesignTokens.primary),
+                  ),
+                ],
                 const SizedBox(height: 16),
-                _feedbackCard(_feedback!),
+                if (_feedback == null)
+                  PasseportPrimaryButton(
+                    label: 'Submit for grading',
+                    onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+                  )
+                else
+                  PasseportPrimaryButton(
+                    label: 'Done',
+                    icon: CupertinoIcons.checkmark,
+                    onPressed: widget.showFinishButton ? _finish : _doneInLab,
+                  ),
+                const SizedBox(height: 24),
               ],
-              if (_errorText != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  _errorText!,
-                  style: DesignTokens.mono(
-                    11,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-              ],
-              const SizedBox(height: 16),
-              if (_feedback == null)
-                PasseportPrimaryButton(
-                  label: 'Submit for grading',
-                  onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
-                )
-              else
-                PasseportPrimaryButton(
-                  label: 'Done',
-                  icon: CupertinoIcons.checkmark,
-                  onPressed: widget.showFinishButton ? _finish : _doneInLab,
-                ),
-              const SizedBox(height: 24),
-            ],
-          ),
-          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
-        ],
+            ),
+            FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+          ],
+        ),
       ),
     );
   }

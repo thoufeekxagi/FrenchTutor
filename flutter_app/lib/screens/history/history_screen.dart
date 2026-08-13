@@ -6,6 +6,7 @@ import '../../models/chat_message.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key, required this.session});
@@ -51,73 +52,76 @@ class HistoryScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         top: false,
-        child: PSContentColumn(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  DesignTokens.screenMargin,
-                  DesignTokens.space2,
-                  DesignTokens.screenMargin,
-                  DesignTokens.space5,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      session.topic ?? 'Session',
-                      style: DesignTokens.display(28),
-                    ),
-                    const SizedBox(height: DesignTokens.space2),
-                    Text(
-                      durationText == null
-                          ? dateText
-                          : '$dateText · $durationText',
-                      style: DesignTokens.body(
-                        14,
-                      ).copyWith(color: DesignTokens.slateDim),
-                    ),
-                    const SizedBox(height: DesignTokens.space4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: DesignTokens.space3,
-                        vertical: DesignTokens.space2,
+        child: WebConstrainedView(
+          maxWidth: 920,
+          child: PSContentColumn(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    DesignTokens.screenMargin,
+                    DesignTokens.space2,
+                    DesignTokens.screenMargin,
+                    DesignTokens.space5,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        session.topic ?? 'Session',
+                        style: DesignTokens.display(28),
                       ),
-                      decoration: BoxDecoration(
-                        color: DesignTokens.infoSoft,
-                        borderRadius: BorderRadius.circular(
-                          DesignTokens.radiusPill,
-                        ),
-                      ),
-                      child: Text(
-                        '${messages.length} message${messages.length == 1 ? '' : 's'} saved',
+                      const SizedBox(height: DesignTokens.space2),
+                      Text(
+                        durationText == null
+                            ? dateText
+                            : '$dateText · $durationText',
                         style: DesignTokens.body(
-                          12,
-                          weight: FontWeight.w600,
-                        ).copyWith(color: DesignTokens.info),
+                          14,
+                        ).copyWith(color: DesignTokens.slateDim),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: messages.isEmpty
-                    ? _emptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(
-                          DesignTokens.screenMargin,
-                          DesignTokens.space2,
-                          DesignTokens.screenMargin,
-                          32,
+                      const SizedBox(height: DesignTokens.space4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: DesignTokens.space3,
+                          vertical: DesignTokens.space2,
                         ),
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          return _buildMessage(messages[index]);
-                        },
+                        decoration: BoxDecoration(
+                          color: DesignTokens.infoSoft,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusPill,
+                          ),
+                        ),
+                        child: Text(
+                          '${messages.length} message${messages.length == 1 ? '' : 's'} saved',
+                          style: DesignTokens.body(
+                            12,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: DesignTokens.info),
+                        ),
                       ),
-              ),
-            ],
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: messages.isEmpty
+                      ? _emptyState()
+                      : ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(
+                            DesignTokens.screenMargin,
+                            DesignTokens.space2,
+                            DesignTokens.screenMargin,
+                            32,
+                          ),
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) {
+                            return _buildMessage(messages[index]);
+                          },
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

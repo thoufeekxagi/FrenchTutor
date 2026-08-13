@@ -59,63 +59,63 @@ void main() {
     expect(find.text('ParleSprint'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
 
-    await tester.tap(find.text('Continue'));
+    await tester.tap(find.text('Build my plan'));
     await tester.pumpAndSettle();
     expect(find.text('What should French unlock for you?'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
   });
 
-  testWidgets(
-    'full funnel: welcome → questions → preparing → sign-in gate '
-    '(trial auto-skipped without a Gemini key)',
-    (WidgetTester tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final db = sqlite3.openInMemory();
-      addTearDown(db.dispose);
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [databaseProvider.overrideWithValue(db)],
-          child: const FrenchTutorApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('full funnel: welcome → questions → preparing → sign-in gate '
+      '(trial auto-skipped without a Gemini key)', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final db = sqlite3.openInMemory();
+    addTearDown(db.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(db)],
+        child: const FrenchTutorApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Continue')); // welcome
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Build my plan')); // welcome
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Everyday French')); // goal
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Everyday French')); // goal
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('A1 · Just starting')); // level
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Build my plan'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('A1 · Just starting')); // level
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Build my plan'));
+    await tester.pumpAndSettle();
 
-      // Interests step — optional, skip without picking any.
-      expect(find.text('What do you enjoy?'), findsOneWidget);
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
+    // Interests step — optional, skip without picking any.
+    expect(find.text('What do you enjoy?'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
 
-      // Tutor step — pick the first France-accent tutor card.
-      await tester.tap(find.text('Marie'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Continue'));
-      await tester.pump();
+    // Tutor step — pick the first France-accent tutor card.
+    await tester.tap(find.text('Marie'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
 
-      // Preparing pane: page transition, then the 3.2s progress animation,
-      // then the 450ms beat on 100%. No trial key in tests → onboarding
-      // finishes straight into the sign-in gate.
-      await tester.pump(const Duration(milliseconds: 400)); // page slide
-      expect(find.textContaining('Creating your first lessons'), findsOneWidget);
-      await tester.pump(const Duration(milliseconds: 3300));
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
+    // Preparing pane: page transition, then the 3.2s progress animation,
+    // then the 450ms beat on 100%. No trial key in tests → onboarding
+    // finishes straight into the sign-in gate.
+    await tester.pump(const Duration(milliseconds: 400)); // page slide
+    expect(find.textContaining('Creating your first lessons'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 3300));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Continue with Google'), findsOneWidget);
-    },
-  );
+    expect(find.text('How your practice works'), findsOneWidget);
+    await tester.tap(find.text('Agree and continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Continue with Google'), findsOneWidget);
+  });
 
   testWidgets('completed speaking result reports real evidence', (
     WidgetTester tester,
@@ -134,11 +134,12 @@ void main() {
       ),
     );
 
-    expect(find.text('Practice saved'), findsOneWidget);
+    expect(find.text('Session complete'), findsOneWidget);
     expect(find.text('1:35'), findsOneWidget);
     expect(find.text('6'), findsOneWidget);
     expect(find.textContaining('Daily path updated'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Done'));
     await tester.tap(find.text('Done'));
     expect(finished, isTrue);
   });
@@ -159,11 +160,11 @@ void main() {
       ),
     );
 
-    expect(find.text('Good start, keep going'), findsOneWidget);
+    expect(find.text('Session complete'), findsOneWidget);
     expect(
       find.textContaining('Nothing has been marked complete'),
       findsOneWidget,
     );
-    expect(find.text('Practice saved'), findsNothing);
+    expect(find.text('Session complete'), findsOneWidget);
   });
 }

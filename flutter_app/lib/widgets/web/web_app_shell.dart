@@ -159,7 +159,7 @@ class _BrandHeader extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              gradient: DesignTokens.heroGradient,
+              color: DesignTokens.primary,
               borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
             ),
             alignment: Alignment.center,

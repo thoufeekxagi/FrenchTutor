@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
 import '../../data/content_service.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
@@ -14,8 +12,10 @@ import '../../services/progress_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
+import '../../widgets/web/web_layout.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
+import '../path/path_screen.dart';
 
 /// Practice history and evidence of progress — no duplicated checklist (that's
 /// what "Today's mission" on the Today tab is for) and no legacy roadmap
@@ -46,6 +46,20 @@ class ProgressScreen extends ConsumerWidget {
     final categories = _categoryBreakdown(sessions);
     final recent = sessions.take(5).toList();
 
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return _webProgress(
+        context,
+        skills: skills,
+        week: week,
+        days: days,
+        categories: categories,
+        recalledIds: recalledIds,
+        recalledWords: recalledWords,
+        recent: recent,
+        hasSessions: sessions.isNotEmpty,
+      );
+    }
+
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: SafeArea(
@@ -64,7 +78,7 @@ class ProgressScreen extends ConsumerWidget {
                 'See the practice behind your growing French.',
                 style: DesignTokens.body(
                   16,
-                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
               ),
               const SizedBox(height: 28),
 
@@ -89,7 +103,9 @@ class ProgressScreen extends ConsumerWidget {
               ),
               const SizedBox(height: DesignTokens.space5),
               ...skills.map(_buildSkill),
-              const SizedBox(height: 12),
+              const SizedBox(height: DesignTokens.space3),
+              _buildNextRecommendation(context),
+              const SizedBox(height: 32),
 
               _sectionHeading(
                 'Practice by category',
@@ -128,6 +144,67 @@ class ProgressScreen extends ConsumerWidget {
               _buildRecentSessions(context, recent),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _webProgress(
+    BuildContext context, {
+    required List<SkillProgress> skills,
+    required ({int streak, int sessionsThisWeek, int minutesThisWeek}) week,
+    required List<({DateTime day, int categoriesDone})> days,
+    required List<({String category, int count})> categories,
+    required Set<String> recalledIds,
+    required List<VocabEntry> recalledWords,
+    required List<Session> recent,
+    required bool hasSessions,
+  }) {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: WebPage(
+          header: const WebPageHeader(
+            title: 'Progress',
+            subtitle: 'Evidence from the work you have completed.',
+          ),
+          children: [
+            WebCardGrid(
+              minTileWidth: 440,
+              children: [
+                WebCard(child: _buildWeekCard(week, days)),
+                WebCard(child: _buildCategoryBreakdown(categories)),
+              ],
+            ),
+            if (recalledWords.isNotEmpty || recalledIds.isNotEmpty) ...[
+              const SizedBox(height: DesignTokens.space6),
+              const WebSectionHeader(title: 'Recall evidence'),
+              _buildRecallCard(recalledIds.length, recalledWords),
+            ],
+            const SizedBox(height: DesignTokens.space6),
+            const WebSectionHeader(title: 'Mastery'),
+            WebCard(
+              child: Column(
+                children: [
+                  for (var index = 0; index < skills.length; index++) ...[
+                    _buildSkill(skills[index]),
+                    if (index < skills.length - 1)
+                      Divider(color: DesignTokens.hairline),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: DesignTokens.space6),
+            WebSectionHeader(
+              title: 'Recent sessions',
+              actionLabel: hasSessions ? 'View all' : null,
+              onAction: hasSessions
+                  ? () =>
+                        AppRouter.push(context, (_) => const AllHistoryScreen())
+                  : null,
+            ),
+            WebCard(child: _buildRecentSessions(context, recent)),
+          ],
         ),
       ),
     );
@@ -194,7 +271,7 @@ class ProgressScreen extends ConsumerWidget {
           description,
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       ],
     );
@@ -204,20 +281,17 @@ class ProgressScreen extends ConsumerWidget {
     ({int streak, int sessionsThisWeek, int minutesThisWeek}) week,
     List<({DateTime day, int categoriesDone})> days,
   ) {
+    final planItems = days.fold<int>(
+      0,
+      (total, day) => total + day.categoriesDone,
+    );
     return PasseportCard(
       padding: DesignTokens.space5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              _statTile('${week.streak}', 'Day streak'),
-              _statTile('${week.sessionsThisWeek}', 'Sessions'),
-              _statTile('${week.minutesThisWeek}', 'Minutes'),
-            ],
-          ),
-          const SizedBox(height: DesignTokens.space5),
-          SizedBox(height: 116, child: _WeekActivityChart(days: days)),
+          _statTile('${week.minutesThisWeek}', 'Focused minutes'),
+          _statTile('${week.sessionsThisWeek}', 'Sessions'),
+          _statTile('$planItems', 'Plan items'),
         ],
       ),
     );
@@ -234,7 +308,7 @@ class ProgressScreen extends ConsumerWidget {
             label,
             style: DesignTokens.body(
               12.5,
-            ).copyWith(color: DesignTokens.slateDim),
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),
@@ -294,7 +368,16 @@ class ProgressScreen extends ConsumerWidget {
   }
 
   Widget _buildSkill(SkillProgress skill) {
-    final percentage = (skill.fraction * 100).round();
+    final state = skill.fraction >= 0.75
+        ? 'Ready'
+        : skill.fraction > 0
+        ? 'Building'
+        : 'Review';
+    final stateColor = state == 'Ready'
+        ? DesignTokens.success
+        : state == 'Building'
+        ? DesignTokens.primary
+        : DesignTokens.mutedDim;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: DesignTokens.space5),
@@ -328,11 +411,8 @@ class ProgressScreen extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      '$percentage%',
-                      style: DesignTokens.body(
-                        13,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      state,
+                      style: DesignTokens.label(11).copyWith(color: stateColor),
                     ),
                   ],
                 ),
@@ -342,10 +422,8 @@ class ProgressScreen extends ConsumerWidget {
                   child: LinearProgressIndicator(
                     value: skill.fraction,
                     minHeight: 7,
-                    backgroundColor: DesignTokens.parchmentDim,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      DesignTokens.success,
-                    ),
+                    backgroundColor: DesignTokens.canvasDim,
+                    valueColor: AlwaysStoppedAnimation<Color>(stateColor),
                   ),
                 ),
                 const SizedBox(height: DesignTokens.space2),
@@ -353,10 +431,46 @@ class ProgressScreen extends ConsumerWidget {
                   skill.detail,
                   style: DesignTokens.body(
                     13,
-                  ).copyWith(color: DesignTokens.slateDim, height: 1.35),
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNextRecommendation(BuildContext context) {
+    return PasseportCard(
+      padding: DesignTokens.space5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'WHAT TO PRACTICE NEXT',
+            style: DesignTokens.label(
+              10,
+            ).copyWith(color: DesignTokens.primary, letterSpacing: 0.9),
+          ),
+          const SizedBox(height: DesignTokens.space2),
+          Text('Structure an argument', style: DesignTokens.display(20)),
+          const SizedBox(height: DesignTokens.space1),
+          Text(
+            '12 min · supports TEF speaking Part 2',
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
+          ),
+          const SizedBox(height: DesignTokens.space3),
+          Text(
+            'Strengthen the structures you used in your recent practice.',
+            style: DesignTokens.body(
+              13,
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+          ),
+          const SizedBox(height: DesignTokens.space4),
+          OutlinedButton(
+            onPressed: () => AppRouter.push(context, (_) => const PathScreen()),
+            child: const Text('Open path'),
           ),
         ],
       ),
@@ -379,7 +493,7 @@ class ProgressScreen extends ConsumerWidget {
           'Practice a session in any category and it will show up here.',
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       );
     }
@@ -414,7 +528,7 @@ class ProgressScreen extends ConsumerWidget {
                     child: LinearProgressIndicator(
                       value: fraction,
                       minHeight: 8,
-                      backgroundColor: DesignTokens.parchmentDim,
+                      backgroundColor: DesignTokens.canvasDim,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         DesignTokens.primary,
                       ),
@@ -451,7 +565,7 @@ class ProgressScreen extends ConsumerWidget {
           'Your practice sessions will appear here once you complete one.',
           style: DesignTokens.body(
             14,
-          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
       );
     }
@@ -460,8 +574,7 @@ class ProgressScreen extends ConsumerWidget {
       child: Column(
         children: [
           for (var i = 0; i < recent.length; i++) ...[
-            if (i > 0)
-              const Divider(height: 1, color: DesignTokens.parchmentDim),
+            if (i > 0) const Divider(height: 1, color: DesignTokens.canvasDim),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => AppRouter.push(
@@ -499,75 +612,4 @@ class ProgressScreen extends ConsumerWidget {
     'Writing' => CupertinoIcons.square_pencil,
     _ => CupertinoIcons.waveform,
   };
-}
-
-/// A plain 7-bar activity chart — bar height is how many of the 6 daily-goal
-/// categories were touched that day, out of 6. Same source as the Today
-/// tab's mission dots, just shown across a week instead of one day.
-class _WeekActivityChart extends StatelessWidget {
-  const _WeekActivityChart({required this.days});
-
-  final List<({DateTime day, int categoriesDone})> days;
-
-  @override
-  Widget build(BuildContext context) {
-    final today = DateTime.now();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final barAreaHeight = constraints.maxHeight - 30;
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: days.map((entry) {
-            final isToday =
-                entry.day.year == today.year &&
-                entry.day.month == today.month &&
-                entry.day.day == today.day;
-            final fraction = (entry.categoriesDone / 6).clamp(0.0, 1.0);
-            final barHeight = (barAreaHeight * fraction).clamp(
-              entry.categoriesDone > 0 ? 6.0 : 2.0,
-              barAreaHeight,
-            );
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    AnimatedContainer(
-                      duration: DesignTokens.durationMedium,
-                      curve: DesignTokens.curveStandard,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        color: entry.categoriesDone > 0
-                            ? (isToday
-                                  ? DesignTokens.primary
-                                  : DesignTokens.primarySoft)
-                            : DesignTokens.canvasDim,
-                        borderRadius: BorderRadius.circular(
-                          DesignTokens.radiusSmall,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.space2),
-                    Text(
-                      DateFormat('EEEEE').format(entry.day),
-                      style:
-                          DesignTokens.body(
-                            11,
-                            weight: isToday ? FontWeight.w700 : FontWeight.w500,
-                          ).copyWith(
-                            color: isToday
-                                ? DesignTokens.primary
-                                : DesignTokens.slateDim,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
 }

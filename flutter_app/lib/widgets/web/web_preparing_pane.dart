@@ -96,13 +96,7 @@ class _WebPreparingPaneState extends State<WebPreparingPane>
 
   Widget _brandPanel() {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [DesignTokens.primaryDeep, DesignTokens.ink],
-        ),
-      ),
+      decoration: const BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),

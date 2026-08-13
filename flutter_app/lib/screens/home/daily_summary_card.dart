@@ -21,9 +21,10 @@ class DailySummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: DesignTokens.cardShadow,
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +74,10 @@ class DailySummaryCard extends StatelessWidget {
           '${(summary.speakingSeconds / 60).ceil()} min spoken',
         ),
       if (summary.learnerUtterances > 0)
-        (CupertinoIcons.bubble_left_fill, '${summary.learnerUtterances} replies'),
+        (
+          CupertinoIcons.bubble_left_fill,
+          '${summary.learnerUtterances} replies',
+        ),
       if (summary.writingScore != null)
         (
           CupertinoIcons.pencil_outline,

@@ -13,6 +13,7 @@ import '../../models/profile.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/session_recorder.dart';
 import '../lessons/story_reader_screen.dart';
@@ -77,9 +78,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
     try {
       final learningStore = ref.read(learningStoreProvider);
       final agent = ref.read(lessonAgentServiceProvider);
-      final explanation = await agent.buildLiaisonExplanation(
-        levelBand: level,
-      );
+      final explanation = await agent.buildLiaisonExplanation(levelBand: level);
       final passage = await agent.buildLiaisonStory(
         levelBand: level,
         explanation: explanation,
@@ -212,111 +211,116 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        children: [
-          const SizedBox(height: 8),
-          const KickerText('Practice liaison'),
-          const SizedBox(height: 10),
-          PasseportCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'When a silent consonant links to the next word (like "les_amis"), it changes how a sentence sounds. Generate a story built to practice it, then pass the quiz at 80% or better.',
-                  style: DesignTokens.body(
-                    13,
-                  ).copyWith(color: DesignTokens.slateDim, height: 1.4),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Text(
-                      'Level',
-                      style: DesignTokens.body(13, weight: FontWeight.w600),
+      body: WebConstrainedView(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          children: [
+            const SizedBox(height: 8),
+            const KickerText('Practice liaison'),
+            const SizedBox(height: 10),
+            PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'When a silent consonant links to the next word (like "les_amis"), it changes how a sentence sounds. Generate a story built to practice it, then pass the quiz at 80% or better.',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Text(
+                        'Level',
+                        style: DesignTokens.body(13, weight: FontWeight.w600),
+                      ),
+                      const Spacer(),
+                      Text(
+                        LearnerLevel.displayLabel(_selectedLevel),
+                        style: DesignTokens.body(
+                          13,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: DesignTokens.primary),
+                      ),
+                    ],
+                  ),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: DesignTokens.primary,
+                      thumbColor: DesignTokens.primary,
                     ),
-                    const Spacer(),
+                    child: Slider(
+                      value: _levelIndex,
+                      min: 0,
+                      max: (LearnerLevel.cefrValues.length - 1).toDouble(),
+                      divisions: LearnerLevel.cefrValues.length - 1,
+                      label: LearnerLevel.displayLabel(_selectedLevel),
+                      onChanged: (v) => setState(() => _levelIndex = v),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  PasseportPrimaryButton(
+                    label: _isGenerating
+                        ? 'Building your story…'
+                        : 'Generate practice story',
+                    icon: _isGenerating ? null : CupertinoIcons.wand_stars,
+                    onPressed: _isGenerating ? null : _practiceLiaison,
+                  ),
+                  if (_errorText != null) ...[
+                    const SizedBox(height: 8),
                     Text(
-                      LearnerLevel.displayLabel(_selectedLevel),
-                      style: DesignTokens.body(
-                        13,
-                        weight: FontWeight.w700,
+                      _errorText!,
+                      style: DesignTokens.mono(
+                        11,
                       ).copyWith(color: DesignTokens.primary),
                     ),
                   ],
-                ),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: DesignTokens.primary,
-                    thumbColor: DesignTokens.primary,
-                  ),
-                  child: Slider(
-                    value: _levelIndex,
-                    min: 0,
-                    max: (LearnerLevel.cefrValues.length - 1).toDouble(),
-                    divisions: LearnerLevel.cefrValues.length - 1,
-                    label: LearnerLevel.displayLabel(_selectedLevel),
-                    onChanged: (v) => setState(() => _levelIndex = v),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                PasseportPrimaryButton(
-                  label: _isGenerating
-                      ? 'Building your story…'
-                      : 'Generate practice story',
-                  icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-                  onPressed: _isGenerating ? null : _practiceLiaison,
-                ),
-                if (_errorText != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _errorText!,
-                    style: DesignTokens.mono(
-                      11,
-                    ).copyWith(color: DesignTokens.primary),
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          if (history.isNotEmpty) ...[
-            const KickerText('Your liaison practice', color: DesignTokens.slateDim),
-            const SizedBox(height: 10),
-            for (final entry in history)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _LiaisonHistoryTile(
-                  story: entry,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => StoryReaderScreen(
-                      story: GeneratedStory(
-                        id: entry.id,
-                        passage: entry.passage,
-                        quiz: entry.quiz,
-                        keywords: entry.keywords,
-                        createdAt: entry.createdAt,
+            const SizedBox(height: 24),
+            if (history.isNotEmpty) ...[
+              const KickerText(
+                'Your liaison practice',
+                color: DesignTokens.slateDim,
+              ),
+              const SizedBox(height: 10),
+              for (final entry in history)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _LiaisonHistoryTile(
+                    story: entry,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => StoryReaderScreen(
+                        story: GeneratedStory(
+                          id: entry.id,
+                          passage: entry.passage,
+                          quiz: entry.quiz,
+                          keywords: entry.keywords,
+                          createdAt: entry.createdAt,
+                        ),
+                        grammarExplanation: entry.explanation,
+                        grammarTabLabel: 'Liaison',
                       ),
-                      grammarExplanation: entry.explanation,
-                      grammarTabLabel: 'Liaison',
                     ),
                   ),
                 ),
+            ] else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'No liaison practice yet, generate one above.',
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
               ),
-          ] else
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(
-                'No liaison practice yet, generate one above.',
-                textAlign: TextAlign.center,
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.slateDim),
-              ),
-            ),
-          const SizedBox(height: 32),
-        ],
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }

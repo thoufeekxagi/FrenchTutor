@@ -60,28 +60,28 @@ The direction is **Guided Momentum**: professional enough for an immigration or 
 
 Color is a plug-and-play layer. Palettes live in `lib/design/palettes.dart` as classes with
 identical slots; `lib/design/tokens.dart` selects the active one with a single typedef line
-(`typedef _Palette = ProSystemAzure;`). To try a new direction from a marketing mockup
+(`typedef _Palette = NorthstarStudio;`). To try a new direction from a marketing mockup
 (`marketing/color-palette/*.jpg`): add a palette class with the same slots, flip the typedef,
 rebuild. Nothing else in the app changes.
 
-**Active palette: Pro System Azure** (`marketing/color-palette/pro_system_azure.jpg`) —
-professional blue system, high-trust neutrals:
+**Active palette: Northstar Studio** — a calm, premium system designed for
+serious learners preparing for TEF/TCF or building confident everyday French:
 
-- dark navy ink (`#1C1E21`) for text and headings;
-- off-white canvas (`#F8F9FA`), white surfaces for grouping;
-- azure blue (`#007BFF`) for the one primary action, links, active states;
-- vibrant teal (`#17A2B8`) for secondary call-to-actions, guidance, information;
-- emerald (`#28A745`) for success and speaking/listening readiness;
-- amber (`#FFC107`) for cautions and for demonstrated mastery;
-- crimson (`#DC3545`) for errors and destructive actions only;
-- grays (`#A0A0A0` / `#707070`) for tertiary text and disabled states.
+- deep navy ink (`#152238`) for trust and long-form reading;
+- cool neutral canvas (`#F4F6F8`), white surfaces for focus;
+- cobalt (`#2259C7`) for the single primary action and active states;
+- deep teal (`#0F7F78`) for Marie, speaking, and listening states;
+- grounded green (`#2D8A5B`) for captured success evidence;
+- warm amber (`#B97823`) for demonstrated mastery only;
+- muted coral (`#C95757`) for corrections, errors, and destructive actions;
+- slate neutrals for tertiary text, captions, and disabled states.
 
 Use semantic tokens from `lib/design/tokens.dart` rather than inline colors. Color
 communicates action or learning state. It is not used to make every tile different.
 
 ### Typography
 
-Inter is the product typeface on every platform. Use scale, weight, line height, and spacing for hierarchy. Large titles are compact and confident; body copy remains readable at system text scaling. Avoid all-caps labels except very short metadata. Never render meaningful text below 11 points.
+Plus Jakarta Sans carries headings and display moments, while Inter carries reading, controls, and metadata on every platform. Use scale, weight, line height, and spacing for hierarchy. Large titles are compact and confident; body copy remains readable at system text scaling. Avoid all-caps labels except very short metadata. Never render meaningful text below 11 points.
 
 ### Shape and depth
 

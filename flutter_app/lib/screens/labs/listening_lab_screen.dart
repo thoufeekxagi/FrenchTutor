@@ -15,6 +15,7 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/story_reader_screen.dart';
 
 // Fixed topic categories the learner can tap to steer generation, alongside
@@ -185,55 +186,57 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        children: [
-          _GenerateStoryTile(
-            generating: _generatingStory,
-            selectedTopic: _selectedTopic,
-            onTap: _generateStory,
-          ),
-          const SizedBox(height: 10),
-          _TopicChipRow(
-            selected: _selectedTopic,
-            onSelect: (topic) => setState(() => _selectedTopic = topic),
-          ),
-          const SizedBox(height: 20),
-          if (stories.isNotEmpty) ...[
-            const KickerText('Your stories', color: DesignTokens.slateDim),
+      body: WebConstrainedView(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          children: [
+            _GenerateStoryTile(
+              generating: _generatingStory,
+              selectedTopic: _selectedTopic,
+              onTap: _generateStory,
+            ),
             const SizedBox(height: 10),
-            for (final story in stories)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _StoryTile(
-                  story: story,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => StoryReaderScreen(story: story),
+            _TopicChipRow(
+              selected: _selectedTopic,
+              onSelect: (topic) => setState(() => _selectedTopic = topic),
+            ),
+            const SizedBox(height: 20),
+            if (stories.isNotEmpty) ...[
+              const KickerText('Your stories', color: DesignTokens.slateDim),
+              const SizedBox(height: 10),
+              for (final story in stories)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _StoryTile(
+                    story: story,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => StoryReaderScreen(story: story),
+                    ),
                   ),
                 ),
-              ),
-            const SizedBox(height: 8),
-          ] else
-            _EmptyLibraryNote(),
-          if (starterStories.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            const KickerText('Starter stories', color: DesignTokens.slateDim),
-            const SizedBox(height: 10),
-            for (final story in starterStories)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _StoryTile(
-                  story: story,
-                  isStarter: true,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => StoryReaderScreen(story: story),
+              const SizedBox(height: 8),
+            ] else
+              _EmptyLibraryNote(),
+            if (starterStories.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const KickerText('Starter stories', color: DesignTokens.slateDim),
+              const SizedBox(height: 10),
+              for (final story in starterStories)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _StoryTile(
+                    story: story,
+                    isStarter: true,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => StoryReaderScreen(story: story),
+                    ),
                   ),
                 ),
-              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

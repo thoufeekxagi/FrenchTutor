@@ -6,6 +6,7 @@ import '../../design/tokens.dart';
 import '../../models/note.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 /// Lets a student browse and study everything they jotted down with the floating
 /// notetaker across every lesson/session — grouped by which stage it came from
@@ -102,69 +103,72 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: PSContentColumn(
-          measure: PSMeasure.reading,
-          child: _loading
-              ? const Center(child: PSProgressIndicator())
-              : _notes.isEmpty
-              ? _emptyState()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        DesignTokens.screenMargin,
-                        DesignTokens.space4,
-                        DesignTokens.screenMargin,
-                        DesignTokens.space3,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Review what mattered',
-                            style: DesignTokens.display(27),
-                          ),
-                          const SizedBox(height: DesignTokens.space2),
-                          Text(
-                            '${_filteredNotes.length} note${_filteredNotes.length == 1 ? '' : 's'} ready to revisit.',
-                            style: DesignTokens.body(
-                              14,
-                            ).copyWith(color: DesignTokens.slateDim),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _sourceFilterBar(),
-                    if (tags.isNotEmpty) _filterBar(tags),
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: DesignTokens.primary,
-                        onRefresh: () async => _reload(),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(
-                            DesignTokens.screenMargin,
-                            DesignTokens.space4,
-                            DesignTokens.screenMargin,
-                            32,
-                          ),
-                          itemCount: _filteredNotes.length,
-                          separatorBuilder: (_, _) => const Divider(
-                            height: 32,
-                            color: DesignTokens.parchmentDim,
-                          ),
-                          itemBuilder: (context, index) {
-                            final note = _filteredNotes[index];
-                            return _NoteRow(
-                              note: note,
-                              onDelete: () => _delete(note),
-                            );
-                          },
+        child: WebConstrainedView(
+          maxWidth: 920,
+          child: PSContentColumn(
+            measure: PSMeasure.content,
+            child: _loading
+                ? const Center(child: PSProgressIndicator())
+                : _notes.isEmpty
+                ? _emptyState()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          DesignTokens.screenMargin,
+                          DesignTokens.space4,
+                          DesignTokens.screenMargin,
+                          DesignTokens.space3,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Review what mattered',
+                              style: DesignTokens.display(27),
+                            ),
+                            const SizedBox(height: DesignTokens.space2),
+                            Text(
+                              '${_filteredNotes.length} note${_filteredNotes.length == 1 ? '' : 's'} ready to revisit.',
+                              style: DesignTokens.body(
+                                14,
+                              ).copyWith(color: DesignTokens.slateDim),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      _sourceFilterBar(),
+                      if (tags.isNotEmpty) _filterBar(tags),
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: DesignTokens.primary,
+                          onRefresh: () async => _reload(),
+                          child: ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(
+                              DesignTokens.screenMargin,
+                              DesignTokens.space4,
+                              DesignTokens.screenMargin,
+                              32,
+                            ),
+                            itemCount: _filteredNotes.length,
+                            separatorBuilder: (_, _) => const Divider(
+                              height: 32,
+                              color: DesignTokens.parchmentDim,
+                            ),
+                            itemBuilder: (context, index) {
+                              final note = _filteredNotes[index];
+                              return _NoteRow(
+                                note: note,
+                                onDelete: () => _delete(note),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

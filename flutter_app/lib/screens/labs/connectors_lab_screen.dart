@@ -13,6 +13,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/inline_call_bar.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
   const ConnectorsLabScreen({super.key});
@@ -82,29 +83,32 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
         scrolledUnderElevation: 0,
         actions: [InlineCallActions(controller: _call)],
       ),
-      body: Column(
-        children: [
-          if (_call.isLive || _call.error != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
-              child: InlineCallStatusCard(
-                controller: _call,
-                listeningLabel: 'Listening. Ask about connectors anytime.',
+      body: WebConstrainedView(
+        maxWidth: 1080,
+        child: Column(
+          children: [
+            if (_call.isLive || _call.error != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+                child: InlineCallStatusCard(
+                  controller: _call,
+                  listeningLabel: 'Listening. Ask about connectors anytime.',
+                ),
               ),
+            Expanded(
+              child: pack == null
+                  ? Center(
+                      child: Text(
+                        'Connectors content unavailable.',
+                        style: DesignTokens.body(
+                          13,
+                        ).copyWith(color: DesignTokens.slateDim),
+                      ),
+                    )
+                  : _buildContent(pack),
             ),
-          Expanded(
-            child: pack == null
-                ? Center(
-                    child: Text(
-                      'Connectors content unavailable.',
-                      style: DesignTokens.body(
-                        13,
-                      ).copyWith(color: DesignTokens.slateDim),
-                    ),
-                  )
-                : _buildContent(pack),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

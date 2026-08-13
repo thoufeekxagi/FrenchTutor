@@ -631,15 +631,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     switch (_callStatus) {
       case CallStatus.connecting:
       case CallStatus.reconnecting:
-        return Passeport.brass;
+        return DesignTokens.warning;
       case CallStatus.listening:
-        return Passeport.sage;
+        return DesignTokens.success;
       case CallStatus.tutorSpeaking:
-        return Passeport.sky;
+        return DesignTokens.secondary;
       case CallStatus.muted:
-        return Passeport.slate;
+        return DesignTokens.muted;
       case CallStatus.ended:
-        return Passeport.slate.withValues(alpha: 0.5);
+        return DesignTokens.muted.withValues(alpha: 0.5);
     }
   }
 
@@ -734,7 +734,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             );
           }
           return Scaffold(
-            backgroundColor: Passeport.parchment,
+            backgroundColor: DesignTokens.canvas,
             body: SafeArea(
               child: Stack(
                 children: [
@@ -813,7 +813,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
               color: _statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -851,8 +851,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       width: 54,
       height: 54,
       decoration: BoxDecoration(
-        color: Passeport.infoSoft,
-        shape: BoxShape.circle,
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         border: Border.all(
           color: _statusColor.withValues(alpha: 0.32),
           width: 2,
@@ -861,11 +861,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       child: Center(
         child: Text(
           _gemini.persona.initial,
-          style: const TextStyle(
-            color: Passeport.sky,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: DesignTokens.display(
+            20,
+          ).copyWith(color: DesignTokens.secondary),
         ),
       ),
     );
@@ -959,19 +957,24 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
       decoration: BoxDecoration(
-        color: Passeport.card,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Passeport.ink.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(DesignTokens.radiusCard),
+        ),
+        border: Border(top: BorderSide(color: DesignTokens.hairline)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(
+            widget.stage == 'speaking'
+                ? 'Focus: give reasons and examples'
+                : 'Focus: clear, natural French',
+            style: DesignTokens.label(
+              11,
+            ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.6),
+          ),
+          const SizedBox(height: DesignTokens.space3),
           KeyedSubtree(
             key: AppTour.micModeKey,
             child: MicModeBar(
@@ -1020,7 +1023,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 child: _controlButton(
                   icon: CupertinoIcons.phone_down_fill,
                   label: 'End',
-                  color: Passeport.maroon,
+                  color: DesignTokens.primary,
                   onTap: _confirmEnd,
                 ),
               ),
@@ -1054,11 +1057,24 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 height: 58,
                 decoration: BoxDecoration(
                   color: onTap == null
-                      ? Passeport.slate.withValues(alpha: 0.35)
-                      : color,
+                      ? DesignTokens.canvasDim
+                      : color == DesignTokens.primary
+                      ? DesignTokens.primary
+                      : DesignTokens.canvasDim,
                   shape: BoxShape.circle,
+                  border: color == DesignTokens.primary
+                      ? null
+                      : Border.all(color: DesignTokens.hairline),
                 ),
-                child: Icon(icon, color: Colors.white, size: 23),
+                child: Icon(
+                  icon,
+                  color: color == DesignTokens.primary
+                      ? Colors.white
+                      : onTap == null
+                      ? DesignTokens.muted
+                      : color,
+                  size: 23,
+                ),
               ),
               const SizedBox(height: 7),
               Text(
@@ -1084,55 +1100,32 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
-    return Row(
-      mainAxisAlignment: isUser
-          ? MainAxisAlignment.end
-          : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!isUser) _avatar(false),
-        if (!isUser) const SizedBox(width: 8),
-        Flexible(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-            decoration: BoxDecoration(
-              color: isUser ? Passeport.ink : Passeport.infoSoft,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isUser ? 16 : 4),
-                bottomRight: Radius.circular(isUser ? 4 : 16),
-              ),
-            ),
-            child: Text(
-              message.content,
-              style: Passeport.body(14).copyWith(
-                color: isUser ? Colors.white : Passeport.text,
-                height: 1.35,
-              ),
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.space4,
+            vertical: DesignTokens.space3,
+          ),
+          decoration: BoxDecoration(
+            color: isUser ? DesignTokens.ink : DesignTokens.infoSoft,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+            border: isUser
+                ? null
+                : Border(
+                    left: BorderSide(color: DesignTokens.secondary, width: 3),
+                  ),
+          ),
+          child: Text(
+            message.content,
+            style: DesignTokens.body(15).copyWith(
+              color: isUser ? Colors.white : DesignTokens.ink,
+              height: 1.45,
             ),
           ),
         ),
-        if (isUser) const SizedBox(width: 8),
-        if (isUser) _avatar(true),
-      ],
-    );
-  }
-
-  Widget _avatar(bool isUser) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: (isUser ? Passeport.maroon : Passeport.brass).withValues(
-          alpha: 0.15,
-        ),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        isUser ? CupertinoIcons.person_fill : CupertinoIcons.book_fill,
-        size: 14,
-        color: isUser ? Passeport.maroon : Passeport.brass,
       ),
     );
   }

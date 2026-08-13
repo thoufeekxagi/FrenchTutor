@@ -51,7 +51,7 @@ class AuthForm extends StatelessWidget {
             child: SignInWithAppleButton(
               onPressed: loading ? () {} : onApple,
               style: SignInWithAppleButtonStyle.black,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
             ),
           ),
           const SizedBox(height: 12),
@@ -64,7 +64,7 @@ class AuthForm extends StatelessWidget {
               backgroundColor: Passeport.surface,
               side: BorderSide(color: Passeport.hairline),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
               ),
             ),
             child: Row(
@@ -76,12 +76,16 @@ class AuthForm extends StatelessWidget {
                   height: 20,
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  'Continue with Google',
-                  style: Passeport.body(
-                    15,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: Passeport.ink),
+                Flexible(
+                  child: Text(
+                    'Continue with Google',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Passeport.body(
+                      15,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: Passeport.ink),
+                  ),
                 ),
               ],
             ),
@@ -146,7 +150,7 @@ class AuthForm extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         Text(
-          'By continuing, you agree to use ParleSprint for your own learning practice.',
+          'By continuing, you agree to our Terms of Service and Privacy Policy.',
           textAlign: TextAlign.center,
           style: Passeport.body(11.5).copyWith(
             color: onDark
@@ -179,7 +183,7 @@ class AuthForm extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   color: Passeport.primarySoft,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
                 ),
                 child: Image.asset('assets/images/logo_mark.png'),
               ),
@@ -195,7 +199,7 @@ class AuthForm extends StatelessWidget {
         ),
         const SizedBox(height: 28),
         Text(
-          isSignUp ? 'Create your account' : 'Welcome back',
+          isSignUp ? 'Create your account' : 'Keep your progress',
           style: Passeport.display(30).copyWith(color: headingColor),
         ),
         const SizedBox(height: 8),
@@ -240,11 +244,11 @@ class AuthForm extends StatelessWidget {
       fillColor: Passeport.surface,
       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         borderSide: BorderSide(color: Passeport.hairline),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         borderSide: BorderSide(color: Passeport.hairline),
       ),
       focusedBorder: const OutlineInputBorder(
@@ -267,7 +271,7 @@ class AuthForm extends StatelessWidget {
           color: onDark
               ? color.withValues(alpha: 0.16)
               : color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
           border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(

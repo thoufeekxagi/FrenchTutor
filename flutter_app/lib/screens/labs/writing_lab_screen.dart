@@ -7,6 +7,7 @@ import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/writing_task_screen.dart';
 
 class WritingLabScreen extends ConsumerStatefulWidget {
@@ -66,24 +67,30 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        children: [
-          PasseportPrimaryButton(
-            label: _isGenerating ? 'Preparing your task…' : 'New writing practice',
-            icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-            onPressed: _isGenerating ? null : _startNewPractice,
-          ),
-          if (_errorText != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              _errorText!,
-              style: DesignTokens.mono(11).copyWith(color: DesignTokens.primary),
+      body: WebConstrainedView(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          children: [
+            PasseportPrimaryButton(
+              label: _isGenerating
+                  ? 'Preparing your task…'
+                  : 'New writing practice',
+              icon: _isGenerating ? null : CupertinoIcons.wand_stars,
+              onPressed: _isGenerating ? null : _startNewPractice,
             ),
+            if (_errorText != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _errorText!,
+                style: DesignTokens.mono(
+                  11,
+                ).copyWith(color: DesignTokens.primary),
+              ),
+            ],
+            const SizedBox(height: 16),
+            _pastSubmissions(),
           ],
-          const SizedBox(height: 16),
-          _pastSubmissions(),
-        ],
+        ),
       ),
     );
   }

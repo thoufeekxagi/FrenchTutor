@@ -7,6 +7,7 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
+import 'design/tokens.dart';
 import 'config/api_keys.dart';
 import 'data/content_service.dart';
 import 'data/database/pilot_infrastructure_store.dart';
@@ -125,7 +126,7 @@ class _StartupErrorApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFFFAF9F6),
+        backgroundColor: DesignTokens.canvas,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),

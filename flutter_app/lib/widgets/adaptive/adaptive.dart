@@ -124,7 +124,7 @@ Future<T?> showPSActionSheet<T>(
                 title,
                 style: DesignTokens.body(
                   13,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ),
           for (final a in actions)
@@ -211,7 +211,7 @@ class PSSegmented<T> extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(DesignTokens.space1),
       decoration: BoxDecoration(
-        color: DesignTokens.parchmentDim,
+        color: DesignTokens.canvasDim,
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       child: Row(
@@ -264,7 +264,7 @@ class PSSegmented<T> extends StatelessWidget {
                         ).copyWith(
                           color: isSelected
                               ? DesignTokens.text
-                              : DesignTokens.slateDim,
+                              : DesignTokens.mutedDim,
                         ),
                   ),
                 ),

@@ -197,14 +197,14 @@ class _PreviewBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(lab.$3, size: 22, color: DesignTokens.primary),
-                    const SizedBox(height: DesignTokens.space4),
-                    Text(lab.$1, style: Passeport.display(16)),
                     const SizedBox(height: DesignTokens.space2),
+                    Text(lab.$1, style: Passeport.display(16)),
+                    const SizedBox(height: DesignTokens.space1),
                     Text(
                       lab.$2,
                       style: Passeport.body(
                         13,
-                      ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
+                      ).copyWith(color: DesignTokens.mutedDim, height: 1.3),
                     ),
                   ],
                 ),

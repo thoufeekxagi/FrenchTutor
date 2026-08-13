@@ -57,6 +57,27 @@ class MicController {
 
   bool _connected = false;
   bool _held = false;
+  Future<void>? _startInFlight;
+  Future<void>? _stopInFlight;
+
+  Future<void> _startStream() {
+    if (_startInFlight != null) return _startInFlight!;
+    final operation = startStream();
+    return _startInFlight = operation.whenComplete(() => _startInFlight = null);
+  }
+
+  Future<void> _stopStream() async {
+    final start = _startInFlight;
+    if (start != null) {
+      try {
+        await start;
+      } catch (_) {}
+    }
+    if (_stopInFlight != null) return _stopInFlight!;
+    final operation = stopStream();
+    _stopInFlight = operation.whenComplete(() => _stopInFlight = null);
+    return _stopInFlight!;
+  }
 
   /// True while the hold-to-talk button is physically pressed.
   bool get isHeld => _held;
@@ -71,7 +92,7 @@ class MicController {
   /// Call once the live socket reports connected and mic permission is granted.
   Future<void> onConnected() async {
     _connected = true;
-    if (_mode == MicMode.auto && !_muted) await startStream();
+    if (_mode == MicMode.auto && !_muted) await _startStream();
   }
 
   /// Switch modes mid-call. Auto → PTT stops the open mic immediately;
@@ -83,9 +104,9 @@ class MicController {
     unawaited(MicModePrefs.save(mode));
     if (!_connected) return;
     if (mode == MicMode.auto) {
-      if (!_muted) await startStream();
+      if (!_muted) await _startStream();
     } else {
-      await stopStream();
+      await _stopStream();
     }
   }
 
@@ -94,9 +115,9 @@ class MicController {
     _muted = muted;
     if (!_connected || _mode != MicMode.auto) return;
     if (muted) {
-      await stopStream();
+      await _stopStream();
     } else {
-      await startStream();
+      await _startStream();
     }
   }
 
@@ -104,7 +125,7 @@ class MicController {
   Future<void> pttDown() async {
     if (_mode != MicMode.pushToTalk || !_connected || _held) return;
     _held = true;
-    await startStream();
+    await _startStream();
   }
 
   /// Hold-to-talk released: stop capturing, then close the utterance for the
@@ -112,7 +133,7 @@ class MicController {
   Future<void> pttUp() async {
     if (_mode != MicMode.pushToTalk || !_held) return;
     _held = false;
-    await stopStream();
+    await _stopStream();
     final silence = List<int>.filled(silenceChunkBytes, 0);
     for (var i = 0; i < silenceTailChunks; i++) {
       sendAudio(silence);
@@ -122,14 +143,14 @@ class MicController {
   /// App backgrounded: the mic never streams from a pocket, in either mode.
   Future<void> onAppPaused() async {
     _held = false;
-    await stopStream();
+    await _stopStream();
   }
 
   /// App foregrounded: auto mode reopens the mic (unless muted); push-to-talk
   /// stays closed until the next hold.
   Future<void> onAppResumed() async {
     if (!_connected) return;
-    if (_mode == MicMode.auto && !_muted) await startStream();
+    if (_mode == MicMode.auto && !_muted) await _startStream();
   }
 
   /// Adopt the persisted preference before the call connects.

@@ -17,7 +17,11 @@ import 'fingerprint_engine.dart';
 /// A brand-new learner sees a grayed-out demo constellation built from real
 /// course words, replaced by their own the moment they practice.
 class FingerprintView extends StatefulWidget {
-  const FingerprintView({super.key, required this.store, required this.content});
+  const FingerprintView({
+    super.key,
+    required this.store,
+    required this.content,
+  });
 
   final LearningStore store;
   final ContentService content;
@@ -81,7 +85,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                 // CustomPaint, so pinching/dragging moved the "background"
                 // right along with the dots instead of staying put.
                 const Positioned.fill(
-                  child: ColoredBox(color: Color(0xFF0D1017)),
+                  child: ColoredBox(color: DesignTokens.ink),
                 ),
                 Positioned.fill(
                   child: GestureDetector(
@@ -95,12 +99,19 @@ class _FingerprintViewState extends State<FingerprintView> {
                       maxScale: 3.5,
                       child: CustomPaint(
                         size: const Size(1100, 820),
-                        painter: _FingerprintPainter(graph: _graph, selected: _selected),
+                        painter: _FingerprintPainter(
+                          graph: _graph,
+                          selected: _selected,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                Positioned(top: 12, right: 12, child: _chip('Pinch · drag · tap')),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: _chip('Pinch · drag · tap'),
+                ),
                 Positioned(top: 12, left: 12, child: _modalityLegend()),
               ],
             ),
@@ -116,7 +127,9 @@ class _FingerprintViewState extends State<FingerprintView> {
                     _graph.isDemo
                         ? 'Preview. Practice a word to start yours.'
                         : 'Bigger words mean more practice.',
-                    style: Passeport.body(13).copyWith(color: Passeport.slateDim, height: 1.4),
+                    style: Passeport.body(
+                      13,
+                    ).copyWith(color: Passeport.slateDim, height: 1.4),
                   ),
                 )
               : Container(
@@ -134,11 +147,16 @@ class _FingerprintViewState extends State<FingerprintView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_selected!.entry.fr, style: Passeport.display(20)),
+                            Text(
+                              _selected!.entry.fr,
+                              style: Passeport.display(20),
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               '${_selected!.entry.en} · ${_selected!.theme}',
-                              style: Passeport.body(13).copyWith(color: Passeport.slateDim),
+                              style: Passeport.body(
+                                13,
+                              ).copyWith(color: Passeport.slateDim),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -147,7 +165,10 @@ class _FingerprintViewState extends State<FingerprintView> {
                               children: [
                                 for (final source in ModalitySource.values)
                                   if ((_selected!.counts[source] ?? 0) > 0)
-                                    _sourcePill(source, _selected!.counts[source]!),
+                                    _sourcePill(
+                                      source,
+                                      _selected!.counts[source]!,
+                                    ),
                               ],
                             ),
                           ],
@@ -159,17 +180,30 @@ class _FingerprintViewState extends State<FingerprintView> {
                           GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => LessonSpeechService.shared.speak(
-                              items: [SpeechItem(text: _selected!.entry.fr, language: 'fr-FR')],
+                              items: [
+                                SpeechItem(
+                                  text: _selected!.entry.fr,
+                                  language: 'fr-FR',
+                                ),
+                              ],
                             ),
                             child: const SizedBox(
                               width: 44,
                               height: 44,
-                              child: Icon(CupertinoIcons.speaker_2_fill, color: Passeport.sky),
+                              child: Icon(
+                                CupertinoIcons.speaker_2_fill,
+                                color: Passeport.sky,
+                              ),
                             ),
                           ),
                           Text(
-                            _graph.isDemo ? 'preview' : '${_selected!.total} total',
-                            style: Passeport.body(12, weight: FontWeight.w700).copyWith(color: Passeport.sky),
+                            _graph.isDemo
+                                ? 'preview'
+                                : '${_selected!.total} total',
+                            style: Passeport.body(
+                              12,
+                              weight: FontWeight.w700,
+                            ).copyWith(color: Passeport.sky),
                           ),
                         ],
                       ),
@@ -187,7 +221,9 @@ class _FingerprintViewState extends State<FingerprintView> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: _modalityColor(source).withValues(alpha: 0.4)),
+        border: Border.all(
+          color: _modalityColor(source).withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -195,12 +231,18 @@ class _FingerprintViewState extends State<FingerprintView> {
           Container(
             width: 7,
             height: 7,
-            decoration: BoxDecoration(color: _modalityColor(source), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: _modalityColor(source),
+              shape: BoxShape.circle,
+            ),
           ),
           const SizedBox(width: 6),
           Text(
             '${_modalityLabel(source)} · $count',
-            style: Passeport.body(11.5, weight: FontWeight.w600).copyWith(color: Passeport.inkSoft),
+            style: Passeport.body(
+              11.5,
+              weight: FontWeight.w600,
+            ).copyWith(color: Passeport.inkSoft),
           ),
         ],
       ),
@@ -222,12 +264,18 @@ class _FingerprintViewState extends State<FingerprintView> {
             Container(
               width: 7,
               height: 7,
-              decoration: BoxDecoration(color: _modalityColor(source), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: _modalityColor(source),
+                shape: BoxShape.circle,
+              ),
             ),
             const SizedBox(width: 5),
             Text(
               _modalityLabel(source),
-              style: Passeport.body(10.5, weight: FontWeight.w600).copyWith(color: Colors.white.withValues(alpha: 0.82)),
+              style: Passeport.body(
+                10.5,
+                weight: FontWeight.w600,
+              ).copyWith(color: Colors.white.withValues(alpha: 0.82)),
             ),
             if (source != ModalitySource.values.last) const SizedBox(width: 10),
           ],
@@ -246,7 +294,10 @@ class _FingerprintViewState extends State<FingerprintView> {
       ),
       child: Text(
         label,
-        style: Passeport.body(12, weight: FontWeight.w600).copyWith(color: Colors.white.withValues(alpha: 0.8)),
+        style: Passeport.body(
+          12,
+          weight: FontWeight.w600,
+        ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
       ),
     );
   }
@@ -265,7 +316,8 @@ Color _modalityColor(ModalitySource source) => switch (source) {
 };
 
 class _FingerprintPainter extends CustomPainter {
-  _FingerprintPainter({required this.graph, required this.selected}) : _themeColors = _assignThemeColors(graph);
+  _FingerprintPainter({required this.graph, required this.selected})
+    : _themeColors = _assignThemeColors(graph);
 
   final FingerprintGraph graph;
   final FingerprintNode? selected;
@@ -287,7 +339,10 @@ class _FingerprintPainter extends CustomPainter {
     for (final node in graph.nodes) {
       if (!themes.contains(node.theme)) themes.add(node.theme);
     }
-    return {for (var i = 0; i < themes.length; i++) themes[i]: _palette[i % _palette.length]};
+    return {
+      for (var i = 0; i < themes.length; i++)
+        themes[i]: _palette[i % _palette.length],
+    };
   }
 
   Color _nodeColor(FingerprintNode node) {
@@ -299,7 +354,9 @@ class _FingerprintPainter extends CustomPainter {
     if (selected == null) return true;
     if (node == selected) return true;
     return graph.edges.any(
-      (edge) => (edge.a == selected && edge.b == node) || (edge.b == selected && edge.a == node),
+      (edge) =>
+          (edge.a == selected && edge.b == node) ||
+          (edge.b == selected && edge.a == node),
     );
   }
 
@@ -308,13 +365,18 @@ class _FingerprintPainter extends CustomPainter {
     _paintNebula(canvas, size);
 
     for (final edge in graph.edges) {
-      final highlighted = selected == null || edge.a == selected || edge.b == selected;
+      final highlighted =
+          selected == null || edge.a == selected || edge.b == selected;
       final color = graph.isDemo
           ? Passeport.slate
           : switch (edge.kind) {
               FingerprintEdgeKind.session => Passeport.brass,
               FingerprintEdgeKind.cooccurrence => Passeport.sage,
-              FingerprintEdgeKind.theme => Color.lerp(_nodeColor(edge.a), _nodeColor(edge.b), 0.5)!,
+              FingerprintEdgeKind.theme => Color.lerp(
+                _nodeColor(edge.a),
+                _nodeColor(edge.b),
+                0.5,
+              )!,
             };
       if (highlighted) {
         canvas.drawLine(
@@ -333,7 +395,9 @@ class _FingerprintPainter extends CustomPainter {
           edge.a.position,
           edge.b.position,
           Paint()
-            ..color = color.withValues(alpha: highlighted ? (graph.isDemo ? 0.30 : 0.5) : 0.08)
+            ..color = color.withValues(
+              alpha: highlighted ? (graph.isDemo ? 0.30 : 0.5) : 0.08,
+            )
             ..strokeWidth = 1.3,
         );
       } else {
@@ -341,14 +405,21 @@ class _FingerprintPainter extends CustomPainter {
           edge.a.position,
           edge.b.position,
           Paint()
-            ..color = color.withValues(alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07)
-            ..strokeWidth = edge.kind == FingerprintEdgeKind.session ? 1.4 : 0.9,
+            ..color = color.withValues(
+              alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07,
+            )
+            ..strokeWidth = edge.kind == FingerprintEdgeKind.session
+                ? 1.4
+                : 0.9,
         );
       }
     }
 
     for (final node in graph.nodes) {
-      final strength = (math.log(node.total + 1) / math.log(8)).clamp(0.18, 1.0);
+      final strength = (math.log(node.total + 1) / math.log(8)).clamp(
+        0.18,
+        1.0,
+      );
       final related = _isRelated(node);
       final color = _nodeColor(node);
       final dimFactor = related ? 1.0 : 0.22;
@@ -357,18 +428,30 @@ class _FingerprintPainter extends CustomPainter {
         node.position,
         node.radius * 2.4,
         Paint()
-          ..color = color.withValues(alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor)
+          ..color = color.withValues(
+            alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor,
+          )
           ..maskFilter = MaskFilter.blur(BlurStyle.normal, node.radius * 1.1),
       );
       canvas.drawCircle(
         node.position,
         node.radius * 1.25,
         Paint()
-          ..color = color.withValues(alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor)
+          ..color = color.withValues(
+            alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor,
+          )
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
       );
-      final core = Color.lerp(color, Colors.white, graph.isDemo ? 0.1 : 0.25 + 0.3 * strength)!;
-      canvas.drawCircle(node.position, node.radius, Paint()..color = core.withValues(alpha: dimFactor.clamp(0.24, 1.0)));
+      final core = Color.lerp(
+        color,
+        Colors.white,
+        graph.isDemo ? 0.1 : 0.25 + 0.3 * strength,
+      )!;
+      canvas.drawCircle(
+        node.position,
+        node.radius,
+        Paint()..color = core.withValues(alpha: dimFactor.clamp(0.24, 1.0)),
+      );
 
       if (!graph.isDemo && node.sources.length > 1) {
         _paintModalityRing(canvas, node, dimFactor);
@@ -390,14 +473,24 @@ class _FingerprintPainter extends CustomPainter {
           text: TextSpan(
             text: node.entry.fr,
             style: Passeport.body(12, weight: FontWeight.w600).copyWith(
-              color: Colors.white.withValues(alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2),
-              shadows: [Shadow(color: Colors.black.withValues(alpha: 0.7), blurRadius: 4)],
+              color: Colors.white.withValues(
+                alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2,
+              ),
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  blurRadius: 4,
+                ),
+              ],
             ),
           ),
           textDirection: TextDirection.ltr,
           maxLines: 1,
         )..layout(maxWidth: 130);
-        painter.paint(canvas, node.position + Offset(-painter.width / 2, node.radius + 6));
+        painter.paint(
+          canvas,
+          node.position + Offset(-painter.width / 2, node.radius + 6),
+        );
       }
     }
   }
@@ -413,7 +506,13 @@ class _FingerprintPainter extends CustomPainter {
     final rand = math.Random(graph.seed);
     final blobColors = graph.isDemo
         ? [Passeport.slate, Passeport.slate, Passeport.slate]
-        : [Passeport.maroon, Passeport.sky, Passeport.brass, Passeport.sage, Passeport.danger];
+        : [
+            Passeport.maroon,
+            Passeport.sky,
+            Passeport.brass,
+            Passeport.sage,
+            Passeport.danger,
+          ];
     for (var i = 0; i < 3; i++) {
       final color = blobColors[rand.nextInt(blobColors.length)];
       final cx = size.width * (0.15 + rand.nextDouble() * 0.7);
@@ -423,9 +522,15 @@ class _FingerprintPainter extends CustomPainter {
         Offset(cx, cy),
         radius,
         Paint()
-          ..shader = RadialGradient(
-            colors: [color.withValues(alpha: graph.isDemo ? 0.05 : 0.10), Colors.transparent],
-          ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: radius)),
+          ..shader =
+              RadialGradient(
+                colors: [
+                  color.withValues(alpha: graph.isDemo ? 0.05 : 0.10),
+                  Colors.transparent,
+                ],
+              ).createShader(
+                Rect.fromCircle(center: Offset(cx, cy), radius: radius),
+              ),
       );
     }
     canvas.drawRect(
@@ -434,7 +539,10 @@ class _FingerprintPainter extends CustomPainter {
         ..shader = RadialGradient(
           center: Alignment.center,
           radius: 0.9,
-          colors: [Colors.white.withValues(alpha: graph.isDemo ? 0.02 : 0.04), Colors.transparent],
+          colors: [
+            Colors.white.withValues(alpha: graph.isDemo ? 0.02 : 0.04),
+            Colors.transparent,
+          ],
         ).createShader(Offset.zero & size),
     );
   }
@@ -442,8 +550,14 @@ class _FingerprintPainter extends CustomPainter {
   /// A thin segmented ring, one arc per contributing modality, drawn just
   /// outside the core — the Apple-Watch-rings idea, but reporting *how* a
   /// word was earned rather than a fitness stat.
-  void _paintModalityRing(Canvas canvas, FingerprintNode node, double dimFactor) {
-    final sources = ModalitySource.values.where((s) => node.sources.contains(s)).toList();
+  void _paintModalityRing(
+    Canvas canvas,
+    FingerprintNode node,
+    double dimFactor,
+  ) {
+    final sources = ModalitySource.values
+        .where((s) => node.sources.contains(s))
+        .toList();
     if (sources.isEmpty) return;
     final sweep = (2 * math.pi) / sources.length;
     final ringRadius = node.radius + 4.5;
@@ -472,7 +586,11 @@ class _FingerprintPainter extends CustomPainter {
     var covered = 0.0;
     while (covered < total) {
       final segmentEnd = math.min(covered + dashLength, total);
-      canvas.drawLine(a + direction * covered, a + direction * segmentEnd, paint);
+      canvas.drawLine(
+        a + direction * covered,
+        a + direction * segmentEnd,
+        paint,
+      );
       covered += dashLength + gapLength;
     }
   }

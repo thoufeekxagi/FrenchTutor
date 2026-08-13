@@ -85,13 +85,7 @@ class AiConsentScreen extends StatelessWidget {
 
   Widget _desktopIntro() {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [DesignTokens.primaryDeep, DesignTokens.ink],
-        ),
-      ),
+      decoration: const BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
@@ -159,15 +153,12 @@ class AiConsentScreen extends StatelessWidget {
   }
 
   Widget _mobileLayout() {
-    return Container(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
-            child: _details(onDark: true, centered: true),
-          ),
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+          child: _details(onDark: false, centered: false),
         ),
       ),
     );

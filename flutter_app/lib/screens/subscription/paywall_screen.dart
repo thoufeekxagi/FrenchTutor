@@ -144,40 +144,30 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Full-bleed gradient backdrop behind a transparent Scaffold — same
-    // pattern as auth_screen.dart/onboarding, so it never shrinks behind the
-    // keyboard or shows a seam at the Scaffold's resizing edge.
-    return Stack(
-      children: [
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
-          ),
-        ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SafeArea(
-            child: Stack(
-              children: [
-                _loading ? _buildLoading() : _buildContent(),
-                Positioned(
-                  top: DesignTokens.space2,
-                  right: DesignTokens.space2,
-                  child: _CloseButton(
-                    onTap: () => Navigator.of(context).pop(false),
-                  ),
-                ),
-              ],
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            _loading ? _buildLoading() : _buildContent(),
+            Positioned(
+              top: DesignTokens.space2,
+              right: DesignTokens.space2,
+              child: _CloseButton(
+                onTap: () => Navigator.of(context).pop(false),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildLoading() {
     return const Center(
-      child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white)),
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
+      ),
     );
   }
 
@@ -203,13 +193,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           Container(
             padding: const EdgeInsets.all(DesignTokens.space5),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [DesignTokens.surface, DesignTokens.primarySoft],
-              ),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusCard * 1.25),
-              boxShadow: DesignTokens.cardShadow,
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+              border: Border.all(color: DesignTokens.hairline),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -225,9 +211,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 ],
                 if (packages.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: DesignTokens.space2,
-                    ),
+                    padding: const EdgeInsets.only(bottom: DesignTokens.space2),
                     child: Text(
                       // Real, honest urgency — no fabricated "was" price.
                       // This genuinely is today's price, and it genuinely
@@ -256,9 +240,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     const SizedBox(width: DesignTokens.space1),
                     Text(
                       'Secure via App Store · Cancel anytime',
-                      style: Passeport.body(12).copyWith(
-                        color: DesignTokens.mutedDim,
-                      ),
+                      style: Passeport.body(
+                        12,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -290,20 +274,18 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           Container(
             padding: const EdgeInsets.all(DesignTokens.space5),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [DesignTokens.surface, DesignTokens.primarySoft],
-              ),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusCard * 1.25),
-              boxShadow: DesignTokens.cardShadow,
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+              border: Border.all(color: DesignTokens.hairline),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   'Subscriptions aren\'t available on this device yet. If you have an invite code, you can redeem it below.',
-                  style: Passeport.body(15).copyWith(color: DesignTokens.mutedDim),
+                  style: Passeport.body(
+                    15,
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: DesignTokens.space5),
                 _buildRedeemSection(forceOpen: true),
@@ -333,9 +315,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           onPressed: () => setState(() => _showRedeem = true),
           child: Text(
             'Have an invite code?',
-            style: Passeport.body(14, weight: FontWeight.w600).copyWith(
-              color: DesignTokens.primary,
-            ),
+            style: Passeport.body(
+              14,
+              weight: FontWeight.w600,
+            ).copyWith(color: DesignTokens.primary),
           ),
         ),
       );
@@ -345,9 +328,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       children: [
         Text(
           'Invite code',
-          style: Passeport.body(13, weight: FontWeight.w600).copyWith(
-            color: DesignTokens.mutedDim,
-          ),
+          style: Passeport.body(
+            13,
+            weight: FontWeight.w600,
+          ).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: DesignTokens.space2),
         Row(
@@ -387,9 +371,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: DesignTokens.primary,
-                  borderRadius: BorderRadius.circular(
-                    DesignTokens.radiusSmall,
-                  ),
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
                 ),
                 child: _redeeming
                     ? const SizedBox(
@@ -439,18 +421,14 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Full access to\nParleSprint',
-          style: Passeport.display(30).copyWith(color: Colors.white),
-        ),
+        Text('More guidance.\nMore speaking.', style: DesignTokens.display(30)),
         const SizedBox(height: DesignTokens.space2),
         Text(
-          hasTrial
-              ? 'Start your 7-day free trial. Cancel anytime.'
-              : 'Unlock every mission, lab, and speaking session.',
-          style: Passeport.body(15).copyWith(
-            color: Colors.white.withValues(alpha: 0.85),
-          ),
+          'Keep the clear path, live practice with Marie, saved evidence, '
+          'and deeper review sessions.',
+          style: DesignTokens.body(
+            15,
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
         ),
       ],
     );
@@ -461,9 +439,9 @@ class _BenefitsList extends StatelessWidget {
   const _BenefitsList();
 
   static const _benefits = [
-    (CupertinoIcons.mic_fill, 'Unlimited daily missions and speaking practice'),
-    (CupertinoIcons.book_fill, 'Full grammar, listening, and reading library'),
-    (CupertinoIcons.repeat, 'Personalized review across every session'),
+    (CupertinoIcons.calendar, 'A full guided study block'),
+    (CupertinoIcons.mic_fill, 'Live practice with Marie'),
+    (CupertinoIcons.doc_text, 'Saved progress and session evidence'),
   ];
 
   @override
@@ -482,18 +460,13 @@ class _BenefitsList extends StatelessWidget {
                   height: 32,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.16),
+                    color: DesignTokens.infoSoft,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 16, color: Colors.white),
+                  child: Icon(icon, size: 16, color: DesignTokens.info),
                 ),
                 const SizedBox(width: DesignTokens.space3),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: Passeport.body(15).copyWith(color: Colors.white),
-                  ),
-                ),
+                Expanded(child: Text(label, style: DesignTokens.body(15))),
               ],
             ),
           ),
@@ -526,7 +499,8 @@ class _PlanCard extends StatelessWidget {
   /// Required content per App Store Review Guideline 3.1.2; a previous
   /// submission was rejected for omitting this.
   String get _termsLine => switch (package.packageType) {
-    PackageType.annual => '1 Year subscription. Billed annually. Cancel anytime.',
+    PackageType.annual =>
+      '1 Year subscription. Billed annually. Cancel anytime.',
     PackageType.threeMonth =>
       '3 Month subscription. Billed every 3 months. Cancel anytime.',
     _ => 'Auto-renewing subscription. Cancel anytime.',
@@ -540,7 +514,9 @@ class _PlanCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: selected ? DesignTokens.primarySoft.withValues(alpha: 0.35) : DesignTokens.canvasDim,
+          color: selected
+              ? DesignTokens.primarySoft.withValues(alpha: 0.35)
+              : DesignTokens.canvasDim,
           borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
           border: Border.all(
             color: selected ? DesignTokens.primary : DesignTokens.hairline,
@@ -580,16 +556,17 @@ class _PlanCard extends StatelessWidget {
                   if (hasTrial)
                     Text(
                       '7 days free, then ${package.storeProduct.priceString}',
-                      style: Passeport.body(14).copyWith(
-                        color: DesignTokens.mutedDim,
-                      ),
+                      style: Passeport.body(
+                        14,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     )
                   else
                     Text(
                       package.storeProduct.priceString,
-                      style: Passeport.body(14, weight: FontWeight.w600).copyWith(
-                        color: DesignTokens.primaryDeep,
-                      ),
+                      style: Passeport.body(
+                        14,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.primaryDeep),
                     ),
                   const SizedBox(height: 3),
                   Text(
@@ -622,9 +599,10 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Passeport.body(11, weight: FontWeight.w700).copyWith(
-          color: DesignTokens.primaryDeep,
-        ),
+        style: Passeport.body(
+          11,
+          weight: FontWeight.w700,
+        ).copyWith(color: DesignTokens.primaryDeep),
       ),
     );
   }
@@ -654,7 +632,9 @@ class _LegalLinks extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space2),
           child: Text(
             '·',
-            style: Passeport.body(12).copyWith(color: Colors.white.withValues(alpha: 0.5)),
+            style: Passeport.body(
+              12,
+            ).copyWith(color: Colors.white.withValues(alpha: 0.5)),
           ),
         ),
         GestureDetector(

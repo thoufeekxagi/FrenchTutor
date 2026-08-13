@@ -21,17 +21,42 @@ AudioStreamingService createAudioStreamingService() =>
 /// screen. ScriptProcessorNode runs on the main thread and drops frames under
 /// exactly that load, which is audible as clipped words.
 ///
-/// It forwards raw Float32 frames untouched; all PCM16 conversion happens in
-/// Dart so the format logic lives next to the rest of the audio code.
+/// It resamples Float32 frames to Gemini's 16 kHz input rate; all PCM16
+/// conversion happens in Dart so the format logic lives next to the rest of
+/// the audio code.
 const _captureWorkletSource = r'''
 class PcmCaptureProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.pending = [];
+    this.position = 0;
+    this.step = sampleRate / 16000;
+  }
+
   process(inputs) {
     const input = inputs[0];
-    if (input && input.length > 0 && input[0] && input[0].length > 0) {
-      // Copy: the underlying buffer is reused by the audio thread between
-      // render quanta, so posting it directly would deliver mutated samples.
-      this.port.postMessage(new Float32Array(input[0]));
+    if (!input || input.length === 0 || !input[0] || input[0].length === 0) {
+      return true;
     }
+
+    for (const sample of input[0]) this.pending.push(sample);
+    const output = [];
+    while (this.position + 1 < this.pending.length) {
+      const left = Math.floor(this.position);
+      const fraction = this.position - left;
+      output.push(
+        this.pending[left] * (1 - fraction) +
+        this.pending[left + 1] * fraction,
+      );
+      this.position += this.step;
+    }
+
+    const consumed = Math.floor(this.position);
+    if (consumed > 0) {
+      this.pending.splice(0, consumed);
+      this.position -= consumed;
+    }
+    if (output.length > 0) this.port.postMessage(new Float32Array(output));
     return true;
   }
 }
@@ -39,10 +64,9 @@ registerProcessor('pcm-capture', PcmCaptureProcessor);
 ''';
 
 class WebAudioStreamingService implements AudioStreamingService {
-  // The browser resamples for us: constructing each AudioContext at the exact
-  // rate Gemini expects means no hand-written interpolation anywhere. Input and
-  // output need different rates, hence two contexts.
-  static const _inputSampleRate = 16000;
+  // The input context uses the browser's native microphone rate. The capture
+  // worklet resamples to Gemini's 16 kHz input format. Output remains separate
+  // because Gemini sends PCM at 24 kHz.
   static const _outputSampleRate = 24000;
 
   web.AudioContext? _inputContext;
@@ -50,6 +74,12 @@ class WebAudioStreamingService implements AudioStreamingService {
   web.MediaStream? _micStream;
   web.MediaStreamAudioSourceNode? _micSource;
   web.AudioWorkletNode? _captureNode;
+  web.ScriptProcessorNode? _captureProcessor;
+
+  // Only used by the legacy ScriptProcessor fallback. AudioWorklet handles
+  // resampling off the UI thread in supported browsers.
+  final List<double> _fallbackPending = [];
+  double _fallbackPosition = 0;
 
   void Function(List<int> chunk)? _onChunk;
   bool _isStreaming = false;
@@ -135,32 +165,29 @@ class WebAudioStreamingService implements AudioStreamingService {
           )
           .toDart;
 
-      final ctx = web.AudioContext(
-        web.AudioContextOptions(sampleRate: _inputSampleRate),
-      );
+      // Do not force the input context to 16 kHz. Firefox and some Chromium
+      // devices reject a MediaStream source when the requested context rate
+      // differs from the microphone's hardware rate. The worklet resamples
+      // from the browser's native rate to Gemini's 16 kHz format instead.
+      final ctx = web.AudioContext();
       _inputContext = ctx;
 
-      final blob = web.Blob(
-        [_captureWorkletSource.toJS].toJS,
-        web.BlobPropertyBag(type: 'application/javascript'),
-      );
-      final url = web.URL.createObjectURL(blob);
-      try {
-        await ctx.audioWorklet.addModule(url).toDart;
-      } finally {
-        web.URL.revokeObjectURL(url);
-      }
-
-      final node = web.AudioWorkletNode(ctx, 'pcm-capture');
-      _captureNode = node;
-      node.port.onmessage = (web.MessageEvent event) {
-        _handleMicFrame(event.data as JSFloat32Array);
-      }.toJS;
-
       _micSource = ctx.createMediaStreamSource(_micStream!);
-      _micSource!.connect(node);
-      // Deliberately NOT connected to ctx.destination: routing the mic to the
-      // speakers would play the learner's own voice back at them.
+      try {
+        await _startWorkletCapture(ctx);
+      } catch (e) {
+        // Safari versions and hardened browser profiles can expose Web Audio
+        // but reject blob-backed AudioWorklet modules. Fall back to the older
+        // ScriptProcessor API, which is still available in those browsers.
+        debugPrint(
+          'WebAudioStreamingService: AudioWorklet unavailable, '
+          'using compatibility capture: $e',
+        );
+        _startScriptProcessorCapture(ctx);
+      }
+      // Both capture paths end in a silent output connection so browsers keep
+      // pulling audio through the graph. Neither path sends microphone audio
+      // to the speakers.
 
       // Autoplay policy can start a context suspended even after a user
       // gesture in some browsers.
@@ -177,7 +204,73 @@ class WebAudioStreamingService implements AudioStreamingService {
     }
   }
 
+  Future<void> _startWorkletCapture(web.AudioContext ctx) async {
+    final blob = web.Blob(
+      [_captureWorkletSource.toJS].toJS,
+      web.BlobPropertyBag(type: 'application/javascript'),
+    );
+    final url = web.URL.createObjectURL(blob);
+    try {
+      await ctx.audioWorklet.addModule(url).toDart;
+    } finally {
+      web.URL.revokeObjectURL(url);
+    }
+
+    final node = web.AudioWorkletNode(ctx, 'pcm-capture');
+    _captureNode = node;
+    node.port.onmessage = (web.MessageEvent event) {
+      _handleMicFrame(event.data as JSFloat32Array);
+    }.toJS;
+    _micSource!.connect(node);
+    // The processor does not write output frames, so this connection is silent
+    // but keeps the worklet active in browsers that cull unconnected nodes.
+    node.connect(ctx.destination);
+  }
+
+  void _startScriptProcessorCapture(web.AudioContext ctx) {
+    _fallbackPending.clear();
+    _fallbackPosition = 0;
+    final processor = ctx.createScriptProcessor(4096, 1, 1);
+    _captureProcessor = processor;
+    processor.onaudioprocess = (web.Event event) {
+      final audioEvent = event as web.AudioProcessingEvent;
+      final frame = audioEvent.inputBuffer.getChannelData(0).toDart;
+      _handleFallbackFrame(frame, ctx.sampleRate);
+    }.toJS;
+    _micSource!.connect(processor);
+    // The output buffer is left silent. This connection is required by
+    // ScriptProcessorNode implementations to keep audioprocess events firing.
+    processor.connect(ctx.destination);
+  }
+
+  void _handleFallbackFrame(Float32List frame, double inputRate) {
+    if (frame.isEmpty) return;
+    _fallbackPending.addAll(frame);
+    final step = inputRate / 16000;
+    final output = <double>[];
+    while (_fallbackPosition + 1 < _fallbackPending.length) {
+      final left = _fallbackPosition.floor();
+      final fraction = _fallbackPosition - left;
+      output.add(
+        _fallbackPending[left] * (1 - fraction) +
+            _fallbackPending[left + 1] * fraction,
+      );
+      _fallbackPosition += step;
+    }
+    final consumed = _fallbackPosition.floor();
+    if (consumed > 0) {
+      _fallbackPending.removeRange(0, consumed);
+      _fallbackPosition -= consumed;
+    }
+    if (output.isEmpty) return;
+    _handleMicFloatFrame(Float32List.fromList(output));
+  }
+
   void _handleMicFrame(JSFloat32Array jsFrame) {
+    _handleMicFloatFrame(jsFrame.toDart);
+  }
+
+  void _handleMicFloatFrame(Float32List frame) {
     final onChunk = _onChunk;
     if (!_isStreaming || onChunk == null) return;
 
@@ -192,7 +285,6 @@ class WebAudioStreamingService implements AudioStreamingService {
       }
     }
 
-    final frame = jsFrame.toDart;
     if (frame.isEmpty) return;
 
     // Float32 [-1, 1] -> little-endian PCM16, clamped so an over-unity sample
@@ -218,6 +310,14 @@ class WebAudioStreamingService implements AudioStreamingService {
       _captureNode?.disconnect();
     } catch (_) {}
     _captureNode = null;
+
+    try {
+      _captureProcessor?.onaudioprocess = null;
+      _captureProcessor?.disconnect();
+    } catch (_) {}
+    _captureProcessor = null;
+    _fallbackPending.clear();
+    _fallbackPosition = 0;
 
     try {
       _micSource?.disconnect();

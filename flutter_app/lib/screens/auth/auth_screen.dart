@@ -111,23 +111,14 @@ class _AuthScreenState extends State<AuthScreen> {
         if (constraints.maxWidth >= DesignTokens.breakpointExpanded) {
           return WebAuthLayout(child: _formContent(onDark: false));
         }
-        return Stack(
-          children: [
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
-              ),
+        return Scaffold(
+          backgroundColor: DesignTokens.canvas,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              child: WebAuthFrame(child: _formContent(onDark: false)),
             ),
-            Scaffold(
-              backgroundColor: Colors.transparent,
-              body: SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-                  child: WebAuthFrame(child: _formContent(onDark: true)),
-                ),
-              ),
-            ),
-          ],
+          ),
         );
       },
     );

@@ -67,13 +67,7 @@ class _BrandPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [DesignTokens.primaryDeep, DesignTokens.ink],
-        ),
-      ),
+      decoration: const BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),

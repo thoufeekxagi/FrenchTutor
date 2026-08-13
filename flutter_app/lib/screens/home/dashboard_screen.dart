@@ -17,6 +17,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
+import '../../widgets/web/web_layout.dart';
 import '../../widgets/web/web_practice_grid.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
@@ -108,6 +109,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return _webDashboard();
+    }
     return Scaffold(
       backgroundColor: Passeport.parchment,
       body: SafeArea(
@@ -119,7 +123,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
               children: [
                 _header(),
-                const SizedBox(height: 22),
+                const SizedBox(height: 24),
                 KeyedSubtree(
                   key: AppTour.missionKey,
                   child: TodayMissionWidget(
@@ -127,21 +131,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     onProgress: _reload,
                   ),
                 ),
-                const SizedBox(height: 12),
+                if (_summary?.hasActivity == true) ...[
+                  const SizedBox(height: 16),
+                  DailySummaryCard(summary: _summary!),
+                ],
+                const SizedBox(height: 28),
+                _sectionTitle('Practice with Marie'),
+                const SizedBox(height: 10),
+                KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
+                const SizedBox(height: 28),
+                _sectionTitle('Today’s study block'),
+                const SizedBox(height: 10),
                 KeyedSubtree(
                   key: AppTour.keepPractisingKey,
                   child: _keepPractising(),
                 ),
-                if (_summary?.hasActivity == true) ...[
-                  const SizedBox(height: 12),
-                  DailySummaryCard(summary: _summary!),
-                ],
                 const SizedBox(height: 28),
-                _sectionTitle('Practice your way'),
-                const SizedBox(height: 10),
-                KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
-                const SizedBox(height: 28),
-                _sectionTitle('Your momentum'),
+                _sectionTitle('This week'),
                 const SizedBox(height: 10),
                 _momentumCard(),
                 if (_sessions.isNotEmpty) ...[
@@ -179,6 +185,64 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  Widget _webDashboard() {
+    final goal = ref.read(learningStoreProvider).profile().goal;
+    final goalLabel = switch (goal) {
+      'tef_canada' => 'TEF Canada · CLB 7',
+      'everyday' => 'Everyday French',
+      _ => 'French foundations',
+    };
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: WebPage(
+          header: WebPageHeader(
+            title: 'Bonjour',
+            subtitle:
+                '${DateFormat('EEEE, MMMM d').format(DateTime.now())} · $goalLabel',
+          ),
+          children: [
+            const WebSectionHeader(title: 'Your next session'),
+            KeyedSubtree(
+              key: AppTour.missionKey,
+              child: TodayMissionWidget(
+                isActive: widget.isActive,
+                onProgress: _reload,
+              ),
+            ),
+            if (_summary?.hasActivity == true) ...[
+              const SizedBox(height: DesignTokens.space4),
+              DailySummaryCard(summary: _summary!),
+            ],
+            const SizedBox(height: DesignTokens.space6),
+            KeyedSubtree(
+              key: AppTour.keepPractisingKey,
+              child: _keepPractising(),
+            ),
+            const SizedBox(height: DesignTokens.space6),
+            const WebSectionHeader(title: 'Practice with Marie'),
+            KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
+            const SizedBox(height: DesignTokens.space6),
+            const WebSectionHeader(title: 'Your momentum'),
+            _momentumCard(),
+            const SizedBox(height: DesignTokens.space6),
+            WebSectionHeader(
+              title: _sessions.isEmpty ? 'Your notes' : 'Recent practice',
+              actionLabel: _sessions.isEmpty ? null : 'View all',
+              onAction: _sessions.isEmpty
+                  ? null
+                  : () => AppRouter.push(
+                      context,
+                      (_) => const AllHistoryScreen(),
+                    ),
+            ),
+            _sessions.isEmpty ? _notesRow() : _journalCard(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _header() {
     final goal = ref.read(learningStoreProvider).profile().goal;
     final goalLabel = switch (goal) {
@@ -195,14 +259,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase(),
-                style: Passeport.body(
+                'TODAY · ${DateFormat('EEEE, MMMM d').format(DateTime.now())}',
+                style: DesignTokens.label(
                   10.5,
-                  weight: FontWeight.w700,
-                ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
+                ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.8),
               ),
-              const SizedBox(height: 5),
-              Text('Bonjour', style: Passeport.display(32)),
+              const SizedBox(height: 6),
+              Text('Good morning', style: DesignTokens.display(32)),
               const SizedBox(height: 4),
               Text(
                 goalLabel,
@@ -256,8 +319,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ref.read(contentServiceProvider).resources()?.speakingTopics ?? [];
     return Container(
       decoration: BoxDecoration(
-        color: Passeport.infoSoft,
-        borderRadius: BorderRadius.circular(18),
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(
+          color: DesignTokens.secondary.withValues(alpha: 0.22),
+        ),
       ),
       child: Column(
         children: [
@@ -510,91 +576,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       return WebPracticeGrid(items: chips);
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Passeport.infoSoft,
-        borderRadius: BorderRadius.circular(18),
+    final focusItems = [
+      (
+        shortcut: chips[0],
+        duration: '8 min',
+        state: 'Ready',
+        detail: 'Strengthen active recall',
       ),
+      (
+        shortcut: chips[4],
+        duration: '12 min',
+        state: 'Building',
+        detail: 'Make your sentences more precise',
+      ),
+      (
+        shortcut: chips[8],
+        duration: '18 min',
+        state: 'Next',
+        detail: 'Use today’s language in conversation',
+      ),
+    ];
+
+    return PasseportCard(
+      padding: 0,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'KEEP PRACTISING',
-                  style: Passeport.body(
-                    10.5,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: Passeport.sky, letterSpacing: 0.9),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Practice any skill, any time. One locked skill unlocks '
-                  'free each day. Your practice still informs what comes next.',
-                  style: Passeport.body(
-                    13,
-                  ).copyWith(color: Passeport.slateDim, height: 1.35),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 44,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: chips.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final chip = chips[index];
-                final locked = chip.locked;
-                return Semantics(
-                  button: true,
-                  label: locked
-                      ? '${chip.label} (subscribers only)'
-                      : chip.label,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      PSHaptics.light();
-                      chip.onTap();
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: Passeport.card,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            locked ? CupertinoIcons.lock_fill : chip.icon,
-                            size: locked ? 13 : 16,
-                            color: locked ? Passeport.slateDim : Passeport.sky,
-                          ),
-                          const SizedBox(width: 7),
-                          Text(
-                            chip.label,
-                            style: Passeport.body(12.5, weight: FontWeight.w600)
-                                .copyWith(
-                                  color: locked ? Passeport.slateDim : null,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+          for (var index = 0; index < focusItems.length; index++) ...[
+            if (index > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 68),
+                child: Container(height: 1, color: DesignTokens.hairline),
+              ),
+            _StudyBlockRow(
+              shortcut: focusItems[index].shortcut,
+              duration: focusItems[index].duration,
+              state: focusItems[index].state,
+              detail: focusItems[index].detail,
+              onTap: () {
+                PSHaptics.light();
+                focusItems[index].shortcut.onTap();
               },
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -615,11 +638,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Expanded(
             child: _Metric(
               value: '$doneToday/$goalTotal',
-              label: 'steps today',
-              color: doneToday == goalTotal ? Passeport.sage : Passeport.maroon,
+              label: 'plan items today',
+              color: doneToday == goalTotal
+                  ? DesignTokens.success
+                  : DesignTokens.primary,
             ),
           ),
-          Container(width: 1, height: 42, color: Passeport.hairline),
+          Container(width: 1, height: 42, color: DesignTokens.hairline),
           Expanded(
             child: _Metric(
               value: '$sessionsThisWeek',
@@ -715,14 +740,124 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value, style: Passeport.display(24).copyWith(color: color)),
+        Text(value, style: DesignTokens.display(24).copyWith(color: color)),
         const SizedBox(height: 2),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: Passeport.body(11.5).copyWith(color: Passeport.slateDim),
+          style: DesignTokens.body(11.5).copyWith(color: DesignTokens.mutedDim),
         ),
       ],
+    );
+  }
+}
+
+class _StudyBlockRow extends StatelessWidget {
+  const _StudyBlockRow({
+    required this.shortcut,
+    required this.duration,
+    required this.state,
+    required this.detail,
+    required this.onTap,
+  });
+
+  final WebPracticeShortcut shortcut;
+  final String duration;
+  final String state;
+  final String detail;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = shortcut.locked;
+    return Semantics(
+      button: true,
+      label: locked ? '${shortcut.label} (subscribers only)' : shortcut.label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.space4,
+            vertical: DesignTokens.space3,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: locked
+                      ? DesignTokens.canvasDim
+                      : DesignTokens.infoSoft,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                ),
+                child: Icon(
+                  locked ? CupertinoIcons.lock_fill : shortcut.icon,
+                  size: 18,
+                  color: locked ? DesignTokens.muted : DesignTokens.info,
+                ),
+              ),
+              const SizedBox(width: DesignTokens.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            shortcut.label,
+                            style: DesignTokens.body(
+                              15,
+                              weight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          duration,
+                          style: DesignTokens.label(
+                            11,
+                          ).copyWith(color: DesignTokens.mutedDim),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      detail,
+                      style: DesignTokens.body(
+                        12.5,
+                      ).copyWith(color: DesignTokens.mutedDim),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: DesignTokens.space2),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.space2,
+                  vertical: DesignTokens.space1,
+                ),
+                decoration: BoxDecoration(
+                  color: state == 'Next'
+                      ? DesignTokens.primarySoft
+                      : DesignTokens.canvasDim,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                ),
+                child: Text(
+                  state,
+                  style: DesignTokens.label(10).copyWith(
+                    color: state == 'Next'
+                        ? DesignTokens.primary
+                        : DesignTokens.mutedDim,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

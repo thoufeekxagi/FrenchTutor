@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 /// slots (the palette contract below). `tokens.dart` selects one via a single
 /// typedef line:
 ///
-///     typedef _Palette = ProSystemAzure;   // ← swap this line, re-run, done
+///     typedef _Palette = NorthstarStudio;   // ← swap this line, re-run, done
 ///
 /// Because the slots are `static const`, the whole chain stays const —
 /// no call site anywhere in the app changes when the palette does.
@@ -29,8 +29,35 @@ import 'package:flutter/widgets.dart';
 ///   danger(+Soft)          — invalid, errors, destructive
 ///   muted / mutedDim       — tertiary text, captions, disabled
 
-/// ACTIVE — "Pro System Azure" (marketing/color-palette/pro_system_azure.jpg).
-/// Professional azure-blue system: Dribbble-quality spec, high-trust neutrals.
+/// ACTIVE — "Northstar Studio", a calm premium learning palette.
+/// Cobalt carries action, teal carries speaking, amber carries mastery,
+/// and coral is reserved for corrections or errors.
+abstract final class NorthstarStudio {
+  static const ink = Color(0xFF152238);
+  static const inkSoft = Color(0xFF3E4B62);
+  static const canvas = Color(0xFFF4F6F8);
+  static const canvasDim = Color(0xFFE7ECF2);
+  static const surface = Color(0xFFFFFFFF);
+  static const primary = Color(0xFF2259C7);
+  static const primaryDeep = Color(0xFF173E91);
+  static const primarySoft = Color(0xFFEAF0FF);
+  static const secondary = Color(0xFF0F7F78);
+  static const success = Color(0xFF2D8A5B);
+  static const successSoft = Color(0xFFE8F4ED);
+  static const info = Color(0xFF0F7F78);
+  static const infoSoft = Color(0xFFE5F4F2);
+  static const mastery = Color(0xFFB97823);
+  static const masterySoft = Color(0xFFFBF2E4);
+  static const warning = Color(0xFFB97823);
+  static const warningSoft = Color(0xFFFBF2E4);
+  static const danger = Color(0xFFC95757);
+  static const dangerSoft = Color(0xFFFBECEC);
+  static const muted = Color(0xFF8B98A9);
+  static const mutedDim = Color(0xFF607084);
+}
+
+/// Previous identity — professional azure-blue system, retained as a
+/// plug-and-play alternative for controlled visual comparison.
 abstract final class ProSystemAzure {
   static const ink = Color(0xFF1C1E21); // Dark Navy — text, headings
   static const inkSoft = Color(0xFF33383F);
