@@ -4,9 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme.dart';
 import '../../orchestration/models/competency.dart';
-import '../../orchestration/models/content_descriptor.dart';
 import '../../orchestration/models/competency_state.dart';
-import 'learning_graph_view.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 

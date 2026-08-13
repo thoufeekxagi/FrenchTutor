@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart' as google;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -48,6 +49,11 @@ class AuthService {
   /// error.
   bool get isGoogleConfigured =>
       ApiKeys.googleIosClientId.isNotEmpty && ApiKeys.googleWebClientId.isNotEmpty;
+
+  /// Apple sign-in on web needs an Apple Developer **Service ID** plus a
+  /// redirect URL, not just the native bundle ID. Until that's configured,
+  /// hide the button on web.
+  bool get isAppleAvailable => !kIsWeb;
 
   Session? get currentSession => _client.auth.currentSession;
 

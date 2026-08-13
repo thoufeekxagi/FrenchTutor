@@ -7,6 +7,7 @@ import '../design/tokens.dart';
 import '../providers/database_provider.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
+import '../widgets/web/web_app_shell.dart';
 import 'home/dashboard_screen.dart';
 import 'labs/labs_screen.dart';
 import 'path/path_screen.dart';
@@ -77,6 +78,24 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
         FloatingNotetakerOverlay(state: notetaker),
       ],
     );
+
+    final isDesktop =
+        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
+    if (isDesktop) {
+      return WebAppShell(
+        destinations: _destinations,
+        currentIndex: _currentIndex,
+        onSelect: (index) => setState(() => _currentIndex = index),
+        topBarActions: [
+          WebIconButton(
+            icon: CupertinoIcons.person,
+            tooltip: 'Profile',
+            onTap: () => AppRouter.push(context, (_) => const SettingsScreen()),
+          ),
+        ],
+        body: body,
+      );
+    }
 
     return Scaffold(
       body: body,

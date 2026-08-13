@@ -335,10 +335,46 @@ Future<DateTime?> showPSDatePicker(
 
 /// Constrains wide layouts (web/tablet) to a readable centered column;
 /// pass-through on phones.
+///
+/// This is wired into ~10 screens (dashboard, path, labs, progress, settings,
+/// notes, history), which makes it the single highest-leverage control over how
+/// the app reads on a desktop browser.
+///
+/// It used to cap everything at `DesignTokens.contentMaxWidth` (560), which is
+/// the right measure for the Daily Path column on a tablet but is *phone width*
+/// on a 1440px monitor — the direct cause of interior screens looking like "a
+/// phone screenshot in the middle of the screen". On web the cap now depends on
+/// what the content actually is:
+///
+///  - [measure] `PSMeasure.reading` (~720) for prose and single-column forms,
+///    where long lines genuinely hurt legibility.
+///  - [measure] `PSMeasure.content` (~1080, the web default) for dashboards,
+///    lists and card grids, which have structure and can use the room.
+///
+/// Native tablet keeps the original 560 column: there the narrow measure was a
+/// deliberate reading decision, not an accident, and iOS is locked.
+/// See docs/web_migration/07_web_ui_redesign.md.
+enum PSMeasure {
+  /// Prose and single-column forms.
+  reading(720.0),
+
+  /// Dashboards, lists, card grids.
+  content(1080.0);
+
+  const PSMeasure(this.webMaxWidth);
+
+  final double webMaxWidth;
+}
+
 class PSContentColumn extends StatelessWidget {
-  const PSContentColumn({super.key, required this.child});
+  const PSContentColumn({
+    super.key,
+    required this.child,
+    this.measure = PSMeasure.content,
+  });
 
   final Widget child;
+  final PSMeasure measure;
 
   @override
   Widget build(BuildContext context) {
@@ -346,10 +382,10 @@ class PSContentColumn extends StatelessWidget {
     if (width < DesignTokens.breakpointMedium) return child;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: DesignTokens.contentMaxWidth,
+        constraints: BoxConstraints(
+          maxWidth: kIsWeb ? measure.webMaxWidth : DesignTokens.contentMaxWidth,
         ),
-        child: child,
+        child: SizedBox(width: double.infinity, child: child),
       ),
     );
   }
