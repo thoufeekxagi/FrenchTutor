@@ -47,8 +47,12 @@ class AuthService {
   /// button in the UI stays visible but returns a friendly explanation
   /// instead of attempting a sign-in that would fail with an obscure native
   /// error.
-  bool get isGoogleConfigured =>
-      ApiKeys.googleIosClientId.isNotEmpty && ApiKeys.googleWebClientId.isNotEmpty;
+  /// On web only the web client ID is relevant — the iOS client ID is for the
+  /// native SDK, which is not used there (see [signInWithGoogle]).
+  bool get isGoogleConfigured => kIsWeb
+      ? ApiKeys.googleWebClientId.isNotEmpty
+      : ApiKeys.googleIosClientId.isNotEmpty &&
+            ApiKeys.googleWebClientId.isNotEmpty;
 
   /// Apple sign-in on web needs an Apple Developer **Service ID** plus a
   /// redirect URL, not just the native bundle ID. Until that's configured,
@@ -68,6 +72,33 @@ class AuthService {
       return AuthResult.failure(
         'Google sign-in isn\'t set up yet, use Apple or email for now.',
       );
+    }
+    // The one platform branch in this file, and it lives here deliberately:
+    // AuthService IS the leaf seam for "trigger a sign-in", so the split
+    // belongs at this boundary rather than being pushed up into any screen.
+    //
+    // Native uses the Google SDK's account picker + signInWithIdToken, so no
+    // browser ever opens. That approach has no web equivalent: on web the
+    // google_sign_in plugin renders its own button and cannot be driven from
+    // an arbitrary onTap. Supabase's OAuth redirect is the supported web flow
+    // and needs no extra client-side wiring; it returns here with a session,
+    // which onAuthStateChange delivers to AuthGate exactly like any other
+    // sign-in. Requires the site URL / redirect URL to be allow-listed in the
+    // Supabase dashboard (see docs/web_migration/03_phase3_auth_and_payments.md).
+    if (kIsWeb) {
+      try {
+        await _client.auth.signInWithOAuth(
+          OAuthProvider.google,
+          redirectTo: Uri.base.origin,
+        );
+        // The page navigates away; the session arrives via onAuthStateChange
+        // after the redirect back, so there is nothing to report synchronously.
+        return AuthResult.success;
+      } on AuthException catch (e) {
+        return AuthResult.failure(e.message);
+      } catch (e) {
+        return AuthResult.failure('Google sign-in failed: $e');
+      }
     }
     try {
       final googleSignIn = google.GoogleSignIn(
