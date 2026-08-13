@@ -16,3 +16,8 @@
 **/ios/Runner.xcworkspace/
 **/ios/Runner/GeneratedPluginRegistrant.h
 **/ios/Runner/GeneratedPluginRegistrant.m
+
+# Local Python runtime artifacts, never source-controlled.
+server/venv/
+server/__pycache__/
+server/*.db
