@@ -7,7 +7,7 @@ import 'palettes.dart';
 /// app re-skins — screens only ever see the semantic tokens below, never a
 /// palette directly, so swapping is one line + rebuild. See palettes.dart for
 /// the slot contract and how to add a palette from a marketing mockup.
-typedef _Palette = ConfidentMomentum;
+typedef _Palette = NorthstarStudio;
 
 /// Layer 1 of the design wiring (PILOT_PLAN.md Phase 0.2): pure constants.
 /// Semantic tokens — colors, type, spacing, radius, motion — with NO platform
@@ -16,16 +16,14 @@ typedef _Palette = ConfidentMomentum;
 /// (widgets/adaptive) renders per platform. A palette swap should only ever
 /// touch the typedef; a structural redesign only this file + design skills.
 ///
-/// Typography rules (from ux-design/passeport style mockups):
-///  - Serif (Playfair) is a DISPLAY voice only — the "Bonjour !" greeting,
-///    screen titles, flashcard French words. Never below 22pt: small serif
-///    reads as a dated "Times New Roman" app, which is exactly the failure
-///    mode the mockups avoid. display() enforces this automatically.
-///  - Everything else is Inter — an SF Pro-metrics sans that renders
-///    identically on iOS/Android/web (one vibe, no Roboto bleed-through).
-///  - No monospace anywhere; labels/badges are letterspaced Inter.
+/// Typography rules from the Northstar Studio reference:
+///  - Plus Jakarta Sans carries confident headings and display moments.
+///  - Inter carries reading, controls, labels, and data on every platform.
+///  - No decorative type or monospace treatment in learner-facing content.
 abstract final class DesignTokens {
   // --- Colors — every value comes from the active palette (typedef above).
+  // Semantic names are canonical; the legacy names (parchment/card/maroon/
+  // brass/sage/sky/slate) are aliases kept while older call sites migrate.
   static const ink = _Palette.ink;
   static const inkSoft = _Palette.inkSoft;
   static const canvas = _Palette.canvas;
@@ -49,7 +47,18 @@ abstract final class DesignTokens {
   static const mutedDim = _Palette.mutedDim;
   static const text = ink;
 
-  // Legacy aliases (ParleSprint era) — migrate call sites, don't add new uses.
+  // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
+  static const parchment = canvas;
+  static const parchmentDim = canvasDim;
+  static const card = surface;
+  static const maroon = primary;
+  static const maroonDeep = primaryDeep;
+  static const brass = mastery;
+  static const sage = success;
+  static const sky = info;
+  static const slate = muted;
+  static const slateDim = mutedDim;
+
   static final hairline = ink.withValues(alpha: 0.09);
   static final hairlineLight = canvas.withValues(alpha: 0.16);
 
@@ -59,17 +68,14 @@ abstract final class DesignTokens {
   static const heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryDeep, primary, secondary],
+    colors: [ink, primaryDeep],
   );
 
-  /// Soft card shadow — depth via a whisper of ink, never Material elevation.
-  static List<BoxShadow> get surfaceShadow => [
-    BoxShadow(
-      color: ink.withValues(alpha: 0.06),
-      blurRadius: 24,
-      offset: const Offset(0, 8),
-    ),
-  ];
+  /// Surfaces rely on tonal layers and hairline borders instead of elevation.
+  static List<BoxShadow> get surfaceShadow => const [];
+
+  /// Compatibility name for screens that still use the original card widget.
+  static List<BoxShadow> get cardShadow => surfaceShadow;
 
   // --- Spacing (4pt base grid) ---
   static const space1 = 4.0;
@@ -83,10 +89,10 @@ abstract final class DesignTokens {
   static const screenMargin = 20.0;
 
   // --- Radius ---
-  static const radiusSmall = 10.0;
-  static const radiusMedium = 14.0;
-  static const radiusCard = 20.0;
-  static const radiusLarge = 28.0;
+  static const radiusSmall = 8.0;
+  static const radiusMedium = 12.0;
+  static const radiusCard = 18.0;
+  static const radiusLarge = 24.0;
   static const radiusPill = 100.0;
 
   // --- Hit targets (Apple HIG minimum) ---
@@ -106,12 +112,10 @@ abstract final class DesignTokens {
 
   // --- Typography ---
 
-  /// Display voice — Inter, heavier and tighter at hero sizes. The serif
-  /// experiment is fully retired (2026-07): every platform, every screen,
-  /// onboarding included, renders the same SF-style sans.
+  /// Display voice — Plus Jakarta Sans for confident, geometric headings.
   static TextStyle display(double size, {FontWeight weight = FontWeight.w700}) {
     final resolved = size >= 22
-        ? (weight.value < FontWeight.w700.value ? FontWeight.w700 : weight)
+        ? (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight)
         : (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight);
     return GoogleFonts.plusJakartaSans(
       fontSize: size,
@@ -121,7 +125,7 @@ abstract final class DesignTokens {
     );
   }
 
-  /// The UI voice — Inter everywhere (SF Pro look, identical cross-platform).
+  /// The UI voice — Inter for reading and controls on every platform.
   static TextStyle body(double size, {FontWeight weight = FontWeight.w400}) {
     return GoogleFonts.inter(
       fontSize: size,
@@ -131,8 +135,7 @@ abstract final class DesignTokens {
     );
   }
 
-  /// Labels, badges, kickers, numbers — letterspaced Inter medium (the old
-  /// JetBrains Mono techy look is gone; mockups use quiet spaced caps).
+  /// Compact metadata and badges use Inter with a little tracking.
   static TextStyle label(double size, {FontWeight weight = FontWeight.w700}) {
     return GoogleFonts.inter(
       fontSize: size,
@@ -142,6 +145,7 @@ abstract final class DesignTokens {
     );
   }
 
+  /// Backwards-compatible alias for metadata styles.
   static TextStyle mono(double size, {FontWeight weight = FontWeight.w600}) =>
       label(size, weight: weight);
 }

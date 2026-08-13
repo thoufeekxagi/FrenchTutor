@@ -15,7 +15,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:french_tutor/app.dart';
 import 'package:french_tutor/design/app_theme.dart';
 import 'package:french_tutor/providers/database_provider.dart';
-import 'package:french_tutor/screens/onboarding/ai_consent_screen.dart';
 import 'package:french_tutor/widgets/speaking_session_result.dart';
 
 void main() {
@@ -60,7 +59,7 @@ void main() {
     expect(find.text('ParleSprint'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
 
-    await tester.tap(find.text('Continue'));
+    await tester.tap(find.text('Build my plan'));
     await tester.pumpAndSettle();
     expect(find.text('What should French unlock for you?'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
@@ -68,7 +67,7 @@ void main() {
 
   testWidgets('full funnel: welcome → questions → preparing → sign-in gate '
       '(trial auto-skipped without a Gemini key)', (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({AiConsentScreen.prefsKey: true});
+    SharedPreferences.setMockInitialValues({});
     final db = sqlite3.openInMemory();
     addTearDown(db.dispose);
     await tester.pumpWidget(
@@ -79,7 +78,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Continue')); // welcome
+    await tester.tap(find.text('Build my plan')); // welcome
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Everyday French')); // goal
@@ -112,6 +111,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pumpAndSettle();
 
+    expect(find.text('How your practice works'), findsOneWidget);
+    await tester.tap(find.text('Agree and continue'));
+    await tester.pumpAndSettle();
     expect(find.text('Continue with Google'), findsOneWidget);
   });
 
@@ -132,11 +134,12 @@ void main() {
       ),
     );
 
-    expect(find.text('Practice saved'), findsOneWidget);
+    expect(find.text('Session complete'), findsOneWidget);
     expect(find.text('1:35'), findsOneWidget);
     expect(find.text('6'), findsOneWidget);
     expect(find.textContaining('Daily path updated'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Done'));
     await tester.tap(find.text('Done'));
     expect(finished, isTrue);
   });
@@ -157,11 +160,11 @@ void main() {
       ),
     );
 
-    expect(find.text('Good start, keep going'), findsOneWidget);
+    expect(find.text('Session complete'), findsOneWidget);
     expect(
       find.textContaining('Nothing has been marked complete'),
       findsOneWidget,
     );
-    expect(find.text('Practice saved'), findsNothing);
+    expect(find.text('Session complete'), findsOneWidget);
   });
 }

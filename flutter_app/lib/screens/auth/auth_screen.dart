@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/primary_action_button.dart';
+import '../../widgets/auth_form.dart';
+import '../../widgets/web/web_auth_layout.dart';
 
 /// The one-and-only entry screen: Apple, Google, and email/password, no
 /// exceptions, no browser tabs — every path here resolves inside the app or
@@ -50,17 +49,15 @@ class _AuthScreenState extends State<AuthScreen> {
       _loading = false;
       switch (result.outcome) {
         case AuthOutcome.success:
-          // The app-level auth-state listener handles navigation from here —
-          // this screen simply stops showing a spinner and disappears once
-          // the session stream fires.
+          // The app-level auth-state listener handles navigation from here.
           break;
         case AuthOutcome.cancelled:
-          // The user backed out of a native sheet — say nothing, exactly as
-          // if they'd never tapped the button.
+          // The user backed out of a native sheet. Say nothing.
           break;
         case AuthOutcome.needsEmailConfirmation:
           _infoMessage =
               'Check your email to confirm your account, then sign in.';
+          break;
         case AuthOutcome.failure:
           _errorMessage = result.message;
       }
@@ -101,258 +98,53 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
     await _run(() => AuthService.shared.sendPasswordReset(email));
-    if (!mounted) return;
-    if (_errorMessage == null) {
-      setState(
-        () => _infoMessage = 'Password reset email sent, check your inbox.',
-      );
-    }
+    if (!mounted || _errorMessage != null) return;
+    setState(
+      () => _infoMessage = 'Password reset email sent, check your inbox.',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // A fixed, full-bleed backdrop behind a transparent Scaffold — not a
-    // DecoratedBox inside the Scaffold's own body — so the gradient always
-    // covers the entire physical screen. The Scaffold's body resizes when
-    // the keyboard opens (to keep fields above it); a gradient painted on
-    // that resizing body would shrink with it and expose a flat, seam-edged
-    // gap below. This backdrop sits outside that resize entirely.
-    return Stack(
-      children: [
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
-          ),
-        ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= DesignTokens.breakpointExpanded) {
+          return WebAuthLayout(child: _formContent(onDark: false));
+        }
+        return Scaffold(
+          backgroundColor: DesignTokens.canvas,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _header(),
-                  const SizedBox(height: 40),
-                  _appleButton(),
-                  const SizedBox(height: 12),
-                  _googleButton(),
-                  const SizedBox(height: 24),
-                  _divider(),
-                  const SizedBox(height: 20),
-                  _modeToggle(),
-                  const SizedBox(height: 18),
-                  _emailField(),
-                  const SizedBox(height: 12),
-                  _passwordField(),
-                  if (!_isSignUp) ...[
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: _loading ? null : _forgotPassword,
-                        child: Text(
-                          'Forgot password?',
-                          style: AppStyles.body(
-                            12.5,
-                            weight: FontWeight.w600,
-                          ).copyWith(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  if (_errorMessage != null)
-                    _messageBanner(_errorMessage!, isError: true),
-                  if (_infoMessage != null)
-                    _messageBanner(_infoMessage!, isError: false),
-                  if (_errorMessage != null || _infoMessage != null)
-                    const SizedBox(height: 12),
-                  PrimaryActionButton(
-                    label: _loading
-                        ? 'Please wait…'
-                        : (_isSignUp ? 'Create account' : 'Sign in'),
-                    onPressed: _loading ? null : _submitEmail,
-                  ),
-                ],
-              ),
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              child: WebAuthFrame(child: _formContent(onDark: false)),
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo_mark.png', width: 18, height: 22),
-            const SizedBox(width: 6),
-            Text(
-              'ParleSprint',
-              style: AppStyles.body(
-                12.5,
-                weight: FontWeight.w700,
-              ).copyWith(color: Colors.white, letterSpacing: 0.1),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Welcome',
-          style: AppStyles.display(30).copyWith(color: Colors.white),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Sign in to save your progress and pick up right where you left off.',
-          style: AppStyles.body(
-            14,
-          ).copyWith(color: Colors.white.withValues(alpha: 0.86), height: 1.4),
-        ),
-      ],
-    );
-  }
-
-  Widget _appleButton() {
-    return SizedBox(
-      height: 52,
-      child: SignInWithAppleButton(
-        onPressed: _loading ? () {} : _submitApple,
-        style: SignInWithAppleButtonStyle.black,
-        borderRadius: BorderRadius.circular(12),
-      ),
-    );
-  }
-
-  Widget _googleButton() {
-    return SizedBox(
-      height: 52,
-      child: OutlinedButton(
-        onPressed: _loading ? null : _submitGoogle,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: AppStyles.surface,
-          side: BorderSide(color: AppStyles.hairline),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/google_logo.png', width: 20, height: 20),
-            const SizedBox(width: 10),
-            Text(
-              'Continue with Google',
-              style: AppStyles.body(
-                15,
-                weight: FontWeight.w600,
-              ).copyWith(color: AppStyles.ink),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _divider() {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'or continue with email',
-            style: AppStyles.body(
-              12,
-            ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
-          ),
-        ),
-        Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
-      ],
-    );
-  }
-
-  Widget _modeToggle() {
-    return PSSegmented<bool>(
-      segments: const [
-        (value: false, label: 'Sign in'),
-        (value: true, label: 'Create account'),
-      ],
-      selected: _isSignUp,
-      onChanged: (value) {
+  Widget _formContent({required bool onDark}) {
+    return AuthForm(
+      emailController: _emailController,
+      passwordController: _passwordController,
+      isSignUp: _isSignUp,
+      loading: _loading,
+      errorMessage: _errorMessage,
+      infoMessage: _infoMessage,
+      appleAvailable: AuthService.shared.isAppleAvailable,
+      onApple: _submitApple,
+      onGoogle: _submitGoogle,
+      onSubmit: _submitEmail,
+      onForgotPassword: _forgotPassword,
+      onModeChanged: (value) {
         PSHaptics.selection();
         setState(() {
           _isSignUp = value;
           _clearMessages();
         });
       },
-    );
-  }
-
-  InputDecoration _fieldDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: AppStyles.body(13).copyWith(color: AppStyles.mutedDim),
-      prefixIcon: Icon(icon, size: 19, color: AppStyles.mutedDim),
-      filled: true,
-      fillColor: AppStyles.surface,
-      contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppStyles.hairline),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppStyles.hairline),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppStyles.primary, width: 1.5),
-      ),
-    );
-  }
-
-  Widget _emailField() {
-    return TextField(
-      controller: _emailController,
-      enabled: !_loading,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      autocorrect: false,
-      style: AppStyles.body(14.5),
-      decoration: _fieldDecoration('Email', CupertinoIcons.mail),
-    );
-  }
-
-  Widget _passwordField() {
-    return TextField(
-      controller: _passwordController,
-      enabled: !_loading,
-      obscureText: true,
-      textInputAction: TextInputAction.done,
-      onSubmitted: (_) => _submitEmail(),
-      style: AppStyles.body(14.5),
-      decoration: _fieldDecoration('Password', CupertinoIcons.lock),
-    );
-  }
-
-  Widget _messageBanner(String text, {required bool isError}) {
-    final color = isError ? AppStyles.danger : AppStyles.success;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        text,
-        style: AppStyles.body(12.5).copyWith(color: color, height: 1.35),
-      ),
+      onDark: onDark,
     );
   }
 }

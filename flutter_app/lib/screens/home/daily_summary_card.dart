@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../services/daily_summary_service.dart';
 import '../../widgets/kicker_text.dart';
 
@@ -21,8 +21,9 @@ class DailySummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppStyles.surface,
-        borderRadius: BorderRadius.circular(16),
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
         boxShadow: DesignTokens.surfaceShadow,
       ),
       child: Column(
@@ -30,14 +31,14 @@ class DailySummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              KickerText('Today so far', color: AppStyles.mutedDim),
+              KickerText('Today so far', color: Passeport.slateDim),
               const Spacer(),
               Text(
                 '${summary.stagesCompleted}/${summary.stagesTotal} stages',
-                style: AppStyles.mono(
+                style: Passeport.mono(
                   11,
                   weight: FontWeight.w600,
-                ).copyWith(color: AppStyles.primary),
+                ).copyWith(color: Passeport.maroon),
               ),
             ],
           ),
@@ -93,14 +94,14 @@ class DailySummaryCard extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 13, color: AppStyles.success),
+              Icon(icon, size: 13, color: Passeport.sage),
               const SizedBox(width: 5),
               Text(
                 label,
-                style: AppStyles.body(
+                style: Passeport.body(
                   12,
                   weight: FontWeight.w600,
-                ).copyWith(color: AppStyles.inkSoft),
+                ).copyWith(color: Passeport.inkSoft),
               ),
             ],
           ),
@@ -117,15 +118,15 @@ class DailySummaryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
-              color: AppStyles.canvasDim,
+              color: Passeport.parchmentDim,
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
               word.fr,
-              style: AppStyles.body(
+              style: Passeport.body(
                 11.5,
                 weight: FontWeight.w600,
-              ).copyWith(color: AppStyles.ink),
+              ).copyWith(color: Passeport.ink),
             ),
           ),
         if (summary.wordsPracticed.length > 8)
@@ -133,7 +134,7 @@ class DailySummaryCard extends StatelessWidget {
             padding: const EdgeInsets.only(top: 6, left: 2),
             child: Text(
               '+${summary.wordsPracticed.length - 8} more',
-              style: AppStyles.body(11).copyWith(color: AppStyles.mutedDim),
+              style: Passeport.body(11).copyWith(color: Passeport.slateDim),
             ),
           ),
       ],
@@ -146,10 +147,10 @@ class DailySummaryCard extends StatelessWidget {
       children: [
         Text(
           'Fought back today, returning tomorrow',
-          style: AppStyles.body(
+          style: Passeport.body(
             11.5,
             weight: FontWeight.w700,
-          ).copyWith(color: AppStyles.primary),
+          ).copyWith(color: Passeport.maroon),
         ),
         const SizedBox(height: 6),
         for (final hard in summary.hardWords)
@@ -159,16 +160,16 @@ class DailySummaryCard extends StatelessWidget {
               children: [
                 Text(
                   hard.entry.fr,
-                  style: AppStyles.body(12.5, weight: FontWeight.w600),
+                  style: Passeport.body(12.5, weight: FontWeight.w600),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     hard.entry.en,
                     overflow: TextOverflow.ellipsis,
-                    style: AppStyles.body(
+                    style: Passeport.body(
                       11.5,
-                    ).copyWith(color: AppStyles.mutedDim),
+                    ).copyWith(color: Passeport.slateDim),
                   ),
                 ),
               ],
@@ -184,10 +185,10 @@ class DailySummaryCard extends StatelessWidget {
       children: [
         Text(
           'Pronunciation focus',
-          style: AppStyles.body(
+          style: Passeport.body(
             11.5,
             weight: FontWeight.w700,
-          ).copyWith(color: AppStyles.info),
+          ).copyWith(color: Passeport.sky),
         ),
         const SizedBox(height: 6),
         for (final tag in summary.pronunciationFocus)
@@ -195,7 +196,7 @@ class DailySummaryCard extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 3),
             child: Text(
               '• ${tag.description}',
-              style: AppStyles.body(11.5).copyWith(color: AppStyles.inkSoft),
+              style: Passeport.body(11.5).copyWith(color: Passeport.inkSoft),
             ),
           ),
       ],

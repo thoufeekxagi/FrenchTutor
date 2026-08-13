@@ -15,9 +15,10 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
-import '../../widgets/learning_card.dart';
+import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/primary_action_button.dart';
+import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 /// Popped by this screen's `_finish()` — a plain score/hints carrier.
 class WritingStageResult {
@@ -284,10 +285,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
         title: Text(task.title, style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.canvasDim,
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: widget.showFinishButton ? 72 : null,
@@ -298,63 +299,67 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                   'Skip',
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: DesignTokens.mutedDim),
+                  ).copyWith(color: DesignTokens.slateDim),
                 ),
               )
             : null,
         actions: [InlineCallActions(controller: _call)],
       ),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            children: [
-              if (_call.isLive || _call.error != null) ...[
-                InlineCallStatusCard(
-                  controller: _call,
-                  listeningLabel: 'Listening. Keep writing, she can hear you.',
-                ),
+      body: WebConstrainedView(
+        maxWidth: 920,
+        child: Stack(
+          children: [
+            ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              children: [
+                if (_call.isLive || _call.error != null) ...[
+                  InlineCallStatusCard(
+                    controller: _call,
+                    listeningLabel:
+                        'Listening. Keep writing, she can hear you.',
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                _promptCard(),
                 const SizedBox(height: 16),
-              ],
-              _promptCard(),
-              const SizedBox(height: 16),
-              _connectorsCard(),
-              const SizedBox(height: 16),
-              _editorCard(),
-              if (_isGrading) ...[
+                _connectorsCard(),
                 const SizedBox(height: 16),
-                const Center(child: PSProgressIndicator()),
-              ],
-              if (_feedback != null) ...[
+                _editorCard(),
+                if (_isGrading) ...[
+                  const SizedBox(height: 16),
+                  const Center(child: PSProgressIndicator()),
+                ],
+                if (_feedback != null) ...[
+                  const SizedBox(height: 16),
+                  _feedbackCard(_feedback!),
+                ],
+                if (_errorText != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorText!,
+                    style: DesignTokens.mono(
+                      11,
+                    ).copyWith(color: DesignTokens.primary),
+                  ),
+                ],
                 const SizedBox(height: 16),
-                _feedbackCard(_feedback!),
+                if (_feedback == null)
+                  PasseportPrimaryButton(
+                    label: 'Submit for grading',
+                    onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+                  )
+                else
+                  PasseportPrimaryButton(
+                    label: 'Done',
+                    icon: CupertinoIcons.checkmark,
+                    onPressed: widget.showFinishButton ? _finish : _doneInLab,
+                  ),
+                const SizedBox(height: 24),
               ],
-              if (_errorText != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  _errorText!,
-                  style: DesignTokens.mono(
-                    11,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-              ],
-              const SizedBox(height: 16),
-              if (_feedback == null)
-                PrimaryActionButton(
-                  label: 'Submit for grading',
-                  onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
-                )
-              else
-                PrimaryActionButton(
-                  label: 'Done',
-                  icon: CupertinoIcons.checkmark,
-                  onPressed: widget.showFinishButton ? _finish : _doneInLab,
-                ),
-              const SizedBox(height: 24),
-            ],
-          ),
-          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
-        ],
+            ),
+            FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+          ],
+        ),
       ),
     );
   }
@@ -374,13 +379,13 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   // -- Feedback card --
 
   Widget _feedbackCard(WritingFeedback feedback) {
-    return LearningCard(
+    return PasseportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const KickerText('Feedback', color: DesignTokens.mutedDim),
+              const KickerText('Feedback', color: DesignTokens.slateDim),
               const Spacer(),
               Text(
                 '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
@@ -449,7 +454,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                         const Icon(
                           CupertinoIcons.arrow_right,
                           size: 11,
-                          color: DesignTokens.muted,
+                          color: DesignTokens.slate,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -467,7 +472,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                         child: Text(
                           c.why,
                           style: DesignTokens.body(12.5).copyWith(
-                            color: DesignTokens.mutedDim,
+                            color: DesignTokens.slateDim,
                             height: 1.35,
                           ),
                         ),
@@ -564,11 +569,11 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   // -- Prompt card --
 
   Widget _promptCard() {
-    return LearningCard(
+    return PasseportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Prompt', color: DesignTokens.mutedDim),
+          const KickerText('Prompt', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           Text(task.promptFr, style: DesignTokens.body(14)),
           const SizedBox(height: 6),
@@ -577,7 +582,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
               task.promptEn,
               style: DesignTokens.body(
                 12.5,
-              ).copyWith(color: DesignTokens.mutedDim),
+              ).copyWith(color: DesignTokens.slateDim),
             )
           else
             TextButton(
@@ -610,7 +615,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                         hint,
                         style: DesignTokens.mono(
                           10.5,
-                        ).copyWith(color: DesignTokens.mutedDim),
+                        ).copyWith(color: DesignTokens.slateDim),
                       ),
                     ),
                   ],
@@ -628,11 +633,11 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     final connectors = _targetConnectorObjects;
     if (connectors.isEmpty) return const SizedBox.shrink();
 
-    return LearningCard(
+    return PasseportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Target connectors', color: DesignTokens.mutedDim),
+          const KickerText('Target connectors', color: DesignTokens.slateDim),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -668,20 +673,20 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   // -- Editor card --
 
   Widget _editorCard() {
-    return LearningCard(
+    return PasseportCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const KickerText('Your response', color: DesignTokens.mutedDim),
+              const KickerText('Your response', color: DesignTokens.slateDim),
               const Spacer(),
               Text(
                 '$_wordCount / ${task.minWords} words',
                 style: DesignTokens.mono(10.5).copyWith(
                   color: _wordCount >= task.minWords
                       ? DesignTokens.info
-                      : DesignTokens.mutedDim,
+                      : DesignTokens.slateDim,
                 ),
               ),
             ],
@@ -690,7 +695,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
           Container(
             constraints: const BoxConstraints(minHeight: 180),
             decoration: BoxDecoration(
-              color: DesignTokens.canvasDim,
+              color: DesignTokens.parchmentDim,
               borderRadius: BorderRadius.circular(8),
             ),
             child: TextField(
@@ -704,7 +709,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                 hintText: 'Write your response here...',
                 hintStyle: DesignTokens.body(
                   13.5,
-                ).copyWith(color: DesignTokens.muted),
+                ).copyWith(color: DesignTokens.slate),
                 contentPadding: const EdgeInsets.all(12),
                 border: InputBorder.none,
               ),

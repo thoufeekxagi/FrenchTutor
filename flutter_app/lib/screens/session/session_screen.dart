@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/chat_message.dart';
 import '../../flow/stage_outcome.dart';
@@ -163,8 +163,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     if (_callStatus == CallStatus.ended || _sessionSaved) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      _audio.stopPlayback();
-      _audio.isOutputActive = false;
       _mic.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
@@ -184,6 +182,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       // confirm. A direct `pop()` bypasses that gate entirely, same as
       // `_finishResult()` below already relies on to close this screen.
       Navigator.of(context).pop();
+      return;
+    }
+    if (widget.apiKey.trim().isEmpty) {
+      setState(() {
+        _callStatus = CallStatus.ended;
+        _errorMessage =
+            'Live tutor is not enabled for this build.';
+      });
       return;
     }
     _gemini.connect();
@@ -623,15 +629,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     switch (_callStatus) {
       case CallStatus.connecting:
       case CallStatus.reconnecting:
-        return AppStyles.mastery;
+        return DesignTokens.warning;
       case CallStatus.listening:
-        return AppStyles.success;
+        return DesignTokens.success;
       case CallStatus.tutorSpeaking:
-        return AppStyles.info;
+        return DesignTokens.secondary;
       case CallStatus.muted:
-        return AppStyles.muted;
+        return DesignTokens.muted;
       case CallStatus.ended:
-        return AppStyles.muted.withValues(alpha: 0.5);
+        return DesignTokens.muted.withValues(alpha: 0.5);
     }
   }
 
@@ -681,7 +687,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           });
         }
         return const Scaffold(
-          backgroundColor: AppStyles.canvas,
+          backgroundColor: Passeport.parchment,
           body: SizedBox.expand(),
         );
       }
@@ -712,7 +718,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-        backgroundColor: AppStyles.canvas,
+        backgroundColor: DesignTokens.canvas,
         body: SafeArea(
           child: Stack(
             children: [
@@ -752,7 +758,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     child: Icon(
                       CupertinoIcons.xmark,
                       size: 20,
-                      color: AppStyles.ink,
+                      color: Passeport.ink,
                     ),
                   ),
                 ),
@@ -767,8 +773,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                           widget.durationLimitSeconds!,
                         ),
                       ),
-                style: AppStyles.body(14, weight: FontWeight.w700).copyWith(
-                  color: AppStyles.mutedDim,
+                style: Passeport.body(14, weight: FontWeight.w700).copyWith(
+                  color: Passeport.slateDim,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -782,14 +788,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           const SizedBox(height: 4),
           _avatarWithCountdownRing(),
           const SizedBox(height: 9),
-          Text(_gemini.persona.displayName, style: AppStyles.display(22)),
+          Text(_gemini.persona.displayName, style: Passeport.display(22)),
           const SizedBox(height: 7),
           AnimatedContainer(
             duration: DesignTokens.durationFast,
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
               color: _statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -805,10 +811,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 const SizedBox(width: 7),
                 Text(
                   _statusText,
-                  style: AppStyles.body(
+                  style: Passeport.body(
                     12,
                     weight: FontWeight.w600,
-                  ).copyWith(color: AppStyles.inkSoft),
+                  ).copyWith(color: Passeport.inkSoft),
                 ),
               ],
             ),
@@ -827,8 +833,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       width: 54,
       height: 54,
       decoration: BoxDecoration(
-        color: AppStyles.infoSoft,
-        shape: BoxShape.circle,
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         border: Border.all(
           color: _statusColor.withValues(alpha: 0.32),
           width: 2,
@@ -837,11 +843,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       child: Center(
         child: Text(
           _gemini.persona.initial,
-          style: const TextStyle(
-            color: AppStyles.info,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: DesignTokens.display(
+            20,
+          ).copyWith(color: DesignTokens.secondary),
         ),
       ),
     );
@@ -865,8 +869,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 value: value,
                 strokeWidth: 3,
                 strokeCap: StrokeCap.round,
-                color: closing ? AppStyles.warning : AppStyles.primary,
-                backgroundColor: AppStyles.hairline,
+                color: closing ? Passeport.warning : Passeport.primary,
+                backgroundColor: Passeport.hairline,
               ),
             ),
           ),
@@ -888,13 +892,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 width: 54,
                 height: 54,
                 decoration: const BoxDecoration(
-                  color: AppStyles.successSoft,
+                  color: Passeport.successSoft,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   CupertinoIcons.waveform,
                   size: 24,
-                  color: AppStyles.success,
+                  color: Passeport.sage,
                 ),
               ),
               const SizedBox(height: 14),
@@ -903,7 +907,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? 'Preparing your session'
                     : '${_gemini.persona.displayName} is listening',
                 textAlign: TextAlign.center,
-                style: AppStyles.body(16, weight: FontWeight.w700),
+                style: Passeport.body(16, weight: FontWeight.w700),
               ),
               const SizedBox(height: 6),
               Text(
@@ -911,9 +915,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? 'This usually takes a moment.'
                     : 'Speak naturally. You can pause, correct yourself, or ask for help.',
                 textAlign: TextAlign.center,
-                style: AppStyles.body(
+                style: Passeport.body(
                   13.5,
-                ).copyWith(color: AppStyles.mutedDim, height: 1.4),
+                ).copyWith(color: Passeport.slateDim, height: 1.4),
               ),
             ],
           ),
@@ -935,19 +939,24 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
       decoration: BoxDecoration(
-        color: AppStyles.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: AppStyles.ink.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(DesignTokens.radiusCard),
+        ),
+        border: Border(top: BorderSide(color: DesignTokens.hairline)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(
+            widget.stage == 'speaking'
+                ? 'Focus: give reasons and examples'
+                : 'Focus: clear, natural French',
+            style: DesignTokens.label(
+              11,
+            ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.6),
+          ),
+          const SizedBox(height: DesignTokens.space3),
           KeyedSubtree(
             key: AppTour.micModeKey,
             child: MicModeBar(
@@ -971,7 +980,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? CupertinoIcons.speaker_2_fill
                     : CupertinoIcons.ear,
                 label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
-                color: AppStyles.ink,
+                color: Passeport.ink,
                 onTap: _callStatus == CallStatus.connecting
                     ? null
                     : _toggleSpeaker,
@@ -996,7 +1005,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 child: _controlButton(
                   icon: CupertinoIcons.phone_down_fill,
                   label: 'End',
-                  color: AppStyles.primary,
+                  color: DesignTokens.primary,
                   onTap: _confirmEnd,
                 ),
               ),
@@ -1030,19 +1039,32 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 height: 58,
                 decoration: BoxDecoration(
                   color: onTap == null
-                      ? AppStyles.muted.withValues(alpha: 0.35)
-                      : color,
+                      ? DesignTokens.canvasDim
+                      : color == DesignTokens.primary
+                      ? DesignTokens.primary
+                      : DesignTokens.canvasDim,
                   shape: BoxShape.circle,
+                  border: color == DesignTokens.primary
+                      ? null
+                      : Border.all(color: DesignTokens.hairline),
                 ),
-                child: Icon(icon, color: Colors.white, size: 23),
+                child: Icon(
+                  icon,
+                  color: color == DesignTokens.primary
+                      ? Colors.white
+                      : onTap == null
+                      ? DesignTokens.muted
+                      : color,
+                  size: 23,
+                ),
               ),
               const SizedBox(height: 7),
               Text(
                 label,
-                style: AppStyles.body(
+                style: Passeport.body(
                   11.5,
                   weight: FontWeight.w600,
-                ).copyWith(color: AppStyles.mutedDim),
+                ).copyWith(color: Passeport.slateDim),
               ),
             ],
           ),
@@ -1060,55 +1082,32 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
-    return Row(
-      mainAxisAlignment: isUser
-          ? MainAxisAlignment.end
-          : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!isUser) _avatar(false),
-        if (!isUser) const SizedBox(width: 8),
-        Flexible(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-            decoration: BoxDecoration(
-              color: isUser ? AppStyles.ink : AppStyles.infoSoft,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isUser ? 16 : 4),
-                bottomRight: Radius.circular(isUser ? 4 : 16),
-              ),
-            ),
-            child: Text(
-              message.content,
-              style: AppStyles.body(14).copyWith(
-                color: isUser ? Colors.white : AppStyles.text,
-                height: 1.35,
-              ),
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.space4,
+            vertical: DesignTokens.space3,
+          ),
+          decoration: BoxDecoration(
+            color: isUser ? DesignTokens.ink : DesignTokens.infoSoft,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+            border: isUser
+                ? null
+                : Border(
+                    left: BorderSide(color: DesignTokens.secondary, width: 3),
+                  ),
+          ),
+          child: Text(
+            message.content,
+            style: DesignTokens.body(15).copyWith(
+              color: isUser ? Colors.white : DesignTokens.ink,
+              height: 1.45,
             ),
           ),
         ),
-        if (isUser) const SizedBox(width: 8),
-        if (isUser) _avatar(true),
-      ],
-    );
-  }
-
-  Widget _avatar(bool isUser) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: (isUser ? AppStyles.primary : AppStyles.mastery).withValues(
-          alpha: 0.15,
-        ),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        isUser ? CupertinoIcons.person_fill : CupertinoIcons.book_fill,
-        size: 14,
-        color: isUser ? AppStyles.primary : AppStyles.mastery,
       ),
     );
   }

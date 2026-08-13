@@ -7,6 +7,7 @@ import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/session_row.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import 'history_screen.dart';
 
 /// Every practice session the learner has ever done — missions and
@@ -80,47 +81,50 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: PSContentColumn(
-          child: _loading
-              ? const Center(child: PSProgressIndicator())
-              : _sessions.isEmpty
-              ? _emptyState()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (stages.isNotEmpty) _filterBar(stages),
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: DesignTokens.primary,
-                        onRefresh: () async => _reload(),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(
-                            DesignTokens.screenMargin,
-                            DesignTokens.space4,
-                            DesignTokens.screenMargin,
-                            32,
+        child: WebConstrainedView(
+          maxWidth: 1080,
+          child: PSContentColumn(
+            child: _loading
+                ? const Center(child: PSProgressIndicator())
+                : _sessions.isEmpty
+                ? _emptyState()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (stages.isNotEmpty) _filterBar(stages),
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: DesignTokens.primary,
+                          onRefresh: () async => _reload(),
+                          child: ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(
+                              DesignTokens.screenMargin,
+                              DesignTokens.space4,
+                              DesignTokens.screenMargin,
+                              32,
+                            ),
+                            itemCount: _filteredSessions.length,
+                            separatorBuilder: (_, _) => const Divider(
+                              height: 1,
+                              color: DesignTokens.parchmentDim,
+                            ),
+                            itemBuilder: (context, index) {
+                              final session = _filteredSessions[index];
+                              return GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => AppRouter.push(
+                                  context,
+                                  (_) => HistoryScreen(session: session),
+                                ),
+                                child: SessionRow(session: session),
+                              );
+                            },
                           ),
-                          itemCount: _filteredSessions.length,
-                          separatorBuilder: (_, _) => const Divider(
-                            height: 1,
-                            color: DesignTokens.canvasDim,
-                          ),
-                          itemBuilder: (context, index) {
-                            final session = _filteredSessions[index];
-                            return GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => AppRouter.push(
-                                context,
-                                (_) => HistoryScreen(session: session),
-                              ),
-                              child: SessionRow(session: session),
-                            );
-                          },
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -156,7 +160,9 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                   horizontal: DesignTokens.space4,
                 ),
                 decoration: BoxDecoration(
-                  color: selected ? DesignTokens.ink : DesignTokens.canvasDim,
+                  color: selected
+                      ? DesignTokens.ink
+                      : DesignTokens.parchmentDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(
@@ -183,7 +189,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
         child: Text(
           'Nothing practiced yet. It\'ll show up here once you do.',
           textAlign: TextAlign.center,
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(14).copyWith(color: DesignTokens.slateDim),
         ),
       ),
     );

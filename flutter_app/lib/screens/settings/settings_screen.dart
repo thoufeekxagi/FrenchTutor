@@ -10,7 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../data/database/account_deletion.dart';
 import '../../data/database/local_data_reset.dart';
 import '../../design/app_router.dart';
@@ -27,6 +27,7 @@ import '../../services/tutor_voice_preview.dart';
 import '../subscription/paywall_screen.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -219,23 +220,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             constraints: const BoxConstraints(minHeight: 84),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              // Selected = the same azure gradient as the onboarding hero,
-              // always use semantic foreground roles from the active palette.
-              color: selected ? null : AppStyles.canvasDim,
-              gradient: selected
-                  ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        DesignTokens.primaryDeep,
-                        DesignTokens.primary,
-                        DesignTokens.secondary,
-                      ],
-                    )
-                  : null,
+              color: selected
+                  ? DesignTokens.primarySoft
+                  : DesignTokens.canvasDim,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: selected ? Colors.transparent : AppStyles.hairline,
+                color: selected ? Colors.transparent : Passeport.hairline,
               ),
             ),
             child: Column(
@@ -246,9 +236,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Expanded(
                       child: Text(
                         p.displayName,
-                        style: AppStyles.body(14, weight: FontWeight.w700)
+                        style: Passeport.body(14, weight: FontWeight.w700)
                             .copyWith(
-                              color: selected ? Colors.white : AppStyles.ink,
+                              color: selected
+                                  ? DesignTokens.primaryDeep
+                                  : Passeport.ink,
                             ),
                       ),
                     ),
@@ -263,14 +255,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 height: 15,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppStyles.info,
+                                  color: Passeport.sky,
                                 ),
                               )
                             : Icon(
                                 _previewer.playingId == p.id
                                     ? CupertinoIcons.stop_circle_fill
                                     : CupertinoIcons.play_circle_fill,
-                                color: selected ? Colors.white : AppStyles.info,
+                                color: selected
+                                    ? DesignTokens.secondary
+                                    : Passeport.sky,
                                 size: 19,
                               ),
                       ),
@@ -278,7 +272,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (selected)
                       const Icon(
                         CupertinoIcons.checkmark_circle_fill,
-                        color: Colors.white,
+                        color: DesignTokens.primary,
                         size: 17,
                       ),
                   ],
@@ -286,21 +280,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 3),
                 Text(
                   '${p.accent.label} French',
-                  style: AppStyles.body(10.5, weight: FontWeight.w700).copyWith(
+                  style: Passeport.body(10.5, weight: FontWeight.w700).copyWith(
                     color: selected
-                        ? Colors.white.withValues(alpha: 0.9)
-                        : AppStyles.primary,
+                        ? DesignTokens.primaryDeep
+                        : DesignTokens.primary,
                     letterSpacing: 0.4,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   p.tagline,
-                  style: AppStyles.body(10.5).copyWith(
-                    color: selected
-                        ? Colors.white.withValues(alpha: 0.75)
-                        : AppStyles.mutedDim,
-                  ),
+                  style: Passeport.body(
+                    10.5,
+                  ).copyWith(color: Passeport.slateDim),
                 ),
               ],
             ),
@@ -470,375 +462,433 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // Riverpod re-fetches on its own — without this, Settings keeps showing
     // "Free" after a successful purchase until the screen happens to be
     // torn down and rebuilt some other way.
-    if (mounted)
+    if (mounted) {
       setState(() => _access = ref.read(pilotAccessServiceProvider).snapshot());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppStyles.canvas,
+      backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        backgroundColor: AppStyles.canvas,
-        title: Text('Settings', style: AppStyles.display(22)),
+        backgroundColor: DesignTokens.canvas,
+        title: Text('Profile', style: DesignTokens.display(22)),
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: PSContentColumn(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          children: [
-            // --- Interactive walkthrough replay ---
-            _LearningCard(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () async {
-                  await AppTour.reset();
-                  AppTour.pendingHomeReplay = true;
-                  if (context.mounted) Navigator.of(context).pop();
-                },
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppStyles.infoSoft,
-                        borderRadius: BorderRadius.circular(12),
+      body: WebConstrainedView(
+        maxWidth: 920,
+        child: PSContentColumn(
+          measure: PSMeasure.content,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            children: [
+              // --- Interactive walkthrough replay ---
+              _PasseportCard(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    await AppTour.reset();
+                    AppTour.pendingHomeReplay = true;
+                    if (context.mounted) Navigator.of(context).pop();
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Passeport.infoSoft,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          CupertinoIcons.play_circle_fill,
+                          color: Passeport.info,
+                        ),
                       ),
-                      child: const Icon(
-                        CupertinoIcons.play_circle_fill,
-                        color: AppStyles.info,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Replay the walkthrough',
+                              style: Passeport.body(
+                                15,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'The guided tour of Home plays now; the call tour plays on your next call',
+                              style: Passeport.body(
+                                12,
+                              ).copyWith(color: Passeport.slateDim),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        CupertinoIcons.chevron_right,
+                        size: 16,
+                        color: Passeport.slateDim,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // --- Subscription: plan, renewal/days left, upgrade/manage ---
+              // Placed right under the walkthrough replay, near the top —
+              // this is the single highest-intent action in Settings and
+              // shouldn't be buried below Learning/Tutor preferences.
+              Builder(
+                builder: (context) {
+                  final entitlement = _access.entitlement;
+                  final subscribed = entitlement.grantsAccess;
+                  final expiresAt = entitlement.expiresAt;
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: DesignTokens.surface,
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusCard,
+                      ),
+                      border: Border.all(
+                        color: Passeport.primary.withValues(alpha: 0.18),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Replay the walkthrough',
-                            style: AppStyles.body(15, weight: FontWeight.w700),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.sparkles,
+                              size: 16,
+                              color: Passeport.primaryDeep,
+                            ),
+                            const SizedBox(width: 6),
+                            KickerText(
+                              'Subscription',
+                              color: Passeport.primaryDeep,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        _SettingsRow(
+                          label: 'Plan',
+                          value: subscribed
+                              ? _planName(entitlement.productId)
+                              : 'Free',
+                        ),
+                        if (subscribed && expiresAt != null) ...[
+                          Divider(height: 1, color: Passeport.hairline),
+                          _SettingsRow(
+                            label: 'Renews',
+                            value: DateFormat.yMMMd().format(expiresAt),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'The guided tour of Home plays now; the call tour plays on your next call',
-                            style: AppStyles.body(
-                              12,
-                            ).copyWith(color: AppStyles.mutedDim),
+                          Divider(height: 1, color: Passeport.hairline),
+                          _SettingsRow(
+                            label: 'Days left',
+                            value: '${_daysRemaining(expiresAt)}',
                           ),
                         ],
-                      ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: subscribed
+                              ? _openManageSubscriptions
+                              : _openPaywall,
+                          child: Container(
+                            height: 46,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: subscribed
+                                  ? Passeport.parchmentDim
+                                  : Passeport.primary,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (!subscribed) ...[
+                                  const Icon(
+                                    CupertinoIcons.sparkles,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                Text(
+                                  subscribed
+                                      ? 'Manage subscription'
+                                      : 'Unlock full access',
+                                  style:
+                                      Passeport.body(
+                                        14,
+                                        weight: FontWeight.w700,
+                                      ).copyWith(
+                                        color: subscribed
+                                            ? Passeport.slateDim
+                                            : Colors.white,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Icon(
-                      CupertinoIcons.chevron_right,
-                      size: 16,
-                      color: AppStyles.mutedDim,
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Learning', color: Passeport.slateDim),
+                    const SizedBox(height: 6),
+                    _ChoiceRow(
+                      label: 'Level',
+                      options: [
+                        for (final level in LearnerLevel.cefrValues)
+                          (level, LearnerLevel.displayLabel(level)),
+                      ],
+                      selected: _profile.level,
+                      onChanged: _confirmLevelChange,
+                    ),
+                    Divider(height: 16, color: Passeport.hairline),
+                    _ChoiceRow(
+                      label: 'Goal',
+                      options: const [
+                        ('tef_canada', 'TEF Canada'),
+                        ('everyday', 'Everyday'),
+                        ('unsure', 'Exploring'),
+                      ],
+                      selected: _profile.goal,
+                      onChanged: (v) => _saveProfile((p) => p.goal = v),
+                    ),
+                    Divider(height: 16, color: Passeport.hairline),
+                    _ChoiceRow(
+                      label: 'Session length',
+                      options: const [
+                        ('quick', 'Quick'),
+                        ('standard', 'Standard'),
+                        ('deep', 'Deep'),
+                      ],
+                      selected: _profile.sessionLength,
+                      onChanged: (v) =>
+                          _saveProfile((p) => p.sessionLength = v),
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // --- Subscription: plan, renewal/days left, upgrade/manage ---
-            // Placed right under the walkthrough replay, near the top —
-            // this is the single highest-intent action in Settings and
-            // shouldn't be buried below Learning/Tutor preferences.
-            Builder(
-              builder: (context) {
-                final entitlement = _access.entitlement;
-                final subscribed = entitlement.grantsAccess;
-                final expiresAt = entitlement.expiresAt;
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppStyles.surface, AppStyles.primarySoft],
+              // --- Tutor (P2.1/P2.3): persona, language mix, voice speed ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Your tutor', color: Passeport.slateDim),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Applies from your next call, a call in progress keeps '
+                      'the tutor it started with.',
+                      style: Passeport.body(
+                        11,
+                      ).copyWith(color: Passeport.slateDim),
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppStyles.primary.withValues(alpha: 0.18),
+                    const SizedBox(height: 12),
+                    _personaGrid(),
+                    Divider(height: 22, color: Passeport.hairline),
+                    _ChoiceRow(
+                      label: 'English / French mix',
+                      options: const [
+                        ('gentle', 'Gentle'),
+                        ('balanced', 'Balanced'),
+                        ('immersive', 'Immersion'),
+                      ],
+                      selected: _languageMix,
+                      onChanged: (v) {
+                        setState(() => _languageMix = v);
+                        TutorTuning.saveLanguageMix(v);
+                      },
                     ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    Divider(height: 16, color: Passeport.hairline),
+                    _ChoiceRow(
+                      label: 'Tutor speaking pace',
+                      options: const [
+                        ('slower', 'Slower'),
+                        ('natural', 'Natural'),
+                        ('faster', 'Faster'),
+                      ],
+                      selected: _voiceSpeed,
+                      onChanged: (v) {
+                        setState(() => _voiceSpeed = v);
+                        TutorTuning.saveVoiceSpeed(v);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // --- Roadmap ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Roadmap', color: Passeport.slateDim),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _pickRoadmapStartDate,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Start date',
+                              style: Passeport.body(
+                                12.5,
+                              ).copyWith(color: Passeport.slateDim),
+                            ),
+                            const Spacer(),
+                            Text(
+                              DateFormat.yMMMd().format(_roadmapStartDate),
+                              style: Passeport.mono(
+                                12,
+                                weight: FontWeight.w500,
+                              ).copyWith(color: Passeport.maroon),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              CupertinoIcons.calendar,
+                              size: 14,
+                              color: Passeport.maroon,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // --- Lesson voice ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Lesson voice', color: Passeport.slateDim),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Narration rate',
+                      style: Passeport.body(
+                        12.5,
+                      ).copyWith(color: Passeport.slateDim),
+                    ),
+                    const SizedBox(height: 4),
+                    SliderTheme(
+                      data: SliderThemeData(
+                        activeTrackColor: Passeport.maroon,
+                        inactiveTrackColor: Passeport.maroon.withValues(
+                          alpha: 0.2,
+                        ),
+                        thumbColor: Passeport.maroon,
+                        overlayColor: Passeport.maroon.withValues(alpha: 0.12),
+                      ),
+                      child: Slider(
+                        value: _narrationRate,
+                        min: 0.3,
+                        max: 0.55,
+                        onChanged: (v) {
+                          setState(() => _narrationRate = v);
+                          _saveDouble('lesson_narration_rate', v);
+                        },
+                      ),
+                    ),
+                    if (kDebugMode) ...[
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(
-                            CupertinoIcons.sparkles,
-                            size: 16,
-                            color: AppStyles.primaryDeep,
+                          Text(
+                            'New cards/day (labs): $_newCardsPerDay',
+                            style: Passeport.body(
+                              12.5,
+                            ).copyWith(color: Passeport.text),
                           ),
-                          const SizedBox(width: 6),
-                          KickerText(
-                            'Subscription',
-                            color: AppStyles.primaryDeep,
+                          const Spacer(),
+                          _StepperButton(
+                            icon: CupertinoIcons.minus,
+                            onTap: _newCardsPerDay > 5
+                                ? () {
+                                    setState(() => _newCardsPerDay -= 5);
+                                    _saveInt(
+                                      'srs_new_cards_per_day',
+                                      _newCardsPerDay,
+                                    );
+                                  }
+                                : null,
+                          ),
+                          const SizedBox(width: 8),
+                          _StepperButton(
+                            icon: CupertinoIcons.plus,
+                            onTap: _newCardsPerDay < 50
+                                ? () {
+                                    setState(() => _newCardsPerDay += 5);
+                                    _saveInt(
+                                      'srs_new_cards_per_day',
+                                      _newCardsPerDay,
+                                    );
+                                  }
+                                : null,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      _SettingsRow(
-                        label: 'Plan',
-                        value: subscribed
-                            ? _planName(entitlement.productId)
-                            : 'Free',
-                      ),
-                      if (subscribed && expiresAt != null) ...[
-                        Divider(height: 1, color: AppStyles.hairline),
-                        _SettingsRow(
-                          label: 'Renews',
-                          value: DateFormat.yMMMd().format(expiresAt),
-                        ),
-                        Divider(height: 1, color: AppStyles.hairline),
-                        _SettingsRow(
-                          label: 'Days left',
-                          value: '${_daysRemaining(expiresAt)}',
-                        ),
-                      ],
-                      const SizedBox(height: 10),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: subscribed
-                            ? _openManageSubscriptions
-                            : _openPaywall,
-                        child: Container(
-                          height: 46,
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: subscribed
-                                ? AppStyles.canvasDim
-                                : AppStyles.primary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    ],
+                    const SizedBox(height: 8),
+                    // How many honest attempts a NEW word needs in a live session before
+                    // Marie is allowed to offer moving on (familiar words need two fewer).
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (!subscribed) ...[
-                                const Icon(
-                                  CupertinoIcons.sparkles,
-                                  size: 15,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 6),
-                              ],
                               Text(
-                                subscribed
-                                    ? 'Manage subscription'
-                                    : 'Unlock full access',
-                                style:
-                                    AppStyles.body(
-                                      14,
-                                      weight: FontWeight.w700,
-                                    ).copyWith(
-                                      color: subscribed
-                                          ? AppStyles.mutedDim
-                                          : Colors.white,
-                                    ),
+                                'Practice passes per word: $_practicePasses',
+                                style: Passeport.body(
+                                  12.5,
+                                ).copyWith(color: Passeport.text),
+                              ),
+                              Text(
+                                'How many times you repeat a new word before Marie may suggest the next one',
+                                style: Passeport.mono(
+                                  10,
+                                ).copyWith(color: Passeport.slateDim),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Learning', color: AppStyles.mutedDim),
-                  const SizedBox(height: 6),
-                  _ChoiceRow(
-                    label: 'Level',
-                    options: [
-                      for (final level in LearnerLevel.cefrValues)
-                        (level, LearnerLevel.displayLabel(level)),
-                    ],
-                    selected: _profile.level,
-                    onChanged: _confirmLevelChange,
-                  ),
-                  Divider(height: 16, color: AppStyles.hairline),
-                  _ChoiceRow(
-                    label: 'Goal',
-                    options: const [
-                      ('tef_canada', 'TEF Canada'),
-                      ('everyday', 'Everyday'),
-                      ('unsure', 'Exploring'),
-                    ],
-                    selected: _profile.goal,
-                    onChanged: (v) => _saveProfile((p) => p.goal = v),
-                  ),
-                  Divider(height: 16, color: AppStyles.hairline),
-                  _ChoiceRow(
-                    label: 'Session length',
-                    options: const [
-                      ('quick', 'Quick'),
-                      ('standard', 'Standard'),
-                      ('deep', 'Deep'),
-                    ],
-                    selected: _profile.sessionLength,
-                    onChanged: (v) => _saveProfile((p) => p.sessionLength = v),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // --- Tutor (P2.1/P2.3): persona, language mix, voice speed ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Your tutor', color: AppStyles.mutedDim),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Applies from your next call, a call in progress keeps '
-                    'the tutor it started with.',
-                    style: AppStyles.body(
-                      11,
-                    ).copyWith(color: AppStyles.mutedDim),
-                  ),
-                  const SizedBox(height: 12),
-                  _personaGrid(),
-                  Divider(height: 22, color: AppStyles.hairline),
-                  _ChoiceRow(
-                    label: 'English / French mix',
-                    options: const [
-                      ('gentle', 'Gentle'),
-                      ('balanced', 'Balanced'),
-                      ('immersive', 'Immersion'),
-                    ],
-                    selected: _languageMix,
-                    onChanged: (v) {
-                      setState(() => _languageMix = v);
-                      TutorTuning.saveLanguageMix(v);
-                    },
-                  ),
-                  Divider(height: 16, color: AppStyles.hairline),
-                  _ChoiceRow(
-                    label: 'Tutor speaking pace',
-                    options: const [
-                      ('slower', 'Slower'),
-                      ('natural', 'Natural'),
-                      ('faster', 'Faster'),
-                    ],
-                    selected: _voiceSpeed,
-                    onChanged: (v) {
-                      setState(() => _voiceSpeed = v);
-                      TutorTuning.saveVoiceSpeed(v);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // --- Roadmap ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Roadmap', color: AppStyles.mutedDim),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _pickRoadmapStartDate,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Start date',
-                            style: AppStyles.body(
-                              12.5,
-                            ).copyWith(color: AppStyles.mutedDim),
-                          ),
-                          const Spacer(),
-                          Text(
-                            DateFormat.yMMMd().format(_roadmapStartDate),
-                            style: AppStyles.mono(
-                              12,
-                              weight: FontWeight.w500,
-                            ).copyWith(color: AppStyles.primary),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            CupertinoIcons.calendar,
-                            size: 14,
-                            color: AppStyles.primary,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // --- Lesson voice ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Lesson voice', color: AppStyles.mutedDim),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Narration rate',
-                    style: AppStyles.body(
-                      12.5,
-                    ).copyWith(color: AppStyles.mutedDim),
-                  ),
-                  const SizedBox(height: 4),
-                  SliderTheme(
-                    data: SliderThemeData(
-                      activeTrackColor: AppStyles.primary,
-                      inactiveTrackColor: AppStyles.primary.withValues(
-                        alpha: 0.2,
-                      ),
-                      thumbColor: AppStyles.primary,
-                      overlayColor: AppStyles.primary.withValues(alpha: 0.12),
-                    ),
-                    child: Slider(
-                      value: _narrationRate,
-                      min: 0.3,
-                      max: 0.55,
-                      onChanged: (v) {
-                        setState(() => _narrationRate = v);
-                        _saveDouble('lesson_narration_rate', v);
-                      },
-                    ),
-                  ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          'New cards/day (labs): $_newCardsPerDay',
-                          style: AppStyles.body(
-                            12.5,
-                          ).copyWith(color: AppStyles.text),
-                        ),
-                        const Spacer(),
                         _StepperButton(
                           icon: CupertinoIcons.minus,
-                          onTap: _newCardsPerDay > 5
+                          onTap: _practicePasses > 2
                               ? () {
-                                  setState(() => _newCardsPerDay -= 5);
+                                  setState(() => _practicePasses -= 1);
                                   _saveInt(
-                                    'srs_new_cards_per_day',
-                                    _newCardsPerDay,
+                                    'practice_passes_per_word',
+                                    _practicePasses,
                                   );
                                 }
                               : null,
@@ -846,12 +896,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SizedBox(width: 8),
                         _StepperButton(
                           icon: CupertinoIcons.plus,
-                          onTap: _newCardsPerDay < 50
+                          onTap: _practicePasses < 10
                               ? () {
-                                  setState(() => _newCardsPerDay += 5);
+                                  setState(() => _practicePasses += 1);
                                   _saveInt(
-                                    'srs_new_cards_per_day',
-                                    _newCardsPerDay,
+                                    'practice_passes_per_word',
+                                    _practicePasses,
                                   );
                                 }
                               : null,
@@ -859,490 +909,442 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                     ),
                   ],
-                  const SizedBox(height: 8),
-                  // How many honest attempts a NEW word needs in a live session before
-                  // Marie is allowed to offer moving on (familiar words need two fewer).
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Practice passes per word: $_practicePasses',
-                              style: AppStyles.body(
-                                12.5,
-                              ).copyWith(color: AppStyles.text),
-                            ),
-                            Text(
-                              'How many times you repeat a new word before Marie may suggest the next one',
-                              style: AppStyles.mono(
-                                10,
-                              ).copyWith(color: AppStyles.mutedDim),
-                            ),
-                          ],
-                        ),
-                      ),
-                      _StepperButton(
-                        icon: CupertinoIcons.minus,
-                        onTap: _practicePasses > 2
-                            ? () {
-                                setState(() => _practicePasses -= 1);
-                                _saveInt(
-                                  'practice_passes_per_word',
-                                  _practicePasses,
-                                );
-                              }
-                            : null,
-                      ),
-                      const SizedBox(width: 8),
-                      _StepperButton(
-                        icon: CupertinoIcons.plus,
-                        onTap: _practicePasses < 10
-                            ? () {
-                                setState(() => _practicePasses += 1);
-                                _saveInt(
-                                  'practice_passes_per_word',
-                                  _practicePasses,
-                                );
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // --- Vocabulary practice ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Vocabulary practice', color: AppStyles.mutedDim),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Words per practice: $_autoQueueSize',
-                              style: AppStyles.body(
-                                12.5,
-                              ).copyWith(color: AppStyles.text),
-                            ),
-                            Text(
-                              'How many words the Auto queue shows each time. Smaller means less repetition if you practice more than once a day',
-                              style: AppStyles.mono(
-                                10,
-                              ).copyWith(color: AppStyles.mutedDim),
-                            ),
-                          ],
-                        ),
-                      ),
-                      _StepperButton(
-                        icon: CupertinoIcons.minus,
-                        onTap: _autoQueueSize > 1
-                            ? () {
-                                setState(() => _autoQueueSize -= 1);
-                                SRSService.setAutoQueueSize(_autoQueueSize);
-                              }
-                            : null,
-                      ),
-                      const SizedBox(width: 8),
-                      _StepperButton(
-                        icon: CupertinoIcons.plus,
-                        onTap: _autoQueueSize < 10
-                            ? () {
-                                setState(() => _autoQueueSize += 1);
-                                SRSService.setAutoQueueSize(_autoQueueSize);
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            if (kDebugMode) ...[
-              _LearningCard(
-                child: GestureDetector(
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => const OrchestrationLabScreen(),
-                  ),
-                  child: Container(
-                    constraints: const BoxConstraints(minHeight: 44),
-                    child: Row(
+              // --- Vocabulary practice ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText(
+                      'Vocabulary practice',
+                      color: Passeport.slateDim,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
                       children: [
-                        const Icon(
-                          CupertinoIcons.lab_flask,
-                          size: 21,
-                          color: AppStyles.mastery,
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Orchestration Lab',
-                                style: AppStyles.body(
-                                  14,
-                                  weight: FontWeight.w600,
-                                ),
+                                'Words per practice: $_autoQueueSize',
+                                style: Passeport.body(
+                                  12.5,
+                                ).copyWith(color: Passeport.text),
                               ),
-                              const SizedBox(height: 2),
                               Text(
-                                'Preview personas, constraints, and competency paths',
-                                style: AppStyles.body(
-                                  11.5,
-                                ).copyWith(color: AppStyles.mutedDim),
+                                'How many words the Auto queue shows each time. Smaller means less repetition if you practice more than once a day',
+                                style: Passeport.mono(
+                                  10,
+                                ).copyWith(color: Passeport.slateDim),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(
-                          CupertinoIcons.chevron_forward,
-                          size: 16,
-                          color: AppStyles.mutedDim,
+                        _StepperButton(
+                          icon: CupertinoIcons.minus,
+                          onTap: _autoQueueSize > 1
+                              ? () {
+                                  setState(() => _autoQueueSize -= 1);
+                                  SRSService.setAutoQueueSize(_autoQueueSize);
+                                }
+                              : null,
+                        ),
+                        const SizedBox(width: 8),
+                        _StepperButton(
+                          icon: CupertinoIcons.plus,
+                          onTap: _autoQueueSize < 10
+                              ? () {
+                                  setState(() => _autoQueueSize += 1);
+                                  SRSService.setAutoQueueSize(_autoQueueSize);
+                                }
+                              : null,
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
               ),
               const SizedBox(height: 12),
-              _LearningCard(
+
+              if (kDebugMode) ...[
+                _PasseportCard(
+                  child: GestureDetector(
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => const OrchestrationLabScreen(),
+                    ),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.lab_flask,
+                            size: 21,
+                            color: Passeport.brass,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Orchestration Lab',
+                                  style: Passeport.body(
+                                    14,
+                                    weight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Preview personas, constraints, and competency paths',
+                                  style: Passeport.body(
+                                    11.5,
+                                  ).copyWith(color: Passeport.slateDim),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            CupertinoIcons.chevron_forward,
+                            size: 16,
+                            color: Passeport.slateDim,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _PasseportCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      KickerText('Developer', color: Passeport.slateDim),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text(
+                            'Force unlock premium',
+                            style: Passeport.body(12.5),
+                          ),
+                          const Spacer(),
+                          Switch.adaptive(
+                            value: DevSubscriptionOverride.enabled,
+                            activeThumbColor: Passeport.maroon,
+                            onChanged: (v) {
+                              DevSubscriptionOverride.set(v).then((_) {
+                                if (mounted) setState(() {});
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Bypasses subscription/invite-code checks for testing. '
+                        'Debug builds only, compiled out entirely from release.',
+                        style: Passeport.body(
+                          11.5,
+                        ).copyWith(color: Passeport.slateDim),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // --- Notetaker ---
+              _PasseportCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Developer', color: AppStyles.mutedDim),
+                    KickerText('Notetaker', color: Passeport.slateDim),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Text(
-                          'Force unlock premium',
-                          style: AppStyles.body(12.5),
-                        ),
+                        Text('Floating notetaker', style: Passeport.body(12.5)),
                         const Spacer(),
                         Switch.adaptive(
-                          value: DevSubscriptionOverride.enabled,
-                          activeThumbColor: AppStyles.primary,
+                          value: ref.read(notetakerStateProvider).isEnabled,
+                          activeThumbColor: Passeport.maroon,
                           onChanged: (v) {
-                            DevSubscriptionOverride.set(v).then((_) {
-                              if (mounted) setState(() {});
-                            });
+                            setState(
+                              () => ref.read(notetakerStateProvider).isEnabled =
+                                  v,
+                            );
                           },
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Bypasses subscription/invite-code checks for testing. '
-                      'Debug builds only, compiled out entirely from release.',
-                      style: AppStyles.body(
-                        11.5,
-                      ).copyWith(color: AppStyles.mutedDim),
+                      'Shows a draggable note bubble during lessons so you can '
+                      'jot things down while listening or writing.',
+                      style: Passeport.body(
+                        11,
+                      ).copyWith(color: Passeport.slateDim),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
-            ],
 
-            // --- Notetaker ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Notetaker', color: AppStyles.mutedDim),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text('Floating notetaker', style: AppStyles.body(12.5)),
-                      const Spacer(),
-                      Switch.adaptive(
-                        value: ref.read(notetakerStateProvider).isEnabled,
-                        activeThumbColor: AppStyles.primary,
-                        onChanged: (v) {
-                          setState(
-                            () =>
-                                ref.read(notetakerStateProvider).isEnabled = v,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Shows a draggable note bubble during lessons so you can '
-                    'jot things down while listening or writing.',
-                    style: AppStyles.body(
-                      11,
-                    ).copyWith(color: AppStyles.mutedDim),
-                  ),
-                ],
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Access', color: Passeport.slateDim),
+                    const SizedBox(height: 4),
+                    _SettingsRow(
+                      label: 'Founding pass',
+                      value: _entitlementLabel(_access.entitlement.status),
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _SettingsRow(
+                      label: 'Tracked speaking today',
+                      value:
+                          '${(_access.remainingSeconds / 60).ceil()} min remaining',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _SettingsRow(
+                      label: 'Verification',
+                      value: _access.serverAuthoritative
+                          ? 'Cloud verified'
+                          : 'Local preview',
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Access', color: AppStyles.mutedDim),
-                  const SizedBox(height: 4),
-                  _SettingsRow(
-                    label: 'Founding pass',
-                    value: _entitlementLabel(_access.entitlement.status),
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _SettingsRow(
-                    label: 'Tracked speaking today',
-                    value:
-                        '${(_access.remainingSeconds / 60).ceil()} min remaining',
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _SettingsRow(
-                    label: 'Verification',
-                    value: _access.serverAuthoritative
-                        ? 'Cloud verified'
-                        : 'Local preview',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // --- Invite a friend (referral bonus minutes) ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Invite a friend', color: AppStyles.mutedDim),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Share your code. When a friend redeems it, you both get '
-                    '120 bonus minutes.',
-                    style: AppStyles.body(
-                      11,
-                    ).copyWith(color: AppStyles.mutedDim),
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _referralStats == null ? null : _copyReferralCode,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppStyles.canvasDim,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _referralStats?.code ?? 'Loading…',
-                              style: AppStyles.mono(
-                                16,
-                                weight: FontWeight.w700,
-                              ).copyWith(color: AppStyles.primary),
+              // --- Invite a friend (referral bonus minutes) ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Invite a friend', color: Passeport.slateDim),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Share your code. When a friend redeems it, you both get '
+                      '120 bonus minutes.',
+                      style: Passeport.body(
+                        11,
+                      ).copyWith(color: Passeport.slateDim),
+                    ),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _referralStats == null ? null : _copyReferralCode,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Passeport.parchmentDim,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _referralStats?.code ?? 'Loading…',
+                                style: Passeport.mono(
+                                  16,
+                                  weight: FontWeight.w700,
+                                ).copyWith(color: Passeport.maroon),
+                              ),
                             ),
-                          ),
-                          const Icon(
-                            CupertinoIcons.doc_on_doc,
-                            size: 16,
-                            color: AppStyles.mutedDim,
-                          ),
-                        ],
+                            const Icon(
+                              CupertinoIcons.doc_on_doc,
+                              size: 16,
+                              color: Passeport.slateDim,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  _SettingsRow(
-                    label: 'Friends redeemed',
-                    value: _referralStats == null
-                        ? 'N/A'
-                        : '${_referralStats!.successfulRedemptions} of ${_referralStats!.maxRedemptions}',
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _SettingsRow(
-                    label: 'Bonus balance',
-                    value: '${(_bonusSecondsBalance / 60).floor()} min',
-                  ),
-                  Divider(height: 16, color: AppStyles.hairline),
-                  Text(
-                    'Have an invite code?',
-                    style: AppStyles.body(
-                      12.5,
-                    ).copyWith(color: AppStyles.mutedDim),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _redeemController,
-                          textCapitalization: TextCapitalization.characters,
-                          style: AppStyles.mono(14),
-                          decoration: InputDecoration(
-                            hintText: 'e.g. AB12CD',
-                            isDense: true,
-                            border: OutlineInputBorder(
+                    const SizedBox(height: 10),
+                    _SettingsRow(
+                      label: 'Friends redeemed',
+                      value: _referralStats == null
+                          ? 'N/A'
+                          : '${_referralStats!.successfulRedemptions} of ${_referralStats!.maxRedemptions}',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _SettingsRow(
+                      label: 'Bonus balance',
+                      value: '${(_bonusSecondsBalance / 60).floor()} min',
+                    ),
+                    Divider(height: 16, color: Passeport.hairline),
+                    Text(
+                      'Have an invite code?',
+                      style: Passeport.body(
+                        12.5,
+                      ).copyWith(color: Passeport.slateDim),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _redeemController,
+                            textCapitalization: TextCapitalization.characters,
+                            style: Passeport.mono(14),
+                            decoration: InputDecoration(
+                              hintText: 'e.g. AB12CD',
+                              isDense: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _redeeming ? null : _redeemCode,
+                          child: Container(
+                            height: 44,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Passeport.maroon,
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            child: _redeeming
+                                ? const SizedBox(
+                                    width: 15,
+                                    height: 15,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Redeem',
+                                    style: Passeport.body(
+                                      13,
+                                      weight: FontWeight.w700,
+                                    ).copyWith(color: Colors.white),
+                                  ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: _redeeming ? null : _redeemCode,
-                        child: Container(
-                          height: 44,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: AppStyles.primary,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: _redeeming
-                              ? const SizedBox(
-                                  width: 15,
-                                  height: 15,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  'Redeem',
-                                  style: AppStyles.body(
-                                    13,
-                                    weight: FontWeight.w700,
-                                  ).copyWith(color: Colors.white),
-                                ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // --- Account ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('Account', color: Passeport.slateDim),
+                    const SizedBox(height: 4),
+                    _SettingsRow(
+                      label: 'Signed in as',
+                      value:
+                          AuthService.shared.currentSession?.user.email ??
+                          'Signed in',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _confirmSignOut,
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 44),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Sign out',
+                          style: Passeport.body(
+                            13,
+                            weight: FontWeight.w600,
+                          ).copyWith(color: Passeport.danger),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // --- Account ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('Account', color: AppStyles.mutedDim),
-                  const SizedBox(height: 4),
-                  _SettingsRow(
-                    label: 'Signed in as',
-                    value:
-                        AuthService.shared.currentSession?.user.email ??
-                        'Signed in',
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _confirmSignOut,
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Sign out',
-                        style: AppStyles.body(
-                          13,
-                          weight: FontWeight.w600,
-                        ).copyWith(color: AppStyles.danger),
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _deletingAccount ? null : _confirmDeleteAccount,
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 44),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        alignment: Alignment.centerLeft,
+                        child: _deletingAccount
+                            ? Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 15,
+                                    height: 15,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Passeport.danger,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Deleting account…',
+                                    style: Passeport.body(
+                                      13,
+                                      weight: FontWeight.w600,
+                                    ).copyWith(color: Passeport.danger),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                'Delete account',
+                                style: Passeport.body(
+                                  13,
+                                  weight: FontWeight.w600,
+                                ).copyWith(color: Passeport.danger),
+                              ),
                       ),
                     ),
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _deletingAccount ? null : _confirmDeleteAccount,
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      alignment: Alignment.centerLeft,
-                      child: _deletingAccount
-                          ? Row(
-                              children: [
-                                const SizedBox(
-                                  width: 15,
-                                  height: 15,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppStyles.danger,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Deleting account…',
-                                  style: AppStyles.body(
-                                    13,
-                                    weight: FontWeight.w600,
-                                  ).copyWith(color: AppStyles.danger),
-                                ),
-                              ],
-                            )
-                          : Text(
-                              'Delete account',
-                              style: AppStyles.body(
-                                13,
-                                weight: FontWeight.w600,
-                              ).copyWith(color: AppStyles.danger),
-                            ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // --- About & support ---
-            _LearningCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KickerText('ParleSprint', color: AppStyles.mutedDim),
-                  const SizedBox(height: 4),
-                  _SettingsRow(
-                    label: 'Version',
-                    value: _appVersion.isEmpty ? 'N/A' : _appVersion,
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _SettingsRow(
-                    label: 'Feedback',
-                    value: 'thoufeekbaber1@gmail.com',
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _LegalLinkRow(
-                    label: 'Privacy Policy',
-                    url: 'https://parlesprint.com/privacy',
-                  ),
-                  Divider(height: 1, color: AppStyles.hairline),
-                  _LegalLinkRow(
-                    label: 'Terms of Service',
-                    url: 'https://parlesprint.com/terms',
-                  ),
-                ],
+              // --- About & support ---
+              _PasseportCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KickerText('ParleSprint', color: Passeport.slateDim),
+                    const SizedBox(height: 4),
+                    _SettingsRow(
+                      label: 'Version',
+                      value: _appVersion.isEmpty ? 'N/A' : _appVersion,
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _SettingsRow(
+                      label: 'Feedback',
+                      value: 'thoufeekbaber1@gmail.com',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _LegalLinkRow(
+                      label: 'Privacy Policy',
+                      url: 'https://parlesprint.com/privacy',
+                    ),
+                    Divider(height: 1, color: Passeport.hairline),
+                    _LegalLinkRow(
+                      label: 'Terms of Service',
+                      url: 'https://parlesprint.com/terms',
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -1370,7 +1372,7 @@ class _ChoiceRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppStyles.body(12.5).copyWith(color: AppStyles.mutedDim),
+          style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -1385,15 +1387,15 @@ class _ChoiceRow extends StatelessWidget {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppStyles.primary : AppStyles.canvasDim,
+                  color: isSelected ? Passeport.maroon : Passeport.parchmentDim,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
                   o.$2,
-                  style: AppStyles.body(
+                  style: Passeport.body(
                     11.5,
                     weight: FontWeight.w600,
-                  ).copyWith(color: isSelected ? Colors.white : AppStyles.text),
+                  ).copyWith(color: isSelected ? Colors.white : Passeport.text),
                 ),
               ),
             );
@@ -1408,8 +1410,8 @@ class _ChoiceRow extends StatelessWidget {
 // Reusable helpers
 // ---------------------------------------------------------------------------
 
-class _LearningCard extends StatelessWidget {
-  const _LearningCard({required this.child});
+class _PasseportCard extends StatelessWidget {
+  const _PasseportCard({required this.child});
   final Widget child;
 
   @override
@@ -1418,9 +1420,9 @@ class _LearningCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppStyles.surface,
+        color: Passeport.card,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: DesignTokens.surfaceShadow,
+        boxShadow: DesignTokens.cardShadow,
       ),
       child: child,
     );
@@ -1459,13 +1461,13 @@ class _LegalLinkRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: AppStyles.body(12.5).copyWith(color: AppStyles.text),
+                  style: Passeport.body(12.5).copyWith(color: Passeport.text),
                 ),
               ),
               Icon(
                 CupertinoIcons.chevron_forward,
                 size: 14,
-                color: AppStyles.mutedDim,
+                color: Passeport.slateDim,
               ),
             ],
           ),
@@ -1489,7 +1491,7 @@ class _SettingsRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: AppStyles.body(12.5).copyWith(color: AppStyles.mutedDim),
+              style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
             ),
           ),
           const SizedBox(width: 12),
@@ -1497,10 +1499,10 @@ class _SettingsRow extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: AppStyles.body(
+              style: Passeport.body(
                 12,
                 weight: FontWeight.w600,
-              ).copyWith(color: AppStyles.text),
+              ).copyWith(color: Passeport.text),
             ),
           ),
         ],
@@ -1524,14 +1526,14 @@ class _StepperButton extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           color: enabled
-              ? AppStyles.primary.withValues(alpha: 0.1)
-              : AppStyles.muted.withValues(alpha: 0.1),
+              ? Passeport.maroon.withValues(alpha: 0.1)
+              : Passeport.slate.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: enabled ? AppStyles.primary : AppStyles.muted,
+          color: enabled ? Passeport.maroon : Passeport.slate,
         ),
       ),
     );

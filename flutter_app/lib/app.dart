@@ -140,21 +140,20 @@ class _RestoringProgressView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.primaryDeep,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(color: Colors.white),
-              const SizedBox(height: 16),
-              Text(
-                'Restoring your progress…',
-                style: DesignTokens.body(15).copyWith(color: Colors.white),
-              ),
-            ],
-          ),
+      backgroundColor: DesignTokens.canvas,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: DesignTokens.primary),
+            const SizedBox(height: 16),
+            Text(
+              'Restoring your progress…',
+              style: DesignTokens.body(
+                15,
+              ).copyWith(color: DesignTokens.mutedDim),
+            ),
+          ],
         ),
       ),
     );

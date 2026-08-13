@@ -6,6 +6,7 @@ import '../../design/tokens.dart';
 import '../../models/note.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_constrained_view.dart';
 
 /// Lets a student browse and study everything they jotted down with the floating
 /// notetaker across every lesson/session — grouped by which stage it came from
@@ -102,68 +103,72 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: PSContentColumn(
-          child: _loading
-              ? const Center(child: PSProgressIndicator())
-              : _notes.isEmpty
-              ? _emptyState()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        DesignTokens.screenMargin,
-                        DesignTokens.space4,
-                        DesignTokens.screenMargin,
-                        DesignTokens.space3,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Review what mattered',
-                            style: DesignTokens.display(27),
-                          ),
-                          const SizedBox(height: DesignTokens.space2),
-                          Text(
-                            '${_filteredNotes.length} note${_filteredNotes.length == 1 ? '' : 's'} ready to revisit.',
-                            style: DesignTokens.body(
-                              14,
-                            ).copyWith(color: DesignTokens.mutedDim),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _sourceFilterBar(),
-                    if (tags.isNotEmpty) _filterBar(tags),
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: DesignTokens.primary,
-                        onRefresh: () async => _reload(),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(
-                            DesignTokens.screenMargin,
-                            DesignTokens.space4,
-                            DesignTokens.screenMargin,
-                            32,
-                          ),
-                          itemCount: _filteredNotes.length,
-                          separatorBuilder: (_, _) => const Divider(
-                            height: 32,
-                            color: DesignTokens.canvasDim,
-                          ),
-                          itemBuilder: (context, index) {
-                            final note = _filteredNotes[index];
-                            return _NoteRow(
-                              note: note,
-                              onDelete: () => _delete(note),
-                            );
-                          },
+        child: WebConstrainedView(
+          maxWidth: 920,
+          child: PSContentColumn(
+            measure: PSMeasure.content,
+            child: _loading
+                ? const Center(child: PSProgressIndicator())
+                : _notes.isEmpty
+                ? _emptyState()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          DesignTokens.screenMargin,
+                          DesignTokens.space4,
+                          DesignTokens.screenMargin,
+                          DesignTokens.space3,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Review what mattered',
+                              style: DesignTokens.display(27),
+                            ),
+                            const SizedBox(height: DesignTokens.space2),
+                            Text(
+                              '${_filteredNotes.length} note${_filteredNotes.length == 1 ? '' : 's'} ready to revisit.',
+                              style: DesignTokens.body(
+                                14,
+                              ).copyWith(color: DesignTokens.slateDim),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      _sourceFilterBar(),
+                      if (tags.isNotEmpty) _filterBar(tags),
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: DesignTokens.primary,
+                          onRefresh: () async => _reload(),
+                          child: ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(
+                              DesignTokens.screenMargin,
+                              DesignTokens.space4,
+                              DesignTokens.screenMargin,
+                              32,
+                            ),
+                            itemCount: _filteredNotes.length,
+                            separatorBuilder: (_, _) => const Divider(
+                              height: 32,
+                              color: DesignTokens.parchmentDim,
+                            ),
+                            itemBuilder: (context, index) {
+                              final note = _filteredNotes[index];
+                              return _NoteRow(
+                                note: note,
+                                onDelete: () => _delete(note),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -210,7 +215,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                     decoration: BoxDecoration(
                       color: _sourceFilter == option.$1
                           ? DesignTokens.primary
-                          : DesignTokens.canvasDim,
+                          : DesignTokens.parchmentDim,
                       borderRadius: BorderRadius.circular(
                         DesignTokens.radiusPill,
                       ),
@@ -264,7 +269,9 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                   horizontal: DesignTokens.space4,
                 ),
                 decoration: BoxDecoration(
-                  color: selected ? DesignTokens.ink : DesignTokens.canvasDim,
+                  color: selected
+                      ? DesignTokens.ink
+                      : DesignTokens.parchmentDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(
@@ -314,7 +321,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
               'Use the notetaker during a lesson or call. Anything you save will be ready to review here.',
               style: DesignTokens.body(
                 14,
-              ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
+              ).copyWith(color: DesignTokens.slateDim, height: 1.45),
               textAlign: TextAlign.center,
             ),
           ],
@@ -384,7 +391,7 @@ class _NoteRow extends StatelessWidget {
                           style: DesignTokens.body(
                             13,
                             weight: FontWeight.w600,
-                          ).copyWith(color: DesignTokens.mutedDim),
+                          ).copyWith(color: DesignTokens.slateDim),
                         ),
                       ),
                       const SizedBox(width: DesignTokens.space3),
@@ -392,7 +399,7 @@ class _NoteRow extends StatelessWidget {
                         _formatDate(note.updatedAt),
                         style: DesignTokens.body(
                           12,
-                        ).copyWith(color: DesignTokens.mutedDim),
+                        ).copyWith(color: DesignTokens.slateDim),
                       ),
                     ],
                   ),
@@ -425,7 +432,7 @@ class _NoteRow extends StatelessWidget {
       case 'Roleplay':
         return DesignTokens.infoSoft;
       default:
-        return DesignTokens.canvasDim;
+        return DesignTokens.parchmentDim;
     }
   }
 

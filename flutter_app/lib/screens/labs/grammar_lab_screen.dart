@@ -9,9 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/generated_grammar_story_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
-import '../../widgets/learning_card.dart';
+import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/primary_action_button.dart';
+import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/session_recorder.dart';
@@ -232,109 +233,111 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         : availableTenses.first;
 
     return Scaffold(
-      backgroundColor: DesignTokens.canvas,
+      backgroundColor: DesignTokens.parchment,
       appBar: AppBar(
         title: Text('Grammar', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvas,
+        backgroundColor: DesignTokens.parchment,
         foregroundColor: DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        children: [
-          // --- Practice a tense (story-generator rebuild) ---
-          const SizedBox(height: 8),
-          const KickerText('Practice a tense'),
-          const SizedBox(height: 10),
-          LearningCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Learn it the way you learn a story: generate one built around the tense you pick, then pass the quiz at 80% or better.',
-                  style: DesignTokens.body(
-                    13,
-                  ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final tense in availableTenses)
-                      _TenseChip(
-                        label: tense,
-                        selected: tense == effectiveTense,
-                        status:
-                            progress['grammar_story_${tense.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}']
-                                ?.status ??
-                            'not_started',
-                        onTap: () => setState(() => _selectedTense = tense),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                PrimaryActionButton(
-                  label: _isGenerating
-                      ? 'Building your story…'
-                      : 'Generate practice story',
-                  icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-                  onPressed: _isGenerating ? null : _practiceTense,
-                ),
-                if (_errorText != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _errorText!,
-                    style: DesignTokens.mono(
-                      11,
-                    ).copyWith(color: DesignTokens.primary),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          // --- History ---
-          const SizedBox(height: 24),
-          if (history.isNotEmpty) ...[
-            const KickerText(
-              'Your grammar practice',
-              color: DesignTokens.mutedDim,
-            ),
+      body: WebConstrainedView(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          children: [
+            // --- Practice a tense (story-generator rebuild) ---
+            const SizedBox(height: 8),
+            const KickerText('Practice a tense'),
             const SizedBox(height: 10),
-            for (final entry in history)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _GrammarHistoryTile(
-                  story: entry,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => StoryReaderScreen(
-                      story: GeneratedStory(
-                        id: entry.id,
-                        passage: entry.passage,
-                        quiz: entry.quiz,
-                        keywords: entry.keywords,
-                        createdAt: entry.createdAt,
+            PasseportCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Learn it the way you learn a story: generate one built around the tense you pick, then pass the quiz at 80% or better.',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final tense in availableTenses)
+                        _TenseChip(
+                          label: tense,
+                          selected: tense == effectiveTense,
+                          status:
+                              progress['grammar_story_${tense.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}']
+                                  ?.status ??
+                              'not_started',
+                          onTap: () => setState(() => _selectedTense = tense),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  PasseportPrimaryButton(
+                    label: _isGenerating
+                        ? 'Building your story…'
+                        : 'Generate practice story',
+                    icon: _isGenerating ? null : CupertinoIcons.wand_stars,
+                    onPressed: _isGenerating ? null : _practiceTense,
+                  ),
+                  if (_errorText != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _errorText!,
+                      style: DesignTokens.mono(
+                        11,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // --- History ---
+            const SizedBox(height: 24),
+            if (history.isNotEmpty) ...[
+              const KickerText(
+                'Your grammar practice',
+                color: DesignTokens.slateDim,
+              ),
+              const SizedBox(height: 10),
+              for (final entry in history)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _GrammarHistoryTile(
+                    story: entry,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => StoryReaderScreen(
+                        story: GeneratedStory(
+                          id: entry.id,
+                          passage: entry.passage,
+                          quiz: entry.quiz,
+                          keywords: entry.keywords,
+                          createdAt: entry.createdAt,
+                        ),
+                        grammarExplanation: entry.explanation,
                       ),
-                      grammarExplanation: entry.explanation,
                     ),
                   ),
                 ),
+            ] else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'No grammar practice yet, generate one above.',
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.slateDim),
+                ),
               ),
-          ] else
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(
-                'No grammar practice yet, generate one above.',
-                textAlign: TextAlign.center,
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.mutedDim),
-              ),
-            ),
-          const SizedBox(height: 32),
-        ],
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
@@ -348,7 +351,7 @@ class _GrammarHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LearningCard(
+    return PasseportCard(
       padding: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -374,7 +377,7 @@ class _GrammarHistoryTile extends StatelessWidget {
                 DateFormat('MMM d, HH:mm').format(story.createdAt),
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.mutedDim),
+                ).copyWith(color: DesignTokens.slateDim),
               ),
               if (story.score != null) ...[
                 const SizedBox(width: 8),

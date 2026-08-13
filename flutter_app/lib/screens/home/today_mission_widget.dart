@@ -10,7 +10,7 @@ import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
-import '../../widgets/primary_action_button.dart';
+import '../../widgets/passeport_primary_button.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
 import '../labs/roleplay_lab_screen.dart';
@@ -160,8 +160,9 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                 context,
                 ref.read(pilotAccessServiceProvider),
               ) ||
-              !mounted)
+              !mounted) {
             break;
+          }
           LessonSpeechService.shared.deactivate();
           await AppRouter.push(
             context,
@@ -210,7 +211,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
           decoration: BoxDecoration(
             color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-            boxShadow: DesignTokens.surfaceShadow,
+            border: Border.all(color: DesignTokens.hairline),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +219,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               Row(
                 children: [
                   Text(
-                    'TODAY’S MISSION',
+                    'NEXT BEST SESSION',
                     style: DesignTokens.body(11, weight: FontWeight.w700)
                         .copyWith(
                           color: DesignTokens.mutedDim,
@@ -276,7 +277,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                               boxShadow: [
                                 BoxShadow(
                                   color: DesignTokens.ink.withValues(
-                                    alpha: 0.10,
+                                    alpha: 0.1,
                                   ),
                                   blurRadius: 3,
                                 ),
@@ -322,6 +323,22 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   weight: FontWeight.w600,
                 ).copyWith(color: DesignTokens.inkSoft),
               ),
+              const SizedBox(height: DesignTokens.space3),
+              Wrap(
+                spacing: DesignTokens.space2,
+                runSpacing: DesignTokens.space2,
+                children: [
+                  _MissionMeta(label: '${_durationFor(featured)} min'),
+                  _MissionMeta(label: _modeLabel(featured)),
+                ],
+              ),
+              const SizedBox(height: DesignTokens.space2),
+              Text(
+                _reasonFor(featured),
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
+              ),
               if (_actionError != null) ...[
                 const SizedBox(height: DesignTokens.space3),
                 Text(
@@ -333,8 +350,10 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                 ),
               ],
               const SizedBox(height: DesignTokens.space5),
-              PrimaryActionButton(
-                label: _isLocked(featured) ? 'Unlock to start' : 'Start',
+              PasseportPrimaryButton(
+                label: _isLocked(featured)
+                    ? 'Unlock to start'
+                    : 'Start session',
                 icon: _isLocked(featured)
                     ? CupertinoIcons.lock_fill
                     : CupertinoIcons.arrow_right,
@@ -349,7 +368,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                     child: TextButton(
                       onPressed: _running ? null : _skipForNow,
                       child: Text(
-                        'Show something else',
+                        'Choose a different focus',
                         style: DesignTokens.body(
                           13,
                           weight: FontWeight.w500,
@@ -364,6 +383,39 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
       ],
     );
   }
+
+  int _durationFor(String category) => switch (category) {
+    'Vocabulary' => 8,
+    'Grammar' => 12,
+    'Listening' => 10,
+    'Roleplay' => 15,
+    'Writing' => 12,
+    _ => 18,
+  };
+
+  String _modeLabel(String category) => switch (category) {
+    'Vocabulary' => 'Active recall',
+    'Grammar' => 'Build accuracy',
+    'Listening' => 'Comprehension',
+    'Roleplay' => 'Real conversation',
+    'Writing' => 'Clear expression',
+    _ => 'Speaking readiness',
+  };
+
+  String _reasonFor(String category) => switch (category) {
+    'Vocabulary' =>
+      'A short recall block keeps useful words available when you speak.',
+    'Grammar' =>
+      'A focused rule review makes your next conversation more precise.',
+    'Listening' =>
+      'Listening first gives you the phrasing and rhythm to reuse later.',
+    'Roleplay' =>
+      'A realistic scene turns today’s language into a usable response.',
+    'Writing' =>
+      'Writing gives you time to build a clear sentence before speaking.',
+    _ =>
+      'A live speaking block turns today’s preparation into confident French.',
+  };
 
   IconData _iconFor(String category) => switch (category) {
     'Vocabulary' => CupertinoIcons.square_stack_3d_up,
@@ -382,6 +434,30 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     'Writing' => 'Write a short passage',
     _ => 'Talk with Marie',
   };
+}
+
+class _MissionMeta extends StatelessWidget {
+  const _MissionMeta({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.space3,
+        vertical: DesignTokens.space2,
+      ),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvasDim,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+      ),
+      child: Text(
+        label,
+        style: DesignTokens.label(11).copyWith(color: DesignTokens.mutedDim),
+      ),
+    );
+  }
 }
 
 class _MissionProgress extends StatelessWidget {
@@ -530,7 +606,10 @@ class _MissionNotice extends StatelessWidget {
           const SizedBox(height: DesignTokens.space3),
           SizedBox(
             width: 160,
-            child: PrimaryActionButton(label: 'Try again', onPressed: onRetry),
+            child: PasseportPrimaryButton(
+              label: 'Try again',
+              onPressed: onRetry,
+            ),
           ),
         ],
       ),

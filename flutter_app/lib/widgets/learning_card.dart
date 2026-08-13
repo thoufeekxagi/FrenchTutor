@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../design/tokens.dart';
 
-/// Shared Guided Momentum surface for content that needs visual grouping.
-///
-/// Prefer open composition when a section does not need a distinct surface.
 class LearningCard extends StatelessWidget {
   const LearningCard({
     super.key,
@@ -23,22 +20,22 @@ class LearningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = Container(
+    final surface = Container(
       decoration: BoxDecoration(
         color: color ?? DesignTokens.surface,
         borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
         border: Border.all(color: borderColor ?? DesignTokens.hairline),
-        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: Padding(padding: EdgeInsets.all(padding), child: child),
     );
-    if (onTap == null) return content;
+
+    if (onTap == null) return surface;
     return Semantics(
       button: true,
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        child: content,
+        child: surface,
       ),
     );
   }

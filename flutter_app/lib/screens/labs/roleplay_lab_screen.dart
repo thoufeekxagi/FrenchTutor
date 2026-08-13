@@ -14,7 +14,8 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/learning_card.dart';
+import '../../widgets/passeport_card.dart';
+import '../../widgets/web/web_constrained_view.dart';
 import '../pathway/agent_led_listening_screen.dart';
 
 // Fixed scenario categories the learner can tap to steer generation,
@@ -174,75 +175,80 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
         .starterRoleplays();
 
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.parchmentDim,
       appBar: AppBar(
         title: Text('Roleplay', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvasDim,
+        backgroundColor: DesignTokens.parchmentDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        children: [
-          _StartRoleplayTile(
-            generating: _generating,
-            selectedScenario: _selectedScenario,
-            onTap: _startRoleplay,
-          ),
-          const SizedBox(height: 10),
-          _ScenarioChipRow(
-            selected: _selectedScenario,
-            onSelect: (scenario) =>
-                setState(() => _selectedScenario = scenario),
-          ),
-          const SizedBox(height: 20),
-          if (roleplays.isNotEmpty) ...[
-            const KickerText('Your roleplays', color: DesignTokens.mutedDim),
+      body: WebConstrainedView(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          children: [
+            _StartRoleplayTile(
+              generating: _generating,
+              selectedScenario: _selectedScenario,
+              onTap: _startRoleplay,
+            ),
             const SizedBox(height: 10),
-            for (final roleplay in roleplays)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _RoleplayTile(
-                  roleplay: roleplay,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => AgentLedListeningScreen(
-                      passage: roleplay.passage,
-                      noteContext: 'Roleplay',
-                      sessionStage: 'roleplay',
-                      sessionTopic: roleplay.displayTitle,
+            _ScenarioChipRow(
+              selected: _selectedScenario,
+              onSelect: (scenario) =>
+                  setState(() => _selectedScenario = scenario),
+            ),
+            const SizedBox(height: 20),
+            if (roleplays.isNotEmpty) ...[
+              const KickerText('Your roleplays', color: DesignTokens.slateDim),
+              const SizedBox(height: 10),
+              for (final roleplay in roleplays)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _RoleplayTile(
+                    roleplay: roleplay,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => AgentLedListeningScreen(
+                        passage: roleplay.passage,
+                        noteContext: 'Roleplay',
+                        sessionStage: 'roleplay',
+                        sessionTopic: roleplay.displayTitle,
+                      ),
+                      fullscreenDialog: true,
                     ),
-                    fullscreenDialog: true,
                   ),
                 ),
+              const SizedBox(height: 8),
+            ] else
+              _EmptyRoleplayLibraryNote(),
+            if (starterRoleplays.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const KickerText(
+                'Starter roleplays',
+                color: DesignTokens.slateDim,
               ),
-            const SizedBox(height: 8),
-          ] else
-            _EmptyRoleplayLibraryNote(),
-          if (starterRoleplays.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            const KickerText('Starter roleplays', color: DesignTokens.mutedDim),
-            const SizedBox(height: 10),
-            for (final roleplay in starterRoleplays)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _RoleplayTile(
-                  roleplay: roleplay,
-                  isStarter: true,
-                  onTap: () => AppRouter.push(
-                    context,
-                    (_) => AgentLedListeningScreen(
-                      passage: roleplay.passage,
-                      noteContext: 'Roleplay',
-                      sessionStage: 'roleplay',
-                      sessionTopic: roleplay.displayTitle,
+              const SizedBox(height: 10),
+              for (final roleplay in starterRoleplays)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _RoleplayTile(
+                    roleplay: roleplay,
+                    isStarter: true,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => AgentLedListeningScreen(
+                        passage: roleplay.passage,
+                        noteContext: 'Roleplay',
+                        sessionStage: 'roleplay',
+                        sessionTopic: roleplay.displayTitle,
+                      ),
+                      fullscreenDialog: true,
                     ),
-                    fullscreenDialog: true,
                   ),
                 ),
-              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -261,7 +267,7 @@ class _StartRoleplayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LearningCard(
+    return PasseportCard(
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: Container(
@@ -291,7 +297,7 @@ class _StartRoleplayTile extends StatelessWidget {
               : selectedScenario != null
               ? 'A fresh $selectedScenario scene'
               : 'A fresh live scene, generated for you',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
         ),
         trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
         onTap: generating ? null : onTap,
@@ -336,7 +342,7 @@ class _ScenarioChipRow extends StatelessWidget {
                 option ?? 'Surprise me',
                 style: DesignTokens.body(12.5, weight: FontWeight.w600)
                     .copyWith(
-                      color: isSelected ? Colors.white : DesignTokens.mutedDim,
+                      color: isSelected ? Colors.white : DesignTokens.slateDim,
                     ),
               ),
             ),
@@ -360,7 +366,7 @@ class _RoleplayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LearningCard(
+    return PasseportCard(
       padding: 0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -378,7 +384,7 @@ class _RoleplayTile extends StatelessWidget {
                 : DateFormat('MMM d, HH:mm').format(roleplay.createdAt),
             style: DesignTokens.mono(
               10.5,
-            ).copyWith(color: DesignTokens.mutedDim),
+            ).copyWith(color: DesignTokens.slateDim),
           ),
         ),
         trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
@@ -399,14 +405,14 @@ class _EmptyRoleplayLibraryNote extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.bubble_left_bubble_right,
-            color: DesignTokens.mutedDim,
+            color: DesignTokens.slateDim,
             size: 28,
           ),
           const SizedBox(height: 10),
           Text(
             'No roleplays of your own yet, start one above, or try a starter scene below',
             textAlign: TextAlign.center,
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.slateDim),
           ),
         ],
       ),

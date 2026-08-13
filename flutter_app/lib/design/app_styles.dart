@@ -46,7 +46,7 @@ abstract final class AppStyles {
   static TextStyle body(double size, {FontWeight weight = FontWeight.w400}) =>
       DesignTokens.body(size, weight: weight);
 
-  static TextStyle mono(double size, {FontWeight weight = FontWeight.w400}) =>
+  static TextStyle mono(double size, {FontWeight weight = FontWeight.w600}) =>
       DesignTokens.mono(size, weight: weight);
 
   static TextStyle label(double size, {FontWeight weight = FontWeight.w700}) =>

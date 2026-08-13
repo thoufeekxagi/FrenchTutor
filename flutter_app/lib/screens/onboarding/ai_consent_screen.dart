@@ -26,7 +26,7 @@ class AiConsentScreen extends StatelessWidget {
     return prefs.getBool(prefsKey) == true;
   }
 
-  Future<void> _accept(BuildContext context) async {
+  Future<void> _accept() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(prefsKey, true);
     onAccepted();
@@ -34,100 +34,280 @@ class AiConsentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Spacer(flex: 2),
-                Icon(
-                  CupertinoIcons.chat_bubble_2_fill,
-                  size: 40,
-                  color: Colors.white.withValues(alpha: 0.95),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= DesignTokens.breakpointExpanded) {
+          return _desktopLayout();
+        }
+        return _mobileLayout();
+      },
+    );
+  }
+
+  Widget _desktopLayout() {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: Row(
+        children: [
+          Expanded(flex: 5, child: _desktopIntro()),
+          Expanded(
+            flex: 6,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 40,
                 ),
-                const SizedBox(height: 18),
-                Text(
-                  'How your practice works',
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.display(24).copyWith(color: Colors.white),
-                ),
-                const SizedBox(height: 22),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.22),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Container(
+                      padding: const EdgeInsets.all(40),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
+                        ),
+                        border: Border.all(color: DesignTokens.hairline),
+                        boxShadow: DesignTokens.cardShadow,
+                      ),
+                      child: _details(onDark: false, centered: false),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'ParleSprint sends what you say and write during '
-                        'practice to Google, which powers your AI tutor '
-                        'and gives you feedback.',
-                        textAlign: TextAlign.center,
-                        style: DesignTokens.body(
-                          15,
-                        ).copyWith(color: Colors.white, height: 1.5),
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        "We don't sell your data, and Google doesn't use "
-                        'it to train its other products.',
-                        textAlign: TextAlign.center,
-                        style: DesignTokens.body(15).copyWith(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      GestureDetector(
-                        onTap: () => launchUrl(
-                          Uri.parse('https://parlesprint.com/privacy'),
-                          mode: LaunchMode.externalApplication,
-                        ),
-                        child: Text(
-                          'Read our full privacy policy',
-                          style: DesignTokens.body(14, weight: FontWeight.w600)
-                              .copyWith(
-                                color: Colors.white,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-                const Spacer(flex: 3),
-                SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () => _accept(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: DesignTokens.primaryDeep,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      textStyle: DesignTokens.body(15, weight: FontWeight.w700),
-                    ),
-                    child: const Text('Agree and continue'),
-                  ),
-                ),
-              ],
+              ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _desktopIntro() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(color: DesignTokens.ink),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ParleSprint',
+                style: DesignTokens.body(
+                  16,
+                  weight: FontWeight.w700,
+                ).copyWith(color: Colors.white),
+              ),
+              const Spacer(),
+              Text(
+                'Before we\nstart speaking.',
+                style: DesignTokens.display(42, weight: FontWeight.w700)
+                    .copyWith(
+                      color: Colors.white,
+                      height: 1.08,
+                      letterSpacing: -1.1,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'One clear note about how AI practice works, so you can choose with context.',
+                style: DesignTokens.body(17).copyWith(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  height: 1.55,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: DesignTokens.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'You can review the full policy anytime.',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: Colors.white.withValues(alpha: 0.62)),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                'PRIVACY FIRST  /  CLEAR BY DESIGN',
+                style: DesignTokens.mono(11, weight: FontWeight.w600).copyWith(
+                  color: Colors.white.withValues(alpha: 0.45),
+                  letterSpacing: 1.3,
+                ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _mobileLayout() {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+          child: _details(onDark: false, centered: false),
+        ),
+      ),
+    );
+  }
+
+  Widget _details({required bool onDark, required bool centered}) {
+    final primaryText = onDark ? Colors.white : DesignTokens.ink;
+    final secondaryText = onDark
+        ? Colors.white.withValues(alpha: 0.78)
+        : DesignTokens.mutedDim;
+    final panelColor = onDark
+        ? Colors.white.withValues(alpha: 0.13)
+        : DesignTokens.canvas;
+    final linkColor = onDark ? Colors.white : DesignTokens.primary;
+    return Column(
+      crossAxisAlignment: centered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      children: [
+        Icon(
+          CupertinoIcons.chat_bubble_2_fill,
+          size: 30,
+          color: onDark ? Colors.white : DesignTokens.primary,
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'How your practice works',
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+          style: DesignTokens.display(27).copyWith(color: primaryText),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'A short explanation before your first AI-powered lesson.',
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+          style: DesignTokens.body(
+            14,
+          ).copyWith(color: secondaryText, height: 1.45),
+        ),
+        const SizedBox(height: 28),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: panelColor,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            border: Border.all(
+              color: onDark
+                  ? Colors.white.withValues(alpha: 0.18)
+                  : DesignTokens.hairline,
+            ),
+          ),
+          child: Column(
+            children: [
+              _consentPoint(
+                '01',
+                'Your words power feedback',
+                'What you say and write during practice is sent to Google, which powers your AI tutor.',
+                onDark,
+              ),
+              const SizedBox(height: 18),
+              _consentPoint(
+                '02',
+                'Your choice stays visible',
+                "We don't sell your data, and Google doesn't use it to train its other products.",
+                onDark,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Align(
+          alignment: centered ? Alignment.center : Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () => launchUrl(
+              Uri.parse('https://parlesprint.com/privacy'),
+              mode: LaunchMode.externalApplication,
+            ),
+            style: TextButton.styleFrom(
+              minimumSize: const Size(44, 44),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              foregroundColor: linkColor,
+            ),
+            child: const Text('Read the full privacy policy'),
+          ),
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: () => _accept(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: onDark ? Colors.white : DesignTokens.primary,
+              foregroundColor: onDark ? DesignTokens.primaryDeep : Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+              ),
+              textStyle: DesignTokens.body(15, weight: FontWeight.w700),
+            ),
+            child: const Text('Agree and continue'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _consentPoint(
+    String number,
+    String title,
+    String detail,
+    bool onDark,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          number,
+          style: DesignTokens.mono(11, weight: FontWeight.w700).copyWith(
+            color: onDark
+                ? Colors.white.withValues(alpha: 0.66)
+                : DesignTokens.primary,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: DesignTokens.body(
+                  14,
+                  weight: FontWeight.w700,
+                ).copyWith(color: onDark ? Colors.white : DesignTokens.ink),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                detail,
+                style: DesignTokens.body(13).copyWith(
+                  color: onDark
+                      ? Colors.white.withValues(alpha: 0.76)
+                      : DesignTokens.mutedDim,
+                  height: 1.45,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

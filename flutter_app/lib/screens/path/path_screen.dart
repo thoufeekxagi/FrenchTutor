@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../orchestration/models/competency.dart';
+import '../../orchestration/models/content_descriptor.dart';
 import '../../orchestration/models/competency_state.dart';
 import 'learning_graph_view.dart';
 import '../../providers/database_provider.dart';
@@ -19,15 +20,15 @@ extension on _MasteryTier {
   };
 
   Color foreground(BuildContext context) => switch (this) {
-    _MasteryTier.newSkill => AppStyles.mutedDim,
-    _MasteryTier.building => AppStyles.info,
-    _MasteryTier.ready => AppStyles.success,
+    _MasteryTier.newSkill => Passeport.slateDim,
+    _MasteryTier.building => Passeport.sky,
+    _MasteryTier.ready => Passeport.sage,
   };
 
   Color background(BuildContext context) => switch (this) {
-    _MasteryTier.newSkill => AppStyles.canvasDim,
-    _MasteryTier.building => AppStyles.infoSoft,
-    _MasteryTier.ready => AppStyles.successSoft,
+    _MasteryTier.newSkill => Passeport.parchmentDim,
+    _MasteryTier.building => Passeport.infoSoft,
+    _MasteryTier.ready => Passeport.successSoft,
   };
 }
 
@@ -81,34 +82,54 @@ class _PathScreenState extends ConsumerState<PathScreen> {
     _expandedBands ??= {_currentBand(profile.level)};
 
     return Scaffold(
-      backgroundColor: AppStyles.canvas,
+      backgroundColor: Passeport.parchment,
       body: SafeArea(
         child: PSContentColumn(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fixed header: the fingerprint canvas stays put as the page
-              // scrolls — only its own contents pan/zoom, never the frame.
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text('Your path', style: DesignTokens.display(30)),
+                    const SizedBox(height: DesignTokens.space1),
                     Text(
-                      'Your French fingerprint',
-                      style: AppStyles.display(28),
+                      '${_currentBand(profile.level)} · ${profile.goal == 'tef_canada' ? 'TEF Canada' : 'Everyday French'}',
+                      style: DesignTokens.body(
+                        15,
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Shaped by how you practice.',
-                      style: AppStyles.body(
-                        14.5,
-                      ).copyWith(color: AppStyles.mutedDim, height: 1.4),
-                    ),
-                    const SizedBox(height: 18),
-                    FingerprintView(
-                      store: ref.watch(learningStoreProvider),
-                      content: ref.watch(contentServiceProvider),
+                    const SizedBox(height: DesignTokens.space4),
+                    Container(
+                      padding: const EdgeInsets.all(DesignTokens.space4),
+                      decoration: BoxDecoration(
+                        color: DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusCard,
+                        ),
+                        border: Border.all(color: DesignTokens.hairline),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${_currentBand(profile.level)} Intermediate',
+                              style: DesignTokens.body(
+                                15,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Speaking · Building',
+                            style: DesignTokens.label(
+                              11,
+                            ).copyWith(color: DesignTokens.secondary),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -117,7 +138,7 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
                   children: [
-                    Text('Curriculum path', style: AppStyles.display(22)),
+                    Text('Curriculum path', style: DesignTokens.display(22)),
                     const SizedBox(height: 12),
                     if (framework == null)
                       const _EmptyPath()
@@ -125,23 +146,23 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppStyles.infoSoft,
+                          color: Passeport.infoSoft,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(
-                              CupertinoIcons.sparkles,
-                              color: AppStyles.info,
+                              CupertinoIcons.info_circle_fill,
+                              color: DesignTokens.secondary,
                               size: 21,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Every skill moves from New to Building to Ready as you practice. Tap a level to expand it.',
-                                style: AppStyles.body(13).copyWith(
-                                  color: AppStyles.inkSoft,
+                                'Complete the next skill in order. Your state moves from New to Building to Ready as evidence accumulates.',
+                                style: Passeport.body(13).copyWith(
+                                  color: Passeport.inkSoft,
                                   height: 1.4,
                                 ),
                               ),
@@ -235,20 +256,20 @@ class _BandHeader extends StatelessWidget {
                 ? CupertinoIcons.chevron_down
                 : CupertinoIcons.chevron_right,
             size: 14,
-            color: AppStyles.mutedDim,
+            color: Passeport.slateDim,
           ),
           const SizedBox(width: 6),
           Text(
             '$band FOUNDATION',
-            style: AppStyles.body(
+            style: Passeport.body(
               11,
               weight: FontWeight.w700,
-            ).copyWith(color: AppStyles.mutedDim, letterSpacing: 1),
+            ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
           ),
           const Spacer(),
           Text(
             '$readyCount/$count ready',
-            style: AppStyles.body(12).copyWith(color: AppStyles.mutedDim),
+            style: Passeport.body(12).copyWith(color: Passeport.slateDim),
           ),
         ],
       ),
@@ -274,9 +295,9 @@ class _CompetencyNode extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppStyles.surface,
+          color: Passeport.card,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: DesignTokens.surfaceShadow,
+          boxShadow: DesignTokens.cardShadow,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +325,7 @@ class _CompetencyNode extends StatelessWidget {
                       Expanded(
                         child: Text(
                           competency.title,
-                          style: AppStyles.body(15, weight: FontWeight.w700),
+                          style: Passeport.body(15, weight: FontWeight.w700),
                         ),
                       ),
                       Container(
@@ -318,7 +339,7 @@ class _CompetencyNode extends StatelessWidget {
                         ),
                         child: Text(
                           tier.label,
-                          style: AppStyles.body(9.5, weight: FontWeight.w700)
+                          style: Passeport.body(9.5, weight: FontWeight.w700)
                               .copyWith(
                                 color: tier.foreground(context),
                                 letterSpacing: 0.7,
@@ -330,18 +351,18 @@ class _CompetencyNode extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     competency.description,
-                    style: AppStyles.body(
+                    style: Passeport.body(
                       13,
-                    ).copyWith(color: AppStyles.mutedDim, height: 1.4),
+                    ).copyWith(color: Passeport.slateDim, height: 1.4),
                   ),
                   if (competency.prerequisiteIds.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     Text(
                       'Builds after ${competency.prerequisiteIds.map((id) => titleById[id] ?? id).join(' · ')}',
-                      style: AppStyles.body(
+                      style: Passeport.body(
                         11.5,
                         weight: FontWeight.w600,
-                      ).copyWith(color: AppStyles.info),
+                      ).copyWith(color: Passeport.sky),
                     ),
                   ],
                 ],
@@ -374,16 +395,16 @@ class _EmptyPath extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(CupertinoIcons.map, color: AppStyles.info, size: 34),
+            const Icon(CupertinoIcons.map, color: Passeport.sky, size: 34),
             const SizedBox(height: 14),
-            Text('Your path is being prepared', style: AppStyles.display(22)),
+            Text('Your path is being prepared', style: Passeport.display(22)),
             const SizedBox(height: 7),
             Text(
               'The competency map will appear after the curriculum finishes loading.',
               textAlign: TextAlign.center,
-              style: AppStyles.body(
+              style: Passeport.body(
                 14,
-              ).copyWith(color: AppStyles.mutedDim, height: 1.4),
+              ).copyWith(color: Passeport.slateDim, height: 1.4),
             ),
           ],
         ),

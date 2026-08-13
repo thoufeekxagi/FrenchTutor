@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
-import '../../design/app_styles.dart';
+import '../../config/theme.dart';
 import '../../data/content_service.dart';
 import '../../data/database/learning_store.dart';
 import '../../services/lesson_speech_service.dart';
@@ -127,9 +127,9 @@ class _FingerprintViewState extends State<FingerprintView> {
                     _graph.isDemo
                         ? 'Preview. Practice a word to start yours.'
                         : 'Bigger words mean more practice.',
-                    style: AppStyles.body(
+                    style: Passeport.body(
                       13,
-                    ).copyWith(color: AppStyles.mutedDim, height: 1.4),
+                    ).copyWith(color: Passeport.slateDim, height: 1.4),
                   ),
                 )
               : Container(
@@ -138,7 +138,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                   margin: const EdgeInsets.only(top: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppStyles.infoSoft,
+                    color: Passeport.infoSoft,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -149,14 +149,14 @@ class _FingerprintViewState extends State<FingerprintView> {
                           children: [
                             Text(
                               _selected!.entry.fr,
-                              style: AppStyles.display(20),
+                              style: Passeport.display(20),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${_selected!.entry.en} · ${_selected!.theme}',
-                              style: AppStyles.body(
+                              style: Passeport.body(
                                 13,
-                              ).copyWith(color: AppStyles.mutedDim),
+                              ).copyWith(color: Passeport.slateDim),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -192,7 +192,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                               height: 44,
                               child: Icon(
                                 CupertinoIcons.speaker_2_fill,
-                                color: AppStyles.info,
+                                color: Passeport.sky,
                               ),
                             ),
                           ),
@@ -200,10 +200,10 @@ class _FingerprintViewState extends State<FingerprintView> {
                             _graph.isDemo
                                 ? 'preview'
                                 : '${_selected!.total} total',
-                            style: AppStyles.body(
+                            style: Passeport.body(
                               12,
                               weight: FontWeight.w700,
-                            ).copyWith(color: AppStyles.info),
+                            ).copyWith(color: Passeport.sky),
                           ),
                         ],
                       ),
@@ -239,10 +239,10 @@ class _FingerprintViewState extends State<FingerprintView> {
           const SizedBox(width: 6),
           Text(
             '${_modalityLabel(source)} · $count',
-            style: AppStyles.body(
+            style: Passeport.body(
               11.5,
               weight: FontWeight.w600,
-            ).copyWith(color: AppStyles.inkSoft),
+            ).copyWith(color: Passeport.inkSoft),
           ),
         ],
       ),
@@ -253,7 +253,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
-        color: AppStyles.ink.withValues(alpha: 0.78),
+        color: Passeport.ink.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
@@ -272,7 +272,7 @@ class _FingerprintViewState extends State<FingerprintView> {
             const SizedBox(width: 5),
             Text(
               _modalityLabel(source),
-              style: AppStyles.body(
+              style: Passeport.body(
                 10.5,
                 weight: FontWeight.w600,
               ).copyWith(color: Colors.white.withValues(alpha: 0.82)),
@@ -288,13 +288,13 @@ class _FingerprintViewState extends State<FingerprintView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppStyles.ink.withValues(alpha: 0.82),
+        color: Passeport.ink.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Text(
         label,
-        style: AppStyles.body(
+        style: Passeport.body(
           12,
           weight: FontWeight.w600,
         ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
@@ -310,9 +310,9 @@ String _modalityLabel(ModalitySource source) => switch (source) {
 };
 
 Color _modalityColor(ModalitySource source) => switch (source) {
-  ModalitySource.recall => AppStyles.info,
-  ModalitySource.speaking => AppStyles.mastery,
-  ModalitySource.writing => AppStyles.success,
+  ModalitySource.recall => Passeport.sky,
+  ModalitySource.speaking => Passeport.brass,
+  ModalitySource.writing => Passeport.sage,
 };
 
 class _FingerprintPainter extends CustomPainter {
@@ -326,12 +326,12 @@ class _FingerprintPainter extends CustomPainter {
   /// A wider jewel-tone cycle than a plain "topic color" scheme needs, so
   /// clusters read as distinct neighborhoods rather than a handful of repeats.
   static const _palette = <Color>[
-    AppStyles.primary,
-    AppStyles.info,
-    AppStyles.mastery,
-    AppStyles.success,
-    AppStyles.danger,
-    AppStyles.primaryDeep,
+    Passeport.maroon,
+    Passeport.sky,
+    Passeport.brass,
+    Passeport.sage,
+    Passeport.danger,
+    Passeport.primaryDeep,
   ];
 
   static Map<String, Color> _assignThemeColors(FingerprintGraph graph) {
@@ -346,8 +346,8 @@ class _FingerprintPainter extends CustomPainter {
   }
 
   Color _nodeColor(FingerprintNode node) {
-    if (graph.isDemo) return AppStyles.muted;
-    return _themeColors[node.theme] ?? AppStyles.info;
+    if (graph.isDemo) return Passeport.slate;
+    return _themeColors[node.theme] ?? Passeport.sky;
   }
 
   bool _isRelated(FingerprintNode node) {
@@ -368,10 +368,10 @@ class _FingerprintPainter extends CustomPainter {
       final highlighted =
           selected == null || edge.a == selected || edge.b == selected;
       final color = graph.isDemo
-          ? AppStyles.muted
+          ? Passeport.slate
           : switch (edge.kind) {
-              FingerprintEdgeKind.session => AppStyles.mastery,
-              FingerprintEdgeKind.cooccurrence => AppStyles.success,
+              FingerprintEdgeKind.session => Passeport.brass,
+              FingerprintEdgeKind.cooccurrence => Passeport.sage,
               FingerprintEdgeKind.theme => Color.lerp(
                 _nodeColor(edge.a),
                 _nodeColor(edge.b),
@@ -472,7 +472,7 @@ class _FingerprintPainter extends CustomPainter {
         final painter = TextPainter(
           text: TextSpan(
             text: node.entry.fr,
-            style: AppStyles.body(12, weight: FontWeight.w600).copyWith(
+            style: Passeport.body(12, weight: FontWeight.w600).copyWith(
               color: Colors.white.withValues(
                 alpha: related ? (graph.isDemo ? 0.55 : 0.92) : 0.2,
               ),
@@ -505,13 +505,13 @@ class _FingerprintPainter extends CustomPainter {
     // and resize under the fixed one as soon as the graph is panned/zoomed.
     final rand = math.Random(graph.seed);
     final blobColors = graph.isDemo
-        ? [AppStyles.muted, AppStyles.muted, AppStyles.muted]
+        ? [Passeport.slate, Passeport.slate, Passeport.slate]
         : [
-            AppStyles.primary,
-            AppStyles.info,
-            AppStyles.mastery,
-            AppStyles.success,
-            AppStyles.danger,
+            Passeport.maroon,
+            Passeport.sky,
+            Passeport.brass,
+            Passeport.sage,
+            Passeport.danger,
           ];
     for (var i = 0; i < 3; i++) {
       final color = blobColors[rand.nextInt(blobColors.length)];

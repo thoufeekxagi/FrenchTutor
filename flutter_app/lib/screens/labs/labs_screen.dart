@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/web/web_layout.dart';
+import '../../widgets/web/web_practice_grid.dart';
 import '../subscription/paywall_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import 'alphabet_lab_screen.dart';
@@ -28,6 +31,9 @@ class LabsScreen extends ConsumerWidget {
     // rebuilds with fresh lock state instead of showing what was true when
     // the tab was first opened.
     final gate = ref.watch(subscriptionGateServiceProvider);
+    if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
+      return _webPracticePage(context, gate);
+    }
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: SafeArea(
@@ -38,10 +44,10 @@ class LabsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                Text('Practice', style: DesignTokens.display(24)),
+                Text('Practice', style: DesignTokens.display(30)),
                 const SizedBox(height: 4),
                 Text(
-                  'Go deeper on one skill at a time',
+                  'Choose one skill. Leave with evidence.',
                   style: DesignTokens.body(
                     14,
                   ).copyWith(color: DesignTokens.mutedDim),
@@ -50,6 +56,14 @@ class LabsScreen extends ConsumerWidget {
                 Expanded(
                   child: ListView(
                     children: [
+                      _RecommendedPractice(
+                        onTap: () => _open(
+                          context,
+                          locked: gate.isLabLocked('vocabulary'),
+                          builder: (_) => const VocabPickerScreen(),
+                        ),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
                       _LabTile(
                         icon: CupertinoIcons.textformat_abc,
                         title: 'Learn the Alphabet',
@@ -174,6 +188,130 @@ class LabsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _webPracticePage(BuildContext context, SubscriptionGateService gate) {
+    final items = <WebPracticeShortcut>[
+      WebPracticeShortcut(
+        icon: CupertinoIcons.textformat_abc,
+        label: 'Alphabet',
+        locked: gate.isLabLocked('alphabet'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('alphabet'),
+          builder: (_) => const AlphabetLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.stopwatch_fill,
+        label: 'Speaking mock',
+        locked: gate.isLabLocked('speaking_mock'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('speaking_mock'),
+          builder: (_) => const MocksScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.mic_fill,
+        label: 'Vocabulary',
+        locked: gate.isLabLocked('vocabulary'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('vocabulary'),
+          builder: (_) => const VocabPickerScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.square_stack_3d_up,
+        label: 'Flashcards',
+        locked: gate.isLabLocked('flashcards'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('flashcards'),
+          builder: (_) => const VocabLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.book,
+        label: 'Grammar',
+        locked: gate.isLabLocked('grammar'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('grammar'),
+          builder: (_) => const GrammarLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.waveform,
+        label: 'Liaison',
+        locked: gate.isLabLocked('liaison'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('liaison'),
+          builder: (_) => const LiaisonLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.link,
+        label: 'Connectors',
+        locked: gate.isLabLocked('connectors'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('connectors'),
+          builder: (_) => const ConnectorsLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.headphones,
+        label: 'Listening',
+        locked: gate.isLabLocked('listening'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('listening'),
+          builder: (_) => const ListeningLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.bubble_left_bubble_right,
+        label: 'Roleplay',
+        locked: gate.isLabLocked('roleplay'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('roleplay'),
+          builder: (_) => const RoleplayLabScreen(),
+        ),
+      ),
+      WebPracticeShortcut(
+        icon: CupertinoIcons.pencil,
+        label: 'Writing',
+        locked: gate.isLabLocked('writing'),
+        onTap: () => _open(
+          context,
+          locked: gate.isLabLocked('writing'),
+          builder: (_) => const WritingLabScreen(),
+        ),
+      ),
+    ];
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: WebPage(
+          header: const WebPageHeader(
+            title: 'Practice',
+            subtitle: 'Choose a focused way to build your French.',
+          ),
+          children: [
+            WebPracticeGrid(
+              heading: 'PRACTICE LIBRARY',
+              description:
+                  'Short, focused ways to practise one skill at a time.',
+              items: items,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 void _open(
@@ -190,6 +328,89 @@ void _open(
     return;
   }
   AppRouter.push(context, builder);
+}
+
+class _RecommendedPractice extends StatelessWidget {
+  const _RecommendedPractice({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Review six words from yesterday',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(DesignTokens.space4),
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            border: Border.all(color: DesignTokens.hairline),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+                ),
+                child: const Icon(
+                  CupertinoIcons.arrow_counterclockwise,
+                  color: DesignTokens.primary,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: DesignTokens.space3),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recommended for you',
+                      style: TextStyle(
+                        color: DesignTokens.mutedDim,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.7,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Review 6 words from yesterday',
+                      style: TextStyle(
+                        color: DesignTokens.ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Spaced repetition · 8 min',
+                      style: TextStyle(
+                        color: DesignTokens.mutedDim,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                CupertinoIcons.chevron_right,
+                color: DesignTokens.mutedDim,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _LabTile extends StatelessWidget {
@@ -254,7 +475,7 @@ class _LabTile extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: DesignTokens.ink.withValues(alpha: 0.10),
+                            color: DesignTokens.ink.withValues(alpha: 0.1),
                             blurRadius: 3,
                           ),
                         ],

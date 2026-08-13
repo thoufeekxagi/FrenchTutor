@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,23 +79,26 @@ void main() {
       expect(starts, 2);
     });
 
-    test('hold streams, release stops and closes the turn with silence', () async {
-      mic.adoptSavedMode(MicMode.pushToTalk);
-      await mic.onConnected();
-      await mic.pttDown();
-      expect(starts, 1);
-      expect(mic.isHeld, isTrue);
-      await mic.pttUp();
-      expect(stops, 1);
-      expect(mic.isHeld, isFalse);
-      expect(sent.length, MicController.silenceTailChunks);
-      expect(sent.first.length, MicController.silenceChunkBytes);
-      expect(sent.first.every((b) => b == 0), isTrue);
-      // > 2.5s of audio so the server VAD reliably sees end-of-speech.
-      final seconds =
-          sent.length * MicController.silenceChunkBytes / 2 / 16000;
-      expect(seconds, greaterThan(2.5));
-    });
+    test(
+      'hold streams, release stops and closes the turn with silence',
+      () async {
+        mic.adoptSavedMode(MicMode.pushToTalk);
+        await mic.onConnected();
+        await mic.pttDown();
+        expect(starts, 1);
+        expect(mic.isHeld, isTrue);
+        await mic.pttUp();
+        expect(stops, 1);
+        expect(mic.isHeld, isFalse);
+        expect(sent.length, MicController.silenceTailChunks);
+        expect(sent.first.length, MicController.silenceChunkBytes);
+        expect(sent.first.every((b) => b == 0), isTrue);
+        // > 2.5s of audio so the server VAD reliably sees end-of-speech.
+        final seconds =
+            sent.length * MicController.silenceChunkBytes / 2 / 16000;
+        expect(seconds, greaterThan(2.5));
+      },
+    );
 
     test('release without hold is a no-op', () async {
       mic.adoptSavedMode(MicMode.pushToTalk);
@@ -109,6 +114,25 @@ void main() {
       await mic.pttDown();
       await mic.pttDown();
       expect(starts, 1);
+    });
+
+    test('overlapping resume and connect share one start', () async {
+      final startGate = Completer<void>();
+      var concurrentStarts = 0;
+      mic = MicController(
+        startStream: () async {
+          concurrentStarts += 1;
+          await startGate.future;
+        },
+        stopStream: () async {},
+        sendAudio: sent.add,
+      );
+      final connected = mic.onConnected();
+      final resumed = mic.onAppResumed();
+      await Future<void>.delayed(Duration.zero);
+      startGate.complete();
+      await Future.wait([connected, resumed]);
+      expect(concurrentStarts, 1);
     });
 
     test('hold before connection is ignored', () async {
