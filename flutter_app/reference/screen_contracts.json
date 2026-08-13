@@ -1,0 +1,33 @@
+{
+  "project": "ParleSprint Guided Momentum",
+  "branch": "parlesprint-full-redesign",
+  "principles": [
+    "One dominant intent per screen",
+    "Every recommendation explains what, why, duration, and outcome",
+    "Serious adaptive coaching with restrained game energy",
+    "No XP, coins, lives, leaderboards, guilt, mascots, or fake scarcity",
+    "Preserve real learning evidence and orchestration behavior"
+  ],
+  "flow": [
+    {"id":"launch","stage":"entry","arrived":"A new or returning learner opens ParleSprint","understand":"This is a serious coach for practical French progress","primary":"Start learning","secondary":"I already have an account","success":"Moves into goal setup or sign-in","must_not":"Feature collage, fake testimonials, decorative French props"},
+    {"id":"goal","stage":"onboarding","arrived":"Learner chose to start","understand":"The app can focus their learning around a real goal","primary":"Choose goal and continue","secondary":"Skip for now","success":"Goal is stored and next setup step opens","must_not":"More than one dominant choice"},
+    {"id":"level","stage":"onboarding","arrived":"Goal is selected","understand":"Starting level determines the first useful practice","primary":"Choose current level","secondary":"I am not sure","success":"Level is stored","must_not":"Exam-like test before value"},
+    {"id":"coach","stage":"onboarding","arrived":"Goal and level are known","understand":"Marie is the coach and the learner controls the pace","primary":"Meet Marie","secondary":"Change later","success":"Coach preference is stored","must_not":"Mascot treatment or ungrounded personality claims"},
+    {"id":"consent","stage":"trust","arrived":"Setup is complete","understand":"What AI uses and what remains private","primary":"Continue with AI features","secondary":"Learn more","success":"Consent is stored or the learner can use non-AI paths","must_not":"Legal wall without plain-language explanation"},
+    {"id":"auth","stage":"account","arrived":"Learner has seen the product value","understand":"An account saves progress across devices","primary":"Create account or sign in","secondary":"Continue locally where supported","success":"Learner enters the app","must_not":"Account wall before value"},
+    {"id":"today","stage":"core","arrived":"Learner returns to the app","understand":"The single most valuable next session","primary":"Start next session","secondary":"Choose another practice","success":"Session begins and Today updates from evidence","must_not":"Dashboard grid, fake streak pressure, competing CTAs"},
+    {"id":"path","stage":"core","arrived":"Learner wants to understand progression","understand":"What is ready, building, blocked, and next","primary":"Open next competency","secondary":"Inspect evidence","success":"A clear next skill opens","must_not":"Decorative constellation without learning meaning"},
+    {"id":"practice","stage":"core","arrived":"Learner wants a directed choice","understand":"Practice modes mapped to real outcomes","primary":"Choose one mode","secondary":"Return to recommendation","success":"Selected practice starts","must_not":"Equal-weight tile maze"},
+    {"id":"scan","stage":"core","arrived":"Learner finds French in the world","understand":"A scan turns useful text into practice","primary":"Scan text","secondary":"Choose photo or PDF","success":"Recognized content becomes a reviewable lesson","must_not":"OCR claims without confidence or editable result"},
+    {"id":"session-brief","stage":"learning","arrived":"Learner starts a recommended session","understand":"What will happen and how long it takes","primary":"Begin session","secondary":"Exit","success":"Session starts in the correct mode","must_not":"Unclear timer or surprise microphone behavior"},
+    {"id":"live-session","stage":"learning","arrived":"Session is active","understand":"Whether Marie is listening, speaking, or waiting","primary":"Speak or answer","secondary":"Pause, transcript, end","success":"Real turns and duration are captured","must_not":"Dense controls or ornamental animation"},
+    {"id":"session-result","stage":"learning","arrived":"Session ended","understand":"What was actually completed and saved","primary":"Continue to Today","secondary":"Review transcript","success":"Today reflects captured evidence","must_not":"Invented pronunciation scores or AI praise"},
+    {"id":"flashcards","stage":"practice","arrived":"Learner chose vocabulary","understand":"Which word is being recalled and why","primary":"Recall and rate honestly","secondary":"Hear example","success":"Review state is saved","must_not":"Punitive failure mechanics"},
+    {"id":"story","stage":"practice","arrived":"Learner chose listening or reading","understand":"Meaning from context, not isolated drills","primary":"Continue story","secondary":"Save phrase","success":"Comprehension evidence is captured","must_not":"Overloaded annotation chrome"},
+    {"id":"writing","stage":"practice","arrived":"Learner chose writing","understand":"The task, audience, and useful correction","primary":"Submit writing","secondary":"See prompt help","success":"Writing evidence is saved","must_not":"Unverifiable grading claims"},
+    {"id":"progress","stage":"reflection","arrived":"Learner checks development","understand":"Evidence of ability and goal readiness","primary":"Open recommended next step","secondary":"Review history","success":"Reflection leads back to useful practice","must_not":"Vanity metrics or leaderboard framing"},
+    {"id":"history","stage":"reflection","arrived":"Learner wants to look back","understand":"Sessions completed and skills practiced","primary":"Resume useful thread","secondary":"Filter history","success":"A past thread becomes actionable","must_not":"Chronological dump without meaning"},
+    {"id":"settings","stage":"support","arrived":"Learner manages account or preferences","understand":"Where to control coach, privacy, audio, and account","primary":"Save a setting","secondary":"Sign out or support","success":"Preference is applied predictably","must_not":"Hidden destructive actions"},
+    {"id":"paywall","stage":"conversion","arrived":"Learner reaches a paid capability","understand":"What the plan unlocks and whether it matters now","primary":"Choose plan","secondary":"Not now","success":"Entitlement is clear and reflected in app","must_not":"Fake scarcity, guilt, or blocking core trust"}
+  ]
+}

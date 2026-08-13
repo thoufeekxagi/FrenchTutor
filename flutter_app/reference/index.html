@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ParleSprint — Guided Momentum Reference</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#launch" aria-label="ParleSprint reference home">ParleSprint</a>
+    <div class="project-label">Guided Momentum / screen 01</div>
+  </header>
+  <main>
+    <section class="stage-nav" aria-label="Reference stages">
+      <button class="stage active" data-stage="launch"><span>01</span>Welcome</button>
+      <button class="stage" data-stage="goal"><span>02</span>Goal setup</button>
+      <button class="stage" data-stage="today"><span>03</span>Today</button>
+      <button class="stage" data-stage="path"><span>04</span>Path</button>
+      <button class="stage" data-stage="session"><span>05</span>Live session</button>
+      <button class="stage" data-stage="progress"><span>06</span>Progress</button>
+    </section>
+    <section class="screen-frame" id="launch" data-screen>
+      <div class="phone-screen">
+        <div class="phone-status"><span>9:41</span><span>•••</span></div>
+        <div class="phone-content launch-content">
+          <div class="wordmark">ParleSprint<span>.</span></div>
+          <div class="launch-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="signal signal-one">demain</div><div class="signal signal-two">parler</div>
+            <div class="signal signal-three">ensemble</div><div class="signal signal-four">→</div>
+          </div>
+          <div class="launch-copy">
+            <p class="eyebrow">A French coach for real life</p>
+            <h1>French for the moments that matter.</h1>
+            <p class="lede">One clear next step for your everyday, immigration, and TEF/TCF goals.</p>
+          </div>
+          <div class="launch-actions">
+            <button class="primary-action" data-next="goal">Start learning <span>→</span></button>
+            <button class="text-action" data-next="auth">I already have an account</button>
+          </div>
+          <p class="trust-line">Built around your evidence, not your ego.</p>
+        </div>
+        <div class="home-indicator"></div>
+      </div>
+      <aside class="screen-notes">
+        <p class="note-kicker">Screen contract</p>
+        <h2>Start with purpose.</h2>
+        <p>The first screen establishes ParleSprint as an adult coach, not a game. The learner understands the promise before choosing a goal.</p>
+        <dl><dt>Primary</dt><dd>Start learning</dd><dt>Success</dt><dd>Goal setup opens</dd><dt>Next</dt><dd>Goal → level → coach</dd></dl>
+      </aside>
+    </section>
+    <section class="screen-frame hidden" id="goal" data-screen>
+      <div class="phone-screen"><div class="phone-status"><span>9:41</span><span>•••</span></div><div class="phone-content setup-content"><div class="progress-label"><span>SETUP</span><span>1 of 3</span></div><div class="progress-track"><i></i></div><p class="eyebrow">Make it useful</p><h1>What brings you to French?</h1><p class="lede">Your answer helps us choose the next skill that matters.</p><div class="choice-list"><button>Everyday confidence <span>→</span></button><button>Immigration or citizenship <span>→</span></button><button>TEF or TCF preparation <span>→</span></button></div><button class="text-action">I’m still exploring</button></div><div class="home-indicator"></div></div><aside class="screen-notes"><p class="note-kicker">Next reference</p><h2>Goal before gamification.</h2><p>Three meaningful paths replace a noisy preference grid. The learner knows why the answer matters.</p></aside>
+    </section>
+    <section class="screen-frame hidden" id="today" data-screen><div class="phone-screen"><div class="phone-status"><span>9:41</span><span>•••</span></div><div class="phone-content today-content"><div class="today-top"><div><p class="eyebrow">MONDAY, 12 AUGUST</p><h1>Good morning, Alex.</h1></div><button class="avatar">A</button></div><div class="momentum-line"><span>Today’s momentum</span><strong>1 of 3 steps</strong></div><div class="recommendation"><p class="eyebrow teal">NEXT BEST STEP · 8 MIN</p><h2>Make a clear request</h2><p>Because your speaking practice is building, this short listening task gives you the phrases you need next.</p><div class="outcome"><span>After this</span><strong>You can ask for clarification with confidence.</strong></div><button class="primary-action">Start session <span>→</span></button></div><button class="quiet-option">Choose another practice</button></div><div class="home-indicator"></div></div><aside class="screen-notes"><p class="note-kicker">Core product screen</p><h2>One next step, explained.</h2><p>Today is not a dashboard. It is a calm decision surface that answers what, why, duration, and outcome.</p></aside></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
