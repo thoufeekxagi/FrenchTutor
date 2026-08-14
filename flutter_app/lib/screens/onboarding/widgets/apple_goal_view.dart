@@ -4,9 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../design/tokens.dart';
 
-/// Apple-Standard Goal & Motivation Setup Step for ParleSprint.
-/// Matches the verified Stitch design specification with step progress indicator,
-/// high-contrast typography, interactive goal cards, and Apple HIG touch targets.
+/// Streamlined, High-Conversion Goal Selection Step for ParleSprint.
+/// Optimized for low cognitive load and zero-scroll above-the-fold layout.
 class AppleGoalView extends StatelessWidget {
   const AppleGoalView({
     super.key,
@@ -24,21 +23,21 @@ class AppleGoalView extends StatelessWidget {
   static const _goals = [
     (
       id: 'tef_canada',
-      title: 'TEF / TCF Canada',
-      subtitle: 'Immigration points, Express Entry, and CLB 7+ prep',
-      icon: CupertinoIcons.doc_text_fill,
+      emoji: '🍁',
+      title: 'Canada Immigration',
+      subtitle: 'TEF / TCF Canada',
     ),
     (
       id: 'everyday',
-      title: 'Everyday French',
-      subtitle: 'Travel, real-world confidence, and social conversations',
-      icon: CupertinoIcons.chat_bubble_2_fill,
+      emoji: '✈️',
+      title: 'Travel & Daily French',
+      subtitle: 'Real conversations',
     ),
     (
       id: 'unsure',
-      title: 'Build the Foundations',
-      subtitle: 'Pronunciation, core grammar, and beginner structure',
-      icon: CupertinoIcons.compass_fill,
+      emoji: '🌱',
+      title: 'Complete Beginner',
+      subtitle: 'Start from scratch',
     ),
   ];
 
@@ -52,67 +51,77 @@ class AppleGoalView extends StatelessWidget {
             // Top Navigation & Step Progress
             _TopStepHeader(onBack: onBack),
 
-            // Scrollable Content
+            // Content Area (Fits perfectly above the fold)
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Eyebrow
-                    Text(
-                      'YOUR GOAL',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: const Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
                     // Headline
                     Text(
-                      'What should French unlock for you?',
+                      'What is your main goal?',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 27,
+                        fontSize: 26,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFF0F172A),
                         letterSpacing: -0.5,
-                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
                     // Subtitle
                     Text(
-                      'Your answer tailors every speaking session, vocabulary drill, and AI coach recommendation.',
+                      'Personalizes your daily coach.',
                       style: GoogleFonts.inter(
-                        fontSize: 14.5,
+                        fontSize: 14,
                         color: const Color(0xFF64748B),
-                        height: 1.45,
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
 
-                    // Interactive Goal Cards
+                    // Streamlined Goal Cards
                     for (final goal in _goals)
                       _GoalCard(
+                        emoji: goal.emoji,
                         title: goal.title,
                         subtitle: goal.subtitle,
-                        icon: goal.icon,
                         isSelected: selectedGoal == goal.id,
                         onTap: () => onGoalSelected(goal.id),
                       ),
+
+                    const Spacer(),
                   ],
                 ),
               ),
             ),
 
-            // Bottom CTA Area
-            _BottomActionArea(
-              enabled: selectedGoal != null,
-              onContinue: onContinue,
+            // Bottom CTA
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: selectedGoal != null ? onContinue : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0062CC),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFFE2E8F0),
+                    disabledForegroundColor: const Color(0xFF94A3B8),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                    ),
+                    textStyle: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  child: const Text('Continue →'),
+                ),
+              ),
             ),
           ],
         ),
@@ -128,87 +137,84 @@ class _TopStepHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: onBack,
-            icon: const Icon(
-              CupertinoIcons.chevron_back,
-              size: 22,
-              color: Color(0xFF0F172A),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  'STEP 1 OF 3',
-                  style: GoogleFonts.inter(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.1,
-                    color: const Color(0xFF64748B),
-                  ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: onBack,
+                icon: const Icon(
+                  CupertinoIcons.chevron_back,
+                  size: 22,
+                  color: Color(0xFF0F172A),
                 ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Container(
-                    height: 4,
-                    width: 140,
-                    color: const Color(0xFFE2E8F0),
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      height: 4,
-                      width: 140 * 0.33,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0062CC),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'STEP 1 OF 3',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.1,
+                      color: const Color(0xFF64748B),
                     ),
                   ),
                 ),
-              ],
+              ),
+              const SizedBox(width: 48), // Spacer to balance back button
+            ],
+          ),
+        ),
+        Container(
+          height: 3,
+          width: double.infinity,
+          color: const Color(0xFFE2E8F0),
+          alignment: Alignment.centerLeft,
+          child: FractionallySizedBox(
+            widthFactor: 0.33,
+            child: Container(
+              color: const Color(0xFF0062CC),
             ),
           ),
-          const SizedBox(width: 48), // Balancing spacer
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 class _GoalCard extends StatelessWidget {
   const _GoalCard({
+    required this.emoji,
     required this.title,
     required this.subtitle,
-    required this.icon,
     required this.isSelected,
     required this.onTap,
   });
 
+  final String emoji;
   final String title;
   final String subtitle;
-  final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 10),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected ? const Color(0xFF0062CC) : const Color(0xFFE2E8F0),
               width: isSelected ? 2 : 1,
@@ -218,31 +224,18 @@ class _GoalCard extends StatelessWidget {
                 color: isSelected
                     ? const Color(0xFF0062CC).withValues(alpha: 0.08)
                     : Colors.black.withValues(alpha: 0.02),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? const Color(0xFF0062CC).withValues(alpha: 0.12)
-                      : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: isSelected
-                      ? const Color(0xFF0062CC)
-                      : const Color(0xFF64748B),
-                ),
+              Text(
+                emoji,
+                style: const TextStyle(fontSize: 26),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,28 +243,27 @@ class _GoalCard extends StatelessWidget {
                     Text(
                       title,
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF0F172A),
                         letterSpacing: -0.2,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: GoogleFonts.inter(
-                        fontSize: 12.5,
+                        fontSize: 12,
                         color: const Color(0xFF64748B),
-                        height: 1.35,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Container(
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isSelected
@@ -287,7 +279,7 @@ class _GoalCard extends StatelessWidget {
                 child: isSelected
                     ? const Icon(
                         CupertinoIcons.checkmark,
-                        size: 14,
+                        size: 13,
                         color: Colors.white,
                       )
                     : null,
@@ -295,60 +287,6 @@ class _GoalCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _BottomActionArea extends StatelessWidget {
-  const _BottomActionArea({
-    required this.enabled,
-    required this.onContinue,
-  });
-
-  final bool enabled;
-  final VoidCallback onContinue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              onPressed: enabled ? onContinue : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0062CC),
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: const Color(0xFFE2E8F0),
-                disabledForegroundColor: const Color(0xFF94A3B8),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-                ),
-                textStyle: GoogleFonts.plusJakartaSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              child: const Text('Continue →'),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'You can change this anytime in Settings',
-            style: GoogleFonts.inter(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF94A3B8),
-            ),
-          ),
-        ],
       ),
     );
   }
