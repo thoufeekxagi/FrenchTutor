@@ -21,6 +21,7 @@ import '../../widgets/web/web_onboarding_welcome.dart';
 import '../../widgets/web/web_preparing_pane.dart';
 import '../session/session_screen.dart';
 import 'widgets/apple_goal_view.dart';
+import 'widgets/apple_level_view.dart';
 import 'widgets/apple_welcome_view.dart';
 
 /// Onboarding funnel — Readle's proven anatomy, ParleSprint's palette:
@@ -168,7 +169,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final showHeader = !_web && _page > _pageGoal && _page <= _pageTutor;
+    final showHeader = !_web && _page > _pageLevel && _page <= _pageTutor;
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: DecoratedBox(
@@ -534,54 +535,69 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   Widget _levelStep() {
-    return _step(
-      eyebrow: 'Starting point',
-      title: 'Where are you today?',
-      children: [
-        _choice(
-          label: 'A1 · Just starting',
-          selected: _level == 'a1',
-          onTap: () => setState(() => _level = 'a1'),
+    if (_web) {
+      return _step(
+        eyebrow: 'Starting point',
+        title: 'Where are you today?',
+        children: [
+          _choice(
+            label: 'A1 · Just starting',
+            selected: _level == 'a1',
+            onTap: () => setState(() => _level = 'a1'),
+          ),
+          _choice(
+            label: 'A2 · I know the basics',
+            selected: _level == 'a2',
+            onTap: () => setState(() => _level = 'a2'),
+          ),
+          _choice(
+            label: 'B1 · I can hold a conversation',
+            selected: _level == 'b1',
+            onTap: () => setState(() => _level = 'b1'),
+          ),
+          _choice(
+            label: 'B2 · Polishing',
+            selected: _level == 'b2',
+            onTap: () => setState(() => _level = 'b2'),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'A comfortable daily session',
+            style: Passeport.body(
+              13,
+              weight: FontWeight.w600,
+            ).copyWith(color: DesignTokens.mutedDim),
+          ),
+          const SizedBox(height: 9),
+          PSSegmented<String>(
+            segments: const [
+              (value: 'quick', label: '5 min'),
+              (value: 'standard', label: '15 min'),
+              (value: 'deep', label: '30 min'),
+            ],
+            selected: _sessionLength,
+            onChanged: (value) => setState(() => _sessionLength = value),
+          ),
+        ],
+        footer: _onboardingButton(
+          label: 'Build my plan',
+          onPressed: _level == null ? null : _next,
+          icon: CupertinoIcons.arrow_right,
         ),
-        _choice(
-          label: 'A2 · I know the basics',
-          selected: _level == 'a2',
-          onTap: () => setState(() => _level = 'a2'),
-        ),
-        _choice(
-          label: 'B1 · I can hold a conversation',
-          selected: _level == 'b1',
-          onTap: () => setState(() => _level = 'b1'),
-        ),
-        _choice(
-          label: 'B2 · Polishing',
-          selected: _level == 'b2',
-          onTap: () => setState(() => _level = 'b2'),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'A comfortable daily session',
-          style: Passeport.body(
-            13,
-            weight: FontWeight.w600,
-          ).copyWith(color: DesignTokens.mutedDim),
-        ),
-        const SizedBox(height: 9),
-        PSSegmented<String>(
-          segments: const [
-            (value: 'quick', label: '5 min'),
-            (value: 'standard', label: '15 min'),
-            (value: 'deep', label: '30 min'),
-          ],
-          selected: _sessionLength,
-          onChanged: (value) => setState(() => _sessionLength = value),
-        ),
-      ],
-      footer: _onboardingButton(
-        label: 'Build my plan',
-        onPressed: _level == null ? null : _next,
-        icon: CupertinoIcons.arrow_right,
-      ),
+      );
+    }
+    return AppleLevelView(
+      selectedLevel: _level,
+      sessionLength: _sessionLength,
+      onLevelSelected: (lvl) => setState(() => _level = lvl),
+      onSessionLengthChanged: (len) => setState(() => _sessionLength = len),
+      onContinue: _next,
+      onBack: () {
+        _pageController.previousPage(
+          duration: DesignTokens.durationMedium,
+          curve: DesignTokens.curveStandard,
+        );
+      },
     );
   }
 
