@@ -20,6 +20,7 @@ import '../../widgets/web/web_onboarding_question.dart';
 import '../../widgets/web/web_onboarding_welcome.dart';
 import '../../widgets/web/web_preparing_pane.dart';
 import '../session/session_screen.dart';
+import 'widgets/apple_welcome_view.dart';
 
 /// Onboarding funnel — Readle's proven anatomy, ParleSprint's palette:
 ///   0. gradient social-proof welcome (trust before any question)
@@ -262,92 +263,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   // ---------------------------------------------------------------- page 0
-  /// Gradient social-proof opener: wordmark, one strong promise inside a
-  /// frosted quote card, a laurel trust line, one button. No decisions.
+  /// Apple-standard welcome opener with dual-bubble conversational brand mark,
+  /// high-contrast value proposition, TEF/TCF trust badge, and Apple HIG actions.
   Widget _welcomeStep() {
     if (_web) return _webWelcomeStep();
-    return Container(
-      color: DesignTokens.canvas,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-      child: _CenteredHero(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const _BrandWordmark(onLightBackground: true),
-                const Spacer(),
-                Text(
-                  '1 of 4',
-                  style: DesignTokens.label(
-                    11,
-                  ).copyWith(color: DesignTokens.mutedDim),
-                ),
-              ],
-            ),
-            const Spacer(flex: 2),
-            Text(
-              'French that moves you forward.',
-              style: DesignTokens.display(34).copyWith(height: 1.08),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'A clear daily plan for TEF/TCF goals, real conversations, '
-              'and the French you need next.',
-              style: DesignTokens.body(
-                16,
-              ).copyWith(color: DesignTokens.inkSoft, height: 1.5),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'BUILT AROUND YOUR GOAL, LEVEL, AND TIME',
-              style: DesignTokens.label(
-                10,
-              ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 1),
-            ),
-            const SizedBox(height: 12),
-            for (final item in const [
-              (CupertinoIcons.list_bullet, 'Know what to practice'),
-              (CupertinoIcons.person_2, 'Speak with Marie'),
-              (CupertinoIcons.chart_bar, 'See evidence of progress'),
-            ])
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: DesignTokens.hairline)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(item.$1, size: 18, color: DesignTokens.secondary),
-                    const SizedBox(width: 12),
-                    Text(item.$2, style: DesignTokens.body(15)),
-                  ],
-                ),
-              ),
-            const Spacer(flex: 3),
-            SizedBox(
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _next,
-                icon: const Icon(CupertinoIcons.arrow_right, size: 18),
-                label: const Text('Build my plan'),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: DesignTokens.minTapTarget,
-              child: Center(
-                child: Text(
-                  'Start with your goal. Change it anytime.',
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.mutedDim),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppleWelcomeView(
+      onGetStarted: _next,
+      onAlreadyHaveAccount: () {
+        // Direct jump to completion/auth gate if learner already has an account
+        _finish();
+      },
     );
   }
 
@@ -1389,24 +1314,3 @@ class _HeaderGutter extends StatelessWidget {
   }
 }
 
-/// Centres a hero/splash column at a readable width on desktop and leaves it
-/// untouched on phones. Used by the onboarding welcome pane, where a single
-/// centred column is the right desktop shape but an uncapped one is not.
-class _CenteredHero extends StatelessWidget {
-  const _CenteredHero({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final isWide =
-        MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded;
-    if (!isWide) return child;
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 620),
-        child: child,
-      ),
-    );
-  }
-}
