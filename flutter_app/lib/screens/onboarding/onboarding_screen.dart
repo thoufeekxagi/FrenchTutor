@@ -20,6 +20,7 @@ import '../../widgets/web/web_onboarding_question.dart';
 import '../../widgets/web/web_onboarding_welcome.dart';
 import '../../widgets/web/web_preparing_pane.dart';
 import '../session/session_screen.dart';
+import 'widgets/apple_goal_view.dart';
 import 'widgets/apple_welcome_view.dart';
 
 /// Onboarding funnel — Readle's proven anatomy, ParleSprint's palette:
@@ -167,7 +168,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final showHeader = !_web && _page >= _pageGoal && _page <= _pageTutor;
+    final showHeader = !_web && _page > _pageGoal && _page <= _pageTutor;
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: DecoratedBox(
@@ -491,31 +492,44 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   Widget _goalStep() {
-    return _step(
-      eyebrow: 'Your goal',
-      title: 'What should French unlock for you?',
-      children: [
-        _choice(
-          label: 'TEF / TCF Canada',
-          selected: _goal == 'tef_canada',
-          onTap: () => setState(() => _goal = 'tef_canada'),
+    if (_web) {
+      return _step(
+        eyebrow: 'Your goal',
+        title: 'What should French unlock for you?',
+        children: [
+          _choice(
+            label: 'TEF / TCF Canada',
+            selected: _goal == 'tef_canada',
+            onTap: () => setState(() => _goal = 'tef_canada'),
+          ),
+          _choice(
+            label: 'Everyday French',
+            selected: _goal == 'everyday',
+            onTap: () => setState(() => _goal = 'everyday'),
+          ),
+          _choice(
+            label: 'Build the foundations',
+            selected: _goal == 'unsure',
+            onTap: () => setState(() => _goal = 'unsure'),
+          ),
+        ],
+        footer: _onboardingButton(
+          label: 'Continue',
+          onPressed: _goal == null ? null : _next,
+          icon: CupertinoIcons.arrow_right,
         ),
-        _choice(
-          label: 'Everyday French',
-          selected: _goal == 'everyday',
-          onTap: () => setState(() => _goal = 'everyday'),
-        ),
-        _choice(
-          label: 'Build the foundations',
-          selected: _goal == 'unsure',
-          onTap: () => setState(() => _goal = 'unsure'),
-        ),
-      ],
-      footer: _onboardingButton(
-        label: 'Continue',
-        onPressed: _goal == null ? null : _next,
-        icon: CupertinoIcons.arrow_right,
-      ),
+      );
+    }
+    return AppleGoalView(
+      selectedGoal: _goal,
+      onGoalSelected: (goal) => setState(() => _goal = goal),
+      onContinue: _next,
+      onBack: () {
+        _pageController.previousPage(
+          duration: DesignTokens.durationMedium,
+          curve: DesignTokens.curveStandard,
+        );
+      },
     );
   }
 
