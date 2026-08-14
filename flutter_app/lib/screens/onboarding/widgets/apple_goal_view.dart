@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../design/tokens.dart';
 
-/// Streamlined, High-Conversion Goal Selection Step for ParleSprint.
-/// Optimized for low cognitive load and zero-scroll above-the-fold layout.
+/// Luxury Apple-Standard Goal Selection Step for ParleSprint.
+/// Features custom-tinted vector icon squircle badges (no raw emojis),
+/// high-contrast hierarchy, 8pt spacing rhythm, and a zero-scroll above-the-fold layout.
 class AppleGoalView extends StatelessWidget {
   const AppleGoalView({
     super.key,
@@ -23,19 +24,19 @@ class AppleGoalView extends StatelessWidget {
   static const _goals = [
     (
       id: 'tef_canada',
-      emoji: '🍁',
+      icon: CupertinoIcons.doc_text_fill,
       title: 'Canada Immigration',
-      subtitle: 'TEF / TCF Canada',
+      subtitle: 'TEF / TCF Canada prep',
     ),
     (
       id: 'everyday',
-      emoji: '✈️',
+      icon: CupertinoIcons.airplane,
       title: 'Travel & Daily French',
-      subtitle: 'Real conversations',
+      subtitle: 'Real-world conversations',
     ),
     (
       id: 'unsure',
-      emoji: '🌱',
+      icon: CupertinoIcons.book_fill,
       title: 'Complete Beginner',
       subtitle: 'Start from scratch',
     ),
@@ -51,10 +52,10 @@ class AppleGoalView extends StatelessWidget {
             // Top Navigation & Step Progress
             _TopStepHeader(onBack: onBack),
 
-            // Content Area (Fits perfectly above the fold)
+            // Content Area (Comfortable above-the-fold layout)
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -62,7 +63,7 @@ class AppleGoalView extends StatelessWidget {
                     Text(
                       'What is your main goal?',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 26,
+                        fontSize: 27,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFF0F172A),
                         letterSpacing: -0.5,
@@ -74,16 +75,16 @@ class AppleGoalView extends StatelessWidget {
                     Text(
                       'Personalizes your daily coach.',
                       style: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 14.5,
                         color: const Color(0xFF64748B),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
-                    // Streamlined Goal Cards
+                    // Luxury Selection Cards with Vector Badges
                     for (final goal in _goals)
-                      _GoalCard(
-                        emoji: goal.emoji,
+                      _LuxuryGoalCard(
+                        icon: goal.icon,
                         title: goal.title,
                         subtitle: goal.subtitle,
                         isSelected: selectedGoal == goal.id,
@@ -96,12 +97,12 @@ class AppleGoalView extends StatelessWidget {
               ),
             ),
 
-            // Bottom CTA
+            // Bottom 54px CTA Button
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
               child: SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 54,
                 child: ElevatedButton(
                   onPressed: selectedGoal != null ? onContinue : null,
                   style: ElevatedButton.styleFrom(
@@ -159,7 +160,7 @@ class _TopStepHeader extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 1.1,
+                      letterSpacing: 1.2,
                       color: const Color(0xFF64748B),
                     ),
                   ),
@@ -186,16 +187,16 @@ class _TopStepHeader extends StatelessWidget {
   }
 }
 
-class _GoalCard extends StatelessWidget {
-  const _GoalCard({
-    required this.emoji,
+class _LuxuryGoalCard extends StatelessWidget {
+  const _LuxuryGoalCard({
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.isSelected,
     required this.onTap,
   });
 
-  final String emoji;
+  final IconData icon;
   final String title;
   final String subtitle;
   final bool isSelected;
@@ -204,17 +205,17 @@ class _GoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isSelected ? const Color(0xFF0062CC) : const Color(0xFFE2E8F0),
               width: isSelected ? 2 : 1,
@@ -223,19 +224,40 @@ class _GoalCard extends StatelessWidget {
               BoxShadow(
                 color: isSelected
                     ? const Color(0xFF0062CC).withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+                    : Colors.black.withValues(alpha: 0.03),
+                blurRadius: 14,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Row(
             children: [
-              Text(
-                emoji,
-                style: const TextStyle(fontSize: 26),
+              // Tinted Vector Squircle Badge
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFF0062CC).withValues(alpha: 0.12)
+                      : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isSelected
+                        ? const Color(0xFF0062CC).withValues(alpha: 0.24)
+                        : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: isSelected
+                      ? const Color(0xFF0062CC)
+                      : const Color(0xFF475569),
+                ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 16),
+
+              // Title & Subtitle
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,17 +265,17 @@ class _GoalCard extends StatelessWidget {
                     Text(
                       title,
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15.5,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF0F172A),
                         letterSpacing: -0.2,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       subtitle,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         color: const Color(0xFF64748B),
                       ),
                     ),
@@ -261,9 +283,11 @@ class _GoalCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
+
+              // Apple Selection Indicator
               Container(
-                width: 22,
-                height: 22,
+                width: 24,
+                height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isSelected
@@ -279,7 +303,7 @@ class _GoalCard extends StatelessWidget {
                 child: isSelected
                     ? const Icon(
                         CupertinoIcons.checkmark,
-                        size: 13,
+                        size: 14,
                         color: Colors.white,
                       )
                     : null,
