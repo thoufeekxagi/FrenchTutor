@@ -4,101 +4,42 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import 'package:uuid/uuid.dart';
 
 import '../../data/alphabet_data.dart';
 import '../../design/tokens.dart';
 import '../../models/session.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
-import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/inline_call_bar.dart';
-import '../../widgets/passeport_card.dart';
-import '../../widgets/web/web_constrained_view.dart';
-import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/tts_play_button.dart';
+import '../speak/speak_ui.dart';
 
 /// One-time, static (not AI-generated — accuracy matters more here than
 /// personalization) alphabet lesson, split into four short decks (the full
 /// Alphabet, then Consonants, Vowels, and Accents on their own) instead of
-/// one 26-card sitting, so a total beginner can do one deck at a time.
-/// Deliberately NOT wired into Keep Practising or the 6 mission categories,
-/// just a one-off foundational lesson living at the top of the Practice tab.
-class AlphabetLabScreen extends ConsumerStatefulWidget {
-  const AlphabetLabScreen({super.key});
+/// one 26-card sitting, so a total beginner can do one deck at a time. The
+/// course supplies a deck id when it needs a focused foundation lesson; the
+/// general alphabet entry opens the full alphabet directly instead of adding
+/// a second picker screen.
+class AlphabetLabScreen extends StatelessWidget {
+  const AlphabetLabScreen({super.key, this.deckId});
 
-  @override
-  ConsumerState<AlphabetLabScreen> createState() => _AlphabetLabScreenState();
-}
-
-class _AlphabetLabScreenState extends ConsumerState<AlphabetLabScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // This is the very first thing a brand-new user opens, so it can't feel
-    // slow: every letter and accent name gets synthesized and cached to the
-    // local database right away, in the background, the moment this screen
-    // opens — by the time the student actually taps into a deck, every
-    // speaker button just plays instantly from cache instead of waiting on
-    // a live Gemini round-trip. One-time cost per install; after that this
-    // never calls Gemini for these sounds again, same as any other cached
-    // narration in the app.
-    // Bounded concurrency, not one-at-a-time — this screen's whole point is
-    // to be the fast, ready-to-go landing spot for a brand-new user, and by
-    // now onboarding has likely already prewarmed most of this anyway (see
-    // AlphabetPrewarm), so this mostly just mops up whatever a rushed
-    // onboarding didn't finish before the user got here.
-    unawaited(
-      LessonSpeechService.shared.prewarmNarrationBounded(
-        alphabetPrewarmItems(),
-      ),
-    );
-  }
+  final String? deckId;
 
   @override
   Widget build(BuildContext context) {
-    final store = ref.watch(learningStoreProvider);
-    return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
-      appBar: AppBar(
-        title: Text('Learn the Alphabet', style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.parchmentDim,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      body: WebConstrainedView(
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              Text(
-                'Start with the full alphabet, then drill consonants, vowels, '
-                'or accents on their own. Each deck takes about 10-15 minutes.',
-                style: DesignTokens.body(
-                  13.5,
-                ).copyWith(color: DesignTokens.slateDim, height: 1.4),
-              ),
-              const SizedBox(height: 20),
-              for (final deck in _decks) ...[
-                _DeckTile(
-                  deck: deck,
-                  completed: store.lessonStatus(deck.id).status == 'completed',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => _AlphabetDeckScreen(deck: deck),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-            ],
-          ),
-        ),
-      ),
+    final deckId = this.deckId ?? 'learn_alphabet';
+    final deck = _decks.firstWhere(
+      (candidate) => candidate.id == deckId,
+      orElse: () => _decks.first,
     );
+    return _AlphabetDeckScreen(deck: deck);
   }
 }
 
@@ -158,85 +99,6 @@ class _AlphabetDeck {
   final List<AlphabetLetter> Function(List<AlphabetLetter> letters) quizPoolOf;
 }
 
-class _DeckTile extends StatelessWidget {
-  const _DeckTile({
-    required this.deck,
-    required this.completed,
-    required this.onTap,
-  });
-
-  final _AlphabetDeck deck;
-  final bool completed;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        PSHaptics.light();
-        onTap();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: DesignTokens.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: DesignTokens.hairline, width: 1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: DesignTokens.info.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(deck.icon, color: DesignTokens.info, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        deck.title,
-                        style: DesignTokens.body(15, weight: FontWeight.w500),
-                      ),
-                      if (completed) ...[
-                        const SizedBox(width: 6),
-                        Icon(
-                          CupertinoIcons.checkmark_seal_fill,
-                          size: 15,
-                          color: DesignTokens.success,
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    deck.subtitle,
-                    style: DesignTokens.body(
-                      12,
-                    ).copyWith(color: DesignTokens.slateDim),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              CupertinoIcons.chevron_right,
-              color: DesignTokens.slate,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _AlphabetDeckScreen extends ConsumerStatefulWidget {
   const _AlphabetDeckScreen({required this.deck});
 
@@ -250,6 +112,7 @@ class _AlphabetDeckScreen extends ConsumerStatefulWidget {
 class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
     with WidgetsBindingObserver {
   late final List<AlphabetLetter> _letters = widget.deck.lettersOf();
+  Map<String, String> _remoteStoragePaths = const {};
   bool _inQuiz = false;
   final DateTime _startedAt = DateTime.now();
 
@@ -278,6 +141,30 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
       onUserTranscript: (text) => _recorder.logUser(text),
       onTutorTranscript: (text) => _recorder.logTutor(text),
     );
+    unawaited(_loadRemoteAudioCatalog());
+  }
+
+  Future<void> _loadRemoteAudioCatalog() async {
+    try {
+      final rows = await Supabase.instance.client
+          .from('alphabet_audio_catalog')
+          .select('letter, storage_path')
+          .eq('persona_id', ActiveTutor.current.id);
+      final paths = <String, String>{};
+      for (final row in rows.whereType<Map>()) {
+        final letter = row['letter']?.toString().trim();
+        final storagePath = row['storage_path']?.toString().trim();
+        if (letter != null &&
+            letter.isNotEmpty &&
+            storagePath != null &&
+            storagePath.isNotEmpty) {
+          paths[letter] = storagePath;
+        }
+      }
+      if (mounted) setState(() => _remoteStoragePaths = paths);
+    } catch (_) {
+      // The bundled PCM catalog remains the immediate offline fallback.
+    }
   }
 
   String get _lessonContext {
@@ -345,54 +232,67 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: DesignTokens.canvas,
-      appBar: AppBar(
-        title: Text(widget.deck.title, style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.canvas,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        actions: [InlineCallActions(controller: _call)],
-      ),
-      body: _inQuiz
-          ? _AlphabetQuiz(
-              pool: widget.deck.quizPoolOf(_letters),
-              onFinished: _finishQuiz,
-            )
-          : Column(
-              children: [
-                if (_call.isLive || _call.error != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: InlineCallStatusCard(
-                      controller: _call,
-                      listeningLabel:
-                          'Listening. Ask about any letter anytime.',
-                    ),
-                  ),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    itemCount: _letters.length,
-                    itemBuilder: (context, i) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _CompactLetterCard(
-                        letter: _letters[i],
-                        contentItemId: alphabetAudioId(_letters[i]),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: PasseportPrimaryButton(
-                    label: 'Take the quick review',
-                    icon: CupertinoIcons.checkmark_seal,
-                    onPressed: _startQuiz,
-                  ),
-                ),
-              ],
+    return SpeakScaffold(
+      child: Column(
+        children: [
+          SpeakHeader(
+            title: widget.deck.title,
+            subtitle: '${_letters.length} sounds · tap any letter to hear it',
+            leading: GestureDetector(
+              onTap: () => Navigator.of(context).pop(false),
+              child: const Icon(
+                Icons.close_rounded,
+                color: SpeakColors.inkSoft,
+              ),
             ),
+            trailing: InlineCallActions(controller: _call),
+          ),
+          Expanded(
+            child: _inQuiz
+                ? _AlphabetQuiz(
+                    pool: widget.deck.quizPoolOf(_letters),
+                    onFinished: _finishQuiz,
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
+                    children: [
+                      Text(
+                        'Learn the sound, see it in a word, then check your recall.',
+                        style: DesignTokens.body(
+                          15,
+                        ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+                      ),
+                      if (_call.isLive || _call.error != null) ...[
+                        const SizedBox(height: 14),
+                        InlineCallStatusCard(
+                          controller: _call,
+                          listeningLabel:
+                              'Listening. Ask about any letter anytime.',
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      for (final letter in _letters) ...[
+                        _CompactLetterCard(
+                          letter: letter,
+                          contentItemId: alphabetAudioId(letter),
+                          remoteStoragePath: _remoteStoragePaths[letter.letter],
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ],
+                  ),
+          ),
+          if (!_inQuiz)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: SpeakPrimaryButton(
+                label: 'Take the quick review',
+                icon: Icons.verified_outlined,
+                onTap: _startQuiz,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -401,10 +301,15 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
 /// card used to be a whole empty screen) so 2-3 fit on one screen at once
 /// and the whole deck is one continuous scroll, not a swipe-per-letter.
 class _CompactLetterCard extends StatefulWidget {
-  const _CompactLetterCard({required this.letter, required this.contentItemId});
+  const _CompactLetterCard({
+    required this.letter,
+    required this.contentItemId,
+    this.remoteStoragePath,
+  });
 
   final AlphabetLetter letter;
   final String contentItemId;
+  final String? remoteStoragePath;
 
   @override
   State<_CompactLetterCard> createState() => _CompactLetterCardState();
@@ -420,8 +325,8 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
   @override
   Widget build(BuildContext context) {
     final letter = widget.letter;
-    return PasseportCard(
-      padding: 14,
+    return SpeakCard(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -431,11 +336,11 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: DesignTokens.infoSoft,
-                borderRadius: BorderRadius.circular(14),
+                color: SpeakColors.blueSoft,
+                borderRadius: BorderRadius.circular(16),
               ),
               alignment: Alignment.center,
-              child: Text(letter.letter, style: DesignTokens.display(26)),
+              child: Text(letter.letter, style: DesignTokens.display(28)),
             ),
           ),
           const SizedBox(width: 14),
@@ -455,8 +360,14 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                     // instance via `_ttsKey`.
                     TtsPlayButton(
                       key: _ttsKey,
-                      text: letter.letter,
+                      text: alphabetSpokenText(letter),
                       contentItemId: widget.contentItemId,
+                      remoteStoragePath: widget.remoteStoragePath,
+                      bundledAssetPath: alphabetAudioAssetPath(
+                        letter,
+                        ActiveTutor.current,
+                      ),
+                      color: SpeakColors.blue,
                       size: 28,
                       iconSize: 15,
                     ),
@@ -466,7 +377,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                       style: DesignTokens.body(
                         14,
                         weight: FontWeight.w600,
-                      ).copyWith(color: DesignTokens.primary),
+                      ).copyWith(color: SpeakColors.blue),
                     ),
                   ],
                 ),
@@ -475,7 +386,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                   letter.note,
                   style: DesignTokens.body(
                     12.5,
-                  ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                  ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -483,7 +394,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                   style: DesignTokens.body(
                     12.5,
                     weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: SpeakColors.inkSoft),
                 ),
               ],
             ),
@@ -539,13 +450,13 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
   Widget build(BuildContext context) {
     final allAnswered = _answers.length == _questions.length;
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
       children: [
         Text('Quick review', style: DesignTokens.display(22)),
         const SizedBox(height: 4),
         Text(
           'Just the ones worth double-checking.',
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(14).copyWith(color: SpeakColors.inkSoft),
         ),
         const SizedBox(height: 20),
         for (var i = 0; i < _questions.length; i++) ...[
@@ -561,20 +472,16 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
         ],
         const SizedBox(height: 8),
         if (!_submitted)
-          PasseportPrimaryButton(
+          SpeakPrimaryButton(
             label: 'Check answers',
-            onPressed: allAnswered
-                ? () => setState(() => _submitted = true)
-                : null,
+            onTap: allAnswered ? () => setState(() => _submitted = true) : null,
           )
         else ...[
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _score >= 0.8
-                  ? DesignTokens.successSoft
-                  : DesignTokens.primarySoft,
+              color: SpeakColors.blueSoft,
               borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
             ),
             child: Text(
@@ -585,10 +492,10 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
             ),
           ),
           const SizedBox(height: 12),
-          PasseportPrimaryButton(
+          SpeakPrimaryButton(
             label: 'Done',
             icon: CupertinoIcons.checkmark,
-            onPressed: () => widget.onFinished(_score),
+            onTap: () => widget.onFinished(_score),
           ),
         ],
       ],
@@ -623,7 +530,7 @@ class _QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return SpeakCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -638,19 +545,19 @@ class _QuestionCard extends StatelessWidget {
             children: question.choices.map((choice) {
               final isSelected = selected == choice;
               final isCorrect = choice == question.answer;
-              Color bg = DesignTokens.parchmentDim;
-              Color border = DesignTokens.hairline;
+              Color bg = SpeakColors.line;
+              Color border = SpeakColors.line;
               if (checked) {
                 if (isCorrect) {
-                  bg = DesignTokens.success.withValues(alpha: 0.12);
-                  border = DesignTokens.success;
+                  bg = SpeakColors.blueSoft;
+                  border = SpeakColors.blue;
                 } else if (isSelected) {
-                  bg = DesignTokens.primary.withValues(alpha: 0.1);
-                  border = DesignTokens.primary;
+                  bg = SpeakColors.blueSoft;
+                  border = SpeakColors.blue;
                 }
               } else if (isSelected) {
-                bg = DesignTokens.info.withValues(alpha: 0.12);
-                border = DesignTokens.info;
+                bg = SpeakColors.blueSoft;
+                border = SpeakColors.blue;
               }
               return GestureDetector(
                 onTap: onSelect == null ? null : () => onSelect!(choice),

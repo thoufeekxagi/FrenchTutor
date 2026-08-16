@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/common.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/database/tts_audio_cache_store.dart';
 import '../models/tutor_persona.dart';
@@ -472,6 +473,43 @@ class LessonSpeechService {
         contentItemId: contentItemId,
       );
       return bytes;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Loads a public pre-generated alphabet clip from Supabase Storage and
+  /// stores it in the same persistent cache as bundled audio. A network or
+  /// storage miss returns null so the caller can use its bundled fallback.
+  Future<List<int>?> loadRemoteAudio(
+    String storagePath, {
+    required String text,
+    required String voiceName,
+    bool slow = false,
+    String? contentItemId,
+  }) async {
+    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
+    if (cached != null) {
+      _synthCache[cacheKey] = cached;
+      return cached;
+    }
+    try {
+      final bytes = await Supabase.instance.client.storage
+          .from('alphabet-audio')
+          .download(storagePath);
+      if (bytes.isEmpty || bytes.length.isOdd) return null;
+      final resolved = bytes.toList(growable: false);
+      _synthCache[cacheKey] = resolved;
+      await _writeDiskCache(
+        cacheKey,
+        resolved,
+        voiceName: voiceName,
+        slow: slow,
+        text: text,
+        contentItemId: contentItemId,
+      );
+      return resolved;
     } catch (_) {
       return null;
     }

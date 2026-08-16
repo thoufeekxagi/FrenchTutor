@@ -9,7 +9,8 @@ import 'progress_ring.dart';
 /// A single-clip speaker/play button shared across grammar, vocabulary,
 /// listening, and writing screens. States:
 ///  - idle: plain speaker icon, tappable.
-///  - generating: a green spinning ring replaces the icon while Gemini
+///  - generating: an accent-colored spinning ring replaces the icon while
+///    Gemini
 ///    synthesizes this line for the first time — this only ever happens
 ///    once per line, ever, since every synthesis is cached (see
 ///    `LessonSpeechService`). Once generation finishes the button reverts to
@@ -29,6 +30,7 @@ class TtsPlayButton extends StatefulWidget {
     this.slow = false,
     this.contentItemId,
     this.bundledAssetPath,
+    this.remoteStoragePath,
     this.size = 40,
     this.iconSize = 20,
     this.color,
@@ -42,6 +44,10 @@ class TtsPlayButton extends StatefulWidget {
   /// Gemini; a missing asset is treated as an unavailable clip instead of
   /// falling back to live synthesis.
   final String? bundledAssetPath;
+
+  /// Optional public Supabase Storage path for a pre-generated clip. If the
+  /// remote file is unavailable, [bundledAssetPath] remains the fallback.
+  final String? remoteStoragePath;
   final double size;
   final double iconSize;
   final Color? color;
@@ -67,6 +73,22 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
     if (_readyBytes != null) {
       await _play(_readyBytes!);
       return;
+    }
+
+    final remoteStoragePath = widget.remoteStoragePath;
+    if (remoteStoragePath != null) {
+      final bytes = await LessonSpeechService.shared.loadRemoteAudio(
+        remoteStoragePath,
+        text: widget.text,
+        voiceName: ActiveTutor.current.voiceName,
+        slow: widget.slow,
+        contentItemId: widget.contentItemId,
+      );
+      if (bytes != null) {
+        _readyBytes = bytes;
+        if (mounted) await _play(bytes);
+        return;
+      }
     }
 
     final bundledAssetPath = widget.bundledAssetPath;
@@ -118,7 +140,8 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
   void didUpdateWidget(covariant TtsPlayButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.text != widget.text ||
-        oldWidget.bundledAssetPath != widget.bundledAssetPath) {
+        oldWidget.bundledAssetPath != widget.bundledAssetPath ||
+        oldWidget.remoteStoragePath != widget.remoteStoragePath) {
       _readyBytes = null;
     }
   }
@@ -141,10 +164,7 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
       height: widget.size,
       child: switch (_phase) {
         _Phase.generating => Center(
-          child: SpinningRing(
-            size: widget.size * 0.75,
-            color: DesignTokens.success,
-          ),
+          child: SpinningRing(size: widget.size * 0.75, color: color),
         ),
         _Phase.idle || _Phase.playing => IconButton(
           onPressed: _phase == _Phase.idle ? _onTap : null,
