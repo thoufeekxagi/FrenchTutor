@@ -81,6 +81,8 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   15: _migrationV15,
   16: _migrationV16,
   17: _migrationV17,
+  18: _migrationV18,
+  19: _migrationV19,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -853,4 +855,48 @@ void _migrationV17(CommonDatabase db) {
   db.execute(
     'CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_uuid ON messages (uuid) WHERE uuid IS NOT NULL',
   );
+}
+
+/// Stable course identity for the new published Speak curriculum. Existing
+/// sessions remain valid with a null key; new roadmap/roleplay sessions write
+/// one so completion can follow content across devices and catalog versions.
+void _migrationV18(CommonDatabase db) {
+  if (!_tableExists(db, 'sessions')) return;
+  if (!_columnExists(db, 'sessions', 'content_key')) {
+    db.execute('ALTER TABLE sessions ADD COLUMN content_key TEXT');
+  }
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_sessions_content_key ON sessions (content_key)',
+  );
+}
+
+/// Adds the presentation metadata for the Readle-inspired short-book
+/// library. The passage remains the source of truth for the lesson itself;
+/// these columns only let the home screen render a stable book card and reuse
+/// the one generated cover without another model call.
+void _migrationV19(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_stories')) return;
+  if (!_columnExists(db, 'generated_stories', 'level_band')) {
+    db.execute(
+      "ALTER TABLE generated_stories ADD COLUMN level_band TEXT NOT NULL DEFAULT 'A2'",
+    );
+  }
+  if (!_columnExists(db, 'generated_stories', 'summary')) {
+    db.execute(
+      "ALTER TABLE generated_stories ADD COLUMN summary TEXT NOT NULL DEFAULT ''",
+    );
+  }
+  if (!_columnExists(db, 'generated_stories', 'topic')) {
+    db.execute(
+      "ALTER TABLE generated_stories ADD COLUMN topic TEXT NOT NULL DEFAULT ''",
+    );
+  }
+  if (!_columnExists(db, 'generated_stories', 'read_time_minutes')) {
+    db.execute(
+      "ALTER TABLE generated_stories ADD COLUMN read_time_minutes INTEGER NOT NULL DEFAULT 5",
+    );
+  }
+  if (!_columnExists(db, 'generated_stories', 'cover_url')) {
+    db.execute('ALTER TABLE generated_stories ADD COLUMN cover_url TEXT');
+  }
 }

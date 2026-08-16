@@ -100,6 +100,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   _StoryTab _tab = _StoryTab.story;
   int _currentSegment = 0;
   bool _isPlaying = false;
+  bool _isLoadingAudio = false;
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
@@ -248,6 +249,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     if (segments.isEmpty) return;
     setState(() {
       _isPlaying = true;
+      _isLoadingAudio = true;
       _currentSegment = fromIndex;
     });
     await LessonSpeechService.shared.speak(
@@ -268,6 +270,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         });
         _scrollToCurrent();
       },
+      onPlaybackReady: () {
+        if (mounted) setState(() => _isLoadingAudio = false);
+      },
       onWordBoundary: (_, wordIndex) {
         if (!mounted) return;
         setState(() => _currentWord = wordIndex);
@@ -276,6 +281,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         if (!mounted) return;
         setState(() {
           _isPlaying = false;
+          _isLoadingAudio = false;
           _currentWord = null;
         });
       },
@@ -296,6 +302,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Future<void> _togglePlayPause() async {
     final speech = LessonSpeechService.shared;
+    if (_isLoadingAudio) return;
     if (_isPlaying && !speech.isPaused) {
       await speech.pause();
       if (mounted) setState(() => _isPlaying = false);
@@ -311,7 +318,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Future<void> _stop() async {
     await LessonSpeechService.shared.stop();
-    if (mounted) setState(() => _isPlaying = false);
+    if (mounted) {
+      setState(() {
+        _isPlaying = false;
+        _isLoadingAudio = false;
+        _currentWord = null;
+      });
+    }
   }
 
   void _selectSegment(int index) {
@@ -322,11 +335,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   /// picked), not the rest of the story — for "let me hear that one line
   /// again" rather than "keep reading from here".
   Future<void> _playSelectedSentence() async {
+    if (_isLoadingAudio) return;
     final segments = _passage.segments;
     final index = _selectedSegment ?? _currentSegment;
     if (index < 0 || index >= segments.length) return;
     setState(() {
       _isPlaying = true;
+      _isLoadingAudio = true;
       _currentSegment = index;
     });
     await LessonSpeechService.shared.speak(
@@ -343,6 +358,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         setState(() => _currentWord = null);
         _scrollToCurrent();
       },
+      onPlaybackReady: () {
+        if (mounted) setState(() => _isLoadingAudio = false);
+      },
       onWordBoundary: (_, wordIndex) {
         if (!mounted) return;
         setState(() => _currentWord = wordIndex);
@@ -351,6 +369,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         if (!mounted) return;
         setState(() {
           _isPlaying = false;
+          _isLoadingAudio = false;
           _currentWord = null;
         });
       },
@@ -419,6 +438,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                 if (_tab == _StoryTab.story)
                   _AudioControlBar(
                     isPlaying: _isPlaying,
+                    isLoading: _isLoadingAudio,
                     rate: _rate,
                     onTogglePlayPause: _togglePlayPause,
                     onStop: _stop,
@@ -450,81 +470,112 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Widget _storyView() {
     final segments = _passage.segments;
     String? lastCharacter;
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      itemCount: segments.length,
-      itemBuilder: (context, index) {
-        final segment = segments[index];
-        final showCharacter =
-            segment.characterFr != null && segment.characterFr != lastCharacter;
-        lastCharacter = segment.characterFr ?? lastCharacter;
-        // Highlighted either because it's actively playing right now, or
-        // because the learner picked it as where the next play should
-        // start from — see `_selectedSegment`.
-        final isPlayingNow = index == _currentSegment && _isPlaying;
-        final isPicked = !_isPlaying && index == _selectedSegment;
-        final isHighlighted = isPlayingNow || isPicked;
-        return Padding(
-          key: _keyFor(index),
-          padding: const EdgeInsets.only(bottom: 18),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => _selectSegment(index),
-            child: Container(
-              padding: isHighlighted
-                  ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8)
-                  : EdgeInsets.zero,
-              decoration: isHighlighted
-                  ? BoxDecoration(
-                      color: DesignTokens.primarySoft,
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.radiusMedium,
+      children: [
+        _StoryBookHeader(story: _story),
+        const SizedBox(height: 18),
+        for (final entry in segments.asMap().entries)
+          Builder(
+            builder: (context) {
+              final index = entry.key;
+              final segment = entry.value;
+              final showCharacter =
+                  segment.characterFr != null &&
+                  segment.characterFr != lastCharacter;
+              lastCharacter = segment.characterFr ?? lastCharacter;
+              // Highlighted either because it's actively playing right now, or
+              // because the learner picked it as where the next play should
+              // start from — see `_selectedSegment`.
+              final isPlayingNow = index == _currentSegment && _isPlaying;
+              final isPicked = !_isPlaying && index == _selectedSegment;
+              final isHighlighted = isPlayingNow || isPicked;
+              return Padding(
+                key: _keyFor(index),
+                padding: const EdgeInsets.only(bottom: 12),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _selectSegment(index),
+                  child: ModernCard(
+                    padding: 16,
+                    child: Container(
+                      padding: isHighlighted
+                          ? const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            )
+                          : EdgeInsets.zero,
+                      decoration: isHighlighted
+                          ? BoxDecoration(
+                              color: DesignTokens.primarySoft,
+                              borderRadius: BorderRadius.circular(
+                                DesignTokens.radiusMedium,
+                              ),
+                            )
+                          : null,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showCharacter) ...[
+                            Text(
+                              segment.characterFr!,
+                              style:
+                                  DesignTokens.mono(
+                                    11,
+                                    weight: FontWeight.w700,
+                                  ).copyWith(
+                                    color: DesignTokens.mutedDim,
+                                    letterSpacing: 0.8,
+                                  ),
+                            ),
+                            const SizedBox(height: 6),
+                          ],
+                          isPlayingNow
+                              ? _WordHighlightText(
+                                  text: segment.fr,
+                                  currentWord: _currentWord,
+                                  style: DesignTokens.body(
+                                    17,
+                                    weight: FontWeight.w600,
+                                  ).copyWith(height: 1.4),
+                                )
+                              : Text(
+                                  segment.fr,
+                                  style: DesignTokens.body(
+                                    17,
+                                    weight: FontWeight.w600,
+                                  ).copyWith(height: 1.4),
+                                ),
+                          const SizedBox(height: 4),
+                          isPlayingNow
+                              ? _WordHighlightText(
+                                  text: segment.en,
+                                  currentWord: _mappedTranslationWord(
+                                    currentWord: _currentWord,
+                                    source: segment.fr,
+                                    translation: segment.en,
+                                  ),
+                                  style: DesignTokens.body(14.5).copyWith(
+                                    color: DesignTokens.primary,
+                                    height: 1.4,
+                                  ),
+                                )
+                              : Text(
+                                  segment.en,
+                                  style: DesignTokens.body(14.5).copyWith(
+                                    color: DesignTokens.primary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                        ],
                       ),
-                    )
-                  : null,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (showCharacter) ...[
-                    Text(
-                      segment.characterFr!,
-                      style: DesignTokens.mono(11, weight: FontWeight.w700)
-                          .copyWith(
-                            color: DesignTokens.slateDim,
-                            letterSpacing: 0.8,
-                          ),
                     ),
-                    const SizedBox(height: 6),
-                  ],
-                  isPlayingNow
-                      ? _WordHighlightText(
-                          text: segment.fr,
-                          currentWord: _currentWord,
-                          style: DesignTokens.body(
-                            17,
-                            weight: FontWeight.w600,
-                          ).copyWith(height: 1.4),
-                        )
-                      : Text(
-                          segment.fr,
-                          style: DesignTokens.body(
-                            17,
-                            weight: FontWeight.w600,
-                          ).copyWith(height: 1.4),
-                        ),
-                  const SizedBox(height: 4),
-                  Text(
-                    segment.en,
-                    style: DesignTokens.body(
-                      14.5,
-                    ).copyWith(color: DesignTokens.primary, height: 1.4),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
-        );
-      },
+      ],
     );
   }
 
@@ -552,13 +603,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               style: DesignTokens.mono(
                 10.5,
                 weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.slateDim, letterSpacing: 0.8),
+              ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.8),
             ),
           if (points.isNotEmpty) const SizedBox(height: 12),
         ],
         for (var i = 0; i < points.length; i++) ...[
           if (i > 0) const SizedBox(height: 14),
-          PasseportCard(
+          ModernCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -589,7 +640,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       const Icon(
                         CupertinoIcons.waveform,
                         size: 15,
-                        color: DesignTokens.slateDim,
+                        color: DesignTokens.mutedDim,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -597,7 +648,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                           points[i].pronunciationTip,
                           style: DesignTokens.body(
                             12.5,
-                          ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
                         ),
                       ),
                     ],
@@ -626,7 +677,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Widget _quizCard(int index, MultipleChoiceQuestion question) {
     final answered = _quizAnswers[index];
-    return PasseportCard(
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -697,7 +748,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final entry = keywords[index];
-        return PasseportCard(
+        return ModernCard(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -715,7 +766,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                         entry.phonetic,
                         style: DesignTokens.mono(
                           11,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ],
                   ],
@@ -732,6 +783,93 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           ),
         );
       },
+    );
+  }
+}
+
+class _StoryBookHeader extends StatelessWidget {
+  const _StoryBookHeader({required this.story});
+
+  final GeneratedStory story;
+
+  @override
+  Widget build(BuildContext context) {
+    return ModernCard(
+      padding: 0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: 112,
+              height: 168,
+              child: story.coverUrl == null || story.coverUrl!.isEmpty
+                  ? Container(
+                      decoration: const BoxDecoration(
+                        gradient: DesignTokens.heroGradient,
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.book_fill,
+                        color: Colors.white,
+                        size: 34,
+                      ),
+                    )
+                  : Image.network(
+                      story.coverUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => Container(
+                        decoration: const BoxDecoration(
+                          gradient: DesignTokens.heroGradient,
+                        ),
+                        child: const Icon(
+                          CupertinoIcons.book_fill,
+                          color: Colors.white,
+                          size: 34,
+                        ),
+                      ),
+                    ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${story.levelBand}  •  ${story.readTimeMinutes} min read',
+                      style: DesignTokens.mono(10, weight: FontWeight.w700)
+                          .copyWith(
+                            color: DesignTokens.primary,
+                            letterSpacing: 0.6,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      story.displayTitle,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.display(19),
+                    ),
+                    if (story.summary.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        story.summary,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.body(
+                          12.5,
+                        ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -753,7 +891,7 @@ class _GrammarExplanationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -857,7 +995,7 @@ class _GrammarExplanationCard extends StatelessWidget {
                       ex.en,
                       style: DesignTokens.body(
                         12.5,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -880,7 +1018,7 @@ class _ConjugationTable extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: DesignTokens.parchmentDim,
+        color: DesignTokens.canvasDim,
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       child: Column(
@@ -921,7 +1059,7 @@ class _ConjugationTable extends StatelessWidget {
                       row.pronoun,
                       style: DesignTokens.body(
                         13,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ),
                   Text(
@@ -1032,6 +1170,22 @@ class _WordHighlightText extends StatelessWidget {
   }
 }
 
+int? _mappedTranslationWord({
+  required int? currentWord,
+  required String source,
+  required String translation,
+}) {
+  if (currentWord == null) return null;
+  final sourceCount = _wordParts(source).length;
+  final translationCount = _wordParts(translation).length;
+  if (sourceCount == 0 || translationCount == 0) return null;
+  final mapped = (currentWord * translationCount / sourceCount).floor();
+  return mapped.clamp(0, translationCount - 1);
+}
+
+List<String> _wordParts(String text) =>
+    text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
+
 class _TabRow extends StatelessWidget {
   const _TabRow({
     required this.selected,
@@ -1074,7 +1228,7 @@ class _TabRow extends StatelessWidget {
                       .copyWith(
                         color: isSelected
                             ? Colors.white
-                            : DesignTokens.slateDim,
+                            : DesignTokens.mutedDim,
                       ),
                 ),
               ),
@@ -1089,6 +1243,7 @@ class _TabRow extends StatelessWidget {
 class _AudioControlBar extends StatelessWidget {
   const _AudioControlBar({
     required this.isPlaying,
+    required this.isLoading,
     required this.rate,
     required this.onTogglePlayPause,
     required this.onStop,
@@ -1098,6 +1253,7 @@ class _AudioControlBar extends StatelessWidget {
   });
 
   final bool isPlaying;
+  final bool isLoading;
   final double rate;
   final VoidCallback onTogglePlayPause;
   final VoidCallback onStop;
@@ -1127,7 +1283,8 @@ class _AudioControlBar extends StatelessWidget {
               icon: isPlaying
                   ? CupertinoIcons.pause_fill
                   : CupertinoIcons.play_fill,
-              onTap: onTogglePlayPause,
+              loading: isLoading,
+              onTap: isLoading ? () {} : onTogglePlayPause,
             ),
             const SizedBox(width: 8),
             GestureDetector(
@@ -1197,7 +1354,11 @@ class _AudioControlBar extends StatelessWidget {
     );
   }
 
-  Widget _circleButton({required IconData icon, required VoidCallback onTap}) {
+  Widget _circleButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    bool loading = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1207,7 +1368,16 @@ class _AudioControlBar extends StatelessWidget {
           color: DesignTokens.primary,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 18),
+        child: loading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              )
+            : Icon(icon, color: Colors.white, size: 18),
       ),
     );
   }
@@ -1240,7 +1410,7 @@ class _ComingSoon extends StatelessWidget {
             else
               const Icon(
                 CupertinoIcons.hourglass,
-                color: DesignTokens.slateDim,
+                color: DesignTokens.mutedDim,
                 size: 30,
               ),
             const SizedBox(height: 12),
@@ -1256,7 +1426,7 @@ class _ComingSoon extends StatelessWidget {
               textAlign: TextAlign.center,
               style: DesignTokens.body(
                 13.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
             ),
           ],
         ),

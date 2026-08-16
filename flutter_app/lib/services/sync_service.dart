@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:sqlite3/common.dart';
@@ -75,35 +76,46 @@ class SyncService {
   // Profile
   // ---------------------------------------------------------------------------
 
-  Future<void> syncProfile(Profile p) => _guarded((uid) async {
-    await _client.from('profiles').update({
-      'goal': p.goal,
-      'level': p.level,
-      'session_length': p.sessionLength,
-      'reminder_time': p.reminderTime,
-      'onboarded_at': p.onboardedAt?.toUtc().toIso8601String(),
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    }).eq('id', uid);
-  }, queueTable: 'profiles', queueRowId: p.id);
+  Future<void> syncProfile(Profile p) => _guarded(
+    (uid) async {
+      await _client
+          .from('profiles')
+          .update({
+            'goal': p.goal,
+            'level': p.level,
+            'session_length': p.sessionLength,
+            'reminder_time': p.reminderTime,
+            'onboarded_at': p.onboardedAt?.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', uid);
+    },
+    queueTable: 'profiles',
+    queueRowId: p.id,
+  );
 
   // ---------------------------------------------------------------------------
   // Vocab / SRS
   // ---------------------------------------------------------------------------
 
-  Future<void> syncVocabCard(SRSState s) => _guarded((uid) async {
-    await _client.from('vocab_card_state').upsert({
-      'user_id': uid,
-      'entry_id': s.entryId,
-      'ease': s.ease,
-      'interval_days': s.intervalDays,
-      'reps': s.reps,
-      'due_at': s.dueAt?.toUtc().toIso8601String(),
-      'introduced_on': s.introducedOn,
-      'last_reviewed_at': s.lastReviewedAt?.toUtc().toIso8601String(),
-      'last_grade': s.lastGrade?.name,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    }, onConflict: 'user_id,entry_id');
-  }, queueTable: 'vocab_cards', queueRowId: s.entryId);
+  Future<void> syncVocabCard(SRSState s) => _guarded(
+    (uid) async {
+      await _client.from('vocab_card_state').upsert({
+        'user_id': uid,
+        'entry_id': s.entryId,
+        'ease': s.ease,
+        'interval_days': s.intervalDays,
+        'reps': s.reps,
+        'due_at': s.dueAt?.toUtc().toIso8601String(),
+        'introduced_on': s.introducedOn,
+        'last_reviewed_at': s.lastReviewedAt?.toUtc().toIso8601String(),
+        'last_grade': s.lastGrade?.name,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,entry_id');
+    },
+    queueTable: 'vocab_cards',
+    queueRowId: s.entryId,
+  );
 
   Future<void> logVocabReview({
     required String reviewId,
@@ -112,106 +124,153 @@ class SyncService {
     required String responseType,
     String? sessionId,
     required DateTime reviewedAt,
-  }) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'vocab_review',
-      'payload': {
-        'id': reviewId,
-        'entry_id': entryId,
-        'grade': grade,
-        'response_type': responseType,
-        'session_id': sessionId,
-      },
-      'occurred_at': reviewedAt.toUtc().toIso8601String(),
-    });
-  }, queueTable: 'vocab_reviews', queueRowId: reviewId);
+  }) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'vocab_review',
+        'payload': {
+          'id': reviewId,
+          'entry_id': entryId,
+          'grade': grade,
+          'response_type': responseType,
+          'session_id': sessionId,
+        },
+        'occurred_at': reviewedAt.toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'vocab_reviews',
+    queueRowId: reviewId,
+  );
 
   // ---------------------------------------------------------------------------
   // Daily Path / AI sessions / credit
   // ---------------------------------------------------------------------------
 
-  Future<void> syncDailySession(DailySession session) => _guarded((uid) async {
-    // The table's real uniqueness constraint is (user_id, local_date), not
-    // just `id` — a new local DailySession row (a fresh client-generated id,
-    // e.g. when the rotation planner regenerates today's plan) for a date
-    // that already has a synced row was hitting that constraint as a 23505
-    // conflict instead of updating it, since upsert() only dedupes against
-    // the column set you give it (the primary key, `id`, by default).
-    await _client
-        .from('daily_session_state')
-        .upsert({
-          'id': session.id,
-          'user_id': uid,
-          'local_date': session.localDate,
-          'planned_length': session.plannedLength,
-          'current_stage': session.currentStage?.name,
-          'current_item_index': session.currentItemIndex,
-          'stages_json': session.stagesToJson(),
-          'vocab_entry_ids_json': session.vocabEntryIds,
-          'grammar_lesson_id': session.grammarLessonId,
-          'reading_passage_json': session.readingPassageJson,
-          'writing_task_json': session.writingTaskJson,
-          'started_at': session.startedAt?.toUtc().toIso8601String(),
-          'completed_at': session.completedAt?.toUtc().toIso8601String(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        }, onConflict: 'user_id,local_date');
-  }, queueTable: 'daily_sessions', queueRowId: session.id);
+  Future<void> syncDailySession(DailySession session) => _guarded(
+    (uid) async {
+      // The table's real uniqueness constraint is (user_id, local_date), not
+      // just `id` — a new local DailySession row (a fresh client-generated id,
+      // e.g. when the rotation planner regenerates today's plan) for a date
+      // that already has a synced row was hitting that constraint as a 23505
+      // conflict instead of updating it, since upsert() only dedupes against
+      // the column set you give it (the primary key, `id`, by default).
+      await _client.from('daily_session_state').upsert({
+        'id': session.id,
+        'user_id': uid,
+        'local_date': session.localDate,
+        'planned_length': session.plannedLength,
+        'current_stage': session.currentStage?.name,
+        'current_item_index': session.currentItemIndex,
+        'stages_json': session.stagesToJson(),
+        'vocab_entry_ids_json': session.vocabEntryIds,
+        'grammar_lesson_id': session.grammarLessonId,
+        'reading_passage_json': session.readingPassageJson,
+        'writing_task_json': session.writingTaskJson,
+        'started_at': session.startedAt?.toUtc().toIso8601String(),
+        'completed_at': session.completedAt?.toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,local_date');
+    },
+    queueTable: 'daily_sessions',
+    queueRowId: session.id,
+  );
 
   // ---------------------------------------------------------------------------
   // Generated story library
   // ---------------------------------------------------------------------------
 
-  Future<void> syncGeneratedStory(GeneratedStory story) => _guarded((uid) async {
-    await _client.from('generated_stories').upsert({
-      'id': story.id,
-      'user_id': uid,
-      'title': story.title,
-      'passage_json': story.passage.toJson(),
-      'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
-      'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
-      'created_at': story.createdAt.toUtc().toIso8601String(),
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'generated_stories', queueRowId: story.id);
+  Future<void> syncGeneratedStory(GeneratedStory story) => _guarded(
+    (uid) async {
+      await _client.from('generated_stories').upsert({
+        'id': story.id,
+        'user_id': uid,
+        'title': story.title,
+        'passage_json': story.passage.toJson(),
+        'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
+        'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
+        'level_band': story.levelBand,
+        'summary': story.summary,
+        'topic': story.topic,
+        'read_time_minutes': story.readTimeMinutes,
+        'cover_url': story.coverUrl,
+        'created_at': story.createdAt.toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'generated_stories',
+    queueRowId: story.id,
+  );
+
+  /// Uploads a single generated cover to the public, non-sensitive artwork
+  /// bucket and returns its stable URL. The story row remains protected by
+  /// RLS; only the cover artwork is public so Flutter can render it directly
+  /// from a library card without signed-URL refresh churn.
+  Future<String?> uploadStoryCover({
+    required String storyId,
+    required Uint8List bytes,
+  }) async {
+    final uid = _userId;
+    if (uid == null) return null;
+    final path = '$uid/$storyId.jpg';
+    try {
+      final bucket = _client.storage.from('story-covers');
+      await bucket.uploadBinary(
+        path,
+        bytes,
+        fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+      );
+      return bucket.getPublicUrl(path);
+    } catch (e, st) {
+      debugPrint('Story cover upload failed ($storyId): $e\n$st');
+      return null;
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Generated grammar-practice library
   // ---------------------------------------------------------------------------
 
   Future<void> syncGeneratedGrammarStory(GeneratedGrammarStory story) =>
-      _guarded((uid) async {
-        await _client.from('generated_grammar_stories').upsert({
-          'id': story.id,
-          'user_id': uid,
-          'title': story.title,
-          'grammar_point': story.grammarPoint,
-          'level_band': story.levelBand,
-          'passage_json': story.passage.toJson(),
-          'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
-          'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
-          'explanation_json': story.explanation.toJson(),
-          'score': story.score,
-          'created_at': story.createdAt.toUtc().toIso8601String(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        });
-      }, queueTable: 'generated_grammar_stories', queueRowId: story.id);
+      _guarded(
+        (uid) async {
+          await _client.from('generated_grammar_stories').upsert({
+            'id': story.id,
+            'user_id': uid,
+            'title': story.title,
+            'grammar_point': story.grammarPoint,
+            'level_band': story.levelBand,
+            'passage_json': story.passage.toJson(),
+            'quiz_json': story.quiz.map((q) => q.toJson()).toList(),
+            'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
+            'explanation_json': story.explanation.toJson(),
+            'score': story.score,
+            'created_at': story.createdAt.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          });
+        },
+        queueTable: 'generated_grammar_stories',
+        queueRowId: story.id,
+      );
 
   // ---------------------------------------------------------------------------
   // Generated roleplay library
   // ---------------------------------------------------------------------------
 
-  Future<void> syncGeneratedRoleplay(GeneratedRoleplay roleplay) =>
-      _guarded((uid) async {
-        await _client.from('generated_roleplays').upsert({
-          'id': roleplay.id,
-          'user_id': uid,
-          'title': roleplay.title,
-          'passage_json': roleplay.passage.toJson(),
-          'created_at': roleplay.createdAt.toUtc().toIso8601String(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        });
-      }, queueTable: 'generated_roleplays', queueRowId: roleplay.id);
+  Future<void> syncGeneratedRoleplay(GeneratedRoleplay roleplay) => _guarded(
+    (uid) async {
+      await _client.from('generated_roleplays').upsert({
+        'id': roleplay.id,
+        'user_id': uid,
+        'title': roleplay.title,
+        'passage_json': roleplay.passage.toJson(),
+        'created_at': roleplay.createdAt.toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'generated_roleplays',
+    queueRowId: roleplay.id,
+  );
 
   // ---------------------------------------------------------------------------
   // Practice sessions + their transcripts — every completed practice/lesson,
@@ -221,60 +280,79 @@ class SyncService {
   // reinstall.
   // ---------------------------------------------------------------------------
 
-  Future<void> syncSession(app_session.Session session, {required String updatedAt}) =>
-      _guarded((uid) async {
-        await _client.from('sessions_state').upsert({
-          'id': session.id,
-          'user_id': uid,
-          'started_at': session.startedAt,
-          'ended_at': session.endedAt,
-          'summary': session.summary,
-          'topic': session.topic,
-          'vocabulary_json': session.vocabulary,
-          'stage': session.stage,
-          'updated_at': updatedAt,
-        });
-      }, queueTable: 'sessions_state', queueRowId: session.id);
+  Future<void> syncSession(
+    app_session.Session session, {
+    required String updatedAt,
+  }) => _guarded(
+    (uid) async {
+      await _client.from('sessions_state').upsert({
+        'id': session.id,
+        'user_id': uid,
+        'started_at': session.startedAt,
+        'ended_at': session.endedAt,
+        'summary': session.summary,
+        'topic': session.topic,
+        'content_key': session.contentKey,
+        'vocabulary_json': session.vocabulary,
+        'stage': session.stage,
+        'updated_at': updatedAt,
+      });
+    },
+    queueTable: 'sessions_state',
+    queueRowId: session.id,
+  );
 
   Future<void> syncMessage({
     required String uuid,
     required String sessionId,
     required String role,
     required String content,
-  }) => _guarded((uid) async {
-    await _client.from('chat_messages_state').upsert({
-      'id': uuid,
-      'user_id': uid,
-      'session_id': sessionId,
-      'role': role,
-      'content': content,
-    });
-  }, queueTable: 'chat_messages_state', queueRowId: uuid);
+  }) => _guarded(
+    (uid) async {
+      await _client.from('chat_messages_state').upsert({
+        'id': uuid,
+        'user_id': uid,
+        'session_id': sessionId,
+        'role': role,
+        'content': content,
+      });
+    },
+    queueTable: 'chat_messages_state',
+    queueRowId: uuid,
+  );
 
   // ---------------------------------------------------------------------------
   // Floating notetaker — both self-typed notes and AI-generated session recaps
   // ---------------------------------------------------------------------------
 
-  Future<void> syncNote(Note note) => _guarded((uid) async {
-    if (note.uuid == null) return; // legacy row, not yet assigned an id
-    await _client.from('notes_state').upsert({
-      'id': note.uuid,
-      'user_id': uid,
-      'tag': note.tag,
-      'text': note.text,
-      'source': note.source,
-      'session_id': note.sessionId,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'notes_state', queueRowId: note.uuid ?? note.id.toString());
+  Future<void> syncNote(Note note) => _guarded(
+    (uid) async {
+      if (note.uuid == null) return; // legacy row, not yet assigned an id
+      await _client.from('notes_state').upsert({
+        'id': note.uuid,
+        'user_id': uid,
+        'tag': note.tag,
+        'text': note.text,
+        'source': note.source,
+        'session_id': note.sessionId,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'notes_state',
+    queueRowId: note.uuid ?? note.id.toString(),
+  );
 
-  Future<void> deleteNote(String uuid) => _guarded((uid) async {
-    await _client
-        .from('notes_state')
-        .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', uuid)
-        .eq('user_id', uid);
-  }, queueTable: 'notes_state', queueRowId: uuid);
+  Future<void> deleteNote(String uuid) => _guarded(
+    (uid) async {
+      await _client
+          .from('notes_state')
+          .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', uuid)
+          .eq('user_id', uid);
+    },
+    queueTable: 'notes_state',
+    queueRowId: uuid,
+  );
 
   Future<void> syncAiSessionStart({
     required String id,
@@ -282,17 +360,21 @@ class SyncService {
     String? stage,
     String? topic,
     required DateTime connectedAt,
-  }) => _guarded((uid) async {
-    await _client.from('ai_session_state').upsert({
-      'id': id,
-      'user_id': uid,
-      'daily_session_id': dailySessionId,
-      'stage': stage,
-      'topic': topic,
-      'connected_at': connectedAt.toUtc().toIso8601String(),
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'ai_sessions', queueRowId: id);
+  }) => _guarded(
+    (uid) async {
+      await _client.from('ai_session_state').upsert({
+        'id': id,
+        'user_id': uid,
+        'daily_session_id': dailySessionId,
+        'stage': stage,
+        'topic': topic,
+        'connected_at': connectedAt.toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'ai_sessions',
+    queueRowId: id,
+  );
 
   Future<void> syncAiSessionEnd({
     required String id,
@@ -300,37 +382,45 @@ class SyncService {
     required String endedReason,
     required int learnerUtteranceCount,
     String? transcriptJson,
-  }) => _guarded((uid) async {
-    await _client
-        .from('ai_session_state')
-        .update({
-          'ended_at': endedAt.toUtc().toIso8601String(),
-          'ended_reason': endedReason,
-          'learner_utterance_count': learnerUtteranceCount,
-          if (transcriptJson != null) 'transcript_json': transcriptJson,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', id);
-  }, queueTable: 'ai_sessions', queueRowId: id);
+  }) => _guarded(
+    (uid) async {
+      await _client
+          .from('ai_session_state')
+          .update({
+            'ended_at': endedAt.toUtc().toIso8601String(),
+            'ended_reason': endedReason,
+            'learner_utterance_count': learnerUtteranceCount,
+            if (transcriptJson != null) 'transcript_json': transcriptJson,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', id);
+    },
+    queueTable: 'ai_sessions',
+    queueRowId: id,
+  );
 
   Future<void> addCreditUsage({
     required String localDate,
     required int secondsUsed,
-  }) => _guarded((uid) async {
-    final existing = await _client
-        .from('credit_usage_state')
-        .select('seconds_used')
-        .eq('user_id', uid)
-        .eq('local_date', localDate)
-        .maybeSingle();
-    final total = (existing?['seconds_used'] as int? ?? 0) + secondsUsed;
-    await _client.from('credit_usage_state').upsert({
-      'user_id': uid,
-      'local_date': localDate,
-      'seconds_used': total,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    }, onConflict: 'user_id,local_date');
-  }, queueTable: 'credit_usage', queueRowId: '$localDate:$secondsUsed');
+  }) => _guarded(
+    (uid) async {
+      final existing = await _client
+          .from('credit_usage_state')
+          .select('seconds_used')
+          .eq('user_id', uid)
+          .eq('local_date', localDate)
+          .maybeSingle();
+      final total = (existing?['seconds_used'] as int? ?? 0) + secondsUsed;
+      await _client.from('credit_usage_state').upsert({
+        'user_id': uid,
+        'local_date': localDate,
+        'seconds_used': total,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,local_date');
+    },
+    queueTable: 'credit_usage',
+    queueRowId: '$localDate:$secondsUsed',
+  );
 
   // ---------------------------------------------------------------------------
   // Lesson progress / habits / writing / mistakes / diary — the smaller
@@ -342,80 +432,102 @@ class SyncService {
     String lessonId,
     String status, {
     double? score,
-  }) => _guarded((uid) async {
-    await _client.from('lesson_progress_state').upsert({
-      'user_id': uid,
-      'lesson_id': lessonId,
-      'status': status,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    }, onConflict: 'user_id,lesson_id');
-  }, queueTable: 'lesson_progress', queueRowId: lessonId);
+  }) => _guarded(
+    (uid) async {
+      await _client.from('lesson_progress_state').upsert({
+        'user_id': uid,
+        'lesson_id': lessonId,
+        'status': status,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,lesson_id');
+    },
+    queueTable: 'lesson_progress',
+    queueRowId: lessonId,
+  );
 
   Future<void> logHabit({
     required String habitId,
     required bool done,
     required int minutes,
     required String date,
-  }) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'habit_marked',
-      'payload': {'habit_id': habitId, 'done': done, 'minutes': minutes},
-      'occurred_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'operational_events', queueRowId: '$date:$habitId');
+  }) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'habit_marked',
+        'payload': {'habit_id': habitId, 'done': done, 'minutes': minutes},
+        'occurred_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'operational_events',
+    queueRowId: '$date:$habitId',
+  );
 
   Future<void> logWritingSubmission({
     required String taskId,
     required String text,
     required String feedback,
-  }) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'writing_submission',
-      'payload': {'task_id': taskId, 'text': text, 'feedback': feedback},
-      'occurred_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'operational_events', queueRowId: '$taskId:${DateTime.now().microsecondsSinceEpoch}');
+  }) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'writing_submission',
+        'payload': {'task_id': taskId, 'text': text, 'feedback': feedback},
+        'occurred_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'operational_events',
+    queueRowId: '$taskId:${DateTime.now().microsecondsSinceEpoch}',
+  );
 
-  Future<void> logMistake({
-    required String tag,
-    required String description,
-  }) => _guarded((uid) async {
-    final existing = await _client
-        .from('mistake_tag_state')
-        .select('occurrences')
-        .eq('user_id', uid)
-        .eq('tag', tag)
-        .maybeSingle();
-    await _client.from('mistake_tag_state').upsert({
-      'user_id': uid,
-      'tag': tag,
-      'occurrences': (existing?['occurrences'] as int? ?? 0) + 1,
-      'resolved': false,
-      'last_seen_at': DateTime.now().toUtc().toIso8601String(),
-    }, onConflict: 'user_id,tag');
-  }, queueTable: 'mistake_tags', queueRowId: tag);
+  Future<void> logMistake({required String tag, required String description}) =>
+      _guarded(
+        (uid) async {
+          final existing = await _client
+              .from('mistake_tag_state')
+              .select('occurrences')
+              .eq('user_id', uid)
+              .eq('tag', tag)
+              .maybeSingle();
+          await _client.from('mistake_tag_state').upsert({
+            'user_id': uid,
+            'tag': tag,
+            'occurrences': (existing?['occurrences'] as int? ?? 0) + 1,
+            'resolved': false,
+            'last_seen_at': DateTime.now().toUtc().toIso8601String(),
+          }, onConflict: 'user_id,tag');
+        },
+        queueTable: 'mistake_tags',
+        queueRowId: tag,
+      );
 
-  Future<void> resolveMistakeTag(String tag) => _guarded((uid) async {
-    await _client
-        .from('mistake_tag_state')
-        .update({'resolved': true})
-        .eq('user_id', uid)
-        .eq('tag', tag);
-  }, queueTable: 'mistake_tags', queueRowId: tag);
+  Future<void> resolveMistakeTag(String tag) => _guarded(
+    (uid) async {
+      await _client
+          .from('mistake_tag_state')
+          .update({'resolved': true})
+          .eq('user_id', uid)
+          .eq('tag', tag);
+    },
+    queueTable: 'mistake_tags',
+    queueRowId: tag,
+  );
 
   Future<void> logDiaryEntry({
     required String stage,
     required String summary,
-  }) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'diary_entry',
-      'payload': {'stage': stage, 'summary': summary},
-      'occurred_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }, queueTable: 'operational_events', queueRowId: '$stage:${DateTime.now().microsecondsSinceEpoch}');
+  }) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'diary_entry',
+        'payload': {'stage': stage, 'summary': summary},
+        'occurred_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'operational_events',
+    queueRowId: '$stage:${DateTime.now().microsecondsSinceEpoch}',
+  );
 
   // ---------------------------------------------------------------------------
   // Orchestration state — the learner model ("personality"), evidence/error
@@ -423,52 +535,60 @@ class SyncService {
   // to make resync correctly.
   // ---------------------------------------------------------------------------
 
-  Future<void> logEvidence(EvidenceEvent event) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'evidence_event',
-      'payload': {
-        'id': event.id,
-        'plan_id': event.planId,
-        'plan_task_id': event.planTaskId,
-        'session_id': event.sessionId,
-        'content_item_id': event.contentItemId,
-        'competency_id': event.competencyId,
-        'modality': event.modality.wireName,
-        'support_level': event.supportLevel.wireName,
-        'correctness': event.correctness,
-        'score': event.score,
-        'response_time_ms': event.responseTimeMs,
-        'attempt_number': event.attemptNumber,
-        'evaluator': event.evaluator.wireName,
-        'evaluator_confidence': event.evaluatorConfidence,
-        'response': event.response,
-        'error_codes': event.errorCodes,
-      },
-      'occurred_at': event.occurredAt.toUtc().toIso8601String(),
-    });
-  }, queueTable: 'evidence_events', queueRowId: event.id);
+  Future<void> logEvidence(EvidenceEvent event) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'evidence_event',
+        'payload': {
+          'id': event.id,
+          'plan_id': event.planId,
+          'plan_task_id': event.planTaskId,
+          'session_id': event.sessionId,
+          'content_item_id': event.contentItemId,
+          'competency_id': event.competencyId,
+          'modality': event.modality.wireName,
+          'support_level': event.supportLevel.wireName,
+          'correctness': event.correctness,
+          'score': event.score,
+          'response_time_ms': event.responseTimeMs,
+          'attempt_number': event.attemptNumber,
+          'evaluator': event.evaluator.wireName,
+          'evaluator_confidence': event.evaluatorConfidence,
+          'response': event.response,
+          'error_codes': event.errorCodes,
+        },
+        'occurred_at': event.occurredAt.toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'evidence_events',
+    queueRowId: event.id,
+  );
 
-  Future<void> logError(ErrorEvent event) => _guarded((uid) async {
-    await _client.from('learner_events').insert({
-      'user_id': uid,
-      'event_type': 'error_event',
-      'payload': {
-        'id': event.id,
-        'competency_id': event.competencyId,
-        'source_evidence_id': event.sourceEvidenceId,
-        'error_code': event.errorCode,
-        'observed_form': event.observedForm,
-        'expected_form': event.expectedForm,
-        'explanation': event.explanation,
-        'severity': event.severity,
-        'evaluator': event.evaluator.wireName,
-        'evaluator_confidence': event.evaluatorConfidence,
-        'resolved_by_evidence_id': event.resolvedByEvidenceId,
-      },
-      'occurred_at': event.occurredAt.toUtc().toIso8601String(),
-    });
-  }, queueTable: 'error_events', queueRowId: event.id);
+  Future<void> logError(ErrorEvent event) => _guarded(
+    (uid) async {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'error_event',
+        'payload': {
+          'id': event.id,
+          'competency_id': event.competencyId,
+          'source_evidence_id': event.sourceEvidenceId,
+          'error_code': event.errorCode,
+          'observed_form': event.observedForm,
+          'expected_form': event.expectedForm,
+          'explanation': event.explanation,
+          'severity': event.severity,
+          'evaluator': event.evaluator.wireName,
+          'evaluator_confidence': event.evaluatorConfidence,
+          'resolved_by_evidence_id': event.resolvedByEvidenceId,
+        },
+        'occurred_at': event.occurredAt.toUtc().toIso8601String(),
+      });
+    },
+    queueTable: 'error_events',
+    queueRowId: event.id,
+  );
 
   Future<void> logTaskResult(TaskResult result) async {
     for (final e in result.competencyEvidence) {
@@ -482,93 +602,98 @@ class SyncService {
   /// Replaces the whole learner_competency_state cache for this user —
   /// mirrors CompetencyStateStore.replaceAll's "rebuilt from evidence, never
   /// hand-edited" contract.
-  Future<void> syncCompetencyStates(List<CompetencyState> states) =>
-      _guarded((uid) async {
-        await _client
-            .from('learner_competency_state')
-            .delete()
-            .eq('user_id', uid);
-        if (states.isEmpty) return;
-        await _client
-            .from('learner_competency_state')
-            .insert(
-              states
-                  .map(
-                    (s) => {
-                      'user_id': uid,
-                      'competency_id': s.competencyId,
-                      'modality': s.modality.wireName,
-                      'mastery_estimate': s.masteryEstimate,
-                      'confidence': s.confidence,
-                      'retention_strength': s.retentionStrength,
-                      'evidence_count': s.evidenceCount,
-                      'transfer_status': s.transferStatus.wireName,
-                      'last_observed_at': s.lastObservedAt
-                          ?.toUtc()
-                          .toIso8601String(),
-                      'last_success_at': s.lastSuccessAt
-                          ?.toUtc()
-                          .toIso8601String(),
-                      'next_review_at': s.nextReviewAt
-                          ?.toUtc()
-                          .toIso8601String(),
-                      'learner_model_type': s.learnerModelType,
-                      'model_version': s.modelVersion,
-                      'model_state_json': s.modelState,
-                      'updated_at': DateTime.now().toUtc().toIso8601String(),
-                    },
-                  )
-                  .toList(),
-            );
-      }, queueTable: 'learner_competency_states', queueRowId: _userId ?? 'unknown');
-
-  Future<void> syncPlan(PlanSnapshot plan) => _guarded((uid) async {
-    await _client.from('learning_plan_state').upsert({
-      'id': plan.id,
-      'user_id': uid,
-      'local_date': plan.localDate,
-      'available_minutes': plan.availableMinutes,
-      'environment_json': plan.environment,
-      'primary_priority': plan.primaryPriority,
-      'explanation': plan.explanation,
-      'planner_version': plan.plannerVersion,
-      'input_snapshot_json': plan.inputSnapshot,
-      'status': plan.status.name,
-      'replaces_plan_id': plan.replacesPlanId,
-      'replan_reason': plan.replanReason,
-      'started_at': plan.startedAt?.toUtc().toIso8601String(),
-      'completed_at': plan.completedAt?.toUtc().toIso8601String(),
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
-    });
-    if (plan.tasks.isNotEmpty) {
+  Future<void> syncCompetencyStates(List<CompetencyState> states) => _guarded(
+    (uid) async {
       await _client
-          .from('plan_task_state')
-          .upsert(
-            plan.tasks
+          .from('learner_competency_state')
+          .delete()
+          .eq('user_id', uid);
+      if (states.isEmpty) return;
+      await _client
+          .from('learner_competency_state')
+          .insert(
+            states
                 .map(
-                  (t) => {
-                    'id': t.id,
+                  (s) => {
                     'user_id': uid,
-                    'plan_id': t.planId,
-                    'sequence': t.sequence,
-                    'content_item_id': t.contentItemId,
-                    'requirement': t.requirement.name,
-                    'modality': t.modality.wireName,
-                    'estimated_minutes': t.estimatedMinutes,
-                    'reason_code': t.reasonCode.wireName,
-                    'reason_detail_json': t.reasonDetail,
-                    'target_competency_ids_json': t.targetCompetencyIds,
-                    'status': t.status.name,
-                    'started_at': t.startedAt?.toUtc().toIso8601String(),
-                    'completed_at': t.completedAt?.toUtc().toIso8601String(),
-                    'result_summary_json': t.resultSummary,
+                    'competency_id': s.competencyId,
+                    'modality': s.modality.wireName,
+                    'mastery_estimate': s.masteryEstimate,
+                    'confidence': s.confidence,
+                    'retention_strength': s.retentionStrength,
+                    'evidence_count': s.evidenceCount,
+                    'transfer_status': s.transferStatus.wireName,
+                    'last_observed_at': s.lastObservedAt
+                        ?.toUtc()
+                        .toIso8601String(),
+                    'last_success_at': s.lastSuccessAt
+                        ?.toUtc()
+                        .toIso8601String(),
+                    'next_review_at': s.nextReviewAt?.toUtc().toIso8601String(),
+                    'learner_model_type': s.learnerModelType,
+                    'model_version': s.modelVersion,
+                    'model_state_json': s.modelState,
                     'updated_at': DateTime.now().toUtc().toIso8601String(),
                   },
                 )
                 .toList(),
           );
-    }
-  }, queueTable: 'learning_plans', queueRowId: plan.id);
+    },
+    queueTable: 'learner_competency_states',
+    queueRowId: _userId ?? 'unknown',
+  );
+
+  Future<void> syncPlan(PlanSnapshot plan) => _guarded(
+    (uid) async {
+      await _client.from('learning_plan_state').upsert({
+        'id': plan.id,
+        'user_id': uid,
+        'local_date': plan.localDate,
+        'available_minutes': plan.availableMinutes,
+        'environment_json': plan.environment,
+        'primary_priority': plan.primaryPriority,
+        'explanation': plan.explanation,
+        'planner_version': plan.plannerVersion,
+        'input_snapshot_json': plan.inputSnapshot,
+        'status': plan.status.name,
+        'replaces_plan_id': plan.replacesPlanId,
+        'replan_reason': plan.replanReason,
+        'started_at': plan.startedAt?.toUtc().toIso8601String(),
+        'completed_at': plan.completedAt?.toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+      if (plan.tasks.isNotEmpty) {
+        await _client
+            .from('plan_task_state')
+            .upsert(
+              plan.tasks
+                  .map(
+                    (t) => {
+                      'id': t.id,
+                      'user_id': uid,
+                      'plan_id': t.planId,
+                      'sequence': t.sequence,
+                      'content_item_id': t.contentItemId,
+                      'requirement': t.requirement.name,
+                      'modality': t.modality.wireName,
+                      'estimated_minutes': t.estimatedMinutes,
+                      'reason_code': t.reasonCode.wireName,
+                      'reason_detail_json': t.reasonDetail,
+                      'target_competency_ids_json': t.targetCompetencyIds,
+                      'status': t.status.name,
+                      'started_at': t.startedAt?.toUtc().toIso8601String(),
+                      'completed_at': t.completedAt?.toUtc().toIso8601String(),
+                      'result_summary_json': t.resultSummary,
+                      'updated_at': DateTime.now().toUtc().toIso8601String(),
+                    },
+                  )
+                  .toList(),
+            );
+      }
+    },
+    queueTable: 'learning_plans',
+    queueRowId: plan.id,
+  );
 
   Future<void> markPlanReplaced(String planId) =>
       updatePlanStatus(planId: planId, status: 'replaced');
@@ -577,17 +702,21 @@ class SyncService {
     required String planId,
     required String status,
     DateTime? completedAt,
-  }) => _guarded((uid) async {
-    await _client
-        .from('learning_plan_state')
-        .update({
-          'status': status,
-          if (completedAt != null)
-            'completed_at': completedAt.toUtc().toIso8601String(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', planId);
-  }, queueTable: 'learning_plans', queueRowId: planId);
+  }) => _guarded(
+    (uid) async {
+      await _client
+          .from('learning_plan_state')
+          .update({
+            'status': status,
+            if (completedAt != null)
+              'completed_at': completedAt.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', planId);
+    },
+    queueTable: 'learning_plans',
+    queueRowId: planId,
+  );
 
   Future<void> syncPlanTask({
     required String taskId,
@@ -595,20 +724,24 @@ class SyncService {
     DateTime? startedAt,
     DateTime? completedAt,
     Map<String, Object?>? resultSummary,
-  }) => _guarded((uid) async {
-    await _client
-        .from('plan_task_state')
-        .update({
-          'status': status,
-          if (startedAt != null)
-            'started_at': startedAt.toUtc().toIso8601String(),
-          if (completedAt != null)
-            'completed_at': completedAt.toUtc().toIso8601String(),
-          if (resultSummary != null) 'result_summary_json': resultSummary,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', taskId);
-  }, queueTable: 'plan_tasks', queueRowId: taskId);
+  }) => _guarded(
+    (uid) async {
+      await _client
+          .from('plan_task_state')
+          .update({
+            'status': status,
+            if (startedAt != null)
+              'started_at': startedAt.toUtc().toIso8601String(),
+            if (completedAt != null)
+              'completed_at': completedAt.toUtc().toIso8601String(),
+            if (resultSummary != null) 'result_summary_json': resultSummary,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', taskId);
+    },
+    queueTable: 'plan_tasks',
+    queueRowId: taskId,
+  );
 
   // ---------------------------------------------------------------------------
   // Outbox drain — call on app resume / connectivity restored. Re-attempts
@@ -623,10 +756,10 @@ class SyncService {
     for (final mutation in pending) {
       final ok = await _retryOne(mutation.tableName, mutation.rowId);
       if (ok) {
-        _db.execute(
-          'UPDATE sync_outbox SET processed_at = ? WHERE id = ?',
-          [DateTime.now().toUtc().toIso8601String(), mutation.id],
-        );
+        _db.execute('UPDATE sync_outbox SET processed_at = ? WHERE id = ?', [
+          DateTime.now().toUtc().toIso8601String(),
+          mutation.id,
+        ]);
       } else {
         _db.execute(
           'UPDATE sync_outbox SET attempt_count = attempt_count + 1, updated_at = ? WHERE id = ?',
@@ -782,12 +915,13 @@ class SyncService {
       _db.execute(
         '''
         INSERT INTO sessions
-          (id, started_at, ended_at, summary, topic, vocabulary, stage, updated_at, deleted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (id, started_at, ended_at, summary, topic, content_key, vocabulary, stage, updated_at, deleted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           ended_at = excluded.ended_at,
           summary = excluded.summary,
           topic = excluded.topic,
+          content_key = excluded.content_key,
           vocabulary = excluded.vocabulary,
           stage = excluded.stage,
           updated_at = excluded.updated_at,
@@ -800,6 +934,7 @@ class SyncService {
           r['ended_at'],
           r['summary'],
           r['topic'],
+          r['content_key'],
           _jsonOf(r['vocabulary_json']),
           r['stage'],
           r['updated_at'],
@@ -828,29 +963,37 @@ class SyncService {
     }
   }
 
-  // Pulls the subscription flags the revenuecat-webhook edge function (and
-  // redeem_subscription_invite_code RPC) write onto `profiles` into the local
+  // Pulls the subscription flags the revenuecat-webhook edge function writes
+  // onto `profiles` into the local
   // `entitlements` table, so PilotAccessService's synchronous, offline-first
   // snapshot() reflects real subscription state instead of only ever seeing
-  // the founding_access/localPreview default. subscription_active is treated
-  // as advisory, not authoritative: an invite-code grant has no server job
-  // that flips the flag back off once subscription_expires_at passes (unlike
-  // RevenueCat cancellations, which the webhook handles), so expiry is always
-  // re-checked against wall-clock time here too.
+  // the founding_access/localPreview default. The profile flag is advisory,
+  // so expiry is always re-checked against wall-clock time here too.
   Future<void> _hydrateEntitlements(String uid) async {
     final row = await _client
         .from('profiles')
-        .select('subscription_active, subscription_product_id, subscription_expires_at')
+        .select(
+          'subscription_active, subscription_product_id, subscription_expires_at',
+        )
         .eq('id', uid)
         .maybeSingle();
     if (row == null) return;
 
     final expiresAtRaw = row['subscription_expires_at'] as String?;
-    final expiresAt = expiresAtRaw != null ? DateTime.tryParse(expiresAtRaw) : null;
-    final notExpired = expiresAt == null || expiresAt.isAfter(DateTime.now().toUtc());
-    final isActive = (row['subscription_active'] as bool? ?? false) && notExpired;
-    final status = isActive ? 'active' : 'inactive';
+    final expiresAt = expiresAtRaw != null
+        ? DateTime.tryParse(expiresAtRaw)
+        : null;
+    final notExpired =
+        expiresAt == null || expiresAt.isAfter(DateTime.now().toUtc());
     final productId = (row['subscription_product_id'] as String?) ?? 'none';
+    final isLegacyCodeGrant = productId.trim().toLowerCase().startsWith(
+      'invite:',
+    );
+    final isActive =
+        (row['subscription_active'] as bool? ?? false) &&
+        notExpired &&
+        !isLegacyCodeGrant;
+    final status = isActive ? 'active' : 'inactive';
 
     final existing = _db.select(
       'SELECT status, product_id, expires_at FROM entitlements '
@@ -871,7 +1014,16 @@ class SyncService {
       '''INSERT INTO entitlements
          (id, user_id, product_id, status, source, expires_at, verified_at, created_at, updated_at)
          VALUES (?, ?, ?, ?, 'supabase_subscription', ?, ?, ?, ?)''',
-      ['${uid}_subscription_$now', uid, productId, status, expiresAtRaw, now, now, now],
+      [
+        '${uid}_subscription_$now',
+        uid,
+        productId,
+        status,
+        expiresAtRaw,
+        now,
+        now,
+        now,
+      ],
     );
   }
 
@@ -971,13 +1123,19 @@ class SyncService {
       _db.execute(
         '''
         INSERT INTO generated_stories
-          (id, title, passage_json, quiz_json, keywords_json, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+          (id, title, passage_json, quiz_json, keywords_json, level_band,
+           summary, topic, read_time_minutes, cover_url, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           passage_json = excluded.passage_json,
           quiz_json = excluded.quiz_json,
           keywords_json = excluded.keywords_json,
+          level_band = excluded.level_band,
+          summary = excluded.summary,
+          topic = excluded.topic,
+          read_time_minutes = excluded.read_time_minutes,
+          cover_url = excluded.cover_url,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_stories.updated_at
         ''',
@@ -987,6 +1145,11 @@ class SyncService {
           _jsonOf(r['passage_json']),
           _jsonOf(r['quiz_json']),
           _jsonOf(r['keywords_json']),
+          r['level_band'] ?? 'A2',
+          r['summary'] ?? '',
+          r['topic'] ?? '',
+          r['read_time_minutes'] ?? 5,
+          r['cover_url'],
           r['created_at'],
           r['updated_at'],
         ],
@@ -1067,10 +1230,7 @@ class SyncService {
   /// devices, only the client-generated uuid is. Pulls tombstones too
   /// (`deleted_at`), so a delete on one device removes the note everywhere.
   Future<void> _hydrateNotes(String uid) async {
-    final rows = await _client.from('notes_state').select().eq(
-      'user_id',
-      uid,
-    );
+    final rows = await _client.from('notes_state').select().eq('user_id', uid);
     for (final r in rows) {
       _db.execute(
         '''
@@ -1378,7 +1538,11 @@ class SyncService {
           if (already.isEmpty) {
             _db.execute(
               'INSERT INTO session_diary (date, stage, summary) VALUES (?, ?, ?)',
-              [occurredAt.split('T').first, payload['stage'], payload['summary']],
+              [
+                occurredAt.split('T').first,
+                payload['stage'],
+                payload['summary'],
+              ],
             );
           }
         case 'evidence_event':

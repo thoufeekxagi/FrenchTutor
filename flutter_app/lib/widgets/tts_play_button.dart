@@ -9,20 +9,14 @@ import 'progress_ring.dart';
 /// A single-clip speaker/play button shared across grammar, vocabulary,
 /// listening, and writing screens. States:
 ///  - idle: plain speaker icon, tappable.
-///  - generating: an accent-colored spinning ring replaces the icon while
-///    Gemini
-///    synthesizes this line for the first time — this only ever happens
-///    once per line, ever, since every synthesis is cached (see
-///    `LessonSpeechService`). Once generation finishes the button reverts to
-///    idle — the tap that started it does not auto-play; the learner taps
-///    again to actually hear it (a completed download revealing a "ready"
-///    state, not a surprise autoplay).
+///  - generating: an accent-colored spinning ring replaces the icon while a
+///    remote clip is resolved or Gemini synthesizes this line. The phase is
+///    claimed before the first await so repeated taps cannot queue duplicate
+///    requests.
 ///  - playing: a filled/active icon while the clip sounds, reverting to
 ///    idle once playback finishes.
-/// A line already sitting in cache (from an earlier tap, an earlier
-/// session, or another learner who hit this exact content first) never
-/// shows the ring at all — it plays immediately, indistinguishable from any
-/// other idle→playing tap.
+/// A line already sitting in cache still uses the same guarded transition so
+/// the UI never accepts a burst of taps while its bytes are being resolved.
 class TtsPlayButton extends StatefulWidget {
   const TtsPlayButton({
     super.key,
@@ -70,70 +64,67 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
   Future<void> _onTap() async {
     if (_phase != _Phase.idle) return;
 
-    if (_readyBytes != null) {
-      await _play(_readyBytes!);
-      return;
-    }
+    // Claim the button before any cache or network await. Previously the
+    // remote/bundled lookup happened while the button still looked idle, so
+    // rapid taps could start several identical loads and play them back in a
+    // burst when they resolved.
+    if (mounted) setState(() => _phase = _Phase.generating);
 
-    final remoteStoragePath = widget.remoteStoragePath;
-    if (remoteStoragePath != null) {
-      final bytes = await LessonSpeechService.shared.loadRemoteAudio(
-        remoteStoragePath,
-        text: widget.text,
-        voiceName: ActiveTutor.current.voiceName,
-        slow: widget.slow,
-        contentItemId: widget.contentItemId,
-      );
-      if (bytes != null) {
+    try {
+      if (_readyBytes != null) {
+        await _play(_readyBytes!);
+        return;
+      }
+
+      final remoteStoragePath = widget.remoteStoragePath;
+      if (remoteStoragePath != null) {
+        final bytes = await LessonSpeechService.shared.loadRemoteAudio(
+          remoteStoragePath,
+          text: widget.text,
+          voiceName: ActiveTutor.current.voiceName,
+          slow: widget.slow,
+          contentItemId: widget.contentItemId,
+        );
+        if (bytes != null) {
+          _readyBytes = bytes;
+          if (mounted) await _play(bytes);
+          return;
+        }
+      }
+
+      final bundledAssetPath = widget.bundledAssetPath;
+      if (bundledAssetPath != null) {
+        final bytes = await LessonSpeechService.shared.loadBundledAudio(
+          bundledAssetPath,
+          text: widget.text,
+          voiceName: ActiveTutor.current.voiceName,
+          slow: widget.slow,
+          contentItemId: widget.contentItemId,
+        );
+        if (bytes == null) return;
         _readyBytes = bytes;
         if (mounted) await _play(bytes);
         return;
       }
-    }
 
-    final bundledAssetPath = widget.bundledAssetPath;
-    if (bundledAssetPath != null) {
-      final bytes = await LessonSpeechService.shared.loadBundledAudio(
-        bundledAssetPath,
-        text: widget.text,
-        voiceName: ActiveTutor.current.voiceName,
-        slow: widget.slow,
-        contentItemId: widget.contentItemId,
-      );
-      if (bytes == null) return;
-      _readyBytes = bytes;
-      if (mounted) await _play(bytes);
-      return;
-    }
-
-    final voiceName = ActiveTutor.current.voiceName;
-    final alreadyCached = LessonSpeechService.shared.isCached(
-      widget.text,
-      voiceName: voiceName,
-      slow: widget.slow,
-    );
-    if (alreadyCached) {
+      final voiceName = ActiveTutor.current.voiceName;
       final bytes = await LessonSpeechService.shared.synthesizeWithRetry(
         widget.text,
         voiceName: voiceName,
         slow: widget.slow,
         contentItemId: widget.contentItemId,
       );
-      if (bytes != null) await _play(bytes);
-      return;
+      if (bytes != null) {
+        _readyBytes = bytes;
+        if (mounted) await _play(bytes);
+      }
+    } finally {
+      // _play owns the transition to playing and back to idle. Only reset
+      // here when loading failed or the source was unavailable.
+      if (mounted && _phase == _Phase.generating) {
+        setState(() => _phase = _Phase.idle);
+      }
     }
-
-    if (!mounted) return;
-    setState(() => _phase = _Phase.generating);
-    final bytes = await LessonSpeechService.shared.synthesizeWithRetry(
-      widget.text,
-      voiceName: voiceName,
-      slow: widget.slow,
-      contentItemId: widget.contentItemId,
-    );
-    _readyBytes = bytes;
-    if (!mounted) return;
-    setState(() => _phase = _Phase.idle);
   }
 
   @override

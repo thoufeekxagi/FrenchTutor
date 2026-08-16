@@ -560,6 +560,11 @@ class GeneratedStory {
     required this.quiz,
     required this.keywords,
     required this.createdAt,
+    this.levelBand = 'A2',
+    this.summary = '',
+    this.topic = '',
+    this.readTimeMinutes = 5,
+    this.coverUrl,
   });
 
   final String id;
@@ -568,10 +573,53 @@ class GeneratedStory {
   final List<VocabEntry> keywords;
   final DateTime createdAt;
 
+  /// CEFR band used to generate the story. Kept on the story so the library
+  /// can show the same level even if the learner later changes their profile.
+  final String levelBand;
+
+  /// One-sentence English synopsis used by the library card and Marie's
+  /// context. It is generated once with the story package.
+  final String summary;
+
+  /// The learner's chosen theme or topic, for discovery and replay context.
+  final String topic;
+
+  /// Approximate reading time shown in the Blinkist-style library.
+  final int readTimeMinutes;
+
+  /// Public Supabase Storage URL for the single generated cover image. A
+  /// missing URL is valid: text stories still work when image generation or
+  /// upload is unavailable.
+  final String? coverUrl;
+
   String get title => passage.title;
 
   /// "French title (English gloss)" for display — see `ReadingPassage.displayTitle`.
   String get displayTitle => passage.displayTitle;
+
+  GeneratedStory copyWith({
+    ReadingPassage? passage,
+    List<MultipleChoiceQuestion>? quiz,
+    List<VocabEntry>? keywords,
+    String? levelBand,
+    String? summary,
+    String? topic,
+    int? readTimeMinutes,
+    String? coverUrl,
+  }) {
+    return GeneratedStory(
+      id: id,
+      passage: passage ?? this.passage,
+      quiz: quiz ?? this.quiz,
+      keywords: keywords ?? this.keywords,
+      createdAt: createdAt,
+      levelBand: levelBand ?? this.levelBand,
+      summary: summary ?? this.summary,
+      topic: topic ?? this.topic,
+      readTimeMinutes: readTimeMinutes ?? this.readTimeMinutes,
+      coverUrl: coverUrl ?? this.coverUrl,
+    );
+  }
 
   /// The tts_audio_cache `content_item_id` tag for one segment of this
   /// story's narration — shared by the prewarm call made right after
@@ -579,6 +627,31 @@ class GeneratedStory {
   /// same tag (the actual cache hit only depends on voice+rate+text, but a
   /// consistent tag makes the cache traceable back to its story).
   String segmentContentId(int index) => '${id}_seg$index';
+}
+
+/// The complete payload returned by the one text-generation call used by the
+/// story creator. Quiz and keywords are part of this package, so reopening a
+/// story never triggers another model request.
+class StoryBookGeneration {
+  StoryBookGeneration({
+    required this.passage,
+    required this.quiz,
+    required this.keywords,
+    required this.levelBand,
+    required this.summary,
+    required this.topic,
+    required this.readTimeMinutes,
+    required this.coverPrompt,
+  });
+
+  final ReadingPassage passage;
+  final List<MultipleChoiceQuestion> quiz;
+  final List<VocabEntry> keywords;
+  final String levelBand;
+  final String summary;
+  final String topic;
+  final int readTimeMinutes;
+  final String coverPrompt;
 }
 
 /// A learner's own AI-generated roleplay scene, saved to their personal

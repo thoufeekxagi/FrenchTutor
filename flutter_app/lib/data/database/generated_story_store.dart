@@ -24,7 +24,8 @@ class GeneratedStoryStore {
   /// All saved stories, newest first.
   List<GeneratedStory> list() {
     final rows = _db.select(
-      '''SELECT id, passage_json, quiz_json, keywords_json, created_at
+      '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
+                level_band, summary, topic, read_time_minutes, cover_url
          FROM generated_stories
          WHERE deleted_at IS NULL
          ORDER BY created_at DESC''',
@@ -38,14 +39,20 @@ class GeneratedStoryStore {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT INTO generated_stories
-         (id, title, passage_json, quiz_json, keywords_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)''',
+         (id, title, passage_json, quiz_json, keywords_json, level_band,
+          summary, topic, read_time_minutes, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         story.id,
         story.title,
         jsonEncode(story.passage.toJson()),
         jsonEncode(story.quiz.map((q) => q.toJson()).toList()),
         jsonEncode(story.keywords.map((k) => k.toJson()).toList()),
+        story.levelBand,
+        story.summary,
+        story.topic,
+        story.readTimeMinutes,
+        story.coverUrl,
         story.createdAt.toUtc().toIso8601String(),
         now,
       ],
@@ -74,6 +81,20 @@ class GeneratedStoryStore {
     unawaited(_sync?.syncGeneratedStory(story));
   }
 
+  /// Stores the generated cover URL after the image request/upload completes.
+  /// A cover failure must never invalidate the already-saved text story.
+  void updateCoverUrl(String storyId, String coverUrl) {
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''UPDATE generated_stories
+         SET cover_url = ?, updated_at = ?
+         WHERE id = ?''',
+      [coverUrl, now, storyId],
+    );
+    final story = _find(storyId);
+    if (story != null) unawaited(_sync?.syncGeneratedStory(story));
+  }
+
   /// Upserts a row pulled from Supabase during sign-in hydration.
   /// Last-write-wins on `updated_at`, matching every other hydrate path.
   void upsertFromRemote({
@@ -82,22 +103,56 @@ class GeneratedStoryStore {
     required String passageJson,
     required String quizJson,
     required String keywordsJson,
+    String levelBand = 'A2',
+    String summary = '',
+    String topic = '',
+    int readTimeMinutes = 5,
+    String? coverUrl,
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_stories
-         (id, title, passage_json, quiz_json, keywords_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
+         (id, title, passage_json, quiz_json, keywords_json, level_band,
+          summary, topic, read_time_minutes, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            passage_json = excluded.passage_json,
            quiz_json = excluded.quiz_json,
            keywords_json = excluded.keywords_json,
+           level_band = excluded.level_band,
+           summary = excluded.summary,
+           topic = excluded.topic,
+           read_time_minutes = excluded.read_time_minutes,
+           cover_url = excluded.cover_url,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_stories.updated_at''',
-      [id, title, passageJson, quizJson, keywordsJson, createdAt, updatedAt],
+      [
+        id,
+        title,
+        passageJson,
+        quizJson,
+        keywordsJson,
+        levelBand,
+        summary,
+        topic,
+        readTimeMinutes,
+        coverUrl,
+        createdAt,
+        updatedAt,
+      ],
     );
+  }
+
+  GeneratedStory? _find(String id) {
+    final rows = _db.select(
+      '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
+                level_band, summary, topic, read_time_minutes, cover_url
+         FROM generated_stories WHERE id = ? AND deleted_at IS NULL''',
+      [id],
+    );
+    return rows.isEmpty ? null : _fromRow(rows.first);
   }
 
   GeneratedStory _fromRow(Row row) {
@@ -115,6 +170,11 @@ class GeneratedStoryStore {
           .map((e) => VocabEntry.fromJson((e as Map).cast()))
           .toList(),
       createdAt: DateTime.parse(row['created_at'] as String),
+      levelBand: row['level_band'] as String? ?? 'A2',
+      summary: row['summary'] as String? ?? '',
+      topic: row['topic'] as String? ?? '',
+      readTimeMinutes: row['read_time_minutes'] as int? ?? 5,
+      coverUrl: row['cover_url'] as String?,
     );
   }
 }

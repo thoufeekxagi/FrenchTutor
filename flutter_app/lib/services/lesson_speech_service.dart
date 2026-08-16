@@ -89,6 +89,7 @@ class LessonSpeechService {
   int _ttsIndex = 0;
   void Function(int)? _onItemStart;
   void Function()? _onFinished;
+  void Function()? _onPlaybackReady;
   double? _rateOverride;
 
   /// Fires with (item index, word index within that item's text) as playback
@@ -100,6 +101,7 @@ class LessonSpeechService {
   /// roughly where the voice is without needing per-phoneme timing data.
   void Function(int itemIndex, int wordIndex)? _onWordBoundary;
   final List<Timer> _wordTimers = [];
+  bool _speakStarting = false;
 
   bool isSpeaking = false;
   bool isPaused = false;
@@ -124,20 +126,32 @@ class LessonSpeechService {
     void Function(int)? onItemStart,
     void Function()? onFinished,
     void Function(int itemIndex, int wordIndex)? onWordBoundary,
+    void Function()? onPlaybackReady,
   }) async {
-    await stop();
-    if (items.isEmpty) {
-      onFinished?.call();
-      return;
+    // A tap should claim the loading slot before the first await. This keeps
+    // rapid taps from cancelling the first request and stacking duplicate
+    // Gemini/TTS work while the first line is still being prepared. Once the
+    // first clip is ready, a new intentional speak request may replace it.
+    if (_speakStarting) return;
+    _speakStarting = true;
+    try {
+      await stop();
+      if (items.isEmpty) {
+        onFinished?.call();
+        return;
+      }
+      _ttsQueue = items;
+      _ttsIndex = 0;
+      _rateOverride = rate;
+      _onItemStart = onItemStart;
+      _onFinished = onFinished;
+      _onWordBoundary = onWordBoundary;
+      _onPlaybackReady = onPlaybackReady;
+      isPaused = false;
+      await _speakCurrent();
+    } finally {
+      _speakStarting = false;
     }
-    _ttsQueue = items;
-    _ttsIndex = 0;
-    _rateOverride = rate;
-    _onItemStart = onItemStart;
-    _onFinished = onFinished;
-    _onWordBoundary = onWordBoundary;
-    isPaused = false;
-    await _speakCurrent();
   }
 
   Future<void> pause() async {
@@ -174,6 +188,7 @@ class LessonSpeechService {
     _onFinished = null;
     _onItemStart = null;
     _onWordBoundary = null;
+    _onPlaybackReady = null;
   }
 
   Future<void> _speakCurrent() async {
@@ -219,6 +234,7 @@ class LessonSpeechService {
     );
     if (bytes == null) return false;
     final myIndex = _ttsIndex;
+    _onPlaybackReady?.call();
     await _geminiAudio.playAudioChunk(bytes);
     // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
     final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
