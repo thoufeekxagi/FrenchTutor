@@ -1,17 +1,32 @@
+import 'dart:async';
+import 'dart:convert';
+
 import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/learning_store.dart' show WritingSubmission;
+import '../../data/database/generated_writing_task_store.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
+import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
-import '../lessons/writing_task_screen.dart';
+import '../lessons/writing_workshop_screen.dart';
 
 class WritingLabScreen extends ConsumerStatefulWidget {
-  const WritingLabScreen({super.key});
+  const WritingLabScreen({
+    super.key,
+    this.topic,
+    this.contextPrompt,
+    this.autoStart = false,
+  });
+
+  final String? topic;
+  final String? contextPrompt;
+  final bool autoStart;
 
   @override
   ConsumerState<WritingLabScreen> createState() => _WritingLabScreenState();
@@ -20,6 +35,35 @@ class WritingLabScreen extends ConsumerStatefulWidget {
 class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
   bool _isGenerating = false;
   String? _errorText;
+  List<GeneratedWritingTask>? _history;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+    unawaited(_refreshHistory());
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_startNewPractice());
+      });
+    }
+  }
+
+  void _loadHistory() {
+    if (!mounted) return;
+    setState(
+      () => _history = ref.read(generatedWritingTaskStoreProvider).list(),
+    );
+  }
+
+  Future<void> _refreshHistory() async {
+    try {
+      await ref.read(syncServiceProvider).hydrateGeneratedWritingTasks();
+    } catch (error, stackTrace) {
+      debugPrint('Writing task hydration failed: $error\n$stackTrace');
+    }
+    if (mounted) _loadHistory();
+  }
 
   Future<void> _startNewPractice() async {
     setState(() {
@@ -36,6 +80,8 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
           .read(lessonAgentServiceProvider)
           .generateWritingTask(
             levelBand: profile.level,
+            topic: widget.topic,
+            contextPrompt: widget.contextPrompt,
             knownVocab: content.knownVocabWords(store.allSRSStates()),
             mistakeTags: mistakeTags
                 .map(
@@ -46,10 +92,39 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
             recentDiary: diary.map((d) => d.summary).toList(),
           );
       if (!mounted) return;
+      final generated = GeneratedWritingTask(
+        task: task,
+        createdAt: DateTime.now(),
+      );
+      ref.read(generatedWritingTaskStoreProvider).insert(generated);
+      _loadHistory();
+      unawaited(_generateCover(generated));
       setState(() => _isGenerating = false);
-      AppRouter.push(context, (_) => WritingTaskScreen(task: task));
+      // Warm the fixed prompt while the workshop opens. The live tutor call
+      // remains uncached; only this deterministic lesson line is pre-generated.
+      unawaited(
+        LessonSpeechService.shared.prewarmNarration([
+          SpeechItem(
+            text: task.promptFr,
+            language: 'fr-FR',
+            contentItemId: 'writing:${task.id}:prompt',
+          ),
+        ]),
+      );
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => WritingWorkshopScreen(task: task),
+        fullscreenDialog: widget.autoStart,
+      );
+      if (widget.autoStart && mounted) {
+        Navigator.of(context).pop(result ?? false);
+      }
     } catch (e) {
       if (!mounted) return;
+      if (widget.autoStart) {
+        Navigator.of(context).pop(false);
+        return;
+      }
       setState(() {
         _isGenerating = false;
         _errorText = "Couldn't generate a task, try again.";
@@ -57,13 +132,58 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
     }
   }
 
+  Future<void> _generateCover(GeneratedWritingTask generated) async {
+    final sync = ref.read(syncServiceProvider);
+    final store = ref.read(generatedWritingTaskStoreProvider);
+    try {
+      final bytes = await ref
+          .read(lessonAgentServiceProvider)
+          .generateStoryCover(
+            title: generated.task.title,
+            summary: generated.task.promptEn,
+            topic: generated.task.title,
+            levelBand: generated.task.levelBand,
+            coverPrompt:
+                'A premium literary book-cover scene for a French learner writing about '
+                '${generated.task.promptEn}. Use one clear focal scene, sophisticated editorial '
+                'realism, restrained color grading, layered depth, and a polished publishing '
+                'aesthetic. Keep the composition portrait and crop-friendly with safe margins.',
+          );
+      final url = await sync.uploadStoryCover(
+        storyId: generated.id,
+        bytes: bytes,
+      );
+      if (url == null) return;
+      store.updateCoverUrl(generated.id, url);
+      if (mounted) _loadHistory();
+    } catch (error, stackTrace) {
+      debugPrint('Writing cover generation failed: $error\n$stackTrace');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.autoStart) {
+      return Scaffold(
+        backgroundColor: DesignTokens.canvasDim,
+        appBar: AppBar(
+          title: Text('Writing', style: DesignTokens.display(20)),
+          backgroundColor: DesignTokens.canvasDim,
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Writing', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -71,7 +191,7 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
-            PasseportPrimaryButton(
+            ModernPrimaryButton(
               label: _isGenerating
                   ? 'Preparing your task…'
                   : 'New writing practice',
@@ -88,9 +208,45 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
               ),
             ],
             const SizedBox(height: 16),
+            _pastGeneratedTasks(),
             _pastSubmissions(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _pastGeneratedTasks() {
+    final history = _history ?? const [];
+    if (history.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your writing prompts',
+            style: DesignTokens.mono(
+              10.5,
+              weight: FontWeight.w500,
+            ).copyWith(color: DesignTokens.mutedDim),
+          ),
+          const SizedBox(height: 8),
+          ResponsiveCardGrid(
+            mainAxisExtent: 292,
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              final generated = history[index];
+              return _GeneratedWritingTaskTile(
+                generated: generated,
+                onTap: () => AppRouter.push(
+                  context,
+                  (_) => WritingWorkshopScreen(task: generated.task),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -108,13 +264,162 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
             style: DesignTokens.mono(
               10.5,
               weight: FontWeight.w500,
-            ).copyWith(color: DesignTokens.slateDim),
+            ).copyWith(color: DesignTokens.mutedDim),
           ),
           const SizedBox(height: 8),
           for (final s in submissions) ...[
             _SubmissionTile(submission: s),
             const SizedBox(height: 12),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _GeneratedWritingTaskTile extends StatelessWidget {
+  const _GeneratedWritingTaskTile({
+    required this.generated,
+    required this.onTap,
+  });
+
+  final GeneratedWritingTask generated;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+      child: ModernCard(
+        padding: 0,
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _WritingCover(
+              generated: generated,
+              width: double.infinity,
+              height: 166,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      generated.task.levelBand.toUpperCase(),
+                      style: DesignTokens.label(
+                        10,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      generated.task.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.display(17),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Write',
+                      style: DesignTokens.body(
+                        12,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WritingCover extends StatelessWidget {
+  const _WritingCover({
+    required this.generated,
+    required this.width,
+    required this.height,
+  });
+
+  final GeneratedWritingTask generated;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = generated.coverUrl;
+    if (url != null && url.startsWith('asset:')) {
+      return Image.asset(
+        url.substring('asset:'.length),
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _fallback(),
+      );
+    }
+    if (url != null && url.isNotEmpty) {
+      return Image.network(
+        url,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _fallback(),
+        loadingBuilder: (context, child, progress) =>
+            progress == null ? child : _fallback(),
+      );
+    }
+    return _fallback();
+  }
+
+  Widget _fallback() {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: DesignTokens.heroGradient,
+            ),
+          ),
+          Positioned(
+            right: -22,
+            top: -18,
+            child: Container(
+              width: 92,
+              height: 92,
+              decoration: BoxDecoration(
+                color: DesignTokens.secondary.withValues(alpha: 0.55),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            left: -26,
+            bottom: 22,
+            child: Container(
+              width: 104,
+              height: 104,
+              decoration: BoxDecoration(
+                color: DesignTokens.info.withValues(alpha: 0.32),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          const Center(
+            child: Icon(
+              CupertinoIcons.pencil_ellipsis_rectangle,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
         ],
       ),
     );
@@ -133,9 +438,30 @@ class _SubmissionTile extends StatelessWidget {
     return '${local.day}/${local.month}/${local.year}';
   }
 
+  Map<String, dynamic>? get _review {
+    if (submission.feedback.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(submission.feedback);
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (_) {
+      // Older submissions stored only the improved sentence. Keep them readable.
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
+    final review = _review;
+    final score = review?['score_out_of_10'];
+    final strengths = (review?['strengths'] as List?)
+        ?.whereType<String>()
+        .take(2)
+        .toList(growable: false);
+    final corrections = (review?['corrections'] as List?)
+        ?.whereType<Map>()
+        .take(1)
+        .toList(growable: false);
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -154,20 +480,51 @@ class _SubmissionTile extends StatelessWidget {
                 _dateLabel,
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
             ],
           ),
           if (submission.feedback.isNotEmpty) ...[
             const SizedBox(height: 6),
-            Text(
-              submission.feedback,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.body(
-                12.5,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.35),
-            ),
+            if (review != null) ...[
+              if (score is num)
+                Text(
+                  'Writing score  ${score.toStringAsFixed(1)}/10',
+                  style: DesignTokens.body(
+                    14,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
+              if (strengths != null && strengths.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                for (final strength in strengths)
+                  Text(
+                    '✓ $strength',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.body(12.5).copyWith(height: 1.35),
+                  ),
+              ],
+              if (corrections != null && corrections.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Next correction: ${corrections.first['fixed'] ?? ''}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    12.5,
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+                ),
+              ],
+            ] else
+              Text(
+                submission.feedback,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: DesignTokens.body(
+                  12.5,
+                ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+              ),
           ],
         ],
       ),

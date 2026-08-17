@@ -64,6 +64,44 @@ class VocabEntry {
   };
 }
 
+/// A learner-owned vocabulary set generated for a library card.  Unlike the
+/// bundled curriculum phases, this payload is persisted with the signed-in
+/// learner so it can be reopened on another device without rebuilding it.
+class GeneratedVocabularySet {
+  GeneratedVocabularySet({
+    required this.id,
+    required this.title,
+    required this.summary,
+    required this.topic,
+    required this.levelBand,
+    required this.entries,
+    required this.createdAt,
+    this.coverUrl,
+  });
+
+  final String id;
+  final String title;
+  final String summary;
+  final String topic;
+  final String levelBand;
+  final List<VocabEntry> entries;
+  final DateTime createdAt;
+  final String? coverUrl;
+
+  VocabTheme get asTheme => VocabTheme(id: id, title: title, entries: entries);
+
+  GeneratedVocabularySet copyWith({String? coverUrl}) => GeneratedVocabularySet(
+    id: id,
+    title: title,
+    summary: summary,
+    topic: topic,
+    levelBand: levelBand,
+    entries: entries,
+    createdAt: createdAt,
+    coverUrl: coverUrl ?? this.coverUrl,
+  );
+}
+
 // MARK: - Grammar
 
 class GrammarPack {
@@ -440,23 +478,34 @@ class MultipleChoiceQuestion {
     required this.q,
     required this.choices,
     required this.answerIndex,
+    this.qEn,
+    this.choicesEn,
   });
 
   final String q;
   final List<String> choices;
   final int answerIndex;
 
+  /// Optional English support for beginner listening checks. Older saved
+  /// exercises do not have these fields, so the French payload remains valid.
+  final String? qEn;
+  final List<String>? choicesEn;
+
   factory MultipleChoiceQuestion.fromJson(Map<String, dynamic> json) =>
       MultipleChoiceQuestion(
         q: json['q'] as String,
         choices: List<String>.from(json['choices']),
         answerIndex: json['answerIndex'] as int,
+        qEn: json['q_en'] as String? ?? json['question_en'] as String?,
+        choicesEn: (json['choices_en'] as List?)?.cast<String>(),
       );
 
   Map<String, dynamic> toJson() => {
     'q': q,
     'choices': choices,
     'answerIndex': answerIndex,
+    if (qEn != null) 'q_en': qEn,
+    if (choicesEn != null) 'choices_en': choicesEn,
   };
 }
 
@@ -485,12 +534,18 @@ class ReadingSegment {
   final String? characterEn;
 
   factory ReadingSegment.fromJson(Map<String, dynamic> json) => ReadingSegment(
-    fr: json['fr'] as String,
-    en: json['en'] as String,
-    grammarNote: json['grammarNote'] as String,
-    pronunciationTip: json['pronunciationTip'] as String,
-    characterFr: json['characterFr'] as String?,
-    characterEn: json['characterEn'] as String?,
+    fr: (json['fr'] ?? json['text'] ?? json['french'] ?? '').toString().trim(),
+    en: (json['en'] ?? json['translation'] ?? json['english'] ?? '')
+        .toString()
+        .trim(),
+    grammarNote: (json['grammarNote'] ?? json['grammar'] ?? '')
+        .toString()
+        .trim(),
+    pronunciationTip: (json['pronunciationTip'] ?? json['pronunciation'] ?? '')
+        .toString()
+        .trim(),
+    characterFr: json['characterFr']?.toString(),
+    characterEn: json['characterEn']?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -523,15 +578,53 @@ class ReadingPassage {
   /// generation that didn't return one just show the French title alone.
   final String? titleEn;
 
-  factory ReadingPassage.fromJson(Map<String, dynamic> json) => ReadingPassage(
-    id: json['id'] as String,
-    title: json['title'] as String,
-    segments: (json['segments'] as List)
-        .map((e) => ReadingSegment.fromJson(e))
-        .toList(),
-    fullText: json['fullText'] as String,
-    titleEn: json['titleEn'] as String?,
-  );
+  factory ReadingPassage.fromJson(Map<String, dynamic> json) {
+    final rawSegments = json['segments'] ?? json['sentences'];
+    final parsedSegments = rawSegments is List
+        ? rawSegments
+              .whereType<Map>()
+              .map(
+                (entry) =>
+                    ReadingSegment.fromJson(entry.cast<String, dynamic>()),
+              )
+              .where((segment) => segment.fr.isNotEmpty)
+              .toList()
+        : <ReadingSegment>[];
+    final rawFullText = (json['fullText'] ?? json['text'] ?? '')
+        .toString()
+        .trim();
+    final segments = parsedSegments.isNotEmpty
+        ? parsedSegments
+        : _segmentsFromText(rawFullText);
+    final fullText = rawFullText.isNotEmpty
+        ? rawFullText
+        : segments.map((segment) => segment.fr).join(' ');
+
+    return ReadingPassage(
+      id: (json['id'] ?? json['passageId'] ?? 'reading-passage').toString(),
+      title: (json['title'] ?? json['name'] ?? 'French story').toString(),
+      segments: segments,
+      fullText: fullText,
+      titleEn: json['titleEn']?.toString() ?? json['title_en']?.toString(),
+    );
+  }
+
+  static List<ReadingSegment> _segmentsFromText(String text) {
+    if (text.trim().isEmpty) return const [];
+    return text
+        .split(RegExp(r'(?<=[.!?])\s+|\n+'))
+        .map((sentence) => sentence.trim())
+        .where((sentence) => sentence.isNotEmpty)
+        .map(
+          (sentence) => ReadingSegment(
+            fr: sentence,
+            en: '',
+            grammarNote: '',
+            pronunciationTip: '',
+          ),
+        )
+        .toList();
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -565,6 +658,7 @@ class GeneratedStory {
     this.topic = '',
     this.readTimeMinutes = 5,
     this.coverUrl,
+    this.practiceMode = 'reading',
   });
 
   final String id;
@@ -587,10 +681,14 @@ class GeneratedStory {
   /// Approximate reading time shown in the Blinkist-style library.
   final int readTimeMinutes;
 
-  /// Public Supabase Storage URL for the single generated cover image. A
-  /// missing URL is valid: text stories still work when image generation or
-  /// upload is unavailable.
+  /// Learner-scoped signed Supabase Storage URL for the single generated cover
+  /// image. A local `asset:` marker is also valid while the private upload is
+  /// being completed in the background.
   final String? coverUrl;
+
+  /// Keeps the reading and listening shelves independent while preserving
+  /// one shared story payload and cover pipeline.
+  final String practiceMode;
 
   String get title => passage.title;
 
@@ -606,6 +704,7 @@ class GeneratedStory {
     String? topic,
     int? readTimeMinutes,
     String? coverUrl,
+    String? practiceMode,
   }) {
     return GeneratedStory(
       id: id,
@@ -618,6 +717,7 @@ class GeneratedStory {
       topic: topic ?? this.topic,
       readTimeMinutes: readTimeMinutes ?? this.readTimeMinutes,
       coverUrl: coverUrl ?? this.coverUrl,
+      practiceMode: practiceMode ?? this.practiceMode,
     );
   }
 
@@ -664,11 +764,17 @@ class GeneratedRoleplay {
     required this.id,
     required this.passage,
     required this.createdAt,
+    this.coverUrl,
   });
 
   final String id;
   final ReadingPassage passage;
   final DateTime createdAt;
+
+  /// Learner-scoped signed URL for the generated roleplay artwork. The cover
+  /// is optional so a roleplay remains usable while image generation/upload
+  /// is still running or unavailable.
+  final String? coverUrl;
 
   String get title => passage.title;
 

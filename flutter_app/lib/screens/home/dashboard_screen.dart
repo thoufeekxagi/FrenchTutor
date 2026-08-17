@@ -7,6 +7,7 @@ import '../../config/api_keys.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/session.dart';
+import '../../models/tutor_persona.dart';
 import '../../orchestration/models/competency.dart';
 import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
@@ -22,15 +23,17 @@ import '../../widgets/web/web_practice_grid.dart';
 import '../history/all_history_screen.dart';
 import '../history/history_screen.dart';
 import '../labs/grammar_lab_screen.dart';
+import '../labs/alphabet_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
 import '../labs/listening_lab_screen.dart';
+import '../labs/labs_screen.dart';
 import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
+import '../reading/reading_library_screen.dart';
 import '../notes/notes_review_screen.dart';
-import '../pathway/vocab_picker_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
-import '../subscription/paywall_screen.dart';
+import '../subscription/speak_paywall_screen.dart';
 import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
 
@@ -90,6 +93,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     _reload();
   }
 
+  bool get _isA1Learner {
+    final level = ref.read(learningStoreProvider).profile().level.toLowerCase();
+    return level == 'a1' || level == 'zero' || level == 'basics';
+  }
+
+  void _openPrimaryLesson() {
+    if (_isA1Learner) {
+      AppRouter.push(context, (_) => const AlphabetLabScreen());
+      return;
+    }
+    _openSession();
+  }
+
   void _reload() {
     final storage = ref.read(storageServiceProvider);
     Future(() => storage.getAllSessions()).then((loaded) {
@@ -112,75 +128,346 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
       return _webDashboard();
     }
-    return Scaffold(
-      backgroundColor: Passeport.parchment,
-      body: SafeArea(
-        child: PSContentColumn(
-          child: RefreshIndicator(
-            color: Passeport.maroon,
-            onRefresh: () async => _reload(),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
-              children: [
-                _header(),
-                const SizedBox(height: 24),
-                KeyedSubtree(
-                  key: AppTour.missionKey,
-                  child: TodayMissionWidget(
-                    isActive: widget.isActive,
-                    onProgress: _reload,
-                  ),
-                ),
-                if (_summary?.hasActivity == true) ...[
-                  const SizedBox(height: 16),
-                  DailySummaryCard(summary: _summary!),
-                ],
-                const SizedBox(height: 28),
-                _sectionTitle('Practice with Marie'),
-                const SizedBox(height: 10),
-                KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
-                const SizedBox(height: 28),
-                _sectionTitle('Today’s study block'),
-                const SizedBox(height: 10),
-                KeyedSubtree(
-                  key: AppTour.keepPractisingKey,
-                  child: _keepPractising(),
-                ),
-                const SizedBox(height: 28),
-                _sectionTitle('This week'),
-                const SizedBox(height: 10),
-                _momentumCard(),
-                if (_sessions.isNotEmpty) ...[
-                  const SizedBox(height: 28),
-                  Row(
-                    children: [
-                      _sectionTitle('Recent practice'),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () => AppRouter.push(
-                          context,
-                          (_) => const AllHistoryScreen(),
-                        ),
-                        child: Text(
-                          'View all',
-                          style: Passeport.body(
-                            13.5,
-                            weight: FontWeight.w600,
-                          ).copyWith(color: Passeport.sky),
-                        ),
+    return _mobileHome();
+  }
+
+  Widget _mobileHome() {
+    return ColoredBox(
+      color: DesignTokens.surface,
+      child: SafeArea(
+        child: RefreshIndicator(
+          color: DesignTokens.ink,
+          onRefresh: () async => _reload(),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 36),
+            children: [
+              _mobileHeader(),
+              const SizedBox(height: 30),
+              _primaryStartAction(),
+              const SizedBox(height: 16),
+              _quickActions(),
+              const SizedBox(height: 30),
+              KeyedSubtree(key: AppTour.marieKey, child: _practiceFeature()),
+              const SizedBox(height: 34),
+              _sectionHeading(
+                'Recent practice',
+                action: _sessions.isEmpty ? null : 'View all',
+                onAction: _sessions.isEmpty
+                    ? null
+                    : () => AppRouter.push(
+                        context,
+                        (_) => const AllHistoryScreen(),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  _journalCard(),
-                ] else ...[
-                  const SizedBox(height: 16),
-                  _notesRow(),
-                ],
+              ),
+              const SizedBox(height: 12),
+              _sessions.isEmpty ? _emptyRecent() : _recentList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileHeader() {
+    final goal = ref.read(learningStoreProvider).profile().goal;
+    final goalLabel = switch (goal) {
+      'tef_canada' => 'TEF Canada · CLB 7',
+      'everyday' => 'Everyday French',
+      _ => 'French foundations',
+    };
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Home', style: DesignTokens.display(40)),
+              const SizedBox(height: 4),
+              Text(
+                '${DateFormat('EEEE, MMMM d').format(DateTime.now())} · $goalLabel',
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.mutedDim),
+              ),
+            ],
+          ),
+        ),
+        _profileButton(),
+      ],
+    );
+  }
+
+  Widget _profileButton() {
+    return Semantics(
+      button: true,
+      label: 'Open settings',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          await AppRouter.push(context, (_) => const SettingsScreen());
+          if (mounted && AppTour.pendingHomeReplay) {
+            AppTour.pendingHomeReplay = false;
+            if (context.mounted) AppTour.playHome(context);
+          }
+        },
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: DesignTokens.canvasDim,
+            shape: BoxShape.circle,
+            border: Border.all(color: DesignTokens.hairline),
+          ),
+          child: const Icon(
+            Icons.person_outline_rounded,
+            size: 19,
+            color: DesignTokens.mutedDim,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _primaryStartAction() {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        PSHaptics.light();
+        _openPrimaryLesson();
+      },
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: DesignTokens.ink,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _isA1Learner ? 'Learn the alphabet' : 'Start a conversation',
+                style: DesignTokens.body(
+                  17,
+                  weight: FontWeight.w600,
+                ).copyWith(color: Colors.white),
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _quickActions() {
+    final tutor = ActiveTutor.current;
+    return SizedBox(
+      height: 50,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        children: [
+          _quickAction(
+            icon: Icons.graphic_eq_rounded,
+            label: 'Talk with ${tutor.displayName}',
+            onTap: _openSession,
+          ),
+          _quickAction(
+            icon: Icons.layers_outlined,
+            label: 'Vocabulary',
+            onTap: () => _openGated(
+              'vocabulary',
+              () => _openPractice(PerformanceModality.readingRecognition),
+            ),
+          ),
+          _quickAction(
+            icon: Icons.edit_note_outlined,
+            label: 'Review notes',
+            onTap: () =>
+                AppRouter.push(context, (_) => const NotesReviewScreen()),
+          ),
+          _quickAction(
+            icon: Icons.grid_view_rounded,
+            label: 'Explore practice',
+            onTap: () => AppRouter.push(context, (_) => const LabsScreen()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _quickAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 17),
+          decoration: BoxDecoration(
+            color: DesignTokens.canvasDim,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: DesignTokens.inkSoft),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: DesignTokens.body(13, weight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _practiceFeature() {
+    final tutor = ActiveTutor.current;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvasDim,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: DesignTokens.primarySoft,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.graphic_eq_rounded,
+              color: DesignTokens.primary,
+              size: 23,
+            ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Free talk with ${tutor.displayName}',
+                  style: DesignTokens.body(16, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Speak about anything',
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
               ],
             ),
           ),
-        ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _openSession,
+            child: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(
+                Icons.arrow_forward_rounded,
+                color: DesignTokens.inkSoft,
+                size: 22,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionHeading(
+    String title, {
+    String? action,
+    VoidCallback? onAction,
+  }) {
+    return Row(
+      children: [
+        Text(title, style: DesignTokens.display(22)),
+        if (action != null) ...[
+          const Spacer(),
+          GestureDetector(
+            onTap: onAction,
+            child: Text(
+              action,
+              style: DesignTokens.body(
+                13.5,
+                weight: FontWeight.w600,
+              ).copyWith(color: DesignTokens.secondary),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _recentList() {
+    return Container(
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Column(
+        children: [
+          for (var index = 0; index < _sessions.take(3).length; index++) ...[
+            if (index > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 74),
+                child: Container(height: 1, color: DesignTokens.hairline),
+              ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => AppRouter.push(
+                context,
+                (_) => HistoryScreen(session: _sessions[index]),
+              ),
+              child: SessionRow(session: _sessions[index]),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyRecent() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvas,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.auto_awesome_rounded, color: DesignTokens.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Your recent practice will appear here after your first session.',
+              style: DesignTokens.body(
+                14,
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -210,21 +497,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 onProgress: _reload,
               ),
             ),
-            if (_summary?.hasActivity == true) ...[
-              const SizedBox(height: DesignTokens.space4),
-              DailySummaryCard(summary: _summary!),
-            ],
             const SizedBox(height: DesignTokens.space6),
             KeyedSubtree(
               key: AppTour.keepPractisingKey,
               child: _keepPractising(),
             ),
             const SizedBox(height: DesignTokens.space6),
-            const WebSectionHeader(title: 'Practice with Marie'),
+            WebSectionHeader(
+              title: 'Practice with ${ActiveTutor.current.displayName}',
+            ),
             KeyedSubtree(key: AppTour.marieKey, child: _mariePractice()),
             const SizedBox(height: DesignTokens.space6),
             const WebSectionHeader(title: 'Your momentum'),
             _momentumCard(),
+            if (_summary?.hasActivity == true) ...[
+              const SizedBox(height: DesignTokens.space4),
+              DailySummaryCard(summary: _summary!),
+            ],
             const SizedBox(height: DesignTokens.space6),
             WebSectionHeader(
               title: _sessions.isEmpty ? 'Your notes' : 'Recent practice',
@@ -243,78 +532,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _header() {
-    final goal = ref.read(learningStoreProvider).profile().goal;
-    final goalLabel = switch (goal) {
-      'tef_canada' => 'TEF Canada · CLB 7',
-      'everyday' => 'Everyday French',
-      _ => 'French foundations',
-    };
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'TODAY · ${DateFormat('EEEE, MMMM d').format(DateTime.now())}',
-                style: DesignTokens.label(
-                  10.5,
-                ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.8),
-              ),
-              const SizedBox(height: 6),
-              Text('Good morning', style: DesignTokens.display(32)),
-              const SizedBox(height: 4),
-              Text(
-                goalLabel,
-                style: Passeport.body(
-                  14,
-                  weight: FontWeight.w500,
-                ).copyWith(color: Passeport.slateDim),
-              ),
-            ],
-          ),
-        ),
-        Semantics(
-          button: true,
-          label: 'Open settings',
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () async {
-              await AppRouter.push(context, (_) => const SettingsScreen());
-              // Settings' "Replay the walkthrough" row lands back here.
-              if (mounted && AppTour.pendingHomeReplay) {
-                AppTour.pendingHomeReplay = false;
-                if (context.mounted) AppTour.playHome(context);
-              }
-            },
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Passeport.card,
-                shape: BoxShape.circle,
-                boxShadow: DesignTokens.cardShadow,
-              ),
-              child: const Icon(
-                CupertinoIcons.person_fill,
-                size: 18,
-                color: Passeport.ink,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _sectionTitle(String title) {
-    return Text(title, style: Passeport.display(20));
-  }
-
   Widget _mariePractice() {
+    final tutor = ActiveTutor.current;
     final topics =
         ref.read(contentServiceProvider).resources()?.speakingTopics ?? [];
     return Container(
@@ -341,16 +560,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     width: 48,
                     height: 48,
                     decoration: const BoxDecoration(
-                      color: Passeport.sky,
+                      color: DesignTokens.info,
                       shape: BoxShape.circle,
                     ),
-                    child: const Center(
-                      child: Text(
-                        'M',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                    child: ClipOval(
+                      child: Image.asset(
+                        tutor.portraitAsset,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Text(
+                            tutor.initial,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -361,15 +587,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Talk with Marie',
-                          style: Passeport.body(16, weight: FontWeight.w700),
+                          'Talk with ${tutor.displayName}',
+                          style: DesignTokens.body(16, weight: FontWeight.w700),
                         ),
                         const SizedBox(height: 3),
                         Text(
                           'Open conversation · choose any topic',
-                          style: Passeport.body(
+                          style: DesignTokens.body(
                             13,
-                          ).copyWith(color: Passeport.slateDim),
+                          ).copyWith(color: DesignTokens.mutedDim),
                         ),
                       ],
                     ),
@@ -378,12 +604,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     width: 44,
                     height: 44,
                     decoration: const BoxDecoration(
-                      color: Passeport.card,
+                      color: DesignTokens.surface,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       CupertinoIcons.mic_fill,
-                      color: Passeport.maroon,
+                      color: DesignTokens.primary,
                       size: 19,
                     ),
                   ),
@@ -392,7 +618,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
           if (topics.isNotEmpty) ...[
-            Container(height: 1, color: Passeport.sky.withValues(alpha: 0.12)),
+            Container(
+              height: 1,
+              color: DesignTokens.info.withValues(alpha: 0.12),
+            ),
             SizedBox(
               height: 54,
               child: ListView.separated(
@@ -418,12 +647,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 13),
                       decoration: BoxDecoration(
-                        color: Passeport.card,
+                        color: DesignTokens.surface,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
                         topic.title,
-                        style: Passeport.body(12.5, weight: FontWeight.w600),
+                        style: DesignTokens.body(12.5, weight: FontWeight.w600),
                       ),
                     ),
                   );
@@ -449,7 +678,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void _openPractice(PerformanceModality modality) {
     switch (modality) {
       case PerformanceModality.readingRecognition:
-        AppRouter.push(context, (_) => const VocabPickerScreen());
+        AppRouter.push(context, (_) => const ReadingLibraryScreen());
       case PerformanceModality.listeningRecognition:
         AppRouter.push(context, (_) => const ListeningLabScreen());
       case PerformanceModality.controlledWriting:
@@ -479,7 +708,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ref.read(subscriptionGateServiceProvider).isLabLocked(labId)) {
       final subscribed = await AppRouter.push<bool>(
         context,
-        (_) => const PaywallScreen(),
+        (_) => const SpeakPaywallScreen(),
         fullscreenDialog: true,
       );
       if (subscribed != true || !mounted) return;
@@ -523,7 +752,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         locked: gate.isLabLocked('listening'),
         onTap: () => _openGated(
           'listening',
-          () => AppRouter.push(context, (_) => const ListeningLabScreen()),
+          () => AppRouter.push(context, (_) => const ReadingLibraryScreen()),
         ),
       ),
       WebPracticeShortcut(
@@ -580,24 +809,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       (
         shortcut: chips[0],
         duration: '8 min',
-        state: 'Ready',
+        state: _studyState('Vocabulary'),
         detail: 'Strengthen active recall',
       ),
       (
         shortcut: chips[4],
         duration: '12 min',
-        state: 'Building',
+        state: _studyState('Grammar'),
         detail: 'Make your sentences more precise',
       ),
       (
         shortcut: chips[8],
         duration: '18 min',
-        state: 'Next',
+        state: _studyState('Speaking'),
         detail: 'Use today’s language in conversation',
       ),
     ];
 
-    return PasseportCard(
+    return ModernCard(
       padding: 0,
       child: Column(
         children: [
@@ -623,6 +852,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  String _studyState(String category) {
+    final doneToday = DailyGoalService.categoriesToday(_sessions);
+    if (doneToday.contains(category)) return 'Done';
+    final profile = ref.read(learningStoreProvider).profile();
+    final order = DailyGoalService.missionOrderFor(
+      profile,
+      hasHistory: _sessions.isNotEmpty,
+    );
+    return DailyGoalService.nextCategory(doneToday, order: order) == category
+        ? 'Next'
+        : 'Ready';
+  }
+
   Widget _momentumCard() {
     final doneToday = DailyGoalService.categoriesToday(_sessions).length;
     final goalTotal = DailyGoalService.categories.length;
@@ -631,14 +873,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       return DateTime.tryParse(session.startedAt)?.isAfter(weekStart) ?? false;
     }).length;
 
-    return PasseportCard(
+    return ModernCard(
       padding: 18,
       child: Row(
         children: [
           Expanded(
             child: _Metric(
               value: '$doneToday/$goalTotal',
-              label: 'plan items today',
+              label: 'study steps today',
               color: doneToday == goalTotal
                   ? DesignTokens.success
                   : DesignTokens.primary,
@@ -651,7 +893,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               label: sessionsThisWeek == 1
                   ? 'session this week'
                   : 'sessions this week',
-              color: Passeport.sky,
+              color: DesignTokens.info,
             ),
           ),
         ],
@@ -660,7 +902,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _journalCard() {
-    return PasseportCard(
+    return ModernCard(
       padding: 6,
       child: Column(
         children: [
@@ -675,7 +917,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Container(height: 1, color: Passeport.hairline),
+            child: Container(height: 1, color: DesignTokens.hairline),
           ),
           _notesRow(inCard: true),
         ],
@@ -695,28 +937,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         decoration: inCard
             ? null
             : BoxDecoration(
-                color: Passeport.card,
+                color: DesignTokens.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: DesignTokens.cardShadow,
+                boxShadow: DesignTokens.surfaceShadow,
               ),
         child: Row(
           children: [
             const Icon(
               CupertinoIcons.square_pencil,
               size: 18,
-              color: Passeport.sky,
+              color: DesignTokens.info,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Review your notes',
-                style: Passeport.body(14, weight: FontWeight.w600),
+                style: DesignTokens.body(14, weight: FontWeight.w600),
               ),
             ),
             const Icon(
               CupertinoIcons.chevron_right,
               size: 14,
-              color: Passeport.slate,
+              color: DesignTokens.muted,
             ),
           ],
         ),

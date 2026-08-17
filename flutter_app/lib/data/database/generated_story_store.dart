@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:sqlite3/common.dart';
 import 'package:uuid/uuid.dart';
@@ -22,15 +23,30 @@ class GeneratedStoryStore {
   final SyncService? _sync;
 
   /// All saved stories, newest first.
-  List<GeneratedStory> list() {
+  List<GeneratedStory> list({String? practiceMode}) {
     final rows = _db.select(
       '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
-                level_band, summary, topic, read_time_minutes, cover_url
+                level_band, summary, topic, read_time_minutes, cover_url,
+                practice_mode
          FROM generated_stories
-         WHERE deleted_at IS NULL
+         WHERE deleted_at IS NULL ${practiceMode == null ? '' : 'AND (practice_mode = ? OR practice_mode IS NULL)'}
          ORDER BY created_at DESC''',
+      practiceMode == null ? const [] : [practiceMode],
     );
-    return rows.map(_fromRow).toList();
+    final stories = <GeneratedStory>[];
+    for (final row in rows) {
+      try {
+        stories.add(_fromRow(row));
+      } catch (error, stackTrace) {
+        developer.log(
+          'Skipping malformed generated story ${row['id']}: $error',
+          name: 'GeneratedStoryStore',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+    }
+    return stories;
   }
 
   /// Saves a freshly generated story and pushes it to Supabase (best-effort,
@@ -40,8 +56,9 @@ class GeneratedStoryStore {
     _db.execute(
       '''INSERT INTO generated_stories
          (id, title, passage_json, quiz_json, keywords_json, level_band,
-          summary, topic, read_time_minutes, cover_url, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+          summary, topic, read_time_minutes, cover_url, practice_mode,
+          created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         story.id,
         story.title,
@@ -53,6 +70,7 @@ class GeneratedStoryStore {
         story.topic,
         story.readTimeMinutes,
         story.coverUrl,
+        story.practiceMode,
         story.createdAt.toUtc().toIso8601String(),
         now,
       ],
@@ -108,14 +126,16 @@ class GeneratedStoryStore {
     String topic = '',
     int readTimeMinutes = 5,
     String? coverUrl,
+    String practiceMode = 'reading',
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_stories
          (id, title, passage_json, quiz_json, keywords_json, level_band,
-          summary, topic, read_time_minutes, cover_url, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          summary, topic, read_time_minutes, cover_url, practice_mode,
+          created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            passage_json = excluded.passage_json,
@@ -126,6 +146,7 @@ class GeneratedStoryStore {
            topic = excluded.topic,
            read_time_minutes = excluded.read_time_minutes,
            cover_url = excluded.cover_url,
+           practice_mode = excluded.practice_mode,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_stories.updated_at''',
       [
@@ -139,6 +160,7 @@ class GeneratedStoryStore {
         topic,
         readTimeMinutes,
         coverUrl,
+        practiceMode,
         createdAt,
         updatedAt,
       ],
@@ -148,7 +170,8 @@ class GeneratedStoryStore {
   GeneratedStory? _find(String id) {
     final rows = _db.select(
       '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
-                level_band, summary, topic, read_time_minutes, cover_url
+                level_band, summary, topic, read_time_minutes, cover_url,
+                practice_mode
          FROM generated_stories WHERE id = ? AND deleted_at IS NULL''',
       [id],
     );
@@ -156,27 +179,60 @@ class GeneratedStoryStore {
   }
 
   GeneratedStory _fromRow(Row row) {
-    final passageJson = (jsonDecode(row['passage_json'] as String) as Map)
-        .cast<String, dynamic>();
-    final quizJson = jsonDecode(row['quiz_json'] as String) as List;
-    final keywordsJson = jsonDecode(row['keywords_json'] as String) as List;
+    final passageJson = _decodeMap(row['passage_json']);
+    final quizJson = _decodeList(row['quiz_json']);
+    final keywordsJson = _decodeList(row['keywords_json']);
     return GeneratedStory(
-      id: row['id'] as String,
+      id: _string(row['id'], 'generated-story'),
       passage: ReadingPassage.fromJson(passageJson),
       quiz: quizJson
-          .map((e) => MultipleChoiceQuestion.fromJson((e as Map).cast()))
+          .whereType<Map>()
+          .map(
+            (e) => MultipleChoiceQuestion.fromJson(e.cast<String, dynamic>()),
+          )
           .toList(),
       keywords: keywordsJson
-          .map((e) => VocabEntry.fromJson((e as Map).cast()))
+          .whereType<Map>()
+          .map((e) => VocabEntry.fromJson(e.cast<String, dynamic>()))
           .toList(),
-      createdAt: DateTime.parse(row['created_at'] as String),
-      levelBand: row['level_band'] as String? ?? 'A2',
-      summary: row['summary'] as String? ?? '',
-      topic: row['topic'] as String? ?? '',
-      readTimeMinutes: row['read_time_minutes'] as int? ?? 5,
-      coverUrl: row['cover_url'] as String?,
+      createdAt: _date(row['created_at']),
+      levelBand: _string(row['level_band'], 'A2'),
+      summary: _string(row['summary']),
+      topic: _string(row['topic']),
+      readTimeMinutes: _int(row['read_time_minutes']),
+      coverUrl: row['cover_url']?.toString(),
+      practiceMode: _string(row['practice_mode'], 'reading'),
     );
   }
+
+  Map<String, dynamic> _decodeMap(Object? value) {
+    if (value is Map) return value.cast<String, dynamic>();
+    if (value is String && value.trim().isNotEmpty) {
+      final decoded = jsonDecode(value);
+      if (decoded is Map) return decoded.cast<String, dynamic>();
+    }
+    return <String, dynamic>{};
+  }
+
+  List<dynamic> _decodeList(Object? value) {
+    if (value is List) return value;
+    if (value is String && value.trim().isNotEmpty) {
+      final decoded = jsonDecode(value);
+      if (decoded is List) return decoded;
+    }
+    return const [];
+  }
+
+  String _string(Object? value, [String fallback = '']) =>
+      value?.toString() ?? fallback;
+
+  int _int(Object? value, [int fallback = 5]) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+
+  DateTime _date(Object? value) =>
+      DateTime.tryParse(value?.toString() ?? '')?.toLocal() ?? DateTime.now();
 }
 
 /// Mints a fresh story id — a full UUID v4, per this app's schema rule

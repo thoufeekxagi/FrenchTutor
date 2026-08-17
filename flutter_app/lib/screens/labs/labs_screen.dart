@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../models/tutor_persona.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/web/web_layout.dart';
 import '../../widgets/web/web_practice_grid.dart';
-import '../subscription/paywall_screen.dart';
+import '../subscription/speak_paywall_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import 'alphabet_lab_screen.dart';
 import 'connectors_lab_screen.dart';
@@ -92,7 +93,7 @@ class LabsScreen extends ConsumerWidget {
                         icon: CupertinoIcons.mic_fill,
                         title: 'Vocabulary',
                         subtitle:
-                            'Auto-pick or choose words, practice live with Marie',
+                            'Auto-pick or choose words, practice live with ${ActiveTutor.current.displayName}',
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
@@ -322,7 +323,7 @@ void _open(
   if (locked) {
     AppRouter.push(
       context,
-      (_) => const PaywallScreen(),
+      (_) => const SpeakPaywallScreen(),
       fullscreenDialog: true,
     );
     return;

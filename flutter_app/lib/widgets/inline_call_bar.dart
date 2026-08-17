@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../design/tokens.dart';
+import '../models/tutor_persona.dart';
 import '../services/inline_call_controller.dart';
 import 'adaptive/adaptive.dart';
 import 'learning_card.dart';
@@ -36,7 +37,7 @@ class InlineCallActions extends StatelessWidget {
               ? 'End call'
               : controller.connecting
               ? 'Connecting…'
-              : 'Talk with Marie',
+              : 'Talk with ${ActiveTutor.current.displayName}',
           onPressed: controller.connecting
               ? null
               : () => controller.toggle(context),
@@ -93,11 +94,13 @@ class InlineCallStatusCard extends StatelessWidget {
     required this.controller,
     this.listeningLabel = 'Listening.',
     this.showLastTutorLine = true,
+    this.compact = false,
   });
 
   final InlineCallController controller;
   final String listeningLabel;
   final bool showLastTutorLine;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +122,10 @@ class InlineCallStatusCard extends StatelessWidget {
               children: [
                 Text(
                   controller.statusText(listeningLabel: listeningLabel),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: DesignTokens.body(
-                    13,
+                    15,
                     weight: FontWeight.w500,
                   ).copyWith(color: DesignTokens.inkSoft),
                 ),
@@ -128,12 +133,28 @@ class InlineCallStatusCard extends StatelessWidget {
                     controller.lastTutorLine != null &&
                     controller.error == null) ...[
                   const SizedBox(height: 4),
-                  Text(
-                    controller.lastTutorLine!,
-                    style: DesignTokens.body(
-                      12.5,
-                    ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
-                  ),
+                  if (compact)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 54),
+                      child: Scrollbar(
+                        child: SingleChildScrollView(
+                          child: Text(
+                            controller.lastTutorLine!,
+                            style: DesignTokens.body(15).copyWith(
+                              color: DesignTokens.mutedDim,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      controller.lastTutorLine!,
+                      style: DesignTokens.body(
+                        15,
+                      ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+                    ),
                 ],
               ],
             ),

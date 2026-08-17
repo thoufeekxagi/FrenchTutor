@@ -18,15 +18,15 @@ extension on _MasteryTier {
   };
 
   Color foreground(BuildContext context) => switch (this) {
-    _MasteryTier.newSkill => Passeport.slateDim,
-    _MasteryTier.building => Passeport.sky,
-    _MasteryTier.ready => Passeport.sage,
+    _MasteryTier.newSkill => DesignTokens.mutedDim,
+    _MasteryTier.building => DesignTokens.info,
+    _MasteryTier.ready => DesignTokens.success,
   };
 
   Color background(BuildContext context) => switch (this) {
-    _MasteryTier.newSkill => Passeport.parchmentDim,
-    _MasteryTier.building => Passeport.infoSoft,
-    _MasteryTier.ready => Passeport.successSoft,
+    _MasteryTier.newSkill => DesignTokens.canvasDim,
+    _MasteryTier.building => DesignTokens.infoSoft,
+    _MasteryTier.ready => DesignTokens.successSoft,
   };
 }
 
@@ -80,7 +80,7 @@ class _PathScreenState extends ConsumerState<PathScreen> {
     _expandedBands ??= {_currentBand(profile.level)};
 
     return Scaffold(
-      backgroundColor: Passeport.parchment,
+      backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: PSContentColumn(
           child: Column(
@@ -144,7 +144,7 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Passeport.infoSoft,
+                          color: DesignTokens.infoSoft,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -159,8 +159,8 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                             Expanded(
                               child: Text(
                                 'Complete the next skill in order. Your state moves from New to Building to Ready as evidence accumulates.',
-                                style: Passeport.body(13).copyWith(
-                                  color: Passeport.inkSoft,
+                                style: DesignTokens.body(13).copyWith(
+                                  color: DesignTokens.inkSoft,
                                   height: 1.4,
                                 ),
                               ),
@@ -254,20 +254,20 @@ class _BandHeader extends StatelessWidget {
                 ? CupertinoIcons.chevron_down
                 : CupertinoIcons.chevron_right,
             size: 14,
-            color: Passeport.slateDim,
+            color: DesignTokens.mutedDim,
           ),
           const SizedBox(width: 6),
           Text(
             '$band FOUNDATION',
-            style: Passeport.body(
+            style: DesignTokens.body(
               11,
               weight: FontWeight.w700,
-            ).copyWith(color: Passeport.slateDim, letterSpacing: 1),
+            ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 1),
           ),
           const Spacer(),
           Text(
             '$readyCount/$count ready',
-            style: Passeport.body(12).copyWith(color: Passeport.slateDim),
+            style: DesignTokens.body(12).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),
@@ -293,9 +293,9 @@ class _CompetencyNode extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Passeport.card,
+          color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: DesignTokens.cardShadow,
+          boxShadow: DesignTokens.surfaceShadow,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +323,7 @@ class _CompetencyNode extends StatelessWidget {
                       Expanded(
                         child: Text(
                           competency.title,
-                          style: Passeport.body(15, weight: FontWeight.w700),
+                          style: DesignTokens.body(15, weight: FontWeight.w700),
                         ),
                       ),
                       Container(
@@ -337,7 +337,7 @@ class _CompetencyNode extends StatelessWidget {
                         ),
                         child: Text(
                           tier.label,
-                          style: Passeport.body(9.5, weight: FontWeight.w700)
+                          style: DesignTokens.body(9.5, weight: FontWeight.w700)
                               .copyWith(
                                 color: tier.foreground(context),
                                 letterSpacing: 0.7,
@@ -349,18 +349,18 @@ class _CompetencyNode extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     competency.description,
-                    style: Passeport.body(
+                    style: DesignTokens.body(
                       13,
-                    ).copyWith(color: Passeport.slateDim, height: 1.4),
+                    ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
                   ),
                   if (competency.prerequisiteIds.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     Text(
                       'Builds after ${competency.prerequisiteIds.map((id) => titleById[id] ?? id).join(' · ')}',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         11.5,
                         weight: FontWeight.w600,
-                      ).copyWith(color: Passeport.sky),
+                      ).copyWith(color: DesignTokens.info),
                     ),
                   ],
                 ],
@@ -393,16 +393,16 @@ class _EmptyPath extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(CupertinoIcons.map, color: Passeport.sky, size: 34),
+            const Icon(CupertinoIcons.map, color: DesignTokens.info, size: 34),
             const SizedBox(height: 14),
-            Text('Your path is being prepared', style: Passeport.display(22)),
+            Text('Your path is being prepared', style: DesignTokens.display(22)),
             const SizedBox(height: 7),
             Text(
               'The competency map will appear after the curriculum finishes loading.',
               textAlign: TextAlign.center,
-              style: Passeport.body(
+              style: DesignTokens.body(
                 14,
-              ).copyWith(color: Passeport.slateDim, height: 1.4),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
             ),
           ],
         ),

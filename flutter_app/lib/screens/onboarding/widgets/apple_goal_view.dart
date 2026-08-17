@@ -65,7 +65,7 @@ class AppleGoalView extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 27,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: DesignTokens.ink,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -76,7 +76,7 @@ class AppleGoalView extends StatelessWidget {
                       'Personalizes your daily coach.',
                       style: GoogleFonts.inter(
                         fontSize: 14.5,
-                        color: const Color(0xFF64748B),
+                        color: DesignTokens.inkSoft,
                       ),
                     ),
                     const SizedBox(height: 28),
@@ -106,13 +106,15 @@ class AppleGoalView extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: selectedGoal != null ? onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0062CC),
+                    backgroundColor: DesignTokens.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: const Color(0xFFE2E8F0),
-                    disabledForegroundColor: const Color(0xFF94A3B8),
+                    disabledBackgroundColor: DesignTokens.canvasDim,
+                    disabledForegroundColor: DesignTokens.muted,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusPill,
+                      ),
                     ),
                     textStyle: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
@@ -150,7 +152,7 @@ class _TopStepHeader extends StatelessWidget {
                 icon: const Icon(
                   CupertinoIcons.chevron_back,
                   size: 22,
-                  color: Color(0xFF0F172A),
+                  color: DesignTokens.ink,
                 ),
               ),
               Expanded(
@@ -161,7 +163,7 @@ class _TopStepHeader extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: const Color(0xFF64748B),
+                      color: DesignTokens.inkSoft,
                     ),
                   ),
                 ),
@@ -173,13 +175,11 @@ class _TopStepHeader extends StatelessWidget {
         Container(
           height: 3,
           width: double.infinity,
-          color: const Color(0xFFE2E8F0),
+          color: DesignTokens.canvasDim,
           alignment: Alignment.centerLeft,
           child: FractionallySizedBox(
             widthFactor: 0.33,
-            child: Container(
-              color: const Color(0xFF0062CC),
-            ),
+            child: Container(color: DesignTokens.primary),
           ),
         ),
       ],
@@ -214,16 +214,16 @@ class _LuxuryGoalCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+            color: isSelected ? DesignTokens.primarySoft : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? const Color(0xFF0062CC) : const Color(0xFFE2E8F0),
+              color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                    ? const Color(0xFF0062CC).withValues(alpha: 0.08)
+                    ? DesignTokens.primary.withValues(alpha: 0.08)
                     : Colors.black.withValues(alpha: 0.03),
                 blurRadius: 14,
                 offset: const Offset(0, 3),
@@ -238,21 +238,21 @@ class _LuxuryGoalCard extends StatelessWidget {
                 height: 46,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF0062CC).withValues(alpha: 0.12)
-                      : const Color(0xFFF1F5F9),
+                      ? DesignTokens.primary.withValues(alpha: 0.12)
+                      : DesignTokens.canvas,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF0062CC).withValues(alpha: 0.24)
-                        : const Color(0xFFE2E8F0),
+                        ? DesignTokens.primary.withValues(alpha: 0.24)
+                        : DesignTokens.canvasDim,
                   ),
                 ),
                 child: Icon(
                   icon,
                   size: 22,
                   color: isSelected
-                      ? const Color(0xFF0062CC)
-                      : const Color(0xFF475569),
+                      ? DesignTokens.primary
+                      : DesignTokens.inkSoft,
                 ),
               ),
               const SizedBox(width: 16),
@@ -267,7 +267,7 @@ class _LuxuryGoalCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0F172A),
+                        color: DesignTokens.ink,
                         letterSpacing: -0.2,
                       ),
                     ),
@@ -276,7 +276,7 @@ class _LuxuryGoalCard extends StatelessWidget {
                       subtitle,
                       style: GoogleFonts.inter(
                         fontSize: 12.5,
-                        color: const Color(0xFF64748B),
+                        color: DesignTokens.inkSoft,
                       ),
                     ),
                   ],
@@ -290,13 +290,11 @@ class _LuxuryGoalCard extends StatelessWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected
-                      ? const Color(0xFF0062CC)
-                      : Colors.transparent,
+                  color: isSelected ? DesignTokens.primary : Colors.transparent,
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF0062CC)
-                        : const Color(0xFFCBD5E1),
+                        ? DesignTokens.primary
+                        : DesignTokens.canvasDim,
                     width: 2,
                   ),
                 ),

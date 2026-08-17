@@ -6,17 +6,22 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../models/tutor_persona.dart';
+import '../../services/gemini_live_audio_service.dart';
 import '../../services/inline_call_controller.dart';
+import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/inline_call_bar.dart';
+import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 class ConnectorsLabScreen extends ConsumerStatefulWidget {
-  const ConnectorsLabScreen({super.key});
+  const ConnectorsLabScreen({super.key, this.autoStart = false});
+
+  final bool autoStart;
 
   @override
   ConsumerState<ConnectorsLabScreen> createState() =>
@@ -54,6 +59,12 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
       onUserTranscript: (text) => _recorder.logUser(text),
       onTutorTranscript: (text) => _recorder.logTutor(text),
     );
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final pack = ref.read(contentServiceProvider).connectors();
+        if (mounted && pack != null) _showQuiz(pack.connectors);
+      });
+    }
   }
 
   @override
@@ -75,10 +86,10 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
     final pack = ref.watch(contentServiceProvider).connectors();
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Connectors', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [InlineCallActions(controller: _call)],
@@ -102,7 +113,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                         'Connectors content unavailable.',
                         style: DesignTokens.body(
                           13,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     )
                   : _buildContent(pack),
@@ -121,18 +132,18 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
       children: [
         Text(
           pack.tip,
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        PasseportPrimaryButton(
+        ModernPrimaryButton(
           label: 'Take the 10-question quiz',
           onPressed: () => _showQuiz(pack.connectors),
         ),
         const SizedBox(height: 16),
         for (final category in categories) ...[
-          KickerText(category, color: DesignTokens.slateDim),
+          KickerText(category, color: DesignTokens.mutedDim),
           const SizedBox(height: 8),
-          PasseportCard(
+          ModernCard(
             padding: 10,
             child: Column(
               children: _buildCategoryRows(
@@ -187,7 +198,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                       connector.en,
                       style: DesignTokens.mono(
                         10.5,
-                      ).copyWith(color: DesignTokens.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
@@ -195,7 +206,7 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
                 Text(
                   connector.example.fr,
                   style: DesignTokens.body(11.5).copyWith(
-                    color: DesignTokens.slateDim,
+                    color: DesignTokens.mutedDim,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -203,23 +214,15 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
             ),
           ),
           const SizedBox(width: 10),
-          IconButton(
-            icon: Icon(
-              CupertinoIcons.speaker_2_fill,
-              size: 16,
-              color: DesignTokens.info,
-            ),
-            onPressed: () {
-              LessonSpeechService.shared.speak(
-                items: [
-                  SpeechItem(text: connector.example.fr, language: 'fr-FR'),
-                ],
-              );
-            },
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: DesignTokens.minTapTarget,
-              minHeight: DesignTokens.minTapTarget,
+          TtsPlayButton(
+            text: connector.example.fr,
+            size: DesignTokens.minTapTarget,
+            iconSize: 20,
+            color: DesignTokens.info,
+            audioResolver: () => GeminiLiveAudioService.shared.resolve(
+              text: connector.example.fr,
+              contentItemId: 'connectors:${connector.id}',
+              voiceName: ActiveTutor.current.voiceName,
             ),
           ),
         ],
@@ -227,8 +230,8 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
     );
   }
 
-  void _showQuiz(List<Connector> connectors) {
-    showModalBottomSheet(
+  Future<void> _showQuiz(List<Connector> connectors) async {
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -242,6 +245,9 @@ class _ConnectorsLabScreenState extends ConsumerState<ConnectorsLabScreen>
         ),
       ),
     );
+    if (widget.autoStart && mounted) {
+      Navigator.of(context).pop(result == true);
+    }
   }
 }
 
@@ -273,6 +279,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
   int _index = 0;
   int _correctCount = 0;
   String? _selected;
+  late List<String?> _answers;
 
   @override
   void initState() {
@@ -293,12 +300,14 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
         ..shuffle(rng);
       return _QuizQuestion(connector: connector, choices: choices);
     }).toList();
+    _answers = List<String?>.filled(_questions.length, null);
   }
 
   void _answer(String choice) {
     if (_selected != null) return;
     setState(() {
       _selected = choice;
+      _answers[_index] = choice;
       if (choice == _questions[_index].connector.fr) {
         _correctCount++;
       }
@@ -325,16 +334,18 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
   }
 
   Color _choiceColor(String choice, _QuizQuestion q) {
-    if (choice == q.connector.fr) return DesignTokens.info;
-    if (choice == _selected) return DesignTokens.primary;
-    return DesignTokens.slate;
+    if (_selected != null && choice == q.connector.fr) {
+      return DesignTokens.success;
+    }
+    if (_selected != null && choice == _selected) return DesignTokens.danger;
+    return DesignTokens.muted;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: DesignTokens.parchmentDim,
+        color: DesignTokens.canvasDim,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -345,7 +356,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: DesignTokens.slate,
+              color: DesignTokens.muted,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -391,11 +402,11 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
               '${_index + 1} / ${_questions.length}',
               style: DesignTokens.mono(
                 11,
-              ).copyWith(color: DesignTokens.slateDim),
+              ).copyWith(color: DesignTokens.mutedDim),
             ),
           ),
           const SizedBox(height: 18),
-          PasseportCard(
+          ModernCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -403,7 +414,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
                   'Which connector means:',
                   style: DesignTokens.body(
                     12.5,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -425,7 +436,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
                     foregroundColor: _selected == null
                         ? DesignTokens.text
                         : _choiceColor(choice, q),
-                    backgroundColor: DesignTokens.card,
+                    backgroundColor: DesignTokens.surface,
                     side: BorderSide(color: DesignTokens.hairline),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -440,7 +451,7 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
           ),
           if (_selected != null) ...[
             const SizedBox(height: 8),
-            PasseportPrimaryButton(
+            ModernPrimaryButton(
               label: _index + 1 < _questions.length ? 'Next' : 'See results',
               onPressed: _next,
             ),
@@ -451,40 +462,109 @@ class _ConnectorsQuizViewState extends State<_ConnectorsQuizView> {
   }
 
   Widget _resultCard() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              CupertinoIcons.checkmark_seal_fill,
-              size: 36,
-              color: DesignTokens.info,
-            ),
-            const SizedBox(height: 14),
-            Text(
-              '$_correctCount / ${_questions.length}',
-              style: DesignTokens.display(24, weight: FontWeight.w500),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Great connectors score points on TEF writing and speaking tasks.',
-              style: DesignTokens.body(
-                13,
-              ).copyWith(color: DesignTokens.slateDim),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 60),
-              child: PasseportPrimaryButton(
-                label: 'Done',
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(18, 24, 18, 28),
+      children: [
+        Icon(
+          CupertinoIcons.checkmark_seal_fill,
+          size: 36,
+          color: DesignTokens.info,
         ),
+        const SizedBox(height: 14),
+        Center(
+          child: Text(
+            '$_correctCount / ${_questions.length}',
+            style: DesignTokens.display(24, weight: FontWeight.w500),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: Text(
+            'Your connector answers',
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
+          ),
+        ),
+        const SizedBox(height: 18),
+        for (var i = 0; i < _questions.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _resultRow(i),
+          ),
+        const SizedBox(height: 12),
+        Text(
+          'Great connectors score points on TEF writing and speaking tasks.',
+          style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 42),
+          child: ModernPrimaryButton(
+            label: 'Done',
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _resultRow(int index) {
+    final question = _questions[index];
+    final answer = _answers[index];
+    final isCorrect = answer == question.connector.fr;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isCorrect ? DesignTokens.successSoft : DesignTokens.dangerSoft,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isCorrect ? DesignTokens.success : DesignTokens.danger,
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isCorrect
+                ? CupertinoIcons.checkmark_circle_fill
+                : CupertinoIcons.xmark_circle_fill,
+            size: 20,
+            color: isCorrect ? DesignTokens.success : DesignTokens.danger,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  question.connector.en,
+                  style: DesignTokens.body(12, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isCorrect
+                      ? 'Correct: ${question.connector.fr}'
+                      : 'You chose: ${answer ?? 'No answer'}',
+                  style: DesignTokens.body(11.5).copyWith(
+                    color: isCorrect
+                        ? DesignTokens.success
+                        : DesignTokens.danger,
+                  ),
+                ),
+                if (!isCorrect) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'Correct answer: ${question.connector.fr}',
+                    style: DesignTokens.body(
+                      11.5,
+                    ).copyWith(color: DesignTokens.mutedDim),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

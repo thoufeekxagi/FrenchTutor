@@ -406,7 +406,7 @@ class WebAudioStreamingService implements AudioStreamingService {
   }
 
   @override
-  Future<void> stopPlayback() async {
+  Future<void> stopPlayback({bool hardStop = false}) async {
     for (final node in List.of(_scheduled)) {
       try {
         node.onended = null;

@@ -6,7 +6,7 @@ import '../orchestration/models/competency.dart';
 import 'auth_service.dart';
 
 /// Debug-build-only "unlock everything" switch for testing paid-tier UI
-/// without a real purchase or invite code. Mirrors ActiveTutor's
+/// without a real purchase. Mirrors ActiveTutor's
 /// synchronous-read/async-persist pattern (tutor_persona.dart) — loaded once
 /// at app startup, flippable from a Settings toggle, gone entirely from
 /// release builds: every check is behind `kDebugMode`, which the compiler
@@ -46,12 +46,11 @@ class DevSubscriptionOverride {
 /// Free tier keeps two things fully usable forever: vocabulary practice
 /// (mission steps + the Labs "Vocabulary" flashcards) and the Labs "Speaking
 /// mock" (TCF/TEF), since that's a strong conversion driver for test-takers.
-/// Everything else requires a subscription or an invite-code grant.
+/// Everything else requires a subscription.
 ///
 /// Reads the same local `entitlements` table SyncService._hydrateEntitlements
-/// keeps in sync with Supabase's `profiles.subscription_active` (set by the
-/// RevenueCat webhook or redeem_subscription_invite_code), so one flag covers
-/// both paid subscriptions and invite-code grants.
+/// keeps in sync with Supabase's StoreKit/RevenueCat subscription webhook, so
+/// one flag covers paid subscriptions.
 class SubscriptionGateService {
   SubscriptionGateService({required this.infrastructure});
 

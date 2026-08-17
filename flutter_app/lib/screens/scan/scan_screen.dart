@@ -11,6 +11,7 @@ import 'package:uuid/uuid.dart';
 import '../../data/database/storage_service.dart';
 import '../../design/tokens.dart';
 import '../../models/session.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
@@ -68,7 +69,7 @@ class _ScanSession {
         );
       } else if (message.text.trim().isNotEmpty) {
         lines.add(
-          '${message.isUser ? 'Student' : 'Marie'}: ${message.text.trim()}',
+          '${message.isUser ? 'Student' : ActiveTutor.current.displayName}: ${message.text.trim()}',
         );
       }
     }

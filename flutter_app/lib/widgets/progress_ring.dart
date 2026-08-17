@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 /// A small indeterminate spinning ring — the same visual language as the
 /// live-call mic button's recording indicator, reused wherever something is
 /// generating in the background and there's no real percentage to report
-/// (Gemini TTS synthesis has no progress callback, just "done" or "not yet").
+/// (Gemini Live synthesis has no progress callback, just "done" or "not yet").
 class SpinningRing extends StatefulWidget {
   const SpinningRing({
     super.key,

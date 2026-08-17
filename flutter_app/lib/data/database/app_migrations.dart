@@ -83,6 +83,11 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   17: _migrationV17,
   18: _migrationV18,
   19: _migrationV19,
+  20: _migrationV20,
+  21: _migrationV21,
+  22: _migrationV22,
+  23: _migrationV23,
+  24: _migrationV24,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -899,4 +904,85 @@ void _migrationV19(CommonDatabase db) {
   if (!_columnExists(db, 'generated_stories', 'cover_url')) {
     db.execute('ALTER TABLE generated_stories ADD COLUMN cover_url TEXT');
   }
+}
+
+/// Separates the independent reading and listening shelves without duplicating
+/// passage, quiz, keyword, or cover storage. Existing rows are treated as
+/// reading so they remain visible to learners after the migration.
+void _migrationV20(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_stories')) return;
+  if (!_columnExists(db, 'generated_stories', 'practice_mode')) {
+    db.execute(
+      "ALTER TABLE generated_stories ADD COLUMN practice_mode TEXT NOT NULL DEFAULT 'reading'",
+    );
+  }
+  db.execute(
+    "CREATE INDEX IF NOT EXISTS idx_generated_stories_mode_created ON generated_stories (practice_mode, created_at)",
+  );
+}
+
+/// Adds the generated grammar-story cover URL used by the compact grammar
+/// story shelf. The artwork is optional: the grammar lesson remains entirely
+/// text-first when cover generation or storage is unavailable.
+void _migrationV21(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_grammar_stories')) return;
+  if (!_columnExists(db, 'generated_grammar_stories', 'cover_url')) {
+    db.execute(
+      'ALTER TABLE generated_grammar_stories ADD COLUMN cover_url TEXT',
+    );
+  }
+}
+
+/// Stores AI-generated writing prompts so the Writing lab has the same
+/// reopenable library contract as Reading, Listening, and Grammar.
+void _migrationV22(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS generated_writing_tasks (
+      id TEXT PRIMARY KEY,
+      task_json TEXT NOT NULL,
+      level_band TEXT NOT NULL DEFAULT 'A2',
+      cover_url TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_generated_writing_tasks_created '
+    'ON generated_writing_tasks (created_at)',
+  );
+}
+
+/// Adds optional learner-scoped artwork to saved roleplay scenes. The scene
+/// itself remains usable if cover generation or private storage is unavailable.
+void _migrationV23(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_roleplays')) return;
+  if (!_columnExists(db, 'generated_roleplays', 'cover_url')) {
+    db.execute('ALTER TABLE generated_roleplays ADD COLUMN cover_url TEXT');
+  }
+}
+
+/// Stores learner-owned starter and generated vocabulary libraries. The
+/// entries stay as JSON so the local schema remains compatible with the
+/// Supabase jsonb payload and can evolve without a destructive migration.
+void _migrationV24(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS generated_vocabulary_sets (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      title TEXT NOT NULL,
+      summary TEXT NOT NULL DEFAULT '',
+      topic TEXT NOT NULL DEFAULT '',
+      level_band TEXT NOT NULL DEFAULT 'A1',
+      entries_json TEXT NOT NULL DEFAULT '[]',
+      cover_url TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_generated_vocabulary_sets_created '
+    'ON generated_vocabulary_sets (created_at)',
+  );
 }

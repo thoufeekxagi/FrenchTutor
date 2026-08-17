@@ -227,7 +227,7 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
             stage: 'alphabet',
           ),
         );
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(true);
   }
 
   @override

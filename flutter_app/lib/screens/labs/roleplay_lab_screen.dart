@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../data/database/generated_roleplay_store.dart';
 import '../../design/tokens.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
@@ -15,8 +16,11 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/primary_action_button.dart';
+import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../pathway/agent_led_listening_screen.dart';
+import '../pathway/roleplay_review_screen.dart';
 
 // Fixed scenario categories the learner can tap to steer generation,
 // alongside "Surprise me" (fully random) — mirrors the story library's
@@ -52,7 +56,10 @@ const _roleplayScenarios = [
 /// roleplay library so it can be replayed later, exactly like the story
 /// library saves generated stories — never generate-and-discard.
 class RoleplayLabScreen extends ConsumerStatefulWidget {
-  const RoleplayLabScreen({super.key});
+  const RoleplayLabScreen({super.key, this.topic, this.autoStart = false});
+
+  final String? topic;
+  final bool autoStart;
 
   @override
   ConsumerState<RoleplayLabScreen> createState() => _RoleplayLabScreenState();
@@ -61,6 +68,7 @@ class RoleplayLabScreen extends ConsumerStatefulWidget {
 class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   bool _generating = false;
   List<GeneratedRoleplay>? _roleplays;
+  final Set<String> _coverAttempts = <String>{};
   // null = "Surprise me" (fully random pick each generation).
   String? _selectedScenario;
 
@@ -68,11 +76,47 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   void initState() {
     super.initState();
     _loadRoleplays();
+    unawaited(_refreshRoleplays());
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_startRoleplay());
+      });
+    }
   }
 
   void _loadRoleplays() {
+    if (!mounted) return;
     final store = ref.read(generatedRoleplayStoreProvider);
     setState(() => _roleplays = store.list());
+  }
+
+  Future<void> _refreshRoleplays() async {
+    try {
+      await ref.read(syncServiceProvider).hydrateGeneratedRoleplays();
+    } catch (error, stackTrace) {
+      debugPrint('Roleplay hydration failed: $error\n$stackTrace');
+    }
+    if (mounted) {
+      _loadRoleplays();
+      // A scene is useful without artwork, so cover generation is deliberately
+      // asynchronous. Repair any saved roleplays whose previous image request
+      // or upload was interrupted instead of leaving a permanent placeholder.
+      unawaited(_retryMissingRoleplayCovers());
+    }
+  }
+
+  Future<void> _retryMissingRoleplayCovers() async {
+    final missing = ref
+        .read(generatedRoleplayStoreProvider)
+        .list()
+        .where(
+          (roleplay) => roleplay.coverUrl == null || roleplay.coverUrl!.isEmpty,
+        )
+        .take(6)
+        .toList();
+    for (final roleplay in missing) {
+      await _generateRoleplayCover(roleplay);
+    }
   }
 
   Future<void> _startRoleplay() async {
@@ -91,21 +135,23 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       );
       ref.read(generatedRoleplayStoreProvider).insert(roleplay);
       unawaited(_prewarmNarration(roleplay));
+      // Artwork is deliberately independent of scene generation and live
+      // practice. The learner can start immediately while the private cover
+      // is generated and attached to the library card in the background.
+      unawaited(_generateRoleplayCover(roleplay));
       if (!mounted) return;
       _loadRoleplays();
-      await AppRouter.push(
-        context,
-        (_) => AgentLedListeningScreen(
-          passage: roleplay.passage,
-          noteContext: 'Roleplay',
-          sessionStage: 'roleplay',
-          sessionTopic: roleplay.displayTitle,
-        ),
-        fullscreenDialog: true,
-      );
+      final completed = await _openRoleplay(roleplay);
+      if (widget.autoStart && mounted) {
+        Navigator.of(context).pop(completed);
+      }
     } catch (e) {
       debugPrint('RoleplayLabScreen: scene generation failed: $e');
       if (mounted) {
+        if (widget.autoStart) {
+          Navigator.of(context).pop(false);
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Could not generate a scene. Try again.'),
@@ -117,11 +163,58 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     }
   }
 
+  Future<void> _generateRoleplayCover(GeneratedRoleplay roleplay) async {
+    if (!_coverAttempts.add(roleplay.id)) return;
+    // Capture provider-backed services before the route can be popped. Cover
+    // generation intentionally outlives the live practice route when needed.
+    final sync = ref.read(syncServiceProvider);
+    final store = ref.read(generatedRoleplayStoreProvider);
+    Object? lastError;
+    StackTrace? lastStackTrace;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        final bytes = await LessonAgentService.shared.generateStoryCover(
+          title: roleplay.displayTitle,
+          summary: roleplay.passage.segments
+              .take(2)
+              .map((segment) => segment.en.isNotEmpty ? segment.en : segment.fr)
+              .join(' '),
+          topic: roleplay.displayTitle,
+          levelBand: 'A1',
+          coverPrompt:
+              'A premium editorial cover for a French language roleplay scene. '
+              'Show one cinematic real-life moment that matches the title and dialogue. '
+              'Make it feel like a published language-learning book, with human-scale '
+              'characters and a clear setting, never an app screenshot or cartoon.',
+        );
+        final url = await sync.uploadStoryCover(
+          storyId: roleplay.id,
+          bytes: bytes,
+        );
+        if (url == null || url.isEmpty) {
+          throw StateError('cover upload returned no signed URL');
+        }
+        store.updateCoverUrl(roleplay.id, url);
+        if (mounted) _loadRoleplays();
+        return;
+      } catch (error, stackTrace) {
+        lastError = error;
+        lastStackTrace = stackTrace;
+        if (attempt < 2) {
+          await Future<void>.delayed(Duration(seconds: 2 << attempt));
+        }
+      }
+    }
+    debugPrint(
+      'Roleplay cover generation failed after 3 attempts: $lastError\n$lastStackTrace',
+    );
+  }
+
   /// Synthesizes and caches both sides of every beat's dialogue (the
   /// character's line and the learner's line — the "tap a bubble's speaker
   /// to rehear it" feature in `AgentLedListeningScreen` plays either) right
   /// after the scene is written, so replaying this exact roleplay later
-  /// never needs to call the TTS endpoint live again. Fire-and-forget:
+  /// never needs to call Gemini Live again. Fire-and-forget:
   /// a partial failure just means those specific lines re-synthesize (with
   /// the same retry) the first time they're actually tapped.
   Future<void> _prewarmNarration(GeneratedRoleplay roleplay) {
@@ -156,6 +249,9 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   /// categories, the onboarding interests, and the generic fallback pool as
   /// equal citizens — same rationale as the story library's `_topicFor`.
   String _scenarioFor(Profile profile) {
+    if (widget.topic != null && widget.topic!.trim().isNotEmpty) {
+      return widget.topic!;
+    }
     if (_selectedScenario != null) {
       return _roleplayScenarioCategories[_selectedScenario]!;
     }
@@ -167,18 +263,51 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     return pool[Random().nextInt(pool.length)];
   }
 
+  Future<bool> _openRoleplay(GeneratedRoleplay roleplay) async {
+    final outcome = await AppRouter.push<StageOutcome<ListeningStageResult>>(
+      context,
+      (_) => AgentLedListeningScreen(
+        passage: roleplay.passage,
+        noteContext: 'Roleplay',
+        sessionStage: 'roleplay',
+        sessionTopic: roleplay.displayTitle,
+      ),
+      fullscreenDialog: true,
+    );
+    if (!mounted || outcome == null || !outcome.isCompleted) return false;
+    await AppRouter.push(
+      context,
+      (_) => RoleplayReviewScreen(roleplay: roleplay),
+      fullscreenDialog: true,
+    );
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.autoStart) {
+      return Scaffold(
+        backgroundColor: DesignTokens.canvasDim,
+        appBar: AppBar(
+          title: Text('Roleplay', style: DesignTokens.display(20)),
+          backgroundColor: DesignTokens.canvasDim,
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
     final roleplays = _roleplays ?? const [];
-    final starterRoleplays = ref
-        .watch(contentServiceProvider)
-        .starterRoleplays();
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text('Roleplay', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -186,12 +315,11 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
-            _StartRoleplayTile(
+            _RoleplayStartSection(
               generating: _generating,
-              selectedScenario: _selectedScenario,
               onTap: _startRoleplay,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
             _ScenarioChipRow(
               selected: _selectedScenario,
               onSelect: (scenario) =>
@@ -199,54 +327,21 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
             ),
             const SizedBox(height: 20),
             if (roleplays.isNotEmpty) ...[
-              const KickerText('Your roleplays', color: DesignTokens.slateDim),
+              const KickerText('Your roleplays', color: DesignTokens.mutedDim),
               const SizedBox(height: 10),
-              for (final roleplay in roleplays)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _RoleplayTile(
+              ResponsiveCardGrid(
+                mainAxisExtent: 280,
+                itemCount: roleplays.length,
+                itemBuilder: (context, index) {
+                  final roleplay = roleplays[index];
+                  return _RoleplayTile(
                     roleplay: roleplay,
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => AgentLedListeningScreen(
-                        passage: roleplay.passage,
-                        noteContext: 'Roleplay',
-                        sessionStage: 'roleplay',
-                        sessionTopic: roleplay.displayTitle,
-                      ),
-                      fullscreenDialog: true,
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 8),
+                    onTap: () => _openRoleplay(roleplay),
+                  );
+                },
+              ),
             ] else
               _EmptyRoleplayLibraryNote(),
-            if (starterRoleplays.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const KickerText(
-                'Starter roleplays',
-                color: DesignTokens.slateDim,
-              ),
-              const SizedBox(height: 10),
-              for (final roleplay in starterRoleplays)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _RoleplayTile(
-                    roleplay: roleplay,
-                    isStarter: true,
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => AgentLedListeningScreen(
-                        passage: roleplay.passage,
-                        noteContext: 'Roleplay',
-                        sessionStage: 'roleplay',
-                        sessionTopic: roleplay.displayTitle,
-                      ),
-                      fullscreenDialog: true,
-                    ),
-                  ),
-                ),
-            ],
           ],
         ),
       ),
@@ -254,54 +349,33 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   }
 }
 
-class _StartRoleplayTile extends StatelessWidget {
-  const _StartRoleplayTile({
-    required this.generating,
-    required this.onTap,
-    this.selectedScenario,
-  });
+class _RoleplayStartSection extends StatelessWidget {
+  const _RoleplayStartSection({required this.generating, required this.onTap});
 
   final bool generating;
   final VoidCallback onTap;
-  final String? selectedScenario;
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: DesignTokens.primarySoft,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: generating
-              ? const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(
-                  CupertinoIcons.bubble_left_bubble_right_fill,
-                  color: DesignTokens.primary,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Practice a real situation', style: DesignTokens.display(26)),
+        const SizedBox(height: 6),
+        Text(
+          'Choose the moment you want to rehearse. Marie sets the scene, teaches one turn at a time, and lets you try it for yourself.',
+          style: DesignTokens.body(
+            13.5,
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
-        title: Text(
-          'Start a roleplay',
-          style: DesignTokens.body(15, weight: FontWeight.w600),
+        const SizedBox(height: 18),
+        PrimaryActionButton(
+          label: generating ? 'Setting the scene…' : 'Build roleplay',
+          icon: CupertinoIcons.play_fill,
+          isLoading: generating,
+          onPressed: generating ? null : onTap,
         ),
-        subtitle: Text(
-          generating
-              ? 'Setting the scene…'
-              : selectedScenario != null
-              ? 'A fresh $selectedScenario scene'
-              : 'A fresh live scene, generated for you',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.slateDim),
-        ),
-        trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
-        onTap: generating ? null : onTap,
-      ),
+      ],
     );
   }
 }
@@ -342,7 +416,7 @@ class _ScenarioChipRow extends StatelessWidget {
                 option ?? 'Surprise me',
                 style: DesignTokens.body(12.5, weight: FontWeight.w600)
                     .copyWith(
-                      color: isSelected ? Colors.white : DesignTokens.slateDim,
+                      color: isSelected ? Colors.white : DesignTokens.mutedDim,
                     ),
               ),
             ),
@@ -354,41 +428,125 @@ class _ScenarioChipRow extends StatelessWidget {
 }
 
 class _RoleplayTile extends StatelessWidget {
-  const _RoleplayTile({
-    required this.roleplay,
-    required this.onTap,
-    this.isStarter = false,
-  });
+  const _RoleplayTile({required this.roleplay, required this.onTap});
 
   final GeneratedRoleplay roleplay;
   final VoidCallback onTap;
-  final bool isStarter;
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
-      padding: 0,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        title: Text(
-          roleplay.displayTitle,
-          style: DesignTokens.body(15, weight: FontWeight.w500),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text(
-            isStarter
-                ? 'Ready to play'
-                : DateFormat('MMM d, HH:mm').format(roleplay.createdAt),
-            style: DesignTokens.mono(
-              10.5,
-            ).copyWith(color: DesignTokens.slateDim),
+    return GestureDetector(
+      onTap: onTap,
+      child: ModernCard(
+        padding: 0,
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: 280,
+          child: Column(
+            children: [
+              _RoleplayCover(
+                roleplay: roleplay,
+                width: double.infinity,
+                height: 166,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'YOUR ROLEPLAY',
+                        style: DesignTokens.mono(10, weight: FontWeight.w700)
+                            .copyWith(
+                              color: DesignTokens.primary,
+                              letterSpacing: 0.8,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        roleplay.displayTitle,
+                        style: DesignTokens.display(17),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        '${DateFormat('MMM d, HH:mm').format(roleplay.createdAt)} · ${roleplay.passage.segments.length} turns',
+                        style: DesignTokens.mono(
+                          10.5,
+                        ).copyWith(color: DesignTokens.mutedDim),
+                      ),
+                      const SizedBox(height: 13),
+                      Row(
+                        children: [
+                          const Icon(CupertinoIcons.play_fill, size: 13),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Open roleplay',
+                            style: DesignTokens.body(
+                              12.5,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
-        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _RoleplayCover extends StatelessWidget {
+  const _RoleplayCover({
+    required this.roleplay,
+    required this.width,
+    required this.height,
+  });
+
+  final GeneratedRoleplay roleplay;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = roleplay.coverUrl;
+    final fallback = Container(
+      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
+      child: const Center(
+        child: Icon(
+          CupertinoIcons.bubble_left_bubble_right_fill,
+          color: Colors.white,
+          size: 32,
+        ),
+      ),
+    );
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.horizontal(
+          left: Radius.circular(DesignTokens.radiusMedium),
+        ),
+        child: url != null && url.startsWith('asset:')
+            ? Image.asset(
+                url.substring('asset:'.length),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => fallback,
+              )
+            : url == null || url.isEmpty
+            ? fallback
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => fallback,
+              ),
       ),
     );
   }
@@ -405,14 +563,14 @@ class _EmptyRoleplayLibraryNote extends StatelessWidget {
         children: [
           const Icon(
             CupertinoIcons.bubble_left_bubble_right,
-            color: DesignTokens.slateDim,
+            color: DesignTokens.mutedDim,
             size: 28,
           ),
           const SizedBox(height: 10),
           Text(
-            'No roleplays of your own yet, start one above, or try a starter scene below',
+            'No roleplays yet. Start one above to build your library.',
             textAlign: TextAlign.center,
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.slateDim),
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
           ),
         ],
       ),

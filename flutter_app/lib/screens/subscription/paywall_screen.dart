@@ -6,10 +6,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme.dart';
 import '../../models/pilot_access.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/product_analytics.dart';
 import '../../services/revenue_cat_service.dart';
-import '../../services/subscription_invite_service.dart';
 import '../../widgets/passeport_primary_button.dart';
 
 /// The entitlement identifier configured in the RevenueCat dashboard (both
@@ -39,21 +39,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Package? _selected;
   bool _loading = true;
   bool _purchasing = false;
-  bool _showRedeem = false;
-  bool _redeeming = false;
-  String? _redeemMessage;
-  final _codeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _load();
-  }
-
-  @override
-  void dispose() {
-    _codeController.dispose();
-    super.dispose();
   }
 
   Future<void> _load() async {
@@ -113,35 +103,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     }
   }
 
-  Future<void> _redeemCode() async {
-    final code = _codeController.text.trim();
-    if (code.isEmpty || _redeeming) return;
-    setState(() {
-      _redeeming = true;
-      _redeemMessage = null;
-    });
-    final result = await SubscriptionInviteService.shared.redeem(code);
-    if (!mounted) return;
-    setState(() {
-      _redeeming = false;
-      _redeemMessage = switch (result.outcome) {
-        InviteRedeemOutcome.success =>
-          'Code applied. ${result.monthsGranted} month${result.monthsGranted == 1 ? '' : 's'} of full access added.',
-        InviteRedeemOutcome.alreadyRedeemed => 'You already used this code.',
-        InviteRedeemOutcome.codeInactive => 'This code is no longer active.',
-        InviteRedeemOutcome.codeLimitReached =>
-          'This code has reached its redemption limit.',
-        InviteRedeemOutcome.invalidCode => 'That code isn\'t valid.',
-        InviteRedeemOutcome.networkError =>
-          'Couldn\'t reach the server. Try again.',
-      };
-    });
-    if (result.outcome == InviteRedeemOutcome.success && mounted) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) Navigator.of(context).pop(true);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,7 +135,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Widget _buildContent() {
     final packages = _offerings?.current?.availablePackages ?? const [];
     if (!RevenueCatService.shared.isConfigured || packages.isEmpty) {
-      return _buildInviteOnlyFallback();
+      return _buildUnavailableFallback();
     }
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
@@ -209,22 +170,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                   ),
                   const SizedBox(height: DesignTokens.space3),
                 ],
-                if (packages.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: DesignTokens.space2),
-                    child: Text(
-                      // Real, honest urgency — no fabricated "was" price.
-                      // This genuinely is today's price, and it genuinely
-                      // won't stay this low forever.
-                      'These are our launch prices. They go up as we add '
-                      'more features.',
-                      style: Passeport.body(
-                        12,
-                      ).copyWith(color: DesignTokens.mutedDim),
-                    ),
-                  ),
                 const SizedBox(height: DesignTokens.space1),
-                PasseportPrimaryButton(
+                ModernPrimaryButton(
                   label: _purchasing ? 'Processing…' : _ctaLabel(),
                   onPressed: _purchasing ? null : _purchase,
                 ),
@@ -240,14 +187,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     const SizedBox(width: DesignTokens.space1),
                     Text(
                       'Secure via App Store · Cancel anytime',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         12,
                       ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
-                const SizedBox(height: DesignTokens.space3),
-                _buildRedeemSection(),
               ],
             ),
           ),
@@ -258,7 +203,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
-  Widget _buildInviteOnlyFallback() {
+  Widget _buildUnavailableFallback() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         DesignTokens.space5,
@@ -282,13 +227,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Subscriptions aren\'t available on this device yet. If you have an invite code, you can redeem it below.',
-                  style: Passeport.body(
+                  'Subscriptions are temporarily unavailable on this device. Please try again later or contact support.',
+                  style: DesignTokens.body(
                     15,
                   ).copyWith(color: DesignTokens.mutedDim),
                 ),
-                const SizedBox(height: DesignTokens.space5),
-                _buildRedeemSection(forceOpen: true),
               ],
             ),
           ),
@@ -300,108 +243,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 
   String _ctaLabel() {
-    final intro = _selected?.storeProduct.introductoryPrice;
-    if (intro != null && intro.price == 0) {
-      return 'Subscribe & Try 7 Days Free';
-    }
-    return 'Subscribe Now';
-  }
-
-  Widget _buildRedeemSection({bool forceOpen = false}) {
-    final open = forceOpen || _showRedeem;
-    if (!open) {
-      return Center(
-        child: TextButton(
-          onPressed: () => setState(() => _showRedeem = true),
-          child: Text(
-            'Have an invite code?',
-            style: Passeport.body(
-              14,
-              weight: FontWeight.w600,
-            ).copyWith(color: DesignTokens.primary),
-          ),
-        ),
-      );
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Invite code',
-          style: Passeport.body(
-            13,
-            weight: FontWeight.w600,
-          ).copyWith(color: DesignTokens.mutedDim),
-        ),
-        const SizedBox(height: DesignTokens.space2),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _codeController,
-                textCapitalization: TextCapitalization.characters,
-                style: Passeport.mono(14),
-                decoration: InputDecoration(
-                  hintText: 'e.g. AB12CD',
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: DesignTokens.space3,
-                    vertical: 14,
-                  ),
-                  filled: true,
-                  fillColor: DesignTokens.canvasDim,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusSmall,
-                    ),
-                    borderSide: BorderSide(color: DesignTokens.hairline),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: DesignTokens.space2),
-            GestureDetector(
-              onTap: _redeeming ? null : _redeemCode,
-              child: Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.space4,
-                ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: DesignTokens.primary,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
-                ),
-                child: _redeeming
-                    ? const SizedBox(
-                        width: 15,
-                        height: 15,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        'Apply',
-                        style: Passeport.body(
-                          13,
-                          weight: FontWeight.w700,
-                        ).copyWith(color: Colors.white),
-                      ),
-              ),
-            ),
-          ],
-        ),
-        if (_redeemMessage != null) ...[
-          const SizedBox(height: DesignTokens.space2),
-          Text(
-            _redeemMessage!,
-            style: Passeport.body(13).copyWith(color: DesignTokens.mutedDim),
-          ),
-        ],
-      ],
-    );
+    final price = _selected?.storeProduct.priceString;
+    return price == null ? 'Subscribe' : 'Subscribe for $price';
   }
 }
 
@@ -424,7 +267,7 @@ class _Header extends StatelessWidget {
         Text('More guidance.\nMore speaking.', style: DesignTokens.display(30)),
         const SizedBox(height: DesignTokens.space2),
         Text(
-          'Keep the clear path, live practice with Marie, saved evidence, '
+          'Keep the clear path, live practice with ${ActiveTutor.current.displayName}, saved evidence, '
           'and deeper review sessions.',
           style: DesignTokens.body(
             15,
@@ -438,9 +281,12 @@ class _Header extends StatelessWidget {
 class _BenefitsList extends StatelessWidget {
   const _BenefitsList();
 
-  static const _benefits = [
+  List<(IconData, String)> get _benefits => [
     (CupertinoIcons.calendar, 'A full guided study block'),
-    (CupertinoIcons.mic_fill, 'Live practice with Marie'),
+    (
+      CupertinoIcons.mic_fill,
+      'Live practice with ${ActiveTutor.current.displayName}',
+    ),
     (CupertinoIcons.doc_text, 'Saved progress and session evidence'),
   ];
 
@@ -542,10 +388,8 @@ class _PlanCard extends StatelessWidget {
                     children: [
                       Text(
                         _title,
-                        style: Passeport.body(16, weight: FontWeight.w600),
+                        style: DesignTokens.body(16, weight: FontWeight.w600),
                       ),
-                      const SizedBox(width: DesignTokens.space2),
-                      const _Badge(label: 'Launch price'),
                       if (highlight) ...[
                         const SizedBox(width: DesignTokens.space2),
                         const _Badge(label: 'Best value'),
@@ -553,25 +397,24 @@ class _PlanCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: DesignTokens.space1),
+                  Text(
+                    package.storeProduct.priceString,
+                    style: DesignTokens.display(20).copyWith(
+                      color: DesignTokens.primaryDeep,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
                   if (hasTrial)
                     Text(
-                      '7 days free, then ${package.storeProduct.priceString}',
-                      style: Passeport.body(
-                        14,
+                      'Trial offer applies; then the billed amount above is charged.',
+                      style: DesignTokens.body(
+                        11.5,
                       ).copyWith(color: DesignTokens.mutedDim),
-                    )
-                  else
-                    Text(
-                      package.storeProduct.priceString,
-                      style: Passeport.body(
-                        14,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: DesignTokens.primaryDeep),
                     ),
-                  const SizedBox(height: 3),
                   Text(
                     _termsLine,
-                    style: Passeport.body(
+                    style: DesignTokens.body(
                       11.5,
                     ).copyWith(color: DesignTokens.mutedDim),
                   ),
@@ -599,7 +442,7 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Passeport.body(
+        style: DesignTokens.body(
           11,
           weight: FontWeight.w700,
         ).copyWith(color: DesignTokens.primaryDeep),
@@ -616,7 +459,7 @@ class _LegalLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Passeport.body(12).copyWith(
+    final style = DesignTokens.body(12).copyWith(
       color: Colors.white.withValues(alpha: 0.7),
       decoration: TextDecoration.underline,
       decorationColor: Colors.white.withValues(alpha: 0.4),
@@ -626,13 +469,13 @@ class _LegalLinks extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () => _open(_termsUrl),
-          child: Text('Terms of Service', style: style),
+          child: Text('Terms of Use (EULA)', style: style),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space2),
           child: Text(
             '·',
-            style: Passeport.body(
+            style: DesignTokens.body(
               12,
             ).copyWith(color: Colors.white.withValues(alpha: 0.5)),
           ),

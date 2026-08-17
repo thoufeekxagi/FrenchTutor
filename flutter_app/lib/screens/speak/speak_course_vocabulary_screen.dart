@@ -1,21 +1,22 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
-import '../../data/content_service.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
+import '../../models/tutor_persona.dart';
+import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/speak_language_profile.dart';
 import 'speak_ui.dart';
+import '../../widgets/tts_play_button.dart';
 
-/// The first stage of every course session. It is contextual to the selected
-/// course item, cached after generation, and intentionally separate from the
-/// global SRS vocab lab so a learner sees the words needed for this situation.
+/// The first stage of every course session. It is generated for the selected
+/// course item and intentionally separate from the global SRS vocab lab so a
+/// learner sees the words needed for this situation.
 class SpeakCourseVocabularyScreen extends ConsumerStatefulWidget {
   const SpeakCourseVocabularyScreen({
     super.key,
@@ -41,6 +42,9 @@ class SpeakCourseVocabularyScreen extends ConsumerStatefulWidget {
 
 class _SpeakCourseVocabularyScreenState
     extends ConsumerState<SpeakCourseVocabularyScreen> {
+  static final _uuid = Uuid();
+
+  late final TutorPersona _tutor = ActiveTutor.current;
   List<VocabEntry> _words = const [];
   int _index = 0;
   bool _loading = true;
@@ -50,18 +54,32 @@ class _SpeakCourseVocabularyScreenState
   SpeakLanguageProfile get _language =>
       SpeakLanguageProfile.forLevel(widget.levelBand);
 
-  int get _deckSize => switch (_language.level) {
-    'A1' => 1,
-    'A2' => 2,
-    _ => 3,
-  };
+  bool get _isFoundationDeck {
+    final search = '${widget.topic} ${widget.sessionTitle} ${widget.contentKey}'
+        .toLowerCase();
+    return search.contains('alphabet') ||
+        search.contains('vowel') ||
+        search.contains('voyelle');
+  }
+
+  int get _deckSize {
+    if (_isFoundationDeck) {
+      // Foundation sessions need enough examples to connect sound training
+      // to the speaking step. They remain single-word, A1-safe cards.
+      return switch (_language.level) {
+        'A1' || 'A2' => 5,
+        _ => 6,
+      };
+    }
+    return switch (_language.level) {
+      'A1' => 1,
+      'A2' => 2,
+      _ => 3,
+    };
+  }
 
   VocabEntry? get _current =>
       _words.isEmpty || _index >= _words.length ? null : _words[_index];
-
-  // v3 intentionally invalidates older phrase-heavy decks. A1 is a true
-  // beginner path: one concrete French word, one meaning, one small practice.
-  String get _cacheKey => 'course_vocab_${widget.contentKey}_v3';
 
   @override
   void initState() {
@@ -76,51 +94,99 @@ class _SpeakCourseVocabularyScreenState
   }
 
   Future<void> _loadDeck() async {
-    final prefs = await SharedPreferences.getInstance();
-    final cached = _decodeDeck(prefs.getString(_cacheKey));
-    if (cached.length >= _deckSize) {
-      if (mounted) {
-        setState(() {
-          _words = cached.take(_deckSize).toList(growable: false);
-          _loading = false;
-        });
-      }
-      return;
-    }
-
     try {
-      final generated = await ref
-          .read(lessonAgentServiceProvider)
-          .generateCourseVocabulary(
-            levelBand: _language.level,
-            unitTitle: widget.topic,
-            sessionTitle: widget.sessionTitle,
-            contextPrompt: widget.contextPrompt,
-            targetPhrases: widget.targetPhrases,
-            count: _deckSize,
+      // Capture the provider value before the await. The screen can be popped
+      // while generation is in flight; reading `ref` after disposal would
+      // reproduce the production StateError seen in the writing workshop.
+      final lessonAgent = ref.read(lessonAgentServiceProvider);
+      List<VocabEntry> words;
+      var generatedLive = false;
+      try {
+        final generated = await lessonAgent.generateCourseVocabulary(
+          levelBand: _language.level,
+          unitTitle: widget.topic,
+          sessionTitle: widget.sessionTitle,
+          contextPrompt: widget.contextPrompt,
+          targetPhrases: widget.targetPhrases,
+          count: _deckSize,
+        );
+        words = _normalizeForLevel(generated);
+        if (words.length < _deckSize) {
+          throw StateError(
+            'The vocabulary generator returned ${words.length} of $_deckSize words.',
           );
-      final words = _normalizeForLevel(generated);
-      if (words.isEmpty) throw StateError('The vocabulary deck was empty.');
-      await prefs.setString(
-        _cacheKey,
-        jsonEncode(words.map((word) => word.toJson()).toList()),
-      );
+        }
+        generatedLive = true;
+      } catch (_) {
+        // Live generation remains the primary source. If its text response is
+        // unavailable, use the learner's assigned private vocabulary library
+        // for the card content. Audio never falls back from Gemini Live.
+        words = _libraryWords();
+        if (words.length < _deckSize) rethrow;
+      }
+      if (generatedLive) {
+        ref
+            .read(generatedVocabularySetStoreProvider)
+            .insert(
+              GeneratedVocabularySet(
+                id: _uuid.v4(),
+                title: widget.sessionTitle,
+                summary: 'Contextual vocabulary for ${widget.topic}.',
+                topic: widget.topic,
+                levelBand: _language.level,
+                entries: words,
+                createdAt: DateTime.now(),
+              ),
+            );
+      }
       if (mounted) {
         setState(() {
           _words = words;
           _loading = false;
         });
+        unawaited(_warmDeck(words));
       }
     } catch (_) {
-      final fallback = _fallbackDeck(ref.read(contentServiceProvider));
       if (mounted) {
         setState(() {
-          _words = _normalizeForLevel(fallback);
+          _words = const [];
           _loading = false;
-          _error = 'Using the offline deck for this situation.';
+          _error =
+              'We could not generate this live vocabulary set. Check your connection and try again.';
         });
       }
     }
+  }
+
+  List<VocabEntry> _libraryWords() {
+    final query =
+        '${widget.topic} ${widget.sessionTitle} ${widget.contextPrompt}'
+            .toLowerCase();
+    final sets = ref.read(generatedVocabularySetStoreProvider).list();
+    final matching = sets
+        .where((set) {
+          final haystack = '${set.title} ${set.summary} ${set.topic}'
+              .toLowerCase();
+          return query
+              .split(RegExp(r'\s+'))
+              .where((token) => token.length > 2)
+              .any(haystack.contains);
+        })
+        .toList(growable: false);
+    final orderedSets = [
+      ...matching,
+      ...sets.where((set) => !matching.contains(set)),
+    ];
+    final entries = <VocabEntry>[];
+    final seen = <String>{};
+    for (final set in orderedSets) {
+      for (final entry in _normalizeForLevel(set.entries)) {
+        final key = entry.fr.trim().toLowerCase();
+        if (key.isNotEmpty && seen.add(key)) entries.add(entry);
+        if (entries.length == _deckSize) return entries;
+      }
+    }
+    return entries;
   }
 
   List<VocabEntry> _normalizeForLevel(List<VocabEntry> words) {
@@ -133,111 +199,30 @@ class _SpeakCourseVocabularyScreenState
     final singleWords = words
         .where((word) => !word.fr.trim().contains(RegExp(r'\s')))
         .toList(growable: false);
-    return singleWords.take(1).toList(growable: false);
+    return singleWords.take(_deckSize).toList(growable: false);
   }
 
-  List<VocabEntry> _decodeDeck(String? raw) {
-    if (raw == null || raw.isEmpty) return const [];
-    try {
-      final values = jsonDecode(raw) as List;
-      return values
-          .whereType<Map>()
-          .map((value) => VocabEntry.fromJson(value.cast<String, dynamic>()))
-          .where(
-            (word) => word.fr.trim().isNotEmpty && word.en.trim().isNotEmpty,
-          )
-          .toList(growable: false);
-    } catch (_) {
-      return const [];
-    }
+  void _retry() {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _words = const [];
+      _index = 0;
+      _finished = false;
+    });
+    unawaited(_loadDeck());
   }
 
-  List<VocabEntry> _fallbackDeck(ContentService content) {
-    final search = '${widget.topic} ${widget.sessionTitle}'.toLowerCase();
-    final candidates = <VocabEntry>[];
-    for (final phase in content.vocabPhases) {
-      for (final theme in phase.themes) {
-        final themeMatches =
-            search.contains(theme.title.toLowerCase()) ||
-            theme.title.toLowerCase().contains(search.split(' ').first);
-        if (themeMatches) candidates.addAll(theme.entries);
-      }
-    }
-    for (final phase in content.vocabPhases) {
-      for (final theme in phase.themes) {
-        candidates.addAll(theme.entries);
-      }
-    }
-    final unique = <String, VocabEntry>{};
-    for (final word in candidates) {
-      unique.putIfAbsent(word.fr.toLowerCase(), () => word);
-    }
-    final available = _language.isBeginner
-        ? unique.values.where(
-            (word) => !word.fr.trim().contains(RegExp(r'\s')),
-          )
-        : unique.values;
-    final selected = available.take(_deckSize).toList();
-    if (selected.length == _deckSize) return selected;
-    return [
-      VocabEntry(
-        id: 'offline-billet',
-        fr: 'billet',
-        en: 'ticket',
-        phonetic: 'bee-yay',
-      ),
-      VocabEntry(
-        id: 'offline-gare',
-        fr: 'gare',
-        en: 'station',
-        phonetic: 'gahr',
-      ),
-      VocabEntry(
-        id: 'offline-train',
-        fr: 'train',
-        en: 'train',
-        phonetic: 'trahn',
-      ),
-      ...selected,
-      VocabEntry(
-        id: 'offline-ville',
-        fr: 'la ville',
-        en: 'the city',
-        phonetic: 'lah veel',
-      ),
-      VocabEntry(
-        id: 'offline-aller',
-        fr: 'aller',
-        en: 'to go',
-        phonetic: 'ah-lay',
-      ),
-      VocabEntry(id: 'offline-ou', fr: 'où', en: 'where', phonetic: 'oo'),
-      VocabEntry(
-        id: 'offline-a-gauche',
-        fr: 'à gauche',
-        en: 'to the left',
-        phonetic: 'ah gosh',
-      ),
-      VocabEntry(
-        id: 'offline-a-droite',
-        fr: 'à droite',
-        en: 'to the right',
-        phonetic: 'ah drwat',
-      ),
-      VocabEntry(
-        id: 'offline-sil-vous-plait',
-        fr: "s'il vous plaît",
-        en: 'please',
-        phonetic: 'seel voo pleh',
-      ),
-    ].toList(growable: false);
-  }
-
-  Future<void> _speakCurrent() async {
-    final word = _current;
-    if (word == null) return;
-    await LessonSpeechService.shared.speak(
-      items: [SpeechItem(text: word.fr, language: 'fr-FR')],
+  Future<void> _warmDeck(List<VocabEntry> words) {
+    return GeminiLiveAudioService.shared.warmDeck(
+      voiceName: _tutor.voiceName,
+      items: [
+        for (final word in words)
+          (
+            text: word.fr,
+            contentItemId: '${widget.contentKey}:vocabulary:${word.id}',
+          ),
+      ],
     );
   }
 
@@ -247,7 +232,17 @@ class _SpeakCourseVocabularyScreenState
       return;
     }
     setState(() => _index++);
-    unawaited(_speakCurrent());
+    unawaited(_warmCurrent());
+  }
+
+  Future<void> _warmCurrent() async {
+    final word = _current;
+    if (word == null) return;
+    await GeminiLiveAudioService.shared.resolve(
+      text: word.fr,
+      contentItemId: '${widget.contentKey}:vocabulary:${word.id}',
+      voiceName: _tutor.voiceName,
+    );
   }
 
   @override
@@ -304,6 +299,31 @@ class _SpeakCourseVocabularyScreenState
                       15,
                     ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
                   ),
+                ] else if (_error != null) ...[
+                  const SizedBox(height: 48),
+                  const Icon(
+                    Icons.cloud_off_rounded,
+                    color: SpeakColors.blue,
+                    size: 56,
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Live vocabulary unavailable',
+                    style: DesignTokens.display(26),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _error!,
+                    style: DesignTokens.body(
+                      15,
+                    ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+                  ),
+                  const SizedBox(height: 22),
+                  SpeakPrimaryButton(
+                    label: 'Try again',
+                    icon: Icons.refresh_rounded,
+                    onTap: _retry,
+                  ),
                 ] else if (word != null) ...[
                   Text(
                     _deckSize == 1 ? 'ONE WORD' : '$_deckSize WORDS',
@@ -349,41 +369,52 @@ class _SpeakCourseVocabularyScreenState
                   const SizedBox(height: 18),
                   SpeakCard(
                     color: SpeakColors.blueSoft,
-                    padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(word.fr, style: DesignTokens.display(34)),
-                        const SizedBox(height: 8),
-                        Text(
-                          word.en,
-                          style: DesignTokens.body(
-                            22,
-                            weight: FontWeight.w700,
-                          ).copyWith(color: SpeakColors.blue),
-                        ),
-                        if (word.phonetic.trim().isNotEmpty) ...[
+                    padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 250),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(word.fr, style: DesignTokens.display(42)),
                           const SizedBox(height: 8),
                           Text(
-                            word.phonetic,
+                            word.en,
                             style: DesignTokens.body(
-                              14,
-                            ).copyWith(color: SpeakColors.inkSoft),
+                              22,
+                              weight: FontWeight.w700,
+                            ).copyWith(color: SpeakColors.blue),
+                          ),
+                          if (word.phonetic.trim().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              word.phonetic,
+                              style: DesignTokens.body(
+                                14,
+                              ).copyWith(color: SpeakColors.inkSoft),
+                            ),
+                          ],
+                          const SizedBox(height: 18),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TtsPlayButton(
+                              text: word.fr,
+                              label: 'Listen',
+                              size: 50,
+                              iconSize: 18,
+                              color: SpeakColors.blue,
+                              contentItemId:
+                                  '${widget.contentKey}:vocabulary:${word.id}',
+                              audioResolver: () =>
+                                  GeminiLiveAudioService.shared.resolve(
+                                    text: word.fr,
+                                    contentItemId:
+                                        '${widget.contentKey}:vocabulary:${word.id}',
+                                    voiceName: _tutor.voiceName,
+                                  ),
+                            ),
                           ),
                         ],
-                        const SizedBox(height: 18),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: OutlinedButton.icon(
-                            onPressed: _speakCurrent,
-                            icon: const Icon(
-                              Icons.volume_up_outlined,
-                              size: 18,
-                            ),
-                            label: const Text('Listen'),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),

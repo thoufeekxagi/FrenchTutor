@@ -81,7 +81,7 @@ class AppleLevelView extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: DesignTokens.ink,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -92,7 +92,7 @@ class AppleLevelView extends StatelessWidget {
                       'Sets your vocabulary level and speech pace.',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: const Color(0xFF64748B),
+                        color: DesignTokens.inkSoft,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -116,7 +116,7 @@ class AppleLevelView extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.1,
-                        color: const Color(0xFF64748B),
+                        color: DesignTokens.inkSoft,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -140,13 +140,15 @@ class AppleLevelView extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: selectedLevel != null ? onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0062CC),
+                    backgroundColor: DesignTokens.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: const Color(0xFFE2E8F0),
-                    disabledForegroundColor: const Color(0xFF94A3B8),
+                    disabledBackgroundColor: DesignTokens.canvasDim,
+                    disabledForegroundColor: DesignTokens.muted,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusPill,
+                      ),
                     ),
                     textStyle: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
@@ -184,7 +186,7 @@ class _TopStepHeader extends StatelessWidget {
                 icon: const Icon(
                   CupertinoIcons.chevron_back,
                   size: 22,
-                  color: Color(0xFF0F172A),
+                  color: DesignTokens.ink,
                 ),
               ),
               Expanded(
@@ -195,7 +197,7 @@ class _TopStepHeader extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: const Color(0xFF64748B),
+                      color: DesignTokens.inkSoft,
                     ),
                   ),
                 ),
@@ -207,13 +209,11 @@ class _TopStepHeader extends StatelessWidget {
         Container(
           height: 3,
           width: double.infinity,
-          color: const Color(0xFFE2E8F0),
+          color: DesignTokens.canvasDim,
           alignment: Alignment.centerLeft,
           child: FractionallySizedBox(
             widthFactor: 0.66,
-            child: Container(
-              color: const Color(0xFF0062CC),
-            ),
+            child: Container(color: DesignTokens.primary),
           ),
         ),
       ],
@@ -248,16 +248,16 @@ class _LevelCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+            color: isSelected ? DesignTokens.primarySoft : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? const Color(0xFF0062CC) : const Color(0xFFE2E8F0),
+              color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                    ? const Color(0xFF0062CC).withValues(alpha: 0.08)
+                    ? DesignTokens.primary.withValues(alpha: 0.08)
                     : Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
@@ -272,16 +272,16 @@ class _LevelCard extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF0062CC).withValues(alpha: 0.12)
-                      : const Color(0xFFF1F5F9),
+                      ? DesignTokens.primary.withValues(alpha: 0.12)
+                      : DesignTokens.canvas,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
                   size: 19,
                   color: isSelected
-                      ? const Color(0xFF0062CC)
-                      : const Color(0xFF64748B),
+                      ? DesignTokens.primary
+                      : DesignTokens.inkSoft,
                 ),
               ),
               const SizedBox(width: 14),
@@ -296,7 +296,7 @@ class _LevelCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0F172A),
+                        color: DesignTokens.ink,
                         letterSpacing: -0.2,
                       ),
                     ),
@@ -305,7 +305,7 @@ class _LevelCard extends StatelessWidget {
                       subtitle,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: const Color(0xFF64748B),
+                        color: DesignTokens.inkSoft,
                       ),
                     ),
                   ],
@@ -319,13 +319,11 @@ class _LevelCard extends StatelessWidget {
                 height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected
-                      ? const Color(0xFF0062CC)
-                      : Colors.transparent,
+                  color: isSelected ? DesignTokens.primary : Colors.transparent,
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF0062CC)
-                        : const Color(0xFFCBD5E1),
+                        ? DesignTokens.primary
+                        : DesignTokens.canvasDim,
                     width: 2,
                   ),
                 ),
@@ -362,9 +360,9 @@ class _SessionLengthSegmented extends StatelessWidget {
       height: 44,
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: DesignTokens.canvas,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: DesignTokens.canvasDim),
       ),
       child: Row(
         children: lengths.map((item) {
@@ -393,10 +391,12 @@ class _SessionLengthSegmented extends StatelessWidget {
                   item.label,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    fontWeight: isItemActive ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight: isItemActive
+                        ? FontWeight.w700
+                        : FontWeight.w500,
                     color: isItemActive
-                        ? const Color(0xFF0F172A)
-                        : const Color(0xFF64748B),
+                        ? DesignTokens.ink
+                        : DesignTokens.inkSoft,
                   ),
                 ),
               ),

@@ -7,6 +7,9 @@ import 'package:sqlite3/common.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/database/generated_grammar_story_store.dart';
+import '../data/database/generated_story_store.dart';
+import '../data/database/generated_writing_task_store.dart';
+import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
@@ -43,6 +46,11 @@ class SyncService {
   SupabaseClient get _client => Supabase.instance.client;
   String? get _userId => _client.auth.currentUser?.id;
   bool get isSignedIn => _userId != null;
+
+  /// Local starter cards use an asset URL until their private cover has been
+  /// uploaded. Never persist that local-only marker as a remote URL.
+  String? _remoteCoverUrl(String? value) =>
+      value != null && value.startsWith('asset:') ? null : value;
 
   PilotInfrastructureStore get _outbox => PilotInfrastructureStore(_db);
 
@@ -193,7 +201,8 @@ class SyncService {
         'summary': story.summary,
         'topic': story.topic,
         'read_time_minutes': story.readTimeMinutes,
-        'cover_url': story.coverUrl,
+        'cover_url': _remoteCoverUrl(story.coverUrl),
+        'practice_mode': story.practiceMode,
         'created_at': story.createdAt.toUtc().toIso8601String(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
@@ -202,25 +211,36 @@ class SyncService {
     queueRowId: story.id,
   );
 
-  /// Uploads a single generated cover to the public, non-sensitive artwork
-  /// bucket and returns its stable URL. The story row remains protected by
-  /// RLS; only the cover artwork is public so Flutter can render it directly
-  /// from a library card without signed-URL refresh churn.
+  /// Uploads a generated cover to the learner-scoped private bucket and
+  /// returns a long-lived signed URL for the local story card. The object
+  /// path is owned by the authenticated learner; it is never public.
   Future<String?> uploadStoryCover({
     required String storyId,
     required Uint8List bytes,
   }) async {
     final uid = _userId;
     if (uid == null) return null;
+    if (bytes.isEmpty) {
+      debugPrint('Story cover upload skipped ($storyId): empty image bytes');
+      return null;
+    }
     final path = '$uid/$storyId.jpg';
     try {
       final bucket = _client.storage.from('story-covers');
+      final contentType =
+          bytes.length >= 8 &&
+              bytes[0] == 0x89 &&
+              bytes[1] == 0x50 &&
+              bytes[2] == 0x4e &&
+              bytes[3] == 0x47
+          ? 'image/png'
+          : 'image/jpeg';
       await bucket.uploadBinary(
         path,
         bytes,
-        fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+        fileOptions: FileOptions(contentType: contentType, upsert: true),
       );
-      return bucket.getPublicUrl(path);
+      return await bucket.createSignedUrl(path, 60 * 60 * 24 * 365);
     } catch (e, st) {
       debugPrint('Story cover upload failed ($storyId): $e\n$st');
       return null;
@@ -245,12 +265,30 @@ class SyncService {
             'keywords_json': story.keywords.map((k) => k.toJson()).toList(),
             'explanation_json': story.explanation.toJson(),
             'score': story.score,
+            'cover_url': _remoteCoverUrl(story.coverUrl),
             'created_at': story.createdAt.toUtc().toIso8601String(),
             'updated_at': DateTime.now().toUtc().toIso8601String(),
           });
         },
         queueTable: 'generated_grammar_stories',
         queueRowId: story.id,
+      );
+
+  Future<void> syncGeneratedWritingTask(GeneratedWritingTask generated) =>
+      _guarded(
+        (uid) async {
+          await _client.from('generated_writing_tasks').upsert({
+            'id': generated.id,
+            'user_id': uid,
+            'task_json': generated.task.toJson(),
+            'level_band': generated.task.levelBand,
+            'cover_url': _remoteCoverUrl(generated.coverUrl),
+            'created_at': generated.createdAt.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          });
+        },
+        queueTable: 'generated_writing_tasks',
+        queueRowId: generated.id,
       );
 
   // ---------------------------------------------------------------------------
@@ -264,6 +302,7 @@ class SyncService {
         'user_id': uid,
         'title': roleplay.title,
         'passage_json': roleplay.passage.toJson(),
+        'cover_url': _remoteCoverUrl(roleplay.coverUrl),
         'created_at': roleplay.createdAt.toUtc().toIso8601String(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
@@ -271,6 +310,26 @@ class SyncService {
     queueTable: 'generated_roleplays',
     queueRowId: roleplay.id,
   );
+
+  Future<void> syncGeneratedVocabularySet(GeneratedVocabularySet set) =>
+      _guarded(
+        (uid) async {
+          await _client.from('generated_vocabulary_sets').upsert({
+            'id': set.id,
+            'user_id': uid,
+            'title': set.title,
+            'summary': set.summary,
+            'topic': set.topic,
+            'level_band': set.levelBand,
+            'entries_json': set.entries.map((entry) => entry.toJson()).toList(),
+            'cover_url': _remoteCoverUrl(set.coverUrl),
+            'created_at': set.createdAt.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          });
+        },
+        queueTable: 'generated_vocabulary_sets',
+        queueRowId: set.id,
+      );
 
   // ---------------------------------------------------------------------------
   // Practice sessions + their transcripts — every completed practice/lesson,
@@ -805,6 +864,34 @@ class SyncService {
           if (rows.isEmpty) return true;
           await syncDailySession(_dailySessionFromRow(rows.first));
           return true;
+        case 'generated_stories':
+          final story = GeneratedStoryStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (story == null) return true;
+          await syncGeneratedStory(story);
+          return true;
+        case 'generated_grammar_stories':
+          final story = GeneratedGrammarStoryStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (story == null) return true;
+          await syncGeneratedGrammarStory(story);
+          return true;
+        case 'generated_writing_tasks':
+          final task = GeneratedWritingTaskStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (task == null) return true;
+          await syncGeneratedWritingTask(task);
+          return true;
+        case 'generated_vocabulary_sets':
+          final set = GeneratedVocabularySetStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (set == null) return true;
+          await syncGeneratedVocabularySet(set);
+          return true;
         default:
           // Not yet retryable generically — leave queued rather than drop it.
           return false;
@@ -863,7 +950,9 @@ class SyncService {
       'entitlements': () => _hydrateEntitlements(uid),
       'generatedStories': () => _hydrateGeneratedStories(uid),
       'generatedGrammarStories': () => _hydrateGeneratedGrammarStories(uid),
+      'generatedWritingTasks': () => _hydrateGeneratedWritingTasks(uid),
       'generatedRoleplays': () => _hydrateGeneratedRoleplays(uid),
+      'generatedVocabularySets': () => _hydrateGeneratedVocabularySets(uid),
       'notes': () => _hydrateNotes(uid),
     };
     await Future.wait(
@@ -873,6 +962,39 @@ class SyncService {
         }),
       ),
     );
+  }
+
+  /// Reload generated content into the local store for the current user.
+  /// Screens can call this when they become visible without re-running the
+  /// entire sign-in hydration sequence.
+  Future<void> hydrateGeneratedStories() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateGeneratedStories(uid);
+  }
+
+  Future<void> hydrateGeneratedGrammarStories() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateGeneratedGrammarStories(uid);
+  }
+
+  Future<void> hydrateGeneratedWritingTasks() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateGeneratedWritingTasks(uid);
+  }
+
+  Future<void> hydrateGeneratedRoleplays() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateGeneratedRoleplays(uid);
+  }
+
+  Future<void> hydrateGeneratedVocabularySets() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateGeneratedVocabularySets(uid);
   }
 
   /// The general profile fields (goal/level/session_length/reminder_time/
@@ -1124,8 +1246,9 @@ class SyncService {
         '''
         INSERT INTO generated_stories
           (id, title, passage_json, quiz_json, keywords_json, level_band,
-           summary, topic, read_time_minutes, cover_url, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           summary, topic, read_time_minutes, cover_url, practice_mode,
+           created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           passage_json = excluded.passage_json,
@@ -1136,6 +1259,7 @@ class SyncService {
           topic = excluded.topic,
           read_time_minutes = excluded.read_time_minutes,
           cover_url = excluded.cover_url,
+          practice_mode = excluded.practice_mode,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_stories.updated_at
         ''',
@@ -1150,6 +1274,7 @@ class SyncService {
           r['topic'] ?? '',
           r['read_time_minutes'] ?? 5,
           r['cover_url'],
+          r['practice_mode'] ?? 'reading',
           r['created_at'],
           r['updated_at'],
         ],
@@ -1166,8 +1291,8 @@ class SyncService {
       _db.execute(
         '''
         INSERT INTO generated_grammar_stories
-          (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, cover_url, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           grammar_point = excluded.grammar_point,
@@ -1177,6 +1302,7 @@ class SyncService {
           keywords_json = excluded.keywords_json,
           explanation_json = excluded.explanation_json,
           score = excluded.score,
+          cover_url = excluded.cover_url,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_grammar_stories.updated_at
         ''',
@@ -1190,6 +1316,37 @@ class SyncService {
           _jsonOf(r['keywords_json']),
           _jsonOf(r['explanation_json']),
           r['score'],
+          r['cover_url'],
+          r['created_at'],
+          r['updated_at'],
+        ],
+      );
+    }
+  }
+
+  Future<void> _hydrateGeneratedWritingTasks(String uid) async {
+    final rows = await _client
+        .from('generated_writing_tasks')
+        .select()
+        .eq('user_id', uid);
+    for (final r in rows) {
+      _db.execute(
+        '''
+        INSERT INTO generated_writing_tasks
+          (id, task_json, level_band, cover_url, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          task_json = excluded.task_json,
+          level_band = excluded.level_band,
+          cover_url = excluded.cover_url,
+          updated_at = excluded.updated_at
+        WHERE excluded.updated_at > generated_writing_tasks.updated_at
+        ''',
+        [
+          r['id'],
+          _jsonOf(r['task_json']),
+          r['level_band'] ?? 'A2',
+          r['cover_url'],
           r['created_at'],
           r['updated_at'],
         ],
@@ -1206,11 +1363,12 @@ class SyncService {
       _db.execute(
         '''
         INSERT INTO generated_roleplays
-          (id, title, passage_json, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?)
+          (id, title, passage_json, cover_url, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           passage_json = excluded.passage_json,
+          cover_url = excluded.cover_url,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_roleplays.updated_at
         ''',
@@ -1218,9 +1376,31 @@ class SyncService {
           r['id'],
           r['title'],
           _jsonOf(r['passage_json']),
+          r['cover_url'],
           r['created_at'],
           r['updated_at'],
         ],
+      );
+    }
+  }
+
+  Future<void> _hydrateGeneratedVocabularySets(String uid) async {
+    final rows = await _client
+        .from('generated_vocabulary_sets')
+        .select()
+        .eq('user_id', uid);
+    final store = GeneratedVocabularySetStore(_db);
+    for (final r in rows) {
+      store.upsertFromRemote(
+        id: r['id'] as String,
+        title: r['title'] as String,
+        summary: r['summary'] as String? ?? '',
+        topic: r['topic'] as String? ?? '',
+        levelBand: r['level_band'] as String? ?? 'A1',
+        entriesJson: _jsonOf(r['entries_json']),
+        coverUrl: r['cover_url'] as String?,
+        createdAt: r['created_at'] as String,
+        updatedAt: r['updated_at'] as String,
       );
     }
   }

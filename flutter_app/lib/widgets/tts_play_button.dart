@@ -25,6 +25,8 @@ class TtsPlayButton extends StatefulWidget {
     this.contentItemId,
     this.bundledAssetPath,
     this.remoteStoragePath,
+    this.audioResolver,
+    this.label,
     this.size = 40,
     this.iconSize = 20,
     this.color,
@@ -42,6 +44,11 @@ class TtsPlayButton extends StatefulWidget {
   /// Optional public Supabase Storage path for a pre-generated clip. If the
   /// remote file is unavailable, [bundledAssetPath] remains the fallback.
   final String? remoteStoragePath;
+
+  /// Optional resolver for generated lesson audio. When supplied, it is the
+  /// only live fallback, so this button cannot reach the legacy HTTP TTS path.
+  final Future<List<int>?> Function()? audioResolver;
+  final String? label;
   final double size;
   final double iconSize;
   final Color? color;
@@ -73,6 +80,16 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
     try {
       if (_readyBytes != null) {
         await _play(_readyBytes!);
+        return;
+      }
+
+      final audioResolver = widget.audioResolver;
+      if (audioResolver != null) {
+        final bytes = await audioResolver();
+        if (bytes != null && mounted) {
+          _readyBytes = bytes;
+          await _play(bytes);
+        }
         return;
       }
 
@@ -108,16 +125,24 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
       }
 
       final voiceName = ActiveTutor.current.voiceName;
-      final bytes = await LessonSpeechService.shared.synthesizeWithRetry(
-        widget.text,
-        voiceName: voiceName,
-        slow: widget.slow,
-        contentItemId: widget.contentItemId,
-      );
+      // A cold Gemini request may retry after a transient rate-limit or
+      // network failure. Keep the button recoverable while that happens: a
+      // bounded wait prevents a grammar/listening speaker from spinning
+      // forever when the provider never returns a clip.
+      final bytes = await LessonSpeechService.shared
+          .synthesizeWithRetry(
+            widget.text,
+            voiceName: voiceName,
+            slow: widget.slow,
+            contentItemId: widget.contentItemId,
+          )
+          .timeout(const Duration(seconds: 25), onTimeout: () => null);
       if (bytes != null) {
         _readyBytes = bytes;
         if (mounted) await _play(bytes);
       }
+    } catch (error) {
+      debugPrint('TtsPlayButton: audio playback failed: $error');
     } finally {
       // _play owns the transition to playing and back to idle. Only reset
       // here when loading failed or the source was unavailable.
@@ -132,7 +157,8 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.text != widget.text ||
         oldWidget.bundledAssetPath != widget.bundledAssetPath ||
-        oldWidget.remoteStoragePath != widget.remoteStoragePath) {
+        oldWidget.remoteStoragePath != widget.remoteStoragePath ||
+        oldWidget.audioResolver != widget.audioResolver) {
       _readyBytes = null;
     }
   }
@@ -140,33 +166,50 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
   Future<void> _play(List<int> bytes) async {
     if (!mounted) return;
     setState(() => _phase = _Phase.playing);
-    await LessonSpeechService.shared.playBytes(bytes);
-    final playbackMs = (bytes.length / 2 / 24000 * 1000).round();
-    await Future.delayed(Duration(milliseconds: playbackMs));
-    if (!mounted) return;
-    setState(() => _phase = _Phase.idle);
+    try {
+      await LessonSpeechService.shared.playBytes(bytes);
+      final playbackMs = (bytes.length / 2 / 24000 * 1000).round();
+      await Future.delayed(Duration(milliseconds: playbackMs));
+    } finally {
+      // A native audio-session failure must never leave the button stuck in
+      // its playing state. The learner can retry once the route is available.
+      if (mounted) setState(() => _phase = _Phase.idle);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? DesignTokens.primary;
     return SizedBox(
-      width: widget.size,
+      width: widget.label == null ? widget.size : widget.size + 72,
       height: widget.size,
       child: switch (_phase) {
         _Phase.generating => Center(
           child: SpinningRing(size: widget.size * 0.75, color: color),
         ),
-        _Phase.idle || _Phase.playing => IconButton(
-          onPressed: _phase == _Phase.idle ? _onTap : null,
-          icon: Icon(
-            _phase == _Phase.playing
-                ? CupertinoIcons.speaker_3_fill
-                : CupertinoIcons.speaker_2_fill,
-            color: color,
-            size: widget.iconSize,
-          ),
-        ),
+        _Phase.idle || _Phase.playing =>
+          widget.label == null
+              ? IconButton(
+                  onPressed: _phase == _Phase.idle ? _onTap : null,
+                  icon: Icon(
+                    _phase == _Phase.playing
+                        ? CupertinoIcons.speaker_3_fill
+                        : CupertinoIcons.speaker_2_fill,
+                    color: color,
+                    size: widget.iconSize,
+                  ),
+                )
+              : OutlinedButton.icon(
+                  onPressed: _phase == _Phase.idle ? _onTap : null,
+                  icon: Icon(
+                    _phase == _Phase.playing
+                        ? CupertinoIcons.speaker_3_fill
+                        : CupertinoIcons.speaker_2_fill,
+                    color: color,
+                    size: widget.iconSize,
+                  ),
+                  label: Text(widget.label!),
+                ),
       },
     );
   }

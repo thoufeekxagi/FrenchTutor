@@ -4,7 +4,7 @@ import '../data/database/learning_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/pilot_access.dart';
 import 'auth_service.dart';
-import 'referral_service.dart';
+import 'learning_allowance_service.dart';
 import 'subscription_gate_service.dart';
 
 class PilotAccessService {
@@ -14,7 +14,7 @@ class PilotAccessService {
   /// Gemini Live session that day, not per-session.
   static const freeDailyLimitSeconds = 30 * 60;
 
-  /// Subscribed (RevenueCat purchase or invite-code grant) daily allowance.
+  /// Subscribed (RevenueCat purchase) daily allowance.
   /// Generous on purpose: paying learners shouldn't feel metered, and nobody
   /// realistically talks 2 hours/day anyway.
   static const subscribedDailyLimitSeconds = 120 * 60;
@@ -67,11 +67,10 @@ class PilotAccessService {
             source: 'unconfigured',
           )
         : entitlement;
-    // Bonus minutes earned via invite codes (Supabase is the source of
-    // truth — see referral_service.dart) simply extend today's allowance.
-    // The cached value is refreshed asynchronously elsewhere so this stays
-    // a synchronous, non-blocking read.
-    final bonusSeconds = ReferralService.shared.cachedBonusSecondsBalance;
+    // The cached allowance is refreshed asynchronously elsewhere so this
+    // stays a synchronous, non-blocking read.
+    final bonusSeconds =
+        LearningAllowanceService.shared.cachedBonusSecondsBalance;
     return PilotAccessSnapshot(
       entitlement: safeEntitlement,
       dailyLimitSeconds: baseDailyLimitSeconds(safeEntitlement) + bonusSeconds,

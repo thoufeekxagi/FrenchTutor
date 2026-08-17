@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/api_keys.dart';
 import '../design/tokens.dart';
+import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../providers/database_provider.dart';
 import '../services/audio_streaming_service.dart';
@@ -229,7 +230,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                   children: [
                     Expanded(
                       child: Text(
-                        "Ask Marie's assistant",
+                        "Ask ${ActiveTutor.current.displayName}'s assistant",
                         style: DesignTokens.display(18),
                       ),
                     ),

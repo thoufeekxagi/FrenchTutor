@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../config/api_keys.dart';
 import '../data/database/learning_store.dart';
+import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../widgets/ai_voice_disclosure.dart';
 import 'audio_streaming_service.dart';
@@ -31,6 +32,7 @@ class InlineCallController {
     required this.lessonContext,
     required this.learningStoreForProfile,
     required this.onChanged,
+    this.openingPrompt,
     this.onUserTranscript,
     this.onTutorTranscript,
   });
@@ -46,6 +48,12 @@ class InlineCallController {
 
   /// Called after any field below changes — call `setState(() {})` here.
   final VoidCallback onChanged;
+
+  /// Optional first turn for contexts where Marie should open the call
+  /// instead of waiting for the learner to speak. The writing screen uses
+  /// this for a short, reassuring offer of help after the phone connection
+  /// is ready.
+  final String? openingPrompt;
 
   /// Forwards Marie's transcript turns to the host — without this, an inline
   /// call's conversation was silently never logged anywhere (not even for
@@ -106,6 +114,10 @@ class InlineCallController {
     connecting = false;
     active = true;
     onChanged();
+    final prompt = openingPrompt?.trim();
+    if (prompt != null && prompt.isNotEmpty) {
+      gemini?.injectContext(prompt, expectReply: true);
+    }
   }
 
   Future<bool> _connect() async {
@@ -246,11 +258,13 @@ class InlineCallController {
   }
 
   String statusText({required String listeningLabel}) {
+    final tutorName =
+        gemini?.persona.displayName ?? ActiveTutor.current.displayName;
     if (error != null) return error!;
-    if (connecting) return 'Connecting to Marie…';
+    if (connecting) return 'Connecting to $tutorName…';
     if (reconnecting) return 'Reconnecting…';
     if (pausedForLifecycle) return 'Paused while backgrounded';
-    if (tutorSpeaking) return 'Marie is speaking…';
+    if (tutorSpeaking) return '$tutorName is speaking…';
     return listeningLabel;
   }
 }

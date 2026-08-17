@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
+import '../../models/tutor_persona.dart';
 
 const kWebLessonStages = ['Vocabulary', 'Grammar', 'Listening', 'Writing'];
 
@@ -100,7 +101,7 @@ class WebLessonProgressRail extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Marie is with you',
+                      '${ActiveTutor.current.displayName} is with you',
                       style: DesignTokens.body(
                         13,
                         weight: FontWeight.w700,

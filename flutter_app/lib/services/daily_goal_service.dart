@@ -1,4 +1,5 @@
 import '../models/session.dart';
+import '../models/profile.dart';
 
 /// The day's practice goal — not a game streak, a plain accountability
 /// check: did the learner touch each of these 6 skills today? Backed
@@ -18,6 +19,36 @@ class DailyGoalService {
     'Writing',
     'Speaking',
   ];
+
+  /// The daily mission is the learner's bridge into the broader Path. New
+  /// learners always get the same low-friction first step. After that, the
+  /// order reflects the goal they chose during onboarding while completion
+  /// remains backed by the same session records everywhere in the app.
+  static List<String> missionOrderFor(
+    Profile profile, {
+    bool hasHistory = true,
+  }) {
+    if (!hasHistory) return categories;
+    return switch (profile.goal) {
+      'everyday' => const [
+        'Speaking',
+        'Roleplay',
+        'Listening',
+        'Vocabulary',
+        'Grammar',
+        'Writing',
+      ],
+      'tef_canada' => const [
+        'Vocabulary',
+        'Grammar',
+        'Listening',
+        'Writing',
+        'Speaking',
+        'Roleplay',
+      ],
+      _ => categories,
+    };
+  }
 
   /// Maps a `Session.stage` (set by whichever screen called
   /// `SessionRecorder`) to one of [categories]. Null = doesn't count toward
@@ -60,8 +91,8 @@ class DailyGoalService {
 
   /// The first category (in fixed order) not yet done today — what "Today's
   /// mission" should offer next. Null once all 6 are done.
-  static String? nextCategory(Set<String> doneToday) {
-    for (final category in categories) {
+  static String? nextCategory(Set<String> doneToday, {List<String>? order}) {
+    for (final category in order ?? categories) {
       if (!doneToday.contains(category)) return category;
     }
     return null;

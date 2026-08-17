@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -43,15 +42,15 @@ class SessionRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               color: DesignTokens.primarySoft,
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
-              CupertinoIcons.chat_bubble_fill,
-              size: 16,
+              Icons.forum_outlined,
+              size: 19,
               color: DesignTokens.primary,
             ),
           ),
@@ -81,7 +80,7 @@ class SessionRow extends StatelessWidget {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
-                color: DesignTokens.infoSoft,
+                color: DesignTokens.primarySoft,
                 borderRadius: BorderRadius.circular(100),
               ),
               child: Text(
@@ -89,12 +88,12 @@ class SessionRow extends StatelessWidget {
                 style: DesignTokens.body(
                   10.5,
                   weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.info),
+                ).copyWith(color: DesignTokens.primary),
               ),
             ),
           const Icon(
-            CupertinoIcons.chevron_right,
-            size: 13,
+            Icons.chevron_right_rounded,
+            size: 19,
             color: DesignTokens.muted,
           ),
         ],

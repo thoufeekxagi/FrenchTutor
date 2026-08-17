@@ -14,6 +14,7 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/story_reader_screen.dart';
 
@@ -32,9 +33,10 @@ const _readingSeeds = [
 /// two practices may share the generated-story storage and cover pipeline,
 /// but they do not share their teaching prompt or lesson flow.
 class ReadingLibraryScreen extends ConsumerStatefulWidget {
-  const ReadingLibraryScreen({super.key, this.topic});
+  const ReadingLibraryScreen({super.key, this.topic, this.autoStart = false});
 
   final String? topic;
+  final bool autoStart;
 
   @override
   ConsumerState<ReadingLibraryScreen> createState() =>
@@ -49,7 +51,29 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
   @override
   void initState() {
     super.initState();
-    _stories = ref.read(generatedStoryStoreProvider).list();
+    _stories = ref
+        .read(generatedStoryStoreProvider)
+        .list(practiceMode: 'reading');
+    unawaited(_refreshStories());
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_generate());
+      });
+    }
+  }
+
+  Future<void> _refreshStories() async {
+    try {
+      await ref.read(syncServiceProvider).hydrateGeneratedStories();
+    } catch (error, stackTrace) {
+      debugPrint('Reading story hydration failed: $error\n$stackTrace');
+    }
+    if (!mounted) return;
+    setState(() {
+      _stories = ref
+          .read(generatedStoryStoreProvider)
+          .list(practiceMode: 'reading');
+    });
   }
 
   String _levelFor(String raw) {
@@ -88,7 +112,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         topic: _topicFor(_selectedTopic),
         levelBand: _levelFor(profile.level),
       );
-      var story = GeneratedStory(
+      final story = GeneratedStory(
         id: newGeneratedStoryId(),
         passage: package.passage,
         quiz: package.quiz,
@@ -98,38 +122,37 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         summary: package.summary,
         topic: package.topic,
         readTimeMinutes: package.readTimeMinutes,
+        practiceMode: 'reading',
       );
 
-      // Reading gets one cover call after the one text call. If artwork or
-      // storage is unavailable, the story still saves and uses the editorial
-      // cover treatment below instead of disappearing behind a blank box.
-      try {
-        final bytes = await LessonAgentService.shared.generateStoryCover(
-          title: story.title,
-          summary: story.summary,
-          topic: story.topic,
-          levelBand: story.levelBand,
-          coverPrompt: package.coverPrompt,
-        );
-        final url = await ref
-            .read(syncServiceProvider)
-            .uploadStoryCover(storyId: story.id, bytes: bytes);
-        if (url != null) story = story.copyWith(coverUrl: url);
-      } catch (error, stackTrace) {
-        debugPrint('Reading cover generation failed: $error\n$stackTrace');
-      }
-
+      // Save immediately. Artwork is best-effort and must not block opening
+      // or make a generated story disappear if the image provider is slow.
       ref.read(generatedStoryStoreProvider).insert(story);
       unawaited(_prewarmNarration(story));
       if (!mounted) return;
       setState(() {
-        _stories = ref.read(generatedStoryStoreProvider).list();
+        _stories = ref
+            .read(generatedStoryStoreProvider)
+            .list(practiceMode: 'reading');
         _generating = false;
       });
-      AppRouter.push(context, (_) => StoryReaderScreen(story: story));
+      final result = await AppRouter.push<StoryReaderResult>(
+        context,
+        (_) =>
+            StoryReaderScreen(story: story, showFinishButton: widget.autoStart),
+        fullscreenDialog: widget.autoStart,
+      );
+      if (widget.autoStart && mounted) {
+        Navigator.of(context).pop(result != null);
+      }
+      unawaited(_generateCover(story, package.coverPrompt));
     } catch (error, stackTrace) {
       debugPrint('Reading story generation failed: $error\n$stackTrace');
       if (mounted) {
+        if (widget.autoStart) {
+          Navigator.of(context).pop(false);
+          return;
+        }
         setState(() => _generating = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -137,6 +160,36 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {
+    // Capture providers before awaiting network/image work. This task is
+    // intentionally fire-and-forget, so the screen may be disposed before it
+    // completes; using `ref` after that point would recreate the Sentry crash
+    // seen in other async screens.
+    final syncService = ref.read(syncServiceProvider);
+    final storyStore = ref.read(generatedStoryStoreProvider);
+    try {
+      final bytes = await LessonAgentService.shared.generateStoryCover(
+        title: story.title,
+        summary: story.summary,
+        topic: story.topic,
+        levelBand: story.levelBand,
+        coverPrompt: coverPrompt,
+      );
+      final url = await syncService.uploadStoryCover(
+        storyId: story.id,
+        bytes: bytes,
+      );
+      if (url == null) return;
+      storyStore.updateCoverUrl(story.id, url);
+      if (!mounted) return;
+      setState(() {
+        _stories = storyStore.list(practiceMode: 'reading');
+      });
+    } catch (error, stackTrace) {
+      debugPrint('Reading cover generation failed: $error\n$stackTrace');
     }
   }
 
@@ -157,6 +210,9 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.autoStart) {
+      return const _DirectReadingLoading();
+    }
     final stories = [...?_stories]
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -226,16 +282,10 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                 color: DesignTokens.mutedDim,
               ),
               const SizedBox(height: 10),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+              ResponsiveCardGrid(
                 itemCount: stories.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 22,
-                  childAspectRatio: 0.62,
-                ),
+                maxCardWidth: 158,
+                mainAxisExtent: 258,
                 itemBuilder: (context, index) => _ReadingBookCard(
                   story: stories[index],
                   onTap: () => _open(stories[index]),
@@ -274,6 +324,28 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
             ],
             const SizedBox(height: 20),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DirectReadingLoading extends StatelessWidget {
+  const _DirectReadingLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: DesignTokens.canvasDim,
+      appBar: AppBar(
+        title: Text('Reading', style: DesignTokens.display(20)),
+        backgroundColor: DesignTokens.canvasDim,
+        elevation: 0,
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(28),
+          child: CircularProgressIndicator(),
         ),
       ),
     );
@@ -450,6 +522,15 @@ class _ReadingCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = story.coverUrl;
+    if (url != null && url.startsWith('asset:')) {
+      return Image.asset(
+        url.substring('asset:'.length),
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _fallback(),
+      );
+    }
     if (url != null && url.isNotEmpty) {
       return Image.network(
         url,

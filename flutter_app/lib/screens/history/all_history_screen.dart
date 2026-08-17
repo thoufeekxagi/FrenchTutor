@@ -106,7 +106,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                             itemCount: _filteredSessions.length,
                             separatorBuilder: (_, _) => const Divider(
                               height: 1,
-                              color: DesignTokens.parchmentDim,
+                              color: DesignTokens.canvasDim,
                             ),
                             itemBuilder: (context, index) {
                               final session = _filteredSessions[index];
@@ -162,7 +162,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                 decoration: BoxDecoration(
                   color: selected
                       ? DesignTokens.ink
-                      : DesignTokens.parchmentDim,
+                      : DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(
@@ -189,7 +189,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
         child: Text(
           'Nothing practiced yet. It\'ll show up here once you do.',
           textAlign: TextAlign.center,
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.slateDim),
+          style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
       ),
     );

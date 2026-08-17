@@ -4,7 +4,6 @@ import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,11 +19,10 @@ import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
-import '../../services/referral_service.dart';
 import '../../services/srs_service.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../services/tutor_voice_preview.dart';
-import '../subscription/paywall_screen.dart';
+import '../subscription/speak_paywall_screen.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -46,10 +44,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _languageMix = 'balanced';
   String _voiceSpeed = 'natural';
   bool _deletingAccount = false;
-  ReferralStats? _referralStats;
-  int _bonusSecondsBalance = 0;
-  bool _redeeming = false;
-  final _redeemController = TextEditingController();
   late final TutorVoicePreviewer _previewer = TutorVoicePreviewer()
     ..addListener(() {
       if (mounted) setState(() {});
@@ -64,7 +58,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _profile = ref.read(learningStoreProvider).profile();
     _access = ref.read(pilotAccessServiceProvider).snapshot();
     _loadSettings();
-    _loadReferralInfo();
     _loadAppVersion();
   }
 
@@ -77,75 +70,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void dispose() {
     _previewer.dispose();
-    _redeemController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadReferralInfo() async {
-    final stats = await ReferralService.shared.myReferralStats();
-    final bonusSeconds = await ReferralService.shared.refreshBonusBalance();
-    if (!mounted) return;
-    setState(() {
-      _referralStats = stats;
-      _bonusSecondsBalance = bonusSeconds;
-    });
-  }
-
-  Future<void> _copyReferralCode() async {
-    final code = _referralStats?.code;
-    if (code == null) return;
-    await Clipboard.setData(ClipboardData(text: code));
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Invite code copied')));
-  }
-
-  Future<void> _redeemCode() async {
-    final code = _redeemController.text.trim();
-    if (code.isEmpty || _redeeming) return;
-    final installationId = ref
-        .read(pilotInfrastructureStoreProvider)
-        .installationId('app');
-    setState(() => _redeeming = true);
-    final result = await ReferralService.shared.redeem(
-      code,
-      installationId: installationId,
-    );
-    if (!mounted) return;
-    setState(() => _redeeming = false);
-
-    final message = switch (result.outcome) {
-      RedeemOutcome.success =>
-        'You and your friend each got ${result.bonusMinutes} bonus minutes!',
-      RedeemOutcome.alreadyRedeemed =>
-        'You\'ve already redeemed an invite code.',
-      RedeemOutcome.deviceAlreadyUsed =>
-        'An invite code has already been redeemed on this device.',
-      RedeemOutcome.invalidCode => 'That code doesn\'t look right.',
-      RedeemOutcome.cannotRedeemOwnCode =>
-        'That\'s your own code, share it with a friend instead.',
-      RedeemOutcome.codeLimitReached =>
-        'That code has already been used the maximum number of times.',
-      RedeemOutcome.networkError =>
-        'Couldn\'t reach the server, try again in a moment.',
-    };
-    if (result.outcome == RedeemOutcome.success) {
-      _redeemController.clear();
-      setState(
-        () => _bonusSecondsBalance =
-            ReferralService.shared.cachedBonusSecondsBalance,
-      );
-    }
-    await showPSConfirmDialog(
-      context,
-      title: result.outcome == RedeemOutcome.success
-          ? 'Invite redeemed!'
-          : 'Couldn\'t redeem code',
-      message: message,
-      confirmLabel: 'OK',
-      cancelLabel: 'OK',
-    );
   }
 
   void _saveProfile(void Function(Profile) mutate) {
@@ -225,7 +150,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   : DesignTokens.canvasDim,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: selected ? Colors.transparent : Passeport.hairline,
+                color: selected ? Colors.transparent : DesignTokens.hairline,
               ),
             ),
             child: Column(
@@ -236,11 +161,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Expanded(
                       child: Text(
                         p.displayName,
-                        style: Passeport.body(14, weight: FontWeight.w700)
+                        style: DesignTokens.body(14, weight: FontWeight.w700)
                             .copyWith(
                               color: selected
                                   ? DesignTokens.primaryDeep
-                                  : Passeport.ink,
+                                  : DesignTokens.ink,
                             ),
                       ),
                     ),
@@ -255,7 +180,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 height: 15,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Passeport.sky,
+                                  color: DesignTokens.info,
                                 ),
                               )
                             : Icon(
@@ -264,7 +189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     : CupertinoIcons.play_circle_fill,
                                 color: selected
                                     ? DesignTokens.secondary
-                                    : Passeport.sky,
+                                    : DesignTokens.info,
                                 size: 19,
                               ),
                       ),
@@ -280,19 +205,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 3),
                 Text(
                   '${p.accent.label} French',
-                  style: Passeport.body(10.5, weight: FontWeight.w700).copyWith(
-                    color: selected
-                        ? DesignTokens.primaryDeep
-                        : DesignTokens.primary,
-                    letterSpacing: 0.4,
-                  ),
+                  style: DesignTokens.body(10.5, weight: FontWeight.w700)
+                      .copyWith(
+                        color: selected
+                            ? DesignTokens.primaryDeep
+                            : DesignTokens.primary,
+                        letterSpacing: 0.4,
+                      ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   p.tagline,
-                  style: Passeport.body(
+                  style: DesignTokens.body(
                     10.5,
-                  ).copyWith(color: Passeport.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
             ),
@@ -368,9 +294,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // Deliberately NOT the same helper "Delete account" uses
     // (`wipeLocalDatabase` in account_deletion.dart) — that one also wipes
     // `installations`, which is fine for a permanent deletion but would let
-    // a casual sign-out/sign-in cycle mint a fresh device fingerprint and
-    // defeat the referral-code one-redemption-per-device check. Sign-out
-    // keeps the device identity; only the account-scoped data is cleared.
+    // a casual sign-out/sign-in cycle mint a fresh device fingerprint. Sign-
+    // out keeps the device identity; only the account-scoped data is cleared.
     wipeLocalUserData(ref.read(databaseProvider));
     await clearLocalPreferences();
     // No manual navigation needed — AuthGate's own auth-state listener
@@ -428,12 +353,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     };
   }
 
-  /// Maps a raw RevenueCat/invite product id (e.g. "com.parlesprint.sub.
-  /// 12month", "invite:AB12CD") to a plan name a learner can actually read.
+  /// Maps a raw RevenueCat product id to a plan name a learner can actually
+  /// read.
   String _planName(String productId) {
     if (productId.contains('12month')) return '12-Month Plan';
     if (productId.contains('3month')) return '3-Month Plan';
-    if (productId.startsWith('invite:')) return 'Invite code access';
     if (productId == 'app_review') return 'Reviewer access';
     if (productId == 'founding_access') return 'Founding access';
     return 'Free';
@@ -455,7 +379,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _openPaywall() async {
     await AppRouter.push(
       context,
-      (_) => const PaywallScreen(),
+      (_) => const SpeakPaywallScreen(),
       fullscreenDialog: true,
     );
     // `_access` is a plain snapshot taken once in initState, not something
@@ -486,7 +410,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             children: [
               // --- Interactive walkthrough replay ---
-              _PasseportCard(
+              _ModernCard(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () async {
@@ -500,12 +424,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Passeport.infoSoft,
+                          color: DesignTokens.infoSoft,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           CupertinoIcons.play_circle_fill,
-                          color: Passeport.info,
+                          color: DesignTokens.info,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -515,7 +439,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             Text(
                               'Replay the walkthrough',
-                              style: Passeport.body(
+                              style: DesignTokens.body(
                                 15,
                                 weight: FontWeight.w700,
                               ),
@@ -523,9 +447,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const SizedBox(height: 2),
                             Text(
                               'The guided tour of Home plays now; the call tour plays on your next call',
-                              style: Passeport.body(
+                              style: DesignTokens.body(
                                 12,
-                              ).copyWith(color: Passeport.slateDim),
+                              ).copyWith(color: DesignTokens.mutedDim),
                             ),
                           ],
                         ),
@@ -533,7 +457,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const Icon(
                         CupertinoIcons.chevron_right,
                         size: 16,
-                        color: Passeport.slateDim,
+                        color: DesignTokens.mutedDim,
                       ),
                     ],
                   ),
@@ -558,7 +482,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         DesignTokens.radiusCard,
                       ),
                       border: Border.all(
-                        color: Passeport.primary.withValues(alpha: 0.18),
+                        color: DesignTokens.primary.withValues(alpha: 0.18),
                       ),
                     ),
                     child: Column(
@@ -569,12 +493,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             Icon(
                               CupertinoIcons.sparkles,
                               size: 16,
-                              color: Passeport.primaryDeep,
+                              color: DesignTokens.primaryDeep,
                             ),
                             const SizedBox(width: 6),
                             KickerText(
                               'Subscription',
-                              color: Passeport.primaryDeep,
+                              color: DesignTokens.primaryDeep,
                             ),
                           ],
                         ),
@@ -586,12 +510,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               : 'Free',
                         ),
                         if (subscribed && expiresAt != null) ...[
-                          Divider(height: 1, color: Passeport.hairline),
+                          Divider(height: 1, color: DesignTokens.hairline),
                           _SettingsRow(
                             label: 'Renews',
                             value: DateFormat.yMMMd().format(expiresAt),
                           ),
-                          Divider(height: 1, color: Passeport.hairline),
+                          Divider(height: 1, color: DesignTokens.hairline),
                           _SettingsRow(
                             label: 'Days left',
                             value: '${_daysRemaining(expiresAt)}',
@@ -609,8 +533,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: subscribed
-                                  ? Passeport.parchmentDim
-                                  : Passeport.primary,
+                                  ? DesignTokens.canvasDim
+                                  : DesignTokens.primary,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
@@ -629,12 +553,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       ? 'Manage subscription'
                                       : 'Unlock full access',
                                   style:
-                                      Passeport.body(
+                                      DesignTokens.body(
                                         14,
                                         weight: FontWeight.w700,
                                       ).copyWith(
                                         color: subscribed
-                                            ? Passeport.slateDim
+                                            ? DesignTokens.mutedDim
                                             : Colors.white,
                                       ),
                                 ),
@@ -650,11 +574,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- Learning goal & pace (drives queue budgets and Marie's framing) ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Learning', color: Passeport.slateDim),
+                    KickerText('Learning', color: DesignTokens.mutedDim),
                     const SizedBox(height: 6),
                     _ChoiceRow(
                       label: 'Level',
@@ -665,7 +589,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       selected: _profile.level,
                       onChanged: _confirmLevelChange,
                     ),
-                    Divider(height: 16, color: Passeport.hairline),
+                    Divider(height: 16, color: DesignTokens.hairline),
                     _ChoiceRow(
                       label: 'Goal',
                       options: const [
@@ -676,7 +600,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       selected: _profile.goal,
                       onChanged: (v) => _saveProfile((p) => p.goal = v),
                     ),
-                    Divider(height: 16, color: Passeport.hairline),
+                    Divider(height: 16, color: DesignTokens.hairline),
                     _ChoiceRow(
                       label: 'Session length',
                       options: const [
@@ -694,22 +618,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- Tutor (P2.1/P2.3): persona, language mix, voice speed ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Your tutor', color: Passeport.slateDim),
+                    KickerText('Your tutor', color: DesignTokens.mutedDim),
                     const SizedBox(height: 4),
                     Text(
                       'Applies from your next call, a call in progress keeps '
                       'the tutor it started with.',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         11,
-                      ).copyWith(color: Passeport.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                     const SizedBox(height: 12),
                     _personaGrid(),
-                    Divider(height: 22, color: Passeport.hairline),
+                    Divider(height: 22, color: DesignTokens.hairline),
                     _ChoiceRow(
                       label: 'English / French mix',
                       options: const [
@@ -723,7 +647,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         TutorTuning.saveLanguageMix(v);
                       },
                     ),
-                    Divider(height: 16, color: Passeport.hairline),
+                    Divider(height: 16, color: DesignTokens.hairline),
                     _ChoiceRow(
                       label: 'Tutor speaking pace',
                       options: const [
@@ -743,11 +667,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- Roadmap ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Roadmap', color: Passeport.slateDim),
+                    KickerText('Roadmap', color: DesignTokens.mutedDim),
                     const SizedBox(height: 10),
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -758,23 +682,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             Text(
                               'Start date',
-                              style: Passeport.body(
+                              style: DesignTokens.body(
                                 12.5,
-                              ).copyWith(color: Passeport.slateDim),
+                              ).copyWith(color: DesignTokens.mutedDim),
                             ),
                             const Spacer(),
                             Text(
                               DateFormat.yMMMd().format(_roadmapStartDate),
-                              style: Passeport.mono(
+                              style: DesignTokens.mono(
                                 12,
                                 weight: FontWeight.w500,
-                              ).copyWith(color: Passeport.maroon),
+                              ).copyWith(color: DesignTokens.primary),
                             ),
                             const SizedBox(width: 4),
                             const Icon(
                               CupertinoIcons.calendar,
                               size: 14,
-                              color: Passeport.maroon,
+                              color: DesignTokens.primary,
                             ),
                           ],
                         ),
@@ -786,27 +710,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- Lesson voice ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Lesson voice', color: Passeport.slateDim),
+                    KickerText('Lesson voice', color: DesignTokens.mutedDim),
                     const SizedBox(height: 10),
                     Text(
                       'Narration rate',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         12.5,
-                      ).copyWith(color: Passeport.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                     const SizedBox(height: 4),
                     SliderTheme(
                       data: SliderThemeData(
-                        activeTrackColor: Passeport.maroon,
-                        inactiveTrackColor: Passeport.maroon.withValues(
+                        activeTrackColor: DesignTokens.primary,
+                        inactiveTrackColor: DesignTokens.primary.withValues(
                           alpha: 0.2,
                         ),
-                        thumbColor: Passeport.maroon,
-                        overlayColor: Passeport.maroon.withValues(alpha: 0.12),
+                        thumbColor: DesignTokens.primary,
+                        overlayColor: DesignTokens.primary.withValues(
+                          alpha: 0.12,
+                        ),
                       ),
                       child: Slider(
                         value: _narrationRate,
@@ -824,9 +750,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         children: [
                           Text(
                             'New cards/day (labs): $_newCardsPerDay',
-                            style: Passeport.body(
+                            style: DesignTokens.body(
                               12.5,
-                            ).copyWith(color: Passeport.text),
+                            ).copyWith(color: DesignTokens.text),
                           ),
                           const Spacer(),
                           _StepperButton(
@@ -868,15 +794,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             children: [
                               Text(
                                 'Practice passes per word: $_practicePasses',
-                                style: Passeport.body(
+                                style: DesignTokens.body(
                                   12.5,
-                                ).copyWith(color: Passeport.text),
+                                ).copyWith(color: DesignTokens.text),
                               ),
                               Text(
-                                'How many times you repeat a new word before Marie may suggest the next one',
-                                style: Passeport.mono(
+                                'How many times you repeat a new word before ${ActiveTutor.current.displayName} may suggest the next one',
+                                style: DesignTokens.mono(
                                   10,
-                                ).copyWith(color: Passeport.slateDim),
+                                ).copyWith(color: DesignTokens.mutedDim),
                               ),
                             ],
                           ),
@@ -914,13 +840,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- Vocabulary practice ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     KickerText(
                       'Vocabulary practice',
-                      color: Passeport.slateDim,
+                      color: DesignTokens.mutedDim,
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -931,15 +857,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             children: [
                               Text(
                                 'Words per practice: $_autoQueueSize',
-                                style: Passeport.body(
+                                style: DesignTokens.body(
                                   12.5,
-                                ).copyWith(color: Passeport.text),
+                                ).copyWith(color: DesignTokens.text),
                               ),
                               Text(
                                 'How many words the Auto queue shows each time. Smaller means less repetition if you practice more than once a day',
-                                style: Passeport.mono(
+                                style: DesignTokens.mono(
                                   10,
-                                ).copyWith(color: Passeport.slateDim),
+                                ).copyWith(color: DesignTokens.mutedDim),
                               ),
                             ],
                           ),
@@ -971,7 +897,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               if (kDebugMode) ...[
-                _PasseportCard(
+                _ModernCard(
                   child: GestureDetector(
                     onTap: () => AppRouter.push(
                       context,
@@ -984,7 +910,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           const Icon(
                             CupertinoIcons.lab_flask,
                             size: 21,
-                            color: Passeport.brass,
+                            color: DesignTokens.mastery,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -993,7 +919,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               children: [
                                 Text(
                                   'Orchestration Lab',
-                                  style: Passeport.body(
+                                  style: DesignTokens.body(
                                     14,
                                     weight: FontWeight.w600,
                                   ),
@@ -1001,9 +927,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   'Preview personas, constraints, and competency paths',
-                                  style: Passeport.body(
+                                  style: DesignTokens.body(
                                     11.5,
-                                  ).copyWith(color: Passeport.slateDim),
+                                  ).copyWith(color: DesignTokens.mutedDim),
                                 ),
                               ],
                             ),
@@ -1011,7 +937,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           const Icon(
                             CupertinoIcons.chevron_forward,
                             size: 16,
-                            color: Passeport.slateDim,
+                            color: DesignTokens.mutedDim,
                           ),
                         ],
                       ),
@@ -1019,22 +945,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _PasseportCard(
+                _ModernCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      KickerText('Developer', color: Passeport.slateDim),
+                      KickerText('Developer', color: DesignTokens.mutedDim),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           Text(
                             'Force unlock premium',
-                            style: Passeport.body(12.5),
+                            style: DesignTokens.body(12.5),
                           ),
                           const Spacer(),
                           Switch.adaptive(
                             value: DevSubscriptionOverride.enabled,
-                            activeThumbColor: Passeport.maroon,
+                            activeThumbColor: DesignTokens.primary,
                             onChanged: (v) {
                               DevSubscriptionOverride.set(v).then((_) {
                                 if (mounted) setState(() {});
@@ -1045,11 +971,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Bypasses subscription/invite-code checks for testing. '
+                        'Bypasses subscription checks for testing. '
                         'Debug builds only, compiled out entirely from release.',
-                        style: Passeport.body(
+                        style: DesignTokens.body(
                           11.5,
-                        ).copyWith(color: Passeport.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ],
                   ),
@@ -1058,19 +984,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
 
               // --- Notetaker ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Notetaker', color: Passeport.slateDim),
+                    KickerText('Notetaker', color: DesignTokens.mutedDim),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Text('Floating notetaker', style: Passeport.body(12.5)),
+                        Text(
+                          'Floating notetaker',
+                          style: DesignTokens.body(12.5),
+                        ),
                         const Spacer(),
                         Switch.adaptive(
                           value: ref.read(notetakerStateProvider).isEnabled,
-                          activeThumbColor: Passeport.maroon,
+                          activeThumbColor: DesignTokens.primary,
                           onChanged: (v) {
                             setState(
                               () => ref.read(notetakerStateProvider).isEnabled =
@@ -1084,32 +1013,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Text(
                       'Shows a draggable note bubble during lessons so you can '
                       'jot things down while listening or writing.',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         11,
-                      ).copyWith(color: Passeport.slateDim),
+                      ).copyWith(color: DesignTokens.mutedDim),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
 
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Access', color: Passeport.slateDim),
+                    KickerText('Access', color: DesignTokens.mutedDim),
                     const SizedBox(height: 4),
                     _SettingsRow(
                       label: 'Founding pass',
                       value: _entitlementLabel(_access.entitlement.status),
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     _SettingsRow(
                       label: 'Tracked speaking today',
                       value:
                           '${(_access.remainingSeconds / 60).ceil()} min remaining',
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     _SettingsRow(
                       label: 'Verification',
                       value: _access.serverAuthoritative
@@ -1121,131 +1050,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               const SizedBox(height: 12),
 
-              // --- Invite a friend (referral bonus minutes) ---
-              _PasseportCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    KickerText('Invite a friend', color: Passeport.slateDim),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Share your code. When a friend redeems it, you both get '
-                      '120 bonus minutes.',
-                      style: Passeport.body(
-                        11,
-                      ).copyWith(color: Passeport.slateDim),
-                    ),
-                    const SizedBox(height: 10),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _referralStats == null ? null : _copyReferralCode,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Passeport.parchmentDim,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _referralStats?.code ?? 'Loading…',
-                                style: Passeport.mono(
-                                  16,
-                                  weight: FontWeight.w700,
-                                ).copyWith(color: Passeport.maroon),
-                              ),
-                            ),
-                            const Icon(
-                              CupertinoIcons.doc_on_doc,
-                              size: 16,
-                              color: Passeport.slateDim,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _SettingsRow(
-                      label: 'Friends redeemed',
-                      value: _referralStats == null
-                          ? 'N/A'
-                          : '${_referralStats!.successfulRedemptions} of ${_referralStats!.maxRedemptions}',
-                    ),
-                    Divider(height: 1, color: Passeport.hairline),
-                    _SettingsRow(
-                      label: 'Bonus balance',
-                      value: '${(_bonusSecondsBalance / 60).floor()} min',
-                    ),
-                    Divider(height: 16, color: Passeport.hairline),
-                    Text(
-                      'Have an invite code?',
-                      style: Passeport.body(
-                        12.5,
-                      ).copyWith(color: Passeport.slateDim),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _redeemController,
-                            textCapitalization: TextCapitalization.characters,
-                            style: Passeport.mono(14),
-                            decoration: InputDecoration(
-                              hintText: 'e.g. AB12CD',
-                              isDense: true,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: _redeeming ? null : _redeemCode,
-                          child: Container(
-                            height: 44,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Passeport.maroon,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: _redeeming
-                                ? const SizedBox(
-                                    width: 15,
-                                    height: 15,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    'Redeem',
-                                    style: Passeport.body(
-                                      13,
-                                      weight: FontWeight.w700,
-                                    ).copyWith(color: Colors.white),
-                                  ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
               // --- Account ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Account', color: Passeport.slateDim),
+                    KickerText('Account', color: DesignTokens.mutedDim),
                     const SizedBox(height: 4),
                     _SettingsRow(
                       label: 'Signed in as',
@@ -1253,7 +1063,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           AuthService.shared.currentSession?.user.email ??
                           'Signed in',
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: _confirmSignOut,
@@ -1263,14 +1073,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Sign out',
-                          style: Passeport.body(
+                          style: DesignTokens.body(
                             13,
                             weight: FontWeight.w600,
-                          ).copyWith(color: Passeport.danger),
+                          ).copyWith(color: DesignTokens.danger),
                         ),
                       ),
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: _deletingAccount ? null : _confirmDeleteAccount,
@@ -1286,25 +1096,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     height: 15,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Passeport.danger,
+                                      color: DesignTokens.danger,
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
                                     'Deleting account…',
-                                    style: Passeport.body(
+                                    style: DesignTokens.body(
                                       13,
                                       weight: FontWeight.w600,
-                                    ).copyWith(color: Passeport.danger),
+                                    ).copyWith(color: DesignTokens.danger),
                                   ),
                                 ],
                               )
                             : Text(
                                 'Delete account',
-                                style: Passeport.body(
+                                style: DesignTokens.body(
                                   13,
                                   weight: FontWeight.w600,
-                                ).copyWith(color: Passeport.danger),
+                                ).copyWith(color: DesignTokens.danger),
                               ),
                       ),
                     ),
@@ -1314,27 +1124,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
 
               // --- About & support ---
-              _PasseportCard(
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('ParleSprint', color: Passeport.slateDim),
+                    KickerText('ParleSprint', color: DesignTokens.mutedDim),
                     const SizedBox(height: 4),
                     _SettingsRow(
                       label: 'Version',
                       value: _appVersion.isEmpty ? 'N/A' : _appVersion,
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     _SettingsRow(
                       label: 'Feedback',
                       value: 'thoufeekbaber1@gmail.com',
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     _LegalLinkRow(
                       label: 'Privacy Policy',
                       url: 'https://parlesprint.com/privacy',
                     ),
-                    Divider(height: 1, color: Passeport.hairline),
+                    Divider(height: 1, color: DesignTokens.hairline),
                     _LegalLinkRow(
                       label: 'Terms of Service',
                       url: 'https://parlesprint.com/terms',
@@ -1372,7 +1182,7 @@ class _ChoiceRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -1387,15 +1197,17 @@ class _ChoiceRow extends StatelessWidget {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Passeport.maroon : Passeport.parchmentDim,
+                  color: isSelected
+                      ? DesignTokens.primary
+                      : DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
                   o.$2,
-                  style: Passeport.body(
-                    11.5,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: isSelected ? Colors.white : Passeport.text),
+                  style: DesignTokens.body(11.5, weight: FontWeight.w600)
+                      .copyWith(
+                        color: isSelected ? Colors.white : DesignTokens.text,
+                      ),
                 ),
               ),
             );
@@ -1410,8 +1222,8 @@ class _ChoiceRow extends StatelessWidget {
 // Reusable helpers
 // ---------------------------------------------------------------------------
 
-class _PasseportCard extends StatelessWidget {
-  const _PasseportCard({required this.child});
+class _ModernCard extends StatelessWidget {
+  const _ModernCard({required this.child});
   final Widget child;
 
   @override
@@ -1420,9 +1232,9 @@ class _PasseportCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Passeport.card,
+        color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: DesignTokens.cardShadow,
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: child,
     );
@@ -1461,13 +1273,15 @@ class _LegalLinkRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: Passeport.body(12.5).copyWith(color: Passeport.text),
+                  style: DesignTokens.body(
+                    12.5,
+                  ).copyWith(color: DesignTokens.text),
                 ),
               ),
               Icon(
                 CupertinoIcons.chevron_forward,
                 size: 14,
-                color: Passeport.slateDim,
+                color: DesignTokens.mutedDim,
               ),
             ],
           ),
@@ -1491,7 +1305,9 @@ class _SettingsRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: Passeport.body(12.5).copyWith(color: Passeport.slateDim),
+              style: DesignTokens.body(
+                12.5,
+              ).copyWith(color: DesignTokens.mutedDim),
             ),
           ),
           const SizedBox(width: 12),
@@ -1499,10 +1315,10 @@ class _SettingsRow extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: Passeport.body(
+              style: DesignTokens.body(
                 12,
                 weight: FontWeight.w600,
-              ).copyWith(color: Passeport.text),
+              ).copyWith(color: DesignTokens.text),
             ),
           ),
         ],
@@ -1526,14 +1342,14 @@ class _StepperButton extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           color: enabled
-              ? Passeport.maroon.withValues(alpha: 0.1)
-              : Passeport.slate.withValues(alpha: 0.1),
+              ? DesignTokens.primary.withValues(alpha: 0.1)
+              : DesignTokens.muted.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: enabled ? Passeport.maroon : Passeport.slate,
+          color: enabled ? DesignTokens.primary : DesignTokens.muted,
         ),
       ),
     );

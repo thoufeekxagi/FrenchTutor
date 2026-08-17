@@ -32,7 +32,7 @@ class TutorPersona {
   final TutorAccent accent;
   final bool isFemale;
 
-  /// Gemini Live / Gemini TTS prebuilt voice name.
+  /// Gemini Live prebuilt voice name.
   final String voiceName;
 
   /// One-line description for pickers.
@@ -48,6 +48,18 @@ class TutorPersona {
   final String promptBlock;
 
   String get initial => displayName.substring(0, 1);
+
+  /// Stable portrait used anywhere the selected tutor is shown visually.
+  ///
+  /// Keep this mapping beside the persona registry so a screen cannot silently
+  /// fall back to Marie/Murray just because it forgot which asset belongs to a
+  /// selected tutor.
+  String get portraitAsset => switch (id) {
+    'camille' => 'assets/images/tutor_camille_2d.png',
+    'julien' => 'assets/images/tutor_julien_2d.png',
+    'mathieu' => 'assets/images/tutor_mathieu_2d.png',
+    _ => 'assets/images/tutor_marie_2d.png',
+  };
 
   static const marie = TutorPersona(
     id: 'marie',

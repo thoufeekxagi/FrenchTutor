@@ -133,7 +133,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                               '${_filteredNotes.length} note${_filteredNotes.length == 1 ? '' : 's'} ready to revisit.',
                               style: DesignTokens.body(
                                 14,
-                              ).copyWith(color: DesignTokens.slateDim),
+                              ).copyWith(color: DesignTokens.mutedDim),
                             ),
                           ],
                         ),
@@ -154,7 +154,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                             itemCount: _filteredNotes.length,
                             separatorBuilder: (_, _) => const Divider(
                               height: 32,
-                              color: DesignTokens.parchmentDim,
+                              color: DesignTokens.canvasDim,
                             ),
                             itemBuilder: (context, index) {
                               final note = _filteredNotes[index];
@@ -215,7 +215,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                     decoration: BoxDecoration(
                       color: _sourceFilter == option.$1
                           ? DesignTokens.primary
-                          : DesignTokens.parchmentDim,
+                          : DesignTokens.canvasDim,
                       borderRadius: BorderRadius.circular(
                         DesignTokens.radiusPill,
                       ),
@@ -271,7 +271,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                 decoration: BoxDecoration(
                   color: selected
                       ? DesignTokens.ink
-                      : DesignTokens.parchmentDim,
+                      : DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(
@@ -321,7 +321,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
               'Use the notetaker during a lesson or call. Anything you save will be ready to review here.',
               style: DesignTokens.body(
                 14,
-              ).copyWith(color: DesignTokens.slateDim, height: 1.45),
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
               textAlign: TextAlign.center,
             ),
           ],
@@ -391,7 +391,7 @@ class _NoteRow extends StatelessWidget {
                           style: DesignTokens.body(
                             13,
                             weight: FontWeight.w600,
-                          ).copyWith(color: DesignTokens.slateDim),
+                          ).copyWith(color: DesignTokens.mutedDim),
                         ),
                       ),
                       const SizedBox(width: DesignTokens.space3),
@@ -399,7 +399,7 @@ class _NoteRow extends StatelessWidget {
                         _formatDate(note.updatedAt),
                         style: DesignTokens.body(
                           12,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        ).copyWith(color: DesignTokens.mutedDim),
                       ),
                     ],
                   ),
@@ -432,7 +432,7 @@ class _NoteRow extends StatelessWidget {
       case 'Roleplay':
         return DesignTokens.infoSoft;
       default:
-        return DesignTokens.parchmentDim;
+        return DesignTokens.canvasDim;
     }
   }
 

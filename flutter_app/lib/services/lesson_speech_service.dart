@@ -13,6 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/database/tts_audio_cache_store.dart';
 import '../models/tutor_persona.dart';
 import 'audio_streaming_service.dart';
+import 'gemini_live_audio_service.dart';
 import 'lesson_agent_service.dart';
 
 class SpeechItem {
@@ -37,11 +38,11 @@ class SpeechItem {
   final String? assetPath;
 }
 
-/// TTS + STT for in-lesson narration and voice Q&A — Gemini only, by design.
+/// Gemini Live audio + STT for in-lesson narration and voice Q&A.
 ///
-/// Narration is synthesized by Gemini TTS in the learner's chosen tutor
+/// Narration is synthesized by Gemini Live in the learner's chosen tutor
 /// persona voice ([ActiveTutor.current]), and speech capture is transcribed
-/// by Gemini too. There is deliberately NO on-device speech engine anywhere
+/// by Gemini too. There is deliberately no TTS endpoint or on-device speech engine anywhere
 /// in this service — no flutter_tts, no speech_to_text — a practice session
 /// must sound and listen like the tutor the learner picked, never a generic
 /// device voice/recognizer. If a Gemini call fails, the affected line is
@@ -75,8 +76,13 @@ class LessonSpeechService {
   // interleave into a corrupted/misaligned PCM buffer that then plays back
   // as garbled noise FOREVER since the corrupt file is what gets replayed
   // from the persisted disk cache from then on.
-  final Map<String, Future<List<int>>> _synthInFlight = {};
   Timer? _completionTimer;
+
+  /// Every queued narration request owns a generation. If a learner changes
+  /// line or stage while synthesis is still in flight, the old request is
+  /// allowed to finish its cache write but is never allowed to play or call
+  /// callbacks into the new lesson state.
+  int _queueGeneration = 0;
 
   AudioStreamingService? _captureAudioLazy;
   AudioStreamingService get _captureAudio =>
@@ -94,7 +100,7 @@ class LessonSpeechService {
 
   /// Fires with (item index, word index within that item's text) as playback
   /// reaches each word — for word-by-word highlighting during story
-  /// narration. Gemini TTS returns a raw PCM buffer, not a platform voice
+  /// narration. Gemini Live returns a raw PCM buffer, not a platform voice
   /// with native word-boundary events, so timing is estimated: each word's
   /// slice of the item's known total playback duration is proportional to
   /// its character length. Approximate, not exact — good enough to track
@@ -140,6 +146,7 @@ class LessonSpeechService {
         onFinished?.call();
         return;
       }
+      final generation = ++_queueGeneration;
       _ttsQueue = items;
       _ttsIndex = 0;
       _rateOverride = rate;
@@ -148,7 +155,7 @@ class LessonSpeechService {
       _onWordBoundary = onWordBoundary;
       _onPlaybackReady = onPlaybackReady;
       isPaused = false;
-      await _speakCurrent();
+      await _speakCurrent(generation);
     } finally {
       _speakStarting = false;
     }
@@ -170,10 +177,11 @@ class LessonSpeechService {
   Future<void> resume() async {
     if (!isPaused) return;
     isPaused = false;
-    await _speakCurrent();
+    await _speakCurrent(_queueGeneration);
   }
 
   Future<void> stop() async {
+    _queueGeneration++;
     _completionTimer?.cancel();
     _completionTimer = null;
     for (final t in _wordTimers) {
@@ -191,7 +199,8 @@ class LessonSpeechService {
     _onPlaybackReady = null;
   }
 
-  Future<void> _speakCurrent() async {
+  Future<void> _speakCurrent(int generation) async {
+    if (generation != _queueGeneration) return;
     if (_ttsIndex >= _ttsQueue.length) {
       isSpeaking = false;
       final finished = _onFinished;
@@ -212,11 +221,12 @@ class LessonSpeechService {
       voiceName: persona.voiceName,
       slow: isSlow,
       contentItemId: item.contentItemId,
+      generation: generation,
     );
     if (!played) {
       // Gemini is the only voice engine here — no on-device fallback. Skip
       // this line rather than substitute a device voice, or hang forever.
-      _onUtteranceComplete();
+      _onUtteranceComplete(generation);
     }
   }
 
@@ -225,6 +235,7 @@ class LessonSpeechService {
     required String voiceName,
     required bool slow,
     String? contentItemId,
+    required int generation,
   }) async {
     final bytes = await synthesizeWithRetry(
       text,
@@ -233,16 +244,35 @@ class LessonSpeechService {
       contentItemId: contentItemId,
     );
     if (bytes == null) return false;
+    if (generation != _queueGeneration) return false;
     final myIndex = _ttsIndex;
+    try {
+      await _geminiAudio.playAudioChunk(bytes);
+    } catch (error, stackTrace) {
+      debugPrint(
+        'LessonSpeechService: Gemini Live playback failed: $error\n$stackTrace',
+      );
+      return false;
+    }
+    if (generation != _queueGeneration) return false;
+    // Only remove the loading state after the shared native player has
+    // accepted the clip. Previously this callback fired before player
+    // startup, so a startup failure looked like a ready-but-silent lesson.
     _onPlaybackReady?.call();
-    await _geminiAudio.playAudioChunk(bytes);
     // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
     final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
     _completionTimer = Timer(Duration(milliseconds: playbackMs), () {
-      if (_ttsIndex != myIndex || isPaused) return;
-      _onUtteranceComplete();
+      if (_ttsIndex != myIndex || isPaused || generation != _queueGeneration) {
+        return;
+      }
+      _onUtteranceComplete(generation);
     });
-    _scheduleWordBoundaries(text, playbackMs: playbackMs, itemIndex: myIndex);
+    _scheduleWordBoundaries(
+      text,
+      playbackMs: playbackMs,
+      itemIndex: myIndex,
+      generation: generation,
+    );
     return true;
   }
 
@@ -250,6 +280,7 @@ class LessonSpeechService {
     String text, {
     required int playbackMs,
     required int itemIndex,
+    required int generation,
   }) {
     final onWordBoundary = _onWordBoundary;
     if (onWordBoundary == null) return;
@@ -271,7 +302,11 @@ class LessonSpeechService {
       final wordIndex = i;
       _wordTimers.add(
         Timer(Duration(milliseconds: elapsedMs.round()), () {
-          if (_ttsIndex != itemIndex || isPaused) return;
+          if (_ttsIndex != itemIndex ||
+              isPaused ||
+              generation != _queueGeneration) {
+            return;
+          }
           onWordBoundary(itemIndex, wordIndex);
         }),
       );
@@ -281,7 +316,7 @@ class LessonSpeechService {
 
   /// Reading a whole story fires one fresh synthesis call per sentence in
   /// quick succession (nothing's cached yet on a first read) — enough to hit
-  /// the TTS endpoint's per-minute rate limit partway through, which used to
+  /// the Live socket quota partway through, which used to
   /// fail every remaining sentence instantly with no audio and no retry (the
   /// highlight still advanced from `_onItemStart`, so it looked like playback
   /// was working while actually going silent). Retries a few times with
@@ -330,19 +365,31 @@ class LessonSpeechService {
   /// simultaneous calls is exactly what trips the rate limit in the first
   /// place), so opening it to read hits the persisted `tts_audio_cache`
   /// (same on-device database the story itself is saved in) instead of
-  /// calling the TTS endpoint live for every sentence. Best-effort and
+  /// opening a Live socket for every sentence. Best-effort and
   /// meant to be fired in the background right after generation — any line
   /// that doesn't warm here just falls back to live synthesis (with the
   /// same retry) the first time it's actually played, exactly like before
   /// this existed, so a partial or total failure here is never fatal.
   Future<void> prewarmNarration(List<SpeechItem> items) async {
+    if (items.isEmpty) return;
     final voiceName = ActiveTutor.current.voiceName;
-    for (final item in items) {
-      await synthesizeWithRetry(
-        item.text,
-        voiceName: voiceName,
-        slow: false,
-        contentItemId: item.contentItemId,
+    await GeminiLiveAudioService.shared.resolve(
+      text: items.first.text,
+      contentItemId: items.first.contentItemId ?? 'narration:0',
+      voiceName: voiceName,
+    );
+    if (items.length > 1) {
+      unawaited(
+        GeminiLiveAudioService.shared.warmDeck(
+          voiceName: voiceName,
+          items: [
+            for (var index = 1; index < items.length; index++)
+              (
+                text: items[index].text,
+                contentItemId: items[index].contentItemId ?? 'narration:$index',
+              ),
+          ],
+        ),
       );
     }
   }
@@ -358,26 +405,29 @@ class LessonSpeechService {
     List<SpeechItem> items, {
     int concurrency = 4,
   }) async {
+    if (items.isEmpty) return;
     final voiceName = ActiveTutor.current.voiceName;
-    var next = 0;
-    Future<void> worker() async {
-      while (true) {
-        if (next >= items.length) return;
-        final item = items[next++];
-        await synthesizeWithRetry(
-          item.text,
-          voiceName: voiceName,
-          slow: false,
-          contentItemId: item.contentItemId,
-        );
-      }
+    await GeminiLiveAudioService.shared.resolve(
+      text: items.first.text,
+      contentItemId: items.first.contentItemId ?? 'narration:0',
+      voiceName: voiceName,
+    );
+    if (items.length > 1) {
+      await GeminiLiveAudioService.shared.warmDeck(
+        voiceName: voiceName,
+        items: [
+          for (var index = 1; index < items.length; index++)
+            (
+              text: items[index].text,
+              contentItemId: items[index].contentItemId ?? 'narration:$index',
+            ),
+        ],
+      );
     }
-
-    await Future.wait(List.generate(concurrency, (_) => worker()));
   }
 
   /// Copies pre-generated PCM assets into the same persistent cache used by
-  /// ordinary Gemini narration. This seeds every requested voice variant while
+  /// ordinary Gemini Live narration. This seeds every requested voice variant while
   /// keeping the runtime playback path identical and making the local SQLite
   /// cache index authoritative after the first preload.
   Future<int> prewarmBundled(
@@ -413,9 +463,10 @@ class LessonSpeechService {
     return total;
   }
 
-  void _onUtteranceComplete() {
+  void _onUtteranceComplete(int generation) {
+    if (generation != _queueGeneration) return;
     _ttsIndex += 1;
-    _speakCurrent();
+    _speakCurrent(generation);
   }
 
   /// True if [text] in [voiceName]/[slow] is already synthesized and sitting in
@@ -554,59 +605,13 @@ class LessonSpeechService {
     bool slow = false,
     String? contentItemId,
   }) async {
-    final cacheKey = _diskCacheKey(voiceName, slow, text);
-    final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
-    if (cached != null) {
-      _synthCache[cacheKey] = cached;
-      return cached;
-    }
-
-    // A second caller for the same line while the first is still in flight
-    // (auto-narration racing a manual replay, two screens sharing a cached
-    // sentence) awaits the SAME synthesis/write instead of kicking off its
-    // own — otherwise both would write the same disk-cache file path at
-    // once and could interleave into a corrupted buffer.
-    final inFlight = _synthInFlight[cacheKey];
-    if (inFlight != null) return inFlight;
-
-    final future = _synthesizeAndCache(
-      cacheKey,
-      text,
+    final bytes = await GeminiLiveAudioService.shared.resolve(
+      text: text,
+      contentItemId: contentItemId ?? 'audio:${text.trim()}',
       voiceName: voiceName,
       slow: slow,
-      contentItemId: contentItemId,
     );
-    _synthInFlight[cacheKey] = future;
-    try {
-      return await future;
-    } finally {
-      _synthInFlight.remove(cacheKey);
-    }
-  }
-
-  Future<List<int>> _synthesizeAndCache(
-    String cacheKey,
-    String text, {
-    required String voiceName,
-    required bool slow,
-    String? contentItemId,
-  }) async {
-    final bytes = await LessonAgentService.shared.synthesizeSpeech(
-      text,
-      slow: slow,
-      voiceName: voiceName,
-    );
-    _synthCache[cacheKey] = bytes;
-    unawaited(
-      _writeDiskCache(
-        cacheKey,
-        bytes,
-        voiceName: voiceName,
-        slow: slow,
-        text: text,
-        contentItemId: contentItemId,
-      ),
-    );
+    if (bytes == null) throw StateError('Gemini Live returned no audio');
     return bytes;
   }
 
@@ -614,7 +619,7 @@ class LessonSpeechService {
   // Persistent cache — the same sentence in the same voice is spoken constantly
   // (flashcards, replays, repeated lesson visits, roleplay lines heard again in a
   // later session); persisting synthesized audio in the app's own support directory
-  // (NOT the OS-evictable temp dir) and indexing it in `tts_audio_cache` means most
+  // (NOT the OS-evictable temp dir) and indexing it in the legacy local cache means most
   // narration is instant instead of a fresh Gemini round-trip, and survives both app
   // relaunches and the OS's temp-storage cleanup sweeps. Self-healing: a cache miss
   // (missing row, or a row whose file somehow vanished) just re-synthesizes.

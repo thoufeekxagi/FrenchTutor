@@ -6,10 +6,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
 import 'providers/database_provider.dart';
-import 'screens/auth/auth_screen.dart';
+import 'screens/auth/speak_auth_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/onboarding/speak_onboarding_screen.dart';
+import 'screens/speak/speak_ui.dart';
 import 'services/auth_service.dart';
 import 'services/revenue_cat_service.dart';
 import 'design/tokens.dart';
@@ -98,14 +99,31 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       // whatever is already local (possibly nothing) and it fills in
       // silently as soon as the pull lands, same "best-effort, eventually
       // consistent" contract every other sync call in this app already has.
-      ref
-          .read(syncServiceProvider)
-          .hydrateAfterSignIn()
-          .timeout(const Duration(seconds: 8), onTimeout: () {})
-          .catchError((_) {});
+      _restoreAndSeedContent();
     }
     if (!mounted) return;
     setState(() => _hasSession = session != null);
+  }
+
+  void _restoreAndSeedContent() {
+    unawaited(() async {
+      try {
+        await ref
+            .read(syncServiceProvider)
+            .hydrateAfterSignIn()
+            .timeout(const Duration(seconds: 8));
+      } catch (_) {
+        // Local starter content still makes the app usable offline; the next
+        // auth event retries the remote restore.
+      }
+      try {
+        await ref
+            .read(starterContentServiceProvider)
+            .ensureSeededForCurrentUser();
+      } catch (error, stackTrace) {
+        debugPrint('Starter content seeding failed: $error\n$stackTrace');
+      }
+    }());
   }
 
   @override
@@ -118,7 +136,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Widget build(BuildContext context) {
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
     if (!onboarded) {
-      return OnboardingScreen(onFinished: () => setState(() {}));
+      return SpeakOnboardingScreen(onFinished: () => setState(() {}));
     }
     if (_aiConsented == null) return const _RestoringProgressView();
     if (!_aiConsented!) {
@@ -126,7 +144,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         onAccepted: () => setState(() => _aiConsented = true),
       );
     }
-    if (!_hasSession) return const AuthScreen();
+    if (!_hasSession) return const SpeakAuthScreen();
     return const MainTabScreen();
   }
 }
@@ -140,18 +158,34 @@ class _RestoringProgressView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.canvas,
+      backgroundColor: SpeakColors.blue,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(color: DesignTokens.primary),
-            const SizedBox(height: 16),
+            const Icon(Icons.forum_rounded, color: Colors.white, size: 44),
+            const SizedBox(height: 14),
+            const Text(
+              'ParleSprint',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 14),
             Text(
               'Restoring your progress…',
-              style: DesignTokens.body(
-                15,
-              ).copyWith(color: DesignTokens.mutedDim),
+              style: DesignTokens.body(13).copyWith(color: Colors.white70),
             ),
           ],
         ),

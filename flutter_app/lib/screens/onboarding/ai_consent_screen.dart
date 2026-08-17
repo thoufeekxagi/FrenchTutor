@@ -69,7 +69,7 @@ class AiConsentScreen extends StatelessWidget {
                           DesignTokens.radiusCard,
                         ),
                         border: Border.all(color: DesignTokens.hairline),
-                        boxShadow: DesignTokens.cardShadow,
+                        boxShadow: DesignTokens.surfaceShadow,
                       ),
                       child: _details(onDark: false, centered: false),
                     ),
@@ -213,13 +213,20 @@ class AiConsentScreen extends StatelessWidget {
             children: [
               _consentPoint(
                 '01',
-                'Your words power feedback',
-                'What you say and write during practice is sent to Google, which powers your AI tutor.',
+                'Your practice powers feedback',
+                'Audio, text, and answers from practice are sent to Google, which powers your AI tutor.',
                 onDark,
               ),
               const SizedBox(height: 18),
               _consentPoint(
                 '02',
+                'Photos stay in your control',
+                'If you use Live Vision Scan, photos or PDFs you choose are sent to Google for explanation. You decide when to share them.',
+                onDark,
+              ),
+              const SizedBox(height: 18),
+              _consentPoint(
+                '03',
                 'Your choice stays visible',
                 "We don't sell your data, and Google doesn't use it to train its other products.",
                 onDark,

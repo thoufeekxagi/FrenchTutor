@@ -32,16 +32,23 @@ class PilotEntitlement {
 
   bool get grantsAccess =>
       !isExpired &&
+      !_isLegacyCodeGrant &&
       (status == PilotEntitlementStatus.localPreview ||
           status == PilotEntitlementStatus.active ||
           status == PilotEntitlementStatus.grace);
 
+  /// Historical invite-code rows are retained for audit/future migration,
+  /// but can never unlock the App Store build.
+  bool get _isLegacyCodeGrant =>
+      productId.trim().toLowerCase().startsWith('invite:');
+
   /// Narrower than [grantsAccess]: true only for a real, unexpired paid
-  /// subscription or invite-code grant — excludes `localPreview` (the
-  /// no-entitlement-row default), unlike [grantsAccess]. What
+  /// subscription; excludes `localPreview` (the no-entitlement-row default).
+  /// What
   /// [SubscriptionGateService] and the daily AI-minutes tier should check.
   bool get isPaidActive =>
       !isExpired &&
+      !_isLegacyCodeGrant &&
       (status == PilotEntitlementStatus.active ||
           status == PilotEntitlementStatus.grace);
 }

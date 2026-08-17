@@ -125,6 +125,11 @@ class PilotInfrastructureStore {
       'plan_tasks',
       'lesson_progress',
       'mistake_tags',
+      'generated_stories',
+      'generated_grammar_stories',
+      'generated_writing_tasks',
+      'generated_roleplays',
+      'generated_vocabulary_sets',
     };
     const operations = {'upsert', 'delete'};
     if (!tables.contains(tableName) || !operations.contains(operation)) {

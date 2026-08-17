@@ -215,6 +215,15 @@ class GeminiLiveService {
   /// silent background update, like a periodic draft sync.
   void sendText(String text, {bool expectReply = true}) {
     if (!_isSetupComplete) return;
+    if (expectReply) {
+      // Gemini 3.1 Live requires new conversational text to use
+      // realtimeInput. clientContent is reserved for initial history and can
+      // close the socket with INVALID_ARGUMENT on an active session.
+      _send({
+        'realtimeInput': {'text': text},
+      });
+      return;
+    }
     _send({
       'clientContent': {
         'turns': [
@@ -324,19 +333,27 @@ class GeminiLiveService {
               'briefly: ) $note'
         : '(Note de contexte silencieuse pour toi, ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
-    _send({
-      'clientContent': {
-        'turns': [
-          {
-            'role': 'user',
-            'parts': [
-              {'text': framed},
-            ],
-          },
-        ],
-        'turnComplete': expectReply,
-      },
-    });
+    if (expectReply) {
+      // Gemini 3.1 Live only permits clientContent while seeding initial
+      // history. This is a new turn, so send it on the realtime text stream.
+      _send({
+        'realtimeInput': {'text': framed},
+      });
+    } else {
+      _send({
+        'clientContent': {
+          'turns': [
+            {
+              'role': 'user',
+              'parts': [
+                {'text': framed},
+              ],
+            },
+          ],
+          'turnComplete': false,
+        },
+      });
+    }
     // The reply this injection triggers is wanted — stop dropping stray chunks now.
     if (expectReply) _suppressPreInjection = false;
   }

@@ -5,6 +5,7 @@ class Session {
     this.endedAt,
     this.summary,
     this.topic,
+    this.contentKey,
     this.vocabulary = const [],
     this.stage,
   });
@@ -14,6 +15,7 @@ class Session {
   String? endedAt;
   String? summary;
   String? topic;
+  String? contentKey;
   List<String> vocabulary;
   String? stage;
 }

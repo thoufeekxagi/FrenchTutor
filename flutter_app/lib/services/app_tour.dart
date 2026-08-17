@@ -4,11 +4,11 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../design/tokens.dart';
 
-/// Readle-style interactive walkthroughs: the real screen dims, one live
-/// control at a time is spotlighted, and a numbered card explains it. Two
-/// tours exist — Home (mission, keep practising, Talk with Marie) and the
-/// live call (Auto/Hold, mute, end). Each plays automatically exactly once,
-/// and can be replayed any time from Settings.
+/// Route-aware walkthroughs for the current Speak shell and live call.
+///
+/// The package overlay is configured as a calm spotlight: no pulsing, no
+/// elastic zoom, short focus transitions, and a visible skip action. Targets
+/// are real controls in the current shell rather than the retired dashboard.
 class AppTour {
   AppTour._();
 
@@ -19,12 +19,19 @@ class AppTour {
   /// it when Settings pops back and starts the tour immediately.
   static bool pendingHomeReplay = false;
 
-  // Home targets — attached in dashboard_screen.dart.
-  static final missionKey = GlobalKey(debugLabel: 'tour_mission');
+  // Current shell targets — attached in MainTabScreen and SpeakHomeScreen.
+  static final nextSessionKey = GlobalKey(debugLabel: 'tour_next_session');
+  static final courseTabKey = GlobalKey(debugLabel: 'tour_course_tab');
+  static final practiceTabKey = GlobalKey(debugLabel: 'tour_practice_tab');
+  static final progressTabKey = GlobalKey(debugLabel: 'tour_progress_tab');
+  static final profileTabKey = GlobalKey(debugLabel: 'tour_profile_tab');
+
+  // Retained for the retired dashboard so old routes remain source-compatible.
+  static final missionKey = nextSessionKey;
   static final keepPractisingKey = GlobalKey(
-    debugLabel: 'tour_keep_practising',
+    debugLabel: 'tour_keep_practising_legacy',
   );
-  static final marieKey = GlobalKey(debugLabel: 'tour_marie');
+  static final marieKey = GlobalKey(debugLabel: 'tour_marie_legacy');
 
   // Call targets — attached in session_screen.dart.
   static final micModeKey = GlobalKey(debugLabel: 'tour_mic_mode');
@@ -54,29 +61,49 @@ class AppTour {
       seenKey: _homeSeenKey,
       targets: [
         _target(
-          key: missionKey,
+          key: nextSessionKey,
           step: 1,
-          title: "Today's mission",
+          align: ContentAlign.top,
+          title: 'Continue your course',
           body:
-              'Your daily plan, built for you. Tap Start mission and the '
-              'app walks you through every step.',
+              'Your next lesson is ready here. Open it when you want to keep '
+              'moving through the course.',
         ),
         _target(
-          key: keepPractisingKey,
+          key: courseTabKey,
           step: 2,
-          title: 'Keep practising',
+          align: ContentAlign.top,
+          title: 'Course',
           body:
-              'Every skill, any time: speaking, pronunciation, listening, '
-              'reading, writing. It still shapes what the app plans next.',
+              'See the full level-by-level path, with speaking, listening, '
+              'reading, writing, grammar, and review together.',
         ),
         _target(
-          key: marieKey,
+          key: practiceTabKey,
           step: 3,
           align: ContentAlign.top,
-          title: 'Talk with your tutor',
+          title: 'Practice',
           body:
-              'A live voice call, any topic, whenever you want. Pick a '
-              'suggested topic or just start talking.',
+              'Repeat a skill, start Free Talk, review recent learning, or '
+              'try the tutor stage whenever you need extra practice.',
+        ),
+        _target(
+          key: progressTabKey,
+          step: 4,
+          align: ContentAlign.top,
+          title: 'Progress',
+          body:
+              'See what you have completed and where your course is taking '
+              'you next.',
+        ),
+        _target(
+          key: profileTabKey,
+          step: 5,
+          align: ContentAlign.top,
+          title: 'Profile',
+          body:
+              'Change your tutor, language preferences, and account settings '
+              'here.',
         ),
       ],
     );
@@ -126,9 +153,13 @@ class AppTour {
     TutorialCoachMark(
       targets: targets,
       colorShadow: DesignTokens.ink,
-      opacityShadow: 0.75,
+      opacityShadow: 0.68,
       paddingFocus: 6,
-      hideSkip: true,
+      hideSkip: false,
+      textSkip: 'Skip',
+      focusAnimationDuration: Duration.zero,
+      unFocusAnimationDuration: Duration.zero,
+      pulseEnable: false,
       onFinish: () => _markSeen(seenKey),
       onSkip: () {
         _markSeen(seenKey);

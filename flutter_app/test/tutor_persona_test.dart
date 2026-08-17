@@ -27,7 +27,27 @@ void main() {
         expect(p.tagline, isNotEmpty);
         expect(p.promptBlock, contains(p.displayName));
         expect(p.initial, p.displayName.substring(0, 1));
+        expect(p.portraitAsset, startsWith('assets/images/tutor_'));
       }
+    });
+
+    test('each persona resolves to its own portrait asset', () {
+      expect(
+        TutorPersona.marie.portraitAsset,
+        'assets/images/tutor_marie_2d.png',
+      );
+      expect(
+        TutorPersona.julien.portraitAsset,
+        'assets/images/tutor_julien_2d.png',
+      );
+      expect(
+        TutorPersona.camille.portraitAsset,
+        'assets/images/tutor_camille_2d.png',
+      );
+      expect(
+        TutorPersona.mathieu.portraitAsset,
+        'assets/images/tutor_mathieu_2d.png',
+      );
     });
 
     test('byId falls back to Marie for unknown/legacy/null ids', () {

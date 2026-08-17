@@ -35,3 +35,7 @@ class PasseportPrimaryButton extends StatelessWidget {
     );
   }
 }
+
+/// Neutral migration alias used by routes that have moved to the current
+/// visual language while retaining the shared action implementation.
+typedef ModernPrimaryButton = PasseportPrimaryButton;

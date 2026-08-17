@@ -11,15 +11,20 @@ import '../data/database/generated_scene_cache_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
+import '../data/database/generated_writing_task_store.dart';
+import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
+import '../models/speak_curriculum.dart';
 import '../services/srs_service.dart';
+import '../services/speak_curriculum_catalog.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
 import '../services/subscription_gate_service.dart';
 import '../services/sync_service.dart';
+import '../services/starter_content_service.dart';
 import '../widgets/floating_notetaker.dart';
 
 final databaseProvider = Provider<CommonDatabase>((ref) {
@@ -33,7 +38,10 @@ final syncServiceProvider = Provider<SyncService>((ref) {
 });
 
 final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService(ref.watch(databaseProvider), ref.watch(syncServiceProvider));
+  return StorageService(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final learningStoreProvider = Provider<LearningStore>((ref) {
@@ -68,10 +76,7 @@ final competencyStateStoreProvider = Provider<CompetencyStateStore>((ref) {
 });
 
 final planStoreProvider = Provider<PlanStore>((ref) {
-  return PlanStore(
-    ref.watch(databaseProvider),
-    ref.watch(syncServiceProvider),
-  );
+  return PlanStore(ref.watch(databaseProvider), ref.watch(syncServiceProvider));
 });
 
 final orchestrationServiceProvider = Provider<OrchestrationService>((ref) {
@@ -91,18 +96,47 @@ final generatedStoryStoreProvider = Provider<GeneratedStoryStore>((ref) {
   );
 });
 
-final generatedGrammarStoryStoreProvider =
-    Provider<GeneratedGrammarStoryStore>((ref) {
-      return GeneratedGrammarStoryStore(
-        ref.watch(databaseProvider),
-        ref.watch(syncServiceProvider),
-      );
-    });
+final generatedGrammarStoryStoreProvider = Provider<GeneratedGrammarStoryStore>(
+  (ref) {
+    return GeneratedGrammarStoryStore(
+      ref.watch(databaseProvider),
+      ref.watch(syncServiceProvider),
+    );
+  },
+);
 
 final generatedRoleplayStoreProvider = Provider<GeneratedRoleplayStore>((ref) {
   return GeneratedRoleplayStore(
     ref.watch(databaseProvider),
     ref.watch(syncServiceProvider),
+  );
+});
+
+final generatedWritingTaskStoreProvider = Provider<GeneratedWritingTaskStore>((
+  ref,
+) {
+  return GeneratedWritingTaskStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
+});
+
+final generatedVocabularySetStoreProvider =
+    Provider<GeneratedVocabularySetStore>((ref) {
+      return GeneratedVocabularySetStore(
+        ref.watch(databaseProvider),
+        ref.watch(syncServiceProvider),
+      );
+    });
+
+final starterContentServiceProvider = Provider<StarterContentService>((ref) {
+  return StarterContentService(
+    stories: ref.watch(generatedStoryStoreProvider),
+    grammarStories: ref.watch(generatedGrammarStoryStoreProvider),
+    writingTasks: ref.watch(generatedWritingTaskStoreProvider),
+    roleplays: ref.watch(generatedRoleplayStoreProvider),
+    vocabularySets: ref.watch(generatedVocabularySetStoreProvider),
+    sync: ref.watch(syncServiceProvider),
   );
 });
 
@@ -124,6 +158,17 @@ final subscriptionGateServiceProvider = Provider<SubscriptionGateService>((
 final contentServiceProvider = Provider<ContentService>((ref) {
   return ContentService.shared;
 });
+
+final speakCurriculumRepositoryProvider = Provider<SpeakCurriculumRepository>((
+  ref,
+) {
+  return const SpeakCurriculumRepository();
+});
+
+final speakCurriculumProvider = FutureProvider.autoDispose
+    .family<List<SpeakCurriculumItem>, String>((ref, level) {
+      return ref.read(speakCurriculumRepositoryProvider).loadPublished(level);
+    });
 
 final srsServiceProvider = Provider<SRSService>((ref) {
   return SRSService(store: ref.watch(learningStoreProvider));

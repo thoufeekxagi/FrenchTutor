@@ -10,6 +10,7 @@ class LearningCard extends StatelessWidget {
     this.color,
     this.borderColor,
     this.onTap,
+    this.clipBehavior = Clip.none,
   });
 
   final Widget child;
@@ -17,6 +18,7 @@ class LearningCard extends StatelessWidget {
   final Color? color;
   final Color? borderColor;
   final VoidCallback? onTap;
+  final Clip clipBehavior;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,7 @@ class LearningCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
         border: Border.all(color: borderColor ?? DesignTokens.hairline),
       ),
+      clipBehavior: clipBehavior,
       child: Padding(padding: EdgeInsets.all(padding), child: child),
     );
 

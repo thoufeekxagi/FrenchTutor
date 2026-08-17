@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../design/app_router.dart';
-import '../screens/subscription/paywall_screen.dart';
+import '../models/tutor_persona.dart';
+import '../screens/subscription/speak_paywall_screen.dart';
 import '../widgets/adaptive/adaptive.dart';
 import 'auth_service.dart';
 import 'pilot_access_service.dart';
 import 'product_analytics.dart';
-import 'referral_service.dart';
+import 'learning_allowance_service.dart';
 
 /// Hard gate in front of every live Gemini-voice entry point. Without this,
 /// PilotAccessService's daily-minute tracking is purely cosmetic bookkeeping
@@ -44,7 +45,7 @@ Future<bool> ensureAiSessionQuota(
       title: 'Out of free minutes today',
       message:
           "You've used today's 30 free minutes of speaking practice with "
-          'Marie. Upgrade to Premium for 2 hours a day, or come back '
+          '${ActiveTutor.current.displayName}. Upgrade to Premium for 2 hours a day, or come back '
           'tomorrow.',
       confirmLabel: 'Upgrade to Premium',
       cancelLabel: 'Not now',
@@ -52,7 +53,7 @@ Future<bool> ensureAiSessionQuota(
     if (!upgrade || !context.mounted) return false;
     final subscribed = await AppRouter.push<bool>(
       context,
-      (_) => const PaywallScreen(),
+      (_) => const SpeakPaywallScreen(),
       fullscreenDialog: true,
     );
     // Re-check rather than trust the pop value blindly — a subscribed learner
@@ -75,7 +76,7 @@ Future<bool> ensureAiSessionQuota(
   // Self-serve first — instant, no waiting on a reply. Only asked once per
   // calendar day (enforced server-side in grant_daily_extra_hour), so a
   // learner who's already used today's bonus hour falls back to email.
-  final granted = await ReferralService.shared.grantDailyExtraHour();
+  final granted = await LearningAllowanceService.shared.grantDailyExtraHour();
   if (granted) {
     await ProductAnalytics.capture('extra_hour_granted');
     if (context.mounted) {

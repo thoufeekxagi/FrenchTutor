@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
@@ -15,6 +16,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_primary_button.dart';
@@ -82,11 +84,19 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   @override
   void initState() {
     super.initState();
+    _showEnglish =
+        task.levelBand.toUpperCase() == 'A1' ||
+        task.levelBand.toUpperCase() == 'A2';
     WidgetsBinding.instance.addObserver(this);
     _call = InlineCallController(
       sessionType: LiveSessionType.writingGuide,
       lessonContext: _buildLiveLessonContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
+      openingPrompt:
+          'The call has just connected. Say this warmly and naturally: '
+          '"Hi, I\'m ready to help. What would you like help with in this '
+          'writing task?" Then wait for the student to answer. Keep it to '
+          'one short spoken turn.',
       onChanged: () {
         if (!mounted) return;
         setState(() {});
@@ -285,10 +295,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.parchmentDim,
+      backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
         title: Text(task.title, style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.parchmentDim,
+        backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: widget.showFinishButton ? 72 : null,
@@ -299,7 +309,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                   'Skip',
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: DesignTokens.mutedDim),
                 ),
               )
             : null,
@@ -312,18 +322,10 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
             ListView(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               children: [
-                if (_call.isLive || _call.error != null) ...[
-                  InlineCallStatusCard(
-                    controller: _call,
-                    listeningLabel:
-                        'Listening. Keep writing, she can hear you.',
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                _sessionIntro(),
+                const SizedBox(height: 18),
                 _promptCard(),
-                const SizedBox(height: 16),
-                _connectorsCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 _editorCard(),
                 if (_isGrading) ...[
                   const SizedBox(height: 16),
@@ -344,12 +346,35 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                 ],
                 const SizedBox(height: 16),
                 if (_feedback == null)
-                  PasseportPrimaryButton(
-                    label: 'Submit for grading',
-                    onPressed: (_isGrading || _wordCount < 5) ? null : _submit,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ModernPrimaryButton(
+                        label: _isGrading
+                            ? 'Reviewing your writing…'
+                            : 'Submit writing',
+                        onPressed: (_isGrading || _wordCount < task.minWords)
+                            ? null
+                            : _submit,
+                        isLoading: _isGrading,
+                        loadingLabel: 'Reviewing your writing…',
+                      ),
+                      if (!_isGrading && _wordCount < task.minWords) ...[
+                        const SizedBox(height: 8),
+                        Center(
+                          child: Text(
+                            'Add ${task.minWords - _wordCount} more '
+                            '${task.minWords - _wordCount == 1 ? 'word' : 'words'} to submit',
+                            style: DesignTokens.body(
+                              12,
+                            ).copyWith(color: DesignTokens.mutedDim),
+                          ),
+                        ),
+                      ],
+                    ],
                   )
                 else
-                  PasseportPrimaryButton(
+                  ModernPrimaryButton(
                     label: 'Done',
                     icon: CupertinoIcons.checkmark,
                     onPressed: widget.showFinishButton ? _finish : _doneInLab,
@@ -376,16 +401,136 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     Navigator.of(context).pop(const StageOutcome<WritingStageResult>.skipped());
   }
 
+  Widget _sessionIntro() {
+    final isCallVisible = _call.isLive || _call.error != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const KickerText(
+                    'Writing practice',
+                    color: DesignTokens.mutedDim,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Take your time. Write naturally.',
+                    style: DesignTokens.display(22),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: DesignTokens.primarySoft,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+              ),
+              child: Text(
+                'French · ${task.minWords}+ words',
+                style: DesignTokens.label(
+                  10.5,
+                ).copyWith(color: DesignTokens.primaryDeep),
+              ),
+            ),
+          ],
+        ),
+        if (isCallVisible) ...[const SizedBox(height: 14), _marieHelperCard()],
+      ],
+    );
+  }
+
+  Widget _marieHelperCard() {
+    final hasError = _call.error != null;
+    final isConnecting = _call.connecting;
+    final isSpeaking = _call.tutorSpeaking;
+    return LearningCard(
+      color: hasError ? DesignTokens.surface : DesignTokens.infoSoft,
+      borderColor: hasError
+          ? DesignTokens.primary.withValues(alpha: 0.22)
+          : DesignTokens.info.withValues(alpha: 0.18),
+      padding: 14,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: hasError ? DesignTokens.primarySoft : DesignTokens.info,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              hasError
+                  ? CupertinoIcons.exclamationmark
+                  : isConnecting
+                  ? CupertinoIcons.arrow_2_circlepath
+                  : isSpeaking
+                  ? CupertinoIcons.waveform
+                  : CupertinoIcons.phone_fill,
+              size: 18,
+              color: hasError ? DesignTokens.primary : Colors.white,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  hasError
+                      ? '${ActiveTutor.current.displayName} could not connect'
+                      : isConnecting
+                      ? 'Connecting to ${ActiveTutor.current.displayName}…'
+                      : isSpeaking
+                      ? '${ActiveTutor.current.displayName} is speaking'
+                      : '${ActiveTutor.current.displayName} is ready to help',
+                  style: DesignTokens.body(14, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  hasError
+                      ? _call.error!
+                      : isConnecting
+                      ? 'Give her a moment, then ask for help with your draft.'
+                      : _call.lastTutorLine ??
+                            'Ask a question or keep writing while she listens.',
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                ),
+                if (!hasError && !isConnecting && !isSpeaking) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    'You can end the call any time from the phone button above.',
+                    style: DesignTokens.body(
+                      11.5,
+                    ).copyWith(color: DesignTokens.mutedDim),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // -- Feedback card --
 
   Widget _feedbackCard(WritingFeedback feedback) {
-    return PasseportCard(
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const KickerText('Feedback', color: DesignTokens.slateDim),
+              const KickerText('Feedback', color: DesignTokens.mutedDim),
               const Spacer(),
               Text(
                 '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
@@ -454,7 +599,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                         const Icon(
                           CupertinoIcons.arrow_right,
                           size: 11,
-                          color: DesignTokens.slate,
+                          color: DesignTokens.muted,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -472,7 +617,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                         child: Text(
                           c.why,
                           style: DesignTokens.body(12.5).copyWith(
-                            color: DesignTokens.slateDim,
+                            color: DesignTokens.mutedDim,
                             height: 1.35,
                           ),
                         ),
@@ -569,102 +714,129 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   // -- Prompt card --
 
   Widget _promptCard() {
-    return PasseportCard(
+    final connectors = _targetConnectorObjects;
+    return ModernCard(
+      padding: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const KickerText('Prompt', color: DesignTokens.slateDim),
+          Row(
+            children: [
+              const KickerText(
+                'Your writing brief',
+                color: DesignTokens.mutedDim,
+              ),
+              const Spacer(),
+              Icon(
+                CupertinoIcons.text_alignleft,
+                size: 17,
+                color: DesignTokens.primary,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            task.promptFr,
+            style: DesignTokens.display(
+              23,
+              weight: FontWeight.w600,
+            ).copyWith(height: 1.3),
+          ),
           const SizedBox(height: 8),
-          Text(task.promptFr, style: DesignTokens.body(14)),
-          const SizedBox(height: 6),
           if (_showEnglish)
             Text(
               task.promptEn,
               style: DesignTokens.body(
-                12.5,
-              ).copyWith(color: DesignTokens.slateDim),
+                16,
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
             )
           else
             TextButton(
               onPressed: () => setState(() => _showEnglish = true),
-              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
               child: Text(
-                'Show English',
-                style: DesignTokens.mono(
-                  10.5,
-                  weight: FontWeight.w500,
+                'Show English translation',
+                style: DesignTokens.body(
+                  14,
+                  weight: FontWeight.w600,
                 ).copyWith(color: DesignTokens.primary),
               ),
             ),
           if (task.rubricHints.isNotEmpty) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 18),
             Divider(color: DesignTokens.hairline, height: 1),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
+            Text(
+              'A small focus for this draft',
+              style: DesignTokens.body(
+                14,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.mutedDim),
+            ),
+            const SizedBox(height: 9),
             for (final hint in task.rubricHints)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '• ',
-                      style: TextStyle(color: DesignTokens.info, fontSize: 13),
+                      '✓',
+                      style: DesignTokens.body(
+                        13,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.success),
                     ),
+                    const SizedBox(width: 9),
                     Expanded(
                       child: Text(
                         hint,
-                        style: DesignTokens.mono(
-                          10.5,
-                        ).copyWith(color: DesignTokens.slateDim),
+                        style: DesignTokens.body(
+                          15,
+                        ).copyWith(color: DesignTokens.inkSoft),
                       ),
                     ),
                   ],
                 ),
               ),
           ],
-        ],
-      ),
-    );
-  }
-
-  // -- Connectors card --
-
-  Widget _connectorsCard() {
-    final connectors = _targetConnectorObjects;
-    if (connectors.isEmpty) return const SizedBox.shrink();
-
-    return PasseportCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const KickerText('Target connectors', color: DesignTokens.slateDim),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: connectors.map((c) {
-              final used = _connectorUsed(c);
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: used
-                      ? DesignTokens.info
-                      : DesignTokens.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  c.fr,
-                  style: DesignTokens.mono(
-                    10.5,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: used ? Colors.white : DesignTokens.primary),
-                ),
-              );
-            }).toList(),
-          ),
+          if (connectors.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: connectors.map((c) {
+                final used = _connectorUsed(c);
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: used
+                        ? DesignTokens.successSoft
+                        : DesignTokens.canvasDim,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusPill,
+                    ),
+                  ),
+                  child: Text(
+                    used ? '✓ ${c.fr}' : c.fr,
+                    style: DesignTokens.body(11.5, weight: FontWeight.w600)
+                        .copyWith(
+                          color: used
+                              ? DesignTokens.success
+                              : DesignTokens.mutedDim,
+                        ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );
@@ -673,44 +845,46 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
   // -- Editor card --
 
   Widget _editorCard() {
-    return PasseportCard(
+    return ModernCard(
+      padding: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const KickerText('Your response', color: DesignTokens.slateDim),
+              const KickerText('Your draft', color: DesignTokens.mutedDim),
               const Spacer(),
               Text(
                 '$_wordCount / ${task.minWords} words',
-                style: DesignTokens.mono(10.5).copyWith(
+                style: DesignTokens.body(12, weight: FontWeight.w600).copyWith(
                   color: _wordCount >= task.minWords
                       ? DesignTokens.info
-                      : DesignTokens.slateDim,
+                      : DesignTokens.mutedDim,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Container(
-            constraints: const BoxConstraints(minHeight: 180),
+            constraints: const BoxConstraints(minHeight: 250),
             decoration: BoxDecoration(
-              color: DesignTokens.parchmentDim,
-              borderRadius: BorderRadius.circular(8),
+              color: DesignTokens.canvasDim.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: DesignTokens.hairline),
             ),
             child: TextField(
               controller: _textController,
               onChanged: (val) => setState(() => _content = val),
               maxLines: null,
-              minLines: 8,
-              style: DesignTokens.body(13.5),
+              minLines: 10,
+              style: DesignTokens.body(18).copyWith(height: 1.55),
               cursorColor: DesignTokens.primary,
               decoration: InputDecoration(
-                hintText: 'Write your response here...',
+                hintText: 'Start with a simple sentence…',
                 hintStyle: DesignTokens.body(
-                  13.5,
-                ).copyWith(color: DesignTokens.slate),
-                contentPadding: const EdgeInsets.all(12),
+                  18,
+                ).copyWith(color: DesignTokens.muted, height: 1.55),
+                contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
                 border: InputBorder.none,
               ),
             ),

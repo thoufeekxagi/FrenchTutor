@@ -28,12 +28,22 @@ class StorageService {
         ended_at TEXT,
         summary TEXT,
         topic TEXT,
+        content_key TEXT,
         vocabulary TEXT DEFAULT '[]',
         stage TEXT,
         updated_at TEXT NOT NULL DEFAULT (datetime('now')),
         deleted_at TEXT
       )
     ''');
+    final hasContentKey = _db
+        .select('PRAGMA table_info(sessions)')
+        .any((row) => row['name'] == 'content_key');
+    if (!hasContentKey) {
+      _db.execute('ALTER TABLE sessions ADD COLUMN content_key TEXT');
+    }
+    _db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sessions_content_key ON sessions (content_key)',
+    );
     _db.execute('''
       CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,14 +87,15 @@ class StorageService {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT OR REPLACE INTO sessions
-         (id, started_at, ended_at, summary, topic, vocabulary, stage, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+         (id, started_at, ended_at, summary, topic, content_key, vocabulary, stage, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         session.id,
         session.startedAt,
         session.endedAt,
         session.summary,
         session.topic,
+        session.contentKey,
         vocabJson,
         session.stage,
         now,
@@ -99,6 +110,43 @@ class StorageService {
   List<Session> getAllSessions() {
     final rows = _db.select('SELECT * FROM sessions ORDER BY started_at DESC');
     return rows.map(_sessionFromRow).toList();
+  }
+
+  /// Stable course items completed by this learner. Legacy sessions without
+  /// a content key remain available through [getAllSessions] for history and
+  /// the roadmap's backwards-compatible count fallback.
+  Set<String> completedContentKeys() {
+    final rows = _db.select(
+      'SELECT DISTINCT content_key FROM sessions WHERE content_key IS NOT NULL AND content_key != ? AND deleted_at IS NULL',
+      [''],
+    );
+    return rows.map((row) => row['content_key'] as String).toSet();
+  }
+
+  /// Records a course completion once, even when a learner completes several
+  /// supporting activities before returning to the course session screen.
+  void markCourseSessionCompleted({
+    required String contentKey,
+    required String topic,
+    required String stage,
+  }) {
+    final existing = _db.select(
+      'SELECT 1 FROM sessions WHERE content_key = ? AND deleted_at IS NULL LIMIT 1',
+      [contentKey],
+    );
+    if (existing.isNotEmpty) return;
+    final now = DateTime.now().toUtc().toIso8601String();
+    saveSession(
+      Session(
+        id: _uuid.v4(),
+        startedAt: now,
+        endedAt: now,
+        summary: 'Completed the course session: $topic',
+        topic: topic,
+        contentKey: contentKey,
+        stage: stage,
+      ),
+    );
   }
 
   Session? mostRecentSession({required String stage}) {
@@ -184,10 +232,7 @@ class StorageService {
       );
       rowId = _db.lastInsertRowId;
     }
-    final row = _db.select(
-      'SELECT * FROM notes WHERE id = ?',
-      [rowId],
-    ).first;
+    final row = _db.select('SELECT * FROM notes WHERE id = ?', [rowId]).first;
     unawaited(_sync?.syncNote(_noteFromRow(row)));
     return rowId;
   }
@@ -214,10 +259,9 @@ class StorageService {
   void deleteNote(int id) {
     final rows = _db.select('SELECT uuid FROM notes WHERE id = ?', [id]);
     final uuid = rows.isEmpty ? null : rows.first['uuid'] as String?;
-    _db.execute(
-      "UPDATE notes SET deleted_at = datetime('now') WHERE id = ?",
-      [id],
-    );
+    _db.execute("UPDATE notes SET deleted_at = datetime('now') WHERE id = ?", [
+      id,
+    ]);
     if (uuid != null) unawaited(_sync?.deleteNote(uuid));
   }
 
@@ -233,6 +277,7 @@ class StorageService {
       endedAt: row['ended_at'] as String?,
       summary: row['summary'] as String?,
       topic: row['topic'] as String?,
+      contentKey: row['content_key'] as String?,
       vocabulary: vocab,
       stage: row['stage'] as String?,
     );

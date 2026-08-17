@@ -6,6 +6,7 @@ import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
+import '../../models/tutor_persona.dart';
 import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/lesson_speech_service.dart';
@@ -17,7 +18,7 @@ import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import '../session/session_screen.dart';
-import '../subscription/paywall_screen.dart';
+import '../subscription/speak_paywall_screen.dart';
 
 /// "Today's mission" — not a generated multi-step lesson plan anymore, just
 /// a plain daily accountability check: touch each of [DailyGoalService.categories]
@@ -51,6 +52,8 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
   String? _loadError;
   String? _actionError;
   Set<String> _doneToday = {};
+  List<String> _missionOrder = DailyGoalService.categories;
+  bool _hasHistory = false;
   int _streak = 0;
   // "Skip for today" just previews a different not-yet-done category for
   // this visit — it never marks anything done, so it can't be used to fake
@@ -74,9 +77,15 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     try {
       final sessions = ref.read(storageServiceProvider).getAllSessions();
       final done = DailyGoalService.categoriesToday(sessions);
+      final profile = ref.read(learningStoreProvider).profile();
       if (!mounted) return;
       setState(() {
         _doneToday = done;
+        _hasHistory = sessions.isNotEmpty;
+        _missionOrder = DailyGoalService.missionOrderFor(
+          profile,
+          hasHistory: sessions.isNotEmpty,
+        );
         _streak = DailyGoalService.streak(sessions);
         _previewOffset = 0;
         _loadError = null;
@@ -92,9 +101,8 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     }
   }
 
-  List<String> get _remainingCategories => DailyGoalService.categories
-      .where((c) => !_doneToday.contains(c))
-      .toList();
+  List<String> get _remainingCategories =>
+      _missionOrder.where((c) => !_doneToday.contains(c)).toList();
 
   String? get _featuredCategory {
     final remaining = _remainingCategories;
@@ -134,7 +142,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         ref.read(subscriptionGateServiceProvider).isLabLocked(lockKey)) {
       final subscribed = await AppRouter.push<bool>(
         context,
-        (_) => const PaywallScreen(),
+        (_) => const SpeakPaywallScreen(),
         fullscreenDialog: true,
       );
       if (subscribed != true || !mounted) return;
@@ -219,7 +227,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               Row(
                 children: [
                   Text(
-                    'NEXT BEST SESSION',
+                    _hasHistory ? 'NEXT BEST SESSION' : 'YOUR FIRST SESSION',
                     style: DesignTokens.body(11, weight: FontWeight.w700)
                         .copyWith(
                           color: DesignTokens.mutedDim,
@@ -228,7 +236,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                   ),
                   const Spacer(),
                   Text(
-                    '$doneCount of ${DailyGoalService.categories.length}',
+                    '$doneCount of ${_missionOrder.length}',
                     style: DesignTokens.body(
                       12,
                       weight: FontWeight.w600,
@@ -238,7 +246,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               ),
               const SizedBox(height: DesignTokens.space4),
               _MissionProgress(
-                categories: DailyGoalService.categories,
+                categories: _missionOrder,
                 doneToday: _doneToday,
                 featured: featured,
               ),
@@ -298,7 +306,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'NEXT STEP',
+                          _hasHistory ? 'NEXT STEP' : 'START HERE',
                           style:
                               DesignTokens.body(
                                 10.5,
@@ -334,7 +342,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
               ),
               const SizedBox(height: DesignTokens.space2),
               Text(
-                _reasonFor(featured),
+                _reasonFor(featured, hasHistory: _hasHistory),
                 style: DesignTokens.body(
                   13,
                 ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
@@ -350,10 +358,12 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
                 ),
               ],
               const SizedBox(height: DesignTokens.space5),
-              PasseportPrimaryButton(
+              ModernPrimaryButton(
                 label: _isLocked(featured)
                     ? 'Unlock to start'
-                    : 'Start session',
+                    : _hasHistory
+                    ? 'Start session'
+                    : 'Begin your first session',
                 icon: _isLocked(featured)
                     ? CupertinoIcons.lock_fill
                     : CupertinoIcons.arrow_right,
@@ -402,20 +412,25 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     _ => 'Speaking readiness',
   };
 
-  String _reasonFor(String category) => switch (category) {
-    'Vocabulary' =>
-      'A short recall block keeps useful words available when you speak.',
-    'Grammar' =>
-      'A focused rule review makes your next conversation more precise.',
-    'Listening' =>
-      'Listening first gives you the phrasing and rhythm to reuse later.',
-    'Roleplay' =>
-      'A realistic scene turns today’s language into a usable response.',
-    'Writing' =>
-      'Writing gives you time to build a clear sentence before speaking.',
-    _ =>
-      'A live speaking block turns today’s preparation into confident French.',
-  };
+  String _reasonFor(String category, {required bool hasHistory}) {
+    if (!hasHistory && category == 'Vocabulary') {
+      return 'Start with a short recall block. It gives you useful words for every session that follows.';
+    }
+    return switch (category) {
+      'Vocabulary' =>
+        'A short recall block keeps useful words available when you speak.',
+      'Grammar' =>
+        'A focused rule review makes your next conversation more precise.',
+      'Listening' =>
+        'Listening first gives you the phrasing and rhythm to reuse later.',
+      'Roleplay' =>
+        'A realistic scene turns today’s language into a usable response.',
+      'Writing' =>
+        'Writing gives you time to build a clear sentence before speaking.',
+      _ =>
+        'A live speaking block turns today’s preparation into confident French.',
+    };
+  }
 
   IconData _iconFor(String category) => switch (category) {
     'Vocabulary' => CupertinoIcons.square_stack_3d_up,
@@ -432,7 +447,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     'Listening' => 'Read or listen to a short story',
     'Roleplay' => 'Have a live roleplay conversation',
     'Writing' => 'Write a short passage',
-    _ => 'Talk with Marie',
+    _ => 'Talk with ${ActiveTutor.current.displayName}',
   };
 }
 
@@ -544,7 +559,7 @@ class _MissionComplete extends StatelessWidget {
             size: 28,
           ),
           const SizedBox(height: DesignTokens.space3),
-          Text('Today’s mission is complete', style: DesignTokens.display(22)),
+          Text('Today’s path is complete', style: DesignTokens.display(22)),
           const SizedBox(height: DesignTokens.space1),
           Text(
             'You practiced all 6 skills today.',
@@ -606,10 +621,7 @@ class _MissionNotice extends StatelessWidget {
           const SizedBox(height: DesignTokens.space3),
           SizedBox(
             width: 160,
-            child: PasseportPrimaryButton(
-              label: 'Try again',
-              onPressed: onRetry,
-            ),
+            child: ModernPrimaryButton(label: 'Try again', onPressed: onRetry),
           ),
         ],
       ),

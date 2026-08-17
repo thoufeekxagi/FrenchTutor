@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -10,12 +11,13 @@ import '../config/api_keys.dart';
 import '../models/content_models.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
+import 'gemini_live_audio_service.dart';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
 ///
 /// Text generation uses Gemini Flash-Lite.
-/// Thrown by any raw Gemini HTTP call in this file (TTS synthesis, text
+/// Thrown by any raw Gemini HTTP call in this file (text
 /// generation) instead of the generic [AgentError] so callers can tell a
 /// rate limit (429, back off longer and retry) apart from any other
 /// failure (back off briefly and retry, then give up).
@@ -208,11 +210,6 @@ class LessonAgentService {
   /// `gemini-3.5-flash-lite`; `gemini-2.0-flash-lite` was shut down entirely
   /// in June 2026). Re-pin again once 3.1 shows similar signs of retiring.
   static const _geminiTextModel = 'gemini-3.1-flash-lite';
-
-  /// Cheapest current Gemini native image model, used once per generated
-  /// story for a single 1K portrait cover. The story itself remains text-only
-  /// and is generated in one structured call; we do not generate page art.
-  static const _geminiCoverModel = 'gemini-3.1-flash-lite-image';
 
   static const _openRouterModel = 'nvidia/nemotron-3-super-120b-a12b:free';
 
@@ -417,10 +414,10 @@ Write one French writing-practice task for a language learner, calibrated STRICT
 FORMAT RULE FOR "prompt_fr"/"prompt_en", ABSOLUTE — READ THIS TWICE: these two fields must be a QUESTION or an INSTRUCTION addressed directly TO the student (start with an imperative like "Écris...", "Décris...", "Raconte...", "Parle de...", or a direct question like "Où habites-tu ?"), asking them to produce their OWN original sentences. They must NEVER be a statement of fact, a narrated example, or anything that already reads as a complete, correct answer — if a student could just copy "prompt_fr" verbatim into the answer box and be done, you have generated it WRONG.
 BAD, NEVER DO THIS (this is an already-written answer, not a task): prompt_fr: "Je suis avec ma famille. Je suis content." / prompt_en: "I am with my family. I am happy."
 GOOD (this is an instruction the student must respond to): prompt_fr: "Écris deux phrases sur ta famille et comment tu te sens aujourd'hui." / prompt_en: "Write two sentences about your family and how you feel today."
-DYNAMISM, JUST AS IMPORTANT AS THE FORMAT RULE ABOVE: this must feel as varied and alive as this app's story generator, never a flat recycled "describe your morning" every time. Use the SEED DETAILS below (a character, a setting, a twist) as genuine creative fuel for an interesting, specific angle — a scenario, a small dilemma, an opinion to defend, a mystery to explain — not just a generic daily-routine description. Two prompts at the same level should never feel interchangeable.
-LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruction and the expected answer are, it NEVER means the task itself should feel dumbed-down, boring, or babyish. Even at A1, an interesting specific scenario beats a generic one; at B1/B2 actively push the student towards their level's ceiling of complexity/nuance, don't play it safe and default to the easiest version of the level:
-- A1: the instruction should be answerable in exactly 1-2 very short sentences, built ONLY from the KNOWN VOCABULARY given below plus basic function words (articles, "je/tu/il", "être/avoir", "et"). min_words 5-10. target_connectors: empty list.
-- A2: answerable in 3-4 short sentences on an everyday topic, mostly using the known vocabulary plus a few very common extra words. min_words 15-30. target_connectors: at most 1 simple connector (e.g. "et", "mais", "parce que").
+DYNAMISM, JUST AS IMPORTANT AS THE FORMAT RULE ABOVE: keep A1/A2 concrete and easy to scan. You may vary the everyday object, food, place, or routine, but never add complexity just to make a prompt feel creative. Use the SEED DETAILS only for B1/B2. Two prompts at the same level can be simple while still changing topic and vocabulary.
+LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruction and expected answer are:
+- A1: this is a true beginner. The French instruction must be 4-10 words and ask for exactly one short sentence of 5-10 words. Never use a named character, a multi-part situation, "pourquoi", "comment", "quel est ton préféré", a subordinate clause, or a sentence that reads like a story. Use only known vocabulary plus basic words (articles, je/tu/il, être/avoir, aimer, et). min_words 5-10. target_connectors: empty list. If the creative seed conflicts with these rules, ignore the seed.
+- A2: keep the prompt easy to scan. Use one everyday task in 10-18 French words and ask for 3 short sentences, mostly using known vocabulary and common extra words. Avoid names, abstract topics, multi-part questions, and long context. min_words 15-25. target_connectors: at most 1 simple connector (e.g. "et", "mais", "parce que").
 - B1: answerable in a short paragraph (5-8 sentences), may introduce a couple of new but common words beyond the known list. min_words 40-70. target_connectors: 1-2.
 - B2: answerable as a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
 Never ask for anything harder than the stated level allows, even if the topic invites it.
@@ -445,7 +442,8 @@ ${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to p
       ..writeln('TOPIC (loose inspiration only): $chosenTopic')
       ..writeln(
         'SEED DETAILS for a specific, creative angle (use naturally, do not just state them): '
-        'a person named $seedName, a setting around $seedSetting, involving $seedTwist.',
+        'a person named $seedName, a setting around $seedSetting, involving $seedTwist. '
+        'Use these details only when LEVEL is B1 or B2.',
       );
     if (contextPrompt != null && contextPrompt.trim().isNotEmpty) {
       buf.writeln(
@@ -473,7 +471,90 @@ ${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to p
       maxTokens: 600,
       temperature: 0.95,
     );
-    return _parseWritingTask(raw);
+    final task = _parseWritingTask(raw, levelBand: levelBand);
+    return _calibrateGeneratedWritingTask(
+      task,
+      levelBand: levelBand,
+      topic: chosenTopic,
+    );
+  }
+
+  /// Models sometimes obey the CEFR label but still make an A1 prompt
+  /// needlessly long because the creative seed is interesting. Keep the AI
+  /// variety, but apply a deterministic beginner guardrail before content
+  /// reaches the learner.
+  WritingTask _calibrateGeneratedWritingTask(
+    WritingTask task, {
+    required String levelBand,
+    required String topic,
+  }) {
+    final band = levelBand.trim().toUpperCase();
+    final promptWords = task.promptFr.trim().split(RegExp(r'\s+')).length;
+    final hasComplexA1Marker = RegExp(
+      r'\b(pourquoi|comment|parce que|ce que|quel(le)?|préféré|préférée|raconte|explique|décris)\b',
+      caseSensitive: false,
+    ).hasMatch(task.promptFr);
+    final tooLong = band == 'A1'
+        ? promptWords > 13 || hasComplexA1Marker
+        : band == 'A2' && promptWords > 22;
+    if (!tooLong) return task;
+
+    final fallback = switch (band) {
+      'A1' => const [
+        (
+          fr: 'Écris une phrase. Dis ce que tu aimes.',
+          en: 'Write one sentence. Say what you like.',
+          title: 'One thing I like',
+          hint: 'Use one short present-tense sentence.',
+        ),
+        (
+          fr: 'Écris une phrase sur ta famille.',
+          en: 'Write one sentence about your family.',
+          title: 'My family',
+          hint: 'Use a family word and être or avoir.',
+        ),
+        (
+          fr: 'Écris une phrase sur ton repas.',
+          en: 'Write one sentence about your meal.',
+          title: 'My meal',
+          hint: 'Use one simple food word.',
+        ),
+        (
+          fr: 'Écris une phrase sur ta journée.',
+          en: 'Write one sentence about your day.',
+          title: 'My day',
+          hint: 'Use one simple present-tense verb.',
+        ),
+      ],
+      'A2' => const [
+        (
+          fr: 'Écris trois phrases sur ta journée et ce que tu aimes.',
+          en: 'Write three sentences about your day and what you like.',
+          title: 'A simple day',
+          hint: 'Use the present tense and one simple connector.',
+        ),
+        (
+          fr: 'Écris trois phrases sur ta maison ou ton quartier.',
+          en: 'Write three sentences about your home or neighbourhood.',
+          title: 'My place',
+          hint: 'Name two simple things and connect them with et.',
+        ),
+      ],
+      _ => const [],
+    };
+    if (fallback.isEmpty) return task;
+    final choice = fallback[topic.hashCode.abs() % fallback.length];
+    return WritingTask(
+      id: task.id,
+      type: band == 'A1' ? 'micro' : task.type,
+      title: choice.title,
+      promptFr: choice.fr,
+      promptEn: choice.en,
+      minWords: band == 'A1' ? 5 : 15,
+      targetConnectors: band == 'A1' ? const [] : const ['et'],
+      rubricHints: [choice.hint],
+      levelBand: task.levelBand,
+    );
   }
 
   Future<SpeakingMockFeedback> gradeSpeakingMock({
@@ -661,6 +742,12 @@ Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_wor
     required List<String> targetPhrases,
     int count = 6,
   }) async {
+    final foundationSearch = '$unitTitle $sessionTitle $contextPrompt'
+        .toLowerCase();
+    final isFoundationSession =
+        foundationSearch.contains('alphabet') ||
+        foundationSearch.contains('vowel') ||
+        foundationSearch.contains('voyelle');
     final system =
         '''
 Create a compact French vocabulary deck for one course session. Return ONLY
@@ -673,6 +760,8 @@ mix of nouns, verbs, and one or two useful chunks rather than six near-synonyms.
 Do not include grammar explanations, full sentences, duplicate concepts, or
 words unrelated to the scenario. The deck is shown before speaking and writing,
 so choose words that can be reused in both.
+${isFoundationSession ? '''This is a French alphabet/vowel foundation session. Every entry MUST be one standalone, high-frequency French word (never a letter, phoneme, sentence, or multi-word phrase). Choose exactly the requested number of different beginner-friendly words that reinforce the sound focus and can be used in the linked speaking practice. Keep the set balanced across the supplied target phrases instead of returning only one example.
+''' : ''}
 LANGUAGE MIX: A1 uses very common French with English explanations. A2 stays
 English-supported with a little more French. B1/B2 may use more French in the
 meaning only when it remains clear.
@@ -684,6 +773,8 @@ UNIT CONTEXT: $unitTitle
 SESSION TITLE: $sessionTitle
 SESSION CONTEXT: $contextPrompt
 TARGET PHRASES: ${targetPhrases.isEmpty ? '(none supplied)' : targetPhrases.join('; ')}
+The vocabulary must prepare the learner to say the target phrases above. Reuse
+their key words where appropriate, and do not invent a disconnected theme.
 ''';
     final raw = await _complete(
       messages: [
@@ -972,6 +1063,51 @@ ${_cefrCalibration(levelBand)}
     return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
   }
 
+  /// Listening has its own generation contract. It shares the persisted
+  /// story shape with reading, but the writing is intentionally spoken-first:
+  /// short lines, natural rhythm, and bilingual check questions for beginners.
+  Future<StoryBookGeneration> buildListeningStoryBook({
+    required String topic,
+    required String levelBand,
+  }) async {
+    final system =
+        '''
+Create one short, polished French LISTENING lesson for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+
+LISTENING DESIGN: Write 6 to 9 short spoken French sentences, one per segment. Each sentence must sound natural when read aloud and move a tiny everyday story forward. Use a clear beginning, one small change, and a satisfying ending. This is a listening lesson, not a reading essay, roleplay, or grammar worksheet. A human character is optional: the story may follow an object, animal, place, or natural moment. Never force a named character.
+
+CEFR CONTRACT: Match the requested level exactly. A1 uses 4 to 8 familiar words per sentence, mostly present tense and concrete daily situations. A2 can add simple past/future and short cause-and-effect. B1 can use connected narration and everyday idioms. B2 can use richer but still conversational language. Do not put advanced language into an easier level.
+
+CHECK SUPPORT: Write 4 to 6 comprehension questions. For every question, q is the French question and q_en is its plain English translation. choices must be French options and choices_en must be their English translations in the exact same order. Each question has exactly 3 choices and one valid zero-based answerIndex. Questions must test only details stated or clearly implied by the audio story.
+
+TEACHING FIELDS: For each exact French sentence, provide its English meaning, one short English grammar note tied to that sentence, and an optional pronunciation tip. Include 5 to 8 useful French words or short phrases that actually appear in the story.
+
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
+
+Keep it wholesome and appropriate for teens and adults. Invent a fresh, specific premise every time.
+${_cefrCalibration(levelBand)}
+''';
+    final random = Random();
+    final seed = _readingStorySeeds[random.nextInt(_readingStorySeeds.length)];
+    final setting = _storySettings[random.nextInt(_storySettings.length)];
+    final twist = _storyTwists[random.nextInt(_storyTwists.length)];
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'TOPIC (loose inspiration): $topic\nLEVEL: $levelBand\n'
+              'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
+              'Use these naturally to make this listening lesson specific and memorable.',
+        },
+      ],
+      maxTokens: 2800,
+      temperature: 0.9,
+    );
+    return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
+  }
+
   Future<StoryBookGeneration> buildStoryBook({
     required String topic,
     required String levelBand,
@@ -1013,8 +1149,9 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
   }
 
   /// Creates only the single portrait cover for an already-generated story.
-  /// Uses the cheapest current Gemini image tier and requests inline JPEG
-  /// bytes so the caller can upload the result once to Supabase Storage.
+  /// FLUX.2 Klein is the selected low-cost OpenRouter image tier. The bytes
+  /// are uploaded once to Supabase Storage; reopening a story never regenerates
+  /// its cover.
   Future<Uint8List> generateStoryCover({
     required String title,
     required String summary,
@@ -1022,14 +1159,20 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     required String levelBand,
     String? coverPrompt,
   }) async {
-    final key = await _geminiApiKey;
+    final key = await _openRouterApiKey;
     if (key.isEmpty) throw AgentError.missingKey;
+    const qualityDirection =
+        'Create a premium literary book-cover image in a portrait 2:3 composition. '
+        'Use sophisticated editorial realism, natural lighting, restrained color grading, '
+        'one clear focal scene, layered depth, and a polished publishing aesthetic. '
+        'Keep important details inside safe margins so the cover remains readable when cropped. '
+        'Do not use anime, Ghibli, chibi, cartoon, childish, storybook, or flat vector styles; '
+        'do not use a collage, split panels, decorative frame, or UI mockup. '
+        'Do not include text, letters, logos, borders, watermarks, or captions.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? 'A warm, editorial portrait book-cover illustration for a short French language-learning story titled "$title". Topic: $topic. Mood: $summary. Level: $levelBand. Show one clear scene with expressive but realistic details. No text, letters, logos, borders, watermarks, or UI.'
-        : '$coverPrompt\nCreate a warm editorial portrait book-cover illustration for a French language-learning story. No text, letters, logos, borders, watermarks, or UI.';
-    final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/interactions',
-    );
+        ? '$qualityDirection Title context: "$title". Topic: $topic. Mood: $summary. Level: $levelBand.'
+        : '$qualityDirection\n$coverPrompt';
+    final uri = Uri.parse('https://openrouter.ai/api/v1/images');
     http.Response response;
     try {
       response = await http
@@ -1037,20 +1180,16 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
             uri,
             headers: {
               'Content-Type': 'application/json',
-              'x-goog-api-key': key,
+              'Authorization': 'Bearer $key',
+              'HTTP-Referer': 'https://frenchtutor.app',
+              'X-Title': 'French Tutor',
             },
             body: jsonEncode({
-              'model': _geminiCoverModel,
-              'input': [
-                {'type': 'text', 'text': prompt},
-              ],
-              'response_format': {
-                'type': 'image',
-                'mime_type': 'image/jpeg',
-                'aspect_ratio': '2:3',
-                'image_size': '1K',
-                'delivery': 'inline',
-              },
+              'model': 'black-forest-labs/flux.2-klein-4b',
+              'prompt': prompt,
+              'n': 1,
+              'aspect_ratio': '2:3',
+              'output_format': 'jpeg',
             }),
           )
           .timeout(const Duration(seconds: 45));
@@ -1058,25 +1197,22 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
       throw AgentError.requestFailed;
     }
     if (response.statusCode < 200 || response.statusCode > 299) {
+      // Keep the provider's actual diagnostic visible in device logs. The
+      // previous code reduced every image failure to a generic status, which
+      // made a storage/configuration problem look like the model was blank.
+      developer.log(
+        'OpenRouter image generation failed (${response.statusCode}): '
+        '${response.body}',
+        name: 'LessonAgentService',
+      );
       throw GeminiHttpError.fromResponse(response);
     }
     try {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final direct = json['output_image'];
-      final data = direct is Map ? direct['data'] as String? : null;
-      if (data != null && data.isNotEmpty) return base64Decode(data);
-      final steps = json['steps'] as List? ?? const [];
-      for (final rawStep in steps.reversed) {
-        if (rawStep is! Map) continue;
-        final content = rawStep['content'] as List? ?? const [];
-        for (final rawBlock in content.reversed) {
-          if (rawBlock is! Map || rawBlock['type'] != 'image') continue;
-          final blockData = rawBlock['data'] as String?;
-          if (blockData != null && blockData.isNotEmpty) {
-            return base64Decode(blockData);
-          }
-        }
-      }
+      final data = json['data'] as List? ?? const [];
+      final first = data.isEmpty ? null : data.first;
+      final encoded = first is Map ? first['b64_json'] as String? : null;
+      if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);
       throw AgentError.badResponse;
     } catch (e) {
       if (e is AgentError) rethrow;
@@ -1122,6 +1258,7 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     'Futur proche',
     'Imparfait',
     'Conditionnel présent',
+    'Impératif',
   ];
 
   /// Generates a short story built AROUND one chosen grammar point/tense
@@ -1485,13 +1622,9 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     return trimmed.toUpperCase() == 'NONE' ? '' : trimmed;
   }
 
-  /// Natural-voice line synthesis via Gemini's dedicated TTS model — the ACTIVE
-  /// PERSONA's voice (P2.1), same API key, so replaying a scene line sounds like the
-  /// student's own tutor saying it again, not a robot. On-device TTS was tried and
-  /// rejected as robotic. Returns raw 24kHz mono PCM16 (the live session player's
-  /// native format). Callers cache by text — scene lines are fixed strings, so each
-  /// line costs one call ever (per session; the cache is session-scoped, so a persona
-  /// change never replays a stale voice).
+  /// Compatibility entry point for callers that still ask the lesson agent
+  /// for audio. The implementation is Gemini Live, not the retired HTTP TTS
+  /// endpoint, and uses the selected tutor's voice.
   /// [voiceName] overrides the active persona's voice — used by tutor voice
   /// previews, where each candidate tutor must speak with their OWN voice.
   Future<List<int>> synthesizeSpeech(
@@ -1499,71 +1632,14 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     bool slow = false,
     String? voiceName,
   }) async {
-    final key = await _geminiApiKey;
-    if (key.isEmpty) throw AgentError.missingKey;
-    final prompt = slow
-        ? 'Say this very slowly and clearly, for a beginner learning French: $text'
-        : text;
-    final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=$key',
+    final bytes = await GeminiLiveAudioService.shared.resolve(
+      text: text,
+      contentItemId: 'lesson-agent:${text.trim()}',
+      voiceName: voiceName ?? ActiveTutor.current.voiceName,
+      slow: slow,
     );
-    http.Response response;
-    try {
-      response = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'contents': [
-                {
-                  'parts': [
-                    {'text': prompt},
-                  ],
-                },
-              ],
-              'generationConfig': {
-                'responseModalities': ['AUDIO'],
-                'speechConfig': {
-                  'voiceConfig': {
-                    'prebuiltVoiceConfig': {
-                      'voiceName': voiceName ?? ActiveTutor.current.voiceName,
-                    },
-                  },
-                },
-              },
-            }),
-          )
-          .timeout(const Duration(seconds: 20));
-    } catch (_) {
-      throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw GeminiHttpError.fromResponse(response);
-    }
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final parts =
-          ((json['candidates'] as List).first
-                  as Map<String, dynamic>)['content']
-              as Map<String, dynamic>;
-      final audio = <int>[];
-      for (final part in (parts['parts'] as List)) {
-        final inline = (part as Map<String, dynamic>)['inlineData'];
-        if (inline is Map && inline['data'] is String) {
-          audio.addAll(base64Decode(inline['data'] as String));
-        }
-      }
-      if (audio.isEmpty) throw AgentError.badResponse;
-      // PCM16 mono is 2 bytes/sample — an odd length means a truncated or
-      // misaligned inline part got concatenated in, which then plays back as
-      // garbled/sped-up noise (every sample boundary after the shift is
-      // wrong). Reject rather than return/cache a corrupt buffer.
-      if (audio.length.isOdd) throw AgentError.badResponse;
-      return audio;
-    } catch (e) {
-      if (e is AgentError) rethrow;
-      throw AgentError.badResponse;
-    }
+    if (bytes == null) throw AgentError.requestFailed;
+    return bytes;
   }
 
   /// One-shot speech-to-text for a short clip (a single word/phrase attempt),
@@ -1954,12 +2030,14 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     );
   }
 
-  WritingTask _parseWritingTask(String raw) {
+  WritingTask _parseWritingTask(String raw, {required String levelBand}) {
     final obj = _decodeObject(raw);
     final promptFr = obj['prompt_fr'] as String?;
     if (promptFr == null || promptFr.isEmpty) throw AgentError.badResponse;
     return WritingTask(
-      id: 'generated-${const Uuid().v4().substring(0, 8)}',
+      // Writing prompts are learner-owned rows in Supabase, so their id must
+      // round-trip as a UUID just like generated stories and grammar stories.
+      id: const Uuid().v4(),
       type: obj['type'] as String? ?? 'micro',
       title: obj['title'] as String? ?? 'Writing practice',
       promptFr: promptFr,
@@ -1973,6 +2051,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       rubricHints:
           (obj['rubric_hints'] as List?)?.map((e) => e.toString()).toList() ??
           const [],
+      levelBand: levelBand,
     );
   }
 
@@ -2132,6 +2211,10 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           q: question,
           choices: choices,
           answerIndex: answerIndex,
+          qEn: map['q_en']?.toString() ?? map['question_en']?.toString(),
+          choicesEn: (map['choices_en'] as List?)
+              ?.map((choice) => choice.toString())
+              .toList(growable: false),
         ),
       );
     }

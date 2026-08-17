@@ -191,7 +191,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                             const Spacer(),
                             Text(
                               'Step $_page of 4',
-                              style: Passeport.body(
+                              style: DesignTokens.body(
                                 12,
                                 weight: FontWeight.w600,
                               ).copyWith(color: DesignTokens.mutedDim),
@@ -414,7 +414,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: Passeport.body(15, weight: FontWeight.w700),
+          textStyle: DesignTokens.body(15, weight: FontWeight.w700),
         ),
       ),
     );
@@ -456,21 +456,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   children: [
                     Text(
                       label,
-                      style: Passeport.body(15, weight: FontWeight.w700)
+                      style: DesignTokens.body(15, weight: FontWeight.w700)
                           .copyWith(
                             color: selected
                                 ? DesignTokens.primaryDeep
-                                : Passeport.ink,
+                                : DesignTokens.ink,
                           ),
                     ),
                     if (detail != null) ...[
                       const SizedBox(height: 3),
                       Text(
                         detail,
-                        style: Passeport.body(12.5).copyWith(
+                        style: DesignTokens.body(12.5).copyWith(
                           color: selected
                               ? DesignTokens.primaryDeep.withValues(alpha: 0.82)
-                              : Passeport.slateDim,
+                              : DesignTokens.mutedDim,
                         ),
                       ),
                     ],
@@ -482,7 +482,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 selected
                     ? CupertinoIcons.checkmark_circle_fill
                     : CupertinoIcons.circle,
-                color: selected ? DesignTokens.primaryDeep : Passeport.slate,
+                color: selected ? DesignTokens.primaryDeep : DesignTokens.muted,
                 size: 22,
               ),
             ],
@@ -563,7 +563,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 12),
           Text(
             'A comfortable daily session',
-            style: Passeport.body(
+            style: DesignTokens.body(
               13,
               weight: FontWeight.w600,
             ).copyWith(color: DesignTokens.mutedDim),
@@ -724,7 +724,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     child: CircularProgressIndicator(
                       value: value,
                       strokeWidth: 3,
-                      color: Passeport.sage,
+                      color: DesignTokens.success,
                       backgroundColor: Colors.white.withValues(alpha: 0.25),
                     ),
                   ),
@@ -733,7 +733,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: playing ? Passeport.maroon : Passeport.infoSoft,
+                  color: playing ? DesignTokens.primary : DesignTokens.infoSoft,
                   shape: BoxShape.circle,
                 ),
                 child: loading
@@ -741,7 +741,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         padding: EdgeInsets.all(11),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Passeport.sky,
+                          color: DesignTokens.info,
                         ),
                       )
                     : Icon(
@@ -749,7 +749,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                             ? CupertinoIcons.speaker_2_fill
                             : CupertinoIcons.play_fill,
                         size: 16,
-                        color: playing ? Colors.white : Passeport.sky,
+                        color: playing ? Colors.white : DesignTokens.info,
                       ),
               ),
             ],
@@ -887,71 +887,197 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   // ---------------------------------------------------------------- page 6
-  /// Recap — the "you already did it" moment, with animated evidence bars.
+  /// Recap — the "you already did it" moment, using the same restrained
+  /// surface-and-border language as the rest of the current app.
   Widget _recapStep() {
     final result = _trialResult;
     final words = result?.frenchWordsUsed ?? const <String>[];
-    final minutes = ((result?.durationSeconds ?? 0) / 60).clamp(0, 3);
     return _step(
       eyebrow: 'Your first call',
       title: 'You just spoke French.',
+      subtitle:
+          'Here is the progress you made with ${_tutor.displayName}. Keep it going from your plan.',
       children: [
-        _StatBar(
-          label: 'Minutes with ${_tutor.displayName}',
-          value: minutes.toStringAsFixed(
-            minutes == minutes.roundToDouble() ? 0 : 1,
-          ),
-          fraction: ((result?.durationSeconds ?? 0) / TrialCallGate.maxSeconds)
-              .clamp(0.0, 1.0),
-          color: Passeport.mastery,
-          delay: Duration.zero,
-        ),
-        _StatBar(
-          label: 'Times you spoke',
-          value: '${result?.learnerUtteranceCount ?? 0}',
-          fraction: ((result?.learnerUtteranceCount ?? 0) / 10).clamp(0.0, 1.0),
-          color: Passeport.info,
-          delay: const Duration(milliseconds: 250),
-        ),
-        _StatBar(
-          label: 'French words heard from you',
-          value: '${words.length}',
-          fraction: (words.length / 8).clamp(0.0, 1.0),
-          color: Passeport.success,
-          delay: const Duration(milliseconds: 500),
-        ),
-        if (words.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final word in words.take(12))
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Passeport.primarySoft,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    word,
-                    style: Passeport.body(
-                      13,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: Passeport.primaryDeep),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final cellWidth = (constraints.maxWidth - DesignTokens.space3) / 2;
+            return Wrap(
+              spacing: DesignTokens.space3,
+              runSpacing: DesignTokens.space3,
+              children: [
+                SizedBox(
+                  width: cellWidth,
+                  child: _RecapMetric(
+                    icon: CupertinoIcons.timer,
+                    value: _formatRecapDuration(result?.durationSeconds ?? 0),
+                    label: 'practice time',
+                    color: DesignTokens.mastery,
                   ),
                 ),
-            ],
-          ),
-        ],
+                SizedBox(
+                  width: cellWidth,
+                  child: _RecapMetric(
+                    icon: CupertinoIcons.waveform,
+                    value: '${result?.learnerUtteranceCount ?? 0}',
+                    label: 'times you spoke',
+                    color: DesignTokens.info,
+                  ),
+                ),
+                SizedBox(
+                  width: constraints.maxWidth,
+                  child: _RecapWordsMetric(words: words),
+                ),
+              ],
+            );
+          },
+        ),
       ],
       footer: _onboardingButton(
-        label: 'Keep my progress',
+        label: 'Continue',
         onPressed: _finish,
         icon: CupertinoIcons.arrow_right,
+      ),
+    );
+  }
+}
+
+String _formatRecapDuration(int seconds) {
+  final minutes = seconds ~/ 60;
+  final remainder = seconds % 60;
+  return '$minutes:${remainder.toString().padLeft(2, '0')}';
+}
+
+class _RecapMetric extends StatelessWidget {
+  const _RecapMetric({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 17),
+          ),
+          const SizedBox(height: 12),
+          Text(value, style: DesignTokens.display(24)),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: DesignTokens.body(12).copyWith(color: DesignTokens.mutedDim),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecapWordsMetric extends StatelessWidget {
+  const _RecapWordsMetric({required this.words});
+
+  final List<String> words;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: DesignTokens.success.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  CupertinoIcons.textformat,
+                  color: DesignTokens.success,
+                  size: 17,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text('${words.length}', style: DesignTokens.display(24)),
+              const SizedBox(width: 8),
+              Text(
+                words.length == 1 ? 'French word used' : 'French words used',
+                style: DesignTokens.body(
+                  12,
+                  weight: FontWeight.w600,
+                ).copyWith(color: DesignTokens.mutedDim),
+              ),
+            ],
+          ),
+          if (words.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: [
+                for (final word in words.take(12))
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: DesignTokens.primarySoft,
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusPill,
+                      ),
+                    ),
+                    child: Text(
+                      word,
+                      style: DesignTokens.body(
+                        12,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.primaryDeep),
+                    ),
+                  ),
+              ],
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text(
+              'Your first French words will appear here as you keep practising.',
+              style: DesignTokens.body(
+                12,
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -982,7 +1108,7 @@ class _BrandWordmark extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           'ParleSprint',
-          style: Passeport.body(12.5, weight: FontWeight.w700).copyWith(
+          style: DesignTokens.body(12.5, weight: FontWeight.w700).copyWith(
             color: onLightBackground ? DesignTokens.ink : Colors.white,
             letterSpacing: 0.1,
           ),
@@ -1136,7 +1262,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                                     Flexible(
                                       child: Text(
                                         widget.checkpoints[i],
-                                        style: Passeport.body(
+                                        style: DesignTokens.body(
                                           13.5,
                                           weight: FontWeight.w600,
                                         ).copyWith(color: DesignTokens.ink),
@@ -1166,7 +1292,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                     const SizedBox(width: 7),
                     Text(
                       'Your plan adapts as you practise',
-                      style: Passeport.body(
+                      style: DesignTokens.body(
                         12.5,
                         weight: FontWeight.w600,
                       ).copyWith(color: DesignTokens.mutedDim),
@@ -1177,98 +1303,6 @@ class _PreparingPaneState extends State<_PreparingPane>
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-/// One animated horizontal evidence bar on the recap screen — label + value,
-/// with the fill growing in after [delay] so the three bars land as a
-/// staggered sequence (the Readle "bar moment").
-class _StatBar extends StatefulWidget {
-  const _StatBar({
-    required this.label,
-    required this.value,
-    required this.fraction,
-    required this.color,
-    required this.delay,
-  });
-
-  final String label;
-  final String value;
-  final double fraction;
-  final Color color;
-  final Duration delay;
-
-  @override
-  State<_StatBar> createState() => _StatBarState();
-}
-
-class _StatBarState extends State<_StatBar> {
-  bool _started = false;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(widget.delay, () {
-      if (mounted) setState(() => _started = true);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  widget.label,
-                  style: Passeport.body(
-                    13,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: DesignTokens.ink),
-                ),
-              ),
-              Text(
-                widget.value,
-                style: Passeport.body(
-                  15,
-                  weight: FontWeight.w800,
-                ).copyWith(color: Colors.white),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: SizedBox(
-              height: 10,
-              width: double.infinity,
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 900),
-                curve: Curves.easeOutCubic,
-                tween: Tween(
-                  begin: 0,
-                  end: _started ? widget.fraction.clamp(0.02, 1.0) : 0.0,
-                ),
-                builder: (context, animated, _) => Stack(
-                  children: [
-                    Container(color: DesignTokens.canvasDim),
-                    FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: animated,
-                      child: Container(color: widget.color),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1291,10 +1325,10 @@ class _PromiseRow extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Passeport.infoSoft,
+              color: DesignTokens.infoSoft,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Passeport.sky, size: 19),
+            child: Icon(icon, color: DesignTokens.info, size: 19),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1303,7 +1337,7 @@ class _PromiseRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Passeport.body(
+                  style: DesignTokens.body(
                     14,
                     weight: FontWeight.w700,
                   ).copyWith(color: DesignTokens.ink),
@@ -1343,4 +1377,3 @@ class _HeaderGutter extends StatelessWidget {
     );
   }
 }
-

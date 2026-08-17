@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import '../models/tutor_persona.dart';
 import 'passeport_primary_button.dart';
 
 class SpeakingSessionResultView extends StatelessWidget {
@@ -12,6 +13,7 @@ class SpeakingSessionResultView extends StatelessWidget {
     required this.meetsCompletionThreshold,
     required this.isDailyPath,
     required this.onDone,
+    this.tutorName,
   });
 
   final int durationSeconds;
@@ -19,156 +21,132 @@ class SpeakingSessionResultView extends StatelessWidget {
   final bool meetsCompletionThreshold;
   final bool isDailyPath;
   final VoidCallback onDone;
+  final String? tutorName;
 
   @override
   Widget build(BuildContext context) {
+    final resolvedTutorName = tutorName ?? ActiveTutor.current.displayName;
     return ColoredBox(
       color: DesignTokens.canvas,
-      child: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              DesignTokens.space5,
-              DesignTokens.space5,
-              DesignTokens.space5,
-              DesignTokens.space4,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 40,
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(decoration: TextDecoration.none),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                DesignTokens.space5,
+                DesignTokens.space5,
+                DesignTokens.space5,
+                DesignTokens.space4,
               ),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Semantics(
-                        button: true,
-                        label: 'Close result',
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: onDone,
-                          child: const SizedBox(
-                            width: DesignTokens.minTapTarget,
-                            height: DesignTokens.minTapTarget,
-                            child: Icon(CupertinoIcons.xmark),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 40,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Semantics(
+                          button: true,
+                          label: 'Close result',
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: onDone,
+                            child: const SizedBox(
+                              width: DesignTokens.minTapTarget,
+                              height: DesignTokens.minTapTarget,
+                              child: Icon(CupertinoIcons.xmark),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: DesignTokens.space4),
-                    Text('Session complete', style: DesignTokens.display(30)),
-                    const SizedBox(height: DesignTokens.space2),
-                    Text(
-                      'Speaking · argumentation',
-                      style: DesignTokens.body(
-                        14,
-                      ).copyWith(color: DesignTokens.secondary),
-                    ),
-                    const SizedBox(height: DesignTokens.space5),
-                    Text(
-                      _description,
-                      style: DesignTokens.body(
-                        16,
-                      ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
-                    ),
-                    const SizedBox(height: DesignTokens.space5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: DesignTokens.space4,
+                      const SizedBox(height: DesignTokens.space4),
+                      Text(
+                        'Session complete',
+                        style: DesignTokens.display(
+                          30,
+                        ).copyWith(decoration: TextDecoration.none),
                       ),
-                      decoration: BoxDecoration(
-                        color: DesignTokens.surface,
-                        borderRadius: BorderRadius.circular(
-                          DesignTokens.radiusCard,
+                      const SizedBox(height: DesignTokens.space2),
+                      Text(
+                        'Speaking · argumentation',
+                        style: DesignTokens.body(
+                          14,
+                        ).copyWith(color: DesignTokens.secondary),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
+                      Text(
+                        _description(resolvedTutorName),
+                        style: DesignTokens.body(
+                          16,
+                        ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
+                      ),
+                      const SizedBox(height: DesignTokens.space5),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: DesignTokens.space4,
                         ),
-                        border: Border.all(color: DesignTokens.hairline),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _ResultMetric(
-                              value: _formatDuration(durationSeconds),
-                              label: 'connected',
-                              icon: CupertinoIcons.clock,
-                            ),
+                        decoration: BoxDecoration(
+                          color: DesignTokens.surface,
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.radiusCard,
                           ),
-                          _metricDivider(),
-                          Expanded(
-                            child: _ResultMetric(
-                              value: '$learnerTurns',
-                              label: learnerTurns == 1
-                                  ? 'learner turn'
-                                  : 'learner turns',
-                              icon: CupertinoIcons.waveform,
-                            ),
-                          ),
-                          _metricDivider(),
-                          const Expanded(
-                            child: _ResultMetric(
-                              value: 'Saved',
-                              label: 'transcript',
-                              icon: CupertinoIcons.doc_text,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.space6),
-                    Text('What changes next', style: DesignTokens.display(20)),
-                    const SizedBox(height: DesignTokens.space2),
-                    Text(
-                      _practiceText,
-                      style: DesignTokens.body(
-                        14,
-                      ).copyWith(color: DesignTokens.inkSoft, height: 1.45),
-                    ),
-                    const SizedBox(height: DesignTokens.space4),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(DesignTokens.space4),
-                      decoration: BoxDecoration(
-                        color: DesignTokens.surface,
-                        borderRadius: BorderRadius.circular(
-                          DesignTokens.radiusCard,
+                          border: Border.all(color: DesignTokens.hairline),
                         ),
-                        border: Border.all(color: DesignTokens.hairline),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            CupertinoIcons.book,
-                            color: DesignTokens.primary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: DesignTokens.space3),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Next: Grammar · 12 min',
-                                  style: TextStyle(fontWeight: FontWeight.w700),
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  'Strengthen the structures you used today',
-                                  style: TextStyle(
-                                    color: DesignTokens.mutedDim,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _ResultMetric(
+                                value: _formatDuration(durationSeconds),
+                                label: 'connected',
+                                icon: CupertinoIcons.clock,
+                              ),
                             ),
-                          ),
-                        ],
+                            _metricDivider(),
+                            Expanded(
+                              child: _ResultMetric(
+                                value: '$learnerTurns',
+                                label: learnerTurns == 1
+                                    ? 'learner turn'
+                                    : 'learner turns',
+                                icon: CupertinoIcons.waveform,
+                              ),
+                            ),
+                            _metricDivider(),
+                            const Expanded(
+                              child: _ResultMetric(
+                                value: 'Saved',
+                                label: 'transcript',
+                                icon: CupertinoIcons.doc_text,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    const SizedBox(height: DesignTokens.space8),
-                    PasseportPrimaryButton(label: 'Done', onPressed: onDone),
-                  ],
+                      const SizedBox(height: DesignTokens.space6),
+                      Text(
+                        'What changes next',
+                        style: DesignTokens.display(
+                          20,
+                        ).copyWith(decoration: TextDecoration.none),
+                      ),
+                      const SizedBox(height: DesignTokens.space2),
+                      Text(
+                        _practiceText,
+                        style: DesignTokens.body(
+                          14,
+                        ).copyWith(color: DesignTokens.inkSoft, height: 1.45),
+                      ),
+                      const SizedBox(height: DesignTokens.space4),
+                      _nextPracticeRow(),
+                      const Spacer(),
+                      const SizedBox(height: DesignTokens.space8),
+                      PasseportPrimaryButton(label: 'Done', onPressed: onDone),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -182,14 +160,79 @@ class SpeakingSessionResultView extends StatelessWidget {
     return Container(width: 1, height: 48, color: DesignTokens.hairline);
   }
 
-  String get _description {
+  Widget _nextPracticeRow() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.space4,
+        vertical: DesignTokens.space3,
+      ),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: DesignTokens.primarySoft,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(
+              CupertinoIcons.book,
+              color: DesignTokens.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: DesignTokens.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Grammar',
+                      style: DesignTokens.body(
+                        16,
+                        weight: FontWeight.w700,
+                      ).copyWith(decoration: TextDecoration.none),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '12 min',
+                      style: DesignTokens.label(
+                        11,
+                      ).copyWith(color: DesignTokens.mutedDim),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Strengthen the structures you used today',
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _description(String resolvedTutorName) {
     if (isDailyPath && meetsCompletionThreshold) {
       return 'You used today’s learning in conversation. Your speaking step is complete.';
     }
     if (isDailyPath) {
       return 'Your transcript is saved, but this step needs a little more spoken practice to complete.';
     }
-    return 'Your conversation with Marie and its transcript are now in your journal.';
+    return 'Your conversation with $resolvedTutorName and its transcript are now in your journal.';
   }
 
   String get _practiceText {

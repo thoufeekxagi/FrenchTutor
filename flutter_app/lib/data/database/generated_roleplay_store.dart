@@ -25,12 +25,10 @@ class GeneratedRoleplayStore {
 
   /// All saved roleplays, newest first.
   List<GeneratedRoleplay> list() {
-    final rows = _db.select(
-      '''SELECT id, passage_json, created_at
+    final rows = _db.select('''SELECT id, passage_json, created_at, cover_url
          FROM generated_roleplays
          WHERE deleted_at IS NULL
-         ORDER BY created_at DESC''',
-    );
+         ORDER BY created_at DESC''');
     return rows.map(_fromRow).toList();
   }
 
@@ -41,12 +39,13 @@ class GeneratedRoleplayStore {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT INTO generated_roleplays
-         (id, title, passage_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?)''',
+         (id, title, passage_json, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?)''',
       [
         roleplay.id,
         roleplay.title,
         jsonEncode(roleplay.passage.toJson()),
+        roleplay.coverUrl,
         roleplay.createdAt.toUtc().toIso8601String(),
         now,
       ],
@@ -60,20 +59,46 @@ class GeneratedRoleplayStore {
     required String id,
     required String title,
     required String passageJson,
+    String? coverUrl,
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_roleplays
-         (id, title, passage_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?)
+         (id, title, passage_json, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            passage_json = excluded.passage_json,
+           cover_url = excluded.cover_url,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_roleplays.updated_at''',
-      [id, title, passageJson, createdAt, updatedAt],
+      [id, title, passageJson, coverUrl, createdAt, updatedAt],
     );
+  }
+
+  /// Stores the generated cover URL after image generation/upload completes.
+  /// A cover failure never invalidates the already-saved roleplay scene.
+  void updateCoverUrl(String roleplayId, String coverUrl) {
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''UPDATE generated_roleplays
+         SET cover_url = ?, updated_at = ?
+         WHERE id = ?''',
+      [coverUrl, now, roleplayId],
+    );
+    final roleplay = _find(roleplayId);
+    if (roleplay != null) unawaited(_sync?.syncGeneratedRoleplay(roleplay));
+  }
+
+  GeneratedRoleplay? _find(String id) {
+    final rows = _db.select(
+      '''SELECT id, passage_json, created_at, cover_url
+         FROM generated_roleplays
+         WHERE id = ? AND deleted_at IS NULL''',
+      [id],
+    );
+    return rows.isEmpty ? null : _fromRow(rows.first);
   }
 
   GeneratedRoleplay _fromRow(Row row) {
@@ -83,6 +108,7 @@ class GeneratedRoleplayStore {
       id: row['id'] as String,
       passage: ReadingPassage.fromJson(passageJson),
       createdAt: DateTime.parse(row['created_at'] as String),
+      coverUrl: row['cover_url'] as String?,
     );
   }
 }

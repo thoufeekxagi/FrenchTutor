@@ -20,7 +20,32 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+        ],
       );
     });
 
@@ -47,6 +72,18 @@ void main() {
       expect(entitlement.status, PilotEntitlementStatus.active);
       expect(entitlement.source, 'revenuecat');
       expect(entitlement.grantsAccess, isTrue);
+    });
+
+    test('legacy invite entitlements never grant release access', () {
+      final entitlement = PilotEntitlement(
+        productId: 'invite:SPRINT2026',
+        status: PilotEntitlementStatus.active,
+        source: 'legacy_code',
+        verifiedAt: DateTime.now().toUtc(),
+      );
+
+      expect(entitlement.grantsAccess, isFalse);
+      expect(entitlement.isPaidActive, isFalse);
     });
 
     test('sync outbox stores row references, not learner payloads', () {

@@ -94,6 +94,8 @@ class AgentLedListeningScreen extends ConsumerStatefulWidget {
 class _AgentLedListeningScreenState
     extends ConsumerState<AgentLedListeningScreen>
     with WidgetsBindingObserver {
+  bool get _isRoleplay => widget.sessionStage == 'roleplay';
+
   late GeminiLiveService _gemini;
   late AudioStreamingService _audio;
   late MicController _mic;
@@ -143,7 +145,7 @@ class _AgentLedListeningScreenState
   int _revealedThrough = 0;
   final ScrollController _sceneScrollController = ScrollController();
 
-  // Per-line natural-voice replay: Gemini TTS (Marie's voice family), synthesized once
+  // Per-line natural-voice replay: the selected tutor's Gemini Live voice, synthesized once
   // per line and cached — tap a bubble's speaker to rehear it instantly, long-press for
   // a slow beginner-paced rendition. No round trip to the live session. Cached through
   // LessonSpeechService's shared, persisted store (not a screen-local map) so a line
@@ -1090,7 +1092,9 @@ class _AgentLedListeningScreenState
                 ),
               ),
               ReportProblemButton(
-                sessionType: 'Listening practice',
+                sessionType: _isRoleplay
+                    ? 'Roleplay practice'
+                    : 'Listening practice',
                 personaName: _gemini.persona.displayName,
               ),
             ],
@@ -1101,7 +1105,7 @@ class _AgentLedListeningScreenState
           child: Column(
             children: [
               Text(
-                'Reading & Listening',
+                _isRoleplay ? 'Roleplay' : 'Reading & Listening',
                 style: DesignTokens.display(20, weight: FontWeight.w600),
               ),
               const SizedBox(height: 2),
@@ -1142,61 +1146,75 @@ class _AgentLedListeningScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LearningCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              KickerText(
-                'Scene · ${widget.passage.displayTitle}',
-                color: DesignTokens.mutedDim,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                card != null
-                    ? 'Line ${_segmentIndex + 1} of ${_sessionPlan.length}'
-                    : _finaleStarted
-                    ? 'Finale, play the whole scene through!'
-                    : 'Scene complete',
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.mutedDim),
-              ),
-            ],
+        if (_isRoleplay)
+          _RoleplaySceneHeader(
+            title: widget.passage.displayTitle,
+            current: card == null ? _sessionPlan.length : _segmentIndex + 1,
+            total: _sessionPlan.length,
+            complete: card == null && !_finaleStarted,
+            finaleStarted: _finaleStarted,
+          )
+        else
+          LearningCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                KickerText(
+                  'Scene · ${widget.passage.displayTitle}',
+                  color: DesignTokens.mutedDim,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  card != null
+                      ? 'Line ${_segmentIndex + 1} of ${_sessionPlan.length}'
+                      : _finaleStarted
+                      ? 'Finale, play the whole scene through!'
+                      : 'Scene complete',
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+              ],
+            ),
           ),
-        ),
         const SizedBox(height: 12),
         for (var i = 0; i <= visibleThrough && i < _sessionPlan.length; i++)
           _beatBubbles(i),
         if (card == null) ...[
           const SizedBox(height: 8),
-          LearningCard(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  CupertinoIcons.checkmark_circle_fill,
-                  size: 30,
-                  color: DesignTokens.success,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _finaleStarted
-                      ? 'Scene finale, play it through, then tap "Finish scene"!'
-                      : 'All done!',
-                  style: DesignTokens.body(14, weight: FontWeight.w500),
-                ),
-                const SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: PrimaryActionButton(
-                    label: 'Finish scene',
-                    icon: CupertinoIcons.arrow_right,
-                    onPressed: () => _finish(completed: true),
+          _isRoleplay
+              ? _RoleplayFinishPrompt(
+                  finaleStarted: _finaleStarted,
+                  onFinish: () => _finish(completed: true),
+                )
+              : LearningCard(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        CupertinoIcons.checkmark_circle_fill,
+                        size: 30,
+                        color: DesignTokens.success,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _finaleStarted
+                            ? 'Scene finale, play it through, then tap "Finish scene"!'
+                            : 'All done!',
+                        style: DesignTokens.body(14, weight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        child: PrimaryActionButton(
+                          label: 'Finish scene',
+                          icon: CupertinoIcons.arrow_right,
+                          onPressed: () => _finish(completed: true),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ] else ...[
           const SizedBox(height: 12),
           // Buttons are the ONLY navigation in the roleplay — no dependency
@@ -1241,7 +1259,7 @@ class _AgentLedListeningScreenState
   Widget _beatBubbles(int index) {
     final segment = _sessionPlan[index].segment;
     final isCurrent = index == _segmentIndex && _currentCard != null;
-    return Padding(
+    final content = Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1278,6 +1296,12 @@ class _AgentLedListeningScreenState
         ],
       ),
     );
+    if (!_isRoleplay) return content;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOutCubic,
+      child: content,
+    );
   }
 
   Widget _bubble({
@@ -1289,7 +1313,9 @@ class _AgentLedListeningScreenState
     final bg = isLearner ? DesignTokens.primarySoft : DesignTokens.surface;
     final frColor = isLearner ? DesignTokens.primaryDeep : DesignTokens.text;
     final loading = _ttsLoading.contains('false|$fr');
-    return Container(
+    return AnimatedContainer(
+      duration: _isRoleplay ? const Duration(milliseconds: 220) : Duration.zero,
+      curve: Curves.easeOutCubic,
       constraints: const BoxConstraints(maxWidth: 300),
       padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
       decoration: BoxDecoration(
@@ -1511,4 +1537,115 @@ You have exactly one tool: mark_segment_result, for recording how well the stude
     }
     return parts.join('\n\n');
   }
+}
+
+class _RoleplaySceneHeader extends StatelessWidget {
+  const _RoleplaySceneHeader({
+    required this.title,
+    required this.current,
+    required this.total,
+    required this.complete,
+    required this.finaleStarted,
+  });
+
+  final String title;
+  final int current;
+  final int total;
+  final bool complete;
+  final bool finaleStarted;
+
+  @override
+  Widget build(BuildContext context) {
+    final double progress = total == 0
+        ? 0.0
+        : (current / total).clamp(0.0, 1.0).toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'LIVE SCENE',
+              style: DesignTokens.mono(
+                10,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.primary, letterSpacing: 1.2),
+            ),
+            const Spacer(),
+            Text(
+              complete ? 'Complete' : 'Turn $current of $total',
+              style: DesignTokens.mono(
+                11,
+                weight: FontWeight.w600,
+              ).copyWith(color: DesignTokens.mutedDim),
+            ),
+          ],
+        ),
+        const SizedBox(height: 7),
+        Text(title, style: DesignTokens.display(23)),
+        const SizedBox(height: 6),
+        Text(
+          complete
+              ? 'You made it through the scene. Review the lines or finish.'
+              : finaleStarted
+              ? 'One last pass through the exchange, then you are done.'
+              : 'Hear the situation, try your line, then make it yours.',
+          style: DesignTokens.body(
+            12.5,
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+        ),
+        const SizedBox(height: 14),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            minHeight: 4,
+            value: progress,
+            backgroundColor: DesignTokens.hairline,
+            valueColor: const AlwaysStoppedAnimation(DesignTokens.primary),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RoleplayFinishPrompt extends StatelessWidget {
+  const _RoleplayFinishPrompt({
+    required this.finaleStarted,
+    required this.onFinish,
+  });
+
+  final bool finaleStarted;
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 20),
+    child: Column(
+      children: [
+        const Icon(
+          CupertinoIcons.checkmark_circle_fill,
+          size: 34,
+          color: DesignTokens.success,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          finaleStarted
+              ? 'Play the final exchange, then finish the scene.'
+              : 'You completed the scene.',
+          textAlign: TextAlign.center,
+          style: DesignTokens.body(14, weight: FontWeight.w600),
+        ),
+        const SizedBox(height: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: PrimaryActionButton(
+            label: 'Finish scene',
+            icon: CupertinoIcons.arrow_right,
+            onPressed: onFinish,
+          ),
+        ),
+      ],
+    ),
+  );
 }

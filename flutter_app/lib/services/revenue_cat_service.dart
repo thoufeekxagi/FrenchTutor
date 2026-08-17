@@ -7,8 +7,8 @@ import '../config/api_keys.dart';
 
 /// Cross-platform paywall/entitlement client (iOS StoreKit + Android Play
 /// Billing via RevenueCat's SDK). Supabase remains the source of truth for
-/// the invite-code bonus system (referral_service.dart) — this class only
-/// ever talks about *paid subscription* entitlement, synced into Supabase's
+/// legacy allowance system — this class only ever talks about *paid
+/// subscription* entitlement, synced into Supabase's
 /// `entitlements` table by the `revenuecat-webhook` edge function whenever a
 /// purchase/renewal/cancellation happens, so `PilotAccessService` still only
 /// has to read one place.

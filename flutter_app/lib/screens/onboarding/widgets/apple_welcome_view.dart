@@ -22,9 +22,9 @@ class AppleWelcomeView extends StatelessWidget {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFF0052B4),
-      Color(0xFF0066D6),
-      Color(0xFF007BFF),
+      DesignTokens.primaryDeep,
+      DesignTokens.primary,
+      DesignTokens.secondary,
     ],
   );
 
@@ -131,7 +131,7 @@ class _ValuePropositionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF002F6C).withValues(alpha: 0.18),
+            color: DesignTokens.primaryDeep.withValues(alpha: 0.18),
             blurRadius: 32,
             offset: const Offset(0, 12),
           ),
@@ -146,7 +146,7 @@ class _ValuePropositionCard extends StatelessWidget {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 23,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF0F172A),
+              color: DesignTokens.ink,
               height: 1.22,
               letterSpacing: -0.4,
             ),
@@ -158,7 +158,7 @@ class _ValuePropositionCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14.5,
               fontWeight: FontWeight.w400,
-              color: const Color(0xFF475569),
+              color: DesignTokens.inkSoft,
               height: 1.45,
             ),
           ),
@@ -166,9 +166,9 @@ class _ValuePropositionCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: DesignTokens.canvas,
               borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: DesignTokens.canvasDim),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -176,7 +176,7 @@ class _ValuePropositionCard extends StatelessWidget {
                 const Icon(
                   CupertinoIcons.checkmark_seal_fill,
                   size: 15,
-                  color: Color(0xFF0062CC),
+                  color: DesignTokens.primary,
                 ),
                 const SizedBox(width: 7),
                 Text(
@@ -184,7 +184,7 @@ class _ValuePropositionCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0F172A),
+                    color: DesignTokens.ink,
                   ),
                 ),
               ],
@@ -209,7 +209,7 @@ class _PrimaryActionButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF0062CC),
+          foregroundColor: DesignTokens.primary,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
@@ -237,9 +237,7 @@ class _SecondarySignInButton extends StatelessWidget {
       height: DesignTokens.minTapTarget,
       child: TextButton(
         onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.white,
-        ),
+        style: TextButton.styleFrom(foregroundColor: Colors.white),
         child: Text(
           'I already have an account',
           style: GoogleFonts.inter(

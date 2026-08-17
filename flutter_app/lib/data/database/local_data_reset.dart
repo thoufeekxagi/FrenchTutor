@@ -11,9 +11,9 @@ import 'package:sqlite3/common.dart';
 /// could linger indefinitely.
 ///
 /// `schema_migrations` (migration bookkeeping) and `installations` (the
-/// device-identity row referral-code fraud prevention keys off — see
+/// device-identity row used for device-level abuse prevention — see
 /// `PilotInfrastructureStore` — a NEW installation_id on every sign-out
-/// would let the same device redeem a referral bonus infinitely) are
+/// would let a device repeatedly reset its limits) are
 /// device-level, not user-level, and are deliberately kept.
 void wipeLocalUserData(CommonDatabase db) {
   const keep = {'schema_migrations', 'installations'};

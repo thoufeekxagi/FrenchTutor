@@ -25,6 +25,7 @@ class GeneratedGrammarStory {
     required this.quiz,
     required this.keywords,
     required this.createdAt,
+    this.coverUrl,
     this.score,
   });
 
@@ -41,6 +42,7 @@ class GeneratedGrammarStory {
   final List<VocabEntry> keywords;
   final double? score;
   final DateTime createdAt;
+  final String? coverUrl;
 
   String get title => passage.title;
   String get displayTitle => passage.displayTitle;
@@ -49,17 +51,19 @@ class GeneratedGrammarStory {
   /// same convention as `GeneratedStory.segmentContentId`.
   String segmentContentId(int index) => '${id}_seg$index';
 
-  GeneratedGrammarStory copyWith({double? score}) => GeneratedGrammarStory(
-    id: id,
-    grammarPoint: grammarPoint,
-    levelBand: levelBand,
-    explanation: explanation,
-    passage: passage,
-    quiz: quiz,
-    keywords: keywords,
-    createdAt: createdAt,
-    score: score ?? this.score,
-  );
+  GeneratedGrammarStory copyWith({double? score, String? coverUrl}) =>
+      GeneratedGrammarStory(
+        id: id,
+        grammarPoint: grammarPoint,
+        levelBand: levelBand,
+        explanation: explanation,
+        passage: passage,
+        quiz: quiz,
+        keywords: keywords,
+        createdAt: createdAt,
+        score: score ?? this.score,
+        coverUrl: coverUrl ?? this.coverUrl,
+      );
 }
 
 class GeneratedGrammarStoryStore {
@@ -72,11 +76,9 @@ class GeneratedGrammarStoryStore {
 
   /// All saved grammar sessions, newest first.
   List<GeneratedGrammarStory> list() {
-    final rows = _db.select(
-      '''SELECT * FROM generated_grammar_stories
+    final rows = _db.select('''SELECT * FROM generated_grammar_stories
          WHERE deleted_at IS NULL
-         ORDER BY created_at DESC''',
-    );
+         ORDER BY created_at DESC''');
     return rows.map(_fromRow).toList();
   }
 
@@ -87,8 +89,8 @@ class GeneratedGrammarStoryStore {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT INTO generated_grammar_stories
-         (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+         (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         story.id,
         story.title,
@@ -99,6 +101,7 @@ class GeneratedGrammarStoryStore {
         jsonEncode(story.keywords.map((k) => k.toJson()).toList()),
         jsonEncode(story.explanation.toJson()),
         story.score,
+        story.coverUrl,
         story.createdAt.toUtc().toIso8601String(),
         now,
       ],
@@ -120,7 +123,26 @@ class GeneratedGrammarStoryStore {
       'SELECT * FROM generated_grammar_stories WHERE id = ?',
       [id],
     );
-    if (row.isNotEmpty) unawaited(_sync?.syncGeneratedGrammarStory(_fromRow(row.first)));
+    if (row.isNotEmpty) {
+      unawaited(_sync?.syncGeneratedGrammarStory(_fromRow(row.first)));
+    }
+  }
+
+  void updateCoverUrl(String id, String coverUrl) {
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''UPDATE generated_grammar_stories
+         SET cover_url = ?, updated_at = ?
+         WHERE id = ?''',
+      [coverUrl, now, id],
+    );
+    final rows = _db.select(
+      'SELECT * FROM generated_grammar_stories WHERE id = ?',
+      [id],
+    );
+    if (rows.isNotEmpty) {
+      unawaited(_sync?.syncGeneratedGrammarStory(_fromRow(rows.first)));
+    }
   }
 
   /// Upserts a row pulled from Supabase during sign-in hydration.
@@ -135,13 +157,14 @@ class GeneratedGrammarStoryStore {
     String keywordsJson = '[]',
     String explanationJson = '{}',
     double? score,
+    String? coverUrl,
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_grammar_stories
-         (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (id, title, grammar_point, level_band, passage_json, quiz_json, keywords_json, explanation_json, score, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            grammar_point = excluded.grammar_point,
@@ -151,6 +174,7 @@ class GeneratedGrammarStoryStore {
            keywords_json = excluded.keywords_json,
            explanation_json = excluded.explanation_json,
            score = excluded.score,
+           cover_url = excluded.cover_url,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_grammar_stories.updated_at''',
       [
@@ -163,6 +187,7 @@ class GeneratedGrammarStoryStore {
         keywordsJson,
         explanationJson,
         score,
+        coverUrl,
         createdAt,
         updatedAt,
       ],
@@ -201,6 +226,7 @@ class GeneratedGrammarStoryStore {
           .toList(),
       score: (row['score'] as num?)?.toDouble(),
       createdAt: DateTime.parse(row['created_at'] as String),
+      coverUrl: row['cover_url'] as String?,
     );
   }
 }

@@ -21,3 +21,7 @@
 server/venv/
 server/__pycache__/
 server/*.db
+
+# Codex desktop-local configuration and preview artifacts.
+.mcp.json
+.codex-preview/

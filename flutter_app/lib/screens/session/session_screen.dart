@@ -23,13 +23,16 @@ import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../services/pilot_access_service.dart';
 import '../../services/product_analytics.dart';
-import '../../services/referral_service.dart';
+import '../../services/learning_allowance_service.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/speaking_session_result.dart';
+import '../../widgets/speaking_transcript_strip.dart';
+import '../../widgets/tutor_avatar_stage.dart';
+import '../speak/speak_ui.dart';
 
 enum CallStatus {
   connecting,
@@ -49,6 +52,8 @@ class SessionScreen extends ConsumerStatefulWidget {
     required this.apiKey,
     this.lessonContext,
     this.stage,
+    this.sessionTopic,
+    this.contentKey,
     this.dailySessionId,
     this.examMode = false,
     this.kickoffMessage,
@@ -61,6 +66,8 @@ class SessionScreen extends ConsumerStatefulWidget {
   final String apiKey;
   final String? lessonContext;
   final String? stage;
+  final String? sessionTopic;
+  final String? contentKey;
   final bool examMode;
   final String? kickoffMessage;
   final int? durationLimitSeconds;
@@ -187,8 +194,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     if (widget.apiKey.trim().isEmpty) {
       setState(() {
         _callStatus = CallStatus.ended;
-        _errorMessage =
-            'Live tutor is not enabled for this build.';
+        _errorMessage = 'Live tutor is not enabled for this build.';
       });
       return;
     }
@@ -237,8 +243,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   /// Whatever this session used beyond the base free daily allowance was
-  /// drawn from the invite-code bonus balance (see referral_service.dart) —
-  /// draw it down server-side to match. Fire-and-forget: worst case the
+  /// drawn from the temporary speaking allowance balance — draw it down
+  /// server-side to match. Fire-and-forget: worst case the
   /// balance is very slightly stale until the next successful call.
   void _consumeBonusMinutesIfNeeded(
     LearningStore store,
@@ -260,7 +266,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
     final bonusSecondsUsed = overageAfter - overageBefore;
     if (bonusSecondsUsed > 0) {
-      unawaited(ReferralService.shared.consumeBonusSeconds(bonusSecondsUsed));
+      unawaited(
+        LearningAllowanceService.shared.consumeBonusSeconds(bonusSecondsUsed),
+      );
     }
   }
 
@@ -311,7 +319,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           .startAiSession(
             dailySessionId: widget.dailySessionId,
             stage: widget.stage,
-            topic: widget.lessonContext != null ? 'lesson' : 'free_talk',
+            topic:
+                widget.sessionTopic ??
+                (widget.lessonContext != null ? 'lesson' : 'free_talk'),
           );
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
@@ -466,6 +476,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               .toIso8601String(),
       endedAt: now.toIso8601String(),
       summary: summary,
+      topic: widget.sessionTopic,
+      contentKey: widget.contentKey,
       stage: widget.stage,
     );
     final storage = ref.read(storageServiceProvider);
@@ -524,7 +536,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     return words.toList()..sort();
   }
 
-  void _finishResult() => Navigator.of(context).pop(_result);
+  bool _didFinishResult = false;
+
+  void _finishResult() {
+    // The result screen can be completed by both a button and a deferred
+    // post-frame callback. Make completion idempotent and keep the route
+    // result type explicit at the navigation boundary.
+    if (_didFinishResult || !mounted) return;
+    _didFinishResult = true;
+    Navigator.of(context).pop<SpeakingResult>(_result);
+  }
 
   String _generateLocalSummary() {
     if (_messages.isEmpty) return 'No conversation recorded.';
@@ -658,6 +679,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
   }
 
+  TutorAvatarState get _avatarState => switch (_callStatus) {
+    CallStatus.tutorSpeaking => TutorAvatarState.speaking,
+    CallStatus.reconnecting ||
+    CallStatus.connecting => TutorAvatarState.thinking,
+    CallStatus.muted => TutorAvatarState.idle,
+    CallStatus.listening => TutorAvatarState.listening,
+    CallStatus.ended => TutorAvatarState.idle,
+  };
+
   Future<void> _confirmEnd() async {
     final shouldEnd = await showPSConfirmDialog(
       context,
@@ -687,7 +717,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           });
         }
         return const Scaffold(
-          backgroundColor: Passeport.parchment,
+          backgroundColor: DesignTokens.canvas,
           body: SizedBox.expand(),
         );
       }
@@ -701,11 +731,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           learnerTurns: _userUtteranceCount,
           meetsCompletionThreshold: _result.meetsThreshold,
           isDailyPath: widget.stage == 'speaking',
+          tutorName: _gemini.persona.displayName,
           onDone: _finishResult,
         ),
       );
     }
     final notetaker = ref.watch(notetakerStateProvider);
+    final isCompact = MediaQuery.sizeOf(context).height < 760;
     // Matches iOS's fullScreenCover, which has no swipe-to-dismiss gesture at all — without
     // this, Flutter's iOS edge-swipe-back gesture (still active even on a fullscreenDialog
     // MaterialPageRoute) can silently end the call, bypassing the "End Call?" confirmation
@@ -718,14 +750,20 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-        backgroundColor: DesignTokens.canvas,
+        backgroundColor: SpeakColors.background,
         body: SafeArea(
           child: Stack(
             children: [
               Column(
                 children: [
                   _callHeader(),
-                  Expanded(child: _transcriptView()),
+                  SpeakingTranscriptStrip(
+                    messages: _messages,
+                    controller: _scrollController,
+                    tutorName: _gemini.persona.displayName,
+                    height: isCompact ? 126 : 148,
+                  ),
+                  Expanded(child: _tutorStage(compact: isCompact)),
                   if (_errorMessage.isNotEmpty)
                     ErrorNotice(message: _errorMessage),
                   _callControls(),
@@ -741,7 +779,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   Widget _callHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
       child: Column(
         children: [
           Row(
@@ -758,7 +796,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     child: Icon(
                       CupertinoIcons.xmark,
                       size: 20,
-                      color: Passeport.ink,
+                      color: SpeakColors.inkSoft,
                     ),
                   ),
                 ),
@@ -773,8 +811,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                           widget.durationLimitSeconds!,
                         ),
                       ),
-                style: Passeport.body(14, weight: FontWeight.w700).copyWith(
-                  color: Passeport.slateDim,
+                style: DesignTokens.body(13, weight: FontWeight.w700).copyWith(
+                  color: SpeakColors.inkSoft,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -785,17 +823,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          _avatarWithCountdownRing(),
-          const SizedBox(height: 9),
-          Text(_gemini.persona.displayName, style: Passeport.display(22)),
-          const SizedBox(height: 7),
+          const SizedBox(height: 6),
           AnimatedContainer(
             duration: DesignTokens.durationFast,
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
               color: _statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -811,10 +845,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 const SizedBox(width: 7),
                 Text(
                   _statusText,
-                  style: Passeport.body(
+                  style: DesignTokens.body(
                     12,
                     weight: FontWeight.w600,
-                  ).copyWith(color: Passeport.inkSoft),
+                  ).copyWith(color: SpeakColors.inkSoft),
                 ),
               ],
             ),
@@ -824,126 +858,29 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  /// The tutor avatar. On time-limited calls (trial, exam) a live ring drains
-  /// around it — calm in the app's primary color, warning-tinted for the final
-  /// stretch — so the limit is always visible without reading the clock.
-  Widget _avatarWithCountdownRing() {
-    final limit = widget.durationLimitSeconds;
-    final avatar = Container(
-      width: 54,
-      height: 54,
-      decoration: BoxDecoration(
-        color: DesignTokens.infoSoft,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-        border: Border.all(
-          color: _statusColor.withValues(alpha: 0.32),
-          width: 2,
-        ),
-      ),
-      child: Center(
-        child: Text(
-          _gemini.persona.initial,
-          style: DesignTokens.display(
-            20,
-          ).copyWith(color: DesignTokens.secondary),
-        ),
-      ),
-    );
-    if (limit == null) return avatar;
-    final remaining = (limit - _callDuration).clamp(0, limit);
-    final closing = remaining <= widget.wrapUpLeadSeconds;
-    return SizedBox(
-      width: 66,
-      height: 66,
-      child: Stack(
-        alignment: Alignment.center,
+  Widget _tutorStage({required bool compact}) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          TweenAnimationBuilder<double>(
-            duration: const Duration(seconds: 1),
-            curve: Curves.linear,
-            tween: Tween(end: remaining / limit),
-            builder: (context, value, _) => SizedBox(
-              width: 66,
-              height: 66,
-              child: CircularProgressIndicator(
-                value: value,
-                strokeWidth: 3,
-                strokeCap: StrokeCap.round,
-                color: closing ? Passeport.warning : Passeport.primary,
-                backgroundColor: Passeport.hairline,
-              ),
-            ),
+          TutorAvatarStage(
+            persona: _gemini.persona,
+            state: _avatarState,
+            compact: compact,
           ),
-          avatar,
+          Text(_gemini.persona.displayName, style: DesignTokens.display(22)),
         ],
-      ),
-    );
-  }
-
-  Widget _transcriptView() {
-    if (_messages.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 54,
-                height: 54,
-                decoration: const BoxDecoration(
-                  color: Passeport.successSoft,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  CupertinoIcons.waveform,
-                  size: 24,
-                  color: Passeport.sage,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                _callStatus == CallStatus.connecting
-                    ? 'Preparing your session'
-                    : '${_gemini.persona.displayName} is listening',
-                textAlign: TextAlign.center,
-                style: Passeport.body(16, weight: FontWeight.w700),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _callStatus == CallStatus.connecting
-                    ? 'This usually takes a moment.'
-                    : 'Speak naturally. You can pause, correct yourself, or ask for help.',
-                textAlign: TextAlign.center,
-                style: Passeport.body(
-                  13.5,
-                ).copyWith(color: Passeport.slateDim, height: 1.4),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      itemCount: _messages.length,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: _MessageBubble(message: _messages[index]),
       ),
     );
   }
 
   Widget _callControls() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
       decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(DesignTokens.radiusCard),
-        ),
-        border: Border(top: BorderSide(color: DesignTokens.hairline)),
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: const Border(top: BorderSide(color: SpeakColors.line)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -953,8 +890,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 ? 'Focus: give reasons and examples'
                 : 'Focus: clear, natural French',
             style: DesignTokens.label(
-              11,
-            ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.6),
+              10,
+            ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 0.8),
           ),
           const SizedBox(height: DesignTokens.space3),
           KeyedSubtree(
@@ -980,7 +917,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? CupertinoIcons.speaker_2_fill
                     : CupertinoIcons.ear,
                 label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
-                color: Passeport.ink,
+                color: SpeakColors.navy,
                 onTap: _callStatus == CallStatus.connecting
                     ? null
                     : _toggleSpeaker,
@@ -1061,51 +998,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               const SizedBox(height: 7),
               Text(
                 label,
-                style: Passeport.body(
+                style: DesignTokens.body(
                   11.5,
                   weight: FontWeight.w600,
-                ).copyWith(color: Passeport.slateDim),
+                ).copyWith(color: SpeakColors.inkSoft),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message});
-
-  final ChatMessage message;
-
-  @override
-  Widget build(BuildContext context) {
-    final isUser = message.isUser;
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 620),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.space4,
-            vertical: DesignTokens.space3,
-          ),
-          decoration: BoxDecoration(
-            color: isUser ? DesignTokens.ink : DesignTokens.infoSoft,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
-            border: isUser
-                ? null
-                : Border(
-                    left: BorderSide(color: DesignTokens.secondary, width: 3),
-                  ),
-          ),
-          child: Text(
-            message.content,
-            style: DesignTokens.body(15).copyWith(
-              color: isUser ? Colors.white : DesignTokens.ink,
-              height: 1.45,
-            ),
           ),
         ),
       ),

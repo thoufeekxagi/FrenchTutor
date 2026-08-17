@@ -81,6 +81,7 @@ class AudioStreamingService {
   /// needs it built explicitly.
   final Queue<Uint8List> _playbackQueue = Queue<Uint8List>();
   bool _isDrainingPlaybackQueue = false;
+  int _playbackGeneration = 0;
 
   /// A PCM16 sample is 2 bytes; Gemini's WebSocket chunk boundaries don't
   /// respect that, so a chunk can arrive with an odd byte count, splitting a
@@ -334,6 +335,7 @@ class AudioStreamingService {
   /// `_playbackQueue` and fed to the player by the serialized drain loop below — never fed
   /// directly here — so bursty network delivery can't starve or race the player.
   Future<void> playAudioChunk(List<int> pcmBytes) async {
+    final playbackGeneration = _playbackGeneration;
     var bytes = Uint8List.fromList(pcmBytes);
     if (_pendingOddByte != null) {
       bytes = Uint8List.fromList([..._pendingOddByte!, ...bytes]);
@@ -377,19 +379,21 @@ class AudioStreamingService {
     unawaited(_player.setVolume(1.0).catchError((_) {}));
 
     await _ensurePlayerStarted();
+    if (playbackGeneration != _playbackGeneration) return;
     _playbackQueue.add(bytes);
-    _drainPlaybackQueue();
+    _drainPlaybackQueue(playbackGeneration);
   }
 
   /// Feeds queued chunks to the player strictly one at a time, always awaiting the previous
   /// `feedUint8FromStream` call before starting the next. Safe to call repeatedly — re-entrant
   /// calls while a drain is already running just return immediately, since the running loop
   /// will pick up anything newly queued.
-  Future<void> _drainPlaybackQueue() async {
+  Future<void> _drainPlaybackQueue(int playbackGeneration) async {
     if (_isDrainingPlaybackQueue) return;
     _isDrainingPlaybackQueue = true;
     try {
-      while (_playbackQueue.isNotEmpty) {
+      while (_playbackQueue.isNotEmpty &&
+          playbackGeneration == _playbackGeneration) {
         final bytes = _playbackQueue.removeFirst();
         try {
           await _player.feedUint8FromStream(bytes);
@@ -400,12 +404,20 @@ class AudioStreamingService {
       }
     } finally {
       _isDrainingPlaybackQueue = false;
+      // A stop can invalidate the generation while the native feed call is
+      // still unwinding. If a new clip was queued during that small window,
+      // the new caller sees the old drain as active and returns; restart the
+      // drain here or the new bytes remain stranded forever (silent replay).
+      if (_playbackQueue.isNotEmpty) {
+        unawaited(_drainPlaybackQueue(_playbackGeneration));
+      }
     }
   }
 
   int _muteGeneration = 0;
 
-  Future<void> stopPlayback() async {
+  Future<void> stopPlayback({bool hardStop = false}) async {
+    _playbackGeneration++;
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
     // interruption keep draining and playing after the model was told to stop (barge-in /
     // card-change cut). The player itself is deliberately LEFT RUNNING: tearing it down here
@@ -416,6 +428,28 @@ class AudioStreamingService {
     // A carried-over stray byte belonged to the utterance being cut — letting
     // it prepend to whatever plays next would misalign that unrelated audio.
     _pendingOddByte = null;
+
+    if (hardStop) {
+      // Voice previews are single buffers. Stopping the native stream and
+      // closing it is the only reliable way to remove audio already accepted
+      // by flutter_sound; muting alone allows the old tail to return when a
+      // new clip restores volume.
+      final startLatch = _playerStartLatch;
+      if (startLatch != null) {
+        try {
+          await startLatch;
+        } catch (_) {}
+      }
+      try {
+        if (!_player.isStopped) await _player.stopPlayer();
+      } catch (_) {}
+      try {
+        await _player.closePlayer();
+      } catch (_) {}
+      _isPlayerStarted = false;
+      _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+      return;
+    }
 
     // How long whatever's already been fed to the player still has left to
     // sound, BEFORE it gets reset below. Live-call chunks are short (the

@@ -85,6 +85,13 @@ SPEECH RULES: FOLLOW EXACTLY:
 4. Be encouraging and patient. Use short warm fillers like "très bien", "parfait", "pas de souci", or push a little harder once the student is ready.
 5. Keep punctuation simple and natural for speech. Never use emojis or em dashes.''';
 
+  /// Transcript formatting is separate from the audio: punctuation is not
+  /// spoken, but it gives learners a reliable visual way to select a French
+  /// word or phrase from a bilingual tutor reply.
+  static const transcriptFormatting = '''
+TRANSCRIPT DISPLAY RULE:
+When you mix English and French in one reply, put every French word or short French phrase in straight double quotation marks, and put any English gloss in double quotation marks too. Example: Say "la voie" for "the track", then ask "Tu comprends ?". Do not say the quotation marks aloud; they are only for the on-screen transcript. If the whole reply is naturally French, keep it natural and do not quote every word.''';
+
   /// Freeform conversational drivers — ONLY for free talk; these instincts are
   /// actively harmful inside app-directed stages.
   static const _freeTalkRole = '''
@@ -274,6 +281,6 @@ STUDENT LEVEL: B2 (POLISHING).
     final tuning =
         '${TutorTuning.mixPromptLine(languageMix)}\n'
         '${TutorTuning.speedPromptLine(voiceSpeed)}';
-    return '${_personaBase(persona)}\n\n$tuning\n\n$languageGuardrail\n\n$contentSafety\n\n$role';
+    return '${_personaBase(persona)}\n\n$transcriptFormatting\n\n$tuning\n\n$languageGuardrail\n\n$contentSafety\n\n$role';
   }
 }

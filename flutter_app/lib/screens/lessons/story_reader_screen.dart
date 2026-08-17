@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,11 +13,14 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
+import '../../widgets/lesson_stage_rail.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
+
+enum _StoryReadingMode { fullStory, sentenceBySentence }
 
 /// Popped by [StoryReaderScreen] when [StoryReaderScreen.showFinishButton] is
 /// true — how many of the story's own quiz questions the learner answered
@@ -98,6 +103,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   // Story always leads, even for a grammar-practice session — the story is
   // the point, grammar is a cue card away, not the landing screen.
   _StoryTab _tab = _StoryTab.story;
+  _StoryReadingMode _readingMode = _StoryReadingMode.sentenceBySentence;
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
@@ -193,12 +199,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           if (!mounted) return;
           setState(() {
             _enriching = false;
-            _story = GeneratedStory(
-              id: _story.id,
-              passage: _story.passage,
+            _story = _story.copyWith(
               quiz: result.quiz,
               keywords: result.keywords,
-              createdAt: _story.createdAt,
             );
           });
         },
@@ -310,10 +313,73 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       await speech.resume();
       if (mounted) setState(() => _isPlaying = true);
     } else {
-      // Fresh start (not a resume): play from the sentence the learner
-      // picked, or the whole story from the top if nothing is picked.
-      await _playAll(fromIndex: _selectedSegment ?? 0);
+      // Sentence mode mirrors Listening: the play button speaks only the
+      // visible sentence. Full-story mode keeps the continuous narration.
+      if (_readingMode == _StoryReadingMode.sentenceBySentence) {
+        await _playSelectedSentence();
+      } else {
+        await _playAll(fromIndex: _selectedSegment ?? 0);
+      }
     }
+  }
+
+  Future<void> _switchTab(_StoryTab tab) async {
+    if (_tab == tab) return;
+    if (_tab == _StoryTab.story) await _stop();
+    if (mounted) setState(() => _tab = tab);
+  }
+
+  void _goToStage(int index) {
+    switch (index) {
+      case 0:
+        unawaited(_switchTab(_StoryTab.story));
+      case 1:
+        unawaited(_switchTab(_StoryTab.keywords));
+      case 2:
+        unawaited(_switchTab(_StoryTab.grammar));
+      case 3:
+        unawaited(_switchTab(_StoryTab.quiz));
+      case 4:
+        if (widget.showFinishButton) {
+          _finish();
+        } else {
+          Navigator.pop(context);
+        }
+    }
+  }
+
+  void _advanceTab() {
+    switch (_tab) {
+      case _StoryTab.story:
+        unawaited(_switchTab(_StoryTab.keywords));
+      case _StoryTab.keywords:
+        unawaited(_switchTab(_StoryTab.grammar));
+      case _StoryTab.grammar:
+        unawaited(_switchTab(_StoryTab.quiz));
+      case _StoryTab.quiz:
+        if (widget.showFinishButton) {
+          _finish();
+        } else {
+          Navigator.pop(context);
+        }
+    }
+  }
+
+  String get _nextTabLabel => switch (_tab) {
+    _StoryTab.story => 'Words',
+    _StoryTab.keywords => 'Grammar',
+    _StoryTab.grammar => 'Quiz',
+    _StoryTab.quiz => widget.showFinishButton ? 'Finish' : 'Done',
+  };
+
+  Future<void> _changeSentence(int index) async {
+    if (index < 0 || index >= _passage.segments.length) return;
+    await _stop();
+    if (!mounted) return;
+    setState(() {
+      _currentSegment = index;
+      _selectedSegment = null;
+    });
   }
 
   Future<void> _stop() async {
@@ -414,10 +480,18 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       listeningLabel: 'Listening. Ask about the story anytime.',
                     ),
                   ),
-                _TabRow(
-                  selected: _tab,
-                  onSelect: (tab) => setState(() => _tab = tab),
-                  grammarTabLabel: widget.grammarTabLabel,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: LessonStageRail(
+                    labels: const ['Read', 'Words', 'Grammar', 'Quiz', 'Done'],
+                    currentIndex: switch (_tab) {
+                      _StoryTab.story => 0,
+                      _StoryTab.keywords => 1,
+                      _StoryTab.grammar => 2,
+                      _StoryTab.quiz => 3,
+                    },
+                    onIndexTap: _goToStage,
+                  ),
                 ),
                 Divider(height: 1, color: DesignTokens.hairline),
                 Expanded(
@@ -444,8 +518,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     onStop: _stop,
                     onPlaySentence: _playSelectedSentence,
                     onCycleRate: _cycleRate,
-                    onContinue: widget.showFinishButton ? _finish : null,
-                  ),
+                    onNext: _advanceTab,
+                    nextLabel: _nextTabLabel,
+                  )
+                else
+                  _StoryNextBar(label: _nextTabLabel, onPressed: _advanceTab),
               ],
             ),
             FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
@@ -469,113 +546,212 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Widget _storyView() {
     final segments = _passage.segments;
-    String? lastCharacter;
+
+    if (segments.isEmpty) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        children: [
+          _StoryBookHeader(story: _story),
+          const SizedBox(height: 18),
+          ModernCard(
+            padding: 20,
+            child: Text(
+              _passage.fullText.isNotEmpty
+                  ? _passage.fullText
+                  : 'This story is still loading. Reopen it after generation finishes.',
+              style: DesignTokens.body(18).copyWith(height: 1.45),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (_readingMode == _StoryReadingMode.fullStory) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        children: [
+          _StoryBookHeader(story: _story),
+          const SizedBox(height: 14),
+          _ReadingModeToggle(
+            mode: _readingMode,
+            onChanged: (mode) => setState(() => _readingMode = mode),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'FULL STORY',
+            style: DesignTokens.label(
+              10,
+            ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
+          ),
+          const SizedBox(height: 10),
+          _sentenceCards(),
+        ],
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       children: [
         _StoryBookHeader(story: _story),
-        const SizedBox(height: 18),
-        for (final entry in segments.asMap().entries)
+        const SizedBox(height: 14),
+        _ReadingModeToggle(
+          mode: _readingMode,
+          onChanged: (mode) => setState(() => _readingMode = mode),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'SENTENCE ${_currentSegment + 1} OF ${segments.length}',
+              style: DesignTokens.label(
+                10,
+              ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
+            ),
+            Text(
+              'Read one line at a time',
+              style: DesignTokens.mono(
+                10,
+              ).copyWith(color: DesignTokens.mutedDim),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _sentenceCard(
+          _currentSegment,
+          segments[_currentSegment],
+          showCharacter: true,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _currentSegment == 0
+                  ? null
+                  : () => _changeSentence(_currentSegment - 1),
+              icon: const Icon(CupertinoIcons.chevron_left, size: 16),
+              label: const Text('Previous'),
+            ),
+            ElevatedButton.icon(
+              onPressed: _currentSegment == segments.length - 1
+                  ? null
+                  : () => _changeSentence(_currentSegment + 1),
+              icon: const Icon(CupertinoIcons.chevron_right, size: 16),
+              label: const Text('Next sentence'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _sentenceCards() {
+    String? lastCharacter;
+    return Column(
+      children: [
+        for (final entry in _passage.segments.asMap().entries)
           Builder(
             builder: (context) {
-              final index = entry.key;
               final segment = entry.value;
               final showCharacter =
                   segment.characterFr != null &&
                   segment.characterFr != lastCharacter;
               lastCharacter = segment.characterFr ?? lastCharacter;
-              // Highlighted either because it's actively playing right now, or
-              // because the learner picked it as where the next play should
-              // start from — see `_selectedSegment`.
-              final isPlayingNow = index == _currentSegment && _isPlaying;
-              final isPicked = !_isPlaying && index == _selectedSegment;
-              final isHighlighted = isPlayingNow || isPicked;
-              return Padding(
-                key: _keyFor(index),
-                padding: const EdgeInsets.only(bottom: 12),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _selectSegment(index),
-                  child: ModernCard(
-                    padding: 16,
-                    child: Container(
-                      padding: isHighlighted
-                          ? const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            )
-                          : EdgeInsets.zero,
-                      decoration: isHighlighted
-                          ? BoxDecoration(
-                              color: DesignTokens.primarySoft,
-                              borderRadius: BorderRadius.circular(
-                                DesignTokens.radiusMedium,
-                              ),
-                            )
-                          : null,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (showCharacter) ...[
-                            Text(
-                              segment.characterFr!,
-                              style:
-                                  DesignTokens.mono(
-                                    11,
-                                    weight: FontWeight.w700,
-                                  ).copyWith(
-                                    color: DesignTokens.mutedDim,
-                                    letterSpacing: 0.8,
-                                  ),
-                            ),
-                            const SizedBox(height: 6),
-                          ],
-                          isPlayingNow
-                              ? _WordHighlightText(
-                                  text: segment.fr,
-                                  currentWord: _currentWord,
-                                  style: DesignTokens.body(
-                                    17,
-                                    weight: FontWeight.w600,
-                                  ).copyWith(height: 1.4),
-                                )
-                              : Text(
-                                  segment.fr,
-                                  style: DesignTokens.body(
-                                    17,
-                                    weight: FontWeight.w600,
-                                  ).copyWith(height: 1.4),
-                                ),
-                          const SizedBox(height: 4),
-                          isPlayingNow
-                              ? _WordHighlightText(
-                                  text: segment.en,
-                                  currentWord: _mappedTranslationWord(
-                                    currentWord: _currentWord,
-                                    source: segment.fr,
-                                    translation: segment.en,
-                                  ),
-                                  style: DesignTokens.body(14.5).copyWith(
-                                    color: DesignTokens.primary,
-                                    height: 1.4,
-                                  ),
-                                )
-                              : Text(
-                                  segment.en,
-                                  style: DesignTokens.body(14.5).copyWith(
-                                    color: DesignTokens.primary,
-                                    height: 1.4,
-                                  ),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              return _sentenceCard(
+                entry.key,
+                segment,
+                showCharacter: showCharacter,
               );
             },
           ),
       ],
+    );
+  }
+
+  Widget _sentenceCard(
+    int index,
+    ReadingSegment segment, {
+    required bool showCharacter,
+  }) {
+    final isPlayingNow = index == _currentSegment && _isPlaying;
+    final isPicked = !_isPlaying && index == _selectedSegment;
+    final isHighlighted = isPlayingNow || isPicked;
+    return Padding(
+      key: _keyFor(index),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _selectSegment(index),
+        child: ModernCard(
+          padding: 16,
+          child: Container(
+            padding: isHighlighted
+                ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
+                : EdgeInsets.zero,
+            decoration: isHighlighted
+                ? BoxDecoration(
+                    color: DesignTokens.primarySoft,
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.radiusMedium,
+                    ),
+                  )
+                : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showCharacter && segment.characterFr != null) ...[
+                  Text(
+                    segment.characterFr!,
+                    style: DesignTokens.mono(11, weight: FontWeight.w700)
+                        .copyWith(
+                          color: DesignTokens.mutedDim,
+                          letterSpacing: 0.8,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                isPlayingNow
+                    ? _WordHighlightText(
+                        text: segment.fr,
+                        currentWord: _currentWord,
+                        style: DesignTokens.body(
+                          17,
+                          weight: FontWeight.w600,
+                        ).copyWith(height: 1.4),
+                      )
+                    : Text(
+                        segment.fr,
+                        style: DesignTokens.body(
+                          17,
+                          weight: FontWeight.w600,
+                        ).copyWith(height: 1.4),
+                      ),
+                if (segment.en.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  isPlayingNow
+                      ? _WordHighlightText(
+                          text: segment.en,
+                          currentWord: _mappedTranslationWord(
+                            currentWord: _currentWord,
+                            source: segment.fr,
+                            translation: segment.en,
+                          ),
+                          style: DesignTokens.body(
+                            14.5,
+                          ).copyWith(color: DesignTokens.primary, height: 1.4),
+                        )
+                      : Text(
+                          segment.en,
+                          style: DesignTokens.body(
+                            14.5,
+                          ).copyWith(color: DesignTokens.primary, height: 1.4),
+                        ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -796,29 +972,17 @@ class _StoryBookHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return ModernCard(
       padding: 0,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              width: 112,
-              height: 168,
-              child: story.coverUrl == null || story.coverUrl!.isEmpty
-                  ? Container(
-                      decoration: const BoxDecoration(
-                        gradient: DesignTokens.heroGradient,
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.book_fill,
-                        color: Colors.white,
-                        size: 34,
-                      ),
-                    )
-                  : Image.network(
-                      story.coverUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
+      child: SizedBox(
+        height: 168,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 112,
+                height: 168,
+                child: story.coverUrl == null || story.coverUrl!.isEmpty
+                    ? Container(
                         decoration: const BoxDecoration(
                           gradient: DesignTokens.heroGradient,
                         ),
@@ -827,47 +991,61 @@ class _StoryBookHeader extends StatelessWidget {
                           color: Colors.white,
                           size: 34,
                         ),
-                      ),
-                    ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${story.levelBand}  •  ${story.readTimeMinutes} min read',
-                      style: DesignTokens.mono(10, weight: FontWeight.w700)
-                          .copyWith(
-                            color: DesignTokens.primary,
-                            letterSpacing: 0.6,
+                      )
+                    : Image.network(
+                        story.coverUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: DesignTokens.heroGradient,
                           ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      story.displayTitle,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.display(19),
-                    ),
-                    if (story.summary.isNotEmpty) ...[
+                          child: const Icon(
+                            CupertinoIcons.book_fill,
+                            color: Colors.white,
+                            size: 34,
+                          ),
+                        ),
+                      ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${story.levelBand}  •  ${story.readTimeMinutes} min read',
+                        style: DesignTokens.mono(10, weight: FontWeight.w700)
+                            .copyWith(
+                              color: DesignTokens.primary,
+                              letterSpacing: 0.6,
+                            ),
+                      ),
                       const SizedBox(height: 8),
                       Text(
-                        story.summary,
+                        story.displayTitle,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.body(
-                          12.5,
-                        ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                        style: DesignTokens.display(19),
                       ),
+                      if (story.summary.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          story.summary,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: DesignTokens.body(
+                            12.5,
+                          ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1132,6 +1310,69 @@ class _GrammarCueCard extends StatelessWidget {
   }
 }
 
+class _ReadingModeToggle extends StatelessWidget {
+  const _ReadingModeToggle({required this.mode, required this.onChanged});
+
+  final _StoryReadingMode mode;
+  final ValueChanged<_StoryReadingMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 46,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Row(
+        children: [
+          _option(
+            label: 'Full story',
+            selected: mode == _StoryReadingMode.fullStory,
+            onTap: () => onChanged(_StoryReadingMode.fullStory),
+          ),
+          _option(
+            label: 'Sentences',
+            selected: mode == _StoryReadingMode.sentenceBySentence,
+            onTap: () => onChanged(_StoryReadingMode.sentenceBySentence),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _option({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: DesignTokens.durationFast,
+          curve: DesignTokens.curveStandard,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? DesignTokens.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+          ),
+          child: Text(
+            label,
+            style: DesignTokens.body(
+              12.5,
+              weight: FontWeight.w600,
+            ).copyWith(color: selected ? Colors.white : DesignTokens.mutedDim),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _WordHighlightText extends StatelessWidget {
   const _WordHighlightText({
     required this.text,
@@ -1186,60 +1427,6 @@ int? _mappedTranslationWord({
 List<String> _wordParts(String text) =>
     text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
 
-class _TabRow extends StatelessWidget {
-  const _TabRow({
-    required this.selected,
-    required this.onSelect,
-    this.grammarTabLabel = 'Grammar',
-  });
-
-  final _StoryTab selected;
-  final ValueChanged<_StoryTab> onSelect;
-  final String grammarTabLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final labels = {
-      _StoryTab.story: 'Story',
-      _StoryTab.grammar: grammarTabLabel,
-      _StoryTab.keywords: 'Keywords',
-      _StoryTab.quiz: 'Quiz',
-    };
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: labels.entries.map((entry) {
-          final isSelected = entry.key == selected;
-          return Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onSelect(entry.key),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: isSelected ? DesignTokens.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  entry.value,
-                  style: DesignTokens.body(13, weight: FontWeight.w600)
-                      .copyWith(
-                        color: isSelected
-                            ? Colors.white
-                            : DesignTokens.mutedDim,
-                      ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
 class _AudioControlBar extends StatelessWidget {
   const _AudioControlBar({
     required this.isPlaying,
@@ -1249,7 +1436,8 @@ class _AudioControlBar extends StatelessWidget {
     required this.onStop,
     required this.onPlaySentence,
     required this.onCycleRate,
-    required this.onContinue,
+    required this.onNext,
+    required this.nextLabel,
   });
 
   final bool isPlaying;
@@ -1259,7 +1447,8 @@ class _AudioControlBar extends StatelessWidget {
   final VoidCallback onStop;
   final VoidCallback onPlaySentence;
   final VoidCallback onCycleRate;
-  final VoidCallback? onContinue;
+  final VoidCallback onNext;
+  final String nextLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -1326,28 +1515,25 @@ class _AudioControlBar extends StatelessWidget {
                 ),
               ),
             ),
-            if (onContinue != null)
-              ElevatedButton(
-                onPressed: onContinue,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: DesignTokens.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusPill,
-                    ),
-                  ),
+            ElevatedButton(
+              onPressed: onNext,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: DesignTokens.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
                 ),
-                child: Text(
-                  'Continue',
-                  style: DesignTokens.body(13.5, weight: FontWeight.w600),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
               ),
+              child: Text(
+                nextLabel,
+                style: DesignTokens.body(13.5, weight: FontWeight.w600),
+              ),
+            ),
           ],
         ),
       ),
@@ -1378,6 +1564,53 @@ class _AudioControlBar extends StatelessWidget {
                 ),
               )
             : Icon(icon, color: Colors.white, size: 18),
+      ),
+    );
+  }
+}
+
+class _StoryNextBar extends StatelessWidget {
+  const _StoryNextBar({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        boxShadow: [
+          BoxShadow(
+            color: DesignTokens.ink.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+            onPressed: onPressed,
+            icon: const Icon(CupertinoIcons.arrow_right, size: 16),
+            label: Text(
+              'Next: $label',
+              style: DesignTokens.body(13.5, weight: FontWeight.w700),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DesignTokens.primary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

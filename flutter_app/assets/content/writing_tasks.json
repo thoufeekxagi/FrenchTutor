@@ -1,6 +1,34 @@
 {
   "tasks": [
     {
+      "id": "w00a",
+      "type": "micro",
+      "title": "One thing I like",
+      "promptFr": "Écris une phrase. Dis ce que tu aimes.",
+      "promptEn": "Write one sentence. Say what you like.",
+      "minWords": 5,
+      "targetConnectors": [],
+      "rubricHints": [
+        "Write one short present-tense sentence.",
+        "Use one familiar word for something you like."
+      ],
+      "levelBand": "A1"
+    },
+    {
+      "id": "w00b",
+      "type": "micro",
+      "title": "My family",
+      "promptFr": "Écris une phrase sur ta famille.",
+      "promptEn": "Write one sentence about your family.",
+      "minWords": 5,
+      "targetConnectors": [],
+      "rubricHints": [
+        "Use a family word.",
+        "Use être or avoir in the present tense."
+      ],
+      "levelBand": "A1"
+    },
+    {
       "id": "w01",
       "type": "email",
       "title": "Email to a friend: your week",

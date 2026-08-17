@@ -10,13 +10,13 @@ import '../../data/database/generated_grammar_story_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/session_recorder.dart';
-import '../lessons/story_reader_screen.dart';
+import '../../services/speak_roadmap_service.dart';
+import '../lessons/grammar_workshop_screen.dart';
+import '../speak/speak_ui.dart';
 
 const _liaisonGrammarPoint = 'Liaison';
 
@@ -24,20 +24,19 @@ const _liaisonGrammarPoint = 'Liaison';
 /// quiz" shape the Grammar lab uses (reusing its exact storage/sync/reader,
 /// tagged `grammarPoint: 'Liaison'`), but for the pronunciation rule
 /// (a normally-silent final consonant gets pronounced because the next word
-/// starts with a vowel sound), not a tense. The level picker here is a
-/// SLIDER the learner sets fresh each time, deliberately independent of
-/// their profile's level — practicing liaison at a level above or below
-/// where they normally sit is a legitimate, deliberate choice, not a
-/// permanent calibration change (that's what Settings -> Level is for).
+/// starts with a vowel sound), not a tense. The level is inherited from the
+/// learner profile so liaison stays aligned with the rest of the foundation
+/// curriculum.
 class LiaisonLabScreen extends ConsumerStatefulWidget {
-  const LiaisonLabScreen({super.key});
+  const LiaisonLabScreen({super.key, this.autoStart = false});
+
+  final bool autoStart;
 
   @override
   ConsumerState<LiaisonLabScreen> createState() => _LiaisonLabScreenState();
 }
 
 class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
-  double _levelIndex = 0;
   bool _isGenerating = false;
   String? _errorText;
   List<GeneratedGrammarStory>? _history;
@@ -45,14 +44,17 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
   @override
   void initState() {
     super.initState();
-    _levelIndex = LearnerLevel.cefrValues
-        .indexOf(ref.read(learningStoreProvider).profile().level)
-        .clamp(0, LearnerLevel.cefrValues.length - 1)
-        .toDouble();
     _loadHistory();
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_practiceLiaison());
+      });
+    }
   }
 
-  String get _selectedLevel => LearnerLevel.cefrValues[_levelIndex.round()];
+  String get _selectedLevel => SpeakCurriculumCatalogLevel.normalise(
+    ref.read(learningStoreProvider).profile().level,
+  );
 
   void _loadHistory() {
     final store = ref.read(generatedGrammarStoryStoreProvider);
@@ -101,21 +103,10 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
       grammarStore.insert(liaisonStory);
       _loadHistory();
 
-      final story = GeneratedStory(
-        id: liaisonStory.id,
-        passage: passage,
-        quiz: generated.quiz,
-        keywords: generated.keywords,
-        createdAt: liaisonStory.createdAt,
-      );
-      final result = await AppRouter.push<StoryReaderResult>(
+      final result = await AppRouter.push<GrammarWorkshopResult>(
         context,
-        (_) => StoryReaderScreen(
-          story: story,
-          showFinishButton: true,
-          grammarExplanation: explanation,
-          grammarTabLabel: 'Liaison',
-        ),
+        (_) =>
+            GrammarWorkshopScreen(story: liaisonStory, showFinishButton: true),
         fullscreenDialog: true,
       );
       if (!mounted) return;
@@ -145,9 +136,16 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
           sessionId: recorder.sessionId,
         ),
       );
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        if (widget.autoStart) Navigator.of(context).pop(result != null);
+      }
     } catch (e) {
       if (!mounted) return;
+      if (widget.autoStart) {
+        Navigator.of(context).pop(false);
+        return;
+      }
       setState(() {
         _isGenerating = false;
         _errorText = "Couldn't generate that practice, try again.";
@@ -200,14 +198,31 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.autoStart) {
+      return Scaffold(
+        backgroundColor: SpeakColors.background,
+        appBar: AppBar(
+          title: Text('Liaison', style: DesignTokens.display(20)),
+          backgroundColor: SpeakColors.background,
+          foregroundColor: SpeakColors.navy,
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
     final history = _history ?? const [];
 
     return Scaffold(
-      backgroundColor: DesignTokens.parchment,
+      backgroundColor: SpeakColors.background,
       appBar: AppBar(
         title: Text('Liaison', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.parchment,
-        foregroundColor: DesignTokens.ink,
+        backgroundColor: SpeakColors.background,
+        foregroundColor: SpeakColors.navy,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
@@ -218,7 +233,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
             const SizedBox(height: 8),
             const KickerText('Practice liaison'),
             const SizedBox(height: 10),
-            PasseportCard(
+            SpeakCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -226,7 +241,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                     'When a silent consonant links to the next word (like "les_amis"), it changes how a sentence sounds. Generate a story built to practice it, then pass the quiz at 80% or better.',
                     style: DesignTokens.body(
                       13,
-                    ).copyWith(color: DesignTokens.slateDim, height: 1.4),
+                    ).copyWith(color: SpeakColors.inkSoft, height: 1.4),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -245,27 +260,13 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                       ),
                     ],
                   ),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: DesignTokens.primary,
-                      thumbColor: DesignTokens.primary,
-                    ),
-                    child: Slider(
-                      value: _levelIndex,
-                      min: 0,
-                      max: (LearnerLevel.cefrValues.length - 1).toDouble(),
-                      divisions: LearnerLevel.cefrValues.length - 1,
-                      label: LearnerLevel.displayLabel(_selectedLevel),
-                      onChanged: (v) => setState(() => _levelIndex = v),
-                    ),
-                  ),
                   const SizedBox(height: 4),
-                  PasseportPrimaryButton(
+                  SpeakPrimaryButton(
                     label: _isGenerating
                         ? 'Building your story…'
                         : 'Generate practice story',
                     icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-                    onPressed: _isGenerating ? null : _practiceLiaison,
+                    onTap: _isGenerating ? () {} : _practiceLiaison,
                   ),
                   if (_errorText != null) ...[
                     const SizedBox(height: 8),
@@ -283,7 +284,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
             if (history.isNotEmpty) ...[
               const KickerText(
                 'Your liaison practice',
-                color: DesignTokens.slateDim,
+                color: SpeakColors.inkSoft,
               ),
               const SizedBox(height: 10),
               for (final entry in history)
@@ -293,17 +294,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                     story: entry,
                     onTap: () => AppRouter.push(
                       context,
-                      (_) => StoryReaderScreen(
-                        story: GeneratedStory(
-                          id: entry.id,
-                          passage: entry.passage,
-                          quiz: entry.quiz,
-                          keywords: entry.keywords,
-                          createdAt: entry.createdAt,
-                        ),
-                        grammarExplanation: entry.explanation,
-                        grammarTabLabel: 'Liaison',
-                      ),
+                      (_) => GrammarWorkshopScreen(story: entry),
                     ),
                   ),
                 ),
@@ -315,7 +306,7 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                   textAlign: TextAlign.center,
                   style: DesignTokens.body(
                     13,
-                  ).copyWith(color: DesignTokens.slateDim),
+                  ).copyWith(color: SpeakColors.inkSoft),
                 ),
               ),
             const SizedBox(height: 32),
@@ -334,8 +325,8 @@ class _LiaisonHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PasseportCard(
-      padding: 0,
+    return SpeakCard(
+      padding: EdgeInsets.zero,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         title: Text(
@@ -360,7 +351,7 @@ class _LiaisonHistoryTile extends StatelessWidget {
                 DateFormat('MMM d, HH:mm').format(story.createdAt),
                 style: DesignTokens.mono(
                   10.5,
-                ).copyWith(color: DesignTokens.slateDim),
+                ).copyWith(color: SpeakColors.inkSoft),
               ),
               if (story.score != null) ...[
                 const SizedBox(width: 8),

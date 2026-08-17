@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
+import '../../models/tutor_persona.dart';
 import '../../widgets/primary_action_button.dart';
 
 class ProductGuideScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
   final _controller = PageController();
   var _index = 0;
 
-  static const _steps = [
+  List<_GuideStep> get _steps => [
     _GuideStep(
       icon: CupertinoIcons.flag_fill,
       title: 'Start with Today’s Mission',
@@ -48,9 +49,9 @@ class _ProductGuideScreenState extends State<ProductGuideScreen> {
     ),
     _GuideStep(
       icon: CupertinoIcons.person_2_fill,
-      title: 'Use the same language with Marie',
+      title: 'Use the same language with ${ActiveTutor.current.displayName}',
       body:
-          'The final roleplay uses the scenario and language you just practised. Marie responds in character, while the app keeps the mission structure.',
+          'The final roleplay uses the scenario and language you just practised. ${ActiveTutor.current.displayName} responds in character, while the app keeps the mission structure.',
     ),
     _GuideStep(
       icon: CupertinoIcons.chart_bar_square_fill,

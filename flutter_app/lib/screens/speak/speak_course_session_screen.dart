@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
@@ -47,6 +48,7 @@ class _SpeakCourseSessionScreenState
     skills: {},
     seconds: 0,
   );
+  SpeakSkill? _selectedSkill;
   SpeakRoadmapSession get session => widget.session;
 
   String get _level => session.contentKey.split('_').first;
@@ -54,7 +56,14 @@ class _SpeakCourseSessionScreenState
   /// One course session is one guided loop. The catalog owns the order; the
   /// screen should not invent a second menu of competing destinations.
   List<SpeakSkill> get _activities {
-    final ordered = <SpeakSkill>[...session.activitySkills];
+    // A1 foundation practice is self-contained in the alphabet lab. The lab
+    // already teaches and rehearses the sounds, so never attach the generic
+    // live-conversation route (which belongs to later course situations).
+    final ordered = <SpeakSkill>[
+      ...session.activitySkills.where(
+        (skill) => !_isAlphabetFoundation || skill != SpeakSkill.speaking,
+      ),
+    ];
     final unique = <SpeakSkill>[];
     for (final skill in ordered) {
       if (!unique.contains(skill)) unique.add(skill);
@@ -69,6 +78,19 @@ class _SpeakCourseSessionScreenState
     return null;
   }
 
+  bool get _isAlphabetFoundation =>
+      _level == 'A1' && session.unit == 1 && session.index <= 2;
+
+  String get _activityTopic =>
+      _isAlphabetFoundation ? session.title : session.unitTitle;
+
+  SpeakSkill? _firstIncomplete(CourseActivityProgress progress) {
+    for (final skill in _activities) {
+      if (!progress.skills.contains(skill)) return skill;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +100,18 @@ class _SpeakCourseSessionScreenState
 
   Future<void> _loadProgress() async {
     final progress = await _courseProgress.read(session.contentKey);
-    if (mounted) setState(() => _activityProgress = progress);
+    if (mounted) {
+      setState(() {
+        _activityProgress = progress;
+        _selectedSkill ??=
+            _firstIncomplete(progress) ??
+            (_activities.isEmpty ? null : _activities.first);
+      });
+    }
+  }
+
+  void _selectSkill(SpeakSkill skill) {
+    setState(() => _selectedSkill = skill);
   }
 
   Future<void> _openActivity(SpeakSkill skill) async {
@@ -90,7 +123,7 @@ class _SpeakCourseSessionScreenState
       );
       if (!allowed || !mounted) return;
       LessonSpeechService.shared.deactivate();
-      await AppRouter.push<bool>(
+      await AppRouter.push<SpeakingResult>(
         context,
         (_) => SessionScreen(
           apiKey: ApiKeys.geminiKey,
@@ -125,6 +158,9 @@ class _SpeakCourseSessionScreenState
     final loopComplete = await _courseProgress.shouldAutoComplete(
       contentKey: session.contentKey,
       estimatedMinutes: session.estimatedMinutes,
+      requiredSkills: _isAlphabetFoundation
+          ? const {SpeakSkill.alphabet, SpeakSkill.vocabulary}
+          : null,
     );
     if (!alreadyRecorded && loopComplete) {
       storage.markCourseSessionCompleted(
@@ -136,6 +172,9 @@ class _SpeakCourseSessionScreenState
     if (mounted) {
       setState(() {
         _activityProgress = progress;
+        if (_selectedSkill == skill) {
+          _selectedSkill = _firstIncomplete(progress) ?? skill;
+        }
       });
     }
   }
@@ -153,15 +192,15 @@ class _SpeakCourseSessionScreenState
       SpeakSkill.alphabet => AlphabetLabScreen(deckId: _alphabetDeckId),
       SpeakSkill.connectors => const ConnectorsLabScreen(),
       SpeakSkill.liaison => const LiaisonLabScreen(),
-      SpeakSkill.grammar => GrammarLabScreen(topic: session.unitTitle),
-      SpeakSkill.listening => ListeningLabScreen(topic: session.unitTitle),
-      SpeakSkill.reading => ReadingLibraryScreen(topic: session.unitTitle),
+      SpeakSkill.grammar => GrammarLabScreen(topic: _activityTopic),
+      SpeakSkill.listening => ListeningLabScreen(topic: _activityTopic),
+      SpeakSkill.reading => ReadingLibraryScreen(topic: _activityTopic),
       SpeakSkill.writing => WritingLabScreen(
-        topic: session.unitTitle,
+        topic: _activityTopic,
         contextPrompt: contextPrompt,
       ),
       SpeakSkill.vocabulary => SpeakCourseVocabularyScreen(
-        topic: session.unitTitle,
+        topic: _activityTopic,
         sessionTitle: session.title,
         contextPrompt: contextPrompt,
         contentKey: session.contentKey,
@@ -184,7 +223,7 @@ class _SpeakCourseSessionScreenState
   }
 
   String? get _alphabetDeckId {
-    if (session.unit != 1) return null;
+    if (!_isAlphabetFoundation) return null;
     return switch (session.index % 10) {
       0 => 'learn_alphabet',
       1 => 'learn_vowels',
@@ -207,14 +246,23 @@ class _SpeakCourseSessionScreenState
   @override
   Widget build(BuildContext context) {
     final language = SpeakLanguageProfile.forLevel(_level);
+    final contextTitle = _isAlphabetFoundation
+        ? session.title
+        : session.unitTitle;
+    final contextHint = _isAlphabetFoundation
+        ? 'Learn the sound, connect it to a simple word, then practise it.'
+        : language.sessionHint;
     final nextSkill = _nextSkill;
     final canFinish = nextSkill == null;
+    final selectedSkill =
+        _selectedSkill ??
+        (nextSkill ?? (_activities.isEmpty ? null : _activities.first));
     return SpeakScaffold(
       child: Column(
         children: [
           SpeakHeader(
             title: 'Course session',
-            subtitle: '${session.unitTitle} · ${session.estimatedMinutes} min',
+            subtitle: '$_activityTopic · ${session.estimatedMinutes} min',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
               child: const Icon(
@@ -266,7 +314,7 @@ class _SpeakCourseSessionScreenState
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              session.unitTitle,
+                              contextTitle,
                               style: DesignTokens.body(
                                 17,
                                 weight: FontWeight.w700,
@@ -274,7 +322,7 @@ class _SpeakCourseSessionScreenState
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              language.sessionHint,
+                              contextHint,
                               style: DesignTokens.body(
                                 12,
                               ).copyWith(color: SpeakColors.inkSoft),
@@ -299,7 +347,7 @@ class _SpeakCourseSessionScreenState
                   _activityRow(
                     _activities[i],
                     index: i,
-                    active: !canFinish && _activities[i] == nextSkill,
+                    active: _activities[i] == selectedSkill,
                     complete: _activityProgress.skills.contains(_activities[i]),
                   ),
                   const SizedBox(height: 8),
@@ -311,13 +359,19 @@ class _SpeakCourseSessionScreenState
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
             child: Column(
               children: [
-                SpeakPrimaryButton(
-                  label: canFinish
-                      ? 'Finish session'
-                      : 'Start ${nextSkill.label.toLowerCase()}',
-                  icon: Icons.arrow_forward_rounded,
-                  onTap: canFinish ? _complete : () => _openActivity(nextSkill),
-                ),
+                if (selectedSkill != null)
+                  SpeakPrimaryButton(
+                    label: 'Start ${selectedSkill.label.toLowerCase()}',
+                    icon: Icons.arrow_forward_rounded,
+                    onTap: () => _openActivity(selectedSkill),
+                  ),
+                if (canFinish) ...[
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: _complete,
+                    child: const Text('Finish session'),
+                  ),
+                ],
               ],
             ),
           ),
@@ -332,66 +386,68 @@ class _SpeakCourseSessionScreenState
     required bool active,
     required bool complete,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      decoration: BoxDecoration(
-        color: active ? SpeakColors.blue : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: active ? SpeakColors.blue : SpeakColors.line),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: active ? Colors.white24 : SpeakColors.blueSoft,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _iconFor(skill),
-              color: active ? Colors.white : SpeakColors.blue,
-              size: 19,
-            ),
+    return GestureDetector(
+      onTap: () => _selectSkill(skill),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        decoration: BoxDecoration(
+          color: active ? SpeakColors.blue : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: active ? SpeakColors.blue : SpeakColors.line,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  active
-                      ? '${index + 1}. ${skill.label} · next'
-                      : '${index + 1}. ${skill.label}',
-                  style: DesignTokens.body(
-                    14,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: active ? Colors.white : SpeakColors.navy),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  skill.description,
-                  style: DesignTokens.body(11).copyWith(
-                    color: active ? Colors.white70 : SpeakColors.inkSoft,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: active ? Colors.white24 : SpeakColors.blueSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _iconFor(skill),
+                color: active ? Colors.white : SpeakColors.blue,
+                size: 19,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${index + 1}. ${skill.label}',
+                    style: DesignTokens.body(
+                      14,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: active ? Colors.white : SpeakColors.navy),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 3),
+                  Text(
+                    skill.description,
+                    style: DesignTokens.body(11).copyWith(
+                      color: active ? Colors.white70 : SpeakColors.inkSoft,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Icon(
-            complete
-                ? Icons.check_circle_rounded
-                : active
-                ? Icons.arrow_forward_rounded
-                : Icons.lock_outline_rounded,
-            size: 18,
-            color: complete
-                ? SpeakColors.blue
-                : active
-                ? Colors.white
-                : SpeakColors.inkSoft,
-          ),
-        ],
+            Radio<SpeakSkill>(
+              value: skill,
+              groupValue: _selectedSkill,
+              onChanged: (_) => _selectSkill(skill),
+              activeColor: active ? Colors.white : SpeakColors.blue,
+            ),
+            if (complete)
+              Icon(
+                Icons.check_circle_rounded,
+                size: 18,
+                color: active ? Colors.white : SpeakColors.blue,
+              ),
+          ],
+        ),
       ),
     );
   }

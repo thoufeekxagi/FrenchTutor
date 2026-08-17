@@ -99,7 +99,7 @@ class ProgressScreen extends ConsumerWidget {
 
               _sectionHeading(
                 'Mastery',
-                'Measured from the work you have completed.',
+                'Your cumulative skill progress from completed work.',
               ),
               const SizedBox(height: DesignTokens.space5),
               ...skills.map(_buildSkill),
@@ -108,8 +108,8 @@ class ProgressScreen extends ConsumerWidget {
               const SizedBox(height: 32),
 
               _sectionHeading(
-                'Practice by category',
-                'Where your last 30 days of sessions went.',
+                'Your 30-day rhythm',
+                'How your recent sessions were distributed — not a mastery score.',
               ),
               const SizedBox(height: DesignTokens.space4),
               _buildCategoryBreakdown(categories),
@@ -171,11 +171,11 @@ class ProgressScreen extends ConsumerWidget {
           children: [
             WebCardGrid(
               minTileWidth: 440,
-              children: [
-                WebCard(child: _buildWeekCard(week, days)),
-                WebCard(child: _buildCategoryBreakdown(categories)),
-              ],
+              children: [WebCard(child: _buildWeekCard(week, days))],
             ),
+            const SizedBox(height: DesignTokens.space6),
+            const WebSectionHeader(title: 'Your 30-day rhythm'),
+            WebCard(child: _buildCategoryBreakdown(categories)),
             if (recalledWords.isNotEmpty || recalledIds.isNotEmpty) ...[
               const SizedBox(height: DesignTokens.space6),
               const WebSectionHeader(title: 'Recall evidence'),
@@ -285,7 +285,7 @@ class ProgressScreen extends ConsumerWidget {
       0,
       (total, day) => total + day.categoriesDone,
     );
-    return PasseportCard(
+    return ModernCard(
       padding: DesignTokens.space5,
       child: Row(
         children: [
@@ -373,11 +373,9 @@ class ProgressScreen extends ConsumerWidget {
         : skill.fraction > 0
         ? 'Building'
         : 'Review';
-    final stateColor = state == 'Ready'
-        ? DesignTokens.success
-        : state == 'Building'
-        ? DesignTokens.primary
-        : DesignTokens.mutedDim;
+    final stateColor = state == 'Review'
+        ? DesignTokens.mutedDim
+        : DesignTokens.primary;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: DesignTokens.space5),
@@ -388,13 +386,13 @@ class ProgressScreen extends ConsumerWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: DesignTokens.successSoft,
+              color: DesignTokens.infoSoft,
               borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
             ),
             child: Icon(
               _iconForSkill(skill.name),
               size: 21,
-              color: DesignTokens.success,
+              color: DesignTokens.primary,
             ),
           ),
           const SizedBox(width: DesignTokens.space3),
@@ -442,7 +440,7 @@ class ProgressScreen extends ConsumerWidget {
   }
 
   Widget _buildNextRecommendation(BuildContext context) {
-    return PasseportCard(
+    return ModernCard(
       padding: DesignTokens.space5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,57 +496,63 @@ class ProgressScreen extends ConsumerWidget {
       );
     }
 
-    return PasseportCard(
-      padding: DesignTokens.space5,
+    return ModernCard(
+      padding: DesignTokens.space4,
       child: Column(
-        children: categories.map((c) {
-          final fraction = total > 0 ? c.count / total : 0.0;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: DesignTokens.space4),
-            child: Row(
-              children: [
-                Icon(
-                  _iconForCategory(c.category),
-                  size: 18,
-                  color: DesignTokens.primary,
-                ),
-                const SizedBox(width: DesignTokens.space3),
-                SizedBox(
-                  width: 84,
-                  child: Text(
-                    c.category,
-                    style: DesignTokens.body(13.5, weight: FontWeight.w600),
-                  ),
-                ),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusSmall,
-                    ),
-                    child: LinearProgressIndicator(
-                      value: fraction,
-                      minHeight: 8,
-                      backgroundColor: DesignTokens.canvasDim,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        DesignTokens.primary,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: DesignTokens.space3),
-                SizedBox(
-                  width: 26,
-                  child: Text(
-                    '${c.count}',
-                    textAlign: TextAlign.right,
-                    style: DesignTokens.mono(13, weight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
+        children: [
+          for (var i = 0; i < categories.length; i++) ...[
+            if (i > 0) const Divider(height: 20, color: DesignTokens.canvasDim),
+            _categoryMetric(categories[i], total),
+          ],
+        ],
       ),
+    );
+  }
+
+  Widget _categoryMetric(({String category, int count}) category, int total) {
+    final percent = total == 0 ? 0 : (category.count / total * 100).round();
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: DesignTokens.infoSoft,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            _iconForCategory(category.category),
+            size: 18,
+            color: DesignTokens.primary,
+          ),
+        ),
+        const SizedBox(width: DesignTokens.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                category.category,
+                style: DesignTokens.body(14, weight: FontWeight.w600),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${category.count} session${category.count == 1 ? '' : 's'} · $percent% of recent practice',
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.mutedDim),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          '${category.count}',
+          style: DesignTokens.mono(
+            16,
+            weight: FontWeight.w700,
+          ).copyWith(color: DesignTokens.primary),
+        ),
+      ],
     );
   }
 
@@ -569,7 +573,7 @@ class ProgressScreen extends ConsumerWidget {
         ),
       );
     }
-    return PasseportCard(
+    return ModernCard(
       padding: DesignTokens.space2,
       child: Column(
         children: [
