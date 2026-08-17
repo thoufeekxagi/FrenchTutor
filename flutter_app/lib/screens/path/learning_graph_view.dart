@@ -21,10 +21,12 @@ class FingerprintView extends StatefulWidget {
     super.key,
     required this.store,
     required this.content,
+    this.height = 320,
   });
 
   final LearningStore store;
   final ContentService content;
+  final double height;
 
   @override
   State<FingerprintView> createState() => _FingerprintViewState();
@@ -75,7 +77,7 @@ class _FingerprintViewState extends State<FingerprintView> {
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
-            height: 320,
+            height: widget.height,
             child: Stack(
               children: [
                 // The dark backdrop lives here, OUTSIDE the InteractiveViewer,
@@ -94,6 +96,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                     child: InteractiveViewer(
                       transformationController: _transform,
                       constrained: false,
+                      alignment: Alignment.center,
                       boundaryMargin: const EdgeInsets.all(240),
                       minScale: 0.45,
                       maxScale: 3.5,

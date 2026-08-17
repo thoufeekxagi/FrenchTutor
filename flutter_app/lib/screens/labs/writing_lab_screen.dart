@@ -22,11 +22,17 @@ class WritingLabScreen extends ConsumerStatefulWidget {
     this.topic,
     this.contextPrompt,
     this.autoStart = false,
+    this.examName,
+    this.examLevel,
+    this.examMode = false,
   });
 
   final String? topic;
   final String? contextPrompt;
   final bool autoStart;
+  final String? examName;
+  final String? examLevel;
+  final bool examMode;
 
   @override
   ConsumerState<WritingLabScreen> createState() => _WritingLabScreenState();
@@ -51,12 +57,14 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
 
   void _loadHistory() {
     if (!mounted) return;
+    if (widget.examMode) return;
     setState(
       () => _history = ref.read(generatedWritingTaskStoreProvider).list(),
     );
   }
 
   Future<void> _refreshHistory() async {
+    if (widget.examMode) return;
     try {
       await ref.read(syncServiceProvider).hydrateGeneratedWritingTasks();
     } catch (error, stackTrace) {
@@ -74,48 +82,58 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
       final store = ref.read(learningStoreProvider);
       final content = ref.read(contentServiceProvider);
       final profile = store.profile();
-      final mistakeTags = store.topMistakeTags();
-      final diary = store.recentDiaryEntries();
       final task = await ref
           .read(lessonAgentServiceProvider)
           .generateWritingTask(
-            levelBand: profile.level,
+            levelBand: widget.examLevel ?? profile.level,
             topic: widget.topic,
             contextPrompt: widget.contextPrompt,
             knownVocab: content.knownVocabWords(store.allSRSStates()),
-            mistakeTags: mistakeTags
-                .map(
-                  (m) =>
-                      (tag: m.tag, description: m.description, count: m.count),
-                )
-                .toList(),
-            recentDiary: diary.map((d) => d.summary).toList(),
           );
       if (!mounted) return;
       final generated = GeneratedWritingTask(
         task: task,
         createdAt: DateTime.now(),
       );
-      ref.read(generatedWritingTaskStoreProvider).insert(generated);
-      _loadHistory();
-      unawaited(_generateCover(generated));
+      final examAttemptId = widget.examMode
+          ? ref
+                .read(examPracticeStoreProvider)
+                .startMetadata(
+                  examName: widget.examName ?? 'Exam practice',
+                  levelBand: widget.examLevel ?? task.levelBand,
+                  skill: 'writing',
+                  content: {'kind': 'writing', 'task': task.toJson()},
+                )
+          : null;
+      if (!widget.examMode) {
+        ref.read(generatedWritingTaskStoreProvider).insert(generated);
+        _loadHistory();
+        unawaited(_generateCover(generated));
+      }
       setState(() => _isGenerating = false);
       // Warm the fixed prompt while the workshop opens. The live tutor call
       // remains uncached; only this deterministic lesson line is pre-generated.
-      unawaited(
-        LessonSpeechService.shared.prewarmNarration([
-          SpeechItem(
-            text: task.promptFr,
-            language: 'fr-FR',
-            contentItemId: 'writing:${task.id}:prompt',
-          ),
-        ]),
-      );
+      if (!widget.examMode) {
+        unawaited(
+          LessonSpeechService.shared.prewarmNarration([
+            SpeechItem(
+              text: task.promptFr,
+              language: 'fr-FR',
+              contentItemId: 'writing:${task.id}:prompt',
+            ),
+          ]),
+        );
+      }
       final result = await AppRouter.push<bool>(
         context,
         (_) => WritingWorkshopScreen(task: task),
         fullscreenDialog: widget.autoStart,
       );
+      if (widget.examMode && examAttemptId != null && result == true) {
+        ref
+            .read(examPracticeStoreProvider)
+            .complete(id: examAttemptId, score: 1, total: 1);
+      }
       if (widget.autoStart && mounted) {
         Navigator.of(context).pop(result ?? false);
       }

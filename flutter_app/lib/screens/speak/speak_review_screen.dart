@@ -30,10 +30,10 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final material = ReviewMaterialService.recent(
+    final sessions = ReviewMaterialService.recentSessions(
       ref.watch(storageServiceProvider),
     );
-    final canStart = material.isNotEmpty;
+    final canStart = sessions.isNotEmpty;
 
     return SpeakScaffold(
       child: ListView(
@@ -104,7 +104,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'Built from your ten most recent transcript turns.',
+                            'Built from your 10 most recent practice sessions.',
                             style: DesignTokens.body(
                               12,
                             ).copyWith(color: SpeakColors.inkSoft),
@@ -115,12 +115,12 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                SpeakProgressBar(value: material.length / 10),
+                SpeakProgressBar(value: sessions.length / 10),
                 const SizedBox(height: 10),
                 Row(
                   children: [
                     Text(
-                      '${material.length} ${material.length == 1 ? 'phrase' : 'phrases'} ready',
+                      '${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'} ready',
                       style: DesignTokens.body(12, weight: FontWeight.w600),
                     ),
                     const Spacer(),
@@ -141,7 +141,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                           context,
                           (_) => SpeakReviewLaunchScreen(
                             mode: _mode,
-                            material: material,
+                            sessions: sessions,
                           ),
                           fullscreenDialog: true,
                         )
@@ -153,10 +153,10 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
           const SizedBox(height: 26),
           const SpeakSectionTitle(title: 'Recent practice'),
           const SizedBox(height: 12),
-          if (material.isEmpty)
+          if (sessions.isEmpty)
             const SpeakCard(
               child: Text(
-                'Finish a speaking, listening, story, or roleplay session and its transcript will appear here.',
+                'Finish a practice session and its summary will appear here.',
               ),
             )
           else
@@ -164,10 +164,10 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  for (var i = 0; i < material.length; i++) ...[
+                  for (var i = 0; i < sessions.length; i++) ...[
                     if (i > 0)
                       const Divider(height: 1, color: SpeakColors.line),
-                    _materialRow(material[i]),
+                    _materialRow(sessions[i]),
                   ],
                 ],
               ),
@@ -186,20 +186,19 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
     );
   }
 
-  Widget _materialRow(ReviewPhrase phrase) {
-    final speaker = phrase.role == 'assistant' ? 'Tutor' : 'You';
+  Widget _materialRow(ReviewSessionSummary session) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            phrase.text,
+            session.summary,
             style: DesignTokens.body(14, weight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
           Text(
-            '$speaker · ${phrase.source}',
+            '${session.skill} · ${session.displayTitle}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: DesignTokens.body(11).copyWith(color: SpeakColors.inkSoft),
@@ -224,17 +223,17 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
   };
 }
 
-/// Generates the selected review format from the learner's real recent
-/// material, then hands off to the same lesson screens used everywhere else.
+/// Generates the selected review format from completed-session summaries,
+/// then hands off to the same lesson screens used everywhere else.
 class SpeakReviewLaunchScreen extends ConsumerStatefulWidget {
   const SpeakReviewLaunchScreen({
     super.key,
     required this.mode,
-    required this.material,
+    required this.sessions,
   });
 
   final SpeakReviewMode mode;
-  final List<ReviewPhrase> material;
+  final List<ReviewSessionSummary> sessions;
 
   @override
   ConsumerState<SpeakReviewLaunchScreen> createState() =>
@@ -260,7 +259,7 @@ class _SpeakReviewLaunchScreenState
         case SpeakReviewMode.speaking:
           await AppRouter.push(
             context,
-            (_) => SpeakReviewDetailScreen(phrases: widget.material),
+            (_) => SpeakReviewDetailScreen(sessions: widget.sessions),
             fullscreenDialog: true,
           );
         case SpeakReviewMode.listening:
@@ -439,16 +438,8 @@ class _SpeakReviewLaunchScreenState
   }
 
   String _reviewTopic() {
-    final context = widget.material
-        .map(
-          (phrase) =>
-              '${phrase.role == 'assistant' ? 'Tutor' : 'Learner'}: ${phrase.text}',
-        )
-        .join('\n');
-    final clipped = context.length > 1200
-        ? context.substring(0, 1200)
-        : context;
-    return 'Create a fresh review lesson that naturally reuses these recent practice lines:\n$clipped';
+    final context = ReviewMaterialService.promptContext(widget.sessions);
+    return 'Create a fresh review lesson that reinforces what the learner practised in these recent sessions. Use the summaries as learning context, not as a transcript to repeat verbatim:\n$context';
   }
 
   String _levelFor(String raw) {
@@ -503,7 +494,7 @@ class _SpeakReviewLaunchScreenState
                       const SizedBox(height: 8),
                       Text(
                         _error == null
-                            ? 'Your latest transcript turns are being woven into a fresh lesson.'
+                            ? 'Your recent session summaries are being woven into a fresh lesson.'
                             : 'Your recent practice is still safe. You can retry this review.',
                         style: DesignTokens.body(
                           13,

@@ -251,6 +251,15 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
               _haptics,
               (value) => setState(() => _haptics = value),
             ),
+            _toggleRow(
+              Icons.edit_note_rounded,
+              'Floating notetaker',
+              'Keep a draggable note bubble available during lessons',
+              ref.read(notetakerStateProvider).isEnabled,
+              (value) => setState(
+                () => ref.read(notetakerStateProvider).isEnabled = value,
+              ),
+            ),
           ]),
           const SizedBox(height: 20),
           _section('Learning', [

@@ -108,6 +108,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
             else
               ResponsiveCardGrid(
                 itemCount: visible.length,
+                maxColumns: 5,
                 maxCardWidth: 176,
                 mainAxisExtent: 294,
                 itemBuilder: (context, index) {

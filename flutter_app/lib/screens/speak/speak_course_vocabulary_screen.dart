@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../design/tokens.dart';
+import '../../data/content_service.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../models/tutor_persona.dart';
@@ -13,6 +15,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/speak_language_profile.dart';
 import 'speak_ui.dart';
 import '../../widgets/tts_play_button.dart';
+import '../lessons/vocabulary_workshop_screen.dart';
 
 /// The first stage of every course session. It is generated for the selected
 /// course item and intentionally separate from the global SRS vocab lab so a
@@ -43,6 +46,7 @@ class SpeakCourseVocabularyScreen extends ConsumerStatefulWidget {
 class _SpeakCourseVocabularyScreenState
     extends ConsumerState<SpeakCourseVocabularyScreen> {
   static final _uuid = Uuid();
+  static final _random = Random();
 
   late final TutorPersona _tutor = ActiveTutor.current;
   List<VocabEntry> _words = const [];
@@ -54,29 +58,10 @@ class _SpeakCourseVocabularyScreenState
   SpeakLanguageProfile get _language =>
       SpeakLanguageProfile.forLevel(widget.levelBand);
 
-  bool get _isFoundationDeck {
-    final search = '${widget.topic} ${widget.sessionTitle} ${widget.contentKey}'
-        .toLowerCase();
-    return search.contains('alphabet') ||
-        search.contains('vowel') ||
-        search.contains('voyelle');
-  }
-
-  int get _deckSize {
-    if (_isFoundationDeck) {
-      // Foundation sessions need enough examples to connect sound training
-      // to the speaking step. They remain single-word, A1-safe cards.
-      return switch (_language.level) {
-        'A1' || 'A2' => 5,
-        _ => 6,
-      };
-    }
-    return switch (_language.level) {
-      'A1' => 1,
-      'A2' => 2,
-      _ => 3,
-    };
-  }
+  // Keep the course bridge small enough to feel quick, but never fall back to
+  // the old one-word card. The number is frozen for the lifetime of this
+  // lesson so every stage works from the same deck.
+  late final int _deckSize = 3 + _random.nextInt(3);
 
   VocabEntry? get _current =>
       _words.isEmpty || _index >= _words.length ? null : _words[_index];
@@ -125,11 +110,12 @@ class _SpeakCourseVocabularyScreenState
         if (words.length < _deckSize) rethrow;
       }
       if (generatedLive) {
+        final setId = _uuid.v4();
         ref
             .read(generatedVocabularySetStoreProvider)
             .insert(
               GeneratedVocabularySet(
-                id: _uuid.v4(),
+                id: setId,
                 title: widget.sessionTitle,
                 summary: 'Contextual vocabulary for ${widget.topic}.',
                 topic: widget.topic,
@@ -138,6 +124,7 @@ class _SpeakCourseVocabularyScreenState
                 createdAt: DateTime.now(),
               ),
             );
+        unawaited(_attachCover(setId, widget.sessionTitle, words));
       }
       if (mounted) {
         setState(() {
@@ -186,6 +173,29 @@ class _SpeakCourseVocabularyScreenState
         if (entries.length == _deckSize) return entries;
       }
     }
+
+    // The bundled course dictionary is the legacy source of truth. It is
+    // still useful as a contextual fallback, but it is now rendered by the
+    // modern workshop rather than by the legacy one-word screen.
+    final legacyEntries = ContentService.shared.vocabPhases
+        .expand((phase) => phase.themes.expand((theme) => theme.entries))
+        .toList(growable: false);
+    final tokens = query
+        .split(RegExp(r'[^a-zàâçéèêëîïôœùûüÿñ]+'))
+        .where((token) => token.length > 2)
+        .toSet();
+    final contextual = legacyEntries.where((entry) {
+      final haystack = '${entry.fr} ${entry.en}'.toLowerCase();
+      return tokens.any(haystack.contains);
+    }).toList()..shuffle(_random);
+    final remaining =
+        legacyEntries.where((entry) => !contextual.contains(entry)).toList()
+          ..shuffle(_random);
+    for (final entry in [...contextual, ...remaining]) {
+      final key = entry.fr.trim().toLowerCase();
+      if (key.isNotEmpty && seen.add(key)) entries.add(entry);
+      if (entries.length == _deckSize) return entries;
+    }
     return entries;
   }
 
@@ -199,7 +209,16 @@ class _SpeakCourseVocabularyScreenState
     final singleWords = words
         .where((word) => !word.fr.trim().contains(RegExp(r'\s')))
         .toList(growable: false);
-    return singleWords.take(_deckSize).toList(growable: false);
+    if (singleWords.length >= _deckSize) {
+      return singleWords.take(_deckSize).toList(growable: false);
+    }
+    // If a small generated/contextual set contains a useful phrase, use it
+    // only to fill the deck rather than collapsing the lesson to one word.
+    final seen = singleWords.map((word) => word.fr.toLowerCase()).toSet();
+    return [
+      ...singleWords,
+      ...words.where((word) => seen.add(word.fr.toLowerCase())),
+    ].take(_deckSize).toList(growable: false);
   }
 
   void _retry() {
@@ -226,6 +245,36 @@ class _SpeakCourseVocabularyScreenState
     );
   }
 
+  Future<void> _attachCover(
+    String id,
+    String title,
+    List<VocabEntry> words,
+  ) async {
+    try {
+      final wordList = words
+          .map((word) => '${word.fr} (${word.en})')
+          .join(', ');
+      final bytes = await ref
+          .read(lessonAgentServiceProvider)
+          .generateStoryCover(
+            title: title,
+            summary: 'Vocabulary for ${widget.topic}. Words: $wordList.',
+            topic: widget.topic,
+            levelBand: _language.level,
+            coverPrompt:
+                'Create one coherent real-life learning scene for a French vocabulary study set about ${widget.topic}. Represent these exact words visually: $wordList. Use objects, actions, or a natural setting, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+          );
+      final url = await ref
+          .read(syncServiceProvider)
+          .uploadStoryCover(storyId: id, bytes: bytes);
+      if (url != null && url.isNotEmpty) {
+        ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
+      }
+    } catch (error) {
+      debugPrint('Course vocabulary cover failed: $error');
+    }
+  }
+
   void _next() {
     if (_index >= _words.length - 1) {
       setState(() => _finished = true);
@@ -247,6 +296,20 @@ class _SpeakCourseVocabularyScreenState
 
   @override
   Widget build(BuildContext context) {
+    if (!_loading && _error == null && _words.isNotEmpty) {
+      return VocabularyWorkshopScreen(
+        phase: 1,
+        theme: VocabTheme(
+          id: widget.contentKey,
+          title: widget.sessionTitle,
+          entries: _words,
+        ),
+        initialDeck: _words,
+        contentItemPrefix: '${widget.contentKey}:vocabulary',
+        focusNote:
+            '$_deckSize words selected for ${widget.sessionTitle}. The audio is prepared while you preview the deck.',
+      );
+    }
     final word = _current;
     return SpeakScaffold(
       child: Column(

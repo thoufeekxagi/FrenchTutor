@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
@@ -10,7 +9,6 @@ import '../../data/database/generated_roleplay_store.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
-import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
@@ -36,17 +34,6 @@ const _roleplayScenarioCategories = {
   'Shopping':
       'shopping for clothes or groceries, asking about sizes, prices, or availability',
 };
-
-// Fallback pool for when nothing's picked and there's no relevant onboarding
-// interest to draw on — mirrors the story library's `_storyTopics`.
-const _roleplayScenarios = [
-  'ordering food at a small restaurant',
-  'checking into a hotel after a long trip',
-  'asking for directions to the train station',
-  'buying a ticket at a station kiosk',
-  'shopping for a gift at a local market',
-  'meeting a new neighbour for the first time',
-];
 
 /// A standalone roleplay practice lab — pick (or randomize) a real-life
 /// scenario and get a freshly generated scene, walked through in the same
@@ -123,10 +110,9 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     if (_generating) return;
     setState(() => _generating = true);
     try {
-      final profile = ref.read(learningStoreProvider).profile();
       final scene = await LessonAgentService.shared.buildStandaloneRoleplay(
-        scenario: _scenarioFor(profile),
-        levelBand: profile.level,
+        scenario: _scenarioFor(),
+        levelBand: ref.read(learningStoreProvider).profile().level,
       );
       final roleplay = GeneratedRoleplay(
         id: newGeneratedRoleplayId(),
@@ -245,22 +231,17 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
   }
 
   /// If the learner tapped a scenario chip, use its full description
-  /// directly. Otherwise pick fully at random from a pool mixing the fixed
-  /// categories, the onboarding interests, and the generic fallback pool as
-  /// equal citizens — same rationale as the story library's `_topicFor`.
-  String _scenarioFor(Profile profile) {
+  /// directly. Otherwise return null so Surprise me stays genuinely open.
+  String? _scenarioFor() {
     if (widget.topic != null && widget.topic!.trim().isNotEmpty) {
       return widget.topic!;
     }
     if (_selectedScenario != null) {
       return _roleplayScenarioCategories[_selectedScenario]!;
     }
-    final pool = [
-      ..._roleplayScenarioCategories.values,
-      ...profile.interests.map((i) => 'a roleplay scenario related to $i'),
-      ..._roleplayScenarios,
-    ];
-    return pool[Random().nextInt(pool.length)];
+    // Null is intentional: Surprise me must not inject onboarding interests
+    // or the small legacy scenario pool into the generation prompt.
+    return null;
   }
 
   Future<bool> _openRoleplay(GeneratedRoleplay roleplay) async {

@@ -1058,10 +1058,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     KickerText('Account', color: DesignTokens.mutedDim),
                     const SizedBox(height: 4),
                     _SettingsRow(
-                      label: 'Signed in as',
+                      label: 'Account name',
+                      value: AuthService.shared.signedInDisplayName,
+                    ),
+                    Divider(height: 1, color: DesignTokens.hairline),
+                    _SettingsRow(
+                      label: 'Email',
                       value:
-                          AuthService.shared.currentSession?.user.email ??
-                          'Signed in',
+                          AuthService.shared.signedInEmail ??
+                          'Not provided by this sign-in',
+                    ),
+                    Divider(height: 1, color: DesignTokens.hairline),
+                    _SettingsRow(
+                      label: 'Signed in with',
+                      value: AuthService.shared.signedInProvider,
+                    ),
+                    Divider(height: 1, color: DesignTokens.hairline),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Your password is never displayed in the app.',
+                        style: DesignTokens.body(
+                          11.5,
+                        ).copyWith(color: DesignTokens.mutedDim),
+                      ),
                     ),
                     Divider(height: 1, color: DesignTokens.hairline),
                     GestureDetector(

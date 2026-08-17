@@ -13,6 +13,7 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/exam_practice_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
@@ -128,6 +129,10 @@ final generatedVocabularySetStoreProvider =
         ref.watch(syncServiceProvider),
       );
     });
+
+final examPracticeStoreProvider = Provider<ExamPracticeStore>((ref) {
+  return ExamPracticeStore(ref.watch(databaseProvider));
+});
 
 final starterContentServiceProvider = Provider<StarterContentService>((ref) {
   return StarterContentService(

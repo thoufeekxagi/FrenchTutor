@@ -17,11 +17,11 @@ class SpeakReviewDetailScreen extends ConsumerStatefulWidget {
   const SpeakReviewDetailScreen({
     super.key,
     this.mode = SpeakReviewMode.speaking,
-    this.phrases,
+    this.sessions,
   });
 
   final SpeakReviewMode mode;
-  final List<ReviewPhrase>? phrases;
+  final List<ReviewSessionSummary>? sessions;
 
   @override
   ConsumerState<SpeakReviewDetailScreen> createState() =>
@@ -30,31 +30,34 @@ class SpeakReviewDetailScreen extends ConsumerStatefulWidget {
 
 class _SpeakReviewDetailScreenState
     extends ConsumerState<SpeakReviewDetailScreen> {
-  late final List<ReviewPhrase> _phrases;
+  late final List<ReviewSessionSummary> _sessions;
   var _index = 0;
   var _showContext = false;
 
   @override
   void initState() {
     super.initState();
-    _phrases =
-        widget.phrases ??
-        ReviewMaterialService.recent(ref.read(storageServiceProvider));
-    if (_phrases.isNotEmpty) unawaited(_warmReviewAudio());
+    _sessions =
+        widget.sessions ??
+        ReviewMaterialService.recentSessions(ref.read(storageServiceProvider));
+    if (_sessions.isNotEmpty) unawaited(_warmReviewAudio());
   }
 
   Future<void> _warmReviewAudio() {
     return GeminiLiveAudioService.shared.warmDeck(
       voiceName: ActiveTutor.current.voiceName,
       items: [
-        for (var index = 0; index < _phrases.length; index++)
-          (text: _phrases[index].text, contentItemId: 'speak-review:$index'),
+        for (var index = 0; index < _sessions.length; index++)
+          (
+            text: _sessions[index].summary,
+            contentItemId: 'speak-review:$index',
+          ),
       ],
     );
   }
 
   void _next() {
-    if (_index == _phrases.length - 1) {
+    if (_index == _sessions.length - 1) {
       Navigator.of(context).pop(true);
       return;
     }
@@ -66,8 +69,8 @@ class _SpeakReviewDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    if (_phrases.isEmpty) return _emptyState();
-    final phrase = _phrases[_index];
+    if (_sessions.isEmpty) return _emptyState();
+    final session = _sessions[_index];
     return SpeakScaffold(
       child: Column(
         children: [
@@ -85,11 +88,11 @@ class _SpeakReviewDetailScreenState
               ),
             ),
             title: _modeTitle,
-            subtitle: 'Recent practice · ${_index + 1} of ${_phrases.length}',
+            subtitle: 'Recent practice · ${_index + 1} of ${_sessions.length}',
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(40, 12, 40, 0),
-            child: SpeakProgressBar(value: (_index + 1) / _phrases.length),
+            child: SpeakProgressBar(value: (_index + 1) / _sessions.length),
           ),
           Expanded(
             child: Center(
@@ -103,7 +106,7 @@ class _SpeakReviewDetailScreenState
                       Row(
                         children: [
                           Text(
-                            'PHRASE ${_index + 1} OF ${_phrases.length}',
+                            'SESSION ${_index + 1} OF ${_sessions.length}',
                             style: DesignTokens.label(10).copyWith(
                               color: SpeakColors.inkSoft,
                               letterSpacing: 1,
@@ -111,7 +114,7 @@ class _SpeakReviewDetailScreenState
                           ),
                           const Spacer(),
                           Text(
-                            phrase.role == 'assistant' ? 'TUTOR' : 'YOU',
+                            session.skill.toUpperCase(),
                             style: DesignTokens.label(10).copyWith(
                               color: SpeakColors.inkSoft,
                               letterSpacing: 1,
@@ -121,7 +124,7 @@ class _SpeakReviewDetailScreenState
                       ),
                       const SizedBox(height: 38),
                       Text(
-                        phrase.text,
+                        session.summary,
                         textAlign: TextAlign.center,
                         style: DesignTokens.display(
                           30,
@@ -132,8 +135,8 @@ class _SpeakReviewDetailScreenState
                         duration: const Duration(milliseconds: 180),
                         child: _showContext
                             ? Text(
-                                'From ${phrase.source}',
-                                key: ValueKey(phrase.source),
+                                '${session.displayTitle} · ${session.skill}',
+                                key: ValueKey(session.sessionId),
                                 textAlign: TextAlign.center,
                                 style: DesignTokens.body(
                                   17,
@@ -153,12 +156,12 @@ class _SpeakReviewDetailScreenState
                               ),
                       ),
                       const SizedBox(height: 34),
-                      _listenAction(phrase.text),
+                      _listenAction(session.summary),
                       const SizedBox(height: 28),
                       const Divider(color: SpeakColors.line),
                       const SizedBox(height: 14),
                       Text(
-                        'Say the phrase naturally before continuing.',
+                        'Review this session summary before continuing.',
                         textAlign: TextAlign.center,
                         style: DesignTokens.body(
                           12,
@@ -173,10 +176,10 @@ class _SpeakReviewDetailScreenState
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
             child: SpeakPrimaryButton(
-              label: _index == _phrases.length - 1
+              label: _index == _sessions.length - 1
                   ? 'Finish review'
                   : 'Tap to continue',
-              icon: _index == _phrases.length - 1
+              icon: _index == _sessions.length - 1
                   ? Icons.check_rounded
                   : Icons.arrow_forward_rounded,
               onTap: _next,
@@ -213,7 +216,7 @@ class _SpeakReviewDetailScreenState
                 child: SpeakCard(
                   color: SpeakColors.blueSoft,
                   child: Text(
-                    'There is no recent transcript to review yet. Finish a practice session first.',
+                    'There is no completed practice session to review yet. Finish a session first and your review will grow from its summary.',
                   ),
                 ),
               ),
@@ -224,11 +227,11 @@ class _SpeakReviewDetailScreenState
     );
   }
 
-  Widget _listenAction(String phrase) {
+  Widget _listenAction(String summary) {
     return Column(
       children: [
         TtsPlayButton(
-          text: phrase,
+          text: summary,
           size: 28,
           iconSize: 22,
           color: SpeakColors.blue,

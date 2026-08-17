@@ -13,7 +13,9 @@ import '../../providers/database_provider.dart';
 import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/speak_language_profile.dart';
 import '../../widgets/learning_card.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../../widgets/lesson_stage_rail.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/report_problem_button.dart';
@@ -34,10 +36,16 @@ class VocabularyWorkshopScreen extends ConsumerStatefulWidget {
     super.key,
     required this.phase,
     required this.theme,
+    this.initialDeck,
+    this.contentItemPrefix,
+    this.focusNote,
   });
 
   final int phase;
   final VocabTheme theme;
+  final List<VocabEntry>? initialDeck;
+  final String? contentItemPrefix;
+  final String? focusNote;
 
   @override
   ConsumerState<VocabularyWorkshopScreen> createState() =>
@@ -51,10 +59,13 @@ class _VocabularyWorkshopScreenState
   _VocabularyStep _step = _VocabularyStep.preview;
   List<VocabEntry> _deck = const [];
   List<List<VocabEntry>> _contextChoices = const [];
+  final Map<String, BilingualExample> _contextExamples = {};
+  bool _contextLoading = true;
   bool _loading = true;
   String? _error;
   int _index = 0;
   bool _revealed = false;
+  bool _showRecallRating = false;
   int? _selectedContextChoice;
   bool _contextChecked = false;
   final _sentenceController = TextEditingController();
@@ -78,6 +89,9 @@ class _VocabularyWorkshopScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Vocabulary';
+    });
     unawaited(_loadDeck());
   }
 
@@ -90,25 +104,34 @@ class _VocabularyWorkshopScreenState
 
   Future<void> _loadDeck() async {
     try {
-      final srs = ref.read(srsServiceProvider);
-      List<VocabEntry> queued = const [];
-      try {
-        queued = await srs.buildQueue(
+      final supplied = widget.initialDeck;
+      late final List<VocabEntry> deck;
+      if (supplied != null) {
+        deck = supplied.take(_deckSize).toList(growable: false);
+      } else {
+        final srs = ref.read(srsServiceProvider);
+        List<VocabEntry> queued = const [];
+        try {
+          queued = await srs.buildQueue(
+            phase: widget.phase,
+            themeId: widget.theme.id,
+            limit: _deckSize,
+          );
+        } catch (_) {
+          // A generated library card is valid even before it is enrolled in
+          // the global SRS queue.
+        }
+        final all = srs.allEntries(
           phase: widget.phase,
           themeId: widget.theme.id,
-          limit: _deckSize,
         );
-      } catch (_) {
-        // A generated library card is valid even before it is enrolled in the
-        // global SRS queue.
+        final seen = queued.map((word) => word.id).toSet();
+        deck = [
+          ...queued,
+          ...all.where((word) => !seen.contains(word.id)),
+          ...widget.theme.entries.where((word) => !seen.contains(word.id)),
+        ].take(_deckSize).toList(growable: false);
       }
-      final all = srs.allEntries(phase: widget.phase, themeId: widget.theme.id);
-      final seen = queued.map((word) => word.id).toSet();
-      final deck = [
-        ...queued,
-        ...all.where((word) => !seen.contains(word.id)),
-        ...widget.theme.entries.where((word) => !seen.contains(word.id)),
-      ].take(_deckSize).toList(growable: false);
       if (deck.isEmpty) {
         throw StateError('This vocabulary set has no usable words.');
       }
@@ -116,8 +139,11 @@ class _VocabularyWorkshopScreenState
       setState(() {
         _deck = deck;
         _contextChoices = _buildContextChoices(deck);
+        _contextLoading = true;
         _loading = false;
       });
+      unawaited(_warmDeckAudio(deck));
+      unawaited(_prepareContextExamples(deck));
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -131,8 +157,56 @@ class _VocabularyWorkshopScreenState
   List<List<VocabEntry>> _buildContextChoices(List<VocabEntry> deck) {
     return [
       for (var i = 0; i < deck.length; i++)
-        [deck[i], ...deck.where((word) => word.id != deck[i].id).take(2)],
+        () {
+          final candidates = [
+            deck[i],
+            ...deck.where((word) => word.id != deck[i].id).take(2),
+          ];
+          final offset = (i + 1) % candidates.length;
+          return [...candidates.skip(offset), ...candidates.take(offset)];
+        }(),
     ];
+  }
+
+  Future<void> _prepareContextExamples(List<VocabEntry> deck) async {
+    final content = ref.read(contentServiceProvider);
+    final profile = ref.read(learningStoreProvider).profile();
+    final level = SpeakLanguageProfile.forProfile(profile).level;
+    final prepared = <String, BilingualExample>{};
+
+    await Future.wait(
+      deck.map((word) async {
+        final bundled = content.vocabExamples(word.id);
+        if (bundled != null && _appearsInExample(word, bundled)) {
+          prepared[word.id] = bundled;
+          return;
+        }
+
+        try {
+          final generated = await LessonAgentService.shared
+              .generateVocabularyContext(word: word, levelBand: level);
+          if (_appearsInExample(word, generated)) {
+            prepared[word.id] = generated;
+            return;
+          }
+        } catch (_) {
+          // Keep the lesson usable offline if the live quality check cannot
+          // complete; the deterministic fallback still produces a real cloze.
+        }
+        prepared[word.id] = BilingualExample(
+          fr: 'Je vois ${word.fr}.',
+          en: 'I see ${word.en}.',
+        );
+      }),
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _contextExamples
+        ..clear()
+        ..addAll(prepared);
+      _contextLoading = false;
+    });
   }
 
   BilingualExample _exampleFor(VocabEntry word) {
@@ -143,8 +217,31 @@ class _VocabularyWorkshopScreenState
         );
   }
 
+  String _audioId(String entryId, [String suffix = 'word']) {
+    final prefix = widget.contentItemPrefix ?? 'vocab';
+    return '$prefix:$entryId:$suffix';
+  }
+
+  Future<void> _warmDeckAudio(List<VocabEntry> deck) {
+    final items = <({String text, String contentItemId})>[];
+    for (final word in deck) {
+      items.add((text: word.fr, contentItemId: _audioId(word.id)));
+      final example = _exampleFor(word);
+      items.add((
+        text: example.fr,
+        contentItemId: _audioId(word.id, 'example'),
+      ));
+    }
+    return GeminiLiveAudioService.shared.warmDeck(
+      voiceName: _tutor.voiceName,
+      items: items,
+    );
+  }
+
   bool _appearsInExample(VocabEntry word, BilingualExample example) {
-    return _fold(example.fr).contains(_fold(word.fr));
+    final sentence = _fold(example.fr).replaceAll(RegExp(r'[^a-z0-9]+'), ' ');
+    final target = _fold(word.fr).replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+    return target.isNotEmpty && ' $sentence '.contains(' $target ');
   }
 
   String _fold(String text) {
@@ -173,6 +270,7 @@ class _VocabularyWorkshopScreenState
       _step = step;
       _index = 0;
       _revealed = false;
+      _showRecallRating = false;
       _selectedContextChoice = null;
       _contextChecked = false;
       _sentenceController.clear();
@@ -188,6 +286,7 @@ class _VocabularyWorkshopScreenState
     setState(() {
       _index++;
       _revealed = false;
+      _showRecallRating = false;
       _selectedContextChoice = null;
       _contextChecked = false;
       _sentenceController.clear();
@@ -207,7 +306,22 @@ class _VocabularyWorkshopScreenState
               ? SRSResponseType.unaided
               : SRSResponseType.hinted,
         );
-    setState(() => _recallGrades[word.id] = grade);
+    setState(() {
+      _recallGrades[word.id] = grade;
+      _showRecallRating = false;
+    });
+  }
+
+  void _previousRecallWord() {
+    if (_index == 0) return;
+    setState(() {
+      _index--;
+      _revealed = false;
+      _showRecallRating = false;
+    });
+  }
+
+  void _nextRecallWord() {
     _nextWord(afterLast: _VocabularyStep.context);
   }
 
@@ -287,6 +401,7 @@ class _VocabularyWorkshopScreenState
       _step = _VocabularyStep.recall;
       _index = 0;
       _revealed = false;
+      _showRecallRating = false;
       _selectedContextChoice = null;
       _contextChecked = false;
     });
@@ -309,33 +424,38 @@ class _VocabularyWorkshopScreenState
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: WebConstrainedView(
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-            ? _errorView()
-            : ListView(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
-                children: [
-                  LessonStageRail(
-                    labels: const [
-                      'Preview',
-                      'Learn',
-                      'Recall',
-                      'Context',
-                      'Use',
-                      'Done',
+      body: Stack(
+        children: [
+          WebConstrainedView(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                ? _errorView()
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+                    children: [
+                      LessonStageRail(
+                        labels: const [
+                          'Preview',
+                          'Learn',
+                          'Recall',
+                          'Context',
+                          'Use',
+                          'Done',
+                        ],
+                        currentIndex: _VocabularyStep.values.indexOf(_step),
+                      ),
+                      const SizedBox(height: 18),
+                      _content(),
+                      const SizedBox(height: 22),
+                      ReportProblemButton(
+                        sessionType: 'Vocabulary: ${widget.theme.title}',
+                      ),
                     ],
-                    currentIndex: _VocabularyStep.values.indexOf(_step),
                   ),
-                  const SizedBox(height: 18),
-                  _content(),
-                  const SizedBox(height: 22),
-                  ReportProblemButton(
-                    sessionType: 'Vocabulary: ${widget.theme.title}',
-                  ),
-                ],
-              ),
+          ),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+        ],
       ),
     );
   }
@@ -400,7 +520,8 @@ class _VocabularyWorkshopScreenState
         ),
         const SizedBox(height: 8),
         Text(
-          'Your deck is ready locally. No live call or word generation blocks the lesson.',
+          widget.focusNote ??
+              'Your deck is ready locally. Audio is prepared in the background so the lesson stays fast.',
           style: DesignTokens.body(
             14,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
@@ -476,10 +597,10 @@ class _VocabularyWorkshopScreenState
                   const Spacer(),
                   TtsPlayButton(
                     text: word.fr,
-                    contentItemId: 'vocab_${word.id}',
+                    contentItemId: _audioId(word.id),
                     audioResolver: () => GeminiLiveAudioService.shared.resolve(
                       text: word.fr,
-                      contentItemId: 'vocab_${word.id}',
+                      contentItemId: _audioId(word.id),
                       voiceName: _tutor.voiceName,
                     ),
                   ),
@@ -517,10 +638,10 @@ class _VocabularyWorkshopScreenState
                   TtsPlayButton(
                     text: example.fr,
                     size: 36,
-                    contentItemId: 'vocab_${word.id}_example',
+                    contentItemId: _audioId(word.id, 'example'),
                     audioResolver: () => GeminiLiveAudioService.shared.resolve(
                       text: example.fr,
-                      contentItemId: 'vocab_${word.id}_example',
+                      contentItemId: _audioId(word.id, 'example'),
                       voiceName: _tutor.voiceName,
                     ),
                   ),
@@ -572,6 +693,7 @@ class _VocabularyWorkshopScreenState
 
   Widget _recallView() {
     final word = _current!;
+    final selectedGrade = _recallGrades[word.id];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -587,65 +709,156 @@ class _VocabularyWorkshopScreenState
         ),
         const SizedBox(height: 16),
         LearningCard(
+          color: DesignTokens.primary.withValues(alpha: 0.06),
+          borderColor: DesignTokens.primary.withValues(alpha: 0.14),
+          padding: 28,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                word.fr,
-                textAlign: TextAlign.center,
-                style: DesignTokens.display(32),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                word.phonetic,
-                style: DesignTokens.mono(
-                  12,
-                ).copyWith(color: DesignTokens.primary),
-              ),
-              const SizedBox(height: 20),
-              if (_revealed)
-                Text(
-                  word.en,
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.body(20, weight: FontWeight.w700),
-                )
-              else
-                TextButton.icon(
-                  onPressed: () => setState(() => _revealed = true),
-                  icon: const Icon(CupertinoIcons.eye),
-                  label: const Text('Reveal meaning'),
+              ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 278),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '${_index + 1}/${_deck.length}',
+                          style: DesignTokens.mono(
+                            11,
+                            weight: FontWeight.w700,
+                          ).copyWith(color: DesignTokens.primary),
+                        ),
+                        const Spacer(),
+                        TtsPlayButton(
+                          text: word.fr,
+                          contentItemId: _audioId(word.id),
+                          audioResolver: () =>
+                              GeminiLiveAudioService.shared.resolve(
+                                text: word.fr,
+                                contentItemId: _audioId(word.id),
+                                voiceName: _tutor.voiceName,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Text(
+                      word.fr,
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.display(38),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      word.phonetic,
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.mono(
+                        13,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                    const SizedBox(height: 24),
+                    if (_revealed)
+                      Text(
+                        word.en,
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.body(22, weight: FontWeight.w700),
+                      )
+                    else
+                      OutlinedButton.icon(
+                        onPressed: () => setState(() => _revealed = true),
+                        icon: const Icon(CupertinoIcons.eye, size: 18),
+                        label: const Text('Reveal meaning'),
+                      ),
+                    const Spacer(),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 18),
-        Text(
-          'How did it feel?',
-          style: DesignTokens.body(14, weight: FontWeight.w700),
+        const SizedBox(height: 10),
+        LearningCard(
+          padding: 4,
+          child: Column(
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                leading: Icon(
+                  selectedGrade == null
+                      ? CupertinoIcons.slider_horizontal_3
+                      : CupertinoIcons.checkmark_circle,
+                  size: 19,
+                  color: selectedGrade == null
+                      ? DesignTokens.mutedDim
+                      : DesignTokens.success,
+                ),
+                title: Text(
+                  selectedGrade == null ? 'How did it feel?' : 'Recall rated',
+                  style: DesignTokens.body(13, weight: FontWeight.w700),
+                ),
+                subtitle: const Text('Optional'),
+                trailing: Icon(
+                  _showRecallRating
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
+                  size: 17,
+                  color: DesignTokens.mutedDim,
+                ),
+                onTap: () =>
+                    setState(() => _showRecallRating = !_showRecallRating),
+              ),
+              if (_showRecallRating) ...[
+                const Divider(height: 1),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _GradeButton(
+                        label: 'Again',
+                        color: DesignTokens.primary,
+                        onTap: () => _gradeRecall(SRSGrade.again),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _GradeButton(
+                        label: 'Needed help',
+                        color: DesignTokens.info,
+                        onTap: () => _gradeRecall(SRSGrade.hard),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _GradeButton(
+                        label: 'I knew it',
+                        color: DesignTokens.success,
+                        onTap: () => _gradeRecall(SRSGrade.good),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              ],
+            ],
+          ),
         ),
-        const SizedBox(height: 9),
+        const SizedBox(height: 14),
         Row(
           children: [
             Expanded(
-              child: _GradeButton(
-                label: 'Again',
-                color: DesignTokens.primary,
-                onTap: () => _gradeRecall(SRSGrade.again),
+              child: OutlinedButton.icon(
+                onPressed: _index == 0 ? null : _previousRecallWord,
+                icon: const Icon(CupertinoIcons.chevron_left, size: 17),
+                label: const Text('Back'),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Expanded(
-              child: _GradeButton(
-                label: 'Needed help',
-                color: DesignTokens.info,
-                onTap: () => _gradeRecall(SRSGrade.hard),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _GradeButton(
-                label: 'I knew it',
-                color: DesignTokens.success,
-                onTap: () => _gradeRecall(SRSGrade.good),
+              child: PrimaryActionButton(
+                label: _index == _deck.length - 1 ? 'Next step' : 'Next word',
+                icon: CupertinoIcons.arrow_right,
+                onPressed: _nextRecallWord,
               ),
             ),
           ],
@@ -656,38 +869,56 @@ class _VocabularyWorkshopScreenState
 
   Widget _contextView() {
     final word = _current!;
-    final example = _exampleFor(word);
-    final isCloze = _appearsInExample(word, example);
+    if (_contextLoading) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _StepLabel(number: '04', title: 'Context'),
+          const SizedBox(height: 10),
+          Text('Fill in the blank.', style: DesignTokens.display(27)),
+          const SizedBox(height: 8),
+          Text(
+            'Preparing a sentence that uses each word naturally.',
+            style: DesignTokens.body(
+              14,
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+          ),
+          const SizedBox(height: 28),
+          const Center(child: CircularProgressIndicator()),
+        ],
+      );
+    }
+
+    final example =
+        _contextExamples[word.id] ??
+        BilingualExample(fr: 'Je vois ${word.fr}.', en: 'I see ${word.en}.');
     final choices = _contextChoices[_index];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _StepLabel(number: '04', title: 'Context'),
         const SizedBox(height: 10),
-        Text('Choose the word that belongs.', style: DesignTokens.display(27)),
+        Text('Fill in the blank.', style: DesignTokens.display(27)),
         const SizedBox(height: 8),
         Text(
-          isCloze
-              ? 'Meaning is easier to remember when the sentence does the work.'
-              : 'Use the English meaning to place the word in a useful sentence.',
+          'Use the sentence to retrieve the word, then check your choice.',
           style: DesignTokens.body(
             14,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
         ),
         const SizedBox(height: 16),
-        LearningCard(
-          color: DesignTokens.success.withValues(alpha: 0.07),
-          borderColor: DesignTokens.success.withValues(alpha: 0.17),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isCloze
-                    ? example.fr.replaceFirst(word.fr, '_____')
-                    : example.en,
-                style: DesignTokens.display(21).copyWith(height: 1.35),
-              ),
-              if (isCloze) ...[
+        SizedBox(
+          width: double.infinity,
+          child: LearningCard(
+            color: DesignTokens.success.withValues(alpha: 0.07),
+            borderColor: DesignTokens.success.withValues(alpha: 0.17),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _maskTarget(example.fr, word.fr),
+                  style: DesignTokens.display(21).copyWith(height: 1.35),
+                ),
                 const SizedBox(height: 6),
                 Text(
                   example.en,
@@ -696,7 +927,7 @@ class _VocabularyWorkshopScreenState
                   ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -746,6 +977,12 @@ class _VocabularyWorkshopScreenState
           ),
       ],
     );
+  }
+
+  String _maskTarget(String sentence, String target) {
+    final start = sentence.toLowerCase().indexOf(target.toLowerCase());
+    if (start < 0) return sentence;
+    return '${sentence.substring(0, start)}_____${sentence.substring(start + target.length)}';
   }
 
   Widget _produceView() {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../widgets/adaptive/adaptive.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -11,12 +13,14 @@ import '../../models/content_models.dart';
 import '../../models/daily_session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/speak_language_profile.dart';
 import '../../services/srs_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/primary_action_button.dart';
 import 'agent_led_vocab_screen.dart';
+import '../lessons/vocabulary_workshop_screen.dart';
 
-enum _PickerMode { auto, category }
+enum _PickerMode { auto, category, custom }
 
 /// Sits in front of the vocab stage so today's word list isn't always a black-box auto-pick.
 /// Two modes: fully automatic (today's mixed SRS queue, unchanged default), and a
@@ -36,7 +40,14 @@ class VocabPickerScreen extends ConsumerStatefulWidget {
 class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   _PickerMode _mode = _PickerMode.auto;
   final Set<String> _manualSelection = {};
+  final _customController = TextEditingController();
   bool _isPlanning = false;
+
+  @override
+  void dispose() {
+    _customController.dispose();
+    super.dispose();
+  }
 
   Set<String> get _knownIds {
     final store = ref.read(learningStoreProvider);
@@ -73,9 +84,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
   /// `SRSService.autoQueueSize` is currently set to (capped by how many the
   /// pool actually has, for a very sparse bank).
   Future<int> _autoQueueDisplayCount(int poolSize) async {
-    if (widget.preferredEntryIds != null) return poolSize;
+    if (widget.preferredEntryIds != null) return poolSize.clamp(0, 5).toInt();
     final target = await SRSService.autoQueueSize;
-    return poolSize < target ? poolSize : target;
+    return (poolSize < target ? poolSize : target).clamp(0, 5).toInt();
   }
 
   /// Today's interrupted session, if any — planned words minus practiced ones.
@@ -203,6 +214,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                         segments: const [
                           (value: _PickerMode.auto, label: 'Recommended'),
                           (value: _PickerMode.category, label: 'By category'),
+                          (value: _PickerMode.custom, label: 'Custom'),
                         ],
                         selected: _mode,
                         onChanged: (mode) => setState(() => _mode = mode),
@@ -213,7 +225,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                         widget.preferredEntryIds != null ||
                             _mode == _PickerMode.auto
                         ? _autoBody()
-                        : _categoryBody(),
+                        : _mode == _PickerMode.category
+                        ? _categoryBody()
+                        : _customBody(),
                   ),
                 ],
               ),
@@ -278,84 +292,294 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     required bool isLoading,
     required int displayCount,
   }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.screenMargin,
-        DesignTokens.space6,
-        DesignTokens.screenMargin,
-        DesignTokens.space5,
+    final previewWords = queue.take(displayCount).toList(growable: false);
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              DesignTokens.screenMargin,
+              DesignTokens.space7,
+              DesignTokens.screenMargin,
+              DesignTokens.space5,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 76,
+                  height: 76,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.infoSoft,
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.rectangle_stack_fill,
+                    color: DesignTokens.info,
+                    size: 31,
+                  ),
+                ),
+                const SizedBox(height: DesignTokens.space5),
+                KickerText(
+                  isLoading ? 'Preparing your set' : 'Today’s vocabulary',
+                  color: DesignTokens.info,
+                ),
+                const SizedBox(height: DesignTokens.space2),
+                Text(
+                  isLoading
+                      ? 'Building a useful set for you.'
+                      : '$displayCount words ready',
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.display(30),
+                ),
+                const SizedBox(height: DesignTokens.space3),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Text(
+                    widget.preferredEntryIds == null
+                        ? 'A fresh mix of due reviews and new words, chosen for today’s practice.'
+                        : 'A focused set selected for your current mission. Learn these before moving on.',
+                    textAlign: TextAlign.center,
+                    style: DesignTokens.body(
+                      15,
+                    ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
+                  ),
+                ),
+                if (isLoading) ...[
+                  const SizedBox(height: DesignTokens.space6),
+                  const SizedBox(width: 132, child: PSProgressIndicator()),
+                ] else if (queue.isEmpty) ...[
+                  const SizedBox(height: DesignTokens.space5),
+                  _emptyRecommendedWordsNotice(),
+                ] else ...[
+                  const SizedBox(height: DesignTokens.space6),
+                  _wordSetPreview(previewWords, displayCount),
+                ],
+              ],
+            ),
+          ),
+        ),
+        SafeArea(
+          top: false,
+          minimum: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          child: PrimaryActionButton(
+            label: queue.isEmpty
+                ? 'No recommended words yet'
+                : 'Start $displayCount-word practice',
+            icon: CupertinoIcons.arrow_right,
+            onPressed: isLoading || queue.isEmpty
+                ? null
+                : () => _beginSession(queue, curateFromPool: true),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _wordSetPreview(List<VocabEntry> words, int displayCount) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(),
-          Container(
-            width: 52,
-            height: 52,
-            decoration: const BoxDecoration(
-              color: DesignTokens.infoSoft,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              CupertinoIcons.rectangle_stack_fill,
-              color: DesignTokens.info,
-              size: 23,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.space5),
-          Text(
-            isLoading
-                ? 'Building today’s word queue'
-                : '$displayCount words ready',
-            style: DesignTokens.display(26),
-          ),
-          const SizedBox(height: DesignTokens.space3),
-          Text(
-            widget.preferredEntryIds == null
-                ? 'A personalized mix, curated fresh from your due reviews and new words each time, never the same set on repeat.'
-                : 'These words were selected for your current mission. Finish them before moving to the next mission step.',
-            style: DesignTokens.body(
-              15,
-            ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
-          ),
-          if (isLoading) ...[
-            const SizedBox(height: DesignTokens.space5),
-            const PSProgressIndicator(),
-          ] else if (queue.isEmpty) ...[
-            const SizedBox(height: DesignTokens.space4),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(DesignTokens.space4),
-              decoration: BoxDecoration(
-                color: DesignTokens.infoSoft,
-                borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          Row(
+            children: [
+              Text(
+                'Your first set',
+                style: DesignTokens.body(13, weight: FontWeight.w700),
               ),
-              child: Text(
-                'No words are due right now. Choose a category to practice specific words.',
-                style: DesignTokens.body(14).copyWith(height: 1.4),
+              const Spacer(),
+              Text(
+                '$displayCount words',
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.mutedDim),
               ),
-            ),
-          ],
-          const Spacer(),
-          SafeArea(
-            top: false,
-            minimum: const EdgeInsets.only(bottom: 8),
-            child: PrimaryActionButton(
-              label: queue.isEmpty
-                  ? 'No recommended words yet'
-                  : 'Start $displayCount-word practice',
-              icon: CupertinoIcons.arrow_right,
-              onPressed: isLoading || queue.isEmpty
-                  ? null
-                  : () => _beginSession(queue, curateFromPool: true),
-            ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final word in words)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    color: DesignTokens.primarySoft,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    word.fr,
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.primaryDeep),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
     );
   }
 
+  Widget _emptyRecommendedWordsNotice() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(DesignTokens.space4),
+      decoration: BoxDecoration(
+        color: DesignTokens.infoSoft,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+      ),
+      child: Text(
+        'No words are due right now. Choose a category to practise specific words.',
+        textAlign: TextAlign.center,
+        style: DesignTokens.body(14).copyWith(height: 1.4),
+      ),
+    );
+  }
+
   // MARK: - Category mode
+
+  Widget _customBody() {
+    final profile = ref.read(learningStoreProvider).profile();
+    final level = SpeakLanguageProfile.forProfile(profile).level;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.screenMargin,
+        DesignTokens.space6,
+        DesignTokens.screenMargin,
+        DesignTokens.space5,
+      ),
+      children: [
+        const Icon(CupertinoIcons.sparkles, color: DesignTokens.info, size: 30),
+        const SizedBox(height: DesignTokens.space4),
+        Text('Build a custom five-word set', style: DesignTokens.display(26)),
+        const SizedBox(height: DesignTokens.space2),
+        Text(
+          'Tell the tutor what you want to practise. The words will match your $level level and use the same Preview → Learn → Recall flow.',
+          style: DesignTokens.body(
+            14,
+          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
+        ),
+        const SizedBox(height: DesignTokens.space5),
+        TextField(
+          controller: _customController,
+          maxLines: 3,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            labelText: 'What should the words be about?',
+            hintText: 'Numbers, travel, food, work…',
+            alignLabelWithHint: true,
+          ),
+        ),
+        const SizedBox(height: DesignTokens.space5),
+        PrimaryActionButton(
+          label: 'Generate five words',
+          icon: CupertinoIcons.arrow_right,
+          onPressed: _isPlanning ? null : _beginCustomSession,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _beginCustomSession() async {
+    final prompt = _customController.text.trim();
+    if (prompt.isEmpty) return;
+    setState(() => _isPlanning = true);
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      final level = SpeakLanguageProfile.forProfile(profile).level;
+      final words = await LessonAgentService.shared.generateCourseVocabulary(
+        levelBand: level,
+        unitTitle: 'Custom vocabulary',
+        sessionTitle: prompt,
+        contextPrompt: 'Create a useful five-word set about: $prompt',
+        targetPhrases: const [],
+        count: 5,
+      );
+      if (words.length < 5) throw StateError('Incomplete vocabulary set');
+      final id = 'custom-vocabulary-${DateTime.now().microsecondsSinceEpoch}';
+      ref
+          .read(generatedVocabularySetStoreProvider)
+          .insert(
+            GeneratedVocabularySet(
+              id: id,
+              title: prompt,
+              summary: 'Custom vocabulary for $prompt.',
+              topic: prompt,
+              levelBand: level,
+              entries: words.take(5).toList(growable: false),
+              createdAt: DateTime.now(),
+            ),
+          );
+      unawaited(_attachCustomCover(id, prompt, level, words.take(5).toList()));
+      if (!mounted) return;
+      setState(() => _isPlanning = false);
+      await AppRouter.push<bool>(
+        context,
+        (_) => VocabularyWorkshopScreen(
+          phase: 1,
+          theme: VocabTheme(id: id, title: prompt, entries: words),
+          initialDeck: words.take(5).toList(growable: false),
+          contentItemPrefix: id,
+          focusNote:
+              'Custom words generated for your $level level. Audio is prepared while you preview the deck.',
+        ),
+        fullscreenDialog: true,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isPlanning = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not generate that word set yet.'),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _attachCustomCover(
+    String id,
+    String topic,
+    String level,
+    List<VocabEntry> words,
+  ) async {
+    try {
+      final wordList = words
+          .map((word) => '${word.fr} (${word.en})')
+          .join(', ');
+      final bytes = await LessonAgentService.shared.generateStoryCover(
+        title: topic,
+        summary: 'Custom French vocabulary for $topic. Words: $wordList.',
+        topic: topic,
+        levelBand: level,
+        coverPrompt:
+            'Create one coherent real-life learning scene for a French vocabulary set about $topic. Use visual details that represent these exact words: $wordList. Show the words through objects, actions, or a natural setting, never as written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+      );
+      final url = await ref
+          .read(syncServiceProvider)
+          .uploadStoryCover(storyId: id, bytes: bytes);
+      if (url != null && url.isNotEmpty) {
+        ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
+      }
+    } catch (error) {
+      debugPrint('Custom vocabulary cover failed: $error');
+    }
+  }
 
   int _selectedCount(VocabTheme theme) =>
       theme.entries.where((e) => _manualSelection.contains(e.id)).length;
@@ -637,31 +861,6 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     );
   }
 
-  /// Recent keywords the student ran into in a generated story or grammar
-  /// session — "AI and keywords working in tandem": the vocab curator below
-  /// is told to prefer reinforcing these over a cold, unconnected pick, the
-  /// same cross-feature callback the grammar/story generators already lean on.
-  List<String> _recentGeneratedKeywords() {
-    final stories = ref.read(generatedStoryStoreProvider).list().take(3);
-    final grammarStories = ref
-        .read(generatedGrammarStoryStoreProvider)
-        .list()
-        .take(3);
-    final seen = <String>{};
-    final keywords = <String>[];
-    for (final story in stories) {
-      for (final k in story.keywords) {
-        if (seen.add(k.fr)) keywords.add(k.fr);
-      }
-    }
-    for (final story in grammarStories) {
-      for (final k in story.keywords) {
-        if (seen.add(k.fr)) keywords.add(k.fr);
-      }
-    }
-    return keywords;
-  }
-
   /// Briefly personalizes the session before it starts — the planner call is raced against a
   /// short timeout so a slow/failed OpenRouter call never blocks getting into practice. Example
   /// sentences are pre-authored offline for the entire word bank and looked up instantly via
@@ -679,29 +878,14 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     if (words.isEmpty) return;
     setState(() => _isPlanning = true);
     final store = ref.read(learningStoreProvider);
-    final mistakeTags = store.topMistakeTags();
-    final diary = store.recentDiaryEntries();
     final targetSize = curateFromPool
-        ? await SRSService.autoQueueSize
-        : words.length;
+        ? (await SRSService.autoQueueSize).clamp(1, 5).toInt()
+        : words.length.clamp(1, 5).toInt();
 
     SessionPlan? planResult;
     try {
       planResult = await LessonAgentService.shared
-          .planVocabSession(
-            candidateWords: words,
-            count: targetSize,
-            mistakeTags: mistakeTags
-                .map(
-                  (m) =>
-                      (tag: m.tag, description: m.description, count: m.count),
-                )
-                .toList(),
-            recentDiary: diary.map((d) => d.summary).toList(),
-            recentKeywords: curateFromPool
-                ? _recentGeneratedKeywords()
-                : const [],
-          )
+          .planVocabSession(candidateWords: words, count: targetSize)
           .timeout(const Duration(seconds: 14));
     } catch (_) {
       planResult = null;
@@ -717,30 +901,111 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         chosenQueue = prioritized
             .map((id) => byId[id])
             .whereType<VocabEntry>()
+            .take(targetSize)
             .toList();
       } else {
         // `words` is already shuffled by `dailyMixedQueue` for the Auto
         // tile, so even this fallback gives a different set call to call —
         // never the same deterministic slice every time.
-        chosenQueue = curateFromPool ? words.take(targetSize).toList() : words;
+        chosenQueue = words.take(targetSize).toList();
       }
     } else {
-      chosenQueue = curateFromPool ? words.take(targetSize).toList() : words;
+      chosenQueue = words.take(targetSize).toList();
     }
-    final sessionExamples = ContentService.shared.vocabExamplesFor(chosenQueue);
-
     if (!mounted) return;
     setState(() => _isPlanning = false);
 
-    final outcome = await AppRouter.push<StageOutcome<VocabStageResult>>(
+    final profile = store.profile();
+    final level = SpeakLanguageProfile.forProfile(profile).level;
+    final sessionId =
+        'vocabulary-session-${DateTime.now().microsecondsSinceEpoch}';
+    final topic = curateFromPool
+        ? 'Recommended vocabulary'
+        : 'Course vocabulary';
+    final summary =
+        focusNote ??
+        'A saved vocabulary practice set built from the words selected for this session.';
+    ref
+        .read(generatedVocabularySetStoreProvider)
+        .insert(
+          GeneratedVocabularySet(
+            id: sessionId,
+            title: 'Today\'s Words',
+            summary: summary,
+            topic: topic,
+            levelBand: level,
+            entries: chosenQueue,
+            createdAt: DateTime.now(),
+          ),
+        );
+    unawaited(
+      _attachSessionCover(
+        id: sessionId,
+        topic: topic,
+        context: summary,
+        level: level,
+        words: chosenQueue,
+      ),
+    );
+
+    final workshopResult = await AppRouter.push<bool>(
       context,
-      (_) => AgentLedVocabScreen(
-        vocabQueue: chosenQueue,
+      (_) => VocabularyWorkshopScreen(
+        phase: 1,
+        theme: VocabTheme(
+          id: 'daily-vocabulary',
+          title: 'Today\'s Words',
+          entries: chosenQueue,
+        ),
+        initialDeck: chosenQueue,
+        contentItemPrefix: 'daily-vocabulary',
         focusNote: focusNote,
-        examplesByWordId: sessionExamples,
       ),
       fullscreenDialog: true,
     );
-    if (outcome != null && mounted) Navigator.of(context).pop(outcome);
+    if (!mounted) return;
+    final result = VocabStageResult(
+      wordsCovered: workshopResult == true ? chosenQueue : const [],
+      reviewedCount: workshopResult == true ? chosenQueue.length : 0,
+      plannedWordIds: chosenQueue.map((word) => word.id).toList(),
+    );
+    Navigator.of(context).pop(
+      workshopResult == true
+          ? StageOutcome.completed(result)
+          : StageOutcome<VocabStageResult>.paused(
+              result: result,
+              reason: 'cancelled',
+            ),
+    );
+  }
+
+  Future<void> _attachSessionCover({
+    required String id,
+    required String topic,
+    required String context,
+    required String level,
+    required List<VocabEntry> words,
+  }) async {
+    try {
+      final wordList = words
+          .map((word) => '${word.fr} (${word.en})')
+          .join(', ');
+      final bytes = await LessonAgentService.shared.generateStoryCover(
+        title: 'Today\'s Words',
+        summary: '$context Words: $wordList.',
+        topic: topic,
+        levelBand: level,
+        coverPrompt:
+            'Create one coherent real-life learning scene that visually represents this exact French vocabulary set: $wordList. Let the context guide the setting: $context. Show meaning through objects, actions, and human context, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+      );
+      final url = await ref
+          .read(syncServiceProvider)
+          .uploadStoryCover(storyId: id, bytes: bytes);
+      if (url != null && url.isNotEmpty) {
+        ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
+      }
+    } catch (error) {
+      debugPrint('Vocabulary session cover failed: $error');
+    }
   }
 }

@@ -45,5 +45,11 @@ void main() {
       ),
       findsOneWidget,
     );
+    // A short exchange should size to its content instead of reserving the
+    // full transcript viewport for an empty answer area.
+    expect(
+      tester.getSize(find.byType(SpeakingTranscriptStrip)).height,
+      lessThan(220),
+    );
   });
 }

@@ -209,6 +209,10 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
                     size: widget.iconSize,
                   ),
                   label: Text(widget.label!),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: color,
+                    side: BorderSide(color: color.withValues(alpha: 0.45)),
+                  ),
                 ),
       },
     );

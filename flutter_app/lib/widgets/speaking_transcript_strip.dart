@@ -38,7 +38,7 @@ class SpeakingTranscriptStrip extends StatelessWidget {
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
       child: Container(
-        constraints: BoxConstraints(minHeight: 58, maxHeight: height),
+        constraints: BoxConstraints(maxHeight: height),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
         decoration: BoxDecoration(
@@ -47,13 +47,24 @@ class SpeakingTranscriptStrip extends StatelessWidget {
           border: Border.all(color: SpeakColors.line),
         ),
         child: messages.isEmpty
-            ? const SizedBox(height: 40)
+            ? const SizedBox.shrink()
+            : messages.length <= 4
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var index = 0; index < messages.length; index++) ...[
+                    if (index > 0) const SizedBox(height: 7),
+                    _TranscriptLine(
+                      message: messages[index],
+                      tutorName: resolvedTutorName,
+                    ),
+                  ],
+                ],
+              )
             : ListView.separated(
                 controller: controller,
                 shrinkWrap: true,
-                physics: messages.length > 4
-                    ? const ClampingScrollPhysics()
-                    : const NeverScrollableScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 padding: const EdgeInsets.only(right: 4),
                 itemCount: messages.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 7),
@@ -76,6 +87,9 @@ class _TranscriptLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
+    final displayText = isUser
+        ? _compactUserTranscript(message.content)
+        : message.content;
     final accent = isUser ? SpeakColors.blue : SpeakColors.green;
     final bubble = ConstrainedBox(
       constraints: BoxConstraints(
@@ -101,7 +115,7 @@ class _TranscriptLine extends StatelessWidget {
         ),
         child: SelectableText.rich(
           TextSpan(
-            text: _quoteFrenchTerms(message.content),
+            text: _quoteFrenchTerms(displayText),
             style: DesignTokens.body(
               15,
             ).copyWith(color: SpeakColors.navy, height: 1.3),
@@ -126,6 +140,13 @@ class _TranscriptLine extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Live input transcription can arrive with line breaks or repeated spaces
+  /// from the streaming provider. Keep the learner bubble to one natural
+  /// line-height of spacing instead of showing those invisible empty lines.
+  String _compactUserTranscript(String text) {
+    return text.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   Widget _avatar(Color accent, String initial) {

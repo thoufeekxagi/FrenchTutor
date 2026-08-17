@@ -351,7 +351,10 @@ $submission''';
         {'role': 'user', 'content': user},
       ],
     );
-    return _parseWritingFeedback(raw);
+    return _ensureWritingFeedback(
+      _parseWritingFeedback(raw),
+      submission: submission,
+    );
   }
 
   /// Generates one writing task calibrated to the learner's CEFR level and
@@ -406,8 +409,10 @@ $submission''';
     String? topic,
     String? contextPrompt,
     List<({String tag, String description, int count})> mistakeTags = const [],
-    List<String> recentDiary = const [],
   }) async {
+    final surpriseMode =
+        (topic == null || topic.trim().isEmpty) &&
+        (contextPrompt == null || contextPrompt.trim().isEmpty);
     final system = '''
 Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
 "type" is a short label like "micro" or "email" or "opinion". "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
@@ -421,13 +426,19 @@ LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruct
 - B1: answerable in a short paragraph (5-8 sentences), may introduce a couple of new but common words beyond the known list. min_words 40-70. target_connectors: 1-2.
 - B2: answerable as a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
 Never ask for anything harder than the stated level allows, even if the topic invites it.
-INVENT A FRESH, SPECIFIC PROMPT EVERY TIME — never repeat the same scenario or phrasing as a previous call, even with the same vocabulary and level.
-${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}''';
-    final vocabLine = knownVocab.isEmpty
+Prefer a fresh, specific prompt each time. Vary the scenario and phrasing when it is natural, while keeping the task educational and level-appropriate.
+${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}''';
+    // Surprise mode is intentionally context-free: learner vocabulary and
+    // mistake history are useful for explicitly guided tasks, but must not
+    // quietly steer a "Surprise me" generation back toward old material.
+    final vocabLine = surpriseMode || knownVocab.isEmpty
         ? 'KNOWN VOCABULARY: (none recorded yet — use only the most basic beginner words)'
         : 'KNOWN VOCABULARY: ${knownVocab.take(40).join(', ')}';
     final chosenTopic =
-        topic ?? _writingTopics[Random().nextInt(_writingTopics.length)];
+        topic ??
+        (surpriseMode
+            ? ''
+            : _writingTopics[Random().nextInt(_writingTopics.length)]);
     // Same seeding technique as `buildPersonalStory` — this is what gives
     // stories their variety, and was entirely missing here before, which is
     // why writing prompts felt flat and repetitive by comparison.
@@ -438,29 +449,32 @@ ${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to p
     final seedTwist = _storyTwists[random.nextInt(_storyTwists.length)];
     final buf = StringBuffer()
       ..writeln('LEVEL: $levelBand')
-      ..writeln(vocabLine)
-      ..writeln('TOPIC (loose inspiration only): $chosenTopic')
-      ..writeln(
+      ..writeln(vocabLine);
+    if (surpriseMode) {
+      buf.writeln(
+        'MODE: SURPRISE ME. No topic or learner context was selected. Choose a '
+        'new everyday situation yourself. Do not use onboarding interests, '
+        'course themes, prior transcripts, review phrases, or a fixed default '
+        'scenario. Keep it natural, wholesome, and appropriate to the level.',
+      );
+    } else {
+      buf.writeln('TOPIC (loose inspiration only): $chosenTopic');
+      buf.writeln(
         'SEED DETAILS for a specific, creative angle (use naturally, do not just state them): '
         'a person named $seedName, a setting around $seedSetting, involving $seedTwist. '
         'Use these details only when LEVEL is B1 or B2.',
       );
+    }
     if (contextPrompt != null && contextPrompt.trim().isNotEmpty) {
       buf.writeln(
         'COURSE CONTEXT: Build this as a fresh application of the course language, '
         'not a copy of the lesson. $contextPrompt',
       );
     }
-    if (mistakeTags.isNotEmpty) {
+    if (!surpriseMode && mistakeTags.isNotEmpty) {
       buf.writeln(
         'RECURRING MISTAKES (optional to touch on): '
         '${mistakeTags.map((m) => m.description).take(3).join('; ')}',
-      );
-    }
-    if (recentDiary.isNotEmpty) {
-      buf.writeln(
-        'RECENT PRACTICE, for light context only, do not reference directly: '
-        '${recentDiary.take(2).join(' | ')}',
       );
     }
     final raw = await _complete(
@@ -471,12 +485,12 @@ ${mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to p
       maxTokens: 600,
       temperature: 0.95,
     );
-    final task = _parseWritingTask(raw, levelBand: levelBand);
-    return _calibrateGeneratedWritingTask(
-      task,
+    final task = _calibrateGeneratedWritingTask(
+      _parseWritingTask(raw, levelBand: levelBand),
       levelBand: levelBand,
       topic: chosenTopic,
     );
+    return task;
   }
 
   /// Models sometimes obey the CEFR label but still make an A1 prompt
@@ -669,10 +683,9 @@ STUDENT SAID: $utterance''';
     );
   }
 
-  /// Runs once, briefly, before a vocab session starts — looks at recurring mistakes and
-  /// recent session history and decides what's worth emphasizing today, instead of always
-  /// presenting the same fixed order. Callers should treat this as best-effort: on failure,
-  /// fall back to the original candidate order with no focus note, no user-visible error.
+  /// Runs once, briefly, before a vocab session starts and chooses a varied
+  /// set from the current candidate pool. It never reads prior sessions or
+  /// compact history records, so an automatic session remains a fresh pick.
   /// Curates the actual set of words a practice session shows, from a
   /// CANDIDATE POOL deliberately larger than [count] — this used to only
   /// ever be handed a pre-sliced list of exactly the words about to be
@@ -680,40 +693,20 @@ STUDENT SAID: $utterance''';
   /// reorder them, so even a perfect AI call was just reshuffling the same
   /// deterministic slice. Now it genuinely SELECTS which [count] words to
   /// serve, out of a much wider pool, the way `buildGrammarStory` picks a
-  /// tense rather than being handed one. [recentKeywords] are words the
-  /// student recently ran into in a generated story or grammar session —
-  /// reinforcing those on purpose (not just "next in the textbook") is what
-  /// was asked for as "AI and keywords working in tandem".
+  /// tense rather than being handed one.
   Future<SessionPlan> planVocabSession({
     required List<VocabEntry> candidateWords,
     required int count,
-    required List<({String tag, String description, int count})> mistakeTags,
-    required List<String> recentDiary,
-    List<String> recentKeywords = const [],
   }) async {
     final system =
         '''
-You are quietly curating a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. From the CANDIDATE WORDS pool, SELECT exactly $count of them to actually practice today — do not just take the first $count in the list, genuinely choose based on everything below. Then write a one-sentence, warm, specific focus note for how today's session should be framed.
-SELECTION PRIORITIES, IN ORDER:
-1. If RECENT KEYWORDS are given (words the student just ran into in a story or grammar lesson), prefer including a few of those among your $count if they're present in the candidate pool — reinforcing something they just encountered elsewhere in the app beats a cold, unconnected word every time.
-2. If RECURRING MISTAKES are given, favor words that would let them practice past that specific confusion.
-3. Otherwise, favor an interesting, varied, thematically-loose mix over "next in alphabetical/curriculum order" — avoid picking a set that feels like the same category every time.
+You are quietly curating a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. From the CANDIDATE WORDS pool, SELECT exactly $count of them to actually practice today — do not just take the first $count in the list, genuinely choose a varied, useful mix. Then write a one-sentence, warm, specific focus note for how today's session should be framed.
+SELECTION PRIORITY: favor an interesting, varied, thematically-loose mix over "next in alphabetical/curriculum order" — avoid picking a set that feels like the same category every time.
 Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings}. "prioritized_word_ids" MUST contain exactly $count ids (or fewer only if the candidate pool itself has fewer than $count entries), every one of them must be an exact id from CANDIDATE WORDS, never invent a new one, and never repeat an id.''';
     final wordList = candidateWords
         .map((w) => '${w.id}: ${w.fr} (${w.en})')
         .join('; ');
-    var user = 'CANDIDATE WORDS: $wordList';
-    if (recentKeywords.isNotEmpty) {
-      user +=
-          '\n\nRECENT KEYWORDS (seen in a recent story/grammar session, reinforce if present above): ${recentKeywords.join(', ')}';
-    }
-    if (mistakeTags.isNotEmpty) {
-      user +=
-          '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
-    }
-    if (recentDiary.isNotEmpty) {
-      user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
-    }
+    final user = 'CANDIDATE WORDS: $wordList';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
@@ -787,26 +780,95 @@ their key words where appropriate, and do not invent a disconnected theme.
     return _parseCourseVocabulary(raw, count: count);
   }
 
-  /// Runs once, briefly, before a grammar session starts, when the student picks "Auto" in
-  /// the grammar picker — looks at recurring mistakes and recent session history and picks
-  /// ONE tense/topic from the candidate list to focus on today, exactly the same best-effort
-  /// shape as `planVocabSession` (fall back to the first candidate, no focus note, on failure).
+  /// Generates the cloze sentence used by the vocabulary workshop's Context
+  /// step. The target must appear in the French sentence so the client can
+  /// safely replace it with a blank before showing it to the learner.
+  Future<BilingualExample> generateVocabularyContext({
+    required VocabEntry word,
+    required String levelBand,
+  }) async {
+    const system = '''
+Create one short French vocabulary context sentence. Respond with ONLY compact
+JSON in exactly this shape: {"fr":"...","en":"..."}.
+The French sentence MUST contain the exact target word or phrase exactly as
+provided, with the same spelling and accents, so the app can replace it with a
+blank. The sentence must be natural, useful, and easy to understand at the
+learner's CEFR level. The English field must translate the complete sentence.
+Never return a sentence that omits the target, changes its spelling, or puts the
+target only in the English field. Do not add markdown or extra keys.''';
+    final user =
+        '''
+CEFR LEVEL: $levelBand
+TARGET WORD: ${word.fr}
+TARGET MEANING: ${word.en}
+Write one everyday sentence using the target exactly as written.''';
+
+    for (var attempt = 0; attempt < 2; attempt++) {
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': system + languageGuardrail},
+          {'role': 'user', 'content': user},
+        ],
+        maxTokens: 180,
+        temperature: attempt == 0 ? 0.4 : 0.1,
+      );
+      try {
+        final decoded = jsonDecode(extractJSON(raw));
+        if (decoded is Map) {
+          final fr = decoded['fr'];
+          final en = decoded['en'];
+          if (fr is String &&
+              en is String &&
+              _containsVocabularyTarget(fr, word.fr)) {
+            return BilingualExample(fr: fr.trim(), en: en.trim());
+          }
+        }
+      } catch (_) {
+        // Retry once with the same strict contract before the caller falls
+        // back to a deterministic offline sentence.
+      }
+    }
+    throw AgentError.badResponse;
+  }
+
+  bool _containsVocabularyTarget(String sentence, String target) {
+    String normalize(String value) {
+      var text = value.toLowerCase().trim();
+      const replacements = {
+        'é': 'e',
+        'è': 'e',
+        'ê': 'e',
+        'ë': 'e',
+        'à': 'a',
+        'â': 'a',
+        'ç': 'c',
+        'î': 'i',
+        'ï': 'i',
+        'ô': 'o',
+        'û': 'u',
+        'ù': 'u',
+        'œ': 'oe',
+      };
+      replacements.forEach((from, to) => text = text.replaceAll(from, to));
+      return text.replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+    }
+
+    final normalizedSentence = normalize(sentence);
+    final normalizedTarget = normalize(target);
+    if (normalizedTarget.isEmpty) return false;
+    return ' $normalizedSentence '.contains(' $normalizedTarget ');
+  }
+
+  /// Runs once, briefly, before a grammar session starts, when the student
+  /// picks "Auto" in the grammar picker. It chooses from the current
+  /// candidate list without reading prior session material.
   Future<GrammarSessionPlan> planGrammarSession({
     required List<({String id, String title})> candidates,
-    required List<({String tag, String description, int count})> mistakeTags,
-    required List<String> recentDiary,
   }) async {
     final system = '''
-You are quietly picking which ONE French grammar point a beginner should practice today, the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, the student's recurring mistake patterns, and recent session notes, choose the single most useful one to practice right now (e.g. if their mistakes suggest passé composé confusion, pick that), and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given, never invent a new one.''';
+You are quietly picking which ONE French grammar point a beginner should practice today, the student won't see this reasoning, only the short focus note you write. Given the candidate list of tenses/topics, choose a varied, useful point to practice right now and write a one-sentence warm, specific focus note for how today's session should be framed. If nothing stands out, pick the first candidate. Respond with ONLY a compact JSON object: {"chosen_id": string, "focus_note": string}. chosen_id MUST be exactly one of the candidate IDs given, never invent a new one.''';
     final list = candidates.map((c) => '${c.id}: ${c.title}').join('; ');
-    var user = 'CANDIDATES: $list';
-    if (mistakeTags.isNotEmpty) {
-      user +=
-          '\n\nRECURRING MISTAKES: ${mistakeTags.map((m) => '${m.description} (seen ${m.count}x)').join('; ')}';
-    }
-    if (recentDiary.isNotEmpty) {
-      user += '\n\nRECENT SESSION NOTES: ${recentDiary.join(' | ')}';
-    }
+    final user = 'CANDIDATES: $list';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
@@ -892,20 +954,30 @@ USEFUL STARTERS: ${hints.join('; ')}''',
   /// personal one-off, not a fixed prompt shared across every learner the
   /// way a mission's roleplay prompt is.
   Future<ReadingPassage> buildStandaloneRoleplay({
-    required String scenario,
+    String? scenario,
     required String levelBand,
   }) async {
+    final surpriseMode = scenario == null || scenario.trim().isEmpty;
     final system =
         '''
 Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Do not award a score or claim mastery.
 ${_cefrCalibration(levelBand)}
 The SCENARIO given is only a loose inspiration for the setting, not a rigid script — build an ordinary, realistic scene that fits it.
 This app's users are teens and adults (13+): keep the scene wholesome and educational, appropriate for a general audience, never mature, violent, or otherwise inappropriate.
-INVENT A FRESH, SPECIFIC SCENE EVERY TIME: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type but differ from the obvious default. Never reuse the same premise twice.''';
+Aim for a fresh, specific scene: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type. Vary the premise when it is natural, without forcing novelty.
+${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary new everyday scene yourself. Keep it natural and level-appropriate; do not rely on onboarding interests or a fixed default.' : 'SELECTED CONTEXT: Use the learner scenario only as loose inspiration; do not copy a previous scene.'}''';
+    final user = StringBuffer()
+      ..writeln(
+        surpriseMode
+            ? 'MODE: SURPRISE ME — no scenario supplied'
+            : 'SCENARIO (loose inspiration): $scenario',
+      )
+      ..writeln('LEVEL: $levelBand')
+      ..writeln('REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}');
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
-        {'role': 'user', 'content': 'SCENARIO: $scenario\nLEVEL: $levelBand'},
+        {'role': 'user', 'content': user.toString()},
       ],
       maxTokens: 1400,
       temperature: 1.0,
@@ -1023,12 +1095,20 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
   /// [StoryBookGeneration] so the library/storage contract remains one-call
   /// and the reading lesson can teach from the same frozen text it saves.
   Future<StoryBookGeneration> buildReadingStoryBook({
-    required String topic,
+    String? topic,
     required String levelBand,
+    String? examName,
+    String? examLevel,
   }) async {
+    final surpriseMode = topic == null || topic.trim().isEmpty;
+    final examBlock = _examComprehensionPrompt(
+      examName: examName,
+      levelBand: examLevel ?? levelBand,
+      listening: false,
+    );
     final system =
         '''
-Create one short, polished French READING storybook for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+Create one short, polished French READING storybook for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "choices": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
 READING DESIGN: Write 7 to 10 short narrative sentences, one per segment. The learner will first read the French for meaning, then study one selected sentence, then reread with support, so every segment must stand alone, be natural, and move the plot forward. This is a complete mini-story with a beginning, a small change or problem, and a satisfying ending. It is not a dialogue, roleplay, listening transcript, or speaking exercise.
 
@@ -1038,41 +1118,62 @@ TEACHING FIELDS: For each exact French sentence, write a clear English meaning, 
 
 SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
 
-The topic is inspiration, not a requirement that every sentence mention it. Keep the story wholesome and appropriate for teens and adults. Invent a fresh, specific premise every time.
+The topic is inspiration, not a requirement that every sentence mention it. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
+${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new story, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
+$examBlock
 ''';
     final random = Random();
     final seed = _readingStorySeeds[random.nextInt(_readingStorySeeds.length)];
     final setting = _storySettings[random.nextInt(_storySettings.length)];
     final twist = _storyTwists[random.nextInt(_storyTwists.length)];
+    final seedBlock = surpriseMode
+        ? 'SURPRISE SEED: choose the premise, setting, object, and small turn yourself. '
+              'Do not use a supplied story seed.'
+        : 'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
+              'Use these naturally to make this reading story specific and memorable.';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {
           'role': 'user',
           'content':
-              'TOPIC (loose inspiration): $topic\nLEVEL: $levelBand\n'
-              'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
-              'Use these naturally to make this reading story specific and memorable. '
-              'A human character is optional; the story may follow an object, animal, place, or natural moment.',
+              '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+              '${examName == null ? '' : 'EXAM: $examName\n'}'
+              '$seedBlock\n'
+              'A human character is optional; the story may follow an object, animal, place, or natural moment.\n'
+              'REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}',
         },
       ],
       maxTokens: 3000,
       temperature: 0.9,
     );
-    return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
+    final package = _parseStoryBookGeneration(
+      raw,
+      levelBand: levelBand,
+      topic: topic ?? '',
+    );
+    return package;
   }
 
   /// Listening has its own generation contract. It shares the persisted
   /// story shape with reading, but the writing is intentionally spoken-first:
   /// short lines, natural rhythm, and bilingual check questions for beginners.
   Future<StoryBookGeneration> buildListeningStoryBook({
-    required String topic,
+    String? topic,
     required String levelBand,
+    String? examName,
+    String? examLevel,
   }) async {
+    final surpriseMode = topic == null || topic.trim().isEmpty;
+    final examBlock = _examComprehensionPrompt(
+      examName: examName,
+      levelBand: examLevel ?? levelBand,
+      listening: true,
+    );
     final system =
         '''
-Create one short, polished French LISTENING lesson for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+Create one short, polished French LISTENING lesson for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string, string], "choices_en": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
 LISTENING DESIGN: Write 6 to 9 short spoken French sentences, one per segment. Each sentence must sound natural when read aloud and move a tiny everyday story forward. Use a clear beginning, one small change, and a satisfying ending. This is a listening lesson, not a reading essay, roleplay, or grammar worksheet. A human character is optional: the story may follow an object, animal, place, or natural moment. Never force a named character.
 
@@ -1084,28 +1185,60 @@ TEACHING FIELDS: For each exact French sentence, provide its English meaning, on
 
 SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
 
-Keep it wholesome and appropriate for teens and adults. Invent a fresh, specific premise every time.
+Keep it wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
+${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
+$examBlock
 ''';
     final random = Random();
     final seed = _readingStorySeeds[random.nextInt(_readingStorySeeds.length)];
     final setting = _storySettings[random.nextInt(_storySettings.length)];
     final twist = _storyTwists[random.nextInt(_storyTwists.length)];
+    final seedBlock = surpriseMode
+        ? 'SURPRISE SEED: choose the premise, setting, object, and small turn yourself. '
+              'Do not use a supplied story seed.'
+        : 'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
+              'Use these naturally to make this listening lesson specific and memorable.';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {
           'role': 'user',
           'content':
-              'TOPIC (loose inspiration): $topic\nLEVEL: $levelBand\n'
-              'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
-              'Use these naturally to make this listening lesson specific and memorable.',
+              '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+              '${examName == null ? '' : 'EXAM: $examName\n'}'
+              '$seedBlock\n'
+              'REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}',
         },
       ],
       maxTokens: 2800,
       temperature: 0.9,
     );
-    return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
+    final package = _parseStoryBookGeneration(
+      raw,
+      levelBand: levelBand,
+      topic: topic ?? '',
+    );
+    return package;
+  }
+
+  String _examComprehensionPrompt({
+    required String? examName,
+    required String levelBand,
+    required bool listening,
+  }) {
+    if (examName == null || examName.trim().isEmpty) return '';
+    final isTcf = examName.toLowerCase().startsWith('tcf');
+    final officialShape = isTcf
+        ? listening
+              ? 'TCF Canada listening comprehension is a progressive four-option QCM; the official paper has 39 items in 35 minutes and each recording is played once.'
+              : 'TCF Canada reading comprehension is a progressive four-option QCM; the official paper has 39 items in 60 minutes.'
+        : listening
+        ? 'TEF Canada listening comprehension is a four-option QCM; the official paper has 40 items in 40 minutes and each audio is played once without going back.'
+        : 'TEF Canada reading comprehension is a four-option QCM; the official paper has 40 items in 60 minutes.';
+    return '''
+EXAM READINESS OVERRIDE: This is an independent $examName $levelBand practice set, not a regular course story. $officialShape Generate a mobile-sized practice set of exactly 8 questions so the learner can complete it in one sitting, while modeling the same item discipline. Every question must have exactly 4 answer choices, exactly one correct answer, and an answerIndex from 0 to 3. Do not add English translations, vocabulary cards, grammar tabs, or teaching notes to the exam content. Keep the reading document/audio script and questions self-contained, original, and appropriate to $levelBand. For listening, write short spoken lines and never rely on information that would only be visible in a transcript.
+''';
   }
 
   Future<StoryBookGeneration> buildStoryBook({
@@ -1461,19 +1594,14 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
 
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
   /// deck of `GrammarPracticeCard`s (one short French sentence in the chosen tense per card,
-  /// its English meaning, and a one-line grammar note), reusing the vocabulary words the
-  /// student just practiced in the Vocab stage wherever natural, and informed by that Vocab
-  /// session's actual transcript (what they said, how it went) rather than teaching the tense
-  /// in a vacuum. Pre-generation, not live teaching: mirrors `buildReadingPassageFromVocab`'s
-  /// shape. Kept deliberately lean — only the tense name, a handful of vocab words, and one
-  /// short line of recent context go in, not a full transcript or the whole usage-notes list.
+  /// its English meaning, and a one-line grammar note). Pre-generation, not live teaching:
+  /// the prompt uses only the selected grammar material and current CEFR/content rules.
   String lastRawResponse = '';
 
   Future<List<GrammarPracticeCard>> generateGrammarPracticeCards({
     required String tenseTitle,
     required List<String> tenseUsage,
     required List<String> vocabWords,
-    required String recentVocabTranscript,
     int count = 6,
   }) async {
     final words = vocabWords.take(6);
@@ -2002,24 +2130,31 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
 
   WritingFeedback _parseWritingFeedback(String raw) {
     final obj = _decodeObject(raw);
-    final score = _asDouble(obj['score_out_of_10']);
-    final strengths =
-        (obj['strengths'] as List?)?.map((e) => e.toString()).toList() ??
-        <String>[];
-    final correctionsRaw = (obj['corrections'] as List?) ?? [];
-    final corrections = correctionsRaw.map((c) {
-      final m = c as Map<String, dynamic>;
-      return (
-        original: m['original'] as String? ?? '',
-        fixed: m['fixed'] as String? ?? '',
-        why: m['why'] as String? ?? '',
-      );
-    }).toList();
-    final connectorFeedback = obj['connector_feedback'] as String? ?? '';
-    final improved = obj['improved_version'] as String? ?? '';
-    final nextSteps =
-        (obj['next_steps'] as List?)?.map((e) => e.toString()).toList() ??
-        <String>[];
+    final score = _asDouble(
+      obj['score_out_of_10'] ?? obj['score'],
+    ).clamp(0, 10).toDouble();
+    final strengths = _stringList(obj['strengths']);
+    final corrections = <({String original, String fixed, String why})>[];
+    final correctionsRaw = obj['corrections'];
+    if (correctionsRaw is List) {
+      for (final item in correctionsRaw) {
+        if (item is! Map) continue;
+        final map = Map<String, dynamic>.from(item);
+        final original = _stringValue(map['original']);
+        final fixed = _stringValue(map['fixed']);
+        // Ignore empty/malformed correction rows instead of letting one bad
+        // item discard the entire grading response.
+        if (original.isEmpty && fixed.isEmpty) continue;
+        corrections.add((
+          original: original,
+          fixed: fixed,
+          why: _stringValue(map['why']),
+        ));
+      }
+    }
+    final connectorFeedback = _stringValue(obj['connector_feedback']);
+    final improved = _stringValue(obj['improved_version']);
+    final nextSteps = _stringList(obj['next_steps']);
     return WritingFeedback(
       scoreOutOf10: score,
       strengths: strengths,
@@ -2029,6 +2164,44 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       nextSteps: nextSteps,
     );
   }
+
+  /// Keep a successful grading response useful even when the model omits an
+  /// optional field. The Review screen must always have something concrete to
+  /// show; a sparse JSON response should never turn into a blank lesson.
+  WritingFeedback _ensureWritingFeedback(
+    WritingFeedback feedback, {
+    required String submission,
+  }) {
+    return WritingFeedback(
+      scoreOutOf10: feedback.scoreOutOf10,
+      strengths: feedback.strengths.isEmpty
+          ? const ['You completed the writing task and produced a draft.']
+          : feedback.strengths,
+      corrections: feedback.corrections,
+      connectorFeedback: feedback.connectorFeedback.isEmpty
+          ? 'Keep one clear idea per sentence, then connect the ideas with a simple linking word.'
+          : feedback.connectorFeedback,
+      improvedVersion: feedback.improvedVersion.isEmpty
+          ? submission.trim()
+          : feedback.improvedVersion,
+      nextSteps: feedback.nextSteps.isEmpty
+          ? const [
+              'Review the correction above and reuse that pattern in your next sentence.',
+            ]
+          : feedback.nextSteps,
+    );
+  }
+
+  List<String> _stringList(dynamic value) {
+    if (value is! List) return <String>[];
+    return value
+        .map(_stringValue)
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
+  }
+
+  String _stringValue(dynamic value) => value?.toString().trim() ?? '';
 
   WritingTask _parseWritingTask(String raw, {required String levelBand}) {
     final obj = _decodeObject(raw);
@@ -2314,6 +2487,8 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
   double _asDouble(dynamic value) {
     if (value is double) return value;
     if (value is int) return value.toDouble();
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value.trim()) ?? 0;
     return 0;
   }
 }

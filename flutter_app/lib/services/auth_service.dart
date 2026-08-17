@@ -61,6 +61,43 @@ class AuthService {
 
   Session? get currentSession => _client.auth.currentSession;
 
+  /// The identity details safe to show in Profile settings. Passwords are
+  /// intentionally never exposed by Supabase or by this app.
+  String? get signedInEmail => currentSession?.user.email;
+
+  String get signedInDisplayName {
+    final user = currentSession?.user;
+    final metadata = user?.userMetadata;
+    final name =
+        metadata?['full_name'] ??
+        metadata?['name'] ??
+        metadata?['display_name'] ??
+        metadata?['user_name'];
+    if (name is String && name.trim().isNotEmpty) return name.trim();
+    final email = signedInEmail;
+    if (email == null || !email.contains('@')) return 'French Tutor learner';
+    return email.split('@').first;
+  }
+
+  String get signedInProvider {
+    final user = currentSession?.user;
+    final raw =
+        user?.appMetadata['provider'] ?? user?.userMetadata?['provider'];
+    switch (raw?.toString().toLowerCase()) {
+      case 'google':
+        return 'Google';
+      case 'apple':
+        return 'Apple';
+      case 'email':
+      case 'password':
+        return 'Email and password';
+      default:
+        return raw is String && raw.trim().isNotEmpty
+            ? raw.trim()
+            : 'Account sign-in';
+    }
+  }
+
   Stream<AuthState> get onAuthStateChange => _client.auth.onAuthStateChange;
 
   // ---------------------------------------------------------------------------

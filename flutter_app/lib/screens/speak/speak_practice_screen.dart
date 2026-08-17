@@ -60,32 +60,36 @@ class SpeakPracticeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          SpeakSectionTitle(
-            title: 'Review',
-            action: 'Open review',
-            onTap: () =>
-                AppRouter.push(context, (_) => const SpeakReviewScreen()),
-          ),
+          const SpeakSectionTitle(title: 'Review'),
           const SizedBox(height: 10),
-          SpeakCard(
-            child: Row(
-              children: [
-                _icon(Icons.replay_rounded),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Bring back phrases from recent sessions through speaking, listening, stories, or roleplay.',
-                    style: DesignTokens.body(
-                      13,
-                    ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
-                  ),
+          Semantics(
+            button: true,
+            label: 'Open review from recent practice sessions',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () =>
+                  AppRouter.push(context, (_) => const SpeakReviewScreen()),
+              child: SpeakCard(
+                child: Row(
+                  children: [
+                    _icon(Icons.replay_rounded),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Bring back what you learned in recent speaking, listening, reading, writing, or roleplay sessions.',
+                        style: DesignTokens.body(
+                          13,
+                        ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: SpeakColors.inkSoft,
+                    ),
+                  ],
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: SpeakColors.inkSoft,
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 24),

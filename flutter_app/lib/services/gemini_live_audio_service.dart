@@ -86,6 +86,47 @@ class GeminiLiveAudioService {
     }
   }
 
+  /// Returns an already-generated clip without ever opening a Gemini Live
+  /// socket. This is used by secondary pronunciation controls where a tap
+  /// should reuse the lesson's PCM deck, not create new audio on demand.
+  Future<List<int>?> loadCached({
+    required String text,
+    String? voiceName,
+    bool slow = false,
+  }) async {
+    final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (normalized.isEmpty) return null;
+    final persona = _personaForVoice(voiceName);
+    if (persona == null) return null;
+    final cacheKey = cacheKeyFor(
+      text: normalized,
+      voiceName: persona.voiceName,
+      slow: slow,
+    );
+
+    // If another screen is already warming this exact clip, wait for that
+    // existing work rather than starting anything new from the tap.
+    final existing = _inFlight[cacheKey];
+    if (existing != null) return existing;
+
+    final local = await _readLocal(cacheKey);
+    if (_validPcm(local)) return local;
+
+    final userId = _currentUserId;
+    if (userId == null) return null;
+    try {
+      final remote = await Supabase.instance.client.storage
+          .from(_bucket)
+          .download(storagePathFor(userId: userId, cacheKey: cacheKey));
+      if (!_validPcm(remote)) return null;
+      final bytes = remote.toList(growable: false);
+      await _writeLocal(cacheKey, bytes);
+      return bytes;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Warms the first item before returning, then fills the rest with a small
   /// parallel worker pool so a new lesson never waits for its whole deck.
   Future<void> warmDeck({

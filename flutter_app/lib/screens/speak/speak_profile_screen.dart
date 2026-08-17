@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
+import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/learning_streak_service.dart';
 import '../history/all_history_screen.dart';
@@ -11,6 +12,7 @@ import '../notes/notes_review_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speak_roadmap_screen.dart';
 import 'streak_calendar_screen.dart';
+import 'french_fingerprint_screen.dart';
 import 'speak_ui.dart';
 
 class SpeakProfileScreen extends ConsumerWidget {
@@ -34,7 +36,7 @@ class SpeakProfileScreen extends ConsumerWidget {
     final sessions = ref.watch(storageServiceProvider).getAllSessions();
     final name = 'French learner';
     final level = LearnerLevel.displayLabel(profile.level);
-    final minutes = sessions.length * 8;
+    final studiedSeconds = _actualStudySeconds(sessions);
     final streak = LearningStreakService.summarize(sessions);
 
     return SpeakScaffold(
@@ -85,7 +87,7 @@ class SpeakProfileScreen extends ConsumerWidget {
               ),
               SpeakStat(
                 icon: Icons.schedule_rounded,
-                value: '$minutes min',
+                value: _formatStudyTime(studiedSeconds),
                 label: 'TIME\nSTUDIED',
                 color: SpeakColors.blue,
               ),
@@ -125,6 +127,18 @@ class SpeakProfileScreen extends ConsumerWidget {
                   'Phrases to review',
                   () =>
                       AppRouter.push(context, (_) => const NotesReviewScreen()),
+                ),
+                const Divider(height: 1, color: SpeakColors.line),
+                _profileRow(
+                  context,
+                  Icons.fingerprint_rounded,
+                  DesignTokens.secondary,
+                  'Your French fingerprint',
+                  'Your personal map of words and practice',
+                  () => AppRouter.push(
+                    context,
+                    (_) => const FrenchFingerprintScreen(),
+                  ),
                 ),
               ],
             ),
@@ -250,4 +264,27 @@ class SpeakProfileScreen extends ConsumerWidget {
     );
     return onTap == null ? row : GestureDetector(onTap: onTap, child: row);
   }
+}
+
+int _actualStudySeconds(List<Session> sessions) {
+  var seconds = 0;
+  for (final session in sessions) {
+    final startedAt = DateTime.tryParse(session.startedAt);
+    final endedAt = session.endedAt == null
+        ? null
+        : DateTime.tryParse(session.endedAt!);
+    if (startedAt == null || endedAt == null) continue;
+    final elapsed = endedAt.difference(startedAt).inSeconds;
+    if (elapsed > 0) seconds += elapsed;
+  }
+  return seconds;
+}
+
+String _formatStudyTime(int seconds) {
+  if (seconds < 60) return '<1 min';
+  final minutes = seconds ~/ 60;
+  if (minutes < 60) return '$minutes min';
+  final hours = minutes ~/ 60;
+  final remainingMinutes = minutes % 60;
+  return remainingMinutes == 0 ? '$hours h' : '$hours h ${remainingMinutes}m';
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,11 +45,12 @@ class _ReadingStorybookScreenState extends ConsumerState<ReadingStorybookScreen>
   bool _playing = false;
   int _playingSegment = -1;
   final Map<int, int> _answers = {};
+  Timer? _coverRefreshTimer;
 
   late final InlineCallController _call;
   late final SessionRecorder _recorder;
 
-  GeneratedStory get _story => widget.story;
+  late GeneratedStory _story = widget.story;
   List<ReadingSegment> get _segments => _story.passage.segments;
   ReadingSegment get _focusSegment => _segments[_selectedSegment];
 
@@ -71,6 +74,12 @@ class _ReadingStorybookScreenState extends ConsumerState<ReadingStorybookScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Reading story';
     });
+    if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
+      _coverRefreshTimer = Timer.periodic(
+        const Duration(seconds: 2),
+        (_) => _refreshCoverFromStore(),
+      );
+    }
   }
 
   String get _lessonContext =>
@@ -93,6 +102,7 @@ ${_segments.map((segment) => '- ${segment.fr} — ${segment.en}').join('\n')}
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _coverRefreshTimer?.cancel();
     _call.dispose();
     LessonSpeechService.shared.stop();
     final score = _score;
@@ -101,6 +111,24 @@ ${_segments.map((segment) => '- ${segment.fr} — ${segment.en}').join('\n')}
           'Read "${_story.displayTitle}"${score == null ? '.' : ' and scored $score.'}',
     );
     super.dispose();
+  }
+
+  void _refreshCoverFromStore() {
+    if (!mounted || _story.coverUrl?.isNotEmpty == true) {
+      _coverRefreshTimer?.cancel();
+      return;
+    }
+    GeneratedStory? latest;
+    for (final candidate in ref.read(generatedStoryStoreProvider).list()) {
+      if (candidate.id == _story.id) {
+        latest = candidate;
+        break;
+      }
+    }
+    final coverUrl = latest?.coverUrl;
+    if (coverUrl == null || coverUrl.isEmpty) return;
+    setState(() => _story = _story.copyWith(coverUrl: coverUrl));
+    _coverRefreshTimer?.cancel();
   }
 
   int? get _score {

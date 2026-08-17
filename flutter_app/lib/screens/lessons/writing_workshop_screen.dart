@@ -57,6 +57,7 @@ class _WritingWorkshopScreenState extends ConsumerState<WritingWorkshopScreen>
   MicroWritingFeedback? _rewriteFeedback;
   Uint8List? _submissionCover;
   bool _isCoverGenerating = false;
+  bool _feedbackRecoveryAttempted = false;
   String? _errorText;
 
   final _draftController = TextEditingController();
@@ -237,14 +238,22 @@ Help the learner think and write. Do not write the whole answer for them unless 
       setState(() {
         _feedback = feedback;
         _isGrading = false;
+        _feedbackRecoveryAttempted = false;
         _step = _WritingStep.review;
       });
       unawaited(_generateSubmissionCover());
-      _learningStore.saveSubmission(
-        taskId: _task.id,
-        text: _draft,
-        feedback: jsonEncode(_writingFeedbackPayload(feedback)),
-      );
+      // A local/cloud persistence failure must not hide a grade that is already
+      // in memory. The learner should see feedback immediately even if sync is
+      // temporarily unavailable.
+      try {
+        _learningStore.saveSubmission(
+          taskId: _task.id,
+          text: _draft,
+          feedback: jsonEncode(_writingFeedbackPayload(feedback)),
+        );
+      } catch (error, stackTrace) {
+        debugPrint('Writing feedback persistence failed: $error\n$stackTrace');
+      }
       unawaited(_prewarmWritingFeedbackAudio(feedback));
       _recorder.logUser(_draft);
       _recorder.logTutor(
@@ -412,6 +421,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
                     draftReady: _draftReady,
                     rewriteReady: _rewrite.trim().isNotEmpty,
                     isLoading: _isGrading,
+                    hasFeedback: _feedback != null,
                     hasRewriteFeedback: _rewriteFeedback != null,
                     onNext: _next,
                     onSubmit: _submitDraft,
@@ -642,10 +652,20 @@ Help the learner think and write. Do not write the whole answer for them unless 
 
   Widget _reviewView() {
     final feedback = _feedback;
-    if (feedback == null) return const _EmptyWritingBody();
-    final focus = feedback.corrections.isEmpty
-        ? null
-        : feedback.corrections.first;
+    if (feedback == null) {
+      _scheduleFeedbackRecovery();
+      return _FeedbackPendingBody(
+        isLoading: _isGrading,
+        errorText: _errorText,
+        onRetry: () {
+          setState(() {
+            _feedbackRecoveryAttempted = false;
+            _errorText = null;
+          });
+          unawaited(_submitDraft());
+        },
+      );
+    }
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
@@ -690,9 +710,31 @@ Help the learner think and write. Do not write the whole answer for them unless 
             color: DesignTokens.success,
           ),
         ],
-        if (focus != null) ...[
+        if (feedback.connectorFeedback.isNotEmpty) ...[
           const SizedBox(height: 12),
-          _CorrectionCard(correction: focus),
+          LearningCard(
+            color: DesignTokens.infoSoft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'COACH\'S NOTE',
+                  style: DesignTokens.label(
+                    10,
+                  ).copyWith(color: DesignTokens.info, letterSpacing: 0.8),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  feedback.connectorFeedback,
+                  style: DesignTokens.body(13.5).copyWith(height: 1.4),
+                ),
+              ],
+            ),
+          ),
+        ],
+        for (final correction in feedback.corrections) ...[
+          const SizedBox(height: 12),
+          _CorrectionCard(correction: correction),
         ],
         if (feedback.nextSteps.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -741,6 +783,17 @@ Help the learner think and write. Do not write the whole answer for them unless 
         ],
       ],
     );
+  }
+
+  void _scheduleFeedbackRecovery() {
+    if (_feedbackRecoveryAttempted || _isGrading || !_draftReady) return;
+    _feedbackRecoveryAttempted = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _step != _WritingStep.review || _feedback != null) {
+        return;
+      }
+      unawaited(_submitDraft());
+    });
   }
 
   Widget _rewriteView() {
@@ -802,6 +855,7 @@ class _Footer extends StatelessWidget {
     required this.draftReady,
     required this.rewriteReady,
     required this.isLoading,
+    required this.hasFeedback,
     required this.hasRewriteFeedback,
     required this.onNext,
     required this.onSubmit,
@@ -812,6 +866,7 @@ class _Footer extends StatelessWidget {
   final bool draftReady;
   final bool rewriteReady;
   final bool isLoading;
+  final bool hasFeedback;
   final bool hasRewriteFeedback;
   final VoidCallback onNext;
   final VoidCallback onSubmit;
@@ -825,7 +880,7 @@ class _Footer extends StatelessWidget {
       _WritingStep.brief => 'Build my answer',
       _WritingStep.build => 'Write freely',
       _WritingStep.draft => 'Review my writing',
-      _WritingStep.review => 'Rewrite one idea',
+      _WritingStep.review => hasFeedback ? 'Rewrite one idea' : 'Get feedback',
       _WritingStep.rewrite =>
         hasRewriteFeedback ? 'Finish workshop' : 'Check my rewrite',
     };
@@ -840,7 +895,7 @@ class _Footer extends StatelessWidget {
         child: PrimaryActionButton(
           label: label,
           isLoading: isLoading,
-          loadingLabel: isDraft
+          loadingLabel: isDraft || (step == _WritingStep.review && !hasFeedback)
               ? 'Reviewing your writing…'
               : 'Checking your rewrite…',
           onPressed: isDraft
@@ -849,6 +904,8 @@ class _Footer extends StatelessWidget {
               ? (hasRewriteFeedback
                     ? onNext
                     : (rewriteReady ? onSubmitRewrite : null))
+              : step == _WritingStep.review && !hasFeedback
+              ? (draftReady ? onSubmit : null)
               : onNext,
           icon: isRewrite && hasRewriteFeedback
               ? CupertinoIcons.checkmark
@@ -1305,11 +1362,78 @@ class _ErrorText extends StatelessWidget {
   }
 }
 
-class _EmptyWritingBody extends StatelessWidget {
-  const _EmptyWritingBody();
+class _FeedbackPendingBody extends StatelessWidget {
+  const _FeedbackPendingBody({
+    required this.isLoading,
+    required this.errorText,
+    required this.onRetry,
+  });
+
+  final bool isLoading;
+  final String? errorText;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Write a draft first to unlock feedback.'));
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      children: [
+        const _SectionIntro(
+          kicker: '4 · COACH',
+          title: 'Preparing your feedback',
+          body:
+              'Your writing was submitted. We are turning it into a score, corrections, and one clear next step.',
+        ),
+        const SizedBox(height: 18),
+        LearningCard(
+          color: DesignTokens.infoSoft,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (isLoading)
+                    const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    const Icon(
+                      CupertinoIcons.exclamationmark_circle,
+                      color: DesignTokens.info,
+                    ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      isLoading
+                          ? 'The coach is reviewing your draft…'
+                          : 'The feedback did not load yet.',
+                      style: DesignTokens.body(15, weight: FontWeight.w700),
+                    ),
+                  ),
+                ],
+              ),
+              if (errorText != null && errorText!.trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  errorText!,
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                ),
+              ],
+              if (!isLoading) ...[
+                const SizedBox(height: 14),
+                PrimaryActionButton(
+                  label: 'Try feedback again',
+                  icon: CupertinoIcons.arrow_clockwise,
+                  onPressed: onRetry,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

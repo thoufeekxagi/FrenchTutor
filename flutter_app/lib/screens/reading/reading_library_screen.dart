@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -16,27 +15,29 @@ import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
+import '../exam/exam_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
 
 const _readingTopics = ['Travel', 'Food', 'Music', 'Technology', 'Environment'];
-
-const _readingSeeds = [
-  'a small-town bakery with a surprising new recipe',
-  'a weekend trip that goes slightly wrong',
-  'a mix-up on the first day of a new job',
-  'a new neighbour with an unusual hobby',
-  'a lost pet found in an unexpected place',
-  'a cooking mistake that turns into something good',
-];
 
 /// The reading shelf is deliberately separate from ListeningLabScreen. The
 /// two practices may share the generated-story storage and cover pipeline,
 /// but they do not share their teaching prompt or lesson flow.
 class ReadingLibraryScreen extends ConsumerStatefulWidget {
-  const ReadingLibraryScreen({super.key, this.topic, this.autoStart = false});
+  const ReadingLibraryScreen({
+    super.key,
+    this.topic,
+    this.autoStart = false,
+    this.examName,
+    this.examLevel,
+    this.examMode = false,
+  });
 
   final String? topic;
   final bool autoStart;
+  final String? examName;
+  final String? examLevel;
+  final bool examMode;
 
   @override
   ConsumerState<ReadingLibraryScreen> createState() =>
@@ -51,10 +52,12 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
   @override
   void initState() {
     super.initState();
-    _stories = ref
-        .read(generatedStoryStoreProvider)
-        .list(practiceMode: 'reading');
-    unawaited(_refreshStories());
+    if (!widget.examMode) {
+      _stories = ref
+          .read(generatedStoryStoreProvider)
+          .list(practiceMode: 'reading');
+      unawaited(_refreshStories());
+    }
     if (widget.autoStart) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) unawaited(_generate());
@@ -63,6 +66,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
   }
 
   Future<void> _refreshStories() async {
+    if (widget.examMode) return;
     try {
       await ref.read(syncServiceProvider).hydrateGeneratedStories();
     } catch (error, stackTrace) {
@@ -81,26 +85,17 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     return const {'a1', 'a2', 'b1', 'b2'}.contains(level) ? level : 'a2';
   }
 
-  String _topicFor(String? profileTopic) {
+  String? _topicFor(String? profileTopic) {
     if (widget.topic != null && widget.topic!.trim().isNotEmpty) {
       return 'a short everyday story connected to ${widget.topic}';
     }
     if (profileTopic != null) {
       return 'something related to ${profileTopic.toLowerCase()} that could happen in daily life';
     }
-    final profile = ref.read(learningStoreProvider).profile();
-    final pool = [
-      ..._readingTopics.map(
-        (topic) =>
-            'something related to ${topic.toLowerCase()} that could happen in daily life',
-      ),
-      ...profile.interests.map(
-        (interest) =>
-            'something related to $interest that could happen in daily life',
-      ),
-      ..._readingSeeds,
-    ];
-    return pool[Random().nextInt(pool.length)];
+    // Null is intentional: it is the true Surprise me mode. The generator
+    // must choose the premise itself rather than receiving onboarding
+    // interests or a small fixed topic pool.
+    return null;
   }
 
   Future<void> _generate() async {
@@ -110,7 +105,9 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       final profile = ref.read(learningStoreProvider).profile();
       final package = await LessonAgentService.shared.buildReadingStoryBook(
         topic: _topicFor(_selectedTopic),
-        levelBand: _levelFor(profile.level),
+        levelBand: widget.examLevel ?? _levelFor(profile.level),
+        examName: widget.examMode ? widget.examName : null,
+        examLevel: widget.examMode ? widget.examLevel : null,
       );
       final story = GeneratedStory(
         id: newGeneratedStoryId(),
@@ -125,27 +122,71 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         practiceMode: 'reading',
       );
 
-      // Save immediately. Artwork is best-effort and must not block opening
-      // or make a generated story disappear if the image provider is slow.
-      ref.read(generatedStoryStoreProvider).insert(story);
-      unawaited(_prewarmNarration(story));
-      if (!mounted) return;
-      setState(() {
-        _stories = ref
-            .read(generatedStoryStoreProvider)
-            .list(practiceMode: 'reading');
-        _generating = false;
-      });
-      final result = await AppRouter.push<StoryReaderResult>(
-        context,
-        (_) =>
-            StoryReaderScreen(story: story, showFinishButton: widget.autoStart),
-        fullscreenDialog: widget.autoStart,
-      );
-      if (widget.autoStart && mounted) {
-        Navigator.of(context).pop(result != null);
+      final examAttempt = widget.examMode
+          ? ref
+                .read(examPracticeStoreProvider)
+                .startStory(
+                  examName: widget.examName ?? 'Exam practice',
+                  levelBand: widget.examLevel ?? story.levelBand,
+                  skill: 'reading',
+                  story: story,
+                )
+          : null;
+      // Exam content lives only in the readiness store. Regular stories keep
+      // using the course library and its artwork/narration pipeline.
+      if (!widget.examMode) {
+        ref.read(generatedStoryStoreProvider).insert(story);
+        unawaited(_prewarmNarration(story));
       }
-      unawaited(_generateCover(story, package.coverPrompt));
+      if (!mounted) return;
+      if (!widget.examMode) {
+        setState(() {
+          _stories = ref
+              .read(generatedStoryStoreProvider)
+              .list(practiceMode: 'reading');
+          _generating = false;
+        });
+        // Start artwork before opening the reader. The reader watches the
+        // saved story and can replace its placeholder as soon as the upload
+        // completes.
+        unawaited(_generateCover(story, package.coverPrompt));
+      }
+      if (widget.examMode) {
+        final result = await AppRouter.push<ExamPracticeResult>(
+          context,
+          (_) => ExamPracticeScreen(
+            story: story,
+            examName: widget.examName ?? 'Exam practice',
+            levelBand: widget.examLevel ?? story.levelBand,
+            skill: 'reading',
+          ),
+          fullscreenDialog: true,
+        );
+        if (result != null && examAttempt != null) {
+          ref
+              .read(examPracticeStoreProvider)
+              .complete(
+                id: examAttempt.id,
+                score: result.correct,
+                total: result.total,
+              );
+        }
+        if (widget.autoStart && mounted) {
+          Navigator.of(context).pop(result != null);
+        }
+      } else {
+        final result = await AppRouter.push<StoryReaderResult>(
+          context,
+          (_) => StoryReaderScreen(
+            story: story,
+            showFinishButton: widget.autoStart,
+          ),
+          fullscreenDialog: widget.autoStart,
+        );
+        if (widget.autoStart && mounted) {
+          Navigator.of(context).pop(result != null);
+        }
+      }
     } catch (error, stackTrace) {
       debugPrint('Reading story generation failed: $error\n$stackTrace');
       if (mounted) {

@@ -11,6 +11,8 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/learning_card.dart';
+import '../../widgets/bilingual_word_text.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -68,6 +70,9 @@ class _ListeningPracticeScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Listening';
+    });
     _story = widget.story;
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
@@ -440,22 +445,30 @@ class _ListeningPracticeScreenState
           ReportProblemButton(sessionType: 'Listening: ${_story.displayTitle}'),
         ],
       ),
-      body: WebConstrainedView(
-        maxWidth: 760,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 32),
-          children: [
-            _ListeningHeader(story: _story),
-            const SizedBox(height: DesignTokens.space5),
-            _StageRail(current: _stage),
-            const SizedBox(height: DesignTokens.space5),
-            AnimatedSwitcher(
-              duration: DesignTokens.durationMedium,
-              switchInCurve: DesignTokens.curveStandard,
-              child: KeyedSubtree(key: ValueKey(_stage), child: _stageBody()),
+      body: Stack(
+        children: [
+          WebConstrainedView(
+            maxWidth: 760,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 32),
+              children: [
+                _ListeningHeader(story: _story),
+                const SizedBox(height: DesignTokens.space5),
+                _StageRail(current: _stage),
+                const SizedBox(height: DesignTokens.space5),
+                AnimatedSwitcher(
+                  duration: DesignTokens.durationMedium,
+                  switchInCurve: DesignTokens.curveStandard,
+                  child: KeyedSubtree(
+                    key: ValueKey(_stage),
+                    child: _stageBody(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+        ],
       ),
     );
   }
@@ -620,7 +633,9 @@ class _ListeningPracticeScreenState
         : _story.keywords.cast<VocabEntry?>().firstWhere(
             (entry) =>
                 entry != null &&
-                entry.fr.toLowerCase() == selectedWord.toLowerCase(),
+                _plainWords(
+                  _normalize(entry.fr),
+                ).contains(_normalize(selectedWord)),
             orElse: () => null,
           );
     return Column(
@@ -650,39 +665,23 @@ class _ListeningPracticeScreenState
                 ).copyWith(color: DesignTokens.primarySoft),
               ),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 4,
-                runSpacing: 6,
-                children: [
-                  for (var index = 0; index < words.length; index++)
-                    GestureDetector(
-                      onTap: () => setState(
-                        () => _selectedWordIndex = _selectedWordIndex == index
-                            ? null
-                            : index,
-                      ),
-                      child: Text(
-                        '${words[index]}${index == words.length - 1 ? '' : ' '}',
-                        style: DesignTokens.display(20).copyWith(
-                          color: _selectedWordIndex == index
-                              ? DesignTokens.mastery
-                              : Colors.white,
-                          decoration: _selectedWordIndex == index
-                              ? TextDecoration.underline
-                              : null,
-                          decorationColor: DesignTokens.mastery,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              if (_showTranslation) ...[
-                const SizedBox(height: 16),
-                Text(
-                  line.en,
-                  style: DesignTokens.body(14).copyWith(color: Colors.white70),
+              BilingualWordText(
+                source: line.fr,
+                translation: _showTranslation ? line.en : '',
+                sourceStyle: DesignTokens.display(
+                  20,
+                ).copyWith(color: Colors.white),
+                translationStyle: DesignTokens.body(
+                  14,
+                ).copyWith(color: Colors.white70),
+                keywords: _story.keywords,
+                selectedSourceWord: _selectedWordIndex,
+                onSourceWordTap: (index) => setState(
+                  () => _selectedWordIndex = _selectedWordIndex == index
+                      ? null
+                      : index,
                 ),
-              ],
+              ),
               const SizedBox(height: 18),
               Row(
                 children: [

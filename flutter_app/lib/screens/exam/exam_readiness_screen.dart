@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../flow/stage_outcome.dart';
+import '../../models/exam_practice.dart';
 import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
 import '../labs/listening_lab_screen.dart';
@@ -11,6 +13,8 @@ import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../session/session_screen.dart';
 import '../speak/speak_ui.dart';
+import '../subscription/paywall_screen.dart';
+import '../../widgets/adaptive/adaptive.dart';
 
 enum _ExamFamily { tcf, tef }
 
@@ -27,6 +31,7 @@ class ExamReadinessScreen extends ConsumerStatefulWidget {
 }
 
 class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
+  static const _freePracticeSets = 3;
   _ExamFamily _exam = _ExamFamily.tcf;
   String _level = 'A2';
   bool _prepared = false;
@@ -40,13 +45,75 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
 
   void _prepare() => setState(() => _prepared = true);
 
+  Future<bool> _allowExamPractice() async {
+    final gate = ref.read(subscriptionGateServiceProvider);
+    if (gate.isSubscribed()) return true;
+    final used = ref.read(examPracticeStoreProvider).startedCount();
+    if (used < _freePracticeSets) return true;
+    if (!mounted) return false;
+    final upgrade = await showPSConfirmDialog(
+      context,
+      title: 'Your free practice sets are complete',
+      message:
+          'You have used the three free exam-readiness sets. Keep practicing with Premium, or review your saved results in Exam readiness.',
+      confirmLabel: 'See Premium',
+      cancelLabel: 'Not now',
+    );
+    if (!upgrade || !mounted) return false;
+    await AppRouter.push<bool>(
+      context,
+      (_) => const PaywallScreen(),
+      fullscreenDialog: true,
+    );
+    return ref.read(subscriptionGateServiceProvider).isSubscribed();
+  }
+
+  Future<void> _openReading() async {
+    if (!await _allowExamPractice() || !mounted) return;
+    await AppRouter.push(
+      context,
+      (_) => ReadingLibraryScreen(
+        topic: _examContext,
+        examName: _examName,
+        examLevel: _level,
+        examMode: true,
+        autoStart: true,
+      ),
+      fullscreenDialog: true,
+    );
+  }
+
+  Future<void> _openListening() async {
+    if (!await _allowExamPractice() || !mounted) return;
+    await AppRouter.push(
+      context,
+      (_) => ListeningLabScreen(
+        topic: _examContext,
+        examName: _examName,
+        examLevel: _level,
+        examMode: true,
+        autoStart: true,
+      ),
+      fullscreenDialog: true,
+    );
+  }
+
   Future<void> _openSpeaking() async {
+    if (!await _allowExamPractice() || !mounted) return;
     final allowed = await ensureAiSessionQuota(
       context,
       ref.read(pilotAccessServiceProvider),
     );
     if (!allowed || !mounted) return;
-    await AppRouter.push(
+    final attemptId = ref
+        .read(examPracticeStoreProvider)
+        .startMetadata(
+          examName: _examName,
+          levelBand: _level,
+          skill: 'speaking',
+          content: {'kind': 'speaking', 'context': _examContext},
+        );
+    final result = await AppRouter.push<SpeakingResult>(
       context,
       (_) => SessionScreen(
         apiKey: ApiKeys.geminiKey,
@@ -55,6 +122,27 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
         stage: 'speaking_exam',
         lessonContext: _examContext,
         examMode: true,
+      ),
+      fullscreenDialog: true,
+    );
+    if (result != null && result.meetsThreshold) {
+      ref
+          .read(examPracticeStoreProvider)
+          .complete(id: attemptId, score: 1, total: 1);
+    }
+  }
+
+  Future<void> _openWriting() async {
+    if (!await _allowExamPractice() || !mounted) return;
+    await AppRouter.push<bool>(
+      context,
+      (_) => WritingLabScreen(
+        topic: _examName,
+        contextPrompt: _examContext,
+        examName: _examName,
+        examLevel: _level,
+        examMode: true,
+        autoStart: true,
       ),
       fullscreenDialog: true,
     );
@@ -163,6 +251,9 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                _RecentExamPractice(
+                  attempts: ref.read(examPracticeStoreProvider).summaries(),
+                ),
                 if (!_prepared)
                   SpeakPrimaryButton(
                     label: 'Generate $_examName practice',
@@ -173,7 +264,7 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                   Text('$_examName · $_level', style: DesignTokens.display(22)),
                   const SizedBox(height: 6),
                   Text(
-                    'Choose a skill to generate the next exam-matched task.',
+                    'Choose a skill to start an independent exam practice set. Your result stays here, not in the course library.',
                     style: DesignTokens.body(
                       13,
                     ).copyWith(color: SpeakColors.inkSoft),
@@ -182,32 +273,20 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                   _SkillLauncher(
                     icon: Icons.menu_book_outlined,
                     title: 'Reading',
-                    subtitle: 'Generate an exam-style reading story',
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => ReadingLibraryScreen(topic: _examContext),
-                    ),
+                    subtitle: 'Start an exam-style reading QCM',
+                    onTap: _openReading,
                   ),
                   _SkillLauncher(
                     icon: Icons.headphones_outlined,
                     title: 'Listening',
-                    subtitle: 'Generate an exam-style listening task',
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => ListeningLabScreen(topic: _examContext),
-                    ),
+                    subtitle: 'Start a one-play exam listening QCM',
+                    onTap: _openListening,
                   ),
                   _SkillLauncher(
                     icon: Icons.edit_note_rounded,
                     title: 'Writing',
-                    subtitle: 'Generate an exam-style writing prompt',
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => WritingLabScreen(
-                        topic: _examName,
-                        contextPrompt: _examContext,
-                      ),
-                    ),
+                    subtitle: 'Start an exam-style writing task',
+                    onTap: _openWriting,
                   ),
                   _SkillLauncher(
                     icon: Icons.mic_none_rounded,
@@ -334,6 +413,62 @@ class _SkillLauncher extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecentExamPractice extends StatelessWidget {
+  const _RecentExamPractice({required this.attempts});
+
+  final List<ExamPracticeSummary> attempts;
+
+  @override
+  Widget build(BuildContext context) {
+    if (attempts.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: SpeakCard(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('RECENT READINESS', style: DesignTokens.label(10)),
+            const SizedBox(height: 8),
+            for (final attempt in attempts.take(4))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 7),
+                child: Row(
+                  children: [
+                    Icon(
+                      attempt.isCompleted
+                          ? Icons.check_circle_outline_rounded
+                          : Icons.timelapse_rounded,
+                      size: 17,
+                      color: attempt.isCompleted
+                          ? SpeakColors.green
+                          : SpeakColors.inkSoft,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${attempt.examName} · ${attempt.skill[0].toUpperCase()}${attempt.skill.substring(1)} · ${attempt.levelBand}',
+                        style: DesignTokens.body(12),
+                      ),
+                    ),
+                    if (attempt.score != null && attempt.total != null)
+                      Text(
+                        '${attempt.score}/${attempt.total}',
+                        style: DesignTokens.body(
+                          12,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: SpeakColors.blue),
+                      ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );

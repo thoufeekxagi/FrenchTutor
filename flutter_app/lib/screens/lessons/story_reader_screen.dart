@@ -11,11 +11,14 @@ import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
+import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
+import '../../widgets/learning_card.dart';
 import '../../widgets/lesson_stage_rail.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/report_problem_button.dart';
+import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
@@ -118,12 +121,22 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   /// playing right now (for auto-scroll and the "now playing" highlight).
   int? _selectedSegment;
 
+  /// The word selected for meaning in the story. Only one word is selected at
+  /// a time so its glossary match can be highlighted in the English line too.
+  int? _selectedWordSegment;
+  int? _selectedWord;
+
   /// Which word (by index, split on whitespace) within the currently-playing
   /// segment's French text the narration has reached — null when nothing is
   /// playing, or once a segment's estimated timing runs past its last word.
   /// Timing comes from `LessonSpeechService`'s `onWordBoundary`, estimated
   /// from the known playback duration, not exact phoneme timing.
   int? _currentWord;
+
+  /// Artwork is generated independently of the story text so the learner can
+  /// enter immediately. Keep the open reader watching the saved story until
+  /// the background upload fills in its cover URL.
+  Timer? _coverRefreshTimer;
 
   /// Starts as [StoryReaderScreen.story]; replaced once [StoryReaderScreen.enrichment]
   /// resolves, so the Quiz/Keywords tabs update without navigating away.
@@ -190,6 +203,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       stage: 'story',
       topic: _story.displayTitle,
     );
+    if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
+      _coverRefreshTimer = Timer.periodic(
+        const Duration(seconds: 2),
+        (_) => _refreshCoverFromStore(),
+      );
+    }
     final enrichment = widget.enrichment;
     if (enrichment != null) {
       _enriching = true;
@@ -222,10 +241,32 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _coverRefreshTimer?.cancel();
     _call.dispose();
     LessonSpeechService.shared.stop();
     _finishSession();
     super.dispose();
+  }
+
+  void _refreshCoverFromStore() {
+    if (!mounted || _story.coverUrl?.isNotEmpty == true) {
+      _coverRefreshTimer?.cancel();
+      return;
+    }
+    GeneratedStory? latest;
+    for (final candidate
+        in ref
+            .read(generatedStoryStoreProvider)
+            .list(practiceMode: 'reading')) {
+      if (candidate.id == _story.id) {
+        latest = candidate;
+        break;
+      }
+    }
+    final coverUrl = latest?.coverUrl;
+    if (coverUrl == null || coverUrl.isEmpty) return;
+    setState(() => _story = _story.copyWith(coverUrl: coverUrl));
+    _coverRefreshTimer?.cancel();
   }
 
   void _finishSession() {
@@ -365,6 +406,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     }
   }
 
+  void _retreatTab() {
+    switch (_tab) {
+      case _StoryTab.story:
+        return;
+      case _StoryTab.keywords:
+        unawaited(_switchTab(_StoryTab.story));
+      case _StoryTab.grammar:
+        unawaited(_switchTab(_StoryTab.keywords));
+      case _StoryTab.quiz:
+        unawaited(_switchTab(_StoryTab.grammar));
+    }
+  }
+
   String get _nextTabLabel => switch (_tab) {
     _StoryTab.story => 'Words',
     _StoryTab.keywords => 'Grammar',
@@ -379,6 +433,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     setState(() {
       _currentSegment = index;
       _selectedSegment = null;
+      _selectedWordSegment = null;
+      _selectedWord = null;
     });
   }
 
@@ -394,7 +450,30 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }
 
   void _selectSegment(int index) {
-    setState(() => _selectedSegment = _selectedSegment == index ? null : index);
+    setState(() {
+      final keepsWordSelection = _selectedWordSegment == index;
+      _selectedSegment = _selectedSegment == index ? null : index;
+      // A word tap is nested inside the sentence gesture. Keep its meaning
+      // highlight if the parent recognizer also receives that same tap, so
+      // narration never clears or changes the learner's selection.
+      if (!keepsWordSelection) {
+        _selectedWordSegment = null;
+        _selectedWord = null;
+      }
+    });
+  }
+
+  void _selectWord(int segmentIndex, int wordIndex) {
+    setState(() {
+      _selectedSegment = segmentIndex;
+      if (_selectedWordSegment == segmentIndex && _selectedWord == wordIndex) {
+        _selectedWordSegment = null;
+        _selectedWord = null;
+      } else {
+        _selectedWordSegment = segmentIndex;
+        _selectedWord = wordIndex;
+      }
+    });
   }
 
   /// Plays just the one picked sentence (or the current one if nothing is
@@ -522,7 +601,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     nextLabel: _nextTabLabel,
                   )
                 else
-                  _StoryNextBar(label: _nextTabLabel, onPressed: _advanceTab),
+                  _StoryNextBar(
+                    label: _nextTabLabel,
+                    onPressed: _advanceTab,
+                    onBack: _retreatTab,
+                  ),
               ],
             ),
             FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
@@ -675,79 +758,71 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }) {
     final isPlayingNow = index == _currentSegment && _isPlaying;
     final isPicked = !_isPlaying && index == _selectedSegment;
-    final isHighlighted = isPlayingNow || isPicked;
+    final selectedWord = _selectedWordSegment == index ? _selectedWord : null;
+    final isHighlighted = isPlayingNow || (isPicked && selectedWord == null);
     return Padding(
       key: _keyFor(index),
       padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _selectSegment(index),
-        child: ModernCard(
-          padding: 16,
-          child: Container(
-            padding: isHighlighted
-                ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
-                : EdgeInsets.zero,
-            decoration: isHighlighted
-                ? BoxDecoration(
-                    color: DesignTokens.primarySoft,
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusMedium,
-                    ),
-                  )
-                : null,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (showCharacter && segment.characterFr != null) ...[
-                  Text(
-                    segment.characterFr!,
-                    style: DesignTokens.mono(11, weight: FontWeight.w700)
-                        .copyWith(
-                          color: DesignTokens.mutedDim,
-                          letterSpacing: 0.8,
-                        ),
-                  ),
-                  const SizedBox(height: 6),
-                ],
-                isPlayingNow
-                    ? _WordHighlightText(
-                        text: segment.fr,
-                        currentWord: _currentWord,
-                        style: DesignTokens.body(
-                          17,
-                          weight: FontWeight.w600,
-                        ).copyWith(height: 1.4),
-                      )
-                    : Text(
-                        segment.fr,
-                        style: DesignTokens.body(
-                          17,
-                          weight: FontWeight.w600,
-                        ).copyWith(height: 1.4),
+        child: SizedBox(
+          width: double.infinity,
+          child: LearningCard(
+            padding: 16,
+            color: DesignTokens.ink,
+            borderColor: DesignTokens.ink,
+            child: Container(
+              padding: isHighlighted
+                  ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
+                  : EdgeInsets.zero,
+              decoration: isHighlighted
+                  ? BoxDecoration(
+                      color: DesignTokens.mastery.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusMedium,
                       ),
-                if (segment.en.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  isPlayingNow
-                      ? _WordHighlightText(
-                          text: segment.en,
-                          currentWord: _mappedTranslationWord(
+                    )
+                  : null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (showCharacter && segment.characterFr != null) ...[
+                    Text(
+                      segment.characterFr!,
+                      style: DesignTokens.mono(11, weight: FontWeight.w700)
+                          .copyWith(
+                            color: DesignTokens.mutedDim,
+                            letterSpacing: 0.8,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  BilingualWordText(
+                    source: segment.fr,
+                    translation: segment.en,
+                    sourceStyle: DesignTokens.body(
+                      17,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: Colors.white, height: 1.4),
+                    translationStyle: DesignTokens.body(
+                      14.5,
+                    ).copyWith(color: Colors.white70, height: 1.4),
+                    keywords: _story.keywords,
+                    selectedSourceWord: selectedWord,
+                    playbackSourceWord: isPlayingNow ? _currentWord : null,
+                    playbackTranslationWord: isPlayingNow
+                        ? _mappedTranslationWord(
                             currentWord: _currentWord,
                             source: segment.fr,
                             translation: segment.en,
-                          ),
-                          style: DesignTokens.body(
-                            14.5,
-                          ).copyWith(color: DesignTokens.primary, height: 1.4),
-                        )
-                      : Text(
-                          segment.en,
-                          style: DesignTokens.body(
-                            14.5,
-                          ).copyWith(color: DesignTokens.primary, height: 1.4),
-                        ),
+                          )
+                        : null,
+                    onSourceWordTap: (wordIndex) =>
+                        _selectWord(index, wordIndex),
+                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -789,12 +864,28 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'From this story',
-                  style: DesignTokens.mono(
-                    10.5,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'From this story',
+                        style: DesignTokens.mono(10.5, weight: FontWeight.w700)
+                            .copyWith(
+                              color: DesignTokens.primary,
+                              letterSpacing: 0.8,
+                            ),
+                      ),
+                    ),
+                    TtsPlayButton(
+                      text: points[i].fr,
+                      size: DesignTokens.minTapTarget,
+                      iconSize: 20,
+                      label: 'Listen',
+                      contentItemId: _story.segmentContentId(
+                        _passage.segments.indexOf(points[i]),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -949,11 +1040,23 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                entry.en,
-                style: DesignTokens.body(
-                  13.5,
-                ).copyWith(color: DesignTokens.primary),
+              TtsPlayButton(
+                text: entry.fr,
+                audioResolver: () =>
+                    LessonSpeechService.shared.loadCachedAudio(entry.fr),
+                size: DesignTokens.minTapTarget,
+                iconSize: 20,
+                color: DesignTokens.mastery,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  entry.en,
+                  textAlign: TextAlign.right,
+                  style: DesignTokens.body(
+                    13.5,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
               ),
             ],
           ),
@@ -1373,44 +1476,6 @@ class _ReadingModeToggle extends StatelessWidget {
   }
 }
 
-class _WordHighlightText extends StatelessWidget {
-  const _WordHighlightText({
-    required this.text,
-    required this.currentWord,
-    required this.style,
-  });
-
-  final String text;
-  final int? currentWord;
-  final TextStyle style;
-
-  @override
-  Widget build(BuildContext context) {
-    final words = text.split(RegExp(r'\s+'));
-    return Text.rich(
-      TextSpan(
-        children: [
-          for (var i = 0; i < words.length; i++) ...[
-            if (i > 0) const TextSpan(text: ' '),
-            TextSpan(
-              text: words[i],
-              style: i == currentWord
-                  ? style.copyWith(
-                      backgroundColor: DesignTokens.primary.withValues(
-                        alpha: 0.22,
-                      ),
-                      color: DesignTokens.primaryDeep,
-                    )
-                  : style,
-            ),
-          ],
-        ],
-      ),
-      style: style,
-    );
-  }
-}
-
 int? _mappedTranslationWord({
   required int? currentWord,
   required String source,
@@ -1531,7 +1596,10 @@ class _AudioControlBar extends StatelessWidget {
               ),
               child: Text(
                 nextLabel,
-                style: DesignTokens.body(13.5, weight: FontWeight.w600),
+                style: DesignTokens.body(
+                  13.5,
+                  weight: FontWeight.w600,
+                ).copyWith(color: Colors.white),
               ),
             ),
           ],
@@ -1570,10 +1638,15 @@ class _AudioControlBar extends StatelessWidget {
 }
 
 class _StoryNextBar extends StatelessWidget {
-  const _StoryNextBar({required this.label, required this.onPressed});
+  const _StoryNextBar({
+    required this.label,
+    required this.onPressed,
+    required this.onBack,
+  });
 
   final String label;
   final VoidCallback onPressed;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1591,25 +1664,53 @@ class _StoryNextBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: ElevatedButton.icon(
-            onPressed: onPressed,
-            icon: const Icon(CupertinoIcons.arrow_right, size: 16),
-            label: Text(
-              'Next: $label',
-              style: DesignTokens.body(13.5, weight: FontWeight.w700),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: DesignTokens.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        child: Row(
+          children: [
+            OutlinedButton.icon(
+              onPressed: onBack,
+              icon: const Icon(CupertinoIcons.arrow_left, size: 16),
+              label: Text(
+                'Back',
+                style: DesignTokens.body(13.5, weight: FontWeight.w700),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: DesignTokens.ink,
+                side: BorderSide(color: DesignTokens.hairline),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                ),
               ),
             ),
-          ),
+            const Spacer(),
+            ElevatedButton.icon(
+              onPressed: onPressed,
+              icon: const Icon(CupertinoIcons.arrow_right, size: 16),
+              label: Text(
+                'Next: $label',
+                style: DesignTokens.body(
+                  13.5,
+                  weight: FontWeight.w700,
+                ).copyWith(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: DesignTokens.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

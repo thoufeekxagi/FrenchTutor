@@ -41,23 +41,19 @@ void main() {
   final days = int.tryParse(Platform.environment['DAYS'] ?? '') ?? 30;
   final apiKey = Platform.environment['GEMINI_API_KEY'];
 
-  test(
-    'simulate $days days at $level',
-    () async {
-      if (apiKey == null || apiKey.isEmpty) {
-        fail(
-          'Set GEMINI_API_KEY, e.g.:\n'
-          '  GEMINI_API_KEY=xxx LEVEL=$level DAYS=$days flutter test '
-          'personalized_test_verification/simulate_journey_test.dart --timeout none',
-        );
-      }
-      if (!_levels.contains(level)) {
-        fail('LEVEL must be one of $_levels, got "$level"');
-      }
-      await _runLevel(level: level, days: days, apiKey: apiKey);
-    },
-    timeout: Timeout.none,
-  );
+  test('simulate $days days at $level', () async {
+    if (apiKey == null || apiKey.isEmpty) {
+      fail(
+        'Set GEMINI_API_KEY, e.g.:\n'
+        '  GEMINI_API_KEY=xxx LEVEL=$level DAYS=$days flutter test '
+        'personalized_test_verification/simulate_journey_test.dart --timeout none',
+      );
+    }
+    if (!_levels.contains(level)) {
+      fail('LEVEL must be one of $_levels, got "$level"');
+    }
+    await _runLevel(level: level, days: days, apiKey: apiKey);
+  }, timeout: Timeout.none);
 }
 
 Future<void> _runLevel({
@@ -65,8 +61,7 @@ Future<void> _runLevel({
   required int days,
   required String apiKey,
 }) async {
-  final outPath =
-      'personalized_test_verification/output/${level}_journey.json';
+  final outPath = 'personalized_test_verification/output/${level}_journey.json';
   final outFile = File(outPath);
   if (outFile.existsSync()) {
     final existing = jsonDecode(outFile.readAsStringSync()) as Map;
@@ -132,19 +127,9 @@ Future<void> _runLevel({
     List<VocabEntry> todaysWords = const [];
     try {
       final candidates = await srs.dailyMixedQueue();
-      final mistakeTags = store
-          .topMistakeTags()
-          .map((m) => (tag: m.tag, description: m.description, count: m.count))
-          .toList();
-      final recentDiary = store
-          .recentDiaryEntries()
-          .map((d) => '${d.stage}: ${d.summary}')
-          .toList();
       final plan = await LessonAgentService.shared.planVocabSession(
         candidateWords: candidates,
         count: candidates.length,
-        mistakeTags: mistakeTags,
-        recentDiary: recentDiary,
       );
       final orderedIds = plan.prioritizedWordIds;
       final ordered = orderedIds == null
@@ -165,10 +150,7 @@ Future<void> _runLevel({
         stage: 'vocab',
         summary: '${plan.focusNote} (${todaysWords.length} words)',
       );
-      record['vocab'] = {
-        'focusNote': plan.focusNote,
-        'words': reviewed,
-      };
+      record['vocab'] = {'focusNote': plan.focusNote, 'words': reviewed};
     } catch (e) {
       errors.add('vocab: $e');
       record['vocab'] = {'error': '$e'};
@@ -180,20 +162,8 @@ Future<void> _runLevel({
       if (candidates.isEmpty) {
         record['grammar'] = {'note': 'no remaining grammar candidates'};
       } else {
-        final mistakeTags = store
-            .topMistakeTags()
-            .map(
-              (m) => (tag: m.tag, description: m.description, count: m.count),
-            )
-            .toList();
-        final recentDiary = store
-            .recentDiaryEntries()
-            .map((d) => '${d.stage}: ${d.summary}')
-            .toList();
         final plan = await LessonAgentService.shared.planGrammarSession(
           candidates: candidates,
-          mistakeTags: mistakeTags,
-          recentDiary: recentDiary,
         );
         final usage = _grammarUsageFor(plan.chosenId);
         final chosenTitle = candidates
@@ -202,12 +172,12 @@ Future<void> _runLevel({
               orElse: () => candidates.first,
             )
             .title;
-        final cards = await LessonAgentService.shared.generateGrammarPracticeCards(
-          tenseTitle: chosenTitle,
-          tenseUsage: usage,
-          vocabWords: todaysWords.map((w) => w.fr).toList(),
-          recentVocabTranscript: '',
-        );
+        final cards = await LessonAgentService.shared
+            .generateGrammarPracticeCards(
+              tenseTitle: chosenTitle,
+              tenseUsage: usage,
+              vocabWords: todaysWords.map((w) => w.fr).toList(),
+            );
         store.setLessonStatus(plan.chosenId, 'completed');
         store.saveDiaryEntry(
           stage: 'grammar',
@@ -233,8 +203,8 @@ Future<void> _runLevel({
           ? await LessonAgentService.shared.buildReadingPassageFromVocab(
               words: todaysWords.isEmpty
                   ? ContentService.shared.vocabPhases.first.themes.first.entries
-                      .take(4)
-                      .toList()
+                        .take(4)
+                        .toList()
                   : todaysWords,
               levelBand: levelBand,
             )
@@ -398,7 +368,8 @@ void _seedStartingKnowledge({
 List<({String id, String title})> _grammarCandidates(LearningStore store) {
   final grammar = ContentService.shared.grammar();
   if (grammar == null) return const [];
-  final lessons = [...grammar.lessons]..sort((a, b) => a.order.compareTo(b.order));
+  final lessons = [...grammar.lessons]
+    ..sort((a, b) => a.order.compareTo(b.order));
   final result = <({String id, String title})>[];
   for (final lesson in lessons) {
     if (store.lessonStatus(lesson.id).status != 'completed') {

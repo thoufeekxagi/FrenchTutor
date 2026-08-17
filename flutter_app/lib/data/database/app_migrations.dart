@@ -88,6 +88,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   22: _migrationV22,
   23: _migrationV23,
   24: _migrationV24,
+  25: _migrationV25,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -984,5 +985,32 @@ void _migrationV24(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_generated_vocabulary_sets_created '
     'ON generated_vocabulary_sets (created_at)',
+  );
+}
+
+/// Dedicated local history for exam-readiness practice. This is intentionally
+/// separate from the course-generated content tables so an exam attempt never
+/// appears in Reading or Listening libraries.
+void _migrationV25(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS exam_practice_attempts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      exam_name TEXT NOT NULL,
+      level_band TEXT NOT NULL,
+      skill TEXT NOT NULL,
+      content_json TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'in_progress',
+      score INTEGER,
+      total INTEGER,
+      created_at TEXT NOT NULL,
+      completed_at TEXT,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_exam_practice_attempts_scope '
+    'ON exam_practice_attempts (exam_name, level_band, skill, created_at)',
   );
 }

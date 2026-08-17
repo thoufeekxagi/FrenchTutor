@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
-import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
@@ -16,32 +14,19 @@ import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
+import '../exam/exam_practice_screen.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
 
 // Fixed topic categories the learner can tap to steer generation, alongside
-// "Surprise me" (fully random) — kept short since these are also chip labels.
-// Onboarding interests are folded into the same random pool as these, not
-// treated as the default/only choice, so repeated generations don't keep
-// landing on the same one or two interests picked at onboarding.
+// "Surprise me" (no topic supplied) — kept short since these are also chip
+// labels. Surprise mode does not inject onboarding interests.
 const _storyTopicCategories = [
   'Travel',
   'Food',
   'Music',
   'Technology',
   'Environment',
-];
-
-// Fallback for a profile with no onboarding interests picked (skipped the
-// question, or a pre-existing profile from before it existed): a small
-// rotating pool of broadly appealing topics, one picked at random each time.
-const _storyTopics = [
-  'a small-town bakery with a surprising new recipe',
-  'a weekend trip that goes slightly wrong',
-  'a mix-up on the first day of a new job',
-  'a new neighbour with an unusual hobby',
-  'a lost pet found in an unexpected place',
-  'a cooking mistake that turns into something good',
 ];
 
 /// The learner's personal library of AI-generated stories — the "Read a new
@@ -55,11 +40,17 @@ class ListeningLabScreen extends ConsumerStatefulWidget {
     this.topic,
     this.readingMode = false,
     this.autoStart = false,
+    this.examName,
+    this.examLevel,
+    this.examMode = false,
   });
 
   final String? topic;
   final bool readingMode;
   final bool autoStart;
+  final String? examName;
+  final String? examLevel;
+  final bool examMode;
 
   @override
   ConsumerState<ListeningLabScreen> createState() => _ListeningLabScreenState();
@@ -85,6 +76,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
 
   void _loadStories() {
     if (!mounted) return;
+    if (widget.examMode) return;
     final store = ref.read(generatedStoryStoreProvider);
     setState(
       () => _stories = store.list(
@@ -94,6 +86,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   }
 
   Future<void> _refreshStories() async {
+    if (widget.examMode) return;
     try {
       await ref.read(syncServiceProvider).hydrateGeneratedStories();
     } catch (error, stackTrace) {
@@ -109,8 +102,10 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       final profile = ref.read(learningStoreProvider).profile();
       final levelBand = _cefrLevelFor(profile.level).toUpperCase();
       final package = await LessonAgentService.shared.buildListeningStoryBook(
-        topic: _topicFor(profile),
-        levelBand: levelBand,
+        topic: _topicFor(),
+        levelBand: widget.examLevel ?? levelBand,
+        examName: widget.examMode ? widget.examName : null,
+        examLevel: widget.examMode ? widget.examLevel : null,
       );
       final story = GeneratedStory(
         id: newGeneratedStoryId(),
@@ -124,22 +119,47 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         readTimeMinutes: package.readTimeMinutes,
         practiceMode: 'listening',
       );
+      final examAttempt = widget.examMode
+          ? ref
+                .read(examPracticeStoreProvider)
+                .startStory(
+                  examName: widget.examName ?? 'Exam practice',
+                  levelBand: widget.examLevel ?? story.levelBand,
+                  skill: 'listening',
+                  story: story,
+                )
+          : null;
       final store = ref.read(generatedStoryStoreProvider);
-      store.insert(story);
-      unawaited(_prewarmNarration(story));
+      if (!widget.examMode) {
+        store.insert(story);
+        unawaited(_prewarmNarration(story));
+      }
       if (!mounted) return;
-      _loadStories();
-      final result = await AppRouter.push<bool>(
+      if (!widget.examMode) _loadStories();
+      // Start artwork before entering the lesson. The open lesson watches
+      // the shared story store and replaces its placeholder live.
+      if (!widget.examMode) {
+        unawaited(_generateCover(story, package.coverPrompt));
+      }
+      final result = await AppRouter.push<Object?>(
         context,
         (_) => _lessonScreen(story),
         fullscreenDialog: widget.autoStart,
       );
+      if (widget.examMode &&
+          result is ExamPracticeResult &&
+          examAttempt != null) {
+        ref
+            .read(examPracticeStoreProvider)
+            .complete(
+              id: examAttempt.id,
+              score: result.correct,
+              total: result.total,
+            );
+      }
       if (widget.autoStart && mounted) {
         Navigator.of(context).pop(result ?? false);
       }
-      // The lesson is already durable. Artwork is independent work and can
-      // finish after the learner has entered the lesson or left the screen.
-      unawaited(_generateCover(story, package.coverPrompt));
     } catch (error, stackTrace) {
       debugPrint(
         'ListeningLabScreen: story generation failed: $error\n$stackTrace',
@@ -201,30 +221,18 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     }
   }
 
-  /// If the learner tapped a topic chip, use that directly. Otherwise pick
-  /// fully at random from a pool that mixes the fixed categories, the
-  /// onboarding interests, and the generic fallback topics as equal
-  /// citizens — onboarding interests are just part of the pool, never the
-  /// deciding factor, so two generations in a row rarely land on the same
-  /// thing even for a profile with only one or two interests picked.
-  String _topicFor(Profile profile) {
+  /// If the learner tapped a topic chip, use that directly. Otherwise return
+  /// null so the model can choose a natural premise at the learner's level.
+  String? _topicFor() {
     if (widget.topic != null && widget.topic!.trim().isNotEmpty) {
       return 'a short everyday story connected to ${widget.topic}';
     }
     if (_selectedTopic != null) {
       return 'something related to ${_selectedTopic!.toLowerCase()} that could happen in daily life';
     }
-    final pool = [
-      ..._storyTopicCategories.map(
-        (c) =>
-            'something related to ${c.toLowerCase()} that could happen in daily life',
-      ),
-      ...profile.interests.map(
-        (i) => 'something related to $i that could happen in daily life',
-      ),
-      ..._storyTopics,
-    ];
-    return pool[Random().nextInt(pool.length)];
+    // Null is intentional: Surprise me must not inherit onboarding interests
+    // or a fixed fallback topic. The model chooses a new premise instead.
+    return null;
   }
 
   String _cefrLevelFor(String level) {
@@ -235,6 +243,14 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   }
 
   Widget _lessonScreen(GeneratedStory story) {
+    if (widget.examMode) {
+      return ExamPracticeScreen(
+        story: story,
+        examName: widget.examName ?? 'Exam practice',
+        levelBand: widget.examLevel ?? story.levelBand,
+        skill: 'listening',
+      );
+    }
     return widget.readingMode
         ? StoryReaderScreen(story: story, showFinishButton: widget.autoStart)
         : ListeningPracticeScreen(

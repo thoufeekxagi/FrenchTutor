@@ -1,20 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../design/app_styles.dart';
 import '../data/database/storage_service.dart';
+import '../design/tokens.dart';
 import 'adaptive/adaptive.dart';
 
 /// Shared state for the floating notetaker bubble.
 /// Ported from iOS FloatingNotetaker — manages draft text, position, and expansion.
 class NotetakerState extends ChangeNotifier {
   NotetakerState({required this.storage}) {
-    _loadPrefs();
+    unawaited(_loadPrefs());
   }
 
   final StorageService storage;
 
-  bool _isEnabled = false;
+  bool _isEnabled = true;
   bool get isEnabled => _isEnabled;
   set isEnabled(bool value) {
     _isEnabled = value;
@@ -34,70 +36,90 @@ class NotetakerState extends ChangeNotifier {
   String _draftText = '';
   String get draftText => _draftText;
   set draftText(String value) {
+    if (_draftText == value) return;
     _draftText = value;
     notifyListeners();
-    _autosaveIfNeeded();
+    _persistDraftSoon();
   }
+
+  bool get hasDraft => _draftText.trim().isNotEmpty;
+
+  int get draftWordCount => _draftText
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((word) => word.isNotEmpty)
+      .length;
 
   Offset _offset = Offset.zero;
   Offset get offset => _offset;
   set offset(Offset value) {
     _offset = value;
     notifyListeners();
-    SharedPreferences.getInstance().then((p) {
-      p.setDouble('notetaker.offsetX', value.dx);
-      p.setDouble('notetaker.offsetY', value.dy);
+    _positionPersistTimer?.cancel();
+    _positionPersistTimer = Timer(const Duration(milliseconds: 80), () {
+      unawaited(
+        SharedPreferences.getInstance().then((prefs) async {
+          await prefs.setDouble('notetaker.offsetX', _offset.dx);
+          await prefs.setDouble('notetaker.offsetY', _offset.dy);
+        }),
+      );
     });
   }
 
   String _currentContext = 'General';
   String get currentContext => _currentContext;
   set currentContext(String value) {
+    if (_currentContext == value) return;
     _currentContext = value;
     notifyListeners();
+    unawaited(
+      SharedPreferences.getInstance().then(
+        (prefs) => prefs.setString('notetaker.context', value),
+      ),
+    );
   }
 
-  int _lastAutosavedWordCount = 0;
-
-  /// Row id of the note currently being drafted, once autosave has created it. Reusing this
-  /// id on every subsequent autosave/commit is what makes one note-taking session end up as
-  /// ONE evolving row instead of a new duplicate row every 5 words.
-  int? _draftNoteId;
+  Timer? _draftPersistTimer;
+  Timer? _positionPersistTimer;
 
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    _isEnabled = prefs.getBool('notetaker.enabled') ?? false;
+    _isEnabled = prefs.getBool('notetaker.enabled') ?? true;
+    _draftText = prefs.getString('notetaker.draftText') ?? '';
+    _currentContext = prefs.getString('notetaker.context') ?? 'General';
+    // Positions saved by the previous implementation used the opposite
+    // sign. Keep old installs safe by treating those values as the corner.
     final dx = prefs.getDouble('notetaker.offsetX') ?? 0;
     final dy = prefs.getDouble('notetaker.offsetY') ?? 0;
-    _offset = Offset(dx, dy);
+    _offset = Offset(dx, dy.clamp(0.0, double.infinity));
     notifyListeners();
   }
 
-  void _autosaveIfNeeded() {
-    final wordCount = _draftText
-        .split(RegExp(r'\s+'))
-        .where((w) => w.isNotEmpty)
-        .length;
-    if (wordCount > 0 && wordCount - _lastAutosavedWordCount >= 5) {
-      _lastAutosavedWordCount = wordCount;
-      _draftNoteId = storage.saveNote(
-        id: _draftNoteId,
-        tag: _currentContext,
-        text: _draftText,
+  void _persistDraftSoon() {
+    _draftPersistTimer?.cancel();
+    _draftPersistTimer = Timer(const Duration(milliseconds: 250), () {
+      unawaited(
+        SharedPreferences.getInstance().then(
+          (prefs) => prefs.setString('notetaker.draftText', _draftText),
+        ),
       );
-    }
+    });
   }
 
-  /// Manual Save — commits the draft (updating the same row autosave created, if any) and
-  /// clears state so the bubble reopens empty next time.
+  /// Manual Save — this is the only path that moves a cached draft into the
+  /// permanent notes table.
   void commitDraft() {
     final trimmed = _draftText.trim();
     if (trimmed.isNotEmpty) {
-      storage.saveNote(id: _draftNoteId, tag: _currentContext, text: trimmed);
+      storage.saveNote(tag: _currentContext, text: trimmed);
     }
     _draftText = '';
-    _draftNoteId = null;
-    _lastAutosavedWordCount = 0;
+    _draftPersistTimer?.cancel();
+    unawaited(
+      SharedPreferences.getInstance().then(
+        (prefs) => prefs.remove('notetaker.draftText'),
+      ),
+    );
     _isExpanded = false;
     notifyListeners();
   }
@@ -106,6 +128,13 @@ class NotetakerState extends ChangeNotifier {
   void collapse() {
     _isExpanded = false;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _draftPersistTimer?.cancel();
+    _positionPersistTimer?.cancel();
+    super.dispose();
   }
 }
 
@@ -122,7 +151,7 @@ class FloatingNotetakerOverlay extends StatefulWidget {
 }
 
 class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
-  static const double _bubbleSize = 52;
+  static const double _bubbleSize = 56;
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
 
@@ -156,13 +185,18 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Clamp offset so the bubble stays on screen
-        final maxDx = -(constraints.maxWidth - _bubbleSize - 32);
-        final topInset = _state.isExpanded ? 280.0 : 16.0;
-        final maxDy = -(constraints.maxHeight - _bubbleSize - 16 - topInset);
+        final panelWidth = (constraints.maxWidth - 32).clamp(240.0, 340.0);
+        final maxDx = -(constraints.maxWidth - _bubbleSize - 32).clamp(
+          0.0,
+          double.infinity,
+        );
+        final maxDy = (constraints.maxHeight - _bubbleSize - 32).clamp(
+          0.0,
+          double.infinity,
+        );
         final clampedOffset = Offset(
-          _state.offset.dx.clamp(maxDx, 0),
-          _state.offset.dy.clamp(maxDy, 0),
+          _state.offset.dx.clamp(maxDx, 0.0),
+          _state.offset.dy.clamp(0.0, maxDy),
         );
 
         return Stack(
@@ -177,9 +211,9 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
                   // Expanded card
                   if (_state.isExpanded)
                     AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
+                      duration: DesignTokens.durationFast,
                       opacity: _state.isExpanded ? 1 : 0,
-                      child: _buildExpandedCard(),
+                      child: _buildExpandedCard(panelWidth),
                     ),
                   if (_state.isExpanded) const SizedBox(height: 12),
                   // Bubble
@@ -216,22 +250,58 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
         width: _bubbleSize,
         height: _bubbleSize,
         decoration: BoxDecoration(
-          color: AppStyles.primary,
-          shape: BoxShape.circle,
+          color: DesignTokens.primary,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: DesignTokens.surface.withValues(alpha: 0.9),
+            width: 3,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppStyles.ink.withValues(alpha: 0.25),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+              color: DesignTokens.ink.withValues(alpha: 0.14),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Icon(
-          _state.isExpanded
-              ? CupertinoIcons.chevron_down
-              : CupertinoIcons.pencil,
-          size: 20,
-          color: AppStyles.canvas,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Center(
+              child: Icon(
+                _state.isExpanded
+                    ? CupertinoIcons.chevron_down
+                    : CupertinoIcons.square_pencil,
+                size: 22,
+                color: Colors.white,
+              ),
+            ),
+            if (!_state.isExpanded && _state.hasDraft)
+              Positioned(
+                right: -7,
+                top: -7,
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 20),
+                  height: 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.mastery,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: DesignTokens.surface, width: 2),
+                  ),
+                  child: Text(
+                    _state.draftWordCount > 99
+                        ? '99+'
+                        : '${_state.draftWordCount}',
+                    style: DesignTokens.body(
+                      9,
+                      weight: FontWeight.w800,
+                    ).copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -248,19 +318,19 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
     if (shouldHide) _state.isEnabled = false;
   }
 
-  Widget _buildExpandedCard() {
+  Widget _buildExpandedCard(double width) {
     return Container(
-      width: 280,
-      padding: const EdgeInsets.all(12),
+      width: width,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       decoration: BoxDecoration(
-        color: AppStyles.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppStyles.hairline, width: 1),
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+        border: Border.all(color: DesignTokens.hairline),
         boxShadow: [
           BoxShadow(
-            color: AppStyles.ink.withValues(alpha: 0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: DesignTokens.ink.withValues(alpha: 0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -268,52 +338,87 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Context label + close button
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: AppStyles.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  _state.currentContext.toUpperCase(),
-                  style: AppStyles.mono(
-                    9.5,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: AppStyles.primary),
+                child: const Icon(
+                  CupertinoIcons.square_pencil,
+                  size: 17,
+                  color: DesignTokens.primary,
                 ),
               ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () => _state.collapse(),
-                child: Icon(
-                  CupertinoIcons.xmark,
-                  size: 16,
-                  color: AppStyles.mutedDim,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Quick notes',
+                      style: DesignTokens.body(14, weight: FontWeight.w700),
+                    ),
+                    Text(
+                      _state.currentContext,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.mutedDim),
+                    ),
+                  ],
                 ),
+              ),
+              IconButton(
+                tooltip: 'Keep note for later',
+                onPressed: () => _state.collapse(),
+                icon: const Icon(CupertinoIcons.xmark, size: 16),
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          Text(
+            _state.hasDraft
+                ? '${_state.draftWordCount} words saved in this draft'
+                : 'Keep a private draft across lessons. Save it when it is ready.',
+            style: DesignTokens.body(
+              11.5,
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.3),
+          ),
           const SizedBox(height: 8),
-
-          // Text field
           SizedBox(
-            height: 90,
+            height: 122,
             child: TextFormField(
               controller: _textController,
               focusNode: _focusNode,
               maxLines: null,
               expands: true,
               textAlignVertical: TextAlignVertical.top,
-              style: AppStyles.body(13),
+              style: DesignTokens.body(13),
               decoration: InputDecoration(
-                hintText: "Type what you're hearing or reading…",
-                hintStyle: AppStyles.body(13).copyWith(color: AppStyles.muted),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
+                hintText: 'Type what you want to remember…',
+                hintStyle: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.mutedDim),
+                filled: true,
+                fillColor: DesignTokens.canvas,
+                contentPadding: const EdgeInsets.all(12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: DesignTokens.hairline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: DesignTokens.hairline),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: DesignTokens.primary),
+                ),
               ),
               onChanged: (value) {
                 _state.draftText = value;
@@ -322,34 +427,28 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
           ),
           const SizedBox(height: 8),
 
-          // Save button
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _state.draftText.trim().isEmpty
-                  ? null
-                  : () => _state.commitDraft(),
+            height: 44,
+            child: ElevatedButton.icon(
+              onPressed: _state.hasDraft ? _state.commitDraft : null,
+              icon: const Icon(CupertinoIcons.checkmark, size: 17),
+              label: const Text('Save note'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppStyles.primary,
-                foregroundColor: AppStyles.canvas,
-                disabledBackgroundColor: AppStyles.primary.withValues(
-                  alpha: 0.4,
+                backgroundColor: DesignTokens.primary,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: DesignTokens.muted.withValues(
+                  alpha: 0.18,
                 ),
-                disabledForegroundColor: AppStyles.canvas.withValues(
-                  alpha: 0.5,
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                disabledForegroundColor: DesignTokens.mutedDim,
                 elevation: 0,
-              ),
-              child: Text(
-                'Save note',
-                style: AppStyles.body(
-                  12.5,
-                  weight: FontWeight.w500,
-                ).copyWith(color: AppStyles.canvas),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.radiusMedium,
+                  ),
+                ),
+                textStyle: DesignTokens.body(13, weight: FontWeight.w700),
               ),
             ),
           ),

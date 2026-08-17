@@ -615,6 +615,21 @@ class LessonSpeechService {
     return bytes;
   }
 
+  /// Reads an existing PCM clip without falling back to live synthesis. This
+  /// is for pronunciation buttons that must reuse the audio deck already
+  /// prepared for a lesson.
+  Future<List<int>?> loadCachedAudio(
+    String text, {
+    String? voiceName,
+    bool slow = false,
+  }) {
+    return GeminiLiveAudioService.shared.loadCached(
+      text: text,
+      voiceName: voiceName,
+      slow: slow,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Persistent cache — the same sentence in the same voice is spoken constantly
   // (flashcards, replays, repeated lesson visits, roleplay lines heard again in a

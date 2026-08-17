@@ -11,6 +11,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/learning_card.dart';
+import '../../widgets/floating_notetaker.dart';
 import '../../widgets/lesson_stage_rail.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/report_problem_button.dart';
@@ -72,6 +73,9 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notetakerStateProvider).currentContext = 'Grammar';
+    });
     // Grammar sentences use the same persistent TTS cache as reading and
     // listening. Warm them as soon as a generated lesson is opened so the
     // speaker is normally ready before the learner reaches the notice step.
@@ -182,46 +186,51 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
           ),
         ],
       ),
-      body: WebConstrainedView(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
-          children: [
-            Text(
-              widget.story.passage.displayTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.body(
-                18,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.mutedDim),
+      body: Stack(
+        children: [
+          WebConstrainedView(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+              children: [
+                Text(
+                  widget.story.passage.displayTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    18,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+                const SizedBox(height: 12),
+                LessonStageRail(
+                  labels: const ['Rule', 'Notice', 'Choose', 'Use', 'Done'],
+                  currentIndex: stepIndex,
+                ),
+                const SizedBox(height: 18),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child: KeyedSubtree(
+                    key: ValueKey(_step),
+                    child: _contentForStep(),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                if (_step != _GrammarWorkshopStep.review)
+                  PrimaryActionButton(
+                    label: _primaryLabel,
+                    icon: CupertinoIcons.arrow_right,
+                    onPressed: _canAdvance ? _next : null,
+                  )
+                else
+                  _ReviewActions(
+                    onFinish: _finish,
+                    showFinishButton: widget.showFinishButton,
+                  ),
+              ],
             ),
-            const SizedBox(height: 12),
-            LessonStageRail(
-              labels: const ['Rule', 'Notice', 'Choose', 'Use', 'Done'],
-              currentIndex: stepIndex,
-            ),
-            const SizedBox(height: 18),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
-              child: KeyedSubtree(
-                key: ValueKey(_step),
-                child: _contentForStep(),
-              ),
-            ),
-            const SizedBox(height: 22),
-            if (_step != _GrammarWorkshopStep.review)
-              PrimaryActionButton(
-                label: _primaryLabel,
-                icon: CupertinoIcons.arrow_right,
-                onPressed: _canAdvance ? _next : null,
-              )
-            else
-              _ReviewActions(
-                onFinish: _finish,
-                showFinishButton: widget.showFinishButton,
-              ),
-          ],
-        ),
+          ),
+          FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
+        ],
       ),
     );
   }
@@ -376,6 +385,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                     size: 44,
                     iconSize: 22,
                     color: Colors.white,
+                    label: 'Listen once',
                     contentItemId: widget.story.segmentContentId(_storyIndex),
                   ),
                 ],

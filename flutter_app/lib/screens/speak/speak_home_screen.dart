@@ -11,6 +11,7 @@ import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import 'speak_course_activity_screen.dart';
 import 'speak_roadmap_screen.dart';
+import 'streak_calendar_screen.dart';
 import 'speak_ui.dart';
 
 class SpeakHomeScreen extends ConsumerStatefulWidget {
@@ -114,18 +115,37 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
             children: [
               SpeakPill(label: roadmap.level.toUpperCase(), selected: true),
               const Spacer(),
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: SpeakColors.line),
-                ),
-                child: const Icon(
-                  Icons.local_fire_department_rounded,
-                  color: SpeakColors.orange,
-                  size: 19,
+              Semantics(
+                button: true,
+                label: 'Open streak and today\'s session',
+                hint: 'View your current streak and recent practice',
+                child: IconButton(
+                  tooltip: 'Streak & today\'s session',
+                  onPressed: () {
+                    AppRouter.push(
+                      context,
+                      (_) => const StreakCalendarScreen(),
+                    );
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 48,
+                    height: 48,
+                  ),
+                  icon: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: SpeakColors.line),
+                    ),
+                    child: const Icon(
+                      Icons.local_fire_department_rounded,
+                      color: SpeakColors.orange,
+                      size: 19,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -215,50 +235,58 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
           const SizedBox(height: 12),
           KeyedSubtree(
             key: AppTour.nextSessionKey,
-            child: SpeakCard(
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: SpeakColors.blueSoft,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.mic_rounded,
-                      color: SpeakColors.blue,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Next session',
-                          style: DesignTokens.body(15, weight: FontWeight.w700),
+            child: Semantics(
+              button: true,
+              label: 'Open next session: ${next.title}',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _openSession(next),
+                child: SpeakCard(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: SpeakColors.blueSoft,
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          next.title,
-                          style: DesignTokens.body(
-                            12,
-                          ).copyWith(color: SpeakColors.inkSoft),
+                        child: const Icon(
+                          Icons.mic_rounded,
+                          color: SpeakColors.blue,
+                          size: 22,
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Next session',
+                              style: DesignTokens.body(
+                                15,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              next.title,
+                              style: DesignTokens.body(
+                                12,
+                              ).copyWith(color: SpeakColors.inkSoft),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: SpeakColors.blue,
+                        size: 22,
+                      ),
+                    ],
                   ),
-                  GestureDetector(
-                    onTap: () => _openSession(next),
-                    child: const Icon(
-                      Icons.arrow_forward_rounded,
-                      color: SpeakColors.blue,
-                      size: 22,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
