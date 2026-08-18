@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/widgets/personalized_generation_loader.dart';
 
 void main() {
-  testWidgets('shows a useful animated generation state', (tester) async {
+  testWidgets('shows a concise, left-aligned generation state', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -12,20 +13,13 @@ void main() {
       ),
     );
 
-    expect(
-      find.text('Your personalized grammar class is rendering'),
-      findsOneWidget,
-    );
+    expect(find.text('Preparing grammar class'), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
-    expect(find.text('Reading your learning profile…'), findsOneWidget);
-    expect(find.text('Personalizing'), findsNothing);
-    expect(find.text('Building'), findsNothing);
-    expect(find.text('Polishing'), findsNothing);
-
-    await tester.pump(const Duration(milliseconds: 1600));
     expect(
-      find.text('Choosing the right situation and dialogue for you…'),
+      find.text('Using your level and goals to choose the next activity.'),
       findsOneWidget,
     );
+    expect(find.byIcon(Icons.route_rounded), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.wand_stars), findsNothing);
   });
 }
