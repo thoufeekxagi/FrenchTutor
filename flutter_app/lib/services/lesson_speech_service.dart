@@ -586,12 +586,17 @@ class LessonSpeechService {
   /// session — for callers that want to play a single clip on demand (a
   /// speaker button) without going through the queued narration path above.
   Future<void> playBytes(List<int> bytes) async {
-    // Cuts whatever this shared player is already sounding — without this,
-    // two on-demand taps (e.g. two different TtsPlayButton widgets on the
-    // same screen) queue back-to-back instead of the newer tap replacing
-    // the older one.
-    await _geminiAudio.stopPlayback();
-    await _geminiAudio.playAudioChunk(bytes);
+    if (bytes.isEmpty || bytes.length.isOdd) {
+      throw StateError('Invalid PCM16 playback buffer');
+    }
+
+    // Pronunciation taps are independent one-shot clips, not a continuation
+    // of the live conversation stream. A hard reset removes bytes already
+    // accepted by flutter_sound and starts a clean native stream, which avoids
+    // the old clip being muted/unmuted over the new one and fixes silent replay
+    // after the first pronunciation tap.
+    await _geminiAudio.stopPlayback(hardStop: true);
+    await _geminiAudio.playAudioChunk(bytes, waitForFeed: true);
   }
 
   /// Returns the PCM16 bytes for [text] in [voiceName], from cache when possible.
@@ -622,10 +627,20 @@ class LessonSpeechService {
     String text, {
     String? voiceName,
     bool slow = false,
-  }) {
+  }) async {
+    final resolvedVoice = voiceName ?? ActiveTutor.current.voiceName;
+    final cacheKey = _diskCacheKey(resolvedVoice, slow, text);
+    final lessonCache = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
+    if (lessonCache != null && lessonCache.isNotEmpty) {
+      _synthCache[cacheKey] = lessonCache;
+      return lessonCache;
+    }
+
+    // The newer Gemini Live cache is keyed separately and may contain the
+    // prewarmed PCM even when the legacy lesson cache does not.
     return GeminiLiveAudioService.shared.loadCached(
       text: text,
-      voiceName: voiceName,
+      voiceName: resolvedVoice,
       slow: slow,
     );
   }

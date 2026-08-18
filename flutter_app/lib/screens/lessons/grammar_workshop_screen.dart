@@ -28,6 +28,14 @@ class GrammarWorkshopResult {
 
 enum _GrammarWorkshopStep { rule, notice, choose, use, review }
 
+// Grammar carries more explanatory copy than the other practice screens. Keep
+// its hierarchy deliberately compact so the lesson reads like a sequence of
+// examples instead of a wall of oversized headings.
+const _grammarSectionTitleSize = 24.0;
+const _grammarCardTitleSize = 19.0;
+const _grammarBodySize = 16.0;
+const _grammarChoiceSize = 16.0;
+
 /// A deliberate, card-by-card grammar lesson.
 ///
 /// The generated payload is already frozen in [GeneratedGrammarStory], so this
@@ -197,7 +205,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: DesignTokens.body(
-                    18,
+                    _grammarBodySize,
                     weight: FontWeight.w700,
                   ).copyWith(color: DesignTokens.mutedDim),
                 ),
@@ -266,12 +274,15 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       children: [
         const _StepKicker(number: '01', label: 'Understand the pattern'),
         const SizedBox(height: 10),
-        Text('Start with the rule.', style: DesignTokens.display(28)),
+        Text(
+          'Start with the rule.',
+          style: DesignTokens.display(_grammarSectionTitleSize),
+        ),
         const SizedBox(height: 8),
         Text(
           _explanation.summary,
           style: DesignTokens.body(
-            18,
+            _grammarBodySize,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.45),
         ),
         const SizedBox(height: 16),
@@ -283,7 +294,10 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
             children: [
               Text(
                 'Remember this',
-                style: DesignTokens.body(18, weight: FontWeight.w700),
+                style: DesignTokens.body(
+                  _grammarBodySize,
+                  weight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 10),
               for (final rule in _explanation.usage.take(4))
@@ -299,7 +313,9 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                       Expanded(
                         child: Text(
                           rule,
-                          style: DesignTokens.body(17).copyWith(height: 1.4),
+                          style: DesignTokens.body(
+                            _grammarBodySize,
+                          ).copyWith(height: 1.4),
                         ),
                       ),
                     ],
@@ -324,7 +340,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   child: Text(
                     _explanation.tenseContrast,
                     style: DesignTokens.body(
-                      17,
+                      _grammarBodySize,
                     ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
                   ),
                 ),
@@ -336,7 +352,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
           const SizedBox(height: 18),
           Text(
             'The shape',
-            style: DesignTokens.body(18, weight: FontWeight.w700),
+            style: DesignTokens.body(_grammarBodySize, weight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           _ConjugationCard(conjugation: _explanation.conjugations.first),
@@ -355,12 +371,15 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       children: [
         const _StepKicker(number: '02', label: 'Notice it in context'),
         const SizedBox(height: 10),
-        Text('Find the pattern in the story.', style: DesignTokens.display(28)),
+        Text(
+          'Find the pattern in the story.',
+          style: DesignTokens.display(_grammarSectionTitleSize),
+        ),
         const SizedBox(height: 8),
         Text(
           'Read the French, listen once, then use the English support to confirm it.',
           style: DesignTokens.body(
-            18,
+            _grammarBodySize,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
         ),
         const SizedBox(height: 16),
@@ -394,8 +413,8 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
               Text(
                 segment.fr,
                 style: DesignTokens.display(
-                  28,
-                ).copyWith(color: Colors.white, height: 1.22),
+                  21,
+                ).copyWith(color: Colors.white, height: 1.25),
               ),
               const SizedBox(height: 16),
               Container(height: 1, color: Colors.white24),
@@ -403,7 +422,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
               Text(
                 segment.en,
                 style: DesignTokens.body(
-                  19,
+                  _grammarBodySize,
                   weight: FontWeight.w600,
                 ).copyWith(color: Colors.white, height: 1.35),
               ),
@@ -412,7 +431,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                 Text(
                   segment.grammarNote,
                   style: DesignTokens.body(
-                    17,
+                    14,
                   ).copyWith(color: Colors.white70, height: 1.4),
                 ),
               ],
@@ -427,7 +446,10 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   ? null
                   : () => setState(() => _storyIndex--),
               icon: const Icon(CupertinoIcons.chevron_left, size: 16),
-              label: Text('Previous', style: DesignTokens.body(16)),
+              label: Text(
+                'Previous',
+                style: DesignTokens.body(14, weight: FontWeight.w600),
+              ),
             ),
             const Spacer(),
             OutlinedButton.icon(
@@ -435,7 +457,10 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   ? null
                   : () => setState(() => _storyIndex++),
               icon: const Icon(CupertinoIcons.chevron_right, size: 16),
-              label: Text('Next sentence', style: DesignTokens.body(16)),
+              label: Text(
+                'Next sentence',
+                style: DesignTokens.body(14, weight: FontWeight.w600),
+              ),
             ),
           ],
         ),
@@ -456,17 +481,24 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       children: [
         const _StepKicker(number: '03', label: 'Choose the form'),
         const SizedBox(height: 10),
-        Text('Make the grammar decision.', style: DesignTokens.display(28)),
+        Text(
+          'Make the grammar decision.',
+          style: DesignTokens.display(_grammarSectionTitleSize),
+        ),
         const SizedBox(height: 8),
         Text(
           '${_quizIndex + 1} of ${_quiz.length} · Choose before you check.',
-          style: DesignTokens.body(18).copyWith(color: DesignTokens.inkSoft),
+          style: DesignTokens.body(
+            _grammarBodySize,
+          ).copyWith(color: DesignTokens.inkSoft),
         ),
         const SizedBox(height: 16),
         LearningCard(
           child: Text(
             question.q,
-            style: DesignTokens.display(22).copyWith(height: 1.3),
+            style: DesignTokens.display(
+              _grammarCardTitleSize,
+            ).copyWith(height: 1.3),
           ),
         ),
         const SizedBox(height: 12),
@@ -487,7 +519,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
             selected == question.answerIndex
                 ? 'Correct — keep that pattern.'
                 : 'Not this time. Compare the subject and the verb ending, then keep going.',
-            style: DesignTokens.body(17, weight: FontWeight.w600).copyWith(
+            style: DesignTokens.body(15, weight: FontWeight.w600).copyWith(
               color: selected == question.answerIndex
                   ? DesignTokens.success
                   : DesignTokens.primary,
@@ -531,12 +563,15 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       children: [
         const _StepKicker(number: '04', label: 'Use it yourself'),
         const SizedBox(height: 10),
-        Text('Make one fresh sentence.', style: DesignTokens.display(28)),
+        Text(
+          'Make one fresh sentence.',
+          style: DesignTokens.display(_grammarSectionTitleSize),
+        ),
         const SizedBox(height: 8),
         Text(
           'Recall the rule, then produce something new. Marie checks it only when you ask.',
           style: DesignTokens.body(
-            18,
+            _grammarBodySize,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
         ),
         const SizedBox(height: 16),
@@ -555,7 +590,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
               Expanded(
                 child: Text(
                   'Prompt: use ${widget.story.grammarPoint} in a sentence about the story or your own day.',
-                  style: DesignTokens.body(17).copyWith(height: 1.4),
+                  style: DesignTokens.body(15).copyWith(height: 1.4),
                 ),
               ),
             ],
@@ -604,7 +639,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
             child: Text(
               _transferFeedback!.comment,
               style: DesignTokens.body(
-                16,
+                15,
               ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
             ),
           ),
@@ -630,12 +665,15 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       children: [
         const _StepKicker(number: '05', label: 'Lock it in'),
         const SizedBox(height: 10),
-        Text('Good work. Keep the pattern.', style: DesignTokens.display(28)),
+        Text(
+          'Good work. Keep the pattern.',
+          style: DesignTokens.display(_grammarSectionTitleSize),
+        ),
         const SizedBox(height: 8),
         Text(
           'You moved from explanation to recognition to production. That sequence is what makes the rule usable later.',
           style: DesignTokens.body(
-            18,
+            _grammarBodySize,
           ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
         ),
         const SizedBox(height: 16),
@@ -646,14 +684,17 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
               Text(
                 '$score%',
                 style: DesignTokens.display(
-                  34,
+                  28,
                 ).copyWith(color: DesignTokens.primary),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   '$_correctAnswers of ${_quiz.length} grammar choices correct',
-                  style: DesignTokens.body(18, weight: FontWeight.w600),
+                  style: DesignTokens.body(
+                    _grammarBodySize,
+                    weight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -663,7 +704,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
           const SizedBox(height: 18),
           Text(
             'One last example',
-            style: DesignTokens.body(16, weight: FontWeight.w700),
+            style: DesignTokens.body(15, weight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           LearningCard(
@@ -672,13 +713,13 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
               children: [
                 Text(
                   _explanation.examples.first.fr,
-                  style: DesignTokens.display(19),
+                  style: DesignTokens.display(17),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   _explanation.examples.first.en,
                   style: DesignTokens.body(
-                    16,
+                    14,
                   ).copyWith(color: DesignTokens.mutedDim),
                 ),
               ],
@@ -733,7 +774,7 @@ class _ConjugationCard extends StatelessWidget {
         children: [
           Text(
             conjugation.verb,
-            style: DesignTokens.body(17, weight: FontWeight.w700),
+            style: DesignTokens.body(16, weight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -799,7 +840,10 @@ class _ChoiceTile extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: DesignTokens.body(17, weight: FontWeight.w600),
+              style: DesignTokens.body(
+                _grammarChoiceSize,
+                weight: FontWeight.w600,
+              ),
             ),
           ),
         ],

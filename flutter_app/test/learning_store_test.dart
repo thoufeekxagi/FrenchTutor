@@ -234,5 +234,23 @@ void main() {
       expect(again.sessionLength, 'quick');
       expect(again.isOnboarded, isTrue);
     });
+
+    test('study-plan preferences roundtrip with the profile', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      final p = store.profile()
+        ..preferredDays = ['mon', 'wed', 'sun']
+        ..reminderTime = '19:30'
+        ..timeZone = 'EDT|UTC-04:00'
+        ..notificationPermissionState = 'granted'
+        ..onboardingVersion = 'v3-personal-study-plan';
+      store.saveProfile(p);
+
+      final again = store.profile();
+      expect(again.preferredDays, ['mon', 'wed', 'sun']);
+      expect(again.reminderTime, '19:30');
+      expect(again.timeZone, 'EDT|UTC-04:00');
+      expect(again.notificationPermissionState, 'granted');
+      expect(again.onboardingVersion, 'v3-personal-study-plan');
+    });
   });
 }

@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
-import '../../flow/stage_outcome.dart';
 import '../../models/exam_practice.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
+import '../mocks/mocks_screen.dart';
 import '../reading/reading_library_screen.dart';
-import '../session/session_screen.dart';
 import '../speak/speak_ui.dart';
-import '../subscription/paywall_screen.dart';
+import '../subscription/speak_paywall_screen.dart';
 import '../../widgets/adaptive/adaptive.dart';
 
 enum _ExamFamily { tcf, tef }
@@ -41,7 +38,9 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
 
   String get _examContext =>
       '$_examName preparation at $_level level. Generate an exam-matched '
-      'French practice task with realistic timing, vocabulary, and difficulty.';
+      'French practice task with realistic timing, vocabulary, and difficulty. '
+      '${_level == 'A1' || _level == 'A2' ? 'This is guided training: use short French and brief English support when needed, without revealing answers.' : 'This is assessed practice: the examiner and task content must stay in French only, with no translation or coaching.'} '
+      '${_exam == _ExamFamily.tef ? 'For speaking, use TEF-style information gathering and persuasion tasks.' : 'For speaking, use TCF-style exchange, interaction, and viewpoint tasks.'}';
 
   void _prepare() => setState(() => _prepared = true);
 
@@ -62,7 +61,7 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
     if (!upgrade || !mounted) return false;
     await AppRouter.push<bool>(
       context,
-      (_) => const PaywallScreen(),
+      (_) => const SpeakPaywallScreen(),
       fullscreenDialog: true,
     );
     return ref.read(subscriptionGateServiceProvider).isSubscribed();
@@ -100,11 +99,6 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
 
   Future<void> _openSpeaking() async {
     if (!await _allowExamPractice() || !mounted) return;
-    final allowed = await ensureAiSessionQuota(
-      context,
-      ref.read(pilotAccessServiceProvider),
-    );
-    if (!allowed || !mounted) return;
     final attemptId = ref
         .read(examPracticeStoreProvider)
         .startMetadata(
@@ -113,22 +107,23 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
           skill: 'speaking',
           content: {'kind': 'speaking', 'context': _examContext},
         );
-    final result = await AppRouter.push<SpeakingResult>(
+    final result = await AppRouter.push<SpeakingMockResult>(
       context,
-      (_) => SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        sessionTopic: '$_examName speaking readiness',
-        contentKey: 'exam-readiness-${_exam.name}-$_level-speaking',
-        stage: 'speaking_exam',
-        lessonContext: _examContext,
-        examMode: true,
+      (_) => MocksScreen(
+        examName: _examName,
+        levelBand: _level,
+        includeReadingWarmup: false,
       ),
       fullscreenDialog: true,
     );
-    if (result != null && result.meetsThreshold) {
+    if (result != null && result.completed) {
       ref
           .read(examPracticeStoreProvider)
-          .complete(id: attemptId, score: 1, total: 1);
+          .complete(
+            id: attemptId,
+            score: result.score.round().clamp(0, 10),
+            total: 10,
+          );
     }
   }
 

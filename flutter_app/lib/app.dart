@@ -13,7 +13,6 @@ import 'screens/onboarding/speak_onboarding_screen.dart';
 import 'screens/speak/speak_ui.dart';
 import 'services/auth_service.dart';
 import 'services/revenue_cat_service.dart';
-import 'design/tokens.dart';
 
 class FrenchTutorApp extends StatelessWidget {
   const FrenchTutorApp({super.key});
@@ -55,6 +54,8 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _hasSession = AuthService.shared.currentSession != null;
+  bool _explicitlySignedOut = false;
+  bool _signOutMarkerLoaded = false;
   bool? _aiConsented;
   StreamSubscription<AuthState>? _subscription;
 
@@ -64,14 +65,37 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     _subscription = AuthService.shared.onAuthStateChange.listen(
       _onAuthStateChange,
     );
+    AuthService.shared.localAuthRevision.addListener(_onLocalAuthRevision);
+    AuthService.shared.wasExplicitlySignedOut().then((value) {
+      if (!mounted) return;
+      setState(() {
+        // A live session always wins over a stale device marker. This also
+        // avoids a race if a sign-in completes while preferences are loading.
+        _explicitlySignedOut =
+            AuthService.shared.currentSession == null && value;
+        _signOutMarkerLoaded = true;
+      });
+    });
     AiConsentScreen.hasConsented().then((value) {
       if (mounted) setState(() => _aiConsented = value);
+    });
+  }
+
+  void _onLocalAuthRevision() {
+    if (!mounted || AuthService.shared.currentSession != null) return;
+    setState(() {
+      _hasSession = false;
+      _explicitlySignedOut = true;
+      _signOutMarkerLoaded = true;
     });
   }
 
   void _onAuthStateChange(AuthState state) {
     final session = state.session;
     if (session != null) {
+      _explicitlySignedOut = false;
+      _signOutMarkerLoaded = true;
+      unawaited(AuthService.shared.clearRememberedSignOut());
       // RevenueCat's SDK is otherwise never initialized anywhere in the app
       // — without this, every paywall load silently sees zero packages
       // forever (fetchOfferings() short-circuits on `!_initialized`), no
@@ -86,6 +110,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       // safe to run on every signed-in event, not just the very first one.
       try {
         ref.read(learningStoreProvider).linkSupabaseUser(session.user.id);
+        ref.read(adaptiveCourseStoreProvider).linkSupabaseUser(session.user.id);
       } catch (_) {
         // A local DB hiccup must never block showing the signed-in user
         // their app — the link is retried on the next auth event regardless.
@@ -102,7 +127,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       _restoreAndSeedContent();
     }
     if (!mounted) return;
-    setState(() => _hasSession = session != null);
+    setState(() {
+      _hasSession = session != null;
+      if (state.event == AuthChangeEvent.signedOut) {
+        _explicitlySignedOut = true;
+        _signOutMarkerLoaded = true;
+      }
+    });
   }
 
   void _restoreAndSeedContent() {
@@ -117,6 +148,18 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         // auth event retries the remote restore.
       }
       try {
+        // Onboarding can finish before account creation. After remote state
+        // is hydrated, explicitly push the current route so a new account
+        // does not lose its pre-auth adaptive course.
+        final profile = ref.read(learningStoreProvider).profile();
+        final plan = ref
+            .read(adaptiveCourseStoreProvider)
+            .ensureCurrentPlan(profile);
+        await ref.read(syncServiceProvider).syncAdaptiveCoursePlan(plan);
+      } catch (error, stackTrace) {
+        debugPrint('Adaptive course restore/push failed: $error\n$stackTrace');
+      }
+      try {
         await ref
             .read(starterContentServiceProvider)
             .ensureSeededForCurrentUser();
@@ -129,11 +172,20 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void dispose() {
     _subscription?.cancel();
+    AuthService.shared.localAuthRevision.removeListener(_onLocalAuthRevision);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_signOutMarkerLoaded) return const _RestoringProgressView();
+    // This check intentionally precedes onboarding. Sign-out clears the
+    // account's local profile, so evaluating onboarding first would reopen
+    // the welcome funnel instead of letting the learner switch accounts.
+    if (_explicitlySignedOut ||
+        (_hasSession && AuthService.shared.currentSession == null)) {
+      return const SpeakAuthScreen(initialSignUp: false);
+    }
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
     if (!onboarded) {
       return SpeakOnboardingScreen(onFinished: () => setState(() {}));
@@ -160,34 +212,11 @@ class _RestoringProgressView extends StatelessWidget {
     return Scaffold(
       backgroundColor: SpeakColors.blue,
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.forum_rounded, color: Colors.white, size: 44),
-            const SizedBox(height: 14),
-            const Text(
-              'ParleSprint',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Restoring your progress…',
-              style: DesignTokens.body(13).copyWith(color: Colors.white70),
-            ),
-          ],
+        child: Image.asset(
+          'assets/images/parlesprint_logo.png',
+          width: 128,
+          height: 128,
+          fit: BoxFit.contain,
         ),
       ),
     );

@@ -6,9 +6,11 @@ import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
+import '../../services/auth_service.dart';
 import '../../services/learning_streak_service.dart';
 import '../history/all_history_screen.dart';
 import '../notes/notes_review_screen.dart';
+import '../progress/progress_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speak_roadmap_screen.dart';
 import 'streak_calendar_screen.dart';
@@ -16,11 +18,12 @@ import 'french_fingerprint_screen.dart';
 import 'speak_ui.dart';
 
 class SpeakProfileScreen extends ConsumerWidget {
-  const SpeakProfileScreen({super.key, this.onBack});
+  const SpeakProfileScreen({super.key, this.onBack, this.onReplayPractice});
 
   /// The tab returns to Home; when Profile is pushed from Settings, the
   /// normal navigator pop returns to Settings instead.
   final VoidCallback? onBack;
+  final VoidCallback? onReplayPractice;
 
   void _goBack(BuildContext context) {
     if (onBack != null) {
@@ -34,7 +37,7 @@ class SpeakProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(learningStoreProvider).profile();
     final sessions = ref.watch(storageServiceProvider).getAllSessions();
-    final name = 'French learner';
+    final name = AuthService.shared.signedInDisplayName;
     final level = LearnerLevel.displayLabel(profile.level);
     final studiedSeconds = _actualStudySeconds(sessions);
     final streak = LearningStreakService.summarize(sessions);
@@ -56,8 +59,11 @@ class SpeakProfileScreen extends ConsumerWidget {
               ),
               IconButton(
                 tooltip: 'Settings',
-                onPressed: () =>
-                    AppRouter.push(context, (_) => const SpeakSettingsScreen()),
+                onPressed: () => AppRouter.push(
+                  context,
+                  (_) =>
+                      SpeakSettingsScreen(onReplayPractice: onReplayPractice),
+                ),
                 icon: const Icon(
                   Icons.settings_rounded,
                   color: SpeakColors.inkSoft,
@@ -131,16 +137,31 @@ class SpeakProfileScreen extends ConsumerWidget {
                 const Divider(height: 1, color: SpeakColors.line),
                 _profileRow(
                   context,
-                  Icons.fingerprint_rounded,
-                  DesignTokens.secondary,
-                  'Your French fingerprint',
-                  'Your personal map of words and practice',
-                  () => AppRouter.push(
-                    context,
-                    (_) => const FrenchFingerprintScreen(),
-                  ),
+                  Icons.insights_rounded,
+                  SpeakColors.blue,
+                  'Progress',
+                  'See your skills and practice history',
+                  () => AppRouter.push(context, (_) => const ProgressScreen()),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Keep the fingerprint as its own prominent, semantic button. It
+          // is a destination rather than another profile statistic, and the
+          // Material ink response makes a tap visibly acknowledge the action.
+          SpeakCard(
+            padding: EdgeInsets.zero,
+            child: _profileRow(
+              context,
+              Icons.fingerprint_rounded,
+              DesignTokens.secondary,
+              'Your French fingerprint',
+              'Your personal map of words and practice',
+              () => AppRouter.push(
+                context,
+                (_) => const FrenchFingerprintScreen(),
+              ),
             ),
           ),
           const SizedBox(height: 28),
@@ -262,7 +283,19 @@ class SpeakProfileScreen extends ConsumerWidget {
         ],
       ),
     );
-    return onTap == null ? row : GestureDetector(onTap: onTap, child: row);
+    if (onTap == null) return row;
+    return Semantics(
+      button: true,
+      label: title,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: row,
+        ),
+      ),
+    );
   }
 }
 

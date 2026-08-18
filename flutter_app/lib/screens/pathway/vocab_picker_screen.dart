@@ -15,7 +15,9 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/srs_service.dart';
+import '../../services/vocabulary_level_policy.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/primary_action_button.dart';
 import 'agent_led_vocab_screen.dart';
 import '../lessons/vocabulary_workshop_screen.dart';
@@ -59,7 +61,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         .toSet();
   }
 
-  List<VocabPhase> get _allPhases => ContentService.shared.vocabPhases;
+  List<VocabPhase> get _allPhases => ContentService.shared.vocabPhasesForLevel(
+    ref.read(learningStoreProvider).profile().level,
+  );
 
   Future<List<VocabEntry>> get _autoQueue async {
     final preferredIds = widget.preferredEntryIds;
@@ -348,7 +352,13 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 ),
                 if (isLoading) ...[
                   const SizedBox(height: DesignTokens.space6),
-                  const SizedBox(width: 132, child: PSProgressIndicator()),
+                  const PersonalizedGenerationLoader(
+                    content: 'vocabulary set',
+                    detail:
+                        'Selecting simple, useful words from your current level.',
+                    icon: CupertinoIcons.rectangle_stack_fill,
+                    compact: true,
+                  ),
                 ] else if (queue.isEmpty) ...[
                   const SizedBox(height: DesignTokens.space5),
                   _emptyRecommendedWordsNotice(),
@@ -501,13 +511,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     try {
       final profile = ref.read(learningStoreProvider).profile();
       final level = SpeakLanguageProfile.forProfile(profile).level;
-      final words = await LessonAgentService.shared.generateCourseVocabulary(
-        levelBand: level,
-        unitTitle: 'Custom vocabulary',
-        sessionTitle: prompt,
-        contextPrompt: 'Create a useful five-word set about: $prompt',
-        targetPhrases: const [],
-        count: 5,
+      final words = VocabularyLevelPolicy.filterGenerated(
+        await LessonAgentService.shared.generateCourseVocabulary(
+          levelBand: level,
+          unitTitle: 'Custom vocabulary',
+          sessionTitle: prompt,
+          contextPrompt: 'Create a useful five-word set about: $prompt',
+          targetPhrases: const [],
+          count: 5,
+        ),
+        level,
       );
       if (words.length < 5) throw StateError('Incomplete vocabulary set');
       final id = 'custom-vocabulary-${DateTime.now().microsecondsSinceEpoch}';

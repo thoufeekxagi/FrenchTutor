@@ -5,6 +5,7 @@ import 'package:sqlite3/common.dart';
 
 import '../../models/content_models.dart';
 import '../../services/sync_service.dart';
+import '../../services/starter_cover_resolver.dart';
 import 'app_migrations.dart';
 
 /// A generated writing prompt saved as learner-owned content. The prompt is
@@ -116,7 +117,10 @@ class GeneratedWritingTaskStore {
       createdAt:
           DateTime.tryParse(row['created_at']?.toString() ?? '') ??
           DateTime.now(),
-      coverUrl: row['cover_url']?.toString(),
+      coverUrl: StarterCoverResolver.resolve(
+        title: task.title,
+        coverUrl: row['cover_url']?.toString(),
+      ),
     );
   }
 }

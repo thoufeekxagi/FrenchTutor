@@ -761,7 +761,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     messages: _messages,
                     controller: _scrollController,
                     tutorName: _gemini.persona.displayName,
-                    height: isCompact ? 126 : 148,
+                    // Give the learner enough room to see several recent
+                    // turns while keeping the transcript bounded above the
+                    // tutor and call controls.
+                    height: isCompact ? 154 : 190,
                   ),
                   Expanded(child: _tutorStage(compact: isCompact)),
                   if (_errorMessage.isNotEmpty)
@@ -859,24 +862,54 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Widget _tutorStage({required bool compact}) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TutorAvatarStage(
-            persona: _gemini.persona,
-            state: _avatarState,
-            compact: compact,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final portraitMaxHeight = compact ? 236.0 : 324.0;
+        final portraitHeight = (constraints.maxHeight - 42).clamp(
+          0.0,
+          portraitMaxHeight,
+        );
+        final portraitWidth = compact ? 184.0 : 252.0;
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: portraitWidth,
+                  height: portraitHeight,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: TutorAvatarStage(
+                      persona: _gemini.persona,
+                      state: _avatarState,
+                      compact: compact,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 34,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _gemini.persona.displayName,
+                      style: DesignTokens.display(22),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          Text(_gemini.persona.displayName, style: DesignTokens.display(22)),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _callControls() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -893,7 +926,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               10,
             ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 0.8),
           ),
-          const SizedBox(height: DesignTokens.space3),
+          const SizedBox(height: DesignTokens.space2),
           KeyedSubtree(
             key: AppTour.micModeKey,
             child: MicModeBar(
@@ -908,7 +941,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               onHoldEnd: _pttUp,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

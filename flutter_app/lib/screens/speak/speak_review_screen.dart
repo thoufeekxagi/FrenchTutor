@@ -3,20 +3,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/database/generated_roleplay_store.dart';
+import '../../config/api_keys.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
+import '../../services/ai_session_gate.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/review_material_service.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
-import '../pathway/agent_led_listening_screen.dart';
-import 'speak_review_detail_screen.dart';
+import '../session/session_screen.dart';
 import 'speak_ui.dart';
+
+/// The only three outputs a learner can request from a cross-app review.
+/// Reading, listening, and speaking all use the same recent-history source;
+/// only the generated activity changes.
+enum SpeakReviewMode { speaking, reading, listening }
 
 class SpeakReviewScreen extends ConsumerStatefulWidget {
   const SpeakReviewScreen({super.key});
@@ -104,7 +109,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'Built from your 10 most recent practice sessions.',
+                            'Built from your 15 most recent practice sessions.',
                             style: DesignTokens.body(
                               12,
                             ).copyWith(color: SpeakColors.inkSoft),
@@ -211,15 +216,13 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
   String _modeLabel(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
-    SpeakReviewMode.stories => 'Stories',
-    SpeakReviewMode.roleplay => 'Roleplay',
+    SpeakReviewMode.reading => 'Reading',
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
-    SpeakReviewMode.stories => Icons.auto_stories_outlined,
-    SpeakReviewMode.roleplay => Icons.forum_outlined,
+    SpeakReviewMode.reading => Icons.menu_book_rounded,
   };
 }
 
@@ -257,11 +260,7 @@ class _SpeakReviewLaunchScreenState
     try {
       switch (widget.mode) {
         case SpeakReviewMode.speaking:
-          await AppRouter.push(
-            context,
-            (_) => SpeakReviewDetailScreen(sessions: widget.sessions),
-            fullscreenDialog: true,
-          );
+          await _startSpeakingReview();
         case SpeakReviewMode.listening:
           final story = await _generateStory(listening: true);
           if (!mounted) return;
@@ -270,25 +269,12 @@ class _SpeakReviewLaunchScreenState
             (_) => ListeningPracticeScreen(story: story),
             fullscreenDialog: true,
           );
-        case SpeakReviewMode.stories:
+        case SpeakReviewMode.reading:
           final story = await _generateStory(listening: false);
           if (!mounted) return;
           await AppRouter.push(
             context,
             (_) => StoryReaderScreen(story: story),
-            fullscreenDialog: true,
-          );
-        case SpeakReviewMode.roleplay:
-          final roleplay = await _generateRoleplay();
-          if (!mounted) return;
-          await AppRouter.push(
-            context,
-            (_) => AgentLedListeningScreen(
-              passage: roleplay.passage,
-              noteContext: 'Roleplay review',
-              sessionStage: 'roleplay',
-              sessionTopic: roleplay.displayTitle,
-            ),
             fullscreenDialog: true,
           );
       }
@@ -298,7 +284,7 @@ class _SpeakReviewLaunchScreenState
       if (mounted) {
         setState(() {
           _running = false;
-          _error = 'We could not build this review. Try again.';
+          _error = 'Review generation failed: $error';
         });
       }
     }
@@ -308,14 +294,24 @@ class _SpeakReviewLaunchScreenState
     final profile = ref.read(learningStoreProvider).profile();
     final level = _levelFor(profile.level);
     final topic = _reviewTopic();
+    final existingStories = ref.read(generatedStoryStoreProvider).list();
+    final avoidTitles = existingStories.map((story) => story.title);
+    final avoidOpenings = existingStories.map(
+      (story) =>
+          story.passage.segments.isEmpty ? '' : story.passage.segments.first.fr,
+    );
     final package = listening
         ? await LessonAgentService.shared.buildListeningStoryBook(
             topic: topic,
             levelBand: level,
+            avoidTitles: avoidTitles,
+            avoidOpenings: avoidOpenings,
           )
         : await LessonAgentService.shared.buildReadingStoryBook(
             topic: topic,
             levelBand: level,
+            avoidTitles: avoidTitles,
+            avoidOpenings: avoidOpenings,
           );
     final story = GeneratedStory(
       id: newGeneratedStoryId(),
@@ -335,23 +331,6 @@ class _SpeakReviewLaunchScreenState
     return story;
   }
 
-  Future<GeneratedRoleplay> _generateRoleplay() async {
-    final profile = ref.read(learningStoreProvider).profile();
-    final passage = await LessonAgentService.shared.buildStandaloneRoleplay(
-      scenario: _reviewTopic(),
-      levelBand: _levelFor(profile.level),
-    );
-    final roleplay = GeneratedRoleplay(
-      id: newGeneratedRoleplayId(),
-      passage: passage,
-      createdAt: DateTime.now(),
-    );
-    ref.read(generatedRoleplayStoreProvider).insert(roleplay);
-    unawaited(_prewarmRoleplay(roleplay));
-    unawaited(_attachRoleplayCover(roleplay));
-    return roleplay;
-  }
-
   Future<void> _prewarmStory(GeneratedStory story) {
     return LessonSpeechService.shared.prewarmNarration([
       for (var i = 0; i < story.passage.segments.length; i++)
@@ -361,32 +340,6 @@ class _SpeakReviewLaunchScreenState
           contentItemId: story.segmentContentId(i),
         ),
     ]);
-  }
-
-  Future<void> _prewarmRoleplay(GeneratedRoleplay roleplay) {
-    final items = <SpeechItem>[];
-    for (var i = 0; i < roleplay.passage.segments.length; i++) {
-      final segment = roleplay.passage.segments[i];
-      if (segment.characterFr?.isNotEmpty ?? false) {
-        items.add(
-          SpeechItem(
-            text: segment.characterFr!,
-            language: 'fr-FR',
-            contentItemId: '${roleplay.id}_seg${i}_char',
-          ),
-        );
-      }
-      if (segment.fr.isNotEmpty) {
-        items.add(
-          SpeechItem(
-            text: segment.fr,
-            language: 'fr-FR',
-            contentItemId: '${roleplay.id}_seg${i}_learner',
-          ),
-        );
-      }
-    }
-    return LessonSpeechService.shared.prewarmNarration(items);
   }
 
   Future<void> _attachStoryCover(GeneratedStory story, String prompt) async {
@@ -409,37 +362,50 @@ class _SpeakReviewLaunchScreenState
     }
   }
 
-  Future<void> _attachRoleplayCover(GeneratedRoleplay roleplay) async {
-    try {
-      final bytes = await LessonAgentService.shared.generateStoryCover(
-        title: roleplay.title,
-        summary: roleplay.passage.segments
-            .take(2)
-            .map((segment) => segment.en.isNotEmpty ? segment.en : segment.fr)
-            .join(' '),
-        topic: roleplay.title,
-        levelBand: 'A1',
-        coverPrompt:
-            'A premium editorial cover for a French language roleplay scene. '
-            'Show one cinematic real-life moment that matches the title and dialogue. '
-            'Use realistic publishing photography or editorial realism, never cartoon art.',
-      );
-      final url = await ref
-          .read(syncServiceProvider)
-          .uploadStoryCover(storyId: roleplay.id, bytes: bytes);
-      if (url != null && url.isNotEmpty) {
-        ref
-            .read(generatedRoleplayStoreProvider)
-            .updateCoverUrl(roleplay.id, url);
-      }
-    } catch (error, stackTrace) {
-      debugPrint('Review roleplay cover failed: $error\n$stackTrace');
-    }
+  String _reviewTopic() {
+    final profile = ref.read(learningStoreProvider).profile();
+    return ReviewMaterialService.modePrompt(
+      _modeLabel(widget.mode),
+      widget.sessions,
+      level: _levelFor(profile.level),
+    );
   }
 
-  String _reviewTopic() {
-    final context = ReviewMaterialService.promptContext(widget.sessions);
-    return 'Create a fresh review lesson that reinforces what the learner practised in these recent sessions. Use the summaries as learning context, not as a transcript to repeat verbatim:\n$context';
+  Future<void> _startSpeakingReview() async {
+    if (!await ensureAiSessionQuota(
+          context,
+          ref.read(pilotAccessServiceProvider),
+        ) ||
+        !mounted) {
+      return;
+    }
+    LessonSpeechService.shared.deactivate();
+    final profile = ref.read(learningStoreProvider).profile();
+    final level = _levelFor(profile.level);
+    await AppRouter.push(
+      context,
+      (_) => SessionScreen(
+        apiKey: ApiKeys.geminiKey,
+        stage: 'speaking',
+        sessionTopic: 'Personalized speaking review',
+        contentKey: 'review_speaking_${DateTime.now().microsecondsSinceEpoch}',
+        lessonContext:
+            '''
+${_reviewTopic()}
+
+SPEAKING REVIEW CONTRACT
+- Keep the interaction in a realistic French situation chosen from the recent history.
+- Start with one short, level-appropriate prompt; do not dump a lesson or a list of questions.
+- Let the learner answer before correcting.
+- After each answer, give one concise correction and one stronger reusable phrase.
+- Use English support only for A1/A2 when it prevents confusion. For B1/B2, keep the review in French.
+- Finish with a short spoken recap of the learner's strongest improvement and next priority.
+''',
+        kickoffMessage:
+            '(App instruction, not the student: begin a personalized $level speaking review from the learner history. Ask one short question in French and wait for the learner.)',
+      ),
+      fullscreenDialog: true,
+    );
   }
 
   String _levelFor(String raw) {
@@ -525,14 +491,12 @@ class _SpeakReviewLaunchScreenState
   String _modeLabel(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
-    SpeakReviewMode.stories => 'Stories',
-    SpeakReviewMode.roleplay => 'Roleplay',
+    SpeakReviewMode.reading => 'Reading',
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
-    SpeakReviewMode.stories => Icons.auto_stories_outlined,
-    SpeakReviewMode.roleplay => Icons.forum_outlined,
+    SpeakReviewMode.reading => Icons.menu_book_rounded,
   };
 }

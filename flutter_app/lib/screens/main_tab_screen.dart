@@ -15,7 +15,7 @@ import 'speak/speak_practice_screen.dart';
 import 'speak/speak_profile_screen.dart';
 import 'speak/speak_roadmap_screen.dart';
 import 'speak/speak_settings_screen.dart';
-import 'progress/progress_screen.dart';
+import 'scan/scan_screen.dart';
 
 /// Primary navigation destinations, defined once and shared between the
 /// mobile bottom tab bar and the desktop sidebar so neither shell can drift
@@ -37,9 +37,9 @@ const _destinations = [
     label: 'Practice',
   ),
   NavDestination(
-    icon: Icons.insights_outlined,
-    activeIcon: Icons.insights_rounded,
-    label: 'Progress',
+    icon: Icons.photo_camera_outlined,
+    activeIcon: Icons.photo_camera_rounded,
+    label: 'Photo tutor',
   ),
   NavDestination(
     icon: Icons.person_outline_rounded,
@@ -58,6 +58,17 @@ class MainTabScreen extends ConsumerStatefulWidget {
 class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   int _currentIndex = 0;
 
+  void _selectTab(int index) {
+    if (_currentIndex == index) return;
+    PSHaptics.selection();
+    setState(() => _currentIndex = index);
+    if (index == 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) AppTour.playPracticeIfNeeded(context);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TutorPersona>(
@@ -74,8 +85,11 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       const SpeakHomeScreen(),
       const SpeakRoadmapScreen(embedded: true),
       const SpeakPracticeScreen(),
-      const ProgressScreen(),
-      SpeakProfileScreen(onBack: () => setState(() => _currentIndex = 0)),
+      const ScanScreen(),
+      SpeakProfileScreen(
+        onBack: () => setState(() => _currentIndex = 0),
+        onReplayPractice: () => _selectTab(2),
+      ),
     ];
     final body = Stack(
       children: [
@@ -90,13 +104,15 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       return WebAppShell(
         destinations: _destinations,
         currentIndex: _currentIndex,
-        onSelect: (index) => setState(() => _currentIndex = index),
+        onSelect: _selectTab,
         topBarActions: [
           WebIconButton(
             icon: CupertinoIcons.person,
             tooltip: 'Profile',
-            onTap: () =>
-                AppRouter.push(context, (_) => const SpeakSettingsScreen()),
+            onTap: () => AppRouter.push(
+              context,
+              (_) => SpeakSettingsScreen(onReplayPractice: () => _selectTab(2)),
+            ),
           ),
         ],
         body: body,
@@ -144,9 +160,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          if (_currentIndex == index) return;
-          PSHaptics.selection();
-          setState(() => _currentIndex = index);
+          _selectTab(index);
         },
         child: AnimatedContainer(
           duration: DesignTokens.durationFast,
@@ -186,9 +200,10 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       ),
     );
     final tourKey = switch (index) {
+      0 => AppTour.homeTabKey,
       1 => AppTour.courseTabKey,
       2 => AppTour.practiceTabKey,
-      3 => AppTour.progressTabKey,
+      3 => AppTour.photoTutorTabKey,
       4 => AppTour.profileTabKey,
       _ => null,
     };

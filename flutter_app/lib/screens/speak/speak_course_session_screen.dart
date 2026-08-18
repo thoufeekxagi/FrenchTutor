@@ -22,7 +22,7 @@ import '../labs/writing_lab_screen.dart';
 import 'speak_course_vocabulary_screen.dart';
 import '../reading/reading_library_screen.dart';
 import 'speak_free_talk_screen.dart';
-import 'speak_review_detail_screen.dart';
+import 'speak_review_screen.dart';
 import 'speak_roleplay_screen.dart';
 import 'speak_ui.dart';
 
@@ -51,7 +51,7 @@ class _SpeakCourseSessionScreenState
   SpeakSkill? _selectedSkill;
   SpeakRoadmapSession get session => widget.session;
 
-  String get _level => session.contentKey.split('_').first;
+  String get _level => session.level.toUpperCase();
 
   /// One course session is one guided loop. The catalog owns the order; the
   /// screen should not invent a second menu of competing destinations.
@@ -79,7 +79,7 @@ class _SpeakCourseSessionScreenState
   }
 
   bool get _isAlphabetFoundation =>
-      _level == 'A1' && session.unit == 1 && session.index <= 2;
+      _level == 'A1' && session.primarySkill == SpeakSkill.alphabet;
 
   String get _activityTopic =>
       _isAlphabetFoundation ? session.title : session.unitTitle;
@@ -215,9 +215,9 @@ class _SpeakCourseSessionScreenState
         scene: session.roleplay,
         contentKey: session.contentKey,
       ),
-      SpeakSkill.review => const SpeakReviewDetailScreen(
-        mode: SpeakReviewMode.speaking,
-      ),
+      // Course-map review uses the same chooser and history source as the
+      // Practice tab. It must not open a second summary-only review flow.
+      SpeakSkill.review => const SpeakReviewScreen(),
       SpeakSkill.freeTalk => const SpeakFreeTalkScreen(),
     };
   }

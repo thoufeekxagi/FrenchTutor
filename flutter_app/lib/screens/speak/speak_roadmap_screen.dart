@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/database/adaptive_course_store.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
@@ -22,15 +23,15 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
-    final catalog = ref.watch(speakCurriculumProvider(profile.level));
-    return catalog.when(
-      loading: () => const SpeakScaffold(
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, _) =>
-          _buildRoadmap(context, ref, profile, completedContentKeys, null),
-      data: (items) =>
-          _buildRoadmap(context, ref, profile, completedContentKeys, items),
+    final adaptivePlan = ref
+        .read(adaptiveCourseStoreProvider)
+        .ensureCurrentPlan(profile);
+    return _buildRoadmap(
+      context,
+      ref,
+      profile,
+      completedContentKeys,
+      adaptivePlan.sessions,
     );
   }
 
@@ -39,7 +40,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     WidgetRef ref,
     Profile profile,
     Set<String> completedContentKeys,
-    List<SpeakCurriculumItem>? catalog,
+    List<AdaptiveCourseSessionSpec> adaptiveSessions,
   ) {
     final roadmap = SpeakRoadmapService.build(
       profile,
@@ -47,9 +48,8 @@ class SpeakRoadmapScreen extends ConsumerWidget {
       // Only stable course content keys are allowed to unlock this path.
       // There is no safe legacy index fallback: keys from another level
       // must not unlock this level's path.
-      completedSessions: 0,
       completedContentKeys: completedContentKeys,
-      catalog: catalog,
+      adaptiveSessions: adaptiveSessions,
     );
     final language = SpeakLanguageProfile.forLevel(roadmap.level);
     final units =
@@ -62,7 +62,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
           SpeakHeader(
             title: 'Your course',
             subtitle:
-                '${roadmap.level.toUpperCase()} · ${roadmap.sessions.length} sessions · ${language.shortLabel}',
+                '${roadmap.level.toUpperCase()} · ${roadmap.trackLabel} · ${roadmap.sessions.length} sessions · ${language.shortLabel}',
             leading: embedded
                 ? null
                 : GestureDetector(
@@ -154,6 +154,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     required bool featured,
   }) {
     final active = featured && !session.completed;
+    final lessonSubtitle = _lessonSubtitle(session.subtitle);
     return GestureDetector(
       onTap: () => AppRouter.push(context, (_) => _screenFor(session)),
       child: Container(
@@ -205,7 +206,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${session.primarySkill.label} · ${session.subtitle}',
+                    '${session.primarySkill.label} · $lessonSubtitle',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: DesignTokens.body(11).copyWith(
@@ -226,6 +227,13 @@ class SpeakRoadmapScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _lessonSubtitle(String subtitle) {
+    // The route stores the track label in the first segment for generation
+    // context, but course cards should show the human lesson purpose first.
+    final separator = subtitle.indexOf(' · ');
+    return separator == -1 ? subtitle : subtitle.substring(separator + 3);
   }
 
   Widget _screenFor(SpeakRoadmapSession session) =>

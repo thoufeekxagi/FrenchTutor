@@ -41,9 +41,13 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
   bool _audioStarted = false;
   bool _audioComplete = false;
   bool _audioPlaying = false;
-  bool _submitting = false;
+  bool _submitted = false;
 
   List<MultipleChoiceQuestion> get _questions => widget.story.quiz;
+
+  int get _correctAnswers => _questions.asMap().entries.where((entry) {
+    return _answers[entry.key] == entry.value.answerIndex;
+  }).length;
 
   @override
   void dispose() {
@@ -85,17 +89,12 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
   }
 
   void _submit() {
-    if (_submitting || _questions.isEmpty) return;
+    if (_submitted || _questions.isEmpty) return;
     if (_answers.length != _questions.length) return;
     if (widget.isListening && !_audioComplete) return;
-    var correct = 0;
-    for (var i = 0; i < _questions.length; i++) {
-      if (_answers[i] == _questions[i].answerIndex) correct++;
-    }
-    setState(() => _submitting = true);
-    Navigator.of(
-      context,
-    ).pop(ExamPracticeResult(correct: correct, total: _questions.length));
+    setState(() {
+      _submitted = true;
+    });
   }
 
   @override
@@ -132,13 +131,24 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
                 padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
                 children: [
                   if (widget.isListening) _audioPanel() else _readingPanel(),
+                  if (_submitted) ...[
+                    const SizedBox(height: 18),
+                    _reviewSummary(),
+                  ],
                   const SizedBox(height: 18),
                   for (var i = 0; i < _questions.length; i++) ...[
                     _QuestionBlock(
                       index: i,
                       question: _questions[i],
                       selectedIndex: _answers[i],
-                      enabled: !widget.isListening || _audioComplete,
+                      enabled:
+                          !_submitted &&
+                          (!widget.isListening || _audioComplete),
+                      submitted: _submitted,
+                      showEnglishSupport: const {
+                        'A1',
+                        'A2',
+                      }.contains(widget.levelBand.trim().toUpperCase()),
                       onSelected: (answer) =>
                           setState(() => _answers[i] = answer),
                     ),
@@ -225,6 +235,7 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
 
   Widget _submitBar(String title) {
     final ready =
+        !_submitted &&
         _answers.length == _questions.length &&
         (!widget.isListening || _audioComplete);
     return SafeArea(
@@ -238,9 +249,22 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
         child: SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: ready ? _submit : null,
-            icon: const Icon(Icons.arrow_forward_rounded),
-            label: Text(_submitting ? 'Saving…' : 'Submit $title'),
+            onPressed: _submitted
+                ? () => Navigator.of(context).pop(
+                    ExamPracticeResult(
+                      correct: _correctAnswers,
+                      total: _questions.length,
+                    ),
+                  )
+                : ready
+                ? _submit
+                : null,
+            icon: Icon(
+              _submitted ? Icons.check_rounded : Icons.arrow_forward_rounded,
+            ),
+            label: Text(
+              _submitted ? 'Finish and save result' : 'Submit $title',
+            ),
             style: FilledButton.styleFrom(
               backgroundColor: SpeakColors.blue,
               foregroundColor: Colors.white,
@@ -250,6 +274,50 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _reviewSummary() {
+    final total = _questions.length;
+    final percent = total == 0 ? 0 : ((_correctAnswers / total) * 100).round();
+    return _ExamSurface(
+      color: SpeakColors.blueSoft,
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: SpeakColors.blue,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '$percent%',
+              style: DesignTokens.display(16).copyWith(color: Colors.white),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Exam review',
+                  style: DesignTokens.body(16, weight: FontWeight.w800),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '$_correctAnswers of $total answers correct. Check each item below to see what to keep and what to practise next.',
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -318,6 +386,8 @@ class _QuestionBlock extends StatelessWidget {
     required this.question,
     required this.selectedIndex,
     required this.enabled,
+    required this.submitted,
+    required this.showEnglishSupport,
     required this.onSelected,
   });
 
@@ -325,6 +395,8 @@ class _QuestionBlock extends StatelessWidget {
   final MultipleChoiceQuestion question;
   final int? selectedIndex;
   final bool enabled;
+  final bool submitted;
+  final bool showEnglishSupport;
   final ValueChanged<int> onSelected;
 
   @override
@@ -339,11 +411,13 @@ class _QuestionBlock extends StatelessWidget {
           Text(
             question.q,
             style: DesignTokens.body(17, weight: FontWeight.w700).copyWith(
-              color: enabled ? DesignTokens.ink : DesignTokens.mutedDim,
+              color: enabled || submitted
+                  ? DesignTokens.ink
+                  : DesignTokens.mutedDim,
               height: 1.35,
             ),
           ),
-          if (question.qEn != null) ...[
+          if (showEnglishSupport && question.qEn != null) ...[
             const SizedBox(height: 4),
             Text(
               question.qEn!,
@@ -356,10 +430,33 @@ class _QuestionBlock extends StatelessWidget {
           for (var i = 0; i < question.choices.length; i++)
             _OptionRow(
               label: question.choices[i],
+              secondaryLabel:
+                  showEnglishSupport &&
+                      question.choicesEn != null &&
+                      i < question.choicesEn!.length
+                  ? question.choicesEn![i]
+                  : null,
               selected: selectedIndex == i,
+              correct: submitted && i == question.answerIndex,
+              incorrect:
+                  submitted && selectedIndex == i && i != question.answerIndex,
               enabled: enabled,
               onTap: () => onSelected(i),
             ),
+          if (submitted) ...[
+            const SizedBox(height: 4),
+            _ReviewAnswerLine(
+              label: 'Correct answer',
+              value: question.choices[question.answerIndex],
+              color: DesignTokens.success,
+            ),
+            if (selectedIndex != null && selectedIndex != question.answerIndex)
+              _ReviewAnswerLine(
+                label: 'Your answer',
+                value: question.choices[selectedIndex!],
+                color: DesignTokens.danger,
+              ),
+          ],
         ],
       ),
     );
@@ -369,13 +466,19 @@ class _QuestionBlock extends StatelessWidget {
 class _OptionRow extends StatelessWidget {
   const _OptionRow({
     required this.label,
+    this.secondaryLabel,
     required this.selected,
+    required this.correct,
+    required this.incorrect,
     required this.enabled,
     required this.onTap,
   });
 
   final String label;
+  final String? secondaryLabel;
   final bool selected;
+  final bool correct;
+  final bool incorrect;
   final bool enabled;
   final VoidCallback onTap;
 
@@ -390,32 +493,101 @@ class _OptionRow extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? SpeakColors.blueSoft : Colors.transparent,
+            color: correct
+                ? DesignTokens.success.withValues(alpha: 0.10)
+                : incorrect
+                ? DesignTokens.danger.withValues(alpha: 0.10)
+                : selected
+                ? SpeakColors.blueSoft
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: selected ? SpeakColors.blue : DesignTokens.hairline,
+              color: correct
+                  ? DesignTokens.success
+                  : incorrect
+                  ? DesignTokens.danger
+                  : selected
+                  ? SpeakColors.blue
+                  : DesignTokens.hairline,
             ),
           ),
           child: Row(
             children: [
               Icon(
-                selected
+                correct
+                    ? Icons.check_circle_rounded
+                    : incorrect
+                    ? Icons.cancel_rounded
+                    : selected
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
                 size: 20,
-                color: selected ? SpeakColors.blue : DesignTokens.mutedDim,
+                color: correct
+                    ? DesignTokens.success
+                    : incorrect
+                    ? DesignTokens.danger
+                    : selected
+                    ? SpeakColors.blue
+                    : DesignTokens.mutedDim,
               ),
               const SizedBox(width: 9),
               Expanded(
-                child: Text(
-                  label,
-                  style: DesignTokens.body(14).copyWith(
-                    color: enabled ? DesignTokens.ink : DesignTokens.mutedDim,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: DesignTokens.body(14).copyWith(
+                        color: enabled || correct || incorrect
+                            ? DesignTokens.ink
+                            : DesignTokens.mutedDim,
+                      ),
+                    ),
+                    if (secondaryLabel != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        secondaryLabel!,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: DesignTokens.mutedDim),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewAnswerLine extends StatelessWidget {
+  const _ReviewAnswerLine({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 7),
+      child: RichText(
+        text: TextSpan(
+          style: DesignTokens.body(13).copyWith(color: DesignTokens.ink),
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: TextStyle(color: color, fontWeight: FontWeight.w800),
+            ),
+            TextSpan(text: value),
+          ],
         ),
       ),
     );

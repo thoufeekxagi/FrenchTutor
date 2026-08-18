@@ -24,7 +24,10 @@ class ReviewSessionSummary {
 }
 
 abstract final class ReviewMaterialService {
-  static const defaultSessionLimit = 10;
+  /// A review should have enough history to feel personal without turning
+  /// into a replay of the entire account. Fifteen completed sessions gives
+  /// the generator a useful mix while remaining small enough for prompts.
+  static const defaultSessionLimit = 15;
 
   /// Returns the newest completed practice sessions, newest first.
   ///
@@ -49,10 +52,13 @@ abstract final class ReviewMaterialService {
       if (summaries.length == limit) break;
       if (session.endedAt == null) continue;
       if (!_isPracticeStage(session.stage)) continue;
-      final summary = _clean(
+      final recordedSummary = _clean(
         recapBySession[session.id] ?? session.summary ?? '',
       );
-      if (summary.isEmpty) continue;
+      final skill = _skillLabel(session.stage);
+      final summary = recordedSummary.isEmpty
+          ? 'Completed a $skill practice session${session.topic?.trim().isNotEmpty == true ? ' about ${_clean(session.topic!)}' : ''}.'
+          : recordedSummary;
       final occurredAt =
           DateTime.tryParse(session.endedAt!) ??
           DateTime.tryParse(session.startedAt) ??
@@ -60,7 +66,7 @@ abstract final class ReviewMaterialService {
       summaries.add(
         ReviewSessionSummary(
           sessionId: session.id,
-          skill: _skillLabel(session.stage),
+          skill: skill,
           topic: _clean(session.topic ?? ''),
           summary: summary,
           occurredAt: occurredAt,
@@ -85,6 +91,41 @@ abstract final class ReviewMaterialService {
       lines.add(line);
     }
     return lines.join('\n');
+  }
+
+  /// Mode-specific instructions shared by Course review and Practice review.
+  /// The recent summaries are deliberately the only learner-history input;
+  /// the selected mode controls the new activity that is generated.
+  static String modePrompt(
+    String mode,
+    List<ReviewSessionSummary> sessions, {
+    String level = 'A2',
+  }) {
+    final normalized = mode.toLowerCase();
+    final modeInstructions = switch (normalized) {
+      'reading' =>
+        'Create a short reading lesson with a realistic French passage, '
+            'clear comprehension questions, and explanations matched to $level.',
+      'listening' =>
+        'Create a short listening lesson with natural but level-matched '
+            'French, comprehension questions, and useful replayable phrases.',
+      'speaking' =>
+        'Create a guided speaking review. Reuse the learner\'s recent themes '
+            'and weak points, ask one turn at a time, and give one useful '
+            'correction after each response. Keep it at $level.',
+      _ => 'Create a focused French review at $level.',
+    };
+    return '''
+REVIEW MODE: ${normalized.toUpperCase()}
+$modeInstructions
+This is a new personalized review, not a transcript replay. Select the most
+useful language from the learner's recent completed sessions below. Avoid
+repeating a whole session or inventing unrelated topics.
+
+RECENT LEARNING HISTORY:
+${promptContext(sessions)}
+'''
+        .trim();
   }
 
   static String _clean(String value) =>
@@ -121,5 +162,6 @@ abstract final class ReviewMaterialService {
     'exam_listening',
     'exam_writing',
     'exam_speaking',
+    'review',
   }.contains(stage);
 }

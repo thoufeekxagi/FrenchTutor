@@ -3,6 +3,7 @@ import '../data/content_service.dart';
 import '../data/database/learning_store.dart';
 import '../models/content_models.dart';
 import '../models/srs_state.dart';
+import 'vocabulary_level_policy.dart';
 
 class SRSService {
   SRSService({required this.store});
@@ -106,7 +107,16 @@ class SRSService {
     final themes = themeId != null
         ? phaseContent.themes.where((t) => t.id == themeId).toList()
         : phaseContent.themes;
-    final entries = themes.expand((t) => t.entries).toList();
+    final entries = themes
+        .expand((t) => t.entries)
+        .where(
+          (entry) => VocabularyLevelPolicy.allowsBundledEntry(
+            entry,
+            level: store.profile().level,
+            phase: phase,
+          ),
+        )
+        .toList();
     final states = store.allSRSStates();
     final now = DateTime.now();
 
@@ -137,7 +147,15 @@ class SRSService {
           (t) => t.id == themeId,
           orElse: () => VocabTheme(id: '', title: '', entries: []),
         )
-        .entries;
+        .entries
+        .where(
+          (entry) => VocabularyLevelPolicy.allowsBundledEntry(
+            entry,
+            level: store.profile().level,
+            phase: phase,
+          ),
+        )
+        .toList(growable: false);
   }
 
   /// The single queue policy for the guided Daily Path (PILOT_PLAN.md P0.6/P0.7):
@@ -176,9 +194,9 @@ class SRSService {
   /// slice call after call. Shuffling here means even a total AI failure now
   /// produces a different, genuinely varied set each time.
   Future<List<VocabEntry>> dailyMixedQueue() async {
-    final allEntries = ContentService.shared.vocabPhases
-        .expand((p) => p.themes.expand((t) => t.entries))
-        .toList();
+    final allEntries = ContentService.shared.vocabEntriesForLevel(
+      store.profile().level,
+    );
     final states = store.allSRSStates();
     final now = DateTime.now();
     final basePolicy = policyFor(
@@ -253,9 +271,9 @@ class SRSService {
   }
 
   List<VocabEntry> knownSample({int limit = 6}) {
-    final allEntries = ContentService.shared.vocabPhases
-        .expand((p) => p.themes.expand((t) => t.entries))
-        .toList();
+    final allEntries = ContentService.shared.vocabEntriesForLevel(
+      store.profile().level,
+    );
     final states = store.allSRSStates();
     final knownIds = states.entries
         .where((e) => e.value.reps >= 2)

@@ -34,45 +34,33 @@ class SpeakingTranscriptStrip extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, String resolvedTutorName) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      child: Container(
-        constraints: BoxConstraints(maxHeight: height),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.82),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: SpeakColors.line),
+    // Keep the rail's viewport fixed. Only the ListView inside it may move;
+    // otherwise each new turn changes the rail height and pushes the tutor
+    // portrait/name downward in the call screen.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: SizedBox(
+        height: height,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: SpeakColors.line),
+          ),
+          child: ListView.separated(
+            controller: controller,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.only(right: 4),
+            itemCount: messages.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 7),
+            itemBuilder: (context, index) => _TranscriptLine(
+              message: messages[index],
+              tutorName: resolvedTutorName,
+            ),
+          ),
         ),
-        child: messages.isEmpty
-            ? const SizedBox.shrink()
-            : messages.length <= 4
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (var index = 0; index < messages.length; index++) ...[
-                    if (index > 0) const SizedBox(height: 7),
-                    _TranscriptLine(
-                      message: messages[index],
-                      tutorName: resolvedTutorName,
-                    ),
-                  ],
-                ],
-              )
-            : ListView.separated(
-                controller: controller,
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.only(right: 4),
-                itemCount: messages.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 7),
-                itemBuilder: (context, index) => _TranscriptLine(
-                  message: messages[index],
-                  tutorName: resolvedTutorName,
-                ),
-              ),
       ),
     );
   }
@@ -91,53 +79,62 @@ class _TranscriptLine extends StatelessWidget {
         ? _compactUserTranscript(message.content)
         : message.content;
     final accent = isUser ? SpeakColors.blue : SpeakColors.green;
-    final bubble = ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.sizeOf(context).width * 0.72,
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-        decoration: BoxDecoration(
-          color: isUser
-              ? SpeakColors.blueSoft.withValues(alpha: 0.78)
-              : Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(15),
-            topRight: const Radius.circular(15),
-            bottomLeft: Radius.circular(isUser ? 15 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 15),
-          ),
-          border: Border.all(
-            color: isUser
-                ? SpeakColors.blue.withValues(alpha: 0.20)
-                : SpeakColors.line,
-          ),
+    const avatarGap = 7.0;
+    final bubble = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      decoration: BoxDecoration(
+        color: isUser
+            ? SpeakColors.blueSoft.withValues(alpha: 0.78)
+            : Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(15),
+          topRight: const Radius.circular(15),
+          bottomLeft: Radius.circular(isUser ? 15 : 4),
+          bottomRight: Radius.circular(isUser ? 4 : 15),
         ),
-        child: SelectableText.rich(
-          TextSpan(
-            text: _quoteFrenchTerms(displayText),
-            style: DesignTokens.body(
-              15,
-            ).copyWith(color: SpeakColors.navy, height: 1.3),
-          ),
-          maxLines: 3,
+        border: Border.all(
+          color: isUser
+              ? SpeakColors.blue.withValues(alpha: 0.20)
+              : SpeakColors.line,
+        ),
+      ),
+      child: SelectableText.rich(
+        TextSpan(
+          text: _quoteFrenchTerms(displayText),
+          style: DesignTokens.body(
+            15,
+          ).copyWith(color: SpeakColors.navy, height: 1.3),
         ),
       ),
     );
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+    return SizedBox(
+      width: double.infinity,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!isUser) ...[
-            _avatar(accent, tutorName.isEmpty ? 'T' : tutorName[0]),
-            const SizedBox(width: 7),
-          ],
-          bubble,
-          if (isUser) ...[const SizedBox(width: 7), _avatar(accent, 'Y')],
-        ],
+        children: isUser
+            ? [
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.sizeOf(context).width * 0.82,
+                      ),
+                      child: bubble,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: avatarGap),
+                _avatar(accent, 'Y'),
+              ]
+            : [
+                _avatar(accent, tutorName.isEmpty ? 'T' : tutorName[0]),
+                const SizedBox(width: avatarGap),
+                Expanded(child: bubble),
+              ],
       ),
     );
   }

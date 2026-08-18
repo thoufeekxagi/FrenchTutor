@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/content_models.dart';
 import '../../services/sync_service.dart';
+import '../../services/starter_cover_resolver.dart';
 import 'app_migrations.dart';
 
 const _uuid = Uuid();
@@ -203,6 +204,7 @@ class GeneratedGrammarStoryStore {
     final explanationJson =
         (jsonDecode(row['explanation_json'] as String? ?? '{}') as Map)
             .cast<String, dynamic>();
+    final passage = ReadingPassage.fromJson(passageJson);
     return GeneratedGrammarStory(
       id: row['id'] as String,
       grammarPoint: row['grammar_point'] as String,
@@ -217,7 +219,7 @@ class GeneratedGrammarStoryStore {
               examples: const [],
             )
           : GrammarExplanation.fromJson(explanationJson),
-      passage: ReadingPassage.fromJson(passageJson),
+      passage: passage,
       quiz: quizJson
           .map((e) => MultipleChoiceQuestion.fromJson((e as Map).cast()))
           .toList(),
@@ -226,7 +228,10 @@ class GeneratedGrammarStoryStore {
           .toList(),
       score: (row['score'] as num?)?.toDouble(),
       createdAt: DateTime.parse(row['created_at'] as String),
-      coverUrl: row['cover_url'] as String?,
+      coverUrl: StarterCoverResolver.resolve(
+        title: passage.title,
+        coverUrl: row['cover_url'] as String?,
+      ),
     );
   }
 }

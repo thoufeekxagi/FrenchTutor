@@ -34,6 +34,7 @@ class _ScanMessage {
     this.text = '',
     this.imageBytes,
     this.isLoading = false,
+    this.attachmentSummary,
   });
 
   final String id;
@@ -44,6 +45,7 @@ class _ScanMessage {
   String? attachmentSummary;
 
   bool get isUser => role == _ScanMessageRole.user;
+  bool get hasAttachment => imageBytes != null || attachmentSummary != null;
 }
 
 class _ScanSession {
@@ -57,10 +59,33 @@ class _ScanSession {
 
   bool get isClosed => closedAt != null;
 
+  String get label {
+    for (final message in messages) {
+      if (!message.isUser && message.text.trim().isNotEmpty) {
+        final firstLine = message.text.trim().split('\n').first.trim();
+        return firstLine.length <= 42
+            ? firstLine
+            : '${firstLine.substring(0, 39)}…';
+      }
+    }
+    for (final message in messages) {
+      final summary = message.attachmentSummary?.trim();
+      if (summary != null && summary.isNotEmpty) {
+        final firstLine = summary.split('\n').first.trim();
+        if (firstLine.isNotEmpty) {
+          return firstLine.length <= 42
+              ? firstLine
+              : '${firstLine.substring(0, 39)}…';
+        }
+      }
+    }
+    return messages.isEmpty ? 'New photo session' : 'Photo tutor session';
+  }
+
   String get context {
     final lines = <String>[];
     for (final message in messages) {
-      if (message.imageBytes != null) {
+      if (message.hasAttachment) {
         final summary = message.attachmentSummary;
         lines.add(
           summary == null || summary.isEmpty
@@ -80,7 +105,7 @@ class _ScanSession {
   List<Map<String, String>> get conversation {
     final turns = <Map<String, String>>[];
     for (final message in messages) {
-      final content = message.imageBytes != null
+      final content = message.hasAttachment
           ? 'The student uploaded a photo. Image summary: ${message.attachmentSummary ?? 'not available yet'}'
           : message.text.trim();
       if (content.isEmpty) continue;
@@ -130,6 +155,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     super.initState();
     _storage = ref.read(storageServiceProvider);
     _agent = ref.read(lessonAgentServiceProvider);
+    _restoreSavedSessions();
     WidgetsBinding.instance.addObserver(this);
     _call = InlineCallController(
       sessionType: LiveSessionType.visionScan,
@@ -148,6 +174,49 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
       onUserTranscript: _handleCallUserTranscript,
       onTutorTranscript: _handleCallTutorTranscript,
     );
+  }
+
+  void _restoreSavedSessions() {
+    final saved = _storage
+        .getAllSessions()
+        .where((session) => session.stage == 'vision_scan')
+        .toList(growable: false);
+    for (final savedSession in saved.reversed) {
+      final startedAt = DateTime.tryParse(savedSession.startedAt);
+      if (startedAt == null) continue;
+      final session = _ScanSession(id: savedSession.id, startedAt: startedAt);
+      final endedAt = savedSession.endedAt == null
+          ? null
+          : DateTime.tryParse(savedSession.endedAt!);
+      session.closedAt = endedAt;
+      for (final message in _storage.getSessionMessages(
+        sessionId: savedSession.id,
+      )) {
+        if (message.content == '[Photo uploaded]') {
+          session.messages.add(
+            _ScanMessage(
+              id: message.id,
+              role: _ScanMessageRole.user,
+              attachmentSummary: 'Photo from this session',
+            ),
+          );
+        } else if (message.content.trim().isNotEmpty) {
+          session.messages.add(
+            _ScanMessage(
+              id: message.id,
+              role: message.isUser
+                  ? _ScanMessageRole.user
+                  : _ScanMessageRole.assistant,
+              text: message.content,
+            ),
+          );
+        }
+      }
+      _sessions.add(session);
+      if (!session.isClosed && _activeSession == null) {
+        _activeSession = session;
+      }
+    }
   }
 
   String get _latestContext {
@@ -174,6 +243,13 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _call.handleAppLifecycle(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      final session = _activeSession;
+      if (session != null && session.messages.isNotEmpty) {
+        _persistSession(session);
+      }
+    }
   }
 
   @override
@@ -201,6 +277,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
       role: 'user',
       content: '[Photo uploaded]',
     );
+    _persistSession(session);
     _pipeline = _pipeline.then((_) => _processImage(session, message));
   }
 
@@ -210,11 +287,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
         imageBytes: message.imageBytes!,
         conversationContext: session.context,
       );
-      final reply = result.reply.isNotEmpty
-          ? result.reply
-          : (result.ocrText.isNotEmpty
-                ? result.ocrText
-                : "Couldn't read anything useful from that photo.");
+      if (result.reply.trim().isEmpty) {
+        throw StateError('The vision model returned an empty response.');
+      }
+      final reply = result.reply.trim();
       message.isLoading = false;
       if (_call.isLive &&
           identical(_activeSession, session) &&
@@ -234,14 +310,14 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
           ),
         );
       }
-    } catch (_) {
+    } catch (error) {
       message.isLoading = false;
       _appendMessage(
         session,
         _ScanMessage(
           id: const Uuid().v4(),
           role: _ScanMessageRole.assistant,
-          text: "Couldn't reach the AI tutor. Check your connection.",
+          text: _scanErrorText(error),
         ),
       );
     }
@@ -269,6 +345,25 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
         content: message.text.trim(),
       );
     }
+    _persistSession(session);
+  }
+
+  String _scanErrorText(Object error) {
+    if (error is AgentError) return 'Scan failed: ${error.message}';
+    return 'Scan failed: $error';
+  }
+
+  void _persistSession(_ScanSession session) {
+    _storage.saveSession(
+      Session(
+        id: session.id,
+        startedAt: session.startedAt.toIso8601String(),
+        endedAt: session.closedAt?.toIso8601String(),
+        summary: session.label,
+        topic: 'Photo tutor',
+        stage: 'vision_scan',
+      ),
+    );
   }
 
   void _handleCallUserTranscript(String text) {
@@ -325,21 +420,24 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
         question: question,
         conversation: history,
       );
+      if (reply.trim().isEmpty) {
+        throw StateError('The text model returned an empty response.');
+      }
       _appendMessage(
         session,
         _ScanMessage(
           id: const Uuid().v4(),
           role: _ScanMessageRole.assistant,
-          text: reply.isEmpty ? "I couldn't form an answer just now." : reply,
+          text: reply.trim(),
         ),
       );
-    } catch (_) {
+    } catch (error) {
       _appendMessage(
         session,
         _ScanMessage(
           id: const Uuid().v4(),
           role: _ScanMessageRole.assistant,
-          text: "Couldn't reach the AI tutor. Check your connection.",
+          text: _scanErrorText(error),
         ),
       );
     }
@@ -417,7 +515,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
         for (var i = 0; i < _sessions.length; i++)
           (
             label:
-                'Session ${i + 1}${_sessions[i].isClosed ? ' · Closed' : ''}',
+                '${_sessions[i].label}${_sessions[i].isClosed ? ' · Closed' : ''}',
             value: i,
             destructive: false,
           ),
@@ -450,18 +548,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     final session = _activeSession;
     if (session == null || session.isClosed) return;
     session.closedAt = DateTime.now();
-    _storage.saveSession(
-      Session(
-        id: session.id,
-        startedAt: session.startedAt.toIso8601String(),
-        endedAt: session.closedAt!.toIso8601String(),
-        summary: session.hadCall
-            ? 'Vision Scan session with voice call'
-            : 'Vision Scan session',
-        topic: 'Vision Scan',
-        stage: 'vision_scan',
-      ),
-    );
+    _persistSession(session);
     if (mounted) setState(() {});
   }
 
@@ -472,15 +559,20 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        title: Text('Scan', style: DesignTokens.display(18)),
+        title: Text('Photo tutor', style: DesignTokens.display(18)),
         backgroundColor: DesignTokens.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           _ScanHeaderButton(
             icon: CupertinoIcons.clock,
-            label: 'Scan sessions',
+            label: 'Photo tutor sessions',
             onPressed: _showSessionPicker,
+          ),
+          _ScanHeaderButton(
+            icon: CupertinoIcons.add,
+            label: 'Start a new photo tutor session',
+            onPressed: _startNewSession,
           ),
           InlineCallActions(controller: _call),
         ],
@@ -490,9 +582,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
           children: [
             _SessionToolbar(
               session: session,
-              sessionNumber: session == null
-                  ? null
-                  : _sessions.indexOf(session) + 1,
               onSelect: _showSessionPicker,
               onClose: canCompose ? _closeActiveSession : null,
               onNew: _startNewSession,
@@ -644,14 +733,12 @@ class _ScanMessageBubble extends StatelessWidget {
 class _SessionToolbar extends StatelessWidget {
   const _SessionToolbar({
     required this.session,
-    required this.sessionNumber,
     required this.onSelect,
     required this.onClose,
     required this.onNew,
   });
 
   final _ScanSession? session;
-  final int? sessionNumber;
   final VoidCallback onSelect;
   final VoidCallback? onClose;
   final VoidCallback onNew;
@@ -659,8 +746,8 @@ class _SessionToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = session == null
-        ? 'New scan session'
-        : 'Session $sessionNumber${session!.isClosed ? ' · Closed' : ''}';
+        ? 'New photo session'
+        : '${session!.label}${session!.isClosed ? ' · Closed' : ''}';
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
       child: Row(

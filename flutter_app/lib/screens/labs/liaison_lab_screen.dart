@@ -11,6 +11,7 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/session_recorder.dart';
@@ -85,7 +86,10 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
         levelBand: level,
         explanation: explanation,
       );
-      final generated = await agent.buildLiaisonQuiz(passage: passage);
+      final generated = await agent.buildLiaisonQuiz(
+        passage: passage,
+        levelBand: level,
+      );
       if (!mounted) return;
       setState(() => _isGenerating = false);
 
@@ -209,8 +213,11 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
         ),
         body: const Center(
           child: Padding(
-            padding: EdgeInsets.all(28),
-            child: CircularProgressIndicator(),
+            padding: EdgeInsets.all(20),
+            child: PersonalizedGenerationLoader(
+              content: 'liaison class',
+              detail: 'Building a focused pronunciation lesson for your level.',
+            ),
           ),
         ),
       );
@@ -261,13 +268,18 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  SpeakPrimaryButton(
-                    label: _isGenerating
-                        ? 'Building your story…'
-                        : 'Generate practice story',
-                    icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-                    onTap: _isGenerating ? () {} : _practiceLiaison,
-                  ),
+                  if (_isGenerating)
+                    const PersonalizedGenerationLoader(
+                      content: 'liaison class',
+                      detail: 'Choosing examples that fit your current French.',
+                      compact: true,
+                    )
+                  else
+                    SpeakPrimaryButton(
+                      label: 'Generate practice story',
+                      icon: CupertinoIcons.wand_stars,
+                      onTap: _practiceLiaison,
+                    ),
                   if (_errorText != null) ...[
                     const SizedBox(height: 8),
                     Text(

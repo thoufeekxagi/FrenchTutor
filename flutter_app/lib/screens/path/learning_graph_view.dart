@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../data/content_service.dart';
 import '../../data/database/learning_store.dart';
+import '../../data/database/generated_grammar_story_store.dart';
+import '../../data/database/generated_writing_task_store.dart';
+import '../../models/content_models.dart';
 import '../../services/lesson_speech_service.dart';
 import 'fingerprint_engine.dart';
 
@@ -21,11 +24,23 @@ class FingerprintView extends StatefulWidget {
     super.key,
     required this.store,
     required this.content,
+    this.graph,
+    this.vocabularySets = const [],
+    this.stories = const [],
+    this.grammarStories = const [],
+    this.roleplays = const [],
+    this.writingTasks = const [],
     this.height = 320,
   });
 
   final LearningStore store;
   final ContentService content;
+  final FingerprintGraph? graph;
+  final List<GeneratedVocabularySet> vocabularySets;
+  final List<GeneratedStory> stories;
+  final List<GeneratedGrammarStory> grammarStories;
+  final List<GeneratedRoleplay> roleplays;
+  final List<GeneratedWritingTask> writingTasks;
   final double height;
 
   @override
@@ -40,14 +55,36 @@ class _FingerprintViewState extends State<FingerprintView> {
   @override
   void initState() {
     super.initState();
-    _graph = buildFingerprintGraph(widget.store, widget.content);
+    _graph = widget.graph ?? _buildGraph(widget);
   }
 
   @override
   void didUpdateWidget(covariant FingerprintView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _graph = buildFingerprintGraph(widget.store, widget.content);
+    final graphChanged = widget.graph != null
+        ? widget.graph != oldWidget.graph
+        : widget.store != oldWidget.store ||
+              widget.content != oldWidget.content ||
+              widget.vocabularySets != oldWidget.vocabularySets ||
+              widget.stories != oldWidget.stories ||
+              widget.grammarStories != oldWidget.grammarStories ||
+              widget.roleplays != oldWidget.roleplays ||
+              widget.writingTasks != oldWidget.writingTasks;
+    if (graphChanged) {
+      _graph = widget.graph ?? _buildGraph(widget);
+      _selected = null;
+    }
   }
+
+  FingerprintGraph _buildGraph(FingerprintView view) => buildFingerprintGraph(
+    view.store,
+    view.content,
+    vocabularySets: view.vocabularySets,
+    stories: view.stories,
+    grammarStories: view.grammarStories,
+    roleplays: view.roleplays,
+    writingTasks: view.writingTasks,
+  );
 
   @override
   void dispose() {
@@ -55,8 +92,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     super.dispose();
   }
 
-  void _selectNode(TapDownDetails details) {
-    final point = _transform.toScene(details.localPosition);
+  void _selectNode(Offset point) {
     FingerprintNode? nearest;
     var nearestDistance = double.infinity;
     for (final node in _graph.nodes) {
@@ -90,16 +126,21 @@ class _FingerprintViewState extends State<FingerprintView> {
                   child: ColoredBox(color: DesignTokens.ink),
                 ),
                 Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapDown: _selectNode,
-                    child: InteractiveViewer(
-                      transformationController: _transform,
-                      constrained: false,
-                      alignment: Alignment.center,
-                      boundaryMargin: const EdgeInsets.all(240),
-                      minScale: 0.45,
-                      maxScale: 3.5,
+                  child: InteractiveViewer(
+                    transformationController: _transform,
+                    constrained: false,
+                    alignment: Alignment.center,
+                    panEnabled: true,
+                    scaleEnabled: true,
+                    boundaryMargin: const EdgeInsets.all(280),
+                    minScale: 0.45,
+                    maxScale: 3.5,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      // The child is in scene coordinates. Handling the tap
+                      // here avoids the old viewport/scene mismatch and lets
+                      // InteractiveViewer keep ownership of drag and pinch.
+                      onTapUp: (details) => _selectNode(details.localPosition),
                       child: CustomPaint(
                         size: const Size(1100, 820),
                         painter: _FingerprintPainter(

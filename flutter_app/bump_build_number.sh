@@ -3,11 +3,11 @@
 #   1. Auto-increments the iOS build number from the git commit count (always
 #      strictly increasing, never collides with a previous TestFlight upload).
 #      Skipped if the current number is already ahead.
-#   2. Regenerates ios/Flutter/Generated.xcconfig WITH the dart-define keys
-#      baked in, and verifies they actually landed. This part always runs:
-#      Generated.xcconfig is what Xcode's Run/Archive reads, and any bare
-#      `flutter build`/`flutter run` without defines silently wipes the keys
-#      from it — the app then refuses to start ("Missing SUPABASE_URL").
+#   2. Regenerates ios/Flutter/Generated.xcconfig WITH the local dart-defines
+#      baked in, so optional/private integrations are present when available.
+#      Supabase's public production configuration is compiled into the app as
+#      a safe fallback, so a direct Xcode Run/Archive no longer depends on
+#      this local script for Supabase startup.
 # Run this once before opening Xcode. See BUILD_FLUTTER_TO_IPHONE.md.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -66,8 +66,8 @@ fi
 # DART_DEFINES entries are base64; "U1VQQUJBU0VfVVJM" is the stable encoding
 # of the "SUPABASE_URL" prefix — its presence proves OUR keys are baked in,
 # not just Flutter's built-in defines (which exist even in a keyless config).
-if ! grep -q 'U1VQQUJBU0VfVVJM' ios/Flutter/Generated.xcconfig; then
-  echo "ERROR: Supabase key missing from Generated.xcconfig DART_DEFINES — Xcode builds would ship keyless. Do not archive." >&2
-  exit 1
+if grep -q 'U1VQQUJBU0VfVVJM' ios/Flutter/Generated.xcconfig; then
+  echo "Generated.xcconfig confirmed: build $ACTUAL, local overrides baked in. Ready for Xcode."
+else
+  echo "Generated.xcconfig confirmed: build $ACTUAL. Supabase will use its public production fallback; optional local overrides are absent."
 fi
-echo "Generated.xcconfig confirmed: build $ACTUAL, keys baked in. Ready for Xcode."

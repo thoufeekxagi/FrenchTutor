@@ -7,6 +7,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/content_models.dart';
 import '../../services/sync_service.dart';
+import '../../services/starter_cover_resolver.dart';
+import '../../services/story_variety_service.dart';
 import 'app_migrations.dart';
 
 const _uuid = Uuid();
@@ -34,9 +36,22 @@ class GeneratedStoryStore {
       practiceMode == null ? const [] : [practiceMode],
     );
     final stories = <GeneratedStory>[];
+    final fingerprints = <String>{};
     for (final row in rows) {
       try {
-        stories.add(_fromRow(row));
+        final story = _fromRow(row);
+        final opening = story.passage.segments.isEmpty
+            ? ''
+            : story.passage.segments.first.fr;
+        // Older builds could save the same generated response more than once
+        // when a screen was reopened during an in-flight request. Keep the
+        // newest copy visible while preserving every underlying row for sync
+        // and account deletion.
+        final fingerprint = StoryVarietyService.storyFingerprint(
+          title: story.title,
+          opening: opening,
+        );
+        if (fingerprints.add(fingerprint)) stories.add(story);
       } catch (error, stackTrace) {
         developer.log(
           'Skipping malformed generated story ${row['id']}: $error',
@@ -200,7 +215,10 @@ class GeneratedStoryStore {
       summary: _string(row['summary']),
       topic: _string(row['topic']),
       readTimeMinutes: _int(row['read_time_minutes']),
-      coverUrl: row['cover_url']?.toString(),
+      coverUrl: StarterCoverResolver.resolve(
+        title: _string(row['title']),
+        coverUrl: row['cover_url']?.toString(),
+      ),
       practiceMode: _string(row['practice_mode'], 'reading'),
     );
   }

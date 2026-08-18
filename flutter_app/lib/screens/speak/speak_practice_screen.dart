@@ -6,6 +6,7 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
+import '../../services/app_tour.dart';
 import '../../services/lesson_speech_service.dart';
 import '../session/session_screen.dart';
 import '../labs/alphabet_lab_screen.dart';
@@ -37,57 +38,63 @@ class SpeakPracticeScreen extends ConsumerWidget {
             subtitle: 'Strengthen anything you have learned so far.',
           ),
           const SizedBox(height: 22),
-          SpeakCard(
-            color: SpeakColors.blueSoft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Free Talk', style: DesignTokens.display(22)),
-                const SizedBox(height: 5),
-                Text(
-                  'Open a live conversation and choose what you want to practise. This is always available, not another required task.',
-                  style: DesignTokens.body(
-                    13,
-                  ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
-                ),
-                const SizedBox(height: 14),
-                SpeakPrimaryButton(
-                  label: 'Start a conversation',
-                  icon: Icons.arrow_forward_rounded,
-                  onTap: () => _startFreeTalk(context, ref),
-                ),
-              ],
+          KeyedSubtree(
+            key: AppTour.practiceFreeTalkKey,
+            child: SpeakCard(
+              color: SpeakColors.blueSoft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Free Talk', style: DesignTokens.display(22)),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Open a live conversation and choose what you want to practise. This is always available, not another required task.',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+                  ),
+                  const SizedBox(height: 14),
+                  SpeakPrimaryButton(
+                    label: 'Start a conversation',
+                    icon: Icons.arrow_forward_rounded,
+                    onTap: () => _startFreeTalk(context, ref),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
           const SpeakSectionTitle(title: 'Review'),
           const SizedBox(height: 10),
-          Semantics(
-            button: true,
-            label: 'Open review from recent practice sessions',
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () =>
-                  AppRouter.push(context, (_) => const SpeakReviewScreen()),
-              child: SpeakCard(
-                child: Row(
-                  children: [
-                    _icon(Icons.replay_rounded),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Bring back what you learned in recent speaking, listening, reading, writing, or roleplay sessions.',
-                        style: DesignTokens.body(
-                          13,
-                        ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+          KeyedSubtree(
+            key: AppTour.practiceReviewKey,
+            child: Semantics(
+              button: true,
+              label: 'Open review from recent practice sessions',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () =>
+                    AppRouter.push(context, (_) => const SpeakReviewScreen()),
+                child: SpeakCard(
+                  child: Row(
+                    children: [
+                      _icon(Icons.replay_rounded),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Bring back what you learned in recent speaking, listening, reading, writing, or roleplay sessions.',
+                          style: DesignTokens.body(
+                            13,
+                          ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+                        ),
                       ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 16,
-                      color: SpeakColors.inkSoft,
-                    ),
-                  ],
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 16,
+                        color: SpeakColors.inkSoft,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -101,6 +108,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Reading',
             subtitle: 'Stories and real-world text',
             screen: const ReadingLibraryScreen(),
+            tourKey: AppTour.practiceReadingKey,
           ),
           _skillRow(
             context,
@@ -108,6 +116,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Listening',
             subtitle: 'Understand spoken French',
             screen: const ListeningLabScreen(),
+            tourKey: AppTour.practiceListeningKey,
           ),
           _skillRow(
             context,
@@ -115,6 +124,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Writing',
             subtitle: 'Create your own useful sentences',
             screen: const WritingLabScreen(),
+            tourKey: AppTour.practiceWritingKey,
           ),
           _skillRow(
             context,
@@ -122,6 +132,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Grammar',
             subtitle: 'Learn patterns through stories',
             screen: const GrammarLabScreen(),
+            tourKey: AppTour.practiceGrammarKey,
           ),
           _skillRow(
             context,
@@ -129,6 +140,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Vocabulary',
             subtitle: 'Recall words with spaced practice',
             screen: const VocabLabScreen(),
+            tourKey: AppTour.practiceVocabularyKey,
           ),
           _skillRow(
             context,
@@ -136,6 +148,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             title: 'Roleplay',
             subtitle: 'Practise a specific real-life moment',
             screen: const RoleplayLabScreen(),
+            tourKey: AppTour.practiceRoleplayKey,
           ),
           const SizedBox(height: 18),
           SpeakSectionTitle(title: 'Foundations', action: 'Refresh anytime'),
@@ -174,36 +187,42 @@ class SpeakPracticeScreen extends ConsumerWidget {
           GestureDetector(
             onTap: () =>
                 AppRouter.push(context, (_) => const ExamReadinessScreen()),
-            child: SpeakCard(
-              color: SpeakColors.blueSoft,
-              child: Row(
-                children: [
-                  _icon(Icons.fact_check_outlined),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Exam readiness',
-                          style: DesignTokens.body(14, weight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Free TCF and TEF practice at the level you choose',
-                          style: DesignTokens.body(
-                            11,
-                          ).copyWith(color: SpeakColors.inkSoft),
-                        ),
-                      ],
+            child: KeyedSubtree(
+              key: AppTour.practiceExamKey,
+              child: SpeakCard(
+                color: SpeakColors.blueSoft,
+                child: Row(
+                  children: [
+                    _icon(Icons.fact_check_outlined),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Exam readiness',
+                            style: DesignTokens.body(
+                              14,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Free TCF and TEF practice at the level you choose',
+                            style: DesignTokens.body(
+                              11,
+                            ).copyWith(color: SpeakColors.inkSoft),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 15,
-                    color: SpeakColors.inkSoft,
-                  ),
-                ],
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 15,
+                      color: SpeakColors.inkSoft,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -240,8 +259,9 @@ class SpeakPracticeScreen extends ConsumerWidget {
     required String title,
     required String subtitle,
     required Widget screen,
+    GlobalKey? tourKey,
   }) {
-    return Padding(
+    final child = Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
         onTap: () => AppRouter.push(context, (_) => screen),
@@ -279,6 +299,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
         ),
       ),
     );
+    return tourKey == null ? child : KeyedSubtree(key: tourKey, child: child);
   }
 
   Widget _foundation(

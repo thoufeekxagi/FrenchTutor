@@ -8,8 +8,25 @@ abstract final class ApiKeys {
   /// OpenRouter keys above, it is not a secret. It still travels via
   /// dart-define for consistency with the rest of this file and so switching
   /// Supabase projects (e.g. a staging project) never requires a code change.
-  static const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  ///
+  /// The production public configuration is also the compile-time fallback.
+  /// This is intentional: Xcode's native Run/Archive path does not execute
+  /// our local key script, and Supabase's publishable key is safe to ship in a
+  /// public client. A supplied dart-define still wins, so CI and staging can
+  /// select a different project without changing source.
+  static const _productionSupabaseUrl =
+      'https://oxfnrsjskdjbroekxdco.supabase.co';
+  static const _productionSupabasePublishableKey =
+      'sb_publishable_jdorszpxwu--tDeMKkaARw_pGHf01nn';
+
+  static const supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: _productionSupabaseUrl,
+  );
+  static const supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: _productionSupabasePublishableKey,
+  );
 
   /// Google Sign-In OAuth client IDs (from Google Cloud Console — see
   /// BUILD_FLUTTER_TO_IPHONE.md for the one-time setup checklist). Neither is

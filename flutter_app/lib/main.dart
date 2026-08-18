@@ -47,10 +47,9 @@ void main() {
         try {
           if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
             throw StateError(
-              'Missing SUPABASE_URL / SUPABASE_ANON_KEY. Run via '
-              './run_with_keys.sh or ./run_release_with_keys.sh (see '
-              'BUILD_FLUTTER_TO_IPHONE.md), a plain `flutter run` ships '
-              'without these and auth cannot work.',
+              'Supabase public configuration is empty. Set SUPABASE_URL and '
+              'SUPABASE_ANON_KEY with --dart-define or restore the production '
+              'public defaults in lib/config/api_keys.dart.',
             );
           }
           await Supabase.initialize(

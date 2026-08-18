@@ -12,6 +12,9 @@ import '../models/content_models.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 import 'gemini_live_audio_service.dart';
+import 'story_variety_service.dart';
+import 'vocabulary_level_policy.dart';
+import '../prompts/live_prompts.dart';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
@@ -60,6 +63,9 @@ class AgentError implements Exception {
   static const badResponse = AgentError._(
     'The AI tutor gave an unexpected response.',
   );
+  static const duplicateStory = AgentError._(
+    'The AI returned a duplicate story. No duplicate was saved.',
+  );
 
   static AgentError badJSON(String raw) => AgentError._(
     'LLM returned non-JSON: ${raw.substring(0, raw.length > 200 ? 200 : raw.length)}',
@@ -77,6 +83,7 @@ class WritingFeedback {
     required this.connectorFeedback,
     required this.improvedVersion,
     this.nextSteps = const [],
+    this.scoreBreakdown = const {},
   });
 
   final double scoreOutOf10;
@@ -90,6 +97,10 @@ class WritingFeedback {
   /// doesn't give on its own. May be empty for older cached feedback
   /// generated before this field existed.
   final List<String> nextSteps;
+
+  /// Level-aware rubric marks. Empty for older cached/model responses that
+  /// predate the detailed writing review contract.
+  final Map<String, double> scoreBreakdown;
 }
 
 class MicroWritingFeedback {
@@ -328,16 +339,24 @@ CEFR CALIBRATION FOR $levelBand: use present tense and short, simple sentences w
     required String submission,
     required String levelBand,
   }) async {
+    final band = levelBand.trim().toUpperCase();
     final system =
         '''
-You are a professional French writing examiner grading like a TCF/TEF rater — strict but encouraging. Grade the student's submission against the task, calibrated to their CEFR level ($levelBand) — do NOT hold an A1/A2 learner to a B2 essay bar; judge them against what is realistic at their stated level (task completion, basic grammar/agreement accuracy, use of the vocabulary/connectors actually asked for, coherence). Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
-{"score_out_of_10": number, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "improved_version": string, "next_steps": [string,...]}
-LANGUAGE, ABSOLUTE RULE: this student is a beginner and reads explanations in English, not French. Every explanatory piece of text — every "strengths" entry, every "why", "connector_feedback", and every "next_steps" entry — MUST be written in English, always, no matter what language the student wrote their submission in. The ONLY French allowed anywhere in the response is inside "original", "fixed", and "improved_version" (the student's actual sentences), since those are the language content being corrected, not an explanation.
-"why" should read like a professional examiner's note: name the specific grammar rule or agreement broken, not just "this is wrong" — e.g. "The verb 's'appeler' needs two p's and two l's, and an apostrophe before 'appelle'." rather than a vague comment.
-"next_steps": 2 to 4 concrete, actionable tips for what this student should specifically practice next based on THIS submission (e.g. a recurring error pattern, a CEFR skill to work on) — not generic advice.''';
+You are a professional French writing examiner grading like a TCF/TEF rater. Grade the student's submission against the task at CEFR level $band. The level is part of the rubric: do NOT hold an A1/A2 learner to a B2 essay bar, and do NOT reward a B1/B2 answer merely for being long. Judge task completion, grammar/agreement, vocabulary, and coherence against what is realistic at this level.
+
+Respond with ONLY one compact JSON object, with exactly this shape:
+{"score_out_of_10": number, "score_breakdown": {"task_completion": number, "grammar": number, "vocabulary": number, "coherence": number}, "strengths": [string,...], "corrections": [{"original": string, "fixed": string, "why": string}, ...], "connector_feedback": string, "model_answer": string, "next_steps": [string,...]}
+
+SCORING: Every score is from 0 to 10. The four breakdown scores must be justified by evidence in the submission. The overall score is the level-appropriate combined judgment, not a random average. For A1, expect one or a few short understandable sentences with basic high-frequency words. For A2, expect short connected everyday sentences. For B1, expect a coherent paragraph with developing control. For B2, expect a developed, logically organized response with appropriate range and accuracy.
+
+CORRECTIONS: Use exact words or short spans copied from the student's submission in "original". Give the corrected French in "fixed". Explain the specific rule in English in "why". Do not invent an error that is not present. Include at most 5 high-value corrections, prioritizing patterns the learner can reuse.
+
+MODEL ANSWER: "model_answer" must be a concise, natural French answer to THIS task at exactly level $band. It is a reference answer, not an advanced rewrite. It must satisfy the prompt and be realistic for this learner's level. Do not add facts the prompt does not ask for.
+
+LANGUAGE: Every explanation — strengths, why, connector_feedback, and next_steps — MUST be in English. French is allowed only in original, fixed, and model_answer. next_steps must contain 2 to 4 concrete actions based on THIS submission, not generic encouragement.''';
     final user =
         '''
-LEVEL: $levelBand
+LEVEL: $band
 TASK: ${task.title}
 PROMPT: ${task.promptFr}
 MINIMUM WORDS: ${task.minWords}
@@ -576,12 +595,18 @@ ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work 
     required String monologueTranscript,
     required String interactionPrompt,
     required String interactionTranscript,
+    String examName = 'TEF / TCF Canada',
+    String levelBand = 'B1',
   }) async {
     const system = '''
 You are a strict TEF/TCF Canada speaking examiner. Assess only evidence present in the learner transcripts. Speech recognition may contain minor transcription noise, so do not penalize an isolated spelling artifact. Score task completion, fluency/coherence, grammatical range/accuracy, and vocabulary range/precision from 0 to 10. Estimate a CLB band conservatively. Give specific, brief feedback in English. Respond with ONLY compact JSON matching exactly:
 {"overall_score": number, "clb_estimate": string, "task_completion": number, "fluency": number, "grammar": number, "vocabulary": number, "strengths": [string, string], "next_steps": [string, string]}''';
     final user =
         '''
+EXAM: $examName
+TARGET LEVEL: $levelBand
+LANGUAGE POLICY: For A1/A2, evaluate the French the learner successfully produced while treating brief scaffold use as support. For B1/B2, the assessed response must be French-only; do not award task-completion credit for English answers.
+
 TASK 1, MONOLOGUE
 Prompt: $monologuePrompt
 Learner transcript: ${monologueTranscript.isEmpty ? '(no usable response)' : monologueTranscript}
@@ -768,6 +793,7 @@ SESSION CONTEXT: $contextPrompt
 TARGET PHRASES: ${targetPhrases.isEmpty ? '(none supplied)' : targetPhrases.join('; ')}
 The vocabulary must prepare the learner to say the target phrases above. Reuse
 their key words where appropriate, and do not invent a disconnected theme.
+${VocabularyLevelPolicy.calibration(levelBand)}
 ''';
     final raw = await _complete(
       messages: [
@@ -777,7 +803,7 @@ their key words where appropriate, and do not invent a disconnected theme.
       maxTokens: 700,
       temperature: 0.7,
     );
-    return _parseCourseVocabulary(raw, count: count);
+    return _parseCourseVocabulary(raw, count: count, levelBand: levelBand);
   }
 
   /// Generates the cloze sentence used by the vocabulary workshop's Context
@@ -956,8 +982,16 @@ USEFUL STARTERS: ${hints.join('; ')}''',
   Future<ReadingPassage> buildStandaloneRoleplay({
     String? scenario,
     required String levelBand,
+    Iterable<String> avoidTitles = const [],
+    Iterable<String> avoidOpenings = const [],
   }) async {
     final surpriseMode = scenario == null || scenario.trim().isEmpty;
+    final titles = avoidTitles.toList(growable: false);
+    final openings = avoidOpenings.toList(growable: false);
+    final exclusion = StoryVarietyService.exclusionPrompt(
+      titles: titles,
+      openings: openings,
+    );
     final system =
         '''
 Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Do not award a score or claim mastery.
@@ -966,23 +1000,56 @@ The SCENARIO given is only a loose inspiration for the setting, not a rigid scri
 This app's users are teens and adults (13+): keep the scene wholesome and educational, appropriate for a general audience, never mature, violent, or otherwise inappropriate.
 Aim for a fresh, specific scene: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type. Vary the premise when it is natural, without forcing novelty.
 ${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary new everyday scene yourself. Keep it natural and level-appropriate; do not rely on onboarding interests or a fixed default.' : 'SELECTED CONTEXT: Use the learner scenario only as loose inspiration; do not copy a previous scene.'}''';
-    final user = StringBuffer()
-      ..writeln(
-        surpriseMode
-            ? 'MODE: SURPRISE ME — no scenario supplied'
-            : 'SCENARIO (loose inspiration): $scenario',
-      )
-      ..writeln('LEVEL: $levelBand')
-      ..writeln('REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}');
-    final raw = await _complete(
-      messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
-        {'role': 'user', 'content': user.toString()},
-      ],
-      maxTokens: 1400,
-      temperature: 1.0,
-    );
-    return _parseReadingPassage(raw);
+    Future<ReadingPassage> request(String retryInstruction) async {
+      final seed = StoryVarietyService.chooseSeed(
+        avoidTexts: [...titles, ...openings],
+      );
+      final user = StringBuffer()
+        ..writeln(
+          surpriseMode
+              ? 'MODE: SURPRISE ME — no scenario supplied'
+              : 'SCENARIO (loose inspiration): $scenario',
+        )
+        ..writeln('LEVEL: $levelBand')
+        ..writeln(
+          'SURPRISE SEED: $seed. Make the setting, object, character, and '
+          'small complication clearly different around this seed.',
+        )
+        ..writeln(exclusion)
+        ..writeln(retryInstruction)
+        ..writeln('REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}');
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': system + languageGuardrail},
+          {'role': 'user', 'content': user.toString()},
+        ],
+        maxTokens: 1400,
+        temperature: 1.0,
+      );
+      return _parseReadingPassage(raw);
+    }
+
+    var scene = await request('');
+    if (StoryVarietyService.isDuplicate(
+      title: scene.title,
+      opening: scene.segments.firstOrNull?.fr ?? '',
+      avoidTitles: titles,
+      avoidOpenings: openings,
+    )) {
+      scene = await request(
+        'DUPLICATE REJECTION: discard the previous scene completely. Return '
+        'a different premise, title, opening, characters, and dominant image.',
+      );
+      if (StoryVarietyService.isDuplicate(
+        title: scene.title,
+        opening: scene.segments.firstOrNull?.fr ?? '',
+        avoidTitles: titles,
+        avoidOpenings: openings,
+      )) {
+        throw AgentError.duplicateStory;
+      }
+    }
+    return scene;
   }
 
   /// First names and settings used to force real variety between generated
@@ -1030,21 +1097,6 @@ ${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary ne
     'a surprising coincidence',
     'a problem solved just in time',
     'a small risk that pays off',
-  ];
-
-  // Reading is a storybook, not a fixed cast of recurring human characters.
-  // These seeds deliberately include objects, animals, places, and small
-  // natural moments so generated books can feel genuinely personal and
-  // surprising instead of drifting back to the old Hugo-shaped template.
-  static const _readingStorySeeds = [
-    'a curious sparrow near a window box',
-    'a blue umbrella left on a tram',
-    'a small tree in a community garden',
-    'a handwritten recipe found in a market bag',
-    'a bicycle bell heard on a quiet street',
-    'a sudden rainstorm over a seaside path',
-    'a paper boat floating beside a bridge',
-    'a lantern that helps someone find the way home',
   ];
 
   /// A short third-person narrative story (not a roleplay dialogue like the two methods
@@ -1099,6 +1151,8 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
     required String levelBand,
     String? examName,
     String? examLevel,
+    Iterable<String> avoidTitles = const [],
+    Iterable<String> avoidOpenings = const [],
   }) async {
     final surpriseMode = topic == null || topic.trim().isEmpty;
     final examBlock = _examComprehensionPrompt(
@@ -1108,13 +1162,13 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
     );
     final system =
         '''
-Create one short, polished French READING storybook for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "choices": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+Create one short, polished French READING storybook for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string, string], "choices_en": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
 READING DESIGN: Write 7 to 10 short narrative sentences, one per segment. The learner will first read the French for meaning, then study one selected sentence, then reread with support, so every segment must stand alone, be natural, and move the plot forward. This is a complete mini-story with a beginning, a small change or problem, and a satisfying ending. It is not a dialogue, roleplay, listening transcript, or speaking exercise.
 
 CEFR CONTRACT: Keep sentence length, verb forms, vocabulary, inference load, and story structure at the requested level. A1 uses concrete daily situations, mostly familiar present-tense language, and very short sentences. A2 adds simple past/future or cause-and-effect when useful. B1 uses connected narration and everyday idioms. B2 can use richer description and implicit meaning without becoming literary or academic. Do not put advanced language into an easier level just to make the story sound impressive.
 
-TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions in English; each has exactly 3 choices and one valid zero-based answerIndex.
+TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions. In regular lessons, provide q_en and choices_en as learner support at every level. If an EXAM READINESS OVERRIDE appears below, it takes precedence: follow its language policy exactly. Each has exactly 3 choices and one valid zero-based answerIndex.
 
 SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
 
@@ -1123,37 +1177,20 @@ ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new
 ${_cefrCalibration(levelBand)}
 $examBlock
 ''';
-    final random = Random();
-    final seed = _readingStorySeeds[random.nextInt(_readingStorySeeds.length)];
-    final setting = _storySettings[random.nextInt(_storySettings.length)];
-    final twist = _storyTwists[random.nextInt(_storyTwists.length)];
-    final seedBlock = surpriseMode
-        ? 'SURPRISE SEED: choose the premise, setting, object, and small turn yourself. '
-              'Do not use a supplied story seed.'
-        : 'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
-              'Use these naturally to make this reading story specific and memorable.';
-    final raw = await _complete(
-      messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
-        {
-          'role': 'user',
-          'content':
-              '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
-              '${examName == null ? '' : 'EXAM: $examName\n'}'
-              '$seedBlock\n'
-              'A human character is optional; the story may follow an object, animal, place, or natural moment.\n'
-              'REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}',
-        },
-      ],
-      maxTokens: 3000,
-      temperature: 0.9,
-    );
-    final package = _parseStoryBookGeneration(
-      raw,
+    return _buildUniqueStoryBook(
+      system: system + languageGuardrail,
       levelBand: levelBand,
       topic: topic ?? '',
+      maxTokens: 3000,
+      avoidTitles: avoidTitles,
+      avoidOpenings: avoidOpenings,
+      userContent: (seed, nonce, exclusion, retryInstruction) =>
+          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+          '${examName == null ? '' : 'EXAM: $examName\n'}'
+          'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
+          'A human character is optional; the story may follow an object, animal, place, or natural moment.\n'
+          '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
     );
-    return package;
   }
 
   /// Listening has its own generation contract. It shares the persisted
@@ -1164,6 +1201,8 @@ $examBlock
     required String levelBand,
     String? examName,
     String? examLevel,
+    Iterable<String> avoidTitles = const [],
+    Iterable<String> avoidOpenings = const [],
   }) async {
     final surpriseMode = topic == null || topic.trim().isEmpty;
     final examBlock = _examComprehensionPrompt(
@@ -1190,35 +1229,83 @@ ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new
 ${_cefrCalibration(levelBand)}
 $examBlock
 ''';
-    final random = Random();
-    final seed = _readingStorySeeds[random.nextInt(_readingStorySeeds.length)];
-    final setting = _storySettings[random.nextInt(_storySettings.length)];
-    final twist = _storyTwists[random.nextInt(_storyTwists.length)];
-    final seedBlock = surpriseMode
-        ? 'SURPRISE SEED: choose the premise, setting, object, and small turn yourself. '
-              'Do not use a supplied story seed.'
-        : 'SEED DETAILS: central image or subject $seed; setting $setting; small turn $twist. '
-              'Use these naturally to make this listening lesson specific and memorable.';
-    final raw = await _complete(
-      messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
-        {
-          'role': 'user',
-          'content':
-              '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
-              '${examName == null ? '' : 'EXAM: $examName\n'}'
-              '$seedBlock\n'
-              'REQUEST NONCE: ${DateTime.now().microsecondsSinceEpoch}',
-        },
-      ],
-      maxTokens: 2800,
-      temperature: 0.9,
-    );
-    final package = _parseStoryBookGeneration(
-      raw,
+    return _buildUniqueStoryBook(
+      system: system + languageGuardrail,
       levelBand: levelBand,
       topic: topic ?? '',
+      maxTokens: 2800,
+      avoidTitles: avoidTitles,
+      avoidOpenings: avoidOpenings,
+      userContent: (seed, nonce, exclusion, retryInstruction) =>
+          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+          '${examName == null ? '' : 'EXAM: $examName\n'}'
+          'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
+          '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
     );
+  }
+
+  Future<StoryBookGeneration> _buildUniqueStoryBook({
+    required String system,
+    required String levelBand,
+    required String topic,
+    required int maxTokens,
+    required Iterable<String> avoidTitles,
+    required Iterable<String> avoidOpenings,
+    required String Function(
+      String seed,
+      String nonce,
+      String exclusion,
+      String retryInstruction,
+    )
+    userContent,
+  }) async {
+    final titles = avoidTitles.toList(growable: false);
+    final openings = avoidOpenings.toList(growable: false);
+    final priorText = [...titles, ...openings];
+    final exclusion = StoryVarietyService.exclusionPrompt(
+      titles: titles,
+      openings: openings,
+    );
+
+    Future<StoryBookGeneration> request(String retryInstruction) async {
+      final seed = StoryVarietyService.chooseSeed(avoidTexts: priorText);
+      final nonce =
+          '${DateTime.now().microsecondsSinceEpoch}-${seed.hashCode.abs()}';
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': system},
+          {
+            'role': 'user',
+            'content': userContent(seed, nonce, exclusion, retryInstruction),
+          },
+        ],
+        maxTokens: maxTokens,
+        temperature: 1.0,
+      );
+      return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
+    }
+
+    var package = await request('');
+    if (StoryVarietyService.isDuplicate(
+      title: package.passage.title,
+      opening: package.passage.segments.firstOrNull?.fr ?? '',
+      avoidTitles: titles,
+      avoidOpenings: openings,
+    )) {
+      package = await request(
+        'DUPLICATE REJECTION: the previous draft collided with a recent story. '
+        'Discard it completely and create a different premise, title, opening, '
+        'and dominant image. Do not mention or reuse the rejected draft.',
+      );
+      if (StoryVarietyService.isDuplicate(
+        title: package.passage.title,
+        opening: package.passage.segments.firstOrNull?.fr ?? '',
+        avoidTitles: titles,
+        avoidOpenings: openings,
+      )) {
+        throw AgentError.duplicateStory;
+      }
+    }
     return package;
   }
 
@@ -1229,6 +1316,7 @@ $examBlock
   }) {
     if (examName == null || examName.trim().isEmpty) return '';
     final isTcf = examName.toLowerCase().startsWith('tcf');
+    final band = LivePrompts.normalizeLevel(levelBand);
     final officialShape = isTcf
         ? listening
               ? 'TCF Canada listening comprehension is a progressive four-option QCM; the official paper has 39 items in 35 minutes and each recording is played once.'
@@ -1236,8 +1324,11 @@ $examBlock
         : listening
         ? 'TEF Canada listening comprehension is a four-option QCM; the official paper has 40 items in 40 minutes and each audio is played once without going back.'
         : 'TEF Canada reading comprehension is a four-option QCM; the official paper has 40 items in 60 minutes.';
+    final languagePolicy = band == 'A1' || band == 'A2'
+        ? '''This app's A1/A2 training mode includes controlled bilingual support: write every question in simple French and include q_en in plain English; include choices_en in the same order as choices. The French question and French choices remain authoritative, and the English support must not reveal the answer.'''
+        : '''This app's $band exam mode is French-only: write questions and choices in French, omit q_en and choices_en, and never translate, explain, or simplify the answer choices.''';
     return '''
-EXAM READINESS OVERRIDE: This is an independent $examName $levelBand practice set, not a regular course story. $officialShape Generate a mobile-sized practice set of exactly 8 questions so the learner can complete it in one sitting, while modeling the same item discipline. Every question must have exactly 4 answer choices, exactly one correct answer, and an answerIndex from 0 to 3. Do not add English translations, vocabulary cards, grammar tabs, or teaching notes to the exam content. Keep the reading document/audio script and questions self-contained, original, and appropriate to $levelBand. For listening, write short spoken lines and never rely on information that would only be visible in a transcript.
+EXAM READINESS OVERRIDE: This is an independent $examName $band training set, not a full official-length exam. $officialShape Generate a mobile-sized practice set of exactly 8 questions so the learner can complete it in one sitting, while modeling the same item discipline. Every question must have exactly 4 answer choices, exactly one correct answer, and an answerIndex from 0 to 3. $languagePolicy Do not add vocabulary cards, grammar tabs, or teaching notes to the exam content. Keep the reading document/audio script and questions self-contained, original, and appropriate to $band. For listening, write short spoken lines and never rely on information that would only be visible in a transcript.
 ''';
   }
 
@@ -1247,13 +1338,13 @@ EXAM READINESS OVERRIDE: This is an independent $examName $levelBand practice se
   }) async {
     final system =
         '''
-Create one short, polished French reading book for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+Create one short, polished French reading book for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
 STORY: Write 7 to 10 short narrative segments with a clear beginning, small turn, and satisfying ending. This is a reading-app story, not a textbook exercise and not a dialogue. Keep the story wholesome and appropriate for teens and adults. The topic is inspiration, not a requirement that every sentence mention it.
 SUMMARY: Write one short English sentence that makes the story inviting to open.
 READ TIME: Estimate the reading time in whole minutes, normally 3 to 7.
 COVER PROMPT: Write one concise English prompt for a portrait book-cover illustration of the story's setting and mood. Do not request any text, letters, logos, borders, or UI in the image; the app overlays the title.
-QUIZ: Write 4 to 6 comprehension questions in English. Each question must have exactly 3 choices and one valid zero-based answerIndex. Only ask about details stated or clearly implied by the story.
+QUIZ: Write 4 to 6 comprehension questions. At A1/A2, q must be simple French plus q_en in plain English, and choices must be French plus choices_en in the exact same order. At B1/B2, still provide the English support fields. Each question must have exactly 3 choices and one valid zero-based answerIndex. Only ask about details stated or clearly implied by the story.
 KEYWORDS: Write 6 to 10 useful French words or short phrases that appear in the story, with simple English meanings and non-IPA phonetic hints. IDs must be short unique snake_case slugs.
 GRAMMAR: Each segment gets one plain-English grammar note tied to that exact sentence. pronunciation_tip may be empty when no useful tip is needed.
 ${_cefrCalibration(levelBand)}
@@ -1361,19 +1452,25 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
   /// failure rather than block the story from being created, since the
   /// Story/Grammar tabs work fine on their own.
   Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
-  buildStoryQuizAndKeywords(ReadingPassage passage) async {
+  buildStoryQuizAndKeywords(
+    ReadingPassage passage, {
+    String levelBand = 'A2',
+  }) async {
     const system = '''
-Given a short French story, write a comprehension quiz and a keyword glossary for a language learner. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
-QUIZ: 4 to 6 multiple-choice comprehension questions in English about events/details in the story, each with exactly 3 French-or-English choices as appropriate to the question and answerIndex pointing at the correct one (0-based). Only ask about things stated or clearly implied in the story.
+Given a short French story, write a comprehension quiz and a keyword glossary for a language learner. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 4 to 6 multiple-choice comprehension questions about events/details in the story. At A1/A2, q must be simple French with q_en as plain English support; choices must be French with choices_en as translations in exactly the same order. At B1/B2, still provide the support fields. Each question has exactly 3 choices and answerIndex points at the correct one (0-based). Only ask about things stated or clearly implied in the story.
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
-        {'role': 'user', 'content': 'STORY:\n${passage.fullText}'},
+        {
+          'role': 'user',
+          'content': 'LEVEL: $levelBand\nSTORY:\n${passage.fullText}',
+        },
       ],
       maxTokens: 1400,
     );
-    return _parseStoryQuizAndKeywords(raw);
+    return _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
   }
 
   /// Grammar points offered by the Grammar lab's "Practice a tense" picker —
@@ -1483,11 +1580,12 @@ ${_cefrCalibration(levelBand)}''';
   buildGrammarQuiz({
     required ReadingPassage passage,
     required String grammarPoint,
+    String levelBand = 'A2',
   }) async {
     final system =
         '''
-Given a short French story built specifically around the grammar point "$grammarPoint", write a quiz that TESTS THAT GRAMMAR POINT (not just story comprehension) plus a keyword glossary, same as for a regular story. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
-QUIZ: 5 to 6 questions: mostly "which form is correct" fill-in-the-blank questions (English question stem naming the subject/verb, exactly 3 French answer choices, only one grammatically correct for "$grammarPoint"), plus 1-2 questions asking how the story used that grammar point in a specific sentence. Base every question on "$grammarPoint" and the story's own sentences/vocabulary, never an unrelated grammar point.
+Given a short French story built specifically around the grammar point "$grammarPoint", write a quiz that TESTS THAT GRAMMAR POINT (not just story comprehension) plus a keyword glossary, same as for a regular story. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 5 to 6 questions. At A1/A2, q must be a simple French question with q_en in plain English, and choices must be French with choices_en in the exact same order. Mostly ask "which form is correct" fill-in-the-blank questions, with only one grammatically correct answer for "$grammarPoint", plus 1-2 questions asking how the story used that grammar point. At B1/B2, still provide the English support fields. Base every question on "$grammarPoint" and the story's own sentences/vocabulary, never an unrelated grammar point.
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
     final raw = await _complete(
       messages: [
@@ -1495,12 +1593,12 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
         {
           'role': 'user',
           'content':
-              'GRAMMAR POINT: $grammarPoint\nSTORY:\n${passage.fullText}',
+              'LEVEL: $levelBand\nGRAMMAR POINT: $grammarPoint\nSTORY:\n${passage.fullText}',
         },
       ],
       maxTokens: 1400,
     );
-    return _parseStoryQuizAndKeywords(raw);
+    return _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
   }
 
   // ---------------------------------------------------------------------------
@@ -1577,19 +1675,25 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or openi
   }
 
   Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
-  buildLiaisonQuiz({required ReadingPassage passage}) async {
+  buildLiaisonQuiz({
+    required ReadingPassage passage,
+    String levelBand = 'A2',
+  }) async {
     const system = '''
-Given a short French story written specifically to be rich in liaison examples, write a quiz that TESTS LIAISON RECOGNITION (not just story comprehension) plus a keyword glossary. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "choices": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
-QUIZ: 5 to 6 questions, mostly "does this word pair have a liaison?" or "how is this pronounced?" style questions quoting an actual word pair from the story, with 3 answer choices (e.g. three different phonetic renderings, only one correct), plus 1-2 questions about a specific liaison the story used. Base every question on the story's own sentences.
+Given a short French story written specifically to be rich in liaison examples, write a quiz that TESTS LIAISON RECOGNITION (not just story comprehension) plus a keyword glossary. Return ONLY compact JSON with this exact shape: {"quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}, ...], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}, ...]}.
+QUIZ: 5 to 6 questions. At A1/A2, q must be simple French with q_en in plain English, and choices must be French with choices_en in the exact same order. Ask "does this word pair have a liaison?" or "how is this pronounced?" using actual word pairs from the story, plus 1-2 questions about a specific liaison. At B1/B2, still provide the English support fields. Base every question on the story's own sentences.
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story, each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA).''';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
-        {'role': 'user', 'content': 'STORY:\n${passage.fullText}'},
+        {
+          'role': 'user',
+          'content': 'LEVEL: $levelBand\nSTORY:\n${passage.fullText}',
+        },
       ],
       maxTokens: 1400,
     );
-    return _parseStoryQuizAndKeywords(raw);
+    return _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
   }
 
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
@@ -2153,8 +2257,39 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       }
     }
     final connectorFeedback = _stringValue(obj['connector_feedback']);
-    final improved = _stringValue(obj['improved_version']);
+    final improved = _stringValue(
+      obj['model_answer'] ?? obj['improved_version'],
+    );
     final nextSteps = _stringList(obj['next_steps']);
+    final scoreBreakdown = <String, double>{};
+    final rawBreakdown = obj['score_breakdown'];
+    if (rawBreakdown is Map) {
+      for (final key in const [
+        'task_completion',
+        'grammar',
+        'vocabulary',
+        'coherence',
+      ]) {
+        if (!rawBreakdown.containsKey(key)) continue;
+        final value = _asDouble(rawBreakdown[key]);
+        if (value.isFinite) {
+          scoreBreakdown[key] = value.clamp(0, 10).toDouble();
+        }
+      }
+    }
+    // Accept the flat form during rolling updates so an older model response
+    // still produces useful review content.
+    for (final key in const [
+      'task_completion',
+      'grammar',
+      'vocabulary',
+      'coherence',
+    ]) {
+      if (scoreBreakdown.containsKey(key)) continue;
+      if (!obj.containsKey(key)) continue;
+      final value = _asDouble(obj[key]);
+      if (value.isFinite) scoreBreakdown[key] = value.clamp(0, 10).toDouble();
+    }
     return WritingFeedback(
       scoreOutOf10: score,
       strengths: strengths,
@@ -2162,6 +2297,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       connectorFeedback: connectorFeedback,
       improvedVersion: improved,
       nextSteps: nextSteps,
+      scoreBreakdown: scoreBreakdown,
     );
   }
 
@@ -2189,6 +2325,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
               'Review the correction above and reuse that pattern in your next sentence.',
             ]
           : feedback.nextSteps,
+      scoreBreakdown: feedback.scoreBreakdown,
     );
   }
 
@@ -2318,7 +2455,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
   }) {
     final obj = _decodeObject(raw);
     final passage = _parseReadingPassage(raw);
-    final enrichment = _parseStoryQuizAndKeywords(raw);
+    final enrichment = _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
     final summary = obj['summary']?.toString().trim() ?? '';
     final coverPrompt = obj['cover_prompt']?.toString().trim() ?? '';
     final parsedMinutes = obj['read_time_minutes'];
@@ -2337,7 +2474,11 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     );
   }
 
-  List<VocabEntry> _parseCourseVocabulary(String raw, {required int count}) {
+  List<VocabEntry> _parseCourseVocabulary(
+    String raw, {
+    required int count,
+    required String levelBand,
+  }) {
     final obj = _decodeObject(raw);
     final wordsRaw = obj['words'] as List? ?? const [];
     final words = <VocabEntry>[];
@@ -2354,7 +2495,11 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           ? 'course-${words.length}-${const Uuid().v4().substring(0, 6)}'
           : rawId.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_-]+'), '_');
       if (!ids.add(id)) continue;
-      words.add(VocabEntry(id: id, fr: fr, en: en, phonetic: phonetic));
+      final entry = VocabEntry(id: id, fr: fr, en: en, phonetic: phonetic);
+      if (!VocabularyLevelPolicy.allowsGeneratedEntry(entry, levelBand)) {
+        continue;
+      }
+      words.add(entry);
       if (words.length == count) break;
     }
     if (words.length < count) throw AgentError.badResponse;
@@ -2362,21 +2507,34 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
   }
 
   ({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})
-  _parseStoryQuizAndKeywords(String raw) {
+  _parseStoryQuizAndKeywords(String raw, {String levelBand = 'A2'}) {
     final obj = _decodeObject(raw);
     final quizRaw = (obj['quiz'] as List?) ?? [];
     final quiz = <MultipleChoiceQuestion>[];
+    final beginnerLevel = switch (levelBand.trim().toUpperCase()) {
+      'A1' || 'A2' => true,
+      _ => false,
+    };
     for (final q in quizRaw) {
       final map = q as Map<String, dynamic>;
       final question = map['q'] as String?;
       final choices = (map['choices'] as List?)?.cast<String>() ?? const [];
       final answerIndex = map['answerIndex'];
+      final qEn = map['q_en']?.toString() ?? map['question_en']?.toString();
+      final choicesEn = (map['choices_en'] as List?)
+          ?.map((choice) => choice.toString())
+          .toList(growable: false);
       if (question == null ||
           question.isEmpty ||
           choices.isEmpty ||
           answerIndex is! int ||
           answerIndex < 0 ||
-          answerIndex >= choices.length) {
+          answerIndex >= choices.length ||
+          (beginnerLevel &&
+              (qEn == null ||
+                  qEn.trim().isEmpty ||
+                  choicesEn == null ||
+                  choicesEn.length != choices.length))) {
         continue;
       }
       quiz.add(
@@ -2384,10 +2542,8 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           q: question,
           choices: choices,
           answerIndex: answerIndex,
-          qEn: map['q_en']?.toString() ?? map['question_en']?.toString(),
-          choicesEn: (map['choices_en'] as List?)
-              ?.map((choice) => choice.toString())
-              .toList(growable: false),
+          qEn: qEn,
+          choicesEn: choicesEn,
         ),
       );
     }

@@ -11,6 +11,7 @@ import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -101,11 +102,18 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     try {
       final profile = ref.read(learningStoreProvider).profile();
       final levelBand = _cefrLevelFor(profile.level).toUpperCase();
+      final existingStories = ref.read(generatedStoryStoreProvider).list();
       final package = await LessonAgentService.shared.buildListeningStoryBook(
         topic: _topicFor(),
         levelBand: widget.examLevel ?? levelBand,
         examName: widget.examMode ? widget.examName : null,
         examLevel: widget.examMode ? widget.examLevel : null,
+        avoidTitles: existingStories.map((story) => story.title),
+        avoidOpenings: existingStories.map(
+          (story) => story.passage.segments.isEmpty
+              ? ''
+              : story.passage.segments.first.fr,
+        ),
       );
       final story = GeneratedStory(
         id: newGeneratedStoryId(),
@@ -170,9 +178,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           return;
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not generate a story. Try again.'),
-          ),
+          SnackBar(content: Text('Story generation failed: $error')),
         );
       }
     } finally {
@@ -195,6 +201,12 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           text: segments[i].fr,
           language: 'fr-FR',
           contentItemId: story.segmentContentId(i),
+        ),
+      for (var i = 0; i < story.keywords.length; i++)
+        SpeechItem(
+          text: story.keywords[i].fr,
+          language: 'fr-FR',
+          contentItemId: '${story.id}_kw_${story.keywords[i].id}',
         ),
     ]);
   }
@@ -285,12 +297,23 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
-            _GenerateStoryTile(
-              generating: _generatingStory,
-              selectedTopic: _selectedTopic,
-              listening: !widget.readingMode,
-              onTap: _generateStory,
-            ),
+            if (_generatingStory)
+              PersonalizedGenerationLoader(
+                content: widget.readingMode
+                    ? 'reading story'
+                    : 'listening lesson',
+                detail: widget.readingMode
+                    ? 'Shaping a short story around your level and interests.'
+                    : 'Preparing bilingual audio practice for your current level.',
+                icon: CupertinoIcons.book_fill,
+              )
+            else
+              _GenerateStoryTile(
+                generating: false,
+                selectedTopic: _selectedTopic,
+                listening: !widget.readingMode,
+                onTap: _generateStory,
+              ),
             const SizedBox(height: 10),
             _TopicChipRow(
               selected: _selectedTopic,
@@ -347,16 +370,15 @@ class _DirectCourseLoading extends StatelessWidget {
         backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 18),
-              Text(message, style: DesignTokens.body(15)),
-            ],
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: PersonalizedGenerationLoader(
+            content: title.toLowerCase() == 'reading'
+                ? 'reading story'
+                : 'listening lesson',
+            detail: message,
+            icon: CupertinoIcons.book_fill,
           ),
         ),
       ),

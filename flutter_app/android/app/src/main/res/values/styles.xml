@@ -13,6 +13,8 @@
 
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
-        <item name="android:windowBackground">#F6F7F9</item>
+        <!-- Keep the first Flutter frame continuous with the native launch
+             screen; a canvas-colour flash here is visible on cold start. -->
+        <item name="android:windowBackground">#2259C7</item>
     </style>
 </resources>

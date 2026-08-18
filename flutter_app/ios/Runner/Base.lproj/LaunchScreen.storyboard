@@ -15,47 +15,17 @@
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.141" green="0.329" blue="0.961" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.133" green="0.349" blue="0.780" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="parle-logo">
                                 <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ParleSprint" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="parle-brand">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="40"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30" weight="bold"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="French for real conversations." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="parle-tagline">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="24"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17" weight="semibold"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="A clear course from your first words to confident everyday French." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="parle-description">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="48"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="15" weight="regular"/>
-                                <color key="textColor" white="1" alpha="0.78" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <constraints>
                             <constraint firstItem="parle-logo" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-logo-center-x"/>
-                            <constraint firstItem="parle-logo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-150" id="parle-logo-center-y"/>
+                            <constraint firstItem="parle-logo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="parle-logo-center-y"/>
                             <constraint firstItem="parle-logo" firstAttribute="width" constant="128" id="parle-logo-width"/>
                             <constraint firstItem="parle-logo" firstAttribute="height" constant="128" id="parle-logo-height"/>
-                            <constraint firstItem="parle-brand" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-brand-center-x"/>
-                            <constraint firstItem="parle-brand" firstAttribute="top" secondItem="parle-logo" secondAttribute="bottom" constant="24" id="parle-brand-top"/>
-                            <constraint firstItem="parle-brand" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="24" id="parle-brand-leading"/>
-                            <constraint firstItem="parle-brand" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" constant="-24" id="parle-brand-trailing"/>
-                            <constraint firstItem="parle-tagline" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-tagline-center-x"/>
-                            <constraint firstItem="parle-tagline" firstAttribute="top" secondItem="parle-brand" secondAttribute="bottom" constant="10" id="parle-tagline-top"/>
-                            <constraint firstItem="parle-tagline" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="24" id="parle-tagline-leading"/>
-                            <constraint firstItem="parle-tagline" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" constant="-24" id="parle-tagline-trailing"/>
-                            <constraint firstItem="parle-description" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-description-center-x"/>
-                            <constraint firstItem="parle-description" firstAttribute="top" secondItem="parle-tagline" secondAttribute="bottom" constant="14" id="parle-description-top"/>
-                            <constraint firstItem="parle-description" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="36" id="parle-description-leading"/>
-                            <constraint firstItem="parle-description" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" constant="-36" id="parle-description-trailing"/>
                         </constraints>
                     </view>
                 </viewController>

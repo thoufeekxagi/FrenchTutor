@@ -89,6 +89,8 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   23: _migrationV23,
   24: _migrationV24,
   25: _migrationV25,
+  26: _migrationV26,
+  27: _migrationV27,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1012,5 +1014,89 @@ void _migrationV25(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_exam_practice_attempts_scope '
     'ON exam_practice_attempts (exam_name, level_band, skill, created_at)',
+  );
+}
+
+/// Stores the learner's study-plan inputs separately from content defaults.
+/// Existing learners keep safe weekday/default values until they revisit the
+/// updated onboarding or Settings.
+void _migrationV26(CommonDatabase db) {
+  if (!_columnExists(db, 'profiles', 'preferred_days')) {
+    db.execute(
+      "ALTER TABLE profiles ADD COLUMN preferred_days TEXT NOT NULL DEFAULT 'mon,tue,wed,thu,fri'",
+    );
+  }
+  if (!_columnExists(db, 'profiles', 'time_zone')) {
+    db.execute('ALTER TABLE profiles ADD COLUMN time_zone TEXT');
+  }
+  if (!_columnExists(db, 'profiles', 'notification_permission_state')) {
+    db.execute(
+      "ALTER TABLE profiles ADD COLUMN notification_permission_state TEXT NOT NULL DEFAULT 'not_requested'",
+    );
+  }
+  if (!_columnExists(db, 'profiles', 'onboarding_version')) {
+    db.execute(
+      "ALTER TABLE profiles ADD COLUMN onboarding_version TEXT NOT NULL DEFAULT 'v1'",
+    );
+  }
+}
+
+/// Adaptive course plans replace the old one-size-fits-all catalog for new
+/// learners. A plan contains lightweight, validated session specifications;
+/// the existing practice engines generate the full story/quiz/audio/artwork
+/// only when a learner opens a session.
+void _migrationV27(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS adaptive_course_plans (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      goal TEXT NOT NULL,
+      level TEXT NOT NULL,
+      profile_fingerprint TEXT NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_adaptive_course_plans_active '
+    "ON adaptive_course_plans (status, version, created_at)",
+  );
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS adaptive_course_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      plan_id TEXT NOT NULL,
+      content_key TEXT NOT NULL,
+      sequence INTEGER NOT NULL,
+      level TEXT NOT NULL,
+      unit INTEGER NOT NULL,
+      unit_title TEXT NOT NULL,
+      title TEXT NOT NULL,
+      subtitle TEXT NOT NULL,
+      competency TEXT NOT NULL,
+      context TEXT NOT NULL,
+      primary_skill TEXT NOT NULL,
+      supporting_skills_json TEXT NOT NULL DEFAULT '[]',
+      grammar_focus_json TEXT NOT NULL DEFAULT '[]',
+      success_criteria_json TEXT NOT NULL DEFAULT '[]',
+      estimated_minutes INTEGER NOT NULL DEFAULT 10,
+      profile_fingerprint TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'planned',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      completed_at TEXT,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_adaptive_course_sessions_plan '
+    'ON adaptive_course_sessions (plan_id, sequence)',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_adaptive_course_sessions_content '
+    'ON adaptive_course_sessions (content_key, status)',
   );
 }

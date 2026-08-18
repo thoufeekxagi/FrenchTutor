@@ -18,7 +18,22 @@ class FrenchFingerprintScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final store = ref.watch(learningStoreProvider);
     final content = ref.watch(contentServiceProvider);
-    final graph = buildFingerprintGraph(store, content);
+    final vocabularySets = ref
+        .watch(generatedVocabularySetStoreProvider)
+        .list();
+    final stories = ref.watch(generatedStoryStoreProvider).list();
+    final grammarStories = ref.watch(generatedGrammarStoryStoreProvider).list();
+    final roleplays = ref.watch(generatedRoleplayStoreProvider).list();
+    final writingTasks = ref.watch(generatedWritingTaskStoreProvider).list();
+    final graph = buildFingerprintGraph(
+      store,
+      content,
+      vocabularySets: vocabularySets,
+      stories: stories,
+      grammarStories: grammarStories,
+      roleplays: roleplays,
+      writingTasks: writingTasks,
+    );
     final sessions = ref.watch(storageServiceProvider).getAllSessions();
     final practiceSignals = _practiceSignals(sessions);
 
@@ -61,7 +76,17 @@ class FrenchFingerprintScreen extends ConsumerWidget {
             sessions: sessions.length,
           ),
           const SizedBox(height: 18),
-          FingerprintView(store: store, content: content, height: 500),
+          FingerprintView(
+            store: store,
+            content: content,
+            graph: graph,
+            vocabularySets: vocabularySets,
+            stories: stories,
+            grammarStories: grammarStories,
+            roleplays: roleplays,
+            writingTasks: writingTasks,
+            height: 500,
+          ),
           const SizedBox(height: 24),
           Text('Practice signals', style: DesignTokens.display(20)),
           const SizedBox(height: 5),

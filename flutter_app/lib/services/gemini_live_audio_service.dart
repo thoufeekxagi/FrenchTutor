@@ -117,7 +117,8 @@ class GeminiLiveAudioService {
     try {
       final remote = await Supabase.instance.client.storage
           .from(_bucket)
-          .download(storagePathFor(userId: userId, cacheKey: cacheKey));
+          .download(storagePathFor(userId: userId, cacheKey: cacheKey))
+          .timeout(const Duration(seconds: 8));
       if (!_validPcm(remote)) return null;
       final bytes = remote.toList(growable: false);
       await _writeLocal(cacheKey, bytes);
@@ -216,7 +217,8 @@ class GeminiLiveAudioService {
       try {
         final remote = await Supabase.instance.client.storage
             .from(_bucket)
-            .download(storagePath);
+            .download(storagePath)
+            .timeout(const Duration(seconds: 8));
         if (_validPcm(remote)) {
           final bytes = remote.toList(growable: false);
           await _writeLocal(cacheKey, bytes);

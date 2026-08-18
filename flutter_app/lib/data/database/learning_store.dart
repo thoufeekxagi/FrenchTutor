@@ -128,12 +128,20 @@ class LearningStore {
       final r = rows.first;
       final onboardedRaw = r['onboarded_at'] as String?;
       final interestsRaw = r['interests'] as String?;
+      final preferredDaysRaw = r['preferred_days'] as String?;
       return Profile(
         id: r['id'] as String,
         goal: r['goal'] as String,
         level: r['level'] as String,
         sessionLength: r['session_length'] as String,
         reminderTime: r['reminder_time'] as String?,
+        preferredDays: preferredDaysRaw == null || preferredDaysRaw.isEmpty
+            ? const ['mon', 'tue', 'wed', 'thu', 'fri']
+            : preferredDaysRaw.split(',').where((s) => s.isNotEmpty).toList(),
+        timeZone: r['time_zone'] as String?,
+        notificationPermissionState:
+            r['notification_permission_state'] as String? ?? 'not_requested',
+        onboardingVersion: r['onboarding_version'] as String? ?? 'v1',
         onboardedAt: onboardedRaw != null
             ? DateTime.tryParse(onboardedRaw)
             : null,
@@ -166,7 +174,8 @@ class LearningStore {
     _db.execute(
       '''
       UPDATE profiles SET goal = ?, level = ?, session_length = ?, reminder_time = ?,
-        onboarded_at = ?, interests = ?, updated_at = ?
+        preferred_days = ?, time_zone = ?, notification_permission_state = ?,
+        onboarding_version = ?, onboarded_at = ?, interests = ?, updated_at = ?
       WHERE id = ?
     ''',
       [
@@ -174,6 +183,10 @@ class LearningStore {
         p.level,
         p.sessionLength,
         p.reminderTime,
+        p.preferredDays.isEmpty ? null : p.preferredDays.join(','),
+        p.timeZone,
+        p.notificationPermissionState,
+        p.onboardingVersion,
         p.onboardedAt?.toIso8601String(),
         p.interests.isEmpty ? null : p.interests.join(','),
         _now(),

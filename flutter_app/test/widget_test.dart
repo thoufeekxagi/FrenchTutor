@@ -86,13 +86,22 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('A1 · Just starting')); // level
+    // Goal-specific interest step.
+    expect(find.text('What should your lessons focus on?'), findsOneWidget);
+    expect(find.text('Select all six'), findsOneWidget);
+    await tester.tap(find.text('Select all six'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Build my plan'));
+    expect(find.text('6 of 6 selected'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    // Interests step — optional, skip without picking any.
-    expect(find.text('What do you enjoy?'), findsOneWidget);
+    await tester.tap(find.text('A1 · Just starting')); // level
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    // Schedule step — keep the default weekday plan for this funnel test.
+    expect(find.text('When will French fit your life?'), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 

@@ -57,12 +57,9 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
-    final catalog = ref.watch(speakCurriculumProvider(profile.level));
-    if (catalog.isLoading && catalog.valueOrNull == null) {
-      return const SpeakScaffold(
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
+    final adaptivePlan = ref
+        .read(adaptiveCourseStoreProvider)
+        .ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
       profile,
       // Only course sessions may advance the course. Counting every saved
@@ -70,9 +67,8 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
       // roadmap and made the progress card disagree with the path.
       // There is no safe legacy index fallback: keys from another level
       // must not unlock this level's path.
-      completedSessions: 0,
       completedContentKeys: completedContentKeys,
-      catalog: catalog.valueOrNull,
+      adaptiveSessions: adaptivePlan.sessions,
     );
     final language = SpeakLanguageProfile.forLevel(roadmap.level);
     final next = roadmap.nextSession ?? roadmap.sessions.last;
@@ -165,7 +161,15 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
                       ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 1),
                     ),
                     const SizedBox(height: 4),
-                    Text(featured.unitTitle, style: DesignTokens.display(25)),
+                    Text(roadmap.trackLabel, style: DesignTokens.display(25)),
+                    const SizedBox(height: 5),
+                    Text(
+                      'CEFR foundations · Unit ${featured.unit}',
+                      style: DesignTokens.body(
+                        12,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: SpeakColors.blue),
+                    ),
                   ],
                 ),
               ),

@@ -10,6 +10,7 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/adaptive_course_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
@@ -19,6 +20,8 @@ import '../models/note.dart';
 import '../models/session.dart' as app_session;
 import '../models/profile.dart';
 import '../models/srs_state.dart';
+import '../models/speak_curriculum.dart';
+import 'image_storage_optimizer.dart';
 import '../orchestration/models/competency_state.dart';
 import '../orchestration/models/error_event.dart';
 import '../orchestration/models/evidence_event.dart';
@@ -93,6 +96,13 @@ class SyncService {
             'level': p.level,
             'session_length': p.sessionLength,
             'reminder_time': p.reminderTime,
+            'preferred_days': p.preferredDays.isEmpty
+                ? null
+                : p.preferredDays.join(','),
+            'interests': p.interests.isEmpty ? null : p.interests.join(','),
+            'time_zone': p.timeZone,
+            'notification_permission_state': p.notificationPermissionState,
+            'onboarding_version': p.onboardingVersion,
             'onboarded_at': p.onboardedAt?.toUtc().toIso8601String(),
             'updated_at': DateTime.now().toUtc().toIso8601String(),
           })
@@ -101,6 +111,103 @@ class SyncService {
     queueTable: 'profiles',
     queueRowId: p.id,
   );
+
+  // ---------------------------------------------------------------------------
+  // Adaptive course plans and learner-specific session specifications
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncAdaptiveCoursePlan(AdaptiveCoursePlanSnapshot plan) =>
+      _guarded(
+        (uid) async {
+          final now = DateTime.now().toUtc().toIso8601String();
+          await _client.from('adaptive_course_plans').upsert({
+            'id': plan.id,
+            'user_id': uid,
+            'goal': plan.goal,
+            'level': plan.level,
+            'profile_fingerprint': plan.profileFingerprint,
+            'version': plan.version,
+            'status': plan.status,
+            'updated_at': now,
+          }, onConflict: 'id');
+          if (plan.sessions.isEmpty) return;
+          await _client
+              .from('adaptive_course_sessions')
+              .upsert(
+                plan.sessions
+                    .map(
+                      (session) => {
+                        'id': session.id,
+                        'user_id': uid,
+                        'plan_id': plan.id,
+                        'content_key': session.contentKey,
+                        'sequence': session.sequence,
+                        'level': session.level,
+                        'unit': session.unit,
+                        'unit_title': session.unitTitle,
+                        'title': session.title,
+                        'subtitle': session.subtitle,
+                        'competency': session.competency,
+                        'context': session.context,
+                        'primary_skill': session.primarySkill.wireName,
+                        'supporting_skills_json': session.supportingSkills
+                            .map((skill) => skill.wireName)
+                            .toList(),
+                        'grammar_focus_json': session.grammarFocus,
+                        'success_criteria_json': session.successCriteria,
+                        'estimated_minutes': session.estimatedMinutes,
+                        'profile_fingerprint': session.profileFingerprint,
+                        'status': session.status,
+                        'created_at': session.createdAt
+                            .toUtc()
+                            .toIso8601String(),
+                        'updated_at': now,
+                        'completed_at': session.completedAt
+                            ?.toUtc()
+                            .toIso8601String(),
+                      },
+                    )
+                    .toList(),
+                onConflict: 'id',
+              );
+        },
+        queueTable: 'adaptive_course_plans',
+        queueRowId: plan.id,
+      );
+
+  Future<void> syncAdaptiveCourseSession(AdaptiveCourseSessionSpec session) =>
+      _guarded(
+        (uid) async {
+          await _client.from('adaptive_course_sessions').upsert({
+            'id': session.id,
+            'user_id': uid,
+            'plan_id': session.planId,
+            'content_key': session.contentKey,
+            'sequence': session.sequence,
+            'level': session.level,
+            'unit': session.unit,
+            'unit_title': session.unitTitle,
+            'title': session.title,
+            'subtitle': session.subtitle,
+            'competency': session.competency,
+            'context': session.context,
+            'primary_skill': session.primarySkill.wireName,
+            'supporting_skills_json': session.supportingSkills
+                .map((skill) => skill.wireName)
+                .toList(),
+            'grammar_focus_json': session.grammarFocus,
+            'success_criteria_json': session.successCriteria,
+            'estimated_minutes': session.estimatedMinutes,
+            'profile_fingerprint': session.profileFingerprint,
+            'status': session.status,
+            'created_at': session.createdAt.toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+            'completed_at': session.completedAt?.toUtc().toIso8601String(),
+          }, onConflict: 'id');
+        },
+        queueTable: 'adaptive_course_sessions',
+        queueRowId: session.id,
+      );
 
   // ---------------------------------------------------------------------------
   // Vocab / SRS
@@ -217,34 +324,141 @@ class SyncService {
   Future<String?> uploadStoryCover({
     required String storyId,
     required Uint8List bytes,
+    String? diagnosticRoleplayId,
   }) async {
     final uid = _userId;
     if (uid == null) return null;
     if (bytes.isEmpty) {
       debugPrint('Story cover upload skipped ($storyId): empty image bytes');
+      if (diagnosticRoleplayId != null) {
+        unawaited(
+          logRoleplayCoverEvent(
+            roleplayId: diagnosticRoleplayId,
+            phase: 'upload_skipped',
+            error: StateError('image bytes were empty'),
+            sourceBytes: 0,
+          ),
+        );
+      }
       return null;
     }
-    final path = '$uid/$storyId.jpg';
     try {
+      final optimized = ImageStorageOptimizer.optimizeCover(bytes);
+      if (optimized.length > ImageStorageOptimizer.maxBytes) {
+        debugPrint(
+          'Story cover upload skipped ($storyId): optimizer exceeded '
+          '${ImageStorageOptimizer.maxBytes} bytes',
+        );
+        if (diagnosticRoleplayId != null) {
+          unawaited(
+            logRoleplayCoverEvent(
+              roleplayId: diagnosticRoleplayId,
+              phase: 'optimization_failed',
+              error: StateError(
+                'optimized image exceeded ${ImageStorageOptimizer.maxBytes} bytes',
+              ),
+              sourceBytes: bytes.length,
+              optimizedBytes: optimized.length,
+            ),
+          );
+        }
+        return null;
+      }
+      final path = '$uid/$storyId.jpg';
       final bucket = _client.storage.from('story-covers');
       final contentType =
-          bytes.length >= 8 &&
-              bytes[0] == 0x89 &&
-              bytes[1] == 0x50 &&
-              bytes[2] == 0x4e &&
-              bytes[3] == 0x47
+          optimized.length >= 8 &&
+              optimized[0] == 0x89 &&
+              optimized[1] == 0x50 &&
+              optimized[2] == 0x4e &&
+              optimized[3] == 0x47
           ? 'image/png'
           : 'image/jpeg';
       await bucket.uploadBinary(
         path,
-        bytes,
+        optimized,
         fileOptions: FileOptions(contentType: contentType, upsert: true),
       );
-      return await bucket.createSignedUrl(path, 60 * 60 * 24 * 365);
+      final signedUrl = await bucket.createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (diagnosticRoleplayId != null) {
+        unawaited(
+          logRoleplayCoverEvent(
+            roleplayId: diagnosticRoleplayId,
+            phase: 'upload_succeeded',
+            sourceBytes: bytes.length,
+            optimizedBytes: optimized.length,
+          ),
+        );
+      }
+      return signedUrl;
     } catch (e, st) {
       debugPrint('Story cover upload failed ($storyId): $e\n$st');
+      if (diagnosticRoleplayId != null) {
+        unawaited(
+          logRoleplayCoverEvent(
+            roleplayId: diagnosticRoleplayId,
+            phase: 'upload_failed',
+            error: e,
+            sourceBytes: bytes.length,
+          ),
+        );
+      }
       return null;
     }
+  }
+
+  /// Best-effort, private diagnostics for the roleplay cover pipeline.
+  ///
+  /// These events intentionally use the existing RLS-protected
+  /// `learner_events` append-only stream. They never enter the sync outbox:
+  /// a diagnostic must not create a user-data mutation or delay the lesson.
+  /// The payload is bounded and contains no prompt, image bytes, URL, or
+  /// credential material.
+  Future<void> logRoleplayCoverEvent({
+    required String roleplayId,
+    required String phase,
+    int? attempt,
+    Object? error,
+    int? sourceBytes,
+    int? optimizedBytes,
+  }) async {
+    final uid = _userId;
+    if (uid == null) return;
+    final payload = <String, Object?>{
+      'roleplay_id': roleplayId,
+      'phase': phase,
+      if (attempt != null) 'attempt': attempt,
+      if (error != null) ...{
+        'error_type': error.runtimeType.toString(),
+        'error_message': _boundedDiagnostic(error),
+      },
+      if (sourceBytes != null) 'source_bytes': sourceBytes,
+      if (optimizedBytes != null) 'optimized_bytes': optimizedBytes,
+    };
+    try {
+      await _client.from('learner_events').insert({
+        'user_id': uid,
+        'event_type': 'roleplay_cover',
+        'payload': payload,
+        'occurred_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (logError, stackTrace) {
+      // Diagnostics must never affect content generation or the learner's
+      // route. Keep a local breadcrumb for development builds instead.
+      debugPrint('Roleplay cover diagnostic failed: $logError\n$stackTrace');
+    }
+  }
+
+  String _boundedDiagnostic(Object error) {
+    final redacted = error.toString().replaceAll(
+      RegExp(
+        r'(authorization|api[-_ ]?key|access[-_ ]?token|refresh[-_ ]?token)\s*[:=]\s*[^\s,;]+',
+        caseSensitive: false,
+      ),
+      '<redacted>',
+    );
+    if (redacted.length <= 500) return redacted;
+    return '${redacted.substring(0, 500)}…';
   }
 
   // ---------------------------------------------------------------------------
@@ -892,6 +1106,16 @@ class SyncService {
           if (set == null) return true;
           await syncGeneratedVocabularySet(set);
           return true;
+        case 'adaptive_course_plans':
+          final plan = AdaptiveCourseStore(_db).planById(rowId);
+          if (plan == null) return true;
+          await syncAdaptiveCoursePlan(plan);
+          return true;
+        case 'adaptive_course_sessions':
+          final session = AdaptiveCourseStore(_db).sessionById(rowId);
+          if (session == null) return true;
+          await syncAdaptiveCourseSession(session);
+          return true;
         default:
           // Not yet retryable generically — leave queued rather than drop it.
           return false;
@@ -936,6 +1160,7 @@ class SyncService {
     // instead of just reading as "progress didn't come back".
     final legs = <String, Future<void> Function()>{
       'profile': () => _hydrateProfile(uid),
+      'adaptiveCourses': () => _hydrateAdaptiveCourses(uid),
       'vocabCards': () => _hydrateVocabCards(uid),
       'dailySessions': () => _hydrateDailySessions(uid),
       'sessions': () => _hydrateSessions(uid),
@@ -998,7 +1223,7 @@ class SyncService {
   }
 
   /// The general profile fields (goal/level/session_length/reminder_time/
-  /// onboarded_at) — previously push-only, never pulled back on sign-in, so
+  /// study-plan preferences/onboarded_at) — previously push-only, never pulled back on sign-in, so
   /// a reinstalled device kept whatever onboarding defaults it was given
   /// locally instead of the real remote profile.
   Future<void> _hydrateProfile(String uid) async {
@@ -1009,7 +1234,8 @@ class SyncService {
       '''
       UPDATE profiles SET
         goal = ?, level = ?, session_length = ?, reminder_time = ?,
-        onboarded_at = ?, updated_at = ?
+        preferred_days = ?, interests = ?, time_zone = ?, notification_permission_state = ?,
+        onboarding_version = ?, onboarded_at = ?, updated_at = ?
       WHERE user_id = ? AND updated_at < ?
       ''',
       [
@@ -1017,12 +1243,46 @@ class SyncService {
         r['level'],
         r['session_length'],
         r['reminder_time'],
+        r['preferred_days'],
+        r['interests'],
+        r['time_zone'],
+        r['notification_permission_state'] ?? 'not_requested',
+        r['onboarding_version'] ?? 'v1',
         r['onboarded_at'],
         r['updated_at'],
         uid,
         r['updated_at'],
       ],
     );
+  }
+
+  Future<void> _hydrateAdaptiveCourses(String uid) async {
+    final store = AdaptiveCourseStore(_db);
+    final plans = await _client
+        .from('adaptive_course_plans')
+        .select()
+        .eq('user_id', uid);
+    final remotePlanIds = <String>{};
+    for (final row in plans) {
+      final mapped = Map<String, dynamic>.from(row);
+      remotePlanIds.add(mapped['id'] as String);
+      store.upsertPlanFromRemote(mapped);
+    }
+    store.archivePlansNotIn(uid, remotePlanIds);
+
+    final sessions = await _client
+        .from('adaptive_course_sessions')
+        .select()
+        .eq('user_id', uid);
+    for (final row in sessions) {
+      store.upsertSessionFromRemote(Map<String, dynamic>.from(row));
+    }
+  }
+
+  Future<void> hydrateAdaptiveCourses() async {
+    final uid = _userId;
+    if (uid == null) return;
+    await _hydrateAdaptiveCourses(uid);
   }
 
   /// Every completed practice session — the exact data `DailyGoalService`

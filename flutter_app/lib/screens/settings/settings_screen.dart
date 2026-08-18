@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import '../../widgets/adaptive/adaptive.dart';
@@ -15,12 +16,15 @@ import '../../data/database/local_data_reset.dart';
 import '../../design/app_router.dart';
 import '../../models/pilot_access.dart';
 import '../../models/profile.dart';
+import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
+import '../../services/adaptive_curriculum_service.dart';
 import '../../services/srs_service.dart';
 import '../../services/subscription_gate_service.dart';
+import '../../services/notification_scheduler_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../subscription/speak_paywall_screen.dart';
 import 'orchestration_lab_screen.dart';
@@ -76,6 +80,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _saveProfile(void Function(Profile) mutate) {
     setState(() => mutate(_profile));
     ref.read(learningStoreProvider).saveProfile(_profile);
+    // Keep the OS schedule synchronized when reminder settings are changed
+    // from the legacy Settings surface as well as Learning controls.
+    unawaited(NotificationSchedulerService.sync(_profile));
   }
 
   Future<void> _loadSettings() async {
@@ -267,6 +274,296 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _saveProfile((p) => p.level = newLevel);
   }
 
+  Widget _courseFocusEditor() {
+    final selected = AdaptiveCurriculumService.focusSkills(_profile);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        KickerText('Course focus', color: DesignTokens.mutedDim),
+        const SizedBox(height: 5),
+        Text(
+          'Every course uses the complete learning loop. These choices shape the lessons you see most often.',
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final skill in AdaptiveCurriculumService.coreFocusSkills)
+              FilterChip(
+                label: Text(skill.label),
+                selected: selected.contains(skill),
+                onSelected: (value) => _toggleCourseFocus(skill, value),
+                selectedColor: DesignTokens.primarySoft,
+                checkmarkColor: DesignTokens.primary,
+                labelStyle: DesignTokens.body(
+                  12,
+                  weight: FontWeight.w600,
+                ).copyWith(color: DesignTokens.ink),
+                side: BorderSide(color: DesignTokens.hairline),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: () => _saveProfile(
+            (profile) => profile.interests = AdaptiveCurriculumService
+                .coreFocusSkills
+                .map((skill) => skill.label)
+                .toList(),
+          ),
+          icon: const Icon(CupertinoIcons.checkmark_alt_circle, size: 17),
+          label: const Text('Use all six equally'),
+        ),
+      ],
+    );
+  }
+
+  void _toggleCourseFocus(SpeakSkill skill, bool selected) {
+    final current = AdaptiveCurriculumService.focusSkills(_profile).toList();
+    if (selected) {
+      if (!current.contains(skill)) current.add(skill);
+    } else {
+      // Keep one declared emphasis so the generated route never becomes
+      // ambiguous. Other skills still remain available as supporting work.
+      if (current.length == 1) return;
+      current.remove(skill);
+    }
+    _saveProfile(
+      (profile) =>
+          profile.interests = current.map((focus) => focus.label).toList(),
+    );
+  }
+
+  Widget _scheduleEditor() {
+    const days = [
+      ('mon', 'M'),
+      ('tue', 'T'),
+      ('wed', 'W'),
+      ('thu', 'T'),
+      ('fri', 'F'),
+      ('sat', 'S'),
+      ('sun', 'S'),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        KickerText('Study schedule', color: DesignTokens.mutedDim),
+        const SizedBox(height: 10),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _editReminderTime,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              children: [
+                Text(
+                  'Reminder time',
+                  style: DesignTokens.body(
+                    12.5,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+                const Spacer(),
+                Text(
+                  _profile.reminderTime ?? 'Not set',
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
+                const SizedBox(width: 5),
+                const Icon(
+                  CupertinoIcons.chevron_forward,
+                  size: 14,
+                  color: DesignTokens.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Divider(height: 18, color: DesignTokens.hairline),
+        Text(
+          'Study days',
+          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final day in days)
+              FilterChip(
+                label: Text(day.$2),
+                selected: _profile.preferredDays.contains(day.$1),
+                onSelected: (selected) => _togglePreferredDay(day.$1, selected),
+                selectedColor: DesignTokens.primarySoft,
+                checkmarkColor: DesignTokens.primary,
+                labelStyle: DesignTokens.body(
+                  12,
+                  weight: FontWeight.w700,
+                ).copyWith(color: DesignTokens.ink),
+                side: BorderSide(color: DesignTokens.hairline),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _editReminderTime() async {
+    final parts = (_profile.reminderTime ?? '19:00').split(':');
+    final initialHour = int.tryParse(parts.first)?.clamp(0, 23) ?? 19;
+    final initialMinute = int.tryParse(parts.last)?.clamp(0, 59) ?? 0;
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        var hour = initialHour;
+        var minute = initialMinute;
+        return StatefulBuilder(
+          builder: (context, setSheetState) => SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Choose your French reminder time',
+                          style: DesignTokens.display(18),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        icon: const Icon(CupertinoIcons.xmark),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _settingsReminderWheel(
+                          label: 'Hour',
+                          initialValue: hour,
+                          itemCount: 24,
+                          onChanged: (value) =>
+                              setSheetState(() => hour = value),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: Text(':', style: DesignTokens.display(27)),
+                      ),
+                      Expanded(
+                        child: _settingsReminderWheel(
+                          label: 'Minute',
+                          initialValue: minute,
+                          itemCount: 60,
+                          onChanged: (value) =>
+                              setSheetState(() => minute = value),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(
+                        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
+                      ),
+                      child: const Text('Save reminder time'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (!mounted || picked == null) return;
+    _saveProfile((profile) => profile.reminderTime = picked);
+  }
+
+  Widget _settingsReminderWheel({
+    required String label,
+    required int initialValue,
+    required int itemCount,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: DesignTokens.body(
+            11,
+            weight: FontWeight.w700,
+          ).copyWith(color: DesignTokens.mutedDim),
+        ),
+        const SizedBox(height: 5),
+        SizedBox(
+          height: 138,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: DesignTokens.canvas,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: DesignTokens.hairline),
+            ),
+            child: ListWheelScrollView.useDelegate(
+              controller: FixedExtentScrollController(
+                initialItem: initialValue,
+              ),
+              itemExtent: 42,
+              diameterRatio: 1.35,
+              perspective: 0.003,
+              physics: const FixedExtentScrollPhysics(),
+              onSelectedItemChanged: onChanged,
+              childDelegate: ListWheelChildBuilderDelegate(
+                childCount: itemCount,
+                builder: (context, index) => Center(
+                  child: Text(
+                    index.toString().padLeft(2, '0'),
+                    style: DesignTokens.display(index == initialValue ? 25 : 19)
+                        .copyWith(
+                          color: index == initialValue
+                              ? DesignTokens.primary
+                              : DesignTokens.mutedDim.withValues(alpha: .58),
+                          fontWeight: index == initialValue
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _togglePreferredDay(String day, bool selected) {
+    final days = _profile.preferredDays.toList();
+    if (selected) {
+      if (!days.contains(day)) days.add(day);
+    } else {
+      if (days.length == 1) return;
+      days.remove(day);
+    }
+    _saveProfile((profile) => profile.preferredDays = days);
+  }
+
   Future<void> _confirmSignOut() async {
     final shouldSignOut = await showPSConfirmDialog(
       context,
@@ -277,14 +574,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       destructive: true,
     );
     if (!shouldSignOut) return;
-    // Push anything still queued while the session is still valid — once
-    // signed out there's no auth token left to push with, and the local
-    // cache is about to be wiped below, so this is the last chance.
-    await ref
-        .read(syncServiceProvider)
-        .drainOutbox(limit: 500)
-        .timeout(const Duration(seconds: 10), onTimeout: () {})
-        .catchError((_) {});
+    // Sign out first so AuthGate can move to the account screen immediately;
+    // a slow outbox/network request must never make the user wait here.
     await AuthService.shared.signOut();
     // Wipes the local cache so a different account signing in on this same
     // device (shared phone, resold device, a reviewer switching accounts)
@@ -298,8 +589,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // out keeps the device identity; only the account-scoped data is cleared.
     wipeLocalUserData(ref.read(databaseProvider));
     await clearLocalPreferences();
-    // No manual navigation needed — AuthGate's own auth-state listener
-    // switches to the sign-in screen automatically once the session clears.
+    await AuthService.shared.rememberSignedOut();
+    // No manual navigation needed — AuthGate's local sign-out signal and
+    // auth-state listener switch to the sign-in screen automatically.
   }
 
   Future<void> _confirmDeleteAccount() async {
@@ -316,10 +608,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (!shouldDelete || !mounted) return;
 
     setState(() => _deletingAccount = true);
+    final database = ref.read(databaseProvider);
     final result = await AuthService.shared.deleteAccount();
-    if (!mounted) return;
 
     if (result.outcome != AuthOutcome.success) {
+      if (!mounted) return;
       setState(() => _deletingAccount = false);
       await showPSConfirmDialog(
         context,
@@ -329,18 +622,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             'Something went wrong. Please try again, or email '
                 'thoufeek@agiventures.ca and we\'ll delete it for you.',
         confirmLabel: 'OK',
-        cancelLabel: 'OK',
+        cancelLabel: 'Close',
       );
       return;
     }
 
-    // The server-side account is gone — now clear everything this device
-    // holds locally so no trace of the deleted account remains.
-    wipeLocalDatabase(ref.read(databaseProvider));
-    await clearLocalPreferences();
-    await AuthService.shared.signOut();
-    // No manual navigation needed — AuthGate's auth-state listener switches
-    // to the sign-in screen automatically once the session clears.
+    // HTTP 200 confirms server deletion. Move to login immediately, then
+    // clear the device cache without making the user wait for remote logout.
+    await AuthService.shared.signOutLocallyImmediately();
+    try {
+      wipeLocalDatabase(database);
+      await clearLocalPreferences();
+      await AuthService.shared.rememberSignedOut();
+    } finally {
+      if (mounted) {
+        Navigator.of(
+          context,
+          rootNavigator: true,
+        ).popUntil((route) => route.isFirst);
+      }
+    }
   }
 
   String _entitlementLabel(PilotEntitlementStatus status) {
@@ -595,6 +896,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       options: const [
                         ('tef_canada', 'TEF Canada'),
                         ('everyday', 'Everyday'),
+                        ('work', 'Professional'),
+                        ('relocation', 'Relocation'),
+                        ('travel', 'Travel'),
+                        ('culture', 'Culture'),
                         ('unsure', 'Exploring'),
                       ],
                       selected: _profile.goal,
@@ -615,6 +920,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+
+              // --- Course focus: every skill stays available; these choices
+              // control which foundations receive the strongest route weight.
+              _ModernCard(child: _courseFocusEditor()),
+              const SizedBox(height: 12),
+
+              // --- Study schedule (the same preferences captured in onboarding) ---
+              _ModernCard(child: _scheduleEditor()),
               const SizedBox(height: 12),
 
               // --- Tutor (P2.1/P2.3): persona, language mix, voice speed ---
@@ -1026,10 +1340,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    KickerText('Access', color: DesignTokens.mutedDim),
+                    KickerText(
+                      'Subscription access',
+                      color: DesignTokens.mutedDim,
+                    ),
                     const SizedBox(height: 4),
                     _SettingsRow(
-                      label: 'Founding pass',
+                      label: 'Access status',
                       value: _entitlementLabel(_access.entitlement.status),
                     ),
                     Divider(height: 1, color: DesignTokens.hairline),
@@ -1065,7 +1382,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _SettingsRow(
                       label: 'Email',
                       value:
-                          AuthService.shared.signedInEmail ??
+                          AuthService.shared.signedInEmailLabel ??
                           'Not provided by this sign-in',
                     ),
                     Divider(height: 1, color: DesignTokens.hairline),

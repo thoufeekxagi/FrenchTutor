@@ -4,6 +4,7 @@ import '../models/content_models.dart';
 import '../models/srs_state.dart';
 import '../orchestration/models/content_descriptor.dart';
 import '../orchestration/models/mission.dart';
+import '../services/vocabulary_level_policy.dart';
 
 class ContentService {
   ContentService._();
@@ -58,6 +59,12 @@ class ContentService {
 
   List<VocabPhase> get vocabPhases =>
       [_phase1, _phase2, _phase3].whereType<VocabPhase>().toList();
+
+  List<VocabPhase> vocabPhasesForLevel(String level) =>
+      VocabularyLevelPolicy.filterPhases(vocabPhases, level);
+
+  List<VocabEntry> vocabEntriesForLevel(String level) =>
+      VocabularyLevelPolicy.entriesForLevel(vocabPhases, level).toList();
 
   BilingualExample? vocabExamples(String entryId) => _vocabExamples?[entryId];
 
@@ -209,10 +216,13 @@ class ContentService {
 
   String storyContext(ReadingPassage passage) {
     final buf = StringBuffer();
-    buf.writeln('Story: ${passage.title}${passage.titleEn != null ? " (${passage.titleEn})" : ""}');
+    buf.writeln(
+      'Story: ${passage.title}${passage.titleEn != null ? " (${passage.titleEn})" : ""}',
+    );
     buf.writeln('Full text (FR): ${passage.fullText}');
     for (final s in passage.segments) {
-      if (s.grammarNote.isNotEmpty) buf.writeln('Grammar note: ${s.grammarNote}');
+      if (s.grammarNote.isNotEmpty)
+        buf.writeln('Grammar note: ${s.grammarNote}');
     }
     return buf.toString();
   }

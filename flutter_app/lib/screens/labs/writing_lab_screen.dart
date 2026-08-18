@@ -12,6 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/passeport_primary_button.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/writing_workshop_screen.dart';
@@ -191,8 +192,12 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
         ),
         body: const Center(
           child: Padding(
-            padding: EdgeInsets.all(28),
-            child: CircularProgressIndicator(),
+            padding: EdgeInsets.all(20),
+            child: PersonalizedGenerationLoader(
+              content: 'writing task',
+              detail:
+                  'Turning your level, goals, and interests into a useful prompt.',
+            ),
           ),
         ),
       );
@@ -209,13 +214,18 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
           children: [
-            ModernPrimaryButton(
-              label: _isGenerating
-                  ? 'Preparing your task…'
-                  : 'New writing practice',
-              icon: _isGenerating ? null : CupertinoIcons.wand_stars,
-              onPressed: _isGenerating ? null : _startNewPractice,
-            ),
+            if (_isGenerating)
+              const PersonalizedGenerationLoader(
+                content: 'writing task',
+                detail: 'Creating a prompt matched to your level and goals.',
+                compact: true,
+              )
+            else
+              ModernPrimaryButton(
+                label: 'New writing practice',
+                icon: CupertinoIcons.wand_stars,
+                onPressed: _startNewPractice,
+              ),
             if (_errorText != null) ...[
               const SizedBox(height: 8),
               Text(

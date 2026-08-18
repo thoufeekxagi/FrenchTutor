@@ -5,7 +5,9 @@ import '../../services/auth_service.dart';
 import '../speak/speak_ui.dart';
 
 class SpeakAuthScreen extends StatefulWidget {
-  const SpeakAuthScreen({super.key});
+  const SpeakAuthScreen({super.key, this.initialSignUp = true});
+
+  final bool initialSignUp;
 
   @override
   State<SpeakAuthScreen> createState() => _SpeakAuthScreenState();
@@ -14,7 +16,7 @@ class SpeakAuthScreen extends StatefulWidget {
 class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
-  var _signUp = true;
+  late var _signUp = widget.initialSignUp;
   var _loading = false;
   String? _message;
 

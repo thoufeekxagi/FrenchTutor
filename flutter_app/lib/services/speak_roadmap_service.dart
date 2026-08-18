@@ -1,12 +1,14 @@
 import '../models/profile.dart';
 import '../models/speak_curriculum.dart';
-import 'speak_curriculum_catalog.dart';
+import '../data/database/adaptive_course_store.dart';
+import 'adaptive_curriculum_service.dart';
 
 export '../models/speak_curriculum.dart' show SpeakSessionKind, SpeakSkill;
 
 class SpeakRoadmapSession {
   const SpeakRoadmapSession({
     required this.contentKey,
+    this.level = 'A1',
     required this.index,
     required this.unit,
     required this.unitTitle,
@@ -24,6 +26,7 @@ class SpeakRoadmapSession {
   });
 
   final String contentKey;
+  final String level;
   final int index;
   final int unit;
   final String unitTitle;
@@ -43,10 +46,15 @@ class SpeakRoadmapSession {
 }
 
 class SpeakRoadmap {
-  const SpeakRoadmap({required this.level, required this.sessions});
+  const SpeakRoadmap({
+    required this.level,
+    required this.sessions,
+    required this.trackLabel,
+  });
 
   final String level;
   final List<SpeakRoadmapSession> sessions;
+  final String trackLabel;
 
   int get completedCount =>
       sessions.where((session) => session.completed).length;
@@ -64,48 +72,64 @@ class SpeakRoadmap {
 abstract final class SpeakRoadmapService {
   static SpeakRoadmap build(
     Profile profile, {
-    int completedSessions = 0,
     Set<String> completedContentKeys = const {},
-    List<SpeakCurriculumItem>? catalog,
+    required List<AdaptiveCourseSessionSpec> adaptiveSessions,
   }) {
-    final level = SpeakCurriculumCatalogLevel.normalise(profile.level);
-    final items = [...(catalog ?? SpeakCurriculumCatalog.bundled(level))]
-      ..sort((a, b) {
-        final unitOrder = a.unit.compareTo(b.unit);
-        if (unitOrder != 0) return unitOrder;
-        return a.sessionIndex.compareTo(b.sessionIndex);
-      });
-    final sessions = <SpeakRoadmapSession>[];
-    for (var index = 0; index < items.length; index++) {
-      final item = items[index];
+    if (adaptiveSessions.isEmpty) {
+      throw StateError(
+        'An adaptive course plan is required to build a roadmap.',
+      );
+    }
+    return _buildAdaptive(
+      profile,
+      sessions: adaptiveSessions,
+      completedContentKeys: completedContentKeys,
+    );
+  }
+
+  static SpeakRoadmap _buildAdaptive(
+    Profile profile, {
+    required List<AdaptiveCourseSessionSpec> sessions,
+    required Set<String> completedContentKeys,
+  }) {
+    final projected = <SpeakRoadmapSession>[];
+    for (var index = 0; index < sessions.length; index++) {
+      final spec = sessions[index];
       final completed =
-          completedContentKeys.contains(item.contentKey) ||
-          index < completedSessions;
-      sessions.add(
+          spec.status == 'completed' ||
+          completedContentKeys.contains(spec.contentKey);
+      projected.add(
         SpeakRoadmapSession(
-          contentKey: item.contentKey,
+          contentKey: spec.contentKey,
+          level: spec.level,
           index: index,
-          unit: item.unit,
-          unitTitle: item.unitTitle,
-          title: item.title,
-          subtitle: item.subtitle,
-          kind: item.sessionKind,
+          unit: spec.unit,
+          unitTitle: spec.unitTitle,
+          title: spec.title,
+          subtitle: spec.subtitle,
+          kind: _kindFor(spec.primarySkill),
           completed: completed,
-          // The course is a library, not a gate. Learners may revisit a later
-          // session whenever they want; progress recommends the next one but
-          // never hides or locks the rest of the curriculum.
           unlocked: true,
-          estimatedMinutes: item.estimatedMinutes,
-          roleplay: item.roleplay,
-          primarySkill: item.primarySkill,
-          supportingSkills: item.supportingSkills,
-          targetPhrases: item.targetPhrases,
-          contextPrompt: item.contextPrompt,
+          estimatedMinutes: spec.estimatedMinutes,
+          primarySkill: spec.primarySkill,
+          supportingSkills: spec.supportingSkills,
+          contextPrompt: spec.contextPrompt,
         ),
       );
     }
-    return SpeakRoadmap(level: level, sessions: sessions);
+    return SpeakRoadmap(
+      level: SpeakCurriculumLevel.normalise(profile.level),
+      sessions: projected,
+      trackLabel: AdaptiveCurriculumService.forProfile(profile).label,
+    );
   }
+
+  static SpeakSessionKind _kindFor(SpeakSkill skill) => switch (skill) {
+    SpeakSkill.reading || SpeakSkill.listening => SpeakSessionKind.story,
+    SpeakSkill.roleplay => SpeakSessionKind.roleplay,
+    SpeakSkill.review => SpeakSessionKind.review,
+    _ => SpeakSessionKind.speaking,
+  };
 }
 
 abstract final class SpeakCurriculumCatalogLevel {

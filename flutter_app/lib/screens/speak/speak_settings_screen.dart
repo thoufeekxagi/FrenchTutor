@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,16 +10,18 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
+import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../subscription/speak_paywall_screen.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import 'speak_advanced_settings_screen.dart';
-import 'speak_profile_screen.dart';
 import 'speak_ui.dart';
 
 class SpeakSettingsScreen extends ConsumerStatefulWidget {
-  const SpeakSettingsScreen({super.key});
+  const SpeakSettingsScreen({super.key, this.onReplayPractice});
+
+  final VoidCallback? onReplayPractice;
 
   @override
   ConsumerState<SpeakSettingsScreen> createState() =>
@@ -29,7 +33,42 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
   var _wifiOnly = false;
   var _haptics = true;
   var _deletingAccount = false;
+  var _accountDetailsExpanded = false;
+  var _deletionDots = 1;
+  Timer? _deletionTimer;
   TutorPersona _tutor = ActiveTutor.current;
+
+  String get _deletionLabel => 'Deleting account${'.' * _deletionDots}';
+
+  void _startDeletionAnimation() {
+    _deletionTimer?.cancel();
+    _deletionDots = 1;
+    _deletionTimer = Timer.periodic(const Duration(milliseconds: 450), (_) {
+      if (!mounted || !_deletingAccount) return;
+      setState(
+        () => _deletionDots = _deletionDots == 3 ? 1 : _deletionDots + 1,
+      );
+    });
+  }
+
+  void _stopDeletionAnimation() {
+    _deletionTimer?.cancel();
+    _deletionTimer = null;
+  }
+
+  void _returnToAuthGate() {
+    if (!mounted) return;
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).popUntil((route) => route.isFirst);
+  }
+
+  @override
+  void dispose() {
+    _stopDeletionAnimation();
+    super.dispose();
+  }
 
   Future<void> _openUrl(Uri uri) async {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -59,18 +98,14 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
     );
     if (!shouldSignOut) return;
 
-    // Push anything still queued while the session is valid. Once signed out,
-    // there is no auth token left to push with.
-    await ref
-        .read(syncServiceProvider)
-        .drainOutbox(limit: 500)
-        .timeout(const Duration(seconds: 10), onTimeout: () {})
-        .catchError((_) {});
+    // Sign out first so the app shell changes immediately; a slow network
+    // sync must never leave the user staring at the authenticated screen.
     await AuthService.shared.signOut();
     // Keep device-level installation identity, but remove all account data so
     // a different account on this device cannot see the previous user's data.
     wipeLocalUserData(ref.read(databaseProvider));
     await clearLocalPreferences();
+    await AuthService.shared.rememberSignedOut();
   }
 
   Future<void> _confirmDeleteAccount() async {
@@ -87,10 +122,13 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
     if (!shouldDelete || !mounted) return;
 
     setState(() => _deletingAccount = true);
+    _startDeletionAnimation();
+    final database = ref.read(databaseProvider);
     final result = await AuthService.shared.deleteAccount();
-    if (!mounted) return;
 
     if (result.outcome != AuthOutcome.success) {
+      _stopDeletionAnimation();
+      if (!mounted) return;
       setState(() => _deletingAccount = false);
       await showPSConfirmDialog(
         context,
@@ -100,16 +138,24 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
             'Something went wrong. Please try again, or email '
                 'thoufeek@agiventures.ca and we\'ll delete it for you.',
         confirmLabel: 'OK',
-        cancelLabel: 'OK',
+        cancelLabel: 'Close',
       );
       return;
     }
 
-    // The server-side account is gone; clear all local traces before the
-    // auth-state listener takes the user back to sign-in.
-    wipeLocalDatabase(ref.read(databaseProvider));
-    await clearLocalPreferences();
-    await AuthService.shared.signOut();
+    // HTTP 200 confirms that the server-side account is gone. Sign out
+    // locally immediately, then clear this pushed settings route so the
+    // signed-out AuthGate is visible instead of leaving the deletion label
+    // stranded above it.
+    _stopDeletionAnimation();
+    await AuthService.shared.signOutLocallyImmediately();
+    try {
+      wipeLocalDatabase(database);
+      await clearLocalPreferences();
+      await AuthService.shared.rememberSignedOut();
+    } finally {
+      _returnToAuthGate();
+    }
   }
 
   Future<void> _chooseLanguage() async {
@@ -176,6 +222,18 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
     if (mounted) setState(() => _tutor = picked);
   }
 
+  Future<void> _replayPracticeTour() async {
+    await AppTour.resetPractice();
+    if (!mounted) return;
+    if (widget.onReplayPractice == null) {
+      AppTour.pendingPracticeReplay = true;
+      await Navigator.of(context).maybePop();
+      return;
+    }
+    await Navigator.of(context).maybePop();
+    widget.onReplayPractice!();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SpeakScaffold(
@@ -194,13 +252,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
           ),
           const SizedBox(height: 24),
           _section('Account', [
-            _row(
-              Icons.person_outline_rounded,
-              'Profile',
-              'French learner',
-              onTap: () =>
-                  AppRouter.push(context, (_) => const SpeakProfileScreen()),
-            ),
+            _accountRow(),
             _row(
               Icons.workspace_premium_outlined,
               'Membership',
@@ -221,7 +273,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
             ),
             _row(
               Icons.delete_outline_rounded,
-              _deletingAccount ? 'Deleting account…' : 'Delete account',
+              _deletingAccount ? _deletionLabel : 'Delete account',
               'Permanently remove your account and learning data',
               onTap: _deletingAccount ? null : _confirmDeleteAccount,
               accentColor: DesignTokens.danger,
@@ -288,6 +340,12 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
           const SizedBox(height: 20),
           _section('Support', [
             _row(
+              Icons.school_outlined,
+              'Replay Practice walkthrough',
+              'See what Free Talk, skills, review, and exams do',
+              onTap: _replayPracticeTour,
+            ),
+            _row(
               Icons.help_outline_rounded,
               'Help center',
               'Get answers and contact support',
@@ -351,6 +409,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
     required VoidCallback? onTap,
     Color? accentColor,
     bool destructive = false,
+    bool expanded = false,
   }) {
     final titleStyle = DesignTokens.body(14, weight: FontWeight.w700);
     final rowColor = accentColor ?? SpeakColors.blue;
@@ -383,13 +442,72 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
+            Icon(
+              expanded
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.chevron_right_rounded,
               color: SpeakColors.inkSoft,
               size: 20,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _accountRow() {
+    final name = AuthService.shared.signedInDisplayName;
+    final email = AuthService.shared.signedInEmailLabel;
+    final provider = AuthService.shared.signedInProvider;
+    return Column(
+      children: [
+        _row(
+          Icons.person_outline_rounded,
+          'Profile',
+          name,
+          onTap: () => setState(
+            () => _accountDetailsExpanded = !_accountDetailsExpanded,
+          ),
+          expanded: _accountDetailsExpanded,
+        ),
+        if (_accountDetailsExpanded)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(47, 0, 14, 14),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              decoration: BoxDecoration(
+                color: DesignTokens.canvas,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _compactAccountDetail(
+                    'Email',
+                    email ?? 'Not provided by this sign-in',
+                  ),
+                  const SizedBox(height: 7),
+                  _compactAccountDetail('Signed in with', provider),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _compactAccountDetail(String label, String value) {
+    return RichText(
+      text: TextSpan(
+        style: DesignTokens.body(11.5).copyWith(color: SpeakColors.inkSoft),
+        children: [
+          TextSpan(
+            text: '$label  ',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          TextSpan(text: value),
+        ],
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../../models/pilot_access.dart';
 import '../../providers/database_provider.dart';
 import '../../services/product_analytics.dart';
 import '../../services/revenue_cat_service.dart';
+import '../../widgets/subscription_marketing_sections.dart';
 import '../speak/speak_ui.dart';
 
 const speakProEntitlementId = 'ParleSprint Pro';
@@ -15,7 +16,12 @@ const _termsUrl = 'https://parlesprint.com/terms';
 const _privacyUrl = 'https://parlesprint.com/privacy';
 
 class SpeakPaywallScreen extends ConsumerStatefulWidget {
-  const SpeakPaywallScreen({super.key});
+  const SpeakPaywallScreen({super.key, this.source = 'unknown'});
+
+  /// The measured entry point, such as `settings`, `daily_mission`, or
+  /// `exam_readiness`. This changes analytics only; all entry points share
+  /// the same Apple-compliant purchase surface.
+  final String source;
 
   @override
   ConsumerState<SpeakPaywallScreen> createState() => _SpeakPaywallScreenState();
@@ -31,6 +37,10 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
   @override
   void initState() {
     super.initState();
+    ProductAnalytics.capture(
+      'paywall_shown',
+      properties: {'source': widget.source},
+    );
     _load();
   }
 
@@ -50,6 +60,13 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
   Future<void> _purchase() async {
     final package = _selected;
     if (package == null || _purchasing) return;
+    ProductAnalytics.capture(
+      'purchase_started',
+      properties: {
+        'source': widget.source,
+        'product_id': package.storeProduct.identifier,
+      },
+    );
     setState(() {
       _purchasing = true;
       _message = null;
@@ -57,6 +74,13 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final success = await RevenueCatService.shared.purchasePackage(package);
     if (!mounted) return;
     if (!success) {
+      ProductAnalytics.capture(
+        'purchase_failed',
+        properties: {
+          'source': widget.source,
+          'product_id': package.storeProduct.identifier,
+        },
+      );
       setState(() {
         _purchasing = false;
         _message = 'The purchase could not be completed. You can try again.';
@@ -85,7 +109,10 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     }
     ProductAnalytics.capture(
       'subscription_purchased',
-      properties: {'product_id': package.storeProduct.identifier},
+      properties: {
+        'source': widget.source,
+        'product_id': package.storeProduct.identifier,
+      },
     );
     if (mounted) Navigator.of(context).pop(true);
   }
@@ -102,6 +129,10 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       final info = await Purchases.restorePurchases();
       if (!mounted) return;
       if (info.entitlements.active.containsKey(speakProEntitlementId)) {
+        ProductAnalytics.capture(
+          'purchase_restored',
+          properties: {'source': widget.source},
+        );
         ref.invalidate(subscriptionGateServiceProvider);
         ref.invalidate(pilotAccessServiceProvider);
         Navigator.of(context).pop(true);
@@ -117,58 +148,61 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final packages =
+        _offerings?.current?.availablePackages ?? const <Package>[];
+    Package? trialPackage;
+    for (final package in packages) {
+      if (package.storeProduct.introductoryPrice?.price == 0) {
+        trialPackage = package;
+        break;
+      }
+    }
     return Scaffold(
       backgroundColor: SpeakColors.background,
       body: SafeArea(
-        child: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: SpeakColors.blue),
-              )
-            : Stack(
-                children: [
-                  ListView(
+        child: Stack(
+          children: [
+            _loading
+                ? const Center(
+                    child: CircularProgressIndicator(color: SpeakColors.blue),
+                  )
+                : ListView(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                     children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(false),
-                        child: const Icon(
-                          Icons.arrow_back_rounded,
-                          color: SpeakColors.inkSoft,
-                        ),
-                      ),
-                      const SizedBox(height: 26),
+                      const SizedBox(height: 54),
                       Text(
-                        'Join learners who are already speaking French.',
+                        trialPackage == null
+                            ? 'Unlock full French access'
+                            : 'Start with \$0 for '
+                                  '${_trialHeadlineLabel(trialPackage)}',
                         textAlign: TextAlign.center,
-                        style: DesignTokens.display(27),
+                        style: DesignTokens.display(34),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Keep your course path, live roleplays, smart review and saved progress.',
-                        textAlign: TextAlign.center,
-                        style: DesignTokens.body(
-                          14,
-                        ).copyWith(color: SpeakColors.inkSoft, height: 1.4),
-                      ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 18),
                       _benefit(
-                        'Speak curriculum',
-                        'A clear level-based route from A1 to B2',
+                        'A course shaped around you',
                         Icons.route_rounded,
                       ),
                       _benefit(
-                        'Roleplay and speaking',
-                        'Practise the moments you actually need',
+                        'Live speaking with your tutor',
                         Icons.mic_rounded,
                       ),
                       _benefit(
-                        'Smart review',
-                        'Bring useful phrases back before you forget them',
+                        'Reading and listening that teach',
+                        Icons.menu_book_rounded,
+                      ),
+                      _benefit(
+                        'Writing and grammar feedback',
+                        Icons.edit_note_rounded,
+                      ),
+                      _benefit('TEF and TCF practice', Icons.verified_rounded),
+                      _benefit(
+                        'Smart review that remembers',
                         Icons.bolt_rounded,
                       ),
-                      const SizedBox(height: 16),
-                      _plans(),
                       const SizedBox(height: 14),
+                      _plans(),
+                      const SizedBox(height: 12),
                       if (_message != null)
                         Text(
                           _message!,
@@ -182,6 +216,20 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                         label: _purchasing ? 'Processing…' : _ctaLabel(),
                         icon: Icons.workspace_premium_rounded,
                         onTap: _purchasing ? () {} : _purchase,
+                      ),
+                      const SizedBox(height: 26),
+                      const SubscriptionMarketingSections(),
+                      const SizedBox(height: 24),
+                      SubscriptionBottomOffer(
+                        price: _bottomPriceLine(),
+                        terms: _selected == null
+                            ? 'Select a subscription above to continue.'
+                            : _bottomTerms(_selected!),
+                        ctaLabel: _ctaLabel(),
+                        loading: _purchasing,
+                        onTap: _purchasing || _selected == null
+                            ? null
+                            : _purchase,
                       ),
                       const SizedBox(height: 10),
                       Center(
@@ -215,43 +263,63 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                       ),
                     ],
                   ),
-                ],
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    ProductAnalytics.capture(
+                      'paywall_closed',
+                      properties: {'source': widget.source},
+                    );
+                    Navigator.of(context).pop(false);
+                  },
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: SpeakColors.line),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: DesignTokens.ink,
+                    ),
+                  ),
+                ),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _benefit(String title, String subtitle, IconData icon) {
+  Widget _benefit(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: 38,
+            height: 38,
             decoration: const BoxDecoration(
               color: SpeakColors.blueSoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: SpeakColors.blue, size: 17),
+            child: Icon(icon, color: SpeakColors.blue, size: 19),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: DesignTokens.body(13, weight: FontWeight.w700),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: DesignTokens.body(
-                    11.5,
-                  ).copyWith(color: SpeakColors.inkSoft),
-                ),
-              ],
+            child: Text(
+              title,
+              style: DesignTokens.body(16, weight: FontWeight.w700),
             ),
           ),
         ],
@@ -285,10 +353,19 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final annual = package.packageType == PackageType.annual;
     final trialSummary = _trialSummary(package);
     return GestureDetector(
-      onTap: () => setState(() => _selected = package),
+      onTap: () {
+        setState(() => _selected = package);
+        ProductAnalytics.capture(
+          'paywall_plan_selected',
+          properties: {
+            'source': widget.source,
+            'product_id': package.storeProduct.identifier,
+          },
+        );
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -312,13 +389,13 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    annual ? 'Premium · Best value' : 'Premium',
-                    style: DesignTokens.body(14, weight: FontWeight.w700),
+                    _planTitle(package),
+                    style: DesignTokens.body(16, weight: FontWeight.w700),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     package.storeProduct.priceString,
-                    style: DesignTokens.display(20).copyWith(
+                    style: DesignTokens.display(23).copyWith(
                       color: SpeakColors.navy,
                       fontWeight: FontWeight.w800,
                     ),
@@ -327,18 +404,33 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                   Text(
                     _billingTerms(package),
                     style: DesignTokens.body(
-                      11.5,
+                      13,
                       weight: FontWeight.w600,
                     ).copyWith(color: SpeakColors.inkSoft),
                   ),
                   if (trialSummary != null) ...[
                     const SizedBox(height: 2),
-                    Text(
-                      trialSummary,
-                      style: DesignTokens.body(
-                        10.5,
-                      ).copyWith(color: SpeakColors.inkSoft),
-                    ),
+                    annual
+                        ? SizedBox(
+                            width: double.infinity,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                trialSummary,
+                                maxLines: 1,
+                                style: DesignTokens.body(
+                                  13,
+                                ).copyWith(color: SpeakColors.inkSoft),
+                              ),
+                            ),
+                          )
+                        : Text(
+                            trialSummary,
+                            style: DesignTokens.body(
+                              13,
+                            ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+                          ),
                   ],
                 ],
               ),
@@ -358,33 +450,81 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     return price == null ? 'Subscribe' : 'Subscribe for $price';
   }
 
+  String _bottomPriceLine() {
+    final selected = _selected;
+    if (selected == null) return 'Choose a plan';
+    return selected.storeProduct.priceString;
+  }
+
+  String _bottomTerms(Package package) {
+    final trial = _trialSummary(package);
+    return '${_billingTerms(package)}.${trial == null ? '' : ' $trial'}';
+  }
+
+  String _planTitle(Package package) => switch (package.packageType) {
+    PackageType.annual => 'Annual plan',
+    PackageType.threeMonth => '3-month plan',
+    PackageType.monthly => 'Monthly plan',
+    PackageType.weekly => 'Weekly plan',
+    _ => package.storeProduct.title,
+  };
+
+  String _trialLengthLabel(Package? package) {
+    final intro = package?.storeProduct.introductoryPrice;
+    if (intro == null || intro.price != 0) return '';
+    final units = intro.periodNumberOfUnits * intro.cycles;
+    final unit = _periodUnitLabel(intro.periodUnit);
+    return '$units $unit${units == 1 ? '' : 's'}';
+  }
+
+  String _trialHeadlineLabel(Package? package) {
+    final intro = package?.storeProduct.introductoryPrice;
+    if (intro == null || intro.price != 0) return 'the trial period';
+    if (intro.periodUnit == PeriodUnit.week) {
+      final days = intro.periodNumberOfUnits * intro.cycles * 7;
+      return '$days day${days == 1 ? '' : 's'}';
+    }
+    return _trialLengthLabel(package);
+  }
+
+  String _periodUnitLabel(PeriodUnit unit) => switch (unit) {
+    PeriodUnit.day => 'day',
+    PeriodUnit.week => 'week',
+    PeriodUnit.month => 'month',
+    PeriodUnit.year => 'year',
+    PeriodUnit.unknown => 'period',
+  };
+
   String _billingTerms(Package package) => switch (package.packageType) {
-    PackageType.annual =>
-      'Billed annually · auto-renews yearly · cancel anytime',
+    PackageType.annual => 'Billed yearly · auto-renews · cancel anytime',
     PackageType.threeMonth =>
       'Billed every 3 months · auto-renews · cancel anytime',
     PackageType.monthly => 'Billed monthly · auto-renews · cancel anytime',
     PackageType.weekly => 'Billed weekly · auto-renews · cancel anytime',
-    _ => 'Billed for each subscription period · cancel anytime',
+    _ => 'Auto-renews · cancel anytime',
   };
 
   String? _trialSummary(Package package) {
     final intro = package.storeProduct.introductoryPrice;
     if (intro == null) return null;
-    final unit = switch (intro.periodUnit) {
-      PeriodUnit.day => 'day',
-      PeriodUnit.week => 'week',
-      PeriodUnit.month => 'month',
-      PeriodUnit.year => 'year',
-      PeriodUnit.unknown => 'period',
-    };
+    final unit = _periodUnitLabel(intro.periodUnit);
     final units = intro.periodNumberOfUnits * intro.cycles;
     final label = '$units $unit${units == 1 ? '' : 's'}';
     if (intro.price == 0) {
-      return 'Includes $label free, then ${package.storeProduct.priceString} is billed.';
+      return '$label free, then ${package.storeProduct.priceString} '
+          '${_renewalLabel(package)}';
     }
-    return 'Introductory price ${intro.priceString}, then ${package.storeProduct.priceString} is billed.';
+    return 'Intro price ${intro.priceString} for $label, then '
+        '${package.storeProduct.priceString} ${_renewalLabel(package)}';
   }
+
+  String _renewalLabel(Package package) => switch (package.packageType) {
+    PackageType.annual => 'billed yearly',
+    PackageType.threeMonth => 'billed every 3 months',
+    PackageType.monthly => 'billed monthly',
+    PackageType.weekly => 'billed weekly',
+    _ => 'billed each period',
+  };
 
   Widget _legal(String label, String url) => GestureDetector(
     onTap: () => launchUrl(Uri.parse(url)),

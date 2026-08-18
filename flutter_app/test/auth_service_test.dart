@@ -41,6 +41,14 @@ void main() {
       sub1.cancel();
       sub2.cancel();
     });
+
+    test('signOut publishes an immediate local auth revision', () async {
+      final before = AuthService.shared.localAuthRevision.value;
+      await AuthService.shared.signOut();
+
+      expect(AuthService.shared.localAuthRevision.value, greaterThan(before));
+      expect(AuthService.shared.currentSession, isNull);
+    });
   });
 
   group('AuthResult', () {

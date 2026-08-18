@@ -241,13 +241,12 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     });
     final submittedText = _content;
     try {
-      final level = ref.read(learningStoreProvider).profile().level;
       final result = await ref
           .read(lessonAgentServiceProvider)
           .gradeWriting(
             task: task,
             submission: submittedText,
-            levelBand: level,
+            levelBand: task.levelBand,
           );
       if (!mounted) return;
       setState(() {

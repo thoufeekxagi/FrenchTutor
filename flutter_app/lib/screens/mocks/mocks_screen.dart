@@ -27,8 +27,26 @@ class _ReadingQuestion {
   final int answer;
 }
 
+class SpeakingMockResult {
+  const SpeakingMockResult({required this.score, required this.completed});
+
+  final double score;
+  final bool completed;
+}
+
 class MocksScreen extends ConsumerStatefulWidget {
-  const MocksScreen({super.key});
+  const MocksScreen({
+    super.key,
+    this.examName,
+    this.levelBand = 'B1',
+    this.includeReadingWarmup = true,
+  });
+
+  /// When supplied, this screen is the scored speaking surface launched from
+  /// Exam readiness. With no exam name it remains the standalone mock.
+  final String? examName;
+  final String levelBand;
+  final bool includeReadingWarmup;
 
   @override
   ConsumerState<MocksScreen> createState() => _MocksScreenState();
@@ -38,10 +56,6 @@ class _MocksScreenState extends ConsumerState<MocksScreen> {
   static const _passage = '''
 La médiathèque du quartier sera exceptionnellement fermée mardi matin pour des travaux. Elle ouvrira à 14 h et restera ouverte jusqu'à 20 h. Les documents qui doivent être rendus mardi peuvent être déposés dans la boîte extérieure. L'atelier de conversation française prévu à 18 h aura lieu normalement dans la salle du premier étage.
 ''';
-  static const _monologuePrompt =
-      'Parlez d’un lieu de votre ville que vous recommandez. Expliquez ce qu’on peut y faire et pourquoi vous l’aimez.';
-  static const _interactionPrompt =
-      'Vous téléphonez à un centre de formation pour demander des renseignements sur un cours de français du soir. L’examinateur joue le rôle de l’employé. Posez des questions sur les horaires, le prix et le niveau requis.';
   static const _questions = [
     _ReadingQuestion(
       prompt: 'Quand la médiathèque ouvrira-t-elle mardi ?',
@@ -78,6 +92,32 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
   SpeakingMockFeedback? _feedback;
   String _error = '';
 
+  bool get _isExamReadiness => widget.examName != null;
+
+  String get _monologuePrompt {
+    final band = widget.levelBand.toUpperCase();
+    if (widget.examName?.startsWith('TEF') == true) {
+      return band == 'A1' || band == 'A2'
+          ? 'Présentez un lieu que vous aimez. Dites où il est et ce que vous y faites.'
+          : 'Parlez d’un lieu de votre ville que vous recommandez. Expliquez ce qu’on peut y faire et pourquoi vous l’aimez.';
+    }
+    return band == 'A1' || band == 'A2'
+        ? 'Présentez-vous et dites où vous habitez et ce que vous aimez faire.'
+        : 'Présentez un projet ou une activité importante pour vous. Donnez des raisons et un exemple précis.';
+  }
+
+  String get _interactionPrompt {
+    final band = widget.levelBand.toUpperCase();
+    if (widget.examName?.startsWith('TEF') == true) {
+      return band == 'A1' || band == 'A2'
+          ? 'Vous téléphonez à un centre de formation. Demandez l’heure et le prix d’un cours de français. L’examinateur joue l’employé.'
+          : 'Vous téléphonez à un centre de formation pour demander des renseignements sur un cours de français du soir. L’examinateur joue le rôle de l’employé. Posez des questions sur les horaires, le prix et le niveau requis.';
+    }
+    return band == 'A1' || band == 'A2'
+        ? 'Vous cherchez une activité en français. Posez des questions simples sur le lieu, l’heure et le prix.'
+        : 'Vous voulez obtenir des renseignements sur une activité ou un service. Posez des questions précises, réagissez aux réponses et demandez une information supplémentaire.';
+  }
+
   int get _readingScore {
     var score = 0;
     for (var i = 0; i < _answers.length && i < _questions.length; i++) {
@@ -102,14 +142,18 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
           context,
           ref.read(pilotAccessServiceProvider),
         ) ||
-        !mounted)
+        !mounted) {
       return;
+    }
     final stage = interaction
         ? 'mock_speaking_interaction'
         : 'mock_speaking_monologue';
+    final languageRule = widget.levelBand == 'A1' || widget.levelBand == 'A2'
+        ? 'A1/A2 GUIDED TRAINING: use short French and one brief English clarification only if the learner is clearly blocked; never give an answer.'
+        : 'B1/B2 ASSESSMENT: French only. Never translate, coach, correct, or suggest an answer during the timed task.';
     final examContext = interaction
-        ? 'INTERACTION TASK\nSCENARIO: $_interactionPrompt\nYou are the centre employee. Open in French by asking how you can help. Stay in character and make the learner ask for the required information.'
-        : 'MONOLOGUE TASK\nPROMPT: $_monologuePrompt\nState this exact French prompt once, say “Commencez maintenant”, then remain silent.';
+        ? 'INTERACTION TASK\n$languageRule\nSCENARIO: $_interactionPrompt\nYou are the centre employee. Open in French by asking how you can help. Stay in character and make the learner ask for the required information.'
+        : 'MONOLOGUE TASK\n$languageRule\nPROMPT: $_monologuePrompt\nState this exact French prompt once, say “Commencez maintenant”, then remain silent.';
     final result = await AppRouter.push<SpeakingResult>(
       context,
       (_) => SessionScreen(
@@ -159,6 +203,8 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
             monologueTranscript: _monologueTranscript,
             interactionPrompt: _interactionPrompt,
             interactionTranscript: _interactionTranscript,
+            examName: widget.examName ?? 'TEF / TCF Canada',
+            levelBand: widget.levelBand,
           );
       if (!mounted) return;
       ref
@@ -242,7 +288,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
 
   Widget _overview() {
     return _page([
-      _eyebrow('TEF / TCF CANADA'),
+      _eyebrow(widget.examName ?? 'TEF / TCF CANADA'),
       const SizedBox(height: DesignTokens.space2),
       Text(
         'Measure the French you can produce',
@@ -250,17 +296,20 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
       ),
       const SizedBox(height: DesignTokens.space3),
       Text(
-        'A short reading warm-up followed by two timed speaking tasks. There is no coaching during the assessment; feedback comes after you finish.',
+        _isExamReadiness
+            ? '${widget.examName} speaking practice at ${widget.levelBand}. Two timed tasks are scored after you finish with feedback on completion, fluency, grammar, and vocabulary.'
+            : 'A short reading warm-up followed by two timed speaking tasks. There is no coaching during the assessment; feedback comes after you finish.',
         style: DesignTokens.body(
           16,
         ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
       ),
       const SizedBox(height: 28),
-      _stageRow(
-        CupertinoIcons.book,
-        'Reading warm-up',
-        '3 questions · untimed',
-      ),
+      if (widget.includeReadingWarmup)
+        _stageRow(
+          CupertinoIcons.book,
+          'Reading warm-up',
+          '3 questions · untimed',
+        ),
       _stageRow(CupertinoIcons.mic, 'Task 1 · Monologue', 'Speak for 1 minute'),
       _stageRow(
         CupertinoIcons.person_2,
@@ -283,7 +332,11 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
       PrimaryActionButton(
         label: 'Begin mock',
         icon: CupertinoIcons.play_fill,
-        onPressed: () => setState(() => _step = _MockStep.reading),
+        onPressed: () => setState(
+          () => _step = widget.includeReadingWarmup
+              ? _MockStep.reading
+              : _MockStep.taskOne,
+        ),
       ),
     ]);
   }
@@ -474,15 +527,26 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         ),
       ),
       const SizedBox(height: DesignTokens.space4),
-      Text(
-        'Reading warm-up: $_readingScore/${_questions.length}',
-        style: DesignTokens.body(
-          14,
-          weight: FontWeight.w600,
-        ).copyWith(color: DesignTokens.mutedDim),
-      ),
+      if (widget.includeReadingWarmup)
+        Text(
+          'Reading warm-up: $_readingScore/${_questions.length}',
+          style: DesignTokens.body(
+            14,
+            weight: FontWeight.w600,
+          ).copyWith(color: DesignTokens.mutedDim),
+        ),
       const SizedBox(height: 28),
-      PrimaryActionButton(label: 'Retake mock', onPressed: _restart),
+      PrimaryActionButton(
+        label: _isExamReadiness ? 'Finish and save result' : 'Retake mock',
+        onPressed: _isExamReadiness
+            ? () => Navigator.of(context).pop(
+                SpeakingMockResult(
+                  score: feedback.overallScore,
+                  completed: true,
+                ),
+              )
+            : _restart,
+      ),
     ]);
   }
 

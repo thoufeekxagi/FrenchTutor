@@ -22,7 +22,7 @@ import '../reading/reading_library_screen.dart';
 import '../session/session_screen.dart';
 import 'speak_course_vocabulary_screen.dart';
 import 'speak_free_talk_screen.dart';
-import 'speak_review_detail_screen.dart';
+import 'speak_review_screen.dart';
 import 'speak_ui.dart';
 
 /// Opens one course item directly in the matching Practice engine.
@@ -49,7 +49,7 @@ class _SpeakCourseActivityScreenState
   SpeakRoadmapSession get session => widget.session;
 
   String get _level {
-    final keyLevel = session.contentKey.split('_').first.toUpperCase();
+    final keyLevel = session.level.toUpperCase();
     return const {'A1', 'A2', 'B1', 'B2'}.contains(keyLevel)
         ? keyLevel
         : ref.read(learningStoreProvider).profile().level.toUpperCase();
@@ -74,6 +74,7 @@ class _SpeakCourseActivityScreenState
   Future<void> _launch() async {
     try {
       final startedAt = DateTime.now();
+      ref.read(adaptiveCourseStoreProvider).markStarted(session.contentKey);
       final completed = await _openPractice();
       if (!mounted) return;
       if (!completed) {
@@ -100,6 +101,7 @@ class _SpeakCourseActivityScreenState
               topic: session.title,
               stage: session.primarySkill.wireName,
             );
+        ref.read(adaptiveCourseStoreProvider).markCompleted(session.contentKey);
       }
       if (!mounted) return;
       Navigator.of(context).pop(true);
@@ -170,9 +172,9 @@ class _SpeakCourseActivityScreenState
         topic: _contextPrompt,
         autoStart: true,
       ),
-      SpeakSkill.review => const SpeakReviewDetailScreen(
-        mode: SpeakReviewMode.speaking,
-      ),
+      // A review catalog item hands off to the shared review chooser so the
+      // learner selects Reading, Listening, or Speaking from recent history.
+      SpeakSkill.review => const SpeakReviewScreen(),
       SpeakSkill.freeTalk => const SpeakFreeTalkScreen(),
       SpeakSkill.speaking => throw StateError('Speaking is handled above'),
     };

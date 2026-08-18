@@ -6,13 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../design/tokens.dart';
-import '../../data/content_service.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../models/tutor_persona.dart';
 import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/speak_language_profile.dart';
+import '../../services/vocabulary_level_policy.dart';
 import 'speak_ui.dart';
 import '../../widgets/tts_play_button.dart';
 import '../lessons/vocabulary_workshop_screen.dart';
@@ -95,7 +95,10 @@ class _SpeakCourseVocabularyScreenState
           targetPhrases: widget.targetPhrases,
           count: _deckSize,
         );
-        words = _normalizeForLevel(generated);
+        words = VocabularyLevelPolicy.filterGenerated(
+          _normalizeForLevel(generated),
+          _language.level,
+        );
         if (words.length < _deckSize) {
           throw StateError(
             'The vocabulary generator returned ${words.length} of $_deckSize words.',
@@ -167,35 +170,22 @@ class _SpeakCourseVocabularyScreenState
     final entries = <VocabEntry>[];
     final seen = <String>{};
     for (final set in orderedSets) {
-      for (final entry in _normalizeForLevel(set.entries)) {
+      if (!VocabularyLevelPolicy.isSetAtOrBelow(
+        set.levelBand,
+        _language.level,
+      )) {
+        continue;
+      }
+      for (final entry in VocabularyLevelPolicy.filterGenerated(
+        _normalizeForLevel(set.entries),
+        _language.level,
+      )) {
         final key = entry.fr.trim().toLowerCase();
         if (key.isNotEmpty && seen.add(key)) entries.add(entry);
         if (entries.length == _deckSize) return entries;
       }
     }
 
-    // The bundled course dictionary is the legacy source of truth. It is
-    // still useful as a contextual fallback, but it is now rendered by the
-    // modern workshop rather than by the legacy one-word screen.
-    final legacyEntries = ContentService.shared.vocabPhases
-        .expand((phase) => phase.themes.expand((theme) => theme.entries))
-        .toList(growable: false);
-    final tokens = query
-        .split(RegExp(r'[^a-zàâçéèêëîïôœùûüÿñ]+'))
-        .where((token) => token.length > 2)
-        .toSet();
-    final contextual = legacyEntries.where((entry) {
-      final haystack = '${entry.fr} ${entry.en}'.toLowerCase();
-      return tokens.any(haystack.contains);
-    }).toList()..shuffle(_random);
-    final remaining =
-        legacyEntries.where((entry) => !contextual.contains(entry)).toList()
-          ..shuffle(_random);
-    for (final entry in [...contextual, ...remaining]) {
-      final key = entry.fr.trim().toLowerCase();
-      if (key.isNotEmpty && seen.add(key)) entries.add(entry);
-      if (entries.length == _deckSize) return entries;
-    }
     return entries;
   }
 

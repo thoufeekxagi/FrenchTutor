@@ -6,6 +6,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/content_models.dart';
 import '../../services/sync_service.dart';
+import '../../services/starter_cover_resolver.dart';
+import '../../services/story_variety_service.dart';
 import 'app_migrations.dart';
 
 const _uuid = Uuid();
@@ -29,7 +31,17 @@ class GeneratedRoleplayStore {
          FROM generated_roleplays
          WHERE deleted_at IS NULL
          ORDER BY created_at DESC''');
-    return rows.map(_fromRow).toList();
+    final roleplays = <GeneratedRoleplay>[];
+    final fingerprints = <String>{};
+    for (final row in rows) {
+      final roleplay = _fromRow(row);
+      final fingerprint = StoryVarietyService.storyFingerprint(
+        title: roleplay.title,
+        opening: roleplay.passage.segments.firstOrNull?.fr ?? '',
+      );
+      if (fingerprints.add(fingerprint)) roleplays.add(roleplay);
+    }
+    return roleplays;
   }
 
   /// Saves a freshly generated roleplay and pushes it to Supabase
@@ -104,11 +116,15 @@ class GeneratedRoleplayStore {
   GeneratedRoleplay _fromRow(Row row) {
     final passageJson = (jsonDecode(row['passage_json'] as String) as Map)
         .cast<String, dynamic>();
+    final passage = ReadingPassage.fromJson(passageJson);
     return GeneratedRoleplay(
       id: row['id'] as String,
-      passage: ReadingPassage.fromJson(passageJson),
+      passage: passage,
       createdAt: DateTime.parse(row['created_at'] as String),
-      coverUrl: row['cover_url'] as String?,
+      coverUrl: StarterCoverResolver.resolve(
+        title: passage.title,
+        coverUrl: row['cover_url'] as String?,
+      ),
     );
   }
 }

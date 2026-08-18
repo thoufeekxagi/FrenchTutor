@@ -26,6 +26,7 @@ class TtsPlayButton extends StatefulWidget {
     this.bundledAssetPath,
     this.remoteStoragePath,
     this.audioResolver,
+    this.onError,
     this.label,
     this.size = 40,
     this.iconSize = 20,
@@ -45,9 +46,13 @@ class TtsPlayButton extends StatefulWidget {
   /// remote file is unavailable, [bundledAssetPath] remains the fallback.
   final String? remoteStoragePath;
 
-  /// Optional resolver for generated lesson audio. When supplied, it is the
-  /// only live fallback, so this button cannot reach the legacy HTTP TTS path.
+  /// Optional resolver for generated lesson audio. When supplied, this is the
+  /// complete source of PCM bytes for the button.
   final Future<List<int>?> Function()? audioResolver;
+
+  /// Receives a playback or audio-resolution failure so the owning screen can
+  /// show the real error instead of leaving the learner guessing.
+  final void Function(Object error)? onError;
   final String? label;
   final double size;
   final double iconSize;
@@ -85,8 +90,16 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
 
       final audioResolver = widget.audioResolver;
       if (audioResolver != null) {
-        final bytes = await audioResolver();
-        if (bytes != null && mounted) {
+        // The resolver owns the PCM cache/live-generation policy. A timeout or
+        // empty result is an error, not a silent no-op.
+        final bytes = await audioResolver().timeout(
+          const Duration(seconds: 40),
+          onTimeout: () => throw StateError('Audio resolution timed out.'),
+        );
+        if (bytes == null || bytes.isEmpty) {
+          throw StateError('Audio resolver returned no PCM audio.');
+        }
+        if (mounted) {
           _readyBytes = bytes;
           await _play(bytes);
         }
@@ -143,6 +156,7 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
       }
     } catch (error) {
       debugPrint('TtsPlayButton: audio playback failed: $error');
+      widget.onError?.call(error);
     } finally {
       // _play owns the transition to playing and back to idle. Only reset
       // here when loading failed or the source was unavailable.

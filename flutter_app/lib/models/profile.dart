@@ -4,9 +4,14 @@ class Profile {
   Profile({
     required this.id,
     this.goal = 'tef_canada', // tef_canada | everyday | unsure
-    this.level = 'zero', // CEFR 'a1'|'a2'|'b1'|'b2', or legacy values (see LearnerLevel)
+    this.level =
+        'zero', // CEFR 'a1'|'a2'|'b1'|'b2', or legacy values (see LearnerLevel)
     this.sessionLength = 'standard', // quick | standard | deep
     this.reminderTime,
+    this.preferredDays = const ['mon', 'tue', 'wed', 'thu', 'fri'],
+    this.timeZone,
+    this.notificationPermissionState = 'not_requested',
+    this.onboardingVersion = 'v1',
     this.onboardedAt,
     this.interests = const [],
   });
@@ -16,12 +21,15 @@ class Profile {
   String level;
   String sessionLength;
   String? reminderTime; // 'HH:mm'
+  List<String> preferredDays; // mon | tue | wed | thu | fri | sat | sun
+  String? timeZone; // local zone label plus offset, e.g. EDT|UTC-04:00
+  String notificationPermissionState;
+  String onboardingVersion;
   DateTime? onboardedAt;
 
-  /// Free-pick topics from onboarding's interests step (e.g. "Food",
-  /// "Travel") — used to personalize generated story topics. Empty is
-  /// normal: the question is optional, and pre-existing profiles never
-  /// answered it.
+  /// Learner-selected course focus labels. New onboarding writes the six core
+  /// skill labels here; older installs may still contain goal topics such as
+  /// "Meetings" or "Travel", which remain safe personalization hints.
   List<String> interests;
 
   bool get isOnboarded => onboardedAt != null;

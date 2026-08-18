@@ -4,6 +4,8 @@ import 'package:flutter/material.dart' show Offset, Size;
 
 import '../../data/content_service.dart';
 import '../../data/database/learning_store.dart';
+import '../../data/database/generated_grammar_story_store.dart';
+import '../../data/database/generated_writing_task_store.dart';
 import '../../models/content_models.dart';
 
 /// Where a word's practice evidence came from. A word touched by more than
@@ -158,8 +160,13 @@ List<String> _tokenize(String text) {
 /// (roleplay + pronunciation share the same session log), and free writing.
 FingerprintGraph buildFingerprintGraph(
   LearningStore store,
-  ContentService content,
-) {
+  ContentService content, {
+  Iterable<GeneratedVocabularySet> vocabularySets = const [],
+  Iterable<GeneratedStory> stories = const [],
+  Iterable<GeneratedGrammarStory> grammarStories = const [],
+  Iterable<GeneratedRoleplay> roleplays = const [],
+  Iterable<GeneratedWritingTask> writingTasks = const [],
+}) {
   final entries = <String, VocabEntry>{};
   final themes = <String, String>{};
   for (final phase in content.vocabPhases) {
@@ -168,6 +175,31 @@ FingerprintGraph buildFingerprintGraph(
         entries[entry.id] = entry;
         themes[entry.id] = theme.title;
       }
+    }
+  }
+
+  // Generated lessons use the same VocabEntry shape as the bundled course.
+  // Keeping them in this map means a learner's fingerprint continues to grow
+  // when they practice fresh reading, listening, grammar, or vocabulary
+  // content instead of silently dropping those words.
+  void addGeneratedEntry(VocabEntry entry, String theme) {
+    entries.putIfAbsent(entry.id, () => entry);
+    themes.putIfAbsent(entry.id, () => theme);
+  }
+
+  for (final set in vocabularySets) {
+    for (final entry in set.entries) {
+      addGeneratedEntry(entry, 'Vocabulary · ${set.title}');
+    }
+  }
+  for (final story in stories) {
+    for (final entry in story.keywords) {
+      addGeneratedEntry(entry, 'Reading · ${story.title}');
+    }
+  }
+  for (final story in grammarStories) {
+    for (final entry in story.keywords) {
+      addGeneratedEntry(entry, 'Grammar · ${story.title}');
     }
   }
 
@@ -214,18 +246,78 @@ FingerprintGraph buildFingerprintGraph(
     writingGroups,
   );
 
+  // Library content is deliberately treated as evidence from the matching
+  // learning path. This is a one-time local read when the map opens, not a
+  // timer or background loop, so the graph stays current without consuming
+  // CPU while the learner is elsewhere in the app.
+  final generatedRecallGroups = <Set<String>>[];
+  final generatedSpeakingGroups = <Set<String>>[];
+  final generatedWritingGroups = <Set<String>>[];
+  final generatedRecallTexts = <String>[];
+  final generatedSpeakingTexts = <String>[];
+  final generatedWritingTexts = <String>[];
+
+  for (final set in vocabularySets) {
+    generatedRecallTexts.add(set.entries.map((entry) => entry.fr).join(' '));
+  }
+  for (final story in stories) {
+    generatedRecallTexts.add(story.passage.fullText);
+  }
+  for (final story in grammarStories) {
+    generatedRecallTexts.add(story.passage.fullText);
+  }
+  for (final roleplay in roleplays) {
+    generatedSpeakingTexts.add(roleplay.passage.fullText);
+  }
+  for (final generated in writingTasks) {
+    generatedWritingTexts.add(generated.task.promptFr);
+  }
+
+  final generatedRecallCounts = countAndGroup(
+    generatedRecallTexts,
+    generatedRecallGroups,
+  );
+  final generatedSpeakingCounts = countAndGroup(
+    generatedSpeakingTexts,
+    generatedSpeakingGroups,
+  );
+  final generatedWritingCounts = countAndGroup(
+    generatedWritingTexts,
+    generatedWritingGroups,
+  );
+
+  // A vocabulary set may contain short words that do not occur in its
+  // summary or any story sentence. Give those selected words one recall mark
+  // and connect them as one learning set so the map represents the content
+  // the learner chose, not just words that happened to tokenize in prose.
+  for (final set in vocabularySets) {
+    final group = <String>{};
+    for (final entry in set.entries) {
+      if (entries.containsKey(entry.id)) {
+        generatedRecallCounts[entry.id] =
+            (generatedRecallCounts[entry.id] ?? 0) + 1;
+        group.add(entry.id);
+      }
+    }
+    if (group.length > 1) generatedRecallGroups.add(group);
+  }
+
   final touchedIds = <String>{
     ...recallCounts.keys,
     ...speakingCounts.keys,
     ...writingCounts.keys,
+    ...generatedRecallCounts.keys,
+    ...generatedSpeakingCounts.keys,
+    ...generatedWritingCounts.keys,
   }..removeWhere((id) => !entries.containsKey(id));
 
   if (touchedIds.isEmpty) return _buildDemoGraph(entries, themes);
 
   final lastReviewed = <String, DateTime>{};
   for (final state in store.allSRSStates().values) {
-    if (state.lastReviewedAt != null)
+    if (state.lastReviewedAt != null) {
       lastReviewed[state.entryId] = state.lastReviewedAt!;
+    }
   }
 
   final ranked = touchedIds.toList()
@@ -233,11 +325,17 @@ FingerprintGraph buildFingerprintGraph(
       final totalA =
           (recallCounts[a] ?? 0) +
           (speakingCounts[a] ?? 0) +
-          (writingCounts[a] ?? 0);
+          (writingCounts[a] ?? 0) +
+          (generatedRecallCounts[a] ?? 0) +
+          (generatedSpeakingCounts[a] ?? 0) +
+          (generatedWritingCounts[a] ?? 0);
       final totalB =
           (recallCounts[b] ?? 0) +
           (speakingCounts[b] ?? 0) +
-          (writingCounts[b] ?? 0);
+          (writingCounts[b] ?? 0) +
+          (generatedRecallCounts[b] ?? 0) +
+          (generatedSpeakingCounts[b] ?? 0) +
+          (generatedWritingCounts[b] ?? 0);
       final byTotal = totalB.compareTo(totalA);
       if (byTotal != 0) return byTotal;
       return (lastReviewed[b] ?? DateTime(1970)).compareTo(
@@ -254,9 +352,15 @@ FingerprintGraph buildFingerprintGraph(
         entry: entries[id]!,
         theme: themes[id] ?? 'Vocabulary',
         counts: {
-          ModalitySource.recall: recallCounts[id] ?? 0,
-          ModalitySource.speaking: speakingCounts[id] ?? 0,
-          ModalitySource.writing: writingCounts[id] ?? 0,
+          // Generated reading, listening, grammar, and vocabulary all count
+          // as recall evidence. This preserves the compact legacy legend
+          // while keeping every current learning path represented.
+          ModalitySource.recall:
+              (recallCounts[id] ?? 0) + (generatedRecallCounts[id] ?? 0),
+          ModalitySource.speaking:
+              (speakingCounts[id] ?? 0) + (generatedSpeakingCounts[id] ?? 0),
+          ModalitySource.writing:
+              (writingCounts[id] ?? 0) + (generatedWritingCounts[id] ?? 0),
         },
         position: _seedPosition(i),
       ),
@@ -266,8 +370,9 @@ FingerprintGraph buildFingerprintGraph(
   final edges = _connectNodes(
     nodes,
     sessionGroups: store.reviewedEntryGroupsBySession(),
-    speakingGroups: speakingGroups,
-    writingGroups: writingGroups,
+    speakingGroups: [...speakingGroups, ...generatedSpeakingGroups],
+    writingGroups: [...writingGroups, ...generatedWritingGroups],
+    recallGroups: generatedRecallGroups,
   );
   _settle(nodes, edges);
   return FingerprintGraph(nodes, edges, isDemo: false);
@@ -325,6 +430,7 @@ List<FingerprintEdge> _connectNodes(
   required List<List<String>> sessionGroups,
   required List<Set<String>> speakingGroups,
   required List<Set<String>> writingGroups,
+  List<Set<String>> recallGroups = const [],
 }) {
   final byId = {for (final node in nodes) node.entry.id: node};
   final edgeKeys = <String>{};
@@ -357,7 +463,7 @@ List<FingerprintEdge> _connectNodes(
       connect(visible[i - 1], visible[i], FingerprintEdgeKind.session);
     }
   }
-  for (final group in [...speakingGroups, ...writingGroups]) {
+  for (final group in [...speakingGroups, ...writingGroups, ...recallGroups]) {
     final visible = group.where(byId.containsKey).toList();
     for (var i = 1; i < visible.length; i++) {
       connect(visible[i - 1], visible[i], FingerprintEdgeKind.cooccurrence);
@@ -368,7 +474,10 @@ List<FingerprintEdge> _connectNodes(
 
 void _settle(List<FingerprintNode> nodes, List<FingerprintEdge> edges) {
   if (nodes.length < 2) return;
-  for (var iteration = 0; iteration < 140; iteration++) {
+  // The map is laid out once when opened. Ninety-six passes keep the legacy
+  // constellation feel while avoiding unnecessary work for larger maps.
+  final nodeIndexes = {for (var i = 0; i < nodes.length; i++) nodes[i]: i};
+  for (var iteration = 0; iteration < 96; iteration++) {
     final forces = List<Offset>.filled(nodes.length, Offset.zero);
     for (var i = 0; i < nodes.length; i++) {
       for (var j = i + 1; j < nodes.length; j++) {
@@ -381,8 +490,8 @@ void _settle(List<FingerprintNode> nodes, List<FingerprintEdge> edges) {
       }
     }
     for (final edge in edges) {
-      final a = nodes.indexOf(edge.a);
-      final b = nodes.indexOf(edge.b);
+      final a = nodeIndexes[edge.a]!;
+      final b = nodeIndexes[edge.b]!;
       final delta = edge.b.position - edge.a.position;
       final distance = math.max(1.0, delta.distance);
       final target = edge.kind == FingerprintEdgeKind.theme ? 130.0 : 95.0;

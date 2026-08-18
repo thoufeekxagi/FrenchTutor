@@ -13,6 +13,9 @@ import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/alphabet_prewarm.dart';
+import '../../services/notification_permission_service.dart';
+import '../../services/notification_scheduler_service.dart';
+import '../../services/product_analytics.dart';
 import '../../services/trial_call_gate.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../speak/speak_ui.dart';
@@ -38,11 +41,29 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   late final AnimationController _welcomeController;
   late final Animation<double> _welcomeFade;
   late final Animation<double> _welcomeScale;
+  late final FixedExtentScrollController _reminderHourController;
+  late final FixedExtentScrollController _reminderMinuteController;
   var _page = 0;
   String? _goal;
   String? _level;
   String _minutes = '10';
-  final _focus = <String>{'Speaking', 'Roleplay'};
+  // The course includes every practice mode. These choices decide which
+  // skills receive the strongest early weighting in the generated route.
+  final _focus = <String>{
+    'Speaking',
+    'Listening',
+    'Writing',
+    'Grammar',
+    'Vocabulary',
+    'Review',
+  };
+  final _preferredDays = <String>{'mon', 'tue', 'wed', 'thu', 'fri'};
+  String _reminderTime = '19:00';
+  var _reminderHour = 19;
+  var _reminderMinute = 0;
+  var _remindersEnabled = true;
+  var _requestingNotificationPermission = false;
+  String _notificationPermissionState = 'not_requested';
   var _tutor = TutorPersona.marie;
   var _preparingStarted = false;
   var _trialAvailable = false;
@@ -50,14 +71,16 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   var _advancingFromTutor = false;
   var _startingTrial = false;
 
-  static const _tutorPage = 4;
-  static const _trialPage = 5;
-  static const _preparingPage = 6;
-  static const _pageCount = 7;
+  static const _tutorPage = 5;
+  static const _trialPage = 6;
+  static const _preparingPage = 7;
+  static const _pageCount = 8;
 
   @override
   void initState() {
     super.initState();
+    _reminderHourController = FixedExtentScrollController(initialItem: 19);
+    _reminderMinuteController = FixedExtentScrollController(initialItem: 0);
     _previewer = TutorVoicePreviewer()..addListener(_handlePreviewChanged);
     _welcomeController = AnimationController(
       vsync: this,
@@ -86,6 +109,8 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   void dispose() {
     _previewer.removeListener(_handlePreviewChanged);
     _previewer.dispose();
+    _reminderHourController.dispose();
+    _reminderMinuteController.dispose();
     _welcomeController.dispose();
     _controller.dispose();
     super.dispose();
@@ -146,8 +171,33 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         _ => 'standard',
       }
       ..interests = _focus.toList()
+      ..reminderTime = _remindersEnabled ? _reminderTime : null
+      ..preferredDays = _preferredDays.toList()
+      ..timeZone = _localTimeZoneValue()
+      ..notificationPermissionState = _notificationPermissionState
+      ..onboardingVersion = 'v3-personal-study-plan'
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
+    // The OS schedule is local and survives app termination. If permission
+    // was declined, sync() simply clears any older reminders.
+    unawaited(NotificationSchedulerService.sync(profile));
+    // Materialize the first adaptive route before the account gate closes so
+    // Home/Course can render immediately after sign-in. These are lightweight
+    // session specifications; rich story/audio/art generation remains on the
+    // practice path and can run independently for the first lesson.
+    ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+    ProductAnalytics.capture(
+      'onboarding_completed',
+      properties: {
+        'onboarding_version': profile.onboardingVersion,
+        'goal': profile.goal,
+        'level': profile.level,
+        'session_length': profile.sessionLength,
+        'preferred_days_count': profile.preferredDays.length,
+        'reminders_enabled': _remindersEnabled,
+        'notification_permission_state': profile.notificationPermissionState,
+      },
+    );
     ActiveTutor.set(_tutor);
     TutorTuning.saveLanguageMix(LearnerLevel.defaultLanguageMix(profile.level));
     AlphabetPrewarm.maybeStart(isBeginner: profile.level == 'a1');
@@ -171,13 +221,22 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                   physics: const NeverScrollableScrollPhysics(),
                   onPageChanged: (page) {
                     setState(() => _page = page);
+                    if (page == 4 &&
+                        _remindersEnabled &&
+                        _notificationPermissionState == 'not_requested') {
+                      // Ask in the same context where the learner chooses
+                      // reminder days and time, rather than surprising them
+                      // on the first app launch.
+                      unawaited(_requestNotificationPermission());
+                    }
                     if (page == _preparingPage) _startPreparing();
                   },
                   children: [
                     _welcome(),
                     _goalStep(),
+                    _interestStep(),
                     _levelStep(),
-                    _focusStep(),
+                    _scheduleStep(),
                     _tutorStep(),
                     _trialStep(),
                     _preparing(),
@@ -247,13 +306,11 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'PARLESPRINT',
-                      style: DesignTokens.body(
-                        11,
-                        weight: FontWeight.w700,
-                      ).copyWith(
-                        color: Colors.white.withValues(alpha: .72),
-                        letterSpacing: 2.2,
-                      ),
+                      style: DesignTokens.body(11, weight: FontWeight.w700)
+                          .copyWith(
+                            color: Colors.white.withValues(alpha: .72),
+                            letterSpacing: 2.2,
+                          ),
                     ),
                   ),
                   Expanded(
@@ -270,11 +327,9 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                         Text(
                           'ParleSprint',
                           textAlign: TextAlign.center,
-                          style: DesignTokens.display(compact ? 34 : 40)
-                              .copyWith(
-                                color: Colors.white,
-                                letterSpacing: -1.1,
-                              ),
+                          style: DesignTokens.display(
+                            compact ? 34 : 40,
+                          ).copyWith(color: Colors.white, letterSpacing: -1.1),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -309,9 +364,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       style: DesignTokens.body(
                         12,
                         weight: FontWeight.w600,
-                      ).copyWith(
-                        color: Colors.white.withValues(alpha: .62),
-                      ),
+                      ).copyWith(color: Colors.white.withValues(alpha: .62)),
                     ),
                   ),
                   SizedBox(
@@ -706,10 +759,31 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
           _goal,
         ),
         _option(
+          'Work and professional life',
+          'Meetings, messages, interviews and workplace confidence',
+          'work',
+          Icons.work_outline_rounded,
+          _goal,
+        ),
+        _option(
+          'Move and settle in a French-speaking place',
+          'Housing, healthcare, administration and daily life',
+          'relocation',
+          Icons.home_work_outlined,
+          _goal,
+        ),
+        _option(
           'Travel and new places',
           'Order, ask, explore and connect',
           'travel',
           Icons.flight_takeoff_rounded,
+          _goal,
+        ),
+        _option(
+          'Culture, family and connection',
+          'Understand more and take part in conversations',
+          'culture',
+          Icons.people_outline_rounded,
           _goal,
         ),
       ],
@@ -720,8 +794,8 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
     return _question(
       title: 'How much French do you know?',
       subtitle:
-          'Choose the closest fit and set a daily rhythm. You can change both later.',
-      buttonLabel: 'Build my plan',
+          'Choose the closest fit. We’ll calibrate the language and feedback to you.',
+      buttonLabel: 'Continue',
       options: [
         _levelOption(
           'A1 · Just starting',
@@ -747,44 +821,74 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
           'b2',
           Icons.park_rounded,
         ),
-        const SizedBox(height: 10),
-        Text(
-          'Your daily goal',
-          style: DesignTokens.body(15, weight: FontWeight.w700),
-        ),
-        const SizedBox(height: 9),
-        _timeOption('5 min / day', 'Casual', '5'),
-        _timeOption('10 min / day', 'Regular', '10'),
-        _timeOption('15 min / day', 'Serious', '15'),
-        _timeOption('20 min / day', 'Intense', '20'),
       ],
     );
   }
 
-  Widget _focusStep() {
-    final choices = [
-      ('Speaking', 'Use French out loud from day one', Icons.mic_rounded),
-      (
-        'Roleplay',
-        'Practise real situations with ${_tutor.displayName}',
-        Icons.forum_outlined,
-      ),
-      (
-        'Stories',
-        'Learn through short, memorable scenes',
-        Icons.auto_stories_outlined,
-      ),
-      ('Review', 'Keep useful phrases available', Icons.bolt_rounded),
-    ];
+  Widget _interestStep() {
     return _question(
-      title: 'What do you enjoy?',
-      subtitle: 'Pick what should show up most often in your course.',
+      title: 'What should your lessons focus on?',
+      subtitle:
+          'Your course includes the complete learning loop. Choose the skills you want to emphasize most.',
       buttonLabel: 'Continue',
       options: [
-        for (final choice in choices)
+        _focusActions(),
+        _focusCount(),
+        for (final choice in _focusChoices())
           _focusOption(choice.$1, choice.$2, choice.$3),
       ],
     );
+  }
+
+  Widget _focusActions() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _selectAllFocus,
+              icon: const Icon(Icons.done_all_rounded, size: 18),
+              label: const Text('Select all six'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          TextButton(
+            onPressed: _focus.length > 1 ? _clearFocus : null,
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _focusCount() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        '${_focus.length} of 6 selected',
+        style: DesignTokens.body(
+          13,
+          weight: FontWeight.w700,
+        ).copyWith(color: SpeakColors.inkSoft),
+      ),
+    );
+  }
+
+  void _selectAllFocus() {
+    setState(() {
+      _focus
+        ..clear()
+        ..addAll(_focusChoices().map((choice) => choice.$1));
+    });
+  }
+
+  void _clearFocus() {
+    setState(() {
+      _focus
+        ..clear()
+        ..add('Listening');
+    });
   }
 
   Widget _focusOption(String title, String subtitle, IconData icon) {
@@ -837,6 +941,346 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
       ),
     );
   }
+
+  Widget _scheduleStep() {
+    final goal = _goal ?? 'everyday';
+    final recommended = _recommendedMinutesForGoal(goal);
+    return _question(
+      title: 'When will French fit your life?',
+      subtitle:
+          'A realistic plan is easier to keep. Choose your session length, study days, and local reminder time.',
+      buttonLabel: 'Continue',
+      options: [
+        Text(
+          'Daily practice time',
+          style: DesignTokens.body(15, weight: FontWeight.w700),
+        ),
+        const SizedBox(height: 9),
+        for (final option in const [
+          ('5', '5 minutes', 'A quick habit for busy days'),
+          ('10', '10 minutes', 'A steady daily rhythm'),
+          ('15', '15 minutes', 'More room for practice and feedback'),
+          ('20', '20 minutes', 'A focused route for bigger goals'),
+        ])
+          _timeOption(
+            option.$2,
+            option.$1 == recommended
+                ? '${option.$3} · Recommended for your goal'
+                : option.$3,
+            option.$1,
+          ),
+        const SizedBox(height: 8),
+        Text(
+          'Study days',
+          style: DesignTokens.body(15, weight: FontWeight.w700),
+        ),
+        const SizedBox(height: 9),
+        _dayChoices(),
+        const SizedBox(height: 16),
+        SpeakCard(
+          color: SpeakColors.blueSoft,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your reminder time',
+                style: DesignTokens.body(14, weight: FontWeight.w700),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${_formatReminderTime(_reminderTime)} · ${_timeZoneLabel()}',
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: SpeakColors.inkSoft),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Reminders',
+                    style: DesignTokens.body(13, weight: FontWeight.w700),
+                  ),
+                  Switch.adaptive(
+                    value: _remindersEnabled,
+                    onChanged: (enabled) {
+                      setState(() => _remindersEnabled = enabled);
+                      if (enabled &&
+                          _notificationPermissionState == 'not_requested') {
+                        unawaited(_requestNotificationPermission());
+                      }
+                    },
+                    activeThumbColor: SpeakColors.blue,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _reminderWheel(
+                      key: const ValueKey('reminder-hour-wheel'),
+                      label: 'Hour',
+                      controller: _reminderHourController,
+                      itemCount: 24,
+                      selectedValue: _reminderHour,
+                      onChanged: (hour) => _setReminderTime(hour: hour),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 28),
+                    child: Text(
+                      ':',
+                      style: DesignTokens.display(
+                        27,
+                      ).copyWith(color: DesignTokens.ink),
+                    ),
+                  ),
+                  Expanded(
+                    child: _reminderWheel(
+                      key: const ValueKey('reminder-minute-wheel'),
+                      label: 'Minute',
+                      controller: _reminderMinuteController,
+                      itemCount: 60,
+                      selectedValue: _reminderMinute,
+                      onChanged: (minute) => _setReminderTime(minute: minute),
+                    ),
+                  ),
+                ],
+              ),
+              if (_remindersEnabled &&
+                  _notificationPermissionState != 'granted') ...[
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: _requestingNotificationPermission
+                        ? null
+                        : _requestNotificationPermission,
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    label: Text(
+                      _requestingNotificationPermission
+                          ? 'Checking notification access…'
+                          : 'Turn on reminders',
+                    ),
+                  ),
+                ),
+              ],
+              Text(
+                _remindersEnabled
+                    ? _notificationPermissionState == 'granted'
+                          ? 'Reminders are scheduled for your selected days and time.'
+                          : 'Turn on reminders for your chosen days and time.'
+                    : 'You can turn reminders on later in Settings.',
+                style: DesignTokens.body(
+                  11.5,
+                ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _reminderWheel({
+    required Key key,
+    required String label,
+    required FixedExtentScrollController controller,
+    required int itemCount,
+    required int selectedValue,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Column(
+      key: key,
+      children: [
+        Text(
+          label,
+          style: DesignTokens.body(
+            11,
+            weight: FontWeight.w700,
+          ).copyWith(color: SpeakColors.inkSoft),
+        ),
+        const SizedBox(height: 5),
+        SizedBox(
+          height: 138,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: SpeakColors.line),
+            ),
+            child: ListWheelScrollView.useDelegate(
+              controller: controller,
+              itemExtent: 42,
+              diameterRatio: 1.35,
+              perspective: 0.003,
+              physics: const FixedExtentScrollPhysics(),
+              onSelectedItemChanged: onChanged,
+              childDelegate: ListWheelChildBuilderDelegate(
+                childCount: itemCount,
+                builder: (context, index) {
+                  final selected = index == selectedValue;
+                  return Center(
+                    child: Text(
+                      index.toString().padLeft(2, '0'),
+                      style: DesignTokens.display(selected ? 25 : 19).copyWith(
+                        color: selected
+                            ? SpeakColors.blue
+                            : SpeakColors.inkSoft.withValues(alpha: .58),
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _setReminderTime({int? hour, int? minute}) {
+    setState(() {
+      if (hour != null) _reminderHour = hour;
+      if (minute != null) _reminderMinute = minute;
+      _reminderTime = _wireReminderTime(_reminderHour, _reminderMinute);
+    });
+  }
+
+  String _wireReminderTime(int hour, int minute) =>
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+
+  Widget _dayChoices() {
+    const days = [
+      ('mon', 'M'),
+      ('tue', 'T'),
+      ('wed', 'W'),
+      ('thu', 'T'),
+      ('fri', 'F'),
+      ('sat', 'S'),
+      ('sun', 'S'),
+    ];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        for (final day in days)
+          GestureDetector(
+            onTap: () => setState(() {
+              if (!_preferredDays.remove(day.$1)) {
+                _preferredDays.add(day.$1);
+              }
+            }),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: _preferredDays.contains(day.$1)
+                    ? SpeakColors.blue
+                    : Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _preferredDays.contains(day.$1)
+                      ? SpeakColors.blue
+                      : SpeakColors.line,
+                ),
+              ),
+              child: Text(
+                day.$2,
+                style: DesignTokens.body(13, weight: FontWeight.w800).copyWith(
+                  color: _preferredDays.contains(day.$1)
+                      ? Colors.white
+                      : SpeakColors.inkSoft,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    if (_requestingNotificationPermission) return;
+    _requestingNotificationPermission = true;
+    ProductAnalytics.capture('notification_permission_prompted');
+    final state = await NotificationPermissionService.request();
+    if (!mounted) return;
+    setState(() {
+      _notificationPermissionState = state;
+      _requestingNotificationPermission = false;
+    });
+    ProductAnalytics.capture(
+      'notification_permission_result',
+      properties: {'state': state},
+    );
+  }
+
+  String _localTimeZoneValue() {
+    final now = DateTime.now();
+    final offset = now.timeZoneOffset;
+    final sign = offset.isNegative ? '-' : '+';
+    final hours = offset.inHours.abs().toString().padLeft(2, '0');
+    final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+    return '${now.timeZoneName}|UTC$sign$hours:$minutes';
+  }
+
+  String _timeZoneLabel() => _localTimeZoneValue().replaceFirst('|', ' · ');
+
+  String _formatReminderTime(String value) {
+    final parts = value.split(':');
+    final hour = int.tryParse(parts.first) ?? 19;
+    final minute = int.tryParse(parts.last) ?? 0;
+    return _wireReminderTime(hour.clamp(0, 23), minute.clamp(0, 59));
+  }
+
+  String _goalLabel(String value) => switch (value) {
+    'tef_canada' => 'TEF / TCF Canada',
+    'work' => 'Work and professional life',
+    'relocation' => 'Move and settle in a French-speaking place',
+    'travel' => 'Travel and new places',
+    'culture' => 'Culture, family and connection',
+    _ => 'Everyday French',
+  };
+
+  String _focusSummary() =>
+      _focus.length == 6 ? 'All six skills' : _focus.join(' · ');
+
+  String _recommendedMinutesForGoal(String goal) => switch (goal) {
+    'tef_canada' => '15',
+    'work' || 'relocation' => '10',
+    'travel' || 'culture' => '10',
+    _ => '10',
+  };
+
+  List<(String, String, IconData)> _focusChoices() => const [
+    ('Speaking', 'Say useful French in short guided turns', Icons.mic_rounded),
+    (
+      'Listening',
+      'Catch the meaning and the important details',
+      Icons.headphones_rounded,
+    ),
+    (
+      'Writing',
+      'Build clear messages and short answers',
+      Icons.edit_note_rounded,
+    ),
+    ('Grammar', 'Notice the pattern and use it naturally', Icons.rule_rounded),
+    (
+      'Vocabulary',
+      'Build the words that make each situation useful',
+      Icons.menu_book_rounded,
+    ),
+    (
+      'Review',
+      'Bring difficult language back at the right time',
+      Icons.bolt_rounded,
+    ),
+  ];
 
   void _startPreparing() {
     if (_preparingStarted) return;
@@ -892,7 +1336,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                         _summary(
                           Icons.flag_outlined,
                           'Goal',
-                          _goal ?? 'Everyday French',
+                          _goalLabel(_goal ?? 'everyday'),
                         ),
                         const Divider(height: 22, color: SpeakColors.line),
                         _summary(
@@ -901,10 +1345,12 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                           LearnerLevel.displayLabel(_level ?? 'a1'),
                         ),
                         const Divider(height: 22, color: SpeakColors.line),
+                        _summary(Icons.mic_rounded, 'Focus', _focusSummary()),
+                        const Divider(height: 22, color: SpeakColors.line),
                         _summary(
-                          Icons.mic_rounded,
-                          'Focus',
-                          _focus.join(' · '),
+                          Icons.schedule_rounded,
+                          'Plan',
+                          '$_minutes min · ${_preferredDays.length} days · ${_formatReminderTime(_reminderTime)}',
                         ),
                       ],
                     ),
@@ -928,11 +1374,18 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
     final isSelected = selected == value;
     return _selectable(
       selected: isSelected,
-      onTap: () => setState(() => _goal = value),
+      onTap: () => _selectGoal(value),
       leading: icon,
       title: title,
       subtitle: subtitle,
     );
+  }
+
+  void _selectGoal(String value) {
+    setState(() {
+      _goal = value;
+      _minutes = _recommendedMinutesForGoal(value);
+    });
   }
 
   Widget _levelOption(

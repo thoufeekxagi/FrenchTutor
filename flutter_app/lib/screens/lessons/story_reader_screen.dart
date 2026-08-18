@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
@@ -113,6 +114,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
+  final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
 
   /// The sentence the learner tapped to read from, highlighted so they can
   /// see what pressing play will do — null means "no pick, play the whole
@@ -944,6 +946,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Widget _quizCard(int index, MultipleChoiceQuestion question) {
     final answered = _quizAnswers[index];
+    final beginnerSupport = switch (_story.levelBand.toUpperCase()) {
+      'A1' || 'A2' => true,
+      _ => false,
+    };
     return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -952,6 +958,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
             question.q,
             style: DesignTokens.body(15, weight: FontWeight.w600),
           ),
+          if (beginnerSupport && question.qEn != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              question.qEn!,
+              style: DesignTokens.body(
+                13,
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.3),
+            ),
+          ],
           const SizedBox(height: 12),
           for (var ci = 0; ci < question.choices.length; ci++)
             Padding(
@@ -975,9 +990,25 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          question.choices[ci],
-                          style: DesignTokens.body(13.5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              question.choices[ci],
+                              style: DesignTokens.body(13.5),
+                            ),
+                            if (beginnerSupport &&
+                                question.choicesEn != null &&
+                                ci < question.choicesEn!.length) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                question.choicesEn![ci],
+                                style: DesignTokens.body(
+                                  11.5,
+                                ).copyWith(color: DesignTokens.mutedDim),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       if (answered != null) ...[
@@ -1015,53 +1046,90 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final entry = keywords[index];
+        final audioKey = _keywordAudioKeys.putIfAbsent(
+          entry.id,
+          GlobalKey<TtsPlayButtonState>.new,
+        );
         return ModernCard(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      entry.fr,
-                      style: DesignTokens.body(15, weight: FontWeight.w600),
+          child: Semantics(
+            button: true,
+            label: 'Play pronunciation for ${entry.fr}',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => audioKey.currentState?.trigger(),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.fr,
+                          style: DesignTokens.body(15, weight: FontWeight.w600),
+                        ),
+                        if (entry.phonetic.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            entry.phonetic,
+                            style: DesignTokens.mono(
+                              11,
+                            ).copyWith(color: DesignTokens.mutedDim),
+                          ),
+                        ],
+                      ],
                     ),
-                    if (entry.phonetic.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        entry.phonetic,
-                        style: DesignTokens.mono(
-                          11,
-                        ).copyWith(color: DesignTokens.mutedDim),
-                      ),
-                    ],
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      entry.en,
+                      style: DesignTokens.body(
+                        13.5,
+                      ).copyWith(color: DesignTokens.primary),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IgnorePointer(
+                    child: TtsPlayButton(
+                      key: audioKey,
+                      text: entry.fr,
+                      contentItemId: '${widget.story.id}_kw_${entry.id}',
+                      audioResolver: () => _loadCachedKeywordAudio(entry),
+                      onError: (error) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Audio failed: $error')),
+                        );
+                      },
+                      size: DesignTokens.minTapTarget,
+                      iconSize: 20,
+                      color: DesignTokens.primary,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              TtsPlayButton(
-                text: entry.fr,
-                audioResolver: () =>
-                    LessonSpeechService.shared.loadCachedAudio(entry.fr),
-                size: DesignTokens.minTapTarget,
-                iconSize: 20,
-                color: DesignTokens.mastery,
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  entry.en,
-                  textAlign: TextAlign.right,
-                  style: DesignTokens.body(
-                    13.5,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  /// Use the PCM cache first. If this individual keyword was not prewarmed
+  /// yet, resolve the same French tutor voice live and cache the PCM before
+  /// playing it. The card never silently does nothing.
+  Future<List<int>?> _loadCachedKeywordAudio(VocabEntry entry) async {
+    final cached = await LessonSpeechService.shared
+        .loadCachedAudio(entry.fr)
+        .timeout(const Duration(seconds: 6));
+    if (cached != null && cached.isNotEmpty) return cached;
+    return LessonSpeechService.shared.synthesize(
+      entry.fr,
+      voiceName: ActiveTutor.current.voiceName,
+      contentItemId: '${widget.story.id}_kw_${entry.id}',
     );
   }
 }

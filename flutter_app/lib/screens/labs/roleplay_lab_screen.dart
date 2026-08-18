@@ -15,6 +15,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/primary_action_button.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../pathway/agent_led_listening_screen.dart';
@@ -110,9 +111,14 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     if (_generating) return;
     setState(() => _generating = true);
     try {
+      final existingRoleplays = ref.read(generatedRoleplayStoreProvider).list();
       final scene = await LessonAgentService.shared.buildStandaloneRoleplay(
         scenario: _scenarioFor(),
         levelBand: ref.read(learningStoreProvider).profile().level,
+        avoidTitles: existingRoleplays.map((roleplay) => roleplay.title),
+        avoidOpenings: existingRoleplays.map(
+          (roleplay) => roleplay.passage.segments.firstOrNull?.fr ?? '',
+        ),
       );
       final roleplay = GeneratedRoleplay(
         id: newGeneratedRoleplayId(),
@@ -139,9 +145,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
           return;
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not generate a scene. Try again.'),
-          ),
+          SnackBar(content: Text('Roleplay generation failed: $e')),
         );
       }
     } finally {
@@ -158,6 +162,14 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     Object? lastError;
     StackTrace? lastStackTrace;
     for (var attempt = 0; attempt < 3; attempt++) {
+      final attemptNumber = attempt + 1;
+      unawaited(
+        sync.logRoleplayCoverEvent(
+          roleplayId: roleplay.id,
+          phase: 'attempt_started',
+          attempt: attemptNumber,
+        ),
+      );
       try {
         final bytes = await LessonAgentService.shared.generateStoryCover(
           title: roleplay.displayTitle,
@@ -173,9 +185,18 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
               'Make it feel like a published language-learning book, with human-scale '
               'characters and a clear setting, never an app screenshot or cartoon.',
         );
+        unawaited(
+          sync.logRoleplayCoverEvent(
+            roleplayId: roleplay.id,
+            phase: 'generation_succeeded',
+            attempt: attemptNumber,
+            sourceBytes: bytes.length,
+          ),
+        );
         final url = await sync.uploadStoryCover(
           storyId: roleplay.id,
           bytes: bytes,
+          diagnosticRoleplayId: roleplay.id,
         );
         if (url == null || url.isEmpty) {
           throw StateError('cover upload returned no signed URL');
@@ -186,11 +207,31 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       } catch (error, stackTrace) {
         lastError = error;
         lastStackTrace = stackTrace;
+        unawaited(
+          sync.logRoleplayCoverEvent(
+            roleplayId: roleplay.id,
+            phase: 'attempt_failed',
+            attempt: attemptNumber,
+            error: error,
+          ),
+        );
         if (attempt < 2) {
           await Future<void>.delayed(Duration(seconds: 2 << attempt));
         }
       }
     }
+    // Release the in-flight guard after a terminal failure. Otherwise a
+    // refresh can see the missing cover but the repair pass will return at
+    // the first line above forever during this app session.
+    _coverAttempts.remove(roleplay.id);
+    unawaited(
+      sync.logRoleplayCoverEvent(
+        roleplayId: roleplay.id,
+        phase: 'cover_pipeline_failed',
+        attempt: 3,
+        error: lastError,
+      ),
+    );
     debugPrint(
       'Roleplay cover generation failed after 3 attempts: $lastError\n$lastStackTrace',
     );
@@ -276,8 +317,12 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
         ),
         body: const Center(
           child: Padding(
-            padding: EdgeInsets.all(28),
-            child: CircularProgressIndicator(),
+            padding: EdgeInsets.all(20),
+            child: PersonalizedGenerationLoader(
+              content: 'roleplay',
+              detail:
+                  'Setting up a real situation that matches your French goals.',
+            ),
           ),
         ),
       );
@@ -350,12 +395,18 @@ class _RoleplayStartSection extends StatelessWidget {
           ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
         ),
         const SizedBox(height: 18),
-        PrimaryActionButton(
-          label: generating ? 'Setting the scene…' : 'Build roleplay',
-          icon: CupertinoIcons.play_fill,
-          isLoading: generating,
-          onPressed: generating ? null : onTap,
-        ),
+        if (generating)
+          const PersonalizedGenerationLoader(
+            content: 'roleplay',
+            detail: 'Choosing the right situation and dialogue for you.',
+            compact: true,
+          )
+        else
+          PrimaryActionButton(
+            label: 'Build roleplay',
+            icon: CupertinoIcons.play_fill,
+            onPressed: onTap,
+          ),
       ],
     );
   }

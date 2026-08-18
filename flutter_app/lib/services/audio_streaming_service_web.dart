@@ -354,7 +354,10 @@ class WebAudioStreamingService implements AudioStreamingService {
   }
 
   @override
-  Future<void> playAudioChunk(List<int> pcmBytes) async {
+  Future<void> playAudioChunk(
+    List<int> pcmBytes, {
+    bool waitForFeed = false,
+  }) async {
     if (pcmBytes.isEmpty) return;
     _ensureOutputContext();
     final ctx = _outputContext;

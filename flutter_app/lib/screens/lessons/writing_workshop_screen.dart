@@ -230,10 +230,17 @@ Help the learner think and write. Do not write the whole answer for them unless 
       _errorText = null;
     });
     try {
-      final level = ref.read(learningStoreProvider).profile().level;
       final feedback = await ref
           .read(lessonAgentServiceProvider)
-          .gradeWriting(task: _task, submission: _draft, levelBand: level);
+          .gradeWriting(
+            task: _task,
+            submission: _draft,
+            // The task is the source of truth. A learner can change profile
+            // controls while an already-open task is on screen; grading this
+            // task against a different profile level would produce the wrong
+            // rubric and an over-advanced model answer.
+            levelBand: _task.levelBand,
+          );
       if (!mounted) return;
       setState(() {
         _feedback = feedback;
@@ -411,7 +418,12 @@ Help the learner think and write. Do not write the whole answer for them unless 
                     duration: DesignTokens.durationMedium,
                     child: KeyedSubtree(
                       key: ValueKey(_step),
-                      child: _stepView(),
+                      // Give every step, especially the review ListView, a
+                      // tight viewport. Without this, AnimatedSwitcher can
+                      // lay out the new scroll view loosely during the
+                      // submission transition, leaving the header visible
+                      // while the feedback cards are not painted.
+                      child: SizedBox.expand(child: _stepView()),
                     ),
                   ),
                 ),
@@ -683,24 +695,9 @@ Help the learner think and write. Do not write the whole answer for them unless 
           isLoading: _isCoverGenerating,
         ),
         const SizedBox(height: 12),
-        LearningCard(
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Writing score',
-                  style: DesignTokens.body(16, weight: FontWeight.w700),
-                ),
-              ),
-              Text(
-                '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
-                style: DesignTokens.display(
-                  24,
-                ).copyWith(color: DesignTokens.primary),
-              ),
-            ],
-          ),
-        ),
+        _SubmissionTextCard(draft: _draft),
+        const SizedBox(height: 12),
+        _WritingScoreCard(task: _task, feedback: feedback),
         if (feedback.strengths.isNotEmpty) ...[
           const SizedBox(height: 12),
           _BulletCard(
@@ -732,6 +729,28 @@ Help the learner think and write. Do not write the whole answer for them unless 
             ),
           ),
         ],
+        if (feedback.corrections.isEmpty) ...[
+          const SizedBox(height: 12),
+          LearningCard(
+            color: DesignTokens.successSoft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  CupertinoIcons.checkmark_circle_fill,
+                  color: DesignTokens.success,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'No major corrections were detected for this task. Keep the same structure and practise adding one more detail next time.',
+                    style: DesignTokens.body(13.5).copyWith(height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         for (final correction in feedback.corrections) ...[
           const SizedBox(height: 12),
           _CorrectionCard(correction: correction),
@@ -755,7 +774,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
                 Row(
                   children: [
                     Text(
-                      'MODEL VERSION',
+                      'MODEL ANSWER · ${_task.levelBand.toUpperCase()}',
                       style: DesignTokens.label(
                         10,
                       ).copyWith(color: DesignTokens.info, letterSpacing: 0.8),
@@ -1077,6 +1096,154 @@ class _WritingResultCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The cover card is a quick visual receipt; this card is the authoritative
+/// transcript. Keep it separate so a long submission is never hidden behind
+/// an ellipsis or lost when the generated cover is unavailable.
+class _SubmissionTextCard extends StatelessWidget {
+  const _SubmissionTextCard({required this.draft});
+
+  final String draft;
+
+  @override
+  Widget build(BuildContext context) {
+    return LearningCard(
+      color: DesignTokens.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'YOUR SUBMISSION',
+            style: DesignTokens.label(
+              10,
+            ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
+          ),
+          const SizedBox(height: 9),
+          SelectableText(
+            draft.trim().isEmpty ? 'No text was submitted.' : draft.trim(),
+            style: DesignTokens.body(
+              16,
+            ).copyWith(color: DesignTokens.ink, height: 1.5),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WritingScoreCard extends StatelessWidget {
+  const _WritingScoreCard({required this.task, required this.feedback});
+
+  final WritingTask task;
+  final WritingFeedback feedback;
+
+  @override
+  Widget build(BuildContext context) {
+    final breakdown = feedback.scoreBreakdown;
+    return LearningCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'WRITING SCORE',
+                      style: DesignTokens.label(10).copyWith(
+                        color: DesignTokens.mutedDim,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Level-calibrated review · ${task.levelBand.toUpperCase()}',
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.inkSoft),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
+                style: DesignTokens.display(
+                  24,
+                ).copyWith(color: DesignTokens.primary),
+              ),
+            ],
+          ),
+          if (breakdown.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            for (final item in const [
+              ('Task completion', 'task_completion'),
+              ('Grammar', 'grammar'),
+              ('Vocabulary', 'vocabulary'),
+              ('Coherence', 'coherence'),
+            ])
+              if (breakdown.containsKey(item.$2)) ...[
+                _ScoreRow(label: item.$1, score: breakdown[item.$2]!),
+                const SizedBox(height: 9),
+              ],
+          ] else ...[
+            const SizedBox(height: 12),
+            Text(
+              'Detailed rubric marks were not returned for this review, but the score and corrections below are still valid.',
+              style: DesignTokens.body(
+                12.5,
+              ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  const _ScoreRow({required this.label, required this.score});
+
+  final String label;
+  final double score;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 116,
+          child: Text(label, style: DesignTokens.body(12.5)),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: LinearProgressIndicator(
+              value: (score / 10).clamp(0, 1),
+              minHeight: 7,
+              backgroundColor: DesignTokens.hairline,
+              color: DesignTokens.primary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 9),
+        SizedBox(
+          width: 30,
+          child: Text(
+            score.toStringAsFixed(1),
+            textAlign: TextAlign.right,
+            style: DesignTokens.body(
+              12.5,
+              weight: FontWeight.w700,
+            ).copyWith(color: DesignTokens.primary),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:sqlite3/common.dart';
 
 import '../../models/content_models.dart';
 import '../../services/sync_service.dart';
+import '../../services/starter_cover_resolver.dart';
 import 'app_migrations.dart';
 
 /// Local cache/write buffer for learner-owned vocabulary libraries.
@@ -123,7 +124,10 @@ class GeneratedVocabularySetStore {
           .whereType<Map>()
           .map((entry) => VocabEntry.fromJson(entry.cast<String, dynamic>()))
           .toList(),
-      coverUrl: row['cover_url'] as String?,
+      coverUrl: StarterCoverResolver.resolve(
+        title: row['title'] as String,
+        coverUrl: row['cover_url'] as String?,
+      ),
       createdAt:
           DateTime.tryParse(row['created_at']?.toString() ?? '') ??
           DateTime.now(),

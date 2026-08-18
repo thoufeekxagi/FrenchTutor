@@ -1,61 +1,64 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart';
 
+import 'package:french_tutor/data/database/adaptive_course_store.dart';
 import 'package:french_tutor/models/profile.dart';
-import 'package:french_tutor/services/speak_curriculum_catalog.dart';
 import 'package:french_tutor/services/speak_roadmap_service.dart';
 
 void main() {
-  test('level choice produces the expected long-form course path', () {
-    final a1 = SpeakRoadmapService.build(Profile(id: 'a1', level: 'a1'));
-    final a2 = SpeakRoadmapService.build(Profile(id: 'a2', level: 'a2'));
-    final b1 = SpeakRoadmapService.build(Profile(id: 'b1', level: 'b1'));
-    final b2 = SpeakRoadmapService.build(Profile(id: 'b2', level: 'b2'));
+  test('roadmap is projected only from the adaptive course plan', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(
+      id: 'learner',
+      goal: 'work',
+      level: 'a1',
+      interests: const ['Meetings'],
+    );
+    final plan = store.ensureCurrentPlan(profile);
+    final roadmap = SpeakRoadmapService.build(
+      profile,
+      adaptiveSessions: plan.sessions,
+    );
 
-    expect(a1.sessions, hasLength(120));
-    expect(a2.sessions, hasLength(140));
-    expect(b1.sessions, hasLength(160));
-    expect(b2.sessions, hasLength(200));
+    expect(roadmap.sessions, hasLength(20));
+    expect(roadmap.trackLabel, 'Professional French');
+    expect(roadmap.sessions.first.primarySkill, SpeakSkill.alphabet);
+    expect(roadmap.sessions.first.contextPrompt, contains('Meetings'));
   });
 
-  test(
-    'roadmap keeps every session available while progress recommends next',
-    () {
-      final roadmap = SpeakRoadmapService.build(
-        Profile(id: 'learner', level: 'a1'),
-        completedSessions: 7,
-      );
-
-      expect(roadmap.completedCount, 7);
-      expect(roadmap.progress, closeTo(7 / 120, 0.0001));
-      expect(roadmap.nextSession?.index, 7);
-      expect(roadmap.sessions[7].unlocked, isTrue);
-      expect(roadmap.sessions.every((session) => session.unlocked), isTrue);
-    },
-  );
-
-  test(
-    'roadmap starts at Unit 1 even when catalog rows arrive out of order',
-    () {
-      final items = SpeakCurriculumCatalog.bundled('A1').reversed.toList();
-      final roadmap = SpeakRoadmapService.build(
-        Profile(id: 'learner', level: 'a1'),
-        catalog: items,
-      );
-
-      expect(roadmap.sessions.first.unit, 1);
-      expect(roadmap.sessions.first.index, 0);
-      expect(roadmap.sessions.last.unit, 12);
-    },
-  );
-
-  test('course path includes the requested review and speaking modes', () {
+  test('completion state and appended batches project into the roadmap', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
+    final first = store.ensureCurrentPlan(profile);
+    for (final session in first.sessions.take(15)) {
+      store.markCompleted(session.contentKey);
+    }
+    final expanded = store.ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
-      Profile(id: 'learner', level: 'b1'),
+      profile,
+      adaptiveSessions: expanded.sessions,
     );
-    final kinds = roadmap.sessions.map((session) => session.kind).toSet();
 
-    expect(kinds, contains(SpeakSessionKind.review));
-    expect(kinds, contains(SpeakSessionKind.roleplay));
-    expect(kinds, contains(SpeakSessionKind.story));
+    expect(roadmap.sessions, hasLength(40));
+    expect(roadmap.completedCount, 15);
+    expect(roadmap.nextSession?.index, 15);
+    expect(roadmap.sessions.every((session) => session.unlocked), isTrue);
+  });
+
+  test('adaptive projection retains all practice skill modes', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(id: 'learner', goal: 'tef_canada', level: 'b1');
+    final plan = store.ensureCurrentPlan(profile);
+    final roadmap = SpeakRoadmapService.build(
+      profile,
+      adaptiveSessions: plan.sessions,
+    );
+    final skills = roadmap.sessions
+        .map((session) => session.primarySkill)
+        .toSet();
+
+    expect(skills, contains(SpeakSkill.listening));
+    expect(skills, contains(SpeakSkill.roleplay));
+    expect(skills, contains(SpeakSkill.writing));
   });
 }

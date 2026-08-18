@@ -13,13 +13,12 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/adaptive_course_store.dart';
 import '../data/database/exam_practice_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
-import '../models/speak_curriculum.dart';
 import '../services/srs_service.dart';
-import '../services/speak_curriculum_catalog.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
@@ -49,6 +48,15 @@ final learningStoreProvider = Provider<LearningStore>((ref) {
   return LearningStore(
     ref.watch(databaseProvider),
     ref.watch(syncServiceProvider),
+  );
+});
+
+final adaptiveCourseStoreProvider = Provider<AdaptiveCourseStore>((ref) {
+  final sync = ref.watch(syncServiceProvider);
+  return AdaptiveCourseStore(
+    ref.watch(databaseProvider),
+    onPlanChanged: sync.syncAdaptiveCoursePlan,
+    onSessionChanged: sync.syncAdaptiveCourseSession,
   );
 });
 
@@ -163,17 +171,6 @@ final subscriptionGateServiceProvider = Provider<SubscriptionGateService>((
 final contentServiceProvider = Provider<ContentService>((ref) {
   return ContentService.shared;
 });
-
-final speakCurriculumRepositoryProvider = Provider<SpeakCurriculumRepository>((
-  ref,
-) {
-  return const SpeakCurriculumRepository();
-});
-
-final speakCurriculumProvider = FutureProvider.autoDispose
-    .family<List<SpeakCurriculumItem>, String>((ref, level) {
-      return ref.read(speakCurriculumRepositoryProvider).loadPublished(level);
-    });
 
 final srsServiceProvider = Provider<SRSService>((ref) {
   return SRSService(store: ref.watch(learningStoreProvider));

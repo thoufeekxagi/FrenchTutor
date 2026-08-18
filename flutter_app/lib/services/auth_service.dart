@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show ValueListenable, ValueNotifier, kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart' as google;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/api_keys.dart';
@@ -39,6 +42,12 @@ class AuthService {
   AuthService._();
 
   static final AuthService shared = AuthService._();
+  static const _signedOutMarkerKey = 'auth_gate_signed_out_v1';
+
+  // Supabase emits SIGNED_OUT as soon as its local session is removed, but
+  // this signal also gives the app shell a synchronous fallback if a stream
+  // delivery is delayed by a platform lifecycle transition.
+  final ValueNotifier<int> _localAuthRevision = ValueNotifier<int>(0);
 
   SupabaseClient get _client => Supabase.instance.client;
 
@@ -65,6 +74,18 @@ class AuthService {
   /// intentionally never exposed by Supabase or by this app.
   String? get signedInEmail => currentSession?.user.email;
 
+  /// The address Supabase knows for the account. Apple may intentionally
+  /// provide a private-relay address when the learner chooses Hide My Email;
+  /// the real Apple address is never available to the app in that case.
+  String? get signedInEmailLabel {
+    final email = signedInEmail;
+    if (email == null || email.isEmpty) return null;
+    if (email.toLowerCase().endsWith('@privaterelay.appleid.com')) {
+      return 'Apple private relay email';
+    }
+    return email;
+  }
+
   String get signedInDisplayName {
     final user = currentSession?.user;
     final metadata = user?.userMetadata;
@@ -76,6 +97,9 @@ class AuthService {
     if (name is String && name.trim().isNotEmpty) return name.trim();
     final email = signedInEmail;
     if (email == null || !email.contains('@')) return 'French Tutor learner';
+    if (email.toLowerCase().endsWith('@privaterelay.appleid.com')) {
+      return 'French learner';
+    }
     return email.split('@').first;
   }
 
@@ -99,6 +123,23 @@ class AuthService {
   }
 
   Stream<AuthState> get onAuthStateChange => _client.auth.onAuthStateChange;
+
+  ValueListenable<int> get localAuthRevision => _localAuthRevision;
+
+  Future<bool> wasExplicitlySignedOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_signedOutMarkerKey) == true;
+  }
+
+  Future<void> rememberSignedOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_signedOutMarkerKey, true);
+  }
+
+  Future<void> clearRememberedSignOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_signedOutMarkerKey);
+  }
 
   // ---------------------------------------------------------------------------
   // Google — native account picker, signInWithIdToken (no browser, ever).
@@ -262,12 +303,49 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    Future<void>? request;
     try {
-      await _client.auth.signOut();
+      // Calling signOut starts the local session removal synchronously inside
+      // gotrue, before its optional server-side revocation request. Notify
+      // the app shell now so the user never waits on that network request to
+      // reach the account screen.
+      request = _client.auth.signOut();
     } catch (_) {
-      // Best-effort: even if the network call fails, the local session is
-      // cleared by supabase_flutter, so the user still ends up signed out
-      // client-side, which is what matters for the UI.
+      // Keep the local UI transition best-effort even if the SDK throws while
+      // starting the request.
+    }
+    _localAuthRevision.value++;
+    try {
+      await request;
+    } catch (_) {
+      // Local sign-out already happened. A failed remote revocation must not
+      // strand the user in the authenticated shell.
+    }
+    try {
+      await rememberSignedOut();
+    } catch (_) {
+      // The in-memory auth transition is already complete; persistence is
+      // only a convenience for the next app launch.
+    }
+  }
+
+  /// Removes the local session and notifies AuthGate without waiting for
+  /// Supabase's optional server-side session revocation request. This is
+  /// required after account deletion: the server has already removed the
+  /// Auth user, so waiting for /logout can only produce a harmless 403 and
+  /// must never hold the user on a deletion spinner.
+  Future<void> signOutLocallyImmediately() async {
+    try {
+      final request = _client.auth.signOut(scope: SignOutScope.local);
+      _localAuthRevision.value++;
+      unawaited(request.catchError((_) {}));
+    } catch (_) {
+      _localAuthRevision.value++;
+    }
+    try {
+      await rememberSignedOut();
+    } catch (_) {
+      // The in-memory session is already gone; persistence is best effort.
     }
   }
 
@@ -280,19 +358,50 @@ class AuthService {
   /// surfaced to the caller — the UI should not wipe local data or sign the
   /// user out unless this actually succeeds server-side, or a deleted-locally
   /// but still-live-remotely account could be left behind.
+  String? _functionErrorMessage(dynamic value) {
+    if (value == null) return null;
+    if (value is String) {
+      final text = value.trim();
+      if (text.isEmpty || text == '{}') return null;
+      try {
+        final decoded = jsonDecode(text);
+        final nested = _functionErrorMessage(decoded);
+        if (nested != null) return nested;
+      } catch (_) {
+        // The response is plain text, which is already suitable to show.
+      }
+      return text;
+    }
+    if (value is Map) {
+      for (final key in const ['error', 'message', 'details', 'msg']) {
+        final message = _functionErrorMessage(value[key]);
+        if (message != null) return message;
+      }
+    }
+    return null;
+  }
+
   Future<AuthResult> deleteAccount() async {
     try {
-      final response = await _client.functions.invoke('delete-account');
+      final response = await _client.functions
+          .invoke('delete-account')
+          .timeout(const Duration(seconds: 60));
       if (response.status != 200) {
-        final error = response.data is Map ? response.data['error'] : null;
+        final error = _functionErrorMessage(response.data);
         return AuthResult.failure(
-          error?.toString() ?? 'Account deletion failed (${response.status}).',
+          error ?? 'Account deletion failed (${response.status}).',
         );
       }
       return AuthResult.success;
     } on FunctionException catch (e) {
       return AuthResult.failure(
-        e.details?.toString() ?? 'Account deletion failed: ${e.reasonPhrase}',
+        _functionErrorMessage(e.details) ??
+            'Account deletion failed: ${e.reasonPhrase}',
+      );
+    } on TimeoutException {
+      return AuthResult.failure(
+        'Account deletion is taking too long. Please check your connection '
+        'and try again.',
       );
     } catch (e) {
       return AuthResult.failure('Account deletion failed: $e');

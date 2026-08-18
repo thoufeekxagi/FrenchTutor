@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
+    show TargetPlatform, debugPrint, defaultTargetPlatform;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:permission_handler/permission_handler.dart';
@@ -81,6 +81,7 @@ class AudioStreamingService {
   /// needs it built explicitly.
   final Queue<Uint8List> _playbackQueue = Queue<Uint8List>();
   bool _isDrainingPlaybackQueue = false;
+  Future<void>? _playbackDrainFuture;
   int _playbackGeneration = 0;
 
   /// A PCM16 sample is 2 bytes; Gemini's WebSocket chunk boundaries don't
@@ -334,7 +335,16 @@ class AudioStreamingService {
   /// tracked playback end-of-timeline used by the mic gate above. The chunk is appended to
   /// `_playbackQueue` and fed to the player by the serialized drain loop below — never fed
   /// directly here — so bursty network delivery can't starve or race the player.
-  Future<void> playAudioChunk(List<int> pcmBytes) async {
+  Future<void> playAudioChunk(
+    List<int> pcmBytes, {
+
+    /// One-shot clips (vocabulary, grammar, and pronunciation buttons) need
+    /// confirmation that the native player accepted the buffer before the
+    /// caller starts its playback timer. Live conversation chunks deliberately
+    /// keep the old fire-and-feed behavior so network audio is not blocked by
+    /// the whole queue.
+    bool waitForFeed = false,
+  }) async {
     final playbackGeneration = _playbackGeneration;
     var bytes = Uint8List.fromList(pcmBytes);
     if (_pendingOddByte != null) {
@@ -345,6 +355,7 @@ class AudioStreamingService {
       _pendingOddByte = Uint8List.fromList([bytes.last]);
       bytes = Uint8List.sublistView(bytes, 0, bytes.length - 1);
     }
+    if (bytes.isEmpty) return;
 
     // Arm/extend the mic echo-gate's tail-grace window SYNCHRONOUSLY, before
     // the await below — `_ensurePlayerStarted()` does real platform-channel
@@ -382,13 +393,48 @@ class AudioStreamingService {
     if (playbackGeneration != _playbackGeneration) return;
     _playbackQueue.add(bytes);
     _drainPlaybackQueue(playbackGeneration);
+    if (waitForFeed) {
+      // A previous stream feed can still be unwinding while a new one-shot
+      // clip is queued. Wait through that hand-off as well; otherwise the
+      // button can leave its loading state before the new bytes ever reach
+      // flutter_sound.
+      while (playbackGeneration == _playbackGeneration &&
+          (_playbackQueue.isNotEmpty || _playbackDrainFuture != null)) {
+        final activeDrain = _playbackDrainFuture;
+        if (activeDrain != null) {
+          await activeDrain;
+        } else {
+          await _drainPlaybackQueue(playbackGeneration);
+        }
+      }
+    }
   }
 
   /// Feeds queued chunks to the player strictly one at a time, always awaiting the previous
   /// `feedUint8FromStream` call before starting the next. Safe to call repeatedly — re-entrant
   /// calls while a drain is already running just return immediately, since the running loop
   /// will pick up anything newly queued.
-  Future<void> _drainPlaybackQueue(int playbackGeneration) async {
+  Future<void> _drainPlaybackQueue(int playbackGeneration) {
+    final activeDrain = _playbackDrainFuture;
+    if (activeDrain != null) return activeDrain;
+
+    final drain = _drainPlaybackQueueInternal(playbackGeneration);
+    _playbackDrainFuture = drain;
+    drain.whenComplete(() {
+      if (identical(_playbackDrainFuture, drain)) {
+        _playbackDrainFuture = null;
+        // A stop can invalidate the generation while the native feed call is
+        // still unwinding. If a new clip was queued during that small window,
+        // restart the drain after the old future has fully settled.
+        if (_playbackQueue.isNotEmpty) {
+          unawaited(_drainPlaybackQueue(_playbackGeneration));
+        }
+      }
+    });
+    return drain;
+  }
+
+  Future<void> _drainPlaybackQueueInternal(int playbackGeneration) async {
     if (_isDrainingPlaybackQueue) return;
     _isDrainingPlaybackQueue = true;
     try {
@@ -397,20 +443,17 @@ class AudioStreamingService {
         final bytes = _playbackQueue.removeFirst();
         try {
           await _player.feedUint8FromStream(bytes);
-        } catch (_) {
-          // Dropped chunk — matches the iOS original's "drop and let the system recover"
-          // behavior on a transient playback error rather than crashing the call.
+        } catch (error, stackTrace) {
+          // Keep the live call alive on a transient chunk failure, but expose
+          // the native error in device logs instead of making a silent spinner
+          // impossible to diagnose.
+          debugPrint(
+            'AudioStreamingService: PCM feed failed: $error\n$stackTrace',
+          );
         }
       }
     } finally {
       _isDrainingPlaybackQueue = false;
-      // A stop can invalidate the generation while the native feed call is
-      // still unwinding. If a new clip was queued during that small window,
-      // the new caller sees the old drain as active and returns; restart the
-      // drain here or the new bytes remain stranded forever (silent replay).
-      if (_playbackQueue.isNotEmpty) {
-        unawaited(_drainPlaybackQueue(_playbackGeneration));
-      }
     }
   }
 

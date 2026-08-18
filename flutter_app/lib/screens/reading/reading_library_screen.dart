@@ -12,6 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -103,11 +104,18 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     setState(() => _generating = true);
     try {
       final profile = ref.read(learningStoreProvider).profile();
+      final existingStories = ref.read(generatedStoryStoreProvider).list();
       final package = await LessonAgentService.shared.buildReadingStoryBook(
         topic: _topicFor(_selectedTopic),
         levelBand: widget.examLevel ?? _levelFor(profile.level),
         examName: widget.examMode ? widget.examName : null,
         examLevel: widget.examMode ? widget.examLevel : null,
+        avoidTitles: existingStories.map((story) => story.title),
+        avoidOpenings: existingStories.map(
+          (story) => story.passage.segments.isEmpty
+              ? ''
+              : story.passage.segments.first.fr,
+        ),
       );
       final story = GeneratedStory(
         id: newGeneratedStoryId(),
@@ -196,9 +204,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         }
         setState(() => _generating = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not create the story. Try again.'),
-          ),
+          SnackBar(content: Text('Story generation failed: $error')),
         );
       }
     }
@@ -242,6 +248,12 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
           language: 'fr-FR',
           contentItemId: story.segmentContentId(i),
         ),
+      for (var i = 0; i < story.keywords.length; i++)
+        SpeechItem(
+          text: story.keywords[i].fr,
+          language: 'fr-FR',
+          contentItemId: '${story.id}_kw_${story.keywords[i].id}',
+        ),
     ]);
   }
 
@@ -269,11 +281,18 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
           children: [
-            _GenerateReadingTile(
-              generating: _generating,
-              selectedTopic: _selectedTopic,
-              onTap: _generate,
-            ),
+            if (_generating)
+              const PersonalizedGenerationLoader(
+                content: 'reading story',
+                detail: 'Shaping a short book around your level and interests.',
+                icon: CupertinoIcons.book_fill,
+              )
+            else
+              _GenerateReadingTile(
+                generating: false,
+                selectedTopic: _selectedTopic,
+                onTap: _generate,
+              ),
             const SizedBox(height: 12),
             SizedBox(
               height: 36,
@@ -383,10 +402,14 @@ class _DirectReadingLoading extends StatelessWidget {
         backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
       ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(28),
-          child: CircularProgressIndicator(),
+      body: const Padding(
+        padding: EdgeInsets.all(20),
+        child: Center(
+          child: PersonalizedGenerationLoader(
+            content: 'reading story',
+            detail: 'Building a short book for your course level.',
+            icon: CupertinoIcons.book_fill,
+          ),
         ),
       ),
     );

@@ -11,6 +11,7 @@ import '../../models/content_models.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/primary_action_button.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
@@ -121,6 +122,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
       final quizFuture = agent.buildGrammarQuiz(
         passage: passage,
         grammarPoint: tense,
+        levelBand: level,
       );
       final coverFuture = agent.generateStoryCover(
         title: passage.displayTitle,
@@ -301,8 +303,11 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         ),
         body: const Center(
           child: Padding(
-            padding: EdgeInsets.all(28),
-            child: CircularProgressIndicator(),
+            padding: EdgeInsets.all(20),
+            child: PersonalizedGenerationLoader(
+              content: 'grammar class',
+              detail: 'Matching the lesson to your level and learning goals.',
+            ),
           ),
         ),
       );
@@ -360,14 +365,18 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
               },
             ),
             const SizedBox(height: 14),
-            PrimaryActionButton(
-              label: _isGenerating
-                  ? 'Generating practice…'
-                  : 'Generate practice story',
-              icon: CupertinoIcons.wand_stars,
-              isLoading: _isGenerating,
-              onPressed: _isGenerating ? null : _practiceTense,
-            ),
+            if (_isGenerating)
+              const PersonalizedGenerationLoader(
+                content: 'grammar class',
+                detail: 'Using your chosen sentence pattern and current level.',
+                compact: true,
+              )
+            else
+              PrimaryActionButton(
+                label: 'Generate practice story',
+                icon: CupertinoIcons.wand_stars,
+                onPressed: _practiceTense,
+              ),
             if (_errorText != null) ...[
               const SizedBox(height: 10),
               Text(

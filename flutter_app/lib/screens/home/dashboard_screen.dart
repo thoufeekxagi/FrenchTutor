@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +17,7 @@ import '../../services/app_tour.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/notification_scheduler_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
@@ -114,9 +117,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // Pure local reads (no LLM, no network) — cheap enough to recompute on
     // every reload so the card is always honestly up to date.
     try {
-      final summary = DailySummaryService(
-        store: ref.read(learningStoreProvider),
-      ).compute();
+      final store = ref.read(learningStoreProvider);
+      final summary = DailySummaryService(store: store).compute();
+      // Refresh the local reminder copy after a completed lesson or review.
+      // This keeps the next scheduled notification grounded in current local
+      // progress without a network call or an LLM request.
+      unawaited(
+        NotificationSchedulerService.sync(store.profile(), summary: summary),
+      );
       if (mounted) setState(() => _summary = summary);
     } catch (_) {
       // A summary must never take the dashboard down.
