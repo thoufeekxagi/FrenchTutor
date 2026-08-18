@@ -87,11 +87,15 @@ class NotetakerState extends ChangeNotifier {
     _isEnabled = prefs.getBool('notetaker.enabled') ?? true;
     _draftText = prefs.getString('notetaker.draftText') ?? '';
     _currentContext = prefs.getString('notetaker.context') ?? 'General';
-    // Positions saved by the previous implementation used the opposite
-    // sign. Keep old installs safe by treating those values as the corner.
+    // Older builds could persist a positive vertical value because their
+    // drag math was inverted. Clamp that legacy value back to the corner;
+    // current offsets are negative when the bubble moves left or up.
     final dx = prefs.getDouble('notetaker.offsetX') ?? 0;
     final dy = prefs.getDouble('notetaker.offsetY') ?? 0;
-    _offset = Offset(dx, dy.clamp(0.0, double.infinity));
+    _offset = Offset(
+      dx.clamp(-double.infinity, 0.0),
+      dy.clamp(-double.infinity, 0.0),
+    );
     notifyListeners();
   }
 
@@ -190,13 +194,13 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
           0.0,
           double.infinity,
         );
-        final maxDy = (constraints.maxHeight - _bubbleSize - 32).clamp(
+        final minDy = -(constraints.maxHeight - _bubbleSize - 32).clamp(
           0.0,
           double.infinity,
         );
         final clampedOffset = Offset(
           _state.offset.dx.clamp(maxDx, 0.0),
-          _state.offset.dy.clamp(0.0, maxDy),
+          _state.offset.dy.clamp(minDy, 0.0),
         );
 
         return Stack(
@@ -240,9 +244,8 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
       onPanUpdate: (details) {
         _state.offset = Offset(
           _state.offset.dx + details.delta.dx,
-          // The overlay is bottom-anchored, but the stored offset represents
-          // the bubble's visual movement. Pointer movement should therefore
-          // be applied in the same direction on both axes.
+          // The overlay is bottom-right anchored. Negative offsets move it
+          // left/up, so pointer movement maps directly to visual movement.
           _state.offset.dy + details.delta.dy,
         );
       },
