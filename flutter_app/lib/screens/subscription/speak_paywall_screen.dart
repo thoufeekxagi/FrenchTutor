@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kDebugMode, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -357,9 +359,18 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final packages =
         _offerings?.current?.availablePackages ?? const <Package>[];
     if (packages.isEmpty) {
+      final androidDebugHint =
+          !RevenueCatService.shared.isConfigured &&
+          defaultTargetPlatform == TargetPlatform.android &&
+          kDebugMode;
       return SpeakCard(
         child: Text(
-          'Subscriptions are temporarily unavailable on this device. Please try again later or contact support.',
+          androidDebugHint
+              ? 'Android billing is not configured in this debug build. '
+                    'For UI testing, open Profile > Android developer and '
+                    'enable Force unlock premium.'
+              : 'Subscriptions are temporarily unavailable on this device. '
+                    'Please try again later or contact support.',
           style: DesignTokens.body(13).copyWith(color: SpeakColors.inkSoft),
         ),
       );
