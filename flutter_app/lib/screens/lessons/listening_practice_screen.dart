@@ -312,7 +312,9 @@ class _ListeningPracticeScreenState
     setState(() {
       _focusSegment = next;
       _selectedWordIndex = null;
-      _showTranslation = false;
+      // Keep the learner's Hide/Translate choice for the whole Focus stage.
+      // They can turn it off explicitly on any later line; advancing should
+      // not make them repeat the same tap for every sentence.
       _isPlaying = false;
       _audioLoading = false;
     });
