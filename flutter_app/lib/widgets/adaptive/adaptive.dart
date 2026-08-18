@@ -113,31 +113,38 @@ Future<T?> showPSActionSheet<T>(
   }
   return showModalBottomSheet<T>(
     context: context,
+    isScrollControlled: true,
     builder: (context) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.all(DesignTokens.space4),
-              child: Text(
-                title,
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.mutedDim),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          children: [
+            if (title != null)
+              Padding(
+                padding: const EdgeInsets.all(DesignTokens.space4),
+                child: Text(
+                  title,
+                  style: DesignTokens.body(
+                    13,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
               ),
-            ),
-          for (final a in actions)
-            ListTile(
-              title: Text(
-                a.label,
-                style: a.destructive
-                    ? const TextStyle(color: DesignTokens.primary)
-                    : null,
+            for (final a in actions)
+              ListTile(
+                title: Text(
+                  a.label,
+                  style: a.destructive
+                      ? const TextStyle(color: DesignTokens.primary)
+                      : null,
+                ),
+                onTap: () => Navigator.of(context).pop(a.value),
               ),
-              onTap: () => Navigator.of(context).pop(a.value),
-            ),
-        ],
+          ],
+        ),
       ),
     ),
   );
