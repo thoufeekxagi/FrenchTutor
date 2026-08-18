@@ -164,15 +164,6 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final packages =
-        _offerings?.current?.availablePackages ?? const <Package>[];
-    Package? trialPackage;
-    for (final package in packages) {
-      if (package.storeProduct.introductoryPrice?.price == 0) {
-        trialPackage = package;
-        break;
-      }
-    }
     return Scaffold(
       backgroundColor: SpeakColors.background,
       body: SafeArea(
@@ -187,14 +178,13 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                     children: [
                       const SizedBox(height: 54),
                       Text(
-                        trialPackage == null
-                            ? 'Unlock full French access'
-                            : 'Start with \$0 for '
-                                  '${_trialHeadlineLabel(trialPackage)}',
+                        'Unlock full French access',
                         textAlign: TextAlign.center,
                         style: DesignTokens.display(34),
                       ),
                       const SizedBox(height: 18),
+                      _selectedPriceSummary(),
+                      const SizedBox(height: 22),
                       _benefit(
                         'A course shaped around you',
                         Icons.route_rounded,
@@ -343,6 +333,42 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     );
   }
 
+  Widget _selectedPriceSummary() {
+    final selected = _selected;
+    if (selected == null) return const SizedBox.shrink();
+    final trialSummary = _trialSummary(selected);
+    return SpeakCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            selected.storeProduct.priceString,
+            style: DesignTokens.display(
+              36,
+            ).copyWith(color: SpeakColors.navy, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            _billingTerms(selected),
+            style: DesignTokens.body(
+              14,
+              weight: FontWeight.w700,
+            ).copyWith(color: SpeakColors.inkSoft),
+          ),
+          if (trialSummary != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              trialSummary,
+              style: DesignTokens.body(
+                12,
+              ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _plans() {
     final packages =
         _offerings?.current?.availablePackages ?? const <Package>[];
@@ -484,24 +510,6 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     PackageType.weekly => 'Weekly plan',
     _ => package.storeProduct.title,
   };
-
-  String _trialLengthLabel(Package? package) {
-    final intro = package?.storeProduct.introductoryPrice;
-    if (intro == null || intro.price != 0) return '';
-    final units = intro.periodNumberOfUnits * intro.cycles;
-    final unit = _periodUnitLabel(intro.periodUnit);
-    return '$units $unit${units == 1 ? '' : 's'}';
-  }
-
-  String _trialHeadlineLabel(Package? package) {
-    final intro = package?.storeProduct.introductoryPrice;
-    if (intro == null || intro.price != 0) return 'the trial period';
-    if (intro.periodUnit == PeriodUnit.week) {
-      final days = intro.periodNumberOfUnits * intro.cycles * 7;
-      return '$days day${days == 1 ? '' : 's'}';
-    }
-    return _trialLengthLabel(package);
-  }
 
   String _periodUnitLabel(PeriodUnit unit) => switch (unit) {
     PeriodUnit.day => 'day',
