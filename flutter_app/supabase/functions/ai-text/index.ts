@@ -183,15 +183,17 @@ Deno.serve(async (request) => {
 
   const provider = body.provider === "openrouter" ? "openrouter" : "gemini";
   const messages = body.messages;
-  if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
-    return json({ error: "Invalid messages" }, 400);
-  }
-  if (JSON.stringify(messages).length > MAX_TOTAL_LENGTH) return json({ error: "Request is too large" }, 413);
 
   const maxTokens = Math.min(Math.max(Number(body.maxTokens ?? 1024), 32), 4096);
   const temperature = Math.min(Math.max(Number(body.temperature ?? 0.4), 0), 1.5);
 
   if (provider === "openrouter") {
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
+      return json({ error: "Invalid messages" }, 400);
+    }
+    if (JSON.stringify(messages).length > MAX_TOTAL_LENGTH) {
+      return json({ error: "Request is too large" }, 413);
+    }
     const safeMessages = messages.filter((message) => message && typeof message === "object").map((message) => ({
       role: String((message as { role?: unknown }).role ?? "user"),
       content: String((message as { content?: unknown }).content ?? ""),
@@ -203,6 +205,13 @@ Deno.serve(async (request) => {
   }
 
   const rawContents = body.contents;
+  // Gemini supports two valid request shapes: ordinary text calls use
+  // `messages`, while audio/image transcription sends raw `contents` with
+  // inline_data. Do not require messages for the latter path.
+  if (rawContents === undefined &&
+      (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES)) {
+    return json({ error: "Invalid messages" }, 400);
+  }
   const contents = rawContents === undefined ? buildGeminiContents(messages) : rawContents;
   if (!validateContents(contents)) return json({ error: "Invalid Gemini contents" }, 400);
   const generationConfig = { temperature, maxOutputTokens: maxTokens };
