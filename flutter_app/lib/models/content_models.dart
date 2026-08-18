@@ -805,6 +805,7 @@ class WritingTask {
     required this.targetConnectors,
     required this.rubricHints,
     this.levelBand = 'A2',
+    this.titleEn,
   });
 
   final String id;
@@ -815,6 +816,12 @@ class WritingTask {
   final int minWords;
   final List<String> targetConnectors;
   final List<String> rubricHints;
+
+  /// A short English gloss for the French task title. Beginner learners see
+  /// this first; intermediate/advanced learners see the French title first.
+  /// Older rows may not have this field, so [displayTitle] also knows the
+  /// small set of starter titles that shipped before the field existed.
+  final String? titleEn;
 
   /// CEFR band ("A1"/"A2"/"B1"/"B2") this task is appropriate for — the
   /// static offline bank shouldn't show a B2 essay to an A1 learner, unlike
@@ -833,6 +840,7 @@ class WritingTask {
     'targetConnectors': targetConnectors,
     'rubricHints': rubricHints,
     'levelBand': levelBand,
+    if (titleEn != null && titleEn!.trim().isNotEmpty) 'titleEn': titleEn,
   };
 
   factory WritingTask.fromJson(Map<String, dynamic> json) => WritingTask(
@@ -845,8 +853,35 @@ class WritingTask {
     targetConnectors: List<String>.from(json['targetConnectors']),
     rubricHints: List<String>.from(json['rubricHints']),
     levelBand: (json['levelBand'] as String?) ?? 'A2',
+    titleEn: json['titleEn']?.toString() ?? json['title_en']?.toString(),
   );
+
+  /// The learner-facing title. A1/A2 learners get the English meaning first
+  /// so a French-only title does not make the task feel inaccessible. B1/B2
+  /// learners get the French title first, with the gloss as a supplement.
+  String get displayTitle {
+    final french = title.trim();
+    final english = (titleEn ?? _legacyTitleGloss[french])?.trim();
+    if (english == null || english.isEmpty || english == french) return french;
+
+    final band = levelBand.trim().toUpperCase();
+    if (band == 'A1' || band == 'A2') return '$english ($french)';
+    return '$french ($english)';
+  }
 }
+
+/// Starter writing rows created before `WritingTask.titleEn` was introduced.
+/// This keeps already-seeded A1 cards readable without changing their stored
+/// French title or requiring a network translation call.
+const _legacyTitleGloss = <String, String>{
+  'Mon repas favori': 'My favourite meal',
+  'Mon repas préféré': 'My favourite meal',
+  'Une visite au marché': 'A market visit',
+  'Mon dernier voyage': 'My last trip',
+  'Un soir tranquille': 'A quiet evening',
+  'Mon projet de demain': 'My plan for tomorrow',
+  'Un voyage imaginaire': 'An imaginary trip',
+};
 
 // MARK: - Roadmap
 

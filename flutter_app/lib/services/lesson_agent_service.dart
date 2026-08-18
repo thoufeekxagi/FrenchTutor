@@ -439,7 +439,8 @@ $submission''';
         (topic == null || topic.trim().isEmpty) &&
         (contextPrompt == null || contextPrompt.trim().isEmpty);
     final system = '''
-Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
+Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
+"title" is a short natural French title. "title_en" is a short, clear English gloss of that title (2-5 words), even when LEVEL is A1 or A2. Never leave "title_en" empty. For A1/A2, use everyday words that a beginner can understand in the English gloss; B1/B2 may use a more precise translation.
 "type" is a short label like "micro" or "email" or "opinion". "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
 FORMAT RULE FOR "prompt_fr"/"prompt_en", ABSOLUTE — READ THIS TWICE: these two fields must be a QUESTION or an INSTRUCTION addressed directly TO the student (start with an imperative like "Écris...", "Décris...", "Raconte...", "Parle de...", or a direct question like "Où habites-tu ?"), asking them to produce their OWN original sentences. They must NEVER be a statement of fact, a narrated example, or anything that already reads as a complete, correct answer — if a student could just copy "prompt_fr" verbatim into the answer box and be done, you have generated it WRONG.
 BAD, NEVER DO THIS (this is an already-written answer, not a task): prompt_fr: "Je suis avec ma famille. Je suis content." / prompt_en: "I am with my family. I am happy."
@@ -2162,6 +2163,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       id: const Uuid().v4(),
       type: obj['type'] as String? ?? 'micro',
       title: obj['title'] as String? ?? 'Writing practice',
+      titleEn: obj['title_en']?.toString() ?? obj['titleEn']?.toString(),
       promptFr: promptFr,
       promptEn: obj['prompt_en'] as String? ?? '',
       minWords: (obj['min_words'] as num?)?.toInt() ?? 5,

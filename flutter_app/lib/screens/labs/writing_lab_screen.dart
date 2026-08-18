@@ -344,7 +344,7 @@ class _GeneratedWritingTaskTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      generated.task.title,
+                      generated.task.displayTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: DesignTokens.display(17),

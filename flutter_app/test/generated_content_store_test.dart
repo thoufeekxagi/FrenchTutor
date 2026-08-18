@@ -19,6 +19,7 @@ void main() {
       targetConnectors: const ['et'],
       rubricHints: const ['Use a simple sentence.'],
       levelBand: 'A1',
+      titleEn: 'A small plan',
     );
 
     store.insert(
@@ -28,5 +29,51 @@ void main() {
 
     store.updateCoverUrl(task.id, 'https://example.com/cover.jpg');
     expect(store.list().single.coverUrl, 'https://example.com/cover.jpg');
+  });
+
+  test('writing titles follow the learner CEFR level', () {
+    final beginner = WritingTask(
+      id: const Uuid().v4(),
+      type: 'micro',
+      title: 'Mon repas favori',
+      titleEn: 'My favourite meal',
+      promptFr: 'Écris une phrase.',
+      promptEn: 'Write one sentence.',
+      minWords: 5,
+      targetConnectors: const [],
+      rubricHints: const [],
+      levelBand: 'A1',
+    );
+    final advanced = WritingTask(
+      id: const Uuid().v4(),
+      type: 'essay',
+      title: 'Le travail à distance',
+      titleEn: 'Remote work',
+      promptFr: 'Donnez votre opinion.',
+      promptEn: 'Give your opinion.',
+      minWords: 120,
+      targetConnectors: const ['cependant'],
+      rubricHints: const [],
+      levelBand: 'B2',
+    );
+
+    expect(beginner.displayTitle, 'My favourite meal (Mon repas favori)');
+    expect(advanced.displayTitle, 'Le travail à distance (Remote work)');
+  });
+
+  test('legacy starter title gets a beginner gloss without migration', () {
+    final task = WritingTask(
+      id: const Uuid().v4(),
+      type: 'starter',
+      title: 'Un voyage imaginaire',
+      promptFr: 'Imagine un voyage.',
+      promptEn: 'Imagine a trip.',
+      minWords: 5,
+      targetConnectors: const [],
+      rubricHints: const [],
+      levelBand: 'A1',
+    );
+
+    expect(task.displayTitle, 'An imaginary trip (Un voyage imaginaire)');
   });
 }

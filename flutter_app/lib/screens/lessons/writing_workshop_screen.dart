@@ -1062,7 +1062,7 @@ class _WritingResultCard extends StatelessWidget {
                     ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
                   ),
                   const SizedBox(height: 8),
-                  Text(task.title, style: DesignTokens.display(18)),
+                  Text(task.displayTitle, style: DesignTokens.display(18)),
                   const SizedBox(height: 7),
                   Text(
                     draft.trim(),

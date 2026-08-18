@@ -38,6 +38,7 @@ class StarterContentCatalog {
       grammarSummary:
           'Use the present tense for routines and facts happening now.',
       writingTitle: 'Une visite au marché',
+      writingTitleEn: 'A market visit',
       writingFr: 'Écris quatre phrases sur une visite au marché.',
       writingEn: 'Write four sentences about a visit to a market.',
       roleplayTitle: 'Au marché',
@@ -68,6 +69,7 @@ class StarterContentCatalog {
       grammarPoint: 'Passé composé',
       grammarSummary: 'Use passé composé for a completed action in the past.',
       writingTitle: 'Mon dernier voyage',
+      writingTitleEn: 'My last trip',
       writingFr: 'Raconte un court voyage que tu as fait.',
       writingEn: 'Describe a short trip you took.',
       roleplayTitle: 'À la gare',
@@ -99,6 +101,7 @@ class StarterContentCatalog {
       grammarSummary:
           'Use imparfait to describe a past scene, habit, or background.',
       writingTitle: 'Un soir tranquille',
+      writingTitleEn: 'A quiet evening',
       writingFr: 'Décris une soirée calme chez toi.',
       writingEn: 'Describe a quiet evening at home.',
       roleplayTitle: 'Dans le jardin',
@@ -139,6 +142,7 @@ class StarterContentCatalog {
       grammarSummary:
           'Use futur proche for a clear plan or near-future action.',
       writingTitle: 'Mon projet de demain',
+      writingTitleEn: 'My plan for tomorrow',
       writingFr: 'Écris ce que tu vas faire demain.',
       writingEn: 'Write what you are going to do tomorrow.',
       roleplayTitle: 'Une rencontre surprenante',
@@ -176,6 +180,7 @@ class StarterContentCatalog {
       grammarSummary:
           'Use the conditional to express a polite wish or possibility.',
       writingTitle: 'Un voyage imaginaire',
+      writingTitleEn: 'An imaginary trip',
       writingFr: 'Imagine un petit voyage près de l’eau.',
       writingEn: 'Imagine a short journey near the water.',
       roleplayTitle: 'Au bord de l’eau',
@@ -196,6 +201,7 @@ class StarterSeed {
     required this.grammarPoint,
     required this.grammarSummary,
     required this.writingTitle,
+    required this.writingTitleEn,
     required this.writingFr,
     required this.writingEn,
     required this.roleplayTitle,
@@ -212,6 +218,7 @@ class StarterSeed {
   final String grammarPoint;
   final String grammarSummary;
   final String writingTitle;
+  final String writingTitleEn;
   final String writingFr;
   final String writingEn;
   final String roleplayTitle;
@@ -316,6 +323,7 @@ class StarterContentService {
               id: writingId,
               type: 'starter',
               title: seed.writingTitle,
+              titleEn: seed.writingTitleEn,
               promptFr: seed.writingFr,
               promptEn: seed.writingEn,
               minWords: 8,
