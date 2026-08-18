@@ -345,7 +345,8 @@ class _SpeakReviewLaunchScreenState
 
   Future<void> _attachStoryCover(GeneratedStory story, String prompt) async {
     try {
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: ref.read(syncServiceProvider),
         id: story.id,
         title: story.title,
         summary: story.summary,
@@ -353,9 +354,6 @@ class _SpeakReviewLaunchScreenState
         levelBand: story.levelBand,
         coverPrompt: prompt,
       );
-      final url = await ref
-          .read(syncServiceProvider)
-          .uploadStoryCover(storyId: story.id, bytes: bytes);
       if (url != null && url.isNotEmpty) {
         ref.read(generatedStoryStoreProvider).updateCoverUrl(story.id, url);
       }

@@ -28,6 +28,15 @@ import '../orchestration/models/evidence_event.dart';
 import '../orchestration/models/learning_plan.dart';
 import '../orchestration/models/task_result.dart';
 
+class _CoverOptimizationFailure implements Exception {
+  const _CoverOptimizationFailure(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// The single gateway between local SQLite and Supabase.
 ///
 /// Supabase is the source of truth for every signed-in learner — vocab
@@ -325,72 +334,15 @@ class SyncService {
     required String storyId,
     required Uint8List bytes,
     String? diagnosticRoleplayId,
+    int maxBytes = ImageStorageOptimizer.maxBytes,
   }) async {
-    final uid = _userId;
-    if (uid == null) return null;
-    if (bytes.isEmpty) {
-      debugPrint('Story cover upload skipped ($storyId): empty image bytes');
-      if (diagnosticRoleplayId != null) {
-        unawaited(
-          logRoleplayCoverEvent(
-            roleplayId: diagnosticRoleplayId,
-            phase: 'upload_skipped',
-            error: StateError('image bytes were empty'),
-            sourceBytes: 0,
-          ),
-        );
-      }
-      return null;
-    }
     try {
-      final optimized = ImageStorageOptimizer.optimizeCover(bytes);
-      if (optimized.length > ImageStorageOptimizer.maxBytes) {
-        debugPrint(
-          'Story cover upload skipped ($storyId): optimizer exceeded '
-          '${ImageStorageOptimizer.maxBytes} bytes',
-        );
-        if (diagnosticRoleplayId != null) {
-          unawaited(
-            logRoleplayCoverEvent(
-              roleplayId: diagnosticRoleplayId,
-              phase: 'optimization_failed',
-              error: StateError(
-                'optimized image exceeded ${ImageStorageOptimizer.maxBytes} bytes',
-              ),
-              sourceBytes: bytes.length,
-              optimizedBytes: optimized.length,
-            ),
-          );
-        }
-        return null;
-      }
-      final path = '$uid/$storyId.jpg';
-      final bucket = _client.storage.from('story-covers');
-      final contentType =
-          optimized.length >= 8 &&
-              optimized[0] == 0x89 &&
-              optimized[1] == 0x50 &&
-              optimized[2] == 0x4e &&
-              optimized[3] == 0x47
-          ? 'image/png'
-          : 'image/jpeg';
-      await bucket.uploadBinary(
-        path,
-        optimized,
-        fileOptions: FileOptions(contentType: contentType, upsert: true),
+      return await _uploadStoryCoverOnce(
+        storyId: storyId,
+        bytes: bytes,
+        maxBytes: maxBytes,
+        diagnosticRoleplayId: diagnosticRoleplayId,
       );
-      final signedUrl = await bucket.createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (diagnosticRoleplayId != null) {
-        unawaited(
-          logRoleplayCoverEvent(
-            roleplayId: diagnosticRoleplayId,
-            phase: 'upload_succeeded',
-            sourceBytes: bytes.length,
-            optimizedBytes: optimized.length,
-          ),
-        );
-      }
-      return signedUrl;
     } catch (e, st) {
       debugPrint('Story cover upload failed ($storyId): $e\n$st');
       if (diagnosticRoleplayId != null) {
@@ -405,6 +357,116 @@ class SyncService {
       }
       return null;
     }
+  }
+
+  /// Generates and uploads artwork with the single shared retry policy.
+  /// Generation/compression may happen twice; upload/network errors do not
+  /// trigger an unbounded regeneration loop.
+  Future<String?> uploadGeneratedStoryCover({
+    required String storyId,
+    required Future<Uint8List> Function(int attempt) generate,
+    String? diagnosticRoleplayId,
+  }) async {
+    for (var attempt = 0; attempt < 2; attempt++) {
+      final attemptNumber = attempt + 1;
+      unawaited(
+        diagnosticRoleplayId == null
+            ? Future<void>.value()
+            : logRoleplayCoverEvent(
+                roleplayId: diagnosticRoleplayId,
+                phase: 'attempt_started',
+                attempt: attemptNumber,
+              ),
+      );
+      Uint8List bytes;
+      try {
+        bytes = await generate(attempt);
+      } catch (error) {
+        debugPrint(
+          'Story cover generation attempt $attemptNumber failed ($storyId): $error',
+        );
+        if (attempt == 1) return null;
+        continue;
+      }
+      try {
+        final url = await _uploadStoryCoverOnce(
+          storyId: storyId,
+          bytes: bytes,
+          maxBytes: attempt == 0 ? ImageStorageOptimizer.maxBytes : 40 * 1024,
+          diagnosticRoleplayId: diagnosticRoleplayId,
+        );
+        if (url != null && url.isNotEmpty) return url;
+        return null;
+      } on _CoverOptimizationFailure catch (error) {
+        debugPrint(
+          'Story cover compression attempt $attemptNumber failed ($storyId): $error',
+        );
+        if (attempt == 1) return null;
+      } catch (error, stackTrace) {
+        debugPrint('Story cover upload failed ($storyId): $error\n$stackTrace');
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<String?> _uploadStoryCoverOnce({
+    required String storyId,
+    required Uint8List bytes,
+    required int maxBytes,
+    String? diagnosticRoleplayId,
+  }) async {
+    final uid = _userId;
+    if (uid == null) return null;
+    if (bytes.isEmpty) {
+      if (diagnosticRoleplayId != null) {
+        unawaited(
+          logRoleplayCoverEvent(
+            roleplayId: diagnosticRoleplayId,
+            phase: 'upload_skipped',
+            error: StateError('image bytes were empty'),
+            sourceBytes: 0,
+          ),
+        );
+      }
+      throw _CoverOptimizationFailure('generated image bytes were empty');
+    }
+    late final Uint8List optimized;
+    try {
+      optimized = ImageStorageOptimizer.optimizeCover(
+        bytes,
+        maxBytes: maxBytes,
+      );
+    } on FormatException catch (error) {
+      throw _CoverOptimizationFailure(error.message);
+    }
+    final path = '$uid/$storyId.jpg';
+    final bucket = _client.storage.from('story-covers');
+    final contentType =
+        optimized.length >= 8 &&
+            optimized[0] == 0x89 &&
+            optimized[1] == 0x50 &&
+            optimized[2] == 0x4e &&
+            optimized[3] == 0x47
+        ? 'image/png'
+        : 'image/jpeg';
+    await bucket.uploadBinary(
+      path,
+      optimized,
+      fileOptions: FileOptions(contentType: contentType, upsert: true),
+    );
+    final signedUrl = await bucket.createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (diagnosticRoleplayId != null) {
+      unawaited(
+        logRoleplayCoverEvent(
+          roleplayId: diagnosticRoleplayId,
+          phase: 'upload_succeeded',
+          sourceBytes: bytes.length,
+          optimizedBytes: optimized.length,
+        ),
+      );
+    }
+    return signedUrl;
   }
 
   /// Best-effort, private diagnostics for the roleplay cover pipeline.

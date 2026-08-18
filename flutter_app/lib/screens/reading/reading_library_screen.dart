@@ -220,17 +220,14 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     final syncService = ref.read(syncServiceProvider);
     final storyStore = ref.read(generatedStoryStoreProvider);
     try {
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: syncService,
         id: story.id,
         title: story.title,
         summary: story.summary,
         topic: story.topic,
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
-      );
-      final url = await syncService.uploadStoryCover(
-        storyId: story.id,
-        bytes: bytes,
       );
       if (url == null) return;
       storyStore.updateCoverUrl(story.id, url);

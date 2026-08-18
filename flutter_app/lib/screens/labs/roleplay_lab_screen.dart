@@ -161,67 +161,27 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     // generation intentionally outlives the live practice route when needed.
     final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedRoleplayStoreProvider);
-    Object? lastError;
-    StackTrace? lastStackTrace;
-    for (var attempt = 0; attempt < 3; attempt++) {
-      final attemptNumber = attempt + 1;
-      unawaited(
-        sync.logRoleplayCoverEvent(
-          roleplayId: roleplay.id,
-          phase: 'attempt_started',
-          attempt: attemptNumber,
-        ),
-      );
-      try {
-        final bytes = await PracticeArtworkService.generate(
-          id: roleplay.id,
-          title: roleplay.displayTitle,
-          summary: roleplay.passage.segments
-              .take(2)
-              .map((segment) => segment.en.isNotEmpty ? segment.en : segment.fr)
-              .join(' '),
-          topic: roleplay.displayTitle,
-          levelBand: roleplay.levelBand,
-          coverPrompt:
-              'A premium editorial cover for a French language roleplay scene. '
-              'Show one cinematic real-life moment that matches the title and dialogue. '
-              'Make it feel like a published language-learning book, with human-scale '
-              'characters and a clear setting, never an app screenshot or cartoon.',
-        );
-        unawaited(
-          sync.logRoleplayCoverEvent(
-            roleplayId: roleplay.id,
-            phase: 'generation_succeeded',
-            attempt: attemptNumber,
-            sourceBytes: bytes.length,
-          ),
-        );
-        final url = await sync.uploadStoryCover(
-          storyId: roleplay.id,
-          bytes: bytes,
-          diagnosticRoleplayId: roleplay.id,
-        );
-        if (url == null || url.isEmpty) {
-          throw StateError('cover upload returned no signed URL');
-        }
-        store.updateCoverUrl(roleplay.id, url);
-        if (mounted) _loadRoleplays();
-        return;
-      } catch (error, stackTrace) {
-        lastError = error;
-        lastStackTrace = stackTrace;
-        unawaited(
-          sync.logRoleplayCoverEvent(
-            roleplayId: roleplay.id,
-            phase: 'attempt_failed',
-            attempt: attemptNumber,
-            error: error,
-          ),
-        );
-        if (attempt < 2) {
-          await Future<void>.delayed(Duration(seconds: 2 << attempt));
-        }
-      }
+    final url = await PracticeArtworkService.generateAndUpload(
+      sync: sync,
+      id: roleplay.id,
+      diagnosticRoleplayId: roleplay.id,
+      title: roleplay.displayTitle,
+      summary: roleplay.passage.segments
+          .take(2)
+          .map((segment) => segment.en.isNotEmpty ? segment.en : segment.fr)
+          .join(' '),
+      topic: roleplay.displayTitle,
+      levelBand: roleplay.levelBand,
+      coverPrompt:
+          'A premium literary book cover for a French language roleplay scene. '
+          'Show one cinematic real-life setting, object, architecture, weather, '
+          'or action that matches the title and dialogue. Do not show people, '
+          'faces, animals, mascots, or named characters; never use an app screenshot.',
+    );
+    if (url != null && url.isNotEmpty) {
+      store.updateCoverUrl(roleplay.id, url);
+      if (mounted) _loadRoleplays();
+      return;
     }
     // Release the in-flight guard after a terminal failure. Otherwise a
     // refresh can see the missing cover but the repair pass will return at
@@ -231,13 +191,13 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       sync.logRoleplayCoverEvent(
         roleplayId: roleplay.id,
         phase: 'cover_pipeline_failed',
-        attempt: 3,
-        error: lastError,
+        attempt: 2,
+        error: StateError(
+          'cover generation or upload failed after two attempts',
+        ),
       ),
     );
-    debugPrint(
-      'Roleplay cover generation failed after 3 attempts: $lastError\n$lastStackTrace',
-    );
+    debugPrint('Roleplay cover generation failed after two attempts');
   }
 
   /// Synthesizes and caches both sides of every beat's dialogue (the

@@ -28,7 +28,7 @@ abstract final class ImageStorageOptimizer {
     0.05,
   ];
 
-  static Uint8List optimizeCover(Uint8List source) {
+  static Uint8List optimizeCover(Uint8List source, {int maxBytes = 25 * 1024}) {
     if (source.isEmpty) return source;
     try {
       final decoded = img.decodeImage(source);

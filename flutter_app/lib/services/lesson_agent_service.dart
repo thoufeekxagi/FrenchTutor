@@ -15,15 +15,17 @@ import 'story_variety_service.dart';
 import 'vocabulary_level_policy.dart';
 import '../prompts/live_prompts.dart';
 
-/// Shared instruction for every generated lesson image. Keep this in the
-/// client prompt as well as the Edge Function so local previews and release
-/// builds describe the same image-only contract.
-const _imageOnlyInstruction = '''
-IMAGE-ONLY OUTPUT: create the visual scene and nothing else. Do not render or
-draw any text, words, letters, numbers, punctuation, symbols, signs, labels,
-logos, watermarks, captions, book titles, UI, borders, frames, or overlays.
-Leave all surfaces free of writing. The image must communicate through people,
-objects, actions, lighting, colour, and composition only.
+/// Shared instruction for every generated lesson image. The Edge Function
+/// repeats this contract at the provider boundary, so local previews and
+/// release builds produce the same typography-first literary cover.
+const _bookCoverInstruction = '''
+BOOK-COVER OUTPUT: create a premium portrait literary cover in a 2:3
+composition. Render exactly the supplied title as clean, readable typography.
+Do not add an author name, subtitle, labels, logos, watermarks, captions, UI,
+borders, frames, or any other words. Do not show people, faces, animals,
+mascots, or named characters. If the source mentions one, make the setting,
+objects, architecture, weather, or action the primary subject instead. Keep the
+title inside safe margins and make it legible.
 ''';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -1184,7 +1186,7 @@ CEFR CONTRACT: Keep sentence length, verb forms, vocabulary, inference load, and
 
 TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions. In regular lessons, provide q_en and choices_en as learner support at every level. If an EXAM READINESS OVERRIDE appears below, it takes precedence: follow its language policy exactly. Each has exactly 3 choices and one valid zero-based answerIndex.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a portrait literary book cover describing the setting, objects, action, mood, and composition. Do not request characters or extra words; the app supplies the exact title typography.
 
 The topic is inspiration, not a requirement that every sentence mention it. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new story, not a rewrite or continuation of any previous lesson.'''}
@@ -1236,7 +1238,7 @@ CHECK SUPPORT: Write 4 to 6 comprehension questions. For every question, q is th
 
 TEACHING FIELDS: For each exact French sentence, provide its English meaning, one short English grammar note tied to that sentence, and an optional pronunciation tip. Include 5 to 8 useful French words or short phrases that actually appear in the story.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a portrait editorial illustration of the story's setting and mood. Do not request text, letters, logos, borders, watermarks, or UI in the image.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a portrait literary book cover describing the setting, objects, action, mood, and composition. Do not request characters or extra words; the app supplies the exact title typography.
 
 Keep it wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
@@ -1387,8 +1389,8 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
   }
 
   /// Creates only the single portrait cover for an already-generated story.
-  /// FLUX.2 Klein is the selected low-cost OpenRouter image tier. The bytes
-  /// are uploaded once to Supabase Storage; reopening a story never regenerates
+  /// MiniMax Image-01 creates the shared typography-first cover. The caller
+  /// owns the bounded retry/upload policy; reopening a story never regenerates
   /// its cover.
   Future<Uint8List> generateStoryCover({
     required String title,
@@ -1399,12 +1401,13 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     String? variationSeed,
   }) async {
     const qualityDirection =
-        'Create a premium portrait editorial illustration in a 2:3 composition. '
-        'Use sophisticated editorial realism, natural lighting, restrained color grading, '
-        'one clear focal scene, layered depth, and a polished publishing aesthetic. '
-        'Keep important visual details inside safe margins so the image remains clear when cropped. '
-        'Do not use anime, Ghibli, chibi, cartoon, childish, storybook, or flat vector styles; '
-        'do not use a collage, split panels, decorative frame, or UI mockup.';
+        'Create a premium portrait literary book cover in a 2:3 composition. '
+        'Use sophisticated editorial realism, tactile 3D materials where useful, '
+        'natural lighting, restrained color grading, one clear focal scene, layered depth, '
+        'and a polished publishing aesthetic. Keep important visual details inside safe margins. '
+        'Do not use anime, Ghibli, chibi, childish, flat vector, collage, split panels, '
+        'decorative frame, or UI mockup styles. Do not show people, faces, animals, mascots, '
+        'or named characters; make the setting, objects, architecture, weather, or action primary.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
         ? '$qualityDirection\nScene subject: $topic. Mood and context: $summary. Learner level: $levelBand.'
         : '$qualityDirection\n$coverPrompt\n'
@@ -1414,10 +1417,19 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         ? ''
         : '\nInternal visual variation seed: ${variationSeed.trim()}. '
               'Use it to choose a fresh composition and do not render it.';
-    final imageOnlyPrompt = '$prompt$variation\n$_imageOnlyInstruction';
+    final fullPrompt =
+        '$qualityDirection\n'
+        'EXACT TITLE TO RENDER: "$title"\n'
+        '$prompt$variation\n$_bookCoverInstruction';
+    // MiniMax Image-01 accepts prompts up to 1,500 characters. Preserve the
+    // title and the universal policy first; trim only free-form scene detail.
+    final imagePrompt = fullPrompt.length <= 1_500
+        ? fullPrompt
+        : '${fullPrompt.substring(0, 1_500 - _bookCoverInstruction.length - 80)}\n'
+              'EXACT TITLE TO RENDER: "$title"\n$_bookCoverInstruction';
     try {
       final response = await _invokeFunction('ai-image', {
-        'prompt': imageOnlyPrompt,
+        'prompt': imagePrompt,
       }, timeout: const Duration(seconds: 45));
       final encoded = response['imageBase64'] as String?;
       if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);

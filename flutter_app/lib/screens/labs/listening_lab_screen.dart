@@ -217,7 +217,8 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedStoryStoreProvider);
     try {
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: sync,
         id: story.id,
         title: story.title,
         summary: story.summary,
@@ -225,7 +226,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
       );
-      final url = await sync.uploadStoryCover(storyId: story.id, bytes: bytes);
       if (url == null) return;
       store.updateCoverUrl(story.id, url);
       if (mounted) _loadStories();

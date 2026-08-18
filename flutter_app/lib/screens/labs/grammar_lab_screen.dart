@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
@@ -126,14 +125,15 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         levelBand: level,
       );
       final storyId = newGeneratedGrammarStoryId();
-      final coverFuture = PracticeArtworkService.generate(
+      final coverFuture = PracticeArtworkService.generateAndUpload(
+        sync: ref.read(syncServiceProvider),
         id: storyId,
         title: passage.displayTitle,
         summary: 'A short French grammar story about $tense.',
         topic: 'French grammar: $tense',
         levelBand: level,
         coverPrompt:
-            'A warm editorial portrait illustration for a short French grammar story about ${passage.displayTitle}. Show the story world and one clear everyday moment. No text, letters, logos, borders, watermarks, or UI.',
+            'A premium literary book cover for a short French grammar story about ${passage.displayTitle}. Show the setting, objects, and action as the primary subject; no people, faces, animals, or characters.',
       );
       final explanation = await explanationFuture;
       final generated = await quizFuture;
@@ -236,13 +236,11 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
 
   Future<void> _saveGrammarCover(
     GeneratedGrammarStory story,
-    Future<Uint8List> coverFuture,
+    Future<String?> coverFuture,
   ) async {
-    final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedGrammarStoryStoreProvider);
     try {
-      final bytes = await coverFuture;
-      final url = await sync.uploadStoryCover(storyId: story.id, bytes: bytes);
+      final url = await coverFuture;
       if (url == null) return;
       store.updateCoverUrl(story.id, url);
       if (mounted) _loadHistory();

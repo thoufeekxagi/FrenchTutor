@@ -157,7 +157,8 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
     final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedWritingTaskStoreProvider);
     try {
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: sync,
         id: generated.id,
         title: generated.task.title,
         summary: generated.task.promptEn,
@@ -168,10 +169,6 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
             '${generated.task.promptEn}. Use one clear focal scene, sophisticated editorial '
             'realism, restrained color grading, layered depth, and a polished publishing '
             'aesthetic. Keep the composition portrait and crop-friendly with safe margins.',
-      );
-      final url = await sync.uploadStoryCover(
-        storyId: generated.id,
-        bytes: bytes,
       );
       if (url == null) return;
       store.updateCoverUrl(generated.id, url);

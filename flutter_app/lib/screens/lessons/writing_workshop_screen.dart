@@ -342,9 +342,10 @@ Help the learner think and write. Do not write the whole answer for them unless 
         topic: _task.title,
         levelBand: _task.levelBand,
         coverPrompt:
-            'A clean editorial illustration for a French learner writing about '
-            '${_task.promptEn}. Visualize the learner\'s idea without readable text. '
-            'Use a calm, friendly classroom-book aesthetic with one clear focal scene.',
+            'A premium literary book cover for a French learner writing about '
+            '${_task.promptEn}. Make the setting, objects, or action the primary '
+            'subject; do not show people, faces, animals, mascots, or characters. '
+            'The exact supplied title may appear as the only typography.',
       );
       if (!mounted) return;
       setState(() {

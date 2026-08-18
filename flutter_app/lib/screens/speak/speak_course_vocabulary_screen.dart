@@ -245,18 +245,16 @@ class _SpeakCourseVocabularyScreenState
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: ref.read(syncServiceProvider),
         id: id,
         title: title,
         summary: 'Vocabulary for ${widget.topic}. Words: $wordList.',
         topic: widget.topic,
         levelBand: _language.level,
         coverPrompt:
-            'Create one coherent real-life learning scene for a French vocabulary study set about ${widget.topic}. Represent these exact words visually: $wordList. Use objects, actions, or a natural setting, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+            'Create a premium literary book cover for a French vocabulary study set about ${widget.topic}. Represent these exact words through objects, actions, or a natural setting; no people, faces, animals, mascots, or characters. The exact supplied title may appear as the only typography.',
       );
-      final url = await ref
-          .read(syncServiceProvider)
-          .uploadStoryCover(storyId: id, bytes: bytes);
       if (url != null && url.isNotEmpty) {
         ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
       }

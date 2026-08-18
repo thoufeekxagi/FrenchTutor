@@ -6,23 +6,21 @@ const headers = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Enforce the visual-only contract at the provider boundary as well as in
-// Flutter prompts. Generated lesson text belongs in the app's UI, never in
-// the bitmap returned by this function.
-const IMAGE_ONLY_INSTRUCTION = `
-FINAL IMAGE-ONLY REQUIREMENT: render only the visual scene. Do not render or
-draw any text, words, letters, numbers, punctuation, symbols, signs, labels,
-logos, watermarks, captions, titles, UI, borders, frames, or overlays. Leave
-all surfaces free of writing. Communicate through people, objects, actions,
-lighting, colour, and composition only.
+// Keep the provider boundary aligned with the shared Flutter artwork contract:
+// one exact title is allowed, while everything else that looks like UI or
+// marketing copy is forbidden.
+const BOOK_COVER_INSTRUCTION = `
+FINAL BOOK-COVER REQUIREMENT: create a polished portrait literary cover. Render
+only the exact supplied title as clean, readable typography. Do not add an
+author name, subtitle, labels, logos, watermark, UI, borders, frames, captions,
+or any other words. Do not show people, faces, animals, mascots, or named
+characters; if the prompt mentions one, make the setting, objects, architecture,
+weather, or action the primary subject instead. Keep the title inside safe
+margins and make it legible.
 `;
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
-}
-
-function wait(milliseconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 Deno.serve(async (request) => {
@@ -36,45 +34,44 @@ Deno.serve(async (request) => {
     return json({ error: "Invalid JSON" }, 400);
   }
   const prompt = String(body.prompt ?? "").trim();
-  if (!prompt || prompt.length > 12_000) return json({ error: "Invalid prompt" }, 400);
-  const imageOnlyPrompt = `${prompt}\n${IMAGE_ONLY_INSTRUCTION}`;
+  if (!prompt || prompt.length > 1_500) return json({ error: "Invalid prompt" }, 400);
+  const promptBudget = Math.max(200, 1_500 - BOOK_COVER_INSTRUCTION.length - 1);
+  const bookCoverPrompt = `${prompt.slice(0, promptBudget)}\n${BOOK_COVER_INSTRUCTION}`;
 
-  const apiKey = Deno.env.get("OPENROUTER_API_KEY");
-  if (!apiKey) return json({ error: "OpenRouter is not configured" }, 503);
+  const apiKey = Deno.env.get("MINIMAX_API_KEY");
+  if (!apiKey) return json({ error: "MiniMax is not configured" }, 503);
 
   const requestBody = JSON.stringify({
-    model: "black-forest-labs/flux.2-klein-4b",
-    prompt: imageOnlyPrompt,
+    model: "image-01",
+    prompt: bookCoverPrompt,
     n: 1,
     aspect_ratio: "2:3",
-    output_format: "jpeg",
+    response_format: "base64",
+    prompt_optimizer: false,
+    aigc_watermark: false,
   });
-  let lastStatus = 502;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/images", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://frenchtutor.app",
-          "X-Title": "ParleSprint",
-        },
-        body: requestBody,
-      });
-      lastStatus = response.status;
-      if (response.ok) {
-        const data = await response.json();
-        const imageBase64 = String(data?.data?.[0]?.b64_json ?? "");
-        if (imageBase64) return json({ imageBase64 });
-      }
-    } catch (_) {
-      lastStatus = 502;
+  try {
+    const response = await fetch("https://api.minimaxi.com/v1/image_generation", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: requestBody,
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const encoded = data?.data?.image_base64;
+      const imageBase64 = Array.isArray(encoded)
+        ? String(encoded[0] ?? "")
+        : String(encoded ?? "");
+      if (imageBase64) return json({ imageBase64 });
     }
-    if (attempt === 0) await wait(750);
+    return json(
+      { error: "Image generation failed" },
+      response.status === 429 ? 429 : 502,
+    );
+  } catch (_) {
+    return json({ error: "Image generation failed" }, 502);
   }
-  return json(
-    { error: "Image generation failed" },
-    lastStatus === 429 ? 429 : 502,
-  );
 });

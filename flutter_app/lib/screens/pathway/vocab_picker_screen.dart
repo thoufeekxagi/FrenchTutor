@@ -577,18 +577,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: ref.read(syncServiceProvider),
         id: id,
         title: topic,
         summary: 'Custom French vocabulary for $topic. Words: $wordList.',
         topic: topic,
         levelBand: level,
         coverPrompt:
-            'Create one coherent real-life learning scene for a French vocabulary set about $topic. Use visual details that represent these exact words: $wordList. Show the words through objects, actions, or a natural setting, never as written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+            'Create a premium literary book cover for a French vocabulary set about $topic. Represent these exact words through objects, actions, or a natural setting; no people, faces, animals, mascots, or characters. The exact supplied title may appear as the only typography.',
       );
-      final url = await ref
-          .read(syncServiceProvider)
-          .uploadStoryCover(storyId: id, bytes: bytes);
       if (url != null && url.isNotEmpty) {
         ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
       }
@@ -1015,18 +1013,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await PracticeArtworkService.generate(
+      final url = await PracticeArtworkService.generateAndUpload(
+        sync: ref.read(syncServiceProvider),
         id: id,
         title: title,
         summary: '$context Words: $wordList.',
         topic: topic,
         levelBand: level,
         coverPrompt:
-            'Create one coherent real-life learning scene that visually represents this exact French vocabulary set: $wordList. Let the context guide the setting: $context. Show meaning through objects, actions, and human context, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+            'Create a premium literary book cover for a French vocabulary set. Represent these exact words through objects, actions, or a natural setting. Let the context guide the setting: $context. No people, faces, animals, mascots, or characters. The exact supplied title may appear as the only typography.',
       );
-      final url = await ref
-          .read(syncServiceProvider)
-          .uploadStoryCover(storyId: id, bytes: bytes);
       if (url != null && url.isNotEmpty) {
         ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
       }
