@@ -10,8 +10,8 @@ import '../labs/writing_lab_screen.dart';
 import '../mocks/mocks_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../speak/speak_ui.dart';
-import '../subscription/speak_paywall_screen.dart';
-import '../../widgets/adaptive/adaptive.dart';
+import '../../services/premium_access_gate.dart';
+import '../../services/subscription_gate_service.dart';
 
 enum _ExamFamily { tcf, tef }
 
@@ -28,7 +28,6 @@ class ExamReadinessScreen extends ConsumerStatefulWidget {
 }
 
 class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
-  static const _freePracticeSets = 3;
   _ExamFamily _exam = _ExamFamily.tcf;
   String _level = 'A2';
   bool _prepared = false;
@@ -45,26 +44,12 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
   void _prepare() => setState(() => _prepared = true);
 
   Future<bool> _allowExamPractice() async {
-    final gate = ref.read(subscriptionGateServiceProvider);
-    if (gate.isSubscribed()) return true;
-    final used = ref.read(examPracticeStoreProvider).startedCount();
-    if (used < _freePracticeSets) return true;
-    if (!mounted) return false;
-    final upgrade = await showPSConfirmDialog(
+    return requirePremiumArea(
       context,
-      title: 'Your free practice sets are complete',
-      message:
-          'You have used the three free exam-readiness sets. Keep practicing with Premium, or review your saved results in Exam readiness.',
-      confirmLabel: 'See Premium',
-      cancelLabel: 'Not now',
+      ref,
+      PremiumArea.exam,
+      source: 'exam_readiness',
     );
-    if (!upgrade || !mounted) return false;
-    await AppRouter.push<bool>(
-      context,
-      (_) => const SpeakPaywallScreen(),
-      fullscreenDialog: true,
-    );
-    return ref.read(subscriptionGateServiceProvider).isSubscribed();
   }
 
   Future<void> _openReading() async {

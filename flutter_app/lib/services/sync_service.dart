@@ -1349,7 +1349,7 @@ class SyncService {
   // onto `profiles` into the local
   // `entitlements` table, so PilotAccessService's synchronous, offline-first
   // snapshot() reflects real subscription state instead of only ever seeing
-  // the founding_access/localPreview default. The profile flag is advisory,
+  // the free-preview default. The profile flag is advisory,
   // so expiry is always re-checked against wall-clock time here too.
   Future<void> _hydrateEntitlements(String uid) async {
     final row = await _client

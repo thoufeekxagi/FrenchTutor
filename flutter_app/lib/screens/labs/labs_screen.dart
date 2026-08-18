@@ -10,7 +10,7 @@ import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/web/web_layout.dart';
 import '../../widgets/web/web_practice_grid.dart';
-import '../subscription/speak_paywall_screen.dart';
+import '../../services/premium_access_gate.dart';
 import '../pathway/vocab_picker_screen.dart';
 import 'alphabet_lab_screen.dart';
 import 'connectors_lab_screen.dart';
@@ -33,7 +33,7 @@ class LabsScreen extends ConsumerWidget {
     // the tab was first opened.
     final gate = ref.watch(subscriptionGateServiceProvider);
     if (MediaQuery.sizeOf(context).width >= DesignTokens.breakpointExpanded) {
-      return _webPracticePage(context, gate);
+      return _webPracticePage(context, ref, gate);
     }
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
@@ -60,7 +60,8 @@ class LabsScreen extends ConsumerWidget {
                       _RecommendedPractice(
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('vocabulary'),
+                          ref: ref,
+                          labId: 'vocabulary',
                           builder: (_) => const VocabPickerScreen(),
                         ),
                       ),
@@ -73,7 +74,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('alphabet'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('alphabet'),
+                          ref: ref,
+                          labId: 'alphabet',
                           builder: (_) => const AlphabetLabScreen(),
                         ),
                       ),
@@ -85,7 +87,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('speaking_mock'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('speaking_mock'),
+                          ref: ref,
+                          labId: 'speaking_mock',
                           builder: (_) => const MocksScreen(),
                         ),
                       ),
@@ -97,7 +100,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('vocabulary'),
+                          ref: ref,
+                          labId: 'vocabulary',
                           builder: (_) => const VocabPickerScreen(),
                         ),
                       ),
@@ -108,7 +112,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('flashcards'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('flashcards'),
+                          ref: ref,
+                          labId: 'flashcards',
                           builder: (_) => const VocabLabScreen(),
                         ),
                       ),
@@ -119,7 +124,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('grammar'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('grammar'),
+                          ref: ref,
+                          labId: 'grammar',
                           builder: (_) => const GrammarLabScreen(),
                         ),
                       ),
@@ -130,7 +136,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('liaison'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('liaison'),
+                          ref: ref,
+                          labId: 'liaison',
                           builder: (_) => const LiaisonLabScreen(),
                         ),
                       ),
@@ -141,7 +148,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('connectors'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('connectors'),
+                          ref: ref,
+                          labId: 'connectors',
                           builder: (_) => const ConnectorsLabScreen(),
                         ),
                       ),
@@ -152,7 +160,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('listening'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('listening'),
+                          ref: ref,
+                          labId: 'listening',
                           builder: (_) => const ListeningLabScreen(),
                         ),
                       ),
@@ -164,7 +173,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('roleplay'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('roleplay'),
+                          ref: ref,
+                          labId: 'roleplay',
                           builder: (_) => const RoleplayLabScreen(),
                         ),
                       ),
@@ -175,7 +185,8 @@ class LabsScreen extends ConsumerWidget {
                         locked: gate.isLabLocked('writing'),
                         onTap: () => _open(
                           context,
-                          locked: gate.isLabLocked('writing'),
+                          ref: ref,
+                          labId: 'writing',
                           builder: (_) => const WritingLabScreen(),
                         ),
                       ),
@@ -190,7 +201,11 @@ class LabsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _webPracticePage(BuildContext context, SubscriptionGateService gate) {
+  Widget _webPracticePage(
+    BuildContext context,
+    WidgetRef ref,
+    SubscriptionGateService gate,
+  ) {
     final items = <WebPracticeShortcut>[
       WebPracticeShortcut(
         icon: CupertinoIcons.textformat_abc,
@@ -198,7 +213,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('alphabet'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('alphabet'),
+          ref: ref,
+          labId: 'alphabet',
           builder: (_) => const AlphabetLabScreen(),
         ),
       ),
@@ -208,7 +224,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('speaking_mock'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('speaking_mock'),
+          ref: ref,
+          labId: 'speaking_mock',
           builder: (_) => const MocksScreen(),
         ),
       ),
@@ -218,7 +235,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('vocabulary'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('vocabulary'),
+          ref: ref,
+          labId: 'vocabulary',
           builder: (_) => const VocabPickerScreen(),
         ),
       ),
@@ -228,7 +246,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('flashcards'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('flashcards'),
+          ref: ref,
+          labId: 'flashcards',
           builder: (_) => const VocabLabScreen(),
         ),
       ),
@@ -238,7 +257,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('grammar'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('grammar'),
+          ref: ref,
+          labId: 'grammar',
           builder: (_) => const GrammarLabScreen(),
         ),
       ),
@@ -248,7 +268,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('liaison'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('liaison'),
+          ref: ref,
+          labId: 'liaison',
           builder: (_) => const LiaisonLabScreen(),
         ),
       ),
@@ -258,7 +279,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('connectors'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('connectors'),
+          ref: ref,
+          labId: 'connectors',
           builder: (_) => const ConnectorsLabScreen(),
         ),
       ),
@@ -268,7 +290,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('listening'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('listening'),
+          ref: ref,
+          labId: 'listening',
           builder: (_) => const ListeningLabScreen(),
         ),
       ),
@@ -278,7 +301,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('roleplay'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('roleplay'),
+          ref: ref,
+          labId: 'roleplay',
           builder: (_) => const RoleplayLabScreen(),
         ),
       ),
@@ -288,7 +312,8 @@ class LabsScreen extends ConsumerWidget {
         locked: gate.isLabLocked('writing'),
         onTap: () => _open(
           context,
-          locked: gate.isLabLocked('writing'),
+          ref: ref,
+          labId: 'writing',
           builder: (_) => const WritingLabScreen(),
         ),
       ),
@@ -317,18 +342,16 @@ class LabsScreen extends ConsumerWidget {
 
 void _open(
   BuildContext context, {
-  required bool locked,
+  required WidgetRef ref,
+  required String labId,
   required WidgetBuilder builder,
-}) {
-  if (locked) {
-    AppRouter.push(
-      context,
-      (_) => const SpeakPaywallScreen(),
-      fullscreenDialog: true,
-    );
+}) async {
+  final area = PremiumAreaMapping.fromLabId(labId);
+  if (area != null &&
+      !await requirePremiumArea(context, ref, area, source: 'labs_$labId')) {
     return;
   }
-  AppRouter.push(context, builder);
+  if (context.mounted) await AppRouter.push(context, builder);
 }
 
 class _RecommendedPractice extends StatelessWidget {

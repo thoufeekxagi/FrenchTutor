@@ -129,6 +129,22 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       final info = await Purchases.restorePurchases();
       if (!mounted) return;
       if (info.entitlements.active.containsKey(speakProEntitlementId)) {
+        final entitlement = info.entitlements.active[speakProEntitlementId];
+        if (entitlement != null) {
+          ref
+              .read(pilotInfrastructureStoreProvider)
+              .saveEntitlement(
+                PilotEntitlement(
+                  productId: entitlement.productIdentifier,
+                  status: PilotEntitlementStatus.active,
+                  source: 'revenuecat_restore',
+                  expiresAt: entitlement.expirationDate == null
+                      ? null
+                      : DateTime.tryParse(entitlement.expirationDate!),
+                  verifiedAt: DateTime.now(),
+                ),
+              );
+        }
         ProductAnalytics.capture(
           'purchase_restored',
           properties: {'source': widget.source},

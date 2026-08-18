@@ -10,7 +10,9 @@ import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
+import '../../services/subscription_gate_service.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
@@ -73,6 +75,16 @@ class _SpeakCourseActivityScreenState
 
   Future<void> _launch() async {
     try {
+      final allowed = await requirePremiumArea(
+        context,
+        ref,
+        PremiumArea.course,
+        source: 'course',
+      );
+      if (!allowed || !mounted) {
+        if (mounted) Navigator.of(context).pop(false);
+        return;
+      }
       final startedAt = DateTime.now();
       ref.read(adaptiveCourseStoreProvider).markStarted(session.contentKey);
       final completed = await _openPractice();

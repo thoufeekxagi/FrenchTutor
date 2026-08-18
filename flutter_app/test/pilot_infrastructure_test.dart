@@ -3,6 +3,7 @@ import 'package:french_tutor/data/database/learning_store.dart';
 import 'package:french_tutor/data/database/pilot_infrastructure_store.dart';
 import 'package:french_tutor/models/pilot_access.dart';
 import 'package:french_tutor/services/pilot_access_service.dart';
+import 'package:french_tutor/services/subscription_gate_service.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
@@ -48,6 +49,7 @@ void main() {
           25,
           26,
           27,
+          28,
         ],
       );
     });
@@ -64,7 +66,7 @@ void main() {
 
       infrastructure.saveEntitlement(
         PilotEntitlement(
-          productId: 'founding_access',
+          productId: 'com.parlesprint.pro.annual',
           status: PilotEntitlementStatus.active,
           source: 'revenuecat',
           verifiedAt: DateTime.now().toUtc(),
@@ -75,6 +77,33 @@ void main() {
       expect(entitlement.status, PilotEntitlementStatus.active);
       expect(entitlement.source, 'revenuecat');
       expect(entitlement.grantsAccess, isTrue);
+    });
+
+    test('gives one shared premium preview per local day', () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final infrastructure = PilotInfrastructureStore(db);
+      final gate = SubscriptionGateService(
+        infrastructure: infrastructure,
+        database: db,
+      );
+
+      expect(gate.tryEnter(PremiumArea.reading), isTrue);
+      expect(gate.previewUsedToday, isTrue);
+      expect(gate.tryEnter(PremiumArea.listening), isFalse);
+      expect(gate.isLabLocked('vocabulary'), isFalse);
+      expect(gate.isLabLocked('writing'), isTrue);
+
+      infrastructure.saveEntitlement(
+        PilotEntitlement(
+          productId: 'com.parlesprint.pro.annual',
+          status: PilotEntitlementStatus.active,
+          source: 'revenuecat',
+          verifiedAt: DateTime.now().toUtc(),
+        ),
+      );
+      expect(gate.hasPremiumAccess, isTrue);
+      expect(gate.tryEnter(PremiumArea.writing), isTrue);
     });
 
     test('legacy invite entitlements never grant release access', () {

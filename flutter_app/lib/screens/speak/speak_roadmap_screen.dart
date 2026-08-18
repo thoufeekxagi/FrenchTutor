@@ -9,6 +9,7 @@ import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
+import '../../services/subscription_gate_service.dart';
 import 'speak_course_activity_screen.dart';
 import 'speak_ui.dart';
 
@@ -52,6 +53,9 @@ class SpeakRoadmapScreen extends ConsumerWidget {
       adaptiveSessions: adaptiveSessions,
     );
     final language = SpeakLanguageProfile.forLevel(roadmap.level);
+    final courseLocked = ref
+        .watch(subscriptionGateServiceProvider)
+        .isAreaLocked(PremiumArea.course);
     final units =
         roadmap.sessions.map((session) => session.unit).toSet().toList()
           ..sort();
@@ -120,6 +124,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
                 context,
                 session,
                 featured: session.index == roadmap.nextSession?.index,
+                locked: courseLocked,
               ),
               const SizedBox(height: 8),
             ],
@@ -152,6 +157,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     BuildContext context,
     SpeakRoadmapSession session, {
     required bool featured,
+    required bool locked,
   }) {
     final active = featured && !session.completed;
     final lessonSubtitle = _lessonSubtitle(session.subtitle);
@@ -217,7 +223,9 @@ class SpeakRoadmapScreen extends ConsumerWidget {
               ),
             ),
             Icon(
-              session.completed
+              locked
+                  ? Icons.lock_outline_rounded
+                  : session.completed
                   ? Icons.check_circle_rounded
                   : Icons.arrow_forward_ios_rounded,
               size: 18,

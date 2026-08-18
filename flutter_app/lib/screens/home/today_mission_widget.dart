@@ -10,6 +10,8 @@ import '../../models/tutor_persona.dart';
 import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/premium_access_gate.dart';
+import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../labs/listening_lab_screen.dart';
@@ -18,7 +20,6 @@ import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
 import '../session/session_screen.dart';
-import '../subscription/speak_paywall_screen.dart';
 
 /// "Today's mission" — not a generated multi-step lesson plan anymore, just
 /// a plain daily accountability check: touch each of [DailyGoalService.categories]
@@ -138,14 +139,17 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
 
   Future<void> _openCategory(String category) async {
     final lockKey = _labLockKeyFor(category);
-    if (lockKey != null &&
-        ref.read(subscriptionGateServiceProvider).isLabLocked(lockKey)) {
-      final subscribed = await AppRouter.push<bool>(
-        context,
-        (_) => const SpeakPaywallScreen(),
-        fullscreenDialog: true,
-      );
-      if (subscribed != true || !mounted) return;
+    if (lockKey != null) {
+      final area = PremiumAreaMapping.fromLabId(lockKey);
+      if (area != null &&
+          !await requirePremiumArea(
+            context,
+            ref,
+            area,
+            source: 'today_mission_$category',
+          )) {
+        return;
+      }
     }
     setState(() {
       _running = true;

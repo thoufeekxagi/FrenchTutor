@@ -9,6 +9,7 @@ import 'package:french_tutor/design/app_theme.dart';
 import 'package:french_tutor/models/content_models.dart';
 import 'package:french_tutor/providers/database_provider.dart';
 import 'package:french_tutor/screens/lessons/story_reader_screen.dart';
+import 'package:french_tutor/widgets/bilingual_word_text.dart';
 
 void main() {
   setUpAll(() async {
@@ -62,24 +63,27 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Le marché est vivant.'), findsOneWidget);
-    expect(find.text('The market is lively.'), findsOneWidget);
-    expect(find.text('La pluie commence.'), findsNothing);
+    Finder sentence(String source) => find.byWidgetPredicate(
+      (widget) => widget is BilingualWordText && widget.source == source,
+    );
+
+    expect(sentence('Le marché est vivant.'), findsOneWidget);
+    expect(sentence('La pluie commence.'), findsNothing);
 
     await tester.tap(find.text('Next sentence'));
     await tester.pumpAndSettle();
-    expect(find.text('Le marché est vivant.'), findsNothing);
-    expect(find.text('La pluie commence.'), findsOneWidget);
+    expect(sentence('Le marché est vivant.'), findsNothing);
+    expect(sentence('La pluie commence.'), findsOneWidget);
 
     await tester.tap(find.text('Full story'));
     await tester.pumpAndSettle();
     expect(find.text('FULL STORY'), findsOneWidget);
-    expect(find.text('Le marché est vivant.'), findsOneWidget);
-    expect(find.text('La pluie commence.'), findsOneWidget);
+    expect(sentence('Le marché est vivant.'), findsOneWidget);
+    expect(sentence('La pluie commence.'), findsOneWidget);
 
     await tester.tap(find.text('Sentences'));
     await tester.pumpAndSettle();
-    expect(find.text('Le marché est vivant.'), findsNothing);
-    expect(find.text('La pluie commence.'), findsOneWidget);
+    expect(sentence('Le marché est vivant.'), findsNothing);
+    expect(sentence('La pluie commence.'), findsOneWidget);
   });
 }

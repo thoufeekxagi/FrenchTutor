@@ -51,47 +51,51 @@ class BilingualWordText extends StatelessWidget {
             sourceWords.length,
           );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 0,
-          runSpacing: 4,
-          children: [
-            for (var index = 0; index < sourceWords.length; index++)
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onSourceWordTap(index),
-                child: Text(
-                  '${sourceWords[index]}${index == sourceWords.length - 1 ? '' : ' '}',
-                  style: _wordStyle(
-                    sourceStyle,
-                    selected: selectedSourceWord == index,
-                    playing: playbackSourceWord == index,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        if (translationWords.isNotEmpty) ...[
-          const SizedBox(height: 8),
+    return Semantics(
+      container: true,
+      label: translationWords.isEmpty ? source : '$source $translation',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Wrap(
             spacing: 0,
             runSpacing: 4,
             children: [
-              for (var index = 0; index < translationWords.length; index++)
-                Text(
-                  '${translationWords[index]}${index == translationWords.length - 1 ? '' : ' '}',
-                  style: _wordStyle(
-                    translationStyle,
-                    selected: selectedTranslationWords.contains(index),
-                    playing: playbackTranslationWord == index,
+              for (var index = 0; index < sourceWords.length; index++)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onSourceWordTap(index),
+                  child: Text(
+                    '${sourceWords[index]}${index == sourceWords.length - 1 ? '' : ' '}',
+                    style: _wordStyle(
+                      sourceStyle,
+                      selected: selectedSourceWord == index,
+                      playing: playbackSourceWord == index,
+                    ),
                   ),
                 ),
             ],
           ),
+          if (translationWords.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 0,
+              runSpacing: 4,
+              children: [
+                for (var index = 0; index < translationWords.length; index++)
+                  Text(
+                    '${translationWords[index]}${index == translationWords.length - 1 ? '' : ' '}',
+                    style: _wordStyle(
+                      translationStyle,
+                      selected: selectedTranslationWords.contains(index),
+                      playing: playbackTranslationWord == index,
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 

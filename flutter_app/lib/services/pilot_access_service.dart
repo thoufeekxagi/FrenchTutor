@@ -62,9 +62,9 @@ class PilotAccessService {
     final safeEntitlement =
         entitlement.status == PilotEntitlementStatus.localPreview && !kDebugMode
         ? const PilotEntitlement(
-            productId: 'founding_access',
+            productId: 'none',
             status: PilotEntitlementStatus.inactive,
-            source: 'unconfigured',
+            source: 'free_preview',
           )
         : entitlement;
     // The cached allowance is refreshed asynchronously elsewhere so this

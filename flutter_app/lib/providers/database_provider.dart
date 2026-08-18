@@ -165,6 +165,7 @@ final subscriptionGateServiceProvider = Provider<SubscriptionGateService>((
 ) {
   return SubscriptionGateService(
     infrastructure: ref.watch(pilotInfrastructureStoreProvider),
+    database: ref.watch(databaseProvider),
   );
 });
 

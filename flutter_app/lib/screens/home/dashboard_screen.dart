@@ -18,6 +18,8 @@ import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/notification_scheduler_service.dart';
+import '../../services/premium_access_gate.dart';
+import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
@@ -36,7 +38,6 @@ import '../reading/reading_library_screen.dart';
 import '../notes/notes_review_screen.dart';
 import '../session/session_screen.dart';
 import '../settings/settings_screen.dart';
-import '../subscription/speak_paywall_screen.dart';
 import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
 
@@ -712,14 +713,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   /// everywhere else. `null` means the skill is never lab-gated (Speaking/
   /// Pronunciation are quota-gated by the daily AI-minutes cap instead).
   Future<void> _openGated(String? labId, VoidCallback action) async {
-    if (labId != null &&
-        ref.read(subscriptionGateServiceProvider).isLabLocked(labId)) {
-      final subscribed = await AppRouter.push<bool>(
-        context,
-        (_) => const SpeakPaywallScreen(),
-        fullscreenDialog: true,
-      );
-      if (subscribed != true || !mounted) return;
+    if (labId != null) {
+      final area = PremiumAreaMapping.fromLabId(labId);
+      if (area != null &&
+          !await requirePremiumArea(
+            context,
+            ref,
+            area,
+            source: 'dashboard_$labId',
+          )) {
+        return;
+      }
     }
     action();
   }

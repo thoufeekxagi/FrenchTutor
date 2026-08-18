@@ -91,6 +91,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   25: _migrationV25,
   26: _migrationV26,
   27: _migrationV27,
+  28: _migrationV28,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1099,4 +1100,20 @@ void _migrationV27(CommonDatabase db) {
     'CREATE INDEX IF NOT EXISTS idx_adaptive_course_sessions_content '
     'ON adaptive_course_sessions (content_key, status)',
   );
+}
+
+/// One bounded, device-local premium preview per local calendar day. The
+/// preview is intentionally shared across premium areas: a learner chooses
+/// whether today's useful session is reading, listening, writing, exam prep,
+/// or the course. A subscription bypasses this table entirely.
+void _migrationV28(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS premium_preview_usage (
+      usage_date TEXT PRIMARY KEY,
+      area TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
 }

@@ -68,9 +68,9 @@ class PilotInfrastructureStore {
     );
     if (rows.isEmpty) {
       return const PilotEntitlement(
-        productId: 'founding_access',
+        productId: 'none',
         status: PilotEntitlementStatus.localPreview,
-        source: 'local',
+        source: 'free_preview',
       );
     }
     final row = rows.first;

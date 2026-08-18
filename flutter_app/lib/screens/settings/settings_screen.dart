@@ -660,7 +660,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (productId.contains('12month')) return '12-Month Plan';
     if (productId.contains('3month')) return '3-Month Plan';
     if (productId == 'app_review') return 'Reviewer access';
-    if (productId == 'founding_access') return 'Founding access';
     return 'Free';
   }
 
