@@ -87,6 +87,13 @@ flutter:
     - assets/content/
     - assets/audio/tutor_previews/
     - assets/audio/alphabet/
+    # Flutter asset directory entries are not recursive. Keep each tutor
+    # catalog explicit so release/TestFlight bundles every PCM clip, not only
+    # the top-level catalog.json.
+    - assets/audio/alphabet/marie/
+    - assets/audio/alphabet/julien/
+    - assets/audio/alphabet/camille/
+    - assets/audio/alphabet/mathieu/
     - assets/images/
     - assets/images/tutor_camille_storyboard/
     - assets/starter_covers/

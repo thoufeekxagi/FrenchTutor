@@ -384,14 +384,14 @@ String alphabetAudioAssetPath(AlphabetLetter letter, TutorPersona persona) =>
 /// letters plus the 5 accent marks — Consonants/Vowels are just subsets of
 /// the same 26, so nothing extra is needed for them). Every one of the four
 /// tutor voices is included so changing tutors never triggers live generation.
-List<SpeechItem> alphabetPrewarmItems() => [
-  for (final persona in TutorPersona.all)
+List<SpeechItem> alphabetPrewarmItems({TutorPersona? persona}) => [
+  for (final selectedPersona in persona == null ? TutorPersona.all : [persona])
     for (final letter in [...frenchAlphabet, ...frenchAccents])
       SpeechItem(
         text: alphabetSpokenText(letter),
         language: 'fr-FR',
         contentItemId: alphabetAudioId(letter),
-        voiceName: persona.voiceName,
-        assetPath: alphabetAudioAssetPath(letter, persona),
+        voiceName: selectedPersona.voiceName,
+        assetPath: alphabetAudioAssetPath(letter, selectedPersona),
       ),
 ];

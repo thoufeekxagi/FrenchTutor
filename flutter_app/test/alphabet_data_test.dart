@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 
 import 'package:french_tutor/data/alphabet_data.dart';
 import 'package:french_tutor/models/tutor_persona.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('vowel cards speak the letter name, not the example word', () {
     const expectedSpokenNames = {
       'A': 'a',
@@ -83,4 +86,37 @@ void main() {
       }
     },
   );
+
+  test('selected tutor prewarm contains only that tutor\'s 31 clips', () {
+    for (final tutor in TutorPersona.all) {
+      final items = alphabetPrewarmItems(persona: tutor);
+
+      expect(items, hasLength(31));
+      expect(items.every((item) => item.voiceName == tutor.voiceName), isTrue);
+      expect(items.map((item) => item.contentItemId).toSet(), hasLength(31));
+      expect(
+        items.every((item) => item.assetPath!.contains('/${tutor.id}/')),
+        isTrue,
+      );
+    }
+  });
+
+  test('every alphabet clip is present in Flutter\'s asset bundle', () async {
+    final items = alphabetPrewarmItems();
+
+    for (final item in items) {
+      final assetPath = item.assetPath!;
+      final data = await rootBundle.load(assetPath);
+      expect(
+        data.lengthInBytes,
+        greaterThan(0),
+        reason: 'Empty bundled alphabet audio: $assetPath',
+      );
+      expect(
+        data.lengthInBytes.isEven,
+        isTrue,
+        reason: 'Alphabet PCM16 asset has an odd byte length: $assetPath',
+      );
+    }
+  });
 }

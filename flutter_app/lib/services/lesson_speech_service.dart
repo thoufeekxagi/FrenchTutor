@@ -446,6 +446,7 @@ class LessonSpeechService {
   Future<int> prewarmBundled(
     List<SpeechItem> items, {
     int concurrency = 4,
+    String? cacheNamespace,
   }) async {
     var next = 0;
     Future<int> worker() async {
@@ -461,6 +462,7 @@ class LessonSpeechService {
           text: item.text,
           voiceName: voiceName,
           contentItemId: item.contentItemId,
+          cacheNamespace: cacheNamespace,
         );
         if (bytes != null) seeded++;
       }
@@ -638,11 +640,9 @@ class LessonSpeechService {
       throw StateError('Invalid PCM16 playback buffer');
     }
 
-    // Pronunciation taps are independent one-shot clips, not a continuation
-    // of the live conversation stream. A hard reset removes bytes already
-    // accepted by flutter_sound and starts a clean native stream, which avoids
-    // the old clip being muted/unmuted over the new one and fixes silent replay
-    // after the first pronunciation tap.
+    // Pronunciation clips are independent one-shot buffers. Hard-reset the
+    // shared player before feeding the selected clip so a live-call timeline
+    // or queued tail can never make a tap appear to do nothing.
     await _geminiAudio.stopPlayback(hardStop: true);
     await _geminiAudio.playAudioChunk(bytes, waitForFeed: true);
   }

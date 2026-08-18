@@ -459,7 +459,10 @@ class AudioStreamingService {
 
   int _muteGeneration = 0;
 
-  Future<void> stopPlayback({bool hardStop = false}) async {
+  Future<void> stopPlayback({
+    bool hardStop = false,
+    bool waitForSilence = false,
+  }) async {
     _playbackGeneration++;
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
     // interruption keep draining and playing after the model was told to stop (barge-in /
@@ -535,6 +538,9 @@ class AudioStreamingService {
     // The tracked timeline is now stale — without this reset the mic gate would keep
     // blocking uploads until a time that no longer corresponds to any audio actually playing.
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+    if (waitForSilence && remainingMs > 0) {
+      await Future<void>.delayed(Duration(milliseconds: muteMs));
+    }
   }
 
   /// Best-effort speaker/earpiece toggle for the in-call UI button. The session is already

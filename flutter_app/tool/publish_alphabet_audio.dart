@@ -16,6 +16,12 @@ const _manifestPath = 'assets/audio/alphabet/catalog.json';
 
 Future<void> main(List<String> args) async {
   final storageOnly = args.contains('--storage-only');
+  final personaFilter = _argValue(args, '--persona');
+  final itemFilter = _argValue(args, '--items')
+      ?.split(',')
+      .map((value) => value.trim())
+      .where((value) => value.isNotEmpty)
+      .toSet();
   final supabaseUrl = Platform.environment['SUPABASE_URL'];
   final serviceRoleKey = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
   if (supabaseUrl == null || supabaseUrl.isEmpty) {
@@ -36,7 +42,18 @@ Future<void> main(List<String> args) async {
     return;
   }
   final manifest = jsonDecode(await manifestFile.readAsString()) as Map;
-  final items = (manifest['items'] as List).cast<Map>();
+  final items = (manifest['items'] as List)
+      .cast<Map>()
+      .where(
+        (item) =>
+            (personaFilter == null || item['persona_id'] == personaFilter) &&
+            (itemFilter == null ||
+                itemFilter.contains(item['content_item_id'])),
+      )
+      .toList();
+  if (items.isEmpty) {
+    throw StateError('No catalog items match the requested filters.');
+  }
   final headers = {
     'Authorization': 'Bearer $serviceRoleKey',
     'apikey': serviceRoleKey,
@@ -90,6 +107,14 @@ Future<void> main(List<String> args) async {
     );
   }
   stdout.writeln('Published ${items.length} catalog rows to Supabase.');
+}
+
+String? _argValue(List<String> args, String name) {
+  final prefix = '$name=';
+  for (final arg in args) {
+    if (arg.startsWith(prefix)) return arg.substring(prefix.length);
+  }
+  return null;
 }
 
 Future<void> _verifyCatalogTable(

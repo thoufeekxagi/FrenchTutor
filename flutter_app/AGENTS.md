@@ -17,6 +17,8 @@ API secrets, service-account JSON, signing certificates, or OAuth credentials.
 
 ## UI/UX v2
 
+- Before any UI change or redesign, read `design_approach.md` and follow its
+  screen contract, responsive checks, and visual QA requirements.
 - `lib/design/` is the source of truth for color, typography, spacing, radii,
   shadows, motion, and component themes.
 - Use semantic `DesignTokens` names. Do not add retired palette vocabulary or

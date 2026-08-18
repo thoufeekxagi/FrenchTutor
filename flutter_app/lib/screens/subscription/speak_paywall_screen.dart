@@ -196,15 +196,18 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                     child: CircularProgressIndicator(color: SpeakColors.blue),
                   )
                 : ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                     children: [
-                      const SizedBox(height: 54),
+                      // Reserve a real header zone for the back control. The
+                      // old overlay sat on top of the title on narrow phones.
+                      const SizedBox(height: 48),
                       Text(
                         'Unlock full French access',
                         textAlign: TextAlign.center,
-                        style: DesignTokens.display(34),
+                        maxLines: 2,
+                        style: DesignTokens.display(28),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 18),
                       _benefit(
                         'A course shaped around you',
                         Icons.route_rounded,
@@ -226,9 +229,9 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                         'Smart review that remembers',
                         Icons.bolt_rounded,
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 8),
                       _plans(),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       if (_message != null)
                         Text(
                           _message!,
@@ -237,13 +240,17 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                             12,
                           ).copyWith(color: SpeakColors.inkSoft),
                         ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       SpeakPrimaryButton(
                         label: _purchasing ? 'Processing…' : _ctaLabel(),
                         icon: Icons.workspace_premium_rounded,
                         onTap: _purchasing ? () {} : _purchase,
                       ),
-                      const SizedBox(height: 26),
+                      // Keep the first viewport focused on the purchase
+                      // decision. The value story remains in the same
+                      // scrollable page, but starts below the normal phone
+                      // viewport instead of peeking beneath the CTA.
+                      const SizedBox(height: 192),
                       const SubscriptionMarketingSections(),
                       const SizedBox(height: 24),
                       SubscriptionBottomOffer(
@@ -290,8 +297,8 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                     ],
                   ),
             Positioned(
-              top: 8,
-              left: 8,
+              top: 12,
+              left: 12,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -328,24 +335,24 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
 
   Widget _benefit(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 7),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 32,
+            height: 32,
             decoration: const BoxDecoration(
               color: SpeakColors.blueSoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: SpeakColors.blue, size: 19),
+            child: Icon(icon, color: SpeakColors.blue, size: 17),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 9),
           Expanded(
             child: Text(
               title,
-              style: DesignTokens.body(16, weight: FontWeight.w700),
+              style: DesignTokens.body(14.5, weight: FontWeight.w700),
             ),
           ),
         ],
@@ -368,7 +375,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       children: [
         for (final package in packages) ...[
           _plan(package),
-          const SizedBox(height: 9),
+          const SizedBox(height: 7),
         ],
       ],
     );
@@ -391,7 +398,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -409,33 +416,33 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
               color: selected ? SpeakColors.blue : SpeakColors.line,
               size: 21,
             ),
-            const SizedBox(width: 11),
+            const SizedBox(width: 9),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     _planTitle(package),
-                    style: DesignTokens.body(16, weight: FontWeight.w700),
+                    style: DesignTokens.body(14.5, weight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 1),
                   Text(
                     package.storeProduct.priceString,
-                    style: DesignTokens.display(23).copyWith(
+                    style: DesignTokens.display(21).copyWith(
                       color: SpeakColors.navy,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     _billingTerms(package),
                     style: DesignTokens.body(
-                      13,
+                      11.5,
                       weight: FontWeight.w600,
                     ).copyWith(color: SpeakColors.inkSoft),
                   ),
                   if (trialSummary != null) ...[
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
                     annual
                         ? SizedBox(
                             width: double.infinity,
@@ -446,7 +453,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                                 trialSummary,
                                 maxLines: 1,
                                 style: DesignTokens.body(
-                                  13,
+                                  11.5,
                                 ).copyWith(color: SpeakColors.inkSoft),
                               ),
                             ),
@@ -454,7 +461,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                         : Text(
                             trialSummary,
                             style: DesignTokens.body(
-                              13,
+                              11.5,
                             ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
                           ),
                   ],

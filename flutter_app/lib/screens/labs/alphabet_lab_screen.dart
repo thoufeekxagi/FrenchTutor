@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
@@ -12,6 +13,7 @@ import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
+import '../../services/alphabet_prewarm.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/inline_call_bar.dart';
@@ -146,6 +148,9 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
       onUserTranscript: (text) => _recorder.logUser(text),
       onTutorTranscript: (text) => _recorder.logTutor(text),
     );
+    // Warm the selected tutor's 31-clip catalog in the background. This is
+    // idempotent with the onboarding prewarm and does not block the deck.
+    unawaited(AlphabetPrewarm.maybeStart(isBeginner: true));
   }
 
   String get _lessonContext {
@@ -339,14 +344,32 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                       key: _ttsKey,
                       text: alphabetSpokenText(letter),
                       contentItemId: widget.contentItemId,
+                      // The bundled catalog is authoritative for alphabet
+                      // sounds. Do not consult a stale Supabase object here:
+                      // TestFlight must use the validated clip shipped in
+                      // this build until Storage is synchronized.
+                      remoteStoragePath: null,
                       // Alphabet pronunciation is static, curated content.
-                      // Keep it on the bundled clip so a stale or misassigned
-                      // remote catalog entry can never make A say "ami", etc.
+                      // The bundled asset is the selected tutor's canonical
+                      // clip and can never turn A into the example word
+                      // "ami" or reuse stale remote audio.
                       cacheNamespace: 'alphabet-bundled-v2',
                       bundledAssetPath: alphabetAudioAssetPath(
                         letter,
                         ActiveTutor.current,
                       ),
+                      onError: (error) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'This pronunciation is unavailable in this build. Please reinstall the latest version.',
+                              ),
+                            ),
+                          );
+                      },
                       color: SpeakColors.blue,
                       size: 48,
                       iconSize: 15,
