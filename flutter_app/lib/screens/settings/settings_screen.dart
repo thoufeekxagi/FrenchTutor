@@ -1288,7 +1288,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               activeThumbColor: DesignTokens.primary,
                               onChanged: (v) {
                                 DevSubscriptionOverride.set(v).then((_) {
-                                  if (mounted) setState(() {});
+                                  if (!mounted) return;
+                                  ref.invalidate(
+                                    subscriptionGateServiceProvider,
+                                  );
+                                  ref.invalidate(pilotAccessServiceProvider);
+                                  setState(
+                                    () => _access = ref
+                                        .read(pilotAccessServiceProvider)
+                                        .snapshot(),
+                                  );
                                 });
                               },
                             ),
