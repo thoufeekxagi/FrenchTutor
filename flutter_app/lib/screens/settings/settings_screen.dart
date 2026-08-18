@@ -1266,42 +1266,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _ModernCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      KickerText('Developer', color: DesignTokens.mutedDim),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Text(
-                            'Force unlock premium',
-                            style: DesignTokens.body(12.5),
-                          ),
-                          const Spacer(),
-                          Switch.adaptive(
-                            value: DevSubscriptionOverride.enabled,
-                            activeThumbColor: DesignTokens.primary,
-                            onChanged: (v) {
-                              DevSubscriptionOverride.set(v).then((_) {
-                                if (mounted) setState(() {});
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Bypasses subscription checks for testing. '
-                        'Debug builds only, compiled out entirely from release.',
-                        style: DesignTokens.body(
-                          11.5,
-                        ).copyWith(color: DesignTokens.mutedDim),
-                      ),
-                    ],
+                if (DevSubscriptionOverride.isAvailable) ...[
+                  _ModernCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        KickerText(
+                          'Android developer',
+                          color: DesignTokens.mutedDim,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              'Force unlock premium',
+                              style: DesignTokens.body(12.5),
+                            ),
+                            const Spacer(),
+                            Switch.adaptive(
+                              value: DevSubscriptionOverride.enabled,
+                              activeThumbColor: DesignTokens.primary,
+                              onChanged: (v) {
+                                DevSubscriptionOverride.set(v).then((_) {
+                                  if (mounted) setState(() {});
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Android debug builds only. Unlocks premium locally '
+                          'for testing and is removed from release builds.',
+                          style: DesignTokens.body(
+                            11.5,
+                          ).copyWith(color: DesignTokens.mutedDim),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
+                ],
               ],
 
               // --- Notetaker ---

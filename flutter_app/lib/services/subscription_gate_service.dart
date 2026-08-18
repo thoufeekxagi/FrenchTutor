@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kDebugMode, kIsWeb, TargetPlatform;
 import 'package:sqlite3/common.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,10 +19,13 @@ class DevSubscriptionOverride {
 
   static bool _enabled = false;
 
-  static bool get enabled => kDebugMode && _enabled;
+  static bool get isAvailable =>
+      kDebugMode && !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  static bool get enabled => isAvailable && _enabled;
 
   static Future<void> load() async {
-    if (!kDebugMode) return;
+    if (!isAvailable) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       _enabled = prefs.getBool(_prefsKey) ?? false;
@@ -31,7 +35,7 @@ class DevSubscriptionOverride {
   }
 
   static Future<void> set(bool value) async {
-    if (!kDebugMode) return;
+    if (!isAvailable) return;
     _enabled = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefsKey, value);
