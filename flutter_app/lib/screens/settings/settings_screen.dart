@@ -657,8 +657,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   /// Maps a raw RevenueCat product id to a plan name a learner can actually
   /// read.
   String _planName(String productId) {
-    if (productId.contains('12month')) return '12-Month Plan';
-    if (productId.contains('3month')) return '3-Month Plan';
+    final normalized = productId.toLowerCase().replaceAll('-', '_');
+    if (normalized.contains('12month') ||
+        normalized.contains('annual') ||
+        normalized.contains('year')) {
+      return 'Annual Plan';
+    }
+    if (normalized.contains('3month') || normalized.contains('quarter')) {
+      return '3-Month Plan';
+    }
+    if (normalized.contains('month')) return 'Monthly Plan';
     if (productId == 'app_review') return 'Reviewer access';
     return 'Free';
   }

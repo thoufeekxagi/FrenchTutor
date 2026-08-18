@@ -70,9 +70,11 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       _purchasing = true;
       _message = null;
     });
-    final success = await RevenueCatService.shared.purchasePackage(package);
+    final purchaseInfo = await RevenueCatService.shared.purchasePackage(
+      package,
+    );
     if (!mounted) return;
-    if (!success) {
+    if (purchaseInfo == null) {
       ProductAnalytics.capture(
         'purchase_failed',
         properties: {
@@ -89,18 +91,38 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final info = await RevenueCatService.shared.activeEntitlementInfo(
       parlesprintProEntitlementId,
     );
-    if (info != null && mounted) {
+    if (info == null) {
+      // A StoreKit transaction can complete even when the RevenueCat product
+      // is not attached to the configured entitlement. Do not dismiss the
+      // paywall in that state: doing so makes the user look purchased while
+      // every premium gate correctly remains locked.
+      ProductAnalytics.capture(
+        'purchase_entitlement_missing',
+        properties: {
+          'source': widget.source,
+          'product_id': package.storeProduct.identifier,
+        },
+      );
+      setState(() {
+        _purchasing = false;
+        _message =
+            'The purchase completed, but access is still syncing. Tap '
+            'Restore Purchase or try again in a moment.';
+      });
+      return;
+    }
+    if (mounted) {
       ref
           .read(pilotInfrastructureStoreProvider)
           .saveEntitlement(
             PilotEntitlement(
-              productId: package.storeProduct.identifier,
+              productId: info.productIdentifier,
               status: PilotEntitlementStatus.active,
               source: 'revenuecat_purchase',
               expiresAt: info.expirationDate == null
                   ? null
                   : DateTime.tryParse(info.expirationDate!),
-              verifiedAt: DateTime.now(),
+              verifiedAt: DateTime.now().toUtc(),
             ),
           );
       ref.invalidate(subscriptionGateServiceProvider);

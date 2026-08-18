@@ -1,17 +1,22 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/database/account_deletion.dart';
 import '../../data/database/local_data_reset.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../models/pilot_access.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/auth_service.dart';
+import '../../services/revenue_cat_service.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../subscription/speak_paywall_screen.dart';
 import '../../widgets/adaptive/adaptive.dart';
@@ -28,7 +33,8 @@ class SpeakSettingsScreen extends ConsumerStatefulWidget {
       _SpeakSettingsScreenState();
 }
 
-class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
+class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
+    with WidgetsBindingObserver {
   var _dailyReminder = true;
   var _wifiOnly = false;
   var _haptics = true;
@@ -37,6 +43,22 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
   var _deletionDots = 1;
   Timer? _deletionTimer;
   TutorPersona _tutor = ActiveTutor.current;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Refresh once when the Membership row is opened so a purchase or offer
+    // redemption completed outside this screen is reflected immediately.
+    unawaited(RevenueCatService.shared.refreshCustomerInfo());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(RevenueCatService.shared.refreshCustomerInfo());
+    }
+  }
 
   String get _deletionLabel => 'Deleting account${'.' * _deletionDots}';
 
@@ -66,8 +88,53 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _stopDeletionAnimation();
     super.dispose();
+  }
+
+  String _membershipPlan(String productId) {
+    final normalized = productId.toLowerCase().replaceAll('-', '_');
+    if (normalized.contains('12month') ||
+        normalized.contains('annual') ||
+        normalized.contains('year')) {
+      return 'Annual plan';
+    }
+    if (normalized.contains('3month') || normalized.contains('quarter')) {
+      return '3-month plan';
+    }
+    if (normalized.contains('month')) return 'Monthly plan';
+    return 'Active subscription';
+  }
+
+  String _membershipSubtitle(PilotEntitlement entitlement) {
+    if (!entitlement.isPaidActive) {
+      return 'Premium plans and restore purchase';
+    }
+    final plan = _membershipPlan(entitlement.productId);
+    final expiresAt = entitlement.expiresAt;
+    if (expiresAt == null) return '$plan · Active';
+    return '$plan · Renews ${DateFormat.yMMMd().format(expiresAt.toLocal())}';
+  }
+
+  Future<void> _openMembership() async {
+    final entitlement = ref
+        .read(pilotAccessServiceProvider)
+        .snapshot()
+        .entitlement;
+    if (!entitlement.isPaidActive) {
+      await AppRouter.push(
+        context,
+        (_) => const SpeakPaywallScreen(),
+        fullscreenDialog: true,
+      );
+      if (mounted) setState(() {});
+      return;
+    }
+    final url = defaultTargetPlatform == TargetPlatform.iOS
+        ? 'https://apps.apple.com/account/subscriptions'
+        : 'https://play.google.com/store/account/subscriptions';
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
   Future<void> _openUrl(Uri uri) async {
@@ -256,12 +323,10 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen> {
             _row(
               Icons.workspace_premium_outlined,
               'Membership',
-              'Premium plans and restore purchase',
-              onTap: () => AppRouter.push(
-                context,
-                (_) => const SpeakPaywallScreen(),
-                fullscreenDialog: true,
+              _membershipSubtitle(
+                ref.watch(pilotAccessServiceProvider).snapshot().entitlement,
               ),
+              onTap: _openMembership,
             ),
             _row(
               Icons.logout_rounded,

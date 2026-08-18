@@ -153,13 +153,21 @@ class RevenueCatService {
     }
   }
 
-  Future<bool> purchasePackage(Package package) async {
-    if (!_initialized) return false;
+  /// Purchases the package and immediately forwards RevenueCat's returned
+  /// customer snapshot to the same listener used for restores and renewals.
+  ///
+  /// The SDK returns the post-purchase [CustomerInfo] directly. Waiting only
+  /// for the asynchronous listener is racy: the transaction can succeed,
+  /// while the paywall still has no cached entitlement for one frame (or
+  /// longer on a slow sandbox device).
+  Future<CustomerInfo?> purchasePackage(Package package) async {
+    if (!_initialized) return null;
     try {
-      await Purchases.purchasePackage(package);
-      return true;
+      final info = await Purchases.purchasePackage(package);
+      _customerInfoListener?.call(info);
+      return info;
     } catch (_) {
-      return false;
+      return null;
     }
   }
 }
