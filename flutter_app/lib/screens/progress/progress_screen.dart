@@ -72,6 +72,19 @@ class ProgressScreen extends ConsumerWidget {
               40,
             ),
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  tooltip: 'Back',
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.centerLeft,
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(
+                    CupertinoIcons.back,
+                    color: DesignTokens.ink,
+                  ),
+                ),
+              ),
               Text('Progress', style: DesignTokens.display(30)),
               const SizedBox(height: DesignTokens.space2),
               Text(
@@ -164,9 +177,21 @@ class ProgressScreen extends ConsumerWidget {
       backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: WebPage(
-          header: const WebPageHeader(
-            title: 'Progress',
-            subtitle: 'Evidence from the work you have completed.',
+          header: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                tooltip: 'Back',
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(CupertinoIcons.back, color: DesignTokens.ink),
+              ),
+              const Expanded(
+                child: WebPageHeader(
+                  title: 'Progress',
+                  subtitle: 'Evidence from the work you have completed.',
+                ),
+              ),
+            ],
           ),
           children: [
             WebCardGrid(
