@@ -15,6 +15,7 @@ import '../models/profile.dart';
 abstract final class NotificationSchedulerService {
   static const _channelId = 'parlesprint-study-reminders';
   static const _firstNotificationId = 4200;
+  static const _scheduleWeeksAhead = 4;
   static final _plugin = FlutterLocalNotificationsPlugin();
   static Future<void>? _initializing;
 
@@ -39,9 +40,10 @@ abstract final class NotificationSchedulerService {
     );
   }
 
-  /// Replaces the existing weekly reminders with the learner's current plan.
-  /// Calling this after onboarding or Settings changes keeps the OS schedule
-  /// synchronized with the profile without duplicating notifications.
+  /// Replaces the next four weeks of reminders with the learner's current
+  /// plan. One-off dates are intentional: a repeating OS notification would
+  /// reuse the same copy forever, while this lets each upcoming reminder use
+  /// a fresh, useful prompt without requiring a server push.
   static Future<void> sync(Profile profile, {DailySummary? summary}) async {
     try {
       await _sync(profile, summary: summary);
@@ -86,24 +88,39 @@ abstract final class NotificationSchedulerService {
       ),
     );
 
+    final now = tz.TZDateTime.now(tz.local);
+    final occurrences = <({String day, tz.TZDateTime date})>[];
+    for (var week = 0; week < _scheduleWeeksAhead; week++) {
+      for (final day in profile.preferredDays) {
+        final weekday = _weekday(day);
+        if (weekday == null) continue;
+        occurrences.add((
+          day: day,
+          date: _nextOccurrence(weekday, hour, minute, week: week, now: now),
+        ));
+      }
+    }
+    occurrences.sort((a, b) => a.date.compareTo(b.date));
+
     var index = 0;
-    for (final day in profile.preferredDays) {
-      final weekday = _weekday(day);
-      if (weekday == null) continue;
-      final scheduledDate = _nextOccurrence(weekday, hour, minute);
+    for (final occurrence in occurrences) {
+      // If the learner already completed today's route, do not interrupt
+      // them with a reminder later today. Future reminders remain scheduled.
+      if (_isToday(occurrence.date, now) && _completed(summary)) continue;
+
+      final message = _message(profile, summary, occurrence.date);
       await _plugin.zonedSchedule(
         id: _firstNotificationId + index++,
-        title: _title(profile),
-        body: _body(profile, summary),
-        scheduledDate: scheduledDate,
+        title: message.title,
+        body: message.body,
+        scheduledDate: occurrence.date,
         notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
         payload: 'open_practice',
       );
       debugPrint(
-        'Scheduled French reminder for $day at '
-        '$scheduledDate (${tz.local.name})',
+        'Scheduled French reminder for ${occurrence.day} at '
+        '${occurrence.date} (${tz.local.name}): ${message.title}',
       );
     }
   }
@@ -129,8 +146,13 @@ abstract final class NotificationSchedulerService {
     _ => null,
   };
 
-  static tz.TZDateTime _nextOccurrence(int weekday, int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
+  static tz.TZDateTime _nextOccurrence(
+    int weekday,
+    int hour,
+    int minute, {
+    required int week,
+    required tz.TZDateTime now,
+  }) {
     final candidate = tz.TZDateTime(
       tz.local,
       now.year,
@@ -148,29 +170,57 @@ abstract final class NotificationSchedulerService {
       tz.local,
       now.year,
       now.month,
-      now.day + daysUntil,
+      now.day + daysUntil + (week * 7),
       hour.clamp(0, 23),
       minute.clamp(0, 59),
     );
   }
 
-  static String _title(Profile profile) {
-    return switch (profile.goal) {
-      'tef_canada' => '🇫🇷 TEF / TCF practice is ready',
-      'work' => '🇫🇷 Your professional French practice',
-      'relocation' => '🇫🇷 Your relocation French practice',
-      'travel' => '🇫🇷 Your travel French practice',
-      _ => '🇫🇷 Your French practice is ready',
-    };
+  static bool _isToday(tz.TZDateTime value, tz.TZDateTime now) =>
+      value.year == now.year &&
+      value.month == now.month &&
+      value.day == now.day;
+
+  static bool _completed(DailySummary? summary) {
+    if (summary == null || !summary.hasActivity) return false;
+    return summary.stagesCompleted >= summary.stagesTotal &&
+        summary.stagesTotal > 0;
   }
 
-  static String _body(Profile profile, DailySummary? summary) {
+  static _NotificationMessage _message(
+    Profile profile,
+    DailySummary? summary,
+    tz.TZDateTime scheduledDate,
+  ) {
     final goal = _goalOutcome(profile);
     final focus = _focus(profile);
+    final seed =
+        scheduledDate.year * 1000 +
+        (scheduledDate.month * 31) +
+        scheduledDate.day +
+        profile.goal.hashCode.abs();
+    final variation = seed % 4;
 
     if (summary != null && summary.hardWords.isNotEmpty) {
       final count = summary.hardWords.length;
-      return 'Review $count tricky ${count == 1 ? 'word' : 'words'} next, then keep building $goal French.';
+      return switch (variation) {
+        0 => _NotificationMessage(
+          '🇫🇷 Those tricky words are back',
+          'See if today’s quick review feels easier.',
+        ),
+        1 => _NotificationMessage(
+          '🇫🇷 Ready for a second look?',
+          'Your quick word review is waiting inside.',
+        ),
+        2 => _NotificationMessage(
+          '🇫🇷 A small French win is waiting',
+          'Try the $count ${count == 1 ? 'word' : 'words'} that slowed you down last time.',
+        ),
+        _ => _NotificationMessage(
+          '🇫🇷 Your next phrase is hiding here',
+          'Open ParleSprint and give your tricky $goal words another go.',
+        ),
+      };
     }
 
     if (summary != null && summary.hasActivity) {
@@ -178,18 +228,49 @@ abstract final class NotificationSchedulerService {
       final completed = summary.stagesCompleted.clamp(0, total);
       final progress = ((completed / total) * 100).round();
       if (completed >= total) {
-        return 'Nice work — today’s route is complete. A short $focus review keeps your $goal French ready.';
+        return _NotificationMessage(
+          '🇫🇷 Keep the thread going',
+          'One small $focus review can keep today’s progress warm.',
+        );
       }
-      return 'You’re $progress% through today’s route. Continue with $focus to strengthen your $goal French.';
+      return switch (variation) {
+        0 => _NotificationMessage(
+          '🇫🇷 Your route is still open',
+          'One short step can move today’s $goal French forward.',
+        ),
+        1 => _NotificationMessage(
+          '🇫🇷 The next turn is yours',
+          'Pick up your $focus practice when you have a minute.',
+        ),
+        2 => _NotificationMessage(
+          '🇫🇷 You’re $progress% of the way there',
+          'Open ParleSprint and see what comes next.',
+        ),
+        _ => _NotificationMessage(
+          '🇫🇷 Your next French scene is waiting',
+          'A short $focus challenge is ready inside your route.',
+        ),
+      };
     }
 
-    final rhythm = switch (profile.sessionLength) {
-      'quick' => 'quick',
-      'deep' => 'focused',
-      _ => 'daily',
+    return switch (variation) {
+      0 => const _NotificationMessage(
+        '🇫🇷 A new French scene is waiting',
+        'Open ParleSprint to discover today’s short challenge.',
+      ),
+      1 => const _NotificationMessage(
+        '🇫🇷 Today’s route has a new turn',
+        'Your next phrase is waiting inside.',
+      ),
+      2 => _NotificationMessage(
+        '🇫🇷 One phrase closer',
+        'Pick up where you left off with a quick $focus challenge.',
+      ),
+      _ => const _NotificationMessage(
+        '🇫🇷 Something new is ready in French',
+        'Open ParleSprint and see what today brings.',
+      ),
     };
-    final level = LearnerLevel.displayLabel(profile.level);
-    return 'Your personalized $level $focus $rhythm practice is ready. Continue your $goal French route.';
   }
 
   static String _focus(Profile profile) {
@@ -206,4 +287,11 @@ abstract final class NotificationSchedulerService {
     'culture' => 'culture',
     _ => 'everyday',
   };
+}
+
+final class _NotificationMessage {
+  const _NotificationMessage(this.title, this.body);
+
+  final String title;
+  final String body;
 }
