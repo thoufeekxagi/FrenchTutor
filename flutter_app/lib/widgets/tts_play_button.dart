@@ -150,10 +150,11 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
             contentItemId: widget.contentItemId,
           )
           .timeout(const Duration(seconds: 25), onTimeout: () => null);
-      if (bytes != null) {
-        _readyBytes = bytes;
-        if (mounted) await _play(bytes);
+      if (bytes == null || bytes.isEmpty) {
+        throw StateError('Gemini Live returned no playable audio.');
       }
+      _readyBytes = bytes;
+      if (mounted) await _play(bytes);
     } catch (error) {
       debugPrint('TtsPlayButton: audio playback failed: $error');
       widget.onError?.call(error);
@@ -194,34 +195,39 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? DesignTokens.primary;
+    final speakerIcon = Icon(
+      _phase == _Phase.playing
+          ? CupertinoIcons.speaker_3_fill
+          : CupertinoIcons.speaker_2_fill,
+      color: color,
+      size: widget.iconSize,
+    );
+    final loadingIcon = Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        SizedBox(
+          width: widget.iconSize + 14,
+          height: widget.iconSize + 14,
+          child: SpinningRing(size: widget.iconSize + 14, color: color),
+        ),
+        speakerIcon,
+      ],
+    );
     return SizedBox(
       width: widget.label == null ? widget.size : widget.size + 72,
       height: widget.size,
       child: switch (_phase) {
-        _Phase.generating => Center(
-          child: SpinningRing(size: widget.size * 0.75, color: color),
-        ),
+        _Phase.generating => Center(child: loadingIcon),
         _Phase.idle || _Phase.playing =>
           widget.label == null
               ? IconButton(
                   onPressed: _phase == _Phase.idle ? _onTap : null,
-                  icon: Icon(
-                    _phase == _Phase.playing
-                        ? CupertinoIcons.speaker_3_fill
-                        : CupertinoIcons.speaker_2_fill,
-                    color: color,
-                    size: widget.iconSize,
-                  ),
+                  icon: speakerIcon,
                 )
               : OutlinedButton.icon(
                   onPressed: _phase == _Phase.idle ? _onTap : null,
-                  icon: Icon(
-                    _phase == _Phase.playing
-                        ? CupertinoIcons.speaker_3_fill
-                        : CupertinoIcons.speaker_2_fill,
-                    color: color,
-                    size: widget.iconSize,
-                  ),
+                  icon: speakerIcon,
                   label: Text(widget.label!),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: color,

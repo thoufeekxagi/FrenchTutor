@@ -96,6 +96,7 @@ class LessonSpeechService {
   void Function(int)? _onItemStart;
   void Function()? _onFinished;
   void Function()? _onPlaybackReady;
+  void Function(Object error)? _onError;
   double? _rateOverride;
 
   /// Fires with (item index, word index within that item's text) as playback
@@ -133,6 +134,7 @@ class LessonSpeechService {
     void Function()? onFinished,
     void Function(int itemIndex, int wordIndex)? onWordBoundary,
     void Function()? onPlaybackReady,
+    void Function(Object error)? onError,
   }) async {
     // A tap should claim the loading slot before the first await. This keeps
     // rapid taps from cancelling the first request and stacking duplicate
@@ -154,6 +156,7 @@ class LessonSpeechService {
       _onFinished = onFinished;
       _onWordBoundary = onWordBoundary;
       _onPlaybackReady = onPlaybackReady;
+      _onError = onError;
       isPaused = false;
       await _speakCurrent(generation);
     } finally {
@@ -197,6 +200,7 @@ class LessonSpeechService {
     _onItemStart = null;
     _onWordBoundary = null;
     _onPlaybackReady = null;
+    _onError = null;
   }
 
   Future<void> _speakCurrent(int generation) async {
@@ -224,9 +228,13 @@ class LessonSpeechService {
       generation: generation,
     );
     if (!played) {
-      // Gemini is the only voice engine here — no on-device fallback. Skip
-      // this line rather than substitute a device voice, or hang forever.
-      _onUtteranceComplete(generation);
+      // Gemini is the only voice engine here — no on-device fallback. Stop
+      // the queue and surface the failure instead of silently skipping every
+      // line and leaving the reader looking like it played.
+      _abortQueue(
+        generation,
+        StateError('Gemini Live returned no playable audio.'),
+      );
     }
   }
 
@@ -247,7 +255,12 @@ class LessonSpeechService {
     if (generation != _queueGeneration) return false;
     final myIndex = _ttsIndex;
     try {
-      await _geminiAudio.playAudioChunk(bytes);
+      // Narration is a one-shot PCM buffer, not a live conversation chunk.
+      // Wait until the serialized native feed has accepted it before clearing
+      // the loading state or starting the playback timer. Without this, a
+      // first-use player race could report “ready” while the buffer was still
+      // queued (or had already been dropped), producing silent narration.
+      await _geminiAudio.playAudioChunk(bytes, waitForFeed: true);
     } catch (error, stackTrace) {
       debugPrint(
         'LessonSpeechService: Gemini Live playback failed: $error\n$stackTrace',
@@ -467,6 +480,29 @@ class LessonSpeechService {
     if (generation != _queueGeneration) return;
     _ttsIndex += 1;
     _speakCurrent(generation);
+  }
+
+  void _abortQueue(int generation, Object error) {
+    if (generation != _queueGeneration) return;
+    _queueGeneration++;
+    _completionTimer?.cancel();
+    _completionTimer = null;
+    for (final timer in _wordTimers) {
+      timer.cancel();
+    }
+    _wordTimers.clear();
+    _ttsQueue = [];
+    _ttsIndex = 0;
+    isSpeaking = false;
+    isPaused = false;
+    final onError = _onError;
+    _onError = null;
+    _onFinished = null;
+    _onItemStart = null;
+    _onWordBoundary = null;
+    _onPlaybackReady = null;
+    unawaited(_geminiAudioLazy?.stopPlayback());
+    onError?.call(error);
   }
 
   /// True if [text] in [voiceName]/[slow] is already synthesized and sitting in

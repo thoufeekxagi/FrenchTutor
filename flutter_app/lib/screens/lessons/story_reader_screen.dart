@@ -319,6 +319,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       onPlaybackReady: () {
         if (mounted) setState(() => _isLoadingAudio = false);
       },
+      onError: (error) {
+        if (!mounted) return;
+        setState(() {
+          _isPlaying = false;
+          _isLoadingAudio = false;
+          _currentWord = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Audio is unavailable right now. Please try again.'),
+          ),
+        );
+      },
       onWordBoundary: (_, wordIndex) {
         if (!mounted) return;
         setState(() => _currentWord = wordIndex);
@@ -507,6 +520,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       },
       onPlaybackReady: () {
         if (mounted) setState(() => _isLoadingAudio = false);
+      },
+      onError: (error) {
+        if (!mounted) return;
+        setState(() {
+          _isPlaying = false;
+          _isLoadingAudio = false;
+          _currentWord = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Audio is unavailable right now. Please try again.'),
+          ),
+        );
       },
       onWordBoundary: (_, wordIndex) {
         if (!mounted) return;
@@ -1683,23 +1709,34 @@ class _AudioControlBar extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: const BoxDecoration(
-          color: DesignTokens.primary,
-          shape: BoxShape.circle,
-        ),
-        child: loading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: DesignTokens.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.white, size: 18),
+            ),
+            if (loading)
+              const Positioned.fill(
+                child: Padding(
+                  padding: EdgeInsets.all(1),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
+                  ),
                 ),
-              )
-            : Icon(icon, color: Colors.white, size: 18),
+              ),
+          ],
+        ),
       ),
     );
   }
