@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../data/database/learning_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/pilot_access.dart';
-import 'auth_service.dart';
 import 'learning_allowance_service.dart';
 import 'subscription_gate_service.dart';
 
@@ -19,45 +18,10 @@ class PilotAccessService {
   /// realistically talks 2 hours/day anyway.
   static const subscribedDailyLimitSeconds = 120 * 60;
 
-  // Apple/Google App Review's fixed demo login (see APP_STORE_CONNECT_PRIVACY.md).
-  // A reviewer hitting the normal 60-min/day cap mid-review is a Guideline 2.1
-  // rejection risk for something that isn't even a real bug, so this one
-  // account gets an effectively unlimited daily allowance instead.
-  static const _reviewerEmail = 'admin@parlesprint.com';
-  static const _reviewerLimitSeconds = 24 * 60 * 60;
-
   final LearningStore store;
   final PilotInfrastructureStore infrastructure;
 
-  bool get _isReviewerAccount {
-    // Supabase may not be initialized yet (app boot ordering, or a plain
-    // unit test that never calls Supabase.initialize) — that's just "not
-    // signed in," not an error, so never let this getter throw.
-    try {
-      return AuthService.shared.currentSession?.user.email == _reviewerEmail;
-    } catch (_) {
-      return false;
-    }
-  }
-
   PilotAccessSnapshot snapshot() {
-    // Short-circuit entirely for App Review's demo login: a release build
-    // with no `entitlements` row (true for any fresh reviewer install)
-    // otherwise resolves to `inactive` below, which would lock the reviewer
-    // out of the core feature outright.
-    if (_isReviewerAccount) {
-      return const PilotAccessSnapshot(
-        entitlement: PilotEntitlement(
-          productId: 'app_review',
-          status: PilotEntitlementStatus.active,
-          source: 'reviewer_override',
-        ),
-        dailyLimitSeconds: _reviewerLimitSeconds,
-        usedSeconds: 0,
-        serverAuthoritative: false,
-      );
-    }
-
     final entitlement = infrastructure.entitlement();
     final safeEntitlement =
         entitlement.status == PilotEntitlementStatus.localPreview && !kDebugMode

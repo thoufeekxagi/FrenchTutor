@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/database/pilot_infrastructure_store.dart';
 import '../orchestration/models/competency.dart';
-import 'auth_service.dart';
 
 /// Debug-build-only "unlock everything" switch for testing paid-tier UI
 /// without a real purchase. Mirrors ActiveTutor's
@@ -82,16 +81,14 @@ abstract final class PremiumAreaMapping {
 /// premium area gets one meaningful preview per local day, then the same
 /// subscription prompt.
 ///
-/// Reads the same local `entitlements` table SyncService._hydrateEntitlements
-/// keeps in sync with Supabase's StoreKit/RevenueCat subscription webhook, so
-/// one flag covers paid subscriptions.
+/// Reads the local `entitlements` table written by RevenueCat customer-info
+/// updates, purchases, and restores. Supabase is not consulted for paid
+/// access, and no app-side code can create a paid entitlement.
 class SubscriptionGateService {
   SubscriptionGateService({
     required this.infrastructure,
     required this.database,
   });
-
-  static const _reviewerEmail = 'admin@parlesprint.com';
 
   /// Small, durable free core. Everything else gets one useful premium
   /// preview per local day, then the same paywall.
@@ -100,21 +97,12 @@ class SubscriptionGateService {
   final PilotInfrastructureStore infrastructure;
   final CommonDatabase database;
 
-  bool get _isReviewerAccount {
-    try {
-      return AuthService.shared.currentSession?.user.email == _reviewerEmail;
-    } catch (_) {
-      return false;
-    }
-  }
-
   bool isSubscribed() {
     return hasPremiumAccess;
   }
 
   bool get hasPremiumAccess {
     if (DevSubscriptionOverride.enabled) return true;
-    if (_isReviewerAccount) return true;
     return infrastructure.entitlement().isPaidActive;
   }
 

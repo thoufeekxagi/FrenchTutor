@@ -1,3 +1,5 @@
+const parlesprintProEntitlementId = 'ParleSprint Pro';
+
 enum PilotEntitlementStatus {
   localPreview,
   active,

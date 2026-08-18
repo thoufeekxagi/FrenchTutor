@@ -64,6 +64,7 @@ void main() {
         PilotEntitlementStatus.localPreview,
       );
 
+      infrastructure.setEntitlementUser('test-user');
       infrastructure.saveEntitlement(
         PilotEntitlement(
           productId: 'com.parlesprint.pro.annual',
@@ -94,6 +95,7 @@ void main() {
       expect(gate.isLabLocked('vocabulary'), isFalse);
       expect(gate.isLabLocked('writing'), isTrue);
 
+      infrastructure.setEntitlementUser('test-user');
       infrastructure.saveEntitlement(
         PilotEntitlement(
           productId: 'com.parlesprint.pro.annual',
@@ -117,6 +119,32 @@ void main() {
       expect(entitlement.grantsAccess, isFalse);
       expect(entitlement.isPaidActive, isFalse);
     });
+
+    test(
+      'entitlement cache is isolated when the signed-in account changes',
+      () {
+        final db = sqlite3.openInMemory();
+        addTearDown(db.dispose);
+        final infrastructure = PilotInfrastructureStore(db);
+
+        infrastructure.setEntitlementUser('user-a');
+        infrastructure.saveEntitlement(
+          PilotEntitlement(
+            productId: 'com.parlesprint.pro.annual',
+            status: PilotEntitlementStatus.active,
+            source: 'revenuecat_customer_info',
+            verifiedAt: DateTime.now().toUtc(),
+          ),
+        );
+        expect(infrastructure.entitlement().isPaidActive, isTrue);
+
+        infrastructure.setEntitlementUser('user-b');
+        expect(
+          infrastructure.entitlement().status,
+          PilotEntitlementStatus.localPreview,
+        );
+      },
+    );
 
     test('sync outbox stores row references, not learner payloads', () {
       final db = sqlite3.openInMemory();

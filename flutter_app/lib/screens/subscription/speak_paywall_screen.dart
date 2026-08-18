@@ -11,7 +11,6 @@ import '../../services/revenue_cat_service.dart';
 import '../../widgets/subscription_marketing_sections.dart';
 import '../speak/speak_ui.dart';
 
-const speakProEntitlementId = 'ParleSprint Pro';
 const _termsUrl = 'https://parlesprint.com/terms';
 const _privacyUrl = 'https://parlesprint.com/privacy';
 
@@ -88,7 +87,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       return;
     }
     final info = await RevenueCatService.shared.activeEntitlementInfo(
-      speakProEntitlementId,
+      parlesprintProEntitlementId,
     );
     if (info != null && mounted) {
       ref
@@ -128,8 +127,9 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     try {
       final info = await Purchases.restorePurchases();
       if (!mounted) return;
-      if (info.entitlements.active.containsKey(speakProEntitlementId)) {
-        final entitlement = info.entitlements.active[speakProEntitlementId];
+      if (info.entitlements.active.containsKey(parlesprintProEntitlementId)) {
+        final entitlement =
+            info.entitlements.active[parlesprintProEntitlementId];
         if (entitlement != null) {
           ref
               .read(pilotInfrastructureStoreProvider)

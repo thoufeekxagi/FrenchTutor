@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
+import 'models/pilot_access.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/main_tab_screen.dart';
@@ -96,15 +98,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       _explicitlySignedOut = false;
       _signOutMarkerLoaded = true;
       unawaited(AuthService.shared.clearRememberedSignOut());
-      // RevenueCat's SDK is otherwise never initialized anywhere in the app
-      // — without this, every paywall load silently sees zero packages
-      // forever (fetchOfferings() short-circuits on `!_initialized`), no
-      // matter what's configured in App Store Connect/RevenueCat. Using the
-      // Supabase user id as the RevenueCat appUserID is what lets the
-      // revenuecat-webhook edge function resolve a purchase back to the
-      // right `profiles` row. Idempotent (configure() no-ops once already
-      // initialized) — safe on every signed-in event.
-      RevenueCatService.shared.configure(appUserId: session.user.id);
+      // Apple StoreKit remains the billing authority. RevenueCat uses the
+      // Supabase user id only as its stable customer identifier, then sends
+      // customer-info updates here whenever a purchase, restore, renewal, or
+      // offer-code redemption changes the Apple entitlement.
+      ref
+          .read(pilotInfrastructureStoreProvider)
+          .setEntitlementUser(session.user.id);
+      unawaited(
+        RevenueCatService.shared.configure(
+          appUserId: session.user.id,
+          onCustomerInfo: _cacheRevenueCatCustomerInfo,
+        ),
+      );
       // Stamp the local profile with the Supabase user id (PILOT_PLAN.md
       // Phase 5's "local rows adopt the new user_id" step). Idempotent —
       // safe to run on every signed-in event, not just the very first one.
@@ -125,6 +131,10 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       // silently as soon as the pull lands, same "best-effort, eventually
       // consistent" contract every other sync call in this app already has.
       _restoreAndSeedContent();
+    } else {
+      unawaited(RevenueCatService.shared.logOut());
+      final infrastructure = ref.read(pilotInfrastructureStoreProvider);
+      infrastructure.clearEntitlements();
     }
     if (!mounted) return;
     setState(() {
@@ -134,6 +144,36 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         _signOutMarkerLoaded = true;
       }
     });
+  }
+
+  void _cacheRevenueCatCustomerInfo(CustomerInfo info) {
+    if (!mounted) return;
+    final entitlement = info.entitlements.active[parlesprintProEntitlementId];
+    final store = ref.read(pilotInfrastructureStoreProvider);
+    if (entitlement == null) {
+      store.saveEntitlement(
+        PilotEntitlement(
+          productId: 'none',
+          status: PilotEntitlementStatus.inactive,
+          source: 'revenuecat_customer_info',
+          verifiedAt: DateTime.now().toUtc(),
+        ),
+      );
+    } else {
+      store.saveEntitlement(
+        PilotEntitlement(
+          productId: entitlement.productIdentifier,
+          status: PilotEntitlementStatus.active,
+          source: 'revenuecat_customer_info',
+          expiresAt: entitlement.expirationDate == null
+              ? null
+              : DateTime.tryParse(entitlement.expirationDate!),
+          verifiedAt: DateTime.now().toUtc(),
+        ),
+      );
+    }
+    ref.invalidate(subscriptionGateServiceProvider);
+    ref.invalidate(pilotAccessServiceProvider);
   }
 
   void _restoreAndSeedContent() {

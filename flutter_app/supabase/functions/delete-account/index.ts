@@ -70,7 +70,6 @@ const USER_DATA_TABLES: Array<[string, string]> = [
   ["ai_session_state", "user_id"],
   ["daily_session_state", "user_id"],
   ["referral_redemptions", "redeemed_by_user_id"],
-  ["subscription_invite_redemptions", "redeemed_by_user_id"],
   ["referral_codes", "owner_user_id"],
   ["generated_grammar_stories", "user_id"],
   ["generated_roleplays", "user_id"],

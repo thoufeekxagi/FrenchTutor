@@ -1172,7 +1172,6 @@ class SyncService {
       'lessonProgress': () => _hydrateLessonProgress(uid),
       'mistakeTags': () => _hydrateMistakeTags(uid),
       'events': () => _hydrateEvents(uid),
-      'entitlements': () => _hydrateEntitlements(uid),
       'generatedStories': () => _hydrateGeneratedStories(uid),
       'generatedGrammarStories': () => _hydrateGeneratedGrammarStories(uid),
       'generatedWritingTasks': () => _hydrateGeneratedWritingTasks(uid),
@@ -1343,70 +1342,6 @@ class SyncService {
         [r['id'], r['session_id'], r['role'], r['content'], r['created_at']],
       );
     }
-  }
-
-  // Pulls the subscription flags the revenuecat-webhook edge function writes
-  // onto `profiles` into the local
-  // `entitlements` table, so PilotAccessService's synchronous, offline-first
-  // snapshot() reflects real subscription state instead of only ever seeing
-  // the free-preview default. The profile flag is advisory,
-  // so expiry is always re-checked against wall-clock time here too.
-  Future<void> _hydrateEntitlements(String uid) async {
-    final row = await _client
-        .from('profiles')
-        .select(
-          'subscription_active, subscription_product_id, subscription_expires_at',
-        )
-        .eq('id', uid)
-        .maybeSingle();
-    if (row == null) return;
-
-    final expiresAtRaw = row['subscription_expires_at'] as String?;
-    final expiresAt = expiresAtRaw != null
-        ? DateTime.tryParse(expiresAtRaw)
-        : null;
-    final notExpired =
-        expiresAt == null || expiresAt.isAfter(DateTime.now().toUtc());
-    final productId = (row['subscription_product_id'] as String?) ?? 'none';
-    final isLegacyCodeGrant = productId.trim().toLowerCase().startsWith(
-      'invite:',
-    );
-    final isActive =
-        (row['subscription_active'] as bool? ?? false) &&
-        notExpired &&
-        !isLegacyCodeGrant;
-    final status = isActive ? 'active' : 'inactive';
-
-    final existing = _db.select(
-      'SELECT status, product_id, expires_at FROM entitlements '
-      "WHERE source = 'supabase_subscription' "
-      'ORDER BY verified_at DESC, updated_at DESC LIMIT 1',
-    );
-    if (existing.isNotEmpty) {
-      final e = existing.first;
-      if (e['status'] == status &&
-          e['product_id'] == productId &&
-          e['expires_at'] == expiresAtRaw) {
-        return; // Unchanged since last hydration — skip the redundant insert.
-      }
-    }
-
-    final now = DateTime.now().toUtc().toIso8601String();
-    _db.execute(
-      '''INSERT INTO entitlements
-         (id, user_id, product_id, status, source, expires_at, verified_at, created_at, updated_at)
-         VALUES (?, ?, ?, ?, 'supabase_subscription', ?, ?, ?, ?)''',
-      [
-        '${uid}_subscription_$now',
-        uid,
-        productId,
-        status,
-        expiresAtRaw,
-        now,
-        now,
-        now,
-      ],
-    );
   }
 
   Future<void> _hydrateVocabCards(String uid) async {

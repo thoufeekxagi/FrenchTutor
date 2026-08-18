@@ -6,12 +6,10 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../config/api_keys.dart';
 
 /// Cross-platform paywall/entitlement client (iOS StoreKit + Android Play
-/// Billing via RevenueCat's SDK). Supabase remains the source of truth for
-/// legacy allowance system — this class only ever talks about *paid
-/// subscription* entitlement, synced into Supabase's
-/// `entitlements` table by the `revenuecat-webhook` edge function whenever a
-/// purchase/renewal/cancellation happens, so `PilotAccessService` still only
-/// has to read one place.
+/// Billing via RevenueCat's SDK). Apple/Google store transactions are the
+/// billing authority; RevenueCat is the entitlement adapter and cache. The
+/// app persists the resulting entitlement locally so route gates can remain
+/// synchronous and offline-safe.
 ///
 /// Inert until a real RevenueCat project exists: [isConfigured] is false and
 /// every method below is a safe no-op until `REVENUECAT_IOS_KEY` /
@@ -24,14 +22,20 @@ class RevenueCatService {
   static final RevenueCatService shared = RevenueCatService._();
 
   bool _initialized = false;
+  String? _appUserId;
+  CustomerInfoUpdateListener? _customerInfoListener;
+  bool _listenerRegistered = false;
 
   bool get isConfigured =>
       !kIsWeb &&
       ((Platform.isIOS && ApiKeys.revenueCatIosKey.isNotEmpty) ||
           (Platform.isAndroid && ApiKeys.revenueCatAndroidKey.isNotEmpty));
 
-  Future<void> configure({required String appUserId}) async {
-    if (_initialized) return;
+  Future<void> configure({
+    required String appUserId,
+    CustomerInfoUpdateListener? onCustomerInfo,
+  }) async {
+    _customerInfoListener ??= onCustomerInfo;
     if (!isConfigured) {
       debugPrint(
         'RevenueCatService: not configured — no API key for this platform '
@@ -39,6 +43,21 @@ class RevenueCatService {
         '--dart-define=REVENUECAT_ANDROID_KEY=...). The paywall will show '
         'zero packages until this is set.',
       );
+      return;
+    }
+    if (_initialized) {
+      _registerCustomerInfoListener();
+      if (_appUserId != appUserId) {
+        try {
+          final result = await Purchases.logIn(appUserId);
+          _appUserId = appUserId;
+          _customerInfoListener?.call(result.customerInfo);
+        } catch (e) {
+          debugPrint('RevenueCatService.logIn failed — $e');
+        }
+      } else {
+        await refreshCustomerInfo();
+      }
       return;
     }
     final apiKey = Platform.isIOS
@@ -49,9 +68,40 @@ class RevenueCatService {
         PurchasesConfiguration(apiKey)..appUserID = appUserId,
       );
       _initialized = true;
+      _appUserId = appUserId;
+      _registerCustomerInfoListener();
+      await refreshCustomerInfo();
     } catch (e) {
       debugPrint('RevenueCatService: Purchases.configure failed — $e');
     }
+  }
+
+  void _registerCustomerInfoListener() {
+    if (_listenerRegistered || _customerInfoListener == null) return;
+    Purchases.addCustomerInfoUpdateListener(_customerInfoListener!);
+    _listenerRegistered = true;
+  }
+
+  Future<CustomerInfo?> refreshCustomerInfo() async {
+    if (!_initialized) return null;
+    try {
+      final info = await Purchases.getCustomerInfo();
+      _customerInfoListener?.call(info);
+      return info;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> logOut() async {
+    if (!_initialized) return;
+    try {
+      await Purchases.logOut();
+    } catch (_) {
+      // RevenueCat can already be anonymous after a partial sign-out. The
+      // app's Supabase auth state remains the owner of session navigation.
+    }
+    _appUserId = null;
   }
 
   Future<bool> hasActiveEntitlement(String entitlementId) async {
@@ -66,15 +116,10 @@ class RevenueCatService {
 
   /// The full active entitlement record (product id + expiration), so a
   /// caller can show a real "renews on / days left" right after purchase
-  /// instead of waiting on the revenuecat-webhook -> Supabase sync round-trip.
+  /// instead of waiting for a later app refresh.
   Future<EntitlementInfo?> activeEntitlementInfo(String entitlementId) async {
-    if (!_initialized) return null;
-    try {
-      final info = await Purchases.getCustomerInfo();
-      return info.entitlements.active[entitlementId];
-    } catch (_) {
-      return null;
-    }
+    final info = await refreshCustomerInfo();
+    return info?.entitlements.active[entitlementId];
   }
 
   Future<Offerings?> fetchOfferings() async {

@@ -44,6 +44,7 @@ class PilotInfrastructureStore {
   }
 
   final CommonDatabase _db;
+  String? _entitlementUserId;
 
   String _now() => DateTime.now().toUtc().toIso8601String();
 
@@ -63,9 +64,13 @@ class PilotInfrastructureStore {
   }
 
   PilotEntitlement entitlement() {
-    final rows = _db.select(
-      'SELECT * FROM entitlements WHERE deleted_at IS NULL ORDER BY verified_at DESC, updated_at DESC LIMIT 1',
-    );
+    final rows = _entitlementUserId == null
+        ? const <Map<String, Object?>>[]
+        : _db.select(
+            'SELECT * FROM entitlements WHERE deleted_at IS NULL '
+            'AND user_id = ? ORDER BY verified_at DESC, updated_at DESC LIMIT 1',
+            [_entitlementUserId],
+          );
     if (rows.isEmpty) {
       return const PilotEntitlement(
         productId: 'none',
@@ -89,10 +94,11 @@ class PilotInfrastructureStore {
     final now = _now();
     _db.execute(
       '''INSERT INTO entitlements
-         (id, product_id, status, source, expires_at, verified_at, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+         (id, user_id, product_id, status, source, expires_at, verified_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         _uuid.v4(),
+        _entitlementUserId,
         entitlement.productId,
         entitlement.status.name,
         entitlement.source,
@@ -102,6 +108,27 @@ class PilotInfrastructureStore {
         now,
       ],
     );
+  }
+
+  /// Selects the local cache owner before RevenueCat is configured. If a
+  /// different account is signing in, discard the previous account's cache
+  /// before any synchronous gate can read it.
+  void setEntitlementUser(String userId) {
+    if (_entitlementUserId == userId) return;
+    final rows = _db.select(
+      'SELECT DISTINCT user_id FROM entitlements WHERE deleted_at IS NULL',
+    );
+    if (rows.any((row) => row['user_id'] != userId)) {
+      clearEntitlements();
+    }
+    _entitlementUserId = userId;
+  }
+
+  /// Removes the cached store entitlement when the signed-in learner session
+  /// ends. Apple/RevenueCat will repopulate it after the next account signs in.
+  void clearEntitlements() {
+    _db.execute('DELETE FROM entitlements');
+    _entitlementUserId = null;
   }
 
   void queueMutation({
