@@ -15,6 +15,17 @@ import 'story_variety_service.dart';
 import 'vocabulary_level_policy.dart';
 import '../prompts/live_prompts.dart';
 
+/// Shared instruction for every generated lesson image. Keep this in the
+/// client prompt as well as the Edge Function so local previews and release
+/// builds describe the same image-only contract.
+const _imageOnlyInstruction = '''
+IMAGE-ONLY OUTPUT: create the visual scene and nothing else. Do not render or
+draw any text, words, letters, numbers, punctuation, symbols, signs, labels,
+logos, watermarks, captions, book titles, UI, borders, frames, or overlays.
+Leave all surfaces free of writing. The image must communicate through people,
+objects, actions, lighting, colour, and composition only.
+''';
+
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
 ///
@@ -1379,19 +1390,19 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     String? coverPrompt,
   }) async {
     const qualityDirection =
-        'Create a premium literary book-cover image in a portrait 2:3 composition. '
+        'Create a premium portrait editorial illustration in a 2:3 composition. '
         'Use sophisticated editorial realism, natural lighting, restrained color grading, '
         'one clear focal scene, layered depth, and a polished publishing aesthetic. '
-        'Keep important details inside safe margins so the cover remains readable when cropped. '
+        'Keep important visual details inside safe margins so the image remains clear when cropped. '
         'Do not use anime, Ghibli, chibi, cartoon, childish, storybook, or flat vector styles; '
-        'do not use a collage, split panels, decorative frame, or UI mockup. '
-        'Do not include text, letters, logos, borders, watermarks, or captions.';
+        'do not use a collage, split panels, decorative frame, or UI mockup.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? '$qualityDirection Title context: "$title". Topic: $topic. Mood: $summary. Level: $levelBand.'
+        ? '$qualityDirection\nScene subject: $topic. Mood and context: $summary. Learner level: $levelBand.'
         : '$qualityDirection\n$coverPrompt';
+    final imageOnlyPrompt = '$prompt\n$_imageOnlyInstruction';
     try {
       final response = await _invokeFunction('ai-image', {
-        'prompt': prompt,
+        'prompt': imageOnlyPrompt,
       }, timeout: const Duration(seconds: 45));
       final encoded = response['imageBase64'] as String?;
       if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);

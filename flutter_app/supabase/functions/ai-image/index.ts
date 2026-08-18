@@ -6,6 +6,17 @@ const headers = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Enforce the visual-only contract at the provider boundary as well as in
+// Flutter prompts. Generated lesson text belongs in the app's UI, never in
+// the bitmap returned by this function.
+const IMAGE_ONLY_INSTRUCTION = `
+FINAL IMAGE-ONLY REQUIREMENT: render only the visual scene. Do not render or
+draw any text, words, letters, numbers, punctuation, symbols, signs, labels,
+logos, watermarks, captions, titles, UI, borders, frames, or overlays. Leave
+all surfaces free of writing. Communicate through people, objects, actions,
+lighting, colour, and composition only.
+`;
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
@@ -22,6 +33,7 @@ Deno.serve(async (request) => {
   }
   const prompt = String(body.prompt ?? "").trim();
   if (!prompt || prompt.length > 12_000) return json({ error: "Invalid prompt" }, 400);
+  const imageOnlyPrompt = `${prompt}\n${IMAGE_ONLY_INSTRUCTION}`;
 
   const apiKey = Deno.env.get("OPENROUTER_API_KEY");
   if (!apiKey) return json({ error: "OpenRouter is not configured" }, 503);
@@ -36,7 +48,7 @@ Deno.serve(async (request) => {
     },
     body: JSON.stringify({
       model: "black-forest-labs/flux.2-klein-4b",
-      prompt,
+      prompt: imageOnlyPrompt,
       n: 1,
       aspect_ratio: "2:3",
       output_format: "jpeg",
