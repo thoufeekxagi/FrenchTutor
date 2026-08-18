@@ -182,9 +182,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                         textAlign: TextAlign.center,
                         style: DesignTokens.display(34),
                       ),
-                      const SizedBox(height: 18),
-                      _selectedPriceSummary(),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 28),
                       _benefit(
                         'A course shaped around you',
                         Icons.route_rounded,
@@ -328,42 +326,6 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
               style: DesignTokens.body(16, weight: FontWeight.w700),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _selectedPriceSummary() {
-    final selected = _selected;
-    if (selected == null) return const SizedBox.shrink();
-    final trialSummary = _trialSummary(selected);
-    return SpeakCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            selected.storeProduct.priceString,
-            style: DesignTokens.display(
-              36,
-            ).copyWith(color: SpeakColors.navy, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            _billingTerms(selected),
-            style: DesignTokens.body(
-              14,
-              weight: FontWeight.w700,
-            ).copyWith(color: SpeakColors.inkSoft),
-          ),
-          if (trialSummary != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              trialSummary,
-              style: DesignTokens.body(
-                12,
-              ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
-            ),
-          ],
         ],
       ),
     );
