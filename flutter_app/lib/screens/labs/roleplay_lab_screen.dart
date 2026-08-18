@@ -559,6 +559,11 @@ class _RoleplayCover extends StatelessWidget {
         ),
       ),
     );
+    final localFallback = Image.asset(
+      'assets/starter_covers/station.png',
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => fallback,
+    );
     return SizedBox(
       width: width,
       height: height,
@@ -570,14 +575,14 @@ class _RoleplayCover extends StatelessWidget {
             ? Image.asset(
                 url.substring('asset:'.length),
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => fallback,
+                errorBuilder: (_, _, _) => localFallback,
               )
             : url == null || url.isEmpty
-            ? fallback
+            ? localFallback
             : Image.network(
                 url,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => fallback,
+                errorBuilder: (_, _, _) => localFallback,
               ),
       ),
     );

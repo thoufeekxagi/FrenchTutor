@@ -11,6 +11,7 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/story_cover_image.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
@@ -1178,31 +1179,10 @@ class _StoryBookHeader extends StatelessWidget {
               SizedBox(
                 width: 112,
                 height: 168,
-                child: story.coverUrl == null || story.coverUrl!.isEmpty
-                    ? Container(
-                        decoration: const BoxDecoration(
-                          gradient: DesignTokens.heroGradient,
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.book_fill,
-                          color: Colors.white,
-                          size: 34,
-                        ),
-                      )
-                    : Image.network(
-                        story.coverUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
-                          decoration: const BoxDecoration(
-                            gradient: DesignTokens.heroGradient,
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.book_fill,
-                            color: Colors.white,
-                            size: 34,
-                          ),
-                        ),
-                      ),
+                child: StoryCoverImage(
+                  title: story.title,
+                  source: story.coverUrl,
+                ),
               ),
               Expanded(
                 child: Padding(

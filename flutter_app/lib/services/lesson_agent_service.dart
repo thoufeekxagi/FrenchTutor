@@ -1398,7 +1398,9 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         'do not use a collage, split panels, decorative frame, or UI mockup.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
         ? '$qualityDirection\nScene subject: $topic. Mood and context: $summary. Learner level: $levelBand.'
-        : '$qualityDirection\n$coverPrompt';
+        : '$qualityDirection\n$coverPrompt\n'
+              'Scene title: $topic. Dialogue and visual context: $summary. '
+              'Learner level: $levelBand.';
     final imageOnlyPrompt = '$prompt\n$_imageOnlyInstruction';
     try {
       final response = await _invokeFunction('ai-image', {

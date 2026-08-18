@@ -10,6 +10,7 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/story_cover_image.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
@@ -722,22 +723,11 @@ class _BookHero extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (story.coverUrl != null && story.coverUrl!.isNotEmpty)
-              Image.network(
-                story.coverUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  decoration: const BoxDecoration(
-                    gradient: DesignTokens.heroGradient,
-                  ),
-                ),
-              )
-            else
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: DesignTokens.heroGradient,
-                ),
-              ),
+            StoryCoverImage(
+              title: story.title,
+              source: story.coverUrl,
+              fallbackIcon: null,
+            ),
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(

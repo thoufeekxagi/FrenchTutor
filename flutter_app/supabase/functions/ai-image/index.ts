@@ -21,6 +21,10 @@ function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
 
+function wait(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers });
   if (request.method !== "POST") return json({ error: "POST required" }, 405);
@@ -38,24 +42,39 @@ Deno.serve(async (request) => {
   const apiKey = Deno.env.get("OPENROUTER_API_KEY");
   if (!apiKey) return json({ error: "OpenRouter is not configured" }, 503);
 
-  const response = await fetch("https://openrouter.ai/api/v1/images", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://frenchtutor.app",
-      "X-Title": "ParleSprint",
-    },
-    body: JSON.stringify({
-      model: "black-forest-labs/flux.2-klein-4b",
-      prompt: imageOnlyPrompt,
-      n: 1,
-      aspect_ratio: "2:3",
-      output_format: "jpeg",
-    }),
+  const requestBody = JSON.stringify({
+    model: "black-forest-labs/flux.2-klein-4b",
+    prompt: imageOnlyPrompt,
+    n: 1,
+    aspect_ratio: "2:3",
+    output_format: "jpeg",
   });
-  if (!response.ok) return json({ error: "Image generation failed" }, response.status === 429 ? 429 : 502);
-  const data = await response.json();
-  const imageBase64 = String(data?.data?.[0]?.b64_json ?? "");
-  return imageBase64 ? json({ imageBase64 }) : json({ error: "Image provider returned no image" }, 502);
+  let lastStatus = 502;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/images", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://frenchtutor.app",
+          "X-Title": "ParleSprint",
+        },
+        body: requestBody,
+      });
+      lastStatus = response.status;
+      if (response.ok) {
+        const data = await response.json();
+        const imageBase64 = String(data?.data?.[0]?.b64_json ?? "");
+        if (imageBase64) return json({ imageBase64 });
+      }
+    } catch (_) {
+      lastStatus = 502;
+    }
+    if (attempt === 0) await wait(750);
+  }
+  return json(
+    { error: "Image generation failed" },
+    lastStatus === 429 ? 429 : 502,
+  );
 });
