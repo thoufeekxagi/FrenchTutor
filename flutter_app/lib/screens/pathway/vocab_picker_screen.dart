@@ -16,6 +16,7 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/srs_service.dart';
 import '../../services/vocabulary_level_policy.dart';
+import '../../utils/vocabulary_set_copy.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/primary_action_button.dart';
@@ -182,7 +183,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
-        title: Text("Today's Words", style: DesignTokens.display(18)),
+        title: Text('Vocabulary session', style: DesignTokens.display(18)),
         backgroundColor: DesignTokens.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -326,7 +327,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                 ),
                 const SizedBox(height: DesignTokens.space5),
                 KickerText(
-                  isLoading ? 'Preparing your set' : 'Today’s vocabulary',
+                  isLoading ? 'Preparing your set' : 'Your vocabulary session',
                   color: DesignTokens.info,
                 ),
                 const SizedBox(height: DesignTokens.space2),
@@ -891,6 +892,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     if (words.isEmpty) return;
     setState(() => _isPlanning = true);
     final store = ref.read(learningStoreProvider);
+    final level = SpeakLanguageProfile.forProfile(store.profile()).level;
     final targetSize = curateFromPool
         ? (await SRSService.autoQueueSize).clamp(1, 5).toInt()
         : words.length.clamp(1, 5).toInt();
@@ -898,7 +900,11 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     SessionPlan? planResult;
     try {
       planResult = await LessonAgentService.shared
-          .planVocabSession(candidateWords: words, count: targetSize)
+          .planVocabSession(
+            candidateWords: words,
+            count: targetSize,
+            levelBand: level,
+          )
           .timeout(const Duration(seconds: 14));
     } catch (_) {
       planResult = null;
@@ -928,8 +934,6 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     if (!mounted) return;
     setState(() => _isPlanning = false);
 
-    final profile = store.profile();
-    final level = SpeakLanguageProfile.forProfile(profile).level;
     final sessionId =
         'vocabulary-session-${DateTime.now().microsecondsSinceEpoch}';
     final topic = curateFromPool
@@ -938,12 +942,16 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     final summary =
         focusNote ??
         'A saved vocabulary practice set built from the words selected for this session.';
+    final plannedTitle = planResult?.sessionTitle?.trim();
+    final title = plannedTitle == null || plannedTitle.isEmpty
+        ? _fallbackSessionTitle(chosenQueue, summary)
+        : plannedTitle;
     ref
         .read(generatedVocabularySetStoreProvider)
         .insert(
           GeneratedVocabularySet(
             id: sessionId,
-            title: 'Today\'s Words',
+            title: title,
             summary: summary,
             topic: topic,
             levelBand: level,
@@ -954,6 +962,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     unawaited(
       _attachSessionCover(
         id: sessionId,
+        title: title,
         topic: topic,
         context: summary,
         level: level,
@@ -967,7 +976,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         phase: 1,
         theme: VocabTheme(
           id: 'daily-vocabulary',
-          title: 'Today\'s Words',
+          title: title,
           entries: chosenQueue,
         ),
         initialDeck: chosenQueue,
@@ -994,6 +1003,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
 
   Future<void> _attachSessionCover({
     required String id,
+    required String title,
     required String topic,
     required String context,
     required String level,
@@ -1004,7 +1014,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
       final bytes = await LessonAgentService.shared.generateStoryCover(
-        title: 'Today\'s Words',
+        title: title,
         summary: '$context Words: $wordList.',
         topic: topic,
         levelBand: level,
@@ -1020,5 +1030,18 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     } catch (error) {
       debugPrint('Vocabulary session cover failed: $error');
     }
+  }
+
+  String _fallbackSessionTitle(List<VocabEntry> words, String summary) {
+    final generated = GeneratedVocabularySet(
+      id: 'fallback',
+      title: 'Today\'s Words',
+      summary: summary,
+      topic: 'Vocabulary',
+      levelBand: 'A1',
+      entries: words,
+      createdAt: DateTime.now(),
+    );
+    return VocabularySetCopy.title(generated);
   }
 }

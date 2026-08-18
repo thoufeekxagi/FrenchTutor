@@ -8,6 +8,7 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
+import '../../utils/vocabulary_set_copy.dart';
 import '../../widgets/learning_card.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/responsive_card_grid.dart';
@@ -110,7 +111,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                 itemCount: visible.length,
                 maxColumns: 5,
                 maxCardWidth: 176,
-                mainAxisExtent: 294,
+                mainAxisExtent: 324,
                 itemBuilder: (context, index) {
                   final set = visible[index];
                   return _VocabularyCard(
@@ -140,6 +141,8 @@ class _VocabularyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = VocabularySetCopy.title(set);
+    final summary = VocabularySetCopy.summary(set, displayedTitle: title);
     return LearningCard(
       padding: 0,
       child: InkWell(
@@ -168,11 +171,22 @@ class _VocabularyCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    set.title,
+                    title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: DesignTokens.body(15, weight: FontWeight.w700),
                   ),
+                  if (summary != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      summary,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.mutedDim, height: 1.2),
+                    ),
+                  ],
                   const SizedBox(height: 6),
                   Text(
                     '${set.entries.length} words  •  ${set.levelBand}',

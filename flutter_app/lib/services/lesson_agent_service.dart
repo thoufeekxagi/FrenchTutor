@@ -176,10 +176,15 @@ class MistakeJudgment {
 }
 
 class SessionPlan {
-  SessionPlan({required this.focusNote, this.prioritizedWordIds});
+  SessionPlan({
+    required this.focusNote,
+    this.prioritizedWordIds,
+    this.sessionTitle,
+  });
 
   final String focusNote;
   final List<String>? prioritizedWordIds;
+  final String? sessionTitle;
 }
 
 class GrammarSessionPlan {
@@ -729,16 +734,18 @@ STUDENT SAID: $utterance''';
   Future<SessionPlan> planVocabSession({
     required List<VocabEntry> candidateWords,
     required int count,
+    String levelBand = 'A1',
   }) async {
     final system =
         '''
-You are quietly curating a French vocabulary practice session before it starts, the student won't see this reasoning, only the short focus note you write. From the CANDIDATE WORDS pool, SELECT exactly $count of them to actually practice today — do not just take the first $count in the list, genuinely choose a varied, useful mix. Then write a one-sentence, warm, specific focus note for how today's session should be framed.
+You are quietly curating a French vocabulary practice session before it starts. From the CANDIDATE WORDS pool, SELECT exactly $count of them to actually practice today — do not just take the first $count in the list, genuinely choose a varied, useful mix. Then write both a short title and a one-sentence, warm, specific focus note for how today's session should be framed.
 SELECTION PRIORITY: favor an interesting, varied, thematically-loose mix over "next in alphabetical/curriculum order" — avoid picking a set that feels like the same category every time.
-Respond with ONLY a compact JSON object: {"focus_note": string, "prioritized_word_ids": array_of_strings}. "prioritized_word_ids" MUST contain exactly $count ids (or fewer only if the candidate pool itself has fewer than $count entries), every one of them must be an exact id from CANDIDATE WORDS, never invent a new one, and never repeat an id.''';
+TITLE RULES: "session_title" must be 2-6 words, concrete, and clearly connected to the selected words as a small everyday situation or story. Never use generic titles such as "Today's Words", "Recommended Vocabulary", "Vocabulary Session", or "New Words". For A1/A2, write the title in simple English first and optionally add a short French title in parentheses. For B1/B2, write natural French first and optionally add English in parentheses.
+Respond with ONLY a compact JSON object: {"session_title": string, "focus_note": string, "prioritized_word_ids": array_of_strings}. "prioritized_word_ids" MUST contain exactly $count ids (or fewer only if the candidate pool itself has fewer than $count entries), every one of them must be an exact id from CANDIDATE WORDS, never invent a new one, and never repeat an id.''';
     final wordList = candidateWords
         .map((w) => '${w.id}: ${w.fr} (${w.en})')
         .join('; ');
-    final user = 'CANDIDATE WORDS: $wordList';
+    final user = 'CEFR LEVEL: $levelBand\nCANDIDATE WORDS: $wordList';
     final raw = await _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
@@ -2408,6 +2415,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
   }) {
     final obj = _decodeObject(raw);
     final focusNote = obj['focus_note'] as String? ?? '';
+    final sessionTitle = obj['session_title'] as String?;
     var prioritized = (obj['prioritized_word_ids'] as List?)
         ?.map((e) => e.toString())
         .where(validIds.contains) // drop any hallucinated id
@@ -2427,7 +2435,13 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       // only trust it if it's an exact permutation of the real candidates.
       prioritized = null;
     }
-    return SessionPlan(focusNote: focusNote, prioritizedWordIds: prioritized);
+    return SessionPlan(
+      focusNote: focusNote,
+      prioritizedWordIds: prioritized,
+      sessionTitle: sessionTitle?.trim().isEmpty == true
+          ? null
+          : sessionTitle?.trim(),
+    );
   }
 
   GrammarSessionPlan _parseGrammarSessionPlan(
