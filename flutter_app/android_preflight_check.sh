@@ -47,7 +47,10 @@ echo "=== 2. Android toolchain (flutter doctor) ==="
 # 'flutter doctor' mid-write and (under `pipefail`) surface as a false
 # failure here even though the check itself matched fine.
 DOCTOR_OUTPUT=$(flutter doctor 2>/dev/null)
-if [[ "$DOCTOR_OUTPUT" == *"[✓] Android toolchain"* ]]; then
+# Match Flutter's stable, human-readable toolchain label instead of the
+# Unicode status glyph, which is rendered differently by PowerShell/Git Bash
+# on Windows and caused a false failure on healthy SDK installations.
+if [[ "$DOCTOR_OUTPUT" == *"Android toolchain - develop for Android devices"* ]]; then
   pass "Android toolchain OK"
 else
   fail "Android toolchain not OK — run 'flutter doctor -v' and fix the Android section"
