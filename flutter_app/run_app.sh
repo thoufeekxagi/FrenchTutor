@@ -2,7 +2,8 @@
 # Canonical local Flutter entry point.
 #
 # Usage:
-#   ./run_app.sh              # debug run on the configured iPhone
+#   ./run_app.sh              # release run on the configured iPhone
+#   ./run_app.sh debug        # explicit debug run when needed
 #   ./run_app.sh release      # release run on the configured iPhone
 #   ./run_app.sh ipa          # build a release IPA for distribution/TestFlight
 #
@@ -14,15 +15,15 @@ set -euo pipefail
 APP_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 cd "$APP_DIR"
 
-MODE="debug"
+MODE="release"
 DEVICE_ID="${FLUTTER_DEVICE_ID:-00008101-00124C4601EB001E}"
 
 usage() {
   cat <<'EOF'
 Usage: ./run_app.sh [debug|release|ipa] [--device DEVICE_ID]
 
-  debug    Run the app in debug mode (default).
-  release  Run the release build on the configured device.
+  debug    Run the app in debug mode (explicit opt-in).
+  release  Run the release build on the configured device (default).
   ipa      Build a release IPA for distribution/TestFlight.
 EOF
 }
