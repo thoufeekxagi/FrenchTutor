@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import 'package:uuid/uuid.dart';
 
 import '../../data/alphabet_data.dart';
@@ -79,6 +77,14 @@ final List<_AlphabetDeck> _decks = [
     lettersOf: () => frenchAccents,
     quizPoolOf: (letters) => letters,
   ),
+  _AlphabetDeck(
+    id: 'learn_core_accents',
+    title: 'Core accent marks',
+    subtitle: 'Accent aigu, accent grave, and accent circonflexe',
+    icon: CupertinoIcons.textformat,
+    lettersOf: () => coreAccentLetters,
+    quizPoolOf: (letters) => letters,
+  ),
 ];
 
 class _AlphabetDeck {
@@ -112,7 +118,6 @@ class _AlphabetDeckScreen extends ConsumerStatefulWidget {
 class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
     with WidgetsBindingObserver {
   late final List<AlphabetLetter> _letters = widget.deck.lettersOf();
-  Map<String, String> _remoteStoragePaths = const {};
   bool _inQuiz = false;
   final DateTime _startedAt = DateTime.now();
 
@@ -141,30 +146,6 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
       onUserTranscript: (text) => _recorder.logUser(text),
       onTutorTranscript: (text) => _recorder.logTutor(text),
     );
-    unawaited(_loadRemoteAudioCatalog());
-  }
-
-  Future<void> _loadRemoteAudioCatalog() async {
-    try {
-      final rows = await Supabase.instance.client
-          .from('alphabet_audio_catalog')
-          .select('letter, storage_path')
-          .eq('persona_id', ActiveTutor.current.id);
-      final paths = <String, String>{};
-      for (final row in rows.whereType<Map>()) {
-        final letter = row['letter']?.toString().trim();
-        final storagePath = row['storage_path']?.toString().trim();
-        if (letter != null &&
-            letter.isNotEmpty &&
-            storagePath != null &&
-            storagePath.isNotEmpty) {
-          paths[letter] = storagePath;
-        }
-      }
-      if (mounted) setState(() => _remoteStoragePaths = paths);
-    } catch (_) {
-      // The bundled PCM catalog remains the immediate offline fallback.
-    }
   }
 
   String get _lessonContext {
@@ -275,7 +256,6 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
                         _CompactLetterCard(
                           letter: letter,
                           contentItemId: alphabetAudioId(letter),
-                          remoteStoragePath: _remoteStoragePaths[letter.letter],
                         ),
                         const SizedBox(height: 10),
                       ],
@@ -301,15 +281,10 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
 /// card used to be a whole empty screen) so 2-3 fit on one screen at once
 /// and the whole deck is one continuous scroll, not a swipe-per-letter.
 class _CompactLetterCard extends StatefulWidget {
-  const _CompactLetterCard({
-    required this.letter,
-    required this.contentItemId,
-    this.remoteStoragePath,
-  });
+  const _CompactLetterCard({required this.letter, required this.contentItemId});
 
   final AlphabetLetter letter;
   final String contentItemId;
-  final String? remoteStoragePath;
 
   @override
   State<_CompactLetterCard> createState() => _CompactLetterCardState();
@@ -330,17 +305,22 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => _ttsKey.currentState?.trigger(),
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: SpeakColors.blueSoft,
-                borderRadius: BorderRadius.circular(16),
+          Semantics(
+            button: true,
+            label: 'Play the French sound for ${letter.letter}',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _ttsKey.currentState?.trigger(),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: SpeakColors.blueSoft,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.center,
+                child: Text(letter.letter, style: DesignTokens.display(28)),
               ),
-              alignment: Alignment.center,
-              child: Text(letter.letter, style: DesignTokens.display(28)),
             ),
           ),
           const SizedBox(width: 14),
@@ -349,35 +329,38 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // TtsPlayButton already debounces (disabled while
-                    // generating/playing, so a second tap mid-playback is
-                    // ignored until the sound finishes) and plays from the
-                    // prewarmed cache instantly once it's been synthesized
-                    // once, exactly what a fast, no-double-trigger button
-                    // needs here. The letter badge above triggers this same
-                    // instance via `_ttsKey`.
+                    // Keep the native 48-point control target, but let the
+                    // phonetic hint wrap on narrow phones. The old
+                    // mainAxisSize.min row overflowed for labels such as
+                    // "accent circonflexe" and made the card report a
+                    // RenderFlex overflow in Sentry.
                     TtsPlayButton(
                       key: _ttsKey,
                       text: alphabetSpokenText(letter),
                       contentItemId: widget.contentItemId,
-                      remoteStoragePath: widget.remoteStoragePath,
+                      // Alphabet pronunciation is static, curated content.
+                      // Keep it on the bundled clip so a stale or misassigned
+                      // remote catalog entry can never make A say "ami", etc.
+                      cacheNamespace: 'alphabet-bundled-v2',
                       bundledAssetPath: alphabetAudioAssetPath(
                         letter,
                         ActiveTutor.current,
                       ),
                       color: SpeakColors.blue,
-                      size: 28,
+                      size: 48,
                       iconSize: 15,
                     ),
                     const SizedBox(width: 3),
-                    Text(
-                      '"${letter.phonetic}"',
-                      style: DesignTokens.body(
-                        14,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: SpeakColors.blue),
+                    Flexible(
+                      child: Text(
+                        '"${letter.phonetic}"',
+                        softWrap: true,
+                        style: DesignTokens.body(
+                          14,
+                          weight: FontWeight.w600,
+                        ).copyWith(color: SpeakColors.blue),
+                      ),
                     ),
                   ],
                 ),

@@ -228,6 +228,7 @@ class _SpeakCourseSessionScreenState
       0 => 'learn_alphabet',
       1 => 'learn_vowels',
       2 => 'learn_consonants',
+      3 => 'learn_core_accents',
       _ => null,
     };
   }

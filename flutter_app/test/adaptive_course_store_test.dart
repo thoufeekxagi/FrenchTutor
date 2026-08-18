@@ -30,18 +30,23 @@ void main() {
         plan.sessions.map((session) => session.competency).toSet().length,
         greaterThan(10),
       );
+      expect(plan.sessions.take(5).map((session) => session.title), [
+        'Recognize French sounds',
+        'Build vowel confidence',
+        'Notice French consonants',
+        'Recognize core accent marks',
+        'Connect sound to meaning',
+      ]);
       expect(
         plan.sessions
-            .take(3)
+            .take(4)
             .every((session) => session.primarySkill == SpeakSkill.alphabet),
         isTrue,
       );
-      expect(plan.sessions.skip(3).first.title, 'Introduce yourself naturally');
-      expect(
-        plan.sessions.skip(3).first.unitTitle,
-        'Professional introductions',
-      );
-      expect(plan.sessions.skip(3).first.title, isNot(contains('Meetings')));
+      expect(plan.sessions[4].primarySkill, SpeakSkill.vocabulary);
+      expect(plan.sessions.skip(5).first.title, 'Write a short message');
+      expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
+      expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
     },
   );
 

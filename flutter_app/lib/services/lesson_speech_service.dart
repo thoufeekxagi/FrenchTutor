@@ -526,8 +526,14 @@ class LessonSpeechService {
     required String voiceName,
     bool slow = false,
     String? contentItemId,
+    String? cacheNamespace,
   }) async {
-    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    final cacheKey = _diskCacheKey(
+      voiceName,
+      slow,
+      text,
+      namespace: cacheNamespace,
+    );
     final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
     if (cached != null) {
       _synthCache[cacheKey] = cached;
@@ -590,8 +596,14 @@ class LessonSpeechService {
     required String voiceName,
     bool slow = false,
     String? contentItemId,
+    String? cacheNamespace,
   }) async {
-    final cacheKey = _diskCacheKey(voiceName, slow, text);
+    final cacheKey = _diskCacheKey(
+      voiceName,
+      slow,
+      text,
+      namespace: cacheNamespace,
+    );
     final cached = _synthCache[cacheKey] ?? await _readDiskCache(cacheKey);
     if (cached != null) {
       _synthCache[cacheKey] = cached;
@@ -701,8 +713,14 @@ class LessonSpeechService {
     return _cacheDirLazy = dir;
   }
 
-  String _diskCacheKey(String voiceName, bool slow, String text) =>
-      sha256.convert(utf8.encode('$voiceName|$slow|$text')).toString();
+  String _diskCacheKey(
+    String voiceName,
+    bool slow,
+    String text, {
+    String? namespace,
+  }) => sha256
+      .convert(utf8.encode('${namespace ?? 'default'}|$voiceName|$slow|$text'))
+      .toString();
 
   Future<List<int>?> _readDiskCache(String key) async {
     try {

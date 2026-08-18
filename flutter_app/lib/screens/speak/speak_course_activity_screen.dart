@@ -207,11 +207,12 @@ class _SpeakCourseActivityScreenState
       'at ${_level.toUpperCase()} level and do not open with a generic free-talk question.)';
 
   String? get _alphabetDeckId {
-    if (session.unit != 1 || session.index > 2) return null;
+    if (session.unit != 1 || session.index > 3) return null;
     return switch (session.index % 10) {
       0 => 'learn_alphabet',
       1 => 'learn_vowels',
       2 => 'learn_consonants',
+      3 => 'learn_core_accents',
       _ => null,
     };
   }
