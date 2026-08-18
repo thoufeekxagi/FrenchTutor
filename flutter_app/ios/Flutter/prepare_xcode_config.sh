@@ -7,8 +7,9 @@
 # The generated xcconfig is ignored and is never committed.
 #
 # Supabase's production URL/publishable key are compiled into Dart as a safe
-# fallback, so this script is optional for a clean checkout. The local file is
-# still used for private provider credentials that must not be committed.
+# fallback, so this script is optional for a clean checkout. Provider
+# credentials are intentionally absent: AI calls use authenticated Supabase
+# Edge Functions, and Gemini Live uses a short-lived token.
 set -eu
 
 IOS_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
@@ -43,7 +44,7 @@ for encoded in $generated_defines; do
   [ -n "$encoded" ] || continue
   decoded=$(printf '%s' "$encoded" | base64 -D 2>/dev/null || printf '%s' "$encoded" | base64 -d 2>/dev/null || true)
   case "$decoded" in
-    GEMINI_API_KEY=*|OPENROUTER_API_KEY=*|SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|SENTRY_DSN=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
+    SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|SENTRY_DSN=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
       continue
       ;;
   esac
@@ -54,8 +55,6 @@ IFS=$old_ifs
 
 defines="$kept_defines"
 for key in \
-  GEMINI_API_KEY \
-  OPENROUTER_API_KEY \
   SUPABASE_URL \
   SUPABASE_ANON_KEY \
   GOOGLE_IOS_CLIENT_ID \

@@ -76,8 +76,6 @@ get_property() {
 
 if [[ -f "$SECRETS_FILE" ]]; then
   for key in \
-    GEMINI_API_KEY \
-    OPENROUTER_API_KEY \
     SUPABASE_URL \
     SUPABASE_ANON_KEY \
     GOOGLE_IOS_CLIENT_ID \
@@ -95,7 +93,7 @@ if [[ -f "$SECRETS_FILE" ]]; then
   echo "Using local configuration from secrets.local.properties (values hidden)."
 else
   echo "No secrets.local.properties found; using built-in public Supabase configuration."
-  echo "Private AI/provider integrations will be unavailable until local values are added."
+  echo "AI requests use the authenticated Supabase Edge Functions."
 fi
 
 case "$MODE" in

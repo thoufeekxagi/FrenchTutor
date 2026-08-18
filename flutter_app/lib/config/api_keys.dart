@@ -1,6 +1,10 @@
 abstract final class ApiKeys {
-  static const geminiKey = String.fromEnvironment('GEMINI_API_KEY');
-  static const openRouterKey = String.fromEnvironment('OPENROUTER_API_KEY');
+  /// Kept as an empty compatibility value for older widget constructors.
+  /// Gemini Live uses a short-lived Supabase-minted token; Gemini text and
+  /// OpenRouter are called by authenticated Edge Functions. No provider
+  /// credential is compiled into any Flutter build.
+  @Deprecated('Provider credentials are server-side; do not use this value.')
+  static const geminiKey = '';
 
   /// Supabase project URL and anon/publishable key. The anon key is DESIGNED
   /// to be public — it's meaningless without the Row Level Security policies

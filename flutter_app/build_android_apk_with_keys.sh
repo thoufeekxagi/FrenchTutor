@@ -1,6 +1,6 @@
 #!/bin/bash
-# Builds a standalone Android APK (debug by default) with keys baked in via
-# --dart-define, then installs it on whatever adb device is connected.
+# Builds a standalone Android APK (debug by default) with public/optional app
+# configuration via --dart-define, then installs it on whatever adb device is connected.
 # A plain `flutter build apk` ships with no keys and the app refuses to start
 # with "Bad state: Missing SUPABASE_URL / SUPABASE_ANON_KEY" (see
 # lib/config/api_keys.dart + main.dart) — always use this script instead of
@@ -22,8 +22,6 @@ if [ ! -f "$SECRETS_FILE" ]; then
   echo "Missing $SECRETS_FILE — copy secrets.local.properties.example to $SECRETS_FILE and fill in real keys." >&2
   exit 1
 fi
-GEMINI_KEY=$(grep '^GEMINI_API_KEY=' "$SECRETS_FILE" | sed 's/^GEMINI_API_KEY=//')
-OPENROUTER_KEY=$(grep '^OPENROUTER_API_KEY=' "$SECRETS_FILE" | sed 's/^OPENROUTER_API_KEY=//')
 SUPABASE_URL=$(grep '^SUPABASE_URL=' "$SECRETS_FILE" | sed 's/^SUPABASE_URL=//')
 SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' "$SECRETS_FILE" | sed 's/^SUPABASE_ANON_KEY=//')
 GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
@@ -35,8 +33,6 @@ POSTHOG_API_KEY=$(grep '^POSTHOG_API_KEY=' "$SECRETS_FILE" | sed 's/^POSTHOG_API
 POSTHOG_HOST=$(grep '^POSTHOG_HOST=' "$SECRETS_FILE" | sed 's/^POSTHOG_HOST=//')
 
 DART_DEFINES=(
-  --dart-define=GEMINI_API_KEY="$GEMINI_KEY"
-  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY"
   --dart-define=SUPABASE_URL="$SUPABASE_URL"
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
   --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID"

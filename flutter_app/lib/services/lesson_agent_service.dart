@@ -1,13 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-import '../config/api_keys.dart';
 import '../models/content_models.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
@@ -27,6 +26,8 @@ import '../prompts/live_prompts.dart';
 class GeminiHttpError implements Exception {
   GeminiHttpError(this.statusCode, {this.retryAfter});
 
+  /// Retained for retry-policy tests and older callers. Production provider
+  /// responses now arrive as Edge Function errors, never as direct app HTTP.
   factory GeminiHttpError.fromResponse(http.Response response) {
     final retryMatch = RegExp(
       r'Please retry in ([0-9.]+)s',
@@ -38,6 +39,18 @@ class GeminiHttpError implements Exception {
           ? null
           : Duration(milliseconds: (seconds * 1000).ceil() + 500),
     );
+  }
+
+  factory GeminiHttpError.fromFunctionException(FunctionException error) {
+    Duration? retryAfter;
+    final details = error.details;
+    if (details is Map) {
+      final seconds = double.tryParse(details['retryAfter']?.toString() ?? '');
+      if (seconds != null) {
+        retryAfter = Duration(milliseconds: (seconds * 1000).ceil() + 500);
+      }
+    }
+    return GeminiHttpError(error.status, retryAfter: retryAfter);
   }
 
   final int statusCode;
@@ -220,26 +233,8 @@ class LessonAgentService {
   /// tier ($0.25/$1.50 per 1M input/output tokens vs. $0.30/$2.50 for
   /// `gemini-3.5-flash-lite`; `gemini-2.0-flash-lite` was shut down entirely
   /// in June 2026). Re-pin again once 3.1 shows similar signs of retiring.
-  static const _geminiTextModel = 'gemini-3.1-flash-lite';
-
-  static const _openRouterModel = 'nvidia/nemotron-3-super-120b-a12b:free';
-
   /// Model choice is a code decision, never user- or settings-configurable.
   static const _forceOpenRouter = false;
-
-  Future<String> get _openRouterApiKey async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString('openrouter_api_key');
-    if (stored != null && stored.isNotEmpty) return stored;
-    return ApiKeys.openRouterKey;
-  }
-
-  Future<String> get _geminiApiKey async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString('gemini_api_key');
-    if (stored != null && stored.isNotEmpty) return stored;
-    return ApiKeys.geminiKey;
-  }
 
   static String extractJSON(String raw) {
     var s = raw.trim();
@@ -1383,8 +1378,6 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     required String levelBand,
     String? coverPrompt,
   }) async {
-    final key = await _openRouterApiKey;
-    if (key.isEmpty) throw AgentError.missingKey;
     const qualityDirection =
         'Create a premium literary book-cover image in a portrait 2:3 composition. '
         'Use sophisticated editorial realism, natural lighting, restrained color grading, '
@@ -1396,46 +1389,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
         ? '$qualityDirection Title context: "$title". Topic: $topic. Mood: $summary. Level: $levelBand.'
         : '$qualityDirection\n$coverPrompt';
-    final uri = Uri.parse('https://openrouter.ai/api/v1/images');
-    http.Response response;
     try {
-      response = await http
-          .post(
-            uri,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $key',
-              'HTTP-Referer': 'https://frenchtutor.app',
-              'X-Title': 'French Tutor',
-            },
-            body: jsonEncode({
-              'model': 'black-forest-labs/flux.2-klein-4b',
-              'prompt': prompt,
-              'n': 1,
-              'aspect_ratio': '2:3',
-              'output_format': 'jpeg',
-            }),
-          )
-          .timeout(const Duration(seconds: 45));
-    } catch (_) {
-      throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      // Keep the provider's actual diagnostic visible in device logs. The
-      // previous code reduced every image failure to a generic status, which
-      // made a storage/configuration problem look like the model was blank.
-      developer.log(
-        'OpenRouter image generation failed (${response.statusCode}): '
-        '${response.body}',
-        name: 'LessonAgentService',
-      );
-      throw GeminiHttpError.fromResponse(response);
-    }
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final data = json['data'] as List? ?? const [];
-      final first = data.isEmpty ? null : data.first;
-      final encoded = first is Map ? first['b64_json'] as String? : null;
+      final response = await _invokeFunction('ai-image', {
+        'prompt': prompt,
+      }, timeout: const Duration(seconds: 45));
+      final encoded = response['imageBase64'] as String?;
       if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);
       throw AgentError.badResponse;
     } catch (e) {
@@ -1884,54 +1842,32 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     List<int> pcmBytes, {
     int sampleRateHz = 16000,
   }) async {
-    final key = await _geminiApiKey;
-    if (key.isEmpty) throw AgentError.missingKey;
     if (pcmBytes.isEmpty) return '';
-    final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$key',
-    );
-    http.Response response;
     try {
-      response = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'contents': [
-                {
-                  'parts': [
-                    {
-                      'text':
-                          'Transcribe exactly what is said in this short audio clip, in French or English, whichever was spoken. Reply with ONLY the transcribed text, nothing else. If nothing intelligible was said, reply with an empty string.',
-                    },
-                    {
-                      'inlineData': {
-                        'mimeType': 'audio/pcm;rate=$sampleRateHz',
-                        'data': base64Encode(pcmBytes),
-                      },
-                    },
-                  ],
+      final response = await _invokeFunction('ai-text', {
+        'provider': 'gemini',
+        'contents': [
+          {
+            'parts': [
+              {
+                'text':
+                    'Transcribe exactly what is said in this short audio clip, in French or English, whichever was spoken. Reply with ONLY the transcribed text, nothing else. If nothing intelligible was said, reply with an empty string.',
+              },
+              {
+                'inlineData': {
+                  'mimeType': 'audio/pcm;rate=$sampleRateHz',
+                  'data': base64Encode(pcmBytes),
                 },
-              ],
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-    } catch (_) {
-      throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw AgentError.requestFailed;
-    }
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final candidates = json['candidates'] as List?;
-      if (candidates == null || candidates.isEmpty) return '';
-      final content = (candidates.first as Map<String, dynamic>)['content'];
-      final parts = (content as Map<String, dynamic>?)?['parts'] as List?;
-      final text = parts
-          ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
-          .join();
-      return text?.trim() ?? '';
+              },
+            ],
+          },
+        ],
+        'maxTokens': 220,
+        'temperature': 0.1,
+      }, timeout: const Duration(seconds: 15));
+      return (response['text'] as String? ?? '').trim();
+    } on AgentError {
+      return '';
     } catch (_) {
       return '';
     }
@@ -1949,8 +1885,6 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     String? ocrHint,
     String? conversationContext,
   }) async {
-    final key = await _geminiApiKey;
-    if (key.isEmpty) throw AgentError.missingKey;
     if (imageBytes.isEmpty) return '';
     const system =
         '''You are a bilingual (English/French) travel companion helping a French learner understand something they just photographed while out and about (a sign, menu, notice, or document). Look at the image directly.
@@ -1967,48 +1901,26 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
         'EARLIER IN THIS SCAN SESSION: ${conversationContext.trim()}',
       );
     }
-    final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$key',
-    );
-    http.Response response;
     try {
-      response = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'contents': [
-                {
-                  'parts': [
-                    {'text': promptParts.join('\n\n')},
-                    {
-                      'inlineData': {
-                        'mimeType': mimeType,
-                        'data': base64Encode(imageBytes),
-                      },
-                    },
-                  ],
+      final response = await _invokeFunction('ai-text', {
+        'provider': 'gemini',
+        'contents': [
+          {
+            'parts': [
+              {'text': promptParts.join('\n\n')},
+              {
+                'inlineData': {
+                  'mimeType': mimeType,
+                  'data': base64Encode(imageBytes),
                 },
-              ],
-            }),
-          )
-          .timeout(const Duration(seconds: 20));
-    } catch (_) {
-      throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw AgentError.requestFailed;
-    }
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final candidates = json['candidates'] as List?;
-      if (candidates == null || candidates.isEmpty) return '';
-      final content = (candidates.first as Map<String, dynamic>)['content'];
-      final parts = (content as Map<String, dynamic>?)?['parts'] as List?;
-      final text = parts
-          ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
-          .join();
-      return text?.trim() ?? '';
+              },
+            ],
+          },
+        ],
+        'maxTokens': 300,
+        'temperature': 0.25,
+      }, timeout: const Duration(seconds: 20));
+      return (response['text'] as String? ?? '').trim();
     } catch (_) {
       throw AgentError.badResponse;
     }
@@ -2046,48 +1958,37 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     Duration timeout = const Duration(seconds: 30),
     double temperature = 0.4,
   }) async {
-    if (_forceOpenRouter) {
-      final openRouterKey = await _openRouterApiKey;
-      if (openRouterKey.isEmpty) throw AgentError.missingKey;
-      return _requestOpenRouter(
-        model: _openRouterModel,
-        messages: messages,
-        maxTokens: maxTokens,
-        apiKey: openRouterKey,
-        timeout: timeout,
-        temperature: temperature,
-      );
-    }
-    final geminiKey = await _geminiApiKey;
-    if (geminiKey.isEmpty) throw AgentError.missingKey;
-    return _requestGeminiWithRetry(
+    return _requestTextWithRetry(
+      provider: _forceOpenRouter ? 'openrouter' : 'gemini',
       messages: messages,
       maxTokens: maxTokens,
-      apiKey: geminiKey,
       timeout: timeout,
       temperature: temperature,
     );
   }
 
-  /// Text-generation calls retry transient Gemini failures. For rate limits,
-  /// Gemini's requested cooldown is used before the next attempt.
-  Future<String> _requestGeminiWithRetry({
+  /// Text-generation calls retry transient provider failures. The provider
+  /// credentials never enter this process; the authenticated Edge Function
+  /// owns the provider request and returns only the generated text.
+  Future<String> _requestTextWithRetry({
+    required String provider,
     required List<Map<String, String>> messages,
     required int maxTokens,
-    required String apiKey,
     required Duration timeout,
     required double temperature,
   }) async {
     const maxAttempts = 3;
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        return await _requestGemini(
-          messages: messages,
-          maxTokens: maxTokens,
-          apiKey: apiKey,
-          timeout: timeout,
-          temperature: temperature,
-        );
+        final response = await _invokeFunction('ai-text', {
+          'provider': provider,
+          'messages': messages,
+          'maxTokens': maxTokens,
+          'temperature': temperature,
+        }, timeout: timeout);
+        final text = response['text'] as String?;
+        if (text == null || text.trim().isEmpty) throw AgentError.badResponse;
+        return normalizeGeneratedText(text);
       } catch (e) {
         if (attempt == maxAttempts) rethrow;
         final retryAfter = e is GeminiHttpError && e.isRateLimited
@@ -2101,134 +2002,32 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     throw AgentError.requestFailed; // unreachable, satisfies the analyzer
   }
 
-  Future<String> _requestGemini({
-    required List<Map<String, String>> messages,
-    required int maxTokens,
-    required String apiKey,
+  Future<Map<String, dynamic>> _invokeFunction(
+    String name,
+    Map<String, dynamic> body, {
     required Duration timeout,
-    double temperature = 0.4,
   }) async {
-    final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/$_geminiTextModel:generateContent?key=$apiKey',
-    );
-
-    // Same OpenAI-shaped message arrays all callers already build, mapped to Gemini's
-    // schema: system messages become systemInstruction, assistant becomes "model".
-    final systemText = messages
-        .where((m) => m['role'] == 'system')
-        .map((m) => m['content'] ?? '')
-        .join('\n\n');
-    final contents = messages
-        .where((m) => m['role'] != 'system')
-        .map(
-          (m) => {
-            'role': m['role'] == 'assistant' ? 'model' : 'user',
-            'parts': [
-              {'text': m['content'] ?? ''},
-            ],
-          },
-        )
-        .toList();
-    final body = <String, dynamic>{
-      'contents': contents,
-      'generationConfig': {
-        'temperature': temperature,
-        'maxOutputTokens': maxTokens,
-      },
-    };
-    if (systemText.isNotEmpty) {
-      body['systemInstruction'] = {
-        'parts': [
-          {'text': systemText},
-        ],
-      };
+    if (Supabase.instance.client.auth.currentSession == null) {
+      throw AgentError.requestFailed;
     }
-
-    http.Response response;
     try {
-      response = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(body),
-          )
+      final response = await Supabase.instance.client.functions
+          .invoke(name, body: body)
           .timeout(timeout);
+      final data = response.data;
+      if (data is! Map) throw AgentError.badResponse;
+      return Map<String, dynamic>.from(data);
+    } on TimeoutException {
+      throw AgentError.requestFailed;
+    } on FunctionException catch (error) {
+      if (error.status == 401 || error.status == 403) {
+        throw AgentError.requestFailed;
+      }
+      throw GeminiHttpError.fromFunctionException(error);
+    } on AgentError {
+      rethrow;
     } catch (_) {
       throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw GeminiHttpError.fromResponse(response);
-    }
-
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final candidates = json['candidates'] as List?;
-      final content =
-          (candidates?.isNotEmpty == true
-                  ? candidates!.first as Map<String, dynamic>
-                  : null)?['content']
-              as Map<String, dynamic>?;
-      final parts = content?['parts'] as List?;
-      final text =
-          parts
-              ?.map((p) => (p as Map<String, dynamic>)['text'] as String? ?? '')
-              .join() ??
-          '';
-      if (text.isEmpty) throw AgentError.badResponse;
-      return normalizeGeneratedText(text);
-    } catch (e) {
-      if (e is AgentError) rethrow;
-      throw AgentError.badResponse;
-    }
-  }
-
-  Future<String> _requestOpenRouter({
-    required String model,
-    required List<Map<String, String>> messages,
-    required int maxTokens,
-    required String apiKey,
-    required Duration timeout,
-    double temperature = 0.4,
-  }) async {
-    final uri = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
-    http.Response response;
-    try {
-      response = await http
-          .post(
-            uri,
-            headers: {
-              'Authorization': 'Bearer $apiKey',
-              'Content-Type': 'application/json',
-              'HTTP-Referer': 'https://github.com/frenchtutor-app',
-              'X-Title': 'ParleSprint',
-            },
-            body: jsonEncode({
-              'model': model,
-              'messages': messages,
-              'temperature': temperature,
-              'max_tokens': maxTokens,
-            }),
-          )
-          .timeout(timeout);
-    } catch (_) {
-      throw AgentError.requestFailed;
-    }
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw AgentError.requestFailed;
-    }
-    try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final choices = json['choices'] as List?;
-      final first = choices?.isNotEmpty == true
-          ? choices!.first as Map<String, dynamic>
-          : null;
-      final message = first?['message'] as Map<String, dynamic>?;
-      final content = message?['content'] as String?;
-      if (content == null || content.isEmpty) throw AgentError.badResponse;
-      return normalizeGeneratedText(content);
-    } catch (e) {
-      if (e is AgentError) rethrow;
-      throw AgentError.badResponse;
     }
   }
 

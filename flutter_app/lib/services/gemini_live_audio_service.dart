@@ -9,8 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../config/api_keys.dart';
 import '../models/tutor_persona.dart';
+import 'gemini_live_token_service.dart';
 
 /// Resolves short tutor audio clips through the same Gemini Live model and
 /// selected persona used by an actual call. Generated lesson audio never
@@ -327,11 +327,15 @@ class GeminiLiveAudioService {
     required TutorPersona persona,
     required bool slow,
   }) async {
-    final apiKey = ApiKeys.geminiKey;
-    if (apiKey.isEmpty) return null;
+    late final String token;
+    try {
+      token = await GeminiLiveTokenService.fetch();
+    } catch (_) {
+      return null;
+    }
     final channel = WebSocketChannel.connect(
       Uri.parse(
-        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=$apiKey',
+        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
       ),
     );
     final setupComplete = Completer<void>();

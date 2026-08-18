@@ -1,6 +1,6 @@
 #!/bin/bash
 # Android counterpart to run_with_keys.sh — see BUILD_FLUTTER_TO_IPHONE.md.
-# Reads keys from secrets.local.properties (same file the iOS scripts use) and
+# Reads app configuration from secrets.local.properties (same file the iOS scripts use) and
 # runs a DEBUG build on whichever Android device/emulator adb currently sees.
 # A plain `flutter run`/`flutter build apk` ships with no keys and the app
 # refuses to start with "Bad state: Missing SUPABASE_URL / SUPABASE_ANON_KEY"
@@ -14,8 +14,6 @@ if [ ! -f "$SECRETS_FILE" ]; then
   echo "Missing $SECRETS_FILE — copy secrets.local.properties.example to $SECRETS_FILE and fill in real keys." >&2
   exit 1
 fi
-GEMINI_KEY=$(grep '^GEMINI_API_KEY=' "$SECRETS_FILE" | sed 's/^GEMINI_API_KEY=//')
-OPENROUTER_KEY=$(grep '^OPENROUTER_API_KEY=' "$SECRETS_FILE" | sed 's/^OPENROUTER_API_KEY=//')
 SUPABASE_URL=$(grep '^SUPABASE_URL=' "$SECRETS_FILE" | sed 's/^SUPABASE_URL=//')
 SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' "$SECRETS_FILE" | sed 's/^SUPABASE_ANON_KEY=//')
 GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
@@ -34,8 +32,6 @@ fi
 
 exec flutter run \
   "${DEVICE_FLAG[@]}" \
-  --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
-  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
   --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID" \

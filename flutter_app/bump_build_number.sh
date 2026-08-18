@@ -3,8 +3,9 @@
 #   1. Auto-increments the iOS build number from the git commit count (always
 #      strictly increasing, never collides with a previous TestFlight upload).
 #      Skipped if the current number is already ahead.
-#   2. Regenerates ios/Flutter/Generated.xcconfig WITH the local dart-defines
-#      baked in, so optional/private integrations are present when available.
+#   2. Regenerates ios/Flutter/Generated.xcconfig with public app configuration
+#      and optional observability/store identifiers when available. AI provider
+#      credentials are never passed to Flutter or Xcode.
 #      Supabase's public production configuration is compiled into the app as
 #      a safe fallback, so a direct Xcode Run/Archive no longer depends on
 #      this local script for Supabase startup.
@@ -37,8 +38,6 @@ if [ ! -f "$SECRETS_FILE" ]; then
   echo "Missing $SECRETS_FILE — copy secrets.local.properties.example and fill in real keys." >&2
   exit 1
 fi
-GEMINI_KEY=$(grep '^GEMINI_API_KEY=' "$SECRETS_FILE" | sed 's/^GEMINI_API_KEY=//')
-OPENROUTER_KEY=$(grep '^OPENROUTER_API_KEY=' "$SECRETS_FILE" | sed 's/^OPENROUTER_API_KEY=//')
 SUPABASE_URL=$(grep '^SUPABASE_URL=' "$SECRETS_FILE" | sed 's/^SUPABASE_URL=//')
 SUPABASE_ANON_KEY=$(grep '^SUPABASE_ANON_KEY=' "$SECRETS_FILE" | sed 's/^SUPABASE_ANON_KEY=//')
 GOOGLE_IOS_CLIENT_ID=$(grep '^GOOGLE_IOS_CLIENT_ID=' "$SECRETS_FILE" | sed 's/^GOOGLE_IOS_CLIENT_ID=//')
@@ -47,8 +46,6 @@ REVENUECAT_IOS_KEY=$(grep '^REVENUECAT_IOS_KEY=' "$SECRETS_FILE" | sed 's/^REVEN
 REVENUECAT_ANDROID_KEY=$(grep '^REVENUECAT_ANDROID_KEY=' "$SECRETS_FILE" | sed 's/^REVENUECAT_ANDROID_KEY=//')
 
 flutter build ios --config-only \
-  --dart-define=GEMINI_API_KEY="$GEMINI_KEY" \
-  --dart-define=OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
   --dart-define=GOOGLE_IOS_CLIENT_ID="$GOOGLE_IOS_CLIENT_ID" \

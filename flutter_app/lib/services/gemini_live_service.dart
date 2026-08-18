@@ -10,6 +10,7 @@ import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../services/progress_service.dart';
 import '../utils/generated_text.dart';
+import 'gemini_live_token_service.dart';
 
 /// Ported from GeminiLiveService.swift — bidirectional audio+text streaming over the
 /// Gemini Live WebSocket, with tool-call support for the agent-led Daily Pathway stages.
@@ -109,9 +110,16 @@ class GeminiLiveService {
 
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
-    final uri = Uri.parse(
-      'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=$apiKey',
-    );
+    late final Uri uri;
+    try {
+      final token = await GeminiLiveTokenService.fetch();
+      uri = Uri.parse(
+        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
+      );
+    } catch (_) {
+      _handleConnectionLoss('Could not authenticate Gemini Live');
+      return;
+    }
     try {
       _channel = WebSocketChannel.connect(uri);
     } catch (_) {
