@@ -63,6 +63,10 @@ class SessionScreen extends ConsumerStatefulWidget {
     this.popResultImmediately = false,
   });
 
+  /// Legacy constructor input retained for route compatibility. Gemini Live
+  /// now authenticates with a short-lived Supabase-minted token; no provider
+  /// API key is compiled into the app or required by this screen.
+  @Deprecated('Gemini Live uses a Supabase-minted session token.')
   final String apiKey;
   final String? lessonContext;
   final String? stage;
@@ -192,13 +196,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       Navigator.of(context).pop();
       return;
     }
-    if (widget.apiKey.trim().isEmpty) {
-      setState(() {
-        _callStatus = CallStatus.ended;
-        _errorMessage = 'Live tutor is not enabled for this build.';
-      });
-      return;
-    }
+    // GeminiLiveService obtains a short-lived credential from Supabase. The
+    // old build gate checked the legacy embedded Gemini API-key field here;
+    // that field is intentionally empty now for security, so the gate made
+    // every release/TestFlight call end before it even requested a token.
     _gemini.connect();
     ProductAnalytics.capture('voice_session_started');
   }
