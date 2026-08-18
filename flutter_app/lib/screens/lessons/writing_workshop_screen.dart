@@ -26,6 +26,23 @@ import '../../widgets/web/web_constrained_view.dart';
 
 enum _WritingStep { brief, build, draft, review, rewrite }
 
+typedef WritingFeedbackGrader =
+    Future<WritingFeedback> Function({
+      required WritingTask task,
+      required String submission,
+      required String levelBand,
+    });
+
+final writingFeedbackGraderProvider = Provider<WritingFeedbackGrader>((ref) {
+  return ({
+    required WritingTask task,
+    required String submission,
+    required String levelBand,
+  }) => ref
+      .read(lessonAgentServiceProvider)
+      .gradeWriting(task: task, submission: submission, levelBand: levelBand);
+});
+
 /// A guided writing loop that moves the learner from supported construction to
 /// independent production, then makes one important correction reusable.
 ///
@@ -57,7 +74,6 @@ class _WritingWorkshopScreenState extends ConsumerState<WritingWorkshopScreen>
   MicroWritingFeedback? _rewriteFeedback;
   Uint8List? _submissionCover;
   bool _isCoverGenerating = false;
-  bool _feedbackRecoveryAttempted = false;
   String? _errorText;
 
   final _draftController = TextEditingController();
@@ -153,6 +169,10 @@ Help the learner think and write. Do not write the whole answer for them unless 
       summary: feedback == null
           ? 'Practised writing "${_task.title}".'
           : 'Wrote "${_task.title}" and scored ${feedback.scoreOutOf10.toStringAsFixed(1)}/10.',
+      // This is a typed writing lesson, not a live conversation. The grade,
+      // corrections, and next steps above are already the useful review; do
+      // not launch a second ambient transcript-summary request on dispose.
+      autoNote: false,
     );
     final minutes = DateTime.now().difference(_sessionStart).inMinutes;
     if (minutes > 0 && _draft.trim().isNotEmpty) {
@@ -229,19 +249,23 @@ Help the learner think and write. Do not write the whole answer for them unless 
     setState(() {
       _isGrading = true;
       _errorText = null;
+      _feedback = null;
+      // Enter Review immediately. The learner gets a visible receipt of the
+      // exact text being graded instead of seeing a second ambiguous submit
+      // step while the network request is in flight.
+      _draft = submission;
+      _step = _WritingStep.review;
     });
     try {
-      final feedback = await ref
-          .read(lessonAgentServiceProvider)
-          .gradeWriting(
-            task: _task,
-            submission: submission,
-            // The task is the source of truth. A learner can change profile
-            // controls while an already-open task is on screen; grading this
-            // task against a different profile level would produce the wrong
-            // rubric and an over-advanced model answer.
-            levelBand: _task.levelBand,
-          );
+      final feedback = await ref.read(writingFeedbackGraderProvider)(
+        task: _task,
+        submission: submission,
+        // The task is the source of truth. A learner can change profile
+        // controls while an already-open task is on screen; grading this
+        // task against a different profile level would produce the wrong
+        // rubric and an over-advanced model answer.
+        levelBand: _task.levelBand,
+      );
       if (!mounted) return;
       setState(() {
         // Keep the exact text that was graded. This protects the review from
@@ -250,8 +274,6 @@ Help the learner think and write. Do not write the whole answer for them unless 
         _draft = submission;
         _feedback = feedback;
         _isGrading = false;
-        _feedbackRecoveryAttempted = false;
-        _step = _WritingStep.review;
       });
       unawaited(_generateSubmissionCover());
       // A local/cloud persistence failure must not hide a grade that is already
@@ -419,13 +441,16 @@ Help the learner think and write. Do not write the whole answer for them unless 
                   ),
                 ),
                 Expanded(
-                  // The step body is already a scroll view with a tight
-                  // viewport supplied by Expanded. AnimatedSwitcher used to
-                  // wrap this in a Stack during the Draft -> Review change;
-                  // on device that could paint the Review intro while the
-                  // feedback children were left outside the painted bounds.
-                  // A direct keyed body keeps the handoff deterministic.
-                  child: KeyedSubtree(key: ValueKey(_step), child: _stepView()),
+                  // Include the feedback phase in the key. The review body
+                  // changes from a pending receipt to several result cards
+                  // without changing [_step]; a step-only key can preserve a
+                  // stale scroll subtree on device during that handoff.
+                  child: KeyedSubtree(
+                    key: ValueKey(
+                      '${_step.name}:${_feedback == null ? 'pending' : 'ready'}',
+                    ),
+                    child: SizedBox.expand(child: _stepView()),
+                  ),
                 ),
                 if (!keyboardVisible)
                   _Footer(
@@ -665,13 +690,12 @@ Help the learner think and write. Do not write the whole answer for them unless 
   Widget _reviewView() {
     final feedback = _feedback;
     if (feedback == null) {
-      _scheduleFeedbackRecovery();
       return _FeedbackPendingBody(
+        draft: _draft,
         isLoading: _isGrading,
         errorText: _errorText,
         onRetry: () {
           setState(() {
-            _feedbackRecoveryAttempted = false;
             _errorText = null;
           });
           unawaited(_submitDraft());
@@ -804,17 +828,6 @@ Help the learner think and write. Do not write the whole answer for them unless 
     );
   }
 
-  void _scheduleFeedbackRecovery() {
-    if (_feedbackRecoveryAttempted || _isGrading || !_draftReady) return;
-    _feedbackRecoveryAttempted = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _step != _WritingStep.review || _feedback != null) {
-        return;
-      }
-      unawaited(_submitDraft());
-    });
-  }
-
   Widget _rewriteView() {
     final corrections = _feedback?.corrections ?? const [];
     final correction = corrections.isEmpty ? null : corrections.first;
@@ -898,7 +911,7 @@ class _Footer extends StatelessWidget {
     final label = switch (step) {
       _WritingStep.brief => 'Build my answer',
       _WritingStep.build => 'Write freely',
-      _WritingStep.draft => 'Review my writing',
+      _WritingStep.draft => 'Submit for feedback',
       _WritingStep.review => hasFeedback ? 'Rewrite one idea' : 'Get feedback',
       _WritingStep.rewrite =>
         hasRewriteFeedback ? 'Finish workshop' : 'Check my rewrite',
@@ -915,7 +928,7 @@ class _Footer extends StatelessWidget {
           label: label,
           isLoading: isLoading,
           loadingLabel: isDraft || (step == _WritingStep.review && !hasFeedback)
-              ? 'Reviewing your writing…'
+              ? 'Grading your writing…'
               : 'Checking your rewrite…',
           onPressed: isDraft
               ? (draftReady ? onSubmit : null)
@@ -1021,7 +1034,11 @@ class _WritingResultCard extends StatelessWidget {
       padding: 0,
       clipBehavior: Clip.antiAlias,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        // This card lives inside a vertical ListView, so its row receives an
+        // unbounded height. Stretching across that axis asks Flutter for an
+        // infinite-height child and can make the entire Review result subtree
+        // disappear on device. The cover already has an explicit height.
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 112,
@@ -1531,11 +1548,13 @@ class _ErrorText extends StatelessWidget {
 
 class _FeedbackPendingBody extends StatelessWidget {
   const _FeedbackPendingBody({
+    required this.draft,
     required this.isLoading,
     required this.errorText,
     required this.onRetry,
   });
 
+  final String draft;
   final bool isLoading;
   final String? errorText;
   final VoidCallback onRetry;
@@ -1552,6 +1571,8 @@ class _FeedbackPendingBody extends StatelessWidget {
               'Your writing was submitted. We are turning it into a score, corrections, and one clear next step.',
         ),
         const SizedBox(height: 18),
+        _SubmissionTextCard(draft: draft),
+        const SizedBox(height: 12),
         LearningCard(
           color: DesignTokens.infoSoft,
           child: Column(
