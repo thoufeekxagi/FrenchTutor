@@ -224,7 +224,8 @@ Help the learner think and write. Do not write the whole answer for them unless 
   }
 
   Future<void> _submitDraft() async {
-    if (!_draftReady || _isGrading) return;
+    final submission = _draft.trim();
+    if (submission.isEmpty || _isGrading) return;
     setState(() {
       _isGrading = true;
       _errorText = null;
@@ -234,7 +235,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
           .read(lessonAgentServiceProvider)
           .gradeWriting(
             task: _task,
-            submission: _draft,
+            submission: submission,
             // The task is the source of truth. A learner can change profile
             // controls while an already-open task is on screen; grading this
             // task against a different profile level would produce the wrong
@@ -243,6 +244,10 @@ Help the learner think and write. Do not write the whole answer for them unless 
           );
       if (!mounted) return;
       setState(() {
+        // Keep the exact text that was graded. This protects the review from
+        // a TextField change that happens while the network request is in
+        // flight and makes the Draft -> Review handoff one atomic receipt.
+        _draft = submission;
         _feedback = feedback;
         _isGrading = false;
         _feedbackRecoveryAttempted = false;
@@ -255,14 +260,14 @@ Help the learner think and write. Do not write the whole answer for them unless 
       try {
         _learningStore.saveSubmission(
           taskId: _task.id,
-          text: _draft,
+          text: submission,
           feedback: jsonEncode(_writingFeedbackPayload(feedback)),
         );
       } catch (error, stackTrace) {
         debugPrint('Writing feedback persistence failed: $error\n$stackTrace');
       }
       unawaited(_prewarmWritingFeedbackAudio(feedback));
-      _recorder.logUser(_draft);
+      _recorder.logUser(submission);
       _recorder.logTutor(
         '${feedback.scoreOutOf10.toStringAsFixed(1)}/10. ${feedback.improvedVersion}',
       );
@@ -414,18 +419,13 @@ Help the learner think and write. Do not write the whole answer for them unless 
                   ),
                 ),
                 Expanded(
-                  child: AnimatedSwitcher(
-                    duration: DesignTokens.durationMedium,
-                    child: KeyedSubtree(
-                      key: ValueKey(_step),
-                      // Give every step, especially the review ListView, a
-                      // tight viewport. Without this, AnimatedSwitcher can
-                      // lay out the new scroll view loosely during the
-                      // submission transition, leaving the header visible
-                      // while the feedback cards are not painted.
-                      child: SizedBox.expand(child: _stepView()),
-                    ),
-                  ),
+                  // The step body is already a scroll view with a tight
+                  // viewport supplied by Expanded. AnimatedSwitcher used to
+                  // wrap this in a Stack during the Draft -> Review change;
+                  // on device that could paint the Review intro while the
+                  // feedback children were left outside the painted bounds.
+                  // A direct keyed body keeps the handoff deterministic.
+                  child: KeyedSubtree(key: ValueKey(_step), child: _stepView()),
                 ),
                 if (!keyboardVisible)
                   _Footer(
