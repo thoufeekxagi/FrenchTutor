@@ -10,6 +10,7 @@ import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../utils/vocabulary_set_copy.dart';
 import '../../widgets/learning_card.dart';
+import '../../widgets/practice_content_card.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -111,7 +112,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                 itemCount: visible.length,
                 maxColumns: 5,
                 maxCardWidth: 176,
-                mainAxisExtent: 324,
+                mainAxisExtent: 292,
                 itemBuilder: (context, index) {
                   final set = visible[index];
                   return _VocabularyCard(
@@ -143,97 +144,14 @@ class _VocabularyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = VocabularySetCopy.title(set);
     final summary = VocabularySetCopy.summary(set, displayedTitle: title);
-    return LearningCard(
-      padding: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(DesignTokens.radiusCard),
-              ),
-              child: _VocabularyCover(source: set.coverUrl),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    set.topic.toUpperCase(),
-                    style: DesignTokens.mono(
-                      9.5,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: DesignTokens.primary),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(15, weight: FontWeight.w700),
-                  ),
-                  if (summary != null) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      summary,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.body(
-                        11,
-                      ).copyWith(color: DesignTokens.mutedDim, height: 1.2),
-                    ),
-                  ],
-                  const SizedBox(height: 6),
-                  Text(
-                    '${set.entries.length} words  •  ${set.levelBand}',
-                    style: DesignTokens.body(
-                      11,
-                    ).copyWith(color: DesignTokens.mutedDim),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _VocabularyCover extends StatelessWidget {
-  const _VocabularyCover({required this.source});
-
-  final String? source;
-
-  @override
-  Widget build(BuildContext context) {
-    final fallback = Container(
-      height: 172,
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-      child: const Center(
-        child: Icon(CupertinoIcons.textformat, color: Colors.white, size: 34),
-      ),
-    );
-    if (source == null || source!.isEmpty) return fallback;
-    if (source!.startsWith('asset:')) {
-      return Image.asset(
-        source!.substring('asset:'.length),
-        width: double.infinity,
-        height: 172,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => fallback,
-      );
-    }
-    return Image.network(
-      source!,
-      width: double.infinity,
-      height: 172,
-      fit: BoxFit.cover,
-      errorBuilder: (_, _, _) => fallback,
+    return PracticeContentCard(
+      title: title,
+      summary: summary,
+      levelBand: set.levelBand,
+      meta: '${set.entries.length} words',
+      coverUrl: set.coverUrl,
+      fallbackIcon: CupertinoIcons.textformat,
+      onTap: onTap,
     );
   }
 }

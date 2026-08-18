@@ -92,6 +92,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   26: _migrationV26,
   27: _migrationV27,
   28: _migrationV28,
+  29: _migrationV29,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1116,4 +1117,15 @@ void _migrationV28(CommonDatabase db) {
       deleted_at TEXT
     )
   ''');
+}
+
+/// Persists the CEFR band used for each generated roleplay so the library card
+/// stays truthful after a learner changes their profile level.
+void _migrationV29(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_roleplays')) return;
+  if (!_columnExists(db, 'generated_roleplays', 'level_band')) {
+    db.execute(
+      "ALTER TABLE generated_roleplays ADD COLUMN level_band TEXT NOT NULL DEFAULT 'A1'",
+    );
+  }
 }

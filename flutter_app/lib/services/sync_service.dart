@@ -516,6 +516,7 @@ class SyncService {
         'user_id': uid,
         'title': roleplay.title,
         'passage_json': roleplay.passage.toJson(),
+        'level_band': roleplay.levelBand,
         'cover_url': _remoteCoverUrl(roleplay.coverUrl),
         'created_at': roleplay.createdAt.toUtc().toIso8601String(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
@@ -1558,11 +1559,12 @@ class SyncService {
       _db.execute(
         '''
         INSERT INTO generated_roleplays
-          (id, title, passage_json, cover_url, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+          (id, title, passage_json, level_band, cover_url, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           passage_json = excluded.passage_json,
+          level_band = excluded.level_band,
           cover_url = excluded.cover_url,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_roleplays.updated_at
@@ -1571,6 +1573,7 @@ class SyncService {
           r['id'],
           r['title'],
           _jsonOf(r['passage_json']),
+          r['level_band'] ?? 'A1',
           r['cover_url'],
           r['created_at'],
           r['updated_at'],

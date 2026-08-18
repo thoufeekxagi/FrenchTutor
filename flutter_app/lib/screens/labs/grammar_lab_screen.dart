@@ -8,15 +8,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/generated_grammar_story_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/personalized_generation_loader.dart';
+import '../../widgets/practice_content_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/session_recorder.dart';
 import '../lessons/grammar_workshop_screen.dart';
 
@@ -124,7 +125,9 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         grammarPoint: tense,
         levelBand: level,
       );
-      final coverFuture = agent.generateStoryCover(
+      final storyId = newGeneratedGrammarStoryId();
+      final coverFuture = PracticeArtworkService.generate(
+        id: storyId,
         title: passage.displayTitle,
         summary: 'A short French grammar story about $tense.',
         topic: 'French grammar: $tense',
@@ -137,7 +140,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
       if (!mounted) return;
 
       final grammarStory = GeneratedGrammarStory(
-        id: newGeneratedGrammarStoryId(),
+        id: storyId,
         grammarPoint: tense,
         levelBand: level,
         explanation: explanation,
@@ -395,7 +398,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
               ),
               const SizedBox(height: 10),
               ResponsiveCardGrid(
-                mainAxisExtent: 270,
+                mainAxisExtent: 292,
                 itemCount: history.length,
                 itemBuilder: (context, index) {
                   final entry = history[index];
@@ -511,102 +514,14 @@ class _GrammarHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
-      padding: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(DesignTokens.radiusCard),
-              ),
-              child: _GrammarStoryCover(
-                story: story,
-                width: double.infinity,
-                height: 164,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'AI grammar story',
-                    style: DesignTokens.mono(
-                      10,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: DesignTokens.primary),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    story.displayTitle,
-                    style: DesignTokens.body(16, weight: FontWeight.w700),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    '${story.grammarPoint}  •  ${story.levelBand}',
-                    style: DesignTokens.body(
-                      12,
-                    ).copyWith(color: DesignTokens.mutedDim),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GrammarStoryCover extends StatelessWidget {
-  const _GrammarStoryCover({
-    required this.story,
-    required this.width,
-    required this.height,
-  });
-
-  final GeneratedGrammarStory story;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = story.coverUrl;
-    if (url != null && url.startsWith('asset:')) {
-      return Image.asset(
-        url.substring('asset:'.length),
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => _fallback(),
-      );
-    }
-    return SizedBox(
-      width: width,
-      height: height,
-      child: url == null || url.isEmpty
-          ? _fallback()
-          : Image.network(
-              url,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _fallback(),
-            ),
-    );
-  }
-
-  Widget _fallback() {
-    return Container(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-      child: const Center(
-        child: Icon(CupertinoIcons.wand_stars, color: Colors.white, size: 28),
-      ),
+    return PracticeContentCard(
+      title: story.displayTitle,
+      summary: 'Practice ${story.grammarPoint} in context.',
+      levelBand: story.levelBand,
+      meta: '${story.passage.segments.length} scenes',
+      coverUrl: story.coverUrl,
+      fallbackIcon: CupertinoIcons.textformat,
+      onTap: onTap,
     );
   }
 }

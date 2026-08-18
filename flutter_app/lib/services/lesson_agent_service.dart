@@ -1396,6 +1396,7 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     required String topic,
     required String levelBand,
     String? coverPrompt,
+    String? variationSeed,
   }) async {
     const qualityDirection =
         'Create a premium portrait editorial illustration in a 2:3 composition. '
@@ -1409,7 +1410,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         : '$qualityDirection\n$coverPrompt\n'
               'Scene title: $topic. Dialogue and visual context: $summary. '
               'Learner level: $levelBand.';
-    final imageOnlyPrompt = '$prompt\n$_imageOnlyInstruction';
+    final variation = variationSeed == null || variationSeed.trim().isEmpty
+        ? ''
+        : '\nInternal visual variation seed: ${variationSeed.trim()}. '
+              'Use it to choose a fresh composition and do not render it.';
+    final imageOnlyPrompt = '$prompt$variation\n$_imageOnlyInstruction';
     try {
       final response = await _invokeFunction('ai-image', {
         'prompt': imageOnlyPrompt,

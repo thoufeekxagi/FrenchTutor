@@ -11,6 +11,7 @@ import '../../providers/database_provider.dart';
 import '../../models/tutor_persona.dart';
 import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/vocabulary_level_policy.dart';
 import 'speak_ui.dart';
@@ -244,16 +245,15 @@ class _SpeakCourseVocabularyScreenState
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await ref
-          .read(lessonAgentServiceProvider)
-          .generateStoryCover(
-            title: title,
-            summary: 'Vocabulary for ${widget.topic}. Words: $wordList.',
-            topic: widget.topic,
-            levelBand: _language.level,
-            coverPrompt:
-                'Create one coherent real-life learning scene for a French vocabulary study set about ${widget.topic}. Represent these exact words visually: $wordList. Use objects, actions, or a natural setting, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
-          );
+      final bytes = await PracticeArtworkService.generate(
+        id: id,
+        title: title,
+        summary: 'Vocabulary for ${widget.topic}. Words: $wordList.',
+        topic: widget.topic,
+        levelBand: _language.level,
+        coverPrompt:
+            'Create one coherent real-life learning scene for a French vocabulary study set about ${widget.topic}. Represent these exact words visually: $wordList. Use objects, actions, or a natural setting, never written labels. No text, letters, logos, borders, watermarks, collage panels, or UI.',
+      );
       final url = await ref
           .read(syncServiceProvider)
           .uploadStoryCover(storyId: id, bytes: bytes);

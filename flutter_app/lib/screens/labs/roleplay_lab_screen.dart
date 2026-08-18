@@ -4,7 +4,6 @@ import '../../design/app_router.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../data/database/generated_roleplay_store.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
@@ -13,10 +12,11 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/personalized_generation_loader.dart';
+import '../../widgets/practice_content_card.dart';
 import '../../widgets/responsive_card_grid.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../pathway/agent_led_listening_screen.dart';
 import '../pathway/roleplay_review_screen.dart';
@@ -112,9 +112,10 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
     setState(() => _generating = true);
     try {
       final existingRoleplays = ref.read(generatedRoleplayStoreProvider).list();
+      final levelBand = ref.read(learningStoreProvider).profile().level;
       final scene = await LessonAgentService.shared.buildStandaloneRoleplay(
         scenario: _scenarioFor(),
-        levelBand: ref.read(learningStoreProvider).profile().level,
+        levelBand: levelBand,
         avoidTitles: existingRoleplays.map((roleplay) => roleplay.title),
         avoidOpenings: existingRoleplays.map(
           (roleplay) => roleplay.passage.segments.firstOrNull?.fr ?? '',
@@ -124,6 +125,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
         id: newGeneratedRoleplayId(),
         passage: scene,
         createdAt: DateTime.now(),
+        levelBand: levelBand,
       );
       ref.read(generatedRoleplayStoreProvider).insert(roleplay);
       unawaited(_prewarmNarration(roleplay));
@@ -171,14 +173,15 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
         ),
       );
       try {
-        final bytes = await LessonAgentService.shared.generateStoryCover(
+        final bytes = await PracticeArtworkService.generate(
+          id: roleplay.id,
           title: roleplay.displayTitle,
           summary: roleplay.passage.segments
               .take(2)
               .map((segment) => segment.en.isNotEmpty ? segment.en : segment.fr)
               .join(' '),
           topic: roleplay.displayTitle,
-          levelBand: 'A1',
+          levelBand: roleplay.levelBand,
           coverPrompt:
               'A premium editorial cover for a French language roleplay scene. '
               'Show one cinematic real-life moment that matches the title and dialogue. '
@@ -356,7 +359,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
               const KickerText('Your roleplays', color: DesignTokens.mutedDim),
               const SizedBox(height: 10),
               ResponsiveCardGrid(
-                mainAxisExtent: 280,
+                mainAxisExtent: 292,
                 itemCount: roleplays.length,
                 itemBuilder: (context, index) {
                   final roleplay = roleplays[index];
@@ -467,124 +470,14 @@ class _RoleplayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PracticeContentCard(
+      title: roleplay.displayTitle,
+      summary: 'Practice this scene in a live conversation.',
+      levelBand: roleplay.levelBand,
+      meta: '${roleplay.passage.segments.length} turns',
+      coverUrl: roleplay.coverUrl,
+      fallbackIcon: CupertinoIcons.bubble_left_bubble_right_fill,
       onTap: onTap,
-      child: ModernCard(
-        padding: 0,
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          height: 280,
-          child: Column(
-            children: [
-              _RoleplayCover(
-                roleplay: roleplay,
-                width: double.infinity,
-                height: 166,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'YOUR ROLEPLAY',
-                        style: DesignTokens.mono(10, weight: FontWeight.w700)
-                            .copyWith(
-                              color: DesignTokens.primary,
-                              letterSpacing: 0.8,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        roleplay.displayTitle,
-                        style: DesignTokens.display(17),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        '${DateFormat('MMM d, HH:mm').format(roleplay.createdAt)} · ${roleplay.passage.segments.length} turns',
-                        style: DesignTokens.mono(
-                          10.5,
-                        ).copyWith(color: DesignTokens.mutedDim),
-                      ),
-                      const SizedBox(height: 13),
-                      Row(
-                        children: [
-                          const Icon(CupertinoIcons.play_fill, size: 13),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Open roleplay',
-                            style: DesignTokens.body(
-                              12.5,
-                              weight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RoleplayCover extends StatelessWidget {
-  const _RoleplayCover({
-    required this.roleplay,
-    required this.width,
-    required this.height,
-  });
-
-  final GeneratedRoleplay roleplay;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = roleplay.coverUrl;
-    final fallback = Container(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
-      child: const Center(
-        child: Icon(
-          CupertinoIcons.bubble_left_bubble_right_fill,
-          color: Colors.white,
-          size: 32,
-        ),
-      ),
-    );
-    final localFallback = Image.asset(
-      'assets/starter_covers/station.png',
-      fit: BoxFit.cover,
-      errorBuilder: (_, _, _) => fallback,
-    );
-    return SizedBox(
-      width: width,
-      height: height,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.horizontal(
-          left: Radius.circular(DesignTokens.radiusMedium),
-        ),
-        child: url != null && url.startsWith('asset:')
-            ? Image.asset(
-                url.substring('asset:'.length),
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => localFallback,
-              )
-            : url == null || url.isEmpty
-            ? localFallback
-            : Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => localFallback,
-              ),
-      ),
     );
   }
 }

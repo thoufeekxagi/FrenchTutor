@@ -12,6 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/ai_session_gate.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/review_material_service.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
@@ -344,7 +345,8 @@ class _SpeakReviewLaunchScreenState
 
   Future<void> _attachStoryCover(GeneratedStory story, String prompt) async {
     try {
-      final bytes = await LessonAgentService.shared.generateStoryCover(
+      final bytes = await PracticeArtworkService.generate(
+        id: story.id,
         title: story.title,
         summary: story.summary,
         topic: story.topic,

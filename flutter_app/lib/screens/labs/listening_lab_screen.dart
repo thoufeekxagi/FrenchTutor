@@ -10,9 +10,11 @@ import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/passeport_card.dart';
+import '../../widgets/practice_content_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
@@ -215,7 +217,8 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedStoryStoreProvider);
     try {
-      final bytes = await LessonAgentService.shared.generateStoryCover(
+      final bytes = await PracticeArtworkService.generate(
+        id: story.id,
         title: story.title,
         summary: story.summary,
         topic: story.topic,
@@ -336,6 +339,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
               ),
               const SizedBox(height: 10),
               ResponsiveCardGrid(
+                mainAxisExtent: 292,
                 itemCount: stories.length,
                 itemBuilder: (context, index) => _StoryBookCard(
                   story: stories[index],
@@ -570,39 +574,15 @@ class _StoryBookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PracticeContentCard(
+      title: story.displayTitle,
+      summary: story.summary,
+      levelBand: story.levelBand,
+      meta:
+          '${story.passage.segments.length} scenes · ${story.readTimeMinutes} min',
+      coverUrl: story.coverUrl,
+      fallbackIcon: CupertinoIcons.headphones,
       onTap: onTap,
-      child: SizedBox(
-        width: double.infinity,
-        height: 244,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-              child: _StoryCover(
-                story: story,
-                width: double.infinity,
-                height: 174,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              story.displayTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.body(13.5, weight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${story.levelBand}  •  ${story.readTimeMinutes} min',
-              style: DesignTokens.mono(
-                10,
-              ).copyWith(color: DesignTokens.mutedDim),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

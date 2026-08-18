@@ -10,9 +10,11 @@ import '../../data/database/generated_writing_task_store.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/personalized_generation_loader.dart';
+import '../../widgets/practice_content_card.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/writing_workshop_screen.dart';
@@ -155,19 +157,18 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
     final sync = ref.read(syncServiceProvider);
     final store = ref.read(generatedWritingTaskStoreProvider);
     try {
-      final bytes = await ref
-          .read(lessonAgentServiceProvider)
-          .generateStoryCover(
-            title: generated.task.title,
-            summary: generated.task.promptEn,
-            topic: generated.task.title,
-            levelBand: generated.task.levelBand,
-            coverPrompt:
-                'A premium literary book-cover scene for a French learner writing about '
-                '${generated.task.promptEn}. Use one clear focal scene, sophisticated editorial '
-                'realism, restrained color grading, layered depth, and a polished publishing '
-                'aesthetic. Keep the composition portrait and crop-friendly with safe margins.',
-          );
+      final bytes = await PracticeArtworkService.generate(
+        id: generated.id,
+        title: generated.task.title,
+        summary: generated.task.promptEn,
+        topic: generated.task.title,
+        levelBand: generated.task.levelBand,
+        coverPrompt:
+            'A premium literary book-cover scene for a French learner writing about '
+            '${generated.task.promptEn}. Use one clear focal scene, sophisticated editorial '
+            'realism, restrained color grading, layered depth, and a polished publishing '
+            'aesthetic. Keep the composition portrait and crop-friendly with safe margins.',
+      );
       final url = await sync.uploadStoryCover(
         storyId: generated.id,
         bytes: bytes,
@@ -316,140 +317,14 @@ class _GeneratedWritingTaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return PracticeContentCard(
+      title: generated.task.displayTitle,
+      summary: generated.task.promptEn,
+      levelBand: generated.task.levelBand,
+      meta: '${generated.task.minWords}+ words',
+      coverUrl: generated.coverUrl,
+      fallbackIcon: CupertinoIcons.pencil,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-      child: ModernCard(
-        padding: 0,
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _WritingCover(
-              generated: generated,
-              width: double.infinity,
-              height: 166,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      generated.task.levelBand.toUpperCase(),
-                      style: DesignTokens.label(
-                        10,
-                      ).copyWith(color: DesignTokens.primary),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      generated.task.displayTitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.display(17),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Write',
-                      style: DesignTokens.body(
-                        12,
-                        weight: FontWeight.w700,
-                      ).copyWith(color: DesignTokens.primary),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WritingCover extends StatelessWidget {
-  const _WritingCover({
-    required this.generated,
-    required this.width,
-    required this.height,
-  });
-
-  final GeneratedWritingTask generated;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = generated.coverUrl;
-    if (url != null && url.startsWith('asset:')) {
-      return Image.asset(
-        url.substring('asset:'.length),
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => _fallback(),
-      );
-    }
-    if (url != null && url.isNotEmpty) {
-      return Image.network(
-        url,
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => _fallback(),
-        loadingBuilder: (context, child, progress) =>
-            progress == null ? child : _fallback(),
-      );
-    }
-    return _fallback();
-  }
-
-  Widget _fallback() {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: DesignTokens.heroGradient,
-            ),
-          ),
-          Positioned(
-            right: -22,
-            top: -18,
-            child: Container(
-              width: 92,
-              height: 92,
-              decoration: BoxDecoration(
-                color: DesignTokens.secondary.withValues(alpha: 0.55),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            left: -26,
-            bottom: 22,
-            child: Container(
-              width: 104,
-              height: 104,
-              decoration: BoxDecoration(
-                color: DesignTokens.info.withValues(alpha: 0.32),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          const Center(
-            child: Icon(
-              CupertinoIcons.pencil_ellipsis_rectangle,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

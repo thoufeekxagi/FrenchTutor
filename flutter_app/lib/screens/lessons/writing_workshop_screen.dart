@@ -15,6 +15,7 @@ import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
@@ -334,18 +335,17 @@ Help the learner think and write. Do not write the whole answer for them unless 
     if (_isCoverGenerating) return;
     setState(() => _isCoverGenerating = true);
     try {
-      final bytes = await ref
-          .read(lessonAgentServiceProvider)
-          .generateStoryCover(
-            title: _task.title,
-            summary: _task.promptEn,
-            topic: _task.title,
-            levelBand: _task.levelBand,
-            coverPrompt:
-                'A clean editorial illustration for a French learner writing about '
-                '${_task.promptEn}. Visualize the learner\'s idea without readable text. '
-                'Use a calm, friendly classroom-book aesthetic with one clear focal scene.',
-          );
+      final bytes = await PracticeArtworkService.generate(
+        id: _task.id,
+        title: _task.title,
+        summary: _task.promptEn,
+        topic: _task.title,
+        levelBand: _task.levelBand,
+        coverPrompt:
+            'A clean editorial illustration for a French learner writing about '
+            '${_task.promptEn}. Visualize the learner\'s idea without readable text. '
+            'Use a calm, friendly classroom-book aesthetic with one clear focal scene.',
+      );
       if (!mounted) return;
       setState(() {
         _submissionCover = bytes;

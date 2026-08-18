@@ -27,10 +27,12 @@ class GeneratedRoleplayStore {
 
   /// All saved roleplays, newest first.
   List<GeneratedRoleplay> list() {
-    final rows = _db.select('''SELECT id, passage_json, created_at, cover_url
+    final rows = _db.select(
+      '''SELECT id, passage_json, level_band, created_at, cover_url
          FROM generated_roleplays
          WHERE deleted_at IS NULL
-         ORDER BY created_at DESC''');
+         ORDER BY created_at DESC''',
+    );
     final roleplays = <GeneratedRoleplay>[];
     final fingerprints = <String>{};
     for (final row in rows) {
@@ -51,12 +53,13 @@ class GeneratedRoleplayStore {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT INTO generated_roleplays
-         (id, title, passage_json, cover_url, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?)''',
+         (id, title, passage_json, level_band, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)''',
       [
         roleplay.id,
         roleplay.title,
         jsonEncode(roleplay.passage.toJson()),
+        roleplay.levelBand,
         roleplay.coverUrl,
         roleplay.createdAt.toUtc().toIso8601String(),
         now,
@@ -71,21 +74,23 @@ class GeneratedRoleplayStore {
     required String id,
     required String title,
     required String passageJson,
+    String levelBand = 'A1',
     String? coverUrl,
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_roleplays
-         (id, title, passage_json, cover_url, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?)
+         (id, title, passage_json, level_band, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            passage_json = excluded.passage_json,
+           level_band = excluded.level_band,
            cover_url = excluded.cover_url,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_roleplays.updated_at''',
-      [id, title, passageJson, coverUrl, createdAt, updatedAt],
+      [id, title, passageJson, levelBand, coverUrl, createdAt, updatedAt],
     );
   }
 
@@ -105,7 +110,7 @@ class GeneratedRoleplayStore {
 
   GeneratedRoleplay? _find(String id) {
     final rows = _db.select(
-      '''SELECT id, passage_json, created_at, cover_url
+      '''SELECT id, passage_json, level_band, created_at, cover_url
          FROM generated_roleplays
          WHERE id = ? AND deleted_at IS NULL''',
       [id],
@@ -121,6 +126,7 @@ class GeneratedRoleplayStore {
       id: row['id'] as String,
       passage: passage,
       createdAt: DateTime.parse(row['created_at'] as String),
+      levelBand: row['level_band'] as String? ?? 'A1',
       coverUrl: StarterCoverResolver.resolve(
         title: passage.title,
         coverUrl: row['cover_url'] as String?,

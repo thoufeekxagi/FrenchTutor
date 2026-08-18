@@ -764,12 +764,17 @@ class GeneratedRoleplay {
     required this.id,
     required this.passage,
     required this.createdAt,
+    this.levelBand = 'A1',
     this.coverUrl,
   });
 
   final String id;
   final ReadingPassage passage;
   final DateTime createdAt;
+
+  /// CEFR band used when this scene was generated, independent of the
+  /// learner's later profile changes.
+  final String levelBand;
 
   /// Learner-scoped signed URL for the generated roleplay artwork. The cover
   /// is optional so a roleplay remains usable while image generation/upload

@@ -13,6 +13,7 @@ import '../../models/content_models.dart';
 import '../../models/daily_session.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/srs_service.dart';
 import '../../services/vocabulary_level_policy.dart';
@@ -576,7 +577,8 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await LessonAgentService.shared.generateStoryCover(
+      final bytes = await PracticeArtworkService.generate(
+        id: id,
         title: topic,
         summary: 'Custom French vocabulary for $topic. Words: $wordList.',
         topic: topic,
@@ -1013,7 +1015,8 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       final wordList = words
           .map((word) => '${word.fr} (${word.en})')
           .join(', ');
-      final bytes = await LessonAgentService.shared.generateStoryCover(
+      final bytes = await PracticeArtworkService.generate(
+        id: id,
         title: title,
         summary: '$context Words: $wordList.',
         topic: topic,
