@@ -240,7 +240,10 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
       onPanUpdate: (details) {
         _state.offset = Offset(
           _state.offset.dx + details.delta.dx,
-          _state.offset.dy - details.delta.dy,
+          // The overlay is bottom-anchored, but the stored offset represents
+          // the bubble's visual movement. Pointer movement should therefore
+          // be applied in the same direction on both axes.
+          _state.offset.dy + details.delta.dy,
         );
       },
       onLongPress: () {

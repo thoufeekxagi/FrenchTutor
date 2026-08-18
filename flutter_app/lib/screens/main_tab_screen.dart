@@ -94,7 +94,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
     final body = Stack(
       children: [
         IndexedStack(index: _currentIndex, children: screens),
-        FloatingNotetakerOverlay(state: notetaker),
+        if (_currentIndex < 3) FloatingNotetakerOverlay(state: notetaker),
       ],
     );
 
