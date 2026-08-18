@@ -65,8 +65,8 @@ void main() {
     expect(find.text('Continue with Google'), findsNothing);
   });
 
-  testWidgets('full funnel: welcome → questions → preparing → sign-in gate '
-      '(trial auto-skipped without a Gemini key)', (WidgetTester tester) async {
+  testWidgets('full funnel: welcome → questions → preparing → free trial '
+      '→ sign-in gate', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final db = sqlite3.openInMemory();
     addTearDown(db.dispose);
@@ -111,15 +111,14 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pump();
 
-    // Preparing pane: page transition, then the 3.2s progress animation,
-    // then the 450ms beat on 100%. No trial key in tests → onboarding
-    // finishes straight into the sign-in gate.
-    await tester.pump(const Duration(milliseconds: 400)); // page slide
-    expect(find.textContaining('Creating your first lessons'), findsOneWidget);
-    await tester.pump(const Duration(milliseconds: 3300));
-    await tester.pump(const Duration(milliseconds: 500));
+    // The modern onboarding goes straight from the tutor choice to the
+    // pre-signup trial. Its separate Edge Function mints a short-lived,
+    // single-use Gemini Live token without requiring an account.
     await tester.pumpAndSettle();
 
+    expect(find.text('Your first lesson is on us'), findsOneWidget);
+    await tester.tap(find.text('Skip for now'));
+    await tester.pumpAndSettle();
     expect(find.text('How your practice works'), findsOneWidget);
     await tester.tap(find.text('Agree and continue'));
     await tester.pumpAndSettle();

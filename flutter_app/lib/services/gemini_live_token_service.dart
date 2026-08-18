@@ -5,12 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class GeminiLiveTokenService {
   GeminiLiveTokenService._();
 
-  static Future<String> fetch() async {
-    if (Supabase.instance.client.auth.currentSession == null) {
+  static Future<String> fetch({bool trial = false}) async {
+    if (!trial && Supabase.instance.client.auth.currentSession == null) {
       throw StateError('A signed-in session is required for Gemini Live');
     }
     final response = await Supabase.instance.client.functions
-        .invoke('gemini-live-token')
+        .invoke(trial ? 'gemini-live-trial-token' : 'gemini-live-token')
         .timeout(const Duration(seconds: 10));
     final data = response.data;
     final token = data is Map ? data['token']?.toString() : null;

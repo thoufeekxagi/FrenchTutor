@@ -130,6 +130,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _audio = AudioStreamingService();
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
+      isTrial: widget.stage == 'trial',
       sessionType: widget.examMode
           ? LiveSessionType.speakingExam
           : _isRoleplay

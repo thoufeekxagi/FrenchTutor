@@ -1,5 +1,4 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// The pre-signup trial call's single source of truth: ONE 3-minute live call
 /// with the chosen tutor per install, ever — experienced before any account
@@ -27,15 +26,9 @@ class TrialCallGate {
   static const _secondsKey = 'trial_call_seconds';
   static const _utterancesKey = 'trial_call_utterances';
 
-  /// Trial is offered when it has never been started on this install and the
-  /// learner has an authenticated Supabase session for token minting.
+  /// The onboarding trial intentionally runs before account creation. Its
+  /// separate Edge Function mints a short-lived, single-use Live token.
   static Future<bool> isAvailable() async {
-    try {
-      if (Supabase.instance.client.auth.currentSession == null) return false;
-    } catch (_) {
-      // Tests and early startup can query this before Supabase initializes.
-      return false;
-    }
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_usedAtKey) == null;
   }

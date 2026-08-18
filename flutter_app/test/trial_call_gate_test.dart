@@ -4,9 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:french_tutor/services/trial_call_gate.dart';
 
 void main() {
-  // NOTE: availability requires an authenticated Supabase session because
-  // Gemini Live now uses a short-lived server-minted token. These unit tests
-  // run without an initialized Supabase client, so they verify the local gate.
+  // The onboarding trial is pre-signup; the separate Edge Function mints its
+  // short-lived token. These tests verify the local single-use gate.
   test(
     'trial is single-use: once started it is never available again',
     () async {
@@ -19,15 +18,6 @@ void main() {
         durationSeconds: 180,
         learnerUtteranceCount: 7,
       );
-      expect(await TrialCallGate.isAvailable(), isFalse);
-    },
-  );
-
-  test(
-    'trial without an authenticated session is quietly unavailable',
-    () async {
-      SharedPreferences.setMockInitialValues({});
-      // No Supabase session in tests → never offered, never crashes.
       expect(await TrialCallGate.isAvailable(), isFalse);
     },
   );

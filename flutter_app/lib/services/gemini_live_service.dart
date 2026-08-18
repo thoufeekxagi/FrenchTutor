@@ -22,6 +22,7 @@ import 'gemini_live_token_service.dart';
 class GeminiLiveService {
   GeminiLiveService({
     required this.apiKey,
+    this.isTrial = false,
     this.sessionType = LiveSessionType.freeTalk,
     this.lessonContext,
     this.tools = const [],
@@ -30,6 +31,7 @@ class GeminiLiveService {
   });
 
   final String apiKey;
+  final bool isTrial;
   final LiveSessionType sessionType;
   final String? lessonContext;
   final List<AgentTool> tools;
@@ -112,9 +114,9 @@ class GeminiLiveService {
     _isIntentionalDisconnect = false;
     late final Uri uri;
     try {
-      final token = await GeminiLiveTokenService.fetch();
+      final token = await GeminiLiveTokenService.fetch(trial: isTrial);
       uri = Uri.parse(
-        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
+        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
       );
     } catch (_) {
       _handleConnectionLoss('Could not authenticate Gemini Live');

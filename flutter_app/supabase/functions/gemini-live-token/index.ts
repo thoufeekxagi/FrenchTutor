@@ -18,7 +18,7 @@ Deno.serve(async (request) => {
   if (!apiKey) return json({ error: "Gemini is not configured" }, 503);
 
   const now = Date.now();
-  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/auth_tokens", {
+  const response = await fetch("https://generativelanguage.googleapis.com/v1alpha/auth_tokens", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -28,12 +28,12 @@ Deno.serve(async (request) => {
       uses: 1,
       expireTime: new Date(now + 30 * 60 * 1000).toISOString(),
       newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
-      liveConnectConstraints: {
-        model: "models/gemini-3.1-flash-live-preview",
-      },
     }),
   });
-  if (!response.ok) return json({ error: "Could not create a Gemini Live session" }, 502);
+  if (!response.ok) {
+    console.error("Gemini auth token request failed", response.status);
+    return json({ error: "Could not create a Gemini Live session" }, 502);
+  }
   const data = await response.json();
   const token = String(data?.name ?? "");
   return token ? json({ token }) : json({ error: "Gemini returned no session token" }, 502);
