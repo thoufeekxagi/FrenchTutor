@@ -51,11 +51,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   late final AnimationController _brandController;
   late final TutorVoicePreviewer _previewer;
   int _page = 0;
-  String? _goal;
-  String? _level;
+  // Keep the profile valid even when a learner accepts the preselected path.
+  String _goal = 'everyday';
+  String _level = 'a1';
   String _sessionLength = 'standard';
-  final Set<String> _interests = {};
-  TutorPersona? _tutorChoice;
+  final Set<String> _interests = {'Food'};
+  TutorPersona _tutorChoice = TutorPersona.defaultPersona;
   bool _trialAvailable = false;
   bool _startingTrial = false;
   SpeakingResult? _trialResult;
@@ -107,19 +108,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     _finished = true;
     final store = ref.read(learningStoreProvider);
     final Profile profile = store.profile()
-      ..goal = _goal ?? 'unsure'
-      ..level = _level ?? 'unsure'
+      ..goal = _goal
+      ..level = _level
       ..sessionLength = _sessionLength
       ..interests = _interests.toList()
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
-    ActiveTutor.set(_tutorChoice ?? TutorPersona.marie);
+    ActiveTutor.set(_tutorChoice);
     // The English/French mix is derived from level instead of being its own
     // question (A1/A2 gentle, B1 balanced, B2 immersion) — adjustable anytime
     // in Settings.
-    TutorTuning.saveLanguageMix(
-      LearnerLevel.defaultLanguageMix(_level ?? 'a1'),
-    );
+    TutorTuning.saveLanguageMix(LearnerLevel.defaultLanguageMix(_level));
     // Right here, not when the learner later taps into "Learn the
     // Alphabet" — both the level and the tutor voice are already locked in
     // at this exact moment, so this is the earliest point the alphabet's
@@ -130,11 +129,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     widget.onFinished();
   }
 
-  TutorPersona get _tutor => _tutorChoice ?? TutorPersona.marie;
+  TutorPersona get _tutor => _tutorChoice;
 
   List<String> get _preparingCheckpoints => [
     'French',
-    if (_level != null) LearnerLevel.displayLabel(_level!),
+    LearnerLevel.displayLabel(_level),
     switch (_goal) {
       'tef_canada' => 'TEF / TCF Canada',
       'everyday' => 'Everyday French',
@@ -516,7 +515,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         ],
         footer: _onboardingButton(
           label: 'Continue',
-          onPressed: _goal == null ? null : _next,
+          onPressed: _next,
           icon: CupertinoIcons.arrow_right,
         ),
       );
@@ -581,7 +580,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         ],
         footer: _onboardingButton(
           label: 'Build my plan',
-          onPressed: _level == null ? null : _next,
+          onPressed: _next,
           icon: CupertinoIcons.arrow_right,
         ),
       );
@@ -776,7 +775,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             _choice(
               label: p.displayName,
               detail: p.tagline,
-              selected: _tutorChoice?.id == p.id,
+              selected: _tutorChoice.id == p.id,
               onTap: () => setState(() => _tutorChoice = p),
               trailing: _previewButton(p),
             ),
@@ -795,7 +794,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       ],
       footer: _onboardingButton(
         label: 'Continue',
-        onPressed: _tutorChoice == null ? null : _next,
+        onPressed: _next,
         icon: CupertinoIcons.arrow_right,
       ),
     );

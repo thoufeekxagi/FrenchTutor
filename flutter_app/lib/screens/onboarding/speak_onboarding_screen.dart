@@ -44,8 +44,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   late final FixedExtentScrollController _reminderHourController;
   late final FixedExtentScrollController _reminderMinuteController;
   var _page = 0;
-  String? _goal;
-  String? _level;
+  // Every onboarding input starts valid so generation never receives an
+  // empty goal or level when a learner advances without changing a choice.
+  String _goal = 'everyday';
+  String _level = 'a1';
   String _minutes = '10';
   // The course includes every practice mode. These choices decide which
   // skills receive the strongest early weighting in the generated route.
@@ -64,7 +66,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   var _remindersEnabled = true;
   var _requestingNotificationPermission = false;
   String _notificationPermissionState = 'not_requested';
-  var _tutor = TutorPersona.marie;
+  var _tutor = TutorPersona.defaultPersona;
   var _preparingStarted = false;
   var _trialAvailable = false;
   var _trialAvailabilityKnown = false;
@@ -163,8 +165,8 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   void _finish() {
     final store = ref.read(learningStoreProvider);
     final profile = store.profile()
-      ..goal = _goal ?? 'everyday'
-      ..level = _level ?? 'a1'
+      ..goal = _goal
+      ..level = _level
       ..sessionLength = switch (_minutes) {
         '5' => 'quick',
         '20' => 'deep',
@@ -943,7 +945,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   }
 
   Widget _scheduleStep() {
-    final goal = _goal ?? 'everyday';
+    final goal = _goal;
     final recommended = _recommendedMinutesForGoal(goal);
     return _question(
       title: 'When will French fit your life?',
@@ -1336,13 +1338,13 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                         _summary(
                           Icons.flag_outlined,
                           'Goal',
-                          _goalLabel(_goal ?? 'everyday'),
+                          _goalLabel(_goal),
                         ),
                         const Divider(height: 22, color: SpeakColors.line),
                         _summary(
                           Icons.bar_chart_rounded,
                           'Level',
-                          LearnerLevel.displayLabel(_level ?? 'a1'),
+                          LearnerLevel.displayLabel(_level),
                         ),
                         const Divider(height: 22, color: SpeakColors.line),
                         _summary(Icons.mic_rounded, 'Focus', _focusSummary()),

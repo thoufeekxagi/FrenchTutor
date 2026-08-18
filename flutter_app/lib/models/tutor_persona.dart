@@ -78,6 +78,10 @@ class TutorPersona {
         'what the student will hear in exam listening materials.',
   );
 
+  /// The tutor selected for a new learner before they make a choice.
+  /// Keep this in the registry so onboarding and settings share one default.
+  static const defaultPersona = marie;
+
   static const julien = TutorPersona(
     id: 'julien',
     displayName: 'Julien',
