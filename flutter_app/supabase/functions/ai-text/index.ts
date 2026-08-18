@@ -42,6 +42,36 @@ function validateContents(contents: unknown): contents is unknown[] {
   return serialized.length <= MAX_TOTAL_LENGTH;
 }
 
+// The Flutter client uses the camelCase shape used by Google's SDK examples,
+// while the REST generateContent endpoint requires snake_case field names.
+// Normalize at this server boundary so image understanding cannot fail just
+// because the client and REST wire formats use different casing.
+function normalizeGeminiContents(contents: unknown[]): unknown[] {
+  return contents.map((content) => {
+    if (!content || typeof content !== "object") return content;
+    const contentRecord = content as Record<string, unknown>;
+    if (!Array.isArray(contentRecord.parts)) return content;
+    const parts = contentRecord.parts.map((part) => {
+      if (!part || typeof part !== "object") return part;
+      const partRecord = part as Record<string, unknown>;
+      const inline = partRecord.inlineData ?? partRecord.inline_data;
+      if (!inline || typeof inline !== "object") return part;
+      const inlineRecord = inline as Record<string, unknown>;
+      const mimeType = inlineRecord.mimeType ?? inlineRecord.mime_type;
+      const data = inlineRecord.data;
+      if (typeof mimeType !== "string" || typeof data !== "string") return part;
+      const normalizedPart = { ...partRecord };
+      delete normalizedPart.inlineData;
+      normalizedPart.inline_data = {
+        mime_type: mimeType,
+        data,
+      };
+      return normalizedPart;
+    });
+    return { ...contentRecord, parts };
+  });
+}
+
 function buildGeminiContents(messages: unknown[]): unknown[] | null {
   if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
     return null;
@@ -88,21 +118,28 @@ function extractGeminiText(data: unknown): string {
 async function callGemini(body: Record<string, unknown>) {
   const apiKey = Deno.env.get("GEMINI_API_KEY");
   if (!apiKey) return json({ error: "Gemini is not configured" }, 503);
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    },
-  );
-  if (!response.ok) {
-    const details = await response.json().catch(() => ({}));
-    return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
+  let lastResponse: Response | null = null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+    );
+    if (response.ok) {
+      const data = await response.json();
+      const text = extractGeminiText(data);
+      return text ? json({ text, provider: "gemini", model: GEMINI_MODEL }) : json({ error: "Gemini returned no text" }, 502);
+    }
+    lastResponse = response;
+    if (response.status < 500 && response.status !== 429) break;
+    if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  const data = await response.json();
-  const text = extractGeminiText(data);
-  return text ? json({ text, provider: "gemini", model: GEMINI_MODEL }) : json({ error: "Gemini returned no text" }, 502);
+  const response = lastResponse!;
+  const details = await response.json().catch(() => ({}));
+  return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
 }
 
 async function callOpenRouter(body: Record<string, unknown>) {
@@ -169,7 +206,10 @@ Deno.serve(async (request) => {
   const contents = rawContents === undefined ? buildGeminiContents(messages) : rawContents;
   if (!validateContents(contents)) return json({ error: "Invalid Gemini contents" }, 400);
   const generationConfig = { temperature, maxOutputTokens: maxTokens };
-  const geminiBody: Record<string, unknown> = { contents, generationConfig };
+  const geminiBody: Record<string, unknown> = {
+    contents: normalizeGeminiContents(contents),
+    generationConfig,
+  };
   const instruction = body.systemInstruction ?? systemInstruction(messages);
   if (instruction !== undefined) geminiBody.systemInstruction = instruction;
   return await callGemini(geminiBody);
