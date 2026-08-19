@@ -572,10 +572,8 @@ class ReadingPassage {
   final List<ReadingSegment> segments;
   final String fullText;
 
-  /// A short (2-4 word) English gloss of [title], for A1/A2 learners who
-  /// can't yet read the French title on sight — shown as "French (English)"
-  /// wherever a title appears. Optional: older cached content and any
-  /// generation that didn't return one just show the French title alone.
+  /// The English learner-facing heading for [title]. New generated stories
+  /// always provide this value; older cached rows may not.
   final String? titleEn;
 
   factory ReadingPassage.fromJson(Map<String, dynamic> json) {
@@ -634,10 +632,10 @@ class ReadingPassage {
     if (titleEn != null) 'titleEn': titleEn,
   };
 
-  /// "French title (English gloss)" for display, or just the French title
-  /// if no gloss is available.
+  /// The English learner-facing heading. Legacy rows without [titleEn] fall
+  /// back to their stored title so previously saved content remains usable.
   String get displayTitle =>
-      (titleEn != null && titleEn!.isNotEmpty) ? '$title ($titleEn)' : title;
+      (titleEn != null && titleEn!.trim().isNotEmpty) ? titleEn!.trim() : title;
 }
 
 /// A learner's own AI-generated story, saved to their personal library —
@@ -692,7 +690,7 @@ class GeneratedStory {
 
   String get title => passage.title;
 
-  /// "French title (English gloss)" for display — see `ReadingPassage.displayTitle`.
+  /// English learner-facing heading — see `ReadingPassage.displayTitle`.
   String get displayTitle => passage.displayTitle;
 
   GeneratedStory copyWith({

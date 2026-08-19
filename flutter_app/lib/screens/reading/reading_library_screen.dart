@@ -735,7 +735,7 @@ class _ReadingCover extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  story.passage.title,
+                  story.displayTitle,
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: DesignTokens.display(15).copyWith(color: Colors.white),

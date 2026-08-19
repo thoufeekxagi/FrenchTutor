@@ -110,7 +110,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   // Story always leads, even for a grammar-practice session — the story is
   // the point, grammar is a cue card away, not the landing screen.
   _StoryTab _tab = _StoryTab.story;
-  _StoryReadingMode _readingMode = _StoryReadingMode.sentenceBySentence;
+  _StoryReadingMode _readingMode = _StoryReadingMode.fullStory;
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
@@ -120,6 +120,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _underlineWords = true;
   bool _autoPlayWordAudio = false;
   bool _darkMode = true;
+  bool _isLiked = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
   final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
@@ -210,6 +211,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     _underlineWords = _settings.underlineWords;
     _autoPlayWordAudio = _settings.autoPlayWordAudio;
     _darkMode = _settings.darkMode;
+    _readingMode = _settings.sentenceMode
+        ? _StoryReadingMode.sentenceBySentence
+        : _StoryReadingMode.fullStory;
     unawaited(
       _settings.load().then((_) {
         if (!mounted) return;
@@ -219,6 +223,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _underlineWords = _settings.underlineWords;
           _autoPlayWordAudio = _settings.autoPlayWordAudio;
           _darkMode = _settings.darkMode;
+          _readingMode = _settings.sentenceMode
+              ? _StoryReadingMode.sentenceBySentence
+              : _StoryReadingMode.fullStory;
         });
       }),
     );
@@ -590,6 +597,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         underlineWords: _underlineWords,
         autoPlayWordAudio: _autoPlayWordAudio,
         darkMode: _darkMode,
+        readingMode: _readingMode,
       ),
     );
     if (!mounted || result == null) return;
@@ -600,12 +608,23 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _underlineWords = result.underlineWords;
       _autoPlayWordAudio = result.autoPlayWordAudio;
       _darkMode = result.darkMode;
+      _readingMode = result.readingMode;
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setTranslateSentences(_translateSentences));
     unawaited(_settings.setUnderlineWords(_underlineWords));
     unawaited(_settings.setAutoPlayWordAudio(_autoPlayWordAudio));
     unawaited(_settings.setDarkMode(_darkMode));
+    unawaited(
+      _settings.setSentenceMode(
+        _readingMode == _StoryReadingMode.sentenceBySentence,
+      ),
+    );
+  }
+
+  void _toggleTranslation() {
+    setState(() => _translateSentences = !_translateSentences);
+    unawaited(_settings.setTranslateSentences(_translateSentences));
   }
 
   @override
@@ -653,6 +672,14 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       listeningLabel: 'Listening. Ask about the story anytime.',
                     ),
                   ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: _StoryBookHeader(
+                    story: _story,
+                    darkMode: _darkMode,
+                    selectedWord: _selectedWordEntry(),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: _StoryStageIsland(
@@ -760,12 +787,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       return ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
         children: [
-          _StoryBookHeader(
-            story: _story,
-            darkMode: _darkMode,
-            selectedWord: _selectedWordEntry(),
-          ),
-          const SizedBox(height: 18),
+          _storyIntro(),
+          const SizedBox(height: 16),
           ModernCard(
             padding: 20,
             child: Text(
@@ -782,46 +805,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     if (_readingMode == _StoryReadingMode.fullStory) {
       return ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
-        children: [
-          _StoryBookHeader(
-            story: _story,
-            darkMode: _darkMode,
-            selectedWord: _selectedWordEntry(),
-          ),
-          const SizedBox(height: 14),
-          _ReadingModeToggle(
-            mode: _readingMode,
-            onChanged: (mode) => setState(() => _readingMode = mode),
-            darkMode: _darkMode,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            'FULL STORY',
-            style: DesignTokens.label(
-              10,
-            ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
-          ),
-          const SizedBox(height: 10),
-          _sentenceCards(),
-        ],
+        children: [_storyIntro(), const SizedBox(height: 18), _sentenceCards()],
       );
     }
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
       children: [
-        _StoryBookHeader(
-          story: _story,
-          darkMode: _darkMode,
-          selectedWord: _selectedWordEntry(),
-        ),
-        const SizedBox(height: 14),
-        _ReadingModeToggle(
-          mode: _readingMode,
-          onChanged: (mode) => setState(() => _readingMode = mode),
-          darkMode: _darkMode,
-        ),
-        const SizedBox(height: 14),
+        _storyIntro(),
+        const SizedBox(height: 18),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -862,6 +854,91 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               icon: const Icon(CupertinoIcons.chevron_right, size: 16),
               label: const Text('Next sentence'),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _storyIntro() {
+    final text = _darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = _darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = _darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _story.displayTitle,
+          style: DesignTokens.display(29).copyWith(color: text, height: 1.08),
+        ),
+        if (_story.summary.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            _story.summary,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: DesignTokens.body(14).copyWith(color: muted, height: 1.35),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                _story.levelBand,
+                style: DesignTokens.mono(
+                  11,
+                  weight: FontWeight.w800,
+                ).copyWith(color: accent),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '• ${_story.readTimeMinutes} min read',
+              style: DesignTokens.body(
+                13,
+                weight: FontWeight.w600,
+              ).copyWith(color: muted),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              onPressed: _toggleTranslation,
+              tooltip: _translateSentences
+                  ? 'Hide translation'
+                  : 'Show translation',
+              visualDensity: VisualDensity.compact,
+              icon: Icon(
+                CupertinoIcons.textformat,
+                color: _translateSentences ? accent : muted,
+                size: 22,
+              ),
+            ),
+            IconButton(
+              onPressed: _showSettings,
+              tooltip: 'Text and story settings',
+              visualDensity: VisualDensity.compact,
+              icon: Icon(
+                CupertinoIcons.textformat_size,
+                color: muted,
+                size: 23,
+              ),
+            ),
+            IconButton(
+              onPressed: () => setState(() => _isLiked = !_isLiked),
+              tooltip: _isLiked ? 'Unlike story' : 'Like story',
+              visualDensity: VisualDensity.compact,
+              icon: Icon(
+                _isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                color: _isLiked ? accent : muted,
+                size: 23,
+              ),
+            ),
+            ReportProblemButton(sessionType: 'Story: ${_story.displayTitle}'),
           ],
         ),
       ],
@@ -1361,13 +1438,11 @@ class _StoryBookHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
-    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
     final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
       child: SizedBox(
-        height: 238,
+        height: 172,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -1375,19 +1450,20 @@ class _StoryBookHeader extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
+                  begin: Alignment.topRight,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.08),
-                    Colors.black.withValues(alpha: 0.9),
+                    Colors.black.withValues(alpha: 0.02),
+                    Colors.black.withValues(alpha: 0.2),
+                    Colors.black.withValues(alpha: 0.82),
                   ],
                 ),
               ),
             ),
             if (selectedWord != null)
               Positioned(
-                top: 14,
-                right: 14,
+                left: 16,
+                bottom: 12,
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 180),
                   padding: const EdgeInsets.symmetric(
@@ -1428,39 +1504,6 @@ class _StoryBookHeader extends StatelessWidget {
                   ),
                 ),
               ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${story.levelBand}  •  ${story.readTimeMinutes} min read',
-                    style: DesignTokens.mono(
-                      10,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: accent, letterSpacing: 0.6),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    story.displayTitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.display(24).copyWith(color: text),
-                  ),
-                  if (story.summary.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      story.summary,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.body(12).copyWith(color: muted),
-                    ),
-                  ],
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -1761,6 +1804,10 @@ class _GrammarCueCard extends StatelessWidget {
   }
 }
 
+// Retained as a compatibility component for any downstream screen that still
+// wants an inline mode switch; the story reader now exposes this choice only
+// from Story settings, matching the approved Readle-style layout.
+// ignore: unused_element
 class _ReadingModeToggle extends StatelessWidget {
   const _ReadingModeToggle({
     required this.mode,
@@ -2138,6 +2185,7 @@ class _ReaderSettingsResult {
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
+    required this.readingMode,
   });
 
   final double textScale;
@@ -2146,6 +2194,7 @@ class _ReaderSettingsResult {
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
+  final _StoryReadingMode readingMode;
 }
 
 class _StorySettingsSheet extends StatefulWidget {
@@ -2156,6 +2205,7 @@ class _StorySettingsSheet extends StatefulWidget {
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
+    required this.readingMode,
   });
 
   final double textScale;
@@ -2164,6 +2214,7 @@ class _StorySettingsSheet extends StatefulWidget {
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
+  final _StoryReadingMode readingMode;
 
   @override
   State<_StorySettingsSheet> createState() => _StorySettingsSheetState();
@@ -2176,6 +2227,7 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
   late bool _underline = widget.underlineWords;
   late bool _autoPlay = widget.autoPlayWordAudio;
   late bool _dark = widget.darkMode;
+  late _StoryReadingMode _readingMode = widget.readingMode;
 
   void _close() => Navigator.of(context).pop(
     _ReaderSettingsResult(
@@ -2185,6 +2237,7 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
       underlineWords: _underline,
       autoPlayWordAudio: _autoPlay,
       darkMode: _dark,
+      readingMode: _readingMode,
     ),
   );
 
@@ -2255,6 +2308,39 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
                         ),
                       ),
                     ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              _settingLabel('Reading view', text),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _choice(
+                      'Full story',
+                      _readingMode == _StoryReadingMode.fullStory,
+                      () => setState(
+                        () => _readingMode = _StoryReadingMode.fullStory,
+                      ),
+                      text,
+                      accent,
+                      muted,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _choice(
+                      'Sentence focus',
+                      _readingMode == _StoryReadingMode.sentenceBySentence,
+                      () => setState(
+                        () =>
+                            _readingMode = _StoryReadingMode.sentenceBySentence,
+                      ),
+                      text,
+                      accent,
+                      muted,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 18),
@@ -2385,22 +2471,25 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
     Color text,
     Color muted,
     Color accent,
-  ) => SwitchListTile.adaptive(
-    contentPadding: EdgeInsets.zero,
-    title: Text(
-      title,
-      style: DesignTokens.body(
-        14,
-        weight: FontWeight.w600,
-      ).copyWith(color: text),
+  ) => Material(
+    color: Colors.transparent,
+    child: SwitchListTile.adaptive(
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        title,
+        style: DesignTokens.body(
+          14,
+          weight: FontWeight.w600,
+        ).copyWith(color: text),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: DesignTokens.body(11.5).copyWith(color: muted),
+      ),
+      value: value,
+      activeThumbColor: accent,
+      onChanged: onChanged,
     ),
-    subtitle: Text(
-      subtitle,
-      style: DesignTokens.body(11.5).copyWith(color: muted),
-    ),
-    value: value,
-    activeThumbColor: accent,
-    onChanged: onChanged,
   );
 }
 

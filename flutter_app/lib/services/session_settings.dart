@@ -16,12 +16,14 @@ class SessionSettings extends ChangeNotifier {
   static const _underlineKey = 'session_underline_words';
   static const _autoPlayKey = 'session_auto_play_word_audio';
   static const _darkModeKey = 'session_dark_mode';
+  static const _sentenceModeKey = 'session_sentence_mode';
 
   double textScale = 1;
   bool translateSentences = true;
   bool underlineWords = true;
   bool autoPlayWordAudio = false;
   bool darkMode = true;
+  bool sentenceMode = false;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -30,6 +32,7 @@ class SessionSettings extends ChangeNotifier {
     underlineWords = prefs.getBool(_underlineKey) ?? true;
     autoPlayWordAudio = prefs.getBool(_autoPlayKey) ?? false;
     darkMode = prefs.getBool(_darkModeKey) ?? true;
+    sentenceMode = prefs.getBool(_sentenceModeKey) ?? false;
     notifyListeners();
   }
 
@@ -66,5 +69,12 @@ class SessionSettings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_darkModeKey, value);
+  }
+
+  Future<void> setSentenceMode(bool value) async {
+    sentenceMode = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sentenceModeKey, value);
   }
 }

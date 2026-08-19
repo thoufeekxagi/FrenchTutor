@@ -171,7 +171,10 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
         children: [
           Text('DOCUMENT', style: _kickerStyle),
           const SizedBox(height: 10),
-          Text(widget.story.passage.title, style: DesignTokens.display(23)),
+          Text(
+            widget.story.passage.displayTitle,
+            style: DesignTokens.display(23),
+          ),
           const SizedBox(height: 14),
           Text(
             widget.story.passage.fullText,

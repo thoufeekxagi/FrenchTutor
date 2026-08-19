@@ -20,70 +20,69 @@ void main() {
     );
   });
 
-  testWidgets('renders a generated story sentence by sentence', (
-    WidgetTester tester,
-  ) async {
-    final db = sqlite3.openInMemory();
-    addTearDown(db.dispose);
-    final story = GeneratedStory(
-      id: '2c5f81bd-e10e-4ea5-a5f2-62b6f9bb54b5',
-      passage: ReadingPassage(
-        id: 'reading-passage',
-        title: 'Le marché sous la pluie',
-        titleEn: 'The rainy market',
-        fullText: 'Le marché est vivant. La pluie commence.',
-        segments: [
-          ReadingSegment(
-            fr: 'Le marché est vivant.',
-            en: 'The market is lively.',
-            grammarNote: 'Uses être for a description.',
-            pronunciationTip: '',
-          ),
-          ReadingSegment(
-            fr: 'La pluie commence.',
-            en: 'The rain begins.',
-            grammarNote: 'Uses the present tense.',
-            pronunciationTip: '',
-          ),
-        ],
-      ),
-      quiz: const [],
-      keywords: const [],
-      createdAt: DateTime(2026, 8, 17),
-    );
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
-        child: MaterialApp(
-          theme: AppTheme.themeData(),
-          home: StoryReaderScreen(story: story),
+  testWidgets(
+    'renders a generated story with settings-controlled reading mode',
+    (WidgetTester tester) async {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final story = GeneratedStory(
+        id: '2c5f81bd-e10e-4ea5-a5f2-62b6f9bb54b5',
+        passage: ReadingPassage(
+          id: 'reading-passage',
+          title: 'Le marché sous la pluie',
+          titleEn: 'Rainy Market',
+          fullText: 'Le marché est vivant. La pluie commence.',
+          segments: [
+            ReadingSegment(
+              fr: 'Le marché est vivant.',
+              en: 'The market is lively.',
+              grammarNote: 'Uses être for a description.',
+              pronunciationTip: '',
+            ),
+            ReadingSegment(
+              fr: 'La pluie commence.',
+              en: 'The rain begins.',
+              grammarNote: 'Uses the present tense.',
+              pronunciationTip: '',
+            ),
+          ],
         ),
-      ),
-    );
-    await tester.pump();
+        quiz: const [],
+        keywords: const [],
+        createdAt: DateTime(2026, 8, 17),
+      );
 
-    Finder sentence(String source) => find.byWidgetPredicate(
-      (widget) => widget is BilingualWordText && widget.source == source,
-    );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: MaterialApp(
+            theme: AppTheme.themeData(),
+            home: StoryReaderScreen(story: story),
+          ),
+        ),
+      );
+      await tester.pump();
 
-    expect(sentence('Le marché est vivant.'), findsOneWidget);
-    expect(sentence('La pluie commence.'), findsNothing);
+      Finder sentence(String source) => find.byWidgetPredicate(
+        (widget) => widget is BilingualWordText && widget.source == source,
+      );
 
-    await tester.tap(find.text('Next sentence'));
-    await tester.pumpAndSettle();
-    expect(sentence('Le marché est vivant.'), findsNothing);
-    expect(sentence('La pluie commence.'), findsOneWidget);
+      expect(sentence('Le marché est vivant.'), findsOneWidget);
+      expect(sentence('La pluie commence.'), findsOneWidget);
+      expect(find.text('Rainy Market'), findsNWidgets(2));
+      expect(find.text('Le marché sous la pluie'), findsNothing);
+      expect(find.text('Full story'), findsNothing);
 
-    await tester.tap(find.text('Full story'));
-    await tester.pumpAndSettle();
-    expect(find.text('FULL STORY'), findsOneWidget);
-    expect(sentence('Le marché est vivant.'), findsOneWidget);
-    expect(sentence('La pluie commence.'), findsOneWidget);
-
-    await tester.tap(find.text('Sentences'));
-    await tester.pumpAndSettle();
-    expect(sentence('Le marché est vivant.'), findsNothing);
-    expect(sentence('La pluie commence.'), findsOneWidget);
-  });
+      await tester.tap(find.byTooltip('Story settings'));
+      await tester.pumpAndSettle();
+      expect(find.text('Sentence focus'), findsOneWidget);
+      await tester.tap(find.text('Sentence focus'));
+      final done = find.widgetWithText(FilledButton, 'Done');
+      await tester.ensureVisible(done);
+      await tester.tap(done);
+      await tester.pumpAndSettle();
+      expect(sentence('Le marché est vivant.'), findsOneWidget);
+      expect(sentence('La pluie commence.'), findsNothing);
+    },
+  );
 }

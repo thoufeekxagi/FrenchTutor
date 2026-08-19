@@ -1334,7 +1334,7 @@ class _AudioPlayerCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              story.title,
+              story.displayTitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.display(22).copyWith(color: Colors.white),

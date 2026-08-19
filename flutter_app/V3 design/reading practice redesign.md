@@ -24,6 +24,7 @@ The global Home / Course / Practice / Photo navigation is not part of the focuse
 - Gold accent: `#F2B84B`
 - Plus Jakarta Sans for display text
 - Inter for reading text and controls
+- English-only learner-facing story headings; French remains inside the reading, listening, and writing content.
 
 ## Workspace layout
 
