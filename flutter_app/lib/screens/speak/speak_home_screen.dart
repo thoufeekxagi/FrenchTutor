@@ -119,23 +119,23 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
       backgroundColor: DesignTokens.nightCanvas,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
           children: [
             _header(context, roadmap.trackLabel, tutor),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
             _callTutorButton(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _modeRail(context, next.primarySkill),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
             KeyedSubtree(
               key: AppTour.nextSessionKey,
               child: _featuredCarousel(featuredSessions),
             ),
             const SizedBox(height: 10),
             _pageDots(featuredSessions.length),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Text('Recent activity', style: _display(19)),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _activityGrid(context, tutor, lessonCards),
           ],
         ),
@@ -172,8 +172,10 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: DesignTokens.nightAccent, width: 1.5),
               ),
-              child: ClipOval(
-                child: Image.asset(tutor.portraitAsset, fit: BoxFit.cover),
+              child: const Icon(
+                Icons.person_outline_rounded,
+                color: DesignTokens.nightAccent,
+                size: 22,
               ),
             ),
           ),
@@ -511,15 +513,21 @@ class _TutorActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 48,
-            width: double.infinity,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                tutor.portraitAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
+          const SizedBox(
+            width: 34,
+            height: 34,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: DesignTokens.nightAccentSoft,
+                shape: BoxShape.circle,
+                border: Border.fromBorderSide(
+                  BorderSide(color: DesignTokens.nightHairline),
+                ),
+              ),
+              child: Icon(
+                Icons.person_outline_rounded,
+                color: DesignTokens.nightAccent,
+                size: 18,
               ),
             ),
           ),

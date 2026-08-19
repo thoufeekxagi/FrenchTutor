@@ -15,8 +15,8 @@ navigation island without requiring a scroll.
 - Use compact cards with balanced horizontal proportions rather than tall
   square cards.
 - Use consistent 10pt gaps between columns and rows.
-- Keep the tutor portrait and skill-specific lesson icons, but reduce their
-  internal footprint so titles remain readable at the compact height.
+- Replace the tutor portrait with a neutral gold profile icon and keep the
+  skill-specific lesson icons compact so titles remain readable.
 
 ## Preserved behavior
 
@@ -32,7 +32,8 @@ Implemented in `lib/screens/speak/speak_home_screen.dart`:
 - Activity grid uses two equal columns with a 1.34 aspect ratio.
 - Card spacing is 10pt horizontally and vertically.
 - Cards use 12pt padding and a 16pt radius.
-- Tutor image is a compact 48pt-high preview.
+- Tutor card and header use neutral gold profile icons instead of tutor
+  portraits.
 - Lesson icons are 34pt circles with compact typography.
 
 ## Verification checklist
@@ -40,5 +41,8 @@ Implemented in `lib/screens/speak/speak_home_screen.dart`:
 - [x] Four activity cards remain present.
 - [x] Cards retain their original tap destinations.
 - [x] No data or navigation logic changed.
+- [x] Tutor portraits are removed from the activity card and header profile
+      control.
+- [x] Home-only spacing is reduced for the iPhone 12 Pro Max viewport.
 - [ ] Visual confirmation on the user's local device remains pending; this
       pass intentionally does not launch an emulator, simulator, or device.
