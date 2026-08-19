@@ -117,6 +117,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
   double _textScale = 1;
   bool _translateSentences = true;
+  bool _highlightWords = true;
   bool _underlineWords = true;
   bool _autoPlayWordAudio = false;
   bool _darkMode = true;
@@ -125,11 +126,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   final Map<int, int> _quizAnswers = {};
   final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
 
-  /// The sentence the learner tapped to read from, highlighted so they can
-  /// see what pressing play will do — null means "no pick, play the whole
-  /// story from the top". Tapping the same sentence again clears the pick.
+  /// The sentence the learner tapped to read from — null means "no pick, play
+  /// the whole story from the top". Tapping the same sentence again clears the
+  /// pick. The selection controls playback only; sentence cards do not receive
+  /// a separate selection highlight.
   /// Distinct from [_currentSegment], which tracks the segment actually
-  /// playing right now (for auto-scroll and the "now playing" highlight).
+  /// playing right now (for auto-scroll and word-level playback feedback).
   int? _selectedSegment;
 
   /// The word selected for meaning in the story. Only one word is selected at
@@ -208,6 +210,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
     _textScale = _settings.textScale;
     _translateSentences = _settings.translateSentences;
+    _highlightWords = _settings.highlightWords;
     _underlineWords = _settings.underlineWords;
     _autoPlayWordAudio = _settings.autoPlayWordAudio;
     _darkMode = _settings.darkMode;
@@ -220,6 +223,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         setState(() {
           _textScale = _settings.textScale;
           _translateSentences = _settings.translateSentences;
+          _highlightWords = _settings.highlightWords;
           _underlineWords = _settings.underlineWords;
           _autoPlayWordAudio = _settings.autoPlayWordAudio;
           _darkMode = _settings.darkMode;
@@ -594,6 +598,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         textScale: _textScale,
         rate: _rate,
         translateSentences: _translateSentences,
+        highlightWords: _highlightWords,
         underlineWords: _underlineWords,
         autoPlayWordAudio: _autoPlayWordAudio,
         darkMode: _darkMode,
@@ -605,6 +610,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _textScale = result.textScale;
       _rate = result.rate;
       _translateSentences = result.translateSentences;
+      _highlightWords = result.highlightWords;
       _underlineWords = result.underlineWords;
       _autoPlayWordAudio = result.autoPlayWordAudio;
       _darkMode = result.darkMode;
@@ -612,6 +618,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setTranslateSentences(_translateSentences));
+    unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));
     unawaited(_settings.setAutoPlayWordAudio(_autoPlayWordAudio));
     unawaited(_settings.setDarkMode(_darkMode));
@@ -717,30 +724,37 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               ],
             ),
             Positioned(
-              left: 16,
-              right: 16,
               bottom: 10,
+              left: 0,
+              right: 0,
               child: SafeArea(
                 top: false,
-                child: _tab == _StoryTab.story
-                    ? _AudioControlBar(
-                        isPlaying: _isPlaying,
-                        isLoading: _isLoadingAudio,
-                        rate: _rate,
-                        onTogglePlayPause: _togglePlayPause,
-                        onStop: _stop,
-                        onPlaySentence: _playSelectedSentence,
-                        onCycleRate: _cycleRate,
-                        onNext: _advanceTab,
-                        nextLabel: _nextTabLabel,
-                        darkMode: _darkMode,
-                      )
-                    : _StoryNextBar(
-                        label: _nextTabLabel,
-                        onPressed: _advanceTab,
-                        onBack: _retreatTab,
-                        darkMode: _darkMode,
-                      ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _tab == _StoryTab.story
+                      ? IntrinsicWidth(
+                          child: _AudioControlBar(
+                            isPlaying: _isPlaying,
+                            isLoading: _isLoadingAudio,
+                            rate: _rate,
+                            onTogglePlayPause: _togglePlayPause,
+                            onStop: _stop,
+                            onPlaySentence: _playSelectedSentence,
+                            onCycleRate: _cycleRate,
+                            onNext: _advanceTab,
+                            darkMode: _darkMode,
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _StoryNextBar(
+                            label: _nextTabLabel,
+                            onPressed: _advanceTab,
+                            onBack: _retreatTab,
+                            darkMode: _darkMode,
+                          ),
+                        ),
+                ),
               ),
             ),
             FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
@@ -974,9 +988,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     required bool showCharacter,
   }) {
     final isPlayingNow = index == _currentSegment && _isPlaying;
-    final isPicked = !_isPlaying && index == _selectedSegment;
     final selectedWord = _selectedWordSegment == index ? _selectedWord : null;
-    final isHighlighted = isPlayingNow || (isPicked && selectedWord == null);
     return Padding(
       key: _keyFor(index),
       padding: const EdgeInsets.only(bottom: 12),
@@ -991,74 +1003,61 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
             borderColor: _darkMode
                 ? DesignTokens.nightHairline
                 : DesignTokens.hairline,
-            child: Container(
-              padding: isHighlighted
-                  ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
-                  : EdgeInsets.zero,
-              decoration: isHighlighted
-                  ? BoxDecoration(
-                      color: DesignTokens.mastery.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.radiusMedium,
-                      ),
-                    )
-                  : null,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (showCharacter && segment.characterFr != null) ...[
-                    Text(
-                      segment.characterFr!,
-                      style: DesignTokens.mono(11, weight: FontWeight.w700)
-                          .copyWith(
-                            color: _darkMode
-                                ? DesignTokens.nightMuted
-                                : DesignTokens.mutedDim,
-                            letterSpacing: 0.8,
-                          ),
-                    ),
-                    const SizedBox(height: 6),
-                  ],
-                  BilingualWordText(
-                    source: segment.fr,
-                    translation: segment.en,
-                    sourceStyle:
-                        DesignTokens.body(
-                          17 * _textScale,
-                          weight: FontWeight.w600,
-                        ).copyWith(
-                          color: _darkMode
-                              ? DesignTokens.nightText
-                              : DesignTokens.ink,
-                          height: 1.4,
-                        ),
-                    translationStyle: DesignTokens.body(14.5 * _textScale)
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showCharacter && segment.characterFr != null) ...[
+                  Text(
+                    segment.characterFr!,
+                    style: DesignTokens.mono(11, weight: FontWeight.w700)
                         .copyWith(
                           color: _darkMode
                               ? DesignTokens.nightMuted
                               : DesignTokens.mutedDim,
-                          height: 1.4,
+                          letterSpacing: 0.8,
                         ),
-                    keywords: _story.keywords,
-                    showTranslation: _translateSentences,
-                    underlineSelected: _underlineWords,
-                    accentColor: _darkMode
-                        ? DesignTokens.nightAccent
-                        : DesignTokens.primary,
-                    selectedSourceWord: selectedWord,
-                    playbackSourceWord: isPlayingNow ? _currentWord : null,
-                    playbackTranslationWord: isPlayingNow
-                        ? _mappedTranslationWord(
-                            currentWord: _currentWord,
-                            source: segment.fr,
-                            translation: segment.en,
-                          )
-                        : null,
-                    onSourceWordTap: (wordIndex) =>
-                        _selectWord(index, wordIndex),
                   ),
+                  const SizedBox(height: 6),
                 ],
-              ),
+                BilingualWordText(
+                  source: segment.fr,
+                  translation: segment.en,
+                  sourceStyle:
+                      DesignTokens.body(
+                        17 * _textScale,
+                        weight: FontWeight.w600,
+                      ).copyWith(
+                        color: _darkMode
+                            ? DesignTokens.nightText
+                            : DesignTokens.ink,
+                        height: 1.4,
+                      ),
+                  translationStyle: DesignTokens.body(14.5 * _textScale)
+                      .copyWith(
+                        color: _darkMode
+                            ? DesignTokens.nightMuted
+                            : DesignTokens.mutedDim,
+                        height: 1.4,
+                      ),
+                  keywords: _story.keywords,
+                  showTranslation: _translateSentences,
+                  highlightSelected: _highlightWords,
+                  underlineSelected: _underlineWords,
+                  accentColor: _darkMode
+                      ? DesignTokens.nightAccent
+                      : DesignTokens.primary,
+                  selectedSourceWord: selectedWord,
+                  playbackSourceWord: isPlayingNow ? _currentWord : null,
+                  playbackTranslationWord: isPlayingNow
+                      ? _mappedTranslationWord(
+                          currentWord: _currentWord,
+                          source: segment.fr,
+                          translation: segment.en,
+                        )
+                      : null,
+                  onSourceWordTap: (wordIndex) => _selectWord(index, wordIndex),
+                ),
+              ],
             ),
           ),
         ),
@@ -1987,7 +1986,6 @@ class _AudioControlBar extends StatelessWidget {
     required this.onPlaySentence,
     required this.onCycleRate,
     required this.onNext,
-    required this.nextLabel,
     required this.darkMode,
   });
 
@@ -1999,7 +1997,6 @@ class _AudioControlBar extends StatelessWidget {
   final VoidCallback onPlaySentence;
   final VoidCallback onCycleRate;
   final VoidCallback onNext;
-  final String nextLabel;
   final bool darkMode;
 
   @override
@@ -2013,8 +2010,8 @@ class _AudioControlBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: surface.withValues(alpha: 0.86),
             borderRadius: BorderRadius.circular(32),
@@ -2033,6 +2030,13 @@ class _AudioControlBar extends StatelessWidget {
                 onTap: isLoading ? () {} : onTogglePlayPause,
               ),
               _separator(muted),
+              _compactIconAction(
+                icon: CupertinoIcons.stop_fill,
+                tooltip: 'Stop audio',
+                color: text,
+                onTap: onStop,
+              ),
+              _separator(muted),
               _compactAction(
                 label: rate <= 0.36
                     ? '.75x'
@@ -2043,9 +2047,19 @@ class _AudioControlBar extends StatelessWidget {
                 onTap: onCycleRate,
               ),
               _separator(muted),
-              _compactAction(label: '↻', color: text, onTap: onPlaySentence),
+              _compactIconAction(
+                icon: CupertinoIcons.arrow_counterclockwise,
+                tooltip: 'Replay sentence',
+                color: text,
+                onTap: onPlaySentence,
+              ),
               _separator(muted),
-              _compactAction(label: nextLabel, color: accent, onTap: onNext),
+              _compactIconAction(
+                icon: CupertinoIcons.book_fill,
+                tooltip: 'Words',
+                color: accent,
+                onTap: onNext,
+              ),
             ],
           ),
         ),
@@ -2076,6 +2090,26 @@ class _AudioControlBar extends StatelessWidget {
             12,
             weight: FontWeight.w700,
           ).copyWith(color: color),
+        ),
+      ),
+    );
+  }
+
+  Widget _compactIconAction({
+    required IconData icon,
+    required String tooltip,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, color: color, size: 17),
         ),
       ),
     );
@@ -2182,6 +2216,7 @@ class _ReaderSettingsResult {
     required this.textScale,
     required this.rate,
     required this.translateSentences,
+    required this.highlightWords,
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
@@ -2191,6 +2226,7 @@ class _ReaderSettingsResult {
   final double textScale;
   final double rate;
   final bool translateSentences;
+  final bool highlightWords;
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
@@ -2202,6 +2238,7 @@ class _StorySettingsSheet extends StatefulWidget {
     required this.textScale,
     required this.rate,
     required this.translateSentences,
+    required this.highlightWords,
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
@@ -2211,6 +2248,7 @@ class _StorySettingsSheet extends StatefulWidget {
   final double textScale;
   final double rate;
   final bool translateSentences;
+  final bool highlightWords;
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
@@ -2224,6 +2262,7 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
   late double _textScale = widget.textScale;
   late double _rate = widget.rate;
   late bool _translate = widget.translateSentences;
+  late bool _highlight = widget.highlightWords;
   late bool _underline = widget.underlineWords;
   late bool _autoPlay = widget.autoPlayWordAudio;
   late bool _dark = widget.darkMode;
@@ -2234,6 +2273,7 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
       textScale: _textScale,
       rate: _rate,
       translateSentences: _translate,
+      highlightWords: _highlight,
       underlineWords: _underline,
       autoPlayWordAudio: _autoPlay,
       darkMode: _dark,
@@ -2374,6 +2414,15 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
                 'Show the English line under French.',
                 _translate,
                 (v) => setState(() => _translate = v),
+                text,
+                muted,
+                accent,
+              ),
+              _switchRow(
+                'Highlight words',
+                'Color the selected or spoken word.',
+                _highlight,
+                (v) => setState(() => _highlight = v),
                 text,
                 muted,
                 accent,

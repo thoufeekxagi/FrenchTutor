@@ -30,18 +30,20 @@ The rail is a compact rounded island. The current stage uses the gold accent; in
 - A dark gradient keeps the image legible without turning the story into a large hero card.
 - The English story heading, level, read time, translation toggle, text settings, like, and report actions sit below the stage island.
 - Bilingual French/English content below.
-- Gold word selection and playback highlighting.
+- Gold word selection and playback highlighting; sentence cards stay visually neutral.
 - Selected glossary word is surfaced at the lower-left edge of the cover as a small meaning cue.
 - The visible Full story / Sentences switch is removed; the reading mode is selected from Story settings.
 
 ### Audio island
 
-The old full-width bottom toolbar was replaced with a smaller centered translucent island containing:
+The old full-width bottom toolbar was replaced with a smaller centered translucent island
+whose width is driven by its contents, containing:
 
 - Play / pause
+- Stop
 - Playback speed
 - Replay sentence
-- Next stage
+- Words
 
 Story content receives bottom inset so the island never hides text.
 
@@ -52,6 +54,7 @@ Added `SessionSettings` as a shared persisted source of truth for focused practi
 - Small / medium / large text size.
 - Playback speed.
 - Translate sentences.
+- Highlight selected and spoken words.
 - Underline words.
 - Auto-play word audio.
 - Dark/light reading mode.
@@ -64,7 +67,7 @@ The reader consumes these settings now. Other practice screens and the global se
 
 ## Preserved behavior
 
-- Sentence-by-sentence and full-story modes.
+- Sentence-by-sentence and full-story modes, with the mode selected from Story settings.
 - Narration, pause, resume, stop, speed, and sentence replay.
 - Word selection and translation matching.
 - Tutor call context and lifecycle handling.
