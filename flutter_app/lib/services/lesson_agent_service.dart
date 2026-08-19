@@ -19,17 +19,18 @@ import '../prompts/live_prompts.dart';
 /// repeats this contract at the provider boundary, so local previews and
 /// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-IMAGE-ONLY ARTWORK: create one premium landscape story image in an exact 4:3
-composition. Do not render any text at all: no title, letters, words, numbers,
+IMAGE-ONLY ARTWORK: create one premium landscape story image in the requested
+aspect ratio. Do not render any text at all: no title, letters, words, numbers,
 captions, labels, logos, watermarks, signs, UI, borders, or frames. The image
 must stand on its own without typography; the app renders the English title
 outside the image. Use grounded cinematic realism with subtle editorial
 stylization, believable materials, natural lighting, restrained color grading,
-and one clear focal scene. Avoid both photorealistic stock-photo blandness and
-cartoon, anime, chibi, flat-vector, collage, or fantasy-game aesthetics. Do not
-show people, faces, animals, mascots, or named characters. If the source
-mentions one, make the setting, objects, architecture, weather, or action the
-primary subject instead.
+and one clear focal scene. A single visible character or person is allowed when
+the scene calls for one; keep the face and body inside the central 70% safe area
+so downstream card and hero layouts do not crop the subject. Avoid both
+photorealistic stock-photo blandness and cartoon, anime, chibi, flat-vector,
+collage, or fantasy-game aesthetics. Do not render text, letters, numbers,
+logos, mascots, signs, captions, watermarks, or UI.
 ''';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -1408,15 +1409,20 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     required String levelBand,
     String? coverPrompt,
     String? variationSeed,
+    String aspectRatio = '4:3',
+    int? width,
+    int? height,
   }) async {
-    const qualityDirection =
-        'Create one premium landscape story image in an exact 4:3 composition. '
+    final qualityDirection =
+        'Create one premium landscape story image in an exact $aspectRatio composition. '
         'Use grounded cinematic realism with subtle editorial stylization, believable materials, '
         'natural lighting, restrained color grading, one clear focal scene, layered depth, '
-        'and a polished publishing aesthetic. Keep important visual details inside safe margins. '
+        'and a polished publishing aesthetic. Keep the subject and important visual details inside '
+        'the central safe area. A single visible character is allowed when the scene calls for one. '
         'Avoid photorealistic stock-photo blandness, anime, Ghibli, chibi, childish, flat vector, '
-        'cartoon, collage, split panels, decorative frame, or UI mockup styles. Do not show people, '
-        'faces, animals, mascots, or named characters; make the setting, objects, architecture, '
+        'cartoon, collage, split panels, decorative frame, or UI mockup styles. Do not render text, '
+        'letters, numbers, logos, signs, captions, watermarks, or other typography anywhere in the image. '
+        'Do not show mascots or named characters; make the setting, objects, architecture, '
         'weather, or action primary. Render no text, letters, numbers, logos, signs, captions, '
         'watermarks, or other typography anywhere in the image.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
@@ -1429,6 +1435,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         : '\nInternal visual variation seed: ${variationSeed.trim()}. '
               'Use it to choose a fresh composition and do not render it.';
     final fullPrompt = '$prompt$variation\n$_bookCoverInstruction';
+    final resolvedWidth = width ?? (aspectRatio == '4:3' ? 1152 : null);
+    final resolvedHeight = height ?? (aspectRatio == '4:3' ? 864 : null);
+    if ((resolvedWidth == null) != (resolvedHeight == null)) {
+      throw ArgumentError('width and height must be supplied together');
+    }
     // MiniMax Image-01 accepts prompts up to 1,500 characters. Preserve the
     // universal text-free image policy first; trim only free-form scene detail.
     final imagePrompt = fullPrompt.length <= 1_500
@@ -1438,6 +1449,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     try {
       final response = await _invokeFunction('ai-image', {
         'prompt': imagePrompt,
+        'aspectRatio': aspectRatio,
+        if (resolvedWidth != null && resolvedHeight != null) ...{
+          'width': resolvedWidth,
+          'height': resolvedHeight,
+        },
       }, timeout: const Duration(seconds: 45));
       final encoded = response['imageBase64'] as String?;
       if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);
@@ -1572,6 +1588,42 @@ ${_cefrCalibration(levelBand)}''';
       maxTokens: 1300,
     );
     return GrammarExplanation.fromJson(_decodeObject(raw));
+  }
+
+  /// Generates the compact, on-demand grammar cue shown when a learner taps
+  /// "Conjugate" on a selected story word. This is intentionally separate
+  /// from story generation so ordinary word lookups stay instant and the
+  /// extra model call only happens when the learner asks for it.
+  Future<Map<String, dynamic>> buildWordConjugation({
+    required String word,
+    required String translation,
+    required String sentence,
+    required String levelBand,
+  }) async {
+    const system = '''
+You are a concise French grammar teacher. Return ONLY compact JSON with this
+shape: {"title": string, "summary": string, "part_of_speech": string,
+"gender": string, "number": string, "infinitive": string, "tense": string,
+"conjugation": [{"pronoun": string, "form": string}]}. Explain the exact
+selected word in the supplied sentence. Use English for summary and metadata;
+use French only for the selected word, infinitive, and conjugated forms. If the
+word is not a conjugated verb, return an empty conjugation list and leave tense
+empty. Use an empty string for unknown gender or number. Keep the explanation
+short enough for a mobile bottom sheet.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'LEVEL: $levelBand\nSELECTED WORD: $word\nMEANING: $translation\n'
+              'SENTENCE: $sentence',
+        },
+      ],
+      maxTokens: 700,
+      temperature: 0.2,
+    );
+    return _decodeObject(raw);
   }
 
   /// The quiz half of the grammar-story rebuild — unlike

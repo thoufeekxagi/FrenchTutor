@@ -31,9 +31,9 @@ class PracticeArtworkService {
       variationSeed: id,
       coverPrompt:
           '$context\n'
-          'Create one coherent text-free 4:3 story image. Do not show people, '
-          'faces, animals, mascots, or named characters; make the setting, objects, '
-          'architecture, weather, or action primary instead. Render no text, letters, '
+          'Create one coherent text-free 4:3 story image. A single visible character '
+          'is welcome when relevant; keep the character inside the central safe area '
+          'with the full face and body visible. Render no text, letters, '
           'numbers, logos, signs, captions, or other typography. Make the composition, '
           'camera angle, dominant subject, and color balance distinct from other '
           'sessions. Use the variation key $id only as an internal visual seed; '

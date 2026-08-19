@@ -11,6 +11,7 @@ import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
+import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_settings.dart';
 import '../../widgets/story_cover_image.dart';
@@ -19,14 +20,11 @@ import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/learning_card.dart';
-import '../../widgets/passeport_card.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
-
-enum _StoryReadingMode { fullStory, sentenceBySentence }
 
 /// Popped by [StoryReaderScreen] when [StoryReaderScreen.showFinishButton] is
 /// true — how many of the story's own quiz questions the learner answered
@@ -110,7 +108,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   // Story always leads, even for a grammar-practice session — the story is
   // the point, grammar is a cue card away, not the landing screen.
   _StoryTab _tab = _StoryTab.story;
-  _StoryReadingMode _readingMode = _StoryReadingMode.fullStory;
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
@@ -122,6 +119,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _autoPlayWordAudio = false;
   bool _darkMode = true;
   bool _isLiked = false;
+  bool _isMarkedLearned = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
   final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
@@ -209,27 +207,23 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       onTutorTranscript: (text) => _recorder.logTutor(text),
     );
     _textScale = _settings.textScale;
+    _rate = _settings.playbackRate;
     _translateSentences = _settings.translateSentences;
     _highlightWords = _settings.highlightWords;
     _underlineWords = _settings.underlineWords;
     _autoPlayWordAudio = _settings.autoPlayWordAudio;
     _darkMode = _settings.darkMode;
-    _readingMode = _settings.sentenceMode
-        ? _StoryReadingMode.sentenceBySentence
-        : _StoryReadingMode.fullStory;
     unawaited(
       _settings.load().then((_) {
         if (!mounted) return;
         setState(() {
           _textScale = _settings.textScale;
+          _rate = _settings.playbackRate;
           _translateSentences = _settings.translateSentences;
           _highlightWords = _settings.highlightWords;
           _underlineWords = _settings.underlineWords;
           _autoPlayWordAudio = _settings.autoPlayWordAudio;
           _darkMode = _settings.darkMode;
-          _readingMode = _settings.sentenceMode
-              ? _StoryReadingMode.sentenceBySentence
-              : _StoryReadingMode.fullStory;
         });
       }),
     );
@@ -405,13 +399,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       await speech.resume();
       if (mounted) setState(() => _isPlaying = true);
     } else {
-      // Sentence mode mirrors Listening: the play button speaks only the
-      // visible sentence. Full-story mode keeps the continuous narration.
-      if (_readingMode == _StoryReadingMode.sentenceBySentence) {
-        await _playSelectedSentence();
-      } else {
-        await _playAll(fromIndex: _selectedSegment ?? 0);
-      }
+      await _playAll(fromIndex: _selectedSegment ?? 0);
     }
   }
 
@@ -426,29 +414,23 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       case 0:
         unawaited(_switchTab(_StoryTab.story));
       case 1:
-        unawaited(_switchTab(_StoryTab.keywords));
-      case 2:
-        unawaited(_switchTab(_StoryTab.grammar));
-      case 3:
         unawaited(_switchTab(_StoryTab.quiz));
-      case 4:
-        if (widget.showFinishButton) {
-          _finish();
-        } else {
-          Navigator.pop(context);
-        }
+      case 2:
+        unawaited(_switchTab(_StoryTab.keywords));
+      case 3:
+        unawaited(_switchTab(_StoryTab.grammar));
     }
   }
 
   void _advanceTab() {
     switch (_tab) {
       case _StoryTab.story:
+        unawaited(_switchTab(_StoryTab.quiz));
+      case _StoryTab.quiz:
         unawaited(_switchTab(_StoryTab.keywords));
       case _StoryTab.keywords:
         unawaited(_switchTab(_StoryTab.grammar));
       case _StoryTab.grammar:
-        unawaited(_switchTab(_StoryTab.quiz));
-      case _StoryTab.quiz:
         if (widget.showFinishButton) {
           _finish();
         } else {
@@ -461,33 +443,21 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     switch (_tab) {
       case _StoryTab.story:
         return;
-      case _StoryTab.keywords:
+      case _StoryTab.quiz:
         unawaited(_switchTab(_StoryTab.story));
+      case _StoryTab.keywords:
+        unawaited(_switchTab(_StoryTab.quiz));
       case _StoryTab.grammar:
         unawaited(_switchTab(_StoryTab.keywords));
-      case _StoryTab.quiz:
-        unawaited(_switchTab(_StoryTab.grammar));
     }
   }
 
   String get _nextTabLabel => switch (_tab) {
-    _StoryTab.story => 'Words',
+    _StoryTab.story => 'Quiz',
+    _StoryTab.quiz => 'Keywords',
     _StoryTab.keywords => 'Grammar',
-    _StoryTab.grammar => 'Quiz',
-    _StoryTab.quiz => widget.showFinishButton ? 'Finish' : 'Done',
+    _StoryTab.grammar => widget.showFinishButton ? 'Finish' : 'Done',
   };
-
-  Future<void> _changeSentence(int index) async {
-    if (index < 0 || index >= _passage.segments.length) return;
-    await _stop();
-    if (!mounted) return;
-    setState(() {
-      _currentSegment = index;
-      _selectedSegment = null;
-      _selectedWordSegment = null;
-      _selectedWord = null;
-    });
-  }
 
   Future<void> _stop() async {
     await LessonSpeechService.shared.stop();
@@ -587,6 +557,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   void _cycleRate() {
     setState(() => _rate = _rate <= 0.36 ? 0.55 : 0.32);
+    unawaited(_settings.setPlaybackRate(_rate));
   }
 
   Future<void> _showSettings() async {
@@ -602,7 +573,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         underlineWords: _underlineWords,
         autoPlayWordAudio: _autoPlayWordAudio,
         darkMode: _darkMode,
-        readingMode: _readingMode,
       ),
     );
     if (!mounted || result == null) return;
@@ -614,17 +584,59 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _underlineWords = result.underlineWords;
       _autoPlayWordAudio = result.autoPlayWordAudio;
       _darkMode = result.darkMode;
-      _readingMode = result.readingMode;
     });
     unawaited(_settings.setTextScale(_textScale));
+    unawaited(_settings.setPlaybackRate(_rate));
     unawaited(_settings.setTranslateSentences(_translateSentences));
     unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));
     unawaited(_settings.setAutoPlayWordAudio(_autoPlayWordAudio));
     unawaited(_settings.setDarkMode(_darkMode));
-    unawaited(
-      _settings.setSentenceMode(
-        _readingMode == _StoryReadingMode.sentenceBySentence,
+  }
+
+  void _markAsLearned() {
+    setState(() => _isMarkedLearned = true);
+    if (widget.showFinishButton) {
+      _finish();
+      return;
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Story marked as learned.')));
+  }
+
+  bool get _selectedWordCanConjugate {
+    final segmentIndex = _selectedWordSegment;
+    if (segmentIndex == null ||
+        segmentIndex < 0 ||
+        segmentIndex >= _passage.segments.length) {
+      return false;
+    }
+    final note = _passage.segments[segmentIndex].grammarNote.toLowerCase();
+    return RegExp(
+      r'\b(verb|conjugat|tense|present|past|future|imparfait|conditionnel|impératif)\b',
+    ).hasMatch(note);
+  }
+
+  Future<void> _showConjugation() async {
+    final entry = _selectedWordEntry();
+    final segmentIndex = _selectedWordSegment;
+    if (entry == null || segmentIndex == null) return;
+    final segment = _passage.segments[segmentIndex];
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ConjugationSheet(
+        darkMode: _darkMode,
+        word: entry.fr,
+        translation: entry.en,
+        future: LessonAgentService.shared.buildWordConjugation(
+          word: entry.fr,
+          translation: entry.en,
+          sentence: segment.fr,
+          levelBand: _story.levelBand,
+        ),
       ),
     );
   }
@@ -640,37 +652,28 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       backgroundColor: _darkMode
           ? DesignTokens.nightCanvas
           : DesignTokens.canvas,
-      appBar: AppBar(
-        title: Text(
-          _passage.displayTitle,
-          style: DesignTokens.display(16).copyWith(
-            color: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        backgroundColor: _darkMode
-            ? DesignTokens.nightCanvas
-            : DesignTokens.canvas,
-        foregroundColor: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        actions: [
-          InlineCallActions(controller: _call),
-          ReportProblemButton(sessionType: 'Story: ${_passage.displayTitle}'),
-          IconButton(
-            onPressed: _showSettings,
-            tooltip: 'Story settings',
-            icon: const Icon(CupertinoIcons.slider_horizontal_3),
-          ),
-        ],
-      ),
       body: WebConstrainedView(
         maxWidth: 920,
         child: Stack(
           children: [
             Column(
               children: [
+                _StoryBookHeader(
+                  story: _story,
+                  darkMode: _darkMode,
+                  selectedWord: _selectedWordEntry(),
+                  learned: _isMarkedLearned,
+                  onBack: () => Navigator.maybePop(context),
+                  onMarkLearned: _markAsLearned,
+                  onSettings: _showSettings,
+                  onConjugate: _selectedWordCanConjugate
+                      ? _showConjugation
+                      : null,
+                  callActions: InlineCallActions(controller: _call),
+                  reportButton: ReportProblemButton(
+                    sessionType: 'Story: ${_passage.displayTitle}',
+                  ),
+                ),
                 if (_call.isLive || _call.error != null)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -680,22 +683,14 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: _StoryBookHeader(
-                    story: _story,
-                    darkMode: _darkMode,
-                    selectedWord: _selectedWordEntry(),
-                  ),
-                ),
-                Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: _StoryStageIsland(
-                    labels: const ['Read', 'Words', 'Grammar', 'Quiz', 'Done'],
+                    labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
                     currentIndex: switch (_tab) {
                       _StoryTab.story => 0,
-                      _StoryTab.keywords => 1,
-                      _StoryTab.grammar => 2,
-                      _StoryTab.quiz => 3,
+                      _StoryTab.quiz => 1,
+                      _StoryTab.keywords => 2,
+                      _StoryTab.grammar => 3,
                     },
                     onIndexTap: _goToStage,
                   ),
@@ -796,80 +791,73 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Widget _storyView() {
     final segments = _passage.segments;
-
-    if (segments.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
-        children: [
-          _storyIntro(),
-          const SizedBox(height: 16),
-          ModernCard(
-            padding: 20,
-            child: Text(
-              _passage.fullText.isNotEmpty
-                  ? _passage.fullText
-                  : 'This story is still loading. Reopen it after generation finishes.',
-              style: DesignTokens.body(18).copyWith(height: 1.45),
-            ),
-          ),
-        ],
-      );
-    }
-
-    if (_readingMode == _StoryReadingMode.fullStory) {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
-        children: [_storyIntro(), const SizedBox(height: 18), _sentenceCards()],
-      );
-    }
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
       children: [
         _storyIntro(),
         const SizedBox(height: 18),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'SENTENCE ${_currentSegment + 1} OF ${segments.length}',
-              style: DesignTokens.label(
-                10,
-              ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
+        if (segments.isEmpty)
+          Text(
+            _passage.fullText.isNotEmpty
+                ? _passage.fullText
+                : 'This story is still loading. Reopen it after generation finishes.',
+            style: DesignTokens.body(18 * _textScale).copyWith(
+              color: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
+              height: 1.55,
             ),
-            Text(
-              'Read one line at a time',
-              style: DesignTokens.mono(
-                10,
-              ).copyWith(color: DesignTokens.mutedDim),
+          )
+        else
+          _storyReadingText(segments),
+      ],
+    );
+  }
+
+  Widget _storyReadingText(List<ReadingSegment> segments) {
+    final text = _darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = _darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final entry in segments.asMap().entries) ...[
+          if (entry.key > 0) SizedBox(height: _translateSentences ? 22 : 8),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _selectSegment(entry.key),
+            child: BilingualWordText(
+              key: _keyFor(entry.key),
+              source: entry.value.fr,
+              translation: entry.value.en,
+              sourceStyle: DesignTokens.body(
+                18 * _textScale,
+              ).copyWith(color: text, height: 1.52),
+              translationStyle: DesignTokens.body(
+                15 * _textScale,
+              ).copyWith(color: muted, height: 1.45),
+              keywords: _story.keywords,
+              showTranslation: _translateSentences,
+              highlightSelected: _highlightWords,
+              underlineSelected: _underlineWords,
+              accentColor: _darkMode
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.primary,
+              selectedSourceWord: _selectedWordSegment == entry.key
+                  ? _selectedWord
+                  : null,
+              playbackSourceWord: _isPlaying && _currentSegment == entry.key
+                  ? _currentWord
+                  : null,
+              playbackTranslationWord:
+                  _isPlaying && _currentSegment == entry.key
+                  ? _mappedTranslationWord(
+                      currentWord: _currentWord,
+                      source: entry.value.fr,
+                      translation: entry.value.en,
+                    )
+                  : null,
+              onSourceWordTap: (wordIndex) => _selectWord(entry.key, wordIndex),
             ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _sentenceCard(
-          _currentSegment,
-          segments[_currentSegment],
-          showCharacter: true,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OutlinedButton.icon(
-              onPressed: _currentSegment == 0
-                  ? null
-                  : () => _changeSentence(_currentSegment - 1),
-              icon: const Icon(CupertinoIcons.chevron_left, size: 16),
-              label: const Text('Previous'),
-            ),
-            ElevatedButton.icon(
-              onPressed: _currentSegment == segments.length - 1
-                  ? null
-                  : () => _changeSentence(_currentSegment + 1),
-              icon: const Icon(CupertinoIcons.chevron_right, size: 16),
-              label: const Text('Next sentence'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ],
     );
   }
@@ -895,7 +883,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           ),
         ],
         const SizedBox(height: 12),
-        Row(
+        Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 2,
+          runSpacing: 2,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -956,112 +948,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           ],
         ),
       ],
-    );
-  }
-
-  Widget _sentenceCards() {
-    String? lastCharacter;
-    return Column(
-      children: [
-        for (final entry in _passage.segments.asMap().entries)
-          Builder(
-            builder: (context) {
-              final segment = entry.value;
-              final showCharacter =
-                  segment.characterFr != null &&
-                  segment.characterFr != lastCharacter;
-              lastCharacter = segment.characterFr ?? lastCharacter;
-              return _sentenceCard(
-                entry.key,
-                segment,
-                showCharacter: showCharacter,
-              );
-            },
-          ),
-      ],
-    );
-  }
-
-  Widget _sentenceCard(
-    int index,
-    ReadingSegment segment, {
-    required bool showCharacter,
-  }) {
-    final isPlayingNow = index == _currentSegment && _isPlaying;
-    final selectedWord = _selectedWordSegment == index ? _selectedWord : null;
-    return Padding(
-      key: _keyFor(index),
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => _selectSegment(index),
-        child: SizedBox(
-          width: double.infinity,
-          child: LearningCard(
-            padding: 16,
-            color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
-            borderColor: _darkMode
-                ? DesignTokens.nightHairline
-                : DesignTokens.hairline,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (showCharacter && segment.characterFr != null) ...[
-                  Text(
-                    segment.characterFr!,
-                    style: DesignTokens.mono(11, weight: FontWeight.w700)
-                        .copyWith(
-                          color: _darkMode
-                              ? DesignTokens.nightMuted
-                              : DesignTokens.mutedDim,
-                          letterSpacing: 0.8,
-                        ),
-                  ),
-                  const SizedBox(height: 6),
-                ],
-                BilingualWordText(
-                  source: segment.fr,
-                  translation: segment.en,
-                  sourceStyle:
-                      DesignTokens.body(
-                        17 * _textScale,
-                        weight: FontWeight.w600,
-                      ).copyWith(
-                        color: _darkMode
-                            ? DesignTokens.nightText
-                            : DesignTokens.ink,
-                        height: 1.4,
-                      ),
-                  translationStyle: DesignTokens.body(14.5 * _textScale)
-                      .copyWith(
-                        color: _darkMode
-                            ? DesignTokens.nightMuted
-                            : DesignTokens.mutedDim,
-                        height: 1.4,
-                      ),
-                  keywords: _story.keywords,
-                  showTranslation: _translateSentences,
-                  highlightSelected: _highlightWords,
-                  underlineSelected: _underlineWords,
-                  accentColor: _darkMode
-                      ? DesignTokens.nightAccent
-                      : DesignTokens.primary,
-                  selectedSourceWord: selectedWord,
-                  playbackSourceWord: isPlayingNow ? _currentWord : null,
-                  playbackTranslationWord: isPlayingNow
-                      ? _mappedTranslationWord(
-                          currentWord: _currentWord,
-                          source: segment.fr,
-                          translation: segment.en,
-                        )
-                      : null,
-                  onSourceWordTap: (wordIndex) => _selectWord(index, wordIndex),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -1429,81 +1315,430 @@ class _StoryBookHeader extends StatelessWidget {
     required this.story,
     required this.darkMode,
     this.selectedWord,
+    required this.learned,
+    required this.onBack,
+    required this.onMarkLearned,
+    required this.onSettings,
+    required this.onConjugate,
+    required this.callActions,
+    required this.reportButton,
   });
 
   final GeneratedStory story;
   final bool darkMode;
   final VocabEntry? selectedWord;
+  final bool learned;
+  final VoidCallback onBack;
+  final VoidCallback onMarkLearned;
+  final VoidCallback onSettings;
+  final VoidCallback? onConjugate;
+  final Widget callActions;
+  final Widget reportButton;
 
   @override
   Widget build(BuildContext context) {
     final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       child: SizedBox(
-        height: 172,
+        height: 246,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            StoryCoverImage(title: story.title, source: story.coverUrl),
+            ColoredBox(
+              color: darkMode ? DesignTokens.nightSurface : DesignTokens.canvas,
+              child: StoryCoverImage(
+                title: story.title,
+                source: story.coverUrl,
+                fit: BoxFit.cover,
+              ),
+            ),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topRight,
+                  begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.02),
-                    Colors.black.withValues(alpha: 0.2),
-                    Colors.black.withValues(alpha: 0.82),
+                    Colors.black.withValues(alpha: 0.36),
+                    Colors.black.withValues(alpha: 0.04),
+                    Colors.black.withValues(alpha: 0.9),
                   ],
                 ),
               ),
             ),
-            if (selectedWord != null)
-              Positioned(
-                left: 16,
-                bottom: 12,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 180),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 9,
-                  ),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        selectedWord!.fr,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.body(14, weight: FontWeight.w800)
-                            .copyWith(
-                              color: darkMode
-                                  ? DesignTokens.nightCanvas
-                                  : Colors.white,
-                            ),
-                      ),
-                      Text(
-                        selectedWord!.en,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.body(11).copyWith(
-                          color:
-                              (darkMode
-                                      ? DesignTokens.nightCanvas
-                                      : Colors.white)
-                                  .withValues(alpha: 0.78),
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _HeroIconButton(
+                      icon: CupertinoIcons.chevron_left,
+                      tooltip: 'Back',
+                      onTap: onBack,
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 42,
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      decoration: BoxDecoration(
+                        color: learned
+                            ? accent.withValues(alpha: 0.94)
+                            : Colors.black.withValues(alpha: 0.42),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.22),
                         ),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(22),
+                        onTap: onMarkLearned,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              learned
+                                  ? CupertinoIcons.checkmark
+                                  : CupertinoIcons.checkmark,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 7),
+                            Text(
+                              learned ? 'Learned' : 'Mark as learned',
+                              style: DesignTokens.body(
+                                13,
+                                weight: FontWeight.w700,
+                              ).copyWith(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    _HeroIconButton(
+                      icon: CupertinoIcons.slider_horizontal_3,
+                      tooltip: 'Story settings',
+                      onTap: onSettings,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 14,
+              right: selectedWord == null ? 14 : 132,
+              bottom: selectedWord == null ? 18 : 8,
+              child: selectedWord == null
+                  ? const SizedBox.shrink()
+                  : _SelectedWordOverlay(
+                      word: selectedWord!,
+                      accent: accent,
+                      darkMode: darkMode,
+                      onConjugate: onConjugate,
+                    ),
+            ),
+            Positioned(
+              right: 14,
+              bottom: 12,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DefaultTextStyle.merge(
+                    style: TextStyle(color: text),
+                    child: callActions,
+                  ),
+                  DefaultTextStyle.merge(
+                    style: TextStyle(color: muted),
+                    child: reportButton,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroIconButton extends StatelessWidget {
+  const _HeroIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: tooltip,
+      child: IconButton(
+        onPressed: onTap,
+        tooltip: tooltip,
+        visualDensity: VisualDensity.compact,
+        icon: Icon(icon, color: Colors.white, size: 24),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.black.withValues(alpha: 0.38),
+          shape: const CircleBorder(),
+        ),
+      ),
+    );
+  }
+}
+
+class _SelectedWordOverlay extends StatelessWidget {
+  const _SelectedWordOverlay({
+    required this.word,
+    required this.accent,
+    required this.darkMode,
+    this.onConjugate,
+  });
+
+  final VocabEntry word;
+  final Color accent;
+  final bool darkMode;
+  final VoidCallback? onConjugate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          word.fr,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: DesignTokens.display(
+            24,
+          ).copyWith(color: Colors.white, height: 1.05),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          word.en,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: DesignTokens.body(
+            14,
+          ).copyWith(color: Colors.white.withValues(alpha: 0.9), height: 1.25),
+        ),
+        const SizedBox(height: 8),
+        if (onConjugate != null)
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: InkWell(
+              onTap: onConjugate,
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: Text(
+                  'Conjugate  →',
+                  style: DesignTokens.body(12, weight: FontWeight.w800)
+                      .copyWith(
+                        color: darkMode
+                            ? DesignTokens.nightCanvas
+                            : Colors.white,
+                      ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ConjugationSheet extends StatelessWidget {
+  const _ConjugationSheet({
+    required this.future,
+    required this.darkMode,
+    required this.word,
+    required this.translation,
+  });
+
+  final Future<Map<String, dynamic>> future;
+  final bool darkMode;
+  final String word;
+  final String translation;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = darkMode ? DesignTokens.nightSurfaceRaised : Colors.white;
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return SafeArea(
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 620),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: accent.withValues(alpha: 0.28)),
+        ),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox(
+                height: 240,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError || snapshot.data == null) {
+              return SizedBox(
+                height: 220,
+                child: Center(
+                  child: Text(
+                    'The conjugation is unavailable right now. Try again in a moment.',
+                    textAlign: TextAlign.center,
+                    style: DesignTokens.body(15).copyWith(color: muted),
+                  ),
+                ),
+              );
+            }
+            final data = snapshot.data!;
+            final conjugation = (data['conjugation'] as List? ?? const [])
+                .whereType<Map>()
+                .toList();
+            final metadata = [
+              data['part_of_speech']?.toString() ?? '',
+              data['gender']?.toString() ?? '',
+              data['number']?.toString() ?? '',
+              data['tense']?.toString() ?? '',
+            ].where((value) => value.trim().isNotEmpty).join(' · ');
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: muted.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          data['title']?.toString().trim().isNotEmpty == true
+                              ? data['title'].toString()
+                              : word,
+                          style: DesignTokens.display(24).copyWith(color: text),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(CupertinoIcons.xmark, color: muted),
                       ),
                     ],
                   ),
-                ),
+                  Text(
+                    translation,
+                    style: DesignTokens.body(15).copyWith(color: muted),
+                  ),
+                  if (metadata.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      metadata,
+                      style: DesignTokens.mono(11).copyWith(color: accent),
+                    ),
+                  ],
+                  if ((data['summary']?.toString() ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      data['summary'].toString(),
+                      style: DesignTokens.body(
+                        14,
+                      ).copyWith(color: text, height: 1.4),
+                    ),
+                  ],
+                  if (conjugation.isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    Text(
+                      'CONJUGATION',
+                      style: DesignTokens.mono(
+                        10.5,
+                        weight: FontWeight.w800,
+                      ).copyWith(color: accent, letterSpacing: 0.8),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: muted.withValues(alpha: 0.4)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < conjugation.length; i++)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: i.isEven
+                                    ? muted.withValues(alpha: 0.06)
+                                    : Colors.transparent,
+                                border: i == conjugation.length - 1
+                                    ? null
+                                    : Border(
+                                        bottom: BorderSide(
+                                          color: muted.withValues(alpha: 0.2),
+                                        ),
+                                      ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      conjugation[i]['pronoun']?.toString() ??
+                                          '',
+                                      style: DesignTokens.body(
+                                        14,
+                                      ).copyWith(color: muted),
+                                    ),
+                                  ),
+                                  Text(
+                                    conjugation[i]['form']?.toString() ?? '',
+                                    style: DesignTokens.body(
+                                      14,
+                                      weight: FontWeight.w700,
+                                    ).copyWith(color: text),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -1796,85 +2031,6 @@ class _GrammarCueCard extends StatelessWidget {
                 color: DesignTokens.info,
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Retained as a compatibility component for any downstream screen that still
-// wants an inline mode switch; the story reader now exposes this choice only
-// from Story settings, matching the approved Readle-style layout.
-// ignore: unused_element
-class _ReadingModeToggle extends StatelessWidget {
-  const _ReadingModeToggle({
-    required this.mode,
-    required this.onChanged,
-    required this.darkMode,
-  });
-
-  final _StoryReadingMode mode;
-  final ValueChanged<_StoryReadingMode> onChanged;
-  final bool darkMode;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 46,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-        border: Border.all(
-          color: darkMode ? DesignTokens.nightHairline : DesignTokens.hairline,
-        ),
-      ),
-      child: Row(
-        children: [
-          _option(
-            label: 'Full story',
-            selected: mode == _StoryReadingMode.fullStory,
-            onTap: () => onChanged(_StoryReadingMode.fullStory),
-          ),
-          _option(
-            label: 'Sentences',
-            selected: mode == _StoryReadingMode.sentenceBySentence,
-            onTap: () => onChanged(_StoryReadingMode.sentenceBySentence),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _option({
-    required String label,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: DesignTokens.durationFast,
-          curve: DesignTokens.curveStandard,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected
-                ? (darkMode ? DesignTokens.nightAccent : DesignTokens.primary)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-          ),
-          child: Text(
-            label,
-            style: DesignTokens.body(12.5, weight: FontWeight.w600).copyWith(
-              color: selected
-                  ? (darkMode ? DesignTokens.nightCanvas : Colors.white)
-                  : (darkMode
-                        ? DesignTokens.nightMuted
-                        : DesignTokens.mutedDim),
-            ),
           ),
         ),
       ),
@@ -2220,7 +2376,6 @@ class _ReaderSettingsResult {
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
-    required this.readingMode,
   });
 
   final double textScale;
@@ -2230,7 +2385,6 @@ class _ReaderSettingsResult {
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
-  final _StoryReadingMode readingMode;
 }
 
 class _StorySettingsSheet extends StatefulWidget {
@@ -2242,7 +2396,6 @@ class _StorySettingsSheet extends StatefulWidget {
     required this.underlineWords,
     required this.autoPlayWordAudio,
     required this.darkMode,
-    required this.readingMode,
   });
 
   final double textScale;
@@ -2252,7 +2405,6 @@ class _StorySettingsSheet extends StatefulWidget {
   final bool underlineWords;
   final bool autoPlayWordAudio;
   final bool darkMode;
-  final _StoryReadingMode readingMode;
 
   @override
   State<_StorySettingsSheet> createState() => _StorySettingsSheetState();
@@ -2266,7 +2418,6 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
   late bool _underline = widget.underlineWords;
   late bool _autoPlay = widget.autoPlayWordAudio;
   late bool _dark = widget.darkMode;
-  late _StoryReadingMode _readingMode = widget.readingMode;
 
   void _close() => Navigator.of(context).pop(
     _ReaderSettingsResult(
@@ -2277,7 +2428,6 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
       underlineWords: _underline,
       autoPlayWordAudio: _autoPlay,
       darkMode: _dark,
-      readingMode: _readingMode,
     ),
   );
 
@@ -2348,39 +2498,6 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
                         ),
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              _settingLabel('Reading view', text),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: _choice(
-                      'Full story',
-                      _readingMode == _StoryReadingMode.fullStory,
-                      () => setState(
-                        () => _readingMode = _StoryReadingMode.fullStory,
-                      ),
-                      text,
-                      accent,
-                      muted,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _choice(
-                      'Sentence focus',
-                      _readingMode == _StoryReadingMode.sentenceBySentence,
-                      () => setState(
-                        () =>
-                            _readingMode = _StoryReadingMode.sentenceBySentence,
-                      ),
-                      text,
-                      accent,
-                      muted,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 18),
