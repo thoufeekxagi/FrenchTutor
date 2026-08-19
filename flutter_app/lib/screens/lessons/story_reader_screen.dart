@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -11,13 +12,13 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/session_settings.dart';
 import '../../widgets/story_cover_image.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/learning_card.dart';
-import '../../widgets/lesson_stage_rail.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/tts_play_button.dart';
@@ -105,6 +106,7 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
 
 class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     with WidgetsBindingObserver {
+  final SessionSettings _settings = SessionSettings.shared;
   // Story always leads, even for a grammar-practice session — the story is
   // the point, grammar is a cue card away, not the landing screen.
   _StoryTab _tab = _StoryTab.story;
@@ -113,6 +115,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
   double _rate = 0.42; // matches LessonSpeechService's own default "normal"
+  double _textScale = 1;
+  bool _translateSentences = true;
+  bool _underlineWords = true;
+  bool _autoPlayWordAudio = false;
+  bool _darkMode = true;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
   final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
@@ -197,6 +204,23 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       // this point in initState, only by the time a call actually connects.
       onUserTranscript: (text) => _recorder.logUser(text),
       onTutorTranscript: (text) => _recorder.logTutor(text),
+    );
+    _textScale = _settings.textScale;
+    _translateSentences = _settings.translateSentences;
+    _underlineWords = _settings.underlineWords;
+    _autoPlayWordAudio = _settings.autoPlayWordAudio;
+    _darkMode = _settings.darkMode;
+    unawaited(
+      _settings.load().then((_) {
+        if (!mounted) return;
+        setState(() {
+          _textScale = _settings.textScale;
+          _translateSentences = _settings.translateSentences;
+          _underlineWords = _settings.underlineWords;
+          _autoPlayWordAudio = _settings.autoPlayWordAudio;
+          _darkMode = _settings.darkMode;
+        });
+      }),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Story';
@@ -554,24 +578,65 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     setState(() => _rate = _rate <= 0.36 ? 0.55 : 0.32);
   }
 
+  Future<void> _showSettings() async {
+    final result = await showModalBottomSheet<_ReaderSettingsResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _StorySettingsSheet(
+        textScale: _textScale,
+        rate: _rate,
+        translateSentences: _translateSentences,
+        underlineWords: _underlineWords,
+        autoPlayWordAudio: _autoPlayWordAudio,
+        darkMode: _darkMode,
+      ),
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _textScale = result.textScale;
+      _rate = result.rate;
+      _translateSentences = result.translateSentences;
+      _underlineWords = result.underlineWords;
+      _autoPlayWordAudio = result.autoPlayWordAudio;
+      _darkMode = result.darkMode;
+    });
+    unawaited(_settings.setTextScale(_textScale));
+    unawaited(_settings.setTranslateSentences(_translateSentences));
+    unawaited(_settings.setUnderlineWords(_underlineWords));
+    unawaited(_settings.setAutoPlayWordAudio(_autoPlayWordAudio));
+    unawaited(_settings.setDarkMode(_darkMode));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.canvas,
+      backgroundColor: _darkMode
+          ? DesignTokens.nightCanvas
+          : DesignTokens.canvas,
       appBar: AppBar(
         title: Text(
           _passage.displayTitle,
-          style: DesignTokens.display(16),
+          style: DesignTokens.display(16).copyWith(
+            color: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: DesignTokens.canvas,
-        foregroundColor: DesignTokens.ink,
+        backgroundColor: _darkMode
+            ? DesignTokens.nightCanvas
+            : DesignTokens.canvas,
+        foregroundColor: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
           InlineCallActions(controller: _call),
           ReportProblemButton(sessionType: 'Story: ${_passage.displayTitle}'),
+          IconButton(
+            onPressed: _showSettings,
+            tooltip: 'Story settings',
+            icon: const Icon(CupertinoIcons.slider_horizontal_3),
+          ),
         ],
       ),
       body: WebConstrainedView(
@@ -590,7 +655,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: LessonStageRail(
+                  child: _StoryStageIsland(
                     labels: const ['Read', 'Words', 'Grammar', 'Quiz', 'Done'],
                     currentIndex: switch (_tab) {
                       _StoryTab.story => 0,
@@ -601,7 +666,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     onIndexTap: _goToStage,
                   ),
                 ),
-                Divider(height: 1, color: DesignTokens.hairline),
+                Divider(
+                  height: 1,
+                  color: _darkMode
+                      ? DesignTokens.nightHairline
+                      : DesignTokens.hairline,
+                ),
                 Expanded(
                   child: switch (_tab) {
                     _StoryTab.story => _storyView(),
@@ -617,25 +687,34 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     tabLabel: widget.grammarTabLabel,
                     onTap: () => setState(() => _tab = _StoryTab.grammar),
                   ),
-                if (_tab == _StoryTab.story)
-                  _AudioControlBar(
-                    isPlaying: _isPlaying,
-                    isLoading: _isLoadingAudio,
-                    rate: _rate,
-                    onTogglePlayPause: _togglePlayPause,
-                    onStop: _stop,
-                    onPlaySentence: _playSelectedSentence,
-                    onCycleRate: _cycleRate,
-                    onNext: _advanceTab,
-                    nextLabel: _nextTabLabel,
-                  )
-                else
-                  _StoryNextBar(
-                    label: _nextTabLabel,
-                    onPressed: _advanceTab,
-                    onBack: _retreatTab,
-                  ),
               ],
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 10,
+              child: SafeArea(
+                top: false,
+                child: _tab == _StoryTab.story
+                    ? _AudioControlBar(
+                        isPlaying: _isPlaying,
+                        isLoading: _isLoadingAudio,
+                        rate: _rate,
+                        onTogglePlayPause: _togglePlayPause,
+                        onStop: _stop,
+                        onPlaySentence: _playSelectedSentence,
+                        onCycleRate: _cycleRate,
+                        onNext: _advanceTab,
+                        nextLabel: _nextTabLabel,
+                        darkMode: _darkMode,
+                      )
+                    : _StoryNextBar(
+                        label: _nextTabLabel,
+                        onPressed: _advanceTab,
+                        onBack: _retreatTab,
+                        darkMode: _darkMode,
+                      ),
+              ),
             ),
             FloatingNotetakerOverlay(state: ref.watch(notetakerStateProvider)),
           ],
@@ -656,14 +735,36 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
   }
 
+  VocabEntry? _selectedWordEntry() {
+    final segmentIndex = _selectedWordSegment;
+    final wordIndex = _selectedWord;
+    if (segmentIndex == null || wordIndex == null) return null;
+    if (segmentIndex < 0 || segmentIndex >= _passage.segments.length) {
+      return null;
+    }
+    final words = _wordParts(_passage.segments[segmentIndex].fr);
+    if (wordIndex < 0 || wordIndex >= words.length) return null;
+    final selected = _foldStoryWord(words[wordIndex]);
+    for (final entry in _story.keywords) {
+      if (_wordParts(entry.fr).map(_foldStoryWord).contains(selected)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
   Widget _storyView() {
     final segments = _passage.segments;
 
     if (segments.isEmpty) {
       return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
         children: [
-          _StoryBookHeader(story: _story),
+          _StoryBookHeader(
+            story: _story,
+            darkMode: _darkMode,
+            selectedWord: _selectedWordEntry(),
+          ),
           const SizedBox(height: 18),
           ModernCard(
             padding: 20,
@@ -680,13 +781,18 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
     if (_readingMode == _StoryReadingMode.fullStory) {
       return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
         children: [
-          _StoryBookHeader(story: _story),
+          _StoryBookHeader(
+            story: _story,
+            darkMode: _darkMode,
+            selectedWord: _selectedWordEntry(),
+          ),
           const SizedBox(height: 14),
           _ReadingModeToggle(
             mode: _readingMode,
             onChanged: (mode) => setState(() => _readingMode = mode),
+            darkMode: _darkMode,
           ),
           const SizedBox(height: 14),
           Text(
@@ -702,13 +808,18 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 140),
       children: [
-        _StoryBookHeader(story: _story),
+        _StoryBookHeader(
+          story: _story,
+          darkMode: _darkMode,
+          selectedWord: _selectedWordEntry(),
+        ),
         const SizedBox(height: 14),
         _ReadingModeToggle(
           mode: _readingMode,
           onChanged: (mode) => setState(() => _readingMode = mode),
+          darkMode: _darkMode,
         ),
         const SizedBox(height: 14),
         Row(
@@ -799,8 +910,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           width: double.infinity,
           child: LearningCard(
             padding: 16,
-            color: DesignTokens.ink,
-            borderColor: DesignTokens.ink,
+            color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
+            borderColor: _darkMode
+                ? DesignTokens.nightHairline
+                : DesignTokens.hairline,
             child: Container(
               padding: isHighlighted
                   ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
@@ -821,7 +934,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       segment.characterFr!,
                       style: DesignTokens.mono(11, weight: FontWeight.w700)
                           .copyWith(
-                            color: DesignTokens.mutedDim,
+                            color: _darkMode
+                                ? DesignTokens.nightMuted
+                                : DesignTokens.mutedDim,
                             letterSpacing: 0.8,
                           ),
                     ),
@@ -830,14 +945,29 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   BilingualWordText(
                     source: segment.fr,
                     translation: segment.en,
-                    sourceStyle: DesignTokens.body(
-                      17,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: Colors.white, height: 1.4),
-                    translationStyle: DesignTokens.body(
-                      14.5,
-                    ).copyWith(color: Colors.white70, height: 1.4),
+                    sourceStyle:
+                        DesignTokens.body(
+                          17 * _textScale,
+                          weight: FontWeight.w600,
+                        ).copyWith(
+                          color: _darkMode
+                              ? DesignTokens.nightText
+                              : DesignTokens.ink,
+                          height: 1.4,
+                        ),
+                    translationStyle: DesignTokens.body(14.5 * _textScale)
+                        .copyWith(
+                          color: _darkMode
+                              ? DesignTokens.nightMuted
+                              : DesignTokens.mutedDim,
+                          height: 1.4,
+                        ),
                     keywords: _story.keywords,
+                    showTranslation: _translateSentences,
+                    underlineSelected: _underlineWords,
+                    accentColor: _darkMode
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.primary,
                     selectedSourceWord: selectedWord,
                     playbackSourceWord: isPlayingNow ? _currentWord : null,
                     playbackTranslationWord: isPlayingNow
@@ -872,10 +1002,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       return const _ComingSoon(label: 'Grammar');
     }
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
       children: [
         if (explanation != null) ...[
-          _GrammarExplanationCard(explanation: explanation),
+          _GrammarExplanationCard(
+            explanation: explanation,
+            darkMode: _darkMode,
+          ),
           const SizedBox(height: 20),
           if (points.isNotEmpty)
             Text(
@@ -889,7 +1022,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         ],
         for (var i = 0; i < points.length; i++) ...[
           if (i > 0) const SizedBox(height: 14),
-          ModernCard(
+          LearningCard(
+            padding: 16,
+            color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
+            borderColor: _darkMode
+                ? DesignTokens.nightHairline
+                : DesignTokens.hairline,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -900,7 +1038,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                         'From this story',
                         style: DesignTokens.mono(10.5, weight: FontWeight.w700)
                             .copyWith(
-                              color: DesignTokens.primary,
+                              color: _darkMode
+                                  ? DesignTokens.nightAccent
+                                  : DesignTokens.primary,
                               letterSpacing: 0.8,
                             ),
                       ),
@@ -919,32 +1059,45 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                 const SizedBox(height: 8),
                 Text(
                   points[i].fr,
-                  style: DesignTokens.body(15, weight: FontWeight.w600),
+                  style: DesignTokens.body(15, weight: FontWeight.w600)
+                      .copyWith(
+                        color: _darkMode
+                            ? DesignTokens.nightText
+                            : DesignTokens.ink,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   points[i].grammarNote,
-                  style: DesignTokens.body(
-                    13.5,
-                  ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                  style: DesignTokens.body(13.5).copyWith(
+                    color: _darkMode
+                        ? DesignTokens.nightMuted
+                        : DesignTokens.inkSoft,
+                    height: 1.4,
+                  ),
                 ),
                 if (points[i].pronunciationTip.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         CupertinoIcons.waveform,
                         size: 15,
-                        color: DesignTokens.mutedDim,
+                        color: _darkMode
+                            ? DesignTokens.nightMuted
+                            : DesignTokens.mutedDim,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           points[i].pronunciationTip,
-                          style: DesignTokens.body(
-                            12.5,
-                          ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
+                          style: DesignTokens.body(12.5).copyWith(
+                            color: _darkMode
+                                ? DesignTokens.nightMuted
+                                : DesignTokens.mutedDim,
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     ],
@@ -964,7 +1117,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       return _ComingSoon(label: 'Quiz', generating: _enriching);
     }
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
       itemCount: quiz.length,
       separatorBuilder: (_, _) => const SizedBox(height: 14),
       itemBuilder: (context, index) => _quizCard(index, quiz[index]),
@@ -977,21 +1130,31 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       'A1' || 'A2' => true,
       _ => false,
     };
-    return ModernCard(
+    return LearningCard(
+      padding: 16,
+      color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
+      borderColor: _darkMode
+          ? DesignTokens.nightHairline
+          : DesignTokens.hairline,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             question.q,
-            style: DesignTokens.body(15, weight: FontWeight.w600),
+            style: DesignTokens.body(15, weight: FontWeight.w600).copyWith(
+              color: _darkMode ? DesignTokens.nightText : DesignTokens.ink,
+            ),
           ),
           if (beginnerSupport && question.qEn != null) ...[
             const SizedBox(height: 4),
             Text(
               question.qEn!,
-              style: DesignTokens.body(
-                13,
-              ).copyWith(color: DesignTokens.mutedDim, height: 1.3),
+              style: DesignTokens.body(13).copyWith(
+                color: _darkMode
+                    ? DesignTokens.nightMuted
+                    : DesignTokens.mutedDim,
+                height: 1.3,
+              ),
             ),
           ],
           const SizedBox(height: 12),
@@ -1009,7 +1172,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     vertical: 11,
                   ),
                   decoration: BoxDecoration(
-                    color: DesignTokens.canvasDim,
+                    color: _darkMode
+                        ? DesignTokens.nightSurfaceRaised
+                        : DesignTokens.canvasDim,
                     borderRadius: BorderRadius.circular(
                       DesignTokens.radiusMedium,
                     ),
@@ -1022,7 +1187,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                           children: [
                             Text(
                               question.choices[ci],
-                              style: DesignTokens.body(13.5),
+                              style: DesignTokens.body(13.5).copyWith(
+                                color: _darkMode
+                                    ? DesignTokens.nightText
+                                    : DesignTokens.ink,
+                              ),
                             ),
                             if (beginnerSupport &&
                                 question.choicesEn != null &&
@@ -1030,9 +1199,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                               const SizedBox(height: 2),
                               Text(
                                 question.choicesEn![ci],
-                                style: DesignTokens.body(
-                                  11.5,
-                                ).copyWith(color: DesignTokens.mutedDim),
+                                style: DesignTokens.body(11.5).copyWith(
+                                  color: _darkMode
+                                      ? DesignTokens.nightMuted
+                                      : DesignTokens.mutedDim,
+                                ),
                               ),
                             ],
                           ],
@@ -1068,7 +1239,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       return _ComingSoon(label: 'Keywords', generating: _enriching);
     }
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
       itemCount: keywords.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
@@ -1077,7 +1248,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           entry.id,
           GlobalKey<TtsPlayButtonState>.new,
         );
-        return ModernCard(
+        return LearningCard(
+          padding: 16,
+          color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
+          borderColor: _darkMode
+              ? DesignTokens.nightHairline
+              : DesignTokens.hairline,
           child: Semantics(
             button: true,
             label: 'Play pronunciation for ${entry.fr}',
@@ -1094,15 +1270,22 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       children: [
                         Text(
                           entry.fr,
-                          style: DesignTokens.body(15, weight: FontWeight.w600),
+                          style: DesignTokens.body(15, weight: FontWeight.w600)
+                              .copyWith(
+                                color: _darkMode
+                                    ? DesignTokens.nightText
+                                    : DesignTokens.ink,
+                              ),
                         ),
                         if (entry.phonetic.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             entry.phonetic,
-                            style: DesignTokens.mono(
-                              11,
-                            ).copyWith(color: DesignTokens.mutedDim),
+                            style: DesignTokens.mono(11).copyWith(
+                              color: _darkMode
+                                  ? DesignTokens.nightMuted
+                                  : DesignTokens.mutedDim,
+                            ),
                           ),
                         ],
                       ],
@@ -1113,9 +1296,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     flex: 2,
                     child: Text(
                       entry.en,
-                      style: DesignTokens.body(
-                        13.5,
-                      ).copyWith(color: DesignTokens.primary),
+                      style: DesignTokens.body(13.5).copyWith(
+                        color: _darkMode
+                            ? DesignTokens.nightAccent
+                            : DesignTokens.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1133,7 +1318,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       },
                       size: DesignTokens.minTapTarget,
                       iconSize: 20,
-                      color: DesignTokens.primary,
+                      color: _darkMode
+                          ? DesignTokens.nightAccent
+                          : DesignTokens.primary,
                     ),
                   ),
                 ],
@@ -1162,67 +1349,119 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 }
 
 class _StoryBookHeader extends StatelessWidget {
-  const _StoryBookHeader({required this.story});
+  const _StoryBookHeader({
+    required this.story,
+    required this.darkMode,
+    this.selectedWord,
+  });
 
   final GeneratedStory story;
+  final bool darkMode;
+  final VocabEntry? selectedWord;
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
-      padding: 0,
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       child: SizedBox(
-        height: 168,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 112,
-                height: 168,
-                child: StoryCoverImage(
-                  title: story.title,
-                  source: story.coverUrl,
+        height: 238,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            StoryCoverImage(title: story.title, source: story.coverUrl),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.08),
+                    Colors.black.withValues(alpha: 0.9),
+                  ],
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+            ),
+            if (selectedWord != null)
+              Positioned(
+                top: 14,
+                right: 14,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 180),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.94),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${story.levelBand}  •  ${story.readTimeMinutes} min read',
-                        style: DesignTokens.mono(10, weight: FontWeight.w700)
+                        selectedWord!.fr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.body(14, weight: FontWeight.w800)
                             .copyWith(
-                              color: DesignTokens.primary,
-                              letterSpacing: 0.6,
+                              color: darkMode
+                                  ? DesignTokens.nightCanvas
+                                  : Colors.white,
                             ),
                       ),
-                      const SizedBox(height: 8),
                       Text(
-                        story.displayTitle,
-                        maxLines: 3,
+                        selectedWord!.en,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.display(19),
-                      ),
-                      if (story.summary.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          story.summary,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: DesignTokens.body(
-                            12.5,
-                          ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                        style: DesignTokens.body(11).copyWith(
+                          color:
+                              (darkMode
+                                      ? DesignTokens.nightCanvas
+                                      : Colors.white)
+                                  .withValues(alpha: 0.78),
                         ),
-                      ],
+                      ),
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${story.levelBand}  •  ${story.readTimeMinutes} min read',
+                    style: DesignTokens.mono(
+                      10,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: accent, letterSpacing: 0.6),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    story.displayTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.display(24).copyWith(color: text),
+                  ),
+                  if (story.summary.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      story.summary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(12).copyWith(color: muted),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1240,30 +1479,48 @@ class _StoryBookHeader extends StatelessWidget {
 /// story existed (see `LessonAgentService.buildGrammarExplanation`). Shown
 /// at the top of the Grammar tab, above the per-sentence story notes.
 class _GrammarExplanationCard extends StatelessWidget {
-  const _GrammarExplanationCard({required this.explanation});
+  const _GrammarExplanationCard({
+    required this.explanation,
+    required this.darkMode,
+  });
 
   final GrammarExplanation explanation;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return LearningCard(
+      padding: 16,
+      color: darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
+      borderColor: darkMode
+          ? DesignTokens.nightHairline
+          : DesignTokens.hairline,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             explanation.title,
-            style: DesignTokens.display(20, weight: FontWeight.w600),
+            style: DesignTokens.display(
+              20,
+              weight: FontWeight.w600,
+            ).copyWith(color: text),
           ),
           const SizedBox(height: 8),
           Text(
             explanation.summary,
-            style: DesignTokens.body(14).copyWith(height: 1.45),
+            style: DesignTokens.body(14).copyWith(color: text, height: 1.45),
           ),
           if (explanation.usage.isNotEmpty) ...[
             const SizedBox(height: 14),
             Text(
               'Usage',
-              style: DesignTokens.body(13, weight: FontWeight.w600),
+              style: DesignTokens.body(
+                13,
+                weight: FontWeight.w600,
+              ).copyWith(color: text),
             ),
             const SizedBox(height: 6),
             for (final rule in explanation.usage)
@@ -1272,14 +1529,13 @@ class _GrammarExplanationCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '•  ',
-                      style: TextStyle(color: DesignTokens.info, fontSize: 13),
-                    ),
+                    Text('•  ', style: TextStyle(color: accent, fontSize: 13)),
                     Expanded(
                       child: Text(
                         rule,
-                        style: DesignTokens.body(13.5).copyWith(height: 1.4),
+                        style: DesignTokens.body(
+                          13.5,
+                        ).copyWith(color: text, height: 1.4),
                       ),
                     ),
                   ],
@@ -1292,7 +1548,9 @@ class _GrammarExplanationCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: DesignTokens.infoSoft,
+                color: darkMode
+                    ? DesignTokens.nightAccentSoft
+                    : DesignTokens.infoSoft,
                 borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
               ),
               child: Column(
@@ -1303,14 +1561,14 @@ class _GrammarExplanationCard extends StatelessWidget {
                     style: DesignTokens.body(
                       12.5,
                       weight: FontWeight.w600,
-                    ).copyWith(color: DesignTokens.info),
+                    ).copyWith(color: accent),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     explanation.tenseContrast,
                     style: DesignTokens.body(
                       13,
-                    ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                    ).copyWith(color: muted, height: 1.4),
                   ),
                 ],
               ),
@@ -1320,13 +1578,16 @@ class _GrammarExplanationCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Conjugation',
-              style: DesignTokens.body(13, weight: FontWeight.w600),
+              style: DesignTokens.body(
+                13,
+                weight: FontWeight.w600,
+              ).copyWith(color: text),
             ),
             const SizedBox(height: 8),
             for (final conj in explanation.conjugations)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: _ConjugationTable(conjugation: conj),
+                child: _ConjugationTable(conjugation: conj, darkMode: darkMode),
               ),
           ],
           if (explanation.examples.isNotEmpty) ...[
@@ -1344,13 +1605,14 @@ class _GrammarExplanationCard extends StatelessWidget {
                   children: [
                     Text(
                       ex.fr,
-                      style: DesignTokens.body(14, weight: FontWeight.w600),
+                      style: DesignTokens.body(
+                        14,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: text),
                     ),
                     Text(
                       ex.en,
-                      style: DesignTokens.body(
-                        12.5,
-                      ).copyWith(color: DesignTokens.mutedDim),
+                      style: DesignTokens.body(12.5).copyWith(color: muted),
                     ),
                   ],
                 ),
@@ -1363,9 +1625,10 @@ class _GrammarExplanationCard extends StatelessWidget {
 }
 
 class _ConjugationTable extends StatelessWidget {
-  const _ConjugationTable({required this.conjugation});
+  const _ConjugationTable({required this.conjugation, required this.darkMode});
 
   final Conjugation conjugation;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -1373,7 +1636,9 @@ class _ConjugationTable extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: DesignTokens.canvasDim,
+        color: darkMode
+            ? DesignTokens.nightSurfaceRaised
+            : DesignTokens.canvasDim,
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
       ),
       child: Column(
@@ -1394,10 +1659,12 @@ class _ConjugationTable extends StatelessWidget {
                 ),
                 child: Text(
                   conjugation.group,
-                  style: DesignTokens.mono(
-                    9.5,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.info),
+                  style: DesignTokens.mono(9.5, weight: FontWeight.w500)
+                      .copyWith(
+                        color: darkMode
+                            ? DesignTokens.nightAccent
+                            : DesignTokens.info,
+                      ),
                 ),
               ),
             ],
@@ -1412,14 +1679,21 @@ class _ConjugationTable extends StatelessWidget {
                     width: 64,
                     child: Text(
                       row.pronoun,
-                      style: DesignTokens.body(
-                        13,
-                      ).copyWith(color: DesignTokens.mutedDim),
+                      style: DesignTokens.body(13).copyWith(
+                        color: darkMode
+                            ? DesignTokens.nightMuted
+                            : DesignTokens.mutedDim,
+                      ),
                     ),
                   ),
                   Text(
                     row.form,
-                    style: DesignTokens.body(13, weight: FontWeight.w500),
+                    style: DesignTokens.body(13, weight: FontWeight.w500)
+                        .copyWith(
+                          color: darkMode
+                              ? DesignTokens.nightText
+                              : DesignTokens.ink,
+                        ),
                   ),
                 ],
               ),
@@ -1488,10 +1762,15 @@ class _GrammarCueCard extends StatelessWidget {
 }
 
 class _ReadingModeToggle extends StatelessWidget {
-  const _ReadingModeToggle({required this.mode, required this.onChanged});
+  const _ReadingModeToggle({
+    required this.mode,
+    required this.onChanged,
+    required this.darkMode,
+  });
 
   final _StoryReadingMode mode;
   final ValueChanged<_StoryReadingMode> onChanged;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -1499,9 +1778,11 @@ class _ReadingModeToggle extends StatelessWidget {
       height: 46,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: DesignTokens.surface,
+        color: darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
         borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-        border: Border.all(color: DesignTokens.hairline),
+        border: Border.all(
+          color: darkMode ? DesignTokens.nightHairline : DesignTokens.hairline,
+        ),
       ),
       child: Row(
         children: [
@@ -1534,15 +1815,20 @@ class _ReadingModeToggle extends StatelessWidget {
           curve: DesignTokens.curveStandard,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? DesignTokens.primary : Colors.transparent,
+            color: selected
+                ? (darkMode ? DesignTokens.nightAccent : DesignTokens.primary)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
           ),
           child: Text(
             label,
-            style: DesignTokens.body(
-              12.5,
-              weight: FontWeight.w600,
-            ).copyWith(color: selected ? Colors.white : DesignTokens.mutedDim),
+            style: DesignTokens.body(12.5, weight: FontWeight.w600).copyWith(
+              color: selected
+                  ? (darkMode ? DesignTokens.nightCanvas : Colors.white)
+                  : (darkMode
+                        ? DesignTokens.nightMuted
+                        : DesignTokens.mutedDim),
+            ),
           ),
         ),
       ),
@@ -1566,6 +1852,84 @@ int? _mappedTranslationWord({
 List<String> _wordParts(String text) =>
     text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
 
+String _foldStoryWord(String value) => value
+    .toLowerCase()
+    .replaceAll(RegExp(r"[.,!?;:«»'()…]"), '')
+    .replaceAll('"', '')
+    .replaceAll('-', ' ')
+    .replaceAll('à', 'a')
+    .replaceAll('â', 'a')
+    .replaceAll('ä', 'a')
+    .replaceAll('é', 'e')
+    .replaceAll('è', 'e')
+    .replaceAll('ê', 'e')
+    .replaceAll('ë', 'e')
+    .replaceAll('î', 'i')
+    .replaceAll('ï', 'i')
+    .replaceAll('ô', 'o')
+    .replaceAll('ö', 'o')
+    .replaceAll('ù', 'u')
+    .replaceAll('û', 'u')
+    .replaceAll('ü', 'u')
+    .replaceAll('ç', 'c')
+    .trim();
+
+class _StoryStageIsland extends StatelessWidget {
+  const _StoryStageIsland({
+    required this.labels,
+    required this.currentIndex,
+    required this.onIndexTap,
+  });
+
+  final List<String> labels;
+  final int currentIndex;
+  final ValueChanged<int> onIndexTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Row(
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onIndexTap(i),
+                child: AnimatedContainer(
+                  duration: DesignTokens.durationFast,
+                  curve: DesignTokens.curveStandard,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: i == currentIndex
+                        ? DesignTokens.nightAccent
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Text(
+                    labels[i],
+                    style: DesignTokens.body(12, weight: FontWeight.w700)
+                        .copyWith(
+                          color: i == currentIndex
+                              ? DesignTokens.nightCanvas
+                              : DesignTokens.nightMuted,
+                        ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AudioControlBar extends StatelessWidget {
   const _AudioControlBar({
     required this.isPlaying,
@@ -1577,6 +1941,7 @@ class _AudioControlBar extends StatelessWidget {
     required this.onCycleRate,
     required this.onNext,
     required this.nextLabel,
+    required this.darkMode,
   });
 
   final bool isPlaying;
@@ -1588,95 +1953,82 @@ class _AudioControlBar extends StatelessWidget {
   final VoidCallback onCycleRate;
   final VoidCallback onNext;
   final String nextLabel;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        boxShadow: [
-          BoxShadow(
-            color: DesignTokens.ink.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+    final surface = darkMode ? DesignTokens.nightSurface : Colors.white;
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: surface.withValues(alpha: 0.86),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: muted.withValues(alpha: 0.22)),
           ),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _circleButton(
+                icon: isPlaying
+                    ? CupertinoIcons.pause_fill
+                    : CupertinoIcons.play_fill,
+                loading: isLoading,
+                color: accent,
+                iconColor: darkMode ? DesignTokens.nightCanvas : Colors.white,
+                onTap: isLoading ? () {} : onTogglePlayPause,
+              ),
+              _separator(muted),
+              _compactAction(
+                label: rate <= 0.36
+                    ? '.75x'
+                    : rate >= 0.5
+                    ? '1.25x'
+                    : '1x',
+                color: text,
+                onTap: onCycleRate,
+              ),
+              _separator(muted),
+              _compactAction(label: '↻', color: text, onTap: onPlaySentence),
+              _separator(muted),
+              _compactAction(label: nextLabel, color: accent, onTap: onNext),
+            ],
+          ),
+        ),
       ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            _circleButton(
-              icon: isPlaying
-                  ? CupertinoIcons.pause_fill
-                  : CupertinoIcons.play_fill,
-              loading: isLoading,
-              onTap: isLoading ? () {} : onTogglePlayPause,
-            ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: onCycleRate,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: DesignTokens.primary,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  rate <= 0.36 ? '.75x' : '1x',
-                  style: DesignTokens.body(
-                    11,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: Colors.white),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            _circleButton(icon: CupertinoIcons.stop_fill, onTap: onStop),
-            const SizedBox(width: 8),
-            Expanded(
-              child: TextButton.icon(
-                onPressed: onPlaySentence,
-                icon: const Icon(
-                  CupertinoIcons.play_circle,
-                  size: 18,
-                  color: DesignTokens.primary,
-                ),
-                label: Text(
-                  'sentence',
-                  style: DesignTokens.body(
-                    12.5,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: DesignTokens.primary),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DesignTokens.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-                ),
-              ),
-              child: Text(
-                nextLabel,
-                style: DesignTokens.body(
-                  13.5,
-                  weight: FontWeight.w600,
-                ).copyWith(color: Colors.white),
-              ),
-            ),
-          ],
+    );
+  }
+
+  Widget _separator(Color color) => Container(
+    width: 1,
+    height: 24,
+    margin: const EdgeInsets.symmetric(horizontal: 6),
+    color: color.withValues(alpha: 0.2),
+  );
+
+  Widget _compactAction({
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Text(
+          label,
+          style: DesignTokens.body(
+            12,
+            weight: FontWeight.w700,
+          ).copyWith(color: color),
         ),
       ),
     );
@@ -1684,6 +2036,8 @@ class _AudioControlBar extends StatelessWidget {
 
   Widget _circleButton({
     required IconData icon,
+    required Color color,
+    required Color iconColor,
     required VoidCallback onTap,
     bool loading = false,
   }) {
@@ -1694,24 +2048,20 @@ class _AudioControlBar extends StatelessWidget {
         height: 48,
         child: Stack(
           alignment: Alignment.center,
-          clipBehavior: Clip.none,
           children: [
             Container(
               width: 40,
               height: 40,
-              decoration: const BoxDecoration(
-                color: DesignTokens.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: Colors.white, size: 18),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: Icon(icon, color: iconColor, size: 17),
             ),
             if (loading)
-              const Positioned.fill(
+              Positioned.fill(
                 child: Padding(
-                  padding: EdgeInsets.all(1),
+                  padding: const EdgeInsets.all(1),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
+                    valueColor: AlwaysStoppedAnimation(color),
                   ),
                 ),
               ),
@@ -1727,79 +2077,331 @@ class _StoryNextBar extends StatelessWidget {
     required this.label,
     required this.onPressed,
     required this.onBack,
+    required this.darkMode,
   });
 
   final String label;
   final VoidCallback onPressed;
   final VoidCallback onBack;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        boxShadow: [
-          BoxShadow(
-            color: DesignTokens.ink.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+    final surface = darkMode ? DesignTokens.nightSurface : Colors.white;
+    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
+    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: surface.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: accent.withValues(alpha: 0.3)),
           ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            OutlinedButton.icon(
-              onPressed: onBack,
-              icon: const Icon(CupertinoIcons.arrow_left, size: 16),
-              label: Text(
-                'Back',
-                style: DesignTokens.body(13.5, weight: FontWeight.w700),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: onBack,
+                icon: Icon(CupertinoIcons.arrow_left, color: text),
               ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: DesignTokens.ink,
-                side: BorderSide(color: DesignTokens.hairline),
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+              Expanded(
+                child: Text(
+                  'Next: $label',
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: text),
                 ),
               ),
-            ),
-            const Spacer(),
-            ElevatedButton.icon(
-              onPressed: onPressed,
-              icon: const Icon(CupertinoIcons.arrow_right, size: 16),
-              label: Text(
-                'Next: $label',
-                style: DesignTokens.body(
-                  13.5,
-                  weight: FontWeight.w700,
-                ).copyWith(color: Colors.white),
+              IconButton(
+                onPressed: onPressed,
+                icon: Icon(CupertinoIcons.arrow_right, color: accent),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DesignTokens.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+class _ReaderSettingsResult {
+  const _ReaderSettingsResult({
+    required this.textScale,
+    required this.rate,
+    required this.translateSentences,
+    required this.underlineWords,
+    required this.autoPlayWordAudio,
+    required this.darkMode,
+  });
+
+  final double textScale;
+  final double rate;
+  final bool translateSentences;
+  final bool underlineWords;
+  final bool autoPlayWordAudio;
+  final bool darkMode;
+}
+
+class _StorySettingsSheet extends StatefulWidget {
+  const _StorySettingsSheet({
+    required this.textScale,
+    required this.rate,
+    required this.translateSentences,
+    required this.underlineWords,
+    required this.autoPlayWordAudio,
+    required this.darkMode,
+  });
+
+  final double textScale;
+  final double rate;
+  final bool translateSentences;
+  final bool underlineWords;
+  final bool autoPlayWordAudio;
+  final bool darkMode;
+
+  @override
+  State<_StorySettingsSheet> createState() => _StorySettingsSheetState();
+}
+
+class _StorySettingsSheetState extends State<_StorySettingsSheet> {
+  late double _textScale = widget.textScale;
+  late double _rate = widget.rate;
+  late bool _translate = widget.translateSentences;
+  late bool _underline = widget.underlineWords;
+  late bool _autoPlay = widget.autoPlayWordAudio;
+  late bool _dark = widget.darkMode;
+
+  void _close() => Navigator.of(context).pop(
+    _ReaderSettingsResult(
+      textScale: _textScale,
+      rate: _rate,
+      translateSentences: _translate,
+      underlineWords: _underline,
+      autoPlayWordAudio: _autoPlay,
+      darkMode: _dark,
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = _dark ? DesignTokens.nightSurfaceRaised : Colors.white;
+    final text = _dark ? DesignTokens.nightText : DesignTokens.ink;
+    final muted = _dark ? DesignTokens.nightMuted : DesignTokens.mutedDim;
+    final accent = _dark ? DesignTokens.nightAccent : DesignTokens.primary;
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: accent.withValues(alpha: 0.25)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: muted.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Story settings',
+                      style: DesignTokens.display(24).copyWith(color: text),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _close,
+                    icon: Icon(CupertinoIcons.xmark, color: muted),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _settingLabel('Text size', text),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  for (final option in [
+                    (0.9, 'Small'),
+                    (1.0, 'Medium'),
+                    (1.25, 'Large'),
+                  ])
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _choice(
+                          option.$2,
+                          _textScale == option.$1,
+                          () => setState(() => _textScale = option.$1),
+                          text,
+                          accent,
+                          muted,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              _settingLabel('Playback speed', text),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  for (final option in [
+                    (0.32, '0.75×'),
+                    (0.42, '1.00×'),
+                    (0.55, '1.25×'),
+                  ])
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _choice(
+                          option.$2,
+                          _rate == option.$1,
+                          () => setState(() => _rate = option.$1),
+                          text,
+                          accent,
+                          muted,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _switchRow(
+                'Translate sentences',
+                'Show the English line under French.',
+                _translate,
+                (v) => setState(() => _translate = v),
+                text,
+                muted,
+                accent,
+              ),
+              _switchRow(
+                'Underline words',
+                'Keep vocabulary cues visible in the story.',
+                _underline,
+                (v) => setState(() => _underline = v),
+                text,
+                muted,
+                accent,
+              ),
+              _switchRow(
+                'Auto-play word audio',
+                'Play a word when it is selected.',
+                _autoPlay,
+                (v) => setState(() => _autoPlay = v),
+                text,
+                muted,
+                accent,
+              ),
+              _switchRow(
+                'Dark mode',
+                'Use the focused dark reading canvas.',
+                _dark,
+                (v) => setState(() => _dark = v),
+                text,
+                muted,
+                accent,
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _close,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: _dark
+                        ? DesignTokens.nightCanvas
+                        : Colors.white,
+                  ),
+                  child: const Text('Done'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _settingLabel(String label, Color color) => Text(
+    label,
+    style: DesignTokens.body(
+      14,
+      weight: FontWeight.w700,
+    ).copyWith(color: color),
+  );
+
+  Widget _choice(
+    String label,
+    bool selected,
+    VoidCallback onTap,
+    Color text,
+    Color accent,
+    Color muted,
+  ) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: selected ? accent.withValues(alpha: 0.14) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: selected ? accent : muted.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Text(
+        label,
+        style: DesignTokens.body(
+          12,
+          weight: FontWeight.w700,
+        ).copyWith(color: selected ? accent : text),
+      ),
+    ),
+  );
+
+  Widget _switchRow(
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+    Color text,
+    Color muted,
+    Color accent,
+  ) => SwitchListTile.adaptive(
+    contentPadding: EdgeInsets.zero,
+    title: Text(
+      title,
+      style: DesignTokens.body(
+        14,
+        weight: FontWeight.w600,
+      ).copyWith(color: text),
+    ),
+    subtitle: Text(
+      subtitle,
+      style: DesignTokens.body(11.5).copyWith(color: muted),
+    ),
+    value: value,
+    activeThumbColor: accent,
+    onChanged: onChanged,
+  );
 }
 
 class _ComingSoon extends StatelessWidget {

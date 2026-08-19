@@ -22,6 +22,8 @@ class BilingualWordText extends StatelessWidget {
     this.playbackSourceWord,
     this.accentColor = DesignTokens.mastery,
     this.playbackTranslationWord,
+    this.showTranslation = true,
+    this.underlineSelected = true,
   });
 
   final String source;
@@ -34,6 +36,8 @@ class BilingualWordText extends StatelessWidget {
   final int? playbackSourceWord;
   final int? playbackTranslationWord;
   final Color accentColor;
+  final bool showTranslation;
+  final bool underlineSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +80,7 @@ class BilingualWordText extends StatelessWidget {
                 ),
             ],
           ),
-          if (translationWords.isNotEmpty) ...[
+          if (showTranslation && translationWords.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 0,
@@ -108,7 +112,9 @@ class BilingualWordText extends StatelessWidget {
       return base.copyWith(
         color: accentColor,
         backgroundColor: accentColor.withValues(alpha: selected ? 0.14 : 0.1),
-        decoration: TextDecoration.underline,
+        decoration: underlineSelected
+            ? TextDecoration.underline
+            : TextDecoration.none,
         decorationColor: accentColor,
         decorationThickness: 1.5,
       );

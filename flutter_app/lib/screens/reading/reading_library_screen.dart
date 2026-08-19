@@ -12,11 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
-import '../../widgets/kicker_text.dart';
 import '../../widgets/personalized_generation_loader.dart';
-import '../../widgets/passeport_card.dart';
-import '../../widgets/practice_content_card.dart';
-import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
@@ -258,7 +254,11 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
   }
 
   void _open(GeneratedStory story) {
-    AppRouter.push(context, (_) => StoryReaderScreen(story: story));
+    AppRouter.push(
+      context,
+      (_) => StoryReaderScreen(story: story),
+      fullscreenDialog: true,
+    );
   }
 
   @override
@@ -270,17 +270,31 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
-        title: Text('Reading', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvasDim,
+        leading: const BackButton(color: DesignTokens.nightText),
+        title: Text(
+          'Reading',
+          style: DesignTokens.display(
+            21,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+        backgroundColor: DesignTokens.nightCanvas,
+        foregroundColor: DesignTokens.nightText,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
       body: WebConstrainedView(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
           children: [
+            Text(
+              'Stories matched to your level',
+              style: DesignTokens.body(
+                13,
+              ).copyWith(color: DesignTokens.nightMuted),
+            ),
+            const SizedBox(height: 18),
             if (_generating)
               const PersonalizedGenerationLoader(
                 content: 'reading story',
@@ -293,7 +307,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                 selectedTopic: _selectedTopic,
                 onTap: _generate,
               ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             SizedBox(
               height: 36,
               child: ListView.separated(
@@ -311,9 +325,16 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: selected ? DesignTokens.primary : Colors.white,
+                        color: selected
+                            ? DesignTokens.nightAccentSoft
+                            : DesignTokens.nightSurface,
                         borderRadius: BorderRadius.circular(
                           DesignTokens.radiusPill,
+                        ),
+                        border: Border.all(
+                          color: selected
+                              ? DesignTokens.nightAccent
+                              : DesignTokens.nightHairline,
                         ),
                       ),
                       child: Text(
@@ -321,8 +342,8 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                         style: DesignTokens.body(12.5, weight: FontWeight.w600)
                             .copyWith(
                               color: selected
-                                  ? Colors.white
-                                  : DesignTokens.mutedDim,
+                                  ? DesignTokens.nightAccent
+                                  : DesignTokens.nightMuted,
                             ),
                       ),
                     ),
@@ -336,47 +357,54 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                 onTap: () => _open(stories.first),
                 child: _ContinueReadingCard(story: stories.first),
               ),
-              const SizedBox(height: 24),
-              const KickerText(
-                'Your short books',
-                color: DesignTokens.mutedDim,
+              const SizedBox(height: 28),
+              Text(
+                'Previous stories',
+                style: DesignTokens.display(
+                  19,
+                ).copyWith(color: DesignTokens.nightText),
               ),
-              const SizedBox(height: 10),
-              ResponsiveCardGrid(
-                itemCount: stories.length,
-                maxCardWidth: 158,
-                mainAxisExtent: 292,
-                itemBuilder: (context, index) => _ReadingBookCard(
-                  story: stories[index],
-                  onTap: () => _open(stories[index]),
-                ),
-              ),
+              const SizedBox(height: 12),
+              for (final story in stories.skip(1)) ...[
+                _PreviousStoryRow(story: story, onTap: () => _open(story)),
+                const SizedBox(height: 12),
+              ],
             ] else ...[
-              const KickerText(
-                'Your short books',
-                color: DesignTokens.mutedDim,
+              Text(
+                'Previous stories',
+                style: DesignTokens.display(
+                  19,
+                ).copyWith(color: DesignTokens.nightText),
               ),
               const SizedBox(height: 10),
-              ModernCard(
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: DesignTokens.nightSurface,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+                  border: Border.all(color: DesignTokens.nightHairline),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(
                       CupertinoIcons.book,
-                      color: DesignTokens.primary,
+                      color: DesignTokens.nightAccent,
                       size: 28,
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'Your shelf is ready for its first book.',
-                      style: DesignTokens.display(18),
+                      style: DesignTokens.display(
+                        18,
+                      ).copyWith(color: DesignTokens.nightText),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Choose a theme above, then create a short story matched to your profile level.',
                       style: DesignTokens.body(
                         13,
-                      ).copyWith(color: DesignTokens.mutedDim, height: 1.45),
+                      ).copyWith(color: DesignTokens.nightMuted, height: 1.45),
                     ),
                   ],
                 ),
@@ -396,10 +424,16 @@ class _DirectReadingLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
-        title: Text('Reading', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvasDim,
+        title: Text(
+          'Reading',
+          style: DesignTokens.display(
+            20,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+        backgroundColor: DesignTokens.nightCanvas,
+        foregroundColor: DesignTokens.nightText,
         elevation: 0,
       ),
       body: const Padding(
@@ -429,14 +463,20 @@ class _GenerateReadingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         leading: Container(
           width: 46,
           height: 46,
           decoration: BoxDecoration(
-            color: DesignTokens.primarySoft,
+            color: DesignTokens.nightAccentSoft,
             borderRadius: BorderRadius.circular(14),
           ),
           child: generating
@@ -444,17 +484,22 @@ class _GenerateReadingTile extends StatelessWidget {
                   padding: EdgeInsets.all(12),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
+                    valueColor: AlwaysStoppedAnimation(
+                      DesignTokens.nightAccent,
+                    ),
                   ),
                 )
               : const Icon(
                   CupertinoIcons.book_fill,
-                  color: DesignTokens.primary,
+                  color: DesignTokens.nightAccent,
                 ),
         ),
         title: Text(
           'Create a reading story',
-          style: DesignTokens.body(15, weight: FontWeight.w700),
+          style: DesignTokens.body(
+            15,
+            weight: FontWeight.w700,
+          ).copyWith(color: DesignTokens.nightText),
         ),
         subtitle: Text(
           generating
@@ -462,9 +507,15 @@ class _GenerateReadingTile extends StatelessWidget {
               : selectedTopic == null
               ? 'A fresh story shaped to your course level'
               : 'A fresh story about ${selectedTopic!.toLowerCase()}',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(
+            12.5,
+          ).copyWith(color: DesignTokens.nightMuted),
         ),
-        trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
+        trailing: const Icon(
+          CupertinoIcons.chevron_right,
+          size: 18,
+          color: DesignTokens.nightAccent,
+        ),
         onTap: generating ? null : onTap,
       ),
     );
@@ -478,51 +529,56 @@ class _ContinueReadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
-      padding: 0,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       child: SizedBox(
-        height: 190,
-        child: Row(
+        height: 258,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            _ReadingCover(story: story, width: 126, height: 190),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'CONTINUE READING',
-                      style: DesignTokens.label(10).copyWith(
-                        color: DesignTokens.primary,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      story.displayTitle,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.display(18),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${story.passage.segments.length} short scenes · ${story.readTimeMinutes} min',
-                      style: DesignTokens.body(
-                        12,
-                      ).copyWith(color: DesignTokens.mutedDim),
-                    ),
-                    const SizedBox(height: 14),
-                    const Row(
-                      children: [
-                        Icon(CupertinoIcons.play_fill, size: 13),
-                        SizedBox(width: 6),
-                        Text('Open book'),
-                      ],
-                    ),
+            _ReadingCover(story: story, width: double.infinity, height: 258),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    DesignTokens.nightCanvas.withValues(alpha: 0.94),
                   ],
                 ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'CONTINUE READING',
+                    style: DesignTokens.label(11).copyWith(
+                      color: DesignTokens.nightAccent,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    story.displayTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.display(
+                      24,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${story.levelBand}  ·  ${story.passage.segments.length} scenes  ·  ${story.readTimeMinutes} min',
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
               ),
             ),
           ],
@@ -532,23 +588,65 @@ class _ContinueReadingCard extends StatelessWidget {
   }
 }
 
-class _ReadingBookCard extends StatelessWidget {
-  const _ReadingBookCard({required this.story, required this.onTap});
+class _PreviousStoryRow extends StatelessWidget {
+  const _PreviousStoryRow({required this.story, required this.onTap});
 
   final GeneratedStory story;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return PracticeContentCard(
-      title: story.displayTitle,
-      summary: story.summary,
-      levelBand: story.levelBand,
-      meta:
-          '${story.passage.segments.length} scenes · ${story.readTimeMinutes} min',
-      coverUrl: story.coverUrl,
-      fallbackIcon: CupertinoIcons.book_fill,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
+      child: Container(
+        height: 130,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Row(
+          children: [
+            _ReadingCover(story: story, width: 112, height: 130),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      story.displayTitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.display(
+                        16,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${story.levelBand}  ·  ${story.readTimeMinutes} min',
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 14),
+              child: Icon(
+                CupertinoIcons.chevron_right,
+                size: 18,
+                color: DesignTokens.nightAccent,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
