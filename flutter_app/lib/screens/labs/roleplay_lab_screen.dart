@@ -173,10 +173,11 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
       topic: roleplay.displayTitle,
       levelBand: roleplay.levelBand,
       coverPrompt:
-          'A premium literary book cover for a French language roleplay scene. '
+          'A grounded realistic 4:3 image for a French language roleplay scene. '
           'Show one cinematic real-life setting, object, architecture, weather, '
           'or action that matches the title and dialogue. Do not show people, '
-          'faces, animals, mascots, or named characters; never use an app screenshot.',
+          'faces, animals, mascots, or named characters; never use an app screenshot. '
+          'Render no text, letters, numbers, logos, signs, captions, labels, or typography.',
     );
     if (url != null && url.isNotEmpty) {
       store.updateCoverUrl(roleplay.id, url);

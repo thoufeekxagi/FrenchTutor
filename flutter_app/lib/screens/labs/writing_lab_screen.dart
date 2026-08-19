@@ -165,10 +165,11 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
         topic: generated.task.title,
         levelBand: generated.task.levelBand,
         coverPrompt:
-            'A premium literary book-cover scene for a French learner writing about '
+            'A grounded realistic 4:3 image for a French learner writing about '
             '${generated.task.promptEn}. Use one clear focal scene, sophisticated editorial '
             'realism, restrained color grading, layered depth, and a polished publishing '
-            'aesthetic. Keep the composition portrait and crop-friendly with safe margins.',
+            'aesthetic. Keep the composition landscape with safe margins and render no '
+            'text, letters, numbers, logos, signs, captions, labels, or typography.',
       );
       if (url == null) return;
       store.updateCoverUrl(generated.id, url);

@@ -21,6 +21,10 @@ void main() {
 
     expect(decoded.width, lessThanOrEqualTo(ImageStorageOptimizer.maxWidth));
     expect(decoded.height, lessThanOrEqualTo(ImageStorageOptimizer.maxHeight));
+    expect(
+      decoded.width / decoded.height,
+      closeTo(ImageStorageOptimizer.targetAspectRatio, 0.01),
+    );
     expect(optimized[0], 0xff);
     expect(optimized[1], 0xd8);
     expect(optimized.length, lessThanOrEqualTo(ImageStorageOptimizer.maxBytes));

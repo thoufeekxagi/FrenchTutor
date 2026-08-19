@@ -133,7 +133,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         topic: 'French grammar: $tense',
         levelBand: level,
         coverPrompt:
-            'A premium literary book cover for a short French grammar story about ${passage.displayTitle}. Show the setting, objects, and action as the primary subject; no people, faces, animals, or characters.',
+            'A grounded realistic 4:3 image for a short French grammar story about ${passage.displayTitle}. Show the setting, objects, and action as the primary subject; no people, faces, animals, or characters. Render no text, letters, numbers, logos, signs, captions, labels, or typography.',
       );
       final explanation = await explanationFuture;
       final generated = await quizFuture;

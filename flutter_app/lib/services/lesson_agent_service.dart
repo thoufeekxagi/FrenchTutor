@@ -17,15 +17,19 @@ import '../prompts/live_prompts.dart';
 
 /// Shared instruction for every generated lesson image. The Edge Function
 /// repeats this contract at the provider boundary, so local previews and
-/// release builds produce the same typography-first literary cover.
+/// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-BOOK-COVER OUTPUT: create a premium portrait literary cover in a 2:3
-composition. Render exactly the supplied title as clean, readable typography.
-Do not add an author name, subtitle, labels, logos, watermarks, captions, UI,
-borders, frames, or any other words. Do not show people, faces, animals,
-mascots, or named characters. If the source mentions one, make the setting,
-objects, architecture, weather, or action the primary subject instead. Keep the
-title inside safe margins and make it legible.
+IMAGE-ONLY ARTWORK: create one premium landscape story image in an exact 4:3
+composition. Do not render any text at all: no title, letters, words, numbers,
+captions, labels, logos, watermarks, signs, UI, borders, or frames. The image
+must stand on its own without typography; the app renders the English title
+outside the image. Use grounded cinematic realism with subtle editorial
+stylization, believable materials, natural lighting, restrained color grading,
+and one clear focal scene. Avoid both photorealistic stock-photo blandness and
+cartoon, anime, chibi, flat-vector, collage, or fantasy-game aesthetics. Do not
+show people, faces, animals, mascots, or named characters. If the source
+mentions one, make the setting, objects, architecture, weather, or action the
+primary subject instead.
 ''';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -1189,7 +1193,7 @@ CEFR CONTRACT: Keep sentence length, verb forms, vocabulary, inference load, and
 
 TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions. In regular lessons, provide q_en and choices_en as learner support at every level. If an EXAM READINESS OVERRIDE appears below, it takes precedence: follow its language policy exactly. Each has exactly 3 choices and one valid zero-based answerIndex.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a portrait literary book cover describing the setting, objects, action, mood, and composition. Do not request characters or extra words; the app supplies the exact title typography.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 story image describing the setting, objects, action, mood, and composition. Do not request typography or text of any kind.
 
 The topic is inspiration, not a requirement that every sentence mention it. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new story, not a rewrite or continuation of any previous lesson.'''}
@@ -1243,7 +1247,7 @@ CHECK SUPPORT: Write 4 to 6 comprehension questions. For every question, q is th
 
 TEACHING FIELDS: For each exact French sentence, provide its English meaning, one short English grammar note tied to that sentence, and an optional pronunciation tip. Include 5 to 8 useful French words or short phrases that actually appear in the story.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a portrait literary book cover describing the setting, objects, action, mood, and composition. Do not request characters or extra words; the app supplies the exact title typography.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 story image describing the setting, objects, action, mood, and composition. Do not request typography or text of any kind.
 
 Keep it wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
@@ -1365,7 +1369,7 @@ STORY: Write 7 to 10 short narrative segments with a clear beginning, small turn
 TITLE RULE: `title_en` is the only learner-facing book heading. It must always be a clear, natural English title for every level, including C1/C2. Do not combine the French title and English title in the UI; French belongs in the story content.
 SUMMARY: Write one short English sentence that makes the story inviting to open.
 READ TIME: Estimate the reading time in whole minutes, normally 3 to 7.
-COVER PROMPT: Write one concise English prompt for a portrait book-cover illustration of the story's setting and mood. Do not request any text, letters, logos, borders, or UI in the image; the app overlays the title.
+COVER PROMPT: Write one concise English prompt for a text-free 4:3 story image of the story's setting and mood. Do not request any text, letters, logos, borders, or UI in the image.
 QUIZ: Write 4 to 6 comprehension questions. At A1/A2, q must be simple French plus q_en in plain English, and choices must be French plus choices_en in the exact same order. At B1/B2, still provide the English support fields. Each question must have exactly 3 choices and one valid zero-based answerIndex. Only ask about details stated or clearly implied by the story.
 KEYWORDS: Write 6 to 10 useful French words or short phrases that appear in the story, with simple English meanings and non-IPA phonetic hints. IDs must be short unique snake_case slugs.
 GRAMMAR: Each segment gets one plain-English grammar note tied to that exact sentence. pronunciation_tip may be empty when no useful tip is needed.
@@ -1394,10 +1398,9 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
   }
 
-  /// Creates only the single portrait cover for an already-generated story.
-  /// MiniMax Image-01 creates the shared typography-first cover. The caller
-  /// owns the bounded retry/upload policy; reopening a story never regenerates
-  /// its cover.
+  /// Creates only the single 4:3, text-free image for an already-generated
+  /// story. The caller owns the bounded retry/upload policy; reopening a story
+  /// never regenerates its artwork.
   Future<Uint8List> generateStoryCover({
     required String title,
     required String summary,
@@ -1407,32 +1410,31 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     String? variationSeed,
   }) async {
     const qualityDirection =
-        'Create a premium portrait literary book cover in a 2:3 composition. '
-        'Use sophisticated editorial realism, tactile 3D materials where useful, '
+        'Create one premium landscape story image in an exact 4:3 composition. '
+        'Use grounded cinematic realism with subtle editorial stylization, believable materials, '
         'natural lighting, restrained color grading, one clear focal scene, layered depth, '
         'and a polished publishing aesthetic. Keep important visual details inside safe margins. '
-        'Do not use anime, Ghibli, chibi, childish, flat vector, collage, split panels, '
-        'decorative frame, or UI mockup styles. Do not show people, faces, animals, mascots, '
-        'or named characters; make the setting, objects, architecture, weather, or action primary.';
+        'Avoid photorealistic stock-photo blandness, anime, Ghibli, chibi, childish, flat vector, '
+        'cartoon, collage, split panels, decorative frame, or UI mockup styles. Do not show people, '
+        'faces, animals, mascots, or named characters; make the setting, objects, architecture, '
+        'weather, or action primary. Render no text, letters, numbers, logos, signs, captions, '
+        'watermarks, or other typography anywhere in the image.';
     final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
         ? '$qualityDirection\nScene subject: $topic. Mood and context: $summary. Learner level: $levelBand.'
         : '$qualityDirection\n$coverPrompt\n'
-              'Scene title: $topic. Dialogue and visual context: $summary. '
+              'Scene topic: $topic. Visual context: $summary. '
               'Learner level: $levelBand.';
     final variation = variationSeed == null || variationSeed.trim().isEmpty
         ? ''
         : '\nInternal visual variation seed: ${variationSeed.trim()}. '
               'Use it to choose a fresh composition and do not render it.';
-    final fullPrompt =
-        '$qualityDirection\n'
-        'EXACT TITLE TO RENDER: "$title"\n'
-        '$prompt$variation\n$_bookCoverInstruction';
+    final fullPrompt = '$prompt$variation\n$_bookCoverInstruction';
     // MiniMax Image-01 accepts prompts up to 1,500 characters. Preserve the
-    // title and the universal policy first; trim only free-form scene detail.
+    // universal text-free image policy first; trim only free-form scene detail.
     final imagePrompt = fullPrompt.length <= 1_500
         ? fullPrompt
-        : '${fullPrompt.substring(0, 1_500 - _bookCoverInstruction.length - 80)}\n'
-              'EXACT TITLE TO RENDER: "$title"\n$_bookCoverInstruction';
+        : '${fullPrompt.substring(0, 1_500 - _bookCoverInstruction.length - 20)}\n'
+              '$_bookCoverInstruction';
     try {
       final response = await _invokeFunction('ai-image', {
         'prompt': imagePrompt,

@@ -31,10 +31,10 @@ class PracticeArtworkService {
       variationSeed: id,
       coverPrompt:
           '$context\n'
-          'Create one coherent portrait literary book cover. Do not show people, '
+          'Create one coherent text-free 4:3 story image. Do not show people, '
           'faces, animals, mascots, or named characters; make the setting, objects, '
-          'architecture, weather, or action primary instead. Render only the exact '
-          'supplied title as typography and no other words. Make the composition, '
+          'architecture, weather, or action primary instead. Render no text, letters, '
+          'numbers, logos, signs, captions, or other typography. Make the composition, '
           'camera angle, dominant subject, and color balance distinct from other '
           'sessions. Use the variation key $id only as an internal visual seed; '
           'never render it.',

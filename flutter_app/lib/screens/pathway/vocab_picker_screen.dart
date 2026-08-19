@@ -585,7 +585,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         topic: topic,
         levelBand: level,
         coverPrompt:
-            'Create a premium literary book cover for a French vocabulary set about $topic. Represent these exact words through objects, actions, or a natural setting; no people, faces, animals, mascots, or characters. The exact supplied title may appear as the only typography.',
+            'Create a grounded realistic 4:3 image for a French vocabulary set about $topic. Represent these exact words through objects, actions, or a natural setting; no people, faces, animals, mascots, or characters. Render no text, letters, numbers, logos, signs, captions, or typography.',
       );
       if (url != null && url.isNotEmpty) {
         ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);
@@ -1021,7 +1021,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         topic: topic,
         levelBand: level,
         coverPrompt:
-            'Create a premium literary book cover for a French vocabulary set. Represent these exact words through objects, actions, or a natural setting. Let the context guide the setting: $context. No people, faces, animals, mascots, or characters. The exact supplied title may appear as the only typography.',
+            'Create a grounded realistic 4:3 image for a French vocabulary set. Represent these exact words through objects, actions, or a natural setting. Let the context guide the setting: $context. No people, faces, animals, mascots, or characters. Render no text, letters, numbers, logos, signs, captions, or typography.',
       );
       if (url != null && url.isNotEmpty) {
         ref.read(generatedVocabularySetStoreProvider).updateCoverUrl(id, url);

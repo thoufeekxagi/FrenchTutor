@@ -8,6 +8,13 @@ Implemented the Readle-aligned story surface on the canonical Flutter app.
 
 The story reader is an immersive full-screen session. It keeps story-specific controls but removes the global app navigation.
 
+## Artwork contract
+
+- Generated story artwork is image-only: no embedded title, words, letters, numbers, labels, logos, captions, or UI.
+- Artwork is normalized to a landscape 4:3 asset at the upload boundary.
+- The shared visual direction is grounded cinematic realism with subtle editorial stylization: believable materials, natural light, restrained grading, and one clear focal scene.
+- Story titles are rendered by Flutter outside the artwork as English UI text.
+
 ### Top controls
 
 - Back
