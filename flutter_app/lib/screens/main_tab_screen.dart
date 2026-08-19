@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,11 +42,6 @@ const _destinations = [
     icon: Icons.photo_camera_outlined,
     activeIcon: Icons.photo_camera_rounded,
     label: 'Photo tutor',
-  ),
-  NavDestination(
-    icon: Icons.person_outline_rounded,
-    activeIcon: Icons.person_rounded,
-    label: 'Profile',
   ),
 ];
 
@@ -119,30 +116,50 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       );
     }
 
-    return Scaffold(body: body, bottomNavigationBar: _mobileIslandNavigation());
+    return Scaffold(
+      backgroundColor: _currentIndex == 0
+          ? DesignTokens.nightCanvas
+          : DesignTokens.canvas,
+      extendBody: true,
+      body: body,
+      bottomNavigationBar: _mobileIslandNavigation(),
+    );
   }
 
   Widget _mobileIslandNavigation() {
+    final night = _currentIndex == 0;
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: DesignTokens.surface,
-          borderRadius: BorderRadius.circular(34),
-          border: Border.all(color: DesignTokens.hairline),
-        ),
-        child: Row(
-          children: [
-            for (var index = 0; index < _destinations.length; index++)
-              Expanded(
-                child: _mobileNavItem(
-                  index: index,
-                  destination: _destinations[index],
-                ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(34),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: (night ? DesignTokens.nightSurface : DesignTokens.surface)
+                  .withValues(alpha: night ? 0.72 : 0.78),
+              borderRadius: BorderRadius.circular(34),
+              border: Border.all(
+                color:
+                    (night ? DesignTokens.nightHairline : DesignTokens.hairline)
+                        .withValues(alpha: 0.9),
               ),
-          ],
+            ),
+            child: Row(
+              children: [
+                for (var index = 0; index < _destinations.length; index++)
+                  Expanded(
+                    child: _mobileNavItem(
+                      index: index,
+                      destination: _destinations[index],
+                      night: night,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -151,6 +168,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   Widget _mobileNavItem({
     required int index,
     required NavDestination destination,
+    required bool night,
   }) {
     final selected = _currentIndex == index;
     final item = Semantics(
@@ -168,7 +186,11 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
           height: 58,
           padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: selected ? DesignTokens.canvasDim : Colors.transparent,
+            color: selected
+                ? (night
+                      ? DesignTokens.nightAccentSoft
+                      : DesignTokens.canvasDim)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
@@ -177,7 +199,9 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
               Icon(
                 selected ? destination.activeIcon : destination.icon,
                 size: 21,
-                color: selected ? DesignTokens.ink : DesignTokens.mutedDim,
+                color: selected
+                    ? (night ? DesignTokens.nightAccent : DesignTokens.ink)
+                    : (night ? DesignTokens.nightMuted : DesignTokens.mutedDim),
               ),
               const SizedBox(height: 3),
               Text(
@@ -190,8 +214,12 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
                       weight: selected ? FontWeight.w700 : FontWeight.w500,
                     ).copyWith(
                       color: selected
-                          ? DesignTokens.ink
-                          : DesignTokens.mutedDim,
+                          ? (night
+                                ? DesignTokens.nightAccent
+                                : DesignTokens.ink)
+                          : (night
+                                ? DesignTokens.nightMuted
+                                : DesignTokens.mutedDim),
                     ),
               ),
             ],
@@ -204,7 +232,6 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
       1 => AppTour.courseTabKey,
       2 => AppTour.practiceTabKey,
       3 => AppTour.photoTutorTabKey,
-      4 => AppTour.profileTabKey,
       _ => null,
     };
     return tourKey == null ? item : KeyedSubtree(key: tourKey, child: item);

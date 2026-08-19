@@ -71,6 +71,23 @@ abstract final class DesignTokens {
     colors: [ink, primaryDeep],
   );
 
+  // V3 night surface used by the redesigned Home experience. Keeping these
+  // values here makes the dark/gold skin reusable by the next screen without
+  // scattering brand colors through individual widgets.
+  static const nightCanvas = Color(0xFF08090B);
+  static const nightSurface = Color(0xFF151619);
+  static const nightSurfaceRaised = Color(0xFF1D1E21);
+  static const nightText = Color(0xFFF7F5F0);
+  static const nightMuted = Color(0xFFA7A7A8);
+  static const nightAccent = Color(0xFFF2B84B);
+  static const nightAccentSoft = Color(0xFF3A2C17);
+  static const nightHairline = Color(0xFF303136);
+  static const nightGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0B0C0F), Color(0xFF1A1712)],
+  );
+
   /// Surfaces rely on tonal layers and hairline borders instead of elevation.
   static List<BoxShadow> get surfaceShadow => const [];
 
