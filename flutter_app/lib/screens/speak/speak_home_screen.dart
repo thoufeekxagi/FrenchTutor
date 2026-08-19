@@ -322,9 +322,11 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   ) {
     return GridView.count(
       crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      // Keep the activity block compact enough that both rows remain above
+      // the floating navigation island on a standard iPhone viewport.
+      childAspectRatio: 1.34,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -509,18 +511,32 @@ class _TutorActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(tutor.portraitAsset, fit: BoxFit.cover),
+          SizedBox(
+            height: 48,
+            width: double.infinity,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                tutor.portraitAsset,
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text('Change your tutor', style: _cardTitle()),
+          const Spacer(),
+          Text(
+            'Change your tutor',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: _cardTitle(),
+          ),
           const SizedBox(height: 3),
-          Text(tutor.displayName, style: _cardMeta()),
+          Text(
+            tutor.displayName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: _cardMeta(),
+          ),
         ],
       ),
     );
@@ -541,8 +557,8 @@ class _LessonActivityCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
               color: DesignTokens.nightAccentSoft,
               shape: BoxShape.circle,
@@ -551,7 +567,7 @@ class _LessonActivityCard extends StatelessWidget {
             child: Icon(
               _skillIcon(session.primarySkill),
               color: DesignTokens.nightAccent,
-              size: 21,
+              size: 18,
             ),
           ),
           const Spacer(),
@@ -559,7 +575,7 @@ class _LessonActivityCard extends StatelessWidget {
             session.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: _cardTitle(),
+            style: _cardTitle().copyWith(fontSize: 13),
           ),
           const SizedBox(height: 5),
           Text(
@@ -568,13 +584,13 @@ class _LessonActivityCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: _cardMeta(),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 2),
           const Align(
             alignment: Alignment.bottomRight,
             child: Icon(
               Icons.arrow_forward_ios_rounded,
               color: DesignTokens.nightAccent,
-              size: 14,
+              size: 13,
             ),
           ),
         ],
@@ -596,10 +612,10 @@ class _ActivityCardShell extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             gradient: DesignTokens.nightGradient,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: DesignTokens.nightHairline),
           ),
           child: child,
