@@ -9,6 +9,7 @@ import '../data/database/evidence_store.dart';
 import '../data/database/competency_state_store.dart';
 import '../data/database/generated_scene_cache_store.dart';
 import '../data/database/generated_story_store.dart';
+import '../data/database/story_favorite_store.dart';
 import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
@@ -100,6 +101,13 @@ final generatedSceneCacheStoreProvider = Provider<GeneratedSceneCacheStore>((
 
 final generatedStoryStoreProvider = Provider<GeneratedStoryStore>((ref) {
   return GeneratedStoryStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
+});
+
+final storyFavoriteStoreProvider = Provider<StoryFavoriteStore>((ref) {
+  return StoryFavoriteStore(
     ref.watch(databaseProvider),
     ref.watch(syncServiceProvider),
   );

@@ -54,6 +54,11 @@ The rail is a compact rounded island. The current stage uses the gold accent; in
 - A selected glossary word is surfaced at the lower-left edge of the hero with
   its English meaning. A `Conjugate →` action appears only when the segment's
   grammar note identifies a verb/tense cue and opens an on-demand grammar call.
+  Every source word is tappable. It receives an immediate positional glossary
+  fallback and is then refined by a contextual Gemini response using the word,
+  French sentence, English sentence, and learner level. The selected word and
+  meaning are shown in the hero overlay; no gold outline is used around the
+  conjugation sheet.
 - The visible Full story / Sentences switch and sentence-mode setting are
   removed from this reader. Translation is the source of truth for the reading
   presentation.
@@ -86,6 +91,13 @@ Added `SessionSettings` as a shared persisted source of truth for focused practi
 The translation icon beside the English heading is a quick shortcut for the persisted
 `Translate sentences` preference.
 
+The first reader text icon is a French/English translation toggle. The second
+text-size icon cycles the reading scale upward; the settings sheet remains the
+source of truth for choosing a smaller size. The heart is backed by a local
+user-scoped `story_favorites` table and synchronizes to Supabase when the learner
+is signed in. The duplicate hero report action is removed; the metadata row keeps
+the single report action.
+
 The reader consumes these settings now. Other practice screens and the global settings screen should consume the same service in a later pass.
 
 ## Preserved behavior
@@ -94,6 +106,8 @@ The reader consumes these settings now. Other practice screens and the global se
   begins, while the visual reading surface remains one continuous flow.
 - Narration, pause, resume, stop, speed, and sentence replay.
 - Word selection and translation matching.
+- Contextual word meaning fallback for every tapped French word.
+- Per-user story favorites, with local persistence and sign-in hydration.
 - Tutor call context and lifecycle handling.
 - Notes overlay.
 - Session recording.
@@ -105,19 +119,23 @@ The reader consumes these settings now. Other practice screens and the global se
 ## Known follow-up work
 
 1. Finish dark/gold treatment for every Grammar, Quiz, and Keywords subcomponent.
-2. Persist richer optional vocabulary metadata: part of speech, gender, CEFR band, infinitive, and conjugation.
-3. Move the shared settings UI into the app-wide Settings screen.
-4. Apply the shared dark/light setting to all practice shells.
-5. Add screenshot-based visual checks at 375×812, 393×852, and 430×932.
-6. Introduce a separate 16:9 `readerHeroUrl` if visual QA shows the 4:3 card
-   artwork still crops important subjects in the immersive reader.
-7. Migrate the remaining legacy story surfaces to use the English-only heading helper.
+2. Move the shared settings UI into the app-wide Settings screen.
+3. Apply the shared dark/light setting to all practice shells.
+4. Add screenshot-based visual checks at 375×812, 393×852, and 430×932.
+5. Introduce a separate 16:9 `readerHeroUrl` if visual QA shows the 4:3 card
+  artwork still crops important subjects in the immersive reader.
+6. Migrate the remaining legacy story surfaces to use the English-only heading helper.
 
 ## Verification
 
 - `flutter analyze --no-pub`: no errors; only the project’s existing
   info-level lints remain.
-- `flutter test`: all 272 tests passed.
+- The previously completed full suite passed all 272 existing tests.
+- `flutter test test/story_favorite_store_test.dart`: passed the new
+  story-favorite regression test. A subsequent full-suite rerun was blocked
+  before test discovery when the local Flutter SDK tried to rewrite its engine
+  cache outside the workspace; this is an environment permission issue, not a
+  test failure.
 - `flutter build ios --no-codesign`: completed successfully from the canonical
   `flutter_app` directory.
 - No emulator or physical device was launched.

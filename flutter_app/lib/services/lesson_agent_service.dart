@@ -1225,10 +1225,23 @@ $examBlock
     required String levelBand,
     String? examName,
     String? examLevel,
+    String? audioFormat,
     Iterable<String> avoidTitles = const [],
     Iterable<String> avoidOpenings = const [],
   }) async {
     final surpriseMode = topic == null || topic.trim().isEmpty;
+    final formatInstruction = switch (audioFormat) {
+      'podcast' =>
+        'AUDIO FORMAT: PODCAST. Shape the lesson as a light, natural exchange with short conversational turns. Do not add speaker labels to the JSON; the renderer alternates voices from the segment order.',
+      'music' =>
+        'AUDIO FORMAT: MUSIC. Use vivid, rhythmic, lyric-friendly French lines with repetition that remains useful for learners. Keep the meaning clear and avoid slang that would be hard to understand.',
+      'educational' =>
+        'AUDIO FORMAT: EDUCATIONAL. Make the lesson feel like a clear, warm explainer about one everyday idea, with concrete examples and a memorable conclusion.',
+      'narration' =>
+        'AUDIO FORMAT: STORY NARRATION. Favor cinematic but simple narration with a clear image, gentle pacing, and one small change in the story.',
+      _ =>
+        'AUDIO FORMAT: SURPRISE. Choose the most natural spoken format for this lesson and keep it replayable.',
+    };
     final examBlock = _examComprehensionPrompt(
       examName: examName,
       levelBand: examLevel ?? levelBand,
@@ -1239,6 +1252,8 @@ $examBlock
 Create one short, polished French LISTENING lesson for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string, string], "choices_en": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
 LISTENING DESIGN: Write 6 to 9 short spoken French sentences, one per segment. Each sentence must sound natural when read aloud and move a tiny everyday story forward. Use a clear beginning, one small change, and a satisfying ending. This is a listening lesson, not a reading essay, roleplay, or grammar worksheet. A human character is optional: the story may follow an object, animal, place, or natural moment. Never force a named character.
+
+$formatInstruction
 
 TITLE RULE: `title_en` is the only learner-facing lesson heading. It must always be a clear, natural English title for every level, including C1/C2. Do not combine the French title and English title in the UI; French belongs in the audio/story content.
 
@@ -1622,6 +1637,41 @@ short enough for a mobile bottom sheet.''';
       ],
       maxTokens: 700,
       temperature: 0.2,
+    );
+    return _decodeObject(raw);
+  }
+
+  /// Resolves one arbitrary tapped word when the story's compact glossary did
+  /// not include it. The sentence and generated translation are passed
+  /// together so short or ambiguous words are explained in context.
+  Future<Map<String, dynamic>> buildWordMeaning({
+    required String word,
+    required String sentence,
+    required String sentenceTranslation,
+    required String levelBand,
+  }) async {
+    const system = '''
+You are a concise French vocabulary assistant. Return ONLY compact JSON with
+this exact shape: {"word": string, "translation": string, "part_of_speech": string, "gender": string, "number": string, "infinitive": string, "tense": string, "can_conjugate": boolean}.
+Explain the selected French word exactly as it is used in the supplied sentence.
+"translation" must be a short plain-English meaning, not a full sentence.
+Use English for metadata. Use French only for word and infinitive. Set
+can_conjugate true only for a conjugated verb or infinitive that can open a
+conjugation view. Leave unknown gender, number, infinitive, or tense empty.
+Do not invent a meaning unrelated to the sentence.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'LEVEL: $levelBand\nSELECTED WORD: $word\n'
+              'FRENCH SENTENCE: $sentence\n'
+              'ENGLISH SENTENCE: $sentenceTranslation',
+        },
+      ],
+      maxTokens: 260,
+      temperature: 0.1,
     );
     return _decodeObject(raw);
   }

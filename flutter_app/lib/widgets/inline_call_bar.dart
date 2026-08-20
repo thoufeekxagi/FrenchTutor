@@ -12,9 +12,14 @@ import 'learning_card.dart';
 /// grammar/story/listening look and behave identically instead of each
 /// reinventing the row.
 class InlineCallActions extends StatelessWidget {
-  const InlineCallActions({super.key, required this.controller});
+  const InlineCallActions({
+    super.key,
+    required this.controller,
+    this.accentColor,
+  });
 
   final InlineCallController controller;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +55,7 @@ class InlineCallActions extends StatelessWidget {
                   CupertinoIcons.phone_fill,
                   color: controller.active
                       ? DesignTokens.success
-                      : DesignTokens.primary,
+                      : accentColor ?? DesignTokens.primary,
                 ),
         ),
       ],

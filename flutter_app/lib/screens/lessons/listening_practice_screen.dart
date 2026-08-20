@@ -9,12 +9,13 @@ import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/elevenlabs_audio_playback_service.dart';
+import '../../services/elevenlabs_audio_service.dart';
+import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/learning_card.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
-import '../../widgets/primary_action_button.dart';
-import '../../widgets/report_problem_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import 'story_reader_screen.dart';
 
@@ -24,10 +25,12 @@ class ListeningPracticeScreen extends ConsumerStatefulWidget {
   const ListeningPracticeScreen({
     super.key,
     required this.story,
+    this.audioClip,
     this.showFinishButton = false,
   });
 
   final GeneratedStory story;
+  final ElevenLabsAudioClip? audioClip;
   final bool showFinishButton;
 
   @override
@@ -37,6 +40,7 @@ class ListeningPracticeScreen extends ConsumerStatefulWidget {
 
 class _ListeningPracticeScreenState
     extends ConsumerState<ListeningPracticeScreen> {
+  final SessionSettings _settings = SessionSettings.shared;
   late final SessionRecorder _recorder;
   final TextEditingController _dictationController = TextEditingController();
   final Map<int, int> _quizAnswers = {};
@@ -48,8 +52,10 @@ class _ListeningPracticeScreenState
   int? _selectedWordIndex;
   int? _dictationSegment;
   bool _isPlaying = false;
+  bool _isExperimentalPlaying = false;
   bool _audioLoading = false;
   bool _hasListened = false;
+  bool _showTranscript = false;
   bool _showTranslation = false;
   bool _dictationCorrect = false;
   bool _dictationSubmitted = false;
@@ -59,6 +65,10 @@ class _ListeningPracticeScreenState
   String? _shadowFeedback;
   double _rate = 0.42;
   bool _finishedSession = false;
+  bool _isMarkedLearned = false;
+  double _textScale = 1;
+  bool _underlineWords = true;
+  bool _darkMode = true;
   Timer? _coverRefreshTimer;
 
   late GeneratedStory _story;
@@ -74,6 +84,23 @@ class _ListeningPracticeScreenState
       ref.read(notetakerStateProvider).currentContext = 'Listening';
     });
     _story = widget.story;
+    _textScale = _settings.textScale;
+    _rate = _settings.playbackRate;
+    _showTranslation = _settings.translateSentences;
+    _underlineWords = _settings.underlineWords;
+    _darkMode = _settings.darkMode;
+    unawaited(
+      _settings.load().then((_) {
+        if (!mounted) return;
+        setState(() {
+          _textScale = _settings.textScale;
+          _rate = _settings.playbackRate;
+          _showTranslation = _settings.translateSentences;
+          _underlineWords = _settings.underlineWords;
+          _darkMode = _settings.darkMode;
+        });
+      }),
+    );
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
       stage: 'reading_listening',
@@ -96,6 +123,7 @@ class _ListeningPracticeScreenState
     _coverRefreshTimer?.cancel();
     _dictationController.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
+    unawaited(ElevenLabsAudioPlaybackService.shared.stop());
     _finishSession();
     super.dispose();
   }
@@ -192,11 +220,31 @@ class _ListeningPracticeScreenState
     if (mounted) setState(() {});
     try {
       await LessonSpeechService.shared.stop();
+      await ElevenLabsAudioPlaybackService.shared.stop();
+      _isExperimentalPlaying = false;
       if (!mounted) return;
       setState(() {
         _isPlaying = true;
         _currentSegment = fromIndex;
       });
+      final experimentalClip = widget.audioClip;
+      if (experimentalClip != null && fromIndex == 0) {
+        _isExperimentalPlaying = true;
+        await ElevenLabsAudioPlaybackService.shared.play(
+          experimentalClip.bytes,
+          onFinished: () {
+            if (!mounted) return;
+            _isExperimentalPlaying = false;
+            setState(() {
+              _isPlaying = false;
+              _audioLoading = false;
+              _hasListened = true;
+            });
+          },
+        );
+        if (mounted) setState(() => _audioLoading = false);
+        return;
+      }
       await LessonSpeechService.shared.speak(
         items: [
           for (var index = fromIndex; index < _segments.length; index++)
@@ -234,6 +282,8 @@ class _ListeningPracticeScreenState
     if (mounted) setState(() {});
     try {
       await LessonSpeechService.shared.stop();
+      await ElevenLabsAudioPlaybackService.shared.stop();
+      _isExperimentalPlaying = false;
       if (!mounted) return;
       setState(() {
         _isPlaying = true;
@@ -268,6 +318,12 @@ class _ListeningPracticeScreenState
   Future<void> _togglePlayback() async {
     if (_audioLoading) return;
     final speech = LessonSpeechService.shared;
+    if (_isExperimentalPlaying && _isPlaying) {
+      await ElevenLabsAudioPlaybackService.shared.stop();
+      _isExperimentalPlaying = false;
+      if (mounted) setState(() => _isPlaying = false);
+      return;
+    }
     if (_isPlaying && !speech.isPaused) {
       await speech.pause();
       if (mounted) setState(() => _isPlaying = false);
@@ -308,6 +364,8 @@ class _ListeningPracticeScreenState
     // delayed audio callback can make the newly selected line look finished
     // while the old line is still audible.
     await LessonSpeechService.shared.stop();
+    await ElevenLabsAudioPlaybackService.shared.stop();
+    _isExperimentalPlaying = false;
     if (!mounted) return;
     setState(() {
       _focusSegment = next;
@@ -323,6 +381,8 @@ class _ListeningPracticeScreenState
   Future<void> _advanceFocus() async {
     if (_focusSegment >= _segments.length - 1) {
       await LessonSpeechService.shared.stop();
+      await ElevenLabsAudioPlaybackService.shared.stop();
+      _isExperimentalPlaying = false;
       if (mounted) setState(() => _stage = _ListeningStage.dictation);
       return;
     }
@@ -433,18 +493,75 @@ class _ListeningPracticeScreenState
     Navigator.of(context).pop(widget.showFinishButton ? true : null);
   }
 
+  Future<void> _showSettings() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      builder: (_) => _ListeningSettingsSheet(settings: _settings),
+    );
+    if (!mounted) return;
+    setState(() {
+      _textScale = _settings.textScale;
+      _rate = _settings.playbackRate;
+      _showTranslation = _settings.translateSentences;
+      _underlineWords = _settings.underlineWords;
+      _darkMode = _settings.darkMode;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final canvasColor = _darkMode
+        ? DesignTokens.nightCanvas
+        : DesignTokens.canvas;
+    final activeSegment = _segments.isEmpty
+        ? null
+        : _segments[_currentSegment.clamp(0, _segments.length - 1).toInt()];
     return Scaffold(
-      backgroundColor: DesignTokens.canvas,
+      backgroundColor: canvasColor,
       appBar: AppBar(
-        title: Text('Listening', style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.canvas,
-        foregroundColor: DesignTokens.ink,
+        leading: IconButton(
+          tooltip: 'Back',
+          onPressed: _finishAndPop,
+          icon: const Icon(CupertinoIcons.chevron_left),
+        ),
+        title: Text(
+          _story.displayTitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: DesignTokens.body(
+            17,
+            weight: FontWeight.w700,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+        backgroundColor: canvasColor,
+        foregroundColor: DesignTokens.nightText,
+        toolbarHeight: 64,
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
-          ReportProblemButton(sessionType: 'Listening: ${_story.displayTitle}'),
+          TextButton(
+            onPressed: () =>
+                setState(() => _isMarkedLearned = !_isMarkedLearned),
+            child: Text(
+              _isMarkedLearned ? 'Learned' : 'Mark as learned',
+              style: DesignTokens.body(
+                12,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.nightAccent),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Listening settings',
+            onPressed: _showSettings,
+            icon: const Icon(
+              CupertinoIcons.slider_horizontal_3,
+              color: DesignTokens.nightAccent,
+            ),
+          ),
+          const SizedBox(width: 6),
         ],
       ),
       body: Stack(
@@ -452,12 +569,23 @@ class _ListeningPracticeScreenState
           WebConstrainedView(
             maxWidth: 760,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 32),
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 120),
               children: [
-                _ListeningHeader(story: _story),
-                const SizedBox(height: DesignTokens.space5),
+                _ListeningCoverHero(
+                  story: _story,
+                  activeSegment: activeSegment,
+                  currentSegment: _currentSegment,
+                  totalSegments: _segments.length,
+                  showTranscript: _showTranscript,
+                  showTranslation: _showTranslation,
+                  onToggleTranscript: () =>
+                      setState(() => _showTranscript = !_showTranscript),
+                  onToggleTranslation: () =>
+                      setState(() => _showTranslation = !_showTranslation),
+                ),
+                const SizedBox(height: 14),
                 _StageRail(current: _stage),
-                const SizedBox(height: DesignTokens.space5),
+                const SizedBox(height: 22),
                 AnimatedSwitcher(
                   duration: DesignTokens.durationMedium,
                   switchInCurve: DesignTokens.curveStandard,
@@ -495,33 +623,34 @@ class _ListeningPracticeScreenState
           detail: '${_story.levelBand} · ${_story.readTimeMinutes} min',
         ),
         const SizedBox(height: 8),
-        Text('Catch the meaning first.', style: DesignTokens.display(28)),
+        Text(
+          'Catch the meaning first.',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           'The transcript stays hidden. Listen for who, where, and what changes.',
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(14).copyWith(color: DesignTokens.nightMuted),
         ),
         const SizedBox(height: DesignTokens.space5),
-        _AudioPlayerCard(
-          story: _story,
+        _NightAudioIsland(
           isPlaying: _isPlaying,
           isLoading: _audioLoading,
-          currentSegment: _currentSegment,
-          totalSegments: _segments.length,
           rate: _rate,
           onToggle: _togglePlayback,
           onReplay: () => _playStory(),
           onCycleRate: _cycleRate,
         ),
         const SizedBox(height: DesignTokens.space4),
-        LearningCard(
-          color: DesignTokens.primarySoft,
+        _NightPanel(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(
                 CupertinoIcons.headphones,
-                color: DesignTokens.primary,
+                color: DesignTokens.nightAccent,
               ),
               const SizedBox(width: DesignTokens.space3),
               Expanded(
@@ -529,14 +658,17 @@ class _ListeningPracticeScreenState
                   _hasListened
                       ? 'Nice. You heard the whole story. Now check what stayed with you.'
                       : 'One clean listen is enough. You can replay after the first check.',
-                  style: DesignTokens.body(13, weight: FontWeight.w600),
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.nightText),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: DesignTokens.space5),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: 'Check what I caught',
           icon: CupertinoIcons.arrow_right,
           onPressed: _hasListened
@@ -553,7 +685,7 @@ class _ListeningPracticeScreenState
         eyebrow: '02 · Quick check',
         title: 'You are ready for the transcript.',
         body:
-            'This story has no saved comprehension questions, so we will move to line-by-line listening.',
+            'This story has no saved questions, so we will move to line-by-line listening.',
         buttonLabel: 'Open the lines',
         onPressed: () => setState(() => _stage = _ListeningStage.focus),
       );
@@ -569,9 +701,14 @@ class _ListeningPracticeScreenState
           detail: 'No transcript yet',
         ),
         const SizedBox(height: 8),
-        Text('What stayed with you?', style: DesignTokens.display(28)),
+        Text(
+          'What stayed with you?',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 16),
-        LearningCard(
+        _NightPanel(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -579,17 +716,22 @@ class _ListeningPracticeScreenState
                 'Question ${_questionIndex + 1} of ${_questions.length}',
                 style: DesignTokens.label(
                   11,
-                ).copyWith(color: DesignTokens.primary),
+                ).copyWith(color: DesignTokens.nightAccent),
               ),
               const SizedBox(height: 10),
-              Text(question.q, style: DesignTokens.display(19)),
+              Text(
+                question.q,
+                style: DesignTokens.display(
+                  19,
+                ).copyWith(color: DesignTokens.nightText),
+              ),
               if (question.qEn != null && question.qEn!.trim().isNotEmpty) ...[
                 const SizedBox(height: 5),
                 Text(
                   question.qEn!,
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: DesignTokens.mutedDim),
+                  ).copyWith(color: DesignTokens.nightMuted),
                 ),
               ],
               const SizedBox(height: 15),
@@ -612,9 +754,9 @@ class _ListeningPracticeScreenState
           ),
         ),
         const SizedBox(height: 16),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: _questionIndex == _questions.length - 1
-              ? 'Open the transcript'
+              ? 'Open the focus lines'
               : 'Next question',
           icon: CupertinoIcons.arrow_right,
           onPressed: answered ? _advanceFromCheck : null,
@@ -648,15 +790,19 @@ class _ListeningPracticeScreenState
           detail: 'Line ${_focusSegment + 1} of ${_segments.length}',
         ),
         const SizedBox(height: 8),
-        Text('Hear it. See it. Replay it.', style: DesignTokens.display(28)),
+        Text(
+          'Hear it. See it. Replay it.',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           'Tap a word for a quick meaning. Translation stays optional.',
           style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        LearningCard(
-          color: DesignTokens.ink,
+        _NightPanel(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -670,12 +816,16 @@ class _ListeningPracticeScreenState
               BilingualWordText(
                 source: line.fr,
                 translation: _showTranslation ? line.en : '',
-                sourceStyle: DesignTokens.display(
-                  20,
-                ).copyWith(color: Colors.white),
+                sourceStyle: DesignTokens.display(20 * _textScale).copyWith(
+                  color: DesignTokens.nightText,
+                  decoration: _underlineWords
+                      ? TextDecoration.underline
+                      : TextDecoration.none,
+                  decorationColor: DesignTokens.nightAccent,
+                ),
                 translationStyle: DesignTokens.body(
-                  14,
-                ).copyWith(color: Colors.white70),
+                  14 * _textScale,
+                ).copyWith(color: DesignTokens.nightMuted),
                 keywords: _story.keywords,
                 selectedSourceWord: _selectedWordIndex,
                 onSourceWordTap: (index) => setState(
@@ -685,29 +835,27 @@ class _ListeningPracticeScreenState
                 ),
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
-                  _DarkAction(
-                    icon: CupertinoIcons.repeat,
-                    label: 'Replay',
-                    onTap: () => _playLine(_focusSegment),
+              _NightAudioIsland(
+                isPlaying: _isPlaying,
+                isLoading: _audioLoading,
+                rate: _rate,
+                onToggle: () => _playLine(_focusSegment),
+                onReplay: () => _playLine(_focusSegment),
+                onCycleRate: _cycleRate,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () =>
+                      setState(() => _showTranslation = !_showTranslation),
+                  icon: const Icon(CupertinoIcons.globe, size: 17),
+                  label: Text(
+                    _showTranslation ? 'Hide translation' : 'Show translation',
                   ),
-                  const SizedBox(width: 8),
-                  _DarkAction(
-                    icon: CupertinoIcons.speedometer,
-                    label: '${_rate.toStringAsFixed(2)}×',
-                    onTap: _cycleRate,
+                  style: TextButton.styleFrom(
+                    foregroundColor: DesignTokens.nightAccent,
                   ),
-                  const SizedBox(width: 8),
-                  _DarkAction(
-                    icon: _showTranslation
-                        ? CupertinoIcons.eye_slash
-                        : CupertinoIcons.eye,
-                    label: _showTranslation ? 'Hide' : 'Translate',
-                    onTap: () =>
-                        setState(() => _showTranslation = !_showTranslation),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -721,9 +869,10 @@ class _ListeningPracticeScreenState
                 icon: const Icon(CupertinoIcons.chevron_left, size: 17),
                 label: const Text('Previous'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: DesignTokens.ink,
-                  disabledForegroundColor: DesignTokens.mutedDim,
-                  side: BorderSide(color: DesignTokens.hairline),
+                  foregroundColor: DesignTokens.nightText,
+                  disabledForegroundColor: DesignTokens.nightMuted,
+                  side: const BorderSide(color: DesignTokens.nightHairline),
+                  backgroundColor: DesignTokens.nightSurface,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
@@ -743,9 +892,10 @@ class _ListeningPracticeScreenState
                 icon: const Icon(CupertinoIcons.chevron_right, size: 17),
                 label: const Text('Next'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: DesignTokens.ink,
-                  disabledForegroundColor: DesignTokens.mutedDim,
-                  side: BorderSide(color: DesignTokens.hairline),
+                  foregroundColor: DesignTokens.nightText,
+                  disabledForegroundColor: DesignTokens.nightMuted,
+                  side: const BorderSide(color: DesignTokens.nightHairline),
+                  backgroundColor: DesignTokens.nightSurface,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
@@ -760,14 +910,14 @@ class _ListeningPracticeScreenState
         ),
         if (wordEntry != null) ...[
           const SizedBox(height: 12),
-          LearningCard(
-            color: DesignTokens.masterySoft,
+          _NightPanel(
+            accent: DesignTokens.nightAccentSoft,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(
                   CupertinoIcons.textformat,
-                  color: DesignTokens.mastery,
+                  color: DesignTokens.nightAccent,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -776,14 +926,17 @@ class _ListeningPracticeScreenState
                     children: [
                       Text(
                         wordEntry.fr,
-                        style: DesignTokens.body(15, weight: FontWeight.w700),
+                        style: DesignTokens.body(
+                          15,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: DesignTokens.nightText),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         wordEntry.en,
                         style: DesignTokens.body(
                           13,
-                        ).copyWith(color: DesignTokens.mutedDim),
+                        ).copyWith(color: DesignTokens.nightMuted),
                       ),
                     ],
                   ),
@@ -793,7 +946,7 @@ class _ListeningPracticeScreenState
           ),
         ],
         const SizedBox(height: 16),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: _focusSegment == _segments.length - 1
               ? 'Try a dictation line'
               : 'Next line',
@@ -825,15 +978,19 @@ class _ListeningPracticeScreenState
           detail: 'Dictation',
         ),
         const SizedBox(height: 8),
-        Text('Can your ear fill the gap?', style: DesignTokens.display(28)),
+        Text(
+          'Can your ear fill the gap?',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           'Replay the line, then type the missing French word you hear.',
           style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        LearningCard(
-          color: DesignTokens.ink,
+        _NightPanel(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -847,14 +1004,14 @@ class _ListeningPracticeScreenState
                         child: CircularProgressIndicator(
                           strokeWidth: 3,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            DesignTokens.nightAccent,
                           ),
                         ),
                       )
                     : const Icon(
                         CupertinoIcons.play_circle_fill,
                         size: 42,
-                        color: Colors.white,
+                        color: DesignTokens.nightAccent,
                       ),
                 padding: EdgeInsets.zero,
                 alignment: Alignment.centerLeft,
@@ -862,32 +1019,40 @@ class _ListeningPracticeScreenState
               const SizedBox(height: 14),
               Text(
                 prompt,
-                style: DesignTokens.display(20).copyWith(color: Colors.white),
+                style: DesignTokens.display(
+                  20,
+                ).copyWith(color: DesignTokens.nightText),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _dictationController,
                 enabled: !_dictationSubmitted,
-                style: const TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
+                style: DesignTokens.body(
+                  16,
+                ).copyWith(color: DesignTokens.nightText),
+                cursorColor: DesignTokens.nightAccent,
                 textInputAction: TextInputAction.done,
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (_) => _submitDictation(),
                 decoration: InputDecoration(
                   labelText: 'Type the missing word',
-                  labelStyle: const TextStyle(color: Colors.white70),
+                  labelStyle: const TextStyle(color: DesignTokens.nightMuted),
                   hintText: 'écoute…',
-                  hintStyle: const TextStyle(color: Colors.white54),
+                  hintStyle: const TextStyle(color: DesignTokens.nightMuted),
                   filled: true,
-                  fillColor: Colors.white10,
+                  fillColor: DesignTokens.nightSurfaceRaised,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: const BorderSide(
+                      color: DesignTokens.nightHairline,
+                    ),
                     borderRadius: BorderRadius.all(
                       Radius.circular(DesignTokens.radiusMedium),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: DesignTokens.primarySoft),
+                    borderSide: const BorderSide(
+                      color: DesignTokens.nightAccent,
+                    ),
                     borderRadius: BorderRadius.all(
                       Radius.circular(DesignTokens.radiusMedium),
                     ),
@@ -917,7 +1082,7 @@ class _ListeningPracticeScreenState
           ),
         ),
         const SizedBox(height: 16),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: 'Check the word',
           icon: CupertinoIcons.checkmark,
           onPressed:
@@ -939,25 +1104,35 @@ class _ListeningPracticeScreenState
           detail: 'Optional voice check',
         ),
         const SizedBox(height: 8),
-        Text('Borrow the rhythm.', style: DesignTokens.display(28)),
+        Text(
+          'Borrow the rhythm.',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           'Listen once, then repeat the whole line. We only judge the attempt, not perfection.',
           style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        LearningCard(
-          color: DesignTokens.primarySoft,
+        _NightPanel(
+          accent: DesignTokens.nightAccentSoft,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(line.fr, style: DesignTokens.display(20)),
+              Text(
+                line.fr,
+                style: DesignTokens.display(
+                  20 * _textScale,
+                ).copyWith(color: DesignTokens.nightText),
+              ),
               const SizedBox(height: 7),
               Text(
                 line.en,
                 style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.mutedDim),
+                  13 * _textScale,
+                ).copyWith(color: DesignTokens.nightMuted),
               ),
               const SizedBox(height: 16),
               Row(
@@ -968,7 +1143,7 @@ class _ListeningPracticeScreenState
                     icon: const Icon(
                       CupertinoIcons.play_circle_fill,
                       size: 42,
-                      color: DesignTokens.primary,
+                      color: DesignTokens.nightAccent,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -997,9 +1172,9 @@ class _ListeningPracticeScreenState
                     _isRecording ? 'Stop and check' : 'Record attempt',
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: DesignTokens.primary,
+                    foregroundColor: DesignTokens.nightAccent,
                     side: BorderSide(
-                      color: DesignTokens.primary.withValues(alpha: 0.35),
+                      color: DesignTokens.nightAccent.withValues(alpha: 0.35),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -1032,7 +1207,7 @@ class _ListeningPracticeScreenState
           ),
         ),
         const SizedBox(height: 16),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: 'See my listening recap',
           icon: CupertinoIcons.arrow_right,
           onPressed: _shadowTranscript.isNotEmpty || _shadowFeedback != null
@@ -1056,26 +1231,36 @@ class _ListeningPracticeScreenState
       children: [
         const _StageEyebrow(label: 'Complete', detail: 'Listening recap'),
         const SizedBox(height: 8),
-        Text('Your ear did the work.', style: DesignTokens.display(28)),
+        Text(
+          'Your ear did the work.',
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           'Keep the phrases that were hard. They are the best next lesson.',
           style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
         ),
         const SizedBox(height: 16),
-        LearningCard(
-          color: DesignTokens.primarySoft,
+        _NightPanel(
+          accent: DesignTokens.nightAccentSoft,
           child: Row(
             children: [
               Text(
                 '$correct/${_questions.length}',
-                style: DesignTokens.display(30),
+                style: DesignTokens.display(
+                  30,
+                ).copyWith(color: DesignTokens.nightAccent),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   'details caught\n${_dictationCorrect ? 'Dictation landed' : 'Dictation needs one more pass'}',
-                  style: DesignTokens.body(13, weight: FontWeight.w700),
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.nightText),
                 ),
               ),
               Icon(
@@ -1083,33 +1268,39 @@ class _ListeningPracticeScreenState
                     ? CupertinoIcons.checkmark_seal_fill
                     : CupertinoIcons.headphones,
                 color: _shadowCorrect
-                    ? DesignTokens.success
-                    : DesignTokens.primary,
+                    ? Colors.greenAccent
+                    : DesignTokens.nightAccent,
                 size: 30,
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
-        LearningCard(
+        _NightPanel(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(CupertinoIcons.lightbulb, color: DesignTokens.mastery),
+              const Icon(
+                CupertinoIcons.lightbulb,
+                color: DesignTokens.nightAccent,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   _shadowCorrect
                       ? 'Strong repeat. Next time, try the story once at normal speed before opening the transcript.'
                       : 'Replay the focus line tomorrow at 0.75×, then try it again at normal speed.',
-                  style: DesignTokens.body(13, weight: FontWeight.w600),
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.nightText),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 20),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: 'Finish listening',
           icon: CupertinoIcons.checkmark,
           onPressed: _finishAndPop,
@@ -1124,10 +1315,682 @@ class _ListeningPracticeScreenState
                 builder: (_) => StoryReaderScreen(story: _story),
               ),
             ),
-            child: const Text('Open the full transcript'),
+            child: Text(
+              'Open the full transcript',
+              style: DesignTokens.body(
+                13,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.nightAccent),
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ListeningCoverHero extends StatelessWidget {
+  const _ListeningCoverHero({
+    required this.story,
+    required this.activeSegment,
+    required this.currentSegment,
+    required this.totalSegments,
+    required this.showTranscript,
+    required this.showTranslation,
+    required this.onToggleTranscript,
+    required this.onToggleTranslation,
+  });
+
+  final GeneratedStory story;
+  final ReadingSegment? activeSegment;
+  final int currentSegment;
+  final int totalSegments;
+  final bool showTranscript;
+  final bool showTranslation;
+  final VoidCallback onToggleTranscript;
+  final VoidCallback onToggleTranslation;
+
+  @override
+  Widget build(BuildContext context) {
+    final sourceLine = activeSegment?.fr ?? 'Transcript not ready yet.';
+    final translationLine = activeSegment?.en ?? '';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+      child: AspectRatio(
+        aspectRatio: 4 / 3,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (story.coverUrl == null || story.coverUrl!.isEmpty)
+              Image.asset(
+                'assets/images/listening/the_garden_key_background.png',
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: DesignTokens.nightGradient,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.headphones,
+                    color: DesignTokens.nightAccent,
+                    size: 42,
+                  ),
+                ),
+              )
+            else
+              Image.network(
+                story.coverUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: DesignTokens.nightGradient,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.headphones,
+                    color: DesignTokens.nightAccent,
+                    size: 42,
+                  ),
+                ),
+              ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: showTranscript
+                      ? [
+                          Colors.black.withValues(alpha: 0.10),
+                          Colors.black.withValues(alpha: 0.30),
+                          Colors.black.withValues(alpha: 0.88),
+                        ]
+                      : [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.82),
+                        ],
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'NOW PLAYING',
+                          style: DesignTokens.label(
+                            10,
+                          ).copyWith(color: Colors.white70, letterSpacing: 1),
+                        ),
+                        const Spacer(),
+                        const Icon(
+                          CupertinoIcons.ellipsis,
+                          color: Colors.white,
+                          size: 21,
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    if (showTranscript) ...[
+                      Text(
+                        totalSegments == 0
+                            ? 'TRANSCRIPT'
+                            : 'TRANSCRIPT · ${currentSegment + 1}/$totalSegments',
+                        style: DesignTokens.label(
+                          10,
+                        ).copyWith(color: DesignTokens.nightAccent),
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        sourceLine,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.display(
+                          22,
+                        ).copyWith(color: Colors.white),
+                      ),
+                      if (showTranslation && translationLine.isNotEmpty) ...[
+                        const SizedBox(height: 5),
+                        Text(
+                          translationLine,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: DesignTokens.body(
+                            13,
+                          ).copyWith(color: Colors.white70),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                    ],
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'assets/images/listening/the_garden_key_character.png',
+                            width: 42,
+                            height: 42,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Container(
+                              width: 42,
+                              height: 42,
+                              color: Colors.white12,
+                              child: const Icon(
+                                CupertinoIcons.person_fill,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                story.displayTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: DesignTokens.body(
+                                  15,
+                                  weight: FontWeight.w800,
+                                ).copyWith(color: Colors.white),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Narrated French · ${story.levelBand}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: DesignTokens.body(
+                                  11,
+                                ).copyWith(color: Colors.white70),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          CupertinoIcons.heart,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _HeroToggle(
+                            icon: CupertinoIcons.text_alignleft,
+                            label: showTranscript
+                                ? 'Hide transcript'
+                                : 'Transcript',
+                            selected: showTranscript,
+                            onTap: onToggleTranscript,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _HeroToggle(
+                          icon: CupertinoIcons.globe,
+                          label: showTranslation ? 'EN on' : 'Translate',
+                          selected: showTranslation,
+                          onTap: onToggleTranslation,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroToggle extends StatelessWidget {
+  const _HeroToggle({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected
+                ? DesignTokens.nightAccent.withValues(alpha: 0.92)
+                : Colors.black.withValues(alpha: 0.38),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 15,
+                color: selected ? Colors.black : Colors.white,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: DesignTokens.body(
+                  11,
+                  weight: FontWeight.w700,
+                ).copyWith(color: selected ? Colors.black : Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NightPanel extends StatelessWidget {
+  const _NightPanel({required this.child, this.accent});
+
+  final Widget child;
+  final Color? accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: accent ?? DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _NightPrimaryButton extends StatelessWidget {
+  const _NightPrimaryButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: FilledButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(label),
+        style: FilledButton.styleFrom(
+          backgroundColor: DesignTokens.nightAccent,
+          foregroundColor: Colors.black,
+          disabledBackgroundColor: DesignTokens.nightSurfaceRaised,
+          disabledForegroundColor: DesignTokens.nightMuted,
+          textStyle: DesignTokens.body(14, weight: FontWeight.w700),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NightAudioIsland extends StatelessWidget {
+  const _NightAudioIsland({
+    required this.isPlaying,
+    required this.isLoading,
+    required this.rate,
+    required this.onToggle,
+    required this.onReplay,
+    required this.onCycleRate,
+  });
+
+  final bool isPlaying;
+  final bool isLoading;
+  final double rate;
+  final VoidCallback onToggle;
+  final VoidCallback onReplay;
+  final VoidCallback onCycleRate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurfaceRaised.withValues(alpha: 0.96),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _IslandCircle(
+              icon: isLoading
+                  ? CupertinoIcons.hourglass
+                  : isPlaying
+                  ? CupertinoIcons.pause_fill
+                  : CupertinoIcons.play_fill,
+              filled: true,
+              onTap: isLoading ? null : onToggle,
+            ),
+            _IslandDivider(),
+            _IslandText(
+              value: '${rate.toStringAsFixed(2)}×',
+              onTap: onCycleRate,
+            ),
+            _IslandDivider(),
+            _IslandCircle(icon: CupertinoIcons.repeat, onTap: onReplay),
+            _IslandDivider(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Icon(
+                CupertinoIcons.book,
+                color: DesignTokens.nightAccent,
+                size: 19,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _IslandDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      Container(width: 1, height: 24, color: DesignTokens.nightHairline);
+}
+
+class _IslandCircle extends StatelessWidget {
+  const _IslandCircle({required this.icon, this.filled = false, this.onTap});
+
+  final IconData icon;
+  final bool filled;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onTap,
+      tooltip: 'Audio control',
+      icon: Icon(icon, size: 17),
+      color: filled ? Colors.black : DesignTokens.nightText,
+      style: IconButton.styleFrom(
+        backgroundColor: filled ? DesignTokens.nightAccent : Colors.transparent,
+        minimumSize: const Size(38, 38),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+}
+
+class _IslandText extends StatelessWidget {
+  const _IslandText({required this.value, required this.onTap});
+
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: Text(
+          value,
+          style: DesignTokens.body(
+            12,
+            weight: FontWeight.w700,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+      ),
+    );
+  }
+}
+
+class _ListeningSettingsSheet extends StatelessWidget {
+  const _ListeningSettingsSheet({required this.settings});
+
+  final SessionSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: settings,
+      builder: (context, _) => SafeArea(
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 650),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
+          decoration: const BoxDecoration(
+            color: DesignTokens.nightSurface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.nightHairline,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Listening settings',
+                      style: DesignTokens.display(
+                        22,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(
+                      CupertinoIcons.xmark,
+                      color: DesignTokens.nightMuted,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _NightSettingChoice(
+                label: 'Text size',
+                value: _textSizeLabel(settings.textScale),
+                choices: const ['Small', 'Medium', 'Large'],
+                selected: settings.textScale < 0.95
+                    ? 'Small'
+                    : settings.textScale > 1.1
+                    ? 'Large'
+                    : 'Medium',
+                onSelected: (value) => settings.setTextScale(
+                  value == 'Small'
+                      ? 0.9
+                      : value == 'Large'
+                      ? 1.25
+                      : 1,
+                ),
+              ),
+              _NightSettingChoice(
+                label: 'Playback speed',
+                value: '${settings.playbackRate.toStringAsFixed(2)}×',
+                choices: const ['0.75×', '1×', '1.25×'],
+                selected: settings.playbackRate <= 0.36
+                    ? '0.75×'
+                    : settings.playbackRate >= 0.5
+                    ? '1.25×'
+                    : '1×',
+                onSelected: (value) => settings.setPlaybackRate(
+                  value == '0.75×'
+                      ? 0.32
+                      : value == '1.25×'
+                      ? 0.55
+                      : 0.42,
+                ),
+              ),
+              _NightSwitchRow(
+                label: 'Word translations',
+                value: settings.translateSentences,
+                onChanged: settings.setTranslateSentences,
+              ),
+              _NightSwitchRow(
+                label: 'Underline words',
+                value: settings.underlineWords,
+                onChanged: settings.setUnderlineWords,
+              ),
+              _NightSwitchRow(
+                label: 'Auto-play word audio',
+                value: settings.autoPlayWordAudio,
+                onChanged: settings.setAutoPlayWordAudio,
+              ),
+              _NightSwitchRow(
+                label: 'Dark mode',
+                value: settings.darkMode,
+                onChanged: settings.setDarkMode,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _textSizeLabel(double value) => value < 0.95
+      ? 'Small'
+      : value > 1.1
+      ? 'Large'
+      : 'Medium';
+}
+
+class _NightSettingChoice extends StatelessWidget {
+  const _NightSettingChoice({
+    required this.label,
+    required this.value,
+    required this.choices,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final String value;
+  final List<String> choices;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: DesignTokens.body(
+                    14,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.nightText),
+                ),
+              ),
+              Text(
+                value,
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.nightAccent),
+              ),
+            ],
+          ),
+          const SizedBox(height: 9),
+          Row(
+            children: [
+              for (final choice in choices)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      label: Text(choice),
+                      selected: selected == choice,
+                      onSelected: (_) => onSelected(choice),
+                      selectedColor: DesignTokens.nightAccent,
+                      backgroundColor: DesignTokens.nightSurfaceRaised,
+                      labelStyle: TextStyle(
+                        color: selected == choice
+                            ? Colors.black
+                            : DesignTokens.nightMuted,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NightSwitchRow extends StatelessWidget {
+  const _NightSwitchRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile.adaptive(
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        label,
+        style: DesignTokens.body(
+          14,
+          weight: FontWeight.w600,
+        ).copyWith(color: DesignTokens.nightText),
+      ),
+      value: value,
+      activeColor: DesignTokens.nightAccent,
+      onChanged: onChanged,
     );
   }
 }
@@ -1227,39 +2090,42 @@ class _StageRail extends StatelessWidget {
   Widget build(BuildContext context) {
     const labels = ['Listen', 'Check', 'Focus', 'Dictate', 'Shadow', 'Done'];
     final currentIndex = current.index;
-    return Row(
-      children: [
-        for (var index = 0; index < labels.length; index++) ...[
-          Expanded(
-            child: Column(
-              children: [
-                AnimatedContainer(
-                  duration: DesignTokens.durationFast,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: index <= currentIndex
-                        ? DesignTokens.primary
-                        : DesignTokens.hairline,
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusPill,
-                    ),
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Row(
+        children: [
+          for (var index = 0; index < labels.length; index++)
+            Expanded(
+              child: AnimatedContainer(
+                duration: DesignTokens.durationFast,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color: index == currentIndex
+                      ? DesignTokens.nightAccent
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 5),
-                Text(
+                child: Text(
                   labels[index],
-                  style: DesignTokens.label(9).copyWith(
-                    color: index <= currentIndex
-                        ? DesignTokens.primary
-                        : DesignTokens.mutedDim,
+                  textAlign: TextAlign.center,
+                  style: DesignTokens.label(8.5).copyWith(
+                    color: index == currentIndex
+                        ? Colors.black
+                        : index < currentIndex
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.nightMuted,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-          if (index != labels.length - 1) const SizedBox(width: 4),
         ],
-      ],
+      ),
     );
   }
 }
@@ -1277,11 +2143,15 @@ class _StageEyebrow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: DesignTokens.label(11).copyWith(color: DesignTokens.primary),
+          style: DesignTokens.label(
+            11,
+          ).copyWith(color: DesignTokens.nightAccent),
         ),
         Text(
           detail,
-          style: DesignTokens.label(10).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.label(
+            10,
+          ).copyWith(color: DesignTokens.nightMuted),
         ),
       ],
     );
@@ -1429,18 +2299,18 @@ class _ChoiceButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          foregroundColor: correct ? DesignTokens.success : DesignTokens.ink,
+          foregroundColor: correct ? Colors.black : DesignTokens.nightText,
           backgroundColor: correct
-              ? DesignTokens.successSoft
+              ? Colors.greenAccent
               : active
-              ? DesignTokens.primarySoft
-              : DesignTokens.surface,
+              ? DesignTokens.nightAccentSoft
+              : DesignTokens.nightSurfaceRaised,
           side: BorderSide(
             color: correct
-                ? DesignTokens.success
+                ? Colors.greenAccent
                 : selected
-                ? DesignTokens.primary
-                : DesignTokens.hairline,
+                ? DesignTokens.nightAccent
+                : DesignTokens.nightHairline,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -1449,15 +2319,20 @@ class _ChoiceButton extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: DesignTokens.body(13, weight: FontWeight.w600)),
+            Text(
+              label,
+              style: DesignTokens.body(13, weight: FontWeight.w600).copyWith(
+                color: correct ? Colors.black : DesignTokens.nightText,
+              ),
+            ),
             if (secondaryLabel != null &&
                 secondaryLabel!.trim().isNotEmpty) ...[
               const SizedBox(height: 3),
               Text(
                 secondaryLabel!,
-                style: DesignTokens.body(
-                  11.5,
-                ).copyWith(color: DesignTokens.mutedDim),
+                style: DesignTokens.body(11.5).copyWith(
+                  color: correct ? Colors.black87 : DesignTokens.nightMuted,
+                ),
               ),
             ],
           ],
@@ -1530,14 +2405,19 @@ class _EmptyStage extends StatelessWidget {
       children: [
         _StageEyebrow(label: eyebrow, detail: 'Continue'),
         const SizedBox(height: 8),
-        Text(title, style: DesignTokens.display(28)),
+        Text(
+          title,
+          style: DesignTokens.display(
+            28,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 8),
         Text(
           body,
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(14).copyWith(color: DesignTokens.nightMuted),
         ),
         const SizedBox(height: 20),
-        PrimaryActionButton(
+        _NightPrimaryButton(
           label: buttonLabel,
           icon: CupertinoIcons.arrow_right,
           onPressed: onPressed,

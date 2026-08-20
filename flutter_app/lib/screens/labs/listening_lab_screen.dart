@@ -10,12 +10,9 @@ import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/elevenlabs_audio_service.dart';
 import '../../services/practice_artwork_service.dart';
-import '../../widgets/kicker_text.dart';
 import '../../widgets/personalized_generation_loader.dart';
-import '../../widgets/passeport_card.dart';
-import '../../widgets/practice_content_card.dart';
-import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
 import '../lessons/listening_practice_screen.dart';
@@ -31,6 +28,53 @@ const _storyTopicCategories = [
   'Technology',
   'Environment',
 ];
+
+const _listeningFormatOptions = [
+  _ListeningFormatOption(
+    id: 'surprise',
+    label: 'Surprise me',
+    detail: 'Let the lesson choose the mood',
+    icon: CupertinoIcons.sparkles,
+  ),
+  _ListeningFormatOption(
+    id: 'narration',
+    label: 'Story narration',
+    detail: 'Cinematic, calm, story-first',
+    icon: CupertinoIcons.book,
+  ),
+  _ListeningFormatOption(
+    id: 'podcast',
+    label: 'Podcast dialogue',
+    detail: 'Two voices, natural exchange',
+    icon: CupertinoIcons.mic,
+  ),
+  _ListeningFormatOption(
+    id: 'music',
+    label: 'Music lesson',
+    detail: 'Lyrics-led listening practice',
+    icon: CupertinoIcons.music_note_2,
+  ),
+  _ListeningFormatOption(
+    id: 'educational',
+    label: 'Educational',
+    detail: 'Clear explainer, easy to replay',
+    icon: CupertinoIcons.lightbulb,
+  ),
+];
+
+class _ListeningFormatOption {
+  const _ListeningFormatOption({
+    required this.id,
+    required this.label,
+    required this.detail,
+    required this.icon,
+  });
+
+  final String id;
+  final String label;
+  final String detail;
+  final IconData icon;
+}
 
 /// The learner's personal library of AI-generated stories — the "Read a new
 /// story" tile at top always generates a fresh one (Story + Quiz + Keywords +
@@ -64,6 +108,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   List<GeneratedStory>? _stories;
   // null = "Surprise me" (fully random pick each generation).
   String? _selectedTopic;
+  String _selectedFormat = 'surprise';
 
   @override
   void initState() {
@@ -110,6 +155,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         levelBand: widget.examLevel ?? levelBand,
         examName: widget.examMode ? widget.examName : null,
         examLevel: widget.examMode ? widget.examLevel : null,
+        audioFormat: widget.readingMode ? null : _selectedFormat,
         avoidTitles: existingStories.map((story) => story.title),
         avoidOpenings: existingStories.map(
           (story) => story.passage.segments.isEmpty
@@ -129,6 +175,9 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         readTimeMinutes: package.readTimeMinutes,
         practiceMode: 'listening',
       );
+      final experimentalAudio = widget.examMode || widget.readingMode
+          ? null
+          : await _prepareExperimentalAudio(story: story);
       final examAttempt = widget.examMode
           ? ref
                 .read(examPracticeStoreProvider)
@@ -153,7 +202,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       }
       final result = await AppRouter.push<Object?>(
         context,
-        (_) => _lessonScreen(story),
+        (_) => _lessonScreen(story, audioClip: experimentalAudio),
         fullscreenDialog: widget.autoStart,
       );
       if (widget.examMode &&
@@ -185,6 +234,63 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       }
     } finally {
       if (mounted) setState(() => _generatingStory = false);
+    }
+  }
+
+  /// Gemini owns the lesson structure; ElevenLabs renders the selected audio
+  /// format. A provider failure is deliberately fail-open so the existing
+  /// Gemini Live narration remains available while this experimental path is
+  /// being rolled out.
+  Future<ElevenLabsAudioClip?> _prepareExperimentalAudio({
+    required GeneratedStory story,
+  }) async {
+    final format = _selectedFormat == 'surprise'
+        ? 'narration'
+        : _selectedFormat;
+    try {
+      switch (format) {
+        case 'podcast':
+          final turns = <({String text, String? voiceId})>[];
+          var remaining = 2_000;
+          for (final segment in story.passage.segments) {
+            if (remaining <= 0) break;
+            final text = segment.fr.trim();
+            if (text.isEmpty) continue;
+            final bounded = text.length <= remaining
+                ? text
+                : text.substring(0, remaining);
+            turns.add((text: bounded, voiceId: null));
+            remaining -= bounded.length;
+          }
+          if (turns.length < 2) return null;
+          return ElevenLabsAudioService.shared.synthesizePodcast(turns: turns);
+        case 'music':
+          final keywords = story.keywords.map((word) => word.fr).join(', ');
+          return ElevenLabsAudioService.shared.composeMusic(
+            prompt:
+                'Create a warm French learning song inspired by “${story.displayTitle}”. '
+                'Theme: ${story.summary}. Include clear, memorable phrases related to '
+                '$keywords. Gentle acoustic pop, playful melody, easy pronunciation, '
+                'no explicit content.',
+            musicLengthMs: 30_000,
+          );
+        case 'educational':
+          return ElevenLabsAudioService.shared.synthesizeNarration(
+            text: story.passage.segments.map((segment) => segment.fr).join(' '),
+            mode: 'educational',
+          );
+        case 'narration':
+        default:
+          return ElevenLabsAudioService.shared.synthesizeNarration(
+            text: story.passage.segments.map((segment) => segment.fr).join(' '),
+            mode: 'story',
+          );
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        'ElevenLabs experimental audio unavailable: $error\n$stackTrace',
+      );
+      return null;
     }
   }
 
@@ -257,7 +363,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         : 'a2';
   }
 
-  Widget _lessonScreen(GeneratedStory story) {
+  Widget _lessonScreen(GeneratedStory story, {ElevenLabsAudioClip? audioClip}) {
     if (widget.examMode) {
       return ExamPracticeScreen(
         story: story,
@@ -266,12 +372,22 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         skill: 'listening',
       );
     }
+
     return widget.readingMode
         ? StoryReaderScreen(story: story, showFinishButton: widget.autoStart)
         : ListeningPracticeScreen(
             story: story,
+            audioClip: audioClip,
             showFinishButton: widget.autoStart,
           );
+  }
+
+  void _showLibrarySettingsHint() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Open a listening lesson to adjust session settings.'),
+      ),
+    );
   }
 
   @override
@@ -286,75 +402,147 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     }
     final stories = _stories ?? const [];
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
         title: Text(
           widget.readingMode ? 'Reading' : 'Listening',
-          style: DesignTokens.display(20),
+          style: DesignTokens.display(
+            30,
+          ).copyWith(color: DesignTokens.nightText),
         ),
-        backgroundColor: DesignTokens.canvasDim,
+        backgroundColor: DesignTokens.nightCanvas,
+        foregroundColor: DesignTokens.nightText,
+        toolbarHeight: 78,
         elevation: 0,
         scrolledUnderElevation: 0,
-      ),
-      body: WebConstrainedView(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          children: [
-            if (_generatingStory)
-              PersonalizedGenerationLoader(
-                content: widget.readingMode
-                    ? 'reading story'
-                    : 'listening lesson',
-                detail: widget.readingMode
-                    ? 'Shaping a short story around your level and interests.'
-                    : 'Preparing bilingual audio practice for your current level.',
-                icon: CupertinoIcons.book_fill,
-              )
-            else
-              _GenerateStoryTile(
-                generating: false,
-                selectedTopic: _selectedTopic,
-                listening: !widget.readingMode,
-                onTap: _generateStory,
-              ),
-            const SizedBox(height: 10),
-            _TopicChipRow(
-              selected: _selectedTopic,
-              onSelect: (topic) => setState(() => _selectedTopic = topic),
+        actions: [
+          IconButton(
+            tooltip: 'Listening settings',
+            onPressed: _showLibrarySettingsHint,
+            icon: const Icon(
+              CupertinoIcons.slider_horizontal_3,
+              color: DesignTokens.nightAccent,
             ),
-            const SizedBox(height: 20),
-            if (stories.isNotEmpty) ...[
-              _ContinueStoryCard(
-                story: stories.first,
-                listening: !widget.readingMode,
-                onTap: () => AppRouter.push(
-                  context,
-                  (_) => _lessonScreen(stories.first),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: WebConstrainedView(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(18, 2, 18, 32),
+            children: [
+              if (_generatingStory)
+                PersonalizedGenerationLoader(
+                  content: widget.readingMode
+                      ? 'reading story'
+                      : 'listening lesson',
+                  detail: widget.readingMode
+                      ? 'Shaping a short story around your level and interests.'
+                      : 'Preparing a ${_selectedFormatLabel.toLowerCase()} for your current level.',
+                  icon: CupertinoIcons.headphones,
+                )
+              else
+                _GenerateStoryTile(
+                  generating: false,
+                  selectedTopic: _selectedTopic,
+                  selectedFormat: _selectedFormatLabel,
+                  listening: !widget.readingMode,
+                  onTap: _generateStory,
                 ),
-              ),
-              const SizedBox(height: 20),
-              const KickerText(
-                'Your short books',
-                color: DesignTokens.mutedDim,
-              ),
               const SizedBox(height: 10),
-              ResponsiveCardGrid(
-                mainAxisExtent: 292,
-                itemCount: stories.length,
-                itemBuilder: (context, index) => _StoryBookCard(
-                  story: stories[index],
+              if (!widget.readingMode) ...[
+                const _ListeningLibraryLabel('AUDIO FORMAT'),
+                const SizedBox(height: 9),
+                _ListeningFormatGrid(
+                  selected: _selectedFormat,
+                  onSelect: (format) =>
+                      setState(() => _selectedFormat = format),
+                ),
+                const SizedBox(height: 16),
+              ],
+              _TopicChipRow(
+                selected: _selectedTopic,
+                onSelect: (topic) => setState(() => _selectedTopic = topic),
+              ),
+              const SizedBox(height: 22),
+              if (stories.isNotEmpty) ...[
+                _ListeningSectionLabel(
+                  widget.readingMode
+                      ? 'CONTINUE READING'
+                      : 'CONTINUE LISTENING',
+                ),
+                const SizedBox(height: 9),
+                _ContinueStoryCard(
+                  story: stories.first,
+                  listening: !widget.readingMode,
                   onTap: () => AppRouter.push(
                     context,
-                    (_) => _lessonScreen(stories[index]),
+                    (_) => _lessonScreen(stories.first),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-            ] else
-              _EmptyLibraryNote(),
-          ],
+                const SizedBox(height: 24),
+                _ListeningSectionLabel(
+                  widget.readingMode
+                      ? 'PREVIOUS STORIES'
+                      : 'PREVIOUS LISTENING',
+                ),
+                const SizedBox(height: 9),
+                for (final story in stories)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _StoryBookCard(
+                      story: story,
+                      onTap: () =>
+                          AppRouter.push(context, (_) => _lessonScreen(story)),
+                    ),
+                  ),
+              ] else
+                _EmptyLibraryNote(),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  String get _selectedFormatLabel => _listeningFormatOptions
+      .firstWhere(
+        (option) => option.id == _selectedFormat,
+        orElse: () => _listeningFormatOptions.first,
+      )
+      .label;
+}
+
+class _ListeningSectionLabel extends StatelessWidget {
+  const _ListeningSectionLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: DesignTokens.label(
+        11,
+      ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 0.8),
+    );
+  }
+}
+
+class _ListeningLibraryLabel extends StatelessWidget {
+  const _ListeningLibraryLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: DesignTokens.label(
+        11,
+      ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 0.8),
     );
   }
 }
@@ -368,10 +556,16 @@ class _DirectCourseLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DesignTokens.canvasDim,
+      backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
-        title: Text(title, style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvasDim,
+        title: Text(
+          title,
+          style: DesignTokens.display(
+            20,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+        backgroundColor: DesignTokens.nightCanvas,
+        foregroundColor: DesignTokens.nightText,
         elevation: 0,
       ),
       body: Padding(
@@ -395,47 +589,198 @@ class _GenerateStoryTile extends StatelessWidget {
     required this.generating,
     required this.onTap,
     this.selectedTopic,
+    required this.selectedFormat,
     required this.listening,
   });
 
   final bool generating;
   final VoidCallback onTap;
   final String? selectedTopic;
+  final String selectedFormat;
   final bool listening;
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Container(
-          width: 44,
-          height: 44,
+    return InkWell(
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+      onTap: generating ? null : onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: DesignTokens.nightAccentSoft,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: generating
+                  ? const Padding(
+                      padding: EdgeInsets.all(13),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(
+                          DesignTokens.nightAccent,
+                        ),
+                      ),
+                    )
+                  : const Icon(
+                      CupertinoIcons.headphones,
+                      color: DesignTokens.nightAccent,
+                      size: 25,
+                    ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listening
+                        ? 'Create a listening lesson'
+                        : 'Create a reading story',
+                    style: DesignTokens.body(
+                      16,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    listening
+                        ? '$selectedFormat at your level'
+                        : 'A fresh story shaped to your course level',
+                    style: DesignTokens.body(
+                      12.5,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              CupertinoIcons.chevron_right,
+              color: DesignTokens.nightAccent,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ListeningFormatGrid extends StatelessWidget {
+  const _ListeningFormatGrid({required this.selected, required this.onSelect});
+
+  final String selected;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = (constraints.maxWidth - 8) / 2;
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final option in _listeningFormatOptions)
+              SizedBox(
+                width: width,
+                child: _ListeningFormatChoice(
+                  option: option,
+                  selected: option.id == selected,
+                  onTap: () => onSelect(option.id),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ListeningFormatChoice extends StatelessWidget {
+  const _ListeningFormatChoice({
+    required this.option,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _ListeningFormatOption option;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${option.label}. ${option.detail}',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+        child: AnimatedContainer(
+          duration: DesignTokens.durationFast,
+          constraints: const BoxConstraints(minHeight: 76),
+          padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
-            color: DesignTokens.infoSoft,
-            borderRadius: BorderRadius.circular(13),
+            color: selected
+                ? DesignTokens.nightAccentSoft
+                : DesignTokens.nightSurface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
+            border: Border.all(
+              color: selected
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightHairline,
+            ),
           ),
-          child: generating
-              ? const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(CupertinoIcons.book_fill, color: DesignTokens.info),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                option.icon,
+                size: 18,
+                color: selected
+                    ? DesignTokens.nightAccent
+                    : DesignTokens.nightMuted,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      option.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(12.5, weight: FontWeight.w700)
+                          .copyWith(
+                            color: selected
+                                ? DesignTokens.nightAccent
+                                : DesignTokens.nightText,
+                          ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      option.detail,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        10.5,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        title: Text(
-          listening ? 'Generate listening practice' : 'Generate a new story',
-          style: DesignTokens.body(15, weight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          generating
-              ? 'Writing your profile-level lesson…'
-              : selectedTopic != null
-              ? 'A fresh bilingual ${listening ? 'listening lesson' : 'story'} with a $selectedTopic twist'
-              : 'A fresh bilingual ${listening ? 'listening lesson' : 'story'}, generated for you',
-          style: DesignTokens.body(12.5).copyWith(color: DesignTokens.mutedDim),
-        ),
-        trailing: const Icon(CupertinoIcons.chevron_right, size: 18),
-        onTap: generating ? null : onTap,
       ),
     );
   }
@@ -469,8 +814,13 @@ class _TopicChipRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? DesignTokens.primary
-                    : DesignTokens.canvasDim,
+                    ? DesignTokens.nightAccentSoft
+                    : DesignTokens.nightSurface,
+                border: Border.all(
+                  color: isSelected
+                      ? DesignTokens.nightAccent
+                      : DesignTokens.nightHairline,
+                ),
                 borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
               ),
               alignment: Alignment.center,
@@ -478,7 +828,9 @@ class _TopicChipRow extends StatelessWidget {
                 option ?? 'Surprise me',
                 style: DesignTokens.body(12.5, weight: FontWeight.w600)
                     .copyWith(
-                      color: isSelected ? Colors.white : DesignTokens.mutedDim,
+                      color: isSelected
+                          ? DesignTokens.nightAccent
+                          : DesignTokens.nightMuted,
                     ),
               ),
             ),
@@ -504,62 +856,85 @@ class _ContinueStoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ModernCard(
-        padding: 0,
-        child: SizedBox(
-          height: 180,
-          child: Row(
-            children: [
-              _StoryCover(story: story, width: 122, height: 180),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        listening ? 'CONTINUE LISTENING' : 'CONTINUE READING',
-                        style: DesignTokens.mono(10, weight: FontWeight.w700)
-                            .copyWith(
-                              color: DesignTokens.primary,
-                              letterSpacing: 0.8,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        story.displayTitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.display(18),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${story.levelBand}  •  ${story.readTimeMinutes} min',
-                        style: DesignTokens.mono(
-                          10.5,
-                        ).copyWith(color: DesignTokens.mutedDim),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          const Icon(CupertinoIcons.play_fill, size: 13),
-                          const SizedBox(width: 6),
-                          Text(
-                            listening ? 'Open practice' : 'Open book',
-                            style: DesignTokens.body(
-                              12.5,
-                              weight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        child: Stack(
+          children: [
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: _StoryCover(
+                story: story,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.84),
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              left: 18,
+              right: 18,
+              bottom: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listening ? 'CONTINUE LISTENING' : 'CONTINUE READING',
+                    style: DesignTokens.label(11).copyWith(
+                      color: DesignTokens.nightAccent,
+                      letterSpacing: 0.7,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    story.displayTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.display(
+                      23,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${story.levelBand} · ${story.passage.segments.length} scenes · ${story.readTimeMinutes} min',
+                          style: DesignTokens.body(
+                            12,
+                          ).copyWith(color: DesignTokens.nightMuted),
+                        ),
+                      ),
+                      const Icon(
+                        CupertinoIcons.play_fill,
+                        color: DesignTokens.nightAccent,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        listening ? 'Listen' : 'Open book',
+                        style: DesignTokens.body(
+                          12,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: DesignTokens.nightAccent),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -574,15 +949,58 @@ class _StoryBookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PracticeContentCard(
-      title: story.displayTitle,
-      summary: story.summary,
-      levelBand: story.levelBand,
-      meta:
-          '${story.passage.segments.length} scenes · ${story.readTimeMinutes} min',
-      coverUrl: story.coverUrl,
-      fallbackIcon: CupertinoIcons.headphones,
+    return InkWell(
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       onTap: onTap,
+      child: Container(
+        height: 92,
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          children: [
+            _StoryCover(story: story, width: 112, height: 92),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      story.displayTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        15,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${story.levelBand} · ${story.readTimeMinutes} min',
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 14),
+              child: Icon(
+                CupertinoIcons.chevron_right,
+                color: DesignTokens.nightAccent,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -601,6 +1019,15 @@ class _StoryCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = story.coverUrl;
+    Widget fallback() => Container(
+      color: DesignTokens.nightSurfaceRaised,
+      alignment: Alignment.center,
+      child: const Icon(
+        CupertinoIcons.headphones,
+        color: DesignTokens.nightAccent,
+        size: 30,
+      ),
+    );
     return SizedBox(
       width: width,
       height: height,
@@ -608,47 +1035,14 @@ class _StoryCover extends StatelessWidget {
           ? Image.asset(
               url.substring('asset:'.length),
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                decoration: const BoxDecoration(
-                  gradient: DesignTokens.heroGradient,
-                ),
-                child: const Center(
-                  child: Icon(
-                    CupertinoIcons.book_fill,
-                    color: Colors.white,
-                    size: 34,
-                  ),
-                ),
-              ),
+              errorBuilder: (_, _, _) => fallback(),
             )
           : url == null || url.isEmpty
-          ? Container(
-              decoration: const BoxDecoration(
-                gradient: DesignTokens.heroGradient,
-              ),
-              child: const Center(
-                child: Icon(
-                  CupertinoIcons.book_fill,
-                  color: Colors.white,
-                  size: 34,
-                ),
-              ),
-            )
+          ? fallback()
           : Image.network(
               url,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                decoration: const BoxDecoration(
-                  gradient: DesignTokens.heroGradient,
-                ),
-                child: const Center(
-                  child: Icon(
-                    CupertinoIcons.book_fill,
-                    color: Colors.white,
-                    size: 34,
-                  ),
-                ),
-              ),
+              errorBuilder: (_, _, _) => fallback(),
             ),
     );
   }
@@ -660,19 +1054,21 @@ class _EmptyLibraryNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
           const Icon(
-            CupertinoIcons.book,
-            color: DesignTokens.mutedDim,
+            CupertinoIcons.headphones,
+            color: DesignTokens.nightMuted,
             size: 28,
           ),
           const SizedBox(height: 10),
           Text(
             'No stories yet. Generate one above to build your library.',
             textAlign: TextAlign.center,
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.mutedDim),
+            style: DesignTokens.body(
+              13,
+            ).copyWith(color: DesignTokens.nightMuted),
           ),
         ],
       ),

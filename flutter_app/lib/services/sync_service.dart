@@ -327,6 +327,31 @@ class SyncService {
     queueRowId: story.id,
   );
 
+  Future<void> syncStoryFavorite({
+    required String storyId,
+    required bool favorite,
+  }) => _guarded(
+    (uid) async {
+      if (favorite) {
+        final now = DateTime.now().toUtc().toIso8601String();
+        await _client.from('story_favorites').upsert({
+          'user_id': uid,
+          'story_id': storyId,
+          'created_at': now,
+          'updated_at': now,
+        }, onConflict: 'user_id,story_id');
+      } else {
+        await _client
+            .from('story_favorites')
+            .delete()
+            .eq('user_id', uid)
+            .eq('story_id', storyId);
+      }
+    },
+    queueTable: 'story_favorites',
+    queueRowId: storyId,
+  );
+
   /// Uploads a generated cover to the learner-scoped private bucket and
   /// returns a long-lived signed URL for the local story card. The object
   /// path is owned by the authenticated learner; it is never public.
@@ -1148,6 +1173,24 @@ class SyncService {
           if (story == null) return true;
           await syncGeneratedStory(story);
           return true;
+        case 'story_favorites':
+          final uid = _userId;
+          if (uid == null) return true;
+          final rows = _db.select(
+            'SELECT story_id, created_at, updated_at FROM story_favorites '
+            'WHERE user_id = ? AND story_id = ?',
+            [uid, rowId],
+          );
+          if (rows.isEmpty) {
+            await _client
+                .from('story_favorites')
+                .delete()
+                .eq('user_id', uid)
+                .eq('story_id', rowId);
+          } else {
+            await syncStoryFavorite(storyId: rowId, favorite: true);
+          }
+          return true;
         case 'generated_grammar_stories':
           final story = GeneratedGrammarStoryStore(
             _db,
@@ -1236,6 +1279,7 @@ class SyncService {
       'mistakeTags': () => _hydrateMistakeTags(uid),
       'events': () => _hydrateEvents(uid),
       'generatedStories': () => _hydrateGeneratedStories(uid),
+      'storyFavorites': () => _hydrateStoryFavorites(uid),
       'generatedGrammarStories': () => _hydrateGeneratedGrammarStories(uid),
       'generatedWritingTasks': () => _hydrateGeneratedWritingTasks(uid),
       'generatedRoleplays': () => _hydrateGeneratedRoleplays(uid),
@@ -1536,6 +1580,24 @@ class SyncService {
           r['created_at'],
           r['updated_at'],
         ],
+      );
+    }
+  }
+
+  Future<void> _hydrateStoryFavorites(String uid) async {
+    final rows = await _client
+        .from('story_favorites')
+        .select('user_id, story_id, created_at, updated_at')
+        .eq('user_id', uid);
+    for (final row in rows) {
+      _db.execute(
+        '''INSERT INTO story_favorites (user_id, story_id, created_at, updated_at)
+           VALUES (?, ?, ?, ?)
+           ON CONFLICT(user_id, story_id) DO UPDATE SET
+             created_at = excluded.created_at,
+             updated_at = excluded.updated_at
+           WHERE excluded.updated_at > story_favorites.updated_at''',
+        [row['user_id'], row['story_id'], row['created_at'], row['updated_at']],
       );
     }
   }

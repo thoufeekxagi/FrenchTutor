@@ -93,6 +93,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   27: _migrationV27,
   28: _migrationV28,
   29: _migrationV29,
+  30: _migrationV30,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1128,4 +1129,23 @@ void _migrationV29(CommonDatabase db) {
       "ALTER TABLE generated_roleplays ADD COLUMN level_band TEXT NOT NULL DEFAULT 'A1'",
     );
   }
+}
+
+/// Learner-owned story favorites.  Favorites are intentionally separate from
+/// `generated_stories`: starring a story is mutable preference state and must
+/// not rewrite the generated content row or its sync timestamp.
+void _migrationV30(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS story_favorites (
+      user_id TEXT NOT NULL,
+      story_id TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      PRIMARY KEY (user_id, story_id)
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_story_favorites_user_updated '
+    'ON story_favorites (user_id, updated_at DESC)',
+  );
 }

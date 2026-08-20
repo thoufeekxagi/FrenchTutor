@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
+import '../../data/database/story_favorite_store.dart';
 import '../../models/content_models.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
@@ -119,6 +120,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _autoPlayWordAudio = false;
   bool _darkMode = true;
   bool _isLiked = false;
+  bool? _selectedWordConjugatable;
+  VocabEntry? _resolvedWordMeaning;
   bool _isMarkedLearned = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
@@ -189,11 +192,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   /// asking her about the story happens right here without leaving the
   /// page, not in a separate fullscreen call window.
   late final InlineCallController _call;
+  late final StoryFavoriteStore _favorites;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _favorites = ref.read(storyFavoriteStoreProvider);
     _call = InlineCallController(
       sessionType: LiveSessionType.labAssistant,
       lessonContext: () => _lessonContext,
@@ -235,6 +240,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       stage: 'story',
       topic: _story.displayTitle,
     );
+    unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
       _coverRefreshTimer = Timer.periodic(
         const Duration(seconds: 2),
@@ -485,16 +491,44 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }
 
   void _selectWord(int segmentIndex, int wordIndex) {
+    final sameWord =
+        _selectedWordSegment == segmentIndex && _selectedWord == wordIndex;
     setState(() {
       _selectedSegment = segmentIndex;
-      if (_selectedWordSegment == segmentIndex && _selectedWord == wordIndex) {
+      if (sameWord) {
         _selectedWordSegment = null;
         _selectedWord = null;
+        _resolvedWordMeaning = null;
+        _selectedWordConjugatable = null;
       } else {
         _selectedWordSegment = segmentIndex;
         _selectedWord = wordIndex;
+        _resolvedWordMeaning = _fallbackWordEntry(segmentIndex, wordIndex);
+        _selectedWordConjugatable = _heuristicWordCanConjugate(segmentIndex);
       }
     });
+    if (!sameWord) unawaited(_resolveWordMeaning(segmentIndex, wordIndex));
+  }
+
+  Future<void> _loadFavorite() async {
+    final favorite = _favorites.isFavorite(_story.id);
+    if (mounted) setState(() => _isLiked = favorite);
+  }
+
+  void _toggleFavorite() {
+    final next = !_isLiked;
+    setState(() => _isLiked = next);
+    _favorites.setFavorite(_story.id, next);
+  }
+
+  void _cycleTextSize() {
+    final next = _textScale < 0.98
+        ? 1.0
+        : _textScale < 1.15
+        ? 1.25
+        : 0.9;
+    setState(() => _textScale = next);
+    unawaited(_settings.setTextScale(next));
   }
 
   /// Plays just the one picked sentence (or the current one if nothing is
@@ -612,10 +646,14 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         segmentIndex >= _passage.segments.length) {
       return false;
     }
+    if (_selectedWordConjugatable == true) return true;
     final note = _passage.segments[segmentIndex].grammarNote.toLowerCase();
-    return RegExp(
+    final noteSuggestsVerb = RegExp(
       r'\b(verb|conjugat|tense|present|past|future|imparfait|conditionnel|impératif)\b',
     ).hasMatch(note);
+    if (noteSuggestsVerb) return true;
+    final word = _selectedWordEntry()?.fr.toLowerCase() ?? '';
+    return RegExp(r'(er|ir|re|oir)$').hasMatch(word);
   }
 
   Future<void> _showConjugation() async {
@@ -639,6 +677,49 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         ),
       ),
     );
+  }
+
+  Future<void> _resolveWordMeaning(int segmentIndex, int wordIndex) async {
+    if (segmentIndex < 0 || segmentIndex >= _passage.segments.length) return;
+    final segment = _passage.segments[segmentIndex];
+    final words = _wordParts(segment.fr);
+    if (wordIndex < 0 || wordIndex >= words.length) return;
+    final selectedWord = _cleanStoryWord(words[wordIndex]);
+    if (selectedWord.isEmpty) return;
+    try {
+      final data = await LessonAgentService.shared.buildWordMeaning(
+        word: selectedWord,
+        sentence: segment.fr,
+        sentenceTranslation: segment.en,
+        levelBand: _story.levelBand,
+      );
+      if (!mounted ||
+          _selectedWordSegment != segmentIndex ||
+          _selectedWord != wordIndex) {
+        return;
+      }
+      final translation = data['translation']?.toString().trim() ?? '';
+      final resolvedTranslation = translation.isNotEmpty
+          ? translation
+          : _fallbackTranslationForWord(segment, wordIndex);
+      final rawWord = data['word']?.toString().trim() ?? '';
+      final resolvedWord = rawWord.isNotEmpty ? rawWord : selectedWord;
+      final partOfSpeech =
+          data['part_of_speech']?.toString().toLowerCase() ?? '';
+      setState(() {
+        _resolvedWordMeaning = VocabEntry(
+          id: 'story:${_story.id}:$segmentIndex:$wordIndex',
+          fr: resolvedWord,
+          en: resolvedTranslation,
+          phonetic: '',
+        );
+        _selectedWordConjugatable =
+            data['can_conjugate'] == true || partOfSpeech.contains('verb');
+      });
+    } catch (_) {
+      // The local positional meaning remains visible if the model is
+      // unavailable. Tapping another word can retry independently.
+    }
   }
 
   void _toggleTranslation() {
@@ -669,9 +750,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   onConjugate: _selectedWordCanConjugate
                       ? _showConjugation
                       : null,
-                  callActions: InlineCallActions(controller: _call),
-                  reportButton: ReportProblemButton(
-                    sessionType: 'Story: ${_passage.displayTitle}',
+                  callActions: InlineCallActions(
+                    controller: _call,
+                    accentColor: _darkMode
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.primary,
                   ),
                 ),
                 if (_call.isLive || _call.error != null)
@@ -780,14 +863,52 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     }
     final words = _wordParts(_passage.segments[segmentIndex].fr);
     if (wordIndex < 0 || wordIndex >= words.length) return null;
+    if (_selectedWordSegment == segmentIndex &&
+        _selectedWord == wordIndex &&
+        _resolvedWordMeaning != null) {
+      return _resolvedWordMeaning;
+    }
+    return _fallbackWordEntry(segmentIndex, wordIndex);
+  }
+
+  VocabEntry _fallbackWordEntry(int segmentIndex, int wordIndex) {
+    final segment = _passage.segments[segmentIndex];
+    final words = _wordParts(segment.fr);
     final selected = _foldStoryWord(words[wordIndex]);
     for (final entry in _story.keywords) {
       if (_wordParts(entry.fr).map(_foldStoryWord).contains(selected)) {
         return entry;
       }
     }
-    return null;
+    return VocabEntry(
+      id: 'story:${_story.id}:$segmentIndex:$wordIndex',
+      fr: _cleanStoryWord(words[wordIndex]),
+      en: _fallbackTranslationForWord(segment, wordIndex),
+      phonetic: '',
+    );
   }
+
+  String _fallbackTranslationForWord(ReadingSegment segment, int wordIndex) {
+    final sourceWords = _wordParts(segment.fr);
+    final translationWords = _wordParts(segment.en);
+    if (translationWords.isEmpty) return 'Meaning unavailable';
+    final mapped = (wordIndex * translationWords.length / sourceWords.length)
+        .floor()
+        .clamp(0, translationWords.length - 1);
+    return _cleanStoryWord(translationWords[mapped]);
+  }
+
+  bool _heuristicWordCanConjugate(int segmentIndex) {
+    final note = _passage.segments[segmentIndex].grammarNote.toLowerCase();
+    return RegExp(
+      r'\b(verb|conjugat|tense|present|past|future|imparfait|conditionnel|impératif)\b',
+    ).hasMatch(note);
+  }
+
+  String _cleanStoryWord(String value) => value
+      .replaceAll(RegExp(r'^[.,!?;:«»"“”¿¡()\[\]]+'), '')
+      .replaceAll(RegExp(r'[.,!?;:«»"“”¿¡()\[\]]+$'), '')
+      .trim();
 
   Widget _storyView() {
     final segments = _passage.segments;
@@ -873,15 +994,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _story.displayTitle,
           style: DesignTokens.display(29).copyWith(color: text, height: 1.08),
         ),
-        if (_story.summary.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            _story.summary,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: DesignTokens.body(14).copyWith(color: muted, height: 1.35),
-          ),
-        ],
         const SizedBox(height: 12),
         Wrap(
           alignment: WrapAlignment.start,
@@ -919,14 +1031,14 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   : 'Show translation',
               visualDensity: VisualDensity.compact,
               icon: Icon(
-                CupertinoIcons.textformat,
+                Icons.translate,
                 color: _translateSentences ? accent : muted,
                 size: 22,
               ),
             ),
             IconButton(
-              onPressed: _showSettings,
-              tooltip: 'Text and story settings',
+              onPressed: _cycleTextSize,
+              tooltip: 'Text size: ${_textSizeLabel(_textScale)}',
               visualDensity: VisualDensity.compact,
               icon: Icon(
                 CupertinoIcons.textformat_size,
@@ -935,7 +1047,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               ),
             ),
             IconButton(
-              onPressed: () => setState(() => _isLiked = !_isLiked),
+              onPressed: _toggleFavorite,
               tooltip: _isLiked ? 'Unlike story' : 'Like story',
               visualDensity: VisualDensity.compact,
               icon: Icon(
@@ -949,6 +1061,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         ),
       ],
     );
+  }
+
+  String _textSizeLabel(double scale) {
+    if (scale < 0.98) return 'Small';
+    if (scale < 1.15) return 'Medium';
+    return 'Large';
   }
 
   Widget _grammarView() {
@@ -1321,7 +1439,6 @@ class _StoryBookHeader extends StatelessWidget {
     required this.onSettings,
     required this.onConjugate,
     required this.callActions,
-    required this.reportButton,
   });
 
   final GeneratedStory story;
@@ -1333,13 +1450,11 @@ class _StoryBookHeader extends StatelessWidget {
   final VoidCallback onSettings;
   final VoidCallback? onConjugate;
   final Widget callActions;
-  final Widget reportButton;
 
   @override
   Widget build(BuildContext context) {
     final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
     final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
-    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       child: SizedBox(
@@ -1450,10 +1565,6 @@ class _StoryBookHeader extends StatelessWidget {
                   DefaultTextStyle.merge(
                     style: TextStyle(color: text),
                     child: callActions,
-                  ),
-                  DefaultTextStyle.merge(
-                    style: TextStyle(color: muted),
-                    child: reportButton,
                   ),
                 ],
               ),
@@ -1590,7 +1701,6 @@ class _ConjugationSheet extends StatelessWidget {
         decoration: BoxDecoration(
           color: surface,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: accent.withValues(alpha: 0.28)),
         ),
         child: FutureBuilder<Map<String, dynamic>>(
           future: future,
