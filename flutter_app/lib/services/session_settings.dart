@@ -20,7 +20,7 @@ class SessionSettings extends ChangeNotifier {
   static const _darkModeKey = 'session_dark_mode';
 
   double textScale = 1;
-  double playbackRate = 0.42;
+  double playbackRate = 1;
   bool translateSentences = true;
   bool highlightWords = true;
   bool underlineWords = true;
@@ -30,7 +30,7 @@ class SessionSettings extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     textScale = (prefs.getDouble(_textScaleKey) ?? 1).clamp(0.9, 1.35);
-    playbackRate = _validRate(prefs.getDouble(_playbackRateKey) ?? 0.42);
+    playbackRate = _validRate(prefs.getDouble(_playbackRateKey) ?? 1);
     translateSentences = prefs.getBool(_translationKey) ?? true;
     highlightWords = prefs.getBool(_highlightKey) ?? true;
     underlineWords = prefs.getBool(_underlineKey) ?? true;
@@ -89,8 +89,8 @@ class SessionSettings extends ChangeNotifier {
   }
 
   double _validRate(double value) {
-    if ((value - 0.32).abs() < 0.001) return 0.32;
-    if ((value - 0.55).abs() < 0.001) return 0.55;
-    return 0.42;
+    if ((value - 0.75).abs() < 0.001) return 0.75;
+    if ((value - 1.25).abs() < 0.001) return 1.25;
+    return 1;
   }
 }

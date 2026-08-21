@@ -19,19 +19,30 @@ class PracticeArtworkService {
     required String topic,
     required String levelBand,
     String? coverPrompt,
+    String aspectRatio = '4:3',
   }) {
     final context = coverPrompt == null || coverPrompt.trim().isEmpty
         ? 'Show one clear real-life moment from this learning session.'
         : coverPrompt.trim();
+    final ratioInstruction = aspectRatio == '9:16'
+        ? 'CUSTOM LISTENING BACKDROP: this is a true vertical 9:16 phone player image. '
+              'Ignore every compact-cover, 4:3, square, landscape, card, thumbnail, or crop '
+              'instruction in the source context. Compose directly on a 9:16 canvas with '
+              'important details inside the central 70% safe area, a clean upper area for '
+              'status and controls, and a clean lower area for lyrics and playback controls. '
+              'Do not stretch, crop, or zoom a source composition. '
+        : '';
     return LessonAgentService.shared.generateStoryCover(
       title: title,
       summary: summary,
       topic: topic,
       levelBand: levelBand,
       variationSeed: id,
+      aspectRatio: aspectRatio,
       coverPrompt:
+          '$ratioInstruction'
           '$context\n'
-          'Create one coherent text-free 4:3 story image. A single visible character '
+          'Create one coherent text-free $aspectRatio story image. A single visible character '
           'is welcome when relevant; keep the character inside the central safe area '
           'with the full face and body visible. Render no text, letters, '
           'numbers, logos, signs, captions, or other typography. Make the composition, '
@@ -53,10 +64,14 @@ class PracticeArtworkService {
     required String levelBand,
     String? coverPrompt,
     String? diagnosticRoleplayId,
+    String aspectRatio = '4:3',
   }) {
     return sync.uploadGeneratedStoryCover(
       storyId: id,
       diagnosticRoleplayId: diagnosticRoleplayId,
+      targetAspectRatio: aspectRatio == '9:16' ? 9 / 16 : 4 / 3,
+      maxWidth: aspectRatio == '9:16' ? 384 : 512,
+      maxHeight: aspectRatio == '9:16' ? 682 : 384,
       generate: (attempt) => generate(
         id: '$id-attempt-${attempt + 1}',
         title: title,
@@ -64,7 +79,61 @@ class PracticeArtworkService {
         topic: topic,
         levelBand: levelBand,
         coverPrompt: coverPrompt,
+        aspectRatio: aspectRatio,
       ),
+    );
+  }
+
+  /// Generates independent portrait artwork for the full-screen listening
+  /// player. The object is intentionally separate from the compact cover.
+  static Future<String?> generateListeningBackgroundAndUpload({
+    required SyncService sync,
+    required String id,
+    required String title,
+    required String summary,
+    required String topic,
+    required String levelBand,
+    String? coverPrompt,
+  }) {
+    return sync.uploadGeneratedStoryCover(
+      storyId: id,
+      storageSuffix: '-listening',
+      targetAspectRatio: 9 / 16,
+      maxWidth: 768,
+      maxHeight: 1365,
+      maxBytes: 160 * 1024,
+      retryMaxBytes: 240 * 1024,
+      generate: (attempt) => generate(
+        id: '$id-music-attempt-${attempt + 1}',
+        title: title,
+        summary: summary,
+        topic: topic,
+        levelBand: levelBand,
+        coverPrompt: coverPrompt,
+        aspectRatio: '9:16',
+      ),
+    );
+  }
+
+  /// Backward-compatible name for callers that still explicitly request a
+  /// music backdrop.
+  static Future<String?> generateMusicBackgroundAndUpload({
+    required SyncService sync,
+    required String id,
+    required String title,
+    required String summary,
+    required String topic,
+    required String levelBand,
+    String? coverPrompt,
+  }) {
+    return generateListeningBackgroundAndUpload(
+      sync: sync,
+      id: id,
+      title: title,
+      summary: summary,
+      topic: topic,
+      levelBand: levelBand,
+      coverPrompt: coverPrompt,
     );
   }
 }

@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const GEMINI_MODEL = "gemini-3.1-flash-lite";
+const OPENAI_MODEL = "gpt-5.6-luna";
 const OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 const MAX_MESSAGES = 40;
 const MAX_TEXT_LENGTH = 12_000;
@@ -158,6 +159,7 @@ async function callOpenRouter(body: Record<string, unknown>) {
       messages: body.messages,
       temperature: body.temperature,
       max_tokens: body.max_tokens,
+      ...(body.response_format ? { response_format: body.response_format } : {}),
     }),
   });
   if (!response.ok) {
@@ -168,6 +170,58 @@ async function callOpenRouter(body: Record<string, unknown>) {
   const choices = data?.choices;
   const text = Array.isArray(choices) ? String(choices[0]?.message?.content ?? "").trim() : "";
   return text ? json({ text, provider: "openrouter", model: OPENROUTER_MODEL }) : json({ error: "OpenRouter returned no text" }, 502);
+}
+
+function extractOpenAIText(data: unknown): string {
+  const choices = data && typeof data === "object" ? (data as { choices?: unknown }).choices : null;
+  if (!Array.isArray(choices) || choices.length === 0) return "";
+  const message = choices[0] && typeof choices[0] === "object"
+    ? (choices[0] as { message?: unknown }).message
+    : null;
+  if (!message || typeof message !== "object") return "";
+  const content = (message as { content?: unknown }).content;
+  if (typeof content === "string") return content.trim();
+  if (!Array.isArray(content)) return "";
+  return content
+    .map((part) => {
+      if (typeof part === "string") return part;
+      if (!part || typeof part !== "object") return "";
+      return String((part as { text?: unknown }).text ?? "");
+    })
+    .join("")
+    .trim();
+}
+
+async function callOpenAI(body: Record<string, unknown>) {
+  // The dashboard uses OPEN_AI_API_KEY. Keep OPENAI_API_KEY as a harmless
+  // compatibility alias for local/older deployments, but never send either
+  // credential to the client or include it in an error response.
+  const apiKey = Deno.env.get("OPEN_AI_API_KEY")?.trim() || Deno.env.get("OPENAI_API_KEY")?.trim();
+  if (!apiKey) return json({ error: "OpenAI is not configured" }, 503);
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      messages: body.messages,
+      // GPT-5.6 Luna is a reasoning model. Chat Completions expects the
+      // completion budget under this field; the app's existing maxTokens
+      // remains the product-level output budget.
+      max_completion_tokens: Math.max(Number(body.max_tokens ?? 1024), 256),
+      ...(body.response_format ? { response_format: body.response_format } : {}),
+    }),
+  });
+  if (!response.ok) {
+    const details = await response.json().catch(() => ({}));
+    return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
+  }
+  const data = await response.json();
+  const text = extractOpenAIText(data);
+  return text ? json({ text, provider: "openai", model: OPENAI_MODEL }) : json({ error: "OpenAI returned no text" }, 502);
 }
 
 Deno.serve(async (request) => {
@@ -181,13 +235,17 @@ Deno.serve(async (request) => {
     return json({ error: "Invalid JSON" }, 400);
   }
 
-  const provider = body.provider === "openrouter" ? "openrouter" : "gemini";
+  const provider = body.provider === "openai"
+    ? "openai"
+    : body.provider === "openrouter"
+    ? "openrouter"
+    : "gemini";
   const messages = body.messages;
 
   const maxTokens = Math.min(Math.max(Number(body.maxTokens ?? 1024), 32), 4096);
   const temperature = Math.min(Math.max(Number(body.temperature ?? 0.4), 0), 1.5);
 
-  if (provider === "openrouter") {
+  if (provider === "openai" || provider === "openrouter") {
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
       return json({ error: "Invalid messages" }, 400);
     }
@@ -201,7 +259,16 @@ Deno.serve(async (request) => {
     if (safeMessages.some((message) => !message.content || message.content.length > MAX_TEXT_LENGTH)) {
       return json({ error: "Invalid message content" }, 400);
     }
-    return await callOpenRouter({ messages: safeMessages, temperature, max_tokens: maxTokens });
+    const responseFormat = body.responseFormat && typeof body.responseFormat === "object"
+      ? body.responseFormat
+      : undefined;
+    const providerBody = {
+      messages: safeMessages,
+      temperature,
+      max_tokens: maxTokens,
+      ...(responseFormat ? { response_format: responseFormat } : {}),
+    };
+    return provider === "openai" ? await callOpenAI(providerBody) : await callOpenRouter(providerBody);
   }
 
   const rawContents = body.contents;

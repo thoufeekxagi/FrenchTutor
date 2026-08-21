@@ -3,6 +3,10 @@
 Status: 2026-08-16
 Decision: keep the app on the stable image-based tutor presentation for now. The experimental lip-sync renderer is no longer used by runtime screens. The AI-generated tutor portraits remain available and are now resolved from the selected tutor.
 
+Related UI proposal: [V3 Speaking Redesign — Speak + Busuu Interaction Contract](flutter_app/V3%20design/speaking%20interaction%20wireframes.md).
+That proposal defines the guided speaking drill and roleplay shell before any
+new speaking UI code is approved.
+
 ## What was tested and why it was reverted
 
 The first prototype drove a painted mouth and a few face layers from PCM amplitude. The next prototype cross-faded a storyboard of still images. Both approaches failed the product bar:

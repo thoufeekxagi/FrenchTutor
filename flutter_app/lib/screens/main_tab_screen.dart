@@ -12,11 +12,11 @@ import '../services/app_tour.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
 import '../widgets/web/web_app_shell.dart';
-import 'speak/speak_home_screen.dart';
 import 'speak/speak_practice_screen.dart';
 import 'speak/speak_profile_screen.dart';
 import 'speak/speak_roadmap_screen.dart';
 import 'speak/speak_settings_screen.dart';
+import 'speak/speaking_studio_screen.dart';
 import 'scan/scan_screen.dart';
 
 /// Primary navigation destinations, defined once and shared between the
@@ -79,7 +79,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
     // Built fresh every rebuild so each Speak tab can observe the latest
     // session/profile state while the tab shell keeps its navigation index.
     final screens = [
-      const SpeakHomeScreen(),
+      const SpeakingStudioScreen(),
       const SpeakRoadmapScreen(embedded: true),
       const SpeakPracticeScreen(),
       const ScanScreen(),

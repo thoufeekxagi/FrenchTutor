@@ -94,6 +94,8 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   28: _migrationV28,
   29: _migrationV29,
   30: _migrationV30,
+  31: _migrationV31,
+  32: _migrationV32,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1148,4 +1150,28 @@ void _migrationV30(CommonDatabase db) {
     'CREATE INDEX IF NOT EXISTS idx_story_favorites_user_updated '
     'ON story_favorites (user_id, updated_at DESC)',
   );
+}
+
+/// Stores a separately generated portrait backdrop for listening music. The
+/// existing cover remains the compact library artwork and is never cropped
+/// into the music player's full-screen ratio.
+void _migrationV31(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_stories')) return;
+  if (!_columnExists(db, 'generated_stories', 'music_background_url')) {
+    db.execute(
+      'ALTER TABLE generated_stories ADD COLUMN music_background_url TEXT',
+    );
+  }
+}
+
+/// Stores the durable rendered listening clip and the format that created it.
+/// Audio stays in Supabase Storage; SQLite only keeps the learner-scoped path.
+void _migrationV32(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_stories')) return;
+  if (!_columnExists(db, 'generated_stories', 'audio_path')) {
+    db.execute('ALTER TABLE generated_stories ADD COLUMN audio_path TEXT');
+  }
+  if (!_columnExists(db, 'generated_stories', 'audio_mode')) {
+    db.execute('ALTER TABLE generated_stories ADD COLUMN audio_mode TEXT');
+  }
 }

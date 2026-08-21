@@ -739,24 +739,45 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           children: [
             Column(
               children: [
-                _StoryBookHeader(
-                  story: _story,
-                  darkMode: _darkMode,
-                  selectedWord: _selectedWordEntry(),
-                  learned: _isMarkedLearned,
-                  onBack: () => Navigator.maybePop(context),
-                  onMarkLearned: _markAsLearned,
-                  onSettings: _showSettings,
-                  onConjugate: _selectedWordCanConjugate
-                      ? _showConjugation
-                      : null,
-                  callActions: InlineCallActions(
-                    controller: _call,
-                    accentColor: _darkMode
-                        ? DesignTokens.nightAccent
-                        : DesignTokens.primary,
-                  ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _StoryBookHeader(
+                      story: _story,
+                      darkMode: _darkMode,
+                      selectedWord: _selectedWordEntry(),
+                      learned: _isMarkedLearned,
+                      onBack: () => Navigator.maybePop(context),
+                      onMarkLearned: _markAsLearned,
+                      onSettings: _showSettings,
+                      onConjugate: _selectedWordCanConjugate
+                          ? _showConjugation
+                          : null,
+                      callActions: InlineCallActions(
+                        controller: _call,
+                        accentColor: _darkMode
+                            ? DesignTokens.nightAccent
+                            : DesignTokens.primary,
+                      ),
+                    ),
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      bottom: -24,
+                      child: _StoryStageIsland(
+                        labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
+                        currentIndex: switch (_tab) {
+                          _StoryTab.story => 0,
+                          _StoryTab.quiz => 1,
+                          _StoryTab.keywords => 2,
+                          _StoryTab.grammar => 3,
+                        },
+                        onIndexTap: _goToStage,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 24),
                 if (_call.isLive || _call.error != null)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -765,19 +786,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       listeningLabel: 'Listening. Ask about the story anytime.',
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: _StoryStageIsland(
-                    labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
-                    currentIndex: switch (_tab) {
-                      _StoryTab.story => 0,
-                      _StoryTab.quiz => 1,
-                      _StoryTab.keywords => 2,
-                      _StoryTab.grammar => 3,
-                    },
-                    onIndexTap: _goToStage,
-                  ),
-                ),
                 Divider(
                   height: 1,
                   color: _darkMode

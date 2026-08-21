@@ -23,6 +23,7 @@ import '../labs/writing_lab_screen.dart';
 import '../exam/exam_readiness_screen.dart';
 import 'speak_review_screen.dart';
 import 'speak_ui.dart';
+import 'speaking_practice_screen.dart';
 
 /// The open practice workspace. Course sessions provide progression; this
 /// surface provides repetition, free conversation, and targeted refreshers.
@@ -104,6 +105,15 @@ class SpeakPracticeScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const SpeakSectionTitle(title: 'Practice a skill'),
           const SizedBox(height: 10),
+          _skillRow(
+            context,
+            ref: ref,
+            icon: Icons.mic_none_rounded,
+            title: 'Speaking',
+            subtitle: 'Interactive conversation practice',
+            screen: const SpeakingPracticeScreen(),
+            area: PremiumArea.speaking,
+          ),
           _skillRow(
             context,
             ref: ref,

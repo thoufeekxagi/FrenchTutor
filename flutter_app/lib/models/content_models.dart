@@ -656,6 +656,9 @@ class GeneratedStory {
     this.topic = '',
     this.readTimeMinutes = 5,
     this.coverUrl,
+    this.musicBackgroundUrl,
+    this.audioPath,
+    this.audioMode,
     this.practiceMode = 'reading',
   });
 
@@ -684,6 +687,20 @@ class GeneratedStory {
   /// being completed in the background.
   final String? coverUrl;
 
+  /// Separate portrait artwork for the music player. This is never a crop of
+  /// [coverUrl]; music requests an exact 9:16 generation so the full-screen
+  /// player does not distort the story's visual context.
+  final String? musicBackgroundUrl;
+
+  /// Stable path for the rendered listening clip in the learner-scoped
+  /// Supabase Storage bucket. Keeping a path (rather than an expiring URL)
+  /// lets the app download the same clip every time the lesson is reopened.
+  final String? audioPath;
+
+  /// The selected renderer format (`music`, `podcast`, `narration`, or
+  /// `educational`) used to create [audioPath].
+  final String? audioMode;
+
   /// Keeps the reading and listening shelves independent while preserving
   /// one shared story payload and cover pipeline.
   final String practiceMode;
@@ -702,6 +719,9 @@ class GeneratedStory {
     String? topic,
     int? readTimeMinutes,
     String? coverUrl,
+    String? musicBackgroundUrl,
+    String? audioPath,
+    String? audioMode,
     String? practiceMode,
   }) {
     return GeneratedStory(
@@ -715,6 +735,9 @@ class GeneratedStory {
       topic: topic ?? this.topic,
       readTimeMinutes: readTimeMinutes ?? this.readTimeMinutes,
       coverUrl: coverUrl ?? this.coverUrl,
+      musicBackgroundUrl: musicBackgroundUrl ?? this.musicBackgroundUrl,
+      audioPath: audioPath ?? this.audioPath,
+      audioMode: audioMode ?? this.audioMode,
       practiceMode: practiceMode ?? this.practiceMode,
     );
   }

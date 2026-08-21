@@ -29,7 +29,7 @@ class GeneratedStoryStore {
     final rows = _db.select(
       '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
                 level_band, summary, topic, read_time_minutes, cover_url,
-                practice_mode
+                music_background_url, audio_path, audio_mode, practice_mode
          FROM generated_stories
          WHERE deleted_at IS NULL ${practiceMode == null ? '' : 'AND (practice_mode = ? OR practice_mode IS NULL)'}
          ORDER BY created_at DESC''',
@@ -71,9 +71,9 @@ class GeneratedStoryStore {
     _db.execute(
       '''INSERT INTO generated_stories
          (id, title, passage_json, quiz_json, keywords_json, level_band,
-          summary, topic, read_time_minutes, cover_url, practice_mode,
-          created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+          summary, topic, read_time_minutes, cover_url, music_background_url,
+          audio_path, audio_mode, practice_mode, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         story.id,
         story.title,
@@ -85,6 +85,9 @@ class GeneratedStoryStore {
         story.topic,
         story.readTimeMinutes,
         story.coverUrl,
+        story.musicBackgroundUrl,
+        story.audioPath,
+        story.audioMode,
         story.practiceMode,
         story.createdAt.toUtc().toIso8601String(),
         now,
@@ -128,6 +131,19 @@ class GeneratedStoryStore {
     if (story != null) unawaited(_sync?.syncGeneratedStory(story));
   }
 
+  /// Stores the separate portrait artwork used only by the music player.
+  void updateMusicBackgroundUrl(String storyId, String musicBackgroundUrl) {
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''UPDATE generated_stories
+         SET music_background_url = ?, updated_at = ?
+         WHERE id = ?''',
+      [musicBackgroundUrl, now, storyId],
+    );
+    final story = _find(storyId);
+    if (story != null) unawaited(_sync?.syncGeneratedStory(story));
+  }
+
   /// Upserts a row pulled from Supabase during sign-in hydration.
   /// Last-write-wins on `updated_at`, matching every other hydrate path.
   void upsertFromRemote({
@@ -141,6 +157,9 @@ class GeneratedStoryStore {
     String topic = '',
     int readTimeMinutes = 5,
     String? coverUrl,
+    String? musicBackgroundUrl,
+    String? audioPath,
+    String? audioMode,
     String practiceMode = 'reading',
     required String createdAt,
     required String updatedAt,
@@ -148,9 +167,9 @@ class GeneratedStoryStore {
     _db.execute(
       '''INSERT INTO generated_stories
          (id, title, passage_json, quiz_json, keywords_json, level_band,
-          summary, topic, read_time_minutes, cover_url, practice_mode,
-          created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          summary, topic, read_time_minutes, cover_url, music_background_url,
+          audio_path, audio_mode, practice_mode, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            passage_json = excluded.passage_json,
@@ -161,6 +180,9 @@ class GeneratedStoryStore {
            topic = excluded.topic,
            read_time_minutes = excluded.read_time_minutes,
            cover_url = excluded.cover_url,
+           music_background_url = excluded.music_background_url,
+           audio_path = excluded.audio_path,
+           audio_mode = excluded.audio_mode,
            practice_mode = excluded.practice_mode,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_stories.updated_at''',
@@ -175,6 +197,9 @@ class GeneratedStoryStore {
         topic,
         readTimeMinutes,
         coverUrl,
+        musicBackgroundUrl,
+        audioPath,
+        audioMode,
         practiceMode,
         createdAt,
         updatedAt,
@@ -186,7 +211,7 @@ class GeneratedStoryStore {
     final rows = _db.select(
       '''SELECT id, passage_json, quiz_json, keywords_json, created_at,
                 level_band, summary, topic, read_time_minutes, cover_url,
-                practice_mode
+                music_background_url, audio_path, audio_mode, practice_mode
          FROM generated_stories WHERE id = ? AND deleted_at IS NULL''',
       [id],
     );
@@ -219,6 +244,9 @@ class GeneratedStoryStore {
         title: _string(row['title']),
         coverUrl: row['cover_url']?.toString(),
       ),
+      musicBackgroundUrl: row['music_background_url']?.toString(),
+      audioPath: row['audio_path']?.toString(),
+      audioMode: row['audio_mode']?.toString(),
       practiceMode: _string(row['practice_mode'], 'reading'),
     );
   }

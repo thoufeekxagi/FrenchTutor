@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:sqlite3/common.dart';
@@ -318,6 +317,9 @@ class SyncService {
         'topic': story.topic,
         'read_time_minutes': story.readTimeMinutes,
         'cover_url': _remoteCoverUrl(story.coverUrl),
+        'music_background_url': _remoteCoverUrl(story.musicBackgroundUrl),
+        'audio_path': story.audioPath,
+        'audio_mode': story.audioMode,
         'practice_mode': story.practiceMode,
         'created_at': story.createdAt.toUtc().toIso8601String(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
@@ -367,6 +369,9 @@ class SyncService {
         bytes: bytes,
         maxBytes: maxBytes,
         diagnosticRoleplayId: diagnosticRoleplayId,
+        targetAspectRatio: ImageStorageOptimizer.targetAspectRatio,
+        maxWidth: ImageStorageOptimizer.maxWidth,
+        maxHeight: ImageStorageOptimizer.maxHeight,
       );
     } catch (e, st) {
       debugPrint('Story cover upload failed ($storyId): $e\n$st');
@@ -384,6 +389,38 @@ class SyncService {
     }
   }
 
+  /// Saves the exact rendered listening clip in a private, learner-scoped
+  /// bucket. The database stores only this stable path, never base64 audio or
+  /// an expiring signed URL.
+  Future<String?> uploadListeningAudio({
+    required String storyId,
+    required String mode,
+    required Uint8List bytes,
+  }) async {
+    final uid = _userId;
+    if (uid == null || bytes.isEmpty) return null;
+    final safeMode = mode.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '-');
+    final path = '$uid/$storyId-$safeMode.mp3';
+    await _client.storage
+        .from('listening-audio')
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(
+            contentType: 'audio/mpeg',
+            upsert: true,
+          ),
+        );
+    return path;
+  }
+
+  /// Downloads a previously rendered clip using the current user's JWT, so a
+  /// private bucket remains private while the lesson can still be replayed.
+  Future<Uint8List?> downloadListeningAudio(String path) async {
+    if (_userId == null || path.trim().isEmpty) return null;
+    return _client.storage.from('listening-audio').download(path);
+  }
+
   /// Generates and uploads artwork with the single shared retry policy.
   /// Generation/compression may happen twice; upload/network errors do not
   /// trigger an unbounded regeneration loop.
@@ -391,6 +428,12 @@ class SyncService {
     required String storyId,
     required Future<Uint8List> Function(int attempt) generate,
     String? diagnosticRoleplayId,
+    String storageSuffix = '',
+    double targetAspectRatio = ImageStorageOptimizer.targetAspectRatio,
+    int maxWidth = ImageStorageOptimizer.maxWidth,
+    int maxHeight = ImageStorageOptimizer.maxHeight,
+    int maxBytes = ImageStorageOptimizer.maxBytes,
+    int? retryMaxBytes,
   }) async {
     for (var attempt = 0; attempt < 2; attempt++) {
       final attemptNumber = attempt + 1;
@@ -417,8 +460,14 @@ class SyncService {
         final url = await _uploadStoryCoverOnce(
           storyId: storyId,
           bytes: bytes,
-          maxBytes: attempt == 0 ? ImageStorageOptimizer.maxBytes : 40 * 1024,
+          maxBytes: attempt == 0
+              ? maxBytes
+              : (retryMaxBytes ?? (maxBytes * 1.6).round()),
           diagnosticRoleplayId: diagnosticRoleplayId,
+          storageSuffix: storageSuffix,
+          targetAspectRatio: targetAspectRatio,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
         );
         if (url != null && url.isNotEmpty) return url;
         return null;
@@ -440,6 +489,10 @@ class SyncService {
     required Uint8List bytes,
     required int maxBytes,
     String? diagnosticRoleplayId,
+    String storageSuffix = '',
+    required double targetAspectRatio,
+    required int maxWidth,
+    required int maxHeight,
   }) async {
     final uid = _userId;
     if (uid == null) return null;
@@ -458,14 +511,17 @@ class SyncService {
     }
     late final Uint8List optimized;
     try {
-      optimized = ImageStorageOptimizer.optimizeCover(
+      optimized = ImageStorageOptimizer.optimizeArtwork(
         bytes,
         maxBytes: maxBytes,
+        targetAspectRatio: targetAspectRatio,
+        maxWidth: maxWidth,
+        maxHeight: maxHeight,
       );
     } on FormatException catch (error) {
       throw _CoverOptimizationFailure(error.message);
     }
-    final path = '$uid/$storyId.jpg';
+    final path = '$uid/$storyId$storageSuffix.jpg';
     final bucket = _client.storage.from('story-covers');
     final contentType =
         optimized.length >= 8 &&
@@ -1548,9 +1604,9 @@ class SyncService {
         '''
         INSERT INTO generated_stories
           (id, title, passage_json, quiz_json, keywords_json, level_band,
-           summary, topic, read_time_minutes, cover_url, practice_mode,
-           created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           summary, topic, read_time_minutes, cover_url, music_background_url,
+           audio_path, audio_mode, practice_mode, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
           title = excluded.title,
           passage_json = excluded.passage_json,
@@ -1561,6 +1617,9 @@ class SyncService {
           topic = excluded.topic,
           read_time_minutes = excluded.read_time_minutes,
           cover_url = excluded.cover_url,
+          music_background_url = excluded.music_background_url,
+          audio_path = excluded.audio_path,
+          audio_mode = excluded.audio_mode,
           practice_mode = excluded.practice_mode,
           updated_at = excluded.updated_at
         WHERE excluded.updated_at > generated_stories.updated_at
@@ -1576,6 +1635,9 @@ class SyncService {
           r['topic'] ?? '',
           r['read_time_minutes'] ?? 5,
           r['cover_url'],
+          r['music_background_url'],
+          r['audio_path'],
+          r['audio_mode'],
           r['practice_mode'] ?? 'reading',
           r['created_at'],
           r['updated_at'],

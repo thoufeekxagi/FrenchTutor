@@ -9,7 +9,6 @@ import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
@@ -146,6 +145,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   Future<void> _generateStory() async {
     if (_generatingStory) return;
     setState(() => _generatingStory = true);
+    var generationStage = 'story';
     try {
       final profile = ref.read(learningStoreProvider).profile();
       final levelBand = _cefrLevelFor(profile.level).toUpperCase();
@@ -175,9 +175,34 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         readTimeMinutes: package.readTimeMinutes,
         practiceMode: 'listening',
       );
+      generationStage = 'audio';
       final experimentalAudio = widget.examMode || widget.readingMode
           ? null
           : await _prepareExperimentalAudio(story: story);
+      var persistedStory = story;
+      if (!widget.examMode &&
+          !widget.readingMode &&
+          experimentalAudio != null) {
+        final selectedMode = _selectedFormat == 'surprise'
+            ? 'narration'
+            : _selectedFormat;
+        final audioPath = await ref
+            .read(syncServiceProvider)
+            .uploadListeningAudio(
+              storyId: story.id,
+              mode: selectedMode,
+              bytes: experimentalAudio.bytes,
+            );
+        if (audioPath == null || audioPath.isEmpty) {
+          throw const ElevenLabsProviderException(
+            'The rendered lesson audio could not be saved. Please try again.',
+          );
+        }
+        persistedStory = story.copyWith(
+          audioPath: audioPath,
+          audioMode: selectedMode,
+        );
+      }
       final examAttempt = widget.examMode
           ? ref
                 .read(examPracticeStoreProvider)
@@ -185,13 +210,12 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
                   examName: widget.examName ?? 'Exam practice',
                   levelBand: widget.examLevel ?? story.levelBand,
                   skill: 'listening',
-                  story: story,
+                  story: persistedStory,
                 )
           : null;
       final store = ref.read(generatedStoryStoreProvider);
       if (!widget.examMode) {
-        store.insert(story);
-        unawaited(_prewarmNarration(story));
+        store.insert(persistedStory);
       }
       if (!mounted) return;
       if (!widget.examMode) _loadStories();
@@ -199,10 +223,13 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       // the shared story store and replaces its placeholder live.
       if (!widget.examMode) {
         unawaited(_generateCover(story, package.coverPrompt));
+        if (!widget.readingMode) {
+          unawaited(_generateListeningBackground(story, package.coverPrompt));
+        }
       }
       final result = await AppRouter.push<Object?>(
         context,
-        (_) => _lessonScreen(story, audioClip: experimentalAudio),
+        (_) => _lessonScreen(persistedStory, audioClip: experimentalAudio),
         fullscreenDialog: widget.autoStart,
       );
       if (widget.examMode &&
@@ -221,102 +248,130 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       }
     } catch (error, stackTrace) {
       debugPrint(
-        'ListeningLabScreen: story generation failed: $error\n$stackTrace',
+        'ListeningLabScreen: $generationStage generation failed: $error\n$stackTrace',
       );
       if (mounted) {
         if (widget.autoStart) {
           Navigator.of(context).pop(false);
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Story generation failed: $error')),
-        );
+        final label = generationStage == 'audio'
+            ? '$_selectedFormatLabel generation failed'
+            : 'Story generation failed';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$label: $error')));
       }
     } finally {
       if (mounted) setState(() => _generatingStory = false);
     }
   }
 
-  /// Gemini owns the lesson structure; ElevenLabs renders the selected audio
-  /// format. A provider failure is deliberately fail-open so the existing
-  /// Gemini Live narration remains available while this experimental path is
-  /// being rolled out.
-  Future<ElevenLabsAudioClip?> _prepareExperimentalAudio({
+  Future<void> _showFormatPicker() async {
+    final selected = await _showChoiceSheet(
+      title: 'Choose audio format',
+      selected: _selectedFormat,
+      options: [
+        for (final option in _listeningFormatOptions)
+          _ListeningChoiceItem(
+            value: option.id,
+            label: option.label,
+            detail: option.detail,
+            icon: option.icon,
+          ),
+      ],
+    );
+    if (!mounted || selected == null) return;
+    setState(() => _selectedFormat = selected);
+  }
+
+  Future<void> _showTopicPicker() async {
+    final selected = await _showChoiceSheet(
+      title: 'Choose a topic',
+      selected: _selectedTopic ?? 'surprise',
+      options: [
+        const _ListeningChoiceItem(
+          value: 'surprise',
+          label: 'Surprise me',
+          detail: 'Let the lesson choose the premise',
+          icon: CupertinoIcons.sparkles,
+        ),
+        for (final topic in _storyTopicCategories)
+          _ListeningChoiceItem(
+            value: topic.toLowerCase(),
+            label: topic,
+            detail: 'Steer the next story toward $topic',
+            icon: CupertinoIcons.circle_fill,
+          ),
+      ],
+    );
+    if (!mounted || selected == null) return;
+    setState(() => _selectedTopic = selected == 'surprise' ? null : selected);
+  }
+
+  Future<String?> _showChoiceSheet({
+    required String title,
+    required String selected,
+    required List<_ListeningChoiceItem> options,
+  }) {
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      builder: (_) => _ListeningChoiceSheet(
+        title: title,
+        selected: selected,
+        options: options,
+      ),
+    );
+  }
+
+  /// Gemini owns the lesson structure and meanings. ElevenLabs renders the
+  /// selected format from this exact canonical script. A failure is surfaced
+  /// to the learner so an unverified fallback can never enter a lesson.
+  Future<ElevenLabsAudioClip> _prepareExperimentalAudio({
     required GeneratedStory story,
   }) async {
     final format = _selectedFormat == 'surprise'
         ? 'narration'
         : _selectedFormat;
-    try {
-      switch (format) {
-        case 'podcast':
-          final turns = <({String text, String? voiceId})>[];
-          var remaining = 2_000;
-          for (final segment in story.passage.segments) {
-            if (remaining <= 0) break;
-            final text = segment.fr.trim();
-            if (text.isEmpty) continue;
-            final bounded = text.length <= remaining
-                ? text
-                : text.substring(0, remaining);
-            turns.add((text: bounded, voiceId: null));
-            remaining -= bounded.length;
-          }
-          if (turns.length < 2) return null;
-          return ElevenLabsAudioService.shared.synthesizePodcast(turns: turns);
-        case 'music':
-          final keywords = story.keywords.map((word) => word.fr).join(', ');
-          return ElevenLabsAudioService.shared.composeMusic(
-            prompt:
-                'Create a warm French learning song inspired by “${story.displayTitle}”. '
-                'Theme: ${story.summary}. Include clear, memorable phrases related to '
-                '$keywords. Gentle acoustic pop, playful melody, easy pronunciation, '
-                'no explicit content.',
-            musicLengthMs: 30_000,
-          );
-        case 'educational':
-          return ElevenLabsAudioService.shared.synthesizeNarration(
-            text: story.passage.segments.map((segment) => segment.fr).join(' '),
-            mode: 'educational',
-          );
-        case 'narration':
-        default:
-          return ElevenLabsAudioService.shared.synthesizeNarration(
-            text: story.passage.segments.map((segment) => segment.fr).join(' '),
-            mode: 'story',
-          );
-      }
-    } catch (error, stackTrace) {
-      debugPrint(
-        'ElevenLabs experimental audio unavailable: $error\n$stackTrace',
+    final script = CanonicalAudioScript.fromStory(story, format: format);
+    if (script.lines.isEmpty) {
+      throw const ElevenLabsProviderException(
+        'This lesson has no French lines to render yet.',
       );
-      return null;
     }
-  }
-
-  /// Synthesizes and caches this story's narration right after it's
-  /// written, so opening it to read plays instantly from the cache instead
-  /// of opening a Live socket sentence-by-sentence (the on-demand path
-  /// is exactly what used to run out of rate-limit budget partway through a
-  /// fresh story). Fire-and-forget: a partial or total failure here just
-  /// means those lines fall back to live synthesis on first play, same as
-  /// before this existed.
-  Future<void> _prewarmNarration(GeneratedStory story) {
-    final segments = story.passage.segments;
-    return LessonSpeechService.shared.prewarmNarration([
-      for (var i = 0; i < segments.length; i++)
-        SpeechItem(
-          text: segments[i].fr,
-          language: 'fr-FR',
-          contentItemId: story.segmentContentId(i),
-        ),
-      for (var i = 0; i < story.keywords.length; i++)
-        SpeechItem(
-          text: story.keywords[i].fr,
-          language: 'fr-FR',
-          contentItemId: '${story.id}_kw_${story.keywords[i].id}',
-        ),
-    ]);
+    switch (format) {
+      case 'podcast':
+        if (script.lines.length < 2) {
+          throw const ElevenLabsProviderException(
+            'Podcast lessons need at least two canonical lines.',
+          );
+        }
+        return ElevenLabsAudioService.shared.synthesizePodcast(
+          turns: script.podcastTurns,
+        );
+      case 'music':
+        return ElevenLabsAudioService.shared.composeMusic(
+          lyrics: script.lyricLines,
+          style:
+              'warm acoustic French pop, clear solo vocals, gentle drums, '
+              'memorable chorus, conversational verses, 86 BPM, no spoken delivery, '
+              'no English lyrics, no explicit content',
+          musicLengthMs: 45_000,
+        );
+      case 'educational':
+        return ElevenLabsAudioService.shared.synthesizeNarration(
+          text: script.narrationText,
+          mode: 'educational',
+        );
+      case 'narration':
+      default:
+        return ElevenLabsAudioService.shared.synthesizeNarration(
+          text: script.narrationText,
+          mode: 'story',
+        );
+    }
   }
 
   Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {
@@ -338,6 +393,33 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     } catch (error, stackTrace) {
       debugPrint(
         'ListeningLabScreen: cover generation failed: $error\n$stackTrace',
+      );
+    }
+  }
+
+  Future<void> _generateListeningBackground(
+    GeneratedStory story,
+    String? coverPrompt,
+  ) async {
+    final sync = ref.read(syncServiceProvider);
+    final store = ref.read(generatedStoryStoreProvider);
+    try {
+      final url =
+          await PracticeArtworkService.generateListeningBackgroundAndUpload(
+            sync: sync,
+            id: story.id,
+            title: story.title,
+            summary: story.summary,
+            topic: story.topic,
+            levelBand: story.levelBand,
+            coverPrompt: coverPrompt,
+          );
+      if (url != null && url.isNotEmpty) {
+        store.updateMusicBackgroundUrl(story.id, url);
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        'ListeningLabScreen: music background generation failed: $error\n$stackTrace',
       );
     }
   }
@@ -440,7 +522,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
                       : 'listening lesson',
                   detail: widget.readingMode
                       ? 'Shaping a short story around your level and interests.'
-                      : 'Preparing a ${_selectedFormatLabel.toLowerCase()} for your current level.',
+                      : 'Writing the transcript, rendering ${_selectedFormatLabel.toLowerCase()}, then checking every word.',
                   icon: CupertinoIcons.headphones,
                 )
               else
@@ -453,20 +535,34 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
                 ),
               const SizedBox(height: 10),
               if (!widget.readingMode) ...[
-                const _ListeningLibraryLabel('AUDIO FORMAT'),
-                const SizedBox(height: 9),
-                _ListeningFormatGrid(
-                  selected: _selectedFormat,
-                  onSelect: (format) =>
-                      setState(() => _selectedFormat = format),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ListeningSelectionPill(
+                        label: 'Audio format',
+                        value: _selectedFormatLabel,
+                        onTap: _showFormatPicker,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _ListeningSelectionPill(
+                        label: 'Topic',
+                        value: _selectedTopicLabel,
+                        onTap: _showTopicPicker,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
               ],
-              _TopicChipRow(
-                selected: _selectedTopic,
-                onSelect: (topic) => setState(() => _selectedTopic = topic),
-              ),
-              const SizedBox(height: 22),
+              if (widget.readingMode) ...[
+                _TopicChipRow(
+                  selected: _selectedTopic,
+                  onSelect: (topic) => setState(() => _selectedTopic = topic),
+                ),
+                const SizedBox(height: 22),
+              ],
               if (stories.isNotEmpty) ...[
                 _ListeningSectionLabel(
                   widget.readingMode
@@ -513,26 +609,18 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         orElse: () => _listeningFormatOptions.first,
       )
       .label;
-}
 
-class _ListeningSectionLabel extends StatelessWidget {
-  const _ListeningSectionLabel(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: DesignTokens.label(
-        11,
-      ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 0.8),
+  String get _selectedTopicLabel {
+    if (_selectedTopic == null) return 'Surprise me';
+    return _storyTopicCategories.firstWhere(
+      (topic) => topic.toLowerCase() == _selectedTopic,
+      orElse: () => _selectedTopic!,
     );
   }
 }
 
-class _ListeningLibraryLabel extends StatelessWidget {
-  const _ListeningLibraryLabel(this.label);
+class _ListeningSectionLabel extends StatelessWidget {
+  const _ListeningSectionLabel(this.label);
 
   final String label;
 
@@ -674,112 +762,163 @@ class _GenerateStoryTile extends StatelessWidget {
   }
 }
 
-class _ListeningFormatGrid extends StatelessWidget {
-  const _ListeningFormatGrid({required this.selected, required this.onSelect});
-
-  final String selected;
-  final ValueChanged<String> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = (constraints.maxWidth - 8) / 2;
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final option in _listeningFormatOptions)
-              SizedBox(
-                width: width,
-                child: _ListeningFormatChoice(
-                  option: option,
-                  selected: option.id == selected,
-                  onTap: () => onSelect(option.id),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _ListeningFormatChoice extends StatelessWidget {
-  const _ListeningFormatChoice({
-    required this.option,
-    required this.selected,
+class _ListeningSelectionPill extends StatelessWidget {
+  const _ListeningSelectionPill({
+    required this.label,
+    required this.value,
     required this.onTap,
   });
 
-  final _ListeningFormatOption option;
-  final bool selected;
+  final String label;
+  final String value;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      selected: selected,
-      label: '${option.label}. ${option.detail}',
+      label: '$label: $value',
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-        child: AnimatedContainer(
-          duration: DesignTokens.durationFast,
-          constraints: const BoxConstraints(minHeight: 76),
-          padding: const EdgeInsets.all(11),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+        child: Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: selected
-                ? DesignTokens.nightAccentSoft
-                : DesignTokens.nightSurface,
-            borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-            border: Border.all(
-              color: selected
-                  ? DesignTokens.nightAccent
-                  : DesignTokens.nightHairline,
-            ),
+            color: DesignTokens.nightSurface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+            border: Border.all(color: DesignTokens.nightHairline),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                option.icon,
-                size: 18,
-                color: selected
-                    ? DesignTokens.nightAccent
-                    : DesignTokens.nightMuted,
-              ),
-              const SizedBox(width: 8),
               Expanded(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      option.label,
+                      label.toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.body(12.5, weight: FontWeight.w700)
-                          .copyWith(
-                            color: selected
-                                ? DesignTokens.nightAccent
-                                : DesignTokens.nightText,
-                          ),
+                      style: DesignTokens.label(
+                        9,
+                      ).copyWith(color: DesignTokens.nightMuted),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      option.detail,
-                      maxLines: 2,
+                      value,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: DesignTokens.body(
-                        10.5,
-                      ).copyWith(color: DesignTokens.nightMuted),
+                        12,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
                     ),
                   ],
                 ),
               ),
+              const Icon(
+                CupertinoIcons.chevron_down,
+                size: 15,
+                color: DesignTokens.nightAccent,
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ListeningChoiceItem {
+  const _ListeningChoiceItem({
+    required this.value,
+    required this.label,
+    required this.detail,
+    required this.icon,
+  });
+
+  final String value;
+  final String label;
+  final String detail;
+  final IconData icon;
+}
+
+class _ListeningChoiceSheet extends StatelessWidget {
+  const _ListeningChoiceSheet({
+    required this.title,
+    required this.selected,
+    required this.options,
+  });
+
+  final String title;
+  final String selected;
+  final List<_ListeningChoiceItem> options;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 620),
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+        decoration: const BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: DesignTokens.nightHairline,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              style: DesignTokens.display(
+                22,
+              ).copyWith(color: DesignTokens.nightText),
+            ),
+            const SizedBox(height: 12),
+            for (final option in options)
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                leading: Icon(
+                  option.icon,
+                  color: option.value == selected
+                      ? DesignTokens.nightAccent
+                      : DesignTokens.nightMuted,
+                ),
+                title: Text(
+                  option.label,
+                  style: DesignTokens.body(15, weight: FontWeight.w700)
+                      .copyWith(
+                        color: option.value == selected
+                            ? DesignTokens.nightAccent
+                            : DesignTokens.nightText,
+                      ),
+                ),
+                subtitle: Text(
+                  option.detail,
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                ),
+                trailing: option.value == selected
+                    ? const Icon(
+                        CupertinoIcons.checkmark,
+                        color: DesignTokens.nightAccent,
+                      )
+                    : null,
+                onTap: () => Navigator.pop(context, option.value),
+              ),
+          ],
         ),
       ),
     );

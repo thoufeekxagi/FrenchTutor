@@ -3,7 +3,7 @@
 // Required for Apple App Store Guideline 5.1.1(v) — in-app account deletion.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const USER_SCOPED_BUCKETS = ["story-covers", "vocabulary-audio"];
+const USER_SCOPED_BUCKETS = ["story-covers", "vocabulary-audio", "listening-audio"];
 const PAGE_SIZE = 100;
 
 async function listUserFiles(

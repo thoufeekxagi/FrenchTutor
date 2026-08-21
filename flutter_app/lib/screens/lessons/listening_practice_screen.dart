@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter_sound/flutter_sound.dart' show PlaybackDisposition;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
@@ -11,15 +13,18 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/elevenlabs_audio_playback_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
-import '../../widgets/learning_card.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
-import '../../widgets/web/web_constrained_view.dart';
+import '../../widgets/report_problem_button.dart';
+import '../../widgets/story_cover_image.dart';
 import 'story_reader_screen.dart';
 
 enum _ListeningStage { firstListen, check, focus, dictation, shadow, recap }
+
+enum _ListeningTab { transcript, quiz, keywords, grammar }
 
 class ListeningPracticeScreen extends ConsumerStatefulWidget {
   const ListeningPracticeScreen({
@@ -46,15 +51,17 @@ class _ListeningPracticeScreenState
   final Map<int, int> _quizAnswers = {};
 
   _ListeningStage _stage = _ListeningStage.firstListen;
+  _ListeningTab _tab = _ListeningTab.transcript;
   int _currentSegment = 0;
   int _focusSegment = 0;
   int _questionIndex = 0;
   int? _selectedWordIndex;
+  int? _selectedWordSegment;
+  int? _lyricsSelectedWordIndex;
+  int? _currentWord;
   int? _dictationSegment;
   bool _isPlaying = false;
-  bool _isExperimentalPlaying = false;
   bool _audioLoading = false;
-  bool _hasListened = false;
   bool _showTranscript = false;
   bool _showTranslation = false;
   bool _dictationCorrect = false;
@@ -63,13 +70,20 @@ class _ListeningPracticeScreenState
   bool _shadowCorrect = false;
   String _shadowTranscript = '';
   String? _shadowFeedback;
-  double _rate = 0.42;
+  double _rate = 1.0;
   bool _finishedSession = false;
   bool _isMarkedLearned = false;
   double _textScale = 1;
+  bool _highlightWords = true;
   bool _underlineWords = true;
   bool _darkMode = true;
   Timer? _coverRefreshTimer;
+  StreamSubscription<PlaybackDisposition>? _playbackProgressSubscription;
+  Duration _playbackPosition = Duration.zero;
+  Duration _playbackDuration = Duration.zero;
+  bool _hasStartedPlayback = false;
+  late ElevenLabsAudioClip? _audioClip;
+  final Map<int, ElevenLabsAudioClip> _lineAudioCache = {};
 
   late GeneratedStory _story;
   List<ReadingSegment> get _segments => _story.passage.segments;
@@ -84,9 +98,11 @@ class _ListeningPracticeScreenState
       ref.read(notetakerStateProvider).currentContext = 'Listening';
     });
     _story = widget.story;
+    _audioClip = widget.audioClip;
     _textScale = _settings.textScale;
     _rate = _settings.playbackRate;
     _showTranslation = _settings.translateSentences;
+    _highlightWords = _settings.highlightWords;
     _underlineWords = _settings.underlineWords;
     _darkMode = _settings.darkMode;
     unawaited(
@@ -96,6 +112,7 @@ class _ListeningPracticeScreenState
           _textScale = _settings.textScale;
           _rate = _settings.playbackRate;
           _showTranslation = _settings.translateSentences;
+          _highlightWords = _settings.highlightWords;
           _underlineWords = _settings.underlineWords;
           _darkMode = _settings.darkMode;
         });
@@ -106,21 +123,40 @@ class _ListeningPracticeScreenState
       stage: 'reading_listening',
       topic: _story.displayTitle,
     );
+    _playbackProgressSubscription = ElevenLabsAudioPlaybackService
+        .shared
+        .progress
+        .listen(_handlePlaybackProgress);
     _dictationSegment = _findDictationSegment();
-    if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
-      // Covers are generated independently so opening a lesson never waits
-      // for artwork. Keep the already-open headphone card in sync when the
-      // private upload finishes in the library screen behind this route.
+    if (_audioClip == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_loadSavedStoryAudio());
+      });
+    }
+    final needsCover = _story.coverUrl == null || _story.coverUrl!.isEmpty;
+    final needsListeningBackground =
+        _audioClip != null &&
+        (_story.musicBackgroundUrl == null ||
+            _story.musicBackgroundUrl!.isEmpty ||
+            _isLegacyListeningBackground(_story.musicBackgroundUrl));
+    if (needsCover || needsListeningBackground) {
+      // Artwork is generated independently so opening a lesson never waits.
+      // Keep the already-open player in sync when private uploads finish in
+      // the library screen behind this route.
       _coverRefreshTimer = Timer.periodic(
         const Duration(seconds: 2),
-        (_) => _refreshCoverFromStore(),
+        (_) => _refreshArtworkFromStore(),
       );
+      if (_isLegacyListeningBackground(_story.musicBackgroundUrl)) {
+        unawaited(_regenerateListeningBackground());
+      }
     }
   }
 
   @override
   void dispose() {
     _coverRefreshTimer?.cancel();
+    unawaited(_playbackProgressSubscription?.cancel());
     _dictationController.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
     unawaited(ElevenLabsAudioPlaybackService.shared.stop());
@@ -128,11 +164,8 @@ class _ListeningPracticeScreenState
     super.dispose();
   }
 
-  void _refreshCoverFromStore() {
-    if (!mounted || _story.coverUrl?.isNotEmpty == true) {
-      _coverRefreshTimer?.cancel();
-      return;
-    }
+  void _refreshArtworkFromStore() {
+    if (!mounted) return;
     GeneratedStory? latest;
     for (final candidate
         in ref
@@ -143,10 +176,105 @@ class _ListeningPracticeScreenState
         break;
       }
     }
-    final coverUrl = latest?.coverUrl;
-    if (coverUrl == null || coverUrl.isEmpty) return;
-    setState(() => _story = _story.copyWith(coverUrl: coverUrl));
-    _coverRefreshTimer?.cancel();
+    if (latest == null) return;
+    final hasCover = latest.coverUrl?.isNotEmpty == true;
+    final hasMusicBackground = latest.musicBackgroundUrl?.isNotEmpty == true;
+    if (latest.coverUrl != _story.coverUrl ||
+        latest.musicBackgroundUrl != _story.musicBackgroundUrl) {
+      setState(
+        () => _story = _story.copyWith(
+          coverUrl: latest!.coverUrl,
+          musicBackgroundUrl: latest.musicBackgroundUrl,
+          audioPath: latest.audioPath,
+          audioMode: latest.audioMode,
+        ),
+      );
+    }
+    final needsListeningBackground =
+        _audioClip != null &&
+        (!hasMusicBackground ||
+            _isLegacyListeningBackground(latest.musicBackgroundUrl));
+    if (hasCover && !needsListeningBackground) _coverRefreshTimer?.cancel();
+  }
+
+  bool _isLegacyListeningBackground(String? url) =>
+      url?.contains('-music.') == true;
+
+  Future<void> _regenerateListeningBackground() async {
+    try {
+      final url =
+          await PracticeArtworkService.generateListeningBackgroundAndUpload(
+            sync: ref.read(syncServiceProvider),
+            id: _story.id,
+            title: _story.title,
+            summary: _story.summary,
+            topic: _story.topic,
+            levelBand: _story.levelBand,
+            coverPrompt: null,
+          );
+      if (url == null || !mounted) return;
+      ref
+          .read(generatedStoryStoreProvider)
+          .updateMusicBackgroundUrl(_story.id, url);
+    } catch (error, stackTrace) {
+      debugPrint(
+        'ListeningPracticeScreen: legacy backdrop regeneration failed: '
+        '$error\n$stackTrace',
+      );
+    }
+  }
+
+  void _handlePlaybackProgress(PlaybackDisposition disposition) {
+    if (!mounted) return;
+    final duration = disposition.duration;
+    final position = disposition.position;
+    final durationMs = duration.inMilliseconds;
+    final positionMs = position.inMilliseconds.clamp(0, durationMs).toInt();
+    final nextSegment = durationMs <= 0 || _segments.isEmpty
+        ? _currentSegment
+        : ((positionMs / durationMs) * _segments.length)
+              .floor()
+              .clamp(0, _segments.length - 1)
+              .toInt();
+    int? nextWord;
+    var wordCursor = 0;
+    if (durationMs > 0 && _segments.isNotEmpty) {
+      final totalWords = _segments.fold<int>(
+        0,
+        (sum, segment) => sum + _plainWords(segment.fr).length,
+      );
+      if (totalWords > 0) {
+        final globalWord = (positionMs / durationMs * totalWords)
+            .floor()
+            .clamp(0, totalWords - 1)
+            .toInt();
+        for (var index = 0; index < _segments.length; index++) {
+          final count = _plainWords(_segments[index].fr).length;
+          if (globalWord < wordCursor + count) {
+            nextWord = globalWord - wordCursor;
+            break;
+          }
+          wordCursor += count;
+        }
+      }
+    }
+    setState(() {
+      _playbackDuration = duration;
+      _playbackPosition = position;
+      _currentSegment = nextSegment;
+      _currentWord = nextWord;
+      _isPlaying = ElevenLabsAudioPlaybackService.shared.isPlaying;
+    });
+  }
+
+  void _selectListeningWord(int segmentIndex, int wordIndex) {
+    final isSame =
+        _selectedWordSegment == segmentIndex &&
+        _lyricsSelectedWordIndex == wordIndex;
+    setState(() {
+      _selectedWordSegment = isSame ? null : segmentIndex;
+      _lyricsSelectedWordIndex = isSame ? null : wordIndex;
+    });
   }
 
   int? _findDictationSegment() {
@@ -216,61 +344,51 @@ class _ListeningPracticeScreenState
 
   Future<void> _playStory({int fromIndex = 0}) async {
     if (_segments.isEmpty || _audioLoading) return;
+    if (fromIndex > 0) {
+      await _playLine(fromIndex);
+      return;
+    }
     _audioLoading = true;
     if (mounted) setState(() {});
     try {
-      await LessonSpeechService.shared.stop();
+      await LessonSpeechService.shared.deactivate();
       await ElevenLabsAudioPlaybackService.shared.stop();
-      _isExperimentalPlaying = false;
       if (!mounted) return;
       setState(() {
         _isPlaying = true;
+        _hasStartedPlayback = true;
+        _playbackPosition = Duration.zero;
+        _playbackDuration = Duration.zero;
         _currentSegment = fromIndex;
       });
-      final experimentalClip = widget.audioClip;
-      if (experimentalClip != null && fromIndex == 0) {
-        _isExperimentalPlaying = true;
-        await ElevenLabsAudioPlaybackService.shared.play(
-          experimentalClip.bytes,
-          onFinished: () {
-            if (!mounted) return;
-            _isExperimentalPlaying = false;
-            setState(() {
-              _isPlaying = false;
-              _audioLoading = false;
-              _hasListened = true;
-            });
-          },
+      final clip = _audioClip;
+      if (clip == null) {
+        throw const ElevenLabsProviderException(
+          'This lesson audio is not ready. Try rendering it again.',
         );
-        if (mounted) setState(() => _audioLoading = false);
-        return;
       }
-      await LessonSpeechService.shared.speak(
-        items: [
-          for (var index = fromIndex; index < _segments.length; index++)
-            SpeechItem(
-              text: _segments[index].fr,
-              language: 'fr-FR',
-              contentItemId: _story.segmentContentId(index),
-            ),
-        ],
-        rate: _rate,
-        onItemStart: (index) {
-          if (!mounted) return;
-          setState(() => _currentSegment = fromIndex + index);
-        },
-        onPlaybackReady: () {
-          if (mounted) setState(() => _audioLoading = false);
-        },
+      await ElevenLabsAudioPlaybackService.shared.play(
+        clip.bytes,
+        speed: _rate,
         onFinished: () {
           if (!mounted) return;
           setState(() {
             _isPlaying = false;
             _audioLoading = false;
-            _hasListened = true;
+            _playbackPosition = _playbackDuration;
+            _currentSegment = _segments.isEmpty ? 0 : _segments.length - 1;
           });
         },
       );
+      if (mounted) setState(() => _audioLoading = false);
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _audioLoading = false;
+        });
+        _showAudioError(error);
+      }
     } finally {
       if (mounted && _audioLoading) setState(() => _audioLoading = false);
     }
@@ -281,26 +399,20 @@ class _ListeningPracticeScreenState
     _audioLoading = true;
     if (mounted) setState(() {});
     try {
-      await LessonSpeechService.shared.stop();
+      await LessonSpeechService.shared.deactivate();
       await ElevenLabsAudioPlaybackService.shared.stop();
-      _isExperimentalPlaying = false;
       if (!mounted) return;
       setState(() {
         _isPlaying = true;
+        _hasStartedPlayback = true;
         _currentSegment = index;
       });
-      await LessonSpeechService.shared.speak(
-        items: [
-          SpeechItem(
-            text: _segments[index].fr,
-            language: 'fr-FR',
-            contentItemId: _story.segmentContentId(index),
-          ),
-        ],
-        rate: _rate,
-        onPlaybackReady: () {
-          if (mounted) setState(() => _audioLoading = false);
-        },
+      final clip = _lineAudioCache[index] ??= await ElevenLabsAudioService
+          .shared
+          .synthesizeNarration(text: _segments[index].fr, mode: 'narration');
+      await ElevenLabsAudioPlaybackService.shared.play(
+        clip.bytes,
+        speed: _rate,
         onFinished: () {
           if (mounted) {
             setState(() {
@@ -310,6 +422,15 @@ class _ListeningPracticeScreenState
           }
         },
       );
+      if (mounted) setState(() => _audioLoading = false);
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _audioLoading = false;
+        });
+        _showAudioError(error);
+      }
     } finally {
       if (mounted && _audioLoading) setState(() => _audioLoading = false);
     }
@@ -317,20 +438,14 @@ class _ListeningPracticeScreenState
 
   Future<void> _togglePlayback() async {
     if (_audioLoading) return;
-    final speech = LessonSpeechService.shared;
-    if (_isExperimentalPlaying && _isPlaying) {
-      await ElevenLabsAudioPlaybackService.shared.stop();
-      _isExperimentalPlaying = false;
+    if (_isPlaying) {
+      await ElevenLabsAudioPlaybackService.shared.pause();
       if (mounted) setState(() => _isPlaying = false);
       return;
     }
-    if (_isPlaying && !speech.isPaused) {
-      await speech.pause();
-      if (mounted) setState(() => _isPlaying = false);
-      return;
-    }
-    if (speech.isPaused) {
-      await speech.resume();
+    if (_hasStartedPlayback &&
+        ElevenLabsAudioPlaybackService.shared.canResume) {
+      await ElevenLabsAudioPlaybackService.shared.resume();
       if (mounted) setState(() => _isPlaying = true);
       return;
     }
@@ -339,8 +454,298 @@ class _ListeningPracticeScreenState
     );
   }
 
+  Future<void> _loadSavedStoryAudio() async {
+    if (!mounted || _audioClip != null) return;
+    setState(() => _audioLoading = true);
+    try {
+      final storedPath = _story.audioPath;
+      if (storedPath != null && storedPath.trim().isNotEmpty) {
+        final bytes = await ref
+            .read(syncServiceProvider)
+            .downloadListeningAudio(storedPath);
+        if (bytes == null || bytes.isEmpty) {
+          throw const ElevenLabsProviderException(
+            'The saved lesson audio could not be downloaded.',
+          );
+        }
+        if (!mounted) return;
+        setState(() {
+          _audioClip = ElevenLabsAudioClip(
+            mode: _story.audioMode ?? 'narration',
+            bytes: bytes,
+          );
+          _audioLoading = false;
+        });
+        return;
+      }
+
+      // Compatibility path for lessons made before durable audio storage was
+      // added. New lessons never use this branch after reopening.
+      final script = CanonicalAudioScript.fromStory(
+        _story,
+        format: _story.audioMode ?? 'narration',
+      );
+      final format = _story.audioMode ?? 'narration';
+      final clip = switch (format) {
+        'music' => await ElevenLabsAudioService.shared.composeMusic(
+          lyrics: script.lyricLines,
+          style: 'warm acoustic French pop, clear solo vocals, 86 BPM',
+          musicLengthMs: 45_000,
+        ),
+        'podcast' => await ElevenLabsAudioService.shared.synthesizePodcast(
+          turns: script.podcastTurns,
+        ),
+        'educational' =>
+          await ElevenLabsAudioService.shared.synthesizeNarration(
+            text: script.narrationText,
+            mode: 'educational',
+          ),
+        _ => await ElevenLabsAudioService.shared.synthesizeNarration(
+          text: script.narrationText,
+          mode: 'story',
+        ),
+      };
+      if (!mounted) return;
+      setState(() {
+        _audioClip = clip;
+        _audioLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _audioLoading = false);
+      _showAudioError(error);
+    }
+  }
+
+  void _showAudioError(Object error) {
+    final message = error is ElevenLabsProviderException
+        ? error.message
+        : 'The verified lesson audio could not be prepared. Please try again.';
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _selectListeningTab(int index) {
+    final tab = _ListeningTab.values[index.clamp(0, 3).toInt()];
+    setState(() {
+      _tab = tab;
+      if (tab == _ListeningTab.transcript) {
+        _showTranscript = true;
+      } else {
+        // A content tab owns the screen. Never leave lyrics/transcript behind
+        // it, because that creates the exact mixed layout the player is meant
+        // to avoid.
+        _showTranscript = false;
+        _showTranslation = false;
+      }
+      if (tab == _ListeningTab.quiz) _stage = _ListeningStage.check;
+    });
+  }
+
+  void _openLyrics() {
+    setState(() {
+      _tab = _ListeningTab.transcript;
+      _showTranscript = true;
+    });
+  }
+
+  void _toggleTranslation() {
+    setState(() {
+      if (!_showTranscript) {
+        _tab = _ListeningTab.transcript;
+        _showTranscript = true;
+        _showTranslation = true;
+        return;
+      }
+      _showTranslation = !_showTranslation;
+    });
+  }
+
+  void _closeLyrics() {
+    setState(() {
+      _showTranscript = false;
+      _tab = _ListeningTab.transcript;
+    });
+  }
+
+  void _cycleTextSize() {
+    final next = _textScale < 0.98
+        ? 1.0
+        : _textScale < 1.15
+        ? 1.25
+        : 0.9;
+    setState(() => _textScale = next);
+    unawaited(_settings.setTextScale(next));
+  }
+
+  Future<void> _copyCurrentLine() async {
+    final line = _segments.isEmpty
+        ? _story.displayTitle
+        : _segments[_currentSegment.clamp(0, _segments.length - 1).toInt()].fr;
+    await Clipboard.setData(ClipboardData(text: line));
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('French line copied.')));
+    }
+  }
+
+  Future<void> _showMoreMenu() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      builder: (_) => _ListeningMoreSheet(
+        isMarkedLearned: _isMarkedLearned,
+        isLyricsVisible: _showTranscript,
+        sessionType: 'Listening: ${_story.displayTitle}',
+      ),
+    );
+    if (!mounted || action == null) return;
+    switch (action) {
+      case 'lyrics':
+        _showTranscript ? _closeLyrics() : _openLyrics();
+      case 'quiz':
+        _selectListeningTab(_ListeningTab.quiz.index);
+      case 'keywords':
+        _selectListeningTab(_ListeningTab.keywords.index);
+      case 'grammar':
+        _selectListeningTab(_ListeningTab.grammar.index);
+      case 'speed':
+        _cycleRate();
+      case 'learn':
+        setState(() => _isMarkedLearned = true);
+      case 'notes':
+        ref.read(notetakerStateProvider).isExpanded = true;
+      case 'settings':
+        await _showSettings();
+    }
+  }
+
+  Widget _tabBody() {
+    return switch (_tab) {
+      _ListeningTab.transcript =>
+        _stage == _ListeningStage.firstListen
+            ? const SizedBox.shrink()
+            : _stageBody(),
+      _ListeningTab.quiz => _checkView(),
+      _ListeningTab.keywords => _keywordsView(),
+      _ListeningTab.grammar => _grammarView(),
+    };
+  }
+
+  Widget _keywordsView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _StageEyebrow(label: 'Keywords', detail: 'Words from this story'),
+        const SizedBox(height: 10),
+        Text(
+          'Keep these words close.',
+          style: DesignTokens.display(28).copyWith(color: Colors.white),
+        ),
+        const SizedBox(height: 16),
+        if (_story.keywords.isEmpty)
+          _EmptyStage(
+            eyebrow: 'Keywords',
+            title: 'No keywords yet.',
+            body:
+                'The generated lesson did not include a saved vocabulary list.',
+            buttonLabel: 'Back to story',
+            onPressed: () {},
+          )
+        else
+          for (final keyword in _story.keywords)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _NightPanel(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        keyword.fr,
+                        style: DesignTokens.display(
+                          18,
+                        ).copyWith(color: DesignTokens.nightText),
+                      ),
+                    ),
+                    Text(
+                      keyword.en,
+                      style: DesignTokens.body(
+                        14,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+      ],
+    );
+  }
+
+  Widget _grammarView() {
+    final notes = _segments
+        .where((segment) => segment.grammarNote.trim().isNotEmpty)
+        .toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _StageEyebrow(label: 'Grammar', detail: 'Notes from the story'),
+        const SizedBox(height: 10),
+        Text(
+          'Notice how the French works.',
+          style: DesignTokens.display(28).copyWith(color: Colors.white),
+        ),
+        const SizedBox(height: 16),
+        if (notes.isEmpty)
+          _NightPanel(
+            child: Text(
+              'Grammar notes are not available for this lesson yet.',
+              style: DesignTokens.body(
+                14,
+              ).copyWith(color: DesignTokens.nightMuted),
+            ),
+          )
+        else
+          for (final segment in notes)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _NightPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      segment.fr,
+                      style: DesignTokens.body(
+                        15,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      segment.grammarNote,
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+      ],
+    );
+  }
+
   void _cycleRate() {
-    setState(() => _rate = _rate <= 0.36 ? 0.55 : 0.32);
+    final next = _rate < 0.8
+        ? 1.0
+        : _rate < 1.1
+        ? 1.25
+        : 0.75;
+    setState(() => _rate = next);
+    unawaited(_settings.setPlaybackRate(next));
+    unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(next));
   }
 
   void _selectQuizAnswer(int answerIndex) {
@@ -349,7 +754,10 @@ class _ListeningPracticeScreenState
 
   void _advanceFromCheck() {
     if (_questions.isEmpty || _questionIndex >= _questions.length - 1) {
-      setState(() => _stage = _ListeningStage.focus);
+      setState(() {
+        _tab = _ListeningTab.transcript;
+        _stage = _ListeningStage.focus;
+      });
       return;
     }
     setState(() => _questionIndex += 1);
@@ -363,9 +771,8 @@ class _ListeningPracticeScreenState
     // Moving between lines must also stop the previous reply. Otherwise a
     // delayed audio callback can make the newly selected line look finished
     // while the old line is still audible.
-    await LessonSpeechService.shared.stop();
+    await LessonSpeechService.shared.deactivate();
     await ElevenLabsAudioPlaybackService.shared.stop();
-    _isExperimentalPlaying = false;
     if (!mounted) return;
     setState(() {
       _focusSegment = next;
@@ -380,10 +787,14 @@ class _ListeningPracticeScreenState
 
   Future<void> _advanceFocus() async {
     if (_focusSegment >= _segments.length - 1) {
-      await LessonSpeechService.shared.stop();
+      await LessonSpeechService.shared.deactivate();
       await ElevenLabsAudioPlaybackService.shared.stop();
-      _isExperimentalPlaying = false;
-      if (mounted) setState(() => _stage = _ListeningStage.dictation);
+      if (mounted) {
+        setState(() {
+          _tab = _ListeningTab.transcript;
+          _stage = _ListeningStage.dictation;
+        });
+      }
       return;
     }
     await _moveFocus(1);
@@ -396,6 +807,7 @@ class _ListeningPracticeScreenState
     setState(() {
       _dictationSubmitted = true;
       _dictationCorrect = answer == target;
+      _tab = _ListeningTab.transcript;
       _stage = _ListeningStage.shadow;
     });
     _recorder.logUser(_dictationController.text);
@@ -506,6 +918,7 @@ class _ListeningPracticeScreenState
       _textScale = _settings.textScale;
       _rate = _settings.playbackRate;
       _showTranslation = _settings.translateSentences;
+      _highlightWords = _settings.highlightWords;
       _underlineWords = _settings.underlineWords;
       _darkMode = _settings.darkMode;
     });
@@ -513,87 +926,118 @@ class _ListeningPracticeScreenState
 
   @override
   Widget build(BuildContext context) {
-    final canvasColor = _darkMode
-        ? DesignTokens.nightCanvas
-        : DesignTokens.canvas;
-    final activeSegment = _segments.isEmpty
-        ? null
-        : _segments[_currentSegment.clamp(0, _segments.length - 1).toInt()];
+    final showLyrics = _showTranscript;
+    final contentTab = !showLyrics && _tab != _ListeningTab.transcript;
     return Scaffold(
-      backgroundColor: canvasColor,
-      appBar: AppBar(
-        leading: IconButton(
-          tooltip: 'Back',
-          onPressed: _finishAndPop,
-          icon: const Icon(CupertinoIcons.chevron_left),
-        ),
-        title: Text(
-          _story.displayTitle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: DesignTokens.body(
-            17,
-            weight: FontWeight.w700,
-          ).copyWith(color: DesignTokens.nightText),
-        ),
-        backgroundColor: canvasColor,
-        foregroundColor: DesignTokens.nightText,
-        toolbarHeight: 64,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        actions: [
-          TextButton(
-            onPressed: () =>
-                setState(() => _isMarkedLearned = !_isMarkedLearned),
-            child: Text(
-              _isMarkedLearned ? 'Learned' : 'Mark as learned',
-              style: DesignTokens.body(
-                12,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.nightAccent),
-            ),
-          ),
-          IconButton(
-            tooltip: 'Listening settings',
-            onPressed: _showSettings,
-            icon: const Icon(
-              CupertinoIcons.slider_horizontal_3,
-              color: DesignTokens.nightAccent,
-            ),
-          ),
-          const SizedBox(width: 6),
-        ],
-      ),
+      backgroundColor: _darkMode ? Colors.black : DesignTokens.canvas,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          WebConstrainedView(
-            maxWidth: 760,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 4, 18, 120),
+          _ListeningImmersiveBackground(
+            story: _story,
+            dimmed: showLyrics || contentTab,
+          ),
+          SafeArea(
+            child: Stack(
               children: [
-                _ListeningCoverHero(
-                  story: _story,
-                  activeSegment: activeSegment,
-                  currentSegment: _currentSegment,
-                  totalSegments: _segments.length,
-                  showTranscript: _showTranscript,
-                  showTranslation: _showTranslation,
-                  onToggleTranscript: () =>
-                      setState(() => _showTranscript = !_showTranscript),
-                  onToggleTranslation: () =>
-                      setState(() => _showTranslation = !_showTranslation),
-                ),
-                const SizedBox(height: 14),
-                _StageRail(current: _stage),
-                const SizedBox(height: 22),
-                AnimatedSwitcher(
-                  duration: DesignTokens.durationMedium,
-                  switchInCurve: DesignTokens.curveStandard,
-                  child: KeyedSubtree(
-                    key: ValueKey(_stage),
-                    child: _stageBody(),
+                Positioned(
+                  top: 8,
+                  left: 14,
+                  right: 14,
+                  child: _ListeningTopBar(
+                    isMarkedLearned: _isMarkedLearned,
+                    onBack: _finishAndPop,
+                    onMarkLearned: () =>
+                        setState(() => _isMarkedLearned = !_isMarkedLearned),
+                    onSettings: _showSettings,
+                    onMore: _showMoreMenu,
                   ),
                 ),
+                if (showLyrics)
+                  Positioned.fill(
+                    top: 84,
+                    bottom: 14,
+                    child: _ListeningFullscreenTranscript(
+                      segments: _segments,
+                      currentSegment: _currentSegment,
+                      currentWord: _currentWord,
+                      selectedSegment: _selectedWordSegment,
+                      selectedWord: _lyricsSelectedWordIndex,
+                      keywords: _story.keywords,
+                      highlightWords: _highlightWords,
+                      underlineWords: _underlineWords,
+                      showTranslation: _showTranslation,
+                      textScale: _textScale,
+                      isPlaying: _isPlaying,
+                      isLoading: _audioLoading,
+                      rate: _rate,
+                      playbackPosition: _playbackPosition,
+                      playbackDuration: _playbackDuration,
+                      onTogglePlayback: _togglePlayback,
+                      onReplay: () => _playStory(),
+                      onCycleRate: _cycleRate,
+                      onToggleLyrics: _closeLyrics,
+                      onToggleTranslation: _toggleTranslation,
+                      onCycleTextSize: _cycleTextSize,
+                      onCopyLine: _copyCurrentLine,
+                      onWordTap: _selectListeningWord,
+                    ),
+                  ),
+                if (!showLyrics && contentTab)
+                  Positioned(
+                    top: 104,
+                    left: 16,
+                    right: 16,
+                    bottom: 112,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(0, 12, 0, 22),
+                      child: _tabBody(),
+                    ),
+                  ),
+                if (!showLyrics && contentTab)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: contentTab ? 82 : 244,
+                    child: _ListeningStageIslandTabs(
+                      current: _tab,
+                      onTap: _selectListeningTab,
+                    ),
+                  ),
+                if (!showLyrics)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 14,
+                    child: _ListeningPlayerDock(
+                      story: _story,
+                      audioClip: _audioClip,
+                      segments: _segments,
+                      currentSegment: _currentSegment,
+                      compact: contentTab,
+                      isLiked: ref
+                          .read(storyFavoriteStoreProvider)
+                          .isFavorite(_story.id),
+                      isPlaying: _isPlaying,
+                      isLoading: _audioLoading,
+                      rate: _rate,
+                      playbackPosition: _playbackPosition,
+                      playbackDuration: _playbackDuration,
+                      onTogglePlayback: _togglePlayback,
+                      onReplay: () => _playStory(),
+                      onCycleRate: _cycleRate,
+                      onToggleLyrics: _openLyrics,
+                      onToggleTranslation: _toggleTranslation,
+                      onCycleTextSize: _cycleTextSize,
+                      onCopyLine: _copyCurrentLine,
+                      onToggleFavorite: () {
+                        final favorites = ref.read(storyFavoriteStoreProvider);
+                        final next = !favorites.isFavorite(_story.id);
+                        favorites.setFavorite(_story.id, next);
+                        setState(() {});
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
@@ -615,68 +1059,7 @@ class _ListeningPracticeScreenState
   }
 
   Widget _firstListenView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _StageEyebrow(
-          label: '01 · First listen',
-          detail: '${_story.levelBand} · ${_story.readTimeMinutes} min',
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Catch the meaning first.',
-          style: DesignTokens.display(
-            28,
-          ).copyWith(color: DesignTokens.nightText),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'The transcript stays hidden. Listen for who, where, and what changes.',
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.nightMuted),
-        ),
-        const SizedBox(height: DesignTokens.space5),
-        _NightAudioIsland(
-          isPlaying: _isPlaying,
-          isLoading: _audioLoading,
-          rate: _rate,
-          onToggle: _togglePlayback,
-          onReplay: () => _playStory(),
-          onCycleRate: _cycleRate,
-        ),
-        const SizedBox(height: DesignTokens.space4),
-        _NightPanel(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                CupertinoIcons.headphones,
-                color: DesignTokens.nightAccent,
-              ),
-              const SizedBox(width: DesignTokens.space3),
-              Expanded(
-                child: Text(
-                  _hasListened
-                      ? 'Nice. You heard the whole story. Now check what stayed with you.'
-                      : 'One clean listen is enough. You can replay after the first check.',
-                  style: DesignTokens.body(
-                    13,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: DesignTokens.nightText),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: DesignTokens.space5),
-        _NightPrimaryButton(
-          label: 'Check what I caught',
-          icon: CupertinoIcons.arrow_right,
-          onPressed: _hasListened
-              ? () => setState(() => _stage = _ListeningStage.check)
-              : null,
-        ),
-      ],
-    );
+    return const SizedBox.shrink();
   }
 
   Widget _checkView() {
@@ -687,7 +1070,10 @@ class _ListeningPracticeScreenState
         body:
             'This story has no saved questions, so we will move to line-by-line listening.',
         buttonLabel: 'Open the lines',
-        onPressed: () => setState(() => _stage = _ListeningStage.focus),
+        onPressed: () => setState(() {
+          _tab = _ListeningTab.transcript;
+          _stage = _ListeningStage.focus;
+        }),
       );
     }
     final question = _questions[_questionIndex];
@@ -1329,218 +1715,501 @@ class _ListeningPracticeScreenState
   }
 }
 
-class _ListeningCoverHero extends StatelessWidget {
-  const _ListeningCoverHero({
+class _ListeningImmersiveBackground extends StatelessWidget {
+  const _ListeningImmersiveBackground({
     required this.story,
-    required this.activeSegment,
-    required this.currentSegment,
-    required this.totalSegments,
-    required this.showTranscript,
-    required this.showTranslation,
-    required this.onToggleTranscript,
-    required this.onToggleTranslation,
+    required this.dimmed,
   });
 
   final GeneratedStory story;
-  final ReadingSegment? activeSegment;
-  final int currentSegment;
-  final int totalSegments;
-  final bool showTranscript;
-  final bool showTranslation;
-  final VoidCallback onToggleTranscript;
-  final VoidCallback onToggleTranslation;
+  final bool dimmed;
 
   @override
   Widget build(BuildContext context) {
-    final sourceLine = activeSegment?.fr ?? 'Transcript not ready yet.';
-    final translationLine = activeSegment?.en ?? '';
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-      child: AspectRatio(
-        aspectRatio: 4 / 3,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (story.coverUrl == null || story.coverUrl!.isEmpty)
-              Image.asset(
-                'assets/images/listening/the_garden_key_background.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: DesignTokens.nightGradient,
-                  ),
-                  child: Icon(
-                    CupertinoIcons.headphones,
-                    color: DesignTokens.nightAccent,
-                    size: 42,
-                  ),
-                ),
-              )
-            else
-              Image.network(
-                story.coverUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: DesignTokens.nightGradient,
-                  ),
-                  child: Icon(
-                    CupertinoIcons.headphones,
-                    color: DesignTokens.nightAccent,
-                    size: 42,
-                  ),
-                ),
-              ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: showTranscript
-                      ? [
-                          Colors.black.withValues(alpha: 0.10),
-                          Colors.black.withValues(alpha: 0.30),
-                          Colors.black.withValues(alpha: 0.88),
-                        ]
-                      : [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.82),
-                        ],
-                ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        StoryCoverImage(
+          title: story.displayTitle,
+          source: story.musicBackgroundUrl ?? story.coverUrl,
+          fit: story.musicBackgroundUrl?.isNotEmpty == true
+              ? BoxFit.cover
+              : BoxFit.contain,
+          fallbackIcon: CupertinoIcons.headphones,
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withValues(alpha: 0.28),
+                Colors.black.withValues(alpha: dimmed ? 0.24 : 0.06),
+                Colors.black.withValues(alpha: dimmed ? 0.93 : 0.82),
+              ],
+              stops: const [0, 0.45, 1],
+            ),
+          ),
+        ),
+        if (dimmed)
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.14),
+                  Colors.black.withValues(alpha: 0.52),
+                ],
               ),
             ),
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+          ),
+      ],
+    );
+  }
+}
+
+class _ListeningTopBar extends StatelessWidget {
+  const _ListeningTopBar({
+    required this.isMarkedLearned,
+    required this.onBack,
+    required this.onMarkLearned,
+    required this.onSettings,
+    required this.onMore,
+  });
+
+  final bool isMarkedLearned;
+  final VoidCallback onBack;
+  final VoidCallback onMarkLearned;
+  final VoidCallback onSettings;
+  final VoidCallback onMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _ListeningRoundButton(
+          icon: CupertinoIcons.chevron_left,
+          tooltip: 'Back',
+          onTap: onBack,
+        ),
+        const Spacer(),
+        TextButton.icon(
+          onPressed: onMarkLearned,
+          icon: Icon(
+            isMarkedLearned
+                ? CupertinoIcons.checkmark_circle_fill
+                : CupertinoIcons.checkmark_circle,
+            size: 17,
+          ),
+          label: Text(isMarkedLearned ? 'Listened' : 'Mark as listened'),
+          style: TextButton.styleFrom(
+            foregroundColor: DesignTokens.nightAccent,
+            backgroundColor: Colors.black.withValues(alpha: 0.28),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22),
+              side: const BorderSide(color: Colors.white24),
+            ),
+            textStyle: DesignTokens.body(11, weight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(width: 8),
+        _ListeningRoundButton(
+          icon: CupertinoIcons.slider_horizontal_3,
+          tooltip: 'Listening settings',
+          onTap: onSettings,
+          accent: true,
+        ),
+        const SizedBox(width: 4),
+        _ListeningRoundButton(
+          icon: CupertinoIcons.ellipsis,
+          tooltip: 'More listening options',
+          onTap: onMore,
+        ),
+      ],
+    );
+  }
+}
+
+class _ListeningRoundButton extends StatelessWidget {
+  const _ListeningRoundButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+    this.accent = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+  final bool accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onTap,
+      icon: Icon(icon, size: 22),
+      color: accent ? DesignTokens.nightAccent : Colors.white,
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.black.withValues(alpha: 0.28),
+        minimumSize: const Size(42, 42),
+        side: const BorderSide(color: Colors.white24),
+        shape: const CircleBorder(),
+      ),
+    );
+  }
+}
+
+class _ListeningPlayerDock extends StatelessWidget {
+  const _ListeningPlayerDock({
+    required this.story,
+    required this.audioClip,
+    required this.segments,
+    required this.currentSegment,
+    required this.compact,
+    required this.isLiked,
+    required this.isPlaying,
+    required this.isLoading,
+    required this.rate,
+    required this.playbackPosition,
+    required this.playbackDuration,
+    required this.onTogglePlayback,
+    required this.onReplay,
+    required this.onCycleRate,
+    required this.onToggleLyrics,
+    required this.onToggleTranslation,
+    required this.onCycleTextSize,
+    required this.onCopyLine,
+    required this.onToggleFavorite,
+  });
+
+  final GeneratedStory story;
+  final ElevenLabsAudioClip? audioClip;
+  final List<ReadingSegment> segments;
+  final int currentSegment;
+  final bool compact;
+  final bool isLiked;
+  final bool isPlaying;
+  final bool isLoading;
+  final double rate;
+  final Duration playbackPosition;
+  final Duration playbackDuration;
+  final VoidCallback onTogglePlayback;
+  final VoidCallback onReplay;
+  final VoidCallback onCycleRate;
+  final VoidCallback onToggleLyrics;
+  final VoidCallback onToggleTranslation;
+  final VoidCallback onCycleTextSize;
+  final VoidCallback onCopyLine;
+  final VoidCallback onToggleFavorite;
+
+  String get _formatLabel => switch (audioClip?.mode) {
+    'podcast' => 'Podcast dialogue',
+    'music' => 'Music lesson',
+    'educational' => 'Educational',
+    'story' => 'Story narration',
+    'narration' => 'Story narration',
+    _ => 'Narrated French',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    if (compact) {
+      return _ListeningMiniPlayer(
+        story: story,
+        audioClip: audioClip,
+        isPlaying: isPlaying,
+        isLoading: isLoading,
+        onTogglePlayback: onTogglePlayback,
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.64),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: StoryCoverImage(
+                        title: story.displayTitle,
+                        source: story.coverUrl,
+                        fallbackIcon: CupertinoIcons.person_fill,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'NOW PLAYING',
-                          style: DesignTokens.label(
-                            10,
-                          ).copyWith(color: Colors.white70, letterSpacing: 1),
-                        ),
-                        const Spacer(),
-                        const Icon(
-                          CupertinoIcons.ellipsis,
-                          color: Colors.white,
-                          size: 21,
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    if (showTranscript) ...[
-                      Text(
-                        totalSegments == 0
-                            ? 'TRANSCRIPT'
-                            : 'TRANSCRIPT · ${currentSegment + 1}/$totalSegments',
-                        style: DesignTokens.label(
-                          10,
-                        ).copyWith(color: DesignTokens.nightAccent),
-                      ),
-                      const SizedBox(height: 7),
-                      Text(
-                        sourceLine,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: DesignTokens.display(
-                          22,
-                        ).copyWith(color: Colors.white),
-                      ),
-                      if (showTranslation && translationLine.isNotEmpty) ...[
-                        const SizedBox(height: 5),
-                        Text(
-                          translationLine,
-                          maxLines: 2,
+                          story.displayTitle,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: DesignTokens.body(
-                            13,
+                            15,
+                            weight: FontWeight.w800,
+                          ).copyWith(color: Colors.white),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _formatLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: DesignTokens.body(
+                            11,
                           ).copyWith(color: Colors.white70),
                         ),
                       ],
-                      const SizedBox(height: 12),
-                    ],
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            'assets/images/listening/the_garden_key_character.png',
-                            width: 42,
-                            height: 42,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              width: 42,
-                              height: 42,
-                              color: Colors.white12,
-                              child: const Icon(
-                                CupertinoIcons.person_fill,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                story.displayTitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: DesignTokens.body(
-                                  15,
-                                  weight: FontWeight.w800,
-                                ).copyWith(color: Colors.white),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Narrated French · ${story.levelBand}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: DesignTokens.body(
-                                  11,
-                                ).copyWith(color: Colors.white70),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(
-                          CupertinoIcons.heart,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ],
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _HeroToggle(
-                            icon: CupertinoIcons.text_alignleft,
-                            label: showTranscript
-                                ? 'Hide transcript'
-                                : 'Transcript',
-                            selected: showTranscript,
-                            onTap: onToggleTranscript,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        _HeroToggle(
-                          icon: CupertinoIcons.globe,
-                          label: showTranslation ? 'EN on' : 'Translate',
-                          selected: showTranslation,
-                          onTap: onToggleTranslation,
-                        ),
-                      ],
+                  ),
+                  IconButton(
+                    tooltip: isLiked ? 'Remove favorite' : 'Favorite',
+                    onPressed: onToggleFavorite,
+                    icon: Icon(
+                      isLiked
+                          ? CupertinoIcons.heart_fill
+                          : CupertinoIcons.heart,
+                      color: isLiked ? DesignTokens.nightAccent : Colors.white,
+                      size: 22,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    '${story.levelBand} · ${segments.length} lines · ${story.readTimeMinutes} min',
+                    style: DesignTokens.label(
+                      10,
+                    ).copyWith(color: Colors.white70),
+                  ),
+                  const Spacer(),
+                  _ListeningUtilityButton(
+                    icon: Icons.translate,
+                    label: 'Translate',
+                    onTap: onToggleTranslation,
+                  ),
+                  _ListeningUtilityButton(
+                    icon: CupertinoIcons.textformat_size,
+                    label: 'Text size',
+                    onTap: onCycleTextSize,
+                  ),
+                  _ListeningUtilityButton(
+                    icon: CupertinoIcons.doc_on_doc,
+                    label: 'Copy French',
+                    onTap: onCopyLine,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              _ListeningProgressControls(
+                segments: segments,
+                currentSegment: currentSegment,
+                isPlaying: isPlaying,
+                isLoading: isLoading,
+                rate: rate,
+                playbackPosition: playbackPosition,
+                playbackDuration: playbackDuration,
+                onToggle: onTogglePlayback,
+                onReplay: onReplay,
+                onCycleRate: onCycleRate,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ListeningMiniPlayer extends StatelessWidget {
+  const _ListeningMiniPlayer({
+    required this.story,
+    required this.audioClip,
+    required this.isPlaying,
+    required this.isLoading,
+    required this.onTogglePlayback,
+  });
+
+  final GeneratedStory story;
+  final ElevenLabsAudioClip? audioClip;
+  final bool isPlaying;
+  final bool isLoading;
+  final VoidCallback onTogglePlayback;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(29),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: SizedBox(
+              width: 38,
+              height: 38,
+              child: StoryCoverImage(
+                title: story.displayTitle,
+                source: story.coverUrl,
+                fallbackIcon: CupertinoIcons.headphones,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '${story.displayTitle} · ${audioClip?.mode ?? 'listening'}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: DesignTokens.body(
+                12,
+                weight: FontWeight.w700,
+              ).copyWith(color: Colors.white),
+            ),
+          ),
+          IconButton(
+            tooltip: isPlaying ? 'Pause' : 'Play',
+            onPressed: isLoading ? null : onTogglePlayback,
+            icon: Icon(
+              isLoading
+                  ? CupertinoIcons.hourglass
+                  : isPlaying
+                  ? CupertinoIcons.pause_fill
+                  : CupertinoIcons.play_fill,
+              color: DesignTokens.nightAccent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ListeningUtilityButton extends StatelessWidget {
+  const _ListeningUtilityButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: label,
+      onPressed: onTap,
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      icon: Icon(icon, size: 18, color: Colors.white),
+    );
+  }
+}
+
+class _ListeningMoreSheet extends StatelessWidget {
+  const _ListeningMoreSheet({
+    required this.isMarkedLearned,
+    required this.isLyricsVisible,
+    required this.sessionType,
+  });
+
+  final bool isMarkedLearned;
+  final bool isLyricsVisible;
+  final String sessionType;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                isLyricsVisible
+                    ? CupertinoIcons.xmark_circle
+                    : CupertinoIcons.text_quote,
+              ),
+              title: Text(isLyricsVisible ? 'Hide lyrics' : 'Open lyrics'),
+              onTap: () => Navigator.pop(context, 'lyrics'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.checkmark_square),
+              title: const Text('Quiz'),
+              onTap: () => Navigator.pop(context, 'quiz'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.textformat),
+              title: const Text('Keywords'),
+              onTap: () => Navigator.pop(context, 'keywords'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.book),
+              title: const Text('Grammar'),
+              onTap: () => Navigator.pop(context, 'grammar'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.speedometer),
+              title: const Text('Playback speed'),
+              onTap: () => Navigator.pop(context, 'speed'),
+            ),
+            ListTile(
+              leading: Icon(
+                isMarkedLearned
+                    ? CupertinoIcons.checkmark_circle_fill
+                    : CupertinoIcons.checkmark_circle,
+              ),
+              title: Text(isMarkedLearned ? 'Learned' : 'Mark as learned'),
+              onTap: isMarkedLearned
+                  ? null
+                  : () => Navigator.pop(context, 'learn'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.square_pencil),
+              title: const Text('Add a note'),
+              onTap: () => Navigator.pop(context, 'notes'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.slider_horizontal_3),
+              title: const Text('Player settings'),
+              onTap: () => Navigator.pop(context, 'settings'),
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.flag),
+              title: const Text('Report a problem'),
+              trailing: ReportProblemButton(sessionType: sessionType),
             ),
           ],
         ),
@@ -1549,57 +2218,391 @@ class _ListeningCoverHero extends StatelessWidget {
   }
 }
 
-class _HeroToggle extends StatelessWidget {
-  const _HeroToggle({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
+class _ListeningTranscriptLines extends StatelessWidget {
+  const _ListeningTranscriptLines({
+    required this.segments,
+    required this.currentSegment,
+    required this.currentWord,
+    required this.selectedSegment,
+    required this.selectedWord,
+    required this.keywords,
+    required this.highlightWords,
+    required this.underlineWords,
+    required this.onWordTap,
+    required this.showTranslation,
+    this.textScale = 1,
   });
 
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
+  final List<ReadingSegment> segments;
+  final int currentSegment;
+  final int? currentWord;
+  final int? selectedSegment;
+  final int? selectedWord;
+  final List<VocabEntry> keywords;
+  final bool highlightWords;
+  final bool underlineWords;
+  final void Function(int segmentIndex, int wordIndex) onWordTap;
+  final bool showTranslation;
+  final double textScale;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected
-                ? DesignTokens.nightAccent.withValues(alpha: 0.92)
-                : Colors.black.withValues(alpha: 0.38),
-            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-            border: Border.all(color: Colors.white24),
+    if (segments.isEmpty) {
+      return Text(
+        'Transcript not ready yet.',
+        style: DesignTokens.body(15).copyWith(color: Colors.white70),
+      );
+    }
+    final active = currentSegment.clamp(0, segments.length - 1).toInt();
+    final maxStart = segments.length > 4 ? segments.length - 4 : 0;
+    final start = (active - 1).clamp(0, maxStart).toInt();
+    final end = (start + 4).clamp(0, segments.length).toInt();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          audioClipLabel(showTranslation),
+          style: DesignTokens.label(
+            10,
+          ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1),
+        ),
+        const SizedBox(height: 9),
+        for (var index = start; index < end; index++) ...[
+          BilingualWordText(
+            source: segments[index].fr,
+            translation: segments[index].en,
+            sourceStyle:
+                DesignTokens.display(
+                  (index == active ? 28 : 19) * textScale,
+                ).copyWith(
+                  color: index == active ? Colors.white : Colors.white54,
+                  fontWeight: index == active
+                      ? FontWeight.w800
+                      : FontWeight.w500,
+                  height: 1.18,
+                ),
+            translationStyle: DesignTokens.body(17 * textScale).copyWith(
+              color: index == active ? Colors.white70 : Colors.white38,
+              height: 1.3,
+            ),
+            keywords: keywords,
+            showTranslation: showTranslation,
+            highlightSelected: highlightWords,
+            underlineSelected: underlineWords,
+            accentColor: DesignTokens.nightAccent,
+            selectedSourceWord: selectedSegment == index ? selectedWord : null,
+            playbackSourceWord: _isActive(index, active) ? currentWord : null,
+            playbackTranslationWord: _isActive(index, active)
+                ? _mapListeningTranslationWord(
+                    currentWord: currentWord,
+                    source: segments[index].fr,
+                    translation: segments[index].en,
+                  )
+                : null,
+            onSourceWordTap: (wordIndex) => onWordTap(index, wordIndex),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 15,
-                color: selected ? Colors.black : Colors.white,
+          const SizedBox(height: 10),
+        ],
+      ],
+    );
+  }
+
+  String audioClipLabel(bool translated) => translated
+      ? 'TRANSCRIPT · ENGLISH ON'
+      : 'TRANSCRIPT · ${currentSegment + 1}/${segments.length}';
+
+  bool _isActive(int index, int active) => index == active;
+}
+
+int? _mapListeningTranslationWord({
+  required int? currentWord,
+  required String source,
+  required String translation,
+}) {
+  if (currentWord == null || translation.trim().isEmpty) return null;
+  final sourceCount = _listeningWordParts(source).length;
+  final translationCount = _listeningWordParts(translation).length;
+  if (sourceCount == 0 || translationCount == 0) return null;
+  return (currentWord * translationCount / sourceCount)
+      .floor()
+      .clamp(0, translationCount - 1)
+      .toInt();
+}
+
+List<String> _listeningWordParts(String value) => value
+    .split(RegExp(r'\s+'))
+    .where((word) => word.trim().isNotEmpty)
+    .toList();
+
+class _ListeningFullscreenTranscript extends StatelessWidget {
+  const _ListeningFullscreenTranscript({
+    required this.segments,
+    required this.currentSegment,
+    required this.currentWord,
+    required this.selectedSegment,
+    required this.selectedWord,
+    required this.keywords,
+    required this.highlightWords,
+    required this.underlineWords,
+    required this.showTranslation,
+    required this.textScale,
+    required this.isPlaying,
+    required this.isLoading,
+    required this.rate,
+    required this.playbackPosition,
+    required this.playbackDuration,
+    required this.onTogglePlayback,
+    required this.onReplay,
+    required this.onCycleRate,
+    required this.onToggleLyrics,
+    required this.onToggleTranslation,
+    required this.onCycleTextSize,
+    required this.onCopyLine,
+    required this.onWordTap,
+  });
+
+  final List<ReadingSegment> segments;
+  final int currentSegment;
+  final int? currentWord;
+  final int? selectedSegment;
+  final int? selectedWord;
+  final List<VocabEntry> keywords;
+  final bool highlightWords;
+  final bool underlineWords;
+  final bool showTranslation;
+  final double textScale;
+  final bool isPlaying;
+  final bool isLoading;
+  final double rate;
+  final Duration playbackPosition;
+  final Duration playbackDuration;
+  final VoidCallback onTogglePlayback;
+  final VoidCallback onReplay;
+  final VoidCallback onCycleRate;
+  final VoidCallback onToggleLyrics;
+  final VoidCallback onToggleTranslation;
+  final VoidCallback onCycleTextSize;
+  final VoidCallback onCopyLine;
+  final void Function(int segmentIndex, int wordIndex) onWordTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(18, 36, 18, 26),
+              child: _ListeningTranscriptLines(
+                segments: segments,
+                currentSegment: currentSegment,
+                currentWord: currentWord,
+                selectedSegment: selectedSegment,
+                selectedWord: selectedWord,
+                keywords: keywords,
+                highlightWords: highlightWords,
+                underlineWords: underlineWords,
+                onWordTap: onWordTap,
+                showTranslation: showTranslation,
+                textScale: textScale,
               ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: DesignTokens.body(
-                  11,
-                  weight: FontWeight.w700,
-                ).copyWith(color: selected ? Colors.black : Colors.white),
-              ),
-            ],
+            ),
           ),
         ),
+        Row(
+          children: [
+            _ListeningUtilityButton(
+              icon: CupertinoIcons.chevron_down,
+              label: 'Close lyrics',
+              onTap: onToggleLyrics,
+            ),
+            const Spacer(),
+            _ListeningUtilityButton(
+              icon: Icons.translate,
+              label: showTranslation ? 'Hide translation' : 'Show translation',
+              onTap: onToggleTranslation,
+            ),
+            _ListeningUtilityButton(
+              icon: CupertinoIcons.textformat_size,
+              label: 'Text size',
+              onTap: onCycleTextSize,
+            ),
+            _ListeningUtilityButton(
+              icon: CupertinoIcons.doc_on_doc,
+              label: 'Copy French',
+              onTap: onCopyLine,
+            ),
+          ],
+        ),
+        _ListeningProgressControls(
+          segments: segments,
+          currentSegment: currentSegment,
+          isPlaying: isPlaying,
+          isLoading: isLoading,
+          rate: rate,
+          playbackPosition: playbackPosition,
+          playbackDuration: playbackDuration,
+          onToggle: onTogglePlayback,
+          onReplay: onReplay,
+          onCycleRate: onCycleRate,
+        ),
+      ],
+    );
+  }
+}
+
+class _ListeningStageIslandTabs extends StatelessWidget {
+  const _ListeningStageIslandTabs({required this.current, required this.onTap});
+
+  final _ListeningTab current;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const labels = ['Lyrics', 'Quiz', 'Keywords', 'Grammar'];
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: DesignTokens.nightHairline),
       ),
+      child: Row(
+        children: [
+          for (var index = 0; index < labels.length; index++)
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onTap(index),
+                child: AnimatedContainer(
+                  duration: DesignTokens.durationFast,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: current.index == index
+                        ? DesignTokens.nightAccent
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      labels[index],
+                      style: DesignTokens.body(11, weight: FontWeight.w700)
+                          .copyWith(
+                            color: current.index == index
+                                ? Colors.black
+                                : Colors.white70,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ListeningProgressControls extends StatelessWidget {
+  const _ListeningProgressControls({
+    required this.segments,
+    required this.currentSegment,
+    required this.isPlaying,
+    required this.isLoading,
+    required this.rate,
+    required this.playbackPosition,
+    required this.playbackDuration,
+    required this.onToggle,
+    required this.onReplay,
+    required this.onCycleRate,
+  });
+
+  final List<ReadingSegment> segments;
+  final int currentSegment;
+  final bool isPlaying;
+  final bool isLoading;
+  final double rate;
+  final Duration playbackPosition;
+  final Duration playbackDuration;
+  final VoidCallback onToggle;
+  final VoidCallback onReplay;
+  final VoidCallback onCycleRate;
+
+  @override
+  Widget build(BuildContext context) {
+    final durationMs = playbackDuration.inMilliseconds;
+    final positionMs = playbackPosition.inMilliseconds;
+    final progress = durationMs > 0
+        ? (positionMs / durationMs).clamp(0.0, 1.0)
+        : segments.length <= 1
+        ? 0.0
+        : (currentSegment / (segments.length - 1)).clamp(0.0, 1.0);
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              segments.isEmpty
+                  ? 'LISTENING'
+                  : 'LINE ${currentSegment.clamp(0, segments.length - 1) + 1} / ${segments.length}',
+              style: DesignTokens.label(9).copyWith(color: Colors.white60),
+            ),
+            const Spacer(),
+            Text(
+              '${rate.toStringAsFixed(2)}×',
+              style: DesignTokens.label(9).copyWith(color: Colors.white60),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 3,
+            backgroundColor: Colors.white24,
+            valueColor: const AlwaysStoppedAnimation(DesignTokens.nightAccent),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              tooltip: 'Replay',
+              onPressed: onReplay,
+              icon: const Icon(CupertinoIcons.gobackward),
+              color: Colors.white,
+            ),
+            IconButton(
+              tooltip: isPlaying ? 'Pause' : 'Play',
+              onPressed: isLoading ? null : onToggle,
+              icon: Icon(
+                isLoading
+                    ? CupertinoIcons.hourglass
+                    : isPlaying
+                    ? CupertinoIcons.pause_fill
+                    : CupertinoIcons.play_fill,
+                size: 24,
+              ),
+              color: Colors.black,
+              style: IconButton.styleFrom(
+                backgroundColor: DesignTokens.nightAccent,
+                minimumSize: const Size(54, 54),
+                shape: const CircleBorder(),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Playback speed',
+              onPressed: onCycleRate,
+              icon: const Icon(CupertinoIcons.speedometer),
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -1848,23 +2851,28 @@ class _ListeningSettingsSheet extends StatelessWidget {
                 label: 'Playback speed',
                 value: '${settings.playbackRate.toStringAsFixed(2)}×',
                 choices: const ['0.75×', '1×', '1.25×'],
-                selected: settings.playbackRate <= 0.36
+                selected: settings.playbackRate < 0.8
                     ? '0.75×'
-                    : settings.playbackRate >= 0.5
+                    : settings.playbackRate >= 1.1
                     ? '1.25×'
                     : '1×',
                 onSelected: (value) => settings.setPlaybackRate(
                   value == '0.75×'
-                      ? 0.32
+                      ? 0.75
                       : value == '1.25×'
-                      ? 0.55
-                      : 0.42,
+                      ? 1.25
+                      : 1,
                 ),
               ),
               _NightSwitchRow(
                 label: 'Word translations',
                 value: settings.translateSentences,
                 onChanged: settings.setTranslateSentences,
+              ),
+              _NightSwitchRow(
+                label: 'Highlight words',
+                value: settings.highlightWords,
+                onChanged: settings.setHighlightWords,
               ),
               _NightSwitchRow(
                 label: 'Underline words',
@@ -1880,6 +2888,18 @@ class _ListeningSettingsSheet extends StatelessWidget {
                 label: 'Dark mode',
                 value: settings.darkMode,
                 onChanged: settings.setDarkMode,
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: DesignTokens.nightAccent,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text('Done'),
+                ),
               ),
             ],
           ),
@@ -1989,143 +3009,8 @@ class _NightSwitchRow extends StatelessWidget {
         ).copyWith(color: DesignTokens.nightText),
       ),
       value: value,
-      activeColor: DesignTokens.nightAccent,
+      activeThumbColor: DesignTokens.nightAccent,
       onChanged: onChanged,
-    );
-  }
-}
-
-class _ListeningHeader extends StatelessWidget {
-  const _ListeningHeader({required this.story});
-
-  final GeneratedStory story;
-
-  @override
-  Widget build(BuildContext context) {
-    return LearningCard(
-      padding: 0,
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(DesignTokens.radiusCard),
-              bottomLeft: Radius.circular(DesignTokens.radiusCard),
-            ),
-            child: SizedBox(
-              width: 92,
-              height: 116,
-              child: story.coverUrl == null || story.coverUrl!.isEmpty
-                  ? const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: DesignTokens.heroGradient,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.headphones,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    )
-                  : Image.network(
-                      story.coverUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: DesignTokens.heroGradient,
-                        ),
-                        child: Icon(
-                          CupertinoIcons.headphones,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${story.levelBand} · ${story.readTimeMinutes} min',
-                    style: DesignTokens.label(
-                      10,
-                    ).copyWith(color: DesignTokens.primary),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    story.displayTitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.display(18),
-                  ),
-                  if (story.summary.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      story.summary,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: DesignTokens.body(
-                        11.5,
-                      ).copyWith(color: DesignTokens.mutedDim),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StageRail extends StatelessWidget {
-  const _StageRail({required this.current});
-
-  final _ListeningStage current;
-
-  @override
-  Widget build(BuildContext context) {
-    const labels = ['Listen', 'Check', 'Focus', 'Dictate', 'Shadow', 'Done'];
-    final currentIndex = current.index;
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: DesignTokens.nightSurface,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-        border: Border.all(color: DesignTokens.nightHairline),
-      ),
-      child: Row(
-        children: [
-          for (var index = 0; index < labels.length; index++)
-            Expanded(
-              child: AnimatedContainer(
-                duration: DesignTokens.durationFast,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: index == currentIndex
-                      ? DesignTokens.nightAccent
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  labels[index],
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.label(8.5).copyWith(
-                    color: index == currentIndex
-                        ? Colors.black
-                        : index < currentIndex
-                        ? DesignTokens.nightAccent
-                        : DesignTokens.nightMuted,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }
@@ -2154,122 +3039,6 @@ class _StageEyebrow extends StatelessWidget {
           ).copyWith(color: DesignTokens.nightMuted),
         ),
       ],
-    );
-  }
-}
-
-class _AudioPlayerCard extends StatelessWidget {
-  const _AudioPlayerCard({
-    required this.story,
-    required this.isPlaying,
-    required this.isLoading,
-    required this.currentSegment,
-    required this.totalSegments,
-    required this.rate,
-    required this.onToggle,
-    required this.onReplay,
-    required this.onCycleRate,
-  });
-
-  final GeneratedStory story;
-  final bool isPlaying;
-  final bool isLoading;
-  final int currentSegment;
-  final int totalSegments;
-  final double rate;
-  final VoidCallback onToggle;
-  final VoidCallback onReplay;
-  final VoidCallback onCycleRate;
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = totalSegments == 0
-        ? 0.0
-        : ((currentSegment + (isPlaying ? 1 : 0)) / totalSegments)
-              .clamp(0.0, 1.0)
-              .toDouble();
-    return LearningCard(
-      padding: 0,
-      color: DesignTokens.ink,
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'NATURAL FRENCH · ${story.levelBand}',
-              style: DesignTokens.label(
-                10,
-              ).copyWith(color: DesignTokens.primarySoft),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              story.displayTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.display(22).copyWith(color: Colors.white),
-            ),
-            const SizedBox(height: 18),
-            LinearProgressIndicator(
-              value: progress,
-              minHeight: 5,
-              backgroundColor: Colors.white12,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                DesignTokens.primarySoft,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                IconButton(
-                  tooltip: isPlaying ? 'Pause story' : 'Play story',
-                  onPressed: isLoading ? null : onToggle,
-                  icon: isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        )
-                      : Icon(
-                          isPlaying
-                              ? CupertinoIcons.pause_fill
-                              : CupertinoIcons.play_fill,
-                          color: DesignTokens.ink,
-                        ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    minimumSize: const Size(52, 52),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    totalSegments == 0
-                        ? 'No audio lines yet'
-                        : 'Line ${currentSegment + 1} of $totalSegments',
-                    style: DesignTokens.body(
-                      12,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: Colors.white70),
-                  ),
-                ),
-                _DarkAction(
-                  icon: CupertinoIcons.repeat,
-                  label: isLoading ? 'Preparing audio' : 'Replay',
-                  onTap: isLoading ? () {} : onReplay,
-                ),
-                const SizedBox(width: 8),
-                _DarkAction(
-                  icon: CupertinoIcons.speedometer,
-                  label: '${rate.toStringAsFixed(2)}×',
-                  onTap: onCycleRate,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -2336,47 +3105,6 @@ class _ChoiceButton extends StatelessWidget {
               ),
             ],
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DarkAction extends StatelessWidget {
-  const _DarkAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-        child: SizedBox(
-          height: 48,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 17, color: Colors.white70),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: DesignTokens.label(9).copyWith(color: Colors.white70),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-/// Converts generated story artwork into a small, predictable Storage object.
-/// Artwork is normalized to the shared 4:3 card ratio before compression, so
-/// provider-specific aspect ratios never leak into the learner experience.
+/// Converts generated artwork into small, predictable Storage objects while
+/// preserving the requested visual ratio. Card covers use 4:3; music backdrops
+/// use 9:16 and must never be cropped back to the card ratio.
 abstract final class ImageStorageOptimizer {
   static const targetAspectRatio = 4 / 3;
   static const maxWidth = 512;
@@ -29,6 +29,22 @@ abstract final class ImageStorageOptimizer {
   ];
 
   static Uint8List optimizeCover(Uint8List source, {int maxBytes = 25 * 1024}) {
+    return optimizeArtwork(
+      source,
+      maxBytes: maxBytes,
+      targetAspectRatio: targetAspectRatio,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+    );
+  }
+
+  static Uint8List optimizeArtwork(
+    Uint8List source, {
+    int maxBytes = 25 * 1024,
+    required double targetAspectRatio,
+    required int maxWidth,
+    required int maxHeight,
+  }) {
     if (source.isEmpty) return source;
     try {
       final decoded = img.decodeImage(source);
@@ -39,8 +55,13 @@ abstract final class ImageStorageOptimizer {
       // Providers can return a portrait or square image even when the prompt
       // requests landscape. Normalize at the storage boundary so every card
       // receives the same 4:3 artwork contract.
-      final cropped = _cropToAspectRatio(decoded);
-      final baseScale = _scaleFor(cropped.width, cropped.height);
+      final cropped = _cropToAspectRatio(decoded, targetAspectRatio);
+      final baseScale = _scaleFor(
+        cropped.width,
+        cropped.height,
+        maxWidth,
+        maxHeight,
+      );
       Uint8List? smallest;
       for (final scaleStep in _scaleSteps) {
         final scale = baseScale * scaleStep;
@@ -75,14 +96,17 @@ abstract final class ImageStorageOptimizer {
     }
   }
 
-  static double _scaleFor(int width, int height) {
+  static double _scaleFor(int width, int height, int maxWidth, int maxHeight) {
     final widthScale = maxWidth / width;
     final heightScale = maxHeight / height;
     final scale = widthScale < heightScale ? widthScale : heightScale;
     return scale < 1 ? scale : 1;
   }
 
-  static img.Image _cropToAspectRatio(img.Image source) {
+  static img.Image _cropToAspectRatio(
+    img.Image source,
+    double targetAspectRatio,
+  ) {
     final sourceAspectRatio = source.width / source.height;
     if ((sourceAspectRatio - targetAspectRatio).abs() < 0.001) {
       return source;

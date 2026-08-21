@@ -105,7 +105,13 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
     );
     final next = roadmap.nextSession ?? roadmap.sessions.first;
     final lessonCards = _lessonCards(roadmap, next);
-    final featuredSessions = lessonCards.take(2).toList(growable: false);
+    // Keep the featured rail independent from the activity grid. If the
+    // adaptive plan temporarily returns no lesson cards, the Home shell still
+    // has the first two roadmap sessions to render directly below the modes.
+    final featuredSessions =
+        (lessonCards.isEmpty ? roadmap.sessions : lessonCards)
+            .take(2)
+            .toList(growable: false);
     final tutor = ActiveTutor.current;
 
     if (_tourRequested) {
@@ -282,13 +288,15 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
         onPageChanged: (page) => setState(() => _featuredPage = page),
         itemBuilder: (context, index) {
           final session = sessions[index];
-          return Padding(
-            padding: EdgeInsets.only(
-              right: index == sessions.length - 1 ? 0 : 8,
-            ),
-            child: GestureDetector(
-              onTap: () => _openSession(session),
-              child: _FeaturedSessionCard(session: session),
+          return SizedBox.expand(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: index == sessions.length - 1 ? 0 : 8,
+              ),
+              child: GestureDetector(
+                onTap: () => _openSession(session),
+                child: _FeaturedSessionCard(session: session),
+              ),
             ),
           );
         },
@@ -448,7 +456,10 @@ class _FeaturedSessionCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(_coverAsset(session), fit: BoxFit.cover),
+          DecoratedBox(
+            decoration: const BoxDecoration(color: DesignTokens.nightSurface),
+            child: Image.asset(_coverAsset(session), fit: BoxFit.cover),
+          ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(

@@ -12,6 +12,7 @@ import '../../services/course_progress_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
+import '../../services/starter_cover_resolver.dart';
 import '../../services/subscription_gate_service.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
@@ -45,7 +46,7 @@ class SpeakCourseActivityScreen extends ConsumerStatefulWidget {
 
 class _SpeakCourseActivityScreenState
     extends ConsumerState<SpeakCourseActivityScreen> {
-  bool _launching = true;
+  bool _launching = false;
   String? _error;
 
   SpeakRoadmapSession get session => widget.session;
@@ -68,12 +69,24 @@ class _SpeakCourseActivityScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _launch();
-    });
+    if (!_isConversation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _launch();
+      });
+    }
   }
 
+  bool get _isConversation => switch (session.primarySkill) {
+    SpeakSkill.speaking || SpeakSkill.roleplay || SpeakSkill.freeTalk => true,
+    _ => false,
+  };
+
   Future<void> _launch() async {
+    if (_launching) return;
+    setState(() {
+      _launching = true;
+      _error = null;
+    });
     try {
       final allowed = await requirePremiumArea(
         context,
@@ -219,6 +232,263 @@ class _SpeakCourseActivityScreenState
 
   @override
   Widget build(BuildContext context) {
+    if (_isConversation) return _sceneBrief(context);
+    return _legacyLaunchShell(context);
+  }
+
+  Widget _sceneBrief(BuildContext context) {
+    final roleplay = session.roleplay;
+    final goal =
+        roleplay?.goal ??
+        (session.subtitle.trim().isEmpty
+            ? session.primarySkill.description
+            : session.subtitle);
+    final learnerRole = roleplay?.learnerRole ?? 'You';
+    final tutorRole = roleplay?.tutorRole ?? 'French conversation partner';
+    final openingLine =
+        roleplay?.openingLine ??
+        (session.targetPhrases.isEmpty
+            ? 'Bonjour !'
+            : session.targetPhrases.first);
+
+    return Scaffold(
+      backgroundColor: DesignTokens.nightCanvas,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          children: [
+            Row(
+              children: [
+                Semantics(
+                  button: true,
+                  label: 'Close scene brief',
+                  child: IconButton(
+                    tooltip: 'Back',
+                    onPressed: () => Navigator.of(context).pop(false),
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: DesignTokens.nightText,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Speaking Studio',
+                    style: DesignTokens.display(
+                      20,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                ),
+                Text(
+                  '${session.level}  ·  ${session.estimatedMinutes} min',
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            Text(
+              'BEFORE YOU SPEAK',
+              style: DesignTokens.body(
+                11,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              session.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: DesignTokens.display(
+                30,
+              ).copyWith(color: DesignTokens.nightText),
+            ),
+            const SizedBox(height: 14),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(23),
+              child: SizedBox(
+                height: 192,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(_sceneCoverAsset(session), fit: BoxFit.cover),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.08),
+                            Colors.black.withValues(alpha: 0.78),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          'SCENE ${session.index}',
+                          style: DesignTokens.body(11, weight: FontWeight.w700)
+                              .copyWith(
+                                color: DesignTokens.nightAccent,
+                                letterSpacing: 1.1,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              goal,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: DesignTokens.body(
+                16,
+                weight: FontWeight.w600,
+              ).copyWith(color: DesignTokens.nightText, height: 1.35),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _sceneDetail(
+                    icon: Icons.person_outline_rounded,
+                    label: 'Your role',
+                    value: learnerRole,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: _sceneDetail(
+                    icon: Icons.record_voice_over_rounded,
+                    label: 'Marcus',
+                    value: tutorRole,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            Text(
+              'MARCUS SAYS',
+              style: DesignTokens.body(
+                11,
+                weight: FontWeight.w700,
+              ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+              decoration: BoxDecoration(
+                color: DesignTokens.nightSurface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: DesignTokens.nightHairline),
+              ),
+              child: Text(
+                openingLine,
+                style: DesignTokens.body(
+                  18,
+                  weight: FontWeight.w600,
+                ).copyWith(color: DesignTokens.nightText, height: 1.35),
+              ),
+            ),
+            const SizedBox(height: 26),
+            if (_error != null) ...[
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.nightMuted),
+              ),
+              const SizedBox(height: 12),
+            ],
+            Semantics(
+              button: true,
+              label: 'Enter the speaking scene',
+              child: GestureDetector(
+                onTap: _launching ? null : _launch,
+                child: Container(
+                  height: 58,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: _launching
+                        ? DesignTokens.nightHairline
+                        : DesignTokens.nightAccent,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: _launching
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: DesignTokens.nightAccent,
+                          ),
+                        )
+                      : Text(
+                          'I’m ready — enter the scene',
+                          style: DesignTokens.body(
+                            15,
+                            weight: FontWeight.w700,
+                          ).copyWith(color: Colors.black),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sceneDetail({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 13),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: DesignTokens.nightAccent, size: 19),
+          const SizedBox(height: 9),
+          Text(
+            label.toUpperCase(),
+            style: DesignTokens.body(
+              10,
+              weight: FontWeight.w700,
+            ).copyWith(color: DesignTokens.nightMuted, letterSpacing: 0.6),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: DesignTokens.body(
+              13,
+              weight: FontWeight.w600,
+            ).copyWith(color: DesignTokens.nightText),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _legacyLaunchShell(BuildContext context) {
     return SpeakScaffold(
       child: Column(
         children: [
@@ -275,4 +545,17 @@ class _SpeakCourseActivityScreenState
       ),
     );
   }
+}
+
+String _sceneCoverAsset(SpeakRoadmapSession session) {
+  final resolved = StarterCoverResolver.resolve(title: session.title);
+  if (resolved != null && resolved.startsWith('asset:')) {
+    return resolved.substring('asset:'.length);
+  }
+  return switch (session.index % 4) {
+    0 => 'assets/starter_covers/market.png',
+    1 => 'assets/starter_covers/station.png',
+    2 => 'assets/starter_covers/lantern.png',
+    _ => 'assets/starter_covers/boat.png',
+  };
 }

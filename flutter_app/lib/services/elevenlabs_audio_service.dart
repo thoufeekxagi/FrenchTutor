@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/content_models.dart';
+
 /// A provider-rendered lesson clip returned by the authenticated Supabase
 /// ElevenLabs boundary. Alignment is character-level, which is enough to
 /// derive segment/word timing later without making the transcript provider-
@@ -13,14 +15,20 @@ class ElevenLabsAudioClip {
     required this.bytes,
     this.alignment,
     this.voiceSegments = const [],
+    this.validation,
   });
 
   final String mode;
   final Uint8List bytes;
-  final Map<String, dynamic>? alignment;
+
+  /// TTS/dialogue return an alignment map; detailed music can return a list of
+  /// word timestamps, so keep the provider's timing shape intact.
+  final Object? alignment;
   final List<Map<String, dynamic>> voiceSegments;
+  final Map<String, dynamic>? validation;
 
   bool get hasTiming => alignment != null;
+  bool get isValidated => validation?['accepted'] == true;
 }
 
 class ElevenLabsProviderException implements Exception {
@@ -35,9 +43,69 @@ class ElevenLabsProviderException implements Exception {
   String toString() => message;
 }
 
+/// The only text allowed to reach ElevenLabs for a listening lesson. The
+/// configured canonical text model creates the story package; this immutable projection carries the French
+/// lines plus their learner-facing meaning into the renderer without letting
+/// the provider invent replacement lesson content.
+class CanonicalAudioLine {
+  const CanonicalAudioLine({
+    required this.index,
+    required this.french,
+    required this.english,
+    required this.grammarNote,
+    required this.pronunciationTip,
+    required this.speakerId,
+  });
+
+  final int index;
+  final String french;
+  final String english;
+  final String grammarNote;
+  final String pronunciationTip;
+  final String speakerId;
+}
+
+class CanonicalAudioScript {
+  const CanonicalAudioScript({required this.mode, required this.lines});
+
+  factory CanonicalAudioScript.fromStory(
+    GeneratedStory story, {
+    required String format,
+  }) {
+    final mode = format == 'surprise' ? 'narration' : format;
+    return CanonicalAudioScript(
+      mode: mode,
+      lines: [
+        for (var index = 0; index < story.passage.segments.length; index++)
+          if (story.passage.segments[index].fr.trim().isNotEmpty)
+            CanonicalAudioLine(
+              index: index,
+              french: story.passage.segments[index].fr.trim(),
+              english: story.passage.segments[index].en.trim(),
+              grammarNote: story.passage.segments[index].grammarNote.trim(),
+              pronunciationTip: story.passage.segments[index].pronunciationTip
+                  .trim(),
+              speakerId: index.isEven ? 'host' : 'guest',
+            ),
+      ],
+    );
+  }
+
+  final String mode;
+  final List<CanonicalAudioLine> lines;
+
+  String get frenchText => lines.map((line) => line.french).join(' ');
+  String get narrationText => lines.map((line) => line.french).join('\n\n');
+  List<String> get lyricLines => lines.map((line) => line.french).toList();
+
+  List<({String text, String? voiceId})> get podcastTurns => [
+    for (final line in lines) (text: line.french, voiceId: null),
+  ];
+}
+
 /// Calls the Supabase Edge Function that owns the ElevenLabs credential.
 ///
-/// Gemini remains responsible for the lesson/story JSON. This service only
+/// The canonical text model remains responsible for the lesson/story JSON. This service only
 /// renders the already-generated French content into narration, dialogue, or
 /// music, so the learning transcript remains deterministic and testable.
 class ElevenLabsAudioService {
@@ -84,28 +152,25 @@ class ElevenLabsAudioService {
   }
 
   Future<ElevenLabsAudioClip> composeMusic({
-    required String prompt,
+    required List<String> lyrics,
+    String style = 'gentle acoustic French learning pop',
     int musicLengthMs = 30_000,
-    bool forceInstrumental = false,
   }) async {
     final response = await _invoke({
       'mode': 'music',
-      'prompt': prompt,
+      'lyrics': lyrics,
+      'style': style,
       'musicLengthMs': musicLengthMs,
-      'forceInstrumental': forceInstrumental,
     });
     final data = response.data;
-    if (data is Uint8List) {
-      return ElevenLabsAudioClip(mode: 'music', bytes: data);
-    }
-    if (data is List<int>) {
-      return ElevenLabsAudioClip(
-        mode: 'music',
-        bytes: Uint8List.fromList(data),
+    if (data is! Map) {
+      throw const ElevenLabsProviderException(
+        'ElevenLabs music returned an invalid validation response.',
       );
     }
-    throw const ElevenLabsProviderException(
-      'ElevenLabs music returned no playable audio.',
+    return _clipFromJson(
+      Map<String, dynamic>.from(data),
+      fallbackMode: 'music',
     );
   }
 
@@ -159,10 +224,7 @@ class ElevenLabsAudioService {
         'ElevenLabs returned an empty audio clip.',
       );
     }
-    final rawAlignment = data['alignment'];
-    final alignment = rawAlignment is Map
-        ? Map<String, dynamic>.from(rawAlignment)
-        : null;
+    final alignment = data['alignment'];
     final rawVoiceSegments = data['voiceSegments'];
     final voiceSegments = rawVoiceSegments is List
         ? [
@@ -176,6 +238,9 @@ class ElevenLabsAudioService {
         bytes: Uint8List.fromList(base64Decode(encoded)),
         alignment: alignment,
         voiceSegments: voiceSegments,
+        validation: data['validation'] is Map
+            ? Map<String, dynamic>.from(data['validation'] as Map)
+            : null,
       );
     } on FormatException {
       throw const ElevenLabsProviderException(

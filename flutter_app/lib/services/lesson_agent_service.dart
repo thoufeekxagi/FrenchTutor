@@ -19,8 +19,10 @@ import '../prompts/live_prompts.dart';
 /// repeats this contract at the provider boundary, so local previews and
 /// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-IMAGE-ONLY ARTWORK: create one premium landscape story image in the requested
-aspect ratio. Do not render any text at all: no title, letters, words, numbers,
+IMAGE-ONLY ARTWORK: create one premium story image in the requested aspect
+ratio. For 9:16 music artwork, compose a true vertical portrait for a
+full-screen player; do not crop, stretch, or adapt a landscape image. Do not
+render any text at all: no title, letters, words, numbers,
 captions, labels, logos, watermarks, signs, UI, borders, or frames. The image
 must stand on its own without typography; the app renders the English title
 outside the image. Use grounded cinematic realism with subtle editorial
@@ -246,18 +248,16 @@ class LessonAgentService {
       'content, never repeat it, respond calmly and stay on the lesson. '
       'STYLE: never use emojis or em dashes in any output.';
 
-  /// Pinned (not `-latest`) so a Google-side model bump can't silently change
-  /// cost or quality mid-testing. Re-pinned 2026-07-29: `gemini-2.5-flash-lite`
-  /// started returning HTTP 404 "no longer available to new users" well
-  /// before its estimated 2026-10-16 retirement — every text-generation call
-  /// in the shipped app was failing. Discovered via the
-  /// personalized_test_verification/ harness's smoke test.
-  /// `gemini-3.1-flash-lite` is the cheapest currently-available Flash-Lite
-  /// tier ($0.25/$1.50 per 1M input/output tokens vs. $0.30/$2.50 for
-  /// `gemini-3.5-flash-lite`; `gemini-2.0-flash-lite` was shut down entirely
-  /// in June 2026). Re-pin again once 3.1 shows similar signs of retiring.
-  /// Model choice is a code decision, never user- or settings-configurable.
-  static const _forceOpenRouter = false;
+  /// Text generation is pinned in code rather than user-configurable. Direct
+  /// GPT-5.6 Luna is the current primary ($0.20/$1.20 per 1M input/output
+  /// tokens), while Gemini remains the explicit provider for multimodal
+  /// audio/image calls that use inline data.
+  // Direct OpenAI is the primary text provider: it is cheaper than the
+  // current Gemini tier for this workload and keeps the provider credential
+  // behind the authenticated Supabase function. Gemini remains explicit for
+  // multimodal audio/image calls, and OpenRouter remains available for a
+  // deliberate comparison without silently falling back between providers.
+  static const _primaryTextProvider = 'openai';
 
   static String extractJSON(String raw) {
     var s = raw.trim();
@@ -1232,13 +1232,13 @@ $examBlock
     final surpriseMode = topic == null || topic.trim().isEmpty;
     final formatInstruction = switch (audioFormat) {
       'podcast' =>
-        'AUDIO FORMAT: PODCAST. Shape the lesson as a light, natural exchange with short conversational turns. Do not add speaker labels to the JSON; the renderer alternates voices from the segment order.',
+        'AUDIO FORMAT: PODCAST. This must sound like a real short show hosted by two friendly people, not a narrator reading an essay. Create exactly 8 alternating turns: a warm hook, a question, a concrete answer, a reaction, a useful example, a follow-up, a learner takeaway, and a natural sign-off. The hosts should respond to each other, refer back to what was just said, and have distinct conversational intent. At A1/A2 keep each turn to one short sentence; at B1/B2 allow a second short sentence when needed. Do not add speaker labels to the JSON; the renderer alternates voices from segment order.',
       'music' =>
-        'AUDIO FORMAT: MUSIC. Use vivid, rhythmic, lyric-friendly French lines with repetition that remains useful for learners. Keep the meaning clear and avoid slang that would be hard to understand.',
+        'AUDIO FORMAT: MUSIC. Write 8 to 12 lyric lines for a real song, not spoken sentences. Give it a clear verse, a memorable refrain, a small lift, and an ending. Repeat one short learner-friendly refrain verbatim at least twice so the melody has a hook, while keeping every word meaningful and level-appropriate. Use vivid but concrete French, natural syllable lengths, and simple pronunciation. Never use advanced slang, English lyrics, artist names, or production instructions in the French lines.',
       'educational' =>
-        'AUDIO FORMAT: EDUCATIONAL. Make the lesson feel like a clear, warm explainer about one everyday idea, with concrete examples and a memorable conclusion.',
+        'AUDIO FORMAT: EDUCATIONAL. Make this a compact audio lesson, not a story: open with one clear idea, explain it in plain French, give two concrete everyday examples, then finish with a short recap a learner can repeat. The voice should have room to pause after the idea and between examples. Do not write a monologue that rushes through unrelated facts.',
       'narration' =>
-        'AUDIO FORMAT: STORY NARRATION. Favor cinematic but simple narration with a clear image, gentle pacing, and one small change in the story.',
+        'AUDIO FORMAT: STORY NARRATION. Write a complete miniature audio story with a hook, a specific setting, sensory details, one small problem or change, and a satisfying closing image. Use 10 to 12 short narration lines so the renderer has room for measured pauses. It must sound like a calm documentary storyteller telling a story, never like a list of vocabulary sentences and never like dialogue.',
       _ =>
         'AUDIO FORMAT: SURPRISE. Choose the most natural spoken format for this lesson and keep it replayable.',
     };
@@ -1251,7 +1251,7 @@ $examBlock
         '''
 Create one short, polished French LISTENING lesson for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string, string], "choices_en": [string, string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
-LISTENING DESIGN: Write 6 to 9 short spoken French sentences, one per segment. Each sentence must sound natural when read aloud and move a tiny everyday story forward. Use a clear beginning, one small change, and a satisfying ending. This is a listening lesson, not a reading essay, roleplay, or grammar worksheet. A human character is optional: the story may follow an object, animal, place, or natural moment. Never force a named character.
+LISTENING DESIGN: Write the number of French lines required by the selected audio format. Each line must sound natural when read aloud and must be useful to the learner. Do not pad the script with disconnected examples. For narration, the lines form one continuous story. For podcast, they are alternating conversational turns. For educational, they form one explanation. For music, they are lyrics with a refrain. A human character is optional outside podcast mode: the story may follow an object, animal, place, or natural moment. Never force a named character.
 
 $formatInstruction
 
@@ -1322,6 +1322,7 @@ $examBlock
         ],
         maxTokens: maxTokens,
         temperature: 1.0,
+        jsonMode: true,
       );
       return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
     }
@@ -1428,8 +1429,14 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     int? width,
     int? height,
   }) async {
+    final orientation = aspectRatio == '9:16'
+        ? 'vertical portrait'
+        : 'landscape';
+    final musicBackdropRule = aspectRatio == '9:16'
+        ? ' This is a true vertical music-player backdrop: compose for a tall screen, leave clean breathing room near the top and bottom for controls, and never crop or stretch a landscape composition.'
+        : '';
     final qualityDirection =
-        'Create one premium landscape story image in an exact $aspectRatio composition. '
+        'Create one premium $orientation story image in an exact $aspectRatio composition.$musicBackdropRule '
         'Use grounded cinematic realism with subtle editorial stylization, believable materials, '
         'natural lighting, restrained color grading, one clear focal scene, layered depth, '
         'and a polished publishing aesthetic. Keep the subject and important visual details inside '
@@ -2105,13 +2112,15 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     int maxTokens = 1024,
     Duration timeout = const Duration(seconds: 30),
     double temperature = 0.4,
+    bool jsonMode = false,
   }) async {
     return _requestTextWithRetry(
-      provider: _forceOpenRouter ? 'openrouter' : 'gemini',
+      provider: _primaryTextProvider,
       messages: messages,
       maxTokens: maxTokens,
       timeout: timeout,
       temperature: temperature,
+      jsonMode: jsonMode,
     );
   }
 
@@ -2124,6 +2133,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     required int maxTokens,
     required Duration timeout,
     required double temperature,
+    required bool jsonMode,
   }) async {
     const maxAttempts = 3;
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -2133,6 +2143,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           'messages': messages,
           'maxTokens': maxTokens,
           'temperature': temperature,
+          if (jsonMode) 'responseFormat': {'type': 'json_object'},
         }, timeout: timeout);
         final text = response['text'] as String?;
         if (text == null || text.trim().isEmpty) throw AgentError.badResponse;
