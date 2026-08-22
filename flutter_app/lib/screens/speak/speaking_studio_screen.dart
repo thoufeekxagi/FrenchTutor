@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import '../session/session_screen.dart';
 import 'speak_course_activity_screen.dart';
 import 'speak_profile_screen.dart';
-import 'speak_review_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
 
@@ -33,6 +28,8 @@ class SpeakingStudioScreen extends ConsumerStatefulWidget {
 }
 
 class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
+  var _carouselPage = 0;
+
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
       context,
@@ -42,25 +39,14 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   }
 
   Future<void> _callTutor() async {
-    if (!await ensureAiSessionQuota(
-          context,
-          ref.read(pilotAccessServiceProvider),
-        ) ||
-        !mounted) {
-      return;
-    }
-    LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
-      (_) => const SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        stage: 'free_talk',
-        sessionTopic: 'Free conversation',
-        lessonContext:
-            'Have a natural French conversation with the learner. Do not force '
-            'a preset scenario or topic. Let the learner choose what to talk '
-            'about, respond warmly and concisely, and offer a brief correction '
-            'only when it helps.',
+      (_) => const SpeakingPracticeScreen(
+        request: SpeakingPracticeRequest(
+          mode: SpeakingMode.freeTalk,
+          topic: 'Surprise me',
+          goal: 'Fluency',
+        ),
       ),
       fullscreenDialog: true,
     );
@@ -96,18 +82,20 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
           children: [
             _header(context, roadmap.trackLabel, tutor),
-            const SizedBox(height: 16),
-            _continueRail(context, next),
             const SizedBox(height: 28),
             Text('GOOD MORNING', style: _eyebrow()),
             const SizedBox(height: 5),
-            Text('Your next conversation', style: _display(27)),
+            Text('Your next session', style: _display(27)),
             const SizedBox(height: 12),
-            _nextConversationCard(next),
+            _continueCarousel(lessonCards),
+            if (lessonCards.length > 1) ...[
+              const SizedBox(height: 8),
+              _carouselDots(lessonCards.length),
+            ],
             const SizedBox(height: 24),
             Text('QUICK START', style: _eyebrow()),
             const SizedBox(height: 10),
-            _quickStartRow(context, next),
+            _quickStartRow(context),
             const SizedBox(height: 26),
             _progressSignal(roadmap),
             const SizedBox(height: 26),
@@ -132,10 +120,10 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Marcus Speak', style: _display(25)),
+              Text('Home', style: _display(25)),
               const SizedBox(height: 3),
               Text(
-                '$trackLabel  ·  Tutor ${tutor.displayName}',
+                'French  ·  Tutor ${tutor.displayName}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: _body(12, color: DesignTokens.nightMuted),
@@ -189,55 +177,60 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     weight: FontWeight.w700,
   ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2);
 
-  Widget _continueRail(BuildContext context, SpeakRoadmapSession next) {
-    final items = [
-      ('Continue', Icons.play_arrow_rounded, true, () => _openSession(next)),
-      (
-        'Speaking',
-        Icons.mic_none_rounded,
-        false,
-        () => AppRouter.push(context, (_) => const SpeakingPracticeScreen()),
-      ),
-      (
-        'Writing',
-        Icons.edit_note_rounded,
-        false,
-        () => AppRouter.push(context, (_) => const WritingLabScreen()),
-      ),
-      (
-        'Reading',
-        Icons.menu_book_rounded,
-        false,
-        () => AppRouter.push(context, (_) => const ReadingLibraryScreen()),
-      ),
-      (
-        'Listening',
-        Icons.headphones_rounded,
-        false,
-        () => AppRouter.push(context, (_) => const ListeningLabScreen()),
-      ),
-    ];
+  Widget _continueCarousel(List<SpeakRoadmapSession> sessions) {
+    if (sessions.isEmpty) {
+      return _nextConversationCard(null);
+    }
     return SizedBox(
-      height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const ClampingScrollPhysics(),
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final (label, icon, selected, onTap) = items[index];
-          return _ModePill(
-            label: label,
-            icon: icon,
-            selected: selected,
-            onTap: onTap,
-          );
-        },
+      height: 278,
+      child: PageView.builder(
+        itemCount: sessions.length,
+        onPageChanged: (page) => setState(() => _carouselPage = page),
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.only(right: 1),
+          child: _nextConversationCard(sessions[index]),
+        ),
       ),
     );
   }
 
-  Widget _nextConversationCard(SpeakRoadmapSession session) {
+  Widget _carouselDots(int count) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var index = 0; index < count; index++)
+          AnimatedContainer(
+            duration: DesignTokens.durationFast,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: index == _carouselPage ? 18 : 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: index == _carouselPage
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightHairline,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _nextConversationCard(SpeakRoadmapSession? session) {
+    if (session == null) {
+      return Container(
+        height: 278,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Text(
+          'Your next lesson will appear here.',
+          style: _body(14, color: DesignTokens.nightMuted),
+        ),
+      );
+    }
     final goal = session.subtitle.trim().isEmpty
         ? session.primarySkill.description
         : session.subtitle;
@@ -388,15 +381,16 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     );
   }
 
-  Widget _quickStartRow(BuildContext context, SpeakRoadmapSession next) {
+  Widget _quickStartRow(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: _QuickStartCard(
-            icon: Icons.mic_none_rounded,
+            icon: Icons.edit_note_rounded,
             label: 'Warm up',
-            detail: 'One phrase',
-            onTap: () => _openSession(next),
+            detail: 'Writing',
+            onTap: () =>
+                AppRouter.push(context, (_) => const WritingLabScreen()),
           ),
         ),
         const SizedBox(width: 8),
@@ -411,11 +405,11 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: _QuickStartCard(
-            icon: Icons.replay_rounded,
-            label: 'Review',
-            detail: 'Bring it back',
+            icon: Icons.headphones_rounded,
+            label: 'Listening',
+            detail: 'Catch the meaning',
             onTap: () =>
-                AppRouter.push(context, (_) => const SpeakReviewScreen()),
+                AppRouter.push(context, (_) => const ListeningLabScreen()),
           ),
         ),
       ],

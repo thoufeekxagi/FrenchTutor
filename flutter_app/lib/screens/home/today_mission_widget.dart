@@ -2,24 +2,20 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
 import '../../models/tutor_persona.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/daily_goal_service.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_primary_button.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
-import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
-import '../session/session_screen.dart';
+import '../speak/speaking_practice_screen.dart';
 
 /// "Today's mission" — not a generated multi-step lesson plan anymore, just
 /// a plain daily accountability check: touch each of [DailyGoalService.categories]
@@ -164,28 +160,32 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
         case 'Listening':
           await AppRouter.push(context, (_) => const ListeningLabScreen());
         case 'Roleplay':
-          await AppRouter.push(context, (_) => const RoleplayLabScreen());
+          await AppRouter.push(
+            context,
+            (_) => const SpeakingPracticeScreen(
+              request: SpeakingPracticeRequest(
+                mode: SpeakingMode.roleplay,
+                topic: 'Surprise me',
+                goal: 'Fluency',
+              ),
+            ),
+          );
         case 'Writing':
           await AppRouter.push(context, (_) => const WritingLabScreen());
         case 'Speaking':
-          if (!await ensureAiSessionQuota(
-                context,
-                ref.read(pilotAccessServiceProvider),
-              ) ||
-              !mounted) {
-            break;
-          }
-          LessonSpeechService.shared.deactivate();
           await AppRouter.push(
             context,
-            // Missing `stage: 'speaking'` was the actual "mission completion
-            // doesn't complete the mission" bug: SessionScreen persists
-            // whatever `stage` it's given verbatim (defaulting to null when
-            // omitted, same as the dashboard's stage-less free-talk call),
-            // and DailyGoalService only counts a session toward a category
-            // when its stage maps to one — a null stage silently never
-            // counted, so Speaking could never reach 6/6 from this button.
-            (_) => SessionScreen(apiKey: ApiKeys.geminiKey, stage: 'speaking'),
+            (_) => SpeakingPracticeScreen(
+              autoStart: true,
+              request: SpeakingPracticeRequest(
+                mode: SpeakingMode.roleplay,
+                topic: 'Today\'s speaking mission',
+                level: ref.read(learningStoreProvider).profile().level,
+                goal: 'Fluency',
+                stage: 'speaking',
+                sessionTopic: 'Today\'s speaking mission',
+              ),
+            ),
             fullscreenDialog: true,
           );
       }

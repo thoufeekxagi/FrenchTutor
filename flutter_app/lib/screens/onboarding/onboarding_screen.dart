@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../flow/stage_outcome.dart';
@@ -19,7 +18,7 @@ import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/web/web_onboarding_question.dart';
 import '../../widgets/web/web_onboarding_welcome.dart';
 import '../../widgets/web/web_preparing_pane.dart';
-import '../session/session_screen.dart';
+import '../speak/speaking_practice_screen.dart';
 import 'widgets/apple_goal_view.dart';
 import 'widgets/apple_level_view.dart';
 import 'widgets/apple_welcome_view.dart';
@@ -854,15 +853,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     if (!mounted) return;
     final result = await AppRouter.push<SpeakingResult>(
       context,
-      (_) => SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        lessonContext: LivePrompts.trialLessonContext,
-        stage: 'trial',
-        kickoffMessage: LivePrompts.trialKickoff,
-        durationLimitSeconds: TrialCallGate.maxSeconds,
-        wrapUpNote: LivePrompts.trialWrapUpNote,
-        wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
-        popResultImmediately: true,
+      (_) => SpeakingPracticeScreen(
+        autoStart: true,
+        request: SpeakingPracticeRequest(
+          mode: SpeakingMode.freeTalk,
+          topic: 'First conversation',
+          level: 'A1',
+          goal: 'First conversation',
+          durationMinutes: 3,
+          lessonContext: LivePrompts.trialLessonContext,
+          stage: 'trial',
+          sessionTopic: 'Your first conversation',
+          kickoffMessage: LivePrompts.trialKickoff,
+          durationLimitSeconds: TrialCallGate.maxSeconds,
+          wrapUpNote: LivePrompts.trialWrapUpNote,
+          wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
+          popResultImmediately: true,
+          skipQuota: true,
+        ),
       ),
       fullscreenDialog: true,
     );

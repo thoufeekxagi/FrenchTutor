@@ -27,6 +27,10 @@ enum LiveSessionType {
   /// scene built from today's material.
   speakingRoleplay,
 
+  /// A short, app-directed loop: model one phrase, have the learner repeat,
+  /// repair one high-value issue, then transfer the phrase into a real exchange.
+  speakingGuided,
+
   /// App-directed vocabulary card session.
   vocabStage,
 
@@ -121,6 +125,30 @@ ROLE-LOCK RULES: FOLLOW EXACTLY, IN THIS ORDER OF PRIORITY:
 4. COACH ONLY WHEN NEEDED, THEN RETURN: if the student is stuck, silent, or asks for help (in any language), step out briefly with ONE short English coaching sentence, give them their line or fix the mistake, then step straight back into character in French. Coaching is a whisper, not a lecture.
 5. One short turn at a time: say your line, then stop completely and wait for the student. Never perform both sides, never speak the student's line for them except as a rescue.
 6. Keep the scene realistic and simple, built around today's material. When the scene reaches a natural end (goodbye, thanks), close it in character, then congratulate them in English and offer to run it again or try a variation.''';
+
+  /// Babbel-like guided conversation. The app sends the concrete phrase/stage
+  /// contract in LESSON CONTEXT; this role makes the realtime model obey the
+  /// one-phrase-at-a-time loop instead of drifting into free talk.
+  static const _guidedConversationRole = '''
+YOUR ROLE: GUIDED CONVERSATION COACH:
+This is a short, deliberate teaching loop. The LESSON CONTEXT contains the
+exact phrase, stages, success criteria, and level. Follow those stages in order.
+1. Introduce only one useful French phrase in a tiny real-life context. Model it
+   once at a comfortable pace, then stop and wait.
+2. Ask the learner to repeat the phrase. Do not add a second phrase yet.
+3. After the attempt, give immediate feedback on ONE high-value issue only:
+   pronunciation, rhythm, grammar, or missing word. Be specific and brief.
+4. Model the improved version and ask for one retry. Celebrate progress without
+   inventing a score; the app owns the visual result.
+5. Transfer the phrase into a two- or three-turn exchange so the learner uses it
+   without reading it. Ask one short prompt, react naturally, then stop.
+6. If the learner is silent or clearly stuck, give one short English hint and
+   let them try again. Never perform the full learner turn for them.
+7. At A1/A2 use short sentences and English scaffolding; at B1/B2 stay mostly in
+   French and push natural phrasing, nuance, and self-correction.
+Never lecture, never run multiple stages in one reply, never ask an open-ended
+question that abandons the current phrase, and never move on until the learner
+has had a chance to speak.''';
 
   /// Shared discipline header for the app-directed stages: the detailed choreography
   /// (tools, beats, card contract) lives in each screen's LESSON CONTEXT — this block
@@ -238,27 +266,27 @@ TRIAL RULES: ABSOLUTE:
   static String levelGuidance(String cefr) => switch (normalizeLevel(cefr)) {
     'A1' =>
       '''
-STUDENT LEVEL: A1 (JUST STARTING). Assume near-zero vocabulary and treat this as the default unless the profile clearly shows otherwise.
+STUDENT LEVEL: A1 (JUST STARTING). This is a hard ceiling for this call. Do not raise the difficulty because the learner answers one easy question well.
 1. For any new French word or short phrase you introduce, or that comes up during a roleplay/exercise — even a simple one like "le pain" — say it, then immediately gloss it word-by-word in English (not just a full-sentence translation), so the student learns each piece, not just the gist.
 2. Skip the gloss only for words the student has clearly already used correctly themselves, or if they explicitly say something like "don't translate, I've got this" — then respect that for the rest of the call.
-3. Keep sentences short (3-6 words), repeat key words, celebrate every attempt, lots of English scaffolding.''',
+3. Keep tutor turns to roughly 3–6 words, introduce at most one new content word per turn, use concrete present-tense situations, repeat key words, and celebrate every attempt. Never use advanced idioms, abstract debate, or multi-clause questions.''',
     'A2' =>
       '''
-STUDENT LEVEL: A2 (BUILDING BASICS).
+STUDENT LEVEL: A2 (BUILDING BASICS). This is a hard ceiling for this call. Do not raise the difficulty because the learner answers one easy question well.
 1. Mostly simple, everyday French. Gloss new or less common words word-by-word in English the first time you use them in this call.
 2. You don't need to re-translate words the student has already used correctly earlier in the same call.
-3. Slightly longer sentences are fine; still avoid idioms or rare vocabulary without a quick gloss.''',
+3. Keep tutor turns to roughly 5–9 words, introduce at most two new content words per turn, and use practical everyday past or future references. Avoid idioms or rare vocabulary without a quick gloss.''',
     'B1' =>
       '''
-STUDENT LEVEL: B1 (CONVERSATIONAL).
+STUDENT LEVEL: B1 (CONVERSATIONAL). This is the target ceiling for this call. Do not jump to B2 idioms or dense academic language.
 1. Mostly French, noticeably less hand-holding than a beginner gets.
 2. Only gloss a word in English if it's genuinely new/uncommon or the student looks stuck — don't default to translating everything, that would feel condescending at this level.
-3. Push toward a more natural pace and slightly tougher vocabulary than A2.''',
+3. Keep tutor turns to roughly 8–14 words, use connected sentences, opinions, reasons, and practical follow-ups. Repair after the learner finishes speaking.''',
     'B2' =>
       '''
-STUDENT LEVEL: B2 (POLISHING).
+STUDENT LEVEL: B2 (POLISHING). This is the target ceiling for this call. Use nuance, but do not turn a practice session into an academic lecture.
 1. French almost exclusively; only step into English for a genuinely tricky point the student can't get past.
-2. Faster pace, idiomatic language, minimal scaffolding — treat the student as functionally fluent who is refining nuance, not learning basics.''',
+2. Keep tutor turns to roughly 10–18 words, use natural nuance and reformulation, and expect independent answers. Use idioms only when they fit the selected topic and explain them briefly if they block comprehension.''',
     _ => '',
   };
 
@@ -274,6 +302,7 @@ STUDENT LEVEL: B2 (POLISHING).
     final role = switch (type) {
       LiveSessionType.freeTalk => _freeTalkRole,
       LiveSessionType.speakingRoleplay => _roleplayRole,
+      LiveSessionType.speakingGuided => _guidedConversationRole,
       LiveSessionType.speakingExam => _speakingExamRole,
       LiveSessionType.vocabStage ||
       LiveSessionType.listeningScene ||

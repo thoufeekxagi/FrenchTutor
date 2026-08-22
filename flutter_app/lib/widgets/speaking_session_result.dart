@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import '../design/tokens.dart';
 import '../models/tutor_persona.dart';
-import 'passeport_primary_button.dart';
 
 class SpeakingSessionResultView extends StatelessWidget {
   const SpeakingSessionResultView({
@@ -14,6 +14,7 @@ class SpeakingSessionResultView extends StatelessWidget {
     required this.isDailyPath,
     required this.onDone,
     this.tutorName,
+    this.practiceLabel,
   });
 
   final int durationSeconds;
@@ -22,12 +23,13 @@ class SpeakingSessionResultView extends StatelessWidget {
   final bool isDailyPath;
   final VoidCallback onDone;
   final String? tutorName;
+  final String? practiceLabel;
 
   @override
   Widget build(BuildContext context) {
     final resolvedTutorName = tutorName ?? ActiveTutor.current.displayName;
     return ColoredBox(
-      color: DesignTokens.canvas,
+      color: DesignTokens.nightCanvas,
       child: DefaultTextStyle.merge(
         style: const TextStyle(decoration: TextDecoration.none),
         child: SafeArea(
@@ -58,31 +60,35 @@ class SpeakingSessionResultView extends StatelessWidget {
                             child: const SizedBox(
                               width: DesignTokens.minTapTarget,
                               height: DesignTokens.minTapTarget,
-                              child: Icon(CupertinoIcons.xmark),
+                              child: Icon(
+                                CupertinoIcons.xmark,
+                                color: DesignTokens.nightMuted,
+                              ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: DesignTokens.space4),
                       Text(
-                        'Session complete',
-                        style: DesignTokens.display(
-                          30,
-                        ).copyWith(decoration: TextDecoration.none),
+                        'Speaking complete',
+                        style: DesignTokens.display(30).copyWith(
+                          color: DesignTokens.nightText,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
                       const SizedBox(height: DesignTokens.space2),
                       Text(
-                        'Speaking · argumentation',
+                        practiceLabel ?? 'Speaking practice',
                         style: DesignTokens.body(
                           14,
-                        ).copyWith(color: DesignTokens.secondary),
+                        ).copyWith(color: DesignTokens.nightAccent),
                       ),
                       const SizedBox(height: DesignTokens.space5),
                       Text(
                         _description(resolvedTutorName),
                         style: DesignTokens.body(
                           16,
-                        ).copyWith(color: DesignTokens.mutedDim, height: 1.5),
+                        ).copyWith(color: DesignTokens.nightMuted, height: 1.5),
                       ),
                       const SizedBox(height: DesignTokens.space5),
                       Container(
@@ -90,11 +96,11 @@ class SpeakingSessionResultView extends StatelessWidget {
                           vertical: DesignTokens.space4,
                         ),
                         decoration: BoxDecoration(
-                          color: DesignTokens.surface,
+                          color: DesignTokens.nightSurface,
                           borderRadius: BorderRadius.circular(
                             DesignTokens.radiusCard,
                           ),
-                          border: Border.all(color: DesignTokens.hairline),
+                          border: Border.all(color: DesignTokens.nightHairline),
                         ),
                         child: Row(
                           children: [
@@ -129,22 +135,45 @@ class SpeakingSessionResultView extends StatelessWidget {
                       const SizedBox(height: DesignTokens.space6),
                       Text(
                         'What changes next',
-                        style: DesignTokens.display(
-                          20,
-                        ).copyWith(decoration: TextDecoration.none),
+                        style: DesignTokens.display(20).copyWith(
+                          color: DesignTokens.nightText,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
                       const SizedBox(height: DesignTokens.space2),
                       Text(
                         _practiceText,
-                        style: DesignTokens.body(
-                          14,
-                        ).copyWith(color: DesignTokens.inkSoft, height: 1.45),
+                        style: DesignTokens.body(14).copyWith(
+                          color: DesignTokens.nightMuted,
+                          height: 1.45,
+                        ),
                       ),
                       const SizedBox(height: DesignTokens.space4),
                       _nextPracticeRow(),
                       const Spacer(),
                       const SizedBox(height: DesignTokens.space8),
-                      PasseportPrimaryButton(label: 'Done', onPressed: onDone),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: onDone,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: DesignTokens.nightAccent,
+                            foregroundColor: Colors.black,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            'Back to Speaking Practice',
+                            style: DesignTokens.body(
+                              15,
+                              weight: FontWeight.w800,
+                            ).copyWith(color: Colors.black),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -157,7 +186,7 @@ class SpeakingSessionResultView extends StatelessWidget {
   }
 
   Widget _metricDivider() {
-    return Container(width: 1, height: 48, color: DesignTokens.hairline);
+    return Container(width: 1, height: 48, color: DesignTokens.nightHairline);
   }
 
   Widget _nextPracticeRow() {
@@ -168,9 +197,9 @@ class SpeakingSessionResultView extends StatelessWidget {
         vertical: DesignTokens.space3,
       ),
       decoration: BoxDecoration(
-        color: DesignTokens.surface,
+        color: DesignTokens.nightSurface,
         borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-        border: Border.all(color: DesignTokens.hairline),
+        border: Border.all(color: DesignTokens.nightHairline),
       ),
       child: Row(
         children: [
@@ -178,12 +207,12 @@ class SpeakingSessionResultView extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: DesignTokens.primarySoft,
+              color: DesignTokens.nightAccentSoft,
               borderRadius: BorderRadius.circular(13),
             ),
             child: const Icon(
               CupertinoIcons.book,
-              color: DesignTokens.primary,
+              color: DesignTokens.nightAccent,
               size: 20,
             ),
           ),
@@ -196,17 +225,18 @@ class SpeakingSessionResultView extends StatelessWidget {
                   children: [
                     Text(
                       'Grammar',
-                      style: DesignTokens.body(
-                        16,
-                        weight: FontWeight.w700,
-                      ).copyWith(decoration: TextDecoration.none),
+                      style: DesignTokens.body(16, weight: FontWeight.w700)
+                          .copyWith(
+                            color: DesignTokens.nightText,
+                            decoration: TextDecoration.none,
+                          ),
                     ),
                     const Spacer(),
                     Text(
                       '12 min',
                       style: DesignTokens.label(
                         11,
-                      ).copyWith(color: DesignTokens.mutedDim),
+                      ).copyWith(color: DesignTokens.nightMuted),
                     ),
                   ],
                 ),
@@ -215,7 +245,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                   'Strengthen the structures you used today',
                   style: DesignTokens.body(
                     12,
-                  ).copyWith(color: DesignTokens.mutedDim),
+                  ).copyWith(color: DesignTokens.nightMuted),
                 ),
               ],
             ),
@@ -267,14 +297,19 @@ class _ResultMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: DesignTokens.secondary, size: 18),
+        Icon(icon, color: DesignTokens.nightAccent, size: 18),
         const SizedBox(height: DesignTokens.space2),
-        Text(value, style: DesignTokens.display(20)),
+        Text(
+          value,
+          style: DesignTokens.display(
+            20,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: DesignTokens.space1),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: DesignTokens.body(11).copyWith(color: DesignTokens.mutedDim),
+          style: DesignTokens.body(11).copyWith(color: DesignTokens.nightMuted),
         ),
       ],
     );

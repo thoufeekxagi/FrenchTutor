@@ -22,6 +22,7 @@ class MicModeBar extends StatefulWidget {
     required this.onModeChanged,
     required this.onHoldStart,
     required this.onHoldEnd,
+    this.dark = false,
   });
 
   final MicMode mode;
@@ -30,6 +31,7 @@ class MicModeBar extends StatefulWidget {
   final ValueChanged<MicMode> onModeChanged;
   final VoidCallback onHoldStart;
   final VoidCallback onHoldEnd;
+  final bool dark;
 
   @override
   State<MicModeBar> createState() => _MicModeBarState();
@@ -173,7 +175,9 @@ class _MicModeBarState extends State<MicModeBar>
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: DesignTokens.muted.withValues(alpha: 0.12),
+        color: widget.dark
+            ? DesignTokens.nightSurfaceRaised
+            : DesignTokens.muted.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(
@@ -213,7 +217,9 @@ class _MicModeBarState extends State<MicModeBar>
           duration: DesignTokens.durationFast,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: selected ? DesignTokens.surface : Colors.transparent,
+            color: selected
+                ? (widget.dark ? DesignTokens.nightSurface : DesignTokens.surface)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(100),
             boxShadow: selected
                 ? [
@@ -231,13 +237,23 @@ class _MicModeBarState extends State<MicModeBar>
               Icon(
                 icon,
                 size: 13,
-                color: selected ? DesignTokens.primary : DesignTokens.mutedDim,
+                color: selected
+                    ? (widget.dark
+                          ? DesignTokens.nightAccent
+                          : DesignTokens.primary)
+                    : (widget.dark
+                          ? DesignTokens.nightMuted
+                          : DesignTokens.mutedDim),
               ),
               const SizedBox(width: 5),
               Text(
                 label,
                 style: DesignTokens.body(12, weight: FontWeight.w600).copyWith(
-                  color: selected ? DesignTokens.ink : DesignTokens.mutedDim,
+                  color: selected
+                      ? (widget.dark ? DesignTokens.nightText : DesignTokens.ink)
+                      : (widget.dark
+                            ? DesignTokens.nightMuted
+                            : DesignTokens.mutedDim),
                 ),
               ),
             ],
@@ -260,6 +276,7 @@ class MicPrimaryButton extends StatelessWidget {
     required this.onAutoTap,
     required this.onHoldStart,
     required this.onHoldEnd,
+    this.dark = false,
   });
 
   final MicMode mode;
@@ -269,6 +286,7 @@ class MicPrimaryButton extends StatelessWidget {
   final VoidCallback onAutoTap;
   final VoidCallback onHoldStart;
   final VoidCallback onHoldEnd;
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +298,9 @@ class MicPrimaryButton extends StatelessWidget {
         ? DesignTokens.muted.withValues(alpha: 0.35)
         : isPtt
         ? (isHolding ? DesignTokens.success : DesignTokens.primary)
-        : (isMuted ? DesignTokens.muted : DesignTokens.ink);
+        : (isMuted
+              ? DesignTokens.muted
+              : (dark ? DesignTokens.nightText : DesignTokens.ink));
     final icon = isPtt
         ? (isHolding ? CupertinoIcons.waveform : CupertinoIcons.mic_fill)
         : (isMuted ? CupertinoIcons.mic_slash_fill : CupertinoIcons.mic_fill);
@@ -314,7 +334,11 @@ class MicPrimaryButton extends StatelessWidget {
                 width: 58,
                 height: 58,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                child: Icon(icon, color: DesignTokens.surface, size: 23),
+                child: Icon(
+                  icon,
+                  color: dark ? Colors.black : DesignTokens.surface,
+                  size: 23,
+                ),
               ),
               const SizedBox(height: 7),
               Text(
@@ -323,7 +347,9 @@ class MicPrimaryButton extends StatelessWidget {
                     .copyWith(
                       color: isHolding
                           ? DesignTokens.success
-                          : DesignTokens.mutedDim,
+                          : (dark
+                                ? DesignTokens.nightMuted
+                                : DesignTokens.mutedDim),
                     ),
               ),
             ],

@@ -17,10 +17,10 @@ import 'connectors_lab_screen.dart';
 import 'grammar_lab_screen.dart';
 import 'liaison_lab_screen.dart';
 import 'listening_lab_screen.dart';
-import 'roleplay_lab_screen.dart';
 import 'vocab_lab_screen.dart';
 import 'writing_lab_screen.dart';
 import '../mocks/mocks_screen.dart';
+import '../speak/speaking_practice_screen.dart';
 
 class LabsScreen extends ConsumerWidget {
   const LabsScreen({super.key});
@@ -175,7 +175,13 @@ class LabsScreen extends ConsumerWidget {
                           context,
                           ref: ref,
                           labId: 'roleplay',
-                          builder: (_) => const RoleplayLabScreen(),
+                          builder: (_) => const SpeakingPracticeScreen(
+                            request: SpeakingPracticeRequest(
+                              mode: SpeakingMode.roleplay,
+                              topic: 'Surprise me',
+                              goal: 'Fluency',
+                            ),
+                          ),
                         ),
                       ),
                       _LabTile(
@@ -303,7 +309,13 @@ class LabsScreen extends ConsumerWidget {
           context,
           ref: ref,
           labId: 'roleplay',
-          builder: (_) => const RoleplayLabScreen(),
+          builder: (_) => const SpeakingPracticeScreen(
+            request: SpeakingPracticeRequest(
+              mode: SpeakingMode.roleplay,
+              topic: 'Surprise me',
+              goal: 'Fluency',
+            ),
+          ),
         ),
       ),
       WebPracticeShortcut(

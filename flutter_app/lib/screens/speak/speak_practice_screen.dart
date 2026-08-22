@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/app_tour.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/premium_access_gate.dart';
+import '../../services/review_material_service.dart';
 import '../../services/subscription_gate_service.dart';
-import '../session/session_screen.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
 import '../labs/listening_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import '../labs/roleplay_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../exam/exam_readiness_screen.dart';
 import 'speak_review_screen.dart';
-import 'speak_ui.dart';
+import 'speak_roadmap_screen.dart';
 import 'speaking_practice_screen.dart';
+import 'speak_ui.dart';
 
 /// The open practice workspace. Course sessions provide progression; this
 /// surface provides repetition, free conversation, and targeted refreshers.
@@ -32,6 +29,17 @@ class SpeakPracticeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final recentSpeaking =
+        ReviewMaterialService.recentSessions(ref.watch(storageServiceProvider))
+            .where(
+              (session) => const {
+                'Speaking',
+                'Roleplay',
+                'Exam speaking',
+              }.contains(session.skill),
+            )
+            .take(3)
+            .toList(growable: false);
     return SpeakScaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
@@ -41,31 +49,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             subtitle: 'Strengthen anything you have learned so far.',
           ),
           const SizedBox(height: 22),
-          KeyedSubtree(
-            key: AppTour.practiceFreeTalkKey,
-            child: SpeakCard(
-              color: SpeakColors.blueSoft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Free Talk', style: DesignTokens.display(22)),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Open a live conversation and choose what you want to practise. This is always available, not another required task.',
-                    style: DesignTokens.body(
-                      13,
-                    ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
-                  ),
-                  const SizedBox(height: 14),
-                  SpeakPrimaryButton(
-                    label: 'Start a conversation',
-                    icon: Icons.arrow_forward_rounded,
-                    onTap: () => _startFreeTalk(context, ref),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _workspaceTabs(context),
           const SizedBox(height: 24),
           const SpeakSectionTitle(title: 'Review'),
           const SizedBox(height: 10),
@@ -164,16 +148,24 @@ class SpeakPracticeScreen extends ConsumerWidget {
             area: null,
             tourKey: AppTour.practiceVocabularyKey,
           ),
-          _skillRow(
-            context,
-            ref: ref,
-            icon: Icons.forum_outlined,
-            title: 'Roleplay',
-            subtitle: 'Practise a specific real-life moment',
-            screen: const RoleplayLabScreen(),
-            area: PremiumArea.roleplay,
-            tourKey: AppTour.practiceRoleplayKey,
-          ),
+          if (recentSpeaking.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            const SpeakSectionTitle(title: 'Recent speaking'),
+            const SizedBox(height: 10),
+            SpeakCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  for (var index = 0; index < recentSpeaking.length; index++)
+                    _recentSpeakingRow(
+                      context,
+                      recentSpeaking[index],
+                      showDivider: index > 0,
+                    ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 18),
           SpeakSectionTitle(title: 'Foundations', action: 'Refresh anytime'),
           const SizedBox(height: 10),
@@ -261,25 +253,131 @@ class SpeakPracticeScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _startFreeTalk(BuildContext context, WidgetRef ref) async {
-    if (!await ensureAiSessionQuota(
-          context,
-          ref.read(pilotAccessServiceProvider),
-        ) ||
-        !context.mounted) {
-      return;
-    }
-    LessonSpeechService.shared.deactivate();
-    await AppRouter.push(
-      context,
-      (_) => const SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        stage: 'free_talk',
-        sessionTopic: 'Free conversation',
-        lessonContext:
-            'Have a natural French conversation with the learner. Do not force a preset scenario or topic. Let the learner choose what to talk about, respond warmly and concisely, and offer a brief correction only when it helps.',
+  Widget _workspaceTabs(BuildContext context) {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: SpeakColors.line),
       ),
-      fullscreenDialog: true,
+      child: Row(
+        children: [
+          Expanded(
+            child: _workspaceTab(
+              label: 'Course',
+              selected: false,
+              onTap: () =>
+                  AppRouter.push(context, (_) => const SpeakRoadmapScreen()),
+            ),
+          ),
+          Expanded(
+            child: _workspaceTab(
+              label: 'Practice',
+              selected: true,
+              onTap: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _workspaceTab({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: DesignTokens.durationFast,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? SpeakColors.blueSoft : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            label,
+            style: DesignTokens.body(13, weight: FontWeight.w700).copyWith(
+              color: selected ? SpeakColors.blue : SpeakColors.inkSoft,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _recentSpeakingRow(
+    BuildContext context,
+    ReviewSessionSummary session, {
+    required bool showDivider,
+  }) {
+    return Column(
+      children: [
+        if (showDivider) const Divider(height: 1, color: SpeakColors.line),
+        Semantics(
+          button: true,
+          label: 'Open saved transcript for ${session.displayTitle}',
+          child: InkWell(
+            onTap: () => AppRouter.push(
+              context,
+              (_) => SavedSpeakingTranscriptScreen(session: session),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: SpeakColors.blueSoft,
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: const Icon(
+                      Icons.forum_outlined,
+                      color: SpeakColors.blue,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          session.displayTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: DesignTokens.body(14, weight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '${session.skill} · Open saved transcript',
+                          style: DesignTokens.body(
+                            11,
+                          ).copyWith(color: SpeakColors.inkSoft),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 15,
+                    color: SpeakColors.inkSoft,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

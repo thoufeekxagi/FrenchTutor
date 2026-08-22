@@ -10,20 +10,16 @@ were included when this proposal was drafted.
 
 ## Implementation status
 
-- **Screen 1 — Speaking Studio / Your next conversation:** implemented in
-  `lib/screens/speak/speaking_studio_screen.dart` and now used as the primary
-  Home surface from `main_tab_screen.dart`. It gives the next scene a dominant
-  hero, keeps Warm up / Free talk / Review as compact quick starts, shows real
-  roadmap progress, and includes a scrollable Continue / Speaking / Writing /
-  Reading / Listening rail.
-- **Global Home:** now intentionally uses Speaking Studio as its primary
-  surface. The previous `lib/screens/speak/speak_home_screen.dart` remains in
-  the repository as the preserved Home implementation for safe rollback, but
-  it is not a runtime fallback.
-- **Guided Speaking entry:** implemented in
-  `lib/screens/speak/speaking_practice_screen.dart`. Home's Speaking rail and
-  Practice → Speaking both open this screen, which hands off to the existing
-  Scene Brief and live tutor engine.
+- **Global Home:** uses the restored dark, image-led dashboard in
+  `lib/screens/speak/speaking_studio_screen.dart`. It is the app Home surface
+  with the hero “Next Up” card, quick starts, progress, and path cards.
+- **Speaking setup entry:** implemented in
+  `lib/screens/speak/speaking_practice_screen.dart`. Home speaking shortcuts
+  and Practice → Speaking both open this independent setup screen, which
+  contains the mode, topic, level, goal, and duration controls before the live
+  tutor engine.
+- **Practice → Speaking:** does not reuse the Home dashboard. It opens the
+  independent setup in `lib/screens/speak/speaking_practice_screen.dart`.
 - **Screen 2 — Scene Brief / Before you speak:** implemented in
   `lib/screens/speak/speak_course_activity_screen.dart` for speaking,
   roleplay, and free-talk course entries. The learner now sees the scene,
@@ -100,7 +96,7 @@ without changing the interaction model below.
 
 | Existing screen | What it currently does | Decision in Speaking Studio |
 |---|---|---|
-| `SpeakHomeScreen` | Shows next action, roadmap, “Call tutor,” recent activity, and profile access. | Keep as the entry point; make one scene the obvious next action. |
+| `SpeakHomeScreen` | Alternate speaking workspace surface with next action, roadmap, tutor access, recent activity, and profile access. | Keep separate from the global Home and from the Practice → Speaking setup route. |
 | `SpeakCourseActivityScreen` | Routes a selected activity and shows “Opening your speaking practice…” while preparing it. | Keep as routing only; never expose the spinner as a learner-facing destination. |
 | `SpeakCourseSessionScreen` | Shows a course activity, time, lesson contents, and start/finish actions. | Merge the useful context into Scene Brief; remove duplicate start screens. |
 | `SpeakLessonScreen` | Presents a topic, one speaking target, a model phrase, and why the tutor will help. | Keep the target phrase and model audio; move them into Scene Brief. |

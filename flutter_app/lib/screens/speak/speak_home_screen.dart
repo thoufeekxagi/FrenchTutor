@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/app_tour.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import '../session/session_screen.dart';
 import 'speak_course_activity_screen.dart';
-import 'speak_practice_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
+import 'speaking_practice_screen.dart';
+import 'speaking_flow_screen.dart';
 
 /// V3 Home: a compact next-action surface over the existing course/session
 /// data flow. The redesign changes hierarchy and presentation only.
@@ -64,25 +61,14 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   }
 
   Future<void> _callTutor() async {
-    if (!await ensureAiSessionQuota(
-          context,
-          ref.read(pilotAccessServiceProvider),
-        ) ||
-        !mounted) {
-      return;
-    }
-    LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
-      (_) => const SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        stage: 'free_talk',
-        sessionTopic: 'Free conversation',
-        lessonContext:
-            'Have a natural French conversation with the learner. Do not force '
-            'a preset scenario or topic. Let the learner choose what to talk '
-            'about, respond warmly and concisely, and offer a brief correction '
-            'only when it helps.',
+      (_) => const SpeakingPracticeScreen(
+        request: SpeakingPracticeRequest(
+          mode: SpeakingMode.freeTalk,
+          topic: 'Surprise me',
+          goal: 'Fluency',
+        ),
       ),
       fullscreenDialog: true,
     );
@@ -132,6 +118,8 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
             _callTutorButton(),
             const SizedBox(height: 12),
             _modeRail(context, next.primarySkill),
+            const SizedBox(height: 18),
+            _speakingPracticeOptions(context),
             const SizedBox(height: 14),
             KeyedSubtree(
               key: AppTour.nextSessionKey,
@@ -243,7 +231,7 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
         'Speaking',
         SpeakSkill.speaking,
         Icons.graphic_eq_rounded,
-        const SpeakPracticeScreen(),
+        const SpeakingHubScreen(),
       ),
       (
         'Reading',
@@ -276,6 +264,91 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
         },
       ),
     );
+  }
+
+  Widget _speakingPracticeOptions(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text('Speaking practice', style: _display(19))),
+            GestureDetector(
+              onTap: () =>
+                  AppRouter.push(context, (_) => const SpeakingHubScreen()),
+              child: Text(
+                'See all',
+                style: _body(
+                  12,
+                  color: DesignTokens.nightAccent,
+                  weight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 2.45,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _PracticeOptionCard(
+              icon: Icons.record_voice_over_outlined,
+              title: 'Guided conversation',
+              subtitle: 'Hear · repeat · repair',
+              onTap: () => _openSpeakingMode(SpeakingMode.guidedConversation),
+            ),
+            _PracticeOptionCard(
+              icon: Icons.forum_outlined,
+              title: 'Roleplay',
+              subtitle: 'Real-life scenes',
+              onTap: () => AppRouter.push(
+                context,
+                (_) => const SpeakingHubScreen(initialCourseTab: false),
+              ),
+            ),
+            _PracticeOptionCard(
+              icon: Icons.people_outline_rounded,
+              title: 'Free talk',
+              subtitle: 'Choose a topic',
+              onTap: () => _openSpeakingMode(SpeakingMode.freeTalk),
+            ),
+            _PracticeOptionCard(
+              icon: Icons.fact_check_outlined,
+              title: 'TEF / TCF',
+              subtitle: 'Exam speaking',
+              onTap: () => _openSpeakingMode(SpeakingMode.tefSectionA),
+            ),
+            _PracticeOptionCard(
+              icon: Icons.image_outlined,
+              title: 'Picture description',
+              subtitle: 'Describe clearly',
+              onTap: () => _openSpeakingMode(SpeakingMode.pictureDescription),
+            ),
+            _PracticeOptionCard(
+              icon: Icons.graphic_eq_rounded,
+              title: 'Pronunciation repair',
+              subtitle: 'Fix one sound',
+              onTap: () => _openSpeakingMode(SpeakingMode.pronunciationRepair),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openSpeakingMode(SpeakingMode mode) async {
+    await AppRouter.push(
+      context,
+      (_) =>
+          SpeakingPracticeScreen(request: SpeakingPracticeRequest(mode: mode)),
+      fullscreenDialog: true,
+    );
+    if (mounted) setState(() {});
   }
 
   Widget _featuredCarousel(List<SpeakRoadmapSession> sessions) {
@@ -434,6 +507,71 @@ class _ModePill extends StatelessWidget {
                   color: selected
                       ? DesignTokens.nightAccent
                       : DesignTokens.nightMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PracticeOptionCard extends StatelessWidget {
+  const _PracticeOptionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: '$title. $subtitle',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+          decoration: BoxDecoration(
+            color: DesignTokens.nightSurface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: DesignTokens.nightHairline),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: DesignTokens.nightAccent, size: 19),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        11.5,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        10,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -3,21 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/review_material_service.dart';
+import '../../widgets/speaking_transcript_strip.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
-import '../session/session_screen.dart';
 import 'speak_ui.dart';
+import 'speaking_practice_screen.dart';
 
 /// The only three outputs a learner can request from a cross-app review.
 /// Reading, listening, and speaking all use the same recent-history source;
@@ -193,23 +192,56 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
   }
 
   Widget _materialRow(ReviewSessionSummary session) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            session.summary,
-            style: DesignTokens.body(14, weight: FontWeight.w700),
+    final isSpeaking = const {
+      'Speaking',
+      'Roleplay',
+      'Exam speaking',
+    }.contains(session.skill);
+    return Semantics(
+      button: isSpeaking,
+      label: isSpeaking
+          ? 'Open saved transcript for ${session.displayTitle}'
+          : '${session.skill} ${session.displayTitle}',
+      child: InkWell(
+        onTap: isSpeaking
+            ? () => AppRouter.push(
+                context,
+                (_) => SavedSpeakingTranscriptScreen(session: session),
+              )
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                session.summary,
+                style: DesignTokens.body(14, weight: FontWeight.w700),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${session.skill} · ${session.displayTitle}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: SpeakColors.inkSoft),
+                    ),
+                  ),
+                  if (isSpeaking)
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: SpeakColors.inkSoft,
+                    ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            '${session.skill} · ${session.displayTitle}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: DesignTokens.body(11).copyWith(color: SpeakColors.inkSoft),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -225,6 +257,169 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
     SpeakReviewMode.listening => Icons.headphones_rounded,
     SpeakReviewMode.reading => Icons.menu_book_rounded,
   };
+}
+
+/// Read-only history surface for a completed speaking call.
+///
+/// Opening a recent speaking item must never create another AI session. The
+/// learner sees the persisted transcript first and can explicitly choose
+/// "Practice again" when they want a new call.
+class SavedSpeakingTranscriptScreen extends ConsumerStatefulWidget {
+  const SavedSpeakingTranscriptScreen({super.key, required this.session});
+
+  final ReviewSessionSummary session;
+
+  @override
+  ConsumerState<SavedSpeakingTranscriptScreen> createState() =>
+      _SavedSpeakingTranscriptScreenState();
+}
+
+class _SavedSpeakingTranscriptScreenState
+    extends ConsumerState<SavedSpeakingTranscriptScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final messages = ref
+        .watch(storageServiceProvider)
+        .getSessionMessages(sessionId: widget.session.sessionId);
+    return Scaffold(
+      backgroundColor: DesignTokens.nightCanvas,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+              child: Row(
+                children: [
+                  Semantics(
+                    button: true,
+                    label: 'Close saved transcript',
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: DesignTokens.nightText,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      'Saved transcript',
+                      style: DesignTokens.display(
+                        21,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                  ),
+                  Text(
+                    widget.session.skill,
+                    style: DesignTokens.body(
+                      12,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightAccent),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.session.displayTitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.display(
+                        25,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      messages.isEmpty
+                          ? 'No transcript was saved for this session.'
+                          : '${messages.length} saved turns · Read-only history',
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) => SpeakingTranscriptStrip(
+                  messages: messages,
+                  controller: _scrollController,
+                  tutorName: 'Tutor',
+                  dark: true,
+                  height: constraints.maxHeight > 8
+                      ? constraints.maxHeight - 8
+                      : 0,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+              child: SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
+                  onPressed: () => AppRouter.push(
+                    context,
+                    (_) =>
+                        SpeakingPracticeScreen(request: _practiceAgainRequest),
+                    fullscreenDialog: true,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DesignTokens.nightAccent,
+                    foregroundColor: Colors.black,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Text(
+                    'Practice again',
+                    style: DesignTokens.body(
+                      15,
+                      weight: FontWeight.w800,
+                    ).copyWith(color: Colors.black),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SpeakingPracticeRequest get _practiceAgainRequest {
+    final mode = switch (widget.session.skill) {
+      'Roleplay' => SpeakingMode.roleplay,
+      'Exam speaking' => SpeakingMode.tefSectionA,
+      'Speaking' => SpeakingMode.guidedConversation,
+      _ => throw StateError(
+        'Saved transcript ${widget.session.sessionId} is not a speaking session.',
+      ),
+    };
+    return SpeakingPracticeRequest(
+      mode: mode,
+      topic: widget.session.displayTitle,
+      goal: 'Fluency',
+    );
+  }
 }
 
 /// Generates the selected review format from completed-session summaries,
@@ -372,25 +567,23 @@ class _SpeakReviewLaunchScreenState
   }
 
   Future<void> _startSpeakingReview() async {
-    if (!await ensureAiSessionQuota(
-          context,
-          ref.read(pilotAccessServiceProvider),
-        ) ||
-        !mounted) {
-      return;
-    }
-    LessonSpeechService.shared.deactivate();
     final profile = ref.read(learningStoreProvider).profile();
     final level = _levelFor(profile.level);
     await AppRouter.push(
       context,
-      (_) => SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        stage: 'speaking',
-        sessionTopic: 'Personalized speaking review',
-        contentKey: 'review_speaking_${DateTime.now().microsecondsSinceEpoch}',
-        lessonContext:
-            '''
+      (_) => SpeakingPracticeScreen(
+        autoStart: true,
+        request: SpeakingPracticeRequest(
+          mode: SpeakingMode.roleplay,
+          topic: 'Recent conversations',
+          level: level,
+          goal: 'Fluency',
+          stage: 'speaking',
+          sessionTopic: 'Personalized speaking review',
+          contentKey:
+              'review_speaking_${DateTime.now().microsecondsSinceEpoch}',
+          lessonContext:
+              '''
 ${_reviewTopic()}
 
 SPEAKING REVIEW CONTRACT
@@ -401,8 +594,9 @@ SPEAKING REVIEW CONTRACT
 - Use English support only for A1/A2 when it prevents confusion. For B1/B2, keep the review in French.
 - Finish with a short spoken recap of the learner's strongest improvement and next priority.
 ''',
-        kickoffMessage:
-            '(App instruction, not the student: begin a personalized $level speaking review from the learner history. Ask one short question in French and wait for the learner.)',
+          kickoffMessage:
+              '(App instruction, not the student: begin a personalized $level speaking review from the learner history. Ask one short question in French and wait for the learner.)',
+        ),
       ),
       fullscreenDialog: true,
     );

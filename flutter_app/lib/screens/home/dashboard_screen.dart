@@ -5,18 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../config/api_keys.dart';
 import '../../config/theme.dart';
 import '../../design/app_router.dart';
 import '../../models/session.dart';
 import '../../models/tutor_persona.dart';
 import '../../orchestration/models/competency.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/app_tour.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/notification_scheduler_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/subscription_gate_service.dart';
@@ -32,11 +29,10 @@ import '../labs/alphabet_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/labs_screen.dart';
-import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../notes/notes_review_screen.dart';
-import '../session/session_screen.dart';
+import '../speak/speaking_practice_screen.dart';
 import '../settings/settings_screen.dart';
 import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
@@ -78,19 +74,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _openSession({String? lessonContext}) async {
-    if (!await ensureAiSessionQuota(
-          context,
-          ref.read(pilotAccessServiceProvider),
-        ) ||
-        !mounted) {
-      return;
-    }
-    LessonSpeechService.shared.deactivate();
     await AppRouter.push(
       context,
-      (_) => SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        lessonContext: lessonContext,
+      (_) => SpeakingPracticeScreen(
+        request: SpeakingPracticeRequest(
+          mode: lessonContext == null
+              ? SpeakingMode.freeTalk
+              : SpeakingMode.roleplay,
+          topic: 'Daily speaking practice',
+          level: ref.read(learningStoreProvider).profile().level,
+          goal: 'Fluency',
+          lessonContext: lessonContext,
+          sessionTopic: 'Daily speaking practice',
+        ),
       ),
       fullscreenDialog: true,
     );
@@ -791,7 +787,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         locked: gate.isLabLocked('roleplay'),
         onTap: () => _openGated(
           'roleplay',
-          () => AppRouter.push(context, (_) => const RoleplayLabScreen()),
+          () => AppRouter.push(
+            context,
+            (_) => const SpeakingPracticeScreen(
+              request: SpeakingPracticeRequest(
+                mode: SpeakingMode.roleplay,
+                topic: 'Surprise me',
+                goal: 'Fluency',
+              ),
+            ),
+          ),
         ),
       ),
       WebPracticeShortcut(

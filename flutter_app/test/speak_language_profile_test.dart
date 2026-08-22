@@ -29,4 +29,30 @@ void main() {
   test('legacy conversational profiles resolve to B1 guidance', () {
     expect(SpeakLanguageProfile.forLevel('conversational').level, 'B1');
   });
+
+  test('each CEFR level has a distinct speaking difficulty ceiling', () {
+    final profiles = [
+      SpeakLanguageProfile.forLevel('A1'),
+      SpeakLanguageProfile.forLevel('A2'),
+      SpeakLanguageProfile.forLevel('B1'),
+      SpeakLanguageProfile.forLevel('B2'),
+    ];
+
+    expect(profiles.map((profile) => profile.tutorTurnWordLimit).toList(), [
+      '3–6 words',
+      '5–9 words',
+      '8–14 words',
+      '10–18 words',
+    ]);
+    expect(profiles.map((profile) => profile.newWordsPerTurn).toList(), [
+      1,
+      2,
+      4,
+      6,
+    ]);
+    expect(
+      profiles.every((profile) => profile.levelContract.isNotEmpty),
+      isTrue,
+    );
+  });
 }

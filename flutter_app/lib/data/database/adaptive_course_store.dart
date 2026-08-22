@@ -11,6 +11,11 @@ import 'app_migrations.dart';
 
 const _adaptiveUuid = Uuid();
 
+/// The unit of course progression shared by onboarding, Home, Course, and
+/// the speaking pathway. A block is generated lazily as specifications; the
+/// rich lesson is still created only when the learner opens a session.
+const adaptiveCourseBlockSize = 20;
+
 /// One planned session in the learner's current adaptive route.
 ///
 /// This is intentionally a specification, not the final story/quiz payload.
@@ -61,6 +66,14 @@ class AdaptiveCourseSessionSpec {
   final String status; // planned | active | completed | replaced
   final DateTime createdAt;
   final DateTime? completedAt;
+
+  /// Zero-based block number. Session 1–20 are block 0, 21–40 are block 1,
+  /// and so on. Keeping this derived from the stable sequence means no schema
+  /// migration is needed and synced rows remain backwards compatible.
+  int get blockIndex => (sequence - 1) ~/ adaptiveCourseBlockSize;
+
+  /// One-based position within the current twenty-session block.
+  int get blockPosition => ((sequence - 1) % adaptiveCourseBlockSize) + 1;
 
   String get contextPrompt =>
       '''PERSONALIZED COURSE SESSION
@@ -147,10 +160,11 @@ class AdaptiveCoursePlanSnapshot {
 ///
 /// The store creates twenty lightweight lesson specifications immediately.
 /// The first lesson can open without waiting for the rest, while the remaining
-/// specifications are already available to Home/Course. When five or fewer
-/// unfinished sessions remain, another twenty are appended in the same local
-/// transaction. A profile change replaces only unfinished future sessions and
-/// copies completed sessions into the new plan version.
+/// specifications are already available to Home/Course. After the learner
+/// completes the twentieth session in the current block, the next twenty are
+/// appended in the same local transaction on the next plan refresh. A profile
+/// change replaces only unfinished future sessions and copies completed
+/// sessions into the new plan version.
 class AdaptiveCourseStore {
   AdaptiveCourseStore(this._db, {this._onPlanChanged, this._onSessionChanged}) {
     runAppMigrations(_db);
@@ -161,8 +175,8 @@ class AdaptiveCourseStore {
   final Future<void> Function(AdaptiveCourseSessionSpec session)?
   _onSessionChanged;
 
-  static const initialBatchSize = 20;
-  static const replanThreshold = 5;
+  static const initialBatchSize = adaptiveCourseBlockSize;
+  static const replanThreshold = 0;
 
   AdaptiveCoursePlanSnapshot ensureCurrentPlan(Profile profile) {
     final fingerprint = adaptiveProfileFingerprint(profile);
@@ -715,12 +729,13 @@ abstract final class AdaptiveCoursePlanGenerator {
       final isSoundFoundation = level == 'A1' && sequence <= 5;
       final template = isSoundFoundation
           ? _foundationTemplates[sequence - 1]
-          : _templateForFocus(
-              templates,
-              focusSkills,
-              sequence: sequence,
-              cycle: cycle,
-            );
+          : _reservedSpeakingTemplate(templates, sequence) ??
+                _templateForFocus(
+                  templates,
+                  focusSkills,
+                  sequence: sequence,
+                  cycle: cycle,
+                );
       final baseContext =
           track.contexts[(sequence - 1) % track.contexts.length];
       final foundationBase =
@@ -769,6 +784,35 @@ abstract final class AdaptiveCoursePlanGenerator {
     return sessions;
   }
 
+  /// Every twenty-session block has two deliberate production anchors. This
+  /// prevents a learner who heavily weights listening, grammar, or writing
+  /// from losing the dedicated speaking pathway entirely. The first anchor
+  /// is a controlled speaking lesson; the second is a roleplay transfer.
+  /// A1's first five sound foundations remain untouched.
+  static _AdaptiveTemplate? _reservedSpeakingTemplate(
+    List<_AdaptiveTemplate> templates,
+    int sequence,
+  ) {
+    final position = ((sequence - 1) % adaptiveCourseBlockSize) + 1;
+    final target = switch (position) {
+      6 => SpeakSkill.speaking,
+      16 => SpeakSkill.roleplay,
+      _ => null,
+    };
+    if (target == null) return null;
+    final candidates = templates
+        .where((template) => template.primary == target)
+        .toList(growable: false);
+    if (candidates.isNotEmpty) {
+      return candidates[((sequence - 1) ~/ adaptiveCourseBlockSize) %
+          candidates.length];
+    }
+    throw StateError(
+      'Adaptive course has no dedicated ${target.label} template for '
+      'block position $position.',
+    );
+  }
+
   static int _minutes(String sessionLength, SpeakSkill skill) =>
       switch (sessionLength) {
         'quick' => 5,
@@ -785,9 +829,19 @@ abstract final class AdaptiveCoursePlanGenerator {
     final target = focusSkills[(sequence - 4) % focusSkills.length];
     final rotation = (sequence - 4) ~/ focusSkills.length;
     final candidates = templates
-        .where((template) => _matchesFocus(template.primary, target))
+        .where(
+          (template) =>
+              _matchesFocus(template.primary, target) ||
+              (target == SpeakSkill.vocabulary &&
+                  template.supporting.contains(target)),
+        )
         .toList(growable: false);
-    if (candidates.isEmpty) return templates[(sequence - 1) % templates.length];
+    if (candidates.isEmpty) {
+      throw StateError(
+        'Adaptive course has no template for focus ${target.label} '
+        'at sequence $sequence.',
+      );
+    }
     // Every focus cycle gets a different competency where possible. The
     // second speaking cycle deliberately introduces roleplay so a learner
     // gets application practice early instead of a route of abstract drills.

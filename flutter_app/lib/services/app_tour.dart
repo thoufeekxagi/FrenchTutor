@@ -21,7 +21,8 @@ class AppTour {
   static bool pendingHomeReplay = false;
   static bool pendingPracticeReplay = false;
 
-  // Current shell targets — attached in MainTabScreen and SpeakHomeScreen.
+  // Current shell targets — attached in MainTabScreen and the dedicated
+  // speaking workspace/setup surfaces.
   static final homeTabKey = GlobalKey(debugLabel: 'tour_home_tab');
   static final nextSessionKey = GlobalKey(debugLabel: 'tour_next_session');
   static final courseTabKey = GlobalKey(debugLabel: 'tour_course_tab');

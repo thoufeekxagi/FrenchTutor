@@ -31,8 +31,6 @@ import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/speaking_session_result.dart';
 import '../../widgets/speaking_transcript_strip.dart';
-import '../../widgets/tutor_avatar_stage.dart';
-import '../speak/speak_ui.dart';
 
 enum CallStatus {
   connecting,
@@ -51,6 +49,7 @@ class SessionScreen extends ConsumerStatefulWidget {
     super.key,
     required this.apiKey,
     this.lessonContext,
+    this.levelOverride,
     this.stage,
     this.sessionTopic,
     this.contentKey,
@@ -69,6 +68,7 @@ class SessionScreen extends ConsumerStatefulWidget {
   @Deprecated('Gemini Live uses a Supabase-minted session token.')
   final String apiKey;
   final String? lessonContext;
+  final String? levelOverride;
   final String? stage;
   final String? sessionTopic;
   final String? contentKey;
@@ -121,6 +121,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   final String _sessionId = const Uuid().v4();
 
   bool get _isRoleplay => widget.stage == 'speaking';
+  bool get _isGuided => widget.stage == 'speaking_guided';
+
+  String get _practiceLabel {
+    if (_isGuided) return 'Guided conversation';
+    if (_isRoleplay) return 'Guided roleplay';
+    if (widget.stage == 'speaking_exam') return 'TEF / TCF practice';
+    if (widget.stage == 'free_talk') return 'Free talk';
+    return 'Speaking practice';
+  }
 
   @override
   void initState() {
@@ -137,10 +146,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       isTrial: widget.stage == 'trial',
       sessionType: widget.examMode
           ? LiveSessionType.speakingExam
+          : _isGuided
+          ? LiveSessionType.speakingGuided
           : _isRoleplay
           ? LiveSessionType.speakingRoleplay
           : LiveSessionType.freeTalk,
       lessonContext: widget.lessonContext,
+      levelOverride: widget.levelOverride,
       learningStoreForProfile: ref.read(learningStoreProvider),
     );
     _mic = MicController(
@@ -343,7 +355,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           // "what do you want to practice?" greetings broke the roleplay contract.
           _gemini.sendText(
             widget.kickoffMessage ??
-                (_isRoleplay
+                (_isGuided
+                    ? '(Note from the app, not the student: the learner just joined a '
+                          'guided conversation. Begin the first stage from the speaking task '
+                          'plan: introduce one phrase, model it once, then stop and wait for '
+                          'the learner to repeat it. Do not jump ahead.)'
+                    : _isRoleplay
                     ? '(Note from the app, not the student: the student just joined the '
                           'roleplay call. Open the scene NOW exactly as your role rules say, '
                           'one short English sentence to set the scene from today\'s material, '
@@ -673,22 +690,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       case CallStatus.listening:
         return 'Listening. Speak in French';
       case CallStatus.tutorSpeaking:
-        return '${_gemini.persona.displayName} is speaking…';
+        return 'Tutor is speaking…';
       case CallStatus.muted:
         return 'Microphone muted';
       case CallStatus.ended:
         return 'Call ended';
     }
   }
-
-  TutorAvatarState get _avatarState => switch (_callStatus) {
-    CallStatus.tutorSpeaking => TutorAvatarState.speaking,
-    CallStatus.reconnecting ||
-    CallStatus.connecting => TutorAvatarState.thinking,
-    CallStatus.muted => TutorAvatarState.idle,
-    CallStatus.listening => TutorAvatarState.listening,
-    CallStatus.ended => TutorAvatarState.idle,
-  };
 
   Future<void> _confirmEnd() async {
     final shouldEnd = await showPSConfirmDialog(
@@ -719,7 +727,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           });
         }
         return const Scaffold(
-          backgroundColor: DesignTokens.canvas,
+          backgroundColor: DesignTokens.nightCanvas,
           body: SizedBox.expand(),
         );
       }
@@ -734,12 +742,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           meetsCompletionThreshold: _result.meetsThreshold,
           isDailyPath: widget.stage == 'speaking',
           tutorName: _gemini.persona.displayName,
+          practiceLabel: _practiceLabel,
           onDone: _finishResult,
         ),
       );
     }
     final notetaker = ref.watch(notetakerStateProvider);
-    final isCompact = MediaQuery.sizeOf(context).height < 760;
     // Matches iOS's fullScreenCover, which has no swipe-to-dismiss gesture at all — without
     // this, Flutter's iOS edge-swipe-back gesture (still active even on a fullscreenDialog
     // MaterialPageRoute) can silently end the call, bypassing the "End Call?" confirmation
@@ -752,23 +760,27 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-        backgroundColor: SpeakColors.background,
+        backgroundColor: DesignTokens.nightCanvas,
         body: SafeArea(
           child: Stack(
             children: [
               Column(
                 children: [
                   _callHeader(),
-                  SpeakingTranscriptStrip(
-                    messages: _messages,
-                    controller: _scrollController,
-                    tutorName: _gemini.persona.displayName,
-                    // Give the learner enough room to see several recent
-                    // turns while keeping the transcript bounded above the
-                    // tutor and call controls.
-                    height: isCompact ? 154 : 190,
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) =>
+                          SpeakingTranscriptStrip(
+                            messages: _messages,
+                            controller: _scrollController,
+                            tutorName: _gemini.persona.displayName,
+                            dark: true,
+                            height: constraints.maxHeight > 8
+                                ? constraints.maxHeight - 8
+                                : 0,
+                          ),
+                    ),
                   ),
-                  Expanded(child: _tutorStage(compact: isCompact)),
                   if (_errorMessage.isNotEmpty)
                     ErrorNotice(message: _errorMessage),
                   _callControls(),
@@ -801,7 +813,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     child: Icon(
                       CupertinoIcons.xmark,
                       size: 20,
-                      color: SpeakColors.inkSoft,
+                      color: DesignTokens.nightMuted,
                     ),
                   ),
                 ),
@@ -817,7 +829,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                         ),
                       ),
                 style: DesignTokens.body(13, weight: FontWeight.w700).copyWith(
-                  color: SpeakColors.inkSoft,
+                  color: DesignTokens.nightMuted,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -853,7 +865,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   style: DesignTokens.body(
                     12,
                     weight: FontWeight.w600,
-                  ).copyWith(color: SpeakColors.inkSoft),
+                  ).copyWith(color: DesignTokens.nightText),
                 ),
               ],
             ),
@@ -863,70 +875,30 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  Widget _tutorStage({required bool compact}) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final portraitMaxHeight = compact ? 236.0 : 324.0;
-        final portraitHeight = (constraints.maxHeight - 42).clamp(
-          0.0,
-          portraitMaxHeight,
-        );
-        final portraitWidth = compact ? 184.0 : 252.0;
-        return Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: portraitWidth,
-                  height: portraitHeight,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: TutorAvatarStage(
-                      persona: _gemini.persona,
-                      state: _avatarState,
-                      compact: compact,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 34,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      _gemini.persona.displayName,
-                      style: DesignTokens.display(22),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _callControls() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.nightSurface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: const Border(top: BorderSide(color: SpeakColors.line)),
+        border: const Border(
+          top: BorderSide(color: DesignTokens.nightHairline),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            widget.stage == 'speaking'
-                ? 'Focus: give reasons and examples'
+            _isGuided
+                ? 'Focus: listen, repeat, repair'
+                : widget.stage == 'speaking'
+                ? 'Focus: respond and keep the scene moving'
+                : widget.examMode
+                ? 'Focus: complete the task clearly'
                 : 'Focus: clear, natural French',
             style: DesignTokens.label(
               10,
-            ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 0.8),
+            ).copyWith(color: DesignTokens.nightMuted, letterSpacing: 0.8),
           ),
           const SizedBox(height: DesignTokens.space2),
           KeyedSubtree(
@@ -934,6 +906,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             child: MicModeBar(
               mode: _micMode,
               isHolding: _mic.isHeld,
+              dark: true,
               enabled:
                   _callStatus != CallStatus.connecting &&
                   _callStatus != CallStatus.reconnecting &&
@@ -952,7 +925,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ? CupertinoIcons.speaker_2_fill
                     : CupertinoIcons.ear,
                 label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
-                color: SpeakColors.navy,
+                color: DesignTokens.nightText,
                 onTap: _callStatus == CallStatus.connecting
                     ? null
                     : _toggleSpeaker,
@@ -963,6 +936,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   mode: _micMode,
                   isHolding: _mic.isHeld,
                   isMuted: _callStatus == CallStatus.muted,
+                  dark: true,
                   enabled:
                       _callStatus != CallStatus.connecting &&
                       _callStatus != CallStatus.reconnecting &&
@@ -1011,21 +985,21 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 height: 58,
                 decoration: BoxDecoration(
                   color: onTap == null
-                      ? DesignTokens.canvasDim
+                      ? DesignTokens.nightSurfaceRaised
                       : color == DesignTokens.primary
                       ? DesignTokens.primary
-                      : DesignTokens.canvasDim,
+                      : DesignTokens.nightSurfaceRaised,
                   shape: BoxShape.circle,
                   border: color == DesignTokens.primary
                       ? null
-                      : Border.all(color: DesignTokens.hairline),
+                      : Border.all(color: DesignTokens.nightHairline),
                 ),
                 child: Icon(
                   icon,
                   color: color == DesignTokens.primary
                       ? Colors.white
                       : onTap == null
-                      ? DesignTokens.muted
+                      ? DesignTokens.nightMuted
                       : color,
                   size: 23,
                 ),
@@ -1036,7 +1010,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 style: DesignTokens.body(
                   11.5,
                   weight: FontWeight.w600,
-                ).copyWith(color: SpeakColors.inkSoft),
+                ).copyWith(color: DesignTokens.nightMuted),
               ),
             ],
           ),

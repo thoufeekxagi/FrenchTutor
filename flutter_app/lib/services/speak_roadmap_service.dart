@@ -14,6 +14,7 @@ class SpeakRoadmapSession {
     required this.unitTitle,
     required this.title,
     required this.subtitle,
+    this.competency = '',
     required this.kind,
     required this.completed,
     required this.unlocked,
@@ -32,6 +33,7 @@ class SpeakRoadmapSession {
   final String unitTitle;
   final String title;
   final String subtitle;
+  final String competency;
   final SpeakSessionKind kind;
   final bool completed;
   final bool unlocked;
@@ -107,6 +109,7 @@ abstract final class SpeakRoadmapService {
           unitTitle: spec.unitTitle,
           title: spec.title,
           subtitle: spec.subtitle,
+          competency: spec.competency,
           kind: _kindFor(spec.primarySkill),
           completed: completed,
           unlocked: true,

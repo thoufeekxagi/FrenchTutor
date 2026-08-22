@@ -67,6 +67,18 @@ void main() {
       expect(prompt, isNot(contains('one simple follow-up question')));
     });
 
+    test(
+      'guided conversation prompt enforces repeat, repair, and transfer',
+      () {
+        final prompt = LivePrompts.forSession(LiveSessionType.speakingGuided);
+        expect(prompt, contains('GUIDED CONVERSATION COACH'));
+        expect(prompt, contains('Ask the learner to repeat the phrase'));
+        expect(prompt, contains('ONE high-value issue only'));
+        expect(prompt, contains('Transfer the phrase'));
+        expect(prompt, isNot(contains('one simple follow-up question')));
+      },
+    );
+
     test('speaking exam disables coaching and separates task behavior', () {
       final prompt = LivePrompts.forSession(LiveSessionType.speakingExam);
       expect(prompt, contains('TIMED SPEAKING EXAMINER'));

@@ -30,7 +30,7 @@ void main() {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
     final first = store.ensureCurrentPlan(profile);
-    for (final session in first.sessions.take(15)) {
+    for (final session in first.sessions) {
       store.markCompleted(session.contentKey);
     }
     final expanded = store.ensureCurrentPlan(profile);
@@ -40,8 +40,8 @@ void main() {
     );
 
     expect(roadmap.sessions, hasLength(40));
-    expect(roadmap.completedCount, 15);
-    expect(roadmap.nextSession?.index, 15);
+    expect(roadmap.completedCount, 20);
+    expect(roadmap.nextSession?.index, 20);
     expect(roadmap.sessions.every((session) => session.unlocked), isTrue);
   });
 

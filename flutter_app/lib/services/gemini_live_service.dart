@@ -25,6 +25,7 @@ class GeminiLiveService {
     this.isTrial = false,
     this.sessionType = LiveSessionType.freeTalk,
     this.lessonContext,
+    this.levelOverride,
     this.tools = const [],
     this.learningStoreForProfile,
     this.autoReconnect = true,
@@ -34,6 +35,11 @@ class GeminiLiveService {
   final bool isTrial;
   final LiveSessionType sessionType;
   final String? lessonContext;
+
+  /// A speaking setup may intentionally practise a level different from the
+  /// learner's profile level. When supplied, this selected level is the hard
+  /// contract for the call; it must not be silently replaced by the profile.
+  final String? levelOverride;
   final List<AgentTool> tools;
   final LearningStore? learningStoreForProfile;
 
@@ -261,7 +267,7 @@ class GeminiLiveService {
       prompt +=
           '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$profile';
     }
-    final level = await _learnerLevel();
+    final level = levelOverride ?? await _learnerLevel();
     if (level != null) {
       prompt += '\n\n${LivePrompts.levelGuidance(level)}';
     }

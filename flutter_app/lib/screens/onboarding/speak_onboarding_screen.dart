@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
@@ -19,7 +18,7 @@ import '../../services/product_analytics.dart';
 import '../../services/trial_call_gate.dart';
 import '../../services/tutor_voice_preview.dart';
 import '../speak/speak_ui.dart';
-import '../session/session_screen.dart';
+import '../speak/speaking_practice_screen.dart';
 
 /// The rebuilt first-run funnel: one question per screen, fast choices, a
 /// visible plan preview, and an honest handoff to account creation after the
@@ -672,15 +671,24 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
     if (!mounted) return;
     final result = await AppRouter.push<SpeakingResult>(
       context,
-      (_) => SessionScreen(
-        apiKey: ApiKeys.geminiKey,
-        lessonContext: LivePrompts.trialLessonContext,
-        stage: 'trial',
-        kickoffMessage: LivePrompts.trialKickoff,
-        durationLimitSeconds: TrialCallGate.maxSeconds,
-        wrapUpNote: LivePrompts.trialWrapUpNote,
-        wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
-        popResultImmediately: true,
+      (_) => SpeakingPracticeScreen(
+        autoStart: true,
+        request: SpeakingPracticeRequest(
+          mode: SpeakingMode.freeTalk,
+          topic: 'First conversation',
+          level: 'A1',
+          goal: 'First conversation',
+          durationMinutes: 3,
+          lessonContext: LivePrompts.trialLessonContext,
+          stage: 'trial',
+          sessionTopic: 'Your first conversation',
+          kickoffMessage: LivePrompts.trialKickoff,
+          durationLimitSeconds: TrialCallGate.maxSeconds,
+          wrapUpNote: LivePrompts.trialWrapUpNote,
+          wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
+          popResultImmediately: true,
+          skipQuota: true,
+        ),
       ),
       fullscreenDialog: true,
     );

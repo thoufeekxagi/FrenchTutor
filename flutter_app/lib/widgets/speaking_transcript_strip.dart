@@ -17,12 +17,14 @@ class SpeakingTranscriptStrip extends StatelessWidget {
     required this.controller,
     this.tutorName,
     this.height = 148,
+    this.dark = false,
   });
 
   final List<ChatMessage> messages;
   final ScrollController controller;
   final String? tutorName;
   final double height;
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
@@ -45,21 +47,38 @@ class SpeakingTranscriptStrip extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.82),
+            color: dark
+                ? DesignTokens.nightSurface.withValues(alpha: 0.92)
+                : Colors.white.withValues(alpha: 0.82),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: SpeakColors.line),
-          ),
-          child: ListView.separated(
-            controller: controller,
-            physics: const ClampingScrollPhysics(),
-            padding: const EdgeInsets.only(right: 4),
-            itemCount: messages.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 7),
-            itemBuilder: (context, index) => _TranscriptLine(
-              message: messages[index],
-              tutorName: resolvedTutorName,
+            border: Border.all(
+              color: dark ? DesignTokens.nightHairline : SpeakColors.line,
             ),
           ),
+          child: messages.isEmpty
+              ? Center(
+                  child: Text(
+                    'Your conversation will appear here.',
+                    textAlign: TextAlign.center,
+                    style: DesignTokens.body(14).copyWith(
+                      color: dark
+                          ? DesignTokens.nightMuted
+                          : SpeakColors.inkSoft,
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  controller: controller,
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.only(right: 4),
+                  itemCount: messages.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 7),
+                  itemBuilder: (context, index) => _TranscriptLine(
+                    message: messages[index],
+                    tutorName: resolvedTutorName,
+                    dark: dark,
+                  ),
+                ),
         ),
       ),
     );
@@ -67,10 +86,15 @@ class SpeakingTranscriptStrip extends StatelessWidget {
 }
 
 class _TranscriptLine extends StatelessWidget {
-  const _TranscriptLine({required this.message, required this.tutorName});
+  const _TranscriptLine({
+    required this.message,
+    required this.tutorName,
+    required this.dark,
+  });
 
   final ChatMessage message;
   final String tutorName;
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +102,20 @@ class _TranscriptLine extends StatelessWidget {
     final displayText = isUser
         ? _compactUserTranscript(message.content)
         : message.content;
-    final accent = isUser ? SpeakColors.blue : SpeakColors.green;
+    final accent = isUser
+        ? (dark ? DesignTokens.nightAccent : SpeakColors.blue)
+        : (dark ? DesignTokens.nightText : SpeakColors.green);
     const avatarGap = 7.0;
     final bubble = Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
         color: isUser
-            ? SpeakColors.blueSoft.withValues(alpha: 0.78)
-            : Colors.white.withValues(alpha: 0.72),
+            ? (dark
+                  ? DesignTokens.nightAccentSoft
+                  : SpeakColors.blueSoft.withValues(alpha: 0.78))
+            : (dark
+                  ? DesignTokens.nightSurfaceRaised
+                  : Colors.white.withValues(alpha: 0.72)),
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(15),
           topRight: const Radius.circular(15),
@@ -94,16 +124,19 @@ class _TranscriptLine extends StatelessWidget {
         ),
         border: Border.all(
           color: isUser
-              ? SpeakColors.blue.withValues(alpha: 0.20)
-              : SpeakColors.line,
+              ? (dark
+                    ? DesignTokens.nightAccent.withValues(alpha: 0.32)
+                    : SpeakColors.blue.withValues(alpha: 0.20))
+              : (dark ? DesignTokens.nightHairline : SpeakColors.line),
         ),
       ),
       child: SelectableText.rich(
         TextSpan(
           text: _quoteFrenchTerms(displayText),
-          style: DesignTokens.body(
-            15,
-          ).copyWith(color: SpeakColors.navy, height: 1.3),
+          style: DesignTokens.body(15).copyWith(
+            color: dark ? DesignTokens.nightText : SpeakColors.navy,
+            height: 1.3,
+          ),
         ),
       ),
     );

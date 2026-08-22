@@ -44,7 +44,7 @@ void main() {
         isTrue,
       );
       expect(plan.sessions[4].primarySkill, SpeakSkill.vocabulary);
-      expect(plan.sessions.skip(5).first.title, 'Write a short message');
+      expect(plan.sessions.skip(5).first.title, 'Introduce yourself naturally');
       expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
       expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
     },
@@ -66,6 +66,10 @@ void main() {
       expect(
         plan.sessions
             .skip(3)
+            .where(
+              (session) =>
+                  session.blockPosition != 6 && session.blockPosition != 16,
+            )
             .every(
               (session) =>
                   session.primarySkill == SpeakSkill.listening ||
@@ -76,25 +80,85 @@ void main() {
     },
   );
 
-  test('the next twenty are appended when five or fewer remain', () {
-    final store = AdaptiveCourseStore(sqlite3.openInMemory());
-    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
-    final first = store.ensureCurrentPlan(profile);
+  test(
+    'the next twenty are appended only after the current block completes',
+    () {
+      final store = AdaptiveCourseStore(sqlite3.openInMemory());
+      final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
+      final first = store.ensureCurrentPlan(profile);
 
-    for (final session in first.sessions.take(15)) {
-      store.markCompleted(session.contentKey);
-    }
-    final expanded = store.ensureCurrentPlan(profile);
+      for (final session in first.sessions.take(15)) {
+        store.markCompleted(session.contentKey);
+      }
+      final stillInFirstBlock = store.ensureCurrentPlan(profile);
 
-    expect(expanded.sessions, hasLength(40));
-    expect(
-      expanded.sessions
-          .take(15)
-          .every((session) => session.status == 'completed'),
-      isTrue,
-    );
-    expect(expanded.sessions.last.sequence, 40);
-  });
+      expect(stillInFirstBlock.sessions, hasLength(adaptiveCourseBlockSize));
+      expect(stillInFirstBlock.sessions.last.blockIndex, 0);
+
+      for (final session in first.sessions.skip(15)) {
+        store.markCompleted(session.contentKey);
+      }
+      final expanded = store.ensureCurrentPlan(profile);
+
+      expect(expanded.sessions, hasLength(adaptiveCourseBlockSize * 2));
+      expect(
+        expanded.sessions
+            .take(15)
+            .every((session) => session.status == 'completed'),
+        isTrue,
+      );
+      expect(expanded.sessions.last.sequence, 40);
+      expect(expanded.sessions.last.blockIndex, 1);
+      expect(expanded.sessions.last.blockPosition, adaptiveCourseBlockSize);
+    },
+  );
+
+  test(
+    'every generated block contains guided speaking and roleplay anchors',
+    () {
+      final store = AdaptiveCourseStore(sqlite3.openInMemory());
+      final profile = Profile(
+        id: 'listener',
+        goal: 'everyday',
+        level: 'b1',
+        interests: const ['Listening'],
+      );
+      final first = store.ensureCurrentPlan(profile);
+      final firstBlock = first.sessions.take(adaptiveCourseBlockSize);
+
+      expect(
+        firstBlock.any(
+          (session) => session.primarySkill == SpeakSkill.speaking,
+        ),
+        isTrue,
+      );
+      expect(
+        firstBlock.any(
+          (session) => session.primarySkill == SpeakSkill.roleplay,
+        ),
+        isTrue,
+      );
+
+      for (final session in first.sessions) {
+        store.markCompleted(session.contentKey);
+      }
+      final second = store.ensureCurrentPlan(profile);
+      final secondBlock = second.sessions.skip(adaptiveCourseBlockSize);
+
+      expect(
+        secondBlock.any(
+          (session) => session.primarySkill == SpeakSkill.speaking,
+        ),
+        isTrue,
+      );
+      expect(
+        secondBlock.any(
+          (session) => session.primarySkill == SpeakSkill.roleplay,
+        ),
+        isTrue,
+      );
+    },
+  );
 
   test(
     'profile changes preserve completed sessions and replace future context',

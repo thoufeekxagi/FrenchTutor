@@ -138,7 +138,12 @@ ${promptContext(sessions)}
     'writing' => 'Writing',
     'grammar' => 'Grammar',
     'vocab' => 'Vocabulary',
-    'speaking' || 'free_talk' || 'speaking_exam' => 'Speaking',
+    'speaking' ||
+    'speaking_guided' ||
+    'free_talk' ||
+    'speaking_exam' ||
+    'picture_description' ||
+    'pronunciation_repair' => 'Speaking',
     'exam_reading' => 'Exam reading',
     'exam_listening' => 'Exam listening',
     'exam_writing' => 'Exam writing',
@@ -156,8 +161,11 @@ ${promptContext(sessions)}
     'vocab',
     'alphabet',
     'speaking',
+    'speaking_guided',
     'free_talk',
     'speaking_exam',
+    'picture_description',
+    'pronunciation_repair',
     'exam_reading',
     'exam_listening',
     'exam_writing',

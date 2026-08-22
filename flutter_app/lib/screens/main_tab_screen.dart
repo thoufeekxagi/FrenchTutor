@@ -76,8 +76,8 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
 
   Widget _buildShell(BuildContext context) {
     final notetaker = ref.watch(notetakerStateProvider);
-    // Built fresh every rebuild so each Speak tab can observe the latest
-    // session/profile state while the tab shell keeps its navigation index.
+    // Restore the dark, image-led Home dashboard. Practice -> Speaking still
+    // opens its independent SpeakingPracticeScreen route.
     final screens = [
       const SpeakingStudioScreen(),
       const SpeakRoadmapScreen(embedded: true),

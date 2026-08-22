@@ -1,32 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
-import '../../services/ai_session_gate.dart';
 import '../../services/course_progress_service.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
-import '../../services/starter_cover_resolver.dart';
 import '../../services/subscription_gate_service.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
 import '../labs/listening_lab_screen.dart';
-import '../labs/roleplay_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import '../session/session_screen.dart';
 import 'speak_course_vocabulary_screen.dart';
-import 'speak_free_talk_screen.dart';
 import 'speak_review_screen.dart';
 import 'speak_ui.dart';
+import 'speaking_practice_screen.dart';
+import 'speaking_flow_screen.dart';
 
 /// Opens one course item directly in the matching Practice engine.
 ///
@@ -51,6 +46,11 @@ class _SpeakCourseActivityScreenState
 
   SpeakRoadmapSession get session => widget.session;
 
+  bool get _isSpeakingPath =>
+      session.primarySkill == SpeakSkill.speaking ||
+      session.primarySkill == SpeakSkill.roleplay ||
+      session.primarySkill == SpeakSkill.freeTalk;
+
   String get _level {
     final keyLevel = session.level.toUpperCase();
     return const {'A1', 'A2', 'B1', 'B2'}.contains(keyLevel)
@@ -59,27 +59,39 @@ class _SpeakCourseActivityScreenState
   }
 
   String get _contextPrompt {
-    final target = session.targetPhrases.isEmpty
+    final target =
+        session.primarySkill == SpeakSkill.speaking ||
+            session.primarySkill == SpeakSkill.roleplay
+        ? _requiredTargetPhrases
+        : const <String>[];
+    final roleplay = session.roleplay;
+    final targetLine = target.isEmpty
         ? ''
-        : '\nTarget phrases: ${session.targetPhrases.join('; ')}.';
+        : '\nTarget phrases: ${target.join('; ')}.';
     return 'Course unit: ${session.unitTitle}. Lesson: ${session.title}. '
-        '${session.contextPrompt}$target';
+        '${session.contextPrompt}$targetLine'
+        '${roleplay == null ? '' : '\nRoleplay location: ${roleplay.location}. '
+                  'Learner role: ${roleplay.learnerRole}. '
+                  'Tutor role: ${roleplay.tutorRole}. '
+                  'Goal: ${roleplay.goal}.'}';
+  }
+
+  List<String> get _requiredTargetPhrases {
+    if (session.primarySkill == SpeakSkill.freeTalk) {
+      return const [];
+    }
+    return session.targetPhrases;
   }
 
   @override
   void initState() {
     super.initState();
-    if (!_isConversation) {
+    if (!_isSpeakingPath) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _launch();
       });
     }
   }
-
-  bool get _isConversation => switch (session.primarySkill) {
-    SpeakSkill.speaking || SpeakSkill.roleplay || SpeakSkill.freeTalk => true,
-    _ => false,
-  };
 
   Future<void> _launch() async {
     if (_launching) return;
@@ -135,33 +147,26 @@ class _SpeakCourseActivityScreenState
       if (!mounted) return;
       setState(() {
         _launching = false;
-        _error = 'This lesson could not be opened. Please try again.';
+        _error = error.toString().replaceFirst('Bad state: ', '');
       });
     }
   }
 
   Future<bool> _openPractice() async {
     final skill = session.primarySkill;
-    if (skill == SpeakSkill.speaking) {
-      final allowed = await ensureAiSessionQuota(
-        context,
-        ref.read(pilotAccessServiceProvider),
-      );
-      if (!allowed || !mounted) return false;
-      LessonSpeechService.shared.deactivate();
+    if (skill == SpeakSkill.speaking ||
+        skill == SpeakSkill.roleplay ||
+        skill == SpeakSkill.freeTalk) {
       final result = await AppRouter.push<SpeakingResult>(
         context,
-        (_) => SessionScreen(
-          apiKey: ApiKeys.geminiKey,
-          sessionTopic: session.title,
-          contentKey: session.contentKey,
-          stage: skill.wireName,
-          lessonContext: _contextPrompt,
-          kickoffMessage: _speakingKickoff,
-        ),
+        (_) =>
+            SpeakingPracticeScreen(request: _speakingRequest, autoStart: true),
         fullscreenDialog: true,
       );
-      return result != null;
+      // A cancelled, silent, or very short call stays resumable. The course
+      // must only advance after the same connected/utterance/time threshold
+      // used by the speaking completion policy.
+      return result?.meetsThreshold ?? false;
     }
 
     final screen = switch (skill) {
@@ -193,14 +198,17 @@ class _SpeakCourseActivityScreenState
         levelBand: _level,
         targetPhrases: session.targetPhrases,
       ),
-      SpeakSkill.roleplay => RoleplayLabScreen(
-        topic: _contextPrompt,
+      SpeakSkill.roleplay => SpeakingPracticeScreen(
+        request: _speakingRequest,
         autoStart: true,
       ),
       // A review catalog item hands off to the shared review chooser so the
       // learner selects Reading, Listening, or Speaking from recent history.
       SpeakSkill.review => const SpeakReviewScreen(),
-      SpeakSkill.freeTalk => const SpeakFreeTalkScreen(),
+      SpeakSkill.freeTalk => SpeakingPracticeScreen(
+        request: _speakingRequest,
+        autoStart: true,
+      ),
       SpeakSkill.speaking => throw StateError('Speaking is handled above'),
     };
 
@@ -212,12 +220,35 @@ class _SpeakCourseActivityScreenState
     return result == true;
   }
 
-  String get _speakingKickoff =>
-      '(App instruction, not the student: this is the speaking step inside '
-      'the course lesson "${session.title}". Explain the lesson context in '
-      'one short English sentence, then model "${session.targetPhrases.isEmpty ? 'Bonjour !' : session.targetPhrases.first}" '
-      'in French and ask the learner for one short response. Keep the lesson '
-      'at ${_level.toUpperCase()} level and do not open with a generic free-talk question.)';
+  String get _speakingKickoff {
+    final modelLine = _requiredTargetPhrases.isEmpty
+        ? 'model the first useful French phrase for this competency'
+        : 'model "${_requiredTargetPhrases.first}" in French';
+    return '(App instruction, not the student: this is the speaking step inside '
+        'the course lesson "${session.title}". Explain the lesson context in '
+        'one short English sentence, then $modelLine and ask the learner for '
+        'one short response. Keep the lesson at ${_level.toUpperCase()} level '
+        'and do not open with a generic free-talk question.)';
+  }
+
+  SpeakingPracticeRequest get _speakingRequest => SpeakingPracticeRequest(
+    mode: switch (session.primarySkill) {
+      SpeakSkill.speaking => SpeakingMode.guidedConversation,
+      SpeakSkill.roleplay => SpeakingMode.roleplay,
+      SpeakSkill.freeTalk => SpeakingMode.freeTalk,
+      _ => throw StateError(
+        'Speaking request cannot be created for ${session.primarySkill.label}.',
+      ),
+    },
+    topic: session.title,
+    level: _level,
+    goal: 'Fluency',
+    durationMinutes: session.estimatedMinutes.clamp(5, 15).toInt(),
+    lessonContext: _contextPrompt,
+    sessionTopic: session.title,
+    contentKey: session.contentKey,
+    kickoffMessage: _speakingKickoff,
+  );
 
   String? get _alphabetDeckId {
     if (session.unit != 1 || session.index > 3) return null;
@@ -232,260 +263,10 @@ class _SpeakCourseActivityScreenState
 
   @override
   Widget build(BuildContext context) {
-    if (_isConversation) return _sceneBrief(context);
+    if (_isSpeakingPath) {
+      return SpeakingLessonDetailScreen(session: session, onStart: _launch);
+    }
     return _legacyLaunchShell(context);
-  }
-
-  Widget _sceneBrief(BuildContext context) {
-    final roleplay = session.roleplay;
-    final goal =
-        roleplay?.goal ??
-        (session.subtitle.trim().isEmpty
-            ? session.primarySkill.description
-            : session.subtitle);
-    final learnerRole = roleplay?.learnerRole ?? 'You';
-    final tutorRole = roleplay?.tutorRole ?? 'French conversation partner';
-    final openingLine =
-        roleplay?.openingLine ??
-        (session.targetPhrases.isEmpty
-            ? 'Bonjour !'
-            : session.targetPhrases.first);
-
-    return Scaffold(
-      backgroundColor: DesignTokens.nightCanvas,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
-          children: [
-            Row(
-              children: [
-                Semantics(
-                  button: true,
-                  label: 'Close scene brief',
-                  child: IconButton(
-                    tooltip: 'Back',
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: DesignTokens.nightText,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Speaking Studio',
-                    style: DesignTokens.display(
-                      20,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: DesignTokens.nightText),
-                  ),
-                ),
-                Text(
-                  '${session.level}  ·  ${session.estimatedMinutes} min',
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.nightMuted),
-                ),
-              ],
-            ),
-            const SizedBox(height: 22),
-            Text(
-              'BEFORE YOU SPEAK',
-              style: DesignTokens.body(
-                11,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              session.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.display(
-                30,
-              ).copyWith(color: DesignTokens.nightText),
-            ),
-            const SizedBox(height: 14),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(23),
-              child: SizedBox(
-                height: 192,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(_sceneCoverAsset(session), fit: BoxFit.cover),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.08),
-                            Colors.black.withValues(alpha: 0.78),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text(
-                          'SCENE ${session.index}',
-                          style: DesignTokens.body(11, weight: FontWeight.w700)
-                              .copyWith(
-                                color: DesignTokens.nightAccent,
-                                letterSpacing: 1.1,
-                              ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              goal,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.body(
-                16,
-                weight: FontWeight.w600,
-              ).copyWith(color: DesignTokens.nightText, height: 1.35),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _sceneDetail(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Your role',
-                    value: learnerRole,
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: _sceneDetail(
-                    icon: Icons.record_voice_over_rounded,
-                    label: 'Marcus',
-                    value: tutorRole,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 22),
-            Text(
-              'MARCUS SAYS',
-              style: DesignTokens.body(
-                11,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
-              decoration: BoxDecoration(
-                color: DesignTokens.nightSurface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: DesignTokens.nightHairline),
-              ),
-              child: Text(
-                openingLine,
-                style: DesignTokens.body(
-                  18,
-                  weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.nightText, height: 1.35),
-              ),
-            ),
-            const SizedBox(height: 26),
-            if (_error != null) ...[
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.nightMuted),
-              ),
-              const SizedBox(height: 12),
-            ],
-            Semantics(
-              button: true,
-              label: 'Enter the speaking scene',
-              child: GestureDetector(
-                onTap: _launching ? null : _launch,
-                child: Container(
-                  height: 58,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: _launching
-                        ? DesignTokens.nightHairline
-                        : DesignTokens.nightAccent,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: _launching
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: DesignTokens.nightAccent,
-                          ),
-                        )
-                      : Text(
-                          'I’m ready — enter the scene',
-                          style: DesignTokens.body(
-                            15,
-                            weight: FontWeight.w700,
-                          ).copyWith(color: Colors.black),
-                        ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _sceneDetail({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 13),
-      decoration: BoxDecoration(
-        color: DesignTokens.nightSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: DesignTokens.nightHairline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: DesignTokens.nightAccent, size: 19),
-          const SizedBox(height: 9),
-          Text(
-            label.toUpperCase(),
-            style: DesignTokens.body(
-              10,
-              weight: FontWeight.w700,
-            ).copyWith(color: DesignTokens.nightMuted, letterSpacing: 0.6),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            value,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: DesignTokens.body(
-              13,
-              weight: FontWeight.w600,
-            ).copyWith(color: DesignTokens.nightText),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _legacyLaunchShell(BuildContext context) {
@@ -545,17 +326,4 @@ class _SpeakCourseActivityScreenState
       ),
     );
   }
-}
-
-String _sceneCoverAsset(SpeakRoadmapSession session) {
-  final resolved = StarterCoverResolver.resolve(title: session.title);
-  if (resolved != null && resolved.startsWith('asset:')) {
-    return resolved.substring('asset:'.length);
-  }
-  return switch (session.index % 4) {
-    0 => 'assets/starter_covers/market.png',
-    1 => 'assets/starter_covers/station.png',
-    2 => 'assets/starter_covers/lantern.png',
-    _ => 'assets/starter_covers/boat.png',
-  };
 }

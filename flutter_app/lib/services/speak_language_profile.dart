@@ -14,6 +14,9 @@ class SpeakLanguageProfile {
     required this.shortLabel,
     required this.roadmapHint,
     required this.sessionHint,
+    required this.tutorTurnWordLimit,
+    required this.newWordsPerTurn,
+    required this.levelContract,
   });
 
   final String level;
@@ -22,6 +25,13 @@ class SpeakLanguageProfile {
   final String shortLabel;
   final String roadmapHint;
   final String sessionHint;
+
+  /// Hard limits for the live speaking contract. These are intentionally
+  /// concrete: a label such as "beginner" is not enough to stop a model from
+  /// producing an advanced prompt in an A1 session.
+  final String tutorTurnWordLimit;
+  final int newWordsPerTurn;
+  final String levelContract;
 
   bool get isBeginner => level == 'A1' || level == 'A2';
 
@@ -36,6 +46,13 @@ class SpeakLanguageProfile {
         roadmapHint: 'English support · French practice',
         sessionHint:
             'Read the guidance in English, then use the French phrase.',
+        tutorTurnWordLimit: '5–9 words',
+        newWordsPerTurn: 2,
+        levelContract:
+            'Use concrete everyday situations, short present-tense sentences, '
+            'and one follow-up at a time. Avoid idioms, abstract debate, and '
+            'long subordinate clauses. Offer a brief English cue only when '
+            'the learner is blocked.',
       ),
       'B1' || 'CONVERSATIONAL' => const SpeakLanguageProfile._(
         level: 'B1',
@@ -45,6 +62,12 @@ class SpeakLanguageProfile {
         roadmapHint: 'French practice · English when useful',
         sessionHint:
             'Work in French first; use the English cue only when you need it.',
+        tutorTurnWordLimit: '8–14 words',
+        newWordsPerTurn: 4,
+        levelContract:
+            'Use natural everyday French with connected sentences, practical '
+            'past and future references, and one meaningful follow-up. Do not '
+            'translate automatically; clarify only when needed.',
       ),
       'B2' => const SpeakLanguageProfile._(
         level: 'B2',
@@ -54,6 +77,12 @@ class SpeakLanguageProfile {
         roadmapHint: 'Immersive French · English when needed',
         sessionHint:
             'Stay in French and use the English cue only to unblock yourself.',
+        tutorTurnWordLimit: '10–18 words',
+        newWordsPerTurn: 6,
+        levelContract:
+            'Use mostly French with natural connected turns, opinions, '
+            'reasons, and occasional nuance. Expect independent answers and '
+            'repair after the learner finishes speaking.',
       ),
       _ => const SpeakLanguageProfile._(
         level: 'A1',
@@ -63,6 +92,14 @@ class SpeakLanguageProfile {
         roadmapHint: 'English-led · French practice',
         sessionHint:
             'Understand the explanation in English, then try one small French step.',
+        tutorTurnWordLimit: '3–6 words',
+        newWordsPerTurn: 1,
+        levelContract:
+            'Assume a true beginner. Use familiar concrete nouns and simple '
+            'present-tense phrases. Model before asking the learner to speak, '
+            'keep one idea per turn, and give a short English gloss for new '
+            'French. Never introduce advanced idioms, abstract topics, or '
+            'multi-clause questions.',
       ),
     };
   }
