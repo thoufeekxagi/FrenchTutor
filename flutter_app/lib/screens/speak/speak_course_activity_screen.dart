@@ -5,6 +5,7 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/premium_access_gate.dart';
@@ -19,9 +20,10 @@ import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import 'speak_course_vocabulary_screen.dart';
 import 'speak_review_screen.dart';
+import 'speak_roleplay_screen.dart';
 import 'speak_ui.dart';
-import 'speaking_practice_screen.dart';
 import 'speaking_flow_screen.dart';
+import 'speaking_lesson_flow_screen.dart';
 
 /// Opens one course item directly in the matching Practice engine.
 ///
@@ -159,13 +161,45 @@ class _SpeakCourseActivityScreenState
         skill == SpeakSkill.freeTalk) {
       final result = await AppRouter.push<SpeakingResult>(
         context,
-        (_) =>
-            SpeakingPracticeScreen(request: _speakingRequest, autoStart: true),
+        (_) => skill == SpeakSkill.speaking
+            ? SpeakingLessonFlowScreen(
+                title: session.title,
+                topic: session.subtitle,
+                level: _level,
+                contentKey: session.contentKey,
+                steps: speakingStepsForLesson(
+                  targets: session.targetPhrases,
+                  title: session.title,
+                  competency: session.competency,
+                  level: _level,
+                ),
+              )
+            : skill == SpeakSkill.roleplay
+            ? SpeakRoleplayScreen(
+                scene: session.roleplay,
+                topic: session.roleplay == null ? session.title : null,
+                contentKey: session.contentKey,
+              )
+            : SpeakingLessonFlowScreen(
+                title: session.title,
+                topic: session.subtitle,
+                level: _level,
+                contentKey: session.contentKey,
+                steps: _freeTalkSteps(session),
+              ),
         fullscreenDialog: true,
       );
       // A cancelled, silent, or very short call stays resumable. The course
       // must only advance after the same connected/utterance/time threshold
       // used by the speaking completion policy.
+      if (skill == SpeakSkill.speaking) {
+        // The controlled drill has its own completion contract: every phrase
+        // has already been checked before this route returns. Requiring a
+        // 30-second live-call threshold here would make a completed four-line
+        // lesson impossible to finish for a careful beginner.
+        return result?.connected == true &&
+            (result?.learnerUtteranceCount ?? 0) > 0;
+      }
       return result?.meetsThreshold ?? false;
     }
 
@@ -198,16 +232,20 @@ class _SpeakCourseActivityScreenState
         levelBand: _level,
         targetPhrases: session.targetPhrases,
       ),
-      SpeakSkill.roleplay => SpeakingPracticeScreen(
-        request: _speakingRequest,
-        autoStart: true,
+      SpeakSkill.roleplay => SpeakRoleplayScreen(
+        scene: session.roleplay,
+        topic: session.roleplay == null ? session.title : null,
+        contentKey: session.contentKey,
       ),
       // A review catalog item hands off to the shared review chooser so the
       // learner selects Reading, Listening, or Speaking from recent history.
       SpeakSkill.review => const SpeakReviewScreen(),
-      SpeakSkill.freeTalk => SpeakingPracticeScreen(
-        request: _speakingRequest,
-        autoStart: true,
+      SpeakSkill.freeTalk => SpeakingLessonFlowScreen(
+        title: session.title,
+        topic: session.subtitle,
+        level: _level,
+        contentKey: session.contentKey,
+        steps: _freeTalkSteps(session),
       ),
       SpeakSkill.speaking => throw StateError('Speaking is handled above'),
     };
@@ -220,35 +258,22 @@ class _SpeakCourseActivityScreenState
     return result == true;
   }
 
-  String get _speakingKickoff {
-    final modelLine = _requiredTargetPhrases.isEmpty
-        ? 'model the first useful French phrase for this competency'
-        : 'model "${_requiredTargetPhrases.first}" in French';
-    return '(App instruction, not the student: this is the speaking step inside '
-        'the course lesson "${session.title}". Explain the lesson context in '
-        'one short English sentence, then $modelLine and ask the learner for '
-        'one short response. Keep the lesson at ${_level.toUpperCase()} level '
-        'and do not open with a generic free-talk question.)';
+  List<SpeakingPhraseStep> _freeTalkSteps(SpeakRoadmapSession session) {
+    final lesson = SpeakingCourseCatalog.freeTalkLessons.firstWhere(
+      (candidate) => candidate.level == _level,
+      orElse: () => SpeakingCourseCatalog.freeTalkLessons.first,
+    );
+    return [
+      for (final line in lesson.lines)
+        SpeakingPhraseStep(
+          french: line.french,
+          english: line.english,
+          partnerFrench: line.partnerFrench,
+          partnerEnglish: line.partnerEnglish,
+          openResponse: true,
+        ),
+    ];
   }
-
-  SpeakingPracticeRequest get _speakingRequest => SpeakingPracticeRequest(
-    mode: switch (session.primarySkill) {
-      SpeakSkill.speaking => SpeakingMode.guidedConversation,
-      SpeakSkill.roleplay => SpeakingMode.roleplay,
-      SpeakSkill.freeTalk => SpeakingMode.freeTalk,
-      _ => throw StateError(
-        'Speaking request cannot be created for ${session.primarySkill.label}.',
-      ),
-    },
-    topic: session.title,
-    level: _level,
-    goal: 'Fluency',
-    durationMinutes: session.estimatedMinutes.clamp(5, 15).toInt(),
-    lessonContext: _contextPrompt,
-    sessionTopic: session.title,
-    contentKey: session.contentKey,
-    kickoffMessage: _speakingKickoff,
-  );
 
   String? get _alphabetDeckId {
     if (session.unit != 1 || session.index > 3) return null;

@@ -11,11 +11,11 @@ import '../../providers/database_provider.dart';
 import '../../utils/vocabulary_set_copy.dart';
 import '../../widgets/learning_card.dart';
 import '../../widgets/practice_content_card.dart';
-import '../../widgets/primary_action_button.dart';
 import '../../widgets/responsive_card_grid.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/vocabulary_workshop_screen.dart';
 import '../pathway/vocab_picker_screen.dart';
+import '../../widgets/v3/v3_surface.dart';
 
 /// The vocabulary library uses the same image-backed five-per-row card system
 /// as Reading and Listening. The old bundled phase browser is intentionally
@@ -65,29 +65,29 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
               )
               .toList();
 
-    return Scaffold(
-      backgroundColor: DesignTokens.canvas,
-      appBar: AppBar(
-        title: Text('Vocabulary', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvas,
-        foregroundColor: DesignTokens.ink,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      body: WebConstrainedView(
+    return V3Scaffold(
+      child: WebConstrainedView(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
           children: [
-            Text('Words you can use next.', style: DesignTokens.display(28)),
+            V3Header(
+              title: 'Vocabulary',
+              subtitle: 'Words you can use next.',
+              leading: const V3BackButton(),
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 14),
             const SizedBox(height: 8),
             Text(
               'Open a short set, hear each word, and practise it in context.',
-              style: DesignTokens.body(15).copyWith(color: DesignTokens.muted),
+              style: DesignTokens.body(
+                15,
+              ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
             ),
             const SizedBox(height: 18),
-            PrimaryActionButton(
+            V3PrimaryButton(
               label: 'Choose or generate a vocabulary session',
-              icon: CupertinoIcons.sparkles,
+              icon: Icons.auto_awesome_rounded,
               onPressed: () async {
                 await AppRouter.push(
                   context,
@@ -102,7 +102,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
               'Auto uses recent context and source vocabulary. You can also choose a category yourself.',
               style: DesignTokens.body(
                 12,
-              ).copyWith(color: DesignTokens.mutedDim),
+              ).copyWith(color: DesignTokens.nightMuted),
             ),
             const SizedBox(height: 24),
             if (visible.isEmpty)

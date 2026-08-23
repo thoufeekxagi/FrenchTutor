@@ -22,6 +22,7 @@ import '../subscription/speak_paywall_screen.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import 'speak_advanced_settings_screen.dart';
 import 'speak_ui.dart';
+import 'v3_settings_screen.dart';
 
 class SpeakSettingsScreen extends ConsumerStatefulWidget {
   const SpeakSettingsScreen({super.key, this.onReplayPractice});
@@ -303,6 +304,11 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Keep this legacy route name as a compatibility boundary for existing
+    // Home, Speaking, and Reading entry points. Settings itself is now one
+    // canonical V3 surface with modal editing.
+    return V3SettingsScreen(onReplayPractice: widget.onReplayPractice);
+    /*
     return SpeakScaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
@@ -439,6 +445,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
         ],
       ),
     );
+    */
   }
 
   Widget _section(String title, List<Widget> rows) {

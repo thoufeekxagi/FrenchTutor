@@ -12,6 +12,7 @@ import '../reading/reading_library_screen.dart';
 import '../speak/speak_ui.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/subscription_gate_service.dart';
+import '../../widgets/v3/v3_surface.dart';
 
 enum _ExamFamily { tcf, tef }
 
@@ -130,19 +131,13 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SpeakScaffold(
+    return V3Scaffold(
       child: Column(
         children: [
-          SpeakHeader(
+          V3Header(
             title: 'Exam readiness',
             subtitle: 'Free TCF and TEF preparation',
-            leading: GestureDetector(
-              onTap: () => Navigator.of(context).maybePop(),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
-            ),
+            leading: const V3BackButton(),
           ),
           Expanded(
             child: ListView(

@@ -16,7 +16,7 @@ import 'speak_course_activity_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
-import 'speaking_flow_screen.dart';
+import 'speaking_course_home_screen.dart';
 
 /// V3 Home: a compact next-action surface over the existing course/session
 /// data flow. The redesign changes hierarchy and presentation only.
@@ -231,7 +231,7 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
         'Speaking',
         SpeakSkill.speaking,
         Icons.graphic_eq_rounded,
-        const SpeakingHubScreen(),
+        const SpeakingCourseHomeScreen(),
       ),
       (
         'Reading',
@@ -274,8 +274,10 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
           children: [
             Expanded(child: Text('Speaking practice', style: _display(19))),
             GestureDetector(
-              onTap: () =>
-                  AppRouter.push(context, (_) => const SpeakingHubScreen()),
+              onTap: () => AppRouter.push(
+                context,
+                (_) => const SpeakingCourseHomeScreen(),
+              ),
               child: Text(
                 'See all',
                 style: _body(
@@ -308,7 +310,7 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
               subtitle: 'Real-life scenes',
               onTap: () => AppRouter.push(
                 context,
-                (_) => const SpeakingHubScreen(initialCourseTab: false),
+                (_) => const SpeakingCourseHomeScreen(),
               ),
             ),
             _PracticeOptionCard(

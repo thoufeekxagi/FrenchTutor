@@ -11,7 +11,7 @@ import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
-import 'screens/onboarding/speak_onboarding_screen.dart';
+import 'screens/onboarding/v3_onboarding_screen.dart';
 import 'screens/speak/speak_ui.dart';
 import 'services/auth_service.dart';
 import 'services/revenue_cat_service.dart';
@@ -228,7 +228,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
     if (!onboarded) {
-      return SpeakOnboardingScreen(onFinished: () => setState(() {}));
+      return V3OnboardingScreen(onFinished: () => setState(() {}));
     }
     if (_aiConsented == null) return const _RestoringProgressView();
     if (!_aiConsented!) {

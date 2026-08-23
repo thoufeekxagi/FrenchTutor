@@ -562,11 +562,16 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     final session = _activeSession;
     final canCompose = session == null || !session.isClosed;
     return Scaffold(
-      backgroundColor: DesignTokens.canvas,
+      backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Photo tutor', style: DesignTokens.display(18)),
-        backgroundColor: DesignTokens.canvas,
+        title: Text(
+          'Photo tutor',
+          style: DesignTokens.display(
+            18,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
+        backgroundColor: DesignTokens.nightCanvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: _ScanHeaderButton(
@@ -638,7 +643,7 @@ class _EmptyState extends StatelessWidget {
             Icon(
               CupertinoIcons.camera_on_rectangle,
               size: 40,
-              color: DesignTokens.mutedDim,
+              color: DesignTokens.nightMuted,
             ),
             const SizedBox(height: 12),
             Text(
@@ -646,7 +651,7 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: DesignTokens.body(
                 14,
-              ).copyWith(color: DesignTokens.mutedDim),
+              ).copyWith(color: DesignTokens.nightMuted),
             ),
           ],
         ),
@@ -671,14 +676,16 @@ class _ScanMessageBubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: user ? DesignTokens.primarySoft : DesignTokens.surface,
+          color: user
+              ? DesignTokens.nightAccentSoft
+              : DesignTokens.nightSurface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
             bottomLeft: Radius.circular(user ? 16 : 4),
             bottomRight: Radius.circular(user ? 4 : 16),
           ),
-          border: user ? null : Border.all(color: DesignTokens.hairline),
+          border: user ? null : Border.all(color: DesignTokens.nightHairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,14 +711,16 @@ class _ScanMessageBubble extends StatelessWidget {
                     'Reading…',
                     style: DesignTokens.body(
                       13,
-                    ).copyWith(color: DesignTokens.mutedDim),
+                    ).copyWith(color: DesignTokens.nightMuted),
                   ),
                 ],
               ),
             if (message.text.trim().isNotEmpty)
               Text(
                 message.text,
-                style: DesignTokens.body(15).copyWith(height: 1.4),
+                style: DesignTokens.body(
+                  15,
+                ).copyWith(color: DesignTokens.nightText, height: 1.4),
               ),
             if (message.attachmentSummary != null) ...[
               if (message.text.trim().isNotEmpty || message.imageBytes != null)
@@ -720,7 +729,7 @@ class _ScanMessageBubble extends StatelessWidget {
                 message.attachmentSummary!,
                 style: DesignTokens.body(
                   13,
-                ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
               ),
             ],
           ],
@@ -1070,8 +1079,8 @@ class _ScanComposer extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        border: Border(top: BorderSide(color: DesignTokens.hairline)),
+        color: DesignTokens.nightSurface,
+        border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
       ),
       child: SafeArea(
         top: false,
@@ -1101,13 +1110,15 @@ class _ScanComposer extends StatelessWidget {
                     vertical: 11,
                   ),
                   decoration: BoxDecoration(
-                    color: DesignTokens.canvasDim,
+                    color: DesignTokens.nightSurfaceRaised,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  style: DesignTokens.body(15),
+                  style: DesignTokens.body(
+                    15,
+                  ).copyWith(color: DesignTokens.nightText),
                   placeholderStyle: DesignTokens.body(
                     15,
-                  ).copyWith(color: DesignTokens.mutedDim),
+                  ).copyWith(color: DesignTokens.nightMuted),
                   onSubmitted: (_) {
                     if (enabled) onSend();
                   },
@@ -1153,7 +1164,7 @@ class _ScanHeaderButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, size: 21, color: DesignTokens.inkSoft),
+            child: Icon(icon, size: 21, color: DesignTokens.nightMuted),
           ),
         ),
       ),
@@ -1191,8 +1202,10 @@ class _ComposerIconButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: filled
-                  ? (active ? DesignTokens.primary : DesignTokens.canvasDim)
-                  : DesignTokens.canvasDim,
+                  ? (active
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.nightHairline)
+                  : DesignTokens.nightHairline,
             ),
             child: Center(child: sendingIcon(icon, active, filled)),
           ),
@@ -1205,7 +1218,7 @@ class _ComposerIconButton extends StatelessWidget {
     return Icon(
       icon,
       size: 20,
-      color: filled && active ? Colors.white : DesignTokens.inkSoft,
+      color: filled && active ? Colors.black : DesignTokens.nightText,
     );
   }
 }

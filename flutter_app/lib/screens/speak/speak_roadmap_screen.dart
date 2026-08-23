@@ -11,7 +11,7 @@ import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
 import 'speak_course_activity_screen.dart';
-import 'speak_ui.dart';
+import '../../widgets/v3/v3_surface.dart';
 
 class SpeakRoadmapScreen extends ConsumerWidget {
   const SpeakRoadmapScreen({super.key, this.embedded = false});
@@ -59,44 +59,68 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     final units =
         roadmap.sessions.map((session) => session.unit).toSet().toList()
           ..sort();
-    return SpeakScaffold(
+    return V3Scaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 34),
         children: [
-          SpeakHeader(
+          V3Header(
             title: 'Your course',
             subtitle:
                 '${roadmap.level.toUpperCase()} · ${roadmap.trackLabel} · ${roadmap.sessions.length} sessions · ${language.shortLabel}',
-            leading: embedded
-                ? null
-                : GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: SpeakColors.inkSoft,
-                    ),
+            leading: embedded ? null : const V3BackButton(),
+            trailing: V3IconButton(
+              icon: Icons.tune_rounded,
+              tooltip: 'Course options',
+              onPressed: () => showV3Picker<String>(
+                context: context,
+                title: 'Course view',
+                selected: 'all',
+                options: const [
+                  V3PickerOption(
+                    value: 'all',
+                    label: 'All sessions',
+                    description: 'See the complete adaptive path.',
+                    icon: Icons.route_rounded,
                   ),
+                  V3PickerOption(
+                    value: 'current',
+                    label: 'Current unit',
+                    description: 'Keep the next lesson close at hand.',
+                    icon: Icons.flag_outlined,
+                  ),
+                ],
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Text(
               language.roadmapHint,
-              style: DesignTokens.body(12).copyWith(color: SpeakColors.inkSoft),
+              style: DesignTokens.body(
+                12,
+              ).copyWith(color: DesignTokens.nightMuted),
             ),
           ),
           const SizedBox(height: 20),
-          SpeakCard(
+          V3Card(
+            raised: true,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.route_rounded, color: SpeakColors.blue),
+                    const Icon(
+                      Icons.route_rounded,
+                      color: DesignTokens.nightAccent,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         '${roadmap.completedCount} of ${roadmap.sessions.length} sessions complete · ${units.length} units',
-                        style: DesignTokens.body(14, weight: FontWeight.w700),
+                        style: DesignTokens.body(
+                          14,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: DesignTokens.nightText),
                       ),
                     ),
                     Text(
@@ -104,12 +128,22 @@ class SpeakRoadmapScreen extends ConsumerWidget {
                       style: DesignTokens.body(
                         12,
                         weight: FontWeight.w700,
-                      ).copyWith(color: SpeakColors.blue),
+                      ).copyWith(color: DesignTokens.nightAccent),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                SpeakProgressBar(value: roadmap.progress),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: roadmap.progress,
+                    minHeight: 8,
+                    backgroundColor: DesignTokens.nightHairline,
+                    valueColor: const AlwaysStoppedAnimation(
+                      DesignTokens.nightAccent,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -143,11 +177,16 @@ class SpeakRoadmapScreen extends ConsumerWidget {
           'UNIT $unit',
           style: DesignTokens.label(
             10,
-          ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 1),
+          ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(session.unitTitle, style: DesignTokens.display(20)),
+          child: Text(
+            session.unitTitle,
+            style: DesignTokens.display(
+              20,
+            ).copyWith(color: DesignTokens.nightText),
+          ),
         ),
       ],
     );
@@ -161,78 +200,67 @@ class SpeakRoadmapScreen extends ConsumerWidget {
   }) {
     final active = featured && !session.completed;
     final lessonSubtitle = _lessonSubtitle(session.subtitle);
-    return GestureDetector(
+    return V3Card(
+      raised: active,
+      borderColor: active
+          ? DesignTokens.nightAccent
+          : DesignTokens.nightHairline,
       onTap: () => AppRouter.push(context, (_) => _screenFor(session)),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: active ? SpeakColors.blue : Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: active ? SpeakColors.blue : SpeakColors.line,
-          ),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: DesignTokens.primary.withValues(alpha: 0.1),
-                    blurRadius: 14,
-                    offset: Offset(0, 5),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: active ? Colors.white24 : SpeakColors.blueSoft,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                session.completed
-                    ? Icons.check_rounded
-                    : _iconFor(session.primarySkill),
-                size: 18,
-                color: active ? Colors.white : SpeakColors.blue,
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: active
+                  ? DesignTokens.nightAccentSoft
+                  : DesignTokens.nightSurfaceRaised,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    session.title,
-                    style: DesignTokens.body(
-                      14,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: active ? Colors.white : SpeakColors.navy),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${session.primarySkill.label} · $lessonSubtitle',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(11).copyWith(
-                      color: active ? Colors.white70 : SpeakColors.inkSoft,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              locked
-                  ? Icons.lock_outline_rounded
-                  : session.completed
-                  ? Icons.check_circle_rounded
-                  : Icons.arrow_forward_ios_rounded,
+            child: Icon(
+              session.completed
+                  ? Icons.check_rounded
+                  : _iconFor(session.primarySkill),
               size: 18,
-              color: active ? Colors.white : SpeakColors.inkSoft,
+              color: active
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightMuted,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  session.title,
+                  style: DesignTokens.body(
+                    14,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.nightText),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${session.primarySkill.label} · $lessonSubtitle',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    11,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            locked
+                ? Icons.lock_outline_rounded
+                : session.completed
+                ? Icons.check_circle_rounded
+                : Icons.arrow_forward_ios_rounded,
+            size: 18,
+            color: active ? DesignTokens.nightAccent : DesignTokens.nightMuted,
+          ),
+        ],
       ),
     );
   }

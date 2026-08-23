@@ -152,6 +152,12 @@ class _AgentLedListeningScreenState
   // heard in an earlier session is instant here too, instead of re-synthesizing.
   final Set<String> _ttsLoading = {};
 
+  // Roleplay-only pronunciation evidence. The legacy roleplay already owns
+  // the two-sided script and Marie's coaching; these collections add the
+  // missing visible speech check without changing that working director.
+  final Map<int, String> _learnerAttempts = {};
+  final Set<int> _matchedRoleplayBeats = {};
+
   Future<void> _speakLine(String text, {bool slow = false}) async {
     if (text.isEmpty) return;
     final key = '$slow|$text';
@@ -423,6 +429,19 @@ class _AgentLedListeningScreenState
     // moving forward is button-only — tap Next sentence.
     _hasAttempted = true;
 
+    if (_isRoleplay && _currentCard != null) {
+      final matched = _matchesRoleplayTarget(trimmed, _currentCard!.segment.fr);
+      setState(() {
+        _learnerAttempts[_segmentIndex] = trimmed;
+        if (matched) {
+          _matchedRoleplayBeats.add(_segmentIndex);
+        } else {
+          _matchedRoleplayBeats.remove(_segmentIndex);
+        }
+      });
+      _scrollSceneToBottom();
+    }
+
     _utteranceSeq += 1;
     final seq = _utteranceSeq;
     final segmentIndexAtLaunch = _segmentIndex;
@@ -461,6 +480,23 @@ class _AgentLedListeningScreenState
       _applyIntent(verdict, utterance: trimmed, source: source);
     }();
   }
+
+  bool _matchesRoleplayTarget(String heard, String target) {
+    final heardWords = _roleplayWords(heard);
+    final targetWords = _roleplayWords(target);
+    if (heardWords.isEmpty || targetWords.isEmpty) return false;
+    if (heardWords.join(' ') == targetWords.join(' ')) return true;
+    final targetSet = targetWords.toSet();
+    final overlap = heardWords.where(targetSet.contains).toSet().length;
+    final required = targetWords.length <= 3 ? 1.0 : 0.72;
+    return overlap / targetSet.length >= required;
+  }
+
+  List<String> _roleplayWords(String value) => foldFrench(value)
+      .replaceAll(RegExp(r'[^a-z0-9 ]+'), ' ')
+      .split(RegExp(r'\s+'))
+      .where((word) => word.isNotEmpty)
+      .toList(growable: false);
 
   /// Navigation (advance/back/goto) is strictly button-only in the roleplay —
   /// Back/Next sentence are the only way to move a card, full stop; nothing
@@ -1011,7 +1047,9 @@ class _AgentLedListeningScreenState
         if (!didPop) _confirmEnd();
       },
       child: Scaffold(
-        backgroundColor: DesignTokens.canvas,
+        backgroundColor: _isRoleplay
+            ? DesignTokens.nightCanvas
+            : DesignTokens.canvas,
         body: SafeArea(
           child: Stack(
             children: [
@@ -1041,7 +1079,7 @@ class _AgentLedListeningScreenState
                   ),
                 ),
               ),
-              FloatingNotetakerOverlay(state: notetaker),
+              if (!_isRoleplay) FloatingNotetakerOverlay(state: notetaker),
             ],
           ),
         ),
@@ -1059,19 +1097,22 @@ class _AgentLedListeningScreenState
               IconButton(
                 tooltip: 'End listening practice',
                 onPressed: _confirmEnd,
-                icon: const Icon(
+                icon: Icon(
                   CupertinoIcons.xmark,
                   size: 20,
-                  color: DesignTokens.ink,
+                  color: _isRoleplay
+                      ? DesignTokens.nightText
+                      : DesignTokens.ink,
                 ),
               ),
               const Spacer(),
               Text(
                 _formatDuration(_callDuration),
-                style: DesignTokens.mono(
-                  13,
-                  weight: FontWeight.w500,
-                ).copyWith(color: DesignTokens.mutedDim),
+                style: DesignTokens.mono(13, weight: FontWeight.w500).copyWith(
+                  color: _isRoleplay
+                      ? DesignTokens.nightMuted
+                      : DesignTokens.mutedDim,
+                ),
               ),
               const Spacer(),
               SizedBox(
@@ -1106,7 +1147,12 @@ class _AgentLedListeningScreenState
             children: [
               Text(
                 _isRoleplay ? 'Roleplay' : 'Reading & Listening',
-                style: DesignTokens.display(20, weight: FontWeight.w600),
+                style: DesignTokens.display(20, weight: FontWeight.w600)
+                    .copyWith(
+                      color: _isRoleplay
+                          ? DesignTokens.nightText
+                          : DesignTokens.text,
+                    ),
               ),
               const SizedBox(height: 2),
               Row(
@@ -1123,9 +1169,11 @@ class _AgentLedListeningScreenState
                   const SizedBox(width: 5),
                   Text(
                     '${(_segmentIndex + 1).clamp(1, _sessionPlan.isEmpty ? 1 : _sessionPlan.length)} of ${_sessionPlan.length} · $_statusText',
-                    style: DesignTokens.mono(
-                      11.5,
-                    ).copyWith(color: DesignTokens.mutedDim),
+                    style: DesignTokens.mono(11.5).copyWith(
+                      color: _isRoleplay
+                          ? DesignTokens.nightMuted
+                          : DesignTokens.mutedDim,
+                    ),
                   ),
                 ],
               ),
@@ -1259,6 +1307,8 @@ class _AgentLedListeningScreenState
   Widget _beatBubbles(int index) {
     final segment = _sessionPlan[index].segment;
     final isCurrent = index == _segmentIndex && _currentCard != null;
+    final matched = _matchedRoleplayBeats.contains(index);
+    final learnerAttempt = _learnerAttempts[index];
     final content = Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -1282,8 +1332,61 @@ class _AgentLedListeningScreenState
               en: segment.en.isEmpty ? null : segment.en,
               isLearner: true,
               isCurrent: isCurrent,
+              matched: matched,
             ),
           ),
+          if (_isRoleplay && learnerAttempt != null) ...[
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 300),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  color: matched
+                      ? DesignTokens.success.withValues(alpha: 0.14)
+                      : DesignTokens.warning.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: matched
+                        ? DesignTokens.success
+                        : DesignTokens.warning,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      matched
+                          ? CupertinoIcons.checkmark_circle_fill
+                          : CupertinoIcons.arrow_counterclockwise_circle,
+                      size: 16,
+                      color: matched
+                          ? DesignTokens.success
+                          : DesignTokens.warning,
+                    ),
+                    const SizedBox(width: 7),
+                    Flexible(
+                      child: Text(
+                        matched
+                            ? 'Matched: $learnerAttempt'
+                            : 'Try again: $learnerAttempt',
+                        style: DesignTokens.body(11.5, weight: FontWeight.w600)
+                            .copyWith(
+                              color: matched
+                                  ? DesignTokens.success
+                                  : DesignTokens.warning,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
           if (isCurrent) ...[
             const SizedBox(height: 6),
             Text(
@@ -1309,9 +1412,21 @@ class _AgentLedListeningScreenState
     String? en,
     required bool isLearner,
     required bool isCurrent,
+    bool matched = false,
   }) {
-    final bg = isLearner ? DesignTokens.primarySoft : DesignTokens.surface;
-    final frColor = isLearner ? DesignTokens.primaryDeep : DesignTokens.text;
+    final nightRoleplay = _isRoleplay;
+    final bg = matched
+        ? DesignTokens.success.withValues(alpha: 0.14)
+        : nightRoleplay
+        ? (isLearner
+              ? DesignTokens.nightAccentSoft
+              : DesignTokens.nightSurfaceRaised)
+        : (isLearner ? DesignTokens.primarySoft : DesignTokens.surface);
+    final frColor = matched
+        ? DesignTokens.success
+        : nightRoleplay
+        ? DesignTokens.nightText
+        : (isLearner ? DesignTokens.primaryDeep : DesignTokens.text);
     final loading = _ttsLoading.contains('false|$fr');
     return AnimatedContainer(
       duration: _isRoleplay ? const Duration(milliseconds: 220) : Duration.zero,
@@ -1322,8 +1437,14 @@ class _AgentLedListeningScreenState
         color: bg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isCurrent
-              ? (isLearner ? DesignTokens.primary : DesignTokens.hairline)
+          color: matched
+              ? DesignTokens.success
+              : isCurrent
+              ? (nightRoleplay
+                    ? DesignTokens.nightAccent
+                    : isLearner
+                    ? DesignTokens.primary
+                    : DesignTokens.hairline)
               : Colors.transparent,
           width: isCurrent && isLearner ? 1.5 : 1,
         ),
@@ -1416,6 +1537,7 @@ class _AgentLedListeningScreenState
             onModeChanged: _setMicMode,
             onHoldStart: _pttDown,
             onHoldEnd: _pttUp,
+            dark: _isRoleplay,
           ),
           const SizedBox(height: 14),
           Row(
@@ -1489,9 +1611,11 @@ class _AgentLedListeningScreenState
               const SizedBox(height: DesignTokens.space2),
               Text(
                 label,
-                style: DesignTokens.body(
-                  11,
-                ).copyWith(color: DesignTokens.mutedDim),
+                style: DesignTokens.body(11).copyWith(
+                  color: _isRoleplay
+                      ? DesignTokens.nightMuted
+                      : DesignTokens.mutedDim,
+                ),
               ),
             ],
           ),
@@ -1569,7 +1693,7 @@ class _RoleplaySceneHeader extends StatelessWidget {
               style: DesignTokens.mono(
                 10,
                 weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.primary, letterSpacing: 1.2),
+              ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
             ),
             const Spacer(),
             Text(
@@ -1577,12 +1701,17 @@ class _RoleplaySceneHeader extends StatelessWidget {
               style: DesignTokens.mono(
                 11,
                 weight: FontWeight.w600,
-              ).copyWith(color: DesignTokens.mutedDim),
+              ).copyWith(color: DesignTokens.nightMuted),
             ),
           ],
         ),
         const SizedBox(height: 7),
-        Text(title, style: DesignTokens.display(23)),
+        Text(
+          title,
+          style: DesignTokens.display(
+            23,
+          ).copyWith(color: DesignTokens.nightText),
+        ),
         const SizedBox(height: 6),
         Text(
           complete
@@ -1592,7 +1721,7 @@ class _RoleplaySceneHeader extends StatelessWidget {
               : 'Hear the situation, try your line, then make it yours.',
           style: DesignTokens.body(
             12.5,
-          ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+          ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
         ),
         const SizedBox(height: 14),
         ClipRRect(
@@ -1600,8 +1729,8 @@ class _RoleplaySceneHeader extends StatelessWidget {
           child: LinearProgressIndicator(
             minHeight: 4,
             value: progress,
-            backgroundColor: DesignTokens.hairline,
-            valueColor: const AlwaysStoppedAnimation(DesignTokens.primary),
+            backgroundColor: DesignTokens.nightHairline,
+            valueColor: const AlwaysStoppedAnimation(DesignTokens.nightAccent),
           ),
         ),
       ],

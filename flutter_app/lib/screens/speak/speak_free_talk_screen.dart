@@ -1,107 +1,140 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../models/speaking_course.dart';
 import 'speak_roleplay_screen.dart';
-import 'speak_ui.dart';
 
-class SpeakFreeTalkScreen extends ConsumerWidget {
+/// Speak-style roleplay catalog. It is deliberately a catalog, not another
+/// speaking home: the learner chooses a scene here, previews its goal, then
+/// enters the shared roleplay conversation.
+class SpeakFreeTalkScreen extends StatefulWidget {
   const SpeakFreeTalkScreen({super.key});
 
-  Future<void> _openTopic(BuildContext context, String topic) async {
-    await AppRouter.push(context, (_) => SpeakRoleplayScreen(topic: topic));
+  @override
+  State<SpeakFreeTalkScreen> createState() => _SpeakFreeTalkScreenState();
+}
+
+class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
+  String _filter = 'Hot';
+
+  Future<void> _openTopic(
+    BuildContext context,
+    SpeakingCourseLesson lesson,
+  ) async {
+    await AppRouter.push(
+      context,
+      (_) => SpeakRoleplayScreen(lesson: lesson),
+      fullscreenDialog: true,
+    );
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SpeakScaffold(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(12, 14, 12, 30),
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(
-                      'Community',
-                      style: DesignTokens.display(
-                        18,
-                        weight: FontWeight.w500,
-                      ).copyWith(color: SpeakColors.inkSoft),
-                    ),
-                    const SizedBox(width: 12),
-                    Text('Topics', style: DesignTokens.display(18)),
-                  ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: DesignTokens.nightCanvas,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  tooltip: 'Back',
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: DesignTokens.nightText,
+                  ),
                 ),
-              ),
-              _roundIcon(Icons.history_rounded),
-              const SizedBox(width: 8),
-              _roundIcon(Icons.favorite_border_rounded),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const SpeakPill(label: 'Roleplay', selected: false),
-          const SizedBox(height: 18),
-          Center(
-            child: Container(
-              width: 30,
-              height: 30,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: SpeakColors.line),
-              ),
-              child: Text(
-                '1',
-                style: DesignTokens.body(12, weight: FontWeight.w700),
-              ),
+                const SizedBox(width: 4),
+                Text('Roleplay', style: _display(25)),
+                const Spacer(),
+                _roundIcon(Icons.history_rounded, 'History'),
+                const SizedBox(width: 8),
+                _roundIcon(Icons.favorite_border_rounded, 'Saved'),
+              ],
             ),
-          ),
-          const SizedBox(height: 12),
-          _topicGrid(context),
-          const SizedBox(height: 16),
-          SpeakPrimaryButton(
-            label: 'Create your own',
-            icon: Icons.add_rounded,
-            onTap: () => _openTopic(context, 'a roleplay you create'),
-          ),
-        ],
+            const SizedBox(height: 22),
+            Text('Practice a real situation', style: _display(29)),
+            const SizedBox(height: 7),
+            Text(
+              'Choose a scene, see the goal, then speak with your tutor one turn at a time.',
+              style: _body(
+                14,
+              ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
+            ),
+            const SizedBox(height: 22),
+            _filterRow(),
+            const SizedBox(height: 16),
+            Text('ROLEPLAY TOPICS', style: _label(12)),
+            const SizedBox(height: 10),
+            _topicGrid(context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _roundIcon(IconData icon) {
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        border: Border.all(color: SpeakColors.line),
+  Widget _filterRow() {
+    return Row(
+      children: [
+        for (final filter in const ['Hot', 'New', 'Top today']) ...[
+          GestureDetector(
+            onTap: () => setState(() => _filter = filter),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: _filter == filter
+                    ? DesignTokens.nightAccent
+                    : DesignTokens.nightSurface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: _filter == filter
+                      ? DesignTokens.nightAccent
+                      : DesignTokens.nightHairline,
+                ),
+              ),
+              child: Text(
+                filter,
+                style: _body(12, weight: FontWeight.w800).copyWith(
+                  color: _filter == filter
+                      ? Colors.black
+                      : DesignTokens.nightMuted,
+                ),
+              ),
+            ),
+          ),
+          if (filter != 'Top today') const SizedBox(width: 8),
+        ],
+      ],
+    );
+  }
+
+  Widget _roundIcon(IconData icon, String label) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          shape: BoxShape.circle,
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Icon(icon, size: 18, color: DesignTokens.nightText),
       ),
-      child: Icon(icon, size: 18, color: SpeakColors.inkSoft),
     );
   }
 
   Widget _topicGrid(BuildContext context) {
-    const topics = [
-      ('Meet a New Friend', Icons.people_alt_rounded, DesignTokens.info),
-      ('At a Crêperie', Icons.restaurant_rounded, DesignTokens.mastery),
-      ('At a Nike Store', Icons.shopping_bag_rounded, DesignTokens.inkSoft),
-      ('At a Coffee Shop', Icons.local_cafe_rounded, DesignTokens.secondary),
-      (
-        'Ask for Directions',
-        Icons.directions_walk_rounded,
-        DesignTokens.primaryDeep,
-      ),
-      (
-        'Make a Reservation',
-        Icons.calendar_month_rounded,
-        DesignTokens.success,
-      ),
+    final topics = SpeakingCourseCatalog.roleplays;
+    const colors = [
+      Color(0xFFB97920),
+      Color(0xFF24489A),
+      Color(0xFF3C4A67),
+      Color(0xFF177F7B),
     ];
     return GridView.builder(
       shrinkWrap: true,
@@ -109,19 +142,19 @@ class SpeakFreeTalkScreen extends ConsumerWidget {
       itemCount: topics.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.9,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.93,
       ),
       itemBuilder: (context, index) {
         final topic = topics[index];
         return GestureDetector(
-          onTap: () => _openTopic(context, topic.$1),
+          onTap: () => _openTopic(context, topic),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: topic.$3,
-              borderRadius: BorderRadius.circular(18),
+              color: colors[index % colors.length],
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,14 +167,21 @@ class SpeakFreeTalkScreen extends ConsumerWidget {
                     color: Colors.white24,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(topic.$2, color: Colors.white, size: 22),
+                  child: Icon(topic.icon, color: Colors.white, size: 22),
                 ),
-                Text(
-                  topic.$1,
-                  style: DesignTokens.body(
-                    14,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: Colors.white),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      topic.title,
+                      style: _body(15, weight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${topic.lines.length} turns · ${topic.level}',
+                      style: _body(11).copyWith(color: Colors.white70),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -150,4 +190,18 @@ class SpeakFreeTalkScreen extends ConsumerWidget {
       },
     );
   }
+
+  TextStyle _display(double size) =>
+      DesignTokens.display(size).copyWith(color: DesignTokens.nightText);
+
+  TextStyle _body(double size, {FontWeight weight = FontWeight.w400}) =>
+      DesignTokens.body(
+        size,
+        weight: weight,
+      ).copyWith(color: DesignTokens.nightText);
+
+  TextStyle _label(double size) => _body(
+    size,
+    weight: FontWeight.w800,
+  ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.3);
 }

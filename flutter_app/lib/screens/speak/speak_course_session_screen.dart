@@ -5,6 +5,7 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/speak_language_profile.dart';
@@ -18,8 +19,9 @@ import '../labs/writing_lab_screen.dart';
 import 'speak_course_vocabulary_screen.dart';
 import '../reading/reading_library_screen.dart';
 import 'speak_review_screen.dart';
+import 'speak_roleplay_screen.dart';
 import 'speak_ui.dart';
-import 'speaking_practice_screen.dart';
+import 'speaking_lesson_flow_screen.dart';
 
 /// The bridge between the course path and the existing learning engines.
 ///
@@ -91,24 +93,6 @@ class _SpeakCourseSessionScreenState
     return session.targetPhrases;
   }
 
-  String get _speakingContext {
-    final target = _requiredTargetPhrases;
-    final roleplay = session.roleplay;
-    if (session.primarySkill == SpeakSkill.roleplay && roleplay == null) {
-      throw StateError(
-        'Roleplay course session ${session.contentKey} is missing its scene.',
-      );
-    }
-    final targetLine = target.isEmpty
-        ? ''
-        : '\nTarget phrases: ${target.join('; ')}.';
-    return '${session.contextPrompt}$targetLine'
-        '${roleplay == null ? '' : '\nRoleplay location: ${roleplay.location}. '
-                  'Learner role: ${roleplay.learnerRole}. '
-                  'Tutor role: ${roleplay.tutorRole}. '
-                  'Goal: ${roleplay.goal}.'}';
-  }
-
   SpeakSkill? _firstIncomplete(CourseActivityProgress progress) {
     for (final skill in _activities) {
       if (!progress.skills.contains(skill)) return skill;
@@ -145,8 +129,18 @@ class _SpeakCourseSessionScreenState
     if (skill == SpeakSkill.speaking) {
       activityResult = await AppRouter.push<SpeakingResult>(
         context,
-        (_) =>
-            SpeakingPracticeScreen(request: _speakingRequest, autoStart: true),
+        (_) => SpeakingLessonFlowScreen(
+          title: session.title,
+          topic: session.subtitle,
+          level: _level,
+          contentKey: session.contentKey,
+          steps: speakingStepsForLesson(
+            targets: _requiredTargetPhrases,
+            title: session.title,
+            competency: session.competency,
+            level: _level,
+          ),
+        ),
         fullscreenDialog: true,
       );
     } else {
@@ -208,32 +202,6 @@ class _SpeakCourseSessionScreenState
     }
   }
 
-  String get _speakingKickoff =>
-      '(App instruction, not the student: this is the speaking step inside '
-      'the course lesson "${session.title}". Explain the lesson context in '
-      'one short English sentence, then model "${_requiredTargetPhrases.first}" '
-      'in French and ask the learner for one short response. Keep the lesson '
-      'at ${_level.toUpperCase()} level and do not open with a generic free-talk question.)';
-
-  SpeakingPracticeRequest get _speakingRequest => SpeakingPracticeRequest(
-    mode: switch (session.primarySkill) {
-      SpeakSkill.speaking => SpeakingMode.guidedConversation,
-      SpeakSkill.roleplay => SpeakingMode.roleplay,
-      SpeakSkill.freeTalk => SpeakingMode.freeTalk,
-      _ => throw StateError(
-        'Speaking request cannot be created for ${session.primarySkill.label}.',
-      ),
-    },
-    topic: session.title,
-    level: _level,
-    goal: 'Fluency',
-    durationMinutes: session.estimatedMinutes.clamp(5, 15).toInt(),
-    lessonContext: _speakingContext,
-    sessionTopic: session.title,
-    contentKey: session.contentKey,
-    kickoffMessage: _speakingKickoff,
-  );
-
   Widget? _screenFor(SpeakSkill skill) {
     final contextPrompt = session.contextPrompt;
     return switch (skill) {
@@ -258,16 +226,29 @@ class _SpeakCourseSessionScreenState
       // Speaking is opened directly by [_openActivity] so the course does
       // not add a preflight screen on top of the live tutor.
       SpeakSkill.speaking => null,
-      SpeakSkill.roleplay => SpeakingPracticeScreen(
-        request: _speakingRequest,
-        autoStart: true,
+      SpeakSkill.roleplay => SpeakRoleplayScreen(
+        scene: session.roleplay,
+        topic: session.roleplay == null ? session.title : null,
+        contentKey: session.contentKey,
       ),
       // Course-map review uses the same chooser and history source as the
       // Practice tab. It must not open a second summary-only review flow.
       SpeakSkill.review => const SpeakReviewScreen(),
-      SpeakSkill.freeTalk => SpeakingPracticeScreen(
-        request: _speakingRequest,
-        autoStart: true,
+      SpeakSkill.freeTalk => SpeakingLessonFlowScreen(
+        title: session.title,
+        topic: session.subtitle,
+        level: _level,
+        contentKey: session.contentKey,
+        steps: [
+          for (final line in SpeakingCourseCatalog.freeTalkLessons.first.lines)
+            SpeakingPhraseStep(
+              french: line.french,
+              english: line.english,
+              partnerFrench: line.partnerFrench,
+              partnerEnglish: line.partnerEnglish,
+              openResponse: true,
+            ),
+        ],
       ),
     };
   }

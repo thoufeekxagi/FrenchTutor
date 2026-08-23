@@ -4,20 +4,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/review_material_service.dart';
-import '../../services/speak_curriculum_catalog.dart';
 import '../../services/speak_roadmap_service.dart';
 import 'speak_course_activity_screen.dart';
+import 'speak_free_talk_screen.dart';
+import 'speak_quick_practice_screen.dart';
 import 'speak_review_screen.dart';
+import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
+import 'speaking_lesson_flow_screen.dart';
 
-/// The speaking product surface. Course and Practice are deliberately kept in
-/// one route so the learner can move from a lesson, to its drill, to a scene
-/// without landing in a second legacy speaking menu.
+/// The speaking product surface.
+///
+/// This is intentionally one course-first surface rather than a second
+/// Course/Practice router. A learner chooses a unit card, previews the lesson,
+/// and then enters the shared live conversation engine. Practice and Home
+/// quick-start entries can point here without changing the app dashboard.
 class SpeakingHubScreen extends ConsumerStatefulWidget {
   const SpeakingHubScreen({super.key, this.initialCourseTab = true});
 
+  /// Kept for source compatibility with older entry points. Speaking no
+  /// longer has a top-level Course/Practice switch.
+  @Deprecated('Speaking now uses one course-first home surface.')
   final bool initialCourseTab;
 
   @override
@@ -25,15 +35,8 @@ class SpeakingHubScreen extends ConsumerStatefulWidget {
 }
 
 class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
-  bool _courseTab = true;
-  String _practiceMode = 'Roleplay';
-  String _filter = 'Hot';
-
-  @override
-  void initState() {
-    super.initState();
-    _courseTab = widget.initialCourseTab;
-  }
+  int _selectedIndex = 0;
+  String _selectedActivity = 'Tutor lesson';
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +53,12 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
     final speakingLessons = roadmap.sessions
         .where(
           (session) =>
-              session.primarySkill == SpeakSkill.speaking ||
-              session.primarySkill == SpeakSkill.roleplay ||
-              session.primarySkill == SpeakSkill.freeTalk ||
-              session.supportingSkills.contains(SpeakSkill.speaking),
+              session.unit == 1 &&
+              (session.primarySkill == SpeakSkill.speaking ||
+                  session.primarySkill == SpeakSkill.roleplay ||
+                  session.primarySkill == SpeakSkill.freeTalk),
         )
-        .take(8)
-        .toList(growable: false);
-    final scenes = SpeakCurriculumCatalog.bundled(roadmap.level)
-        .where((item) => item.roleplay != null)
-        .map((item) => item.roleplay!)
+        .take(6)
         .toList(growable: false);
     final recent =
         ReviewMaterialService.recentSessions(
@@ -72,6 +71,13 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
           }.contains(session.skill),
         );
 
+    if (_selectedIndex >= speakingLessons.length && speakingLessons.isNotEmpty) {
+      _selectedIndex = speakingLessons.length - 1;
+    }
+    final selected = speakingLessons.isEmpty
+        ? null
+        : speakingLessons[_selectedIndex];
+
     return Scaffold(
       backgroundColor: DesignTokens.nightCanvas,
       body: SafeArea(
@@ -79,15 +85,33 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
             _topBar(context),
-            const SizedBox(height: 26),
-            Text('Speaking', style: _display(30)),
-            const SizedBox(height: 14),
-            _segment(),
-            const SizedBox(height: 24),
-            if (_courseTab)
-              _courseView(context, speakingLessons, roadmap)
-            else
-              _practiceView(context, scenes, roadmap.level),
+            const SizedBox(height: 18),
+            Text('Practice French your way', style: _display(30)),
+            const SizedBox(height: 7),
+            Text(
+              'Choose a beginner lesson, hear the model, then speak in one continuous conversation.',
+              style: _body(14).copyWith(color: DesignTokens.nightMuted, height: 1.35),
+            ),
+            const SizedBox(height: 22),
+            if (selected == null)
+              _emptyPanel('No Unit 1 speaking lessons are available yet.')
+            else ...[
+              _unitHeader(selected, roadmap),
+              const SizedBox(height: 12),
+              _selectedLessonCard(context, selected),
+              const SizedBox(height: 22),
+              _sectionLabel('UNIT 1 · THE BASICS'),
+              const SizedBox(height: 10),
+              ...speakingLessons.asMap().entries.map(
+                (entry) => _lessonCard(
+                  entry.value,
+                  selected: entry.key == _selectedIndex,
+                  onTap: () => setState(() => _selectedIndex = entry.key),
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            _quickPracticeSection(context, selected),
             if (recent.isNotEmpty) ...[
               const SizedBox(height: 28),
               _sectionLabel('RECENT SPEAKING'),
@@ -125,158 +149,383 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
           icon: Icons.tune_rounded,
           label: 'Speaking settings',
           onTap: () =>
-              AppRouter.push(context, (_) => const SpeakingPracticeScreen()),
+              AppRouter.push(context, (_) => const SpeakSettingsScreen()),
         ),
       ],
     );
   }
 
-  Widget _segment() {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: DesignTokens.nightSurface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: DesignTokens.nightHairline),
-      ),
-      child: Row(
-        children: [
-          _segmentItem('Course', _courseTab),
-          _segmentItem('Practice', !_courseTab),
-        ],
-      ),
-    );
-  }
-
-  Widget _segmentItem(String label, bool selected) {
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => setState(() => _courseTab = label == 'Course'),
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? DesignTokens.nightAccentSoft : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            label,
-            style: _body(14, weight: FontWeight.w700).copyWith(
-              color: selected
-                  ? DesignTokens.nightText
-                  : DesignTokens.nightMuted,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _courseView(
-    BuildContext context,
-    List<SpeakRoadmapSession> lessons,
-    SpeakRoadmap roadmap,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _unitHeader(SpeakRoadmapSession selected, SpeakRoadmap roadmap) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(
-          children: [
-            Expanded(child: _sectionLabel('THE BASICS')),
-            Text(
-              '${roadmap.completedCount}/${roadmap.sessions.length}',
-              style: _body(13).copyWith(color: DesignTokens.nightMuted),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionLabel('UNIT ${selected.unit}'),
+              const SizedBox(height: 5),
+              Text(selected.unitTitle, style: _display(22)),
+            ],
+          ),
         ),
-        const SizedBox(height: 5),
         Text(
-          'Build the phrase, practise the turn, then use it in a real scene.',
+          '${roadmap.completedCount}/${roadmap.sessions.length}',
           style: _body(13).copyWith(color: DesignTokens.nightMuted),
         ),
-        const SizedBox(height: 12),
-        if (lessons.isEmpty)
-          _emptyPanel('No speaking lessons are available in this course block.')
-        else
-          ...lessons.map(
-            (session) => _lessonRow(
-              context,
-              session,
-              selected: session == roadmap.nextSession,
-            ),
-          ),
       ],
     );
   }
 
-  Widget _practiceView(
+  Widget _selectedLessonCard(
     BuildContext context,
-    List<SpeakRoleplayScene> scenes,
-    String level,
+    SpeakRoadmapSession session,
+  ) {
+    final tutor = ActiveTutor.current;
+    final prompt = session.targetPhrases.isNotEmpty
+        ? session.targetPhrases.first
+        : session.competency;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightAccentSoft,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: DesignTokens.nightAccent, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: DesignTokens.nightAccent,
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: Image.asset(tutor.portraitAsset, fit: BoxFit.cover),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      session.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _body(17, weight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${tutor.displayName} · ${session.level} · ${session.estimatedMinutes} min',
+                      style: _body(12).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                session.completed
+                    ? Icons.check_circle_rounded
+                    : Icons.more_horiz_rounded,
+                color: DesignTokens.nightAccent,
+              ),
+            ],
+          ),
+          if (prompt.trim().isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              prompt,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: _body(15, weight: FontWeight.w700),
+            ),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              for (final activity in const [
+                ('Tutor lesson', Icons.play_circle_outline_rounded),
+                ('Speaking drill', Icons.mic_none_rounded),
+                ('Tutor Q&A', Icons.forum_outlined),
+              ]) ...[
+                Expanded(
+                  child: _activityButton(
+                    label: activity.$1,
+                    icon: activity.$2,
+                    selected: _selectedActivity == activity.$1,
+                    onTap: () => setState(() => _selectedActivity = activity.$1),
+                  ),
+                ),
+                if (activity.$1 != 'Tutor Q&A') const SizedBox(width: 7),
+              ],
+            ],
+          ),
+          const SizedBox(height: 14),
+          _goldButton(
+            label: session.completed ? 'Practise again' : 'Start lesson',
+            onTap: () => _startSelectedActivity(context, session),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startSelectedActivity(
+    BuildContext context,
+    SpeakRoadmapSession session,
+  ) async {
+    if (_selectedActivity == 'Speaking drill' &&
+        session.primarySkill == SpeakSkill.speaking) {
+      await AppRouter.push(
+        context,
+        (_) => SpeakingLessonFlowScreen(
+          title: session.title,
+          topic: session.subtitle,
+          level: session.level,
+          contentKey: session.contentKey,
+          steps: speakingStepsForLesson(
+            targets: session.targetPhrases,
+            title: session.title,
+            competency: session.competency,
+            level: session.level,
+          ),
+        ),
+        fullscreenDialog: true,
+      );
+      return;
+    }
+    if (_selectedActivity == 'Tutor Q&A') {
+      await AppRouter.push(
+        context,
+        (_) => SpeakingPracticeScreen(
+          request: SpeakingPracticeRequest(
+            mode: SpeakingMode.guidedConversation,
+            topic: session.title,
+            level: session.level,
+            goal: 'Answer one question clearly',
+            durationMinutes: session.estimatedMinutes.clamp(5, 12).toInt(),
+            lessonContext: session.contextPrompt,
+            sessionTopic: session.title,
+            contentKey: session.contentKey,
+          ),
+          autoStart: true,
+        ),
+        fullscreenDialog: true,
+      );
+      return;
+    }
+    await AppRouter.push(
+      context,
+      (_) => SpeakCourseActivityScreen(session: session),
+      fullscreenDialog: true,
+    );
+  }
+
+  Widget _quickPracticeSection(
+    BuildContext context,
+    SpeakRoadmapSession? selected,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _sectionLabel('QUICK PRACTICE'),
+        const SizedBox(height: 10),
         Row(
           children: [
-            _modePill('Roleplay', _practiceMode == 'Roleplay'),
-            const SizedBox(width: 8),
-            _modePill('Free talk', _practiceMode == 'Free talk'),
-          ],
-        ),
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            for (final label in const ['Hot', 'New', 'Top today']) ...[
-              _filterPill(label),
-              const SizedBox(width: 8),
-            ],
-          ],
-        ),
-        const SizedBox(height: 22),
-        if (_practiceMode == 'Free talk')
-          _freeTalkPanel(context, level)
-        else ...[
-          _sectionLabel('YOUR ROLEPLAYS'),
-          const SizedBox(height: 10),
-          if (scenes.isEmpty)
-            _emptyPanel('No published roleplay scenes are available.')
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: scenes.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.92,
+            Expanded(
+              child: _quickCard(
+                icon: Icons.mic_none_rounded,
+                title: 'Guided drill',
+                subtitle: 'One phrase at a time',
+                onTap: selected == null
+                    || selected.primarySkill != SpeakSkill.speaking
+                    ? null
+                    : () => _startGuided(context, selected),
               ),
-              itemBuilder: (context, index) =>
-                  _sceneCard(context, scenes[index]),
             ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: _quickCard(
+                icon: Icons.chat_bubble_outline_rounded,
+                title: 'Free talk',
+                subtitle: 'Choose a real scene',
+                onTap: () => AppRouter.push(
+                  context,
+                  (_) => const SpeakFreeTalkScreen(),
+                  fullscreenDialog: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _quickCard(
+          icon: Icons.theater_comedy_outlined,
+          title: 'Roleplay topics',
+          subtitle: 'Hot · New · Top today · cafés, travel, shops, and everyday scenes',
+          onTap: () => AppRouter.push(
+            context,
+            (_) => const SpeakFreeTalkScreen(),
+            fullscreenDialog: true,
+          ),
+          wide: true,
+        ),
+        const SizedBox(height: 10),
+        _quickCard(
+          icon: Icons.bolt_rounded,
+          title: 'Quick lessons',
+          subtitle: 'Vocabulary and verbs for a focused practice minute',
+          onTap: () => AppRouter.push(
+            context,
+            (_) => const SpeakQuickPracticeScreen(),
+            fullscreenDialog: true,
+          ),
+          wide: true,
+        ),
       ],
     );
   }
 
-  Widget _lessonRow(
+  Future<void> _startGuided(
     BuildContext context,
+    SpeakRoadmapSession session,
+  ) async {
+    await AppRouter.push(
+      context,
+      (_) => SpeakingLessonFlowScreen(
+        title: session.title,
+        topic: session.subtitle,
+        level: session.level,
+        contentKey: session.contentKey,
+        steps: speakingStepsForLesson(
+          targets: session.targetPhrases,
+          title: session.title,
+          competency: session.competency,
+          level: session.level,
+        ),
+      ),
+      fullscreenDialog: true,
+    );
+  }
+
+  Widget _quickCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback? onTap,
+    bool wide = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: BoxConstraints(minHeight: wide ? 74 : 112),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(17),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: wide
+            ? Row(
+                children: [
+                  Icon(icon, color: DesignTokens.nightAccent, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(child: _quickCopy(title, subtitle)),
+                  const Icon(Icons.chevron_right_rounded, color: DesignTokens.nightAccent),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(icon, color: DesignTokens.nightAccent, size: 24),
+                  _quickCopy(title, subtitle),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _quickCopy(String title, String subtitle) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: _body(14, weight: FontWeight.w800)),
+      const SizedBox(height: 3),
+      Text(
+        subtitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: _body(11).copyWith(color: DesignTokens.nightMuted),
+      ),
+    ],
+  );
+
+  Widget _activityButton({
+    required String label,
+    required IconData icon,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 58,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          decoration: BoxDecoration(
+            color: selected
+                ? DesignTokens.nightAccent
+                : DesignTokens.nightSurface,
+            borderRadius: BorderRadius.circular(13),
+            border: Border.all(
+              color: selected
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightHairline,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 17,
+                color: selected ? Colors.black : DesignTokens.nightAccent,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: _body(9, weight: FontWeight.w700).copyWith(
+                  color: selected ? Colors.black : DesignTokens.nightText,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _lessonCard(
     SpeakRoadmapSession session, {
     required bool selected,
+    required VoidCallback onTap,
   }) {
-    final skill = session.primarySkill.label;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => AppRouter.push(
-        context,
-        (_) => SpeakCourseActivityScreen(session: session),
-        fullscreenDialog: true,
-      ),
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: selected
               ? DesignTokens.nightAccentSoft
@@ -312,13 +561,10 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(session.title, style: _body(15, weight: FontWeight.w700)),
+                  const SizedBox(height: 3),
                   Text(
-                    session.title,
-                    style: _body(15, weight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$skill · ${session.estimatedMinutes} min',
+                    '${session.level} · ${session.estimatedMinutes} min',
                     style: _body(12).copyWith(color: DesignTokens.nightMuted),
                   ),
                 ],
@@ -333,147 +579,6 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                   : DesignTokens.nightMuted,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _sceneCard(BuildContext context, SpeakRoleplayScene scene) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => AppRouter.push(
-        context,
-        (_) => SpeakingRoleplayDetailScreen(scene: scene),
-        fullscreenDialog: true,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: DesignTokens.nightSurface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: DesignTokens.nightHairline),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: const BoxDecoration(
-                color: DesignTokens.nightAccentSoft,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.forum_outlined,
-                color: DesignTokens.nightAccent,
-              ),
-            ),
-            const Spacer(),
-            Text(
-              scene.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: _body(15, weight: FontWeight.w700),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              '${scene.level} · 4 turns',
-              style: _body(12).copyWith(color: DesignTokens.nightMuted),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _freeTalkPanel(BuildContext context, String level) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: DesignTokens.nightSurface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: DesignTokens.nightHairline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(
-            Icons.people_outline_rounded,
-            color: DesignTokens.nightAccent,
-            size: 30,
-          ),
-          const SizedBox(height: 14),
-          Text('Talk about anything', style: _display(21)),
-          const SizedBox(height: 5),
-          Text(
-            'Choose a topic and keep a natural conversation at $level.',
-            style: _body(13).copyWith(color: DesignTokens.nightMuted),
-          ),
-          const SizedBox(height: 18),
-          _goldButton(
-            label: 'Start free talk',
-            onTap: () => AppRouter.push(
-              context,
-              (_) => const SpeakingPracticeScreen(
-                request: SpeakingPracticeRequest(mode: SpeakingMode.freeTalk),
-              ),
-              fullscreenDialog: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _modePill(String label, bool selected) {
-    return GestureDetector(
-      onTap: () => setState(() => _practiceMode = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? DesignTokens.nightAccent
-              : DesignTokens.nightSurface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected
-                ? DesignTokens.nightAccent
-                : DesignTokens.nightHairline,
-          ),
-        ),
-        child: Text(
-          label,
-          style: _body(
-            13,
-            weight: FontWeight.w700,
-          ).copyWith(color: selected ? Colors.black : DesignTokens.nightMuted),
-        ),
-      ),
-    );
-  }
-
-  Widget _filterPill(String label) {
-    final selected = _filter == label;
-    return GestureDetector(
-      onTap: () => setState(() => _filter = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? DesignTokens.nightAccentSoft : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? DesignTokens.nightAccent
-                : DesignTokens.nightHairline,
-          ),
-        ),
-        child: Text(
-          label,
-          style: _body(12, weight: FontWeight.w600).copyWith(
-            color: selected
-                ? DesignTokens.nightAccent
-                : DesignTokens.nightMuted,
-          ),
         ),
       ),
     );
@@ -599,6 +704,7 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tutor = ActiveTutor.current;
     final prompt = session.targetPhrases.isNotEmpty
         ? session.targetPhrases.first
         : session.competency;
@@ -617,16 +723,15 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Center(
             child: Container(
-              width: 68,
-              height: 68,
+              width: 82,
+              height: 82,
+              padding: const EdgeInsets.all(5),
               decoration: const BoxDecoration(
-                color: DesignTokens.nightAccentSoft,
+                color: DesignTokens.nightAccent,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                _speakingSkillIcon(session.primarySkill),
-                color: DesignTokens.nightAccent,
-                size: 32,
+              child: ClipOval(
+                child: Image.asset(tutor.portraitAsset, fit: BoxFit.cover),
               ),
             ),
           ),
@@ -638,29 +743,50 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            '${session.level} · ${session.primarySkill.label}',
+            '${tutor.displayName} · ${session.level} · ${session.primarySkill.label}',
             textAlign: TextAlign.center,
             style: _detailBody(14).copyWith(color: DesignTokens.nightMuted),
           ),
           const SizedBox(height: 24),
           _quoteCard(prompt),
-          const SizedBox(height: 12),
-          _detailRow(
-            Icons.video_library_outlined,
-            'Tutor lesson',
-            'See the idea before you speak.',
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: DesignTokens.nightSurface,
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(color: DesignTokens.nightHairline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'THIS LESSON',
+                  style: _detailBody(
+                    11,
+                    weight: FontWeight.w800,
+                  ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.3),
+                ),
+                const SizedBox(height: 10),
+                _detailRow(
+                  Icons.play_circle_outline_rounded,
+                  'Tutor lesson',
+                  'Hear the model before you speak.',
+                ),
+                _detailRow(
+                  Icons.mic_none_rounded,
+                  'Speaking drill',
+                  'Repeat the target, then use it in context.',
+                ),
+                _detailRow(
+                  Icons.forum_outlined,
+                  'Tutor Q&A',
+                  'Continue the lesson in one live chat.',
+                ),
+              ],
+            ),
           ),
-          _detailRow(
-            Icons.mic_none_rounded,
-            'Speaking drill',
-            'Repeat the target, then use it in context.',
-          ),
-          _detailRow(
-            Icons.translate_rounded,
-            'Translate',
-            'Reveal meaning without leaving the lesson.',
-          ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           _goldAction(
             label: 'Start lesson',
             onTap: onStart ?? () => _startLesson(context),
@@ -671,6 +797,25 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
   }
 
   void _startLesson(BuildContext context) {
+    if (session.primarySkill == SpeakSkill.speaking) {
+      AppRouter.push(
+        context,
+        (_) => SpeakingLessonFlowScreen(
+          title: session.title,
+          topic: session.subtitle,
+          level: session.level,
+          contentKey: session.contentKey,
+          steps: speakingStepsForLesson(
+            targets: session.targetPhrases,
+            title: session.title,
+            competency: session.competency,
+            level: session.level,
+          ),
+        ),
+        fullscreenDialog: true,
+      );
+      return;
+    }
     AppRouter.push(
       context,
       (_) => SpeakingPracticeScreen(request: _request, autoStart: true),

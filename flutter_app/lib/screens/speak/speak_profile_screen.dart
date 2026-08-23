@@ -16,6 +16,8 @@ import 'speak_roadmap_screen.dart';
 import 'streak_calendar_screen.dart';
 import 'french_fingerprint_screen.dart';
 import 'speak_ui.dart';
+import 'v3_settings_screen.dart';
+import '../profile/v3_profile_screen.dart';
 
 class SpeakProfileScreen extends ConsumerWidget {
   const SpeakProfileScreen({super.key, this.onBack, this.onReplayPractice});
@@ -35,6 +37,10 @@ class SpeakProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Existing routes still construct SpeakProfileScreen; keep that API
+    // stable while all profile entry points share the V3 profile surface.
+    return V3ProfileScreen(onBack: onBack, onReplayPractice: onReplayPractice);
+    /*
     final profile = ref.watch(learningStoreProvider).profile();
     final sessions = ref.watch(storageServiceProvider).getAllSessions();
     final name = AuthService.shared.signedInDisplayName;
@@ -236,6 +242,7 @@ class SpeakProfileScreen extends ConsumerWidget {
         ],
       ),
     );
+    */
   }
 
   Widget _profileRow(

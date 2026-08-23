@@ -12,10 +12,10 @@ import '../services/app_tour.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
 import '../widgets/web/web_app_shell.dart';
-import 'speak/speak_practice_screen.dart';
-import 'speak/speak_profile_screen.dart';
+import 'practice/v3_practice_screen.dart';
 import 'speak/speak_roadmap_screen.dart';
-import 'speak/speak_settings_screen.dart';
+import 'speak/v3_settings_screen.dart';
+import 'profile/v3_profile_screen.dart';
 import 'speak/speaking_studio_screen.dart';
 import 'scan/scan_screen.dart';
 
@@ -81,9 +81,9 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
     final screens = [
       const SpeakingStudioScreen(),
       const SpeakRoadmapScreen(embedded: true),
-      const SpeakPracticeScreen(),
+      const V3PracticeScreen(),
       const ScanScreen(),
-      SpeakProfileScreen(
+      V3ProfileScreen(
         onBack: () => setState(() => _currentIndex = 0),
         onReplayPractice: () => _selectTab(2),
       ),
@@ -108,7 +108,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
             tooltip: 'Profile',
             onTap: () => AppRouter.push(
               context,
-              (_) => SpeakSettingsScreen(onReplayPractice: () => _selectTab(2)),
+              (_) => V3SettingsScreen(onReplayPractice: () => _selectTab(2)),
             ),
           ),
         ],
