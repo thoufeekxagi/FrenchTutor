@@ -55,10 +55,7 @@ class _SpeakAdvancedSettingsScreenState
             subtitle: 'Shape the way your course feels.',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.arrow_back_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           const SizedBox(height: 26),
@@ -209,7 +206,7 @@ class _SpeakAdvancedSettingsScreenState
                       ),
                   ],
                 ),
-                const Divider(height: 26, color: SpeakColors.line),
+                Divider(height: 26, color: SpeakColors.line),
                 Row(
                   children: [
                     Expanded(
@@ -238,7 +235,7 @@ class _SpeakAdvancedSettingsScreenState
                     Switch.adaptive(
                       value: remindersEnabled,
                       onChanged: _toggleReminders,
-                      activeThumbColor: SpeakColors.blue,
+                      activeThumbColor: SpeakColors.accent,
                     ),
                   ],
                 ),
@@ -281,21 +278,21 @@ class _SpeakAdvancedSettingsScreenState
                   _speaking,
                   (value) => setState(() => _speaking = value),
                 ),
-                const Divider(height: 1, color: SpeakColors.line),
+                Divider(height: 1, color: SpeakColors.line),
                 _toggle(
                   'Roleplay',
                   'Use it in a real situation',
                   _roleplay,
                   (value) => setState(() => _roleplay = value),
                 ),
-                const Divider(height: 1, color: SpeakColors.line),
+                Divider(height: 1, color: SpeakColors.line),
                 _toggle(
                   'Stories',
                   'Meet the phrase in context',
                   _stories,
                   (value) => setState(() => _stories = value),
                 ),
-                const Divider(height: 1, color: SpeakColors.line),
+                Divider(height: 1, color: SpeakColors.line),
                 _toggle(
                   'Listening',
                   'Train your ear before speaking',
@@ -318,7 +315,7 @@ class _SpeakAdvancedSettingsScreenState
                   _voiceRecognition,
                   (value) => setState(() => _voiceRecognition = value),
                 ),
-                const Divider(height: 1, color: SpeakColors.line),
+                Divider(height: 1, color: SpeakColors.line),
                 _toggle(
                   'Auto mode',
                   'Keep the conversation moving naturally',
@@ -558,7 +555,7 @@ class _SpeakAdvancedSettingsScreenState
                     style: DesignTokens.display(index == value ? 25 : 19)
                         .copyWith(
                           color: index == value
-                              ? SpeakColors.blue
+                              ? SpeakColors.accent
                               : SpeakColors.inkSoft.withValues(alpha: .58),
                           fontWeight: index == value
                               ? FontWeight.w700
@@ -626,7 +623,7 @@ class _SpeakAdvancedSettingsScreenState
           Switch.adaptive(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: SpeakColors.blue,
+            activeThumbColor: SpeakColors.accent,
           ),
         ],
       ),

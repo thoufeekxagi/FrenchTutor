@@ -103,7 +103,7 @@ class _TranscriptLine extends StatelessWidget {
         ? _compactUserTranscript(message.content)
         : message.content;
     final accent = isUser
-        ? (dark ? DesignTokens.nightAccent : SpeakColors.blue)
+        ? (dark ? DesignTokens.nightAccent : SpeakColors.accent)
         : (dark ? DesignTokens.nightText : SpeakColors.green);
     const avatarGap = 7.0;
     final bubble = Container(
@@ -112,7 +112,7 @@ class _TranscriptLine extends StatelessWidget {
         color: isUser
             ? (dark
                   ? DesignTokens.nightAccentSoft
-                  : SpeakColors.blueSoft.withValues(alpha: 0.78))
+                  : SpeakColors.accentSoft.withValues(alpha: 0.78))
             : (dark
                   ? DesignTokens.nightSurfaceRaised
                   : Colors.white.withValues(alpha: 0.72)),
@@ -126,7 +126,7 @@ class _TranscriptLine extends StatelessWidget {
           color: isUser
               ? (dark
                     ? DesignTokens.nightAccent.withValues(alpha: 0.32)
-                    : SpeakColors.blue.withValues(alpha: 0.20))
+                    : SpeakColors.accent.withValues(alpha: 0.20))
               : (dark ? DesignTokens.nightHairline : SpeakColors.line),
         ),
       ),

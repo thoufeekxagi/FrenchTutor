@@ -8,6 +8,7 @@ import '../design/app_router.dart';
 import '../design/tokens.dart';
 import '../models/tutor_persona.dart';
 import '../providers/database_provider.dart';
+import '../providers/appearance_provider.dart';
 import '../services/app_tour.dart';
 import '../widgets/adaptive/adaptive.dart';
 import '../widgets/floating_notetaker.dart';
@@ -76,6 +77,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
 
   Widget _buildShell(BuildContext context) {
     final notetaker = ref.watch(notetakerStateProvider);
+    final appearance = ref.watch(appearanceSettingsProvider);
     // Restore the dark, image-led Home dashboard. Practice -> Speaking still
     // opens its independent SpeakingPracticeScreen route.
     final screens = [
@@ -117,7 +119,10 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
     }
 
     return Scaffold(
-      backgroundColor: _currentIndex == 0
+      // The shell follows the selected appearance on every tab. Previously
+      // only Home used the dark surface, which made Course, Practice, and
+      // Photo tutor look like a separate app.
+      backgroundColor: appearance.darkMode
           ? DesignTokens.nightCanvas
           : DesignTokens.canvas,
       extendBody: true,
@@ -127,7 +132,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
   }
 
   Widget _mobileIslandNavigation() {
-    final night = _currentIndex == 0;
+    final night = ref.read(appearanceSettingsProvider).darkMode;
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(12, 0, 12, 8),

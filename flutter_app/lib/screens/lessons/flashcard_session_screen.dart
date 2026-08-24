@@ -242,7 +242,7 @@ class _FlashcardSessionScreenState
                     value: (_currentIndex + 1) / _queue.length,
                     minHeight: 4,
                     backgroundColor: DesignTokens.hairline,
-                    valueColor: const AlwaysStoppedAnimation(DesignTokens.info),
+                    valueColor: AlwaysStoppedAnimation(DesignTokens.info),
                   ),
                 ),
                 const Spacer(),

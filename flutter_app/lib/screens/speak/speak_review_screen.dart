@@ -48,7 +48,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
             leading: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.of(context).pop(),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.only(top: 3),
                 child: Icon(
                   Icons.arrow_back_rounded,
@@ -87,13 +87,10 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: SpeakColors.blueSoft,
+                        color: SpeakColors.accentSoft,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(
-                        Icons.bolt_rounded,
-                        color: SpeakColors.blue,
-                      ),
+                      child: Icon(Icons.bolt_rounded, color: SpeakColors.accent),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -170,8 +167,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
               child: Column(
                 children: [
                   for (var i = 0; i < sessions.length; i++) ...[
-                    if (i > 0)
-                      const Divider(height: 1, color: SpeakColors.line),
+                    if (i > 0) Divider(height: 1, color: SpeakColors.line),
                     _materialRow(sessions[i]),
                   ],
                 ],
@@ -232,7 +228,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                     ),
                   ),
                   if (isSpeaking)
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 14,
                       color: SpeakColors.inkSoft,
@@ -303,7 +299,7 @@ class _SavedSpeakingTranscriptScreenState
                     label: 'Close saved transcript',
                     child: IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close_rounded,
                         color: DesignTokens.nightText,
                       ),
@@ -618,7 +614,7 @@ SPEAKING REVIEW CONTRACT
             leading: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.of(context).pop(),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.only(top: 3),
                 child: Icon(
                   Icons.arrow_back_rounded,
@@ -635,14 +631,14 @@ SPEAKING REVIEW CONTRACT
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: SpeakCard(
-                  color: SpeakColors.blueSoft,
+                  color: SpeakColors.accentSoft,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
                         _modeIcon(widget.mode),
-                        color: SpeakColors.blue,
+                        color: SpeakColors.accent,
                         size: 36,
                       ),
                       const SizedBox(height: 14),

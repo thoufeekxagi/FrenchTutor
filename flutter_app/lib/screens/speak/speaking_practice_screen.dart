@@ -445,14 +445,19 @@ class _SpeakingPracticeScreenState
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(
-                  child: _CompactSelection(
-                    label: 'Level',
-                    value: _level,
-                    onTap: _pickLevel,
+                // Free Talk follows the learner's main profile level. It is
+                // intentionally not a second level-setting surface inside
+                // the speaking flow.
+                if (_mode != SpeakingMode.freeTalk) ...[
+                  Expanded(
+                    child: _CompactSelection(
+                      label: 'Level',
+                      value: _level,
+                      onTap: _pickLevel,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   child: _CompactSelection(
                     label: 'Goal',
@@ -541,10 +546,7 @@ class _SpeakingPracticeScreenState
         IconButton(
           tooltip: 'Back',
           onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: DesignTokens.nightText,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: DesignTokens.nightText),
         ),
         const SizedBox(width: 4),
         Text(
@@ -626,8 +628,7 @@ class _SpeakingPracticeScreenState
   }) {
     return Column(
       children: [
-        if (showDivider)
-          const Divider(height: 1, color: DesignTokens.nightHairline),
+        if (showDivider) Divider(height: 1, color: DesignTokens.nightHairline),
         Semantics(
           button: true,
           label: 'Open saved transcript for ${session.displayTitle}',
@@ -649,11 +650,11 @@ class _SpeakingPracticeScreenState
                   Container(
                     width: 42,
                     height: 42,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: DesignTokens.nightAccentSoft,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.forum_outlined,
                       color: DesignTokens.nightAccent,
                     ),
@@ -682,7 +683,7 @@ class _SpeakingPracticeScreenState
                       ],
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
                     color: DesignTokens.nightAccent,
                   ),
@@ -777,7 +778,7 @@ class _PlanPreviewCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.auto_awesome_rounded,
                 color: DesignTokens.nightAccent,
                 size: 19,
@@ -812,7 +813,7 @@ class _PlanPreviewCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.lock_outline_rounded,
                 color: DesignTokens.nightAccent,
                 size: 15,
@@ -930,7 +931,7 @@ class _SelectionTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: DesignTokens.nightAccent,
               ),
@@ -996,7 +997,7 @@ class _CompactSelection extends StatelessWidget {
                     ).copyWith(color: DesignTokens.nightText),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   color: DesignTokens.nightAccent,
                   size: 17,
@@ -1020,13 +1021,13 @@ class _ErrorPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1E1A),
+        color: DesignTokens.dangerSoft,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF6C3B2B)),
+        border: Border.all(color: DesignTokens.danger.withValues(alpha: 0.55)),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline_rounded,
             color: DesignTokens.nightAccent,
             size: 20,
@@ -1176,7 +1177,7 @@ class _PickerOption<T> extends StatelessWidget {
               ),
             ),
             if (selected)
-              const Icon(Icons.check_rounded, color: DesignTokens.nightAccent),
+              Icon(Icons.check_rounded, color: DesignTokens.nightAccent),
           ],
         ),
       ),

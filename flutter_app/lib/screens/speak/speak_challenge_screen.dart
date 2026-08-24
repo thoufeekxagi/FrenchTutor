@@ -24,7 +24,7 @@ class SpeakChallengeScreen extends StatelessWidget {
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: SpeakColors.orange,
                     shape: BoxShape.circle,
                   ),
@@ -63,7 +63,7 @@ class SpeakChallengeScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _challenge(
             icon: Icons.mic_rounded,
-            color: SpeakColors.blue,
+            color: SpeakColors.accent,
             title: 'Make 10 minutes count',
             subtitle: 'Speak aloud for ten minutes this week.',
             progress: 0.6,
@@ -90,11 +90,7 @@ class SpeakChallengeScreen extends StatelessWidget {
           SpeakCard(
             child: Row(
               children: [
-                const Icon(
-                  Icons.groups_rounded,
-                  color: SpeakColors.blue,
-                  size: 28,
-                ),
+                Icon(Icons.groups_rounded, color: SpeakColors.accent, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -158,7 +154,7 @@ class SpeakChallengeScreen extends StatelessWidget {
             style: DesignTokens.body(
               11,
               weight: FontWeight.w700,
-            ).copyWith(color: SpeakColors.blue),
+            ).copyWith(color: SpeakColors.accent),
           ),
         ],
       ),

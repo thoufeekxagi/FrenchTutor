@@ -239,18 +239,27 @@ class _SpeakCourseSessionScreenState
         topic: session.subtitle,
         level: _level,
         contentKey: session.contentKey,
-        steps: [
-          for (final line in SpeakingCourseCatalog.freeTalkLessons.first.lines)
-            SpeakingPhraseStep(
-              french: line.french,
-              english: line.english,
-              partnerFrench: line.partnerFrench,
-              partnerEnglish: line.partnerEnglish,
-              openResponse: true,
-            ),
-        ],
+        steps: _freeTalkSteps(session),
       ),
     };
+  }
+
+  List<SpeakingPhraseStep> _freeTalkSteps(SpeakRoadmapSession session) {
+    final lessons = SpeakingCourseCatalog.freeTalkForLevel(_level);
+    final lessonIndex = session.index < 1
+        ? 0
+        : (session.index - 1) % lessons.length;
+    final lesson = lessons[lessonIndex];
+    return [
+      for (final line in lesson.lines)
+        SpeakingPhraseStep(
+          french: line.french,
+          english: line.english,
+          partnerFrench: line.partnerFrench,
+          partnerEnglish: line.partnerEnglish,
+          openResponse: true,
+        ),
+    ];
   }
 
   String? get _alphabetDeckId {
@@ -298,10 +307,7 @@ class _SpeakCourseSessionScreenState
             subtitle: '$_activityTopic · ${session.estimatedMinutes} min',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.close_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           Expanded(
@@ -325,13 +331,13 @@ class _SpeakCourseSessionScreenState
                 ),
                 const SizedBox(height: 22),
                 SpeakCard(
-                  color: SpeakColors.blueSoft,
+                  color: SpeakColors.accentSoft,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.track_changes_rounded,
-                        color: SpeakColors.blue,
+                        color: SpeakColors.accent,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -343,7 +349,7 @@ class _SpeakCourseSessionScreenState
                               style: DesignTokens.body(
                                 12,
                                 weight: FontWeight.w700,
-                              ).copyWith(color: SpeakColors.blue),
+                              ).copyWith(color: SpeakColors.accent),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -424,10 +430,10 @@ class _SpeakCourseSessionScreenState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: active ? SpeakColors.blue : Colors.white,
+          color: active ? SpeakColors.accent : SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: active ? SpeakColors.blue : SpeakColors.line,
+            color: active ? SpeakColors.accent : SpeakColors.line,
           ),
         ),
         child: Row(
@@ -436,12 +442,12 @@ class _SpeakCourseSessionScreenState
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: active ? Colors.white24 : SpeakColors.blueSoft,
+                color: active ? Colors.white24 : SpeakColors.accentSoft,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 _iconFor(skill),
-                color: active ? Colors.white : SpeakColors.blue,
+                color: active ? SpeakColors.onAccent : SpeakColors.accent,
                 size: 19,
               ),
             ),
@@ -452,16 +458,20 @@ class _SpeakCourseSessionScreenState
                 children: [
                   Text(
                     '${index + 1}. ${skill.label}',
-                    style: DesignTokens.body(
-                      14,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: active ? Colors.white : SpeakColors.navy),
+                    style: DesignTokens.body(14, weight: FontWeight.w700)
+                        .copyWith(
+                          color: active
+                              ? SpeakColors.onAccent
+                              : SpeakColors.navy,
+                        ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     skill.description,
                     style: DesignTokens.body(11).copyWith(
-                      color: active ? Colors.white70 : SpeakColors.inkSoft,
+                      color: active
+                          ? SpeakColors.onAccent.withValues(alpha: 0.72)
+                          : SpeakColors.inkSoft,
                     ),
                   ),
                 ],
@@ -471,13 +481,13 @@ class _SpeakCourseSessionScreenState
               value: skill,
               groupValue: _selectedSkill,
               onChanged: (_) => _selectSkill(skill),
-              activeColor: active ? Colors.white : SpeakColors.blue,
+              activeColor: active ? SpeakColors.onAccent : SpeakColors.accent,
             ),
             if (complete)
               Icon(
                 Icons.check_circle_rounded,
                 size: 18,
-                color: active ? Colors.white : SpeakColors.blue,
+                color: active ? SpeakColors.onAccent : SpeakColors.accent,
               ),
           ],
         ),

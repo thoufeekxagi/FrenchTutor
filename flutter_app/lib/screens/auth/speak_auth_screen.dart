@@ -74,8 +74,8 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
             child: Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(
-                color: SpeakColors.blue,
+              decoration: BoxDecoration(
+                color: SpeakColors.accent,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -127,7 +127,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
           const SizedBox(height: 22),
           Row(
             children: [
-              const Expanded(child: Divider(color: SpeakColors.line)),
+              Expanded(child: Divider(color: SpeakColors.line)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
@@ -137,7 +137,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
                   ).copyWith(color: SpeakColors.inkSoft),
                 ),
               ),
-              const Expanded(child: Divider(color: SpeakColors.line)),
+              Expanded(child: Divider(color: SpeakColors.line)),
             ],
           ),
           const SizedBox(height: 18),
@@ -181,7 +181,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
                 style: DesignTokens.body(
                   12,
                   weight: FontWeight.w700,
-                ).copyWith(color: SpeakColors.blue),
+                ).copyWith(color: SpeakColors.accent),
               ),
             ),
           ),
@@ -251,15 +251,15 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: SpeakColors.line),
+          borderSide: BorderSide(color: SpeakColors.line),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: SpeakColors.line),
+          borderSide: BorderSide(color: SpeakColors.line),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: SpeakColors.blue, width: 2),
+          borderSide: BorderSide(color: SpeakColors.accent, width: 2),
         ),
       ),
     );

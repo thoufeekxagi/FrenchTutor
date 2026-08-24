@@ -53,7 +53,7 @@ class WebOnboardingQuestion extends StatelessWidget {
 
   Widget _brandPanel() {
     return DecoratedBox(
-      decoration: const BoxDecoration(color: DesignTokens.ink),
+      decoration: BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
@@ -156,7 +156,7 @@ class WebOnboardingQuestion extends StatelessWidget {
               value: (step / 4).clamp(0, 1),
               minHeight: 5,
               backgroundColor: DesignTokens.canvasDim,
-              valueColor: const AlwaysStoppedAnimation(DesignTokens.primary),
+              valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
             ),
           ),
           const SizedBox(height: 28),

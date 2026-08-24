@@ -73,9 +73,7 @@ Future<bool> showPSConfirmDialog(
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(
             confirmLabel,
-            style: destructive
-                ? const TextStyle(color: DesignTokens.primary)
-                : null,
+            style: destructive ? TextStyle(color: DesignTokens.primary) : null,
           ),
         ),
       ],
@@ -132,7 +130,7 @@ Future<T?> showPSActionSheet<T>(
               title: Text(
                 a.label,
                 style: a.destructive
-                    ? const TextStyle(color: DesignTokens.primary)
+                    ? TextStyle(color: DesignTokens.primary)
                     : null,
               ),
               onTap: () => Navigator.of(context).pop(a.value),
@@ -172,7 +170,7 @@ class PSProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppTheme.isCupertino
         ? const CupertinoActivityIndicator()
-        : const CircularProgressIndicator(color: DesignTokens.primary);
+        : CircularProgressIndicator(color: DesignTokens.primary);
   }
 }
 
@@ -289,7 +287,7 @@ Future<DateTime?> showPSDatePicker(
   final confirmed = await showPSModalSheet<bool>(
     context,
     builder: (context) => DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: DesignTokens.surface,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(DesignTokens.radiusCard),

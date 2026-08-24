@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../design/tokens.dart';
 import '../models/tutor_persona.dart';
 import '../services/tutor_lip_sync_controller.dart';
 
@@ -66,11 +67,11 @@ class _PortraitFallback extends StatelessWidget {
     return Center(
       child: CircleAvatar(
         radius: 52,
-        backgroundColor: const Color(0xFFE8EEF9),
+        backgroundColor: DesignTokens.primarySoft,
         child: Text(
           persona.initial,
-          style: const TextStyle(
-            color: Color(0xFF2458C6),
+          style: TextStyle(
+            color: DesignTokens.primaryDeep,
             fontSize: 42,
             fontWeight: FontWeight.w700,
           ),

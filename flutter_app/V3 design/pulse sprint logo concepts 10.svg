@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1450" viewBox="0 0 1600 1450">
+  <rect width="1600" height="1450" fill="#08090B"/>
+  <text x="70" y="78" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="42" font-weight="700">ParleSprint · ten symbol directions</text>
+  <text x="72" y="116" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18">One idea per mark · flat geometry · designed to stay recognizable at app-icon size</text>
+
+  <!-- 01 Beat -->
+  <g transform="translate(60 170)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">01 · BEAT</text>
+    <g transform="translate(58 160)" fill="#F7BA45">
+      <rect x="0" y="84" width="34" height="100" rx="17"/>
+      <rect x="52" y="28" width="34" height="156" rx="17"/>
+      <rect x="104" y="58" width="34" height="126" rx="17"/>
+      <circle cx="177" cy="168" r="17"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Pulse</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">rhythm + progress</text>
+  </g>
+
+  <!-- 02 Link -->
+  <g transform="translate(370 170)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">02 · LINK</text>
+    <g transform="translate(46 153)" fill="none" stroke="#F7BA45" stroke-width="30" stroke-linecap="round">
+      <path d="M68 120c-25 0-45-20-45-45S43 30 68 30h42"/>
+      <path d="M120 30c25 0 45 20 45 45s-20 45-45 45H78" opacity=".62"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Connect</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">two voices, one path</text>
+  </g>
+
+  <!-- 03 Open book -->
+  <g transform="translate(680 170)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">03 · OPEN</text>
+    <g transform="translate(53 160)" fill="none" stroke="#F7BA45" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M86 158c-23-19-47-29-73-29V38c26 0 50 10 73 29Z"/>
+      <path d="M86 158c23-19 47-29 73-29V38c-26 0-50 10-73 29Z" opacity=".7"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Open</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">learn + discover</text>
+  </g>
+
+  <!-- 04 Rise -->
+  <g transform="translate(990 170)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">04 · RISE</text>
+    <g transform="translate(55 156)" fill="#F7BA45">
+      <rect x="0" y="112" width="52" height="52" rx="18"/>
+      <rect x="70" y="65" width="52" height="99" rx="18"/>
+      <rect x="140" y="18" width="52" height="146" rx="18"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Rise</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">small steps forward</text>
+  </g>
+
+  <!-- 05 Focus -->
+  <g transform="translate(1300 170)">
+    <rect width="240" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">05 · FOCUS</text>
+    <g transform="translate(48 155)" fill="none" stroke="#F7BA45" stroke-linecap="round">
+      <circle cx="72" cy="76" r="58" stroke-width="22" stroke-dasharray="255 110" transform="rotate(-48 72 76)"/>
+      <circle cx="72" cy="76" r="17" fill="#F7BA45" stroke="none"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Focus</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">attention + recall</text>
+  </g>
+
+  <!-- 06 Twin -->
+  <g transform="translate(60 750)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">06 · TWIN</text>
+    <g transform="translate(65 150)" fill="#F7BA45">
+      <rect x="0" y="38" width="70" height="148" rx="35"/>
+      <rect x="82" y="0" width="70" height="148" rx="35" opacity=".62"/>
+      <circle cx="116" cy="178" r="13"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Together</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">practice + feedback</text>
+  </g>
+
+  <!-- 07 Wave -->
+  <g transform="translate(370 750)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">07 · WAVE</text>
+    <g transform="translate(48 170)" fill="none" stroke="#F7BA45" stroke-width="24" stroke-linecap="round">
+      <path d="M0 84c30-67 60-67 90 0s60 67 90 0"/>
+      <path d="M28 132c21-36 42-36 63 0s42 36 63 0" opacity=".58"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Flow</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">sound + language</text>
+  </g>
+
+  <!-- 08 Gate -->
+  <g transform="translate(680 750)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">08 · GATE</text>
+    <g transform="translate(60 151)" fill="none" stroke="#F7BA45" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M26 178V84c0-34 28-62 62-62s62 28 62 62v94"/>
+      <path d="M26 178h124" opacity=".62"/>
+    </g>
+    <circle cx="208" cy="326" r="15" fill="#F7BA45"/>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Enter</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">open the next lesson</text>
+  </g>
+
+  <!-- 09 Orbit -->
+  <g transform="translate(990 750)">
+    <rect width="280" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">09 · ORBIT</text>
+    <g transform="translate(48 158)" fill="none" stroke="#F7BA45" stroke-linecap="round">
+      <path d="M35 132c-24-54 0-113 54-132 54-19 114 10 133 64" stroke-width="23"/>
+      <circle cx="89" cy="74" r="35" stroke-width="20" opacity=".6"/>
+      <circle cx="222" cy="64" r="16" fill="#F7BA45" stroke="none"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Return</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">review + repeat</text>
+  </g>
+
+  <!-- 10 Stack -->
+  <g transform="translate(1300 750)">
+    <rect width="240" height="520" rx="34" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="28" y="52" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" letter-spacing="3">10 · STACK</text>
+    <g transform="translate(45 174)" fill="#F7BA45">
+      <rect x="0" y="0" width="150" height="30" rx="15"/>
+      <rect x="0" y="52" width="106" height="30" rx="15" opacity=".72"/>
+      <rect x="0" y="104" width="65" height="30" rx="15" opacity=".48"/>
+      <circle cx="177" cy="119" r="15"/>
+    </g>
+    <text x="28" y="450" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700">Build</text>
+    <text x="28" y="482" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">words into fluency</text>
+  </g>
+</svg>

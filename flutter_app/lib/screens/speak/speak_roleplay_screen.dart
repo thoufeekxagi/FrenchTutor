@@ -156,7 +156,7 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
                   IconButton(
                     tooltip: 'Back',
                     onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back_rounded,
                       color: DesignTokens.nightText,
                     ),
@@ -165,7 +165,7 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
                   IconButton(
                     tooltip: 'Save roleplay',
                     onPressed: () {},
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.favorite_border_rounded,
                       color: DesignTokens.nightText,
                     ),
@@ -334,7 +334,7 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
           for (final phrase in phrases)
             ListTile(
               dense: true,
-              leading: const Icon(
+              leading: Icon(
                 Icons.format_quote_rounded,
                 color: DesignTokens.nightAccent,
               ),
@@ -351,7 +351,7 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
                   ],
                   rate: 0.34,
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.volume_up_outlined,
                   color: DesignTokens.nightText,
                   size: 19,

@@ -30,12 +30,14 @@ class PrimaryActionButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(
+              SizedBox(
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    DesignTokens.onPrimary,
+                  ),
                 ),
               ),
               const SizedBox(width: DesignTokens.space2),
@@ -64,8 +66,8 @@ class PrimaryActionButton extends StatelessWidget {
           disabledBackgroundColor: isLoading
               ? DesignTokens.primary
               : DesignTokens.muted.withValues(alpha: 0.35),
-          disabledForegroundColor: isLoading ? Colors.white : null,
-          foregroundColor: Colors.white,
+          disabledForegroundColor: isLoading ? DesignTokens.onPrimary : null,
+          foregroundColor: DesignTokens.onPrimary,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),

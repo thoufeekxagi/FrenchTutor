@@ -22,7 +22,7 @@ class PracticeArtworkService {
     String aspectRatio = '4:3',
   }) {
     final context = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? 'Show one clear real-life moment from this learning session.'
+        ? 'Show the exact everyday place, objects, and action named by this learning session. Use a friendly book-reference composition; do not invent a protagonist or unrelated cinematic setting.'
         : coverPrompt.trim();
     final ratioInstruction = aspectRatio == '9:16'
         ? 'CUSTOM LISTENING BACKDROP: this is a true vertical 9:16 phone player image. '
@@ -41,13 +41,14 @@ class PracticeArtworkService {
       aspectRatio: aspectRatio,
       coverPrompt:
           '$ratioInstruction'
-          '$context\n'
-          'Create one coherent text-free $aspectRatio story image. A single visible character '
-          'is welcome when relevant; keep the character inside the central safe area '
-          'with the full face and body visible. Render no text, letters, '
+          'LESSON VISUAL BRIEF: $context\n'
+          'Create one coherent text-free $aspectRatio learning reference image. Match the lesson title, summary, topic, '
+          'and brief exactly. People are optional and only belong if the lesson requires them; never add a generic hero, '
+          'futuristic city, dramatic stranger, fantasy scene, or unrelated landmark. Keep important visual details inside '
+          'the central safe area. Render no text, letters, '
           'numbers, logos, signs, captions, or other typography. Make the composition, '
-          'camera angle, dominant subject, and color balance distinct from other '
-          'sessions. Use the variation key $id only as an internal visual seed; '
+          'camera angle, dominant subject, and color balance distinct from other sessions while staying semantically faithful. '
+          'Use the variation key $id only as an internal visual seed; '
           'never render it.',
     );
   }

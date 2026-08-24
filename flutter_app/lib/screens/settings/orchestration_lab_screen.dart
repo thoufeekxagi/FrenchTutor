@@ -207,7 +207,7 @@ class _OrchestrationLabScreenState
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               CupertinoIcons.chevron_down,
                               size: 16,
                               color: DesignTokens.mutedDim,
@@ -294,7 +294,7 @@ class _OrchestrationLabScreenState
                                 ).copyWith(color: DesignTokens.primary),
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               CupertinoIcons.arrow_2_circlepath,
                               size: 16,
                               color: DesignTokens.primary,

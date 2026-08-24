@@ -96,6 +96,8 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   30: _migrationV30,
   31: _migrationV31,
   32: _migrationV32,
+  33: _migrationV33,
+  34: _migrationV34,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1173,5 +1175,49 @@ void _migrationV32(CommonDatabase db) {
   }
   if (!_columnExists(db, 'generated_stories', 'audio_mode')) {
     db.execute('ALTER TABLE generated_stories ADD COLUMN audio_mode TEXT');
+  }
+}
+
+/// Freezes the exact vocabulary deck and the learner's position through the
+/// workshop. The deck is stored as JSON so a generated set can be reopened
+/// without asking the content generator to recreate it.
+void _migrationV33(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS vocabulary_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      title TEXT NOT NULL,
+      source TEXT NOT NULL,
+      topic TEXT NOT NULL DEFAULT '',
+      level_band TEXT NOT NULL DEFAULT 'A1',
+      entries_json TEXT NOT NULL DEFAULT '[]',
+      focus_note TEXT,
+      current_step TEXT NOT NULL DEFAULT 'preview',
+      current_index INTEGER NOT NULL DEFAULT 0,
+      recall_grades_json TEXT NOT NULL DEFAULT '{}',
+      context_results_json TEXT NOT NULL DEFAULT '{}',
+      sentence_results_json TEXT NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT 'active',
+      started_at TEXT NOT NULL,
+      completed_at TEXT,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_vocabulary_sessions_recent '
+    'ON vocabulary_sessions (status, updated_at DESC)',
+  );
+}
+
+/// Persists validated context examples alongside the frozen deck so reopening
+/// a session never regenerates a different sentence after a level or provider
+/// setting changes.
+void _migrationV34(CommonDatabase db) {
+  if (!_tableExists(db, 'vocabulary_sessions')) return;
+  if (!_columnExists(db, 'vocabulary_sessions', 'context_examples_json')) {
+    db.execute(
+      "ALTER TABLE vocabulary_sessions ADD COLUMN context_examples_json TEXT NOT NULL DEFAULT '{}'",
+    );
   }
 }

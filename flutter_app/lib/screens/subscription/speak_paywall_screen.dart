@@ -192,8 +192,8 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
         child: Stack(
           children: [
             _loading
-                ? const Center(
-                    child: CircularProgressIndicator(color: SpeakColors.blue),
+                ? Center(
+                    child: CircularProgressIndicator(color: SpeakColors.accent),
                   )
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -273,7 +273,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                             style: DesignTokens.body(
                               12,
                               weight: FontWeight.w700,
-                            ).copyWith(color: SpeakColors.blue),
+                            ).copyWith(color: SpeakColors.accent),
                           ),
                         ),
                       ),
@@ -319,7 +319,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                       border: Border.all(color: SpeakColors.line),
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_rounded,
                       color: DesignTokens.ink,
                     ),
@@ -342,11 +342,11 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
           Container(
             width: 32,
             height: 32,
-            decoration: const BoxDecoration(
-              color: SpeakColors.blueSoft,
+            decoration: BoxDecoration(
+              color: SpeakColors.accentSoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: SpeakColors.blue, size: 17),
+            child: Icon(icon, color: SpeakColors.accent, size: 17),
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -403,7 +403,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? SpeakColors.blue : SpeakColors.line,
+            color: selected ? SpeakColors.accent : SpeakColors.line,
             width: selected ? 2 : 1,
           ),
         ),
@@ -413,7 +413,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
               selected
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              color: selected ? SpeakColors.blue : SpeakColors.line,
+              color: selected ? SpeakColors.accent : SpeakColors.line,
               size: 21,
             ),
             const SizedBox(width: 9),
@@ -548,7 +548,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       style: DesignTokens.body(
         10.5,
         weight: FontWeight.w700,
-      ).copyWith(color: SpeakColors.blue),
+      ).copyWith(color: SpeakColors.accent),
     ),
   );
 }

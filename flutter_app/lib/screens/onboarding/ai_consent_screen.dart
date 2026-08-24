@@ -85,7 +85,7 @@ class AiConsentScreen extends StatelessWidget {
 
   Widget _desktopIntro() {
     return DecoratedBox(
-      decoration: const BoxDecoration(color: DesignTokens.ink),
+      decoration: BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
@@ -123,7 +123,7 @@ class AiConsentScreen extends StatelessWidget {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: DesignTokens.secondary,
                       shape: BoxShape.circle,
                     ),

@@ -150,7 +150,7 @@ class _PathScreenState extends ConsumerState<PathScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
+                            Icon(
                               CupertinoIcons.info_circle_fill,
                               color: DesignTokens.secondary,
                               size: 21,
@@ -393,9 +393,12 @@ class _EmptyPath extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(CupertinoIcons.map, color: DesignTokens.info, size: 34),
+            Icon(CupertinoIcons.map, color: DesignTokens.info, size: 34),
             const SizedBox(height: 14),
-            Text('Your path is being prepared', style: DesignTokens.display(22)),
+            Text(
+              'Your path is being prepared',
+              style: DesignTokens.display(22),
+            ),
             const SizedBox(height: 7),
             Text(
               'The competency map will appear after the curriculum finishes loading.',

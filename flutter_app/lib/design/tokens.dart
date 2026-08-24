@@ -1,13 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'palettes.dart';
-
-/// THE palette switch. Point this at any class in palettes.dart and the whole
-/// app re-skins — screens only ever see the semantic tokens below, never a
-/// palette directly, so swapping is one line + rebuild. See palettes.dart for
-/// the slot contract and how to add a palette from a marketing mockup.
-typedef _Palette = NorthstarStudio;
+import 'appearance_colors.dart';
+import '../services/app_appearance_settings.dart';
 
 /// Layer 1 of the design wiring (PILOT_PLAN.md Phase 0.2): pure constants.
 /// Semantic tokens — colors, type, spacing, radius, motion — with NO platform
@@ -21,71 +16,90 @@ typedef _Palette = NorthstarStudio;
 ///  - Inter carries reading, controls, labels, and data on every platform.
 ///  - No decorative type or monospace treatment in learner-facing content.
 abstract final class DesignTokens {
-  // --- Colors — every value comes from the active palette (typedef above).
+  // --- Colors — one runtime appearance source for every screen.
   // Semantic names are canonical; the legacy names (parchment/card/maroon/
-  // brass/sage/sky/slate) are aliases kept while older call sites migrate.
-  static const ink = _Palette.ink;
-  static const inkSoft = _Palette.inkSoft;
-  static const canvas = _Palette.canvas;
-  static const canvasDim = _Palette.canvasDim;
-  static const surface = _Palette.surface;
-  static const primary = _Palette.primary;
-  static const primaryDeep = _Palette.primaryDeep;
-  static const primarySoft = _Palette.primarySoft;
-  static const secondary = _Palette.secondary;
-  static const success = _Palette.success;
-  static const successSoft = _Palette.successSoft;
-  static const info = _Palette.info;
-  static const infoSoft = _Palette.infoSoft;
-  static const mastery = _Palette.mastery;
-  static const masterySoft = _Palette.masterySoft;
-  static const warning = _Palette.warning;
-  static const warningSoft = _Palette.warningSoft;
-  static const danger = _Palette.danger;
-  static const dangerSoft = _Palette.dangerSoft;
-  static const muted = _Palette.muted;
-  static const mutedDim = _Palette.mutedDim;
-  static const text = ink;
+  // brass/sage/sky/slate) remain aliases while older call sites migrate.
+  static bool get isDark => AppAppearanceSettings.shared.darkMode;
+
+  static Color get ink =>
+      isDark ? AppearanceColors.darkText : AppearanceColors.lightText;
+  static Color get inkSoft =>
+      isDark ? AppearanceColors.darkMuted : AppearanceColors.lightMuted;
+  static Color get canvas =>
+      isDark ? AppearanceColors.darkCanvas : AppearanceColors.lightCanvas;
+  static Color get canvasDim =>
+      isDark ? AppearanceColors.darkSurface : AppearanceColors.lightRaised;
+  static Color get surface =>
+      isDark ? AppearanceColors.darkSurface : AppearanceColors.lightSurface;
+  static Color get primary => AppearanceColors.gold;
+  static Color get primaryDeep => AppearanceColors.goldDeep;
+  static Color get primarySoft =>
+      isDark ? AppearanceColors.goldSoftDark : AppearanceColors.goldSoftLight;
+  // Secondary/info are semantic slots, not a second brand color. They share
+  // the gold accent so legacy screens cannot reintroduce a competing hue.
+  static Color get secondary => AppearanceColors.goldDeep;
+  static Color get success => AppearanceColors.success;
+  static Color get successSoft => isDark
+      ? AppearanceColors.successSoftDark
+      : AppearanceColors.successSoftLight;
+  static Color get info => AppearanceColors.goldDeep;
+  static Color get infoSoft => primarySoft;
+  static Color get mastery => AppearanceColors.goldDeep;
+  static Color get masterySoft => primarySoft;
+  static Color get warning => AppearanceColors.goldDeep;
+  static Color get warningSoft => primarySoft;
+  static Color get danger => AppearanceColors.danger;
+  static Color get dangerSoft => isDark
+      ? AppearanceColors.dangerSoftDark
+      : AppearanceColors.dangerSoftLight;
+  static Color get muted =>
+      isDark ? AppearanceColors.darkMuted : AppearanceColors.lightMuted;
+  static Color get mutedDim => isDark
+      ? AppearanceColors.darkMuted.withValues(alpha: 0.78)
+      : AppearanceColors.lightMuted.withValues(alpha: 0.84);
+  static Color get text => ink;
+  static Color get onPrimary => const Color(0xFF000000);
 
   // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
-  static const parchment = canvas;
-  static const parchmentDim = canvasDim;
-  static const card = surface;
-  static const maroon = primary;
-  static const maroonDeep = primaryDeep;
-  static const brass = mastery;
-  static const sage = success;
-  static const sky = info;
-  static const slate = muted;
-  static const slateDim = mutedDim;
+  static Color get parchment => canvas;
+  static Color get parchmentDim => canvasDim;
+  static Color get card => surface;
+  static Color get maroon => primary;
+  static Color get maroonDeep => primaryDeep;
+  static Color get brass => mastery;
+  static Color get sage => success;
+  static Color get sky => info;
+  static Color get slate => muted;
+  static Color get slateDim => mutedDim;
 
-  static final hairline = ink.withValues(alpha: 0.09);
-  static final hairlineLight = canvas.withValues(alpha: 0.16);
+  static Color get hairline => ink.withValues(alpha: 0.09);
+  static Color get hairlineLight => canvas.withValues(alpha: 0.16);
 
   /// The shared full-bleed brand gradient — onboarding, sign-in, and any
   /// other gate-flow screen that wants the same identity all draw from this
   /// one definition instead of redeclaring it, so they never drift apart.
-  static const heroGradient = LinearGradient(
+  static LinearGradient get heroGradient => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [ink, primaryDeep],
+    colors: [canvas, primarySoft],
   );
 
   // V3 night surface used by the redesigned Home experience. Keeping these
   // values here makes the dark/gold skin reusable by the next screen without
   // scattering brand colors through individual widgets.
-  static const nightCanvas = Color(0xFF08090B);
-  static const nightSurface = Color(0xFF151619);
-  static const nightSurfaceRaised = Color(0xFF1D1E21);
-  static const nightText = Color(0xFFF7F5F0);
-  static const nightMuted = Color(0xFFA7A7A8);
-  static const nightAccent = Color(0xFFF2B84B);
-  static const nightAccentSoft = Color(0xFF3A2C17);
-  static const nightHairline = Color(0xFF303136);
-  static const nightGradient = LinearGradient(
+  static Color get nightCanvas => canvas;
+  static Color get nightSurface => surface;
+  static Color get nightSurfaceRaised =>
+      isDark ? AppearanceColors.darkRaised : AppearanceColors.lightRaised;
+  static Color get nightText => ink;
+  static Color get nightMuted => muted;
+  static Color get nightAccent => primary;
+  static Color get nightAccentSoft => primarySoft;
+  static Color get nightHairline => hairline;
+  static LinearGradient get nightGradient => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0B0C0F), Color(0xFF1A1712)],
+    colors: [canvas, isDark ? AppearanceColors.darkRaised : primarySoft],
   );
 
   /// Surfaces rely on tonal layers and hairline borders instead of elevation.

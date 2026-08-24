@@ -7,24 +7,27 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
 import 'models/pilot_access.dart';
+import 'providers/appearance_provider.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
 import 'screens/onboarding/v3_onboarding_screen.dart';
-import 'screens/speak/speak_ui.dart';
 import 'services/auth_service.dart';
 import 'services/revenue_cat_service.dart';
 
-class FrenchTutorApp extends StatelessWidget {
+class FrenchTutorApp extends ConsumerWidget {
   const FrenchTutorApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appearance = ref.watch(appearanceSettingsProvider);
     return MaterialApp(
       title: 'ParleSprint',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.themeData(),
+      theme: AppTheme.themeData(darkMode: false),
+      darkTheme: AppTheme.themeData(darkMode: true),
+      themeMode: appearance.darkMode ? ThemeMode.dark : ThemeMode.light,
       scrollBehavior: const AppScrollBehavior(),
       home: const AuthGate(),
     );
@@ -250,10 +253,10 @@ class _RestoringProgressView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SpeakColors.blue,
+      backgroundColor: const Color(0xFF08090B),
       body: Center(
         child: Image.asset(
-          'assets/images/parlesprint_logo.png',
+          'assets/images/pulse_sprint_logo.png',
           width: 128,
           height: 128,
           fit: BoxFit.contain,

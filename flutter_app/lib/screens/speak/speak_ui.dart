@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 import '../../design/tokens.dart';
 
 abstract final class SpeakColors {
-  static const background = DesignTokens.canvas;
-  static const blue = DesignTokens.primary;
-  static const blueSoft = DesignTokens.primarySoft;
-  static const navy = DesignTokens.ink;
-  static const inkSoft = DesignTokens.inkSoft;
-  static const line = DesignTokens.canvasDim;
-  static const green = DesignTokens.success;
-  static const orange = DesignTokens.mastery;
+  // Speaking uses the same app-wide black/gold or white/gold appearance as
+  // the shell. Keep these names semantic so future screens cannot add a
+  // competing blue accent by accident.
+  static Color get background => DesignTokens.canvas;
+  static Color get surface => DesignTokens.surface;
+  static Color get accent => DesignTokens.primary;
+  static Color get accentSoft => DesignTokens.primarySoft;
+  static Color get navy => DesignTokens.ink;
+  static Color get inkSoft => DesignTokens.inkSoft;
+  static Color get line => DesignTokens.canvasDim;
+  static Color get green => DesignTokens.success;
+  static Color get orange => DesignTokens.mastery;
+  static Color get onAccent => DesignTokens.onPrimary;
 }
 
 class SpeakScaffold extends StatelessWidget {
@@ -94,10 +99,10 @@ class SpeakPill extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: selected ? SpeakColors.blue : Colors.white,
+        color: selected ? SpeakColors.accent : SpeakColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: selected ? SpeakColors.blue : SpeakColors.line,
+          color: selected ? SpeakColors.accent : SpeakColors.line,
         ),
       ),
       child: Row(
@@ -107,16 +112,15 @@ class SpeakPill extends StatelessWidget {
             Icon(
               icon,
               size: 15,
-              color: selected ? Colors.white : SpeakColors.inkSoft,
+              color: selected ? SpeakColors.onAccent : SpeakColors.inkSoft,
             ),
             const SizedBox(width: 6),
           ],
           Text(
             label,
-            style: DesignTokens.body(
-              12,
-              weight: FontWeight.w600,
-            ).copyWith(color: selected ? Colors.white : SpeakColors.inkSoft),
+            style: DesignTokens.body(12, weight: FontWeight.w600).copyWith(
+              color: selected ? SpeakColors.onAccent : SpeakColors.inkSoft,
+            ),
           ),
         ],
       ),
@@ -156,7 +160,7 @@ class SpeakSectionTitle extends StatelessWidget {
               style: DesignTokens.body(
                 12,
                 weight: FontWeight.w700,
-              ).copyWith(color: SpeakColors.blue),
+              ).copyWith(color: SpeakColors.accent),
             ),
           ),
       ],
@@ -169,19 +173,19 @@ class SpeakCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(16),
-    this.color = Colors.white,
+    this.color,
   });
 
   final Widget child;
   final EdgeInsets padding;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color,
+        color: color ?? SpeakColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: SpeakColors.line),
       ),
@@ -210,7 +214,7 @@ class SpeakPrimaryButton extends StatelessWidget {
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         decoration: BoxDecoration(
-          color: onTap == null ? SpeakColors.line : SpeakColors.blue,
+          color: onTap == null ? SpeakColors.line : SpeakColors.accent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -219,14 +223,18 @@ class SpeakPrimaryButton extends StatelessWidget {
             Text(
               label,
               style: DesignTokens.body(15, weight: FontWeight.w700).copyWith(
-                color: onTap == null ? SpeakColors.inkSoft : Colors.white,
+                color: onTap == null
+                    ? SpeakColors.inkSoft
+                    : SpeakColors.onAccent,
               ),
             ),
             if (icon != null) ...[
               const SizedBox(width: 8),
               Icon(
                 icon,
-                color: onTap == null ? SpeakColors.inkSoft : Colors.white,
+                color: onTap == null
+                    ? SpeakColors.inkSoft
+                    : SpeakColors.onAccent,
                 size: 18,
               ),
             ],
@@ -250,7 +258,7 @@ class SpeakProgressBar extends StatelessWidget {
         minHeight: 6,
         value: value.clamp(0, 1),
         backgroundColor: SpeakColors.line,
-        valueColor: const AlwaysStoppedAnimation(SpeakColors.blue),
+        valueColor: AlwaysStoppedAnimation(SpeakColors.accent),
       ),
     );
   }

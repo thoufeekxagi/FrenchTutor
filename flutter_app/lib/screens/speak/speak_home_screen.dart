@@ -7,12 +7,14 @@ import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
+import '../../services/free_talk_session_launcher.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
+import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import 'speak_course_activity_screen.dart';
+import 'speak_course_session_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
@@ -55,23 +57,13 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
       context,
-      (_) => SpeakCourseActivityScreen(session: session),
+      (_) => SpeakCourseSessionScreen(session: session),
     );
     if (mounted) setState(() {});
   }
 
   Future<void> _callTutor() async {
-    await AppRouter.push(
-      context,
-      (_) => const SpeakingPracticeScreen(
-        request: SpeakingPracticeRequest(
-          mode: SpeakingMode.freeTalk,
-          topic: 'Surprise me',
-          goal: 'Fluency',
-        ),
-      ),
-      fullscreenDialog: true,
-    );
+    await openFreeTalkSession(context, ref);
     if (mounted) setState(() {});
   }
 
@@ -81,9 +73,15 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
+    // Home is a read-only surface. The app/onboarding flow is responsible
+    // for creating the persisted adaptive plan; rendering a card must never
+    // create or re-plan course content.
     final adaptivePlan = ref
         .read(adaptiveCourseStoreProvider)
-        .ensureCurrentPlan(profile);
+        .currentPlan(profile);
+    if (adaptivePlan == null) {
+      throw StateError('Home requires a persisted adaptive course plan.');
+    }
     final roadmap = SpeakRoadmapService.build(
       profile,
       completedContentKeys: completedContentKeys,
@@ -166,7 +164,7 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: DesignTokens.nightAccent, width: 1.5),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_outline_rounded,
                 color: DesignTokens.nightAccent,
                 size: 22,
@@ -194,14 +192,14 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.phone_in_talk_rounded,
                 color: DesignTokens.nightAccent,
                 size: 21,
               ),
               const SizedBox(width: 13),
               Expanded(child: Text('Call tutor', style: _body(17))),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: DesignTokens.nightAccent,
                 size: 16,
@@ -218,6 +216,7 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
       SpeakSkill.speaking || SpeakSkill.roleplay => SpeakSkill.speaking,
       SpeakSkill.reading => SpeakSkill.reading,
       SpeakSkill.vocabulary => SpeakSkill.vocabulary,
+      SpeakSkill.writing => SpeakSkill.writing,
       _ => SpeakSkill.listening,
     };
     final modes = [
@@ -244,6 +243,12 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
         SpeakSkill.vocabulary,
         Icons.style_rounded,
         const VocabLabScreen(),
+      ),
+      (
+        'Writing',
+        SpeakSkill.writing,
+        Icons.edit_note_rounded,
+        const WritingLabScreen(),
       ),
     ];
     return SizedBox(
@@ -344,6 +349,11 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   }
 
   Future<void> _openSpeakingMode(SpeakingMode mode) async {
+    if (mode == SpeakingMode.freeTalk) {
+      await openFreeTalkSession(context, ref);
+      if (mounted) setState(() {});
+      return;
+    }
     await AppRouter.push(
       context,
       (_) =>
@@ -597,7 +607,7 @@ class _FeaturedSessionCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           DecoratedBox(
-            decoration: const BoxDecoration(color: DesignTokens.nightSurface),
+            decoration: BoxDecoration(color: DesignTokens.nightSurface),
             child: Image.asset(_coverAsset(session), fit: BoxFit.cover),
           ),
           DecoratedBox(
@@ -664,7 +674,7 @@ class _TutorActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 34,
             height: 34,
             child: DecoratedBox(
@@ -744,7 +754,7 @@ class _LessonActivityCard extends StatelessWidget {
             style: _cardMeta(),
           ),
           const SizedBox(height: 2),
-          const Align(
+          Align(
             alignment: Alignment.bottomRight,
             child: Icon(
               Icons.arrow_forward_ios_rounded,

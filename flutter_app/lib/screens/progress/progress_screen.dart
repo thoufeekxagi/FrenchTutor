@@ -79,10 +79,7 @@ class ProgressScreen extends ConsumerWidget {
                   padding: EdgeInsets.zero,
                   alignment: Alignment.centerLeft,
                   onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(
-                    CupertinoIcons.back,
-                    color: DesignTokens.ink,
-                  ),
+                  icon: Icon(CupertinoIcons.back, color: DesignTokens.ink),
                 ),
               ),
               Text('Progress', style: DesignTokens.display(30)),
@@ -183,7 +180,7 @@ class ProgressScreen extends ConsumerWidget {
               IconButton(
                 tooltip: 'Back',
                 onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(CupertinoIcons.back, color: DesignTokens.ink),
+                icon: Icon(CupertinoIcons.back, color: DesignTokens.ink),
               ),
               const Expanded(
                 child: WebPageHeader(
@@ -526,7 +523,7 @@ class ProgressScreen extends ConsumerWidget {
       child: Column(
         children: [
           for (var i = 0; i < categories.length; i++) ...[
-            if (i > 0) const Divider(height: 20, color: DesignTokens.canvasDim),
+            if (i > 0) Divider(height: 20, color: DesignTokens.canvasDim),
             _categoryMetric(categories[i], total),
           ],
         ],
@@ -603,7 +600,7 @@ class ProgressScreen extends ConsumerWidget {
       child: Column(
         children: [
           for (var i = 0; i < recent.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: DesignTokens.canvasDim),
+            if (i > 0) Divider(height: 1, color: DesignTokens.canvasDim),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => AppRouter.push(

@@ -1,24 +1,19 @@
 import 'dart:async';
 
 import '../../design/app_router.dart';
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/generated_grammar_story_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
-import '../../widgets/kicker_text.dart';
-import '../../widgets/primary_action_button.dart';
 import '../../widgets/personalized_generation_loader.dart';
-import '../../widgets/practice_content_card.dart';
-import '../../widgets/responsive_card_grid.dart';
-import '../../widgets/web/web_constrained_view.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_recorder.dart';
 import '../lessons/grammar_workshop_screen.dart';
+import '../grammar/grammar_curriculum_home_screen.dart';
 
 /// The Grammar lab — fully replaced the old static Lessons/Topics browsing
 /// list with the same "generate, save, review later" pattern the Story and
@@ -313,213 +308,18 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
         ),
       );
     }
-    final store = ref.watch(learningStoreProvider);
-    final progress = store.allLessonProgress();
     final history = _history ?? const [];
-    final availableTenses = _availableTenses;
-    // Falls back to the first available tense both when nothing's been
-    // picked yet AND when a previously-picked tense fell out of bounds
-    // (e.g. the profile's level changed while this screen was open).
-    final effectiveTense =
-        (_selectedTense != null && availableTenses.contains(_selectedTense))
-        ? _selectedTense!
-        : availableTenses.first;
-
-    return Scaffold(
-      backgroundColor: DesignTokens.canvas,
-      appBar: AppBar(
-        title: Text('Grammar', style: DesignTokens.display(20)),
-        backgroundColor: DesignTokens.canvas,
-        foregroundColor: DesignTokens.ink,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      body: WebConstrainedView(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          children: [
-            // --- Choose a pattern, then let the AI build the lesson ---
-            const SizedBox(height: 8),
-            const KickerText('Choose a sentence pattern'),
-            const SizedBox(height: 10),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: availableTenses.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                mainAxisExtent: 52,
-              ),
-              itemBuilder: (context, index) {
-                final tense = availableTenses[index];
-                return _GrammarPatternChip(
-                  tense: tense,
-                  selected: tense == effectiveTense,
-                  status:
-                      progress['grammar_story_${tense.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}']
-                          ?.status ??
-                      'not_started',
-                  onTap: () => setState(() => _selectedTense = tense),
-                );
-              },
-            ),
-            const SizedBox(height: 14),
-            if (_isGenerating)
-              const PersonalizedGenerationLoader(
-                content: 'grammar class',
-                detail: 'Using your chosen sentence pattern and current level.',
-                compact: true,
-              )
-            else
-              PrimaryActionButton(
-                label: 'Generate practice story',
-                icon: CupertinoIcons.wand_stars,
-                onPressed: _practiceTense,
-              ),
-            if (_errorText != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                _errorText!,
-                style: DesignTokens.mono(
-                  11,
-                ).copyWith(color: DesignTokens.primary),
-              ),
-            ],
-            // --- History ---
-            const SizedBox(height: 24),
-            if (history.isNotEmpty) ...[
-              const KickerText(
-                'Your grammar stories',
-                color: DesignTokens.mutedDim,
-              ),
-              const SizedBox(height: 10),
-              ResponsiveCardGrid(
-                mainAxisExtent: 292,
-                itemCount: history.length,
-                itemBuilder: (context, index) {
-                  final entry = history[index];
-                  return _GrammarHistoryTile(
-                    story: entry,
-                    onTap: () => AppRouter.push(
-                      context,
-                      (_) => GrammarWorkshopScreen(story: entry),
-                    ),
-                  );
-                },
-              ),
-            ] else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Text(
-                  'No grammar practice yet, generate one above.',
-                  textAlign: TextAlign.center,
-                  style: DesignTokens.body(
-                    13,
-                  ).copyWith(color: DesignTokens.mutedDim),
-                ),
-              ),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GrammarPatternChip extends StatelessWidget {
-  const _GrammarPatternChip({
-    required this.tense,
-    required this.selected,
-    required this.status,
-    required this.onTap,
-  });
-
-  final String tense;
-  final bool selected;
-  final String status;
-  final VoidCallback onTap;
-
-  String get _label => switch (tense) {
-    'Présent' => 'Present',
-    'Passé composé' => 'Past',
-    'Futur proche' => 'Future',
-    'Imparfait' => 'Imperfect',
-    'Conditionnel présent' => 'Conditional',
-    'Impératif' => 'Imperative',
-    _ => tense,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(14);
-    final iconColor = status == 'completed'
-        ? (selected ? Colors.white : DesignTokens.success)
-        : (selected ? Colors.white : DesignTokens.primary);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: selected ? DesignTokens.primary : DesignTokens.surface,
-        borderRadius: borderRadius,
-        border: Border.all(
-          color: selected ? DesignTokens.primary : DesignTokens.hairline,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: borderRadius,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(12.5, weight: FontWeight.w700)
-                        .copyWith(
-                          color: selected ? Colors.white : DesignTokens.ink,
-                        ),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Icon(
-                  status == 'completed'
-                      ? CupertinoIcons.checkmark_circle_fill
-                      : selected
-                      ? CupertinoIcons.checkmark_alt
-                      : CupertinoIcons.arrow_up_right,
-                  size: 15,
-                  color: iconColor,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GrammarHistoryTile extends StatelessWidget {
-  const _GrammarHistoryTile({required this.story, required this.onTap});
-
-  final GeneratedGrammarStory story;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return PracticeContentCard(
-      title: story.displayTitle,
-      summary: 'Practice ${story.grammarPoint} in context.',
-      levelBand: story.levelBand,
-      meta: '${story.passage.segments.length} scenes',
-      coverUrl: story.coverUrl,
-      fallbackIcon: CupertinoIcons.textformat,
-      onTap: onTap,
+    return GrammarCurriculumHomeScreen(
+      generatedHistory: history,
+      isGenerating: _isGenerating,
+      generationError: _errorText,
+      onGenerateAdvanced: (lesson) async {
+        setState(() => _selectedTense = lesson.generationPoint);
+        await _practiceTense();
+      },
+      onOpenGenerated: (story) {
+        AppRouter.push(context, (_) => GrammarWorkshopScreen(story: story));
+      },
     );
   }
 }

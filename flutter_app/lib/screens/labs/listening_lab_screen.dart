@@ -501,7 +501,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           IconButton(
             tooltip: 'Listening settings',
             onPressed: _showLibrarySettingsHint,
-            icon: const Icon(
+            icon: Icon(
               CupertinoIcons.slider_horizontal_3,
               color: DesignTokens.nightAccent,
             ),
@@ -709,7 +709,7 @@ class _GenerateStoryTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: generating
-                  ? const Padding(
+                  ? Padding(
                       padding: EdgeInsets.all(13),
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -718,7 +718,7 @@ class _GenerateStoryTile extends StatelessWidget {
                         ),
                       ),
                     )
-                  : const Icon(
+                  : Icon(
                       CupertinoIcons.headphones,
                       color: DesignTokens.nightAccent,
                       size: 25,
@@ -750,7 +750,7 @@ class _GenerateStoryTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               CupertinoIcons.chevron_right,
               color: DesignTokens.nightAccent,
               size: 20,
@@ -817,7 +817,7 @@ class _ListeningSelectionPill extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 CupertinoIcons.chevron_down,
                 size: 15,
                 color: DesignTokens.nightAccent,
@@ -861,7 +861,7 @@ class _ListeningChoiceSheet extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(maxHeight: 620),
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: DesignTokens.nightSurface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
@@ -911,7 +911,7 @@ class _ListeningChoiceSheet extends StatelessWidget {
                   ).copyWith(color: DesignTokens.nightMuted),
                 ),
                 trailing: option.value == selected
-                    ? const Icon(
+                    ? Icon(
                         CupertinoIcons.checkmark,
                         color: DesignTokens.nightAccent,
                       )
@@ -1055,7 +1055,7 @@ class _ContinueStoryCard extends StatelessWidget {
                           ).copyWith(color: DesignTokens.nightMuted),
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         CupertinoIcons.play_fill,
                         color: DesignTokens.nightAccent,
                         size: 16,
@@ -1129,7 +1129,7 @@ class _StoryBookCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(right: 14),
               child: Icon(
                 CupertinoIcons.chevron_right,
@@ -1161,7 +1161,7 @@ class _StoryCover extends StatelessWidget {
     Widget fallback() => Container(
       color: DesignTokens.nightSurfaceRaised,
       alignment: Alignment.center,
-      child: const Icon(
+      child: Icon(
         CupertinoIcons.headphones,
         color: DesignTokens.nightAccent,
         size: 30,
@@ -1196,7 +1196,7 @@ class _EmptyLibraryNote extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             CupertinoIcons.headphones,
             color: DesignTokens.nightMuted,
             size: 28,

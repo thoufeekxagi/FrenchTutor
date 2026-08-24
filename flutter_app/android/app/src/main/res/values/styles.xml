@@ -15,6 +15,6 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <!-- Keep the first Flutter frame continuous with the native launch
              screen; a canvas-colour flash here is visible on cold start. -->
-        <item name="android:windowBackground">#2259C7</item>
+        <item name="android:windowBackground">#08090B</item>
     </style>
 </resources>

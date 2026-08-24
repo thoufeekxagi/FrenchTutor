@@ -1257,7 +1257,7 @@ class _ListeningPracticeScreenState
                 style: OutlinedButton.styleFrom(
                   foregroundColor: DesignTokens.nightText,
                   disabledForegroundColor: DesignTokens.nightMuted,
-                  side: const BorderSide(color: DesignTokens.nightHairline),
+                  side: BorderSide(color: DesignTokens.nightHairline),
                   backgroundColor: DesignTokens.nightSurface,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
@@ -1280,7 +1280,7 @@ class _ListeningPracticeScreenState
                 style: OutlinedButton.styleFrom(
                   foregroundColor: DesignTokens.nightText,
                   disabledForegroundColor: DesignTokens.nightMuted,
-                  side: const BorderSide(color: DesignTokens.nightHairline),
+                  side: BorderSide(color: DesignTokens.nightHairline),
                   backgroundColor: DesignTokens.nightSurface,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
@@ -1301,7 +1301,7 @@ class _ListeningPracticeScreenState
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.textformat,
                   color: DesignTokens.nightAccent,
                 ),
@@ -1384,7 +1384,7 @@ class _ListeningPracticeScreenState
                 tooltip: 'Play dictation line',
                 onPressed: _audioLoading ? null : () => _playLine(index),
                 icon: _audioLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 42,
                         height: 42,
                         child: CircularProgressIndicator(
@@ -1394,7 +1394,7 @@ class _ListeningPracticeScreenState
                           ),
                         ),
                       )
-                    : const Icon(
+                    : Icon(
                         CupertinoIcons.play_circle_fill,
                         size: 42,
                         color: DesignTokens.nightAccent,
@@ -1422,23 +1422,19 @@ class _ListeningPracticeScreenState
                 onSubmitted: (_) => _submitDictation(),
                 decoration: InputDecoration(
                   labelText: 'Type the missing word',
-                  labelStyle: const TextStyle(color: DesignTokens.nightMuted),
+                  labelStyle: TextStyle(color: DesignTokens.nightMuted),
                   hintText: 'écoute…',
-                  hintStyle: const TextStyle(color: DesignTokens.nightMuted),
+                  hintStyle: TextStyle(color: DesignTokens.nightMuted),
                   filled: true,
                   fillColor: DesignTokens.nightSurfaceRaised,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      color: DesignTokens.nightHairline,
-                    ),
+                    borderSide: BorderSide(color: DesignTokens.nightHairline),
                     borderRadius: BorderRadius.all(
                       Radius.circular(DesignTokens.radiusMedium),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      color: DesignTokens.nightAccent,
-                    ),
+                    borderSide: BorderSide(color: DesignTokens.nightAccent),
                     borderRadius: BorderRadius.all(
                       Radius.circular(DesignTokens.radiusMedium),
                     ),
@@ -1526,7 +1522,7 @@ class _ListeningPracticeScreenState
                   IconButton(
                     tooltip: 'Play target line',
                     onPressed: () => _playLine(_focusSegment),
-                    icon: const Icon(
+                    icon: Icon(
                       CupertinoIcons.play_circle_fill,
                       size: 42,
                       color: DesignTokens.nightAccent,
@@ -1666,10 +1662,7 @@ class _ListeningPracticeScreenState
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                CupertinoIcons.lightbulb,
-                color: DesignTokens.nightAccent,
-              ),
+              Icon(CupertinoIcons.lightbulb, color: DesignTokens.nightAccent),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -2564,7 +2557,7 @@ class _ListeningProgressControls extends StatelessWidget {
             value: progress,
             minHeight: 3,
             backgroundColor: Colors.white24,
-            valueColor: const AlwaysStoppedAnimation(DesignTokens.nightAccent),
+            valueColor: AlwaysStoppedAnimation(DesignTokens.nightAccent),
           ),
         ),
         Row(
@@ -2710,7 +2703,7 @@ class _NightAudioIsland extends StatelessWidget {
             _IslandDivider(),
             _IslandCircle(icon: CupertinoIcons.repeat, onTap: onReplay),
             _IslandDivider(),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Icon(
                 CupertinoIcons.book,
@@ -2792,7 +2785,7 @@ class _ListeningSettingsSheet extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(maxHeight: 650),
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: DesignTokens.nightSurface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
@@ -2822,7 +2815,7 @@ class _ListeningSettingsSheet extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       CupertinoIcons.xmark,
                       color: DesignTokens.nightMuted,
                     ),

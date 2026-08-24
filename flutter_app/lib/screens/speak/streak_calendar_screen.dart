@@ -39,10 +39,7 @@ class StreakCalendarScreen extends ConsumerWidget {
             title: 'Streak & Calendar',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.arrow_back_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           const SizedBox(height: 24),
@@ -148,10 +145,7 @@ class StreakCalendarScreen extends ConsumerWidget {
           SpeakCard(
             child: Row(
               children: [
-                const Icon(
-                  Icons.calendar_today_rounded,
-                  color: SpeakColors.blue,
-                ),
+                Icon(Icons.calendar_today_rounded, color: SpeakColors.accent),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -172,7 +166,7 @@ class StreakCalendarScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: SpeakColors.blueSoft,
+          color: SpeakColors.accentSoft,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -225,13 +219,13 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fill = active ? SpeakColors.blue : SpeakColors.line;
+    final fill = active ? SpeakColors.accent : SpeakColors.line;
     return Container(
       decoration: BoxDecoration(
         color: visible ? fill : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: current
-            ? Border.all(color: SpeakColors.blue, width: 1.5)
+            ? Border.all(color: SpeakColors.accent, width: 1.5)
             : null,
       ),
       alignment: Alignment.center,
@@ -258,7 +252,7 @@ class _LegendDot extends StatelessWidget {
     width: 12,
     height: 12,
     decoration: BoxDecoration(
-      color: active ? SpeakColors.blue : SpeakColors.line,
+      color: active ? SpeakColors.accent : SpeakColors.line,
       borderRadius: BorderRadius.circular(4),
     ),
   );

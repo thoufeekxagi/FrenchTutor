@@ -247,13 +247,10 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
               ),
               const SizedBox(height: 18),
               SpeakCard(
-                color: SpeakColors.blueSoft,
+                color: SpeakColors.accentSoft,
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      color: SpeakColors.blue,
-                    ),
+                    Icon(Icons.check_circle_rounded, color: SpeakColors.accent),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -266,7 +263,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
                       style: DesignTokens.body(
                         12,
                         weight: FontWeight.w700,
-                      ).copyWith(color: SpeakColors.blue),
+                      ).copyWith(color: SpeakColors.accent),
                     ),
                   ],
                 ),
@@ -464,7 +461,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
           child: Column(
             children: [
               for (var i = 0; i < rows.length; i++) ...[
-                if (i > 0) const Divider(height: 1, color: SpeakColors.line),
+                if (i > 0) Divider(height: 1, color: SpeakColors.line),
                 rows[i],
               ],
             ],
@@ -484,7 +481,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
     bool expanded = false,
   }) {
     final titleStyle = DesignTokens.body(14, weight: FontWeight.w700);
-    final rowColor = accentColor ?? SpeakColors.blue;
+    final rowColor = accentColor ?? SpeakColors.accent;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -595,7 +592,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       child: Row(
         children: [
-          Icon(icon, color: SpeakColors.blue, size: 21),
+          Icon(icon, color: SpeakColors.accent, size: 21),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -618,7 +615,7 @@ class _SpeakSettingsScreenState extends ConsumerState<SpeakSettingsScreen>
           Switch.adaptive(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: SpeakColors.blue,
+            activeThumbColor: SpeakColors.accent,
           ),
         ],
       ),
@@ -674,7 +671,7 @@ class _TutorPickerSheetState extends State<_TutorPickerSheet> {
                   onTap: () => Navigator.of(context).pop(tutor),
                   child: SpeakCard(
                     color: tutor.id == widget.selected.id
-                        ? SpeakColors.blueSoft
+                        ? SpeakColors.accentSoft
                         : Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
@@ -691,7 +688,7 @@ class _TutorPickerSheetState extends State<_TutorPickerSheet> {
                               alignment: Alignment.topCenter,
                               errorBuilder: (context, error, stackTrace) =>
                                   CircleAvatar(
-                                    backgroundColor: SpeakColors.blue,
+                                    backgroundColor: SpeakColors.accent,
                                     child: Text(
                                       tutor.initial,
                                       style: const TextStyle(
@@ -738,13 +735,13 @@ class _TutorPickerSheetState extends State<_TutorPickerSheet> {
                             _previewer.playingId == tutor.id
                                 ? Icons.stop_circle_outlined
                                 : Icons.play_circle_outline_rounded,
-                            color: SpeakColors.blue,
+                            color: SpeakColors.accent,
                           ),
                         ),
                         if (tutor.id == widget.selected.id)
-                          const Icon(
+                          Icon(
                             Icons.check_circle_rounded,
-                            color: SpeakColors.blue,
+                            color: SpeakColors.accent,
                           ),
                       ],
                     ),

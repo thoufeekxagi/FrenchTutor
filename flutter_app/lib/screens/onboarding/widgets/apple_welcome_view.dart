@@ -18,7 +18,7 @@ class AppleWelcomeView extends StatelessWidget {
   final VoidCallback onGetStarted;
   final VoidCallback? onAlreadyHaveAccount;
 
-  static const _brandGradient = LinearGradient(
+  static final _brandGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
@@ -31,7 +31,7 @@ class AppleWelcomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(gradient: _brandGradient),
+      decoration: BoxDecoration(gradient: _brandGradient),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -173,7 +173,7 @@ class _ValuePropositionCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.checkmark_seal_fill,
                   size: 15,
                   color: DesignTokens.primary,

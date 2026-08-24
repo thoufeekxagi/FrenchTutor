@@ -1299,13 +1299,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       ),
                       if (answered != null) ...[
                         if (ci == question.answerIndex)
-                          const Icon(
+                          Icon(
                             CupertinoIcons.checkmark_circle_fill,
                             color: DesignTokens.success,
                             size: 18,
                           )
                         else if (ci == answered)
-                          const Icon(
+                          Icon(
                             CupertinoIcons.xmark_circle_fill,
                             color: DesignTokens.primary,
                             size: 18,
@@ -2128,7 +2128,7 @@ class _GrammarCueCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.book_fill,
                 size: 18,
                 color: DesignTokens.info,
@@ -2143,7 +2143,7 @@ class _GrammarCueCard extends StatelessWidget {
                   ).copyWith(color: DesignTokens.inkSoft),
                 ),
               ),
-              const Icon(
+              Icon(
                 CupertinoIcons.chevron_right,
                 size: 16,
                 color: DesignTokens.info,
@@ -2802,7 +2802,7 @@ class _ComingSoon extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             else
-              const Icon(
+              Icon(
                 CupertinoIcons.hourglass,
                 color: DesignTokens.mutedDim,
                 size: 30,

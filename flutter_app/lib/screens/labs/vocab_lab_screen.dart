@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
+import '../../data/database/vocabulary_session_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
@@ -31,6 +32,7 @@ class VocabLabScreen extends ConsumerStatefulWidget {
 
 class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
   List<GeneratedVocabularySet> _sets = const [];
+  List<VocabularySessionRecord> _sessions = const [];
 
   @override
   void initState() {
@@ -41,9 +43,10 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
 
   void _load() {
     if (!mounted) return;
-    setState(
-      () => _sets = ref.read(generatedVocabularySetStoreProvider).list(),
-    );
+    setState(() {
+      _sets = ref.read(generatedVocabularySetStoreProvider).list();
+      _sessions = ref.read(vocabularySessionStoreProvider).recent(limit: 6);
+    });
   }
 
   Future<void> _refresh() async {
@@ -105,6 +108,37 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
               ).copyWith(color: DesignTokens.nightMuted),
             ),
             const SizedBox(height: 24),
+            if (_sessions.isNotEmpty) ...[
+              const _SectionLabel('Recent vocabulary'),
+              const SizedBox(height: 10),
+              for (final session in _sessions)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 9),
+                  child: _RecentVocabularySessionCard(
+                    session: session,
+                    onTap: () => AppRouter.push(
+                      context,
+                      (_) => VocabularyWorkshopScreen(
+                        phase: 1,
+                        sessionId: session.id,
+                        source: session.source,
+                        topic: session.topic,
+                        theme: VocabTheme(
+                          id: session.id,
+                          title: session.title,
+                          entries: session.entries,
+                        ),
+                      ),
+                      fullscreenDialog: true,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+            ],
+            if (visible.isNotEmpty) ...[
+              const _SectionLabel('Vocabulary sets'),
+              const SizedBox(height: 10),
+            ],
             if (visible.isEmpty)
               const _EmptyVocabularyLibrary()
             else
@@ -121,6 +155,12 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                       context,
                       (_) => VocabularyWorkshopScreen(
                         phase: 1,
+                        sessionId: ref
+                            .read(vocabularySessionStoreProvider)
+                            .get(set.id)
+                            ?.id,
+                        source: 'saved-set',
+                        topic: set.topic,
                         theme: set.asTheme,
                       ),
                     ),
@@ -164,25 +204,97 @@ class _EmptyVocabularyLibrary extends StatelessWidget {
     return LearningCard(
       child: Column(
         children: [
-          const Icon(
+          Icon(
             CupertinoIcons.textformat,
             color: DesignTokens.primary,
             size: 30,
           ),
           const SizedBox(height: 10),
           Text(
-            'Your vocabulary sets are preparing…',
+            'No saved vocabulary sets yet.',
             textAlign: TextAlign.center,
             style: DesignTokens.body(16, weight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
           Text(
-            'Return to this tab in a moment and your starter cards will be ready.',
+            'Choose a recommended, category, or custom session to create your first saved set.',
             textAlign: TextAlign.center,
             style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RecentVocabularySessionCard extends StatelessWidget {
+  const _RecentVocabularySessionCard({
+    required this.session,
+    required this.onTap,
+  });
+
+  final VocabularySessionRecord session;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final state = switch (session.status) {
+      VocabularySessionStatus.active => 'In progress',
+      VocabularySessionStatus.paused => 'Paused',
+      VocabularySessionStatus.completed => 'Completed',
+    };
+    return LearningCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(
+            session.status == VocabularySessionStatus.completed
+                ? CupertinoIcons.checkmark_circle
+                : CupertinoIcons.play_circle,
+            color: DesignTokens.primary,
+            size: 27,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  session.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(15, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${session.levelBand} · ${session.entries.length} words · $state',
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+              ],
+            ),
+          ),
+          const Icon(CupertinoIcons.chevron_right, size: 18),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: DesignTokens.mono(
+        11,
+        weight: FontWeight.w800,
+      ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
     );
   }
 }

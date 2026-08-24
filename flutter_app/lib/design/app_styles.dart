@@ -10,33 +10,33 @@ export 'tokens.dart';
 /// AppTheme for platform mapping. New code should import those directly;
 /// existing call sites migrate screen-by-screen during Phase 4.
 abstract final class AppStyles {
-  static const ink = DesignTokens.ink;
-  static const inkSoft = DesignTokens.inkSoft;
-  static const primarySoft = DesignTokens.primarySoft;
-  static const successSoft = DesignTokens.successSoft;
-  static const infoSoft = DesignTokens.infoSoft;
-  static const masterySoft = DesignTokens.masterySoft;
-  static const text = DesignTokens.text;
+  static Color get ink => DesignTokens.ink;
+  static Color get inkSoft => DesignTokens.inkSoft;
+  static Color get primarySoft => DesignTokens.primarySoft;
+  static Color get successSoft => DesignTokens.successSoft;
+  static Color get infoSoft => DesignTokens.infoSoft;
+  static Color get masterySoft => DesignTokens.masterySoft;
+  static Color get text => DesignTokens.text;
   static final hairline = DesignTokens.hairline;
   static final hairlineLight = DesignTokens.hairlineLight;
 
   // Semantic names (canonical since the plug-and-play palette layer) — prefer
   // these over the legacy ParleSprint-era names above in new code.
-  static const canvas = DesignTokens.canvas;
-  static const canvasDim = DesignTokens.canvasDim;
-  static const surface = DesignTokens.surface;
-  static const primary = DesignTokens.primary;
-  static const primaryDeep = DesignTokens.primaryDeep;
-  static const secondary = DesignTokens.secondary;
-  static const success = DesignTokens.success;
-  static const info = DesignTokens.info;
-  static const mastery = DesignTokens.mastery;
-  static const warning = DesignTokens.warning;
-  static const warningSoft = DesignTokens.warningSoft;
-  static const danger = DesignTokens.danger;
-  static const dangerSoft = DesignTokens.dangerSoft;
-  static const muted = DesignTokens.muted;
-  static const mutedDim = DesignTokens.mutedDim;
+  static Color get canvas => DesignTokens.canvas;
+  static Color get canvasDim => DesignTokens.canvasDim;
+  static Color get surface => DesignTokens.surface;
+  static Color get primary => DesignTokens.primary;
+  static Color get primaryDeep => DesignTokens.primaryDeep;
+  static Color get secondary => DesignTokens.secondary;
+  static Color get success => DesignTokens.success;
+  static Color get info => DesignTokens.info;
+  static Color get mastery => DesignTokens.mastery;
+  static Color get warning => DesignTokens.warning;
+  static Color get warningSoft => DesignTokens.warningSoft;
+  static Color get danger => DesignTokens.danger;
+  static Color get dangerSoft => DesignTokens.dangerSoft;
+  static Color get muted => DesignTokens.muted;
+  static Color get mutedDim => DesignTokens.mutedDim;
 
   static TextStyle display(
     double size, {
@@ -52,5 +52,6 @@ abstract final class AppStyles {
   static TextStyle label(double size, {FontWeight weight = FontWeight.w700}) =>
       DesignTokens.label(size, weight: weight);
 
-  static ThemeData themeData() => AppTheme.themeData();
+  static ThemeData themeData({bool? darkMode}) =>
+      AppTheme.themeData(darkMode: darkMode);
 }

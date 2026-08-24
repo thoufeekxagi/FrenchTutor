@@ -9,10 +9,16 @@ const headers = {
 // Keep the provider boundary aligned with the shared Flutter artwork contract:
 // artwork is image-only and the app renders titles and controls separately.
 const BOOK_COVER_INSTRUCTION = `
-FINAL ARTWORK REQUIREMENT: create a polished text-free learning scene. Do not
-render a title, author name, subtitle, labels, logos, watermark, UI, borders,
-frames, captions, or any other words. A single visible character is allowed when
-the scene calls for one; keep the face and body inside the central 70% safe area.
+FINAL ARTWORK REQUIREMENT: create a friendly, coherent text-free learning
+reference scene. Follow the lesson title, summary, topic, and visual brief as
+one semantic source of truth. Show the concrete place, objects, and action from
+the lesson. People are optional and must be supported by the lesson context;
+never add a generic hero, dramatic stranger, futuristic city, fantasy scene,
+famous landmark, or movie-poster composition. Use a warm editorial storybook
+reference style, simple readable composition, natural light, and believable
+everyday materials. Keep important details inside the central 70% safe area.
+Do not render a title, author name, subtitle, labels, logos, watermark, UI,
+borders, frames, captions, signs, or any other words.
 `;
 
 const ALLOWED_ASPECT_RATIOS = new Set([

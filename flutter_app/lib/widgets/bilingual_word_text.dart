@@ -20,7 +20,7 @@ class BilingualWordText extends StatelessWidget {
     required this.selectedSourceWord,
     required this.onSourceWordTap,
     this.playbackSourceWord,
-    this.accentColor = DesignTokens.mastery,
+    this.accentColor,
     this.playbackTranslationWord,
     this.showTranslation = true,
     this.highlightSelected = true,
@@ -36,7 +36,7 @@ class BilingualWordText extends StatelessWidget {
   final ValueChanged<int> onSourceWordTap;
   final int? playbackSourceWord;
   final int? playbackTranslationWord;
-  final Color accentColor;
+  final Color? accentColor;
   final bool showTranslation;
   final bool highlightSelected;
   final bool underlineSelected;
@@ -110,16 +110,17 @@ class BilingualWordText extends StatelessWidget {
     required bool selected,
     required bool playing,
   }) {
+    final accent = accentColor ?? DesignTokens.mastery;
     if (selected || playing) {
       return base.copyWith(
-        color: highlightSelected ? accentColor : base.color,
+        color: highlightSelected ? accent : base.color,
         backgroundColor: highlightSelected
-            ? accentColor.withValues(alpha: selected ? 0.14 : 0.1)
+            ? accent.withValues(alpha: selected ? 0.14 : 0.1)
             : null,
         decoration: underlineSelected
             ? TextDecoration.underline
             : TextDecoration.none,
-        decorationColor: accentColor,
+        decorationColor: accent,
         decorationThickness: 1.5,
       );
     }

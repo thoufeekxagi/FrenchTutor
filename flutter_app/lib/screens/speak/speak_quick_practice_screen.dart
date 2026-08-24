@@ -24,12 +24,18 @@ class SpeakQuickPracticeScreen extends StatelessWidget {
                 IconButton(
                   tooltip: 'Back',
                   onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.arrow_back_rounded, color: DesignTokens.nightText),
+                  icon: Icon(
+                    Icons.arrow_back_rounded,
+                    color: DesignTokens.nightText,
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Text('Quick lessons', style: _display(25)),
                 const Spacer(),
-                const Icon(Icons.local_fire_department_rounded, color: DesignTokens.nightAccent),
+                Icon(
+                  Icons.local_fire_department_rounded,
+                  color: DesignTokens.nightAccent,
+                ),
                 const SizedBox(width: 5),
                 Text('3', style: _body(13, weight: FontWeight.w800)),
               ],
@@ -81,19 +87,34 @@ class SpeakQuickPracticeScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.mic_none_rounded, color: DesignTokens.nightAccent, size: 24),
+                    Icon(
+                      Icons.mic_none_rounded,
+                      color: DesignTokens.nightAccent,
+                      size: 24,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Ask your tutor', style: _body(15, weight: FontWeight.w800)),
+                          Text(
+                            'Ask your tutor',
+                            style: _body(15, weight: FontWeight.w800),
+                          ),
                           const SizedBox(height: 3),
-                          Text('Explain a phrase or start a scene.', style: _body(12).copyWith(color: DesignTokens.nightMuted)),
+                          Text(
+                            'Explain a phrase or start a scene.',
+                            style: _body(
+                              12,
+                            ).copyWith(color: DesignTokens.nightMuted),
+                          ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.chevron_right_rounded, color: DesignTokens.nightAccent),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: DesignTokens.nightAccent,
+                    ),
                   ],
                 ),
               ),
@@ -141,19 +162,26 @@ class SpeakQuickPracticeScreen extends StatelessWidget {
                 children: [
                   Text(title, style: _body(15, weight: FontWeight.w800)),
                   const SizedBox(height: 3),
-                  Text(subtitle, style: _body(12).copyWith(color: DesignTokens.nightMuted)),
+                  Text(
+                    subtitle,
+                    style: _body(12).copyWith(color: DesignTokens.nightMuted),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: DesignTokens.nightAccent),
+            Icon(Icons.chevron_right_rounded, color: DesignTokens.nightAccent),
           ],
         ),
       ),
     );
   }
 
-  TextStyle _display(double size) => DesignTokens.display(size).copyWith(color: DesignTokens.nightText);
+  TextStyle _display(double size) =>
+      DesignTokens.display(size).copyWith(color: DesignTokens.nightText);
 
   TextStyle _body(double size, {FontWeight weight = FontWeight.w400}) =>
-      DesignTokens.body(size, weight: weight).copyWith(color: DesignTokens.nightText);
+      DesignTokens.body(
+        size,
+        weight: weight,
+      ).copyWith(color: DesignTokens.nightText);
 }

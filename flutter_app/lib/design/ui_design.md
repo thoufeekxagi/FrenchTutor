@@ -11,12 +11,11 @@ Comprehensive visual heuristics, design tokens, component architecture, and Stit
    - Avoid generic sharp-radiused boxes.
 2. **Zero Raw Emojis in Core UI**:
    - NEVER use raw platform emojis (`🍁`, `✈️`, `🌱`) for functional icons.
-   - Use **tinted squircle vector badges** (44x44pt container, 14pt radius, `#EFF6FF` container with `#0062CC` SF Symbol / Cupertino icon).
-3. **Restrained 3-Color Hierarchy**:
-   - **Primary Action**: French Azure (`#0062CC` / `#007BFF`)
-   - **Prominent Ink**: Obsidian Slate (`#0F172A`)
-   - **Muted Metadata**: Slate (`#64748B`)
-   - **Base Canvas**: Warm Alabaster (`#FAF9F6` or pure `#FFFFFF`)
+   - Use **tinted squircle vector badges** with the shared gold accent and appearance-aware neutral surface.
+3. **Restrained black/gold hierarchy**:
+   - **Dark mode**: near-black canvas, warm gold actions, warm-white text.
+   - **Light mode**: warm-white canvas, the same gold actions, dark ink.
+   - **Muted Metadata**: warm gray.
 4. **8pt Spacing Rhythm & Touch Targets**:
    - All padding/gaps use multiples of 8 (`8, 16, 24, 32`).
    - Minimum tap target: **54px** for CTAs, **68px+** for selection cards.
@@ -30,13 +29,13 @@ Comprehensive visual heuristics, design tokens, component architecture, and Stit
 
 ### Color Tokens
 ```dart
-const kColorPrimary = Color(0xFF0062CC);       // Active actions, progress, checkmarks
-const kColorPrimaryBg = Color(0xFFEFF6FF);     // Active card surface tint
-const kColorPrimaryBorder = Color(0xFFDBEAFE); // Active badge outline
-const kColorInk = Color(0xFF0F172A);           // Primary headlines & titles
-const kColorMuted = Color(0xFF64748B);         // Subtitles, step counters
-const kColorBorder = Color(0xFFE2E8F0);        // Inactive hairline strokes (1px)
-const kColorCanvas = Color(0xFFFAF9F6);        // Atelier background
+const kColorGold = Color(0xFFF2B84B);          // Actions, progress, checkmarks
+const kColorGoldSoft = Color(0xFF3A2C17);      // Dark active surface tint
+const kColorInk = Color(0xFF17130D);           // Light-mode headlines & titles
+const kColorMuted = Color(0xFF746F65);         // Light-mode metadata
+const kColorBorder = Color(0xFFE4DED1);        // Light-mode hairline strokes
+const kColorDarkCanvas = Color(0xFF08090B);    // Dark-mode background
+const kColorLightCanvas = Color(0xFFFBFAF7);   // Light-mode background
 ```
 
 ### Typography Scale
@@ -51,22 +50,22 @@ const kColorCanvas = Color(0xFFFAF9F6);        // Atelier background
 ### A. Step Navigation Header (`TopStepBar`)
 * Back chevron (`CupertinoIcons.chevron_back`, 22px).
 * Centered `STEP X OF Y` tracked uppercase label (11px).
-* 3px full-width progress indicator with fractionally sized `#0062CC` active fill.
+* 3px full-width progress indicator with fractionally sized gold active fill.
 
 ### B. Luxury Selection Card (`LuxuryCard`)
 * Height: `68px–76px`, Padding: `16px horizontal, 14px vertical`.
 * Border radius: `20px continuous`.
 * Leading: `44x44px` tinted squircle badge (`14px radius`) with vector icon.
 * Title (`Plus Jakarta Sans` 15.5px w700) + Subtitle (`Inter` 12px w500).
-* Trailing: 22px circular selection indicator (solid blue with white checkmark when active).
+* Trailing: 22px circular selection indicator (gold with black checkmark when active).
 
 ### C. Segmented Switcher (`PillSegmented`)
-* Height: `44px`, container `#F1F5F9`, border `#E2E8F0`.
-* Active item: White elevated pill with `0px 2px 6px rgba(0,0,0,0.05)` shadow.
+* Height: `44px`, appearance-aware neutral container, gold border.
+* Active item: gold-soft pill with `0px 2px 6px rgba(0,0,0,0.05)` shadow.
 
 ### D. Primary Action CTA (`PrimaryPillButton`)
 * Height: `54px`, full-width pill (`radius: 100px`).
-* Background: `#0062CC`, Text: White bold 16px.
+* Background: gold, Text: black bold 16px.
 
 ---
 
@@ -83,15 +82,15 @@ Design Specifications:
 - Zero cognitive load, everything fits comfortably above the fold.
 
 Layout & Elements:
-1. Top Navigation: iOS back button, clean step indicator 'STEP [X] OF [Y]' with [Z]% blue progress bar (#0062CC).
+1. Top Navigation: iOS back button, clean step indicator 'STEP [X] OF [Y]' with [Z]% gold progress bar.
 2. Header:
-   - Punchy single headline: '[HEADLINE]' (Bold 26px, Plus Jakarta Sans, deep ink #0F172A).
-   - Short 1-line subtitle: '[SUBTITLE]' (14px slate #64748B).
+   - Punchy single headline: '[HEADLINE]' (Bold 26px, Plus Jakarta Sans, appearance-aware ink).
+   - Short 1-line subtitle: '[SUBTITLE]' (14px warm muted text).
 3. Selection Cards / Content:
-   - [Card 1 (Active)]: [Vector Badge Name], '[Title]' • subtitle '[Subtitle]' (Royal blue border #0062CC, tint #EFF6FF, checkmark).
-   - [Card 2]: [Vector Badge Name], '[Title]' • subtitle '[Subtitle]' (Clean white card, 1px border #E2E8F0).
+   - [Card 1 (Active)]: [Vector Badge Name], '[Title]' • subtitle '[Subtitle]' (gold border, appearance-aware gold tint, checkmark).
+   - [Card 2]: [Vector Badge Name], '[Title]' • subtitle '[Subtitle]' (appearance-aware surface, 1px hairline border).
 4. Bottom Action:
-   - Full-width 54px solid blue CTA button (#0062CC, rounded-full, crisp white text): '[CTA TEXT]'.
+   - Full-width 54px solid gold CTA button (rounded-full, black text): '[CTA TEXT]'.
 ```
 
 ---

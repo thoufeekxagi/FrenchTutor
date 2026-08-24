@@ -36,11 +36,24 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
   String get _examName =>
       _exam == _ExamFamily.tcf ? 'TCF Canada' : 'TEF Canada';
 
+  String get _writingSpec => _exam == _ExamFamily.tcf
+      ? 'For written expression use exactly 3 ordered tasks in 60 minutes: '
+            'Task 1 is a message of 60-120 words to describe, narrate, or explain; '
+            'Task 2 is an article, letter, or note of 120-150 words reporting an '
+            'experience or story with comments/opinions/arguments; Task 3 compares '
+            'two viewpoints and states the learner\'s position in 120-180 words. '
+            'Do not skip a task.'
+      : 'For written expression use two sections in 60 minutes: Section A is '
+            'continuing an article with at least 80 words in 25 minutes; Section B '
+            'is expressing and justifying a point of view with at least 200 words '
+            'in 35 minutes.';
+
   String get _examContext =>
       '$_examName preparation at $_level level. Generate an exam-matched '
       'French practice task with realistic timing, vocabulary, and difficulty. '
       '${_level == 'A1' || _level == 'A2' ? 'This is guided training: use short French and brief English support when needed, without revealing answers.' : 'This is assessed practice: the examiner and task content must stay in French only, with no translation or coaching.'} '
-      '${_exam == _ExamFamily.tef ? 'For speaking, use TEF-style information gathering and persuasion tasks.' : 'For speaking, use TCF-style exchange, interaction, and viewpoint tasks.'}';
+      '${_exam == _ExamFamily.tef ? 'For speaking, use TEF-style information gathering and persuasion tasks.' : 'For speaking, use TCF-style exchange, interaction, and viewpoint tasks.'} '
+      'WRITING SPECIFICATION: $_writingSpec';
 
   void _prepare() => setState(() => _prepared = true);
 
@@ -205,14 +218,11 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                 ),
                 const SizedBox(height: 22),
                 SpeakCard(
-                  color: SpeakColors.blueSoft,
+                  color: SpeakColors.accentSoft,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.verified_outlined,
-                        color: SpeakColors.blue,
-                      ),
+                      Icon(Icons.verified_outlined, color: SpeakColors.accent),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -300,10 +310,10 @@ class _ChoiceCard extends StatelessWidget {
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.blue : Colors.white,
+          color: selected ? SpeakColors.accent : SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? SpeakColors.blue : SpeakColors.line,
+            color: selected ? SpeakColors.accent : SpeakColors.line,
           ),
         ),
         child: Column(
@@ -311,16 +321,17 @@ class _ChoiceCard extends StatelessWidget {
           children: [
             Text(
               title,
-              style: DesignTokens.body(
-                14,
-                weight: FontWeight.w700,
-              ).copyWith(color: selected ? Colors.white : SpeakColors.navy),
+              style: DesignTokens.body(14, weight: FontWeight.w700).copyWith(
+                color: selected ? SpeakColors.onAccent : SpeakColors.navy,
+              ),
             ),
             const SizedBox(height: 3),
             Text(
               subtitle,
               style: DesignTokens.body(11).copyWith(
-                color: selected ? Colors.white70 : SpeakColors.inkSoft,
+                color: selected
+                    ? SpeakColors.onAccent.withValues(alpha: 0.72)
+                    : SpeakColors.inkSoft,
               ),
             ),
           ],
@@ -356,11 +367,11 @@ class _SkillLauncher extends StatelessWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: const BoxDecoration(
-                  color: SpeakColors.blueSoft,
+                decoration: BoxDecoration(
+                  color: SpeakColors.accentSoft,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: SpeakColors.blue, size: 20),
+                child: Icon(icon, color: SpeakColors.accent, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -381,7 +392,7 @@ class _SkillLauncher extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 15,
                 color: SpeakColors.inkSoft,
@@ -405,7 +416,7 @@ class _RecentExamPractice extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: SpeakCard(
-        color: Colors.white,
+        color: SpeakColors.surface,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -438,7 +449,7 @@ class _RecentExamPractice extends StatelessWidget {
                         style: DesignTokens.body(
                           12,
                           weight: FontWeight.w700,
-                        ).copyWith(color: SpeakColors.blue),
+                        ).copyWith(color: SpeakColors.accent),
                       ),
                   ],
                 ),

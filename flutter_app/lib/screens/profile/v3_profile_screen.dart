@@ -56,7 +56,7 @@ class V3ProfileScreen extends ConsumerWidget {
                   width: 58,
                   height: 58,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: DesignTokens.nightAccentSoft,
                     shape: BoxShape.circle,
                   ),

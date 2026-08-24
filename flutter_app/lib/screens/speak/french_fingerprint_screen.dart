@@ -46,7 +46,7 @@ class FrenchFingerprintScreen extends ConsumerWidget {
               IconButton(
                 tooltip: 'Back',
                 onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_rounded,
                   color: SpeakColors.inkSoft,
                 ),
@@ -128,7 +128,7 @@ class _FingerprintStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _stat('$words', 'words mapped', SpeakColors.blue),
+        _stat('$words', 'words mapped', SpeakColors.accent),
         const SizedBox(width: 10),
         _stat('$links', 'learning links', SpeakColors.orange),
         const SizedBox(width: 10),
@@ -187,7 +187,7 @@ List<_PracticeSignal> _practiceSignals(List<dynamic> sessions) {
       'Vocabulary',
       counts['vocab'] ?? 0,
       Icons.style_rounded,
-      SpeakColors.blue,
+      SpeakColors.accent,
     ),
     _PracticeSignal(
       'Grammar',

@@ -78,10 +78,7 @@ class _SpeakLessonScreenState extends ConsumerState<SpeakLessonScreen> {
             subtitle: widget.topic,
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.close_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           Expanded(
@@ -101,12 +98,12 @@ class _SpeakLessonScreenState extends ConsumerState<SpeakLessonScreen> {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: SpeakColors.blueSoft,
+                              color: SpeakColors.accentSoft,
                               borderRadius: BorderRadius.circular(13),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.record_voice_over_rounded,
-                              color: SpeakColors.blue,
+                              color: SpeakColors.accent,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -119,7 +116,7 @@ class _SpeakLessonScreenState extends ConsumerState<SpeakLessonScreen> {
                               ),
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.bookmark_border_rounded,
                             color: SpeakColors.inkSoft,
                             size: 20,
@@ -132,7 +129,7 @@ class _SpeakLessonScreenState extends ConsumerState<SpeakLessonScreen> {
                           'Bonjour !',
                           style: DesignTokens.display(
                             30,
-                          ).copyWith(color: SpeakColors.blue),
+                          ).copyWith(color: SpeakColors.accent),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -189,7 +186,7 @@ class _SpeakLessonScreenState extends ConsumerState<SpeakLessonScreen> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: SpeakColors.blue),
+          Icon(icon, size: 18, color: SpeakColors.accent),
           const SizedBox(width: 10),
           Text(
             text,

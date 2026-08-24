@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
+import '../../data/database/vocabulary_session_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/srs_state.dart';
@@ -39,6 +40,9 @@ class VocabularyWorkshopScreen extends ConsumerStatefulWidget {
     this.initialDeck,
     this.contentItemPrefix,
     this.focusNote,
+    this.sessionId,
+    this.source = 'legacy',
+    this.topic,
   });
 
   final int phase;
@@ -46,6 +50,9 @@ class VocabularyWorkshopScreen extends ConsumerStatefulWidget {
   final List<VocabEntry>? initialDeck;
   final String? contentItemPrefix;
   final String? focusNote;
+  final String? sessionId;
+  final String source;
+  final String? topic;
 
   @override
   ConsumerState<VocabularyWorkshopScreen> createState() =>
@@ -63,6 +70,12 @@ class _VocabularyWorkshopScreenState
   bool _contextLoading = true;
   bool _loading = true;
   String? _error;
+  String? _contextError;
+  String? _sentenceError;
+  String? _sessionId;
+  String? _sessionLevelBand;
+  bool _completed = false;
+  String? _savedFocusNote;
   int _index = 0;
   bool _revealed = false;
   bool _showRecallRating = false;
@@ -97,6 +110,9 @@ class _VocabularyWorkshopScreenState
 
   @override
   void dispose() {
+    if (!_completed && _sessionId != null) {
+      ref.read(vocabularySessionStoreProvider).pause(_sessionId!);
+    }
     LessonSpeechService.shared.deactivate();
     _sentenceController.dispose();
     super.dispose();
@@ -104,37 +120,55 @@ class _VocabularyWorkshopScreenState
 
   Future<void> _loadDeck() async {
     try {
-      final supplied = widget.initialDeck;
-      late final List<VocabEntry> deck;
-      if (supplied != null) {
-        deck = supplied.take(_deckSize).toList(growable: false);
+      final sessionStore = ref.read(vocabularySessionStoreProvider);
+      final saved = widget.sessionId == null
+          ? null
+          : sessionStore.get(widget.sessionId!);
+      if (widget.sessionId != null && saved == null) {
+        throw StateError('The saved vocabulary session is not available.');
+      }
+
+      late List<VocabEntry> deck;
+      if (saved != null) {
+        _sessionId = saved.id;
+        _sessionLevelBand = saved.levelBand;
+        _savedFocusNote = saved.focusNote;
+        _restore(saved);
+        deck = saved.entries;
+      } else if (widget.initialDeck != null) {
+        deck = widget.initialDeck!;
+      } else if (widget.theme.entries.isNotEmpty) {
+        deck = widget.theme.entries;
       } else {
         final srs = ref.read(srsServiceProvider);
-        List<VocabEntry> queued = const [];
-        try {
-          queued = await srs.buildQueue(
-            phase: widget.phase,
-            themeId: widget.theme.id,
-            limit: _deckSize,
-          );
-        } catch (_) {
-          // A generated library card is valid even before it is enrolled in
-          // the global SRS queue.
-        }
-        final all = srs.allEntries(
+        deck = await srs.buildQueue(
           phase: widget.phase,
           themeId: widget.theme.id,
+          limit: _deckSize,
         );
-        final seen = queued.map((word) => word.id).toSet();
-        deck = [
-          ...queued,
-          ...all.where((word) => !seen.contains(word.id)),
-          ...widget.theme.entries.where((word) => !seen.contains(word.id)),
-        ].take(_deckSize).toList(growable: false);
       }
+      deck = deck.take(_deckSize).toList(growable: false);
       if (deck.isEmpty) {
         throw StateError('This vocabulary set has no usable words.');
       }
+      _sessionId ??=
+          'vocabulary-session-${DateTime.now().microsecondsSinceEpoch}';
+      if (saved == null) {
+        _sessionLevelBand = SpeakLanguageProfile.forProfile(
+          ref.read(learningStoreProvider).profile(),
+        ).level;
+        sessionStore.create(
+          id: _sessionId!,
+          title: widget.theme.title,
+          source: widget.source,
+          topic: widget.topic ?? widget.theme.title,
+          levelBand: _sessionLevelBand!,
+          entries: deck,
+          contextExamples: _contextExamples,
+          focusNote: widget.focusNote,
+        );
+      }
+      _index = _index.clamp(0, deck.length - 1).toInt();
       if (!mounted) return;
       setState(() {
         _deck = deck;
@@ -144,14 +178,47 @@ class _VocabularyWorkshopScreenState
       });
       unawaited(_warmDeckAudio(deck));
       unawaited(_prepareContextExamples(deck));
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         setState(() {
           _loading = false;
-          _error = 'This word set could not be loaded.';
+          _error = 'This vocabulary session could not be opened. $error';
         });
       }
     }
+  }
+
+  void _restore(VocabularySessionRecord record) {
+    _step = _VocabularyStep.values.firstWhere(
+      (step) => step.name == record.currentStep,
+      orElse: () => _VocabularyStep.preview,
+    );
+    _index = record.currentIndex;
+    _recallGrades
+      ..clear()
+      ..addEntries(
+        record.recallGrades.entries
+            .where((entry) {
+              return SRSGrade.values.any((grade) => grade.name == entry.value);
+            })
+            .map(
+              (entry) => MapEntry(
+                entry.key,
+                SRSGrade.values.firstWhere(
+                  (grade) => grade.name == entry.value,
+                ),
+              ),
+            ),
+      );
+    _contextResults
+      ..clear()
+      ..addAll(record.contextResults);
+    _sentenceResults
+      ..clear()
+      ..addAll(record.sentenceResults);
+    _contextExamples
+      ..clear()
+      ..addAll(record.contextExamples);
   }
 
   List<List<VocabEntry>> _buildContextChoices(List<VocabEntry> deck) {
@@ -171,34 +238,42 @@ class _VocabularyWorkshopScreenState
   Future<void> _prepareContextExamples(List<VocabEntry> deck) async {
     final content = ref.read(contentServiceProvider);
     final profile = ref.read(learningStoreProvider).profile();
-    final level = SpeakLanguageProfile.forProfile(profile).level;
+    final level =
+        _sessionLevelBand ?? SpeakLanguageProfile.forProfile(profile).level;
     final prepared = <String, BilingualExample>{};
 
-    await Future.wait(
-      deck.map((word) async {
+    try {
+      for (final word in deck) {
+        final saved = _contextExamples[word.id];
+        if (saved != null && _appearsInExample(word, saved)) {
+          prepared[word.id] = saved;
+          continue;
+        }
+
         final bundled = content.vocabExamples(word.id);
         if (bundled != null && _appearsInExample(word, bundled)) {
           prepared[word.id] = bundled;
-          return;
+          continue;
         }
 
-        try {
-          final generated = await LessonAgentService.shared
-              .generateVocabularyContext(word: word, levelBand: level);
-          if (_appearsInExample(word, generated)) {
-            prepared[word.id] = generated;
-            return;
-          }
-        } catch (_) {
-          // Keep the lesson usable offline if the live quality check cannot
-          // complete; the deterministic fallback still produces a real cloze.
+        final generated = await LessonAgentService.shared
+            .generateVocabularyContext(word: word, levelBand: level);
+        if (!_appearsInExample(word, generated)) {
+          throw StateError(
+            'The context sentence for ${word.fr} did not pass the target-word check.',
+          );
         }
-        prepared[word.id] = BilingualExample(
-          fr: 'Je vois ${word.fr}.',
-          en: 'I see ${word.en}.',
-        );
-      }),
-    );
+        prepared[word.id] = generated;
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _contextError =
+            'A validated context sentence could not be prepared. $error';
+        _contextLoading = false;
+      });
+      return;
+    }
 
     if (!mounted) return;
     setState(() {
@@ -207,14 +282,12 @@ class _VocabularyWorkshopScreenState
         ..addAll(prepared);
       _contextLoading = false;
     });
+    _persistProgress();
+    unawaited(_warmContextAudio(deck, prepared));
   }
 
-  BilingualExample _exampleFor(VocabEntry word) {
-    return ref.read(contentServiceProvider).vocabExamples(word.id) ??
-        BilingualExample(
-          fr: 'Je découvre ${word.fr}.',
-          en: 'I discover ${word.en}.',
-        );
+  BilingualExample? _exampleFor(VocabEntry word) {
+    return _contextExamples[word.id];
   }
 
   String _audioId(String entryId, [String suffix = 'word']) {
@@ -226,15 +299,27 @@ class _VocabularyWorkshopScreenState
     final items = <({String text, String contentItemId})>[];
     for (final word in deck) {
       items.add((text: word.fr, contentItemId: _audioId(word.id)));
-      final example = _exampleFor(word);
-      items.add((
-        text: example.fr,
-        contentItemId: _audioId(word.id, 'example'),
-      ));
     }
     return GeminiLiveAudioService.shared.warmDeck(
       voiceName: _tutor.voiceName,
       items: items,
+    );
+  }
+
+  Future<void> _warmContextAudio(
+    List<VocabEntry> deck,
+    Map<String, BilingualExample> examples,
+  ) {
+    return GeminiLiveAudioService.shared.warmDeck(
+      voiceName: _tutor.voiceName,
+      items: [
+        for (final word in deck)
+          if (examples[word.id] != null)
+            (
+              text: examples[word.id]!.fr,
+              contentItemId: _audioId(word.id, 'example'),
+            ),
+      ],
     );
   }
 
@@ -275,7 +360,9 @@ class _VocabularyWorkshopScreenState
       _contextChecked = false;
       _sentenceController.clear();
       _sentenceFeedback = null;
+      _sentenceError = null;
     });
+    _persistProgress();
   }
 
   void _nextWord({_VocabularyStep? afterLast}) {
@@ -291,7 +378,28 @@ class _VocabularyWorkshopScreenState
       _contextChecked = false;
       _sentenceController.clear();
       _sentenceFeedback = null;
+      _sentenceError = null;
     });
+    _persistProgress();
+  }
+
+  void _persistProgress() {
+    final id = _sessionId;
+    if (id == null) return;
+    ref
+        .read(vocabularySessionStoreProvider)
+        .saveProgress(
+          id: id,
+          currentStep: _step.name,
+          currentIndex: _index,
+          recallGrades: {
+            for (final entry in _recallGrades.entries)
+              entry.key: entry.value.name,
+          },
+          contextResults: _contextResults,
+          sentenceResults: _sentenceResults,
+          contextExamples: _contextExamples,
+        );
   }
 
   void _gradeRecall(SRSGrade grade) {
@@ -305,11 +413,13 @@ class _VocabularyWorkshopScreenState
           responseType: grade == SRSGrade.good
               ? SRSResponseType.unaided
               : SRSResponseType.hinted,
+          sessionId: _sessionId,
         );
     setState(() {
       _recallGrades[word.id] = grade;
       _showRecallRating = false;
     });
+    _persistProgress();
   }
 
   void _previousRecallWord() {
@@ -319,6 +429,7 @@ class _VocabularyWorkshopScreenState
       _revealed = false;
       _showRecallRating = false;
     });
+    _persistProgress();
   }
 
   void _nextRecallWord() {
@@ -333,6 +444,7 @@ class _VocabularyWorkshopScreenState
       _contextChecked = true;
       _contextResults[word.id] = _contextChoices[_index][choice].id == word.id;
     });
+    _persistProgress();
   }
 
   Future<void> _checkSentence() async {
@@ -353,18 +465,16 @@ class _VocabularyWorkshopScreenState
       setState(() {
         _checkingSentence = false;
         _sentenceFeedback = feedback;
+        _sentenceError = null;
         _sentenceResults[word.id] = submission;
       });
-    } catch (_) {
+      _persistProgress();
+    } catch (error) {
       if (mounted) {
         setState(() {
           _checkingSentence = false;
-          _sentenceFeedback = MicroWritingFeedback(
-            scoreOutOf10: 0,
-            comment:
-                'Your sentence is saved for practice. Keep using the word in context.',
-          );
-          _sentenceResults[word.id] = submission;
+          _sentenceError =
+              'This sentence could not be checked. Nothing was graded. $error';
         });
       }
     }
@@ -372,9 +482,18 @@ class _VocabularyWorkshopScreenState
 
   Future<void> _teachWithMarie() async {
     if (_deck.isEmpty) return;
-    final examples = <String, BilingualExample>{
-      for (final word in _deck) word.id: _exampleFor(word),
-    };
+    final examples = <String, BilingualExample>{};
+    for (final word in _deck) {
+      final example = _exampleFor(word);
+      if (example == null) {
+        setState(
+          () => _contextError =
+              'Marie needs validated context sentences before teaching this set.',
+        );
+        return;
+      }
+      examples[word.id] = example;
+    }
     await AppRouter.push(
       context,
       (_) => AgentLedVocabScreen(
@@ -404,10 +523,26 @@ class _VocabularyWorkshopScreenState
       _showRecallRating = false;
       _selectedContextChoice = null;
       _contextChecked = false;
+      _contextError = null;
     });
+    _persistProgress();
   }
 
-  void _complete() => Navigator.of(context).pop(true);
+  void _complete() {
+    final id = _sessionId;
+    if (id != null) ref.read(vocabularySessionStoreProvider).complete(id);
+    _completed = true;
+    Navigator.of(context).pop(true);
+  }
+
+  void _retryContextExamples() {
+    if (_contextLoading || _deck.isEmpty) return;
+    setState(() {
+      _contextError = null;
+      _contextLoading = true;
+    });
+    unawaited(_prepareContextExamples(_deck));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +612,7 @@ class _VocabularyWorkshopScreenState
       return LearningCard(
         child: Column(
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.exclamationmark_circle,
               color: DesignTokens.primary,
               size: 30,
@@ -520,7 +655,8 @@ class _VocabularyWorkshopScreenState
         ),
         const SizedBox(height: 8),
         Text(
-          widget.focusNote ??
+          _savedFocusNote ??
+              widget.focusNote ??
               'Your deck is ready locally. Audio is prepared in the background so the lesson stays fast.',
           style: DesignTokens.body(
             14,
@@ -565,6 +701,13 @@ class _VocabularyWorkshopScreenState
   Widget _learnView() {
     final word = _current!;
     final example = _exampleFor(word);
+    if (example == null) {
+      return _contextUnavailableView(
+        stepNumber: '02',
+        stepTitle: 'Learn',
+        headline: 'The validated example is not ready yet.',
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -667,7 +810,12 @@ class _VocabularyWorkshopScreenState
         Row(
           children: [
             OutlinedButton.icon(
-              onPressed: _index == 0 ? null : () => setState(() => _index--),
+              onPressed: _index == 0
+                  ? null
+                  : () {
+                      setState(() => _index--);
+                      _persistProgress();
+                    },
               icon: const Icon(CupertinoIcons.chevron_left, size: 16),
               label: const Text('Back'),
             ),
@@ -675,7 +823,10 @@ class _VocabularyWorkshopScreenState
             OutlinedButton.icon(
               onPressed: _index == _deck.length - 1
                   ? null
-                  : () => setState(() => _index++),
+                  : () {
+                      setState(() => _index++);
+                      _persistProgress();
+                    },
               icon: const Icon(CupertinoIcons.chevron_right, size: 16),
               label: const Text('Next word'),
             ),
@@ -889,9 +1040,14 @@ class _VocabularyWorkshopScreenState
       );
     }
 
-    final example =
-        _contextExamples[word.id] ??
-        BilingualExample(fr: 'Je vois ${word.fr}.', en: 'I see ${word.en}.');
+    final example = _contextExamples[word.id];
+    if (example == null) {
+      return _contextUnavailableView(
+        stepNumber: '04',
+        stepTitle: 'Context',
+        headline: 'This context sentence could not be validated.',
+      );
+    }
     final choices = _contextChoices[_index];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -979,6 +1135,66 @@ class _VocabularyWorkshopScreenState
     );
   }
 
+  Widget _contextUnavailableView({
+    required String stepNumber,
+    required String stepTitle,
+    required String headline,
+  }) {
+    final error = _contextError;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepLabel(number: stepNumber, title: stepTitle),
+        const SizedBox(height: 10),
+        Text(headline, style: DesignTokens.display(27)),
+        const SizedBox(height: 8),
+        Text(
+          error ??
+              'The lesson will continue only after the target word appears in a validated French sentence.',
+          style: DesignTokens.body(
+            14,
+          ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+        ),
+        const SizedBox(height: 16),
+        LearningCard(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                error == null
+                    ? CupertinoIcons.hourglass
+                    : CupertinoIcons.exclamationmark_circle,
+                color: error == null
+                    ? DesignTokens.primary
+                    : DesignTokens.danger,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  error == null
+                      ? 'Preparing the validated example…'
+                      : 'No substitute sentence was inserted. Fix the generation or retry this step.',
+                  style: DesignTokens.body(
+                    14,
+                    weight: FontWeight.w600,
+                  ).copyWith(height: 1.35),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (error != null) ...[
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: _retryContextExamples,
+            icon: const Icon(CupertinoIcons.refresh, size: 17),
+            label: const Text('Retry validated context'),
+          ),
+        ],
+      ],
+    );
+  }
+
   String _maskTarget(String sentence, String target) {
     final start = sentence.toLowerCase().indexOf(target.toLowerCase());
     if (start < 0) return sentence;
@@ -988,6 +1204,13 @@ class _VocabularyWorkshopScreenState
   Widget _produceView() {
     final word = _current!;
     final example = _exampleFor(word);
+    if (example == null) {
+      return _contextUnavailableView(
+        stepNumber: '05',
+        stepTitle: 'Produce',
+        headline: 'A validated model sentence is required before writing.',
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1047,6 +1270,17 @@ class _VocabularyWorkshopScreenState
               : const Icon(CupertinoIcons.sparkles),
           label: Text(_checkingSentence ? 'Checking…' : 'Check with AI'),
         ),
+        if (_sentenceError != null) ...[
+          const SizedBox(height: 10),
+          LearningCard(
+            color: DesignTokens.dangerSoft,
+            borderColor: DesignTokens.danger.withValues(alpha: 0.3),
+            child: Text(
+              _sentenceError!,
+              style: DesignTokens.body(13).copyWith(height: 1.35),
+            ),
+          ),
+        ],
         if (_sentenceFeedback != null) ...[
           const SizedBox(height: 10),
           LearningCard(

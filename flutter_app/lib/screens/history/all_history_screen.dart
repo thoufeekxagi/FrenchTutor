@@ -104,7 +104,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                               32,
                             ),
                             itemCount: _filteredSessions.length,
-                            separatorBuilder: (_, _) => const Divider(
+                            separatorBuilder: (_, _) => Divider(
                               height: 1,
                               color: DesignTokens.canvasDim,
                             ),
@@ -160,9 +160,7 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                   horizontal: DesignTokens.space4,
                 ),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? DesignTokens.ink
-                      : DesignTokens.canvasDim,
+                  color: selected ? DesignTokens.ink : DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(

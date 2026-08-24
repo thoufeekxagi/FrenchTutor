@@ -307,10 +307,7 @@ class _SpeakCourseVocabularyScreenState
             subtitle: '${widget.sessionTitle} · ${_language.level}',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.close_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           Expanded(
@@ -331,7 +328,7 @@ class _SpeakCourseVocabularyScreenState
                   ),
                 ] else if (_finished) ...[
                   const SizedBox(height: 48),
-                  const Icon(
+                  Icon(
                     Icons.check_circle_outline_rounded,
                     color: SpeakColors.green,
                     size: 56,
@@ -352,9 +349,9 @@ class _SpeakCourseVocabularyScreenState
                   ),
                 ] else if (_error != null) ...[
                   const SizedBox(height: 48),
-                  const Icon(
+                  Icon(
                     Icons.cloud_off_rounded,
-                    color: SpeakColors.blue,
+                    color: SpeakColors.accent,
                     size: 56,
                   ),
                   const SizedBox(height: 18),
@@ -380,7 +377,7 @@ class _SpeakCourseVocabularyScreenState
                     _deckSize == 1 ? 'ONE WORD' : '$_deckSize WORDS',
                     style: DesignTokens.label(
                       10,
-                    ).copyWith(color: SpeakColors.blue, letterSpacing: 1.2),
+                    ).copyWith(color: SpeakColors.accent, letterSpacing: 1.2),
                   ),
                   const SizedBox(height: 7),
                   Text(
@@ -419,7 +416,7 @@ class _SpeakCourseVocabularyScreenState
                   ),
                   const SizedBox(height: 18),
                   SpeakCard(
-                    color: SpeakColors.blueSoft,
+                    color: SpeakColors.accentSoft,
                     padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 250),
@@ -433,7 +430,7 @@ class _SpeakCourseVocabularyScreenState
                             style: DesignTokens.body(
                               22,
                               weight: FontWeight.w700,
-                            ).copyWith(color: SpeakColors.blue),
+                            ).copyWith(color: SpeakColors.accent),
                           ),
                           if (word.phonetic.trim().isNotEmpty) ...[
                             const SizedBox(height: 8),
@@ -452,7 +449,7 @@ class _SpeakCourseVocabularyScreenState
                               label: 'Listen',
                               size: 50,
                               iconSize: 18,
-                              color: SpeakColors.blue,
+                              color: SpeakColors.accent,
                               contentItemId:
                                   '${widget.contentKey}:vocabulary:${word.id}',
                               audioResolver: () =>

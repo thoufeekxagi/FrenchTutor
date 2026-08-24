@@ -306,7 +306,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '•  ',
                         style: TextStyle(color: DesignTokens.primary),
                       ),
@@ -330,7 +330,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.arrow_left_right,
                   size: 18,
                   color: DesignTokens.info,
@@ -366,6 +366,13 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
       return const _EmptyState(message: 'This story has no sentences yet.');
     }
     final segment = _segments[_storyIndex.clamp(0, _segments.length - 1)];
+    final contextSurface = DesignTokens.isDark
+        ? DesignTokens.surface
+        : DesignTokens.ink;
+    final contextText = DesignTokens.isDark
+        ? DesignTokens.ink
+        : DesignTokens.canvas;
+    final contextMuted = contextText.withValues(alpha: 0.72);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -384,8 +391,10 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
         ),
         const SizedBox(height: 16),
         LearningCard(
-          color: DesignTokens.ink,
-          borderColor: DesignTokens.ink,
+          color: contextSurface,
+          borderColor: DesignTokens.isDark
+              ? DesignTokens.hairline
+              : contextSurface,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -396,14 +405,14 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                     style: DesignTokens.mono(
                       12,
                       weight: FontWeight.w700,
-                    ).copyWith(color: Colors.white70),
+                    ).copyWith(color: contextMuted),
                   ),
                   const Spacer(),
                   TtsPlayButton(
                     text: segment.fr,
                     size: 44,
                     iconSize: 22,
-                    color: Colors.white,
+                    color: contextText,
                     label: 'Listen once',
                     contentItemId: widget.story.segmentContentId(_storyIndex),
                   ),
@@ -414,17 +423,17 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                 segment.fr,
                 style: DesignTokens.display(
                   21,
-                ).copyWith(color: Colors.white, height: 1.25),
+                ).copyWith(color: contextText, height: 1.25),
               ),
               const SizedBox(height: 16),
-              Container(height: 1, color: Colors.white24),
+              Container(height: 1, color: contextText.withValues(alpha: 0.24)),
               const SizedBox(height: 14),
               Text(
                 segment.en,
                 style: DesignTokens.body(
                   _grammarBodySize,
                   weight: FontWeight.w600,
-                ).copyWith(color: Colors.white, height: 1.35),
+                ).copyWith(color: contextText, height: 1.35),
               ),
               if (segment.grammarNote.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
@@ -432,7 +441,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
                   segment.grammarNote,
                   style: DesignTokens.body(
                     14,
-                  ).copyWith(color: Colors.white70, height: 1.4),
+                  ).copyWith(color: contextMuted, height: 1.4),
                 ),
               ],
             ],
@@ -581,7 +590,7 @@ class _GrammarWorkshopScreenState extends ConsumerState<GrammarWorkshopScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.lightbulb,
                 size: 19,
                 color: DesignTokens.success,

@@ -148,10 +148,10 @@ class _FrameImage extends StatelessWidget {
         key: ValueKey(frameId),
         borderRadius: BorderRadius.circular(compact ? 22 : 28),
         child: DecoratedBox(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Color(0x180D1B36),
+                color: Colors.black.withValues(alpha: 0.09),
                 blurRadius: 18,
                 offset: Offset(0, 8),
               ),

@@ -122,9 +122,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                 // the backdrop was painted as part of that same zoomable
                 // CustomPaint, so pinching/dragging moved the "background"
                 // right along with the dots instead of staying put.
-                const Positioned.fill(
-                  child: ColoredBox(color: DesignTokens.ink),
-                ),
+                Positioned.fill(child: ColoredBox(color: DesignTokens.ink)),
                 Positioned.fill(
                   child: InteractiveViewer(
                     transformationController: _transform,
@@ -231,7 +229,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                                 ),
                               ],
                             ),
-                            child: const SizedBox(
+                            child: SizedBox(
                               width: 44,
                               height: 44,
                               child: Icon(
@@ -263,7 +261,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(100),
         border: Border.all(
           color: _modalityColor(source).withValues(alpha: 0.4),
@@ -369,7 +367,7 @@ class _FingerprintPainter extends CustomPainter {
 
   /// A wider jewel-tone cycle than a plain "topic color" scheme needs, so
   /// clusters read as distinct neighborhoods rather than a handful of repeats.
-  static const _palette = <Color>[
+  static final _palette = <Color>[
     DesignTokens.primary,
     DesignTokens.info,
     DesignTokens.mastery,

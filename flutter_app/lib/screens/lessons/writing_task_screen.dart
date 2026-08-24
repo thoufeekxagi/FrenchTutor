@@ -412,10 +412,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const KickerText(
-                    'Writing practice',
-                    color: DesignTokens.mutedDim,
-                  ),
+                  KickerText('Writing practice', color: DesignTokens.mutedDim),
                   const SizedBox(height: 6),
                   Text(
                     'Take your time. Write naturally.',
@@ -529,7 +526,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
         children: [
           Row(
             children: [
-              const KickerText('Feedback', color: DesignTokens.mutedDim),
+              KickerText('Feedback', color: DesignTokens.mutedDim),
               const Spacer(),
               Text(
                 '${feedback.scoreOutOf10.toStringAsFixed(1)} / 10',
@@ -553,7 +550,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       CupertinoIcons.checkmark,
                       size: 14,
                       color: DesignTokens.success,
@@ -595,7 +592,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(
+                        Icon(
                           CupertinoIcons.arrow_right,
                           size: 11,
                           color: DesignTokens.muted,
@@ -652,7 +649,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       CupertinoIcons.arrow_up_right_circle_fill,
                       size: 14,
                       color: DesignTokens.primary,
@@ -680,7 +677,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     CupertinoIcons.speaker_2_fill,
                     size: 18,
                     color: DesignTokens.primary,
@@ -721,10 +718,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
         children: [
           Row(
             children: [
-              const KickerText(
-                'Your writing brief',
-                color: DesignTokens.mutedDim,
-              ),
+              KickerText('Your writing brief', color: DesignTokens.mutedDim),
               const Spacer(),
               Icon(
                 CupertinoIcons.text_alignleft,
@@ -851,7 +845,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
         children: [
           Row(
             children: [
-              const KickerText('Your draft', color: DesignTokens.mutedDim),
+              KickerText('Your draft', color: DesignTokens.mutedDim),
               const Spacer(),
               Text(
                 '$_wordCount / ${task.minWords} words',

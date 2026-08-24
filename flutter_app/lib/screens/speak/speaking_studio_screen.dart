@@ -6,16 +6,17 @@ import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
+import '../../services/free_talk_session_launcher.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import 'speak_course_activity_screen.dart';
+import 'speak_course_session_screen.dart';
+import 'speaking_course_home_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
-import 'speaking_practice_screen.dart';
 
 /// Speaking Studio: a compact next-action surface over the existing course/session
 /// data flow. The redesign changes hierarchy and presentation only.
@@ -33,23 +34,13 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
       context,
-      (_) => SpeakCourseActivityScreen(session: session),
+      (_) => SpeakCourseSessionScreen(session: session),
     );
     if (mounted) setState(() {});
   }
 
   Future<void> _callTutor() async {
-    await AppRouter.push(
-      context,
-      (_) => const SpeakingPracticeScreen(
-        request: SpeakingPracticeRequest(
-          mode: SpeakingMode.freeTalk,
-          topic: 'Surprise me',
-          goal: 'Fluency',
-        ),
-      ),
-      fullscreenDialog: true,
-    );
+    await openFreeTalkSession(context, ref);
     if (mounted) setState(() {});
   }
 
@@ -59,9 +50,15 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
+    // Home is a read-only surface. The app/onboarding flow is responsible
+    // for creating the persisted adaptive plan; rendering a card must never
+    // create or re-plan course content.
     final adaptivePlan = ref
         .read(adaptiveCourseStoreProvider)
-        .ensureCurrentPlan(profile);
+        .currentPlan(profile);
+    if (adaptivePlan == null) {
+      throw StateError('Home requires a persisted adaptive course plan.');
+    }
     final roadmap = SpeakRoadmapService.build(
       profile,
       completedContentKeys: completedContentKeys,
@@ -138,7 +135,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             tooltip: 'Speaking settings',
             onPressed: () =>
                 AppRouter.push(context, (_) => const SpeakSettingsScreen()),
-            icon: const Icon(
+            icon: Icon(
               Icons.tune_rounded,
               color: DesignTokens.nightAccent,
               size: 22,
@@ -160,7 +157,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: DesignTokens.nightAccent, width: 1.5),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_outline_rounded,
                 color: DesignTokens.nightAccent,
                 size: 22,
@@ -339,6 +336,8 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       SpeakSkill.reading => SpeakSkill.reading,
       SpeakSkill.vocabulary => SpeakSkill.vocabulary,
       SpeakSkill.listening => SpeakSkill.listening,
+      SpeakSkill.speaking => SpeakSkill.speaking,
+      SpeakSkill.writing => SpeakSkill.writing,
       _ => null,
     };
     final modes = [
@@ -359,6 +358,18 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
         SpeakSkill.vocabulary,
         Icons.style_rounded,
         const VocabLabScreen(),
+      ),
+      (
+        'Speaking',
+        SpeakSkill.speaking,
+        Icons.graphic_eq_rounded,
+        const SpeakingCourseHomeScreen(),
+      ),
+      (
+        'Writing',
+        SpeakSkill.writing,
+        Icons.edit_note_rounded,
+        const WritingLabScreen(),
       ),
     ];
     return SizedBox(
@@ -431,7 +442,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.route_rounded,
                 color: DesignTokens.nightAccent,
                 size: 19,
@@ -456,7 +467,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
               value: progress,
               minHeight: 6,
               backgroundColor: DesignTokens.nightHairline,
-              valueColor: const AlwaysStoppedAnimation<Color>(
+              valueColor: AlwaysStoppedAnimation<Color>(
                 DesignTokens.nightAccent,
               ),
             ),
@@ -693,7 +704,7 @@ class _UpcomingSessionRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: DesignTokens.nightAccent,
                 size: 15,

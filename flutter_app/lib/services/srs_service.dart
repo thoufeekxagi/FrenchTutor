@@ -182,44 +182,23 @@ class SRSService {
     return base;
   }
 
-  /// Returns a CANDIDATE POOL, deliberately bigger than what actually gets
-  /// practiced — the caller (see `vocab_picker_screen.dart._beginSession`)
-  /// hands this whole pool to `LessonAgentService.planVocabSession` to
-  /// genuinely CURATE the final `autoQueueSize` selection, or falls back to
-  /// taking the front of this list if that call fails. Both due and unseen
-  /// entries are shuffled before picking, which was the root cause of "same
-  /// five words every time": the old version always walked the vocab bank
-  /// in fixed curriculum order and took the first N, so both the direct
-  /// result AND the AI-reorder fallback landed on an identical deterministic
-  /// slice call after call. Shuffling here means even a total AI failure now
-  /// produces a different, genuinely varied set each time.
+  /// Returns the exact deck that the vocabulary workshop will practice.
+  ///
+  /// A deck is content state, not a best-effort suggestion. The caller freezes
+  /// these exact entries before the workshop opens. If there are not enough
+  /// due/new entries, the result is shorter and the UI can say so explicitly
+  /// instead of silently substituting known words.
   Future<List<VocabEntry>> dailyMixedQueue() async {
     final allEntries = ContentService.shared.vocabEntriesForLevel(
       store.profile().level,
     );
     final states = store.allSRSStates();
     final now = DateTime.now();
-    final basePolicy = policyFor(
-      store.profile().sessionLength,
-      firstEverSession: store.hasNoReviewHistory(),
-    );
-
-    // The learner's own word-count preference is the real cap now, not the
-    // session-length-derived total — [autoQueueSize] scales the new/review
-    // split proportionally so a 5-word session isn't suddenly all-new or
-    // all-review, it's just a smaller version of the same mix.
     final targetSize = await autoQueueSize;
-    final scale = basePolicy.totalCap == 0
-        ? 1.0
-        : targetSize / basePolicy.totalCap;
-    final policy = (
-      newBudget: (basePolicy.newBudget * scale).round().clamp(0, targetSize),
-      reviewBudget: (basePolicy.reviewBudget * scale).round().clamp(
-        0,
-        targetSize,
-      ),
-      totalCap: targetSize,
-    );
+    final newCap = await newCardsPerDay;
+    final remainingNew = (newCap - store.newEntriesIntroducedToday())
+        .clamp(0, newCap)
+        .toInt();
 
     final due = <VocabEntry>[];
     final unseen = <VocabEntry>[];
@@ -234,40 +213,11 @@ class SRSService {
     due.shuffle();
     unseen.shuffle();
 
-    // Pool budgets are a multiple of the pacing budgets, not equal to them —
-    // this is what actually gives the curator (or the shuffle fallback)
-    // something to choose FROM, instead of handing over exactly the words
-    // that will be shown.
-    const poolMultiplier = 4;
-    final newBudget = (policy.newBudget - store.newEntriesIntroducedToday())
-        .clamp(0, policy.newBudget);
-    final queue = [
-      ...due.take(policy.reviewBudget * poolMultiplier),
-      ...unseen.take(newBudget * poolMultiplier),
-    ];
-    final poolCap = targetSize * poolMultiplier;
-    final capped = queue.take(poolCap).toList();
-    if (capped.length >= targetSize) return capped;
-
-    // Under the target — the daily new-word cap already got used up
-    // elsewhere today, but there's no reason to leave the learner staring
-    // at "0 words ready" when unseen words still exist in the bank. Top up
-    // with more unseen words beyond today's cap (still fresh content, just
-    // past today's pacing budget), then with known words for review, until
-    // the target is hit or the whole bank is truly spent.
-    final chosenIds = capped.map((e) => e.id).toSet();
-    final topUp = [...capped];
-    for (final entry in unseen) {
-      if (topUp.length >= poolCap) break;
-      if (chosenIds.add(entry.id)) topUp.add(entry);
-    }
-    if (topUp.length < targetSize) {
-      for (final entry in knownSample(limit: poolCap)) {
-        if (topUp.length >= poolCap) break;
-        if (chosenIds.add(entry.id)) topUp.add(entry);
-      }
-    }
-    return topUp;
+    final dueCount = due.length < targetSize ? due.length : targetSize;
+    final newCount = (targetSize - dueCount).clamp(0, remainingNew).toInt();
+    final queue = [...due.take(dueCount), ...unseen.take(newCount)];
+    queue.shuffle();
+    return queue;
   }
 
   List<VocabEntry> knownSample({int limit = 6}) {

@@ -48,7 +48,7 @@ class SessionRow extends StatelessWidget {
               color: DesignTokens.primarySoft,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.forum_outlined,
               size: 19,
               color: DesignTokens.primary,
@@ -91,7 +91,7 @@ class SessionRow extends StatelessWidget {
                 ).copyWith(color: DesignTokens.primary),
               ),
             ),
-          const Icon(
+          Icon(
             Icons.chevron_right_rounded,
             size: 19,
             color: DesignTokens.muted,

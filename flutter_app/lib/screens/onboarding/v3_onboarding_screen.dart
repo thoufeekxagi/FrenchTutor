@@ -135,10 +135,11 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        const Icon(
-          Icons.auto_awesome_rounded,
-          color: DesignTokens.nightAccent,
-          size: 46,
+        Image.asset(
+          'assets/images/pulse_sprint_logo.png',
+          width: 64,
+          height: 64,
+          fit: BoxFit.contain,
         ),
         const SizedBox(height: 26),
         Text(
@@ -155,7 +156,7 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
           ).copyWith(color: DesignTokens.nightMuted, height: 1.45),
         ),
         const SizedBox(height: 24),
-        const V3Card(
+        V3Card(
           child: Row(
             children: [
               Icon(Icons.lock_outline_rounded, color: DesignTokens.nightAccent),
@@ -410,7 +411,7 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
           padding: const EdgeInsets.fromLTRB(14, 8, 7, 8),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.notifications_none_rounded,
                 color: DesignTokens.nightAccent,
               ),

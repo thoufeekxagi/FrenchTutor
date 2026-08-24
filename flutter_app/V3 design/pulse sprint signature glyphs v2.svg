@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="840" viewBox="0 0 1500 840">
+  <rect width="1500" height="840" fill="#08090B"/>
+  <text x="48" y="58" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="32" font-weight="700">ParleSprint · signature glyphs</text>
+  <text x="50" y="90" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">No literal feature icons · no wordmark · one memorable silhouette per direction</text>
+
+  <!-- 01: open comma -->
+  <g transform="translate(40 140)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">01</text>
+    <g transform="translate(71 76)" fill="none" stroke="#F7BA45" stroke-width="34" stroke-linecap="round">
+      <path d="M108 20c-48 0-86 38-86 86s38 86 86 86c29 0 54-14 70-35"/>
+    </g>
+    <circle cx="202" cy="248" r="16" fill="#F7BA45"/>
+  </g>
+
+  <!-- 02: seed -->
+  <g transform="translate(340 140)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">02</text>
+    <path d="M130 78c58 0 86 35 86 74s-28 74-86 74c-34 0-64-10-86-31 34-15 56-40 56-73 0-17-6-31-17-44 14 0 30 0 47 0Z" fill="#F7BA45"/>
+    <circle cx="131" cy="151" r="19" fill="#111316"/>
+  </g>
+
+  <!-- 03: overlap -->
+  <g transform="translate(640 140)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">03</text>
+    <circle cx="110" cy="164" r="58" fill="#F7BA45"/>
+    <circle cx="154" cy="136" r="58" fill="#B88734"/>
+    <circle cx="132" cy="150" r="35" fill="#111316"/>
+  </g>
+
+  <!-- 04: open frame -->
+  <g transform="translate(940 140)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">04</text>
+    <path d="M77 218V125c0-29 24-53 53-53h50" fill="none" stroke="#F7BA45" stroke-width="34" stroke-linecap="round"/>
+    <path d="M180 72c29 0 53 24 53 53v51" fill="none" stroke="#B88734" stroke-width="34" stroke-linecap="round"/>
+    <circle cx="213" cy="218" r="17" fill="#F7BA45"/>
+  </g>
+
+  <!-- 05: fold -->
+  <g transform="translate(1240 140)">
+    <rect width="220" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">05</text>
+    <path d="M64 95c0-19 15-34 34-34h55c19 0 34 15 34 34v52c0 19-15 34-34 34H98c-19 0-34-15-34-34Z" fill="#F7BA45"/>
+    <path d="M64 147h55c19 0 34 15 34 34v24c0 19-15 34-34 34H98c-19 0-34-15-34-34v-24" fill="#B88734"/>
+  </g>
+
+  <!-- 06: offset pair -->
+  <g transform="translate(40 500)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">06</text>
+    <rect x="76" y="88" width="58" height="126" rx="29" fill="#F7BA45"/>
+    <rect x="126" y="72" width="58" height="126" rx="29" fill="#B88734"/>
+    <circle cx="185" cy="214" r="15" fill="#F7BA45"/>
+  </g>
+
+  <!-- 07: double arc -->
+  <g transform="translate(340 500)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">07</text>
+    <path d="M70 199c0-66 27-105 60-105s60 39 60 105" fill="none" stroke="#F7BA45" stroke-width="30" stroke-linecap="round"/>
+    <path d="M93 219c0-34 16-55 37-55s37 21 37 55" fill="none" stroke="#B88734" stroke-width="22" stroke-linecap="round"/>
+  </g>
+
+  <!-- 08: notch -->
+  <g transform="translate(640 500)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">08</text>
+    <path d="M74 104c0-23 19-42 42-42h38c23 0 42 19 42 42v40c0 23-19 42-42 42h-38c-23 0-42-19-42-42Z" fill="#F7BA45"/>
+    <path d="M112 186v27c0 23 19 42 42 42h38" fill="none" stroke="#B88734" stroke-width="30" stroke-linecap="round"/>
+    <circle cx="193" cy="255" r="14" fill="#F7BA45"/>
+  </g>
+
+  <!-- 09: drop -->
+  <g transform="translate(940 500)">
+    <rect width="260" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">09</text>
+    <path d="M130 66c38 40 58 69 58 96 0 36-26 62-58 62s-58-26-58-62c0-27 20-56 58-96Z" fill="#F7BA45"/>
+    <path d="M130 109c18 20 27 35 27 49 0 16-12 28-27 28s-27-12-27-28c0-14 9-29 27-49Z" fill="#111316"/>
+  </g>
+
+  <!-- 10: single mark -->
+  <g transform="translate(1240 500)">
+    <rect width="220" height="300" rx="38" fill="#111316" stroke="#292C30" stroke-width="2"/>
+    <text x="24" y="42" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700">10</text>
+    <path d="M71 215c0-64 28-111 76-111 22 0 39 12 48 31-21 1-35 14-35 32 0 24 20 40 43 40-14 32-42 52-77 52-30 0-55-16-55-44Z" fill="#F7BA45"/>
+    <circle cx="164" cy="151" r="17" fill="#111316"/>
+  </g>
+</svg>

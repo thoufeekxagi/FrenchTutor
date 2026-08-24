@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../design/tokens.dart';
 
@@ -13,19 +14,31 @@ class V3Scaffold extends StatelessWidget {
     super.key,
     required this.child,
     this.floatingActionButton,
-    this.backgroundColor = DesignTokens.nightCanvas,
+    this.backgroundColor,
   });
 
   final Widget child;
   final Widget? floatingActionButton;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      floatingActionButton: floatingActionButton,
-      body: SafeArea(child: child),
+    final dark = DesignTokens.isDark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: DesignTokens.nightCanvas,
+        systemNavigationBarIconBrightness: dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: backgroundColor ?? DesignTokens.nightCanvas,
+        floatingActionButton: floatingActionButton,
+        body: SafeArea(child: child),
+      ),
     );
   }
 }
@@ -107,13 +120,13 @@ class V3IconButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.tooltip,
-    this.accent = DesignTokens.nightText,
+    this.accent,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
   final String? tooltip;
-  final Color accent;
+  final Color? accent;
 
   @override
   Widget build(BuildContext context) {
@@ -121,10 +134,10 @@ class V3IconButton extends StatelessWidget {
       tooltip: tooltip,
       onPressed: onPressed,
       icon: Icon(icon),
-      color: accent,
+      color: accent ?? DesignTokens.nightText,
       style: IconButton.styleFrom(
         backgroundColor: DesignTokens.nightSurface,
-        side: const BorderSide(color: DesignTokens.nightHairline),
+        side: BorderSide(color: DesignTokens.nightHairline),
         shape: const CircleBorder(),
       ),
     );
@@ -196,7 +209,7 @@ class V3Row extends StatelessWidget {
     required this.subtitle,
     this.value,
     this.onTap,
-    this.accent = DesignTokens.nightAccent,
+    this.accent,
     this.trailing,
   });
 
@@ -205,17 +218,18 @@ class V3Row extends StatelessWidget {
   final String subtitle;
   final String? value;
   final VoidCallback? onTap;
-  final Color accent;
+  final Color? accent;
   final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
+    final accentColor = accent ?? DesignTokens.nightAccent;
     return V3Card(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, color: accent, size: 23),
+          Icon(icon, color: accentColor, size: 23),
           const SizedBox(width: 13),
           Expanded(
             child: Column(
@@ -247,16 +261,13 @@ class V3Row extends StatelessWidget {
               style: DesignTokens.body(
                 12,
                 weight: FontWeight.w700,
-              ).copyWith(color: accent),
+              ).copyWith(color: accentColor),
             ),
           ],
           if (trailing != null) ...[const SizedBox(width: 8), trailing!],
           if (onTap != null) ...[
             const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: DesignTokens.nightMuted,
-            ),
+            Icon(Icons.chevron_right_rounded, color: DesignTokens.nightMuted),
           ],
         ],
       ),
@@ -366,7 +377,7 @@ Future<T?> showV3Picker<T>({
                           ).copyWith(color: DesignTokens.nightMuted),
                         ),
                   trailing: option.value == selected
-                      ? const Icon(
+                      ? Icon(
                           Icons.check_rounded,
                           color: DesignTokens.nightAccent,
                         )
@@ -374,7 +385,7 @@ Future<T?> showV3Picker<T>({
                   onTap: () => Navigator.of(sheetContext).pop(option.value),
                 ),
                 if (option != options.last)
-                  const Divider(color: DesignTokens.nightHairline, height: 1),
+                  Divider(color: DesignTokens.nightHairline, height: 1),
               ],
             ],
           ),

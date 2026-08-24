@@ -57,7 +57,7 @@ class SpeakingSessionResultView extends StatelessWidget {
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: onDone,
-                            child: const SizedBox(
+                            child: SizedBox(
                               width: DesignTokens.minTapTarget,
                               height: DesignTokens.minTapTarget,
                               child: Icon(
@@ -210,7 +210,7 @@ class SpeakingSessionResultView extends StatelessWidget {
               color: DesignTokens.nightAccentSoft,
               borderRadius: BorderRadius.circular(13),
             ),
-            child: const Icon(
+            child: Icon(
               CupertinoIcons.book,
               color: DesignTokens.nightAccent,
               size: 20,

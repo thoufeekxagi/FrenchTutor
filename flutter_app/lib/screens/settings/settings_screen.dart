@@ -29,6 +29,7 @@ import '../../services/tutor_voice_preview.dart';
 import '../subscription/speak_paywall_screen.dart';
 import 'orchestration_lab_screen.dart';
 import '../../widgets/kicker_text.dart';
+import '../../widgets/tutor_helper_settings_panel.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -182,7 +183,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 6),
                         child: _previewer.loadingId == p.id
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 15,
                                 height: 15,
                                 child: CircularProgressIndicator(
@@ -202,7 +203,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     if (selected)
-                      const Icon(
+                      Icon(
                         CupertinoIcons.checkmark_circle_fill,
                         color: DesignTokens.primary,
                         size: 17,
@@ -373,7 +374,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ).copyWith(color: DesignTokens.primary),
                 ),
                 const SizedBox(width: 5),
-                const Icon(
+                Icon(
                   CupertinoIcons.chevron_forward,
                   size: 14,
                   color: DesignTokens.primary,
@@ -427,9 +428,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             top: false,
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+              decoration: BoxDecoration(
+                color: DesignTokens.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(26),
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -735,7 +738,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           color: DesignTokens.infoSoft,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           CupertinoIcons.play_circle_fill,
                           color: DesignTokens.info,
                         ),
@@ -762,7 +765,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ],
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         CupertinoIcons.chevron_right,
                         size: 16,
                         color: DesignTokens.mutedDim,
@@ -849,10 +852,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 if (!subscribed) ...[
-                                  const Icon(
+                                  Icon(
                                     CupertinoIcons.sparkles,
                                     size: 15,
-                                    color: Colors.white,
+                                    color: DesignTokens.onPrimary,
                                   ),
                                   const SizedBox(width: 6),
                                 ],
@@ -987,6 +990,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               const SizedBox(height: 12),
 
+              // --- Tutor helper: one source, independent preference per skill ---
+              const TutorHelperSettingsPanel(),
+              const SizedBox(height: 12),
+
               // --- Roadmap ---
               _ModernCard(
                 child: Column(
@@ -1016,7 +1023,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ).copyWith(color: DesignTokens.primary),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(
+                            Icon(
                               CupertinoIcons.calendar,
                               size: 14,
                               color: DesignTokens.primary,
@@ -1228,7 +1235,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       constraints: const BoxConstraints(minHeight: 44),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             CupertinoIcons.lab_flask,
                             size: 21,
                             color: DesignTokens.mastery,
@@ -1255,7 +1262,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ],
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             CupertinoIcons.chevron_forward,
                             size: 16,
                             color: DesignTokens.mutedDim,
@@ -1435,7 +1442,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: _deletingAccount
                             ? Row(
                                 children: [
-                                  const SizedBox(
+                                  SizedBox(
                                     width: 15,
                                     height: 15,
                                     child: CircularProgressIndicator(
@@ -1550,7 +1557,9 @@ class _ChoiceRow extends StatelessWidget {
                   o.$2,
                   style: DesignTokens.body(11.5, weight: FontWeight.w600)
                       .copyWith(
-                        color: isSelected ? Colors.white : DesignTokens.text,
+                        color: isSelected
+                            ? DesignTokens.onPrimary
+                            : DesignTokens.text,
                       ),
                 ),
               ),

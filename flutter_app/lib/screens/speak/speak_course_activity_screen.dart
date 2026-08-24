@@ -259,10 +259,11 @@ class _SpeakCourseActivityScreenState
   }
 
   List<SpeakingPhraseStep> _freeTalkSteps(SpeakRoadmapSession session) {
-    final lesson = SpeakingCourseCatalog.freeTalkLessons.firstWhere(
-      (candidate) => candidate.level == _level,
-      orElse: () => SpeakingCourseCatalog.freeTalkLessons.first,
-    );
+    final lessons = SpeakingCourseCatalog.freeTalkForLevel(_level);
+    final lessonIndex = session.index < 1
+        ? 0
+        : (session.index - 1) % lessons.length;
+    final lesson = lessons[lessonIndex];
     return [
       for (final line in lesson.lines)
         SpeakingPhraseStep(
@@ -303,10 +304,7 @@ class _SpeakCourseActivityScreenState
             subtitle: session.title,
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.close_rounded, color: SpeakColors.inkSoft),
             ),
           ),
           Expanded(

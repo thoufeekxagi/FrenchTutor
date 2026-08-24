@@ -51,7 +51,7 @@ class ReportProblemButton extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _report,
-        child: const SizedBox(
+        child: SizedBox(
           width: 44,
           height: 44,
           child: Icon(CupertinoIcons.flag, size: 19, color: AppStyles.mutedDim),

@@ -396,14 +396,14 @@ class _RecommendedPractice extends StatelessWidget {
                   color: DesignTokens.primarySoft,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.arrow_counterclockwise,
                   color: DesignTokens.primary,
                   size: 19,
                 ),
               ),
               const SizedBox(width: DesignTokens.space3),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -436,7 +436,7 @@ class _RecommendedPractice extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 CupertinoIcons.chevron_right,
                 color: DesignTokens.mutedDim,
                 size: 16,

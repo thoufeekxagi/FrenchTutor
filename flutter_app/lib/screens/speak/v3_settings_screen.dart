@@ -9,10 +9,12 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
+import '../../providers/appearance_provider.dart';
 import '../../providers/database_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/revenue_cat_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
+import '../../widgets/tutor_helper_settings_panel.dart';
 import '../../widgets/v3/v3_surface.dart';
 import '../subscription/speak_paywall_screen.dart';
 
@@ -201,6 +203,7 @@ class _V3SettingsScreenState extends ConsumerState<V3SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final profile = _profile;
+    final appearance = ref.watch(appearanceSettingsProvider);
     return V3Scaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 34),
@@ -245,6 +248,10 @@ class _V3SettingsScreenState extends ConsumerState<V3SettingsScreen> {
             onTap: _pickTutor,
           ),
           const SizedBox(height: 20),
+          V3SectionLabel('Tutor helper by practice area'),
+          const SizedBox(height: 9),
+          TutorHelperSettingsPanel(dark: appearance.darkMode),
+          const SizedBox(height: 20),
           V3SectionLabel('Preferences'),
           const SizedBox(height: 9),
           _toggleRow(
@@ -269,6 +276,14 @@ class _V3SettingsScreenState extends ConsumerState<V3SettingsScreen> {
             'Use gentle touch feedback for key actions',
             _haptics,
             (value) => setState(() => _haptics = value),
+          ),
+          const SizedBox(height: 8),
+          _toggleRow(
+            Icons.dark_mode_outlined,
+            'Dark mode',
+            'Use black and gold across every practice area',
+            appearance.darkMode,
+            (value) => ref.read(appearanceSettingsProvider).setDarkMode(value),
           ),
           const SizedBox(height: 20),
           V3SectionLabel('Account & help'),

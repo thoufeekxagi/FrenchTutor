@@ -14,6 +14,7 @@ import '../../providers/database_provider.dart';
 import '../../services/app_tour.dart';
 import '../../services/daily_goal_service.dart';
 import '../../services/daily_summary_service.dart';
+import '../../services/free_talk_session_launcher.dart';
 import '../../services/notification_scheduler_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/subscription_gate_service.dart';
@@ -74,13 +75,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _openSession({String? lessonContext}) async {
+    if (lessonContext == null) {
+      await openFreeTalkSession(context, ref);
+      _reload();
+      return;
+    }
     await AppRouter.push(
       context,
       (_) => SpeakingPracticeScreen(
         request: SpeakingPracticeRequest(
-          mode: lessonContext == null
-              ? SpeakingMode.freeTalk
-              : SpeakingMode.roleplay,
+          mode: SpeakingMode.roleplay,
           topic: 'Daily speaking practice',
           level: ref.read(learningStoreProvider).profile().level,
           goal: 'Fluency',
@@ -225,7 +229,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: DesignTokens.hairline),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.person_outline_rounded,
             size: 19,
             color: DesignTokens.mutedDim,
@@ -357,7 +361,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               color: DesignTokens.primarySoft,
               borderRadius: BorderRadius.circular(15),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.graphic_eq_rounded,
               color: DesignTokens.primary,
               size: 23,
@@ -385,7 +389,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _openSession,
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(8),
               child: Icon(
                 Icons.arrow_forward_rounded,
@@ -462,7 +466,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.auto_awesome_rounded, color: DesignTokens.primary),
+          Icon(Icons.auto_awesome_rounded, color: DesignTokens.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -564,7 +568,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Container(
                     width: 48,
                     height: 48,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: DesignTokens.info,
                       shape: BoxShape.circle,
                     ),
@@ -608,11 +612,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: DesignTokens.surface,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       CupertinoIcons.mic_fill,
                       color: DesignTokens.primary,
                       size: 19,
@@ -960,7 +964,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.square_pencil,
               size: 18,
               color: DesignTokens.info,
@@ -972,7 +976,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 style: DesignTokens.body(14, weight: FontWeight.w600),
               ),
             ),
-            const Icon(
+            Icon(
               CupertinoIcons.chevron_right,
               size: 14,
               color: DesignTokens.muted,

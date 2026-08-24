@@ -24,7 +24,7 @@ class StoryCoverImage extends StatelessWidget {
 
   Widget _fallback() {
     return Container(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
+      decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
       child: fallbackIcon == null
           ? null
           : Center(child: Icon(fallbackIcon, color: Colors.white, size: 34)),

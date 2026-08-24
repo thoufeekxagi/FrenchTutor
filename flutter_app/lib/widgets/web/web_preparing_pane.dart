@@ -96,7 +96,7 @@ class _WebPreparingPaneState extends State<WebPreparingPane>
 
   Widget _brandPanel() {
     return DecoratedBox(
-      decoration: const BoxDecoration(color: DesignTokens.ink),
+      decoration: BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
@@ -182,7 +182,7 @@ class _WebPreparingPaneState extends State<WebPreparingPane>
               color: DesignTokens.primarySoft,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               CupertinoIcons.waveform,
               size: 20,
               color: DesignTokens.primary,
@@ -248,7 +248,7 @@ class _WebPreparingPaneState extends State<WebPreparingPane>
           const SizedBox(height: 20),
           Row(
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.lock_shield_fill,
                 size: 15,
                 color: DesignTokens.mutedDim,

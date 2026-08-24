@@ -101,7 +101,7 @@ class SpeakProfileScreen extends ConsumerWidget {
                 icon: Icons.schedule_rounded,
                 value: _formatStudyTime(studiedSeconds),
                 label: 'TIME\nSTUDIED',
-                color: SpeakColors.blue,
+                color: SpeakColors.accent,
               ),
               SpeakStat(
                 icon: Icons.local_fire_department_rounded,
@@ -134,7 +134,7 @@ class SpeakProfileScreen extends ConsumerWidget {
                 _profileRow(
                   context,
                   Icons.bookmark_rounded,
-                  SpeakColors.blue,
+                  SpeakColors.accent,
                   'Saved Lines',
                   'Phrases to review',
                   () =>
@@ -144,7 +144,7 @@ class SpeakProfileScreen extends ConsumerWidget {
                 _profileRow(
                   context,
                   Icons.insights_rounded,
-                  SpeakColors.blue,
+                  SpeakColors.accent,
                   'Progress',
                   'See your skills and practice history',
                   () => AppRouter.push(context, (_) => const ProgressScreen()),
@@ -185,12 +185,12 @@ class SpeakProfileScreen extends ConsumerWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: SpeakColors.blueSoft,
+                    color: SpeakColors.accentSoft,
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: const Icon(
                     Icons.language_rounded,
-                    color: SpeakColors.blue,
+                    color: SpeakColors.accent,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -223,7 +223,7 @@ class SpeakProfileScreen extends ConsumerWidget {
             child: SpeakCard(
               child: Row(
                 children: [
-                  const Icon(Icons.history_rounded, color: SpeakColors.blue),
+                  const Icon(Icons.history_rounded, color: SpeakColors.accent),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -286,7 +286,7 @@ class SpeakProfileScreen extends ConsumerWidget {
             ),
           ),
           if (onTap != null)
-            const Icon(Icons.chevron_right_rounded, color: SpeakColors.inkSoft),
+            Icon(Icons.chevron_right_rounded, color: SpeakColors.inkSoft),
         ],
       ),
     );

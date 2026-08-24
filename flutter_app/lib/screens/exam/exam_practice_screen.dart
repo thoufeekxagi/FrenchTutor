@@ -189,14 +189,14 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
 
   Widget _audioPanel() {
     return _ExamSurface(
-      color: SpeakColors.navy,
+      color: DesignTokens.nightSurfaceRaised,
       child: Row(
         children: [
           Icon(
             _audioComplete
                 ? Icons.check_circle_outline_rounded
                 : Icons.headphones_rounded,
-            color: Colors.white,
+            color: DesignTokens.nightText,
             size: 30,
           ),
           const SizedBox(width: 14),
@@ -209,14 +209,16 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
                   style: DesignTokens.body(
                     16,
                     weight: FontWeight.w700,
-                  ).copyWith(color: Colors.white),
+                  ).copyWith(color: DesignTokens.nightText),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   _audioComplete
                       ? 'Answer the questions below.'
                       : 'The recording plays once, like the exam.',
-                  style: DesignTokens.body(12).copyWith(color: Colors.white70),
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.nightMuted),
                 ),
               ],
             ),
@@ -224,10 +226,10 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
           FilledButton(
             onPressed: _audioStarted ? null : _startListening,
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: SpeakColors.navy,
-              disabledBackgroundColor: Colors.white24,
-              disabledForegroundColor: Colors.white70,
+              backgroundColor: DesignTokens.nightAccent,
+              foregroundColor: DesignTokens.onPrimary,
+              disabledBackgroundColor: DesignTokens.nightHairline,
+              disabledForegroundColor: DesignTokens.nightMuted,
             ),
             child: Text(_audioPlaying ? 'Playing…' : 'Start'),
           ),
@@ -246,7 +248,7 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DesignTokens.surface,
           border: Border(top: BorderSide(color: DesignTokens.hairline)),
         ),
         child: SizedBox(
@@ -269,10 +271,10 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
               _submitted ? 'Finish and save result' : 'Submit $title',
             ),
             style: FilledButton.styleFrom(
-              backgroundColor: SpeakColors.blue,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: SpeakColors.blue.withValues(alpha: 0.24),
-              disabledForegroundColor: Colors.white,
+              backgroundColor: DesignTokens.nightAccent,
+              foregroundColor: DesignTokens.onPrimary,
+              disabledBackgroundColor: DesignTokens.nightHairline,
+              disabledForegroundColor: DesignTokens.nightMuted,
               padding: const EdgeInsets.symmetric(vertical: 15),
             ),
           ),
@@ -285,20 +287,22 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
     final total = _questions.length;
     final percent = total == 0 ? 0 : ((_correctAnswers / total) * 100).round();
     return _ExamSurface(
-      color: SpeakColors.blueSoft,
+      color: SpeakColors.accentSoft,
       child: Row(
         children: [
           Container(
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: SpeakColors.blue,
+              color: SpeakColors.accent,
               borderRadius: BorderRadius.circular(16),
             ),
             alignment: Alignment.center,
             child: Text(
               '$percent%',
-              style: DesignTokens.display(16).copyWith(color: Colors.white),
+              style: DesignTokens.display(
+                16,
+              ).copyWith(color: DesignTokens.onPrimary),
             ),
           ),
           const SizedBox(width: 14),
@@ -366,7 +370,7 @@ class _ExamHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
             decoration: BoxDecoration(
-              color: SpeakColors.blueSoft,
+              color: SpeakColors.accentSoft,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -374,7 +378,7 @@ class _ExamHeader extends StatelessWidget {
               style: DesignTokens.body(
                 12,
                 weight: FontWeight.w700,
-              ).copyWith(color: SpeakColors.blue),
+              ).copyWith(color: SpeakColors.accent),
             ),
           ),
         ],
@@ -405,7 +409,9 @@ class _QuestionBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ExamSurface(
-      color: enabled ? Colors.white : Colors.white.withValues(alpha: 0.62),
+      color: enabled
+          ? DesignTokens.surface
+          : DesignTokens.surface.withValues(alpha: 0.62),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -501,7 +507,7 @@ class _OptionRow extends StatelessWidget {
                 : incorrect
                 ? DesignTokens.danger.withValues(alpha: 0.10)
                 : selected
-                ? SpeakColors.blueSoft
+                ? SpeakColors.accentSoft
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
@@ -510,7 +516,7 @@ class _OptionRow extends StatelessWidget {
                   : incorrect
                   ? DesignTokens.danger
                   : selected
-                  ? SpeakColors.blue
+                  ? SpeakColors.accent
                   : DesignTokens.hairline,
             ),
           ),
@@ -530,7 +536,7 @@ class _OptionRow extends StatelessWidget {
                     : incorrect
                     ? DesignTokens.danger
                     : selected
-                    ? SpeakColors.blue
+                    ? SpeakColors.accent
                     : DesignTokens.mutedDim,
               ),
               const SizedBox(width: 9),
@@ -598,10 +604,10 @@ class _ReviewAnswerLine extends StatelessWidget {
 }
 
 class _ExamSurface extends StatelessWidget {
-  const _ExamSurface({required this.child, this.color = Colors.white});
+  const _ExamSurface({required this.child, this.color});
 
   final Widget child;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -609,7 +615,7 @@ class _ExamSurface extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color,
+        color: color ?? DesignTokens.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: DesignTokens.hairline),
       ),
@@ -620,4 +626,4 @@ class _ExamSurface extends StatelessWidget {
 
 TextStyle get _kickerStyle => DesignTokens.label(
   10,
-).copyWith(color: SpeakColors.blue, letterSpacing: 1.1);
+).copyWith(color: SpeakColors.accent, letterSpacing: 1.1);

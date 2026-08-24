@@ -10,43 +10,43 @@ export '../design/tokens.dart';
 /// AppTheme for platform mapping. New code should import those directly;
 /// existing call sites migrate screen-by-screen during Phase 4.
 abstract final class Passeport {
-  static const ink = DesignTokens.ink;
-  static const inkSoft = DesignTokens.inkSoft;
-  static const parchment = DesignTokens.parchment;
-  static const parchmentDim = DesignTokens.parchmentDim;
-  static const card = DesignTokens.card;
-  static const maroon = DesignTokens.maroon;
-  static const maroonDeep = DesignTokens.maroonDeep;
-  static const brass = DesignTokens.brass;
-  static const sage = DesignTokens.sage;
-  static const sky = DesignTokens.sky;
-  static const primarySoft = DesignTokens.primarySoft;
-  static const successSoft = DesignTokens.successSoft;
-  static const infoSoft = DesignTokens.infoSoft;
-  static const masterySoft = DesignTokens.masterySoft;
-  static const slate = DesignTokens.slate;
-  static const slateDim = DesignTokens.slateDim;
-  static const text = DesignTokens.text;
+  static Color get ink => DesignTokens.ink;
+  static Color get inkSoft => DesignTokens.inkSoft;
+  static Color get parchment => DesignTokens.parchment;
+  static Color get parchmentDim => DesignTokens.parchmentDim;
+  static Color get card => DesignTokens.card;
+  static Color get maroon => DesignTokens.maroon;
+  static Color get maroonDeep => DesignTokens.maroonDeep;
+  static Color get brass => DesignTokens.brass;
+  static Color get sage => DesignTokens.sage;
+  static Color get sky => DesignTokens.sky;
+  static Color get primarySoft => DesignTokens.primarySoft;
+  static Color get successSoft => DesignTokens.successSoft;
+  static Color get infoSoft => DesignTokens.infoSoft;
+  static Color get masterySoft => DesignTokens.masterySoft;
+  static Color get slate => DesignTokens.slate;
+  static Color get slateDim => DesignTokens.slateDim;
+  static Color get text => DesignTokens.text;
   static final hairline = DesignTokens.hairline;
   static final hairlineLight = DesignTokens.hairlineLight;
 
   // Semantic names (canonical since the plug-and-play palette layer) — prefer
   // these over the legacy Passeport-era names above in new code.
-  static const canvas = DesignTokens.canvas;
-  static const canvasDim = DesignTokens.canvasDim;
-  static const surface = DesignTokens.surface;
-  static const primary = DesignTokens.primary;
-  static const primaryDeep = DesignTokens.primaryDeep;
-  static const secondary = DesignTokens.secondary;
-  static const success = DesignTokens.success;
-  static const info = DesignTokens.info;
-  static const mastery = DesignTokens.mastery;
-  static const warning = DesignTokens.warning;
-  static const warningSoft = DesignTokens.warningSoft;
-  static const danger = DesignTokens.danger;
-  static const dangerSoft = DesignTokens.dangerSoft;
-  static const muted = DesignTokens.muted;
-  static const mutedDim = DesignTokens.mutedDim;
+  static Color get canvas => DesignTokens.canvas;
+  static Color get canvasDim => DesignTokens.canvasDim;
+  static Color get surface => DesignTokens.surface;
+  static Color get primary => DesignTokens.primary;
+  static Color get primaryDeep => DesignTokens.primaryDeep;
+  static Color get secondary => DesignTokens.secondary;
+  static Color get success => DesignTokens.success;
+  static Color get info => DesignTokens.info;
+  static Color get mastery => DesignTokens.mastery;
+  static Color get warning => DesignTokens.warning;
+  static Color get warningSoft => DesignTokens.warningSoft;
+  static Color get danger => DesignTokens.danger;
+  static Color get dangerSoft => DesignTokens.dangerSoft;
+  static Color get muted => DesignTokens.muted;
+  static Color get mutedDim => DesignTokens.mutedDim;
 
   static TextStyle display(
     double size, {
@@ -59,5 +59,6 @@ abstract final class Passeport {
   static TextStyle mono(double size, {FontWeight weight = FontWeight.w600}) =>
       DesignTokens.mono(size, weight: weight);
 
-  static ThemeData themeData() => AppTheme.themeData();
+  static ThemeData themeData({bool? darkMode}) =>
+      AppTheme.themeData(darkMode: darkMode);
 }

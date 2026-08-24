@@ -17,6 +17,14 @@ The only current Speaking modes are:
 2. Free talk — a structured open prompt with a visible French starter.
 3. Roleplay — the preserved actor-coach scene with Marie and the learner.
 
+Each mode also exposes the selected tutor as bounded help. The tutor is on by
+default as an available phone action, but the learner must explicitly tap the
+phone before microphone streaming begins. The helper receives the current
+lesson, CEFR band, phrase/scene beat, English meaning, pronunciation tip, and
+latest transcript. It may explain or model that current material only; it
+cannot create a new lesson or advance the app. Ending the call leaves the
+regular scripted practice intact.
+
 Immersive roleplay, the generic full-screen tutor portrait, and the old
 Vocabulary/Verbs quick-lessons route are not part of this surface.
 
@@ -103,6 +111,8 @@ The current upgrade adds visible verification without replacing that engine:
 - the next beat remains a button-controlled transition;
 - roleplay uses the dark/gold Speaking skin and hides the unrelated floating
   notetaker overlay.
+- the tutor-coaching switch is on by default; turning it off keeps character
+  line playback, learner recording, matching, and manual progression available.
 
 The roleplay setup shows goal, learner/tutor roles, phrasebook, and one
 `Start roleplay` action. There is no Chat/Immersive switch and no alternate
@@ -140,3 +150,23 @@ No generated or adaptive item may silently replace a pinned lesson level.
 - [x] Immersive roleplay and generic tutor portrait flow are not reachable from the new Speaking home.
 - [x] Course speaking/free-talk/roleplay items use dedicated routes.
 - [ ] Phone visual/audio QA remains to be run by the developer; no Flutter build or simulator was run during this source-only pass.
+
+## Shared tutor-helper settings
+
+`TutorHelperSettings` is the only source of truth for helper availability.
+It stores one preference per practice surface in `SharedPreferences`; it does
+not store or change the selected tutor persona.
+
+| Surface | First-run default | Setting effect |
+| --- | --- | --- |
+| Speaking | On | The guided lesson and legacy roleplay coaching switch use this value. |
+| Listening | On | The listening director keeps or removes coaching instructions while the scripted audio/scene remains intact. |
+| Vocabulary | On | The vocabulary director gives bounded current-word help, or stays on the fixed word flow when disabled. |
+| Reading | Off | Reading stays focused by default; the existing phone action remains available when explicitly requested. |
+| Writing | Off | Writing stays focused by default; the existing phone action remains available when explicitly requested. |
+
+The same five independent switches are rendered in the canonical V3 Settings
+screen and the legacy Profile Settings surface. Speaking also exposes its
+surface switch inside the lesson next to the phone action. Turning a switch
+off ends an active Speaking helper call before recording can start; it never
+changes the target phrase, transcript matching, or lesson progression.

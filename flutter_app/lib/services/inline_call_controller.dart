@@ -87,6 +87,17 @@ class InlineCallController {
       await end();
       return;
     }
+    await start(context);
+  }
+
+  /// Starts the inline helper without changing the existing toggle contract.
+  /// Hosts that temporarily pause the helper while they capture a learner
+  /// answer can restart the same live stream without making Marie repeat her
+  /// opening line.
+  Future<void> start(
+    BuildContext context, {
+    bool sendOpeningPrompt = true,
+  }) async {
     final accepted = await AiVoiceDisclosure.ensureAccepted(context);
     if (!accepted) return;
     LessonSpeechService.shared.deactivate();
@@ -114,7 +125,7 @@ class InlineCallController {
     connecting = false;
     active = true;
     onChanged();
-    final prompt = openingPrompt?.trim();
+    final prompt = sendOpeningPrompt ? openingPrompt?.trim() : null;
     if (prompt != null && prompt.isNotEmpty) {
       gemini?.injectContext(prompt, expectReply: true);
     }
@@ -200,6 +211,15 @@ class InlineCallController {
     final trimmed = text.trim();
     if (!isLive || trimmed.isEmpty) return;
     gemini?.sendText(trimmed);
+  }
+
+  /// Gives the live helper an app-owned coaching instruction. This is kept
+  /// separate from [sendText] so a scripted lesson never treats its own
+  /// current prompt as learner input.
+  void promptTutor(String instruction) {
+    final trimmed = instruction.trim();
+    if (!isLive || trimmed.isEmpty) return;
+    gemini?.injectContext(trimmed, expectReply: true);
   }
 
   Future<void> toggleMute() async {

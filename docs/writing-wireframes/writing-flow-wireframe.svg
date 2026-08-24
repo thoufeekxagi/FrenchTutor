@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1300" viewBox="0 0 1800 1300">
+  <rect width="1800" height="1300" fill="#eeeae2"/>
+  <text x="70" y="62" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#111315">FrenchTutor writing — proposed flow</text>
+  <text x="70" y="98" font-family="Arial, sans-serif" font-size="18" fill="#5e625f">Wireframe proposal · black / gold system · no Flutter code changed</text>
+
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#111315" flood-opacity=".18"/>
+    </filter>
+    <style>
+      .phone { fill:#090a0b; stroke:#2d3032; stroke-width:2; }
+      .panel { fill:#151719; stroke:#303438; stroke-width:2; }
+      .soft { fill:#1d2022; }
+      .gold { fill:#f5b83c; }
+      .gold-stroke { fill:none; stroke:#f5b83c; stroke-width:2; }
+      .white { fill:#f7f5ef; }
+      .muted { fill:#a7aaa9; }
+      .green { fill:#32b76d; }
+      .red { fill:#e45c5c; }
+      .small { font-family:Arial,sans-serif; font-size:14px; }
+      .body { font-family:Arial,sans-serif; font-size:17px; }
+      .title { font-family:Arial,sans-serif; font-size:28px; font-weight:700; }
+      .h2 { font-family:Arial,sans-serif; font-size:21px; font-weight:700; }
+      .label { font-family:Arial,sans-serif; font-size:13px; font-weight:700; letter-spacing:2px; }
+    </style>
+  </defs>
+
+  <!-- 1 -->
+  <g transform="translate(70,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">9:41</text><text x="326" y="42" class="small muted">•••</text>
+    <text x="26" y="95" class="title white">Writing</text><rect x="275" y="70" width="68" height="30" rx="15" class="soft"/><text x="291" y="91" class="small gold">A1⌄</text>
+    <text x="26" y="145" class="label gold">YOUR WRITING PATH</text>
+    <text x="26" y="183" class="title white">Write with confidence</text>
+    <text x="26" y="215" class="body muted">Build from words to real messages.</text>
+    <rect x="20" y="245" width="330" height="128" rx="20" class="panel"/>
+    <text x="40" y="277" class="label gold">NEXT SESSION</text><text x="40" y="310" class="h2 white">Describe your day</text><text x="40" y="338" class="body muted">Sentence build · 3 of 8</text><text x="310" y="325" class="title gold">›</text>
+    <text x="26" y="418" class="label gold">PRACTICE A SKILL</text>
+    <rect x="20" y="442" width="155" height="120" rx="18" class="panel"/><rect x="195" y="442" width="155" height="120" rx="18" class="panel"/>
+    <text x="42" y="478" class="title gold">Aa</text><text x="42" y="516" class="h2 white">Word</text><text x="42" y="540" class="small muted">Choose one</text>
+    <text x="217" y="478" class="title gold">▦</text><text x="217" y="516" class="h2 white">Sentence</text><text x="217" y="540" class="small muted">Build it</text>
+    <rect x="20" y="592" width="330" height="86" rx="18" class="panel"/><text x="40" y="625" class="h2 white">Free writing</text><text x="40" y="651" class="small muted">Message, journal, or TEF task</text><text x="310" y="641" class="title gold">›</text>
+    <text x="26" y="725" class="label gold">RECENT WRITING</text>
+    <rect x="20" y="747" width="330" height="65" rx="16" class="soft"/><text x="40" y="777" class="body white">My morning routine</text><text x="310" y="779" class="title gold">›</text>
+    <rect x="20" y="830" width="330" height="65" rx="16" class="soft"/><text x="40" y="860" class="body white">A message to a friend</text><text x="310" y="862" class="title gold">›</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="110" y="966" class="h2" fill="#090a0b">Create practice</text>
+  </g>
+  <text x="70" y="1195" class="h2" fill="#111315">1 · Writing home</text>
+
+  <!-- 2 -->
+  <g transform="translate(505,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">3/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="110" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">WORD BUILD · A1</text><text x="26" y="166" class="title white">Choose the word</text><text x="26" y="198" class="body muted">Tap the French word that means “small”.</text>
+    <rect x="20" y="235" width="330" height="126" rx="20" class="panel"/><text x="42" y="270" class="label gold">CONTEXT</text><text x="42" y="310" class="h2 white">un petit café</text><text x="42" y="338" class="body muted">a small café</text>
+    <text x="26" y="410" class="label gold">CHOOSE ONE</text>
+    <rect x="20" y="432" width="330" height="62" rx="16" class="panel"/><text x="45" y="471" class="body white">grand</text><text x="314" y="471" class="small muted">?</text>
+    <rect x="20" y="507" width="330" height="62" rx="16" class="gold"/><text x="45" y="546" class="body" fill="#090a0b">petit</text><circle cx="318" cy="538" r="14" fill="#090a0b"/><path d="M311 538l5 5 9-11" stroke="#f5b83c" stroke-width="3" fill="none"/>
+    <rect x="20" y="582" width="330" height="62" rx="16" class="panel"/><text x="45" y="621" class="body white">rapide</text>
+    <rect x="20" y="680" width="330" height="106" rx="18" class="soft"/><text x="42" y="716" class="h2 gold">petit</text><text x="42" y="746" class="body white">small · masculine singular</text><text x="42" y="771" class="small muted">Tap any word for meaning and audio.</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="146" y="966" class="h2" fill="#090a0b">Next</text>
+  </g>
+  <text x="505" y="1195" class="h2" fill="#111315">2 · Single-word retrieval</text>
+
+  <!-- 3 -->
+  <g transform="translate(940,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">4/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="155" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">PHRASE BUILD · A1–A2</text><text x="26" y="166" class="title white">Build the phrase</text><text x="26" y="198" class="body muted">Choose the next word in the sentence.</text>
+    <rect x="20" y="235" width="330" height="105" rx="20" class="panel"/><text x="42" y="271" class="h2 white">Je vais</text><text x="42" y="306" class="h2 gold">au marché</text><text x="42" y="327" class="small muted">I am going to the market.</text>
+    <text x="26" y="394" class="label gold">WORD BANK</text>
+    <rect x="20" y="420" width="96" height="48" rx="14" class="panel"/><text x="47" y="451" class="body white">demain</text>
+    <rect x="127" y="420" width="96" height="48" rx="14" class="gold"/><text x="151" y="451" class="body" fill="#090a0b">demain</text>
+    <rect x="234" y="420" width="116" height="48" rx="14" class="panel"/><text x="255" y="451" class="body white">ensemble</text>
+    <rect x="20" y="492" width="330" height="140" rx="20" class="soft"/><text x="42" y="528" class="label gold">YOUR SENTENCE</text><text x="42" y="572" class="h2 white">Je vais au marché demain.</text><text x="42" y="606" class="small muted">Tap a word to hear it or see its meaning.</text>
+    <rect x="20" y="680" width="330" height="90" rx="18" class="panel"/><text x="42" y="716" class="h2 white">Need help?</text><text x="42" y="744" class="small muted">Hint reveals one useful connector.</text><text x="310" y="734" class="title gold">›</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="125" y="966" class="h2" fill="#090a0b">Check</text>
+  </g>
+  <text x="940" y="1195" class="h2" fill="#111315">3 · Phrase and sentence building</text>
+
+  <!-- 4 -->
+  <g transform="translate(1375,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">5/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="205" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">TYPED DIALOGUE · A2–B1</text><text x="26" y="166" class="title white">Reply naturally</text><text x="26" y="198" class="body muted">Write one useful answer in the conversation.</text>
+    <rect x="20" y="235" width="330" height="108" rx="20" class="panel"/><text x="42" y="270" class="label gold">MURRAY</text><text x="42" y="305" class="h2 white">Tu fais quoi ce soir ?</text><text x="42" y="329" class="body muted">What are you doing tonight?</text>
+    <rect x="20" y="370" width="330" height="220" rx="20" class="panel"/><text x="42" y="407" class="label gold">YOUR REPLY</text><text x="42" y="450" class="body muted">Type in French…</text><line x1="42" y1="468" x2="328" y2="468" stroke="#5b5f60" stroke-width="2"/><text x="42" y="514" class="small muted">Suggested words</text><rect x="42" y="532" width="80" height="32" rx="12" class="soft"/><text x="58" y="553" class="small white">je vais</text><rect x="130" y="532" width="76" height="32" rx="12" class="soft"/><text x="146" y="553" class="small white">chez moi</text><text x="316" y="548" class="title gold">⌨</text>
+    <rect x="20" y="622" width="330" height="96" rx="18" class="soft"/><text x="42" y="659" class="h2 white">French helper</text><text x="42" y="688" class="small muted">Translate · Hint · Grammar</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="130" y="966" class="h2" fill="#090a0b">Submit</text>
+  </g>
+  <text x="1375" y="1195" class="h2" fill="#111315">4 · Real typed response</text>
+
+  <text x="70" y="1260" font-family="Arial,sans-serif" font-size="18" fill="#5e625f">Part 1: saved course path → word retrieval → phrase building → typed response.</text>
+</svg>

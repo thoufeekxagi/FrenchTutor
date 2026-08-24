@@ -15,6 +15,7 @@ import '../../models/agent_tool.dart';
 import '../../models/content_models.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
+import '../../providers/tutor_helper_provider.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
@@ -22,6 +23,7 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
+import '../../services/tutor_helper_settings.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/learning_card.dart';
@@ -157,6 +159,13 @@ class _AgentLedListeningScreenState
   // missing visible speech check without changing that working director.
   final Map<int, String> _learnerAttempts = {};
   final Set<int> _matchedRoleplayBeats = {};
+  final Set<String> _revealedTranslations = {};
+
+  TutorHelperSurface get _helperSurface =>
+      _isRoleplay ? TutorHelperSurface.speaking : TutorHelperSurface.listening;
+
+  bool get _murrayEnabled =>
+      ref.read(tutorHelperSettingsProvider).isEnabled(_helperSurface);
 
   Future<void> _speakLine(String text, {bool slow = false}) async {
     if (text.isEmpty) return;
@@ -300,13 +309,16 @@ class _AgentLedListeningScreenState
       final first = _currentCard;
       if (first != null) {
         _direct(
-          'As the COACH, in ONE short English sentence, set the scene '
-          '(scenario: "${widget.passage.title}", where the student is and who you\'ll play). '
-          'Then IMMEDIATELY become the CHARACTER and ${_characterLineDirection(first.segment)} '
-          'Then, as the COACH in English: in one short sentence say what the character just '
-          'said, give the student their reply line, "${first.segment.fr}"'
-          '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'}, and ask them to '
-          'try it.',
+          _murrayEnabled
+              ? 'As the COACH, in ONE short English sentence, set the scene '
+                    '(scenario: "${widget.passage.title}", where the student is and who you\'ll play). '
+                    'Then IMMEDIATELY become the CHARACTER and ${_characterLineDirection(first.segment)} '
+                    'Then, as the COACH in English: in one short sentence say what the character just '
+                    'said, give the student their reply line, "${first.segment.fr}"'
+                    '${first.segment.en.isEmpty ? '' : ' = "${first.segment.en}"'}, and ask them to '
+                    'try it.'
+              : 'As the CHARACTER, ${_characterLineDirection(first.segment)} '
+                    'Do not coach or explain; stop after the scripted character line.',
         );
       }
     };
@@ -585,6 +597,14 @@ class _AgentLedListeningScreenState
   /// first, coaching comes second. This order is the product: hear the
   /// shopkeeper, then learn what to say back.
   void _directLearn(ReadingSegment segment) {
+    if (!_murrayEnabled) {
+      _direct(
+        'Beat ${_segmentIndex + 1} of the scene. As the CHARACTER, '
+        '${_characterLineDirection(segment)} '
+        'Do not coach or explain; stop after the scripted character line.',
+      );
+      return;
+    }
     final meaning = segment.en.isEmpty ? '' : ' = "${segment.en}"';
     _direct(
       'Beat ${_segmentIndex + 1} of the scene. As the CHARACTER, '
@@ -915,8 +935,11 @@ class _AgentLedListeningScreenState
         : 'then switch to the CHARACTER and say one short French line prompting '
               '"${first.fr}"';
     _direct(
-      'As the COACH, in English, one sentence: every line is rehearsed, now we play the '
-      'whole scene for real, no coaching; $opener.',
+      _murrayEnabled
+          ? 'As the COACH, in English, one sentence: every line is rehearsed, now we play the '
+                'whole scene for real, no coaching during the run; $opener.'
+          : 'Every line is rehearsed. Start the whole scene with $opener. '
+                'Do not coach or explain during the run.',
     );
   }
 
@@ -1010,7 +1033,7 @@ class _AgentLedListeningScreenState
       case CallStatus.listening:
         return DesignTokens.success;
       case CallStatus.tutorSpeaking:
-        return DesignTokens.primary;
+        return _isRoleplay ? DesignTokens.muted : DesignTokens.primary;
       case CallStatus.muted:
         return DesignTokens.muted;
       case CallStatus.ended:
@@ -1088,6 +1111,7 @@ class _AgentLedListeningScreenState
   }
 
   Widget _header() {
+    if (_isRoleplay) return _roleplayHeader();
     return Column(
       children: [
         Padding(
@@ -1184,16 +1208,183 @@ class _AgentLedListeningScreenState
     );
   }
 
+  Widget _roleplayHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+      child: SizedBox(
+        height: DesignTokens.minTapTarget,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'End roleplay practice',
+                    onPressed: _confirmEnd,
+                    icon: Icon(
+                      CupertinoIcons.xmark,
+                      size: 20,
+                      color: DesignTokens.nightText,
+                    ),
+                  ),
+                  Text(
+                    'Roleplay',
+                    style: DesignTokens.body(
+                      15,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                ],
+              ),
+            ),
+            Center(
+              child: Text(
+                _formatDuration(_callDuration),
+                style: DesignTokens.mono(
+                  13,
+                  weight: FontWeight.w500,
+                ).copyWith(color: DesignTokens.nightMuted),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _roleplayStatusIndicator(compact: true),
+                  ReportProblemButton(
+                    sessionType: 'Roleplay practice',
+                    personaName: _gemini.persona.displayName,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// The scene as a scrollable conversation: beats accumulate as chat bubbles
   /// (character left, learner right), past beats stay re-readable forever,
   /// future beats stay hidden until earned. Every bubble carries a speaker —
   /// tap to rehear the line in Marie's voice, long-press for a slow rendition.
+  Future<void> _setMurrayEnabled(bool enabled) async {
+    if (!mounted || !_isRoleplay) return;
+    _cutTutorAudio();
+    await ref
+        .read(tutorHelperSettingsProvider)
+        .setEnabled(TutorHelperSurface.speaking, enabled);
+    if (!mounted) return;
+    setState(() {});
+    if (enabled) {
+      _directCurrentPhase();
+      return;
+    }
+    _gemini.injectContext(
+      'MURRAY COACHING IS OFF for this roleplay. Continue the current scripted '
+      'scene only as the CHARACTER in short French lines. Do not give English '
+      'explanations, hints, praise, or unsolicited corrections. The app still '
+      'owns the current beat and the learner may replay the line or use the '
+      'visible buttons. Stop after the character line and wait.',
+    );
+  }
+
+  Widget _roleplayStatusIndicator({bool compact = false}) {
+    return Semantics(
+      label: _statusText,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: compact ? 8 : 10,
+            height: compact ? 8 : 10,
+            decoration: BoxDecoration(
+              color: _statusColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: compact ? 82 : 108),
+            child: Text(
+              _statusText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: DesignTokens.mono(
+                compact ? 10 : 11,
+                weight: FontWeight.w600,
+              ).copyWith(color: DesignTokens.nightMuted),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _roleplayMurrayBar() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            CupertinoIcons.phone_fill,
+            size: 17,
+            color: _murrayEnabled
+                ? DesignTokens.nightAccent
+                : DesignTokens.nightMuted,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${ActiveTutor.current.displayName} coaching',
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w800,
+                  ).copyWith(color: DesignTokens.nightText),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _murrayEnabled
+                      ? 'On · teaches each line in this scene'
+                      : 'Off · line playback and manual practice remain',
+                  style: DesignTokens.body(
+                    11,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                ),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: _murrayEnabled,
+            onChanged: _setMurrayEnabled,
+            activeThumbColor: DesignTokens.nightAccent,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _content() {
     final card = _currentCard;
     final visibleThrough = _revealedThrough.clamp(0, _sessionPlan.length - 1);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_isRoleplay) _roleplayMurrayBar(),
         if (_isRoleplay)
           _RoleplaySceneHeader(
             title: widget.passage.displayTitle,
@@ -1239,7 +1430,7 @@ class _AgentLedListeningScreenState
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         CupertinoIcons.checkmark_circle_fill,
                         size: 30,
                         color: DesignTokens.success,
@@ -1318,6 +1509,7 @@ class _AgentLedListeningScreenState
             Align(
               alignment: Alignment.centerLeft,
               child: _bubble(
+                translationKey: '$index:character',
                 fr: segment.characterFr!,
                 en: segment.characterEn,
                 isLearner: false,
@@ -1328,65 +1520,15 @@ class _AgentLedListeningScreenState
           Align(
             alignment: Alignment.centerRight,
             child: _bubble(
+              translationKey: '$index:learner',
               fr: segment.fr,
               en: segment.en.isEmpty ? null : segment.en,
               isLearner: true,
               isCurrent: isCurrent,
               matched: matched,
+              learnerAttempt: learnerAttempt,
             ),
           ),
-          if (_isRoleplay && learnerAttempt != null) ...[
-            const SizedBox(height: 6),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 300),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: matched
-                      ? DesignTokens.success.withValues(alpha: 0.14)
-                      : DesignTokens.warning.withValues(alpha: 0.13),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: matched
-                        ? DesignTokens.success
-                        : DesignTokens.warning,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      matched
-                          ? CupertinoIcons.checkmark_circle_fill
-                          : CupertinoIcons.arrow_counterclockwise_circle,
-                      size: 16,
-                      color: matched
-                          ? DesignTokens.success
-                          : DesignTokens.warning,
-                    ),
-                    const SizedBox(width: 7),
-                    Flexible(
-                      child: Text(
-                        matched
-                            ? 'Matched: $learnerAttempt'
-                            : 'Try again: $learnerAttempt',
-                        style: DesignTokens.body(11.5, weight: FontWeight.w600)
-                            .copyWith(
-                              color: matched
-                                  ? DesignTokens.success
-                                  : DesignTokens.warning,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
           if (isCurrent) ...[
             const SizedBox(height: 6),
             Text(
@@ -1408,12 +1550,25 @@ class _AgentLedListeningScreenState
   }
 
   Widget _bubble({
+    required String translationKey,
     required String fr,
     String? en,
     required bool isLearner,
     required bool isCurrent,
     bool matched = false,
+    String? learnerAttempt,
   }) {
+    if (_isRoleplay) {
+      return _roleplayBubble(
+        translationKey: translationKey,
+        fr: fr,
+        en: en,
+        isLearner: isLearner,
+        isCurrent: isCurrent,
+        matched: matched,
+        learnerAttempt: learnerAttempt,
+      );
+    }
     final nightRoleplay = _isRoleplay;
     final bg = matched
         ? DesignTokens.success.withValues(alpha: 0.14)
@@ -1501,6 +1656,166 @@ class _AgentLedListeningScreenState
     );
   }
 
+  Widget _roleplayBubble({
+    required String translationKey,
+    required String fr,
+    required String? en,
+    required bool isLearner,
+    required bool isCurrent,
+    required bool matched,
+    required String? learnerAttempt,
+  }) {
+    final translationVisible = _revealedTranslations.contains(translationKey);
+    final hasAttempt = learnerAttempt?.trim().isNotEmpty == true;
+    final resultColor = !hasAttempt
+        ? DesignTokens.nightAccent
+        : matched
+        ? DesignTokens.success
+        : DesignTokens.danger;
+    final loading = _ttsLoading.contains('false|$fr');
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: SizedBox(
+        width: double.infinity,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.fromLTRB(14, 11, 10, 9),
+          decoration: BoxDecoration(
+            color: hasAttempt
+                ? resultColor.withValues(alpha: 0.13)
+                : isLearner
+                ? DesignTokens.nightAccentSoft
+                : DesignTokens.nightSurfaceRaised,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: hasAttempt
+                  ? resultColor
+                  : isCurrent && isLearner
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightHairline,
+              width: hasAttempt || (isCurrent && isLearner) ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      fr,
+                      style: DesignTokens.body(15, weight: FontWeight.w600)
+                          .copyWith(
+                            color: hasAttempt
+                                ? resultColor
+                                : DesignTokens.nightText,
+                            height: 1.2,
+                          ),
+                    ),
+                  ),
+                  if (hasAttempt)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, top: 2),
+                      child: Icon(
+                        matched
+                            ? CupertinoIcons.checkmark_circle_fill
+                            : CupertinoIcons.xmark_circle_fill,
+                        size: 19,
+                        color: resultColor,
+                      ),
+                    ),
+                ],
+              ),
+              if (hasAttempt) ...[
+                const SizedBox(height: 8),
+                Text(
+                  learnerAttempt!,
+                  style: DesignTokens.body(
+                    13,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: resultColor, height: 1.2),
+                ),
+              ],
+              if (translationVisible && (en?.isNotEmpty ?? false)) ...[
+                const SizedBox(height: 7),
+                Text(
+                  en!,
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.nightMuted, height: 1.25),
+                ),
+              ],
+              const SizedBox(height: 3),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () => _speakLine(fr),
+                    onLongPress: () => _speakLine(fr, slow: true),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: loading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              CupertinoIcons.speaker_2_fill,
+                              size: 16,
+                              color: isLearner
+                                  ? DesignTokens.nightAccent
+                                  : DesignTokens.nightMuted,
+                            ),
+                    ),
+                  ),
+                  if (en?.trim().isNotEmpty ?? false) ...[
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() {
+                        if (translationVisible) {
+                          _revealedTranslations.remove(translationKey);
+                        } else {
+                          _revealedTranslations.add(translationKey);
+                        }
+                      }),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              translationVisible
+                                  ? Icons.translate_rounded
+                                  : Icons.translate_outlined,
+                              size: 17,
+                              color: DesignTokens.nightAccent,
+                            ),
+                            Icon(
+                              translationVisible
+                                  ? Icons.expand_less_rounded
+                                  : Icons.expand_more_rounded,
+                              size: 17,
+                              color: DesignTokens.nightAccent,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _debugPanel() {
     if (!kDebugMode || _debugLog.isEmpty) {
       return const SizedBox.shrink();
@@ -1541,9 +1856,14 @@ class _AgentLedListeningScreenState
           ),
           const SizedBox(height: 14),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: _isRoleplay
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceEvenly,
             children: [
-              const SizedBox(width: 76),
+              if (_isRoleplay)
+                SizedBox(width: 104, child: _roleplayStatusIndicator())
+              else
+                const SizedBox(width: 76),
               MicPrimaryButton(
                 mode: _micMode,
                 isHolding: _mic.isHeld,
@@ -1553,6 +1873,7 @@ class _AgentLedListeningScreenState
                 onHoldStart: _pttDown,
                 onHoldEnd: _pttUp,
               ),
+              if (_isRoleplay) const SizedBox(width: 12),
               _controlButton(
                 icon: CupertinoIcons.phone_down_fill,
                 label: 'End',
@@ -1730,7 +2051,7 @@ class _RoleplaySceneHeader extends StatelessWidget {
             minHeight: 4,
             value: progress,
             backgroundColor: DesignTokens.nightHairline,
-            valueColor: const AlwaysStoppedAnimation(DesignTokens.nightAccent),
+            valueColor: AlwaysStoppedAnimation(DesignTokens.nightAccent),
           ),
         ),
       ],
@@ -1752,7 +2073,7 @@ class _RoleplayFinishPrompt extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 20),
     child: Column(
       children: [
-        const Icon(
+        Icon(
           CupertinoIcons.checkmark_circle_fill,
           size: 34,
           color: DesignTokens.success,

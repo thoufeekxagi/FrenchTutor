@@ -233,11 +233,11 @@ class _SpeakTutorPrototypeScreenState
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: SpeakColors.line),
+                          borderSide: BorderSide(color: SpeakColors.line),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: SpeakColors.line),
+                          borderSide: BorderSide(color: SpeakColors.line),
                         ),
                       ),
                     ),

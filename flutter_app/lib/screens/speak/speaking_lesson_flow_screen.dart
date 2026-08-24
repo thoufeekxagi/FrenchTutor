@@ -1,17 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
+import '../../models/speaking_course.dart';
 import '../../models/tutor_persona.dart';
+import '../../prompts/live_prompts.dart';
+import '../../providers/database_provider.dart';
+import '../../providers/tutor_helper_provider.dart';
+import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../services/tutor_helper_settings.dart';
 
-/// One fixed phrase in the controlled Speak-style lesson.
+/// The three controlled stages used by a Guided Speaking lesson.
+enum SpeakingGuidedStage { wordChoice, sentenceBuilder, speak }
+
+/// One fixed phrase or micro-exercise in the controlled Speak-style lesson.
 ///
-/// The French line is the source of truth. The learner is never asked to
-/// guess what to say from a vague prompt: hear it, see its meaning, say it,
-/// receive an inline check, and then move to the next phrase.
+/// The French line is the source of truth. Guided lessons can teach it in
+/// order: identify one missing word, rebuild the sentence, then say it aloud.
+/// Free Talk and Roleplay keep the default [SpeakingGuidedStage.speak] stage.
 class SpeakingPhraseStep {
   const SpeakingPhraseStep({
     required this.french,
@@ -20,6 +30,10 @@ class SpeakingPhraseStep {
     this.partnerEnglish,
     this.tip = '',
     this.openResponse = false,
+    this.stage = SpeakingGuidedStage.speak,
+    this.blankWord,
+    this.wordChoices = const [],
+    this.sentenceTokens = const [],
   });
 
   final String french;
@@ -28,15 +42,37 @@ class SpeakingPhraseStep {
   final String? partnerEnglish;
   final String tip;
   final bool openResponse;
+  final SpeakingGuidedStage stage;
+  final String? blankWord;
+  final List<String> wordChoices;
+  final List<String> sentenceTokens;
 }
 
 enum _SpeakingStepState { ready, recording, checking, success, retry }
+
+class _SpeakingChatTurn {
+  const _SpeakingChatTurn({
+    required this.index,
+    required this.partnerFrench,
+    required this.partnerEnglish,
+    required this.learnerFrench,
+    required this.learnerEnglish,
+    required this.heard,
+  });
+
+  final int index;
+  final String partnerFrench;
+  final String? partnerEnglish;
+  final String learnerFrench;
+  final String learnerEnglish;
+  final String heard;
+}
 
 /// Shared controlled speaking flow used by the course lesson and quick drill.
 ///
 /// This is intentionally a single route. The reference changes state inside
 /// the same lesson surface instead of pushing a separate random result page.
-class SpeakingLessonFlowScreen extends StatefulWidget {
+class SpeakingLessonFlowScreen extends ConsumerStatefulWidget {
   const SpeakingLessonFlowScreen({
     super.key,
     required this.title,
@@ -44,7 +80,7 @@ class SpeakingLessonFlowScreen extends StatefulWidget {
     required this.steps,
     this.topic,
     this.contentKey,
-    this.tutor = TutorPersona.defaultPersona,
+    this.tutor,
   });
 
   final String title;
@@ -52,15 +88,21 @@ class SpeakingLessonFlowScreen extends StatefulWidget {
   final List<SpeakingPhraseStep> steps;
   final String? topic;
   final String? contentKey;
-  final TutorPersona tutor;
+
+  /// Optional pin for a deliberate course voice; otherwise use the tutor the
+  /// learner selected in Settings for both lesson audio and live coaching.
+  final TutorPersona? tutor;
 
   @override
-  State<SpeakingLessonFlowScreen> createState() =>
+  ConsumerState<SpeakingLessonFlowScreen> createState() =>
       _SpeakingLessonFlowScreenState();
 }
 
-class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
+class _SpeakingLessonFlowScreenState
+    extends ConsumerState<SpeakingLessonFlowScreen>
+    with WidgetsBindingObserver {
   final Stopwatch _sessionClock = Stopwatch();
+  late final InlineCallController _murray;
   int _index = 0;
   int _successful = 0;
   bool _playing = false;
@@ -68,23 +110,107 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   String _heard = '';
   String? _error;
   _SpeakingStepState _state = _SpeakingStepState.ready;
+  String? _selectedWord;
+  final List<int> _selectedSentenceTokens = [];
+  final List<_SpeakingChatTurn> _chatHistory = [];
+  final Set<String> _revealedTranslations = {};
+  bool _restartMurrayAfterRecording = false;
 
   SpeakingPhraseStep get _step => widget.steps[_index];
+  TutorPersona get _tutor => widget.tutor ?? ActiveTutor.current;
+  bool get _isFreeTalk => widget.steps.any((step) => step.openResponse);
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _murray = InlineCallController(
+      sessionType: _murraySessionType,
+      lessonContext: () => _murrayContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      openingPrompt:
+          '(Note from the app: the learner opened tutor help inside the current '
+          'speaking lesson. Give one short, warm sentence offering help with '
+          'the current phrase only, then wait. Never leave the lesson context.)',
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
     _sessionClock.start();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _playCurrentPrompt();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final helperEnabled = ref
+          .read(tutorHelperSettingsProvider)
+          .isEnabled(TutorHelperSurface.speaking);
+      if (_isFreeTalk && helperEnabled) {
+        await _startMurray(sendOpeningPrompt: true);
+      } else {
+        await _playCurrentPrompt();
+      }
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _murray.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
     _sessionClock.stop();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _murray.handleAppLifecycle(state);
+  }
+
+  LiveSessionType get _murraySessionType =>
+      widget.steps.any((step) => step.openResponse)
+      ? LiveSessionType.freeTalk
+      : LiveSessionType.speakingGuided;
+
+  String get _murrayContext {
+    final step = _step;
+    final partner = step.partnerFrench;
+    return '''
+SPEAKING LESSON: "${widget.title}".
+MODE: ${_murraySessionType == LiveSessionType.freeTalk ? 'FREE TALK' : 'GUIDED CONVERSATION'}.
+CEFR LEVEL: ${widget.level}.
+CURRENT STEP: ${_index + 1} of ${widget.steps.length}.
+CURRENT FRENCH TARGET: "${step.french}".
+CURRENT ENGLISH MEANING: "${step.english}".
+${partner == null ? '' : 'CURRENT PARTNER LINE: "$partner" = "${step.partnerEnglish ?? ''}".'}
+${step.tip.trim().isEmpty ? '' : 'CURRENT PRONUNCIATION TIP: "${step.tip}".'}
+LEARNER STATE: ${_state.name}.
+${_heard.trim().isEmpty ? '' : 'LATEST TRANSCRIPT: "$_heard".'}
+
+BOUNDARY: You are the learner's in-lesson coach. Explain, model, or give one
+short hint about the current target only. Do not create a new lesson, switch
+topics, introduce advanced vocabulary, reveal future lines, or control the
+app's next button. The app owns recording, matching, retries, and progression.
+For A1/A2, use short English coaching and clear French examples. Wait after
+one helpful response so the learner can practise.
+''';
+  }
+
+  Future<void> _setMurrayEnabled(bool enabled) async {
+    if (!enabled) {
+      await _murray.end();
+    } else if (_isFreeTalk && !_murray.isLive) {
+      await _startMurray(sendOpeningPrompt: true);
+    }
+    if (!mounted) return;
+    await ref
+        .read(tutorHelperSettingsProvider)
+        .setEnabled(TutorHelperSurface.speaking, enabled);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _startMurray({required bool sendOpeningPrompt}) async {
+    if (!_isFreeTalk || _murray.isLive || !mounted) return;
+    await _murray.start(context, sendOpeningPrompt: sendOpeningPrompt);
+    if (!mounted || _murray.error == null) return;
+    setState(() => _error = _murray.error);
   }
 
   Future<void> _playPhrase() async {
@@ -99,7 +225,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
           text: _step.french,
           language: 'fr-FR',
           contentItemId: widget.contentKey,
-          voiceName: widget.tutor.voiceName,
+          voiceName: _tutor.voiceName,
         ),
       ],
       rate: 0.34,
@@ -122,11 +248,16 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   }
 
   Future<void> _startRecording() async {
+    if (_isGuidedExercise) return;
     if (_state == _SpeakingStepState.checking ||
         _state == _SpeakingStepState.recording) {
       return;
     }
     if (_state == _SpeakingStepState.success) return;
+    if (_isFreeTalk && _murray.isLive) {
+      _restartMurrayAfterRecording = true;
+      await _murray.end();
+    }
     setState(() {
       _state = _SpeakingStepState.recording;
       _heard = '';
@@ -158,11 +289,71 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
       }
       if (match) _successful++;
     });
+    if (_restartMurrayAfterRecording) {
+      _restartMurrayAfterRecording = false;
+      unawaited(_startMurray(sendOpeningPrompt: false));
+    }
   }
 
   Future<void> _stopRecording() async {
     if (_state != _SpeakingStepState.recording) return;
     await LessonSpeechService.shared.stopListening();
+  }
+
+  bool get _isGuidedExercise =>
+      !_isFreeTalk && _step.stage != SpeakingGuidedStage.speak;
+
+  void _chooseWord(String choice) {
+    if (_state == _SpeakingStepState.success ||
+        _state == _SpeakingStepState.checking) {
+      return;
+    }
+    final correct = _fold(choice) == _fold(_step.blankWord ?? '');
+    setState(() {
+      _selectedWord = choice;
+      _state = correct ? _SpeakingStepState.success : _SpeakingStepState.retry;
+      _error = correct ? null : 'Try the word that completes the sentence.';
+      if (correct) _successful++;
+    });
+  }
+
+  void _chooseSentenceToken(int tokenIndex) {
+    if (_state == _SpeakingStepState.success ||
+        _state == _SpeakingStepState.checking ||
+        _selectedSentenceTokens.contains(tokenIndex)) {
+      return;
+    }
+    var selection = [..._selectedSentenceTokens];
+    if (_state == _SpeakingStepState.retry) selection = [];
+    selection.add(tokenIndex);
+    final complete = selection.length == _step.sentenceTokens.length;
+    final correct =
+        complete &&
+        selection.asMap().entries.every((entry) => entry.key == entry.value);
+    setState(() {
+      _selectedSentenceTokens
+        ..clear()
+        ..addAll(selection);
+      if (complete) {
+        _state = correct
+            ? _SpeakingStepState.success
+            : _SpeakingStepState.retry;
+        _error = correct ? null : 'Try the sentence again in the right order.';
+        if (correct) _successful++;
+      } else {
+        _state = _SpeakingStepState.ready;
+        _error = null;
+      }
+    });
+  }
+
+  void _resetGuidedExercise() {
+    setState(() {
+      _selectedWord = null;
+      _selectedSentenceTokens.clear();
+      _state = _SpeakingStepState.ready;
+      _error = null;
+    });
   }
 
   void _next() {
@@ -171,17 +362,43 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
       _finishLesson();
       return;
     }
+    if (_isFreeTalk) {
+      _chatHistory.add(
+        _SpeakingChatTurn(
+          index: _index,
+          partnerFrench: _step.partnerFrench ?? '',
+          partnerEnglish: _step.partnerEnglish,
+          learnerFrench: _step.french,
+          learnerEnglish: _step.english,
+          heard: _heard,
+        ),
+      );
+    }
     setState(() {
       _index++;
       _state = _SpeakingStepState.ready;
       _heard = '';
       _error = null;
+      _selectedWord = null;
+      _selectedSentenceTokens.clear();
     });
     unawaited(_playCurrentPrompt());
   }
 
-  Future<void> _playCurrentPrompt() =>
-      _step.partnerFrench == null ? _playPhrase() : _playPartnerLine();
+  Future<void> _playCurrentPrompt() async {
+    final partner = _step.partnerFrench;
+    if (_isFreeTalk && _murray.isLive && partner != null) {
+      _murray.promptTutor(
+        'For the current Free Talk beat, say this exact French prompt aloud once, then wait for the learner: "$partner". Do not add another question or change the topic.',
+      );
+      return;
+    }
+    if (partner == null) {
+      await _playPhrase();
+    } else {
+      await _playPartnerLine();
+    }
+  }
 
   void _finishLesson() {
     _sessionClock.stop();
@@ -191,7 +408,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
         connected: true,
         durationSeconds: seconds,
         learnerUtteranceCount: _successful,
-        endedReason: 'guided_complete',
+        endedReason: _isFreeTalk ? 'free_talk_complete' : 'guided_complete',
       ),
     );
   }
@@ -242,6 +459,9 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final murrayEnabled = ref
+        .watch(tutorHelperSettingsProvider)
+        .isEnabled(TutorHelperSurface.speaking);
     return Scaffold(
       backgroundColor: DesignTokens.nightCanvas,
       body: SafeArea(
@@ -252,6 +472,8 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
+                  if (_isFreeTalk) _murrayToggleCard(murrayEnabled),
+                  const SizedBox(height: 14),
                   _progressBar(),
                   const SizedBox(height: 24),
                   _lessonHeading(),
@@ -281,10 +503,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
           IconButton(
             tooltip: 'Close lesson',
             onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(
-              Icons.close_rounded,
-              color: DesignTokens.nightText,
-            ),
+            icon: Icon(Icons.close_rounded, color: DesignTokens.nightText),
           ),
           Expanded(
             child: Text(
@@ -296,7 +515,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
           IconButton(
             tooltip: 'Save lesson',
             onPressed: () {},
-            icon: const Icon(
+            icon: Icon(
               Icons.bookmark_border_rounded,
               color: DesignTokens.nightText,
             ),
@@ -329,7 +548,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
             value: progress.clamp(0.0, 1.0),
             minHeight: 6,
             backgroundColor: DesignTokens.nightHairline,
-            valueColor: const AlwaysStoppedAnimation(DesignTokens.nightAccent),
+            valueColor: AlwaysStoppedAnimation(DesignTokens.nightAccent),
           ),
         ),
       ],
@@ -337,13 +556,15 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   }
 
   Widget _lessonHeading() {
+    final heading = _isFreeTalk
+        ? 'FREE TALK'
+        : _step.partnerFrench == null
+        ? 'GUIDED SPEAKING'
+        : 'ROLEPLAY';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _step.partnerFrench == null ? 'GUIDED SPEAKING' : 'ROLEPLAY',
-          style: _label(11).copyWith(letterSpacing: 1.5),
-        ),
+        Text(heading, style: _label(11).copyWith(letterSpacing: 1.5)),
         const SizedBox(height: 6),
         Text(widget.title, style: _display(28)),
         const SizedBox(height: 5),
@@ -355,7 +576,326 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
     );
   }
 
+  Widget _murrayToggleCard(bool enabled) {
+    final tutor = ActiveTutor.current;
+    final status = _murray.isLive
+        ? 'Live · pauses while you answer'
+        : enabled
+        ? 'On by default · starts with this lesson'
+        : 'Off · practise without in-lesson coaching';
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: DesignTokens.nightAccentSoft,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.support_agent_rounded,
+              size: 20,
+              color: enabled
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightMuted,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${tutor.displayName} help',
+                  style: _body(13, weight: FontWeight.w800),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  status,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _body(11).copyWith(color: DesignTokens.nightMuted),
+                ),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: enabled,
+            onChanged: _setMurrayEnabled,
+            activeThumbColor: DesignTokens.nightAccent,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _freeTalkChatCard() {
+    return Container(
+      height: 380,
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+          children: [
+            for (final turn in _chatHistory) ...[
+              _chatBubble(
+                keyName: '${turn.index}:partner',
+                label: 'MARIE',
+                french: turn.partnerFrench,
+                english: turn.partnerEnglish,
+                tutor: true,
+              ),
+              _chatBubble(
+                keyName: '${turn.index}:learner',
+                label: 'YOU',
+                french: turn.heard.isEmpty ? turn.learnerFrench : turn.heard,
+                english: turn.learnerEnglish,
+                tutor: false,
+                success: true,
+              ),
+            ],
+            if (_step.partnerFrench?.trim().isNotEmpty ?? false)
+              _chatBubble(
+                keyName: '$_index:partner',
+                label: 'MARIE',
+                french: _step.partnerFrench!,
+                english: _step.partnerEnglish,
+                tutor: true,
+                onPlay: _playing ? null : _playPartnerLine,
+              ),
+            const SizedBox(height: 10),
+            _currentLearnerBubble(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _chatBubble({
+    required String keyName,
+    required String label,
+    required String french,
+    required String? english,
+    required bool tutor,
+    bool success = false,
+    VoidCallback? onPlay,
+  }) {
+    final translationVisible = _revealedTranslations.contains(keyName);
+    final borderColor = success
+        ? DesignTokens.success.withValues(alpha: 0.75)
+        : DesignTokens.nightHairline;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: tutor
+            ? DesignTokens.nightSurfaceRaised
+            : DesignTokens.nightAccentSoft.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(tutor ? 6 : 18),
+          topRight: Radius.circular(tutor ? 18 : 6),
+          bottomLeft: const Radius.circular(18),
+          bottomRight: const Radius.circular(18),
+        ),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: _label(10).copyWith(
+                    color: tutor
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.nightMuted,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(french, style: _body(17, weight: FontWeight.w700)),
+                if (translationVisible && (english?.isNotEmpty ?? false)) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    english!,
+                    style: _body(13).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: tutor ? 'Play Marie’s line' : 'Play phrase',
+            onPressed: onPlay,
+            icon: Icon(
+              Icons.volume_up_outlined,
+              color: onPlay == null
+                  ? DesignTokens.nightMuted
+                  : DesignTokens.nightText,
+              size: 21,
+            ),
+          ),
+          IconButton(
+            tooltip: translationVisible
+                ? 'Hide translation'
+                : 'Show translation',
+            onPressed: english?.trim().isEmpty ?? true
+                ? null
+                : () => setState(() {
+                    if (translationVisible) {
+                      _revealedTranslations.remove(keyName);
+                    } else {
+                      _revealedTranslations.add(keyName);
+                    }
+                  }),
+            icon: Icon(
+              translationVisible
+                  ? Icons.translate_rounded
+                  : Icons.translate_outlined,
+              color: english?.trim().isEmpty ?? true
+                  ? DesignTokens.nightMuted
+                  : DesignTokens.nightAccent,
+              size: 21,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _currentLearnerBubble() {
+    final success = _state == _SpeakingStepState.success;
+    final retry = _state == _SpeakingStepState.retry;
+    final translationVisible = _revealedTranslations.contains(
+      '$_index:learner',
+    );
+    final stateLabel = success
+        ? 'MATCHED'
+        : retry
+        ? 'TRY AGAIN'
+        : _state == _SpeakingStepState.recording
+        ? 'LISTENING'
+        : 'SPEAK NOW';
+    final stateColor = success
+        ? DesignTokens.success
+        : retry
+        ? DesignTokens.danger
+        : DesignTokens.nightAccent;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 14, 8, 14),
+      decoration: BoxDecoration(
+        color: success
+            ? DesignTokens.success.withValues(alpha: 0.12)
+            : DesignTokens.nightSurfaceRaised,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: success || retry ? stateColor : DesignTokens.nightHairline,
+          width: success || retry ? 1.4 : 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(stateLabel, style: _label(10).copyWith(color: stateColor)),
+                const SizedBox(height: 9),
+                Text(_step.french, style: _display(27).copyWith(height: 1.12)),
+                if (translationVisible) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    _step.english,
+                    style: _body(13).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
+                if (_heard.trim().isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text('I HEARD', style: _label(10)),
+                  const SizedBox(height: 4),
+                  Text(
+                    _heard,
+                    style: _body(14, weight: FontWeight.w700).copyWith(
+                      color: success
+                          ? DesignTokens.success
+                          : DesignTokens.nightText,
+                    ),
+                  ),
+                ],
+                if (_step.tip.trim().isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _step.tip,
+                    style: _body(12).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Column(
+            children: [
+              IconButton(
+                tooltip: 'Play phrase',
+                onPressed: _playing ? null : _playPhrase,
+                icon: Icon(
+                  _playing
+                      ? Icons.graphic_eq_rounded
+                      : Icons.volume_up_outlined,
+                  color: DesignTokens.nightText,
+                  size: 21,
+                ),
+              ),
+              IconButton(
+                tooltip: translationVisible
+                    ? 'Hide translation'
+                    : 'Show translation',
+                onPressed: () => setState(() {
+                  if (translationVisible) {
+                    _revealedTranslations.remove('$_index:learner');
+                  } else {
+                    _revealedTranslations.add('$_index:learner');
+                  }
+                }),
+                icon: Icon(
+                  translationVisible
+                      ? Icons.translate_rounded
+                      : Icons.translate_outlined,
+                  color: DesignTokens.nightAccent,
+                  size: 21,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _phraseCard() {
+    if (_isFreeTalk) return _freeTalkChatCard();
+    if (_step.stage == SpeakingGuidedStage.wordChoice) {
+      return _wordChoiceCard();
+    }
+    if (_step.stage == SpeakingGuidedStage.sentenceBuilder) {
+      return _sentenceBuilderCard();
+    }
     final success = _state == _SpeakingStepState.success;
     final retry = _state == _SpeakingStepState.retry;
     final border = success
@@ -415,7 +955,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
                   IconButton(
                     tooltip: 'Play Marie’s line',
                     onPressed: _playing ? null : _playPartnerLine,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.volume_up_outlined,
                       color: DesignTokens.nightText,
                     ),
@@ -518,6 +1058,225 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
     );
   }
 
+  Widget _wordChoiceCard() {
+    final success = _state == _SpeakingStepState.success;
+    final retry = _state == _SpeakingStepState.retry;
+    final stateColor = success
+        ? DesignTokens.success
+        : retry
+        ? DesignTokens.danger
+        : DesignTokens.nightAccent;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: success
+            ? DesignTokens.success.withValues(alpha: 0.12)
+            : DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: success || retry ? stateColor : DesignTokens.nightHairline,
+          width: success || retry ? 1.4 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                success
+                    ? Icons.check_circle_rounded
+                    : Icons.text_fields_rounded,
+                color: stateColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                success
+                    ? 'Nice work'
+                    : retry
+                    ? 'Try it again'
+                    : 'Complete the phrase',
+                style: _body(
+                  13,
+                  weight: FontWeight.w800,
+                ).copyWith(color: stateColor),
+              ),
+              const Spacer(),
+              IconButton(
+                tooltip: 'Play phrase',
+                onPressed: _playing ? null : _playPhrase,
+                icon: Icon(
+                  _playing
+                      ? Icons.graphic_eq_rounded
+                      : Icons.volume_up_outlined,
+                  color: DesignTokens.nightText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(_blankedSentence(), style: _display(27).copyWith(height: 1.15)),
+          if (_showMeaning) ...[
+            const SizedBox(height: 9),
+            Text(
+              _step.english,
+              style: _body(
+                15,
+              ).copyWith(color: DesignTokens.nightMuted, height: 1.3),
+            ),
+          ],
+          const SizedBox(height: 18),
+          Text('TAP THE MISSING WORD', style: _label(10)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final choice in _step.wordChoices)
+                ChoiceChip(
+                  label: Text(choice),
+                  selected: _selectedWord == choice,
+                  onSelected: success ? null : (_) => _chooseWord(choice),
+                  selectedColor: success
+                      ? DesignTokens.success
+                      : DesignTokens.nightAccent,
+                  backgroundColor: DesignTokens.nightSurfaceRaised,
+                  side: BorderSide(color: DesignTokens.nightHairline),
+                  labelStyle: _body(14, weight: FontWeight.w700).copyWith(
+                    color: _selectedWord == choice && success
+                        ? Colors.black
+                        : DesignTokens.nightText,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sentenceBuilderCard() {
+    final success = _state == _SpeakingStepState.success;
+    final retry = _state == _SpeakingStepState.retry;
+    final stateColor = success
+        ? DesignTokens.success
+        : retry
+        ? DesignTokens.danger
+        : DesignTokens.nightAccent;
+    final available = [
+      for (var index = 0; index < _step.sentenceTokens.length; index++)
+        if (!_selectedSentenceTokens.contains(index)) index,
+    ];
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: success
+            ? DesignTokens.success.withValues(alpha: 0.12)
+            : DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: success || retry ? stateColor : DesignTokens.nightHairline,
+          width: success || retry ? 1.4 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                success
+                    ? Icons.check_circle_rounded
+                    : Icons.format_list_bulleted_rounded,
+                color: stateColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                success
+                    ? 'Nice work'
+                    : retry
+                    ? 'Try it again'
+                    : 'Build the sentence',
+                style: _body(
+                  13,
+                  weight: FontWeight.w800,
+                ).copyWith(color: stateColor),
+              ),
+              const Spacer(),
+              IconButton(
+                tooltip: 'Play phrase',
+                onPressed: _playing ? null : _playPhrase,
+                icon: Icon(
+                  _playing
+                      ? Icons.graphic_eq_rounded
+                      : Icons.volume_up_outlined,
+                  color: DesignTokens.nightText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _selectedSentenceTokens.isEmpty
+                ? 'Tap the words in the right order.'
+                : _selectedSentenceTokens
+                      .map((index) => _step.sentenceTokens[index])
+                      .join(' '),
+            style: _display(24).copyWith(
+              height: 1.18,
+              color: _selectedSentenceTokens.isEmpty
+                  ? DesignTokens.nightMuted
+                  : DesignTokens.nightText,
+            ),
+          ),
+          if (_showMeaning) ...[
+            const SizedBox(height: 9),
+            Text(
+              _step.english,
+              style: _body(
+                15,
+              ).copyWith(color: DesignTokens.nightMuted, height: 1.3),
+            ),
+          ],
+          const SizedBox(height: 18),
+          Text('SENTENCE WORDS', style: _label(10)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final index in available.reversed)
+                ActionChip(
+                  label: Text(_step.sentenceTokens[index]),
+                  onPressed: success ? null : () => _chooseSentenceToken(index),
+                  backgroundColor: DesignTokens.nightSurfaceRaised,
+                  side: BorderSide(color: DesignTokens.nightHairline),
+                  labelStyle: _body(14, weight: FontWeight.w700),
+                ),
+            ],
+          ),
+          if (retry) ...[
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: _resetGuidedExercise,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Start this sentence again'),
+              style: TextButton.styleFrom(foregroundColor: DesignTokens.danger),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _blankedSentence() {
+    final blank = _fold(_step.blankWord ?? '');
+    return _step.french
+        .split(RegExp(r'\s+'))
+        .map((word) => _fold(word) == blank ? '_____' : word)
+        .join(' ');
+  }
+
   Future<void> _playPartnerLine() async {
     final line = _step.partnerFrench;
     if (line == null || line.trim().isEmpty || _playing || !mounted) return;
@@ -532,7 +1291,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
           language: 'fr-FR',
           contentItemId:
               '${widget.contentKey ?? widget.title}_${_index}_partner',
-          voiceName: widget.tutor.voiceName,
+          voiceName: _tutor.voiceName,
         ),
       ],
       rate: 0.34,
@@ -555,17 +1314,33 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   }
 
   Widget _coachCard() {
-    final text = switch (_state) {
-      _SpeakingStepState.ready =>
-        'Listen once, then hold the microphone and say the phrase.',
-      _SpeakingStepState.recording =>
-        'Listening… release when you finish the phrase.',
-      _SpeakingStepState.checking => 'Checking your words…',
-      _SpeakingStepState.success =>
-        'Your phrase matched. Keep going while it is fresh.',
-      _SpeakingStepState.retry =>
-        'The phrase was not close enough yet. Replay it and try again.',
-    };
+    final text = _isGuidedExercise
+        ? switch (_step.stage) {
+            SpeakingGuidedStage.wordChoice => switch (_state) {
+              _SpeakingStepState.success => 'That word completes the phrase.',
+              _SpeakingStepState.retry => 'Try the other word choices.',
+              _ => 'Tap the word that completes the French phrase.',
+            },
+            SpeakingGuidedStage.sentenceBuilder => switch (_state) {
+              _SpeakingStepState.success =>
+                'The sentence is in the right order.',
+              _SpeakingStepState.retry =>
+                'Start again and follow the French order.',
+              _ => 'Tap each word to build the sentence.',
+            },
+            SpeakingGuidedStage.speak => 'Listen once, then say the phrase.',
+          }
+        : switch (_state) {
+            _SpeakingStepState.ready =>
+              'Listen once, then hold the microphone and say the phrase.',
+            _SpeakingStepState.recording =>
+              'Listening… release when you finish the phrase.',
+            _SpeakingStepState.checking => 'Checking your words…',
+            _SpeakingStepState.success =>
+              'Your phrase matched. Keep going while it is fresh.',
+            _SpeakingStepState.retry =>
+              'The phrase was not close enough yet. Replay it and try again.',
+          };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -575,7 +1350,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.tips_and_updates_outlined,
             color: DesignTokens.nightAccent,
             size: 19,
@@ -593,82 +1368,194 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   }
 
   Widget _bottomControls() {
-    final recording = _state == _SpeakingStepState.recording;
-    final checking = _state == _SpeakingStepState.checking;
-    final success = _state == _SpeakingStepState.success;
+    if (_isFreeTalk) return _freeTalkBottomControls();
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      decoration: const BoxDecoration(
+      padding: const EdgeInsets.fromLTRB(26, 10, 26, 15),
+      decoration: BoxDecoration(
         color: DesignTokens.nightCanvas,
         border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _smallControl(
-            icon: _showMeaning
-                ? Icons.translate_rounded
-                : Icons.translate_outlined,
-            label: _showMeaning ? 'Meaning on' : 'Meaning off',
-            onTap: () => setState(() => _showMeaning = !_showMeaning),
-          ),
-          const SizedBox(width: 12),
           Expanded(
-            child: GestureDetector(
-              onTap: checking
-                  ? null
-                  : success
-                  ? _next
-                  : (recording ? _stopRecording : _startRecording),
-              onLongPressStart: checking || success
-                  ? null
-                  : (_) => _startRecording(),
-              onLongPressEnd: checking || success
-                  ? null
-                  : (_) => _stopRecording(),
-              child: Container(
-                height: 58,
-                decoration: BoxDecoration(
-                  color: success
-                      ? DesignTokens.success
-                      : recording
-                      ? DesignTokens.danger
-                      : DesignTokens.nightAccent,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      success
-                          ? Icons.check_rounded
-                          : recording
-                          ? Icons.stop_rounded
-                          : Icons.mic_none_rounded,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      success
-                          ? 'Next phrase'
-                          : recording
-                          ? 'Release to check'
-                          : 'Hold to speak',
-                      style: _body(
-                        14,
-                        weight: FontWeight.w800,
-                      ).copyWith(color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
+            child: _smallControl(
+              icon: _showMeaning
+                  ? Icons.translate_rounded
+                  : Icons.translate_outlined,
+              label: _showMeaning ? 'Meaning on' : 'Meaning off',
+              onTap: () => setState(() => _showMeaning = !_showMeaning),
             ),
           ),
-          const SizedBox(width: 12),
-          _smallControl(
-            icon: Icons.volume_up_outlined,
-            label: 'Replay target',
-            onTap: _playing ? null : _playPhrase,
+          _guidedRoundAction(),
+          Expanded(
+            child: _smallControl(
+              icon: Icons.volume_up_outlined,
+              label: 'Replay target',
+              onTap: _playing ? null : _playPhrase,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _guidedRoundAction() {
+    final recording = _state == _SpeakingStepState.recording;
+    final checking = _state == _SpeakingStepState.checking;
+    final success = _state == _SpeakingStepState.success;
+    final retry = _state == _SpeakingStepState.retry;
+    final exercise = _isGuidedExercise;
+    final active = success
+        ? DesignTokens.success
+        : retry || recording
+        ? DesignTokens.danger
+        : exercise && checking
+        ? DesignTokens.nightSurfaceRaised
+        : DesignTokens.nightAccent;
+    final label = success
+        ? 'Next phrase'
+        : retry && exercise
+        ? 'Try again'
+        : recording
+        ? 'Release to check'
+        : checking
+        ? 'Checking…'
+        : exercise
+        ? _step.stage == SpeakingGuidedStage.wordChoice
+              ? 'Select a word'
+              : 'Build the sentence'
+        : 'Hold to speak';
+    final VoidCallback? onTap = checking
+        ? null
+        : success
+        ? _next
+        : exercise
+        ? retry
+              ? _resetGuidedExercise
+              : null
+        : recording
+        ? _stopRecording
+        : _startRecording;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      onLongPressStart: exercise || checking || success
+          ? null
+          : (_) => _startRecording(),
+      onLongPressEnd: exercise || checking || success
+          ? null
+          : (_) => _stopRecording(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 78,
+            height: 78,
+            decoration: BoxDecoration(color: active, shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Icon(
+              success
+                  ? Icons.arrow_forward_rounded
+                  : retry && exercise
+                  ? Icons.refresh_rounded
+                  : recording
+                  ? Icons.stop_rounded
+                  : exercise
+                  ? Icons.touch_app_rounded
+                  : Icons.mic_none_rounded,
+              color: Colors.black,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(label, style: _body(11, weight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+
+  Widget _freeTalkBottomControls() {
+    final recording = _state == _SpeakingStepState.recording;
+    final checking = _state == _SpeakingStepState.checking;
+    final success = _state == _SpeakingStepState.success;
+    final enabled = !checking;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(26, 10, 26, 15),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightCanvas,
+        border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: _smallControl(
+              icon: Icons.volume_up_outlined,
+              label: 'Replay Marie',
+              onTap: _playing ? null : _playPartnerLine,
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: !enabled
+                ? null
+                : success
+                ? _next
+                : recording
+                ? _stopRecording
+                : _startRecording,
+            onLongPressStart: !enabled || success
+                ? null
+                : (_) => _startRecording(),
+            onLongPressEnd: !enabled || success
+                ? null
+                : (_) => _stopRecording(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 78,
+                  height: 78,
+                  decoration: BoxDecoration(
+                    color: success
+                        ? DesignTokens.success
+                        : recording
+                        ? DesignTokens.danger
+                        : DesignTokens.nightAccent,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    success
+                        ? Icons.arrow_forward_rounded
+                        : recording
+                        ? Icons.stop_rounded
+                        : Icons.mic_none_rounded,
+                    color: Colors.black,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  success
+                      ? 'Next phrase'
+                      : recording
+                      ? 'Release to check'
+                      : checking
+                      ? 'Checking…'
+                      : 'Hold to speak',
+                  style: _body(11, weight: FontWeight.w800),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _smallControl(
+              icon: Icons.volume_up_outlined,
+              label: 'Replay target',
+              onTap: _playing ? null : _playPhrase,
+            ),
           ),
         ],
       ),
@@ -722,7 +1609,7 @@ class _SpeakingLessonFlowScreenState extends State<SpeakingLessonFlowScreen> {
   ).copyWith(color: DesignTokens.nightMuted, letterSpacing: 0.4);
 }
 
-/// Converts a course target list into the five-step Speak-like drill. The
+/// Converts a course target list into the controlled Speak-like drill. The
 /// course currently stores target phrases as French only, so familiar phrases
 /// receive an inline meaning and unknown targets stay honest rather than
 /// inventing a translation in the client.
@@ -891,16 +1778,112 @@ List<SpeakingPhraseStep> _buildSpeakingSteps(
   required Map<String, String> meanings,
   required String level,
 }) {
+  final steps = <SpeakingPhraseStep>[];
+  for (final phrase in source) {
+    final english =
+        meanings[phrase.toLowerCase()] ??
+        'Listen to the tutor, then use this phrase in the lesson.';
+    steps.addAll(
+      _guidedStagesForPhrase(phrase, english: english, level: level),
+    );
+  }
+  return steps;
+}
+
+/// Keeps the authored English and partner fields from the permanent Speaking
+/// catalog while adding the controlled word -> sentence -> speech progression.
+/// Free Talk and Roleplay intentionally do not call this helper.
+List<SpeakingPhraseStep> speakingStepsForCourseLines(
+  Iterable<SpeakingCourseLine> lines, {
+  required String level,
+}) {
+  final steps = <SpeakingPhraseStep>[];
+  for (final line in lines) {
+    if (line.partnerFrench != null || line.openResponse) {
+      steps.add(
+        SpeakingPhraseStep(
+          french: line.french,
+          english: line.english,
+          partnerFrench: line.partnerFrench,
+          partnerEnglish: line.partnerEnglish,
+          tip: line.tip,
+          openResponse: line.openResponse,
+        ),
+      );
+    } else {
+      steps.addAll(
+        _guidedStagesForPhrase(
+          line.french,
+          english: line.english,
+          level: level,
+          tip: line.tip,
+        ),
+      );
+    }
+  }
+  if (steps.isEmpty) {
+    throw StateError('This speaking lesson has no practice lines.');
+  }
+  return steps;
+}
+
+List<SpeakingPhraseStep> _guidedStagesForPhrase(
+  String phrase, {
+  required String english,
+  required String level,
+  String tip = '',
+}) {
+  final tokens = phrase
+      .split(RegExp(r'\s+'))
+      .where((token) => token.trim().isNotEmpty)
+      .toList(growable: false);
+  if (tokens.isEmpty) {
+    throw StateError('A speaking phrase cannot be empty.');
+  }
+  final blank = tokens.length == 1 ? tokens.first : tokens[1];
+  final choices = _guidedWordChoices(blank, level: level);
+  final rhythmTip = tip.trim().isNotEmpty
+      ? tip
+      : level.toUpperCase() == 'A1'
+      ? 'Keep the rhythm clear and unhurried.'
+      : 'Keep the key words connected and natural.';
   return [
-    for (final phrase in source)
-      SpeakingPhraseStep(
-        french: phrase,
-        english:
-            meanings[phrase.toLowerCase()] ??
-            'Listen to the tutor, then use this phrase in the lesson.',
-        tip: level.toUpperCase() == 'A1'
-            ? 'Keep the rhythm clear and unhurried.'
-            : '',
-      ),
+    SpeakingPhraseStep(
+      french: phrase,
+      english: english,
+      tip: rhythmTip,
+      stage: SpeakingGuidedStage.wordChoice,
+      blankWord: blank,
+      wordChoices: choices,
+    ),
+    SpeakingPhraseStep(
+      french: phrase,
+      english: english,
+      tip: rhythmTip,
+      stage: SpeakingGuidedStage.sentenceBuilder,
+      sentenceTokens: tokens,
+    ),
+    SpeakingPhraseStep(french: phrase, english: english, tip: rhythmTip),
   ];
+}
+
+List<String> _guidedWordChoices(String answer, {required String level}) {
+  final distractors = level.toUpperCase() == 'A1'
+      ? const ['bonjour', 'merci', 'voudrais', 'habite', 'cherche', 'aime']
+      : const [
+          'pourrais',
+          'préférerais',
+          'souhaite',
+          'devrais',
+          'propose',
+          'comprends',
+        ];
+  final answerFolded = answer.toLowerCase();
+  final choices = <String>[];
+  for (final choice in distractors) {
+    if (choice.toLowerCase() != answerFolded) choices.add(choice);
+    if (choices.length == 2) break;
+  }
+  choices.insert(choices.isEmpty ? 0 : 1, answer);
+  return choices;
 }

@@ -171,7 +171,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: DecoratedBox(
-        decoration: const BoxDecoration(color: DesignTokens.canvas),
+        decoration: BoxDecoration(color: DesignTokens.canvas),
         child: SafeArea(
           child: Column(
             children: [
@@ -735,7 +735,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   shape: BoxShape.circle,
                 ),
                 child: loading
-                    ? const Padding(
+                    ? Padding(
                         padding: EdgeInsets.all(11),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
@@ -1029,7 +1029,7 @@ class _RecapWordsMetric extends StatelessWidget {
                   color: DesignTokens.success.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.textformat,
                   color: DesignTokens.success,
                   size: 17,
@@ -1096,9 +1096,7 @@ class _BrandWordmark extends StatelessWidget {
   const _BrandWordmark({this.onLightBackground = false});
 
   /// The onboarding header sits on the brand gradient on phones and on a
-  /// neutral canvas on web, so the wordmark needs both an inverted and a
-  /// standard treatment. The logo mark itself is a white-on-transparent PNG,
-  /// hence the tint rather than a second asset.
+  /// neutral canvas on web. The shared mark stays gold on both surfaces.
   final bool onLightBackground;
 
   @override
@@ -1110,7 +1108,7 @@ class _BrandWordmark extends StatelessWidget {
           'assets/images/logo_mark.png',
           width: 18,
           height: 22,
-          color: onLightBackground ? DesignTokens.ink : null,
+          color: null,
         ),
         const SizedBox(width: 6),
         Text(
@@ -1185,7 +1183,7 @@ class _PreparingPaneState extends State<_PreparingPane>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: DesignTokens.canvas),
+      decoration: BoxDecoration(color: DesignTokens.canvas),
       padding: const EdgeInsets.symmetric(horizontal: 28),
       child: AnimatedBuilder(
         animation: _controller,
@@ -1260,7 +1258,7 @@ class _PreparingPaneState extends State<_PreparingPane>
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_circle_fill,
                                       size: 17,
                                       color: DesignTokens.success,

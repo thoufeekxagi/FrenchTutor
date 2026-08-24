@@ -726,7 +726,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             if (mounted) _finishResult();
           });
         }
-        return const Scaffold(
+        return Scaffold(
           backgroundColor: DesignTokens.nightCanvas,
           body: SizedBox.expand(),
         );
@@ -807,7 +807,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: _confirmEnd,
-                  child: const SizedBox(
+                  child: SizedBox(
                     width: 44,
                     height: 44,
                     child: Icon(
@@ -881,9 +881,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       decoration: BoxDecoration(
         color: DesignTokens.nightSurface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: const Border(
-          top: BorderSide(color: DesignTokens.nightHairline),
-        ),
+        border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

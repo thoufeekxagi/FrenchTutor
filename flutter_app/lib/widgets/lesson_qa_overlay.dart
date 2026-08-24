@@ -199,7 +199,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: DesignTokens.surface,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(DesignTokens.radiusCard),
@@ -241,7 +241,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                         minWidth: DesignTokens.minTapTarget,
                         minHeight: DesignTokens.minTapTarget,
                       ),
-                      icon: const Icon(
+                      icon: Icon(
                         CupertinoIcons.xmark_circle_fill,
                         color: DesignTokens.muted,
                         size: 20,
@@ -276,7 +276,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
+                                Icon(
                                   CupertinoIcons.sparkles,
                                   size: 16,
                                   color: DesignTokens.info,
@@ -317,7 +317,7 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
                       IconButton(
                         tooltip: 'Replay answer',
                         onPressed: _replay,
-                        icon: const Icon(
+                        icon: Icon(
                           CupertinoIcons.speaker_2_fill,
                           size: 18,
                           color: DesignTokens.mutedDim,

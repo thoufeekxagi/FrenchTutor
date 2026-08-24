@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1300" viewBox="0 0 1800 1300">
+  <rect width="1800" height="1300" fill="#eeeae2"/>
+  <text x="70" y="62" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#111315">FrenchTutor writing — feedback and transfer</text>
+  <text x="70" y="98" font-family="Arial, sans-serif" font-size="18" fill="#5e625f">Wireframe proposal · feedback stays in the active writing card</text>
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#111315" flood-opacity=".18"/></filter>
+    <style>
+      .phone { fill:#090a0b; stroke:#2d3032; stroke-width:2; }
+      .panel { fill:#151719; stroke:#303438; stroke-width:2; }
+      .soft { fill:#1d2022; }
+      .gold { fill:#f5b83c; }
+      .white { fill:#f7f5ef; }
+      .muted { fill:#a7aaa9; }
+      .green { fill:#32b76d; }
+      .red { fill:#e45c5c; }
+      .small { font-family:Arial,sans-serif; font-size:14px; }
+      .body { font-family:Arial,sans-serif; font-size:17px; }
+      .title { font-family:Arial,sans-serif; font-size:28px; font-weight:700; }
+      .h2 { font-family:Arial,sans-serif; font-size:21px; font-weight:700; }
+      .label { font-family:Arial,sans-serif; font-size:13px; font-weight:700; letter-spacing:2px; }
+    </style>
+  </defs>
+
+  <!-- 5 -->
+  <g transform="translate(70,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">5/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="205" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">CHECKING · SAME SCREEN</text><text x="26" y="166" class="title white">Your response</text><text x="26" y="198" class="body muted">Every correction is tied to a real word.</text>
+    <rect x="20" y="235" width="330" height="170" rx="20" class="panel"/><text x="42" y="272" class="label gold">YOUR DRAFT</text><text x="42" y="315" class="h2 white">Je vais au marché demain.</text><text x="42" y="349" class="body muted">One useful sentence · 5 words</text><text x="42" y="380" class="small green">✓ Meaning is clear</text>
+    <rect x="20" y="432" width="330" height="230" rx="20" class="soft"/><text x="42" y="469" class="label gold">FEEDBACK</text><text x="42" y="510" class="body white">✓ Correct word order</text><text x="42" y="542" class="body white">△ Check the preposition</text><text x="42" y="579" class="body muted">Use “au” before a masculine place:</text><text x="42" y="614" class="h2 gold">Je vais au marché.</text>
+    <rect x="20" y="700" width="330" height="88" rx="18" class="panel"/><text x="42" y="736" class="h2 white">Tap a word</text><text x="42" y="765" class="small muted">Meaning · audio · grammar note</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="116" y="966" class="h2" fill="#090a0b">Rewrite</text>
+  </g>
+  <text x="70" y="1195" class="h2" fill="#111315">5 · Inline correction</text>
+
+  <!-- 6 -->
+  <g transform="translate(505,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">6/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="245" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">REWRITE · A1–B2</text><text x="26" y="166" class="title white">Fix one thing</text><text x="26" y="198" class="body muted">Rewrite the sentence using the hint.</text>
+    <rect x="20" y="235" width="330" height="112" rx="20" class="panel"/><text x="42" y="272" class="label gold">BEFORE</text><text x="42" y="312" class="body muted">Je vais à le marché.</text><text x="42" y="335" class="small red">△ Preposition contraction</text>
+    <rect x="20" y="375" width="330" height="150" rx="20" class="panel"/><text x="42" y="412" class="label gold">TRY AGAIN</text><text x="42" y="451" class="body muted">Type the improved version…</text><line x1="42" y1="470" x2="328" y2="470" stroke="#5b5f60" stroke-width="2"/><text x="42" y="504" class="small muted">Hint: à + le = au</text>
+    <rect x="20" y="552" width="330" height="130" rx="20" class="soft"/><text x="42" y="590" class="label gold">REUSABLE NOTE</text><text x="42" y="625" class="body white">au marché = to the market</text><text x="42" y="654" class="small muted">Save this phrase for review.</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="125" y="966" class="h2" fill="#090a0b">Check</text>
+  </g>
+  <text x="505" y="1195" class="h2" fill="#111315">6 · Rewrite and retry</text>
+
+  <!-- 7 -->
+  <g transform="translate(940,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">7/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" fill="#35383a"/><rect x="20" y="66" width="285" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">FREE WRITE · B1–B2</text><text x="26" y="166" class="title white">Write your message</text><text x="26" y="198" class="body muted">A guided task with a real purpose.</text>
+    <rect x="20" y="235" width="330" height="132" rx="20" class="panel"/><text x="42" y="272" class="label gold">TASK</text><text x="42" y="307" class="body white">Write to a friend about</text><text x="42" y="334" class="body white">changing your weekend plan.</text><text x="42" y="356" class="small muted">80–100 words · informal register</text>
+    <rect x="20" y="395" width="330" height="250" rx="20" class="panel"/><text x="42" y="432" class="label gold">YOUR DRAFT</text><text x="42" y="472" class="body muted">Bonjour…</text><line x1="42" y1="490" x2="328" y2="490" stroke="#5b5f60" stroke-width="2"/><line x1="42" y1="530" x2="328" y2="530" stroke="#5b5f60" stroke-width="2"/><line x1="42" y1="570" x2="328" y2="570" stroke="#5b5f60" stroke-width="2"/><text x="42" y="620" class="small muted">0 / 100 words</text>
+    <rect x="20" y="676" width="330" height="88" rx="18" class="soft"/><text x="42" y="712" class="h2 white">Tools</text><text x="42" y="741" class="small muted">Connectors · tone · hint · translate</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="121" y="966" class="h2" fill="#090a0b">Submit</text>
+  </g>
+  <text x="940" y="1195" class="h2" fill="#111315">7 · Independent writing</text>
+
+  <!-- 8 -->
+  <g transform="translate(1375,145)" filter="url(#shadow)">
+    <rect class="phone" width="370" height="1020" rx="28"/>
+    <text x="26" y="42" class="small muted">‹  Writing</text><text x="325" y="42" class="small muted">8/8</text>
+    <rect x="20" y="66" width="330" height="8" rx="4" class="gold"/>
+    <text x="26" y="126" class="label gold">REVIEW</text><text x="26" y="166" class="title white">Keep the improvement</text><text x="26" y="198" class="body muted">Your writing is saved with the lesson.</text>
+    <rect x="20" y="235" width="330" height="142" rx="20" class="panel"/><text x="42" y="272" class="label gold">YOU WROTE</text><text x="42" y="313" class="body muted">Je vais à le marché.</text><text x="42" y="350" class="small red">One correction to remember</text>
+    <rect x="20" y="400" width="330" height="142" rx="20" class="soft"/><text x="42" y="437" class="label gold">BETTER</text><text x="42" y="478" class="body white">Je vais au marché.</text><text x="42" y="515" class="small green">✓ Clear and correct</text>
+    <rect x="20" y="565" width="330" height="125" rx="20" class="panel"/><text x="42" y="602" class="label gold">NEXT FOCUS</text><text x="42" y="642" class="body white">Practice contractions</text><text x="42" y="671" class="small muted">au · aux · du · des</text>
+    <rect x="20" y="722" width="330" height="80" rx="18" class="soft"/><text x="42" y="757" class="h2 white">Saved phrase</text><text x="310" y="760" class="title gold">♡</text>
+    <rect x="20" y="930" width="330" height="58" rx="20" class="gold"/><text x="118" y="966" class="h2" fill="#090a0b">Next lesson</text>
+  </g>
+  <text x="1375" y="1195" class="h2" fill="#111315">8 · Review and continue</text>
+
+  <text x="70" y="1260" font-family="Arial,sans-serif" font-size="18" fill="#5e625f">Part 2: check, rewrite, transfer, review. TEF/TCF uses the same editor and feedback contract with a longer task.</text>
+</svg>

@@ -272,7 +272,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     return Scaffold(
       backgroundColor: DesignTokens.nightCanvas,
       appBar: AppBar(
-        leading: const BackButton(color: DesignTokens.nightText),
+        leading: BackButton(color: DesignTokens.nightText),
         title: Text(
           'Reading',
           style: DesignTokens.display(
@@ -387,7 +387,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       CupertinoIcons.book,
                       color: DesignTokens.nightAccent,
                       size: 28,
@@ -480,7 +480,7 @@ class _GenerateReadingTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
           child: generating
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(12),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
@@ -489,10 +489,7 @@ class _GenerateReadingTile extends StatelessWidget {
                     ),
                   ),
                 )
-              : const Icon(
-                  CupertinoIcons.book_fill,
-                  color: DesignTokens.nightAccent,
-                ),
+              : Icon(CupertinoIcons.book_fill, color: DesignTokens.nightAccent),
         ),
         title: Text(
           'Create a reading story',
@@ -511,7 +508,7 @@ class _GenerateReadingTile extends StatelessWidget {
             12.5,
           ).copyWith(color: DesignTokens.nightMuted),
         ),
-        trailing: const Icon(
+        trailing: Icon(
           CupertinoIcons.chevron_right,
           size: 18,
           color: DesignTokens.nightAccent,
@@ -636,7 +633,7 @@ class _PreviousStoryRow extends StatelessWidget {
                 ),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(right: 14),
               child: Icon(
                 CupertinoIcons.chevron_right,
@@ -694,9 +691,7 @@ class _ReadingCover extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: DesignTokens.heroGradient,
-            ),
+            decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
           ),
           Positioned(
             right: -24,

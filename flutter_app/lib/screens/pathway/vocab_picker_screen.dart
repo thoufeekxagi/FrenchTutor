@@ -84,11 +84,9 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     return SRSService(store: ref.read(learningStoreProvider)).dailyMixedQueue();
   }
 
-  /// How many words the session actually ends up with — for a mission's
-  /// preferred set that's just its length; for the Auto tile, `_autoQueue`
-  /// now returns an oversized candidate POOL, so the real count is whatever
-  /// `SRSService.autoQueueSize` is currently set to (capped by how many the
-  /// pool actually has, for a very sparse bank).
+  /// How many words the frozen session will show. A preferred mission uses its
+  /// supplied length; the Recommended tile uses the configured daily size,
+  /// capped by the exact queue returned by the SRS service.
   Future<int> _autoQueueDisplayCount(int poolSize) async {
     if (widget.preferredEntryIds != null) return poolSize.clamp(0, 5).toInt();
     final target = await SRSService.autoQueueSize;
@@ -148,7 +146,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const KickerText('In progress', color: DesignTokens.primaryDeep),
+            KickerText('In progress', color: DesignTokens.primaryDeep),
             const SizedBox(height: 4),
             Text(
               '$done of ${resumable.planned.length} words practiced earlier '
@@ -189,7 +187,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             CupertinoIcons.xmark,
             size: 20,
             color: DesignTokens.mutedDim,
@@ -276,11 +274,21 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     return FutureBuilder<List<VocabEntry>>(
       future: _autoQueue,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _pickerErrorBody(
+            'Recommended vocabulary could not be prepared. ${snapshot.error}',
+          );
+        }
         final queue = snapshot.data ?? [];
         final isLoading = snapshot.connectionState == ConnectionState.waiting;
         return FutureBuilder<int>(
           future: _autoQueueDisplayCount(queue.length),
           builder: (context, countSnapshot) {
+            if (countSnapshot.hasError) {
+              return _pickerErrorBody(
+                'The recommended session size could not be read. ${countSnapshot.error}',
+              );
+            }
             final displayCount = countSnapshot.data ?? queue.length;
             return _autoBodyContent(
               queue: queue,
@@ -290,6 +298,29 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _pickerErrorBody(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: DesignTokens.dangerSoft,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+            border: Border.all(
+              color: DesignTokens.danger.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Text(
+            message,
+            style: DesignTokens.body(14).copyWith(height: 1.4),
+          ),
+        ),
+      ),
     );
   }
 
@@ -320,7 +351,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                     color: DesignTokens.infoSoft,
                     borderRadius: BorderRadius.circular(26),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.rectangle_stack_fill,
                     color: DesignTokens.info,
                     size: 31,
@@ -475,7 +506,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         DesignTokens.space5,
       ),
       children: [
-        const Icon(CupertinoIcons.sparkles, color: DesignTokens.info, size: 30),
+        Icon(CupertinoIcons.sparkles, color: DesignTokens.info, size: 30),
         const SizedBox(height: DesignTokens.space4),
         Text('Build a custom five-word set', style: DesignTokens.display(26)),
         const SizedBox(height: DesignTokens.space2),
@@ -539,6 +570,18 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
               createdAt: DateTime.now(),
             ),
           );
+      ref
+          .read(vocabularySessionStoreProvider)
+          .create(
+            id: id,
+            title: prompt,
+            source: 'custom',
+            topic: prompt,
+            levelBand: level,
+            entries: words.take(5).toList(growable: false),
+            focusNote:
+                'Custom words generated for your $level level. Audio is prepared while you preview the deck.',
+          );
       unawaited(_attachCustomCover(id, prompt, level, words.take(5).toList()));
       if (!mounted) return;
       setState(() => _isPlanning = false);
@@ -546,21 +589,23 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         context,
         (_) => VocabularyWorkshopScreen(
           phase: 1,
+          sessionId: id,
           theme: VocabTheme(id: id, title: prompt, entries: words),
-          initialDeck: words.take(5).toList(growable: false),
           contentItemPrefix: id,
           focusNote:
               'Custom words generated for your $level level. Audio is prepared while you preview the deck.',
+          source: 'custom',
+          topic: prompt,
         ),
         fullscreenDialog: true,
       );
       if (mounted) Navigator.of(context).pop(true);
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         setState(() => _isPlanning = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not generate that word set yet.'),
+          SnackBar(
+            content: Text('Custom vocabulary generation failed: $error'),
           ),
         );
       }
@@ -711,7 +756,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             // its own surface. Without this the word grid floated see-through
             // over the dimmed screen behind it.
             builder: (context, scrollController) => Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: DesignTokens.canvas,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
@@ -830,7 +875,7 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
                   ),
                 ),
                 if (isKnown)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 4),
                     child: Icon(
                       CupertinoIcons.checkmark_seal_fill,
@@ -875,21 +920,22 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     );
   }
 
-  /// Briefly personalizes the session before it starts — the planner call is raced against a
-  /// short timeout so a slow/failed OpenRouter call never blocks getting into practice. Example
-  /// sentences are pre-authored offline for the entire word bank and looked up instantly via
-  /// ContentService, so there's nothing to wait on or fail for that part.
-  ///
-  /// [curateFromPool] is only true for the Auto tile: [words] there is a
-  /// deliberately oversized candidate POOL (see `SRSService.dailyMixedQueue`),
-  /// and this call is what actually selects the real session size out of it.
-  /// Resuming a paused session or a manual category pick already IS the
-  /// exact intended set — those must never be curated/truncated further.
+  /// Freezes the exact entries selected by the source tile before the workshop
+  /// opens. Auto is intentionally local and immediate: it uses the SRS queue
+  /// already returned by [SRSService.dailyMixedQueue], never a second AI
+  /// curator with a silent substitution path.
   Future<void> _beginSession(
     List<VocabEntry> words, {
     bool curateFromPool = false,
   }) async {
-    if (words.isEmpty) return;
+    if (words.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No vocabulary words are ready yet.')),
+        );
+      }
+      return;
+    }
     setState(() => _isPlanning = true);
     final store = ref.read(learningStoreProvider);
     final level = SpeakLanguageProfile.forProfile(store.profile()).level;
@@ -897,40 +943,10 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
         ? (await SRSService.autoQueueSize).clamp(1, 5).toInt()
         : words.length.clamp(1, 5).toInt();
 
-    SessionPlan? planResult;
-    try {
-      planResult = await LessonAgentService.shared
-          .planVocabSession(
-            candidateWords: words,
-            count: targetSize,
-            levelBand: level,
-          )
-          .timeout(const Duration(seconds: 14));
-    } catch (_) {
-      planResult = null;
-    }
-
-    List<VocabEntry> chosenQueue;
-    String? focusNote;
-    if (planResult != null) {
-      focusNote = planResult.focusNote.isEmpty ? null : planResult.focusNote;
-      final prioritized = planResult.prioritizedWordIds;
-      if (prioritized != null) {
-        final byId = {for (final w in words) w.id: w};
-        chosenQueue = prioritized
-            .map((id) => byId[id])
-            .whereType<VocabEntry>()
-            .take(targetSize)
-            .toList();
-      } else {
-        // `words` is already shuffled by `dailyMixedQueue` for the Auto
-        // tile, so even this fallback gives a different set call to call —
-        // never the same deterministic slice every time.
-        chosenQueue = words.take(targetSize).toList();
-      }
-    } else {
-      chosenQueue = words.take(targetSize).toList();
-    }
+    final chosenQueue = words.take(targetSize).toList(growable: false);
+    final focusNote = curateFromPool
+        ? 'A local SRS mix: due words first, then new words at your current level.'
+        : 'A saved vocabulary practice set built from the words selected for this session.';
     if (!mounted) return;
     setState(() => _isPlanning = false);
 
@@ -939,13 +955,8 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     final topic = curateFromPool
         ? 'Recommended vocabulary'
         : 'Course vocabulary';
-    final summary =
-        focusNote ??
-        'A saved vocabulary practice set built from the words selected for this session.';
-    final plannedTitle = planResult?.sessionTitle?.trim();
-    final title = plannedTitle == null || plannedTitle.isEmpty
-        ? _fallbackSessionTitle(chosenQueue, summary)
-        : plannedTitle;
+    final summary = focusNote;
+    final title = _sessionTitleFor(chosenQueue);
     ref
         .read(generatedVocabularySetStoreProvider)
         .insert(
@@ -958,6 +969,17 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
             entries: chosenQueue,
             createdAt: DateTime.now(),
           ),
+        );
+    ref
+        .read(vocabularySessionStoreProvider)
+        .create(
+          id: sessionId,
+          title: title,
+          source: curateFromPool ? 'recommended' : 'category',
+          topic: topic,
+          levelBand: level,
+          entries: chosenQueue,
+          focusNote: focusNote,
         );
     unawaited(
       _attachSessionCover(
@@ -974,14 +996,15 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
       context,
       (_) => VocabularyWorkshopScreen(
         phase: 1,
+        sessionId: sessionId,
         theme: VocabTheme(
           id: 'daily-vocabulary',
           title: title,
           entries: chosenQueue,
         ),
-        initialDeck: chosenQueue,
-        contentItemPrefix: 'daily-vocabulary',
+        contentItemPrefix: sessionId,
         focusNote: focusNote,
+        source: curateFromPool ? 'recommended' : 'category',
       ),
       fullscreenDialog: true,
     );
@@ -1031,11 +1054,11 @@ class _VocabPickerScreenState extends ConsumerState<VocabPickerScreen> {
     }
   }
 
-  String _fallbackSessionTitle(List<VocabEntry> words, String summary) {
+  String _sessionTitleFor(List<VocabEntry> words) {
     final generated = GeneratedVocabularySet(
-      id: 'fallback',
+      id: 'session-title',
       title: 'Today\'s Words',
-      summary: summary,
+      summary: 'Vocabulary practice',
       topic: 'Vocabulary',
       levelBand: 'A1',
       entries: words,

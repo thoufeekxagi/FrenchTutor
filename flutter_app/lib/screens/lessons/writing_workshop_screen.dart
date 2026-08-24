@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
-import '../../services/practice_artwork_service.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
@@ -73,8 +71,7 @@ class _WritingWorkshopScreenState extends ConsumerState<WritingWorkshopScreen>
   int _hintsUsed = 0;
   WritingFeedback? _feedback;
   MicroWritingFeedback? _rewriteFeedback;
-  Uint8List? _submissionCover;
-  bool _isCoverGenerating = false;
+  List<String> _selectedTokens = [];
   String? _errorText;
 
   final _draftController = TextEditingController();
@@ -90,10 +87,37 @@ class _WritingWorkshopScreenState extends ConsumerState<WritingWorkshopScreen>
       _task.levelBand.toUpperCase() == 'A1' ||
       _task.levelBand.toUpperCase() == 'A2';
   int get _minimumWords => _task.minWords;
+  bool get _isConstructionTask =>
+      _task.wordBank.isNotEmpty && _task.targetTokens.isNotEmpty;
+  String get _displayPromptFr {
+    if (!_isConstructionTask) return _task.promptFr;
+    return _task.type == 'word'
+        ? 'Complète la phrase.'
+        : 'Construis la phrase.';
+  }
+
+  String get _displayPromptEn {
+    if (!_isConstructionTask || _task.type == 'word') {
+      return _task.promptEn;
+    }
+    return _task.promptEn.replaceFirst(RegExp(r'^Build:\s*'), '');
+  }
+
   // A short draft is still valid input for review. The task's target length is
   // guidance for the learner, not a disabled-submit gate that strands them at
   // the keyboard or after dismissing it.
   bool get _draftReady => _draft.trim().isNotEmpty;
+
+  int get _railIndex {
+    if (!_isConstructionTask) return _WritingStep.values.indexOf(_step);
+    return switch (_step) {
+      _WritingStep.brief => 0,
+      _WritingStep.build => 1,
+      _WritingStep.review => 2,
+      _WritingStep.rewrite => 2,
+      _WritingStep.draft => 1,
+    };
+  }
 
   List<String> get _supportWords {
     final profile = ref.read(learningStoreProvider);
@@ -142,9 +166,14 @@ class _WritingWorkshopScreenState extends ConsumerState<WritingWorkshopScreen>
       '''
 WRITING WORKSHOP
 Task: ${_task.title}
-French prompt: ${_task.promptFr}
-English prompt: ${_task.promptEn}
+Mode: ${_task.type}
+French prompt: $_displayPromptFr
+English prompt: $_displayPromptEn
 Minimum words: ${_task.minWords}
+Exam section: ${_task.examSection ?? '(none)'}
+Time limit minutes: ${_task.timeLimitMinutes ?? '(none)'}
+Maximum words: ${_task.maxWords ?? '(none)'}
+Target answer: ${_task.targetTokens.join(' ')}
 Target connectors: ${_task.targetConnectors.join(', ')}
 Rubric focus: ${_task.rubricHints.join('; ')}
 Current draft: ${_draft.trim().isEmpty ? '(empty)' : _draft.trim()}
@@ -183,11 +212,60 @@ Help the learner think and write. Do not write the whole answer for them unless 
   }
 
   void _next() {
+    if (_isConstructionTask && _step == _WritingStep.review) {
+      Navigator.of(context).pop(true);
+      return;
+    }
     if (_step == _WritingStep.rewrite) {
       Navigator.of(context).pop(true);
       return;
     }
     setState(() => _step = _WritingStep.values[_step.index + 1]);
+  }
+
+  void _checkConstruction() {
+    final expected = _task.targetTokens.map(_normaliseToken).join(' ');
+    final actual = _selectedTokens.map(_normaliseToken).join(' ');
+    final correct = actual == expected;
+    setState(() {
+      _errorText = correct
+          ? null
+          : 'Not quite. Move the words into the order shown by the prompt.';
+      if (correct) _step = _WritingStep.review;
+    });
+  }
+
+  String _normaliseToken(String value) => value
+      .trim()
+      .replaceAll(RegExp(r"\s+"), ' ')
+      .replaceAll(RegExp(r"\s+([,.!?])"), r'\1')
+      .toLowerCase();
+
+  void _toggleToken(String token) {
+    setState(() {
+      final normalised = _normaliseToken(token);
+      final selectedCount = _selectedTokens
+          .map(_normaliseToken)
+          .where((value) => value == normalised)
+          .length;
+      final targetCount = _task.targetTokens
+          .map(_normaliseToken)
+          .where((value) => value == normalised)
+          .length;
+      if (selectedCount > 0 && selectedCount >= targetCount) {
+        final next = [..._selectedTokens];
+        for (var index = next.length - 1; index >= 0; index--) {
+          if (_normaliseToken(next[index]) == normalised) {
+            next.removeAt(index);
+            break;
+          }
+        }
+        _selectedTokens = next;
+      } else {
+        _selectedTokens = [..._selectedTokens, token];
+      }
+      _errorText = null;
+    });
   }
 
   void _back() {
@@ -276,7 +354,6 @@ Help the learner think and write. Do not write the whole answer for them unless 
         _feedback = feedback;
         _isGrading = false;
       });
-      unawaited(_generateSubmissionCover());
       // A local/cloud persistence failure must not hide a grade that is already
       // in memory. The learner should see feedback immediately even if sync is
       // temporarily unavailable.
@@ -329,33 +406,6 @@ Help the learner think and write. Do not write the whole answer for them unless 
         contentItemId: 'writing:${_task.id}:improved',
       ),
     ]);
-  }
-
-  Future<void> _generateSubmissionCover() async {
-    if (_isCoverGenerating) return;
-    setState(() => _isCoverGenerating = true);
-    try {
-      final bytes = await PracticeArtworkService.generate(
-        id: _task.id,
-        title: _task.title,
-        summary: _task.promptEn,
-        topic: _task.title,
-        levelBand: _task.levelBand,
-        coverPrompt:
-            'A grounded realistic 4:3 image for a French learner writing about '
-            '${_task.promptEn}. Make the setting, objects, or action the primary '
-            'subject; do not show people, faces, animals, mascots, or characters. '
-            'Render no text, letters, numbers, logos, signs, captions, labels, or '
-            'other typography.',
-      );
-      if (!mounted) return;
-      setState(() {
-        _submissionCover = bytes;
-        _isCoverGenerating = false;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _isCoverGenerating = false);
-    }
   }
 
   Future<void> _submitRewrite() async {
@@ -432,14 +482,16 @@ Help the learner think and write. Do not write the whole answer for them unless 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                   child: LessonStageRail(
-                    labels: const [
-                      'Brief',
-                      'Build',
-                      'Draft',
-                      'Review',
-                      'Rewrite',
-                    ],
-                    currentIndex: _WritingStep.values.indexOf(_step),
+                    labels: _isConstructionTask
+                        ? const ['Brief', 'Build', 'Review']
+                        : const [
+                            'Brief',
+                            'Build',
+                            'Draft',
+                            'Review',
+                            'Rewrite',
+                          ],
+                    currentIndex: _railIndex,
                   ),
                 ),
                 Expanded(
@@ -462,7 +514,9 @@ Help the learner think and write. Do not write the whole answer for them unless 
                     isLoading: _isGrading,
                     hasFeedback: _feedback != null,
                     hasRewriteFeedback: _rewriteFeedback != null,
+                    isConstruction: _isConstructionTask,
                     onNext: _next,
+                    onCheckConstruction: _checkConstruction,
                     onSubmit: _submitDraft,
                     onSubmitRewrite: _submitRewrite,
                   ),
@@ -505,7 +559,8 @@ Help the learner think and write. Do not write the whole answer for them unless 
         ),
         const SizedBox(height: 18),
         LearningCard(
-          color: DesignTokens.primaryDeep,
+          color: DesignTokens.primary.withValues(alpha: 0.12),
+          borderColor: DesignTokens.primary.withValues(alpha: 0.45),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -513,28 +568,24 @@ Help the learner think and write. Do not write the whole answer for them unless 
                 'YOUR TASK',
                 style: DesignTokens.label(
                   10,
-                ).copyWith(color: Colors.white70, letterSpacing: 1),
+                ).copyWith(color: DesignTokens.inkSoft, letterSpacing: 1),
               ),
               const SizedBox(height: 10),
               Text(
-                _task.promptFr,
-                style: DesignTokens.display(
-                  24,
-                ).copyWith(color: Colors.white, height: 1.35),
+                _displayPromptFr,
+                style: DesignTokens.display(24).copyWith(height: 1.35),
               ),
               const SizedBox(height: 10),
               if (_showEnglish)
                 Text(
-                  _task.promptEn,
-                  style: DesignTokens.body(
-                    16,
-                  ).copyWith(color: Colors.white70, height: 1.4),
+                  _displayPromptEn,
+                  style: DesignTokens.body(16).copyWith(height: 1.4),
                 )
               else
                 TextButton(
                   onPressed: () => setState(() => _showEnglish = true),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.ink,
                     padding: EdgeInsets.zero,
                   ),
                   child: const Text('Show English support'),
@@ -542,6 +593,29 @@ Help the learner think and write. Do not write the whole answer for them unless 
             ],
           ),
         ),
+        if (_task.examSection != null) ...[
+          const SizedBox(height: 12),
+          LearningCard(
+            color: DesignTokens.primarySoft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  CupertinoIcons.checkmark_seal,
+                  color: DesignTokens.primary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '${_task.examSection} · ${_task.timeLimitMinutes ?? 60} min\n'
+                    'Write at least ${_task.minWords} words${_task.maxWords == null ? '' : ' and no more than ${_task.maxWords} words'}.',
+                    style: DesignTokens.body(13).copyWith(height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 14),
         _FocusList(items: _task.rubricHints),
         const SizedBox(height: 14),
@@ -549,7 +623,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
           color: DesignTokens.infoSoft,
           child: Row(
             children: [
-              const Icon(CupertinoIcons.lightbulb, color: DesignTokens.info),
+              Icon(CupertinoIcons.lightbulb, color: DesignTokens.info),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -565,6 +639,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
   }
 
   Widget _buildView() {
+    if (_isConstructionTask) return _constructionView();
     final words = _supportWords;
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -613,6 +688,73 @@ Help the learner think and write. Do not write the whole answer for them unless 
           minWords: _minimumWords,
           onChanged: (value) => setState(() => _draft = value),
         ),
+      ],
+    );
+  }
+
+  Widget _constructionView() {
+    final selected = _selectedTokens;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      children: [
+        const _SectionIntro(
+          kicker: '2 · BUILD',
+          title: 'Build it one word at a time',
+          body:
+              'Choose the French words in the right order. Tap a word again to remove it.',
+        ),
+        const SizedBox(height: 16),
+        _MiniPrompt(task: _task),
+        const SizedBox(height: 14),
+        LearningCard(
+          color: DesignTokens.surface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                selected.isEmpty ? 'YOUR SENTENCE' : selected.join(' '),
+                style: DesignTokens.display(22).copyWith(height: 1.35),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${selected.length}/${_task.targetTokens.length} words selected',
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: DesignTokens.mutedDim),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'WORD BANK',
+          style: DesignTokens.label(
+            10,
+          ).copyWith(color: DesignTokens.primary, letterSpacing: 1),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _task.wordBank.map((word) {
+            final active = selected.contains(word);
+            return ActionChip(
+              label: Text(word),
+              onPressed: () => _toggleToken(word),
+              backgroundColor: active
+                  ? DesignTokens.primarySoft
+                  : DesignTokens.surface,
+              side: BorderSide(
+                color: active ? DesignTokens.primary : DesignTokens.hairline,
+              ),
+              labelStyle: DesignTokens.body(13, weight: FontWeight.w600),
+            );
+          }).toList(),
+        ),
+        if (_errorText != null) ...[
+          const SizedBox(height: 14),
+          _ErrorText(text: _errorText!),
+        ],
       ],
     );
   }
@@ -668,7 +810,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.lightbulb,
                   color: DesignTokens.info,
                   size: 19,
@@ -690,6 +832,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
   }
 
   Widget _reviewView() {
+    if (_isConstructionTask) return _constructionReviewView();
     final feedback = _feedback;
     if (feedback == null) {
       return _FeedbackPendingBody(
@@ -714,12 +857,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
               'Your score is only a snapshot. The useful part is the one change you can reuse next time.',
         ),
         const SizedBox(height: 16),
-        _WritingResultCard(
-          task: _task,
-          draft: _draft,
-          cover: _submissionCover,
-          isLoading: _isCoverGenerating,
-        ),
+        _WritingResultCard(task: _task, draft: _draft),
         const SizedBox(height: 12),
         _SubmissionTextCard(draft: _draft),
         const SizedBox(height: 12),
@@ -762,7 +900,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.checkmark_circle_fill,
                   color: DesignTokens.success,
                 ),
@@ -862,7 +1000,7 @@ Help the learner think and write. Do not write the whole answer for them unless 
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.checkmark_circle_fill,
                   color: DesignTokens.success,
                 ),
@@ -881,6 +1019,50 @@ Help the learner think and write. Do not write the whole answer for them unless 
       ],
     );
   }
+
+  Widget _constructionReviewView() {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      children: [
+        const _SectionIntro(
+          kicker: '3 · CHECK',
+          title: 'That order is correct',
+          body:
+              'You built the sentence exactly. Keep this pattern ready for the next task.',
+        ),
+        const SizedBox(height: 16),
+        LearningCard(
+          color: DesignTokens.successSoft,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                CupertinoIcons.checkmark_circle_fill,
+                color: DesignTokens.success,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _task.targetTokens.join(' '),
+                  style: DesignTokens.display(21).copyWith(height: 1.35),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        LearningCard(
+          color: DesignTokens.surface,
+          child: Text(
+            _task.promptEn,
+            style: DesignTokens.body(
+              15,
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _Footer extends StatelessWidget {
@@ -891,7 +1073,9 @@ class _Footer extends StatelessWidget {
     required this.isLoading,
     required this.hasFeedback,
     required this.hasRewriteFeedback,
+    required this.isConstruction,
     required this.onNext,
+    required this.onCheckConstruction,
     required this.onSubmit,
     required this.onSubmitRewrite,
   });
@@ -902,7 +1086,9 @@ class _Footer extends StatelessWidget {
   final bool isLoading;
   final bool hasFeedback;
   final bool hasRewriteFeedback;
+  final bool isConstruction;
   final VoidCallback onNext;
+  final VoidCallback onCheckConstruction;
   final VoidCallback onSubmit;
   final VoidCallback onSubmitRewrite;
 
@@ -910,11 +1096,19 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDraft = step == _WritingStep.draft;
     final isRewrite = step == _WritingStep.rewrite;
+    final isConstructionBuild = isConstruction && step == _WritingStep.build;
+    final isConstructionReview = isConstruction && step == _WritingStep.review;
     final label = switch (step) {
       _WritingStep.brief => 'Build my answer',
-      _WritingStep.build => 'Write freely',
+      _WritingStep.build =>
+        isConstructionBuild ? 'Check answer' : 'Write freely',
       _WritingStep.draft => 'Submit for feedback',
-      _WritingStep.review => hasFeedback ? 'Rewrite one idea' : 'Get feedback',
+      _WritingStep.review =>
+        isConstructionReview
+            ? 'Finish lesson'
+            : hasFeedback
+            ? 'Rewrite one idea'
+            : 'Get feedback',
       _WritingStep.rewrite =>
         hasRewriteFeedback ? 'Finish workshop' : 'Check my rewrite',
     };
@@ -932,7 +1126,11 @@ class _Footer extends StatelessWidget {
           loadingLabel: isDraft || (step == _WritingStep.review && !hasFeedback)
               ? 'Grading your writing…'
               : 'Checking your rewrite…',
-          onPressed: isDraft
+          onPressed: isConstructionBuild
+              ? onCheckConstruction
+              : isConstructionReview
+              ? onNext
+              : isDraft
               ? (draftReady ? onSubmit : null)
               : isRewrite
               ? (hasRewriteFeedback
@@ -941,7 +1139,9 @@ class _Footer extends StatelessWidget {
               : step == _WritingStep.review && !hasFeedback
               ? (draftReady ? onSubmit : null)
               : onNext,
-          icon: isRewrite && hasRewriteFeedback
+          icon: isConstructionBuild
+              ? CupertinoIcons.checkmark
+              : isRewrite && hasRewriteFeedback
               ? CupertinoIcons.checkmark
               : CupertinoIcons.arrow_right,
         ),
@@ -1018,100 +1218,33 @@ class _SectionIntro extends StatelessWidget {
 }
 
 class _WritingResultCard extends StatelessWidget {
-  const _WritingResultCard({
-    required this.task,
-    required this.draft,
-    required this.cover,
-    required this.isLoading,
-  });
+  const _WritingResultCard({required this.task, required this.draft});
 
   final WritingTask task;
   final String draft;
-  final Uint8List? cover;
-  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return LearningCard(
-      padding: 0,
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        // This card lives inside a vertical ListView, so its row receives an
-        // unbounded height. Stretching across that axis asks Flutter for an
-        // infinite-height child and can make the entire Review result subtree
-        // disappear on device. The cover already has an explicit height.
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 112,
-            height: 154,
-            child: cover == null
-                ? DecoratedBox(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          DesignTokens.primaryDeep,
-                          DesignTokens.primary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        CupertinoIcons.pencil_ellipsis_rectangle,
-                        color: Colors.white,
-                        size: 38,
-                      ),
-                    ),
-                  )
-                : Image.memory(cover!, fit: BoxFit.cover),
+          Text(
+            'YOUR WRITING CARD',
+            style: DesignTokens.label(
+              10,
+            ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 14, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'YOUR WRITING CARD',
-                    style: DesignTokens.label(
-                      10,
-                    ).copyWith(color: DesignTokens.primary, letterSpacing: 0.8),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(task.displayTitle, style: DesignTokens.display(18)),
-                  const SizedBox(height: 7),
-                  Text(
-                    draft.trim(),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(
-                      14,
-                    ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
-                  ),
-                  if (isLoading) ...[
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const SizedBox.square(
-                          dimension: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Creating your cover…',
-                          style: DesignTokens.body(
-                            12,
-                          ).copyWith(color: DesignTokens.mutedDim),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
+          const SizedBox(height: 8),
+          Text(task.displayTitle, style: DesignTokens.display(18)),
+          const SizedBox(height: 7),
+          Text(
+            draft.trim(),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            style: DesignTokens.body(
+              14,
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
           ),
         ],
       ),
@@ -1119,9 +1252,7 @@ class _WritingResultCard extends StatelessWidget {
   }
 }
 
-/// The cover card is a quick visual receipt; this card is the authoritative
-/// transcript. Keep it separate so a long submission is never hidden behind
-/// an ellipsis or lost when the generated cover is unavailable.
+/// The learner's exact submission is the authoritative review record.
 class _SubmissionTextCard extends StatelessWidget {
   const _SubmissionTextCard({required this.draft});
 
@@ -1274,24 +1405,41 @@ class _MiniPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isConstruction =
+        task.wordBank.isNotEmpty && task.targetTokens.isNotEmpty;
+    final isWord = task.type == 'word';
+    final promptFr = isConstruction
+        ? (isWord ? 'Complète la phrase.' : 'Construis la phrase.')
+        : task.promptFr;
+    final promptEn = isConstruction && !isWord
+        ? task.promptEn.replaceFirst(RegExp(r'^Build:\s*'), '')
+        : task.promptEn;
     return LearningCard(
+      color: isConstruction
+          ? DesignTokens.primary.withValues(alpha: 0.08)
+          : null,
+      borderColor: isConstruction
+          ? DesignTokens.primary.withValues(alpha: 0.3)
+          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'WRITE ABOUT THIS',
+            isConstruction
+                ? (isWord ? 'COMPLETE THE PHRASE' : 'BUILD THE SENTENCE')
+                : 'WRITE ABOUT THIS',
             style: DesignTokens.label(
               11,
             ).copyWith(color: DesignTokens.mutedDim, letterSpacing: 0.8),
           ),
           const SizedBox(height: 8),
           Text(
-            task.promptFr,
+            promptFr,
             style: DesignTokens.display(20).copyWith(height: 1.35),
           ),
           const SizedBox(height: 5),
           Text(
-            task.promptEn,
+            promptEn,
             style: DesignTokens.body(
               15,
             ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
@@ -1402,7 +1550,7 @@ class _FocusList extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     CupertinoIcons.checkmark,
                     size: 15,
                     color: DesignTokens.success,
@@ -1453,7 +1601,7 @@ class _CorrectionCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.arrow_down_right,
                 size: 17,
                 color: DesignTokens.warning,
@@ -1588,7 +1736,7 @@ class _FeedbackPendingBody extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   else
-                    const Icon(
+                    Icon(
                       CupertinoIcons.exclamationmark_circle,
                       color: DesignTokens.info,
                     ),

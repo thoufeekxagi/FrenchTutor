@@ -75,7 +75,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
                           ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 16,
                         color: SpeakColors.inkSoft,
@@ -212,7 +212,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
             child: KeyedSubtree(
               key: AppTour.practiceExamKey,
               child: SpeakCard(
-                color: SpeakColors.blueSoft,
+                color: SpeakColors.accentSoft,
                 child: Row(
                   children: [
                     _icon(Icons.fact_check_outlined),
@@ -238,7 +238,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const Icon(
+                    Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 15,
                       color: SpeakColors.inkSoft,
@@ -258,7 +258,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
       height: 44,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: SpeakColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: SpeakColors.line),
       ),
@@ -299,13 +299,13 @@ class SpeakPracticeScreen extends ConsumerWidget {
           duration: DesignTokens.durationFast,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? SpeakColors.blueSoft : Colors.transparent,
+            color: selected ? SpeakColors.accentSoft : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             label,
             style: DesignTokens.body(13, weight: FontWeight.w700).copyWith(
-              color: selected ? SpeakColors.blue : SpeakColors.inkSoft,
+              color: selected ? SpeakColors.accent : SpeakColors.inkSoft,
             ),
           ),
         ),
@@ -320,7 +320,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
   }) {
     return Column(
       children: [
-        if (showDivider) const Divider(height: 1, color: SpeakColors.line),
+        if (showDivider) Divider(height: 1, color: SpeakColors.line),
         Semantics(
           button: true,
           label: 'Open saved transcript for ${session.displayTitle}',
@@ -337,12 +337,12 @@ class SpeakPracticeScreen extends ConsumerWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: SpeakColors.blueSoft,
+                      color: SpeakColors.accentSoft,
                       borderRadius: BorderRadius.circular(13),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.forum_outlined,
-                      color: SpeakColors.blue,
+                      color: SpeakColors.accent,
                       size: 20,
                     ),
                   ),
@@ -367,7 +367,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 15,
                     color: SpeakColors.inkSoft,
@@ -432,7 +432,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 15,
                 color: SpeakColors.inkSoft,
@@ -471,13 +471,13 @@ class SpeakPracticeScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: SpeakColors.line),
         ),
         child: Column(
           children: [
-            Icon(icon, color: SpeakColors.blue, size: 22),
+            Icon(icon, color: SpeakColors.accent, size: 22),
             const SizedBox(height: 7),
             Text(
               label,
@@ -494,9 +494,9 @@ class SpeakPracticeScreen extends ConsumerWidget {
     width: 40,
     height: 40,
     decoration: BoxDecoration(
-      color: SpeakColors.blueSoft,
+      color: SpeakColors.accentSoft,
       borderRadius: BorderRadius.circular(13),
     ),
-    child: Icon(icon, color: SpeakColors.blue, size: 20),
+    child: Icon(icon, color: SpeakColors.accent, size: 20),
   );
 }

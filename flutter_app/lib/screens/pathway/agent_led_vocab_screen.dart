@@ -16,6 +16,7 @@ import '../../models/content_models.dart';
 import '../../models/profile.dart';
 import '../../models/srs_state.dart';
 import '../../providers/database_provider.dart';
+import '../../providers/tutor_helper_provider.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/gemini_live_service.dart';
@@ -24,6 +25,7 @@ import '../../services/mic_mode.dart';
 import '../../services/session_recorder.dart';
 import '../../flow/stage_outcome.dart';
 import '../../services/srs_service.dart';
+import '../../services/tutor_helper_settings.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
 import '../../widgets/learning_card.dart';
@@ -124,6 +126,10 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
   int _judgeGeneration = 0;
 
   final Set<String> _handledCallIds = {};
+
+  bool get _helperEnabled => ref
+      .read(tutorHelperSettingsProvider)
+      .isEnabled(TutorHelperSurface.vocabulary);
 
   // Context-aware navigation: every completed utterance is classified by Flash-Lite (with
   // the current card + Marie's last line as context) instead of keyword matching, so "yes,
@@ -324,9 +330,13 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
             ? ' Example sentence to teach through: "${example.fr}" (${example.en}).'
             : '';
         _gemini.injectContext(
-          'The call has just connected. Greet the student warmly in one short sentence, then '
-          'introduce the first word on their screen: ${first.entry.fr} = ${first.entry.en}.$exampleNote '
-          'Begin teaching it with step 1.',
+          _helperEnabled
+              ? 'The call has just connected. Greet the student warmly in one short sentence, then '
+                    'introduce the first word on their screen: ${first.entry.fr} = ${first.entry.en}.$exampleNote '
+                    'Begin teaching it with step 1. Keep help bounded to the current word and example.'
+              : 'Tutor helper is OFF for this vocabulary session. Greet the student briefly, '
+                    'introduce the first word on their screen: ${first.entry.fr} = ${first.entry.en}.$exampleNote '
+                    'Use the fixed word flow without extra English coaching or unsolicited extensions.',
           expectReply: true,
         );
       }
@@ -1278,7 +1288,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               IconButton(
                 tooltip: 'End vocabulary practice',
                 onPressed: _confirmEnd,
-                icon: const Icon(
+                icon: Icon(
                   CupertinoIcons.xmark,
                   size: 20,
                   color: DesignTokens.ink,
@@ -1296,7 +1306,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               IconButton(
                 tooltip: "Show today's words",
                 onPressed: _showAllWordsSheet,
-                icon: const Icon(
+                icon: Icon(
                   CupertinoIcons.list_bullet,
                   size: 20,
                   color: DesignTokens.ink,
@@ -1352,7 +1362,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.checkmark_circle_fill,
               size: 30,
               color: DesignTokens.success,
@@ -1431,7 +1441,7 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const KickerText('Example', color: DesignTokens.mutedDim),
+                  KickerText('Example', color: DesignTokens.mutedDim),
                   const SizedBox(height: 3),
                   Text(
                     example.fr,

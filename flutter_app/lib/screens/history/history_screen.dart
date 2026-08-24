@@ -139,11 +139,11 @@ class HistoryScreen extends ConsumerWidget {
             Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: DesignTokens.infoSoft,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 CupertinoIcons.text_bubble,
                 color: DesignTokens.info,
                 size: 25,
@@ -180,11 +180,11 @@ class HistoryScreen extends ConsumerWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: DesignTokens.successSoft,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 CupertinoIcons.waveform,
                 size: 18,
                 color: DesignTokens.success,

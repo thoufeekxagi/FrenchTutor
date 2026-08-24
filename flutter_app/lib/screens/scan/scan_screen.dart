@@ -765,7 +765,7 @@ class _NewScanSessionDialog extends StatelessWidget {
                 color: DesignTokens.primarySoft,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(
+              child: Icon(
                 CupertinoIcons.square_pencil,
                 color: DesignTokens.primary,
                 size: 24,
@@ -836,7 +836,7 @@ class _ScanSessionPickerDialog extends StatelessWidget {
                       color: DesignTokens.canvasDim,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       CupertinoIcons.clock,
                       color: DesignTokens.inkSoft,
                       size: 22,
@@ -1014,7 +1014,9 @@ class _ScanDialogButton extends StatelessWidget {
               Text(
                 label,
                 style: DesignTokens.body(14, weight: FontWeight.w700).copyWith(
-                  color: primary ? Colors.white : DesignTokens.inkSoft,
+                  color: primary
+                      ? DesignTokens.onPrimary
+                      : DesignTokens.inkSoft,
                 ),
               ),
               if (icon != null) ...[
@@ -1022,7 +1024,9 @@ class _ScanDialogButton extends StatelessWidget {
                 Icon(
                   icon,
                   size: 18,
-                  color: primary ? Colors.white : DesignTokens.inkSoft,
+                  color: primary
+                      ? DesignTokens.onPrimary
+                      : DesignTokens.inkSoft,
                 ),
               ],
             ],

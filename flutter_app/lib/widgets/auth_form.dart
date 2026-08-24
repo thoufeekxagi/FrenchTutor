@@ -251,7 +251,7 @@ class AuthForm extends StatelessWidget {
         borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         borderSide: BorderSide(color: Passeport.hairline),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(color: Passeport.maroon, width: 1.5),
       ),

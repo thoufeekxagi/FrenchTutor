@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../design/tokens.dart';
 
-/// A compact, consistent lesson roadmap. The active step is blue and the
-/// completed steps stay blue so learners can see both where they are and what
-/// they have already done without adding another large card to the lesson.
+/// A compact, consistent lesson roadmap. The active and completed steps use
+/// the shared accent so the rail follows both appearance modes.
 class LessonStageRail extends StatelessWidget {
   const LessonStageRail({
     super.key,

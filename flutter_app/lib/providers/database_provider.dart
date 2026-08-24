@@ -14,6 +14,7 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/vocabulary_session_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/exam_practice_store.dart';
 import '../data/database/plan_store.dart';
@@ -145,6 +146,10 @@ final generatedVocabularySetStoreProvider =
         ref.watch(syncServiceProvider),
       );
     });
+
+final vocabularySessionStoreProvider = Provider<VocabularySessionStore>((ref) {
+  return VocabularySessionStore(ref.watch(databaseProvider));
+});
 
 final examPracticeStoreProvider = Provider<ExamPracticeStore>((ref) {
   return ExamPracticeStore(ref.watch(databaseProvider));

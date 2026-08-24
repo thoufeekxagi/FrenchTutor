@@ -557,7 +557,7 @@ class _MissionComplete extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             CupertinoIcons.checkmark_seal_fill,
             color: DesignTokens.success,
             size: 28,
@@ -575,7 +575,7 @@ class _MissionComplete extends StatelessWidget {
             const SizedBox(height: DesignTokens.space3),
             Row(
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.flame_fill,
                   size: 16,
                   color: DesignTokens.success,

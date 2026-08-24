@@ -226,10 +226,7 @@ class _AlphabetDeckScreenState extends ConsumerState<_AlphabetDeckScreen>
             subtitle: '${_letters.length} sounds · tap any letter to hear it',
             leading: GestureDetector(
               onTap: () => Navigator.of(context).pop(false),
-              child: const Icon(
-                Icons.close_rounded,
-                color: SpeakColors.inkSoft,
-              ),
+              child: Icon(Icons.close_rounded, color: SpeakColors.inkSoft),
             ),
             trailing: InlineCallActions(controller: _call),
           ),
@@ -320,7 +317,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: SpeakColors.blueSoft,
+                  color: SpeakColors.accentSoft,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 alignment: Alignment.center,
@@ -370,7 +367,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                             ),
                           );
                       },
-                      color: SpeakColors.blue,
+                      color: SpeakColors.accent,
                       size: 48,
                       iconSize: 15,
                     ),
@@ -382,7 +379,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                         style: DesignTokens.body(
                           14,
                           weight: FontWeight.w600,
-                        ).copyWith(color: SpeakColors.blue),
+                        ).copyWith(color: SpeakColors.accent),
                       ),
                     ),
                   ],
@@ -487,7 +484,7 @@ class _AlphabetQuizState extends State<_AlphabetQuiz> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: SpeakColors.blueSoft,
+              color: SpeakColors.accentSoft,
               borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
             ),
             child: Text(
@@ -555,15 +552,15 @@ class _QuestionCard extends StatelessWidget {
               Color border = SpeakColors.line;
               if (checked) {
                 if (isCorrect) {
-                  bg = SpeakColors.blueSoft;
-                  border = SpeakColors.blue;
+                  bg = SpeakColors.accentSoft;
+                  border = SpeakColors.accent;
                 } else if (isSelected) {
-                  bg = SpeakColors.blueSoft;
-                  border = SpeakColors.blue;
+                  bg = SpeakColors.accentSoft;
+                  border = SpeakColors.accent;
                 }
               } else if (isSelected) {
-                bg = SpeakColors.blueSoft;
-                border = SpeakColors.blue;
+                bg = SpeakColors.accentSoft;
+                border = SpeakColors.accent;
               }
               return GestureDetector(
                 onTap: onSelect == null ? null : () => onSelect!(choice),

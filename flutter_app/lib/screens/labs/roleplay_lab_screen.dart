@@ -317,7 +317,7 @@ class _RoleplayLabScreenState extends ConsumerState<RoleplayLabScreen> {
             ),
             const SizedBox(height: 20),
             if (roleplays.isNotEmpty) ...[
-              const KickerText('Your roleplays', color: DesignTokens.mutedDim),
+              KickerText('Your roleplays', color: DesignTokens.mutedDim),
               const SizedBox(height: 10),
               ResponsiveCardGrid(
                 mainAxisExtent: 292,
@@ -452,7 +452,7 @@ class _EmptyRoleplayLibraryNote extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             CupertinoIcons.bubble_left_bubble_right,
             color: DesignTokens.mutedDim,
             size: 28,

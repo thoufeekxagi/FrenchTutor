@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
+import '../../models/content_models.dart';
 import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import 'speak_roleplay_screen.dart';
@@ -27,12 +28,19 @@ class _SpeakingCourseHomeScreenState
     extends ConsumerState<SpeakingCourseHomeScreen> {
   SpeakingCourseMode _mode = SpeakingCourseMode.guided;
   String? _selectedLessonId;
+  final List<SpeakingCourseLesson> _generatedLessons = [];
+  bool _isGenerating = false;
 
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(learningStoreProvider).profile();
     final level = _beginnerBand(profile.level);
-    final lessons = _lessonsFor(_mode, level);
+    final lessons = [
+      ..._lessonsFor(_mode, level),
+      ..._generatedLessons.where(
+        (lesson) => lesson.mode == _mode && lesson.level == level,
+      ),
+    ];
     final selected = lessons.firstWhere(
       (lesson) => lesson.id == _selectedLessonId,
       orElse: () => lessons.first,
@@ -74,9 +82,7 @@ class _SpeakingCourseHomeScreenState
               _lessonGrid(lessons, completed),
             if (_mode == SpeakingCourseMode.guided) ...[
               const SizedBox(height: 24),
-              _sectionLabel('SPEAKING COLLECTIONS'),
-              const SizedBox(height: 10),
-              _collectionGrid(level),
+              _generateMoreCard(level),
             ],
           ],
         ),
@@ -95,10 +101,10 @@ class _SpeakingCourseHomeScreenState
     String level,
   ) {
     if (mode == SpeakingCourseMode.freeTalk) {
-      final exact = SpeakingCourseCatalog.freeTalkLessons
-          .where((lesson) => lesson.level == level)
-          .toList(growable: false);
-      return exact.isNotEmpty ? exact : SpeakingCourseCatalog.freeTalkLessons;
+      return SpeakingCourseCatalog.freeTalkForLevel(level);
+    }
+    if (mode == SpeakingCourseMode.roleplay) {
+      return SpeakingCourseCatalog.roleplaysForLevel(level);
     }
     final all = <SpeakingCourseLesson>[
       for (final collection in SpeakingCourseCatalog.units)
@@ -124,10 +130,7 @@ class _SpeakingCourseHomeScreenState
         IconButton(
           tooltip: 'Back',
           onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: DesignTokens.nightText,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: DesignTokens.nightText),
         ),
         const SizedBox(width: 4),
         Expanded(child: Text('Speaking', style: _display(23))),
@@ -150,7 +153,7 @@ class _SpeakingCourseHomeScreenState
           tooltip: 'Speaking settings',
           onPressed: () =>
               AppRouter.push(context, (_) => const SpeakSettingsScreen()),
-          icon: const Icon(Icons.tune_rounded, color: DesignTokens.nightAccent),
+          icon: Icon(Icons.tune_rounded, color: DesignTokens.nightAccent),
         ),
       ],
     );
@@ -222,11 +225,7 @@ class _SpeakingCourseHomeScreenState
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A3518), Color(0xFF201A12)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: DesignTokens.nightSurface,
         borderRadius: BorderRadius.circular(23),
         border: Border.all(color: DesignTokens.nightAccent),
       ),
@@ -237,11 +236,15 @@ class _SpeakingCourseHomeScreenState
               Container(
                 width: 54,
                 height: 54,
-                decoration: const BoxDecoration(
-                  color: DesignTokens.nightAccent,
+                decoration: BoxDecoration(
+                  color: DesignTokens.nightSurfaceRaised,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(lesson.icon, color: Colors.black, size: 26),
+                child: Icon(
+                  lesson.icon,
+                  color: DesignTokens.nightAccent,
+                  size: 26,
+                ),
               ),
               const SizedBox(width: 13),
               Expanded(
@@ -261,10 +264,7 @@ class _SpeakingCourseHomeScreenState
                 ),
               ),
               if (complete)
-                const Icon(
-                  Icons.check_circle_rounded,
-                  color: DesignTokens.success,
-                ),
+                Icon(Icons.check_circle_rounded, color: DesignTokens.success),
             ],
           ),
           const SizedBox(height: 15),
@@ -374,13 +374,13 @@ class _SpeakingCourseHomeScreenState
               ),
             ),
             if (complete)
-              const Icon(
+              Icon(
                 Icons.check_circle_rounded,
                 color: DesignTokens.success,
                 size: 19,
               )
             else
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 color: DesignTokens.nightAccent,
               ),
@@ -399,114 +399,177 @@ class _SpeakingCourseHomeScreenState
       physics: const NeverScrollableScrollPhysics(),
       itemCount: lessons.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.05,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        mainAxisExtent: 108,
       ),
       itemBuilder: (context, index) {
         final lesson = lessons[index];
-        return GestureDetector(
+        return _SpeakingTopicCard(
+          lesson: lesson,
+          selected: lesson.id == _selectedLessonId,
+          complete: completed.contains(lesson.id),
           onTap: () => setState(() => _selectedLessonId = lesson.id),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: lesson.id == _selectedLessonId
-                  ? DesignTokens.nightAccentSoft
-                  : DesignTokens.nightSurface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: lesson.id == _selectedLessonId
-                    ? DesignTokens.nightAccent
-                    : DesignTokens.nightHairline,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      lesson.icon,
-                      color: DesignTokens.nightAccent,
-                      size: 24,
-                    ),
-                    const Spacer(),
-                    if (completed.contains(lesson.id))
-                      const Icon(
-                        Icons.check_circle_rounded,
-                        color: DesignTokens.success,
-                        size: 18,
-                      ),
-                  ],
-                ),
-                const Spacer(),
-                Text(lesson.title, style: _body(15, weight: FontWeight.w800)),
-                const SizedBox(height: 4),
-                Text(
-                  '${lesson.lines.length} turns · ${lesson.level}',
-                  style: _body(11).copyWith(color: DesignTokens.nightMuted),
-                ),
-              ],
-            ),
-          ),
         );
       },
     );
   }
 
-  Widget _collectionGrid(String level) {
-    final collections = SpeakingCourseCatalog.units
-        .where((collection) => collection.level == level)
-        .toList(growable: false);
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: collections.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.3,
+  Widget _generateMoreCard(String level) {
+    final freeTalk = _mode == SpeakingCourseMode.freeTalk;
+    final roleplay = _mode == SpeakingCourseMode.roleplay;
+    final format = freeTalk
+        ? 'topic'
+        : roleplay
+        ? 'scene'
+        : 'lesson';
+    final formatLabel = freeTalk
+        ? 'Free Talk'
+        : roleplay
+        ? 'roleplay'
+        : 'practice';
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _isGenerating ? null : () => _generateLesson(level),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.fromLTRB(15, 15, 15, 14),
+        decoration: BoxDecoration(
+          color: DesignTokens.nightSurface,
+          borderRadius: BorderRadius.circular(19),
+          border: Border.all(color: DesignTokens.nightHairline),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.auto_awesome_rounded, color: DesignTokens.nightAccent),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isGenerating
+                        ? 'Generating a $level $format…'
+                        : 'Generate more $level $formatLabel',
+                    style: _body(14, weight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    freeTalk
+                        ? 'Create a fresh level-matched topic with prompts, starters, and pronunciation help.'
+                        : roleplay
+                        ? 'Create a fresh level-matched scene with Marie prompts and learner replies.'
+                        : 'Create one short, level-matched conversation with Gemini when you want a fresh challenge.',
+                    style: _body(
+                      11,
+                    ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              _isGenerating
+                  ? Icons.hourglass_top_rounded
+                  : Icons.chevron_right_rounded,
+              color: DesignTokens.nightAccent,
+            ),
+          ],
+        ),
       ),
-      itemBuilder: (context, index) {
-        final collection = collections[index];
-        final firstLesson = collection.lessons.firstWhere(
-          (lesson) => lesson.mode == SpeakingCourseMode.guided,
-          orElse: () => collection.lessons.first,
-        );
-        return GestureDetector(
-          onTap: () => setState(() => _selectedLessonId = firstLesson.id),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: DesignTokens.nightSurface,
-              borderRadius: BorderRadius.circular(19),
-              border: Border.all(color: DesignTokens.nightHairline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  collection.icon,
-                  color: DesignTokens.nightAccent,
-                  size: 25,
-                ),
-                const Spacer(),
-                Text(
-                  collection.title,
-                  style: _body(14, weight: FontWeight.w800),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '${collection.lessons.length} lessons',
-                  style: _body(10).copyWith(color: DesignTokens.nightMuted),
-                ),
-              ],
-            ),
+    );
+  }
+
+  Future<void> _generateLesson(String level, {SpeakingCourseMode? mode}) async {
+    final requestedMode = mode ?? _mode;
+    setState(() => _isGenerating = true);
+    try {
+      final avoidTitles = [
+        ...SpeakingCourseCatalog.units
+            .expand((unit) => unit.lessons)
+            .map((lesson) => lesson.title),
+        ...SpeakingCourseCatalog.freeTalkLessons.map((lesson) => lesson.title),
+        ..._generatedLessons.map((lesson) => lesson.title),
+      ];
+      final passage = requestedMode == SpeakingCourseMode.freeTalk
+          ? await ref
+                .read(lessonAgentServiceProvider)
+                .buildStandaloneFreeTalkTopic(
+                  levelBand: level,
+                  avoidTitles: avoidTitles,
+                )
+          : requestedMode == SpeakingCourseMode.roleplay
+          ? await ref
+                .read(lessonAgentServiceProvider)
+                .buildStandaloneRoleplay(
+                  levelBand: level,
+                  avoidTitles: avoidTitles,
+                )
+          : await ref
+                .read(lessonAgentServiceProvider)
+                .buildStandaloneSpeakingLesson(
+                  levelBand: level,
+                  avoidTitles: avoidTitles,
+                );
+      final lesson = _lessonFromGeneratedPassage(
+        passage,
+        level,
+        mode: requestedMode,
+      );
+      if (!mounted) return;
+      setState(() {
+        _generatedLessons.add(lesson);
+        _selectedLessonId = lesson.id;
+        _isGenerating = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isGenerating = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lesson generation failed: $error')),
+      );
+    }
+  }
+
+  SpeakingCourseLesson _lessonFromGeneratedPassage(
+    ReadingPassage passage,
+    String level, {
+    required SpeakingCourseMode mode,
+  }) {
+    if ((mode == SpeakingCourseMode.freeTalk ||
+            mode == SpeakingCourseMode.roleplay) &&
+        passage.segments.any(
+          (segment) => segment.characterFr?.trim().isNotEmpty != true,
+        )) {
+      throw StateError('Generated speaking scene has an incomplete prompt.');
+    }
+    final lines = passage.segments
+        .map(
+          (segment) => SpeakingCourseLine(
+            french: segment.fr,
+            english: segment.en,
+            partnerFrench: segment.characterFr,
+            partnerEnglish: segment.characterEn,
+            tip: segment.pronunciationTip,
+            openResponse: mode == SpeakingCourseMode.freeTalk,
           ),
-        );
-      },
+        )
+        .toList(growable: false);
+    if (lines.isEmpty) {
+      throw StateError('Generated speaking lesson has no practice lines.');
+    }
+    return SpeakingCourseLesson(
+      id: passage.id,
+      title: passage.titleEn?.trim().isNotEmpty == true
+          ? passage.titleEn!.trim()
+          : passage.title,
+      subtitle: 'A fresh $level conversation matched to your practice.',
+      level: level,
+      icon: Icons.auto_awesome_rounded,
+      mode: mode,
+      lines: lines,
     );
   }
 
@@ -526,17 +589,19 @@ class _SpeakingCourseHomeScreenState
           topic: lesson.subtitle,
           level: lesson.level,
           contentKey: lesson.id,
-          steps: [
-            for (final line in lesson.lines)
-              SpeakingPhraseStep(
-                french: line.french,
-                english: line.english,
-                partnerFrench: line.partnerFrench,
-                partnerEnglish: line.partnerEnglish,
-                tip: line.tip,
-                openResponse: line.openResponse,
-              ),
-          ],
+          steps: lesson.mode == SpeakingCourseMode.guided
+              ? speakingStepsForCourseLines(lesson.lines, level: lesson.level)
+              : [
+                  for (final line in lesson.lines)
+                    SpeakingPhraseStep(
+                      french: line.french,
+                      english: line.english,
+                      partnerFrench: line.partnerFrench,
+                      partnerEnglish: line.partnerEnglish,
+                      tip: line.tip,
+                      openResponse: line.openResponse,
+                    ),
+                ],
         ),
         fullscreenDialog: true,
       );
@@ -568,4 +633,80 @@ class _SpeakingCourseHomeScreenState
         size,
         weight: weight,
       ).copyWith(color: DesignTokens.nightText);
+}
+
+class _SpeakingTopicCard extends StatelessWidget {
+  const _SpeakingTopicCard({
+    required this.lesson,
+    required this.selected,
+    required this.complete,
+    required this.onTap,
+  });
+
+  final SpeakingCourseLesson lesson;
+  final bool selected;
+  final bool complete;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: '${lesson.title}, ${lesson.subtitle}',
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.fromLTRB(11, 12, 9, 10),
+          decoration: BoxDecoration(
+            color: selected
+                ? DesignTokens.nightAccentSoft
+                : DesignTokens.nightSurface,
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(
+              color: selected
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightHairline,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(lesson.icon, color: DesignTokens.nightAccent, size: 20),
+                  const Spacer(),
+                  if (complete)
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: DesignTokens.success,
+                      size: 17,
+                    ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                lesson.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: DesignTokens.body(
+                  12,
+                  weight: FontWeight.w700,
+                ).copyWith(color: DesignTokens.nightText),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                lesson.subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: DesignTokens.body(
+                  10,
+                ).copyWith(color: DesignTokens.nightMuted, height: 1.15),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

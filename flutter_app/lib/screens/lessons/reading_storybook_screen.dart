@@ -555,7 +555,7 @@ ${_segments.map((segment) => '- ${segment.fr} — ${segment.en}').join('\n')}
           color: DesignTokens.infoSoft,
           child: Row(
             children: [
-              const Icon(CupertinoIcons.lightbulb, color: DesignTokens.info),
+              Icon(CupertinoIcons.lightbulb, color: DesignTokens.info),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -630,7 +630,7 @@ class _ProgressHeader extends StatelessWidget {
                 value: progress,
                 minHeight: 5,
                 backgroundColor: DesignTokens.hairline,
-                valueColor: const AlwaysStoppedAnimation(DesignTokens.primary),
+                valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
               ),
             ),
           ),

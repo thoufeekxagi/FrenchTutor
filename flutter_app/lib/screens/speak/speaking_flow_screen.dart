@@ -71,7 +71,8 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
           }.contains(session.skill),
         );
 
-    if (_selectedIndex >= speakingLessons.length && speakingLessons.isNotEmpty) {
+    if (_selectedIndex >= speakingLessons.length &&
+        speakingLessons.isNotEmpty) {
       _selectedIndex = speakingLessons.length - 1;
     }
     final selected = speakingLessons.isEmpty
@@ -90,7 +91,9 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
             const SizedBox(height: 7),
             Text(
               'Choose a beginner lesson, hear the model, then speak in one continuous conversation.',
-              style: _body(14).copyWith(color: DesignTokens.nightMuted, height: 1.35),
+              style: _body(
+                14,
+              ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
             ),
             const SizedBox(height: 22),
             if (selected == null)
@@ -135,7 +138,7 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
         const Spacer(),
         Row(
           children: [
-            const Icon(
+            Icon(
               Icons.local_fire_department_rounded,
               color: DesignTokens.nightAccent,
               size: 18,
@@ -201,7 +204,7 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                 width: 54,
                 height: 54,
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: DesignTokens.nightAccent,
                   shape: BoxShape.circle,
                 ),
@@ -258,7 +261,8 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                     label: activity.$1,
                     icon: activity.$2,
                     selected: _selectedActivity == activity.$1,
-                    onTap: () => setState(() => _selectedActivity = activity.$1),
+                    onTap: () =>
+                        setState(() => _selectedActivity = activity.$1),
                   ),
                 ),
                 if (activity.$1 != 'Tutor Q&A') const SizedBox(width: 7),
@@ -342,8 +346,9 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                 icon: Icons.mic_none_rounded,
                 title: 'Guided drill',
                 subtitle: 'One phrase at a time',
-                onTap: selected == null
-                    || selected.primarySkill != SpeakSkill.speaking
+                onTap:
+                    selected == null ||
+                        selected.primarySkill != SpeakSkill.speaking
                     ? null
                     : () => _startGuided(context, selected),
               ),
@@ -367,7 +372,8 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
         _quickCard(
           icon: Icons.theater_comedy_outlined,
           title: 'Roleplay topics',
-          subtitle: 'Hot · New · Top today · cafés, travel, shops, and everyday scenes',
+          subtitle:
+              'Hot · New · Top today · cafés, travel, shops, and everyday scenes',
           onTap: () => AppRouter.push(
             context,
             (_) => const SpeakFreeTalkScreen(),
@@ -436,7 +442,10 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                   Icon(icon, color: DesignTokens.nightAccent, size: 24),
                   const SizedBox(width: 12),
                   Expanded(child: _quickCopy(title, subtitle)),
-                  const Icon(Icons.chevron_right_rounded, color: DesignTokens.nightAccent),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: DesignTokens.nightAccent,
+                  ),
                 ],
               )
             : Column(
@@ -561,7 +570,10 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(session.title, style: _body(15, weight: FontWeight.w700)),
+                  Text(
+                    session.title,
+                    style: _body(15, weight: FontWeight.w700),
+                  ),
                   const SizedBox(height: 3),
                   Text(
                     '${session.level} · ${session.estimatedMinutes} min',
@@ -600,7 +612,7 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.history_rounded, color: DesignTokens.nightAccent),
+            Icon(Icons.history_rounded, color: DesignTokens.nightAccent),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -608,10 +620,7 @@ class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
                 style: _body(14, weight: FontWeight.w700),
               ),
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: DesignTokens.nightMuted,
-            ),
+            Icon(Icons.chevron_right_rounded, color: DesignTokens.nightMuted),
           ],
         ),
       ),
@@ -715,7 +724,7 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
           _pageHeader(
             context,
             title: 'Speaking',
-            trailing: const Icon(
+            trailing: Icon(
               Icons.bookmark_border_rounded,
               color: DesignTokens.nightText,
             ),
@@ -726,7 +735,7 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
               width: 82,
               height: 82,
               padding: const EdgeInsets.all(5),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: DesignTokens.nightAccent,
                 shape: BoxShape.circle,
               ),
@@ -762,10 +771,10 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   'THIS LESSON',
-                  style: _detailBody(
-                    11,
-                    weight: FontWeight.w800,
-                  ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.3),
+                  style: _detailBody(11, weight: FontWeight.w800).copyWith(
+                    color: DesignTokens.nightAccent,
+                    letterSpacing: 1.3,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 _detailRow(
@@ -851,7 +860,7 @@ class SpeakingRoleplayDetailScreen extends StatelessWidget {
           _pageHeader(
             context,
             title: 'Roleplay',
-            trailing: const Icon(
+            trailing: Icon(
               Icons.favorite_border_rounded,
               color: DesignTokens.nightText,
             ),
@@ -969,7 +978,7 @@ Widget _pageHeader(
     children: [
       GestureDetector(
         onTap: () => Navigator.of(context).maybePop(),
-        child: const SizedBox(
+        child: SizedBox(
           width: 44,
           height: 44,
           child: Icon(Icons.arrow_back_rounded, color: DesignTokens.nightText),
@@ -997,7 +1006,7 @@ Widget _quoteCard(String text) => Container(
   child: Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text(
+      Text(
         '“',
         style: TextStyle(
           color: DesignTokens.nightAccent,
@@ -1013,7 +1022,7 @@ Widget _quoteCard(String text) => Container(
 
 Widget _detailRow(IconData icon, String title, String subtitle) => Container(
   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-  decoration: const BoxDecoration(
+  decoration: BoxDecoration(
     color: DesignTokens.nightSurface,
     border: Border(bottom: BorderSide(color: DesignTokens.nightHairline)),
   ),
@@ -1034,7 +1043,7 @@ Widget _detailRow(IconData icon, String title, String subtitle) => Container(
           ],
         ),
       ),
-      const Icon(Icons.chevron_right_rounded, color: DesignTokens.nightMuted),
+      Icon(Icons.chevron_right_rounded, color: DesignTokens.nightMuted),
     ],
   ),
 );
@@ -1081,17 +1090,13 @@ Widget _phraseRow(String phrase) => Container(
   ),
   child: Row(
     children: [
-      const Text(
+      Text(
         '“',
         style: TextStyle(color: DesignTokens.nightAccent, fontSize: 24),
       ),
       const SizedBox(width: 8),
       Expanded(child: Text(phrase, style: _detailBody(14))),
-      const Icon(
-        Icons.volume_up_outlined,
-        color: DesignTokens.nightMuted,
-        size: 19,
-      ),
+      Icon(Icons.volume_up_outlined, color: DesignTokens.nightMuted, size: 19),
     ],
   ),
 );

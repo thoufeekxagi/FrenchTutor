@@ -90,6 +90,7 @@ class LessonSpeechService {
   final List<int> _captureBuffer = [];
   Timer? _captureAutoStopTimer;
   void Function(String)? _onListenFinal;
+  void Function(String transcript, List<int> pcmBytes)? _onListenFinalWithAudio;
 
   List<SpeechItem> _ttsQueue = [];
   int _ttsIndex = 0;
@@ -864,9 +865,11 @@ class LessonSpeechService {
     String locale = 'en-US',
     required void Function(String) onPartial,
     required void Function(String) onFinal,
+    void Function(String transcript, List<int> pcmBytes)? onFinalWithAudio,
   }) async {
     if (isSpeaking) {
       onFinal('');
+      onFinalWithAudio?.call('', const []);
       return;
     }
     await stopListening();
@@ -874,12 +877,14 @@ class LessonSpeechService {
     final granted = await _captureAudio.requestPermission();
     if (!granted) {
       onFinal('');
+      onFinalWithAudio?.call('', const []);
       return;
     }
 
     isListening = true;
     _captureBuffer.clear();
     _onListenFinal = onFinal;
+    _onListenFinalWithAudio = onFinalWithAudio;
     await _captureAudio.startStreaming(onChunk: _captureBuffer.addAll);
     _captureAutoStopTimer?.cancel();
     _captureAutoStopTimer = Timer(const Duration(seconds: 6), stopListening);
@@ -893,16 +898,21 @@ class LessonSpeechService {
     final bytes = List<int>.of(_captureBuffer);
     _captureBuffer.clear();
     final callback = _onListenFinal;
+    final audioCallback = _onListenFinalWithAudio;
     _onListenFinal = null;
+    _onListenFinalWithAudio = null;
     if (bytes.isEmpty) {
       callback?.call('');
+      audioCallback?.call('', const []);
       return;
     }
     try {
       final text = await LessonAgentService.shared.transcribeSpeech(bytes);
       callback?.call(text);
+      audioCallback?.call(text, bytes);
     } catch (_) {
       callback?.call('');
+      audioCallback?.call('', bytes);
     }
   }
 

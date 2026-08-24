@@ -112,7 +112,7 @@ class _GenerationMark extends StatelessWidget {
           Container(
             width: diameter - 10,
             height: diameter - 10,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: DesignTokens.primarySoft,
               shape: BoxShape.circle,
             ),

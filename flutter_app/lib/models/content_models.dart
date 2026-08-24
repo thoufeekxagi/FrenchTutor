@@ -821,7 +821,7 @@ class WritingPack {
 }
 
 class WritingTask {
-  WritingTask({
+  const WritingTask({
     required this.id,
     required this.type,
     required this.title,
@@ -832,6 +832,11 @@ class WritingTask {
     required this.rubricHints,
     this.levelBand = 'A2',
     this.titleEn,
+    this.wordBank = const [],
+    this.targetTokens = const [],
+    this.examSection,
+    this.timeLimitMinutes,
+    this.maxWords,
   });
 
   final String id;
@@ -856,6 +861,18 @@ class WritingTask {
   /// before this field existed, rather than silently crashing on missing data.
   final String levelBand;
 
+  /// Optional supported-construction data. Word and sentence lessons use the
+  /// same task contract as free writing, but can render a finite bank of
+  /// choices before asking the learner to type independently.
+  final List<String> wordBank;
+  final List<String> targetTokens;
+
+  /// Present only for an exam-shaped task. Keeping these fields on the task
+  /// makes the timer and word-range contract survive persistence/reopening.
+  final String? examSection;
+  final int? timeLimitMinutes;
+  final int? maxWords;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'type': type,
@@ -867,6 +884,11 @@ class WritingTask {
     'rubricHints': rubricHints,
     'levelBand': levelBand,
     if (titleEn != null && titleEn!.trim().isNotEmpty) 'titleEn': titleEn,
+    if (wordBank.isNotEmpty) 'wordBank': wordBank,
+    if (targetTokens.isNotEmpty) 'targetTokens': targetTokens,
+    if (examSection != null) 'examSection': examSection,
+    if (timeLimitMinutes != null) 'timeLimitMinutes': timeLimitMinutes,
+    if (maxWords != null) 'maxWords': maxWords,
   };
 
   factory WritingTask.fromJson(Map<String, dynamic> json) => WritingTask(
@@ -880,6 +902,11 @@ class WritingTask {
     rubricHints: List<String>.from(json['rubricHints']),
     levelBand: (json['levelBand'] as String?) ?? 'A2',
     titleEn: json['titleEn']?.toString() ?? json['title_en']?.toString(),
+    wordBank: List<String>.from(json['wordBank'] as List? ?? const []),
+    targetTokens: List<String>.from(json['targetTokens'] as List? ?? const []),
+    examSection: json['examSection']?.toString(),
+    timeLimitMinutes: (json['timeLimitMinutes'] as num?)?.toInt(),
+    maxWords: (json['maxWords'] as num?)?.toInt(),
   );
 
   /// The learner-facing title. A1/A2 learners get the English meaning first

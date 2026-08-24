@@ -183,7 +183,7 @@ class _TopStepHeader extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: onBack,
-                icon: const Icon(
+                icon: Icon(
                   CupertinoIcons.chevron_back,
                   size: 22,
                   color: DesignTokens.ink,
@@ -248,7 +248,7 @@ class _LevelCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? DesignTokens.primarySoft : Colors.white,
+            color: isSelected ? DesignTokens.primarySoft : DesignTokens.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,

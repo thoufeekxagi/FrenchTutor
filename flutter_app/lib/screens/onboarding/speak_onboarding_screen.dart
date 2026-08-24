@@ -209,9 +209,11 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   Widget build(BuildContext context) {
     final isWelcome = _page == 0;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: isWelcome ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: DesignTokens.isDark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: isWelcome ? SpeakColors.blue : SpeakColors.background,
+        backgroundColor: SpeakColors.background,
         body: SafeArea(
           child: Column(
             children: [
@@ -258,10 +260,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         children: [
           GestureDetector(
             onTap: _back,
-            child: const Icon(
-              Icons.arrow_back_rounded,
-              color: SpeakColors.inkSoft,
-            ),
+            child: Icon(Icons.arrow_back_rounded, color: SpeakColors.inkSoft),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -271,7 +270,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                 minHeight: 6,
                 value: _page / (_pageCount - 1),
                 backgroundColor: SpeakColors.line,
-                color: SpeakColors.blue,
+                color: SpeakColors.accent,
               ),
             ),
           ),
@@ -307,11 +306,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'PARLESPRINT',
-                      style: DesignTokens.body(11, weight: FontWeight.w700)
-                          .copyWith(
-                            color: Colors.white.withValues(alpha: .72),
-                            letterSpacing: 2.2,
-                          ),
+                      style: DesignTokens.body(
+                        11,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: SpeakColors.accent, letterSpacing: 2.2),
                     ),
                   ),
                   Expanded(
@@ -319,7 +317,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/parlesprint_logo.png',
+                          'assets/images/pulse_sprint_logo.png',
                           width: compact ? 112 : 132,
                           height: compact ? 112 : 132,
                           fit: BoxFit.contain,
@@ -328,9 +326,11 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                         Text(
                           'ParleSprint',
                           textAlign: TextAlign.center,
-                          style: DesignTokens.display(
-                            compact ? 34 : 40,
-                          ).copyWith(color: Colors.white, letterSpacing: -1.1),
+                          style: DesignTokens.display(compact ? 34 : 40)
+                              .copyWith(
+                                color: DesignTokens.ink,
+                                letterSpacing: -1.1,
+                              ),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -339,7 +339,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                           style: DesignTokens.body(
                             compact ? 17 : 19,
                             weight: FontWeight.w700,
-                          ).copyWith(color: Colors.white),
+                          ).copyWith(color: DesignTokens.ink),
                         ),
                         const SizedBox(height: 14),
                         ConstrainedBox(
@@ -349,7 +349,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                             textAlign: TextAlign.center,
                             style: DesignTokens.body(compact ? 15 : 16)
                                 .copyWith(
-                                  color: Colors.white.withValues(alpha: .78),
+                                  color: DesignTokens.inkSoft,
                                   height: 1.42,
                                 ),
                           ),
@@ -365,7 +365,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       style: DesignTokens.body(
                         12,
                         weight: FontWeight.w600,
-                      ).copyWith(color: Colors.white.withValues(alpha: .62)),
+                      ).copyWith(color: DesignTokens.inkSoft),
                     ),
                   ),
                   SizedBox(
@@ -376,8 +376,8 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       icon: const Icon(Icons.arrow_forward_rounded),
                       label: const Text('Build my plan'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: SpeakColors.blue,
+                        backgroundColor: SpeakColors.accent,
+                        foregroundColor: SpeakColors.onAccent,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(28),
@@ -439,10 +439,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.blueSoft : Colors.white,
+          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected ? SpeakColors.blue : SpeakColors.line,
+            color: selected ? SpeakColors.accent : SpeakColors.line,
             width: selected ? 2 : 1,
           ),
         ),
@@ -452,7 +452,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: selected ? SpeakColors.blue : SpeakColors.blueSoft,
+                color: selected ? SpeakColors.accent : SpeakColors.accentSoft,
                 shape: BoxShape.circle,
               ),
               clipBehavior: Clip.antiAlias,
@@ -464,7 +464,9 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                   child: Text(
                     persona.initial,
                     style: DesignTokens.display(23).copyWith(
-                      color: selected ? Colors.white : SpeakColors.blue,
+                      color: selected
+                          ? SpeakColors.onAccent
+                          : SpeakColors.accent,
                     ),
                   ),
                 ),
@@ -515,7 +517,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                               : isPlaying
                               ? Icons.stop_circle_outlined
                               : Icons.play_circle_outline_rounded,
-                          color: SpeakColors.blue,
+                          color: SpeakColors.accent,
                           size: 18,
                         ),
                         const SizedBox(width: 5),
@@ -528,7 +530,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                           style: DesignTokens.body(
                             11,
                             weight: FontWeight.w700,
-                          ).copyWith(color: SpeakColors.blue),
+                          ).copyWith(color: SpeakColors.accent),
                         ),
                       ],
                     ),
@@ -542,7 +544,9 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                   : selected
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              color: selected || isActive ? SpeakColors.blue : SpeakColors.line,
+              color: selected || isActive
+                  ? SpeakColors.accent
+                  : SpeakColors.line,
               size: 21,
             ),
           ],
@@ -562,7 +566,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                 'Your first lesson is on us',
                 style: DesignTokens.label(
                   11,
-                ).copyWith(color: SpeakColors.blue, letterSpacing: 1.2),
+                ).copyWith(color: SpeakColors.accent, letterSpacing: 1.2),
               ),
               const SizedBox(height: 10),
               Text(
@@ -578,19 +582,19 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               ),
               const SizedBox(height: 28),
               SpeakCard(
-                color: SpeakColors.blueSoft,
+                color: SpeakColors.accentSoft,
                 child: Column(
                   children: [
                     _trialPoint(
                       Icons.mic_none_rounded,
                       'Speak from the first minute',
                     ),
-                    const Divider(height: 24, color: SpeakColors.line),
+                    Divider(height: 24, color: SpeakColors.line),
                     _trialPoint(
                       Icons.timer_outlined,
                       'A focused 3-minute first lesson',
                     ),
-                    const Divider(height: 24, color: SpeakColors.line),
+                    Divider(height: 24, color: SpeakColors.line),
                     _trialPoint(
                       Icons.card_giftcard_outlined,
                       'Free to try. No card or commitment.',
@@ -636,11 +640,11 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: SpeakColors.surface,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: SpeakColors.blue, size: 19),
+          child: Icon(icon, color: SpeakColors.accent, size: 19),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -912,16 +916,16 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.blueSoft : Colors.white,
+          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? SpeakColors.blue : SpeakColors.line,
+            color: selected ? SpeakColors.accent : SpeakColors.line,
             width: selected ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: SpeakColors.blue, size: 21),
+            Icon(icon, color: SpeakColors.accent, size: 21),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -943,7 +947,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
             ),
             Icon(
               selected ? Icons.check_circle_rounded : Icons.circle_outlined,
-              color: selected ? SpeakColors.blue : SpeakColors.line,
+              color: selected ? SpeakColors.accent : SpeakColors.line,
               size: 21,
             ),
           ],
@@ -988,7 +992,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         _dayChoices(),
         const SizedBox(height: 16),
         SpeakCard(
-          color: SpeakColors.blueSoft,
+          color: SpeakColors.accentSoft,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1020,7 +1024,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                         unawaited(_requestNotificationPermission());
                       }
                     },
-                    activeThumbColor: SpeakColors.blue,
+                    activeThumbColor: SpeakColors.accent,
                   ),
                 ],
               ),
@@ -1116,7 +1120,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
           height: 138,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: SpeakColors.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: SpeakColors.line),
             ),
@@ -1136,7 +1140,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       index.toString().padLeft(2, '0'),
                       style: DesignTokens.display(selected ? 25 : 19).copyWith(
                         color: selected
-                            ? SpeakColors.blue
+                            ? SpeakColors.accent
                             : SpeakColors.inkSoft.withValues(alpha: .58),
                         fontWeight: selected
                             ? FontWeight.w700
@@ -1191,12 +1195,12 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: _preferredDays.contains(day.$1)
-                    ? SpeakColors.blue
+                    ? SpeakColors.accent
                     : Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: _preferredDays.contains(day.$1)
-                      ? SpeakColors.blue
+                      ? SpeakColors.accent
                       : SpeakColors.line,
                 ),
               ),
@@ -1313,8 +1317,8 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                   Container(
                     width: 82,
                     height: 82,
-                    decoration: const BoxDecoration(
-                      color: SpeakColors.blue,
+                    decoration: BoxDecoration(
+                      color: SpeakColors.accent,
                       shape: BoxShape.circle,
                     ),
                     child: const Padding(
@@ -1348,15 +1352,15 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                           'Goal',
                           _goalLabel(_goal),
                         ),
-                        const Divider(height: 22, color: SpeakColors.line),
+                        Divider(height: 22, color: SpeakColors.line),
                         _summary(
                           Icons.bar_chart_rounded,
                           'Level',
                           LearnerLevel.displayLabel(_level),
                         ),
-                        const Divider(height: 22, color: SpeakColors.line),
+                        Divider(height: 22, color: SpeakColors.line),
                         _summary(Icons.mic_rounded, 'Focus', _focusSummary()),
-                        const Divider(height: 22, color: SpeakColors.line),
+                        Divider(height: 22, color: SpeakColors.line),
                         _summary(
                           Icons.schedule_rounded,
                           'Plan',
@@ -1437,10 +1441,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.blueSoft : Colors.white,
+          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? SpeakColors.blue : SpeakColors.line,
+            color: selected ? SpeakColors.accent : SpeakColors.line,
             width: selected ? 2 : 1,
           ),
         ),
@@ -1450,12 +1454,12 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: selected ? SpeakColors.blue : SpeakColors.blueSoft,
+                color: selected ? SpeakColors.accent : SpeakColors.accentSoft,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 leading,
-                color: selected ? Colors.white : SpeakColors.blue,
+                color: selected ? SpeakColors.onAccent : SpeakColors.accent,
                 size: 19,
               ),
             ),
@@ -1482,7 +1486,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               selected
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              color: selected ? SpeakColors.blue : SpeakColors.line,
+              color: selected ? SpeakColors.accent : SpeakColors.line,
               size: 21,
             ),
           ],
@@ -1494,7 +1498,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   Widget _summary(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, color: SpeakColors.blue, size: 21),
+        Icon(icon, color: SpeakColors.accent, size: 21),
         const SizedBox(width: 12),
         Expanded(
           child: Text(

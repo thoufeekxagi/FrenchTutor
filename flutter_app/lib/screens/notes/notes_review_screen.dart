@@ -152,7 +152,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                               32,
                             ),
                             itemCount: _filteredNotes.length,
-                            separatorBuilder: (_, _) => const Divider(
+                            separatorBuilder: (_, _) => Divider(
                               height: 32,
                               color: DesignTokens.canvasDim,
                             ),
@@ -269,9 +269,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                   horizontal: DesignTokens.space4,
                 ),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? DesignTokens.ink
-                      : DesignTokens.canvasDim,
+                  color: selected ? DesignTokens.ink : DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
                 ),
                 child: Text(
@@ -305,7 +303,7 @@ class _NotesReviewScreenState extends ConsumerState<NotesReviewScreen> {
                 color: DesignTokens.infoSoft,
                 borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
               ),
-              child: const Icon(
+              child: Icon(
                 CupertinoIcons.square_pencil,
                 size: 28,
                 color: DesignTokens.info,
@@ -349,7 +347,7 @@ class _NoteRow extends StatelessWidget {
           color: DesignTokens.primary,
           borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
         ),
-        child: const Icon(CupertinoIcons.trash, color: DesignTokens.surface),
+        child: Icon(CupertinoIcons.trash, color: DesignTokens.surface),
       ),
       onDismissed: (_) => onDelete(),
       child: Padding(

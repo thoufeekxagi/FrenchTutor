@@ -18,7 +18,6 @@ import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../speak/speak_review_screen.dart';
-import '../speak/speak_roadmap_screen.dart';
 import '../speak/speaking_course_home_screen.dart';
 
 /// Mixed-skills practice workspace. Speaking is one destination inside this
@@ -39,34 +38,40 @@ class V3PracticeScreen extends ConsumerWidget {
             title: 'Practice',
             subtitle: 'Choose one skill, review a win, or prepare for an exam.',
           ),
-          const SizedBox(height: 18),
-          _workspaceTabs(context),
-          const SizedBox(height: 20),
-          V3SectionLabel('Review'),
+          const SizedBox(height: 24),
+          V3SectionLabel('Foundations'),
           const SizedBox(height: 9),
-          V3Row(
-            icon: Icons.replay_rounded,
-            title: 'Bring it back',
-            subtitle:
-                'Replay recent phrases, stories, listening, and speaking.',
-            onTap: () =>
-                AppRouter.push(context, (_) => const SpeakReviewScreen()),
-          ),
-          if (recent.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            V3SectionLabel('Recent practice'),
-            const SizedBox(height: 9),
-            for (final session in recent) ...[
-              V3Row(
-                icon: _iconFor(session.skill),
-                title: session.displayTitle,
-                subtitle: '${session.skill} · Open saved review',
-                onTap: () => _openRecent(context, session),
+          Row(
+            children: [
+              _foundation(
+                context,
+                ref,
+                Icons.abc_rounded,
+                'Alphabet',
+                const AlphabetLabScreen(),
+                null,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(width: 8),
+              _foundation(
+                context,
+                ref,
+                Icons.link_rounded,
+                'Connectors',
+                const ConnectorsLabScreen(),
+                PremiumArea.connectors,
+              ),
+              const SizedBox(width: 8),
+              _foundation(
+                context,
+                ref,
+                Icons.record_voice_over_outlined,
+                'Liaison',
+                const LiaisonLabScreen(),
+                PremiumArea.liaison,
+              ),
             ],
-          ],
-          const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 20),
           V3SectionLabel('Practice a skill'),
           const SizedBox(height: 9),
           _skill(
@@ -123,39 +128,6 @@ class V3PracticeScreen extends ConsumerWidget {
             const VocabLabScreen(),
             null,
           ),
-          const SizedBox(height: 14),
-          V3SectionLabel('Foundations'),
-          const SizedBox(height: 9),
-          Row(
-            children: [
-              _foundation(
-                context,
-                ref,
-                Icons.abc_rounded,
-                'Alphabet',
-                const AlphabetLabScreen(),
-                null,
-              ),
-              const SizedBox(width: 8),
-              _foundation(
-                context,
-                ref,
-                Icons.link_rounded,
-                'Connectors',
-                const ConnectorsLabScreen(),
-                PremiumArea.connectors,
-              ),
-              const SizedBox(width: 8),
-              _foundation(
-                context,
-                ref,
-                Icons.record_voice_over_outlined,
-                'Liaison',
-                const LiaisonLabScreen(),
-                PremiumArea.liaison,
-              ),
-            ],
-          ),
           const SizedBox(height: 20),
           V3Row(
             icon: Icons.fact_check_outlined,
@@ -164,43 +136,32 @@ class V3PracticeScreen extends ConsumerWidget {
             onTap: () =>
                 AppRouter.push(context, (_) => const ExamReadinessScreen()),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _workspaceTabs(BuildContext context) {
-    return V3Card(
-      padding: const EdgeInsets.all(4),
-      child: Row(
-        children: [
-          Expanded(child: _tab(context, 'Course', false)),
-          Expanded(child: _tab(context, 'Practice', true)),
-        ],
-      ),
-    );
-  }
-
-  Widget _tab(BuildContext context, String label, bool selected) {
-    return GestureDetector(
-      onTap: selected
-          ? null
-          : () => AppRouter.push(context, (_) => const SpeakRoadmapScreen()),
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: 11),
-        decoration: BoxDecoration(
-          color: selected ? DesignTokens.nightAccentSoft : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Text(
-          label,
-          style: DesignTokens.body(13, weight: FontWeight.w700).copyWith(
-            color: selected
-                ? DesignTokens.nightAccent
-                : DesignTokens.nightMuted,
+          const SizedBox(height: 20),
+          V3SectionLabel('Review'),
+          const SizedBox(height: 9),
+          V3Row(
+            icon: Icons.replay_rounded,
+            title: 'Bring it back',
+            subtitle:
+                'Replay recent phrases, stories, listening, and speaking.',
+            onTap: () =>
+                AppRouter.push(context, (_) => const SpeakReviewScreen()),
           ),
-        ),
+          if (recent.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            V3SectionLabel('Recent practice'),
+            const SizedBox(height: 9),
+            for (final session in recent) ...[
+              V3Row(
+                icon: _iconFor(session.skill),
+                title: session.displayTitle,
+                subtitle: '${session.skill} · Open saved review',
+                onTap: () => _openRecent(context, session),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ],
+        ],
       ),
     );
   }

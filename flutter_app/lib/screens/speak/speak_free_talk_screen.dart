@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/speaking_course.dart';
-import 'speak_roleplay_screen.dart';
+import '../../providers/database_provider.dart';
+import 'speaking_lesson_flow_screen.dart';
 
-/// Speak-style roleplay catalog. It is deliberately a catalog, not another
-/// speaking home: the learner chooses a scene here, previews its goal, then
-/// enters the shared roleplay conversation.
-class SpeakFreeTalkScreen extends StatefulWidget {
+/// Speak-style free-talk catalog. It is deliberately a catalog, not another
+/// speaking home: the learner chooses a topic, follows its prompts, then
+/// enters the shared free-talk conversation.
+class SpeakFreeTalkScreen extends ConsumerStatefulWidget {
   const SpeakFreeTalkScreen({super.key});
 
   @override
-  State<SpeakFreeTalkScreen> createState() => _SpeakFreeTalkScreenState();
+  ConsumerState<SpeakFreeTalkScreen> createState() =>
+      _SpeakFreeTalkScreenState();
 }
 
-class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
+class _SpeakFreeTalkScreenState extends ConsumerState<SpeakFreeTalkScreen> {
   String _filter = 'Hot';
+
+  String get _level {
+    final raw = ref.watch(learningStoreProvider).profile().level.toUpperCase();
+    return raw == 'A1' || raw == 'ZERO' || raw == 'BASICS' ? 'A1' : 'A2';
+  }
 
   Future<void> _openTopic(
     BuildContext context,
@@ -24,7 +32,23 @@ class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
   ) async {
     await AppRouter.push(
       context,
-      (_) => SpeakRoleplayScreen(lesson: lesson),
+      (_) => SpeakingLessonFlowScreen(
+        title: lesson.title,
+        topic: lesson.subtitle,
+        level: lesson.level,
+        contentKey: lesson.id,
+        steps: [
+          for (final line in lesson.lines)
+            SpeakingPhraseStep(
+              french: line.french,
+              english: line.english,
+              partnerFrench: line.partnerFrench,
+              partnerEnglish: line.partnerEnglish,
+              tip: line.tip,
+              openResponse: true,
+            ),
+        ],
+      ),
       fullscreenDialog: true,
     );
   }
@@ -42,13 +66,13 @@ class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
                 IconButton(
                   tooltip: 'Back',
                   onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
                     color: DesignTokens.nightText,
                   ),
                 ),
                 const SizedBox(width: 4),
-                Text('Roleplay', style: _display(25)),
+                Text('Free talk', style: _display(25)),
                 const Spacer(),
                 _roundIcon(Icons.history_rounded, 'History'),
                 const SizedBox(width: 8),
@@ -56,10 +80,10 @@ class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
               ],
             ),
             const SizedBox(height: 22),
-            Text('Practice a real situation', style: _display(29)),
+            Text('Talk about your world', style: _display(29)),
             const SizedBox(height: 7),
             Text(
-              'Choose a scene, see the goal, then speak with your tutor one turn at a time.',
+              'Choose a topic, follow the prompts, and speak at your profile level.',
               style: _body(
                 14,
               ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
@@ -67,7 +91,7 @@ class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
             const SizedBox(height: 22),
             _filterRow(),
             const SizedBox(height: 16),
-            Text('ROLEPLAY TOPICS', style: _label(12)),
+            Text('FREE TALK TOPICS', style: _label(12)),
             const SizedBox(height: 10),
             _topicGrid(context),
           ],
@@ -129,57 +153,60 @@ class _SpeakFreeTalkScreenState extends State<SpeakFreeTalkScreen> {
   }
 
   Widget _topicGrid(BuildContext context) {
-    final topics = SpeakingCourseCatalog.roleplays;
-    const colors = [
-      Color(0xFFB97920),
-      Color(0xFF24489A),
-      Color(0xFF3C4A67),
-      Color(0xFF177F7B),
-    ];
+    final topics = SpeakingCourseCatalog.freeTalkForLevel(_level);
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: topics.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.93,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        mainAxisExtent: 122,
       ),
       itemBuilder: (context, index) {
         final topic = topics[index];
         return GestureDetector(
           onTap: () => _openTopic(context, topic),
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(10, 10, 8, 9),
             decoration: BoxDecoration(
-              color: colors[index % colors.length],
-              borderRadius: BorderRadius.circular(20),
+              color: DesignTokens.nightSurface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: DesignTokens.nightHairline),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.nightSurfaceRaised,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(topic.icon, color: Colors.white, size: 22),
+                  child: Icon(
+                    topic.icon,
+                    color: DesignTokens.nightAccent,
+                    size: 17,
+                  ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       topic.title,
-                      style: _body(15, weight: FontWeight.w800),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _body(12, weight: FontWeight.w800),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${topic.lines.length} turns · ${topic.level}',
-                      style: _body(11).copyWith(color: Colors.white70),
+                      '${topic.lines.length} prompts',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _body(10).copyWith(color: DesignTokens.nightMuted),
                     ),
                   ],
                 ),

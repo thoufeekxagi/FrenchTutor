@@ -39,7 +39,7 @@ class WebOnboardingWelcome extends StatelessWidget {
 
   Widget _brandPanel() {
     return DecoratedBox(
-      decoration: const BoxDecoration(color: DesignTokens.ink),
+      decoration: BoxDecoration(color: DesignTokens.ink),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(72, 56, 56, 56),
@@ -140,7 +140,7 @@ class WebOnboardingWelcome extends StatelessWidget {
               color: DesignTokens.primarySoft,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               CupertinoIcons.waveform,
               size: 21,
               color: DesignTokens.primary,
@@ -174,7 +174,7 @@ class WebOnboardingWelcome extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     CupertinoIcons.checkmark_alt,
                     size: 16,
                     color: DesignTokens.success,

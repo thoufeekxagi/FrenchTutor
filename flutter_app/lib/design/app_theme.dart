@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'appearance_colors.dart';
+import '../services/app_appearance_settings.dart';
 import 'tokens.dart';
 
 /// Layer 2 of the design wiring: maps DesignTokens onto Flutter themes and
@@ -14,21 +16,67 @@ abstract final class AppTheme {
       (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS);
 
-  static ThemeData themeData() {
+  static ThemeData themeData({bool? darkMode}) {
+    final dark = darkMode ?? AppAppearanceSettings.shared.darkMode;
+    final canvas = dark
+        ? AppearanceColors.darkCanvas
+        : AppearanceColors.lightCanvas;
+    final surface = dark
+        ? AppearanceColors.darkSurface
+        : AppearanceColors.lightSurface;
+    final raised = dark
+        ? AppearanceColors.darkRaised
+        : AppearanceColors.lightRaised;
+    final ink = dark ? AppearanceColors.darkText : AppearanceColors.lightText;
+    final muted = dark
+        ? AppearanceColors.darkMuted
+        : AppearanceColors.lightMuted;
+    final hairline = dark
+        ? AppearanceColors.darkHairline
+        : AppearanceColors.lightHairline;
+    final goldSoft = dark
+        ? AppearanceColors.goldSoftDark
+        : AppearanceColors.goldSoftLight;
+
     return ThemeData(
       useMaterial3: true,
       // `parchment` is an alias of `canvas`, so this is already the neutral
       // canvas the web reference design is built on — no per-platform branch
       // needed here. Screens that set their own background use the same token.
-      scaffoldBackgroundColor: DesignTokens.canvas,
-      colorScheme: const ColorScheme.light(
-        primary: DesignTokens.primary,
-        secondary: DesignTokens.secondary,
-        surface: DesignTokens.surface,
-        onPrimary: Colors.white,
-        onSecondary: DesignTokens.ink,
-        onSurface: DesignTokens.ink,
+      scaffoldBackgroundColor: canvas,
+      colorScheme: ColorScheme(
+        brightness: dark ? Brightness.dark : Brightness.light,
+        primary: AppearanceColors.gold,
+        onPrimary: Colors.black,
+        secondary: AppearanceColors.goldDeep,
+        onSecondary: Colors.black,
+        surface: surface,
+        onSurface: ink,
+        error: AppearanceColors.danger,
+        onError: Colors.white,
       ),
+      // Keep the neutral container roles in the same black/gold or
+      // white/gold family instead of inheriting Material's blue defaults.
+      extensions: const <ThemeExtension<dynamic>>[],
+      textTheme: ThemeData(
+        brightness: dark ? Brightness.dark : Brightness.light,
+      ).textTheme.apply(bodyColor: ink, displayColor: ink),
+      canvasColor: canvas,
+      cardColor: surface,
+      shadowColor: Colors.black.withValues(alpha: dark ? 0.28 : 0.08),
+      primaryColor: AppearanceColors.gold,
+      hintColor: muted,
+      unselectedWidgetColor: muted,
+      dialogBackgroundColor: surface,
+      dividerColor: hairline,
+      applyElevationOverlayColor: dark,
+      // Material's generated defaults are intentionally overridden below.
+      // The explicit roles are what keep legacy Material widgets on-brand.
+      colorSchemeSeed: null,
+      // `onPrimary` is black in both appearances because gold is the action
+      // surface in both appearances.
+      // ignore: deprecated_member_use
+      primarySwatch: null,
       // iOS: native push/pop with edge-swipe back. Android: platform default.
       // Web: fade (no horizontal slabs sliding on a desktop browser).
       pageTransitionsTheme: PageTransitionsTheme(
@@ -45,139 +93,147 @@ abstract final class AppTheme {
       // No ink ripple anywhere — one ParleSprint vibe on every platform; taps
       // acknowledge with a quiet highlight fade, never a spreading splash.
       splashFactory: NoSplash.splashFactory,
-      highlightColor: DesignTokens.ink.withValues(alpha: 0.06),
+      highlightColor: ink.withValues(alpha: 0.06),
       appBarTheme: AppBarTheme(
         // On web an app bar is a toolbar: white, left-aligned title, separated
         // from the content by a hairline rather than by colour. Mobile keeps the
         // parchment iOS-style bar.
-        backgroundColor: kIsWeb ? DesignTokens.surface : DesignTokens.canvas,
-        foregroundColor: DesignTokens.ink,
+        backgroundColor: kIsWeb ? surface : canvas,
+        foregroundColor: ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: isCupertino,
-        titleTextStyle: DesignTokens.display(kIsWeb ? 17 : 20),
-        shape: kIsWeb
-            ? Border(bottom: BorderSide(color: DesignTokens.hairline))
-            : null,
+        titleTextStyle: DesignTokens.display(
+          kIsWeb ? 17 : 20,
+        ).copyWith(color: ink),
+        shape: kIsWeb ? Border(bottom: BorderSide(color: hairline)) : null,
       ),
-      dividerTheme: DividerThemeData(
-        color: DesignTokens.hairline,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: hairline, thickness: 1, space: 1),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: DesignTokens.surface,
+        fillColor: surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          borderSide: BorderSide(color: DesignTokens.hairline),
+          borderSide: BorderSide(color: hairline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          borderSide: BorderSide(color: DesignTokens.hairline),
+          borderSide: BorderSide(color: hairline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          borderSide: const BorderSide(color: DesignTokens.info, width: 1.5),
+          borderSide: BorderSide(color: AppearanceColors.goldDeep, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(48, 56),
-          backgroundColor: DesignTokens.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppearanceColors.gold,
+          foregroundColor: Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: DesignTokens.body(15, weight: FontWeight.w700),
+          textStyle: DesignTokens.body(
+            15,
+            weight: FontWeight.w700,
+          ).copyWith(color: Colors.black),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(48, 56),
-          backgroundColor: DesignTokens.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppearanceColors.gold,
+          foregroundColor: Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: DesignTokens.body(15, weight: FontWeight.w700),
+          textStyle: DesignTokens.body(
+            15,
+            weight: FontWeight.w700,
+          ).copyWith(color: Colors.black),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(48, 52),
-          foregroundColor: DesignTokens.primary,
-          side: BorderSide(color: DesignTokens.hairline),
+          foregroundColor: AppearanceColors.goldDeep,
+          side: BorderSide(color: hairline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
           ),
-          textStyle: DesignTokens.body(14, weight: FontWeight.w700),
+          textStyle: DesignTokens.body(
+            14,
+            weight: FontWeight.w700,
+          ).copyWith(color: AppearanceColors.goldDeep),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           minimumSize: const Size(48, 48),
-          foregroundColor: DesignTokens.primary,
-          textStyle: DesignTokens.body(14, weight: FontWeight.w700),
+          foregroundColor: AppearanceColors.goldDeep,
+          textStyle: DesignTokens.body(
+            14,
+            weight: FontWeight.w700,
+          ).copyWith(color: AppearanceColors.goldDeep),
         ),
       ),
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? DesignTokens.primary
-              : DesignTokens.canvasDim,
+              ? AppearanceColors.gold
+              : raised,
         ),
         thumbColor: const WidgetStatePropertyAll(Colors.white),
       ),
       listTileTheme: ListTileThemeData(
         iconColor: DesignTokens.primary,
-        textColor: DesignTokens.ink,
+        textColor: ink,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: DesignTokens.primary,
-        inactiveTrackColor: DesignTokens.primarySoft,
-        thumbColor: DesignTokens.primary,
-        overlayColor: DesignTokens.primary.withValues(alpha: 0.1),
+        activeTrackColor: AppearanceColors.gold,
+        inactiveTrackColor: goldSoft,
+        thumbColor: AppearanceColors.gold,
+        overlayColor: AppearanceColors.gold.withValues(alpha: 0.1),
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: DesignTokens.primary,
-        linearTrackColor: DesignTokens.canvasDim,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppearanceColors.gold,
+        linearTrackColor: raised,
       ),
-      tabBarTheme: const TabBarThemeData(
-        labelColor: DesignTokens.primary,
-        unselectedLabelColor: DesignTokens.muted,
-        indicatorColor: DesignTokens.primary,
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppearanceColors.goldDeep,
+        unselectedLabelColor: muted,
+        indicatorColor: AppearanceColors.gold,
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: DesignTokens.surface,
-        selectedItemColor: DesignTokens.primary,
-        unselectedItemColor: DesignTokens.mutedDim,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: surface,
+        selectedItemColor: AppearanceColors.gold,
+        unselectedItemColor: muted,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
-        color: DesignTokens.surface,
+        color: surface,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-          side: BorderSide(color: DesignTokens.hairline),
+          side: BorderSide(color: hairline),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 72,
         elevation: 0,
-        backgroundColor: DesignTokens.surface,
-        indicatorColor: DesignTokens.primarySoft,
+        backgroundColor: surface,
+        indicatorColor: goldSoft,
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) =>
               DesignTokens.body(
@@ -187,36 +243,39 @@ abstract final class AppTheme {
                     : FontWeight.w500,
               ).copyWith(
                 color: states.contains(WidgetState.selected)
-                    ? DesignTokens.primary
-                    : DesignTokens.mutedDim,
+                    ? AppearanceColors.goldDeep
+                    : muted,
               ),
         ),
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)
-                ? DesignTokens.primary
-                : DesignTokens.mutedDim,
+                ? AppearanceColors.goldDeep
+                : muted,
             size: 23,
           ),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: DesignTokens.surface,
-        selectedColor: DesignTokens.primarySoft,
-        side: BorderSide(color: DesignTokens.hairline),
+        backgroundColor: surface,
+        selectedColor: goldSoft,
+        side: BorderSide(color: hairline),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
         ),
-        labelStyle: DesignTokens.body(13, weight: FontWeight.w600),
+        labelStyle: DesignTokens.body(
+          13,
+          weight: FontWeight.w600,
+        ).copyWith(color: ink),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: DesignTokens.surface,
-        modalBackgroundColor: DesignTokens.surface,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        modalBackgroundColor: surface,
         showDragHandle: true,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: DesignTokens.surface,
+        backgroundColor: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
@@ -224,7 +283,7 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: DesignTokens.ink,
+        backgroundColor: ink,
         contentTextStyle: DesignTokens.body(14).copyWith(color: Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),

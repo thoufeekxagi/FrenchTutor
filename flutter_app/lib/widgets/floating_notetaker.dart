@@ -353,7 +353,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
                   color: DesignTokens.primarySoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.square_pencil,
                   size: 17,
                   color: DesignTokens.primary,
@@ -423,7 +423,7 @@ class _FloatingNotetakerOverlayState extends State<FloatingNotetakerOverlay> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: DesignTokens.primary),
+                  borderSide: BorderSide(color: DesignTokens.primary),
                 ),
               ),
               onChanged: (value) {

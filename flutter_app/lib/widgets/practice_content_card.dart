@@ -98,7 +98,7 @@ class _PracticeArtwork extends StatelessWidget {
 
   Widget _fallback() {
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: DesignTokens.heroGradient),
+      decoration: BoxDecoration(gradient: DesignTokens.heroGradient),
       child: Center(child: Icon(fallbackIcon, color: Colors.white, size: 34)),
     );
   }

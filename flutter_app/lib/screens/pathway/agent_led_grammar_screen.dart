@@ -917,7 +917,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
               IconButton(
                 tooltip: 'End grammar practice',
                 onPressed: _confirmEnd,
-                icon: const Icon(
+                icon: Icon(
                   CupertinoIcons.xmark,
                   size: 20,
                   color: DesignTokens.ink,
@@ -1003,7 +1003,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.checkmark_circle_fill,
               size: 30,
               color: DesignTokens.success,
@@ -1061,7 +1061,7 @@ class _AgentLedGrammarScreenState extends ConsumerState<AgentLedGrammarScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const KickerText('Grammar note', color: DesignTokens.mutedDim),
+                KickerText('Grammar note', color: DesignTokens.mutedDim),
                 const SizedBox(height: 3),
                 Text(
                   card.note,

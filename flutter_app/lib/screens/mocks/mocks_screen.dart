@@ -408,11 +408,7 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
       const SizedBox(height: DesignTokens.space4),
       Row(
         children: [
-          const Icon(
-            CupertinoIcons.timer,
-            color: DesignTokens.mutedDim,
-            size: 20,
-          ),
+          Icon(CupertinoIcons.timer, color: DesignTokens.mutedDim, size: 20),
           const SizedBox(width: DesignTokens.space2),
           Text(
             interaction ? '3:00 · no coaching' : '1:00 · no coaching',

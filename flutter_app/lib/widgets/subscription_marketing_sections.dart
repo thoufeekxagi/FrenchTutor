@@ -180,7 +180,7 @@ class _PersonalizationComparisonCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Expanded(
                 child: _ComparisonColumn(
                   title: 'Preset-only route',
@@ -450,7 +450,7 @@ class SubscriptionBottomOffer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.verified_user_outlined,
                 size: 16,
                 color: DesignTokens.mutedDim,

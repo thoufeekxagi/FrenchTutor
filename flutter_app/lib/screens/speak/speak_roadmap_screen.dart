@@ -109,10 +109,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.route_rounded,
-                      color: DesignTokens.nightAccent,
-                    ),
+                    Icon(Icons.route_rounded, color: DesignTokens.nightAccent),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -139,7 +136,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
                     value: roadmap.progress,
                     minHeight: 8,
                     backgroundColor: DesignTokens.nightHairline,
-                    valueColor: const AlwaysStoppedAnimation(
+                    valueColor: AlwaysStoppedAnimation(
                       DesignTokens.nightAccent,
                     ),
                   ),
@@ -151,17 +148,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
           for (final unit in units) ...[
             _unitHeader(roadmap, unit),
             const SizedBox(height: 10),
-            for (final session in roadmap.sessions.where(
-              (session) => session.unit == unit,
-            )) ...[
-              _sessionTile(
-                context,
-                session,
-                featured: session.index == roadmap.nextSession?.index,
-                locked: courseLocked,
-              ),
-              const SizedBox(height: 8),
-            ],
+            _unitPath(context, roadmap, unit, locked: courseLocked),
             const SizedBox(height: 14),
           ],
         ],
@@ -192,6 +179,55 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     );
   }
 
+  Widget _unitPath(
+    BuildContext context,
+    SpeakRoadmap roadmap,
+    int unit, {
+    required bool locked,
+  }) {
+    final sessions = roadmap.sessions
+        .where((session) => session.unit == unit)
+        .toList();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = constraints.maxWidth * 0.84;
+        return Stack(
+          children: [
+            Positioned(
+              top: 12,
+              bottom: 12,
+              left: constraints.maxWidth / 2,
+              child: Container(width: 1, color: DesignTokens.nightHairline),
+            ),
+            Column(
+              children: [
+                for (var index = 0; index < sessions.length; index++) ...[
+                  Align(
+                    alignment: index.isEven
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    child: SizedBox(
+                      width: cardWidth,
+                      child: _sessionTile(
+                        context,
+                        sessions[index],
+                        featured:
+                            sessions[index].index == roadmap.nextSession?.index,
+                        locked: locked,
+                      ),
+                    ),
+                  ),
+                  if (index != sessions.length - 1) const SizedBox(height: 10),
+                ],
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _sessionTile(
     BuildContext context,
     SpeakRoadmapSession session, {
@@ -199,77 +235,67 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     required bool locked,
   }) {
     final active = featured && !session.completed;
-    final lessonSubtitle = _lessonSubtitle(session.subtitle);
-    return V3Card(
-      raised: active,
-      borderColor: active
-          ? DesignTokens.nightAccent
-          : DesignTokens.nightHairline,
-      onTap: () => AppRouter.push(context, (_) => _screenFor(session)),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: active
-                  ? DesignTokens.nightAccentSoft
-                  : DesignTokens.nightSurfaceRaised,
-              shape: BoxShape.circle,
+    final stateIcon = locked
+        ? Icons.lock_outline_rounded
+        : session.completed
+        ? Icons.check_circle_rounded
+        : Icons.arrow_forward_ios_rounded;
+    final stateColor = active
+        ? DesignTokens.nightAccent
+        : DesignTokens.nightMuted;
+    return Semantics(
+      button: true,
+      label:
+          '${session.title}, ${session.primarySkill.label}, ${session.completed
+              ? 'completed'
+              : locked
+              ? 'locked'
+              : 'available'}',
+      child: V3Card(
+        raised: active,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        borderColor: active
+            ? DesignTokens.nightAccent
+            : DesignTokens.nightHairline,
+        onTap: () => AppRouter.push(context, (_) => _screenFor(session)),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: active
+                    ? DesignTokens.nightAccentSoft
+                    : DesignTokens.nightSurfaceRaised,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                session.completed
+                    ? Icons.check_rounded
+                    : _iconFor(session.primarySkill),
+                size: 19,
+                color: active
+                    ? DesignTokens.nightAccent
+                    : DesignTokens.nightMuted,
+              ),
             ),
-            child: Icon(
-              session.completed
-                  ? Icons.check_rounded
-                  : _iconFor(session.primarySkill),
-              size: 18,
-              color: active
-                  ? DesignTokens.nightAccent
-                  : DesignTokens.nightMuted,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                session.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: DesignTokens.display(
+                  15,
+                ).copyWith(color: DesignTokens.nightText),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  session.title,
-                  style: DesignTokens.body(
-                    14,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: DesignTokens.nightText),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '${session.primarySkill.label} · $lessonSubtitle',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.body(
-                    11,
-                  ).copyWith(color: DesignTokens.nightMuted),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            locked
-                ? Icons.lock_outline_rounded
-                : session.completed
-                ? Icons.check_circle_rounded
-                : Icons.arrow_forward_ios_rounded,
-            size: 18,
-            color: active ? DesignTokens.nightAccent : DesignTokens.nightMuted,
-          ),
-        ],
+            const SizedBox(width: 8),
+            Icon(stateIcon, size: 19, color: stateColor),
+          ],
+        ),
       ),
     );
-  }
-
-  String _lessonSubtitle(String subtitle) {
-    // The route stores the track label in the first segment for generation
-    // context, but course cards should show the human lesson purpose first.
-    final separator = subtitle.indexOf(' · ');
-    return separator == -1 ? subtitle : subtitle.substring(separator + 3);
   }
 
   Widget _screenFor(SpeakRoadmapSession session) =>

@@ -19,20 +19,24 @@ import '../prompts/live_prompts.dart';
 /// repeats this contract at the provider boundary, so local previews and
 /// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-IMAGE-ONLY ARTWORK: create one premium story image in the requested aspect
-ratio. For 9:16 music artwork, compose a true vertical portrait for a
-full-screen player; do not crop, stretch, or adapt a landscape image. Do not
-render any text at all: no title, letters, words, numbers,
-captions, labels, logos, watermarks, signs, UI, borders, or frames. The image
-must stand on its own without typography; the app renders the English title
-outside the image. Use grounded cinematic realism with subtle editorial
-stylization, believable materials, natural lighting, restrained color grading,
-and one clear focal scene. A single visible character or person is allowed when
-the scene calls for one; keep the face and body inside the central 70% safe area
-so downstream card and hero layouts do not crop the subject. Avoid both
-photorealistic stock-photo blandness and cartoon, anime, chibi, flat-vector,
-collage, or fantasy-game aesthetics. Do not render text, letters, numbers,
-logos, mascots, signs, captions, watermarks, or UI.
+LEARNING ARTWORK CONTRACT: create one friendly, coherent visual reference for a
+language-learning lesson, in the requested aspect ratio. For 9:16 music artwork,
+compose directly as a true vertical full-screen player image; do not crop,
+stretch, or adapt a landscape image. Show the concrete place, object, and
+action named by the lesson. The title, summary, topic, and visual brief are the
+same story: do not invent a generic hero, unrelated person, futuristic city,
+fantasy scene, famous landmark, or dramatic movie-poster moment. People are
+optional and may appear only when the lesson actually requires a person; never
+insert a character just to make the image feel cinematic. Prefer a warm,
+approachable editorial storybook/reference illustration with simple readable
+composition, natural light, believable everyday materials, and one clear
+learning subject. A1/A2 scenes should be concrete and uncluttered; B1/B2 may
+add context but must stay semantically tied to the lesson. Keep important
+details inside the central 70% safe area so cards and hero layouts do not crop
+the meaning. Do not render any text at all: no title, letters, words, numbers,
+captions, labels, logos, watermarks, signs, UI, borders, or frames. Avoid
+anime, chibi, flat-vector, collage, fantasy-game, or generic stock-photo
+styles. The app renders the learner-facing title outside the image.
 ''';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -106,6 +110,24 @@ class AgentError implements Exception {
 
   @override
   String toString() => message;
+}
+
+class LiaisonAttemptAssessment {
+  const LiaisonAttemptAssessment({
+    required this.transcript,
+    required this.audioClear,
+    required this.wordsMatch,
+    required this.liaisonMatch,
+    required this.confidence,
+    required this.feedback,
+  });
+
+  final String transcript;
+  final bool audioClear;
+  final bool wordsMatch;
+  final bool liaisonMatch;
+  final double confidence;
+  final String feedback;
 }
 
 class WritingFeedback {
@@ -445,13 +467,30 @@ $submission''';
     required List<String> knownVocab,
     String? topic,
     String? contextPrompt,
+    String? examName,
+    bool examMode = false,
     List<({String tag, String description, int count})> mistakeTags = const [],
   }) async {
     final surpriseMode =
         (topic == null || topic.trim().isEmpty) &&
         (contextPrompt == null || contextPrompt.trim().isEmpty);
-    final system = '''
-Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...]}.
+    final examInstructions = examMode
+        ? '''
+EXAM MODE: $examName. Choose exactly one official writing section and return its
+contract in the optional exam fields. For TCF Canada choose exactly one of
+"TCF Task 1", "TCF Task 2", or "TCF Task 3": Task 1 is 60-120 words, Task 2 is
+120-150 words, and Task 3 is 120-180 words. The full written expression paper
+is 60 minutes. For TEF Canada choose either "TEF Section A" (continue an
+article, at least 80 words, 25 minutes) or "TEF Section B" (justify a point of
+view, at least 200 words, 35 minutes). Keep the official word minimum even for
+an A1/A2 learner, but simplify the vocabulary and scaffolding around it. Set
+min_words, max_words when an official upper bound exists, and
+time_limit_minutes to the official total or section time.
+'''
+        : '';
+    final system =
+        '''
+Write one French writing-practice task for a language learner, calibrated STRICTLY to their CEFR level. Respond with ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "type": string, "prompt_fr": string, "prompt_en": string, "min_words": number, "target_connectors": [string,...], "rubric_hints": [string,...], "exam_section": string|null, "time_limit_minutes": number|null, "max_words": number|null}.
 "title" is a short natural French title. "title_en" is a short, clear English gloss of that title (2-5 words), even when LEVEL is A1 or A2. Never leave "title_en" empty. For A1/A2, use everyday words that a beginner can understand in the English gloss; B1/B2 may use a more precise translation.
 "type" is a short label like "micro" or "email" or "opinion". "rubric_hints" are 2-4 short English bullet points on what a good answer includes.
 FORMAT RULE FOR "prompt_fr"/"prompt_en", ABSOLUTE — READ THIS TWICE: these two fields must be a QUESTION or an INSTRUCTION addressed directly TO the student (start with an imperative like "Écris...", "Décris...", "Raconte...", "Parle de...", or a direct question like "Où habites-tu ?"), asking them to produce their OWN original sentences. They must NEVER be a statement of fact, a narrated example, or anything that already reads as a complete, correct answer — if a student could just copy "prompt_fr" verbatim into the answer box and be done, you have generated it WRONG.
@@ -465,6 +504,7 @@ LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruct
 - B2: answerable as a fuller opinion/complaint/narrative piece, TEF-style. min_words 120-180. target_connectors: 2-3 (e.g. "néanmoins", "quant à", "bien que").
 Never ask for anything harder than the stated level allows, even if the topic invites it.
 Prefer a fresh, specific prompt each time. Vary the scenario and phrasing when it is natural, while keeping the task educational and level-appropriate.
+$examInstructions
 ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}''';
     // Surprise mode is intentionally context-free: learner vocabulary and
     // mistake history are useful for explicitly guided tasks, but must not
@@ -496,9 +536,10 @@ ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work 
         'scenario. Keep it natural, wholesome, and appropriate to the level.',
       );
     } else {
-      buf.writeln('TOPIC (loose inspiration only): $chosenTopic');
+      buf.writeln('TOPIC (primary semantic anchor): $chosenTopic');
       buf.writeln(
-        'SEED DETAILS for a specific, creative angle (use naturally, do not just state them): '
+        'OPTIONAL SEED DETAILS for a specific angle (use only when compatible with the topic; '
+        'ignore any detail that conflicts): '
         'a person named $seedName, a setting around $seedSetting, involving $seedTwist. '
         'Use these details only when LEVEL is B1 or B2.',
       );
@@ -523,12 +564,80 @@ ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work 
       maxTokens: 600,
       temperature: 0.95,
     );
+    final parsedTask = _parseWritingTask(raw, levelBand: levelBand);
+    final examTask = examMode
+        ? _calibrateExamWritingTask(parsedTask, examName: examName)
+        : parsedTask;
     final task = _calibrateGeneratedWritingTask(
-      _parseWritingTask(raw, levelBand: levelBand),
+      examTask,
       levelBand: levelBand,
       topic: chosenTopic,
+      examMode: examMode,
     );
     return task;
+  }
+
+  WritingTask _calibrateExamWritingTask(
+    WritingTask task, {
+    required String? examName,
+  }) {
+    final exam = (examName ?? '').trim().toUpperCase();
+    final section = (task.examSection ?? '').trim().toUpperCase();
+    late final String canonicalSection;
+    late final int minimum;
+    int? maximum;
+    late final int timeLimit;
+
+    if (exam.contains('TCF')) {
+      if (section.contains('TASK 1')) {
+        canonicalSection = 'TCF Task 1';
+        minimum = 60;
+        maximum = 120;
+      } else if (section.contains('TASK 2')) {
+        canonicalSection = 'TCF Task 2';
+        minimum = 120;
+        maximum = 150;
+      } else if (section.contains('TASK 3')) {
+        canonicalSection = 'TCF Task 3';
+        minimum = 120;
+        maximum = 180;
+      } else {
+        throw AgentError.badResponse;
+      }
+      timeLimit = 60;
+    } else if (exam.contains('TEF')) {
+      if (section.contains('SECTION A')) {
+        canonicalSection = 'TEF Section A';
+        minimum = 80;
+        timeLimit = 25;
+      } else if (section.contains('SECTION B')) {
+        canonicalSection = 'TEF Section B';
+        minimum = 200;
+        timeLimit = 35;
+      } else {
+        throw AgentError.badResponse;
+      }
+    } else {
+      throw AgentError.badResponse;
+    }
+
+    return WritingTask(
+      id: task.id,
+      type: task.type,
+      title: task.title,
+      titleEn: task.titleEn,
+      promptFr: task.promptFr,
+      promptEn: task.promptEn,
+      minWords: minimum,
+      maxWords: maximum,
+      timeLimitMinutes: timeLimit,
+      examSection: canonicalSection,
+      targetConnectors: task.targetConnectors,
+      rubricHints: task.rubricHints,
+      levelBand: task.levelBand,
+      wordBank: task.wordBank,
+      targetTokens: task.targetTokens,
+    );
   }
 
   /// Models sometimes obey the CEFR label but still make an A1 prompt
@@ -539,7 +648,9 @@ ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work 
     WritingTask task, {
     required String levelBand,
     required String topic,
+    bool examMode = false,
   }) {
+    if (examMode) return task;
     final band = levelBand.trim().toUpperCase();
     final promptWords = task.promptFr.trim().split(RegExp(r'\s+')).length;
     final hasComplexA1Marker = RegExp(
@@ -871,8 +982,8 @@ Write one everyday sentence using the target exactly as written.''';
           }
         }
       } catch (_) {
-        // Retry once with the same strict contract before the caller falls
-        // back to a deterministic offline sentence.
+        // Retry once with the same strict contract. If both responses fail,
+        // the caller receives an explicit error and must not invent content.
       }
     }
     throw AgentError.badResponse;
@@ -992,6 +1103,111 @@ USEFUL STARTERS: ${hints.join('; ')}''',
     return _parseReadingPassage(raw);
   }
 
+  /// Generates one controlled speaking lesson for the dedicated Speaking
+  /// home. This is deliberately a fixed phrase drill, not free conversation:
+  /// the returned lines are shown one at a time and each learner response is
+  /// checked against the exact target line by the speaking flow.
+  Future<ReadingPassage> buildStandaloneSpeakingLesson({
+    required String levelBand,
+    Iterable<String> avoidTitles = const [],
+  }) async {
+    final titles = avoidTitles
+        .map((title) => title.trim())
+        .where((title) => title.isNotEmpty)
+        .join(', ');
+    final system =
+        '''
+Write one short, controlled French speaking lesson for a learner at LEVEL
+$levelBand. This is not a story, essay, vocabulary list, or open roleplay. It
+must teach one ordinary everyday speaking goal with 3 to 5 short target lines
+that the learner can hear, repeat, record, and have checked word by word.
+Return ONLY compact JSON with exactly this shape:
+{"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "pronunciation_tip": string}]}
+
+The title must be new and concrete. `title_en` must be a clear 2-5 word
+English title. Every `fr` line must be a complete, natural learner sentence
+or polite phrase, and every `en` field must be its exact English meaning.
+Keep one conversational purpose from start to finish. Do not add dialogue
+roles, explanations, markdown, questions for the model, or extra fields.
+Avoid these existing titles: ${titles.isEmpty ? '(none)' : titles}.
+
+LEVEL RULES:
+${_cefrCalibration(levelBand)}
+For A1, use only high-frequency everyday words, short present-tense
+sentences, basic questions, greetings, requests, numbers, places, and polite
+closings. Do not use subordinate clauses, abstract opinions, idioms, rare
+vocabulary, or a multi-step scenario. For A2, allow a short reason, a simple
+past or near-future phrase, and one polite follow-up, while staying concrete
+and easy to say aloud.
+''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'Create a fresh useful speaking lesson at exactly $levelBand.',
+        },
+      ],
+      maxTokens: 1200,
+      temperature: 0.8,
+      jsonMode: true,
+    );
+    return _parseReadingPassage(raw);
+  }
+
+  /// Generates one independent Free Talk topic for the Speaking home.
+  ///
+  /// Free Talk is still scripted enough to teach: every beat has one Marie
+  /// prompt and one learner target, but the learner target is an open starter
+  /// rather than a sentence the matcher expects verbatim. The speaking flow
+  /// owns the recording and the visible chat; this method only creates the
+  /// level-calibrated lesson data.
+  Future<ReadingPassage> buildStandaloneFreeTalkTopic({
+    required String levelBand,
+    Iterable<String> avoidTitles = const [],
+  }) async {
+    final titles = avoidTitles
+        .map((title) => title.trim())
+        .where((title) => title.isNotEmpty)
+        .join(', ');
+    final system =
+        '''
+Write one short, level-calibrated French Free Talk lesson for a learner at
+LEVEL $levelBand. The app will show the character's prompt, then ask the
+learner to answer aloud in the same fixed lesson context. Return ONLY compact
+JSON with exactly this shape:
+{"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}
+
+Create exactly 3 or 4 beats that stay on one ordinary topic. The character
+prompt must be a natural question or short follow-up. `learner_fr` must be a
+useful sentence starter or model answer the learner can adapt; `learner_en`
+must be its exact English meaning. Keep it a speaking lesson, not a vocabulary
+list, essay, story, or roleplay catalog. Do not add extra fields or markdown.
+Avoid these existing titles: ${titles.isEmpty ? '(none)' : titles}.
+
+${_cefrCalibration(levelBand)}
+For A1, keep both prompts and starters concrete, present-tense, and short.
+For A2, allow one simple past or near-future idea. For B1/B2, ask for a brief
+reason, comparison, example, or opinion appropriate to the band, but keep each
+beat answerable aloud in one or two sentences.
+''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          'content':
+              'Create one fresh Free Talk topic at exactly $levelBand. Keep the topic concrete and useful.',
+        },
+      ],
+      maxTokens: 1500,
+      temperature: 0.85,
+      jsonMode: true,
+    );
+    return _parseReadingPassage(raw);
+  }
+
   /// The Roleplay lab's own generator — a learner picks (or randomizes) a
   /// scenario like "café" or "airport" and gets a fresh scene to walk
   /// through in `AgentLedListeningScreen`, same JSON contract as
@@ -1017,10 +1233,10 @@ USEFUL STARTERS: ${hints.join('; ')}''',
         '''
 Write a short two-role French roleplay scene for a language learner to practice. The app will direct it beat by beat, then a live tutor will continue the same scene. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Au café du coin" → English "At the corner café"), for a beginner who can't read the French title yet. Write 4 to 6 realistic beats: greeting, purpose, one follow-up, resolution, goodbye. Do not award a score or claim mastery.
 ${_cefrCalibration(levelBand)}
-The SCENARIO given is only a loose inspiration for the setting, not a rigid script — build an ordinary, realistic scene that fits it.
+The SCENARIO is the primary semantic anchor for the scene's concrete place, objects, and action. It need not be repeated in every line, but do not drift to an unrelated premise or visual setting.
 This app's users are teens and adults (13+): keep the scene wholesome and educational, appropriate for a general audience, never mature, violent, or otherwise inappropriate.
 Aim for a fresh, specific scene: pick a concrete setting, named character, and small realistic details (items, prices, times, a tiny complication) that fit the scenario type. Vary the premise when it is natural, without forcing novelty.
-${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary new everyday scene yourself. Keep it natural and level-appropriate; do not rely on onboarding interests or a fixed default.' : 'SELECTED CONTEXT: Use the learner scenario only as loose inspiration; do not copy a previous scene.'}''';
+${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary new everyday scene yourself. Keep it natural and level-appropriate; do not rely on onboarding interests or a fixed default.' : 'SELECTED CONTEXT: Use the learner scenario as the primary semantic anchor for the concrete place, objects, and action; do not drift to an unrelated premise or visual setting, and do not copy a previous scene.'}''';
     Future<ReadingPassage> request(String retryInstruction) async {
       final seed = StoryVarietyService.chooseSeed(
         avoidTexts: [...titles, ...openings],
@@ -1029,7 +1245,7 @@ ${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary ne
         ..writeln(
           surpriseMode
               ? 'MODE: SURPRISE ME — no scenario supplied'
-              : 'SCENARIO (loose inspiration): $scenario',
+              : 'SCENARIO (primary semantic anchor): $scenario',
         )
         ..writeln('LEVEL: $levelBand')
         ..writeln(
@@ -1133,7 +1349,7 @@ ${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary ne
 Write a short third-person narrative story in French for a language learner — NOT a dialogue, no characters talking to each other, just a narrator telling a small real-life story (like a short reading-app story). Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title" (e.g. French "Le vélo emprunté" → English "The borrowed bike"), for a beginner who can't read the French title yet. Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending. "grammar_note" is one simple English sentence about that sentence's grammar; "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
 TITLE RULE: `title_en` is the only learner-facing heading. Make it a clear, natural English title for every level, including C1/C2. Do not combine the French title and English title in the UI; French belongs in the story content.
 ${_cefrCalibration(levelBand)}
-The TOPIC given is only a loose inspiration for the setting or a detail in the background, not the subject of every sentence — do not make the story be "about" the topic word itself; it should read like an ordinary daily-life story that just happens to touch on it.
+The TOPIC is the primary semantic anchor for the story's place, objects, and action. It does not need to appear in every sentence, but the story and its visual brief must remain recognisably connected to it. Do not drift into an unrelated setting just to make the story feel cinematic.
 This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience, never dealing in mature, violent, or otherwise inappropriate themes.
 INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and never write a story with the same title or opening sentence as one already suggested by the seed details below.''';
     final random = Random();
@@ -1147,10 +1363,11 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
         {
           'role': 'user',
           'content':
-              'TOPIC (loose inspiration only): $topic\nLEVEL: $levelBand\n'
-              'SEED DETAILS to build this specific story around: a main character named $name, '
-              'set in or around $setting, involving $twist. Use these seed details naturally; '
-              'do not just state them, weave them into a real small story.',
+              'TOPIC (primary story anchor): $topic\nLEVEL: $levelBand\n'
+              'OPTIONAL VARIATION SEED: a main character named $name, a setting around $setting, '
+              'and a small turn involving $twist. Use these details only when they fit the topic; '
+              'if they conflict with the topic, ignore them. Keep the place, objects, action, and '
+              'visual brief semantically connected to the topic.',
         },
       ],
       maxTokens: 1400,
@@ -1194,10 +1411,10 @@ CEFR CONTRACT: Keep sentence length, verb forms, vocabulary, inference load, and
 
 TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions. In regular lessons, provide q_en and choices_en as learner support at every level. If an EXAM READINESS OVERRIDE appears below, it takes precedence: follow its language policy exactly. Each has exactly 3 choices and one valid zero-based answerIndex.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 story image describing the setting, objects, action, mood, and composition. Do not request typography or text of any kind.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 friendly book-reference image. It must name only concrete setting, objects, action, and mood that are present in this lesson. Do not add a generic protagonist, dramatic landmark, cinematic poster treatment, or unrelated future/fantasy imagery. Do not request typography or text of any kind.
 
-The topic is inspiration, not a requirement that every sentence mention it. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
-${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new story, not a rewrite or continuation of any previous lesson.'''}
+The topic is the primary semantic anchor for the story's concrete place, objects, and action. It need not appear in every sentence, but the story and cover_prompt must remain recognisably connected to it; do not drift into an unrelated cinematic setting. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
+${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it as the primary semantic anchor for the concrete place, objects, action, and cover_prompt. It need not appear in every sentence, but do not drift to an unrelated premise; create a new story, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
 $examBlock
 ''';
@@ -1209,7 +1426,7 @@ $examBlock
       avoidTitles: avoidTitles,
       avoidOpenings: avoidOpenings,
       userContent: (seed, nonce, exclusion, retryInstruction) =>
-          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (primary story anchor): $topic'}\nLEVEL: $levelBand\n'
           '${examName == null ? '' : 'EXAM: $examName\n'}'
           'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
           'A human character is optional; the story may follow an object, animal, place, or natural moment.\n'
@@ -1263,10 +1480,10 @@ CHECK SUPPORT: Write 4 to 6 comprehension questions. For every question, q is th
 
 TEACHING FIELDS: For each exact French sentence, provide its English meaning, one short English grammar note tied to that sentence, and an optional pronunciation tip. Include 5 to 8 useful French words or short phrases that actually appear in the story.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 story image describing the setting, objects, action, mood, and composition. Do not request typography or text of any kind.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 2 to 5 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 friendly book-reference image. It must name only concrete setting, objects, action, and mood that are present in this lesson. Do not add a generic protagonist, dramatic landmark, cinematic poster treatment, or unrelated future/fantasy imagery. Do not request typography or text of any kind.
 
-Keep it wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
-${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it only as loose inspiration and create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
+Keep it wholesome and appropriate for teens and adults. The selected topic is the primary semantic anchor for the audio story's concrete place, objects, and action. It need not appear in every sentence, but do not drift to an unrelated premise or visual setting. Prefer a fresh, specific premise and vary it naturally.
+${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it as the primary semantic anchor for the audio story's concrete place, objects, action, and cover_prompt. It need not appear in every sentence, but do not drift to an unrelated premise or visual setting; create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
 $examBlock
 ''';
@@ -1278,7 +1495,7 @@ $examBlock
       avoidTitles: avoidTitles,
       avoidOpenings: avoidOpenings,
       userContent: (seed, nonce, exclusion, retryInstruction) =>
-          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (loose inspiration): $topic'}\nLEVEL: $levelBand\n'
+          '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (primary story anchor): $topic'}\nLEVEL: $levelBand\n'
           '${examName == null ? '' : 'EXAM: $examName\n'}'
           'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
           '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
@@ -1382,11 +1599,11 @@ EXAM READINESS OVERRIDE: This is an independent $examName $band training set, no
         '''
 Create one short, polished French reading book for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
 
-STORY: Write 7 to 10 short narrative segments with a clear beginning, small turn, and satisfying ending. This is a reading-app story, not a textbook exercise and not a dialogue. Keep the story wholesome and appropriate for teens and adults. The topic is inspiration, not a requirement that every sentence mention it.
+STORY: Write 7 to 10 short narrative segments with a clear beginning, small turn, and satisfying ending. This is a reading-app story, not a textbook exercise and not a dialogue. Keep the story wholesome and appropriate for teens and adults. The topic is the primary semantic anchor for the story's concrete place, objects, and action. It need not appear in every sentence, but the story and cover_prompt must remain recognisably connected to it; do not drift into an unrelated cinematic setting.
 TITLE RULE: `title_en` is the only learner-facing book heading. It must always be a clear, natural English title for every level, including C1/C2. Do not combine the French title and English title in the UI; French belongs in the story content.
 SUMMARY: Write one short English sentence that makes the story inviting to open.
 READ TIME: Estimate the reading time in whole minutes, normally 3 to 7.
-COVER PROMPT: Write one concise English prompt for a text-free 4:3 story image of the story's setting and mood. Do not request any text, letters, logos, borders, or UI in the image.
+COVER PROMPT: Write one concise English prompt for a text-free 4:3 friendly book-reference image. Name the exact place, objects, and action from this story; people are optional and must not be invented. Do not request any cinematic poster treatment, unrelated character, landmark, text, letters, logos, borders, or UI in the image.
 QUIZ: Write 4 to 6 comprehension questions. At A1/A2, q must be simple French plus q_en in plain English, and choices must be French plus choices_en in the exact same order. At B1/B2, still provide the English support fields. Each question must have exactly 3 choices and one valid zero-based answerIndex. Only ask about details stated or clearly implied by the story.
 KEYWORDS: Write 6 to 10 useful French words or short phrases that appear in the story, with simple English meanings and non-IPA phonetic hints. IDs must be short unique snake_case slugs.
 GRAMMAR: Each segment gets one plain-English grammar note tied to that exact sentence. pronunciation_tip may be empty when no useful tip is needed.
@@ -1404,9 +1621,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         {
           'role': 'user',
           'content':
-              'TOPIC: $topic\nLEVEL: $levelBand\n'
-              'SEED: use a main character named $name, a setting around $setting, '
-              'and a small turn involving $twist. Make the result specific and fresh.',
+              'TOPIC (primary story anchor): $topic\nLEVEL: $levelBand\n'
+              'OPTIONAL VARIATION SEED: a main character named $name, a setting around $setting, '
+              'and a small turn involving $twist. Use these details only when they fit the topic; '
+              'if they conflict, ignore them. Keep the place, objects, action, and cover_prompt '
+              'semantically connected to the topic.',
         },
       ],
       maxTokens: 3000,
@@ -1436,22 +1655,20 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
         ? ' This is a true vertical music-player backdrop: compose for a tall screen, leave clean breathing room near the top and bottom for controls, and never crop or stretch a landscape composition.'
         : '';
     final qualityDirection =
-        'Create one premium $orientation story image in an exact $aspectRatio composition.$musicBackdropRule '
-        'Use grounded cinematic realism with subtle editorial stylization, believable materials, '
-        'natural lighting, restrained color grading, one clear focal scene, layered depth, '
-        'and a polished publishing aesthetic. Keep the subject and important visual details inside '
-        'the central safe area. A single visible character is allowed when the scene calls for one. '
-        'Avoid photorealistic stock-photo blandness, anime, Ghibli, chibi, childish, flat vector, '
-        'cartoon, collage, split panels, decorative frame, or UI mockup styles. Do not render text, '
-        'letters, numbers, logos, signs, captions, watermarks, or other typography anywhere in the image. '
-        'Do not show mascots or named characters; make the setting, objects, architecture, '
-        'weather, or action primary. Render no text, letters, numbers, logos, signs, captions, '
-        'watermarks, or other typography anywhere in the image.';
-    final prompt = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? '$qualityDirection\nScene subject: $topic. Mood and context: $summary. Learner level: $levelBand.'
-        : '$qualityDirection\n$coverPrompt\n'
-              'Scene topic: $topic. Visual context: $summary. '
-              'Learner level: $levelBand.';
+        'Create one friendly $orientation learning-reference image in an exact $aspectRatio composition.$musicBackdropRule '
+        'Use a warm editorial storybook/reference style with natural light, believable everyday materials, '
+        'a simple readable composition, and one clear semantic subject. This is not a cinematic movie poster. '
+        'Keep important visual details inside the central safe area. People are optional and must be supported '
+        'by the lesson context; do not invent a generic protagonist. Avoid unrelated landmarks, futuristic cities, '
+        'fantasy scenes, dramatic strangers, anime, chibi, flat vector, collage, split panels, decorative frame, '
+        'or UI mockup styles. Do not render text, letters, numbers, logos, signs, captions, watermarks, or UI.';
+    final lessonAnchor =
+        'LESSON ANCHOR (highest priority): title="$title"; summary="$summary"; '
+        'topic="$topic"; level="$levelBand".';
+    final visualBrief = coverPrompt == null || coverPrompt.trim().isEmpty
+        ? 'VISUAL BRIEF: show only the concrete place, objects, and action stated by the lesson.'
+        : 'VISUAL BRIEF (must stay faithful to the lesson): ${coverPrompt.trim()}';
+    final prompt = '$qualityDirection\n$lessonAnchor\n$visualBrief';
     final variation = variationSeed == null || variationSeed.trim().isEmpty
         ? ''
         : '\nInternal visual variation seed: ${variationSeed.trim()}. '
@@ -1528,9 +1745,15 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     'Présent',
     'Passé composé',
     'Futur proche',
+    'Futur simple',
     'Imparfait',
     'Conditionnel présent',
     'Impératif',
+    'Ordre des pronoms',
+    'Pronoms relatifs',
+    'Connecteurs logiques',
+    'Subjonctif présent',
+    'Hypothèses avec si',
   ];
 
   /// Generates a short story built AROUND one chosen grammar point/tense
@@ -2028,6 +2251,78 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     }
   }
 
+  /// Evaluates the actual sound at one French liaison boundary. A matching
+  /// transcript is deliberately not enough: Gemini receives the PCM audio and
+  /// must judge whether the expected linking consonant (or expected pause) was
+  /// audible. Errors propagate to the lesson instead of becoming a fake pass.
+  Future<LiaisonAttemptAssessment> evaluateLiaisonAttempt({
+    required List<int> pcmBytes,
+    required String referenceText,
+    required String firstWord,
+    required String secondWord,
+    required String linkSound,
+    required bool shouldLink,
+    int sampleRateHz = 16000,
+  }) async {
+    if (pcmBytes.isEmpty) throw AgentError.requestFailed;
+    final expected = shouldLink
+        ? 'A liaison sound "$linkSound" must be audible between "$firstWord" and "$secondWord".'
+        : 'No linking consonant may be inserted between "$firstWord" and "$secondWord".';
+    final response = await _invokeFunction('ai-text', {
+      'provider': 'gemini',
+      'contents': [
+        {
+          'parts': [
+            {
+              'text':
+                  '''You are a strict French pronunciation evaluator. Listen to the supplied audio itself; never infer liaison from spelling or from the transcript alone.
+Reference: "$referenceText"
+Boundary: "$firstWord" + "$secondWord"
+Requirement: $expected
+
+Return ONLY JSON with exactly these keys:
+{"transcript":"what was spoken","audio_clear":true,"words_match":true,"liaison_match":true,"confidence":0.0,"feedback":"one short, specific English coaching sentence"}
+
+liaison_match means the acoustic requirement above was satisfied. confidence must be 0.0 to 1.0. If audio is unclear, set audio_clear false and liaison_match false.''',
+            },
+            {
+              'inlineData': {
+                'mimeType': 'audio/pcm;rate=$sampleRateHz',
+                'data': base64Encode(pcmBytes),
+              },
+            },
+          ],
+        },
+      ],
+      'maxTokens': 260,
+      'temperature': 0.0,
+    }, timeout: const Duration(seconds: 20));
+    final raw = (response['text'] as String? ?? '').trim();
+    final object = _decodeObject(raw);
+    final transcript = object['transcript'];
+    final audioClear = object['audio_clear'];
+    final wordsMatch = object['words_match'];
+    final liaisonMatch = object['liaison_match'];
+    final confidence = object['confidence'];
+    final feedback = object['feedback'];
+    if (transcript is! String ||
+        audioClear is! bool ||
+        wordsMatch is! bool ||
+        liaisonMatch is! bool ||
+        confidence is! num ||
+        feedback is! String) {
+      throw AgentError.badResponse;
+    }
+    return LiaisonAttemptAssessment(
+      transcript: transcript.trim(),
+      audioClear: audioClear,
+      wordsMatch: wordsMatch,
+      liaisonMatch: liaisonMatch,
+      confidence: confidence.toDouble().clamp(0, 1),
+      feedback: feedback.trim(),
+    );
+  }
+
   /// One-shot image understanding for Live Vision Scan: a photo, gallery
   /// image, or rasterized PDF page, optionally paired with an on-device OCR
   /// hint the model can correct against. Deliberately terse and reactive —
@@ -2321,6 +2616,9 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           (obj['rubric_hints'] as List?)?.map((e) => e.toString()).toList() ??
           const [],
       levelBand: levelBand,
+      examSection: obj['exam_section']?.toString(),
+      timeLimitMinutes: (obj['time_limit_minutes'] as num?)?.toInt(),
+      maxWords: (obj['max_words'] as num?)?.toInt(),
     );
   }
 

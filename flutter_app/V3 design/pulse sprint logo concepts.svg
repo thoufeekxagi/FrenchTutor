@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1500" viewBox="0 0 900 1500">
+  <rect width="1400" height="900" fill="#08090B"/>
+  <text x="50" y="72" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="32" font-weight="700">ParleSprint · symbol directions</text>
+  <text x="52" y="108" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">Flat geometry · gold on black · no baked-in text</text>
+
+  <g transform="translate(50 160)">
+    <rect width="380" height="580" rx="42" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="42" y="70" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" letter-spacing="4">A · BEAT</text>
+    <text x="42" y="535" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="30" font-weight="700">Three clear pulses.</text>
+    <text x="42" y="568" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="19">Audio · rhythm · progress</text>
+    <g transform="translate(105 170)" fill="#F7BA45">
+      <rect x="0" y="108" width="42" height="122" rx="21"/>
+      <rect x="64" y="38" width="42" height="192" rx="21"/>
+      <rect x="128" y="78" width="42" height="152" rx="21"/>
+      <circle cx="215" cy="210" r="20"/>
+    </g>
+  </g>
+
+  <g transform="translate(470 160)">
+    <rect width="380" height="580" rx="42" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="42" y="70" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" letter-spacing="4">B · LINK</text>
+    <text x="42" y="535" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="30" font-weight="700">Two voices, one path.</text>
+    <text x="42" y="568" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="19">Conversation · connection · flow</text>
+    <g transform="translate(90 160)" fill="#F7BA45">
+      <path d="M98 34c-43 0-78 31-78 70 0 20 10 38 27 51l-10 43 43-25c6 1 12 2 18 2 43 0 78-32 78-71s-35-70-78-70Zm0 34c24 0 44 16 44 36s-20 37-44 37-44-16-44-37 20-36 44-36Z"/>
+      <path d="M184 90c44 0 78 31 78 70 0 20-10 38-27 51l10 43-43-25c-6 1-12 2-18 2-12 0-23-2-33-6 21-11 35-30 35-52 0-20-10-38-27-51 7-2 16-3 25-3Z" opacity=".72"/>
+    </g>
+  </g>
+
+  <g transform="translate(50 750)">
+    <rect width="380" height="580" rx="42" fill="#111316" stroke="#2A2D31" stroke-width="2"/>
+    <text x="42" y="70" fill="#F7BA45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" letter-spacing="4">C · RISE</text>
+    <text x="42" y="535" fill="#F4F1EA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="30" font-weight="700">A quiet step forward.</text>
+    <text x="42" y="568" fill="#8E8C88" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="19">Momentum · learning · direction</text>
+    <g transform="translate(92 154)" fill="none" stroke="#F7BA45" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M62 212V112c0-33 27-60 60-60h55c33 0 60 27 60 60v27"/>
+      <path d="M62 212h115c33 0 60-27 60-60v-13" opacity=".72"/>
+    </g>
+    <circle cx="279" cy="310" r="20" fill="#F7BA45"/>
+  </g>
+</svg>

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_appearance_settings.dart';
+
 /// Shared learner preferences used by every focused practice session.
 ///
 /// The reader is the first consumer, but these values intentionally live in a
@@ -83,9 +85,11 @@ class SessionSettings extends ChangeNotifier {
 
   Future<void> setDarkMode(bool value) async {
     darkMode = value;
+    AppAppearanceSettings.shared.adoptDarkMode(value);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_darkModeKey, value);
+    await prefs.setBool('app_dark_mode', value);
   }
 
   double _validRate(double value) {
