@@ -10,8 +10,9 @@ import '../../models/speaking_course.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../providers/tutor_helper_provider.dart';
+import '../../prompts/live_prompts.dart';
+import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
-import '../../services/speaking_live_session.dart';
 import '../../services/tutor_helper_settings.dart';
 import '../../utils/speaking_translation_alignment.dart';
 import '../../widgets/bilingual_word_text.dart';
@@ -116,7 +117,7 @@ class _SpeakingLessonFlowScreenState
     extends ConsumerState<SpeakingLessonFlowScreen>
     with WidgetsBindingObserver {
   final Stopwatch _sessionClock = Stopwatch();
-  late final SpeakingLiveSessionController _murray;
+  late final InlineCallController _murray;
   int _index = 0;
   int _successful = 0;
   bool _playing = false;
@@ -149,13 +150,15 @@ class _SpeakingLessonFlowScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _murray = SpeakingLiveSessionController(
-      mode: _liveSessionMode,
+    _murray = InlineCallController(
+      sessionType: _murraySessionType,
       lessonContext: () => _murrayContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
+      // Keep the proven Live connection. Guided lessons use explicit
+      // tap-to-record boundaries; free talk keeps its existing behavior.
+      manualLearnerTurns: !_isFreeTalk,
       openingPrompt: _openingPrompt,
       onUserTranscript: _onMurrayTranscript,
-      onTutorTranscript: (_) {},
       onTurnComplete: _onMurrayTurnComplete,
       tools: _isFreeTalk
           ? AgentTool.freeTalkSpeakingPalette
@@ -200,13 +203,10 @@ class _SpeakingLessonFlowScreenState
     _murray.handleAppLifecycle(state);
   }
 
-  SpeakingLiveSessionMode get _liveSessionMode {
-    if (_isFreeTalk) return SpeakingLiveSessionMode.freeTalk;
-    if (widget.steps.any((step) => step.partnerFrench != null)) {
-      return SpeakingLiveSessionMode.roleplay;
-    }
-    return SpeakingLiveSessionMode.guided;
-  }
+  LiveSessionType get _murraySessionType =>
+      widget.steps.any((step) => step.openResponse)
+      ? LiveSessionType.freeTalk
+      : LiveSessionType.speakingGuided;
 
   String get _openingPrompt {
     if (_isFreeTalk) {
@@ -234,11 +234,7 @@ lesson context.
     final partner = step.partnerFrench;
     return '''
 SPEAKING LESSON: "${widget.title}".
-MODE: ${switch (_liveSessionMode) {
-      SpeakingLiveSessionMode.guided => 'GUIDED SPEAKING',
-      SpeakingLiveSessionMode.freeTalk => 'FREE TALK',
-      SpeakingLiveSessionMode.roleplay => 'ROLEPLAY',
-    }}.
+MODE: ${_murraySessionType == LiveSessionType.freeTalk ? 'FREE TALK' : 'GUIDED CONVERSATION'}.
 CEFR LEVEL: ${widget.level}.
 CURRENT STEP: ${_index + 1} of ${widget.steps.length}.
 CURRENT FRENCH TARGET: "${step.french}".
