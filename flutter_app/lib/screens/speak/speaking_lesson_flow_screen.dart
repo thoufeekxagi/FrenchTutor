@@ -136,6 +136,7 @@ class _SpeakingLessonFlowScreenState
   bool _murrayGuidedGradeReceived = false;
   bool _murrayFreeTalkGradeReceived = false;
   bool _hasSubmittedCurrentPhrase = false;
+  Timer? _guidedGradeTimeout;
   final Set<int> _creditedSteps = {};
   int? _selectedPhraseWord;
   int? _selectedFreeTalkPartnerWord;
@@ -191,6 +192,7 @@ class _SpeakingLessonFlowScreenState
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _guidedGradeTimeout?.cancel();
     _murray.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
     _sessionClock.stop();
@@ -381,6 +383,7 @@ $instruction
       return;
     }
     if (_murray.isLive) {
+      _guidedGradeTimeout?.cancel();
       _murrayInputActive = true;
       _murrayTurnClosing = false;
       _murrayFinalizing = false;
@@ -409,6 +412,17 @@ $instruction
 
   void _onMurrayTranscript(String transcript) {
     if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
+    // Gemini flushes the final learner transcript before it sends the
+    // structured grade_guided_phrase tool event. It is evidence for the
+    // eventual result, not a result by itself. Resolving here races the tool
+    // event and produces a false red retry card even when the phrase matched.
+    if (!_isFreeTalk) {
+      final cleanTranscript = transcript.trim();
+      if (cleanTranscript.isNotEmpty) {
+        setState(() => _heard = cleanTranscript);
+      }
+      return;
+    }
     _murrayFinalizing = true;
     _murrayInputActive = false;
     unawaited(_finishRecording(transcript));
@@ -416,6 +430,9 @@ $instruction
 
   void _onMurrayTurnComplete() {
     if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
+    // The guided result is owned by grade_guided_phrase. turnComplete only
+    // closes Gemini's transport turn and can arrive before that tool call.
+    if (!_isFreeTalk) return;
     // A quiet/unclear turn still needs to resolve visibly instead of leaving
     // the learner stuck on Checking forever.
     _murrayFinalizing = true;
@@ -505,6 +522,7 @@ $instruction
       return;
     }
     _murrayGuidedGradeReceived = true;
+    _guidedGradeTimeout?.cancel();
     _murray.sendToolResponse(
       callId: callId,
       name: name,
@@ -555,6 +573,7 @@ $instruction
     required String feedback,
   }) {
     if (!mounted) return;
+    _guidedGradeTimeout?.cancel();
     final cleanHeard = heard.trim();
     final cleanFeedback = feedback.trim();
     _murrayInputActive = false;
@@ -620,6 +639,26 @@ $instruction
       _murrayTurnClosing = true;
       setState(() => _state = _SpeakingStepState.checking);
       await _murray.endLearnerTurn();
+      if (!_isFreeTalk) {
+        _guidedGradeTimeout?.cancel();
+        _guidedGradeTimeout = Timer(const Duration(seconds: 8), () {
+          if (!mounted ||
+              _isFreeTalk ||
+              _state != _SpeakingStepState.checking ||
+              !_murrayTurnClosing ||
+              _murrayGuidedGradeReceived) {
+            return;
+          }
+          _murrayTurnClosing = false;
+          _murrayFinalizing = false;
+          setState(() {
+            _state = _SpeakingStepState.retry;
+            _hasSubmittedCurrentPhrase = true;
+            _error =
+                'The tutor could not finish checking this attempt. Please try again.';
+          });
+        });
+      }
       return;
     }
     await LessonSpeechService.shared.stopListening();
@@ -690,6 +729,7 @@ $instruction
 
   Future<void> _practiceMore() async {
     if (_isGuidedExercise || !_hasSubmittedCurrentPhrase) return;
+    _guidedGradeTimeout?.cancel();
     setState(() {
       _state = _SpeakingStepState.ready;
       _heard = '';
@@ -723,6 +763,7 @@ $instruction
       _finishLesson();
       return;
     }
+    _guidedGradeTimeout?.cancel();
     if (_isFreeTalk) {
       _chatHistory.add(
         _SpeakingChatTurn(
