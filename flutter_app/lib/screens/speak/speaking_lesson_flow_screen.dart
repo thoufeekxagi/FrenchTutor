@@ -736,6 +736,13 @@ $instruction
       _selectedFreeTalkPartnerWord = null;
       _selectedFreeTalkLearnerWord = null;
     });
+    if (!_isFreeTalk) {
+      // "Practice more" is a retry for the current guided phrase: move
+      // directly into the next Record -> Stop turn instead of showing an
+      // extra idle Record state.
+      await _startRecording();
+      return;
+    }
     // Retry owns the learner's next recording. Do not replay or re-inject the
     // current Marie prompt: that makes the tutor sound like it restarted the
     // beat and can mix the old prompt into the new Live turn.
