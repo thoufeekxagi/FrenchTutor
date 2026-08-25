@@ -137,7 +137,16 @@ class InlineCallController {
       onChanged();
       return;
     }
-    await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
+    if (manualLearnerTurns) {
+      // Do not open the learner microphone for the idle/opening-prompt phase.
+      // Guided speaking opens it only from startLearnerTurn(), after the user
+      // taps Record. Gemini's output player is lazy and starts when Marie's
+      // first audio chunk arrives.
+      muted = true;
+      onChanged();
+    } else {
+      await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
+    }
     connecting = false;
     active = true;
     onChanged();

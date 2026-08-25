@@ -154,10 +154,10 @@ class _SpeakingLessonFlowScreenState
       sessionType: _murraySessionType,
       lessonContext: () => _murrayContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
-      // Keep the existing automatic-VAD session for this constrained Live
-      // endpoint. Stop still sends audioStreamEnd, while transcripts remain
-      // deferred until Gemini closes the turn.
-      manualLearnerTurns: false,
+      // Guided speaking is an explicit tap-to-record turn. The microphone is
+      // closed while Marie speaks or waits; Record sends activityStart and
+      // Stop sends activityEnd. Free Talk keeps its conversational VAD path.
+      manualLearnerTurns: !_isFreeTalk,
       openingPrompt: _openingPrompt,
       onUserTranscript: _onMurrayTranscript,
       onTurnComplete: _onMurrayTurnComplete,
