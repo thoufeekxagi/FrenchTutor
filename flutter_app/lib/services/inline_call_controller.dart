@@ -169,8 +169,9 @@ class InlineCallController {
       // not switch the Live socket to the newer activityStart/activityEnd
       // protocol, which is what caused guided sessions to close.
       manualActivityBoundaries: false,
-      deferUserTranscriptUntilTurnComplete:
-          manualLearnerTurns || sessionType == LiveSessionType.speakingGuided,
+      // Speaking screens consume Gemini's input transcript as it settles so
+      // their UI can resolve independently of Marie's spoken-output duration.
+      deferUserTranscriptUntilTurnComplete: false,
       tools: tools,
     );
     audio = a;

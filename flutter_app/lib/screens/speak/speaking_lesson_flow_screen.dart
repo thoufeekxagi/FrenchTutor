@@ -160,9 +160,7 @@ class _SpeakingLessonFlowScreenState
       openingPrompt: _openingPrompt,
       onUserTranscript: _onMurrayTranscript,
       onTurnComplete: _onMurrayTurnComplete,
-      tools: _isFreeTalk
-          ? AgentTool.freeTalkSpeakingPalette
-          : AgentTool.guidedSpeakingPalette,
+      tools: _isFreeTalk ? AgentTool.freeTalkSpeakingPalette : const [],
       onToolCall: _onMurrayToolCall,
       onChanged: () {
         if (mounted) setState(() {});
@@ -253,12 +251,9 @@ this target. Do not answer a pause inside the phrase, and do not advance the
 lesson yourself.
 
 GUIDED RESULT RULE: For a guided speaking phrase, after the learner turn closes,
-call grade_guided_phrase FIRST, before speaking any feedback, exactly once for
-the current step. Include the 1-based step index, whether the target matched,
-the short final transcript, and one brief beginner-friendly feedback sentence.
-The app updates its visual check immediately from this event; do not ask the
-app to grade again and do not call the tool for a future step. After the tool
-call, say the same brief feedback aloud, then stop.
+give one brief beginner-friendly correction or encouragement aloud, then stop.
+The app reads the same Live input transcript directly for its immediate visual
+check. Do not call a grading tool and do not advance to a future step.
 
 FREE TALK RESULT RULE: For a Free Talk beat, after the learner turn closes,
 call grade_free_talk_turn exactly once for the current step. Accept a short,
@@ -406,18 +401,26 @@ $instruction
   }
 
   void _onMurrayTranscript(String transcript) {
-    if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
-    // Gemini flushes the final learner transcript before it sends the
-    // structured grade_guided_phrase tool event. It is evidence for the
-    // eventual result, not a result by itself. Resolving here races the tool
-    // event and produces a false red retry card even when the phrase matched.
+    if (!mounted || _murrayFinalizing) return;
     if (!_isFreeTalk) {
       final cleanTranscript = transcript.trim();
-      if (cleanTranscript.isNotEmpty) {
-        setState(() => _heard = cleanTranscript);
-      }
+      if (cleanTranscript.isEmpty) return;
+      final combined = _heard.trim().isEmpty
+          ? cleanTranscript
+          : '${_heard.trim()} $cleanTranscript';
+      setState(() => _heard = combined);
+      if (!_murrayTurnClosing || _murrayGuidedGradeReceived) return;
+      _murrayGuidedGradeReceived = true;
+      _guidedGradeTimeout?.cancel();
+      _murrayTurnClosing = false;
+      _applyGuidedResult(
+        matched: _matchesTarget(combined, _step.french),
+        heard: combined,
+        feedback: '',
+      );
       return;
     }
+    if (!_murrayTurnClosing) return;
     _murrayFinalizing = true;
     _murrayInputActive = false;
     unawaited(_finishRecording(transcript));
@@ -425,9 +428,19 @@ $instruction
 
   void _onMurrayTurnComplete() {
     if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
-    // The guided result is owned by grade_guided_phrase. turnComplete only
-    // closes Gemini's transport turn and can arrive before that tool call.
-    if (!_isFreeTalk) return;
+    if (!_isFreeTalk) {
+      final transcript = _heard.trim();
+      if (transcript.isEmpty || _murrayGuidedGradeReceived) return;
+      _murrayGuidedGradeReceived = true;
+      _guidedGradeTimeout?.cancel();
+      _murrayTurnClosing = false;
+      _applyGuidedResult(
+        matched: _matchesTarget(transcript, _step.french),
+        heard: transcript,
+        feedback: '',
+      );
+      return;
+    }
     // A quiet/unclear turn still needs to resolve visibly instead of leaving
     // the learner stuck on Checking forever.
     _murrayFinalizing = true;
@@ -634,7 +647,7 @@ $instruction
       _murrayTurnClosing = true;
       setState(() => _state = _SpeakingStepState.checking);
       await _murray.endLearnerTurn();
-      if (!_isFreeTalk) {
+      if (!_isFreeTalk && !_murrayGuidedGradeReceived) {
         _guidedGradeTimeout?.cancel();
         _guidedGradeTimeout = Timer(const Duration(seconds: 20), () {
           if (!mounted ||
