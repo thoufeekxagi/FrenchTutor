@@ -225,8 +225,11 @@ class InlineCallController {
     g.onToolCall = onToolCall;
 
     g.connect();
+    // Token minting may use the full 10-second server timeout before the
+    // Live socket sends setupComplete. Do not report a false connection error
+    // while the proven legacy transport is still starting.
     final connected = await completer.future.timeout(
-      const Duration(seconds: 6),
+      const Duration(seconds: 22),
       onTimeout: () => false,
     );
     if (!connected) {
