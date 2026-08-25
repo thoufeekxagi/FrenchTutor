@@ -164,7 +164,11 @@ class InlineCallController {
       sessionType: sessionType,
       lessonContext: lessonContext(),
       learningStoreForProfile: learningStoreForProfile,
-      manualActivityBoundaries: manualLearnerTurns,
+      // Keep Gemini on the proven legacy audioStreamEnd/automatic-VAD
+      // protocol. manualLearnerTurns only gates the local microphone; it must
+      // not switch the Live socket to the newer activityStart/activityEnd
+      // protocol, which is what caused guided sessions to close.
+      manualActivityBoundaries: false,
       deferUserTranscriptUntilTurnComplete:
           manualLearnerTurns || sessionType == LiveSessionType.speakingGuided,
       tools: tools,
