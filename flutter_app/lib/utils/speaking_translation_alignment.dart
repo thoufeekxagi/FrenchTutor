@@ -49,7 +49,10 @@ class SpeakingTranslationAlignment {
           );
           matchedTargets.add(target);
           if (target.isNotEmpty) {
-            alignment[start + offset].addAll(target);
+            final sourceIndex =
+                start +
+                (offset < rule.source.length ? offset : rule.source.length - 1);
+            alignment[sourceIndex].addAll(target);
           }
         }
         final lastTarget = matchedTargets.lastWhere(
@@ -71,11 +74,27 @@ class SpeakingTranslationAlignment {
       // rendered text, but it is not a translatable word and should never be
       // forced onto an English word.
       if (sourceWords[sourceIndex].isEmpty) continue;
-      final target = _singleWordMeaningFor(sourceWords[sourceIndex]);
-      final matches = target == null
-          ? _findPhrase(translationWords, sourceWords[sourceIndex])
-          : _findPhrase(translationWords, target);
+      final candidates = _possibleMeaningsFor(sourceWords[sourceIndex]);
+      Set<int> matches = const <int>{};
+      for (final candidate in candidates) {
+        final candidateMatches = _findPhrase(translationWords, candidate);
+        if (candidateMatches.isNotEmpty) {
+          matches = candidateMatches.toSet();
+          break;
+        }
+      }
+      if (matches.isEmpty && candidates.isEmpty) {
+        matches = _findPhrase(
+          translationWords,
+          sourceWords[sourceIndex],
+        ).toSet();
+      }
       if (matches.isEmpty) {
+        // Function words often have no one-to-one English word in an
+        // authored sentence (for example “de”, “le”, or the inversion in
+        // “est-ce”). Leave those taps unpaired rather than inventing a
+        // positional match. Content words still fail validation below.
+        if (_isNonLexicalFreeTalkWord(sourceWords[sourceIndex])) continue;
         throw StateError(
           'No Guided Speaking translation alignment for '
           '"$source" → "$translation" at source word '
@@ -130,6 +149,81 @@ class SpeakingTranslationAlignment {
     return null;
   }
 
+  static List<String> _possibleMeaningsFor(String sourceWord) {
+    final contextual = _contextualMeanings[sourceWord] ?? const <String>[];
+    final primary = _singleWordMeaningFor(sourceWord);
+    return [
+      ...contextual,
+      if (primary != null && !contextual.contains(primary)) primary,
+    ];
+  }
+
+  static const _contextualMeanings = <String, List<String>>{
+    'a t il': ['does', 'has', 'did'],
+    'aimeriez vous': ['would like', 'do you like'],
+    'aimez vous': ['do you like', 'like'],
+    'allez': ['are going', 'go', 'do'],
+    'allez vous': ['do you go', 'are you going'],
+    'animal': ['pet', 'animal'],
+    'aide': ['helps', 'help'],
+    'avez vous': ['do you have', 'have you'],
+    'avons': ['have'],
+    'combien': ['how long', 'how much'],
+    'deviez vous': ['were supposed', 'did you'],
+    'heures': ["o'clock", 'hours', 'time'],
+    'lavez': ['have'],
+    'nai': ['did not', 'have not', 'not'],
+    'on': ['they', 'we'],
+    'parle': ['about', 'speak'],
+    'place': ['there', 'place'],
+    'plu': ['liked', 'pleased'],
+    'prenez vous': ['do you have', 'have you'],
+    'quaimeriez vous': ['would you like', 'would like'],
+    'quavez vous': ['what did you', 'what do you have'],
+    'quil': ['it', 'what'],
+    'reçu': ['received', 'receipt'],
+    'sortir': ['going out', 'go out'],
+    'suis': ['am'],
+    'êtes vous': ['are you', 'do you'],
+    'été': ['was', 'been'],
+  };
+
+  static bool _isNonLexicalFreeTalkWord(String sourceWord) => {
+    '/',
+    'a',
+    'à',
+    'au',
+    'aux',
+    'ce',
+    'de',
+    'des',
+    'du',
+    'en',
+    'est ce',
+    'est il',
+    'et',
+    'il',
+    'la',
+    'le',
+    'les',
+    'me',
+    'ne',
+    'ou',
+    'parce',
+    'pour',
+    'que',
+    'quel',
+    'quelle',
+    'quelles',
+    'quels',
+    'qui',
+    'suis',
+    'sur',
+    'un',
+    'une',
+    'y',
+  }.contains(sourceWord);
+
   static const _singleWordMeanings = <String, String>{
     'bonjour': 'hello',
     'je': 'i',
@@ -137,7 +231,7 @@ class SpeakingTranslationAlignment {
     "j'aime": 'i like',
     "j'habite": 'i live',
     "m'appelle": 'name',
-    'comment': 'what',
+    'comment': 'how',
     'appelez-vous': 'name',
     'viens': 'am',
     'ça': 'that',
@@ -182,7 +276,6 @@ class SpeakingTranslationAlignment {
     'va': 'go',
     'au': 'to the',
     'tout': 'straight',
-    'allez': 'go',
     'tournez': 'turn',
     'où': 'where',
     'ici': 'here',
@@ -329,9 +422,437 @@ class SpeakingTranslationAlignment {
     'montréal': 'montreal',
     'ottawa': 'ottawa',
     'lyon': 'lyon',
+    // Free Talk frames and prompts use a wider everyday vocabulary than the
+    // compact Guided catalog. These entries are deliberately authored rather
+    // than positional so a tap never points at an unrelated English word.
+    'il': 'it',
+    'quand': 'when',
+    'qui': 'who',
+    'quel': 'what',
+    'quelle': 'what',
+    'quels': 'what',
+    'quelles': 'what',
+    'pourquoi': 'why',
+    'avez': 'have',
+    'avons': 'have',
+    'faites-vous': 'do',
+    'étudiez': 'study',
+    'habitez-vous': 'live',
+    'levez-vous': 'get up',
+    'couchez-vous': 'go to bed',
+    'mange': 'eat',
+    'manger': 'eat',
+    'mangez-vous': 'eat',
+    'allez-vous': 'go',
+    'regarde': 'watch',
+    'écoute': 'listen',
+    'l’écoute': 'listen',
+    'l’écoutez': 'listen',
+    'écoutez': 'listen',
+    'bois': 'drink',
+    'buvez': 'drink',
+    'prends': 'have',
+    'prenez': 'have',
+    'dois': 'need',
+    'acheter': 'buy',
+    'achète': 'buy',
+    'souvent': 'often',
+    'travaille': 'work',
+    'porte': 'wearing',
+    'portez': 'wearing',
+    'préférée': 'favorite',
+    'préférez': 'prefer',
+    'anniversaire': 'birthday',
+    'jour-là': 'that day',
+    'recevoir': 'receive',
+    'pendant': 'during',
+    'sortir': 'go out',
+    'rester': 'stay',
+    'chez': 'at',
+    'centre-ville': 'downtown',
+    'quartier': 'neighborhood',
+    'endroit': 'place',
+    'travail': 'work',
+    'cours': 'shopping',
+    'cadeau': 'gift',
+    'petit-déjeuner': 'breakfast',
+    'céréales': 'cereal',
+    'transport': 'transport',
+    'trajet': 'journey',
+    'dure': 'takes',
+    'moyen': 'means',
+    'animal': 'animal',
+    'animaux': 'animals',
+    'ressemble-t-il': 'look',
+    'allé(e)': 'went',
+    'récemment': 'recently',
+    'plu': 'liked',
+    'habitions': 'lived',
+    'avant': 'before',
+    'différent': 'different',
+    'différente': 'different',
+    'logement': 'home',
+    'commandé': 'ordered',
+    'repas': 'meal',
+    'était': 'was',
+    'recommanderiez-vous': 'recommend',
+    'habitude': 'habit',
+    'importante': 'important',
+    'santé': 'health',
+    'déjà': 'already',
+    'j’aimerais': 'would like',
+    'normale': 'normal',
+    'ressemble': 'like',
+    'chargé(e)': 'responsible',
+    'tâche': 'task',
+    'difficile': 'difficult',
+    'apprenez-vous': 'learning',
+    'progresser': 'improve',
+    'objectif': 'goal',
+    'voudrais': 'would like',
+    'partiriez-vous': 'leave',
+    'visiter': 'visit',
+    'livraison': 'delivery',
+    'colis': 'parcel',
+    'devait': 'supposed',
+    'arriver': 'arrive',
+    'demandez-vous': 'ask',
+    'service': 'service',
+    'client': 'customer',
+    'film': 'film',
+    'vu': 'saw',
+    'parle-t-il': 'about',
+    'aimé': 'liked',
+    'changement': 'change',
+    'existe': 'existed',
+    'depuis': 'since',
+    'pense': 'think',
+    'chose': 'thing',
+    'j’étais': 'was',
+    'étais': 'was',
+    'enfant': 'child',
+    'j’habitais': 'lived',
+    'aimais': 'liked',
+    'jouais': 'played',
+    'jouiez-vous': 'play',
+    'prochains': 'next',
+    'mois': 'months',
+    'projet': 'project',
+    'important': 'important',
+    'étape': 'step',
+    'prochaine': 'next',
+    'voyager': 'traveling',
+    'avantages': 'advantages',
+    'avantage': 'advantage',
+    'pratique': 'convenient',
+    'choisi': 'chose',
+    'satisfait(e)': 'satisfied',
+    'événement': 'event',
+    'voulez-vous': 'want',
+    'organiser': 'organize',
+    'inviter': 'invite',
+    'ami(e)': 'friend',
+    'conseil': 'advice',
+    'conseille': 'advise',
+    'lui': 'them',
+    'donner': 'give',
+    'utile': 'useful',
+    'décision': 'decision',
+    'prise': 'made',
+    'résultat': 'result',
+    'décidé': 'decided',
+    'qu’est-ce': 'what',
+    'est-ce': 'is',
+    'qu’avez-vous': 'have',
+    'avez-vous': 'have',
+    'êtes-vous': 'are',
+    'aimez-vous': 'like',
+    'aimeriez-vous': 'would like',
+    'quaimeriez-vous': 'would like',
+    'deviez-vous': 'were supposed',
+    'travaillez-vous': 'work',
+    'étudiez-vous': 'study',
+    'a-t-il': 'does',
+    'est-il': 'is',
+    'chaud': 'hot',
+    'pleut': 'rains',
+    'ensemble': 'together',
+    'dans': 'in',
+    'pièce': 'room',
+    'près': 'near',
+    'fais': 'do',
+    'j’achète': 'buy',
+    'j’ai': 'i',
+    'j’aimais': 'liked',
+    'j’apprends': 'learning',
+    'j’en': 'it',
+    'j’écoute': 'listen',
+    'j’étudie': 'study',
+    'l’ai': 'it',
+    'l’aime': 'like',
+    'l’avantage': 'advantage',
+    'je n’ai': 'did not',
+    'je n’aime': 'do not like',
+    'parce': 'because',
+    'année': 'year',
+    'commence': 'starts',
+    'sont': 'are',
+    'fini': 'finished',
+    'en': 'by',
+    'partirais': 'leave',
+    'vos': 'your',
+    'naime': 'like',
+    'nai': 'did not',
+    'laime': 'like',
+    'jai': 'i',
+    'japprends': 'learning',
+    'jécoute': 'listen',
+    'jétudie': 'study',
+    'lavantage': 'advantage',
+    'jen': 'it',
+    'faites': 'do',
+    'maison': 'home',
+    'nous': 'we',
+    'acheté': 'bought',
+    'achetez': 'buy',
+    'aimiez': 'like',
+    'aller': 'go',
+    'allez': 'go',
+    'avion': 'plane',
+    'faire': 'do',
+    'regardez': 'watch',
+    'travaillez': 'work',
+    'ville': 'city',
+    'aimeriez': 'would like',
+    'changé': 'changed',
+    'elle': 'she',
+    'lavez': 'have',
+    'magasins': 'shopping',
+    'préférez-vous': 'prefer',
+    'prenez-vous': 'have',
+    'recommande': 'recommend',
+    'thé': 'tea',
+    'êtes': 'are',
+    'quoi': 'what',
   };
 
   static const _rules = <_AlignmentRule>[
+    // Free Talk's open frames use ordinary conversational grammar. Keep the
+    // multi-word meaning together before the single-word dictionary runs.
+    _AlignmentRule(
+      ["qu'est-ce", 'que', 'vous', 'faites', 'quand', 'il', 'pleut'],
+      ['what', 'do', 'you', 'do', 'when', 'it', 'rains'],
+    ),
+    _AlignmentRule(
+      ['vous', 'avez', 'une', 'grande', 'famille'],
+      ['do you', 'have', 'a', 'big', 'family'],
+    ),
+    _AlignmentRule(['nous', 'aimons'], ['we', 'like to']),
+    _AlignmentRule(
+      ['vous', 'habitez', 'dans', 'une', 'maison', 'ou', 'un', 'appartement'],
+      ['do you', 'live', 'in', 'a', 'house', 'or', 'an', 'apartment'],
+    ),
+    _AlignmentRule(["j'habite", 'dans'], ['i live', 'in']),
+    _AlignmentRule(
+      ['près', 'de', 'chez', 'moi'],
+      ['near', 'my', 'home', 'home'],
+    ),
+    _AlignmentRule(
+      ["qu'est-ce", "qu'il", 'y', 'a', 'près', 'de', 'chez', 'vous'],
+      ['what', 'is', 'near', 'your', 'home'],
+    ),
+    _AlignmentRule(
+      ["qu'est-ce", 'que', 'vous', 'aimez', 'faire'],
+      ['what', 'do', 'you', 'like', 'to do'],
+    ),
+    _AlignmentRule(['je', 'le', 'fais'], ['i', 'do', 'it']),
+    _AlignmentRule(
+      ['quand', 'est-ce', 'que', 'vous', 'le', 'faites'],
+      ['when', 'do', 'you', 'do', 'it'],
+    ),
+    _AlignmentRule(
+      ['vous', 'le', 'faites', 'avec', 'qui'],
+      ['who', 'do', 'you', 'do it with'],
+    ),
+    _AlignmentRule(['je', 'me', 'lève', 'à'], ['i', 'get up', 'at']),
+    _AlignmentRule(['je', 'vais'], ['i', 'go']),
+    _AlignmentRule(
+      ['comment', 'allez-vous', 'au', 'travail', 'ou', 'à', 'l’école'],
+      ['how', 'do you go', 'to', 'work', 'or', 'school'],
+    ),
+    _AlignmentRule(['après', 'le', 'travail'], ['after', 'work']),
+    _AlignmentRule(
+      ['que', 'faites-vous', 'après', 'le', 'travail'],
+      ['what', 'do you do', 'after', 'work'],
+    ),
+    _AlignmentRule(
+      ['je', 'regarde', '/', "j'écoute"],
+      ['i', 'watch', '/', 'i listen to'],
+    ),
+    _AlignmentRule(
+      ["qu'est-ce", 'que', 'vous', 'regardez', 'ou', 'écoutez'],
+      ['what', 'do', 'you', 'watch', 'or', 'listen to'],
+    ),
+    _AlignmentRule(
+      ["qu'est-ce", 'que', 'vous', 'devez', 'acheter'],
+      ['what', 'do you need to buy'],
+    ),
+    _AlignmentRule(['je', 'fais', 'mes', 'courses'], ['i', 'shop']),
+    _AlignmentRule(
+      ['où', 'faites-vous', 'vos', 'courses'],
+      ['where', 'do you shop'],
+    ),
+    _AlignmentRule(["j'achète", 'souvent'], ['i', 'buy', 'often']),
+    _AlignmentRule(
+      ["qu'est-ce", 'que', 'vous', 'achetez', 'souvent'],
+      ['what', 'do', 'you', 'buy', 'often'],
+    ),
+    _AlignmentRule(
+      ['dans', 'mon', 'quartier', 'il', 'y', 'a'],
+      ['in', 'my', 'neighborhood', 'there is'],
+    ),
+    _AlignmentRule(
+      ['quel', 'endroit', 'aimez-vous'],
+      ['which', 'place', 'do you like'],
+    ),
+    _AlignmentRule(['je', 'me', 'couche', 'à'], ['i', 'go to bed', 'at']),
+    _AlignmentRule(
+      ['comment', 'allez-vous', 'au', 'centre-ville'],
+      ['how', 'do you', 'get', 'downtown'],
+    ),
+    _AlignmentRule(
+      ['comment', 'allez-vous', 'en', 'ville'],
+      ['how', 'do you', 'get around', 'the city'],
+    ),
+    _AlignmentRule(
+      ['pendant', 'mon', 'temps', 'libre', 'je'],
+      ['in', 'my', 'free time', 'i'],
+    ),
+    _AlignmentRule(
+      [
+        "qu'est-ce",
+        'que',
+        'vous',
+        'faites',
+        'pendant',
+        'votre',
+        'temps',
+        'libre',
+      ],
+      ['what', 'do you do', 'in', 'your', 'free time'],
+    ),
+    _AlignmentRule(
+      ['vous', 'préférez', 'sortir', 'ou', 'rester', 'chez', 'vous'],
+      ['do you prefer', 'going out', 'or', 'staying home'],
+    ),
+    _AlignmentRule(['vous', 'allez', 'sortir'], ['are you', 'going out']),
+    _AlignmentRule(
+      ['combien', 'de', 'temps', 'dure', 'le', 'trajet'],
+      ['how long', 'does', 'the', 'journey', 'take'],
+    ),
+    _AlignmentRule(['il', 'est'], ['it', 'is']),
+    _AlignmentRule(['elle', 'est'], ['it', 'is']),
+    _AlignmentRule(
+      ['où', 'êtes-vous', 'allé(e)', 'récemment'],
+      ['where', 'did you go', 'recently'],
+    ),
+    _AlignmentRule(['sur', 'place', "j'ai"], ['there', 'i']),
+    _AlignmentRule(
+      ["qu'avez-vous", 'fait', 'sur', 'place'],
+      ['what did you do', 'there'],
+    ),
+    _AlignmentRule(
+      ["qu'est-ce", 'qui', 'vous', 'a', 'plu'],
+      ['what', 'did you like'],
+    ),
+    _AlignmentRule(
+      ['où', 'habitiez-vous', 'avant'],
+      ['where', 'did you live', 'before'],
+    ),
+    _AlignmentRule(
+      ['quel', 'plat', "avez-vous", 'commandé'],
+      ['what', 'dish', 'did you', 'order'],
+    ),
+    _AlignmentRule(['je', 'fais', 'déjà'], ['i', 'already']),
+    _AlignmentRule(
+      ["qu'aimeriez-vous", 'changer'],
+      ['what', 'would you like', 'to change'],
+    ),
+    _AlignmentRule(
+      ['à', 'quoi', 'ressemble', 'une', 'journée', 'de', 'travail', 'normale'],
+      ['what', 'is', 'a normal workday', 'like'],
+    ),
+    _AlignmentRule(
+      ['quelle', 'tâche', 'prenez-vous', 'en', 'charge'],
+      ['which', 'task', 'are you responsible for'],
+    ),
+    _AlignmentRule(
+      ['le', 'plus', 'difficile', "c'est"],
+      ['the', 'most difficult thing', 'is'],
+    ),
+    _AlignmentRule(
+      ["où", 'aimeriez-vous', 'aller'],
+      ['where', 'would you like', 'to go'],
+    ),
+    _AlignmentRule(['je', "n'ai", 'pas', 'reçu'], ['i', 'did not', 'receive']),
+    _AlignmentRule(
+      ['quand', 'deviez-vous', 'recevoir', 'le', 'colis'],
+      ['when', 'were you supposed', 'to receive', 'the', 'parcel'],
+    ),
+    _AlignmentRule(
+      ['quel', 'film', "avez-vous", 'vu', 'récemment'],
+      ['what', 'film', 'did you', 'see', 'recently'],
+    ),
+    _AlignmentRule(
+      ["est-ce", 'que', 'vous', "l'avez", 'aimé'],
+      ['did', 'you', 'like', 'it'],
+    ),
+    _AlignmentRule(
+      ['dans', 'ma', 'ville', 'on', 'a'],
+      ['in', 'my', 'city', 'they have'],
+    ),
+    _AlignmentRule(
+      ['depuis', 'quand', 'ce', 'changement', 'existe-t-il'],
+      ['how long', 'has', 'this', 'change', 'existed'],
+    ),
+    _AlignmentRule(
+      ['où', 'habitiez-vous', 'quand', 'vous', 'étiez', 'enfant'],
+      ['where', 'did you live', 'when', 'you', 'were', 'a child'],
+    ),
+    _AlignmentRule(
+      ["qu'avez-vous", 'acheté', 'récemment'],
+      ['what did you', 'buy', 'recently'],
+    ),
+    _AlignmentRule(
+      ['pourquoi', "avez-vous", 'choisi', 'cet', 'article'],
+      ['why', 'did you', 'choose', 'this', 'item'],
+    ),
+    _AlignmentRule(
+      ['qui', 'allez-vous', 'inviter'],
+      ['who', 'are you going to', 'invite'],
+    ),
+    _AlignmentRule(['nous', 'avons', 'besoin', 'de'], ['we', 'need']),
+    _AlignmentRule(
+      ['de', 'quoi', "avez-vous", 'besoin'],
+      ['what', 'do you need'],
+    ),
+    _AlignmentRule(
+      ['quel', 'problème', 'votre', 'ami(e)', 'a-t-il', 'ou', 'a-t-elle'],
+      ['what', 'problem', 'does', 'your', 'friend', 'have'],
+    ),
+    _AlignmentRule(
+      ['quelle', 'décision', "avez-vous", 'prise', 'récemment'],
+      ['what', 'decision', 'did you', 'make', 'recently'],
+    ),
+    _AlignmentRule(
+      ['pourquoi', "avez-vous", 'choisi', 'cette', 'solution'],
+      ['why', 'did you', 'choose', 'this', 'solution'],
+    ),
+    _AlignmentRule(['le', 'résultat', 'a', 'été'], ['the', 'result', 'was']),
+    _AlignmentRule(
+      ['quel', 'a', 'été', 'le', 'résultat'],
+      ['what', 'was', 'the', 'result'],
+    ),
     _AlignmentRule(['je', "m'appelle"], ['my', 'name is']),
     _AlignmentRule(
       ["qu'est-ce", 'que', 'vous', 'conseillez'],

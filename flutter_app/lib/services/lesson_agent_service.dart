@@ -1177,12 +1177,15 @@ Write one short, level-calibrated French Free Talk lesson for a learner at
 LEVEL $levelBand. The app will show the character's prompt, then ask the
 learner to answer aloud in the same fixed lesson context. Return ONLY compact
 JSON with exactly this shape:
-{"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}]}
+{"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "hint_words": [string, ...], "hint_words_en": [string, ...], "grammar_note": string, "pronunciation_tip": string}]}
 
 Create exactly 3 or 4 beats that stay on one ordinary topic. The character
 prompt must be a natural question or short follow-up. `learner_fr` must be a
-useful sentence starter or model answer the learner can adapt; `learner_en`
-must be its exact English meaning. Keep it a speaking lesson, not a vocabulary
+short sentence frame the learner completes aloud; `learner_en` must be its
+exact English meaning. `hint_words` must contain 3 to 6 short French words or
+short word groups that complete or extend that frame. `hint_words_en` must give
+the exact English meaning for each hint in the same order. Do not put a completed
+sentence in `hint_words`. Keep it a speaking lesson, not a vocabulary
 list, essay, story, or roleplay catalog. Do not add extra fields or markdown.
 Avoid these existing titles: ${titles.isEmpty ? '(none)' : titles}.
 
@@ -2688,6 +2691,18 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
             pronunciationTip: s['pronunciation_tip'] as String? ?? '',
             characterFr: s['character_fr'] as String?,
             characterEn: s['character_en'] as String?,
+            hintWords:
+                (s['hint_words'] as List?)
+                    ?.map((word) => word.toString().trim())
+                    .where((word) => word.isNotEmpty)
+                    .toList(growable: false) ??
+                const [],
+            hintWordsEnglish:
+                (s['hint_words_en'] as List?)
+                    ?.map((word) => word.toString().trim())
+                    .where((word) => word.isNotEmpty)
+                    .toList(growable: false) ??
+                const [],
           ),
         )
         .toList();

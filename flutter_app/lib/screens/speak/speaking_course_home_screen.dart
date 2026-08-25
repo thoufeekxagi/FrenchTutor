@@ -567,6 +567,35 @@ class _SpeakingCourseHomeScreenState
         )) {
       throw StateError('Generated speaking scene has an incomplete prompt.');
     }
+    if (mode == SpeakingCourseMode.freeTalk) {
+      for (final segment in passage.segments) {
+        if (segment.fr.trim().isEmpty || segment.en.trim().isEmpty) {
+          throw StateError(
+            'Generated Free Talk beat is missing its French frame or English meaning.',
+          );
+        }
+        if (segment.characterEn?.trim().isNotEmpty != true) {
+          throw StateError(
+            'Generated Free Talk beat is missing the tutor English meaning.',
+          );
+        }
+        if (segment.hintWords.length < 3) {
+          throw StateError(
+            'Generated Free Talk beat needs at least three independent hint words.',
+          );
+        }
+        if (segment.hintWordsEnglish.length != segment.hintWords.length) {
+          throw StateError(
+            'Generated Free Talk hint words must have matching English meanings.',
+          );
+        }
+        SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en);
+        SpeakingTranslationAlignment.forPhrase(
+          segment.characterFr!,
+          segment.characterEn ?? '',
+        );
+      }
+    }
     final lines = passage.segments
         .map(
           (segment) => SpeakingCourseLine(
@@ -575,6 +604,17 @@ class _SpeakingCourseHomeScreenState
             partnerFrench: segment.characterFr,
             partnerEnglish: segment.characterEn,
             tip: segment.pronunciationTip,
+            hintWords: segment.hintWords,
+            hintWordsEnglish: segment.hintWordsEnglish,
+            translationAlignment: mode == SpeakingCourseMode.freeTalk
+                ? SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en)
+                : null,
+            partnerTranslationAlignment: mode == SpeakingCourseMode.freeTalk
+                ? SpeakingTranslationAlignment.forPhrase(
+                    segment.characterFr!,
+                    segment.characterEn ?? '',
+                  )
+                : null,
             openResponse: mode == SpeakingCourseMode.freeTalk,
           ),
         )
@@ -621,6 +661,11 @@ class _SpeakingCourseHomeScreenState
                       partnerFrench: line.partnerFrench,
                       partnerEnglish: line.partnerEnglish,
                       tip: line.tip,
+                      hintWords: line.hintWords,
+                      hintWordsEnglish: line.hintWordsEnglish,
+                      translationAlignment: line.translationAlignment,
+                      partnerTranslationAlignment:
+                          line.partnerTranslationAlignment,
                       openResponse: line.openResponse,
                     ),
                 ],

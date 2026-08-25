@@ -1,5 +1,495 @@
 part of 'speaking_course.dart';
 
+class _FreeTalkHintSet {
+  const _FreeTalkHintSet({required this.french, required this.english});
+
+  final List<String> french;
+  final List<String> english;
+}
+
+const _preparedFreeTalkHints = <String, List<_FreeTalkHintSet>>{
+  'speaking_free_a1_weather': [
+    _FreeTalkHintSet(
+      french: ['chaud', 'froid', 'beau'],
+      english: ['hot', 'cold', 'nice'],
+    ),
+    _FreeTalkHintSet(
+      french: ['très chaud', 'un peu froid', 'agréable'],
+      english: ['very hot', 'a little cold', 'pleasant'],
+    ),
+    _FreeTalkHintSet(
+      french: ['reste à la maison', 'lis un livre', 'regarde un film'],
+      english: ['stay home', 'read a book', 'watch a film'],
+    ),
+  ],
+  'speaking_free_a1_family': [
+    _FreeTalkHintSet(
+      french: ['grande', 'petite', 'nombreuse'],
+      english: ['big', 'small', 'large'],
+    ),
+    _FreeTalkHintSet(
+      french: ['ma mère', 'mon frère', 'une amie'],
+      english: ['my mother', 'my brother', 'a friend'],
+    ),
+    _FreeTalkHintSet(
+      french: ['mangeons ensemble', 'regardons un film', 'sortons'],
+      english: ['eat together', 'watch a film', 'go out'],
+    ),
+  ],
+  'speaking_free_a1_home': [
+    _FreeTalkHintSet(
+      french: ['une maison', 'un appartement', 'un studio'],
+      english: ['a house', 'an apartment', 'a studio'],
+    ),
+    _FreeTalkHintSet(
+      french: ['la cuisine', 'la chambre', 'le salon'],
+      english: ['the kitchen', 'the bedroom', 'the living room'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un parc', 'une école', 'un magasin'],
+      english: ['a park', 'a school', 'a shop'],
+    ),
+  ],
+  'speaking_free_a1_hobbies': [
+    _FreeTalkHintSet(
+      french: ['lire', 'cuisiner', 'faire du sport'],
+      english: ['read', 'cook', 'exercise'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le soir', 'le week-end', 'après le travail'],
+      english: ['in the evening', 'on weekends', 'after work'],
+    ),
+    _FreeTalkHintSet(
+      french: ['avec un ami', 'avec ma famille', 'seul'],
+      english: ['with a friend', 'with my family', 'alone'],
+    ),
+  ],
+  'speaking_free_a1_morning': [
+    _FreeTalkHintSet(
+      french: ['à sept heures', 'à huit heures', 'à neuf heures'],
+      english: ['at seven', 'at eight', 'at nine'],
+    ),
+    _FreeTalkHintSet(
+      french: ['du pain', 'un fruit', 'un yaourt'],
+      english: ['bread', 'a fruit', 'a yogurt'],
+    ),
+    _FreeTalkHintSet(
+      french: ['en bus', 'à pied', 'en voiture'],
+      english: ['by bus', 'on foot', 'by car'],
+    ),
+  ],
+  'speaking_free_a1_evening': [
+    _FreeTalkHintSet(
+      french: ['je rentre', 'je me repose', 'je cuisine'],
+      english: ['I go home', 'I rest', 'I cook'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un film', 'la télévision', 'de la musique'],
+      english: ['a film', 'television', 'music'],
+    ),
+    _FreeTalkHintSet(
+      french: ['à dix heures', 'à onze heures', 'vers minuit'],
+      english: ['at ten', 'at eleven', 'around midnight'],
+    ),
+  ],
+  'speaking_free_a1_shopping': [
+    _FreeTalkHintSet(
+      french: ['du lait', 'des pommes', 'du pain'],
+      english: ['milk', 'apples', 'bread'],
+    ),
+    _FreeTalkHintSet(
+      french: ['au marché', 'au supermarché', 'près de chez moi'],
+      english: ['at the market', 'at the supermarket', 'near my home'],
+    ),
+    _FreeTalkHintSet(
+      french: ['des légumes', 'du café', 'des œufs'],
+      english: ['vegetables', 'coffee', 'eggs'],
+    ),
+  ],
+  'speaking_free_a1_neighborhood': [
+    _FreeTalkHintSet(
+      french: ['un parc', 'une pharmacie', 'un café'],
+      english: ['a park', 'a pharmacy', 'a café'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le parc', 'le marché', 'le café'],
+      english: ['the park', 'the market', 'the café'],
+    ),
+    _FreeTalkHintSet(
+      french: ['en bus', 'à pied', 'en métro'],
+      english: ['by bus', 'on foot', 'by subway'],
+    ),
+  ],
+  'speaking_free_a1_school': [
+    _FreeTalkHintSet(
+      french: ['au travail', 'à l’école', 'à l’université'],
+      english: ['at work', 'at school', 'at university'],
+    ),
+    _FreeTalkHintSet(
+      french: ['je travaille', 'j’étudie', 'je déjeune'],
+      english: ['I work', 'I study', 'I have lunch'],
+    ),
+    _FreeTalkHintSet(
+      french: ['la musique', 'le sport', 'la lecture'],
+      english: ['music', 'sport', 'reading'],
+    ),
+  ],
+  'speaking_free_a1_colors': [
+    _FreeTalkHintSet(
+      french: ['une chemise', 'un pantalon', 'une robe'],
+      english: ['a shirt', 'trousers', 'a dress'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le bleu', 'le rouge', 'le vert'],
+      english: ['blue', 'red', 'green'],
+    ),
+    _FreeTalkHintSet(
+      french: ['les vêtements', 'les chaussures', 'les magasins'],
+      english: ['clothes', 'shoes', 'shops'],
+    ),
+  ],
+  'speaking_free_a1_music': [
+    _FreeTalkHintSet(
+      french: ['la pop', 'le jazz', 'la musique classique'],
+      english: ['pop', 'jazz', 'classical music'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le matin', 'le soir', 'en voiture'],
+      english: ['in the morning', 'in the evening', 'in the car'],
+    ),
+    _FreeTalkHintSet(
+      french: ['avec un ami', 'avec ma sœur', 'seul'],
+      english: ['with a friend', 'with my sister', 'alone'],
+    ),
+  ],
+  'speaking_free_a1_birthday': [
+    _FreeTalkHintSet(
+      french: ['en janvier', 'en juin', 'en décembre'],
+      english: ['in January', 'in June', 'in December'],
+    ),
+    _FreeTalkHintSet(
+      french: ['je mange un gâteau', 'je fais la fête', 'je vois ma famille'],
+      english: ['I eat cake', 'I celebrate', 'I see my family'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un livre', 'un voyage', 'un vêtement'],
+      english: ['a book', 'a trip', 'a piece of clothing'],
+    ),
+  ],
+  'speaking_free_a1_breakfast': [
+    _FreeTalkHintSet(
+      french: ['du pain', 'un œuf', 'des céréales'],
+      english: ['bread', 'an egg', 'cereal'],
+    ),
+    _FreeTalkHintSet(
+      french: ['du café', 'du thé', 'de l’eau'],
+      english: ['coffee', 'tea', 'water'],
+    ),
+    _FreeTalkHintSet(
+      french: ['à la maison', 'au café', 'au travail'],
+      english: ['at home', 'at the café', 'at work'],
+    ),
+  ],
+  'speaking_free_a1_free_time': [
+    _FreeTalkHintSet(
+      french: ['je lis', 'je marche', 'je regarde un film'],
+      english: ['I read', 'I walk', 'I watch a film'],
+    ),
+    _FreeTalkHintSet(
+      french: ['sortir', 'rester chez moi', 'voir des amis'],
+      english: ['go out', 'stay home', 'see friends'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’est amusant', 'c’est calme', 'c’est pratique'],
+      english: ['it is fun', 'it is calm', 'it is practical'],
+    ),
+  ],
+  'speaking_free_a1_simple_plans': [
+    _FreeTalkHintSet(
+      french: ['travailler', 'faire des courses', 'voir un ami'],
+      english: ['work', 'go shopping', 'see a friend'],
+    ),
+    _FreeTalkHintSet(
+      french: ['sortir', 'rester chez moi', 'aller au cinéma'],
+      english: ['go out', 'stay home', 'go to the cinema'],
+    ),
+    _FreeTalkHintSet(
+      french: ['à huit heures', 'à midi', 'à dix-huit heures'],
+      english: ['at eight', 'at noon', 'at six p.m.'],
+    ),
+  ],
+  'speaking_free_a1_transport': [
+    _FreeTalkHintSet(
+      french: ['en bus', 'en métro', 'à vélo'],
+      english: ['by bus', 'by subway', 'by bike'],
+    ),
+    _FreeTalkHintSet(
+      french: ['trente minutes', 'une heure', 'un quart d’heure'],
+      english: ['thirty minutes', 'one hour', 'a quarter of an hour'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’est rapide', 'c’est pratique', 'c’est bon marché'],
+      english: ['it is fast', 'it is convenient', 'it is inexpensive'],
+    ),
+  ],
+  'speaking_free_a1_animals': [
+    _FreeTalkHintSet(
+      french: ['un chien', 'un chat', 'un cheval'],
+      english: ['a dog', 'a cat', 'a horse'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un chien', 'un chat', 'un poisson'],
+      english: ['a dog', 'a cat', 'a fish'],
+    ),
+    _FreeTalkHintSet(
+      french: ['grand', 'petit', 'très gentil'],
+      english: ['big', 'small', 'very kind'],
+    ),
+  ],
+  'speaking_free_a2_last_trip': [
+    _FreeTalkHintSet(
+      french: ['à Paris', 'à Montréal', 'en France'],
+      english: ['to Paris', 'to Montreal', 'in France'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'j’ai visité un musée',
+        'j’ai mangé au restaurant',
+        'j’ai marché',
+      ],
+      english: ['I visited a museum', 'I ate at a restaurant', 'I walked'],
+    ),
+    _FreeTalkHintSet(
+      french: ['la ville', 'la cuisine', 'le paysage'],
+      english: ['the city', 'the food', 'the scenery'],
+    ),
+  ],
+  'speaking_free_a2_home_compare': [
+    _FreeTalkHintSet(
+      french: ['dans une maison', 'à Montréal', 'dans un appartement'],
+      english: ['in a house', 'in Montreal', 'in an apartment'],
+    ),
+    _FreeTalkHintSet(
+      french: ['plus grand', 'plus calme', 'plus moderne'],
+      english: ['bigger', 'quieter', 'more modern'],
+    ),
+    _FreeTalkHintSet(
+      french: ['ma maison', 'mon appartement', 'le premier logement'],
+      english: ['my house', 'my apartment', 'the first home'],
+    ),
+  ],
+  'speaking_free_a2_restaurant': [
+    _FreeTalkHintSet(
+      french: ['un steak', 'une soupe', 'un plat de poisson'],
+      english: ['a steak', 'a soup', 'a fish dish'],
+    ),
+    _FreeTalkHintSet(
+      french: ['très bon', 'un peu salé', 'délicieux'],
+      english: ['very good', 'a little salty', 'delicious'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le service', 'la nourriture', 'le prix'],
+      english: ['the service', 'the food', 'the price'],
+    ),
+  ],
+  'speaking_free_a2_health': [
+    _FreeTalkHintSet(
+      french: ['bien dormir', 'faire du sport', 'manger équilibré'],
+      english: ['sleep well', 'exercise', 'eat a balanced diet'],
+    ),
+    _FreeTalkHintSet(
+      french: ['je marche', 'je bois de l’eau', 'je cuisine'],
+      english: ['I walk', 'I drink water', 'I cook'],
+    ),
+    _FreeTalkHintSet(
+      french: ['faire une pause', 'mieux dormir', 'moins travailler'],
+      english: ['take a break', 'sleep better', 'work less'],
+    ),
+  ],
+  'speaking_free_a2_workday': [
+    _FreeTalkHintSet(
+      french: ['à huit heures', 'avec un café', 'au bureau'],
+      english: ['at eight', 'with a coffee', 'at the office'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un projet', 'les clients', 'les réunions'],
+      english: ['a project', 'the clients', 'the meetings'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le temps', 'les appels', 'les délais'],
+      english: ['the time', 'the calls', 'the deadlines'],
+    ),
+  ],
+  'speaking_free_a2_french': [
+    _FreeTalkHintSet(
+      french: ['pour le travail', 'pour voyager', 'pour ma famille'],
+      english: ['for work', 'for travel', 'for my family'],
+    ),
+    _FreeTalkHintSet(
+      french: ['je lis', 'je parle', 'je pratique'],
+      english: ['I read', 'I speak', 'I practise'],
+    ),
+    _FreeTalkHintSet(
+      french: ['parler couramment', 'passer un examen', 'vivre en France'],
+      english: ['speak fluently', 'take an exam', 'live in France'],
+    ),
+  ],
+  'speaking_free_a2_trip_plan': [
+    _FreeTalkHintSet(
+      french: ['au Japon', 'en Italie', 'à Québec'],
+      english: ['to Japan', 'to Italy', 'to Quebec City'],
+    ),
+    _FreeTalkHintSet(
+      french: ['en juillet', 'la semaine prochaine', 'au printemps'],
+      english: ['in July', 'next week', 'in spring'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un musée', 'la vieille ville', 'un château'],
+      english: ['a museum', 'the old town', 'a castle'],
+    ),
+  ],
+  'speaking_free_a2_delivery': [
+    _FreeTalkHintSet(
+      french: ['mon colis', 'ma commande', 'le produit'],
+      english: ['my parcel', 'my order', 'the product'],
+    ),
+    _FreeTalkHintSet(
+      french: ['hier', 'lundi', 'la semaine dernière'],
+      english: ['yesterday', 'on Monday', 'last week'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un remboursement', 'une nouvelle livraison', 'de l’aide'],
+      english: ['a refund', 'a new delivery', 'help'],
+    ),
+  ],
+  'speaking_free_a2_movie': [
+    _FreeTalkHintSet(
+      french: ['un film français', 'une comédie', 'un documentaire'],
+      english: ['a French film', 'a comedy', 'a documentary'],
+    ),
+    _FreeTalkHintSet(
+      french: ['une histoire', 'une famille', 'un voyage'],
+      english: ['a story', 'a family', 'a journey'],
+    ),
+    _FreeTalkHintSet(
+      french: ['les acteurs', 'la musique', 'la fin'],
+      english: ['the actors', 'the music', 'the ending'],
+    ),
+  ],
+  'speaking_free_a2_neighborhood_change': [
+    _FreeTalkHintSet(
+      french: ['une nouvelle ligne', 'un parc', 'une école'],
+      english: ['a new line', 'a park', 'a school'],
+    ),
+    _FreeTalkHintSet(
+      french: ['l’année dernière', 'depuis juin', 'récemment'],
+      english: ['last year', 'since June', 'recently'],
+    ),
+    _FreeTalkHintSet(
+      french: ['utile', 'pratique', 'important'],
+      english: ['useful', 'practical', 'important'],
+    ),
+  ],
+  'speaking_free_a2_childhood': [
+    _FreeTalkHintSet(
+      french: ['à la campagne', 'en ville', 'près de la mer'],
+      english: ['in the countryside', 'in the city', 'near the sea'],
+    ),
+    _FreeTalkHintSet(
+      french: ['jouer dehors', 'lire', 'faire du vélo'],
+      english: ['play outside', 'read', 'ride a bike'],
+    ),
+    _FreeTalkHintSet(
+      french: ['mon frère', 'ma sœur', 'mes amis'],
+      english: ['my brother', 'my sister', 'my friends'],
+    ),
+  ],
+  'speaking_free_a2_future': [
+    _FreeTalkHintSet(
+      french: ['apprendre une langue', 'changer de travail', 'voyager'],
+      english: ['learn a language', 'change jobs', 'travel'],
+    ),
+    _FreeTalkHintSet(
+      french: ['pour ma famille', 'pour mon travail', 'pour moi'],
+      english: ['for my family', 'for my work', 'for me'],
+    ),
+    _FreeTalkHintSet(
+      french: ['faire un plan', 'chercher des informations', 'commencer'],
+      english: ['make a plan', 'look for information', 'start'],
+    ),
+  ],
+  'speaking_free_a2_travel_preference': [
+    _FreeTalkHintSet(
+      french: ['en train', 'en avion', 'en voiture'],
+      english: ['by train', 'by plane', 'by car'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’est confortable', 'c’est rapide', 'c’est moins cher'],
+      english: ['it is comfortable', 'it is fast', 'it is cheaper'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le prix', 'le temps', 'les changements'],
+      english: ['the price', 'the time', 'the changes'],
+    ),
+  ],
+  'speaking_free_a2_purchase': [
+    _FreeTalkHintSet(
+      french: ['un ordinateur', 'un téléphone', 'un manteau'],
+      english: ['a computer', 'a phone', 'a coat'],
+    ),
+    _FreeTalkHintSet(
+      french: ['la qualité', 'le prix', 'la couleur'],
+      english: ['the quality', 'the price', 'the color'],
+    ),
+    _FreeTalkHintSet(
+      french: ['il fonctionne bien', 'il est pratique', 'il est solide'],
+      english: ['it works well', 'it is practical', 'it is sturdy'],
+    ),
+  ],
+  'speaking_free_a2_event': [
+    _FreeTalkHintSet(
+      french: ['un dîner', 'une fête', 'une réunion'],
+      english: ['a dinner', 'a party', 'a meeting'],
+    ),
+    _FreeTalkHintSet(
+      french: ['mes amis', 'ma famille', 'mes collègues'],
+      english: ['my friends', 'my family', 'my colleagues'],
+    ),
+    _FreeTalkHintSet(
+      french: ['de la nourriture', 'des boissons', 'une salle'],
+      english: ['food', 'drinks', 'a room'],
+    ),
+  ],
+  'speaking_free_a2_advice': [
+    _FreeTalkHintSet(
+      french: ['le travail', 'la santé', 'la famille'],
+      english: ['work', 'health', 'family'],
+    ),
+    _FreeTalkHintSet(
+      french: ['de se reposer', 'de parler', 'de demander de l’aide'],
+      english: ['to rest', 'to talk', 'to ask for help'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’est simple', 'c’est pratique', 'c’est important'],
+      english: ['it is simple', 'it is practical', 'it is important'],
+    ),
+  ],
+  'speaking_free_a2_decision': [
+    _FreeTalkHintSet(
+      french: ['un changement', 'un achat', 'un voyage'],
+      english: ['a change', 'a purchase', 'a trip'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’était nécessaire', 'c’était plus simple', 'j’avais le choix'],
+      english: ['it was necessary', 'it was simpler', 'I had a choice'],
+    ),
+    _FreeTalkHintSet(
+      french: ['un bon résultat', 'une nouvelle possibilité', 'plus de temps'],
+      english: ['a good result', 'a new possibility', 'more time'],
+    ),
+  ],
+};
+
 SpeakingCourseLesson _freeTalkSeed({
   required String id,
   required String title,
@@ -11,12 +501,21 @@ SpeakingCourseLesson _freeTalkSeed({
   required List<String> framesFrench,
   required List<String> framesEnglish,
 }) {
+  final hintSets = _preparedFreeTalkHints[id];
   if (questionsFrench.length != 3 ||
       questionsEnglish.length != 3 ||
       framesFrench.length != 3 ||
-      framesEnglish.length != 3) {
+      framesEnglish.length != 3 ||
+      hintSets == null ||
+      hintSets.length != 3 ||
+      hintSets.any(
+        (set) =>
+            set.french.length < 3 ||
+            set.french.length != set.english.length ||
+            set.english.any((word) => word.trim().isEmpty),
+      )) {
     throw StateError(
-      'Every prepared free-talk lesson must have three prompts.',
+      'Every prepared free-talk lesson must have three bilingual hint sets.',
     );
   }
   return SpeakingCourseLesson(
@@ -33,6 +532,16 @@ SpeakingCourseLesson _freeTalkSeed({
           partnerEnglish: questionsEnglish[index],
           french: framesFrench[index],
           english: framesEnglish[index],
+          hintWords: hintSets[index].french,
+          hintWordsEnglish: hintSets[index].english,
+          translationAlignment: SpeakingTranslationAlignment.forPhrase(
+            framesFrench[index],
+            framesEnglish[index],
+          ),
+          partnerTranslationAlignment: SpeakingTranslationAlignment.forPhrase(
+            questionsFrench[index],
+            questionsEnglish[index],
+          ),
           openResponse: true,
         ),
     ],

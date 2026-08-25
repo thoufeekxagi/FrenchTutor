@@ -36,12 +36,15 @@ class SpeakingPhraseStep {
     this.partnerFrench,
     this.partnerEnglish,
     this.tip = '',
+    this.hintWords = const [],
+    this.hintWordsEnglish = const [],
     this.openResponse = false,
     this.stage = SpeakingGuidedStage.speak,
     this.blankWord,
     this.wordChoices = const [],
     this.sentenceTokens = const [],
     this.translationAlignment,
+    this.partnerTranslationAlignment,
   });
 
   final String french;
@@ -49,12 +52,15 @@ class SpeakingPhraseStep {
   final String? partnerFrench;
   final String? partnerEnglish;
   final String tip;
+  final List<String> hintWords;
+  final List<String> hintWordsEnglish;
   final bool openResponse;
   final SpeakingGuidedStage stage;
   final String? blankWord;
   final List<String> wordChoices;
   final List<String> sentenceTokens;
   final List<List<int>>? translationAlignment;
+  final List<List<int>>? partnerTranslationAlignment;
 }
 
 enum _SpeakingStepState { ready, recording, checking, success, retry }
@@ -123,14 +129,17 @@ class _SpeakingLessonFlowScreenState
   String? _selectedWord;
   final List<int> _selectedSentenceTokens = [];
   final List<_SpeakingChatTurn> _chatHistory = [];
-  final Set<String> _revealedTranslations = {};
+  final Set<String> _selectedHintWords = {};
   bool _murrayInputActive = false;
   bool _murrayTurnClosing = false;
   bool _murrayFinalizing = false;
   bool _murrayGuidedGradeReceived = false;
+  bool _murrayFreeTalkGradeReceived = false;
   bool _hasSubmittedCurrentPhrase = false;
   final Set<int> _creditedSteps = {};
   int? _selectedPhraseWord;
+  int? _selectedFreeTalkPartnerWord;
+  int? _selectedFreeTalkLearnerWord;
 
   SpeakingPhraseStep get _step => widget.steps[_index];
   TutorPersona get _tutor => widget.tutor ?? ActiveTutor.current;
@@ -148,14 +157,12 @@ class _SpeakingLessonFlowScreenState
       // endpoint. Stop still sends audioStreamEnd, while transcripts remain
       // deferred until Gemini closes the turn.
       manualLearnerTurns: false,
-      openingPrompt:
-          '(Note from the app: the learner opened tutor help inside the current '
-          'speaking lesson. Introduce yourself briefly, explain what the learner '
-          'should do for the current phrase, model the exact French target once, '
-          'then wait. Never leave the lesson context.)',
+      openingPrompt: _openingPrompt,
       onUserTranscript: _onMurrayTranscript,
       onTurnComplete: _onMurrayTurnComplete,
-      tools: _isFreeTalk ? const [] : AgentTool.guidedSpeakingPalette,
+      tools: _isFreeTalk
+          ? AgentTool.freeTalkSpeakingPalette
+          : AgentTool.guidedSpeakingPalette,
       onToolCall: _onMurrayToolCall,
       onChanged: () {
         if (mounted) setState(() {});
@@ -175,7 +182,7 @@ class _SpeakingLessonFlowScreenState
       } else if (!_murray.isLive && mounted && _error == null) {
         setState(() {
           _error =
-              'Murray could not connect for this guided lesson. Turn tutor help off or reconnect before speaking.';
+              '${_tutor.displayName} could not connect for this lesson. Turn tutor help off or reconnect before speaking.';
         });
       }
     });
@@ -199,6 +206,27 @@ class _SpeakingLessonFlowScreenState
       widget.steps.any((step) => step.openResponse)
       ? LiveSessionType.freeTalk
       : LiveSessionType.speakingGuided;
+
+  String get _openingPrompt {
+    if (_isFreeTalk) {
+      final partner = _step.partnerFrench ?? '';
+      return '''
+(App instruction, not the learner: begin the current Free Talk beat now.)
+You are the selected AI tutor. Briefly explain the session in one short sentence,
+then say this exact French prompt once: "$partner".
+Briefly explain the learner's visible sentence frame "${_step.french}" and wait for
+the learner to complete it aloud. The word hints are visual screen content only;
+never read them, never ask the learner to repeat the hint list, and never include
+them in your reply. Keep the whole opening short and do not add another question.
+''';
+    }
+    return '''
+(App instruction, not the learner: the learner opened tutor help inside the
+current speaking lesson.) Briefly explain what to do, model the exact current
+French target once, then wait. Keep the guidance short and stay on the current
+lesson context.
+''';
+  }
 
   String get _murrayContext {
     final step = _step;
@@ -230,6 +258,14 @@ brief beginner-friendly feedback sentence. The app uses this one result for its
 visual check; do not ask the app to grade again and do not call the tool for a
 future step. Still say the brief feedback aloud, then stop.
 
+FREE TALK RESULT RULE: For a Free Talk beat, after the learner turn closes,
+call grade_free_talk_turn exactly once for the current step. Accept a short,
+meaningful on-topic answer even when it differs from the visible sentence
+frame. If the learner used English or needs grammar repair, say one short
+correction and include that same short French correction in the tool result.
+Do not read the visual hint words, add them to the conversation, ask a new
+question, or advance the lesson.
+
 BOUNDARY: You are the learner's in-lesson coach. Explain, model, or give one
 short hint about the current target only. Do not create a new lesson, switch
 topics, introduce advanced vocabulary, reveal future lines, or control the
@@ -257,6 +293,7 @@ $instruction
       _murrayInputActive = false;
       _murrayTurnClosing = false;
       _murrayFinalizing = false;
+      _murrayFreeTalkGradeReceived = false;
       await _murray.end();
       if (mounted && _state == _SpeakingStepState.recording) {
         setState(() => _state = _SpeakingStepState.ready);
@@ -339,7 +376,7 @@ $instruction
     if (helperEnabled && !_murray.isLive) {
       setState(() {
         _error =
-            'Murray is enabled but is not connected. Turn tutor help off or reconnect before speaking.';
+            '${_tutor.displayName} is enabled but is not connected. Turn tutor help off or reconnect before speaking.';
       });
       return;
     }
@@ -348,6 +385,7 @@ $instruction
       _murrayTurnClosing = false;
       _murrayFinalizing = false;
       _murrayGuidedGradeReceived = false;
+      _murrayFreeTalkGradeReceived = false;
       setState(() {
         _state = _SpeakingStepState.recording;
         _heard = '';
@@ -390,6 +428,49 @@ $instruction
     Map<String, dynamic> args,
     String callId,
   ) {
+    if (name == 'grade_free_talk_turn' && _isFreeTalk) {
+      final stepIndex = args['step_index'];
+      final accepted = args['accepted'];
+      final heard = args['heard'];
+      final correction = args['correction'];
+      final feedback = args['feedback'];
+      final valid =
+          _murrayTurnClosing &&
+          !_murrayFreeTalkGradeReceived &&
+          stepIndex is int &&
+          stepIndex == _index + 1 &&
+          accepted is bool &&
+          heard is String &&
+          correction is String &&
+          feedback is String;
+      if (!valid) {
+        _murray.sendToolResponse(
+          callId: callId,
+          name: name,
+          result: {
+            'ok': false,
+            'error': 'The result was stale or did not match the current beat.',
+          },
+          scheduling: 'SILENT',
+        );
+        return;
+      }
+      _murrayFreeTalkGradeReceived = true;
+      _murray.sendToolResponse(
+        callId: callId,
+        name: name,
+        result: {'ok': true, 'accepted_step_index': stepIndex},
+        scheduling: 'SILENT',
+      );
+      _murrayTurnClosing = false;
+      _applyFreeTalkResult(
+        accepted: accepted,
+        heard: heard,
+        correction: correction,
+        feedback: feedback,
+      );
+      return;
+    }
     if (name != 'grade_guided_phrase' || _isFreeTalk) {
       _murray.sendToolResponse(
         callId: callId,
@@ -436,6 +517,38 @@ $instruction
     _applyGuidedResult(matched: matched, heard: heard, feedback: feedback);
   }
 
+  void _applyFreeTalkResult({
+    required bool accepted,
+    required String heard,
+    required String correction,
+    required String feedback,
+  }) {
+    if (!mounted) return;
+    final cleanHeard = heard.trim();
+    final cleanCorrection = correction.trim();
+    final cleanFeedback = feedback.trim();
+    final visibleFeedback = [
+      cleanCorrection,
+      cleanFeedback,
+    ].where((value) => value.isNotEmpty).join(' ');
+    _murrayInputActive = false;
+    _hasSubmittedCurrentPhrase = true;
+    setState(() {
+      _state = accepted ? _SpeakingStepState.success : _SpeakingStepState.retry;
+      _heard = cleanHeard;
+      _guidedFeedback = visibleFeedback.isEmpty && !accepted
+          ? 'Try the same idea again using the hint words.'
+          : visibleFeedback.isEmpty
+          ? null
+          : visibleFeedback;
+      _error = cleanHeard.isEmpty
+          ? 'No French speech was transcribed. Please try again.'
+          : null;
+    });
+    if (accepted) _creditCurrentStep();
+    _murrayFinalizing = false;
+  }
+
   void _applyGuidedResult({
     required bool matched,
     required String heard,
@@ -460,6 +573,20 @@ $instruction
 
   Future<void> _finishRecording(String transcript) async {
     if (!mounted) return;
+    if (_murray.isLive) {
+      _murrayInputActive = false;
+      _murrayTurnClosing = false;
+      _murrayFinalizing = false;
+      setState(() {
+        _state = _SpeakingStepState.retry;
+        _hasSubmittedCurrentPhrase = true;
+        _heard = transcript.trim();
+        _guidedFeedback = null;
+        _error =
+            'The tutor could not finish checking this attempt. Please try again.';
+      });
+      return;
+    }
     // Fallback only: the normal Murray path resolves through the structured
     // grade_guided_phrase event and never reaches this local matcher.
     _murrayInputActive = false;
@@ -549,6 +676,8 @@ $instruction
     setState(() {
       _selectedWord = null;
       _selectedPhraseWord = null;
+      _selectedFreeTalkPartnerWord = null;
+      _selectedFreeTalkLearnerWord = null;
       _selectedSentenceTokens.clear();
       _state = _SpeakingStepState.ready;
       _error = null;
@@ -568,8 +697,20 @@ $instruction
       _guidedFeedback = null;
       _hasSubmittedCurrentPhrase = false;
       _murrayGuidedGradeReceived = false;
+      _murrayFreeTalkGradeReceived = false;
+      _selectedHintWords.clear();
+      _selectedFreeTalkPartnerWord = null;
+      _selectedFreeTalkLearnerWord = null;
     });
-    await _playCurrentPrompt();
+    // Retry owns the learner's next recording. Do not replay or re-inject the
+    // current Marie prompt: that makes the tutor sound like it restarted the
+    // beat and can mix the old prompt into the new Live turn.
+    if (_isFreeTalk && _murray.isLive) {
+      _promptMurray(
+        'For this retry, say only "Repeat it, please." in French, then wait. '
+        'Do not repeat the question, the lesson explanation, or the visual word hints.',
+      );
+    }
   }
 
   void _next() {
@@ -602,9 +743,13 @@ $instruction
       _guidedFeedback = null;
       _hasSubmittedCurrentPhrase = false;
       _murrayGuidedGradeReceived = false;
+      _murrayFreeTalkGradeReceived = false;
       _selectedWord = null;
       _selectedPhraseWord = null;
+      _selectedFreeTalkPartnerWord = null;
+      _selectedFreeTalkLearnerWord = null;
       _selectedSentenceTokens.clear();
+      _selectedHintWords.clear();
     });
     unawaited(_playCurrentPrompt());
   }
@@ -621,7 +766,9 @@ $instruction
     }
     if (_isFreeTalk && _murray.isLive && partner != null) {
       _promptMurray(
-        'For the current Free Talk beat, say this exact French prompt aloud once, then wait for the learner: "$partner". Do not add another question or change the topic.',
+        'For the current Free Talk beat, say this exact French prompt once: "$partner". '
+        'Then briefly explain the sentence frame "${_step.french}" and wait. '
+        'Do not read or mention the visual word hints. Do not add another question.',
       );
       return;
     }
@@ -711,8 +858,10 @@ $instruction
                   _lessonHeading(),
                   const SizedBox(height: 18),
                   _phraseCard(),
-                  const SizedBox(height: 16),
-                  _coachCard(),
+                  if (!_isFreeTalk) ...[
+                    const SizedBox(height: 16),
+                    _coachCard(),
+                  ],
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     _messageCard(_error!, DesignTokens.danger),
@@ -720,6 +869,7 @@ $instruction
                 ],
               ),
             ),
+            if (_isFreeTalk) _freeTalkHintTray(),
             _bottomControls(),
           ],
         ),
@@ -809,7 +959,7 @@ $instruction
   }
 
   Widget _murrayToggleCard(bool enabled) {
-    final tutor = ActiveTutor.current;
+    final tutor = _tutor;
     final status = _murray.isLive
         ? _murrayInputActive
               ? 'Live · listening to this answer'
@@ -872,7 +1022,7 @@ $instruction
 
   Widget _freeTalkChatCard() {
     return SizedBox(
-      height: 380,
+      height: 410,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
         children: [
@@ -900,7 +1050,6 @@ $instruction
               french: _step.partnerFrench!,
               english: _step.partnerEnglish,
               tutor: true,
-              onPlay: _playing ? null : _playPartnerLine,
             ),
           const SizedBox(height: 10),
           _currentLearnerBubble(),
@@ -916,9 +1065,7 @@ $instruction
     required String? english,
     required bool tutor,
     bool success = false,
-    VoidCallback? onPlay,
   }) {
-    final translationVisible = _revealedTranslations.contains(keyName);
     final borderColor = success
         ? DesignTokens.success.withValues(alpha: 0.75)
         : DesignTokens.nightHairline;
@@ -954,49 +1101,36 @@ $instruction
                   ),
                 ),
                 const SizedBox(height: 5),
-                Text(french, style: _body(17, weight: FontWeight.w700)),
-                if (translationVisible && (english?.isNotEmpty ?? false)) ...[
-                  const SizedBox(height: 5),
-                  Text(
-                    english!,
-                    style: _body(13).copyWith(color: DesignTokens.nightMuted),
-                  ),
-                ],
+                if (english?.trim().isNotEmpty ?? false)
+                  BilingualWordText(
+                    source: french,
+                    translation: english!,
+                    sourceStyle: _display(27).copyWith(height: 1.12),
+                    keywords: const [],
+                    translationStyle: _body(
+                      13,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                    sourceToTranslation: keyName == '$_index:partner'
+                        ? _step.partnerTranslationAlignment
+                        : null,
+                    selectedSourceWord: keyName == '$_index:partner'
+                        ? _selectedFreeTalkPartnerWord
+                        : null,
+                    showTranslation: _showMeaning,
+                    accentColor: DesignTokens.nightAccent,
+                    strictAlignment: true,
+                    onSourceWordTap: keyName == '$_index:partner'
+                        ? (wordIndex) => setState(() {
+                            _selectedFreeTalkPartnerWord =
+                                _selectedFreeTalkPartnerWord == wordIndex
+                                ? null
+                                : wordIndex;
+                          })
+                        : (_) {},
+                  )
+                else
+                  Text(french, style: _body(17, weight: FontWeight.w700)),
               ],
-            ),
-          ),
-          IconButton(
-            tooltip: tutor ? 'Play Marie’s line' : 'Play phrase',
-            onPressed: onPlay,
-            icon: Icon(
-              Icons.volume_up_outlined,
-              color: onPlay == null
-                  ? DesignTokens.nightMuted
-                  : DesignTokens.nightText,
-              size: 21,
-            ),
-          ),
-          IconButton(
-            tooltip: translationVisible
-                ? 'Hide translation'
-                : 'Show translation',
-            onPressed: english?.trim().isEmpty ?? true
-                ? null
-                : () => setState(() {
-                    if (translationVisible) {
-                      _revealedTranslations.remove(keyName);
-                    } else {
-                      _revealedTranslations.add(keyName);
-                    }
-                  }),
-            icon: Icon(
-              translationVisible
-                  ? Icons.translate_rounded
-                  : Icons.translate_outlined,
-              color: english?.trim().isEmpty ?? true
-                  ? DesignTokens.nightMuted
-                  : DesignTokens.nightAccent,
-              size: 21,
             ),
           ),
         ],
@@ -1007,18 +1141,20 @@ $instruction
   Widget _currentLearnerBubble() {
     final success = _state == _SpeakingStepState.success;
     final retry = _state == _SpeakingStepState.retry;
-    final translationVisible = _revealedTranslations.contains(
-      '$_index:learner',
-    );
+    final freeTalkRetry = retry && _isFreeTalk;
     final stateLabel = success
         ? 'MATCHED'
         : retry
-        ? 'TRY AGAIN'
+        ? _isFreeTalk
+              ? 'CORRECTION'
+              : 'TRY AGAIN'
         : _state == _SpeakingStepState.recording
         ? 'LISTENING'
         : 'SPEAK NOW';
     final stateColor = success
         ? DesignTokens.success
+        : freeTalkRetry
+        ? DesignTokens.nightAccent
         : retry
         ? DesignTokens.danger
         : DesignTokens.nightAccent;
@@ -1044,14 +1180,34 @@ $instruction
               children: [
                 Text(stateLabel, style: _label(10).copyWith(color: stateColor)),
                 const SizedBox(height: 9),
-                Text(_step.french, style: _display(27).copyWith(height: 1.12)),
-                if (translationVisible) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    _step.english,
-                    style: _body(13).copyWith(color: DesignTokens.nightMuted),
-                  ),
-                ],
+                BilingualWordText(
+                  source: _step.french,
+                  translation: _step.english,
+                  sourceStyle: _display(27).copyWith(height: 1.12),
+                  keywords: const [],
+                  translationStyle: _body(
+                    13,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                  sourceToTranslation: _step.translationAlignment,
+                  selectedSourceWord: _isFreeTalk
+                      ? _selectedFreeTalkLearnerWord
+                      : _selectedPhraseWord,
+                  showTranslation: _showMeaning,
+                  accentColor: DesignTokens.nightAccent,
+                  strictAlignment: true,
+                  onSourceWordTap: (wordIndex) => setState(() {
+                    if (_isFreeTalk) {
+                      _selectedFreeTalkLearnerWord =
+                          _selectedFreeTalkLearnerWord == wordIndex
+                          ? null
+                          : wordIndex;
+                    } else {
+                      _selectedPhraseWord = _selectedPhraseWord == wordIndex
+                          ? null
+                          : wordIndex;
+                    }
+                  }),
+                ),
                 if (_heard.trim().isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Text('I HEARD', style: _label(10)),
@@ -1065,6 +1221,14 @@ $instruction
                     ),
                   ),
                 ],
+                if (_isFreeTalk &&
+                    (_guidedFeedback?.trim().isNotEmpty ?? false)) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _guidedFeedback!,
+                    style: _body(13).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
                 if (_step.tip.trim().isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -1074,40 +1238,6 @@ $instruction
                 ],
               ],
             ),
-          ),
-          Column(
-            children: [
-              IconButton(
-                tooltip: 'Play phrase',
-                onPressed: _playing ? null : _playPhrase,
-                icon: Icon(
-                  _playing
-                      ? Icons.graphic_eq_rounded
-                      : Icons.volume_up_outlined,
-                  color: DesignTokens.nightText,
-                  size: 21,
-                ),
-              ),
-              IconButton(
-                tooltip: translationVisible
-                    ? 'Hide translation'
-                    : 'Show translation',
-                onPressed: () => setState(() {
-                  if (translationVisible) {
-                    _revealedTranslations.remove('$_index:learner');
-                  } else {
-                    _revealedTranslations.add('$_index:learner');
-                  }
-                }),
-                icon: Icon(
-                  translationVisible
-                      ? Icons.translate_rounded
-                      : Icons.translate_outlined,
-                  color: DesignTokens.nightAccent,
-                  size: 21,
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -1534,12 +1664,87 @@ $instruction
         if (mounted) {
           setState(() {
             _playing = false;
-            _error = 'Marie’s line could not be played: $error';
+            _error = '${_tutor.displayName}’s line could not be played: $error';
           });
         }
       },
     );
     if (mounted && _playing) setState(() => _playing = false);
+  }
+
+  List<String> get _freeTalkHintWords {
+    // Free Talk hints are authored/generated per beat. Never substitute a
+    // topic-level fallback: an unrelated hint teaches the wrong sentence.
+    return _step.hintWords;
+  }
+
+  Widget _freeTalkHintTray() {
+    final words = _freeTalkHintWords;
+    if (words.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 9, 18, 10),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightCanvas,
+        border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.lightbulb_outline_rounded,
+            color: DesignTokens.nightAccent,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: words.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 7),
+                itemBuilder: (context, index) {
+                  final word = words[index];
+                  final english = index < _step.hintWordsEnglish.length
+                      ? _step.hintWordsEnglish[index]
+                      : '';
+                  final selected = _selectedHintWords.contains(word);
+                  return ActionChip(
+                    label: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _showMeaning && english.isNotEmpty ? english : word,
+                        ),
+                        if (_showMeaning && english.isNotEmpty)
+                          Text('[$word]', style: _body(9)),
+                      ],
+                    ),
+                    onPressed: () => setState(() {
+                      if (selected) {
+                        _selectedHintWords.remove(word);
+                      } else {
+                        _selectedHintWords.add(word);
+                      }
+                    }),
+                    labelStyle: _body(
+                      12,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightText),
+                    backgroundColor: selected
+                        ? DesignTokens.nightAccentSoft
+                        : DesignTokens.nightSurfaceRaised,
+                    side: BorderSide(color: DesignTokens.nightHairline),
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _coachCard() {
@@ -1762,8 +1967,7 @@ $instruction
   Widget _freeTalkBottomControls() {
     final recording = _state == _SpeakingStepState.recording;
     final checking = _state == _SpeakingStepState.checking;
-    final success = _state == _SpeakingStepState.success;
-    final enabled = !checking;
+    final submitted = _hasSubmittedCurrentPhrase;
     return Container(
       padding: const EdgeInsets.fromLTRB(26, 10, 26, 15),
       decoration: BoxDecoration(
@@ -1771,62 +1975,29 @@ $instruction
         border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: !enabled
-                ? null
-                : success
-                ? _next
-                : recording
-                ? _stopRecording
-                : _startRecording,
-            onLongPressStart: !enabled || success
-                ? null
-                : (_) => _startRecording(),
-            onLongPressEnd: !enabled || success
-                ? null
-                : (_) => _stopRecording(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 58,
-                  height: 58,
-                  decoration: BoxDecoration(
-                    color: success
-                        ? DesignTokens.success
-                        : recording
-                        ? DesignTokens.danger
-                        : DesignTokens.nightAccent,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    success
-                        ? Icons.arrow_forward_rounded
-                        : recording
-                        ? Icons.stop_rounded
-                        : Icons.mic_none_rounded,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 7),
-                Text(
-                  success
-                      ? 'Next phrase'
-                      : recording
-                      ? _murray.isLive
-                            ? 'Listening…'
-                            : 'Release to check'
-                      : checking
-                      ? 'Checking…'
-                      : 'Hold to speak',
-                  style: _body(11, weight: FontWeight.w800),
-                ),
-              ],
+          Expanded(
+            child: _smallControl(
+              icon: _showMeaning
+                  ? Icons.translate_rounded
+                  : Icons.translate_outlined,
+              label: _showMeaning ? 'Translation on' : 'Translation off',
+              selected: _showMeaning,
+              onTap: () => setState(() => _showMeaning = !_showMeaning),
+            ),
+          ),
+          _freeTalkRoundAction(
+            recording: recording,
+            checking: checking,
+            submitted: submitted,
+          ),
+          Expanded(
+            child: _smallControl(
+              icon: Icons.volume_up_outlined,
+              label: submitted ? 'Replay' : 'Replay ${_tutor.displayName}',
+              showLabel: true,
+              onTap: checking ? null : _replayFreeTalk,
             ),
           ),
         ],
@@ -1834,10 +2005,69 @@ $instruction
     );
   }
 
+  Widget _freeTalkRoundAction({
+    required bool recording,
+    required bool checking,
+    required bool submitted,
+  }) {
+    final label = checking
+        ? 'Checking…'
+        : submitted
+        ? 'Next phrase'
+        : recording
+        ? 'Stop'
+        : 'Record';
+    final icon = checking
+        ? Icons.hourglass_top_rounded
+        : submitted
+        ? Icons.arrow_forward_rounded
+        : recording
+        ? Icons.stop_rounded
+        : Icons.mic_none_rounded;
+    final VoidCallback? onTap = checking
+        ? null
+        : submitted
+        ? _next
+        : recording
+        ? _stopRecording
+        : _startRecording;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: DesignTokens.nightAccent,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.black, size: 30),
+          ),
+          const SizedBox(height: 7),
+          Text(label, style: _body(11, weight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _replayFreeTalk() async {
+    if (_state == _SpeakingStepState.checking) return;
+    if (_hasSubmittedCurrentPhrase) {
+      await _practiceMore();
+      return;
+    }
+    await _playPartnerLine();
+  }
+
   Widget _smallControl({
     required IconData icon,
     required String label,
     bool selected = false,
+    bool showLabel = false,
     VoidCallback? onTap,
   }) {
     return Semantics(
@@ -1846,17 +2076,29 @@ $instruction
       child: GestureDetector(
         onTap: onTap,
         child: SizedBox(
-          width: 48,
-          height: 48,
-          child: Center(
-            child: Icon(
-              icon,
-              color: onTap == null
-                  ? DesignTokens.nightHairline
-                  : selected
-                  ? DesignTokens.nightAccent
-                  : DesignTokens.nightText,
-            ),
+          width: showLabel ? 78 : 48,
+          height: showLabel ? 58 : 48,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: onTap == null
+                    ? DesignTokens.nightHairline
+                    : selected
+                    ? DesignTokens.nightAccent
+                    : DesignTokens.nightText,
+              ),
+              if (showLabel) ...[
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _body(9, weight: FontWeight.w800),
+                ),
+              ],
+            ],
           ),
         ),
       ),
@@ -2156,6 +2398,13 @@ List<SpeakingPhraseStep> speakingStepsForCourseLines(
           partnerFrench: line.partnerFrench,
           partnerEnglish: line.partnerEnglish,
           tip: line.tip,
+          hintWords: line.hintWords,
+          hintWordsEnglish: line.hintWordsEnglish,
+          // Generated Free Talk lines arrive with a validated explicit
+          // alignment. Older prepared lines remain renderable while they are
+          // migrated, but never use a positional highlight fallback.
+          translationAlignment: line.translationAlignment,
+          partnerTranslationAlignment: line.partnerTranslationAlignment,
           openResponse: line.openResponse,
         ),
       );

@@ -26,6 +26,7 @@ class BilingualWordText extends StatelessWidget {
     this.showTranslation = true,
     this.highlightSelected = true,
     this.underlineSelected = true,
+    this.strictAlignment = false,
   });
 
   final String source;
@@ -45,6 +46,7 @@ class BilingualWordText extends StatelessWidget {
   final bool showTranslation;
   final bool highlightSelected;
   final bool underlineSelected;
+  final bool strictAlignment;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class BilingualWordText extends StatelessWidget {
                 selectedEntry?.en,
                 selectedSourceWord!,
                 sourceWords.length,
+                strictAlignment: strictAlignment,
               );
 
     return Semantics(
@@ -168,8 +171,9 @@ class BilingualWordText extends StatelessWidget {
     List<String> words,
     String? target,
     int sourceIndex,
-    int sourceCount,
-  ) {
+    int sourceCount, {
+    bool strictAlignment = false,
+  }) {
     final foldedWords = words.map(_fold).toList();
     if (foldedWords.isEmpty) return const <int>{};
 
@@ -208,6 +212,8 @@ class BilingualWordText extends StatelessWidget {
       }
       if (individual.isNotEmpty) return individual;
     }
+
+    if (strictAlignment) return const <int>{};
 
     // Last resort for an omitted glossary entry or paraphrase: point to the
     // equivalent position in the English sentence instead of silently

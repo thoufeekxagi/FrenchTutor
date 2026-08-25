@@ -111,4 +111,45 @@ class AgentTool {
       ),
     ),
   ];
+
+  /// One result event for an open Free Talk answer. The tutor keeps the
+  /// conversation natural, while the screen receives the same judgment the
+  /// tutor has just spoken aloud.
+  static final freeTalkSpeakingPalette = [
+    AgentTool(
+      name: 'grade_free_talk_turn',
+      description:
+          'Report the result of the learner\'s just-finished Free Talk answer. '
+          'Call exactly once after the learner turn closes. Accept a meaningful '
+          'on-topic answer, even when it is different from the visible frame. '
+          'If correction is needed, provide only one short corrected French sentence.',
+      parameters: _object(
+        {
+          'step_index': {
+            'type': 'INTEGER',
+            'description': 'The 1-based current lesson step index.',
+          },
+          'accepted': {
+            'type': 'BOOLEAN',
+            'description': 'Whether the learner gave a usable on-topic answer.',
+          },
+          'heard': {
+            'type': 'STRING',
+            'description':
+                'The short final French transcript, or empty if unclear.',
+          },
+          'correction': {
+            'type': 'STRING',
+            'description':
+                'One short corrected French sentence, or empty when no correction is needed.',
+          },
+          'feedback': {
+            'type': 'STRING',
+            'description': 'One short beginner-friendly feedback sentence.',
+          },
+        },
+        required: ['step_index', 'accepted', 'heard', 'correction', 'feedback'],
+      ),
+    ),
+  ];
 }

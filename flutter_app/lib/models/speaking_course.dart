@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/speaking_translation_alignment.dart';
+
 part 'speaking_course_seed.dart';
 
 /// The three speaking products currently supported by the dedicated Speaking
@@ -13,6 +15,10 @@ class SpeakingCourseLine {
     this.partnerFrench,
     this.partnerEnglish,
     this.tip = '',
+    this.hintWords = const [],
+    this.hintWordsEnglish = const [],
+    this.translationAlignment,
+    this.partnerTranslationAlignment,
     this.openResponse = false,
   });
 
@@ -21,6 +27,10 @@ class SpeakingCourseLine {
   final String? partnerFrench;
   final String? partnerEnglish;
   final String tip;
+  final List<String> hintWords;
+  final List<String> hintWordsEnglish;
+  final List<List<int>>? translationAlignment;
+  final List<List<int>>? partnerTranslationAlignment;
   final bool openResponse;
 }
 

@@ -98,6 +98,49 @@ void main() {
     },
   );
 
+  test(
+    'every prepared Free Talk beat has authored hints and both alignments',
+    () {
+      final freeTalkLines = [
+        for (final lesson in SpeakingCourseCatalog.freeTalkLessons)
+          if (lesson.id.startsWith('speaking_free_a1_') ||
+              lesson.id.startsWith('speaking_free_a2_'))
+            ...lesson.lines,
+      ];
+      expect(freeTalkLines, hasLength(102));
+      for (final line in freeTalkLines) {
+        expect(line.hintWords.length, greaterThanOrEqualTo(3));
+        expect(line.hintWordsEnglish, hasLength(line.hintWords.length));
+        expect(line.translationAlignment, isNotNull, reason: line.french);
+        expect(
+          line.partnerTranslationAlignment,
+          isNotNull,
+          reason: line.partnerFrench,
+        );
+        expect(
+          line.translationAlignment!.any((indexes) => indexes.isNotEmpty),
+          isTrue,
+          reason: line.french,
+        );
+        for (final indexes in line.translationAlignment!) {
+          if (indexes.isEmpty) continue;
+          expect(indexes, everyElement(isA<int>()), reason: line.french);
+        }
+        expect(
+          line.partnerTranslationAlignment!.any(
+            (indexes) => indexes.isNotEmpty,
+          ),
+          isTrue,
+          reason: line.partnerFrench,
+        );
+        for (final indexes in line.partnerTranslationAlignment!) {
+          if (indexes.isEmpty) continue;
+          expect(indexes, everyElement(isA<int>()), reason: line.partnerFrench);
+        }
+      }
+    },
+  );
+
   test('a future French-only target is rejected before it can render', () {
     expect(
       () => speakingStepsForTargets(const ['Une phrase future inconnue.']),

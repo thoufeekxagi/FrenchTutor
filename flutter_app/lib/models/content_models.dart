@@ -524,6 +524,8 @@ class ReadingSegment {
     required this.pronunciationTip,
     this.characterFr,
     this.characterEn,
+    this.hintWords = const [],
+    this.hintWordsEnglish = const [],
   });
 
   final String fr;
@@ -532,6 +534,8 @@ class ReadingSegment {
   final String pronunciationTip;
   final String? characterFr;
   final String? characterEn;
+  final List<String> hintWords;
+  final List<String> hintWordsEnglish;
 
   factory ReadingSegment.fromJson(Map<String, dynamic> json) => ReadingSegment(
     fr: (json['fr'] ?? json['text'] ?? json['french'] ?? '').toString().trim(),
@@ -546,6 +550,18 @@ class ReadingSegment {
         .trim(),
     characterFr: json['characterFr']?.toString(),
     characterEn: json['characterEn']?.toString(),
+    hintWords:
+        ((json['hintWords'] ?? json['hint_words']) as List?)
+            ?.map((word) => word.toString().trim())
+            .where((word) => word.isNotEmpty)
+            .toList(growable: false) ??
+        const [],
+    hintWordsEnglish:
+        ((json['hintWordsEnglish'] ?? json['hint_words_en']) as List?)
+            ?.map((word) => word.toString().trim())
+            .where((word) => word.isNotEmpty)
+            .toList(growable: false) ??
+        const [],
   );
 
   Map<String, dynamic> toJson() => {
@@ -555,6 +571,8 @@ class ReadingSegment {
     'pronunciationTip': pronunciationTip,
     if (characterFr != null) 'characterFr': characterFr,
     if (characterEn != null) 'characterEn': characterEn,
+    if (hintWords.isNotEmpty) 'hintWords': hintWords,
+    if (hintWordsEnglish.isNotEmpty) 'hintWordsEnglish': hintWordsEnglish,
   };
 }
 
