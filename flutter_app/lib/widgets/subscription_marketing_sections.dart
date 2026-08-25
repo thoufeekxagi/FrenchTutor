@@ -10,8 +10,11 @@ class SubscriptionMarketingSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Register this flow with the inherited theme so a mode toggle rebuilds
+    // the const paywall subtree and re-resolves all semantic tokens.
+    Theme.of(context);
     return Column(
-      children: const [
+      children: [
         _LearningRouteCard(),
         SizedBox(height: DesignTokens.space5),
         _PersonalizationComparisonCard(),
@@ -30,22 +33,23 @@ class _LearningRouteCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
       decoration: BoxDecoration(
-        color: DesignTokens.ink,
+        color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'A route from first French to confident B1',
-            style: DesignTokens.display(24).copyWith(color: Colors.white),
+            style: DesignTokens.display(24),
           ),
           const SizedBox(height: 8),
           Text(
             'Your level, goal, and practice evidence shape what comes next. The route grows with you instead of making you repeat a fixed course.',
             style: DesignTokens.body(
               14,
-            ).copyWith(color: Colors.white70, height: 1.4),
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
           ),
           const SizedBox(height: 18),
           SizedBox(
@@ -53,9 +57,9 @@ class _LearningRouteCard extends StatelessWidget {
             child: Stack(
               children: [
                 Positioned.fill(child: CustomPaint(painter: _RoutePainter())),
-                const Positioned(left: 8, bottom: 42, child: _LevelTag('A1')),
-                const Positioned(left: 116, bottom: 92, child: _LevelTag('A2')),
-                const Positioned(right: 18, top: 18, child: _LevelTag('B1')),
+                Positioned(left: 8, bottom: 42, child: _LevelTag('A1')),
+                Positioned(left: 116, bottom: 92, child: _LevelTag('A2')),
+                Positioned(right: 18, top: 18, child: _LevelTag('B1')),
                 Positioned(
                   left: 4,
                   bottom: 4,
@@ -63,7 +67,7 @@ class _LearningRouteCard extends StatelessWidget {
                     'Start with what you know',
                     style: DesignTokens.body(
                       11,
-                    ).copyWith(color: Colors.white70),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ),
                 Positioned(
@@ -73,7 +77,7 @@ class _LearningRouteCard extends StatelessWidget {
                     'Next route',
                     style: DesignTokens.body(
                       11,
-                    ).copyWith(color: Colors.white70),
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ),
               ],
@@ -113,7 +117,7 @@ class _RoutePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     canvas.drawPath(path, paint);
 
-    final dotPaint = Paint()..color = Colors.white;
+    final dotPaint = Paint()..color = DesignTokens.surface;
     for (final point in [
       Offset(8, size.height - 56),
       Offset(size.width * 0.48, size.height - 76),
@@ -137,7 +141,7 @@ class _LevelTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.primarySoft,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -145,7 +149,7 @@ class _LevelTag extends StatelessWidget {
         style: DesignTokens.body(
           14,
           weight: FontWeight.w800,
-        ).copyWith(color: DesignTokens.primary),
+        ).copyWith(color: DesignTokens.primaryReadable),
       ),
     );
   }
@@ -273,15 +277,16 @@ class _ContextLearningCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
       decoration: BoxDecoration(
-        color: DesignTokens.primaryDeep,
+        color: DesignTokens.primarySoft,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.hairline),
       ),
       child: Column(
         children: [
           Text(
             'Learn words inside real moments',
             textAlign: TextAlign.center,
-            style: DesignTokens.display(23).copyWith(color: Colors.white),
+            style: DesignTokens.display(23),
           ),
           const SizedBox(height: 7),
           Text(
@@ -289,14 +294,15 @@ class _ContextLearningCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: DesignTokens.body(
               14,
-            ).copyWith(color: Colors.white70, height: 1.4),
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
           ),
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: DesignTokens.surface,
               borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: DesignTokens.hairline),
             ),
             child: Column(
               children: [
@@ -319,7 +325,7 @@ class _ContextLearningCard extends StatelessWidget {
                 const SizedBox(height: 14),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const [
+                  children: [
                     _ContextFeature(Icons.volume_up_rounded, 'Audio'),
                     _ContextFeature(Icons.menu_book_rounded, 'Words'),
                     _ContextFeature(Icons.forum_rounded, 'Speak'),
@@ -342,6 +348,7 @@ class _MiniTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
@@ -441,7 +448,9 @@ class SubscriptionBottomOffer extends StatelessWidget {
               child: Text(
                 loading ? 'Processing…' : ctaLabel,
                 style: DesignTokens.body(16, weight: FontWeight.w800).copyWith(
-                  color: onTap == null ? DesignTokens.mutedDim : Colors.white,
+                  color: onTap == null
+                      ? DesignTokens.mutedDim
+                      : DesignTokens.onPrimary,
                 ),
               ),
             ),

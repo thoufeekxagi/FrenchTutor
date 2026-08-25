@@ -225,6 +225,28 @@ abstract final class SpeakingCourseCatalog {
           ],
         ),
         SpeakingCourseLesson(
+          id: 'speaking_a1_08_food',
+          title: 'Order food',
+          subtitle: 'Choose a dish and ask politely.',
+          level: 'A1',
+          icon: Icons.restaurant_menu_outlined,
+          mode: SpeakingCourseMode.guided,
+          lines: [
+            SpeakingCourseLine(
+              french: 'Je voudrais le plat du jour, s’il vous plaît.',
+              english: 'I would like the dish of the day, please.',
+            ),
+            SpeakingCourseLine(
+              french: 'Qu’est-ce que vous recommandez ?',
+              english: 'What do you recommend?',
+            ),
+            SpeakingCourseLine(
+              french: 'L’addition, s’il vous plaît.',
+              english: 'The bill, please.',
+            ),
+          ],
+        ),
+        SpeakingCourseLesson(
           id: 'speaking_a1_08_here',
           title: 'For here or to go',
           subtitle: 'Answer a common café question.',

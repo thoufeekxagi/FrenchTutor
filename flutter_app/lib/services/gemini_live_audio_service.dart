@@ -23,6 +23,7 @@ class GeminiLiveAudioService {
   static const _model = 'models/gemini-3.1-flash-live-preview';
   static const _bucket = 'vocabulary-audio';
   static const _cacheVersion = 'live-audio-v1';
+  static const outputSampleRateHz = 24000;
 
   final Map<String, Future<List<int>?>> _inFlight = {};
   Directory? _cacheDir;
@@ -126,6 +127,37 @@ class GeminiLiveAudioService {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Renders a complete listening lesson when the selected ElevenLabs
+  /// renderer is unavailable because its quota is exhausted. This is a
+  /// deliberate, format-aware recovery mode: Gemini Live returns spoken
+  /// lesson audio only. A music selection therefore becomes a spoken lesson
+  /// rather than pretending that Live generated music.
+  Future<Uint8List> synthesizeListeningLesson({
+    required String text,
+    required String format,
+    required String level,
+    String? voiceName,
+  }) async {
+    final normalized = text.trim();
+    if (normalized.isEmpty) {
+      throw StateError('Gemini Live recovery requires canonical French text.');
+    }
+    final persona = _personaForVoice(voiceName);
+    if (persona == null) {
+      throw StateError('Gemini Live recovery requires an active tutor voice.');
+    }
+    final generated = await _generateLive(
+      normalized,
+      persona: persona,
+      slow: false,
+      systemInstruction: _listeningInstruction(format: format, level: level),
+    ).timeout(const Duration(seconds: 90), onTimeout: () => null);
+    if (!_validPcm(generated)) {
+      throw StateError('Gemini Live returned no listening audio.');
+    }
+    return Uint8List.fromList(generated!);
   }
 
   /// Warms the first item before returning, then fills the rest with a small
@@ -326,6 +358,7 @@ class GeminiLiveAudioService {
     String text, {
     required TutorPersona persona,
     required bool slow,
+    String? systemInstruction,
   }) async {
     late final String token;
     try {
@@ -417,6 +450,7 @@ class GeminiLiveAudioService {
               'parts': [
                 {
                   'text':
+                      systemInstruction ??
                       '${persona.promptBlock} You are preparing one short pronunciation clip. Speak only the French text supplied by the learner, with no explanation or extra words. ${slow ? 'Use a measured, extra-clear learning pace.' : 'Use a natural, clear learning pace.'}',
                 },
               ],
@@ -435,5 +469,24 @@ class GeminiLiveAudioService {
       await subscription.cancel();
       await channel.sink.close();
     }
+  }
+
+  String _listeningInstruction({
+    required String format,
+    required String level,
+  }) {
+    final style = switch (format) {
+      'podcast' =>
+        'Perform it as a warm spoken dialogue with clear pauses between turns, like two friendly people exchanging ideas. Keep every French word exactly as supplied.',
+      'educational' =>
+        'Deliver it as a patient, well-paced French mini-lesson. Explain nothing extra and do not add words beyond the supplied French text.',
+      'music' =>
+        'The music renderer is unavailable. Do not sing and do not create music. Deliver the supplied French text as a calm, expressive spoken lesson instead, with a natural rhythm.',
+      'narration' =>
+        'Deliver it as calm, vivid French story narration with deliberate pauses and expressive phrasing. Do not add, remove, or paraphrase any supplied words.',
+      _ =>
+        'Deliver it as clear, natural French listening practice with deliberate pauses. Do not add, remove, or paraphrase any supplied words.',
+    };
+    return '${ActiveTutor.current.promptBlock} You are rendering a saved French listening lesson for CEFR level $level. $style Use a comfortable learner pace, not rushed speech. Speak only the supplied French text; never add an introduction, explanation, translation, or closing sentence.';
   }
 }

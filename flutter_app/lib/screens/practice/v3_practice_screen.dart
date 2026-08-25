@@ -18,7 +18,7 @@ import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../speak/speak_review_screen.dart';
-import '../speak/speaking_course_home_screen.dart';
+import '../speak/speaking_flow_screen.dart';
 
 /// Mixed-skills practice workspace. Speaking is one destination inside this
 /// screen; it never replaces the Practice shell or the global Home tab.
@@ -80,7 +80,7 @@ class V3PracticeScreen extends ConsumerWidget {
             Icons.mic_none_rounded,
             'Speaking',
             'Guided conversation, roleplay, and exam speaking',
-            const SpeakingCourseHomeScreen(),
+            const SpeakingHubScreen(),
             PremiumArea.speaking,
           ),
           _skill(

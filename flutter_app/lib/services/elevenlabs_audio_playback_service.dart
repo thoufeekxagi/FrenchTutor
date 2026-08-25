@@ -4,9 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart' show Level;
 
-/// Plays provider-rendered MP3 clips independently from the existing PCM
-/// Gemini Live stream. Both services are stopped by the listening screen before
-/// switching sources, so the two native player modes never overlap.
+/// Plays provider-rendered MP3 clips and WAV-wrapped Gemini Live clips. Both
+/// services are stopped by the listening screen before switching sources, so
+/// the two native player modes never overlap.
 class ElevenLabsAudioPlaybackService {
   ElevenLabsAudioPlaybackService._();
 
@@ -27,6 +27,7 @@ class ElevenLabsAudioPlaybackService {
     Uint8List bytes, {
     void Function()? onFinished,
     double speed = 1,
+    String container = 'mp3',
   }) async {
     if (bytes.isEmpty) throw StateError('ElevenLabs audio is empty');
     await stop();
@@ -43,7 +44,7 @@ class ElevenLabsAudioPlaybackService {
     _isPaused = false;
     final duration = await _player.startPlayer(
       fromDataBuffer: bytes,
-      codec: Codec.mp3,
+      codec: container.toLowerCase() == 'wav' ? Codec.pcm16WAV : Codec.mp3,
       whenFinished: () {
         isPlaying = false;
         _isPaused = false;

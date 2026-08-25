@@ -31,7 +31,12 @@ abstract final class DesignTokens {
       isDark ? AppearanceColors.darkSurface : AppearanceColors.lightRaised;
   static Color get surface =>
       isDark ? AppearanceColors.darkSurface : AppearanceColors.lightSurface;
-  static Color get primary => AppearanceColors.gold;
+  // The bright gold is comfortable on the dark canvas. In light mode the
+  // darker gold is the action/accent role so labels and icons do not wash out
+  // against white surfaces.
+  static Color get primary =>
+      isDark ? AppearanceColors.gold : AppearanceColors.goldDeep;
+  static Color get primaryReadable => primary;
   static Color get primaryDeep => AppearanceColors.goldDeep;
   static Color get primarySoft =>
       isDark ? AppearanceColors.goldSoftDark : AppearanceColors.goldSoftLight;
@@ -65,6 +70,7 @@ abstract final class DesignTokens {
   static Color get parchmentDim => canvasDim;
   static Color get card => surface;
   static Color get maroon => primary;
+  static Color get maroonReadable => primaryReadable;
   static Color get maroonDeep => primaryDeep;
   static Color get brass => mastery;
   static Color get sage => success;

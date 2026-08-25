@@ -75,4 +75,40 @@ class AgentTool {
       ),
     ),
   ];
+
+  /// One result event for a controlled guided speaking turn. The screen owns
+  /// progression; Gemini supplies the judgment it already gives aloud so the
+  /// UI does not run a second grading path after the Live turn.
+  static final guidedSpeakingPalette = [
+    AgentTool(
+      name: 'grade_guided_phrase',
+      description:
+          'Report the result of the learner\'s just-finished guided speaking attempt. '
+          'Call exactly once after the learner turn closes, using only the current phrase. '
+          'This is a UI event, not an invitation to advance the lesson.',
+      parameters: _object(
+        {
+          'step_index': {
+            'type': 'INTEGER',
+            'description': 'The 1-based current lesson step index.',
+          },
+          'matched': {
+            'type': 'BOOLEAN',
+            'description':
+                'Whether the learner said the current target closely enough.',
+          },
+          'heard': {
+            'type': 'STRING',
+            'description':
+                'A short transcript of what the learner said, or an empty string if unclear.',
+          },
+          'feedback': {
+            'type': 'STRING',
+            'description': 'One short beginner-friendly feedback sentence.',
+          },
+        },
+        required: ['step_index', 'matched', 'heard', 'feedback'],
+      ),
+    ),
+  ];
 }

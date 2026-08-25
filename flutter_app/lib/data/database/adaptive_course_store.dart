@@ -75,6 +75,24 @@ class AdaptiveCourseSessionSpec {
   /// One-based position within the current twenty-session block.
   int get blockPosition => ((sequence - 1) % adaptiveCourseBlockSize) + 1;
 
+  /// The learner-facing phase of the shared course route. Keeping this on the
+  /// stable session specification lets Course, Home, Practice, and Speaking
+  /// describe the same progression without each screen inventing its own
+  /// lesson order.
+  String get learningPhase => switch (sequence) {
+    1 => 'Sound foundation: recognize the French alphabet.',
+    2 => 'Sound foundation: hear and produce French vowels.',
+    3 => 'Sound foundation: hear and produce French consonants.',
+    4 => 'Sound foundation: notice accents and spelling clues.',
+    5 => 'Sound foundation: connect sound, spelling, and meaning.',
+    6 || 11 || 16 => 'Discover the key words for this unit.',
+    7 || 12 || 17 => 'Use the words in a controlled sentence.',
+    8 || 13 || 18 => 'Read the language in a short, useful context.',
+    9 || 14 || 19 => 'Listen for the same meaning in connected speech.',
+    10 || 15 || 20 => 'Speak and reuse the unit language in a short exchange.',
+    _ => 'Transfer and repair recent language in a new situation.',
+  };
+
   String get contextPrompt =>
       '''PERSONALIZED COURSE SESSION
 Goal: ${subtitle.split(' · ').first}
@@ -83,6 +101,7 @@ Competency: $competency
 Situation: $context
 Primary skill: ${primarySkill.label}
 Supporting skills: ${supportingSkills.map((skill) => skill.label).join(', ')}
+Learning phase: $learningPhase
 Grammar focus: ${grammarFocus.isEmpty ? 'Choose only what supports the competency.' : grammarFocus.join(', ')}
 Session length: $estimatedMinutes minutes
 
@@ -176,15 +195,25 @@ class AdaptiveCourseStore {
   _onSessionChanged;
 
   static const initialBatchSize = adaptiveCourseBlockSize;
-  static const replanThreshold = 0;
+  // Add the next block before the learner reaches the last few sessions. The
+  // adaptive rows are lightweight specifications, so this does not make the
+  // learner wait for rich lesson generation when they finish a block.
+  static const replanThreshold = 5;
 
   AdaptiveCoursePlanSnapshot ensureCurrentPlan(Profile profile) {
     final fingerprint = adaptiveProfileFingerprint(profile);
     final active = _activePlanRow();
     if (active != null && active['profile_fingerprint'] == fingerprint) {
       final plan = _snapshotFromPlanRow(active);
+      final repaired = _repairSequenceGaps(
+        planId: plan.id,
+        profile: profile,
+        profileFingerprint: fingerprint,
+        minimumSequence: initialBatchSize,
+      );
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
+      if (repaired) _notifyPlan(reconciled);
       if (reconciled.sessions
               .where((session) => session.status != 'completed')
               .length <=
@@ -343,7 +372,6 @@ class AdaptiveCourseStore {
       ],
     );
 
-    var nextSequence = 1;
     if (previousPlanId != null) {
       final completed = _sessionsForPlan(
         previousPlanId,
@@ -359,16 +387,25 @@ class AdaptiveCourseStore {
           profileFingerprint: profileFingerprint,
           id: _adaptiveUuid.v4(),
         );
-        if (session.sequence >= nextSequence) {
-          nextSequence = session.sequence + 1;
-        }
       }
     }
+
+    // A profile change keeps completed lessons, but must still rebuild every
+    // missing earlier slot around them. This prevents a new plan from
+    // starting at Unit 4 just because the learner previously completed a
+    // later session.
+    _repairSequenceGaps(
+      planId: planId,
+      profile: profile,
+      profileFingerprint: profileFingerprint,
+      minimumSequence: initialBatchSize,
+    );
+    final repaired = _snapshotForPlan(planId);
     _appendBatch(
       planId: planId,
       profile: profile,
       profileFingerprint: profileFingerprint,
-      startSequence: nextSequence,
+      startSequence: _nextSequence(repaired.sessions),
       batchSize: initialBatchSize,
     );
     final snapshot = _snapshotForPlan(planId);
@@ -377,41 +414,152 @@ class AdaptiveCourseStore {
   }
 
   /// Reconnects a locally rebuilt plan to course completions restored through
-  /// the existing `sessions` sync table. Adaptive plans are lightweight cache
-  /// data; if a learner installs on a new device, their completed adaptive
-  /// sessions still determine the first completed slots after hydration.
+  /// the existing `sessions` sync table. Matching is intentionally by exact
+  /// content key; matching by count could mark a different lesson complete
+  /// when Unit 1/2 rows were missing during hydration.
   void _reconcileCompletedSessions(String planId) {
-    final external = _db.select(
-      "SELECT COUNT(DISTINCT content_key) AS c FROM sessions "
+    final externalRows = _db.select(
+      "SELECT DISTINCT content_key FROM sessions "
       "WHERE content_key LIKE 'adaptive_%' AND deleted_at IS NULL "
       'AND user_id IS ?',
       [_localUserId()],
     );
-    final completedCount = external.first['c'] as int;
-    if (completedCount == 0) return;
-    final current =
-        _db.select(
-              "SELECT COUNT(*) AS c FROM adaptive_course_sessions "
-              "WHERE plan_id = ? AND status = 'completed' AND deleted_at IS NULL",
-              [planId],
-            ).first['c']
-            as int;
-    final missing = completedCount - current;
-    if (missing <= 0) return;
-    final rows = _db.select(
-      "SELECT content_key FROM adaptive_course_sessions "
-      "WHERE plan_id = ? AND status != 'completed' AND deleted_at IS NULL "
-      'ORDER BY sequence LIMIT ?',
-      [planId, missing],
-    );
+    if (externalRows.isEmpty) return;
     final now = _now();
-    for (final row in rows) {
+    for (final row in externalRows) {
+      final contentKey = row['content_key']?.toString();
+      if (contentKey == null || contentKey.isEmpty) continue;
       _db.execute(
         "UPDATE adaptive_course_sessions SET status = 'completed', completed_at = ?, updated_at = ? "
-        'WHERE plan_id = ? AND content_key = ?',
-        [now, now, planId, row['content_key']],
+        "WHERE plan_id = ? AND content_key = ? AND status != 'completed' "
+        'AND deleted_at IS NULL',
+        [now, now, planId, contentKey],
       );
     }
+  }
+
+  /// Repairs a partially hydrated or older plan without replacing its ids or
+  /// completion state. The initial route is always contiguous from sequence 1
+  /// through 20; later gaps are repaired up to the highest known sequence.
+  /// This makes Unit 1 and Unit 2 durable even when Supabase previously
+  /// returned only later rows.
+  bool _repairSequenceGaps({
+    required String planId,
+    required Profile profile,
+    required String profileFingerprint,
+    required int minimumSequence,
+  }) {
+    final existing = _sessionsForPlan(planId);
+    if (existing.isEmpty) return false;
+    final highest = existing
+        .map((session) => session.sequence)
+        .reduce((a, b) => a > b ? a : b);
+    final target = highest > minimumSequence ? highest : minimumSequence;
+    final existingBySequence = <int, AdaptiveCourseSessionSpec>{
+      for (final session in existing) session.sequence: session,
+    };
+    final generated = AdaptiveCoursePlanGenerator.generate(
+      profile: profile,
+      planId: planId,
+      profileFingerprint: profileFingerprint,
+      startSequence: 1,
+      count: target,
+    );
+    var repaired = false;
+    for (final session in generated) {
+      final current = existingBySequence[session.sequence];
+      if (current == null) {
+        _insertSession(
+          session,
+          planId: planId,
+          profileFingerprint: profileFingerprint,
+        );
+        repaired = true;
+        continue;
+      }
+
+      // Upgrade unfinished rows in place so an existing installation gets
+      // the staged Unit 1–4 curriculum without losing its stable id, status,
+      // or progress key. Completed rows remain historical records.
+      if (session.sequence <= initialBatchSize &&
+          current.status != 'completed' &&
+          current.status != 'replaced' &&
+          _needsCurriculumUpgrade(current, session, profileFingerprint)) {
+        _updatePlannedSessionSpec(
+          current,
+          session,
+          profileFingerprint: profileFingerprint,
+        );
+        repaired = true;
+      }
+    }
+    if (repaired) {
+      _db.execute(
+        'UPDATE adaptive_course_plans SET updated_at = ? WHERE id = ?',
+        [_now(), planId],
+      );
+    }
+    return repaired;
+  }
+
+  bool _needsCurriculumUpgrade(
+    AdaptiveCourseSessionSpec current,
+    AdaptiveCourseSessionSpec replacement,
+    String profileFingerprint,
+  ) {
+    return current.level != replacement.level ||
+        current.unit != replacement.unit ||
+        current.unitTitle != replacement.unitTitle ||
+        current.title != replacement.title ||
+        current.subtitle != replacement.subtitle ||
+        current.competency != replacement.competency ||
+        current.context != replacement.context ||
+        current.primarySkill != replacement.primarySkill ||
+        current.supportingSkills.map((skill) => skill.wireName).join('|') !=
+            replacement.supportingSkills
+                .map((skill) => skill.wireName)
+                .join('|') ||
+        current.grammarFocus.join('|') != replacement.grammarFocus.join('|') ||
+        current.successCriteria.join('|') !=
+            replacement.successCriteria.join('|') ||
+        current.estimatedMinutes != replacement.estimatedMinutes ||
+        current.profileFingerprint != profileFingerprint;
+  }
+
+  void _updatePlannedSessionSpec(
+    AdaptiveCourseSessionSpec current,
+    AdaptiveCourseSessionSpec replacement, {
+    required String profileFingerprint,
+  }) {
+    _db.execute(
+      '''UPDATE adaptive_course_sessions
+         SET level = ?, unit = ?, unit_title = ?, title = ?, subtitle = ?,
+             competency = ?, context = ?, primary_skill = ?,
+             supporting_skills_json = ?, grammar_focus_json = ?,
+             success_criteria_json = ?, estimated_minutes = ?,
+             profile_fingerprint = ?, updated_at = ?
+         WHERE id = ? AND status NOT IN ('completed', 'replaced')
+           AND deleted_at IS NULL''',
+      [
+        replacement.level,
+        replacement.unit,
+        replacement.unitTitle,
+        replacement.title,
+        replacement.subtitle,
+        replacement.competency,
+        replacement.context,
+        replacement.primarySkill.wireName,
+        jsonEncode(
+          replacement.supportingSkills.map((skill) => skill.wireName).toList(),
+        ),
+        jsonEncode(replacement.grammarFocus),
+        jsonEncode(replacement.successCriteria),
+        replacement.estimatedMinutes,
+        profileFingerprint,
+        _now(),
+        current.id,
+      ],
+    );
   }
 
   void _appendBatch({
@@ -726,16 +874,16 @@ abstract final class AdaptiveCoursePlanGenerator {
     for (var offset = 0; offset < count; offset++) {
       final sequence = startSequence + offset;
       final cycle = (sequence - 1) ~/ templates.length;
-      final isSoundFoundation = level == 'A1' && sequence <= 5;
-      final template = isSoundFoundation
-          ? _foundationTemplates[sequence - 1]
-          : _reservedSpeakingTemplate(templates, sequence) ??
-                _templateForFocus(
-                  templates,
-                  focusSkills,
-                  sequence: sequence,
-                  cycle: cycle,
-                );
+      final guidedPathTemplate = _guidedPathTemplate(level, sequence);
+      final template =
+          guidedPathTemplate ??
+          _reservedSpeakingTemplate(templates, sequence) ??
+          _templateForFocus(
+            templates,
+            focusSkills,
+            sequence: sequence,
+            cycle: cycle,
+          );
       final baseContext =
           track.contexts[(sequence - 1) % track.contexts.length];
       final foundationBase =
@@ -743,7 +891,8 @@ abstract final class AdaptiveCoursePlanGenerator {
       final foundationContext = interest == null
           ? foundationBase
           : '$foundationBase with a light connection to $interest';
-      final context = isSoundFoundation
+      final isFoundation = sequence <= 5;
+      final context = isFoundation
           ? foundationContext
           : interest == null
           ? baseContext
@@ -783,6 +932,241 @@ abstract final class AdaptiveCoursePlanGenerator {
     }
     return sessions;
   }
+
+  /// The first twenty sessions are a deliberate beginner route rather than a
+  /// rotation of unrelated focus skills. Every five-session unit follows the
+  /// same teach-and-transfer rhythm:
+  /// vocabulary → grammar → reading → listening → speaking/review.
+  ///
+  /// Later blocks remain adaptive and are generated from the learner profile,
+  /// but they continue from this shared foundation instead of replacing it.
+  static _AdaptiveTemplate? _guidedPathTemplate(String level, int sequence) {
+    if (sequence <= 5) {
+      return _foundationTemplatesForLevel(level)[sequence - 1];
+    }
+    if (sequence <= 20) {
+      return _levelledTemplate(level, _integratedPathTemplates[sequence - 6]);
+    }
+    return null;
+  }
+
+  static _AdaptiveTemplate _levelledTemplate(
+    String level,
+    _AdaptiveTemplate base,
+  ) {
+    final levelGrammar = switch (level) {
+      'A1' => 'fixed phrases and the present tense',
+      'A2' => 'past and near-future forms with simple reasons',
+      'B1' => 'connectors, time frames, and supported opinions',
+      'B2' => 'nuance, reformulation, and formal or informal register',
+      _ => 'the learner\'s current CEFR grammar',
+    };
+    final levelSuccess = switch (level) {
+      'A1' => 'Keep the response to one or two clear sentences.',
+      'A2' => 'Link several short ideas and add one reason.',
+      'B1' => 'Organize the response with a clear beginning and follow-up.',
+      'B2' =>
+        'Choose precise wording and adjust the register to the situation.',
+      _ => 'Use the target grammar accurately in context.',
+    };
+    return _AdaptiveTemplate(
+      verb: base.verb,
+      competency: '${base.competency} at $level level',
+      primary: base.primary,
+      supporting: base.supporting,
+      grammar: [...base.grammar, levelGrammar],
+      success: [...base.success, levelSuccess],
+    );
+  }
+
+  static List<_AdaptiveTemplate> _foundationTemplatesForLevel(String level) {
+    if (level == 'A1') return _foundationTemplates;
+    final descriptor = switch (level) {
+      'A2' =>
+        'Review the sound patterns that make everyday French easier to follow',
+      'B1' => 'Refine sound patterns in connected French and natural speech',
+      'B2' =>
+        'Polish sound patterns, rhythm, and spelling clues in fluent speech',
+      _ => 'Review the sound patterns that support the learner\'s level',
+    };
+    return [
+      _t(
+        'Review French sound patterns',
+        '$descriptor, starting with the alphabet',
+        SpeakSkill.alphabet,
+        [SpeakSkill.listening, SpeakSkill.vocabulary],
+        ['letter names', 'sound-spelling patterns'],
+        ['Recognize the target sound patterns.', 'Explain one useful clue.'],
+      ),
+      _t(
+        'Distinguish vowel contrasts',
+        'hear and produce vowel contrasts in short, meaningful words',
+        SpeakSkill.alphabet,
+        [SpeakSkill.listening, SpeakSkill.speaking],
+        ['French vowels', 'rhythm'],
+        ['Distinguish the sounds.', 'Produce them in context.'],
+      ),
+      _t(
+        'Use consonants in connected words',
+        'recognize consonant changes and pronounce them in useful phrases',
+        SpeakSkill.alphabet,
+        [SpeakSkill.listening, SpeakSkill.vocabulary],
+        ['French consonants', 'connected speech'],
+        ['Notice the sound change.', 'Repeat the phrase clearly.'],
+      ),
+      _t(
+        'Read accent clues in context',
+        'use accent marks as clues while reading and listening',
+        SpeakSkill.alphabet,
+        [SpeakSkill.reading, SpeakSkill.listening],
+        ['accent aigu', 'accent grave', 'accent circonflexe'],
+        ['Identify the accent clue.', 'Read the word accurately.'],
+      ),
+      _t(
+        'Connect sound to meaning',
+        'reuse essential words with accurate spelling and pronunciation',
+        SpeakSkill.vocabulary,
+        [SpeakSkill.alphabet, SpeakSkill.speaking],
+        ['spelling and pronunciation', 'word families'],
+        ['Read the words.', 'Use them in a short response.'],
+      ),
+    ];
+  }
+
+  static final _integratedPathTemplates = <_AdaptiveTemplate>[
+    _t(
+      'Learn first-meeting words',
+      'recognize greetings, names, countries, and personal information',
+      SpeakSkill.vocabulary,
+      [SpeakSkill.alphabet, SpeakSkill.grammar],
+      ['greetings', 'names', 'countries', 'être'],
+      ['Recognize the key words.', 'Use three words in a short phrase.'],
+    ),
+    _t(
+      'Build a first introduction',
+      'make a clear first sentence about yourself',
+      SpeakSkill.grammar,
+      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      ['subject pronouns', 'être', 'avoir'],
+      ['Choose the correct subject and verb.', 'Build one accurate sentence.'],
+    ),
+    _t(
+      'Read a short introduction',
+      'understand a short introduction and find personal details',
+      SpeakSkill.reading,
+      [SpeakSkill.vocabulary, SpeakSkill.grammar],
+      ['question words', 'personal details'],
+      [
+        'Find who, where, and one detail.',
+        'Connect the detail to the right person.',
+      ],
+    ),
+    _t(
+      'Listen for personal details',
+      'identify names, countries, and simple personal information in speech',
+      SpeakSkill.listening,
+      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      ['names', 'countries', 'numbers'],
+      ['Identify the main detail.', 'Confirm one detail you heard.'],
+    ),
+    _t(
+      'Introduce yourself',
+      'say your name, origin, and one personal detail',
+      SpeakSkill.speaking,
+      [SpeakSkill.listening, SpeakSkill.vocabulary],
+      ['être', 'venir de', 'question formation'],
+      [
+        'Say the introduction clearly.',
+        'Ask or answer one follow-up question.',
+      ],
+    ),
+    _t(
+      'Learn café and food words',
+      'recognize common café items, food, drinks, and numbers',
+      SpeakSkill.vocabulary,
+      [SpeakSkill.alphabet, SpeakSkill.listening],
+      ['food and drinks', 'numbers', 'articles'],
+      [
+        'Recognize the target items.',
+        'Choose the right word for a simple request.',
+      ],
+    ),
+    _t(
+      'Make a polite request',
+      'form a short request for food or a drink',
+      SpeakSkill.grammar,
+      [SpeakSkill.vocabulary, SpeakSkill.roleplay],
+      ['je voudrais', 'articles', 'question formation'],
+      ['Build the request in the right order.', 'Use a polite closing.'],
+    ),
+    _t(
+      'Read a simple menu',
+      'find items, prices, and options in a short menu',
+      SpeakSkill.reading,
+      [SpeakSkill.vocabulary, SpeakSkill.grammar],
+      ['prices', 'quantities', 'articles'],
+      ['Find the requested item.', 'Read one price and one option.'],
+    ),
+    _t(
+      'Listen for an order',
+      'follow a short café order and catch the essential details',
+      SpeakSkill.listening,
+      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      ['food and drinks', 'numbers', 'polite requests'],
+      ['Identify the order.', 'Confirm the quantity or option.'],
+    ),
+    _t(
+      'Order something simply',
+      'order a food or drink and respond to one follow-up question',
+      SpeakSkill.speaking,
+      [SpeakSkill.listening, SpeakSkill.roleplay],
+      ['je voudrais', 's\'il vous plaît', 'numbers'],
+      ['Make the order clearly.', 'Respond to one choice question.'],
+    ),
+    _t(
+      'Learn numbers and time',
+      'recognize numbers, days, times, and simple schedules',
+      SpeakSkill.vocabulary,
+      [SpeakSkill.listening, SpeakSkill.reading],
+      ['numbers', 'days', 'time expressions'],
+      ['Recognize the target information.', 'Say one time or date accurately.'],
+    ),
+    _t(
+      'Ask a clear question',
+      'form a question about place, time, or a simple need',
+      SpeakSkill.grammar,
+      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      ['est-ce que', 'question words', 'word order'],
+      ['Choose the right question form.', 'Ask one complete question.'],
+    ),
+    _t(
+      'Read a schedule or sign',
+      'find a place, time, and action in a practical notice',
+      SpeakSkill.reading,
+      [SpeakSkill.vocabulary, SpeakSkill.listening],
+      ['times', 'locations', 'imperatives'],
+      ['Find the requested details.', 'Explain what the sign asks you to do.'],
+    ),
+    _t(
+      'Listen for directions',
+      'follow a short exchange about a route or appointment',
+      SpeakSkill.listening,
+      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      ['directions', 'locations', 'time expressions'],
+      ['Identify the destination.', 'Sequence two actions you heard.'],
+    ),
+    _t(
+      'Use an everyday exchange',
+      'combine first words, requests, directions, and repair strategies',
+      SpeakSkill.speaking,
+      [SpeakSkill.listening, SpeakSkill.review, SpeakSkill.roleplay],
+      ['unit review', 'clarification phrases', 'polite requests'],
+      [
+        'Reach the practical goal.',
+        'Repair one misunderstanding or ask for repetition.',
+      ],
+    ),
+  ];
 
   /// Every twenty-session block has two deliberate production anchors. This
   /// prevents a learner who heavily weights listening, grammar, or writing
@@ -902,11 +1286,11 @@ abstract final class AdaptiveCoursePlanGenerator {
       'Opinions and reactions',
     ],
     _ => const [
-      'First conversations',
-      'Routines and appointments',
-      'Choices and preferences',
-      'Stories and plans',
-      'Real-life problem solving',
+      'Alphabet & sound foundations',
+      'First words & introductions',
+      'Everyday needs',
+      'Integrated beginner conversations',
+      'Beyond the basics',
     ],
   };
 

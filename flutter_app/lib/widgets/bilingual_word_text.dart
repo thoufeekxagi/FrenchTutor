@@ -19,6 +19,7 @@ class BilingualWordText extends StatelessWidget {
     required this.keywords,
     required this.selectedSourceWord,
     required this.onSourceWordTap,
+    this.sourceToTranslation,
     this.playbackSourceWord,
     this.accentColor,
     this.playbackTranslationWord,
@@ -34,6 +35,10 @@ class BilingualWordText extends StatelessWidget {
   final List<VocabEntry> keywords;
   final int? selectedSourceWord;
   final ValueChanged<int> onSourceWordTap;
+
+  /// Optional explicit alignment for authored bilingual lines. Each source
+  /// word index maps to the translation word indexes that express it.
+  final List<List<int>>? sourceToTranslation;
   final int? playbackSourceWord;
   final int? playbackTranslationWord;
   final Color? accentColor;
@@ -50,12 +55,16 @@ class BilingualWordText extends StatelessWidget {
         : _entryForWord(sourceWords, selectedSourceWord!);
     final selectedTranslationWords = selectedSourceWord == null
         ? const <int>{}
-        : _translationMatches(
-            translationWords,
-            selectedEntry?.en,
-            selectedSourceWord!,
-            sourceWords.length,
-          );
+        : _explicitTranslationMatches(
+                selectedSourceWord!,
+                translationWords.length,
+              ) ??
+              _translationMatches(
+                translationWords,
+                selectedEntry?.en,
+                selectedSourceWord!,
+                sourceWords.length,
+              );
 
     return Semantics(
       container: true,
@@ -141,6 +150,18 @@ class BilingualWordText extends StatelessWidget {
       }
     }
     return best;
+  }
+
+  Set<int>? _explicitTranslationMatches(int sourceIndex, int translationCount) {
+    final alignment = sourceToTranslation;
+    if (alignment == null ||
+        sourceIndex < 0 ||
+        sourceIndex >= alignment.length) {
+      return null;
+    }
+    return alignment[sourceIndex]
+        .where((index) => index >= 0 && index < translationCount)
+        .toSet();
   }
 
   Set<int> _translationMatches(

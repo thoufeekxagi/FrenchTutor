@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
+import '../../models/agent_tool.dart';
 import '../../models/speaking_course.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
@@ -13,15 +14,21 @@ import '../../providers/tutor_helper_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/tutor_helper_settings.dart';
+import '../../utils/speaking_translation_alignment.dart';
+import '../../widgets/bilingual_word_text.dart';
 
-/// The three controlled stages used by a Guided Speaking lesson.
+/// Legacy stages kept so previously stored lesson data can still render.
+///
+/// New learner lessons use one continuous speak-and-check turn per phrase. The
+/// old staged values are intentionally not emitted by the lesson planners.
 enum SpeakingGuidedStage { wordChoice, sentenceBuilder, speak }
 
 /// One fixed phrase or micro-exercise in the controlled Speak-style lesson.
 ///
-/// The French line is the source of truth. Guided lessons can teach it in
-/// order: identify one missing word, rebuild the sentence, then say it aloud.
-/// Free Talk and Roleplay keep the default [SpeakingGuidedStage.speak] stage.
+/// The French line is the source of truth. New guided lessons use the same
+/// compact loop as the approved reference: hear one phrase, say it once, see
+/// the match, then continue. The optional word/sentence metadata remains on
+/// the model for future in-card help and backwards compatibility.
 class SpeakingPhraseStep {
   const SpeakingPhraseStep({
     required this.french,
@@ -34,6 +41,7 @@ class SpeakingPhraseStep {
     this.blankWord,
     this.wordChoices = const [],
     this.sentenceTokens = const [],
+    this.translationAlignment,
   });
 
   final String french;
@@ -46,6 +54,7 @@ class SpeakingPhraseStep {
   final String? blankWord;
   final List<String> wordChoices;
   final List<String> sentenceTokens;
+  final List<List<int>>? translationAlignment;
 }
 
 enum _SpeakingStepState { ready, recording, checking, success, retry }
@@ -109,12 +118,19 @@ class _SpeakingLessonFlowScreenState
   bool _showMeaning = true;
   String _heard = '';
   String? _error;
+  String? _guidedFeedback;
   _SpeakingStepState _state = _SpeakingStepState.ready;
   String? _selectedWord;
   final List<int> _selectedSentenceTokens = [];
   final List<_SpeakingChatTurn> _chatHistory = [];
   final Set<String> _revealedTranslations = {};
-  bool _restartMurrayAfterRecording = false;
+  bool _murrayInputActive = false;
+  bool _murrayTurnClosing = false;
+  bool _murrayFinalizing = false;
+  bool _murrayGuidedGradeReceived = false;
+  bool _hasSubmittedCurrentPhrase = false;
+  final Set<int> _creditedSteps = {};
+  int? _selectedPhraseWord;
 
   SpeakingPhraseStep get _step => widget.steps[_index];
   TutorPersona get _tutor => widget.tutor ?? ActiveTutor.current;
@@ -128,10 +144,19 @@ class _SpeakingLessonFlowScreenState
       sessionType: _murraySessionType,
       lessonContext: () => _murrayContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
+      // Keep the existing automatic-VAD session for this constrained Live
+      // endpoint. Stop still sends audioStreamEnd, while transcripts remain
+      // deferred until Gemini closes the turn.
+      manualLearnerTurns: false,
       openingPrompt:
           '(Note from the app: the learner opened tutor help inside the current '
-          'speaking lesson. Give one short, warm sentence offering help with '
-          'the current phrase only, then wait. Never leave the lesson context.)',
+          'speaking lesson. Introduce yourself briefly, explain what the learner '
+          'should do for the current phrase, model the exact French target once, '
+          'then wait. Never leave the lesson context.)',
+      onUserTranscript: _onMurrayTranscript,
+      onTurnComplete: _onMurrayTurnComplete,
+      tools: _isFreeTalk ? const [] : AgentTool.guidedSpeakingPalette,
+      onToolCall: _onMurrayToolCall,
       onChanged: () {
         if (mounted) setState(() {});
       },
@@ -142,10 +167,16 @@ class _SpeakingLessonFlowScreenState
       final helperEnabled = ref
           .read(tutorHelperSettingsProvider)
           .isEnabled(TutorHelperSurface.speaking);
-      if (_isFreeTalk && helperEnabled) {
+      if (helperEnabled) {
         await _startMurray(sendOpeningPrompt: true);
-      } else {
+      }
+      if (!helperEnabled) {
         await _playCurrentPrompt();
+      } else if (!_murray.isLive && mounted && _error == null) {
+        setState(() {
+          _error =
+              'Murray could not connect for this guided lesson. Turn tutor help off or reconnect before speaking.';
+        });
       }
     });
   }
@@ -184,19 +215,53 @@ ${step.tip.trim().isEmpty ? '' : 'CURRENT PRONUNCIATION TIP: "${step.tip}".'}
 LEARNER STATE: ${_state.name}.
 ${_heard.trim().isEmpty ? '' : 'LATEST TRANSCRIPT: "$_heard".'}
 
+LIVE TURN RULES: The app keeps you connected as an in-lesson background
+assistant. Only treat microphone audio as the learner's answer while the app
+has opened the current answer window. Never treat your own audio as learner
+input. During an answer window, wait until the app closes the learner's turn,
+then give exactly one short level-appropriate correction or encouragement about
+this target. Do not answer a pause inside the phrase, and do not advance the
+lesson yourself.
+
+GUIDED RESULT RULE: For a guided speaking phrase, after the learner turn closes,
+call grade_guided_phrase exactly once for the current step. Include the 1-based
+step index, whether the target matched, the short final transcript, and one
+brief beginner-friendly feedback sentence. The app uses this one result for its
+visual check; do not ask the app to grade again and do not call the tool for a
+future step. Still say the brief feedback aloud, then stop.
+
 BOUNDARY: You are the learner's in-lesson coach. Explain, model, or give one
 short hint about the current target only. Do not create a new lesson, switch
 topics, introduce advanced vocabulary, reveal future lines, or control the
-app's next button. The app owns recording, matching, retries, and progression.
+app's next button. The app owns recording, stale-result protection, retries,
+and progression; your one accepted grade_guided_phrase result owns the normal
+visual match decision.
 For A1/A2, use short English coaching and clear French examples. Wait after
 one helpful response so the learner can practise.
 ''';
   }
 
+  void _promptMurray(String instruction) {
+    if (!_murray.isLive) return;
+    _murray.promptTutor('''
+CURRENT APP STATE (source of truth; it may have changed since this call began):
+$_murrayContext
+
+APP INSTRUCTION:
+$instruction
+''');
+  }
+
   Future<void> _setMurrayEnabled(bool enabled) async {
     if (!enabled) {
+      _murrayInputActive = false;
+      _murrayTurnClosing = false;
+      _murrayFinalizing = false;
       await _murray.end();
-    } else if (_isFreeTalk && !_murray.isLive) {
+      if (mounted && _state == _SpeakingStepState.recording) {
+        setState(() => _state = _SpeakingStepState.ready);
+      }
+    } else if (!_murray.isLive) {
       await _startMurray(sendOpeningPrompt: true);
     }
     if (!mounted) return;
@@ -207,14 +272,28 @@ one helpful response so the learner can practise.
   }
 
   Future<void> _startMurray({required bool sendOpeningPrompt}) async {
-    if (!_isFreeTalk || _murray.isLive || !mounted) return;
+    if (_murray.isLive || !mounted) return;
     await _murray.start(context, sendOpeningPrompt: sendOpeningPrompt);
-    if (!mounted || _murray.error == null) return;
-    setState(() => _error = _murray.error);
+    if (!mounted) return;
+    if (_murray.error != null) {
+      setState(() => _error = _murray.error);
+      return;
+    }
+    if (!_isFreeTalk && _murray.isLive && !_murray.muted) {
+      // Keep the Gemini session and tutor playback alive, but do not leave the
+      // learner microphone open between controlled phrase turns.
+      await _murray.toggleMute();
+    }
   }
 
   Future<void> _playPhrase() async {
     if (_playing || !mounted) return;
+    if (_murray.isLive) {
+      _promptMurray(
+        'Replay the exact current French target once, slowly and clearly, then give its short English meaning and wait: "${_step.french}".',
+      );
+      return;
+    }
     setState(() {
       _playing = true;
       _error = null;
@@ -254,9 +333,29 @@ one helpful response so the learner can practise.
       return;
     }
     if (_state == _SpeakingStepState.success) return;
-    if (_isFreeTalk && _murray.isLive) {
-      _restartMurrayAfterRecording = true;
-      await _murray.end();
+    final helperEnabled = ref
+        .read(tutorHelperSettingsProvider)
+        .isEnabled(TutorHelperSurface.speaking);
+    if (helperEnabled && !_murray.isLive) {
+      setState(() {
+        _error =
+            'Murray is enabled but is not connected. Turn tutor help off or reconnect before speaking.';
+      });
+      return;
+    }
+    if (_murray.isLive) {
+      _murrayInputActive = true;
+      _murrayTurnClosing = false;
+      _murrayFinalizing = false;
+      _murrayGuidedGradeReceived = false;
+      setState(() {
+        _state = _SpeakingStepState.recording;
+        _heard = '';
+        _error = null;
+        _guidedFeedback = null;
+      });
+      await _murray.startLearnerTurn();
+      return;
     }
     setState(() {
       _state = _SpeakingStepState.recording;
@@ -270,11 +369,105 @@ one helpful response so the learner can practise.
     );
   }
 
+  void _onMurrayTranscript(String transcript) {
+    if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
+    _murrayFinalizing = true;
+    _murrayInputActive = false;
+    unawaited(_finishRecording(transcript));
+  }
+
+  void _onMurrayTurnComplete() {
+    if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
+    // A quiet/unclear turn still needs to resolve visibly instead of leaving
+    // the learner stuck on Checking forever.
+    _murrayFinalizing = true;
+    _murrayInputActive = false;
+    unawaited(_finishRecording(''));
+  }
+
+  void _onMurrayToolCall(
+    String name,
+    Map<String, dynamic> args,
+    String callId,
+  ) {
+    if (name != 'grade_guided_phrase' || _isFreeTalk) {
+      _murray.sendToolResponse(
+        callId: callId,
+        name: name,
+        result: {'ok': false, 'error': 'unsupported guided result'},
+        scheduling: 'SILENT',
+      );
+      return;
+    }
+    final stepIndex = args['step_index'];
+    final matched = args['matched'];
+    final heard = args['heard'];
+    final feedback = args['feedback'];
+    final valid =
+        _murrayTurnClosing &&
+        !_murrayGuidedGradeReceived &&
+        stepIndex is int &&
+        stepIndex == _index + 1 &&
+        matched is bool &&
+        heard is String &&
+        feedback is String;
+    if (!valid) {
+      _murray.sendToolResponse(
+        callId: callId,
+        name: name,
+        result: {
+          'ok': false,
+          'error': 'The result was stale or did not match the current phrase.',
+        },
+        scheduling: 'SILENT',
+      );
+      return;
+    }
+    _murrayGuidedGradeReceived = true;
+    _murray.sendToolResponse(
+      callId: callId,
+      name: name,
+      result: {'ok': true, 'accepted_step_index': stepIndex},
+      scheduling: 'SILENT',
+    );
+    // Ignore the later transcript/turn-complete callbacks for this same turn;
+    // the structured Live result is now the single source of truth.
+    _murrayTurnClosing = false;
+    _applyGuidedResult(matched: matched, heard: heard, feedback: feedback);
+  }
+
+  void _applyGuidedResult({
+    required bool matched,
+    required String heard,
+    required String feedback,
+  }) {
+    if (!mounted) return;
+    final cleanHeard = heard.trim();
+    final cleanFeedback = feedback.trim();
+    _murrayInputActive = false;
+    _hasSubmittedCurrentPhrase = true;
+    setState(() {
+      _state = matched ? _SpeakingStepState.success : _SpeakingStepState.retry;
+      _heard = cleanHeard;
+      _guidedFeedback = cleanFeedback.isEmpty ? null : cleanFeedback;
+      _error = matched || cleanHeard.isNotEmpty
+          ? null
+          : 'No French speech was transcribed. Please try this line again.';
+    });
+    if (matched) _creditCurrentStep();
+    _murrayFinalizing = false;
+  }
+
   Future<void> _finishRecording(String transcript) async {
     if (!mounted) return;
+    // Fallback only: the normal Murray path resolves through the structured
+    // grade_guided_phrase event and never reaches this local matcher.
+    _murrayInputActive = false;
+    _murrayTurnClosing = false;
     setState(() {
       _state = _SpeakingStepState.checking;
       _heard = transcript.trim();
+      _guidedFeedback = null;
     });
     await Future<void>.delayed(const Duration(milliseconds: 180));
     if (!mounted) return;
@@ -283,20 +476,25 @@ one helpful response so the learner can practise.
         : _matchesTarget(_heard, _step.french);
     setState(() {
       _state = match ? _SpeakingStepState.success : _SpeakingStepState.retry;
+      _hasSubmittedCurrentPhrase = true;
       if (_heard.isEmpty) {
         _error =
             'No French speech was transcribed. Please try this line again.';
       }
-      if (match) _successful++;
+      if (match) _creditCurrentStep();
     });
-    if (_restartMurrayAfterRecording) {
-      _restartMurrayAfterRecording = false;
-      unawaited(_startMurray(sendOpeningPrompt: false));
-    }
+    _murrayFinalizing = false;
   }
 
   Future<void> _stopRecording() async {
     if (_state != _SpeakingStepState.recording) return;
+    if (_murray.isLive) {
+      _murrayInputActive = false;
+      _murrayTurnClosing = true;
+      setState(() => _state = _SpeakingStepState.checking);
+      await _murray.endLearnerTurn();
+      return;
+    }
     await LessonSpeechService.shared.stopListening();
   }
 
@@ -350,14 +548,36 @@ one helpful response so the learner can practise.
   void _resetGuidedExercise() {
     setState(() {
       _selectedWord = null;
+      _selectedPhraseWord = null;
       _selectedSentenceTokens.clear();
       _state = _SpeakingStepState.ready;
       _error = null;
     });
   }
 
+  void _creditCurrentStep() {
+    if (_creditedSteps.add(_index)) _successful++;
+  }
+
+  Future<void> _practiceMore() async {
+    if (_isGuidedExercise || !_hasSubmittedCurrentPhrase) return;
+    setState(() {
+      _state = _SpeakingStepState.ready;
+      _heard = '';
+      _error = null;
+      _guidedFeedback = null;
+      _hasSubmittedCurrentPhrase = false;
+      _murrayGuidedGradeReceived = false;
+    });
+    await _playCurrentPrompt();
+  }
+
   void _next() {
-    if (_state != _SpeakingStepState.success) return;
+    if (_isGuidedExercise) {
+      if (_state != _SpeakingStepState.success) return;
+    } else if (!_hasSubmittedCurrentPhrase) {
+      return;
+    }
     if (_index + 1 >= widget.steps.length) {
       _finishLesson();
       return;
@@ -379,7 +599,11 @@ one helpful response so the learner can practise.
       _state = _SpeakingStepState.ready;
       _heard = '';
       _error = null;
+      _guidedFeedback = null;
+      _hasSubmittedCurrentPhrase = false;
+      _murrayGuidedGradeReceived = false;
       _selectedWord = null;
+      _selectedPhraseWord = null;
       _selectedSentenceTokens.clear();
     });
     unawaited(_playCurrentPrompt());
@@ -387,8 +611,16 @@ one helpful response so the learner can practise.
 
   Future<void> _playCurrentPrompt() async {
     final partner = _step.partnerFrench;
+    if (_murray.isLive && !_isFreeTalk) {
+      _promptMurray(
+        partner == null
+            ? 'For this guided speaking turn, say the exact French target aloud once at a slow, natural A1/A2 pace, give its short meaning, and then wait for the learner: "${_step.french}".'
+            : 'For this roleplay turn, say this exact French partner line once, give its short meaning, and then wait for the learner: "$partner".',
+      );
+      return;
+    }
     if (_isFreeTalk && _murray.isLive && partner != null) {
-      _murray.promptTutor(
+      _promptMurray(
         'For the current Free Talk beat, say this exact French prompt aloud once, then wait for the learner: "$partner". Do not add another question or change the topic.',
       );
       return;
@@ -472,7 +704,7 @@ one helpful response so the learner can practise.
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
-                  if (_isFreeTalk) _murrayToggleCard(murrayEnabled),
+                  _murrayToggleCard(murrayEnabled),
                   const SizedBox(height: 14),
                   _progressBar(),
                   const SizedBox(height: 24),
@@ -579,7 +811,9 @@ one helpful response so the learner can practise.
   Widget _murrayToggleCard(bool enabled) {
     final tutor = ActiveTutor.current;
     final status = _murray.isLive
-        ? 'Live · pauses while you answer'
+        ? _murrayInputActive
+              ? 'Live · listening to this answer'
+              : 'Live · follows this lesson'
         : enabled
         ? 'On by default · starts with this lesson'
         : 'Off · practise without in-lesson coaching';
@@ -637,48 +871,40 @@ one helpful response so the learner can practise.
   }
 
   Widget _freeTalkChatCard() {
-    return Container(
+    return SizedBox(
       height: 380,
-      decoration: BoxDecoration(
-        color: DesignTokens.nightSurface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: DesignTokens.nightHairline),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
-          children: [
-            for (final turn in _chatHistory) ...[
-              _chatBubble(
-                keyName: '${turn.index}:partner',
-                label: 'MARIE',
-                french: turn.partnerFrench,
-                english: turn.partnerEnglish,
-                tutor: true,
-              ),
-              _chatBubble(
-                keyName: '${turn.index}:learner',
-                label: 'YOU',
-                french: turn.heard.isEmpty ? turn.learnerFrench : turn.heard,
-                english: turn.learnerEnglish,
-                tutor: false,
-                success: true,
-              ),
-            ],
-            if (_step.partnerFrench?.trim().isNotEmpty ?? false)
-              _chatBubble(
-                keyName: '$_index:partner',
-                label: 'MARIE',
-                french: _step.partnerFrench!,
-                english: _step.partnerEnglish,
-                tutor: true,
-                onPlay: _playing ? null : _playPartnerLine,
-              ),
-            const SizedBox(height: 10),
-            _currentLearnerBubble(),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+        children: [
+          for (final turn in _chatHistory) ...[
+            _chatBubble(
+              keyName: '${turn.index}:partner',
+              label: 'MARIE',
+              french: turn.partnerFrench,
+              english: turn.partnerEnglish,
+              tutor: true,
+            ),
+            _chatBubble(
+              keyName: '${turn.index}:learner',
+              label: 'YOU',
+              french: turn.heard.isEmpty ? turn.learnerFrench : turn.heard,
+              english: turn.learnerEnglish,
+              tutor: false,
+              success: true,
+            ),
           ],
-        ),
+          if (_step.partnerFrench?.trim().isNotEmpty ?? false)
+            _chatBubble(
+              keyName: '$_index:partner',
+              label: 'MARIE',
+              french: _step.partnerFrench!,
+              english: _step.partnerEnglish,
+              tutor: true,
+              onPlay: _playing ? null : _playPartnerLine,
+            ),
+          const SizedBox(height: 10),
+          _currentLearnerBubble(),
+        ],
       ),
     );
   }
@@ -1007,30 +1233,27 @@ one helpful response so the learner can practise.
                           : DesignTokens.nightAccent,
                     ),
                   ),
-                  const Spacer(),
-                  IconButton(
-                    tooltip: 'Play phrase',
-                    onPressed: _playing ? null : _playPhrase,
-                    icon: Icon(
-                      _playing
-                          ? Icons.graphic_eq_rounded
-                          : Icons.volume_up_outlined,
-                      color: DesignTokens.nightText,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 24),
-              Text(_step.french, style: _display(30).copyWith(height: 1.15)),
-              if (_showMeaning) ...[
-                const SizedBox(height: 12),
-                Text(
-                  _step.english,
-                  style: _body(
-                    16,
-                  ).copyWith(color: DesignTokens.nightMuted, height: 1.3),
-                ),
-              ],
+              BilingualWordText(
+                source: _step.french,
+                translation: _step.english,
+                sourceStyle: _display(30).copyWith(height: 1.15),
+                translationStyle: _body(
+                  16,
+                ).copyWith(color: DesignTokens.nightMuted, height: 1.3),
+                keywords: const [],
+                sourceToTranslation: _step.translationAlignment,
+                selectedSourceWord: _selectedPhraseWord,
+                showTranslation: _showMeaning,
+                accentColor: DesignTokens.nightAccent,
+                onSourceWordTap: (wordIndex) => setState(() {
+                  _selectedPhraseWord = _selectedPhraseWord == wordIndex
+                      ? null
+                      : wordIndex;
+                }),
+              ),
               if (_step.tip.trim().isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -1280,6 +1503,12 @@ one helpful response so the learner can practise.
   Future<void> _playPartnerLine() async {
     final line = _step.partnerFrench;
     if (line == null || line.trim().isEmpty || _playing || !mounted) return;
+    if (_murray.isLive) {
+      _promptMurray(
+        'Replay the exact current partner line once, slowly and clearly, then give its short English meaning and wait: "$line".',
+      );
+      return;
+    }
     setState(() {
       _playing = true;
       _error = null;
@@ -1328,18 +1557,22 @@ one helpful response so the learner can practise.
                 'Start again and follow the French order.',
               _ => 'Tap each word to build the sentence.',
             },
-            SpeakingGuidedStage.speak => 'Listen once, then say the phrase.',
+            SpeakingGuidedStage.speak =>
+              'Listen once, then record your phrase.',
           }
         : switch (_state) {
-            _SpeakingStepState.ready =>
-              'Listen once, then hold the microphone and say the phrase.',
+            _SpeakingStepState.ready => 'Listen once, then record your phrase.',
             _SpeakingStepState.recording =>
-              'Listening… release when you finish the phrase.',
+              _murray.isLive
+                  ? 'Recording… tap Stop when you finish the phrase.'
+                  : 'Recording… tap Stop when you finish the phrase.',
             _SpeakingStepState.checking => 'Checking your words…',
             _SpeakingStepState.success =>
-              'Your phrase matched. Keep going while it is fresh.',
+              _guidedFeedback ??
+                  'Your phrase matched. Keep going while it is fresh.',
             _SpeakingStepState.retry =>
-              'The phrase was not close enough yet. Replay it and try again.',
+              _guidedFeedback ??
+                  'The phrase was not close enough yet. Replay it and try again.',
           };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1384,6 +1617,7 @@ one helpful response so the learner can practise.
                   ? Icons.translate_rounded
                   : Icons.translate_outlined,
               label: _showMeaning ? 'Meaning on' : 'Meaning off',
+              selected: _showMeaning,
               onTap: () => setState(() => _showMeaning = !_showMeaning),
             ),
           ),
@@ -1406,9 +1640,12 @@ one helpful response so the learner can practise.
     final success = _state == _SpeakingStepState.success;
     final retry = _state == _SpeakingStepState.retry;
     final exercise = _isGuidedExercise;
+    if (!exercise && (success || retry)) return _postSubmissionActions();
     final active = success
         ? DesignTokens.success
-        : retry || recording
+        : recording
+        ? DesignTokens.nightAccent
+        : retry
         ? DesignTokens.danger
         : exercise && checking
         ? DesignTokens.nightSurfaceRaised
@@ -1418,14 +1655,14 @@ one helpful response so the learner can practise.
         : retry && exercise
         ? 'Try again'
         : recording
-        ? 'Release to check'
+        ? 'Stop'
         : checking
         ? 'Checking…'
         : exercise
         ? _step.stage == SpeakingGuidedStage.wordChoice
               ? 'Select a word'
               : 'Build the sentence'
-        : 'Hold to speak';
+        : 'Record';
     final VoidCallback? onTap = checking
         ? null
         : success
@@ -1440,18 +1677,12 @@ one helpful response so the learner can practise.
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      onLongPressStart: exercise || checking || success
-          ? null
-          : (_) => _startRecording(),
-      onLongPressEnd: exercise || checking || success
-          ? null
-          : (_) => _stopRecording(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 78,
-            height: 78,
+            width: 58,
+            height: 58,
             decoration: BoxDecoration(color: active, shape: BoxShape.circle),
             alignment: Alignment.center,
             child: Icon(
@@ -1475,6 +1706,59 @@ one helpful response so the learner can practise.
     );
   }
 
+  Widget _postSubmissionActions() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _compactGuidedAction(
+          icon: Icons.refresh_rounded,
+          label: 'Practice more',
+          onTap: _practiceMore,
+        ),
+        const SizedBox(width: 10),
+        _compactGuidedAction(
+          icon: Icons.arrow_forward_rounded,
+          label: 'Next phrase',
+          onTap: _next,
+        ),
+      ],
+    );
+  }
+
+  Widget _compactGuidedAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: DesignTokens.nightAccent,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.black, size: 25),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: _body(
+              9,
+              weight: FontWeight.w800,
+            ).copyWith(color: DesignTokens.nightText),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _freeTalkBottomControls() {
     final recording = _state == _SpeakingStepState.recording;
     final checking = _state == _SpeakingStepState.checking;
@@ -1487,15 +1771,8 @@ one helpful response so the learner can practise.
         border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: _smallControl(
-              icon: Icons.volume_up_outlined,
-              label: 'Replay Marie',
-              onTap: _playing ? null : _playPartnerLine,
-            ),
-          ),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: !enabled
@@ -1515,8 +1792,8 @@ one helpful response so the learner can practise.
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 78,
-                  height: 78,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
                     color: success
                         ? DesignTokens.success
@@ -1541,20 +1818,15 @@ one helpful response so the learner can practise.
                   success
                       ? 'Next phrase'
                       : recording
-                      ? 'Release to check'
+                      ? _murray.isLive
+                            ? 'Listening…'
+                            : 'Release to check'
                       : checking
                       ? 'Checking…'
                       : 'Hold to speak',
                   style: _body(11, weight: FontWeight.w800),
                 ),
               ],
-            ),
-          ),
-          Expanded(
-            child: _smallControl(
-              icon: Icons.volume_up_outlined,
-              label: 'Replay target',
-              onTap: _playing ? null : _playPhrase,
             ),
           ),
         ],
@@ -1565,6 +1837,7 @@ one helpful response so the learner can practise.
   Widget _smallControl({
     required IconData icon,
     required String label,
+    bool selected = false,
     VoidCallback? onTap,
   }) {
     return Semantics(
@@ -1572,11 +1845,19 @@ one helpful response so the learner can practise.
       label: label,
       child: GestureDetector(
         onTap: onTap,
-        child: Icon(
-          icon,
-          color: onTap == null
-              ? DesignTokens.nightHairline
-              : DesignTokens.nightText,
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(
+            child: Icon(
+              icon,
+              color: onTap == null
+                  ? DesignTokens.nightHairline
+                  : selected
+                  ? DesignTokens.nightAccent
+                  : DesignTokens.nightText,
+            ),
+          ),
         ),
       ),
     );
@@ -1610,9 +1891,9 @@ one helpful response so the learner can practise.
 }
 
 /// Converts a course target list into the controlled Speak-like drill. The
-/// course currently stores target phrases as French only, so familiar phrases
-/// receive an inline meaning and unknown targets stay honest rather than
-/// inventing a translation in the client.
+/// Every phrase that can enter the controlled Guided Speaking flow has an
+/// authored English counterpart. Unknown generated targets are rejected by
+/// [_buildSpeakingSteps] rather than rendered with an invented placeholder.
 const _speakingMeanings = {
   'bonjour': 'Hello.',
   'je m’appelle…': 'My name is…',
@@ -1624,6 +1905,70 @@ const _speakingMeanings = {
   'il y a…': 'There is / there are…',
   'tu veux venir… ?': 'Do you want to come…?',
   'pouvez-vous répéter ?': 'Can you repeat, please?',
+  'bonjour, je m’appelle alex.': 'Hello, my name is Alex.',
+  'je viens de toronto.': 'I am from Toronto.',
+  'enchanté de vous rencontrer.': 'Nice to meet you.',
+  'et vous, vous habitez où ?': 'And you, where do you live?',
+  'bonjour, je voudrais prendre rendez-vous.':
+      'Hello, I would like to make an appointment.',
+  'je suis disponible mardi matin.': 'I am available Tuesday morning.',
+  'est-ce que dix heures vous convient ?': 'Does ten o’clock work for you?',
+  'merci, à mardi.': 'Thank you, see you Tuesday.',
+  'pardon, pouvez-vous répéter ?': 'Sorry, can you repeat?',
+  'pouvez-vous parler plus lentement ?': 'Can you speak more slowly?',
+  'je n’ai pas compris la dernière phrase.':
+      'I did not understand the last sentence.',
+  'merci, maintenant je comprends.': 'Thank you, now I understand.',
+  'je me lève à sept heures.': 'I get up at seven o’clock.',
+  'je travaille le matin.': 'I work in the morning.',
+  'le soir, je prépare le dîner.': 'In the evening, I prepare dinner.',
+  'le week-end, je me repose.': 'On the weekend, I rest.',
+  'je préfère cette option.': 'I prefer this option.',
+  'c’est plus simple pour moi.': 'It is simpler for me.',
+  'je choisis le billet aller-retour.': 'I choose the return ticket.',
+  'merci pour votre conseil.': 'Thank you for your advice.',
+  'demain, je vais travailler.': 'Tomorrow, I am going to work.',
+  'je voudrais visiter le musée.': 'I would like to visit the museum.',
+  'si j’ai le temps, je prendrai un café.':
+      'If I have time, I will have a coffee.',
+  'on peut se retrouver à midi.': 'We can meet at noon.',
+  'j’ai un petit problème.': 'I have a small problem.',
+  'la porte ne ferme pas.': 'The door does not close.',
+  'pouvez-vous m’aider, s’il vous plaît ?': 'Can you help me, please?',
+  'merci beaucoup pour votre aide.': 'Thank you very much for your help.',
+  'à mon avis, c’est une bonne idée.': 'In my opinion, it is a good idea.',
+  'je préfère cette solution.': 'I prefer this solution.',
+  'parce qu’elle est simple et pratique.':
+      'Because it is simple and practical.',
+  'et vous, qu’en pensez-vous ?': 'And you, what do you think?',
+  'excusez-moi, où est la gare ?': 'Excuse me, where is the station?',
+  'allez tout droit, puis tournez à gauche.': 'Go straight, then turn left.',
+  'c’est loin d’ici ?': 'Is it far from here?',
+  'merci, je vais trouver.': 'Thank you, I will find it.',
+  'j’aime le thé, mais je préfère le café.': 'I like tea, but I prefer coffee.',
+  'je préfère une table près de la fenêtre.':
+      'I prefer a table near the window.',
+  'qu’est-ce que vous aimez ?': 'What do you like?',
+  'nous avons les mêmes goûts.': 'We have the same tastes.',
+  'pourriez-vous m’aider, s’il vous plaît ?': 'Could you help me, please?',
+  'j’aurais besoin d’une information.': 'I would need some information.',
+  'est-ce que vous pouvez vérifier ?': 'Can you check?',
+  'merci pour votre temps.': 'Thank you for your time.',
+  'hier, je suis allé au marché.': 'Yesterday, I went to the market.',
+  'j’ai acheté des légumes frais.': 'I bought fresh vegetables.',
+  'ensuite, je suis rentré chez moi.': 'Then, I went home.',
+  'c’était une matinée agréable.': 'It was a pleasant morning.',
+  'les amis arrivent à huit heures.': 'The friends arrive at eight o’clock.',
+  'nous allons écouter la liaison.': 'We are going to listen to liaison.',
+  'je parle lentement et clairement.': 'I speak slowly and clearly.',
+  'je recommence avec un rythme naturel.':
+      'I start again with a natural rhythm.',
+  'je voudrais sortir, mais il pleut.':
+      'I would like to go out, but it is raining.',
+  'je reste à la maison parce que je suis fatigué.':
+      'I stay at home because I am tired.',
+  'donc, je vais lire un livre.': 'So, I am going to read a book.',
+  'après cela, je préparerai le dîner.': 'After that, I will prepare dinner.',
 };
 
 List<SpeakingPhraseStep> speakingStepsForTargets(
@@ -1780,19 +2125,23 @@ List<SpeakingPhraseStep> _buildSpeakingSteps(
 }) {
   final steps = <SpeakingPhraseStep>[];
   for (final phrase in source) {
-    final english =
-        meanings[phrase.toLowerCase()] ??
-        'Listen to the tutor, then use this phrase in the lesson.';
-    steps.addAll(
-      _guidedStagesForPhrase(phrase, english: english, level: level),
-    );
+    final english = meanings[phrase.toLowerCase()];
+    if (english == null || english.trim().isEmpty) {
+      throw StateError(
+        'Missing English translation for Guided Speaking phrase "$phrase". '
+        'Generated practice must provide a bilingual phrase before it can '
+        'be shown to the learner.',
+      );
+    }
+    steps.add(_guidedSpeechStep(phrase, english: english, level: level));
   }
   return steps;
 }
 
 /// Keeps the authored English and partner fields from the permanent Speaking
-/// catalog while adding the controlled word -> sentence -> speech progression.
-/// Free Talk and Roleplay intentionally do not call this helper.
+/// catalog while producing one compact hear -> speak -> check turn per target.
+/// Free Talk and Roleplay continue to keep their authored partner/open-response
+/// fields; only ordinary guided lines use this compact planner.
 List<SpeakingPhraseStep> speakingStepsForCourseLines(
   Iterable<SpeakingCourseLine> lines, {
   required String level,
@@ -1811,8 +2160,8 @@ List<SpeakingPhraseStep> speakingStepsForCourseLines(
         ),
       );
     } else {
-      steps.addAll(
-        _guidedStagesForPhrase(
+      steps.add(
+        _guidedSpeechStep(
           line.french,
           english: line.english,
           level: level,
@@ -1827,7 +2176,7 @@ List<SpeakingPhraseStep> speakingStepsForCourseLines(
   return steps;
 }
 
-List<SpeakingPhraseStep> _guidedStagesForPhrase(
+SpeakingPhraseStep _guidedSpeechStep(
   String phrase, {
   required String english,
   required String level,
@@ -1841,30 +2190,24 @@ List<SpeakingPhraseStep> _guidedStagesForPhrase(
     throw StateError('A speaking phrase cannot be empty.');
   }
   final blank = tokens.length == 1 ? tokens.first : tokens[1];
-  final choices = _guidedWordChoices(blank, level: level);
   final rhythmTip = tip.trim().isNotEmpty
       ? tip
       : level.toUpperCase() == 'A1'
       ? 'Keep the rhythm clear and unhurried.'
       : 'Keep the key words connected and natural.';
-  return [
-    SpeakingPhraseStep(
-      french: phrase,
-      english: english,
-      tip: rhythmTip,
-      stage: SpeakingGuidedStage.wordChoice,
-      blankWord: blank,
-      wordChoices: choices,
+  return SpeakingPhraseStep(
+    french: phrase,
+    english: english,
+    tip: rhythmTip,
+    stage: SpeakingGuidedStage.speak,
+    blankWord: blank,
+    wordChoices: _guidedWordChoices(blank, level: level),
+    sentenceTokens: tokens,
+    translationAlignment: SpeakingTranslationAlignment.forPhrase(
+      phrase,
+      english,
     ),
-    SpeakingPhraseStep(
-      french: phrase,
-      english: english,
-      tip: rhythmTip,
-      stage: SpeakingGuidedStage.sentenceBuilder,
-      sentenceTokens: tokens,
-    ),
-    SpeakingPhraseStep(french: phrase, english: english, tip: rhythmTip),
-  ];
+  );
 }
 
 List<String> _guidedWordChoices(String answer, {required String level}) {

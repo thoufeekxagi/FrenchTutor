@@ -29,6 +29,8 @@ class GeminiLiveService {
     this.tools = const [],
     this.learningStoreForProfile,
     this.autoReconnect = true,
+    this.manualActivityBoundaries = false,
+    this.deferUserTranscriptUntilTurnComplete = false,
   });
 
   final String apiKey;
@@ -46,6 +48,15 @@ class GeminiLiveService {
   /// Reconnect automatically on unintentional socket loss. On by default; tests and
   /// one-shot probes can turn it off.
   final bool autoReconnect;
+
+  /// When true, the caller owns the learner turn boundary and sends
+  /// activityStart/activityEnd. This is used by tap-to-record speaking turns so
+  /// a pause in a beginner's sentence cannot make Gemini answer early.
+  final bool manualActivityBoundaries;
+
+  /// When true, input transcription is held until the server closes the turn.
+  /// Partial text must never be used to build a new lesson context.
+  final bool deferUserTranscriptUntilTurnComplete;
 
   static const _model = 'models/gemini-3.1-flash-live-preview';
 
@@ -218,6 +229,25 @@ class GeminiLiveService {
     });
   }
 
+  void beginAudioTurn() {
+    if (!_isSetupComplete || !manualActivityBoundaries) return;
+    _send({
+      'realtimeInput': {'activityStart': {}},
+    });
+  }
+
+  /// Closes the learner's current audio turn. Automatic-VAD sessions use the
+  /// documented audioStreamEnd marker; manual tap-to-record sessions use
+  /// activityEnd instead.
+  void endAudioTurn() {
+    if (!_isSetupComplete) return;
+    _send({
+      'realtimeInput': manualActivityBoundaries
+          ? {'activityEnd': {}}
+          : {'audioStreamEnd': true},
+    });
+  }
+
   /// [expectReply] controls the API-level `turnComplete` flag — this is
   /// Gemini Live's OWN turn-taking signal, separate from anything the prompt
   /// text says. Sending `turnComplete: true` tells the model "the user's
@@ -374,6 +404,18 @@ class GeminiLiveService {
     if (expectReply) _suppressPreInjection = false;
   }
 
+  /// Queues a spoken app instruction behind the current model turn. Realtime
+  /// audio and text are concurrent streams, so injecting text while audio is
+  /// still being generated can reorder the phrase or make Gemini restart it.
+  void queueSpokenContext(String note) {
+    if (!_isSetupComplete || note.trim().isEmpty) return;
+    if (_isModelGenerating) {
+      _pendingSpokenContext = note;
+      return;
+    }
+    injectContext(note, expectReply: true);
+  }
+
   void _deliverPendingSpokenContext() {
     final note = _pendingSpokenContext;
     _pendingSpokenContext = null;
@@ -408,7 +450,7 @@ class GeminiLiveService {
       'inputAudioTranscription': <String, dynamic>{},
       'realtimeInputConfig': {
         'automaticActivityDetection': {
-          'disabled': false,
+          'disabled': manualActivityBoundaries,
           'startOfSpeechSensitivity': 'START_SENSITIVITY_LOW',
           'endOfSpeechSensitivity': 'END_SENSITIVITY_LOW',
           'prefixPaddingMs': 300,
@@ -588,18 +630,15 @@ class GeminiLiveService {
       final t = inputTranscription['text'] as String?;
       if (t != null && t.isNotEmpty) {
         _currentUserTranscript += t;
-        // THE core sync fix: the student's transcript used to be delivered only when the
-        // MODEL's reply started streaming (or on turnComplete) — so with Marie instructed
-        // to wait silently, a spoken "next" sat in this buffer indefinitely and the card
-        // never moved. Input transcription streams in near-realtime while the student
-        // talks, so flush on a short trailing debounce instead: the utterance reaches the
-        // intent judge ~800ms after they stop speaking, with zero dependence on whether
-        // or when Marie replies.
-        _inputFlushTimer?.cancel();
-        _inputFlushTimer = Timer(
-          const Duration(milliseconds: 800),
-          _flushUserTranscript,
-        );
+        if (!deferUserTranscriptUntilTurnComplete) {
+          // Open-ended calls still need responsive transcript delivery. Controlled
+          // speaking turns opt out so a partial phrase cannot trigger context injection.
+          _inputFlushTimer?.cancel();
+          _inputFlushTimer = Timer(
+            const Duration(milliseconds: 800),
+            _flushUserTranscript,
+          );
+        }
       }
     }
 
@@ -610,7 +649,9 @@ class GeminiLiveService {
         _isModelGenerating = true;
         if (!_suppressStaleReply && !_suppressPreInjection) {
           onTranscriptDelta?.call(t);
-          _flushUserTranscript();
+          if (!deferUserTranscriptUntilTurnComplete) {
+            _flushUserTranscript();
+          }
           _currentTutorTranscript += t;
         }
       }
@@ -654,6 +695,7 @@ class GeminiLiveService {
         onTutorTranscript?.call(tutorTranscript);
       }
       onTurnComplete?.call();
+      _deliverPendingSpokenContext();
     }
   }
 

@@ -698,7 +698,9 @@ class GeneratedStory {
   final String? audioPath;
 
   /// The selected renderer format (`music`, `podcast`, `narration`, or
-  /// `educational`) used to create [audioPath].
+  /// `educational`) used to create [audioPath]. A quota-recovered lesson is
+  /// stored as `gemini_live_spoken` so the UI never mislabels spoken audio as
+  /// music.
   final String? audioMode;
 
   /// Keeps the reading and listening shelves independent while preserving

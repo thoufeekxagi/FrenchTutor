@@ -13,6 +13,7 @@ class ElevenLabsAudioClip {
   const ElevenLabsAudioClip({
     required this.mode,
     required this.bytes,
+    this.container = 'mp3',
     this.alignment,
     this.voiceSegments = const [],
     this.validation,
@@ -20,6 +21,7 @@ class ElevenLabsAudioClip {
 
   final String mode;
   final Uint8List bytes;
+  final String container;
 
   /// TTS/dialogue return an alignment map; detailed music can return a list of
   /// word timestamps, so keep the provider's timing shape intact.
@@ -29,6 +31,7 @@ class ElevenLabsAudioClip {
 
   bool get hasTiming => alignment != null;
   bool get isValidated => validation?['accepted'] == true;
+  bool get isWav => container.toLowerCase() == 'wav';
 }
 
 class ElevenLabsProviderException implements Exception {
@@ -38,6 +41,19 @@ class ElevenLabsProviderException implements Exception {
   final int? status;
 
   bool get isPaymentRequired => status == 402;
+
+  /// Only provider quota/credit/rate-limit failures are eligible for the
+  /// explicit Gemini Live spoken-audio recovery path. Other errors remain
+  /// visible so a broken renderer cannot be hidden by a different provider.
+  bool get isQuotaExceeded {
+    if (status == 402 || status == 429) return true;
+    final normalized = message.toLowerCase();
+    return normalized.contains('quota') ||
+        normalized.contains('credit') ||
+        normalized.contains('rate limit') ||
+        normalized.contains('resource exhausted') ||
+        normalized.contains('too many requests');
+  }
 
   @override
   String toString() => message;

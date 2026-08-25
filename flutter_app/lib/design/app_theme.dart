@@ -34,6 +34,7 @@ abstract final class AppTheme {
     final hairline = dark
         ? AppearanceColors.darkHairline
         : AppearanceColors.lightHairline;
+    final accent = dark ? AppearanceColors.gold : AppearanceColors.goldDeep;
     final goldSoft = dark
         ? AppearanceColors.goldSoftDark
         : AppearanceColors.goldSoftLight;
@@ -46,7 +47,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: canvas,
       colorScheme: ColorScheme(
         brightness: dark ? Brightness.dark : Brightness.light,
-        primary: AppearanceColors.gold,
+        primary: accent,
         onPrimary: Colors.black,
         secondary: AppearanceColors.goldDeep,
         onSecondary: Colors.black,
@@ -64,7 +65,7 @@ abstract final class AppTheme {
       canvasColor: canvas,
       cardColor: surface,
       shadowColor: Colors.black.withValues(alpha: dark ? 0.28 : 0.08),
-      primaryColor: AppearanceColors.gold,
+      primaryColor: accent,
       hintColor: muted,
       unselectedWidgetColor: muted,
       dialogBackgroundColor: surface,
@@ -126,13 +127,13 @@ abstract final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
-          borderSide: BorderSide(color: AppearanceColors.goldDeep, width: 1.5),
+          borderSide: BorderSide(color: accent, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(48, 56),
-          backgroundColor: AppearanceColors.gold,
+          backgroundColor: accent,
           foregroundColor: Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -147,7 +148,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(48, 56),
-          backgroundColor: AppearanceColors.gold,
+          backgroundColor: accent,
           foregroundColor: Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -185,9 +186,7 @@ abstract final class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? AppearanceColors.gold
-              : raised,
+          (states) => states.contains(WidgetState.selected) ? accent : raised,
         ),
         thumbColor: const WidgetStatePropertyAll(Colors.white),
       ),
@@ -200,23 +199,23 @@ abstract final class AppTheme {
         ),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: AppearanceColors.gold,
+        activeTrackColor: accent,
         inactiveTrackColor: goldSoft,
-        thumbColor: AppearanceColors.gold,
-        overlayColor: AppearanceColors.gold.withValues(alpha: 0.1),
+        thumbColor: accent,
+        overlayColor: accent.withValues(alpha: 0.1),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: AppearanceColors.gold,
+        color: accent,
         linearTrackColor: raised,
       ),
       tabBarTheme: TabBarThemeData(
         labelColor: AppearanceColors.goldDeep,
         unselectedLabelColor: muted,
-        indicatorColor: AppearanceColors.gold,
+        indicatorColor: accent,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
-        selectedItemColor: AppearanceColors.gold,
+        selectedItemColor: accent,
         unselectedItemColor: muted,
         elevation: 0,
       ),

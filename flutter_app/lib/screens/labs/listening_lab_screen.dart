@@ -10,6 +10,8 @@ import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
+import '../../services/audio_container_utils.dart';
+import '../../services/gemini_live_audio_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -27,6 +29,23 @@ const _storyTopicCategories = [
   'Technology',
   'Environment',
 ];
+
+IconData _topicIcon(String topic) {
+  switch (topic.toLowerCase()) {
+    case 'travel':
+      return Icons.flight_rounded;
+    case 'food':
+      return Icons.restaurant_rounded;
+    case 'music':
+      return Icons.music_note_rounded;
+    case 'technology':
+      return Icons.computer_rounded;
+    case 'environment':
+      return Icons.eco_rounded;
+    default:
+      return Icons.circle_outlined;
+  }
+}
 
 const _listeningFormatOptions = [
   _ListeningFormatOption(
@@ -73,6 +92,20 @@ class _ListeningFormatOption {
   final String label;
   final String detail;
   final IconData icon;
+}
+
+class _RenderedListeningAudio {
+  const _RenderedListeningAudio({
+    required this.clip,
+    required this.storageMode,
+    required this.extension,
+    required this.contentType,
+  });
+
+  final ElevenLabsAudioClip clip;
+  final String storageMode;
+  final String extension;
+  final String contentType;
 }
 
 /// The learner's personal library of AI-generated stories — the "Read a new
@@ -176,22 +209,19 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         practiceMode: 'listening',
       );
       generationStage = 'audio';
-      final experimentalAudio = widget.examMode || widget.readingMode
+      final renderedAudio = widget.examMode || widget.readingMode
           ? null
-          : await _prepareExperimentalAudio(story: story);
+          : await _prepareAudioWithQuotaRecovery(story: story);
       var persistedStory = story;
-      if (!widget.examMode &&
-          !widget.readingMode &&
-          experimentalAudio != null) {
-        final selectedMode = _selectedFormat == 'surprise'
-            ? 'narration'
-            : _selectedFormat;
+      if (!widget.examMode && !widget.readingMode && renderedAudio != null) {
         final audioPath = await ref
             .read(syncServiceProvider)
             .uploadListeningAudio(
               storyId: story.id,
-              mode: selectedMode,
-              bytes: experimentalAudio.bytes,
+              mode: renderedAudio.storageMode,
+              bytes: renderedAudio.clip.bytes,
+              extension: renderedAudio.extension,
+              contentType: renderedAudio.contentType,
             );
         if (audioPath == null || audioPath.isEmpty) {
           throw const ElevenLabsProviderException(
@@ -200,7 +230,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         }
         persistedStory = story.copyWith(
           audioPath: audioPath,
-          audioMode: selectedMode,
+          audioMode: renderedAudio.storageMode,
         );
       }
       final examAttempt = widget.examMode
@@ -229,7 +259,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       }
       final result = await AppRouter.push<Object?>(
         context,
-        (_) => _lessonScreen(persistedStory, audioClip: experimentalAudio),
+        (_) => _lessonScreen(persistedStory, audioClip: renderedAudio?.clip),
         fullscreenDialog: widget.autoStart,
       );
       if (widget.examMode &&
@@ -301,7 +331,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
             value: topic.toLowerCase(),
             label: topic,
             detail: 'Steer the next story toward $topic',
-            icon: CupertinoIcons.circle_fill,
+            icon: _topicIcon(topic),
           ),
       ],
     );
@@ -327,8 +357,51 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   }
 
   /// Gemini owns the lesson structure and meanings. ElevenLabs renders the
-  /// selected format from this exact canonical script. A failure is surfaced
-  /// to the learner so an unverified fallback can never enter a lesson.
+  /// selected format from this exact canonical script. Only a detected
+  /// ElevenLabs quota/credit/rate-limit error enters the explicit Gemini Live
+  /// spoken-audio recovery path; every other renderer error stays visible.
+  Future<_RenderedListeningAudio> _prepareAudioWithQuotaRecovery({
+    required GeneratedStory story,
+  }) async {
+    final selectedMode = _selectedFormat == 'surprise'
+        ? 'narration'
+        : _selectedFormat;
+    try {
+      final clip = await _prepareExperimentalAudio(story: story);
+      return _RenderedListeningAudio(
+        clip: clip,
+        storageMode: selectedMode,
+        extension: 'mp3',
+        contentType: 'audio/mpeg',
+      );
+    } on ElevenLabsProviderException catch (error) {
+      if (!error.isQuotaExceeded) rethrow;
+      final script = CanonicalAudioScript.fromStory(
+        story,
+        format: selectedMode,
+      );
+      final pcm = await GeminiLiveAudioService.shared.synthesizeListeningLesson(
+        text: script.narrationText,
+        format: selectedMode,
+        level: story.levelBand,
+      );
+      final wav = pcm16ToWav(
+        pcm,
+        sampleRate: GeminiLiveAudioService.outputSampleRateHz,
+      );
+      return _RenderedListeningAudio(
+        clip: ElevenLabsAudioClip(
+          mode: 'gemini_live_spoken',
+          bytes: wav,
+          container: 'wav',
+        ),
+        storageMode: 'gemini_live_spoken',
+        extension: 'wav',
+        contentType: 'audio/wav',
+      );
+    }
+  }
+
   Future<ElevenLabsAudioClip> _prepareExperimentalAudio({
     required GeneratedStory story,
   }) async {
@@ -857,6 +930,8 @@ class _ListeningChoiceSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = DesignTokens.primaryReadable;
+
     return SafeArea(
       child: Container(
         constraints: const BoxConstraints(maxHeight: 620),
@@ -892,7 +967,7 @@ class _ListeningChoiceSheet extends StatelessWidget {
                 leading: Icon(
                   option.icon,
                   color: option.value == selected
-                      ? DesignTokens.nightAccent
+                      ? accent
                       : DesignTokens.nightMuted,
                 ),
                 title: Text(
@@ -900,7 +975,7 @@ class _ListeningChoiceSheet extends StatelessWidget {
                   style: DesignTokens.body(15, weight: FontWeight.w700)
                       .copyWith(
                         color: option.value == selected
-                            ? DesignTokens.nightAccent
+                            ? accent
                             : DesignTokens.nightText,
                       ),
                 ),
@@ -911,10 +986,7 @@ class _ListeningChoiceSheet extends StatelessWidget {
                   ).copyWith(color: DesignTokens.nightMuted),
                 ),
                 trailing: option.value == selected
-                    ? Icon(
-                        CupertinoIcons.checkmark,
-                        color: DesignTokens.nightAccent,
-                      )
+                    ? Icon(CupertinoIcons.checkmark, color: accent)
                     : null,
                 onTap: () => Navigator.pop(context, option.value),
               ),

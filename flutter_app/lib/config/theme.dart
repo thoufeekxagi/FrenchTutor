@@ -36,6 +36,7 @@ abstract final class Passeport {
   static Color get canvasDim => DesignTokens.canvasDim;
   static Color get surface => DesignTokens.surface;
   static Color get primary => DesignTokens.primary;
+  static Color get primaryReadable => DesignTokens.primaryReadable;
   static Color get primaryDeep => DesignTokens.primaryDeep;
   static Color get secondary => DesignTokens.secondary;
   static Color get success => DesignTokens.success;

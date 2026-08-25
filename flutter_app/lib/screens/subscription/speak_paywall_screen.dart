@@ -186,6 +186,10 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // This screen is often kept alive while the app appearance changes.
+    // Reading the inherited theme makes the stateful paywall rebuild and
+    // re-resolve its semantic colors immediately.
+    Theme.of(context);
     return Scaffold(
       backgroundColor: SpeakColors.background,
       body: SafeArea(
@@ -314,7 +318,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: SpeakColors.surface,
                       shape: BoxShape.circle,
                       border: Border.all(color: SpeakColors.line),
                     ),
@@ -400,7 +404,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected ? SpeakColors.accent : SpeakColors.line,
@@ -428,10 +432,9 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                   const SizedBox(height: 1),
                   Text(
                     package.storeProduct.priceString,
-                    style: DesignTokens.display(21).copyWith(
-                      color: SpeakColors.navy,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: DesignTokens.display(
+                      21,
+                    ).copyWith(fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 1),
                   Text(

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import '../config/api_keys.dart';
 import '../data/database/learning_store.dart';
 import '../models/tutor_persona.dart';
+import '../models/agent_tool.dart';
 import '../prompts/live_prompts.dart';
 import '../widgets/ai_voice_disclosure.dart';
 import 'audio_streaming_service.dart';
@@ -35,6 +36,10 @@ class InlineCallController {
     this.openingPrompt,
     this.onUserTranscript,
     this.onTutorTranscript,
+    this.onTurnComplete,
+    this.tools = const [],
+    this.onToolCall,
+    this.manualLearnerTurns = false,
   });
 
   final LiveSessionType sessionType;
@@ -62,6 +67,17 @@ class InlineCallController {
   /// `logUser`/`logTutor` so the call counts toward that session's recap.
   final void Function(String text)? onUserTranscript;
   final void Function(String text)? onTutorTranscript;
+  final VoidCallback? onTurnComplete;
+
+  /// Optional structured events emitted by Gemini during a Live turn.
+  final List<AgentTool> tools;
+  final void Function(String name, Map<String, dynamic> args, String callId)?
+  onToolCall;
+
+  /// Gives a host explicit tap-to-record boundaries instead of server-side
+  /// silence detection. This is important for short beginner phrases, where a
+  /// pause inside the sentence must not trigger an early Murray reply.
+  final bool manualLearnerTurns;
 
   GeminiLiveService? gemini;
   AudioStreamingService? audio;
@@ -108,7 +124,7 @@ class InlineCallController {
     final connected = await _connect();
     if (!connected) {
       connecting = false;
-      error = "Couldn't connect. Check your connection and try again.";
+      error ??= "Couldn't connect. Check your connection and try again.";
       onChanged();
       return;
     }
@@ -139,6 +155,10 @@ class InlineCallController {
       sessionType: sessionType,
       lessonContext: lessonContext(),
       learningStoreForProfile: learningStoreForProfile,
+      manualActivityBoundaries: manualLearnerTurns,
+      deferUserTranscriptUntilTurnComplete:
+          manualLearnerTurns || sessionType == LiveSessionType.speakingGuided,
+      tools: tools,
     );
     audio = a;
     gemini = g;
@@ -158,11 +178,11 @@ class InlineCallController {
       onChanged();
     };
     g.onError = (msg) {
+      error = msg;
       if (!completer.isCompleted) {
         completer.complete(false);
         return;
       }
-      error = msg;
       onChanged();
     };
     g.onDisconnected = () {
@@ -191,7 +211,9 @@ class InlineCallController {
       a.isOutputActive = false;
       tutorSpeaking = false;
       onChanged();
+      onTurnComplete?.call();
     };
+    g.onToolCall = onToolCall;
 
     g.connect();
     final connected = await completer.future.timeout(
@@ -213,13 +235,50 @@ class InlineCallController {
     gemini?.sendText(trimmed);
   }
 
+  void sendToolResponse({
+    required String callId,
+    required String name,
+    required Map<String, dynamic> result,
+    String? scheduling,
+  }) {
+    gemini?.sendToolResponse(
+      callId: callId,
+      name: name,
+      result: result,
+      scheduling: scheduling,
+    );
+  }
+
   /// Gives the live helper an app-owned coaching instruction. This is kept
   /// separate from [sendText] so a scripted lesson never treats its own
   /// current prompt as learner input.
   void promptTutor(String instruction) {
     final trimmed = instruction.trim();
     if (!isLive || trimmed.isEmpty) return;
-    gemini?.injectContext(trimmed, expectReply: true);
+    // If Murray is still finishing the previous phrase, queue this instruction
+    // behind that turn. Sending it immediately would interrupt the old audio and
+    // make the new phrase sound like a cut-off/restart.
+    gemini?.queueSpokenContext(trimmed);
+  }
+
+  Future<void> startLearnerTurn() async {
+    if (!isLive || gemini == null || audio == null) return;
+    gemini!.beginAudioTurn();
+    if (muted) {
+      muted = false;
+      onChanged();
+      await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
+    }
+  }
+
+  Future<void> endLearnerTurn() async {
+    if (!isLive || gemini == null || audio == null) return;
+    // Signal the server before closing the local recorder so the final PCM
+    // bytes remain part of the same learner turn.
+    gemini!.endAudioTurn();
+    await audio!.stopStreaming();
+    muted = true;
+    onChanged();
   }
 
   Future<void> toggleMute() async {

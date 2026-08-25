@@ -1,3 +1,6 @@
+// The active catalog uses the square lesson grid below.
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +10,7 @@ import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
 import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
+import '../../utils/speaking_translation_alignment.dart';
 import 'speak_roleplay_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_lesson_flow_screen.dart';
@@ -41,11 +45,12 @@ class _SpeakingCourseHomeScreenState
         (lesson) => lesson.mode == _mode && lesson.level == level,
       ),
     ];
+    final completed = ref.watch(storageServiceProvider).completedContentKeys();
+    final nextLesson = _nextLesson(lessons, completed);
     final selected = lessons.firstWhere(
       (lesson) => lesson.id == _selectedLessonId,
-      orElse: () => lessons.first,
+      orElse: () => nextLesson ?? lessons.first,
     );
-    final completed = ref.watch(storageServiceProvider).completedContentKeys();
 
     return Scaffold(
       backgroundColor: DesignTokens.nightCanvas,
@@ -66,20 +71,13 @@ class _SpeakingCourseHomeScreenState
             const SizedBox(height: 22),
             _modePicker(),
             const SizedBox(height: 18),
+            _sectionLabel('EXTRA PRACTICE'),
+            const SizedBox(height: 10),
             _featuredLesson(selected, completed.contains(selected.id)),
             const SizedBox(height: 28),
             _sectionLabel(_sectionTitle),
             const SizedBox(height: 10),
-            if (_mode == SpeakingCourseMode.guided)
-              ...lessons.map(
-                (lesson) => _lessonRow(
-                  lesson,
-                  selected: lesson.id == selected.id,
-                  complete: completed.contains(lesson.id),
-                ),
-              )
-            else
-              _lessonGrid(lessons, completed),
+            _lessonGrid(lessons, completed),
             if (_mode == SpeakingCourseMode.guided) ...[
               const SizedBox(height: 24),
               _generateMoreCard(level),
@@ -402,7 +400,7 @@ class _SpeakingCourseHomeScreenState
         crossAxisCount: 3,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        mainAxisExtent: 108,
+        childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
         final lesson = lessons[index];
@@ -414,6 +412,16 @@ class _SpeakingCourseHomeScreenState
         );
       },
     );
+  }
+
+  SpeakingCourseLesson? _nextLesson(
+    List<SpeakingCourseLesson> lessons,
+    Set<String> completed,
+  ) {
+    for (final lesson in lessons) {
+      if (!completed.contains(lesson.id)) return lesson;
+    }
+    return lessons.isEmpty ? null : lessons.first;
   }
 
   Widget _generateMoreCard(String level) {
@@ -538,6 +546,20 @@ class _SpeakingCourseHomeScreenState
     String level, {
     required SpeakingCourseMode mode,
   }) {
+    if (mode == SpeakingCourseMode.guided) {
+      for (final segment in passage.segments) {
+        if (segment.fr.trim().isEmpty || segment.en.trim().isEmpty) {
+          throw StateError(
+            'Generated Guided Speaking lesson contains a missing French or '
+            'English line.',
+          );
+        }
+        // Validate before adding the lesson to the screen. A generated line
+        // must have a real bilingual contract; it may not rely on a visual
+        // fallback when the learner taps a word later.
+        SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en);
+      }
+    }
     if ((mode == SpeakingCourseMode.freeTalk ||
             mode == SpeakingCourseMode.roleplay) &&
         passage.segments.any(

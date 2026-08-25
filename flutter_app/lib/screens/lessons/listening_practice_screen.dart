@@ -13,6 +13,8 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/elevenlabs_audio_playback_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
+import '../../services/audio_container_utils.dart';
+import '../../services/gemini_live_audio_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
@@ -369,6 +371,7 @@ class _ListeningPracticeScreenState
       }
       await ElevenLabsAudioPlaybackService.shared.play(
         clip.bytes,
+        container: clip.container,
         speed: _rate,
         onFinished: () {
           if (!mounted) return;
@@ -407,11 +410,12 @@ class _ListeningPracticeScreenState
         _hasStartedPlayback = true;
         _currentSegment = index;
       });
-      final clip = _lineAudioCache[index] ??= await ElevenLabsAudioService
-          .shared
-          .synthesizeNarration(text: _segments[index].fr, mode: 'narration');
+      final clip = _lineAudioCache[index] ??= await _synthesizeLineAudio(
+        _segments[index].fr,
+      );
       await ElevenLabsAudioPlaybackService.shared.play(
         clip.bytes,
+        container: clip.container,
         speed: _rate,
         onFinished: () {
           if (mounted) {
@@ -473,6 +477,7 @@ class _ListeningPracticeScreenState
           _audioClip = ElevenLabsAudioClip(
             mode: _story.audioMode ?? 'narration',
             bytes: bytes,
+            container: _isWavAudioPath(storedPath) ? 'wav' : 'mp3',
           );
           _audioLoading = false;
         });
@@ -486,7 +491,50 @@ class _ListeningPracticeScreenState
         format: _story.audioMode ?? 'narration',
       );
       final format = _story.audioMode ?? 'narration';
-      final clip = switch (format) {
+      final clip = await _synthesizeSavedAudioWithQuotaRecovery(
+        script: script,
+        format: format,
+      );
+      if (!mounted) return;
+      setState(() {
+        _audioClip = clip;
+        _audioLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _audioLoading = false);
+      _showAudioError(error);
+    }
+  }
+
+  bool _isWavAudioPath(String path) =>
+      path.toLowerCase().endsWith('.wav') ||
+      _story.audioMode == 'gemini_live_spoken';
+
+  Future<ElevenLabsAudioClip> _synthesizeLineAudio(String text) async {
+    try {
+      return await ElevenLabsAudioService.shared.synthesizeNarration(
+        text: text,
+        mode: 'narration',
+      );
+    } on ElevenLabsProviderException catch (error) {
+      if (!error.isQuotaExceeded) rethrow;
+      return _synthesizeGeminiLiveSpokenClip(text: text, format: 'narration');
+    }
+  }
+
+  Future<ElevenLabsAudioClip> _synthesizeSavedAudioWithQuotaRecovery({
+    required CanonicalAudioScript script,
+    required String format,
+  }) async {
+    if (format == 'gemini_live_spoken') {
+      return _synthesizeGeminiLiveSpokenClip(
+        text: script.narrationText,
+        format: 'narration',
+      );
+    }
+    try {
+      return switch (format) {
         'music' => await ElevenLabsAudioService.shared.composeMusic(
           lyrics: script.lyricLines,
           style: 'warm acoustic French pop, clear solo vocals, 86 BPM',
@@ -505,16 +553,32 @@ class _ListeningPracticeScreenState
           mode: 'story',
         ),
       };
-      if (!mounted) return;
-      setState(() {
-        _audioClip = clip;
-        _audioLoading = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() => _audioLoading = false);
-      _showAudioError(error);
+    } on ElevenLabsProviderException catch (error) {
+      if (!error.isQuotaExceeded) rethrow;
+      return _synthesizeGeminiLiveSpokenClip(
+        text: script.narrationText,
+        format: format,
+      );
     }
+  }
+
+  Future<ElevenLabsAudioClip> _synthesizeGeminiLiveSpokenClip({
+    required String text,
+    required String format,
+  }) async {
+    final pcm = await GeminiLiveAudioService.shared.synthesizeListeningLesson(
+      text: text,
+      format: format,
+      level: _story.levelBand,
+    );
+    return ElevenLabsAudioClip(
+      mode: 'gemini_live_spoken',
+      bytes: pcm16ToWav(
+        pcm,
+        sampleRate: GeminiLiveAudioService.outputSampleRateHz,
+      ),
+      container: 'wav',
+    );
   }
 
   void _showAudioError(Object error) {
@@ -1905,6 +1969,7 @@ class _ListeningPlayerDock extends StatelessWidget {
     'educational' => 'Educational',
     'story' => 'Story narration',
     'narration' => 'Story narration',
+    'gemini_live_spoken' => 'Spoken lesson',
     _ => 'Narrated French',
   };
 

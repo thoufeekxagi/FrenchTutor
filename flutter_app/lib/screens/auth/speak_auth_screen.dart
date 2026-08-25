@@ -114,9 +114,10 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
             Icons.g_mobiledata_rounded,
             'Continue with Google',
             Colors.white,
-            SpeakColors.navy,
+            DesignTokens.ink,
             () => _run(AuthService.shared.signInWithGoogle),
             outlined: true,
+            borderColor: DesignTokens.primaryReadable,
             leading: Image.asset(
               'assets/images/google_logo.png',
               width: 22,
@@ -181,7 +182,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
                 style: DesignTokens.body(
                   12,
                   weight: FontWeight.w700,
-                ).copyWith(color: SpeakColors.accent),
+                ).copyWith(color: DesignTokens.primaryReadable),
               ),
             ),
           ),
@@ -203,6 +204,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
     Color foreground,
     VoidCallback onTap, {
     bool outlined = false,
+    Color? borderColor,
     Widget? leading,
   }) {
     return GestureDetector(
@@ -212,7 +214,9 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(16),
-          border: outlined ? Border.all(color: SpeakColors.navy) : null,
+          border: outlined
+              ? Border.all(color: borderColor ?? SpeakColors.navy)
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -244,9 +248,12 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
       keyboardType: obscure
           ? TextInputType.visiblePassword
           : TextInputType.emailAddress,
+      cursorColor: DesignTokens.primaryReadable,
+      style: DesignTokens.body(14).copyWith(color: Colors.black87),
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: SpeakColors.inkSoft, size: 20),
+        prefixIcon: Icon(icon, color: Colors.black54, size: 20),
         hintText: hint,
+        hintStyle: DesignTokens.body(14).copyWith(color: Colors.black54),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -259,7 +266,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: SpeakColors.accent, width: 2),
+          borderSide: BorderSide(color: DesignTokens.primaryReadable, width: 2),
         ),
       ),
     );

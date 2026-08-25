@@ -1,3 +1,7 @@
+// The legacy detail helpers in this file remain available for existing deep
+// links while the dashboard route delegates to the independent catalog.
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,7 +9,6 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
-import '../../providers/database_provider.dart';
 import '../../services/review_material_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import 'speak_course_activity_screen.dart';
@@ -14,20 +17,20 @@ import 'speak_quick_practice_screen.dart';
 import 'speak_review_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
+import 'speaking_course_home_screen.dart';
 import 'speaking_lesson_flow_screen.dart';
 
 /// The speaking product surface.
 ///
-/// This is intentionally one course-first surface rather than a second
-/// Course/Practice router. A learner chooses a unit card, previews the lesson,
-/// and then enters the shared live conversation engine. Practice and Home
-/// quick-start entries can point here without changing the app dashboard.
+/// This route stays independent from the app Home and Course roadmap. The
+/// preserved catalog owns the beginner speaking lessons and the extra
+/// speaking practice entry points; the shared lesson engine remains below.
 class SpeakingHubScreen extends ConsumerStatefulWidget {
   const SpeakingHubScreen({super.key, this.initialCourseTab = true});
 
   /// Kept for source compatibility with older entry points. Speaking no
   /// longer has a top-level Course/Practice switch.
-  @Deprecated('Speaking now uses one course-first home surface.')
+  @Deprecated('Speaking now uses its independent lesson catalog.')
   final bool initialCourseTab;
 
   @override
@@ -35,96 +38,11 @@ class SpeakingHubScreen extends ConsumerStatefulWidget {
 }
 
 class _SpeakingHubScreenState extends ConsumerState<SpeakingHubScreen> {
-  int _selectedIndex = 0;
   String _selectedActivity = 'Tutor lesson';
 
   @override
   Widget build(BuildContext context) {
-    final profile = ref.watch(learningStoreProvider).profile();
-    final completed = ref.watch(storageServiceProvider).completedContentKeys();
-    final plan = ref
-        .read(adaptiveCourseStoreProvider)
-        .ensureCurrentPlan(profile);
-    final roadmap = SpeakRoadmapService.build(
-      profile,
-      completedContentKeys: completed,
-      adaptiveSessions: plan.sessions,
-    );
-    final speakingLessons = roadmap.sessions
-        .where(
-          (session) =>
-              session.unit == 1 &&
-              (session.primarySkill == SpeakSkill.speaking ||
-                  session.primarySkill == SpeakSkill.roleplay ||
-                  session.primarySkill == SpeakSkill.freeTalk),
-        )
-        .take(6)
-        .toList(growable: false);
-    final recent =
-        ReviewMaterialService.recentSessions(
-          ref.watch(storageServiceProvider),
-        ).where(
-          (session) => const {
-            'Speaking',
-            'Roleplay',
-            'Exam speaking',
-          }.contains(session.skill),
-        );
-
-    if (_selectedIndex >= speakingLessons.length &&
-        speakingLessons.isNotEmpty) {
-      _selectedIndex = speakingLessons.length - 1;
-    }
-    final selected = speakingLessons.isEmpty
-        ? null
-        : speakingLessons[_selectedIndex];
-
-    return Scaffold(
-      backgroundColor: DesignTokens.nightCanvas,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-          children: [
-            _topBar(context),
-            const SizedBox(height: 18),
-            Text('Practice French your way', style: _display(30)),
-            const SizedBox(height: 7),
-            Text(
-              'Choose a beginner lesson, hear the model, then speak in one continuous conversation.',
-              style: _body(
-                14,
-              ).copyWith(color: DesignTokens.nightMuted, height: 1.35),
-            ),
-            const SizedBox(height: 22),
-            if (selected == null)
-              _emptyPanel('No Unit 1 speaking lessons are available yet.')
-            else ...[
-              _unitHeader(selected, roadmap),
-              const SizedBox(height: 12),
-              _selectedLessonCard(context, selected),
-              const SizedBox(height: 22),
-              _sectionLabel('UNIT 1 · THE BASICS'),
-              const SizedBox(height: 10),
-              ...speakingLessons.asMap().entries.map(
-                (entry) => _lessonCard(
-                  entry.value,
-                  selected: entry.key == _selectedIndex,
-                  onTap: () => setState(() => _selectedIndex = entry.key),
-                ),
-              ),
-            ],
-            const SizedBox(height: 20),
-            _quickPracticeSection(context, selected),
-            if (recent.isNotEmpty) ...[
-              const SizedBox(height: 28),
-              _sectionLabel('RECENT SPEAKING'),
-              const SizedBox(height: 10),
-              ...recent.take(3).map((session) => _recentRow(context, session)),
-            ],
-          ],
-        ),
-      ),
-    );
+    return const SpeakingCourseHomeScreen();
   }
 
   Widget _topBar(BuildContext context) {

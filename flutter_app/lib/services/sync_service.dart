@@ -396,20 +396,23 @@ class SyncService {
     required String storyId,
     required String mode,
     required Uint8List bytes,
+    String extension = 'mp3',
+    String contentType = 'audio/mpeg',
   }) async {
     final uid = _userId;
     if (uid == null || bytes.isEmpty) return null;
     final safeMode = mode.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '-');
-    final path = '$uid/$storyId-$safeMode.mp3';
+    final safeExtension = extension.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+    if (safeExtension.isEmpty) {
+      throw ArgumentError.value(extension, 'extension', 'must not be empty');
+    }
+    final path = '$uid/$storyId-$safeMode.$safeExtension';
     await _client.storage
         .from('listening-audio')
         .uploadBinary(
           path,
           bytes,
-          fileOptions: const FileOptions(
-            contentType: 'audio/mpeg',
-            upsert: true,
-          ),
+          fileOptions: FileOptions(contentType: contentType, upsert: true),
         );
     return path;
   }

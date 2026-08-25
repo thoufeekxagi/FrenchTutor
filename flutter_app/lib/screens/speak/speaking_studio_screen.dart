@@ -14,7 +14,7 @@ import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import 'speak_course_session_screen.dart';
-import 'speaking_course_home_screen.dart';
+import 'speaking_flow_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
 
@@ -363,7 +363,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
         'Speaking',
         SpeakSkill.speaking,
         Icons.graphic_eq_rounded,
-        const SpeakingCourseHomeScreen(),
+        const SpeakingHubScreen(),
       ),
       (
         'Writing',

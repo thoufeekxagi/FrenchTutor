@@ -12,7 +12,7 @@ import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
-import 'screens/onboarding/v3_onboarding_screen.dart';
+import 'screens/onboarding/speak_onboarding_screen.dart';
 import 'services/auth_service.dart';
 import 'services/revenue_cat_service.dart';
 
@@ -37,7 +37,7 @@ class FrenchTutorApp extends ConsumerWidget {
 /// The single decision point for what the user sees, re-evaluated on every
 /// auth state change AND when onboarding completes. Deliberate ORDER — the
 /// learner experiences value first, commits second:
-///   1. not onboarded -> [OnboardingScreen] (goal, level, tutor — no account
+///   1. not onboarded -> [SpeakOnboardingScreen] (goal, level, tutor — no account
 ///      wall in front of the product)
 ///   2. onboarded, AI data-use not yet accepted -> [AiConsentScreen] (must
 ///      run before any feature can call the AI provider — Apple Guideline
@@ -231,7 +231,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
     final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
     if (!onboarded) {
-      return V3OnboardingScreen(onFinished: () => setState(() {}));
+      return SpeakOnboardingScreen(onFinished: () => setState(() {}));
     }
     if (_aiConsented == null) return const _RestoringProgressView();
     if (!_aiConsented!) {
