@@ -635,7 +635,7 @@ $instruction
       await _murray.endLearnerTurn();
       if (!_isFreeTalk) {
         _guidedGradeTimeout?.cancel();
-        _guidedGradeTimeout = Timer(const Duration(seconds: 8), () {
+        _guidedGradeTimeout = Timer(const Duration(seconds: 20), () {
           if (!mounted ||
               _isFreeTalk ||
               _state != _SpeakingStepState.checking ||
