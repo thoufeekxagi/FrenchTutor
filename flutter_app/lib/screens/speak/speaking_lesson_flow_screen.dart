@@ -253,11 +253,12 @@ this target. Do not answer a pause inside the phrase, and do not advance the
 lesson yourself.
 
 GUIDED RESULT RULE: For a guided speaking phrase, after the learner turn closes,
-call grade_guided_phrase exactly once for the current step. Include the 1-based
-step index, whether the target matched, the short final transcript, and one
-brief beginner-friendly feedback sentence. The app uses this one result for its
-visual check; do not ask the app to grade again and do not call the tool for a
-future step. Still say the brief feedback aloud, then stop.
+call grade_guided_phrase FIRST, before speaking any feedback, exactly once for
+the current step. Include the 1-based step index, whether the target matched,
+the short final transcript, and one brief beginner-friendly feedback sentence.
+The app updates its visual check immediately from this event; do not ask the
+app to grade again and do not call the tool for a future step. After the tool
+call, say the same brief feedback aloud, then stop.
 
 FREE TALK RESULT RULE: For a Free Talk beat, after the learner turn closes,
 call grade_free_talk_turn exactly once for the current step. Accept a short,

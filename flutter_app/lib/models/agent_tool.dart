@@ -84,8 +84,8 @@ class AgentTool {
       name: 'grade_guided_phrase',
       description:
           'Report the result of the learner\'s just-finished guided speaking attempt. '
-          'Call exactly once after the learner turn closes, using only the current phrase. '
-          'This is a UI event, not an invitation to advance the lesson.',
+          'Call exactly once immediately after the learner turn closes, before speaking any feedback, '
+          'using only the current phrase. This is a UI event, not an invitation to advance the lesson.',
       parameters: _object(
         {
           'step_index': {
