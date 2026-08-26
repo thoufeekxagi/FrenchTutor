@@ -1637,9 +1637,9 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     return _parseStoryBookGeneration(raw, levelBand: levelBand, topic: topic);
   }
 
-  /// Creates only the single 4:3, text-free image for an already-generated
-  /// story. The caller owns the bounded retry/upload policy; reopening a story
-  /// never regenerates its artwork.
+  /// Creates only the single text-free image for an already-generated story.
+  /// The caller owns the bounded retry/upload policy; reopening a story never
+  /// regenerates its artwork.
   Future<Uint8List> generateStoryCover({
     required String title,
     required String summary,
@@ -1651,9 +1651,11 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     int? width,
     int? height,
   }) async {
-    final orientation = aspectRatio == '9:16'
-        ? 'vertical portrait'
-        : 'landscape';
+    final orientation = switch (aspectRatio) {
+      '9:16' => 'vertical portrait',
+      '2:3' => 'portrait',
+      _ => 'landscape',
+    };
     final musicBackdropRule = aspectRatio == '9:16'
         ? ' This is a true vertical music-player backdrop: compose for a tall screen, leave clean breathing room near the top and bottom for controls, and never crop or stretch a landscape composition.'
         : '';

@@ -242,6 +242,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
     unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _refreshCoverFromStore();
+      });
       _coverRefreshTimer = Timer.periodic(
         const Duration(seconds: 2),
         (_) => _refreshCoverFromStore(),
@@ -761,39 +764,24 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       onConjugate: _selectedWordCanConjugate
                           ? _showConjugation
                           : null,
-                      callActions: InlineCallActions(
-                        controller: _call,
-                        accentColor: _darkMode
-                            ? DesignTokens.nightAccent
-                            : DesignTokens.primary,
-                      ),
-                    ),
-                    Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: -24,
-                      child: _StoryStageIsland(
-                        labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
-                        currentIndex: switch (_tab) {
-                          _StoryTab.story => 0,
-                          _StoryTab.quiz => 1,
-                          _StoryTab.keywords => 2,
-                          _StoryTab.grammar => 3,
-                        },
-                        onIndexTap: _goToStage,
-                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                if (_call.isLive || _call.error != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: InlineCallStatusCard(
-                      controller: _call,
-                      listeningLabel: 'Listening. Ask about the story anytime.',
-                    ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _StoryStageIsland(
+                    labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
+                    currentIndex: switch (_tab) {
+                      _StoryTab.story => 0,
+                      _StoryTab.quiz => 1,
+                      _StoryTab.keywords => 2,
+                      _StoryTab.grammar => 3,
+                    },
+                    onIndexTap: _goToStage,
                   ),
+                ),
+                const SizedBox(height: 10),
                 Divider(
                   height: 1,
                   color: _darkMode
@@ -1011,68 +999,84 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           style: DesignTokens.display(29).copyWith(color: text, height: 1.08),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          alignment: WrapAlignment.start,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 2,
-          runSpacing: 2,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(10),
+            Expanded(
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 2,
+                runSpacing: 2,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      _story.levelBand,
+                      style: DesignTokens.mono(
+                        11,
+                        weight: FontWeight.w800,
+                      ).copyWith(color: accent),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '• ${_story.readTimeMinutes} min read',
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: muted),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    onPressed: _toggleTranslation,
+                    tooltip: _translateSentences
+                        ? 'Hide translation'
+                        : 'Show translation',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      Icons.translate,
+                      color: _translateSentences ? accent : muted,
+                      size: 22,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _cycleTextSize,
+                    tooltip: 'Text size: ${_textSizeLabel(_textScale)}',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      CupertinoIcons.textformat_size,
+                      color: muted,
+                      size: 23,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _toggleFavorite,
+                    tooltip: _isLiked ? 'Unlike story' : 'Like story',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      _isLiked
+                          ? CupertinoIcons.heart_fill
+                          : CupertinoIcons.heart,
+                      color: _isLiked ? accent : muted,
+                      size: 23,
+                    ),
+                  ),
+                  ReportProblemButton(
+                    sessionType: 'Story: ${_story.displayTitle}',
+                  ),
+                ],
               ),
-              child: Text(
-                _story.levelBand,
-                style: DesignTokens.mono(
-                  11,
-                  weight: FontWeight.w800,
-                ).copyWith(color: accent),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '• ${_story.readTimeMinutes} min read',
-              style: DesignTokens.body(
-                13,
-                weight: FontWeight.w600,
-              ).copyWith(color: muted),
             ),
             const SizedBox(width: 4),
-            IconButton(
-              onPressed: _toggleTranslation,
-              tooltip: _translateSentences
-                  ? 'Hide translation'
-                  : 'Show translation',
-              visualDensity: VisualDensity.compact,
-              icon: Icon(
-                Icons.translate,
-                color: _translateSentences ? accent : muted,
-                size: 22,
-              ),
-            ),
-            IconButton(
-              onPressed: _cycleTextSize,
-              tooltip: 'Text size: ${_textSizeLabel(_textScale)}',
-              visualDensity: VisualDensity.compact,
-              icon: Icon(
-                CupertinoIcons.textformat_size,
-                color: muted,
-                size: 23,
-              ),
-            ),
-            IconButton(
-              onPressed: _toggleFavorite,
-              tooltip: _isLiked ? 'Unlike story' : 'Like story',
-              visualDensity: VisualDensity.compact,
-              icon: Icon(
-                _isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                color: _isLiked ? accent : muted,
-                size: 23,
-              ),
-            ),
-            ReportProblemButton(sessionType: 'Story: ${_story.displayTitle}'),
+            _ReadingCallState(controller: _call, accent: accent),
           ],
         ),
       ],
@@ -1454,7 +1458,6 @@ class _StoryBookHeader extends StatelessWidget {
     required this.onMarkLearned,
     required this.onSettings,
     required this.onConjugate,
-    required this.callActions,
   });
 
   final GeneratedStory story;
@@ -1465,12 +1468,10 @@ class _StoryBookHeader extends StatelessWidget {
   final VoidCallback onMarkLearned;
   final VoidCallback onSettings;
   final VoidCallback? onConjugate;
-  final Widget callActions;
 
   @override
   Widget build(BuildContext context) {
     final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
-    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       child: SizedBox(
@@ -1502,7 +1503,7 @@ class _StoryBookHeader extends StatelessWidget {
             SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+                padding: const EdgeInsets.fromLTRB(14, 16, 14, 0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1512,40 +1513,43 @@ class _StoryBookHeader extends StatelessWidget {
                       onTap: onBack,
                     ),
                     const Spacer(),
-                    Container(
-                      height: 42,
-                      padding: const EdgeInsets.symmetric(horizontal: 13),
-                      decoration: BoxDecoration(
-                        color: learned
-                            ? accent.withValues(alpha: 0.94)
-                            : Colors.black.withValues(alpha: 0.42),
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.22),
-                        ),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(22),
-                        onTap: onMarkLearned,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              learned
-                                  ? CupertinoIcons.checkmark
-                                  : CupertinoIcons.checkmark,
-                              size: 20,
-                              color: Colors.white,
+                    SizedBox(
+                      height: 44,
+                      child: Center(
+                        child: Container(
+                          height: 36,
+                          padding: const EdgeInsets.symmetric(horizontal: 11),
+                          decoration: BoxDecoration(
+                            color: learned
+                                ? accent.withValues(alpha: 0.94)
+                                : Colors.black.withValues(alpha: 0.42),
+                            borderRadius: BorderRadius.circular(19),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.22),
                             ),
-                            const SizedBox(width: 7),
-                            Text(
-                              learned ? 'Learned' : 'Mark as learned',
-                              style: DesignTokens.body(
-                                13,
-                                weight: FontWeight.w700,
-                              ).copyWith(color: Colors.white),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(19),
+                            onTap: onMarkLearned,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.checkmark,
+                                  size: 17,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  learned ? 'Learned' : 'Mark as learned',
+                                  style: DesignTokens.body(
+                                    12,
+                                    weight: FontWeight.w700,
+                                  ).copyWith(color: Colors.white),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -1553,6 +1557,7 @@ class _StoryBookHeader extends StatelessWidget {
                     _HeroIconButton(
                       icon: CupertinoIcons.slider_horizontal_3,
                       tooltip: 'Story settings',
+                      iconSize: 18,
                       onTap: onSettings,
                     ),
                   ],
@@ -1562,8 +1567,8 @@ class _StoryBookHeader extends StatelessWidget {
             Positioned(
               left: 14,
               right: 14,
-              top: 64,
-              bottom: 52,
+              top: 86,
+              bottom: 24,
               child: selectedWord == null
                   ? const SizedBox.shrink()
                   : Align(
@@ -1575,19 +1580,6 @@ class _StoryBookHeader extends StatelessWidget {
                         onConjugate: onConjugate,
                       ),
                     ),
-            ),
-            Positioned(
-              right: 14,
-              bottom: 12,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DefaultTextStyle.merge(
-                    style: TextStyle(color: text),
-                    child: callActions,
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -1601,11 +1593,13 @@ class _HeroIconButton extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.iconSize = 16,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -1616,7 +1610,9 @@ class _HeroIconButton extends StatelessWidget {
         onPressed: onTap,
         tooltip: tooltip,
         visualDensity: VisualDensity.compact,
-        icon: Icon(icon, color: Colors.white, size: 24),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        icon: Icon(icon, color: Colors.white, size: iconSize),
         style: IconButton.styleFrom(
           backgroundColor: Colors.black.withValues(alpha: 0.38),
           shape: const CircleBorder(),
@@ -2206,6 +2202,47 @@ String _foldStoryWord(String value) => value
     .replaceAll('ç', 'c')
     .trim();
 
+class _ReadingCallState extends StatelessWidget {
+  const _ReadingCallState({required this.controller, required this.accent});
+
+  final InlineCallController controller;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = controller.error != null
+        ? 'Call unavailable'
+        : controller.connecting
+        ? 'Calling…'
+        : controller.active
+        ? 'On call'
+        : null;
+    final labelColor = controller.error != null
+        ? DesignTokens.primary
+        : controller.active
+        ? DesignTokens.success
+        : accent;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (label != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12, right: 1),
+            child: Text(
+              label,
+              style: DesignTokens.mono(
+                9,
+                weight: FontWeight.w700,
+              ).copyWith(color: labelColor),
+            ),
+          ),
+        InlineCallActions(controller: controller, accentColor: accent),
+      ],
+    );
+  }
+}
+
 class _StoryStageIsland extends StatelessWidget {
   const _StoryStageIsland({
     required this.labels,
@@ -2220,12 +2257,14 @@ class _StoryStageIsland extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
+      height: 42,
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: DesignTokens.nightSurface.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: DesignTokens.nightHairline),
+        color: DesignTokens.nightSurface.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: DesignTokens.nightHairline.withValues(alpha: 0.9),
+        ),
       ),
       child: Row(
         children: [
@@ -2242,11 +2281,11 @@ class _StoryStageIsland extends StatelessWidget {
                     color: i == currentIndex
                         ? DesignTokens.nightAccent
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(21),
                   ),
                   child: Text(
                     labels[i],
-                    style: DesignTokens.body(12, weight: FontWeight.w700)
+                    style: DesignTokens.body(11, weight: FontWeight.w700)
                         .copyWith(
                           color: i == currentIndex
                               ? DesignTokens.nightCanvas
