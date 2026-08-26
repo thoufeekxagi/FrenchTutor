@@ -13,6 +13,17 @@ class SessionSettings extends ChangeNotifier {
 
   static final shared = SessionSettings._();
 
+  /// Playback is applied by the native audio player after a clip exists. It
+  /// is deliberately independent from Gemini/voice-generation settings.
+  static const playbackRates = <double>[0.5, 0.75, 1.0, 1.5];
+
+  static String playbackRateLabel(double value) {
+    final normalized = _normalizePlaybackRate(value);
+    return normalized == normalized.roundToDouble()
+        ? normalized.toStringAsFixed(0)
+        : normalized.toString();
+  }
+
   static const _textScaleKey = 'session_text_scale';
   static const _playbackRateKey = 'session_playback_rate';
   static const _translationKey = 'session_translate_sentences';
@@ -93,8 +104,13 @@ class SessionSettings extends ChangeNotifier {
   }
 
   double _validRate(double value) {
+    return _normalizePlaybackRate(value);
+  }
+
+  static double _normalizePlaybackRate(double value) {
+    if ((value - 0.5).abs() < 0.001) return 0.5;
     if ((value - 0.75).abs() < 0.001) return 0.75;
-    if ((value - 1.25).abs() < 0.001) return 1.25;
+    if ((value - 1.5).abs() < 0.001) return 1.5;
     return 1;
   }
 }

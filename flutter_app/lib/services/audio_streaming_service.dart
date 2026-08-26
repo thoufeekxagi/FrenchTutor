@@ -410,6 +410,18 @@ class AudioStreamingService {
     }
   }
 
+  /// Changes the speed of an already-open native player without touching the
+  /// audio bytes or opening another Gemini request. This is used for cached
+  /// lesson narration; live-call callers never change this value.
+  Future<void> setPlaybackSpeed(double speed) async {
+    if (!_isPlayerStarted) return;
+    try {
+      await _player.setSpeed(speed.clamp(0.5, 1.5).toDouble());
+    } catch (error) {
+      debugPrint('AudioStreamingService: playback speed change failed: $error');
+    }
+  }
+
   /// Feeds queued chunks to the player strictly one at a time, always awaiting the previous
   /// `feedUint8FromStream` call before starting the next. Safe to call repeatedly — re-entrant
   /// calls while a drain is already running just return immediately, since the running loop

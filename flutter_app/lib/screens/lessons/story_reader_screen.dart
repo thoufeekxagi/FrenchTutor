@@ -112,7 +112,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
-  double _rate = 0.42; // matches LessonSpeechService's own default "normal"
+  double _rate = 1.0;
   double _textScale = 1;
   bool _translateSentences = true;
   bool _highlightWords = true;
@@ -343,7 +343,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
             contentItemId: _story.segmentContentId(i),
           ),
       ],
-      rate: _rate,
+      playbackSpeed: _rate,
       onItemStart: (i) {
         if (!mounted) return;
         setState(() {
@@ -552,7 +552,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           contentItemId: _story.segmentContentId(index),
         ),
       ],
-      rate: _rate,
+      playbackSpeed: _rate,
       onItemStart: (_) {
         if (!mounted) return;
         setState(() => _currentWord = null);
@@ -590,8 +590,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }
 
   void _cycleRate() {
-    setState(() => _rate = _rate <= 0.36 ? 0.55 : 0.32);
+    final rates = SessionSettings.playbackRates;
+    final currentIndex = rates.indexWhere(
+      (value) => (value - _rate).abs() < 0.001,
+    );
+    final next =
+        rates[(currentIndex < 0 ? 0 : currentIndex + 1) % rates.length];
+    setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(_rate));
+    unawaited(LessonSpeechService.shared.setPlaybackSpeed(_rate));
   }
 
   Future<void> _showSettings() async {
@@ -621,6 +628,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setPlaybackRate(_rate));
+    unawaited(LessonSpeechService.shared.setPlaybackSpeed(_rate));
     unawaited(_settings.setTranslateSentences(_translateSentences));
     unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));
@@ -2316,10 +2324,12 @@ class _AudioControlBar extends StatelessWidget {
               ),
               _separator(muted),
               _compactAction(
-                label: rate <= 0.36
-                    ? '.75x'
-                    : rate >= 0.5
-                    ? '1.25x'
+                label: rate == 0.5
+                    ? '0.5x'
+                    : rate == 0.75
+                    ? '0.75x'
+                    : rate == 1.5
+                    ? '1.5x'
                     : '1x',
                 color: text,
                 onTap: onCycleRate,
@@ -2628,9 +2638,10 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
               Row(
                 children: [
                   for (final option in [
-                    (0.32, '0.75×'),
-                    (0.42, '1.00×'),
-                    (0.55, '1.25×'),
+                    (0.5, '0.5×'),
+                    (0.75, '0.75×'),
+                    (1.0, '1×'),
+                    (1.5, '1.5×'),
                   ])
                     Expanded(
                       child: Padding(

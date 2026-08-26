@@ -802,11 +802,12 @@ class _ListeningPracticeScreenState
   }
 
   void _cycleRate() {
-    final next = _rate < 0.8
-        ? 1.0
-        : _rate < 1.1
-        ? 1.25
-        : 0.75;
+    final rates = SessionSettings.playbackRates;
+    final currentIndex = rates.indexWhere(
+      (value) => (value - _rate).abs() < 0.001,
+    );
+    final next =
+        rates[(currentIndex < 0 ? 0 : currentIndex + 1) % rates.length];
     setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(next));
     unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(next));
@@ -986,6 +987,7 @@ class _ListeningPracticeScreenState
       _underlineWords = _settings.underlineWords;
       _darkMode = _settings.darkMode;
     });
+    unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(_rate));
   }
 
   @override
@@ -2610,7 +2612,7 @@ class _ListeningProgressControls extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              '${rate.toStringAsFixed(2)}×',
+              '${SessionSettings.playbackRateLabel(rate)}×',
               style: DesignTokens.label(9).copyWith(color: Colors.white60),
             ),
           ],
@@ -2907,18 +2909,23 @@ class _ListeningSettingsSheet extends StatelessWidget {
               ),
               _NightSettingChoice(
                 label: 'Playback speed',
-                value: '${settings.playbackRate.toStringAsFixed(2)}×',
-                choices: const ['0.75×', '1×', '1.25×'],
-                selected: settings.playbackRate < 0.8
+                value:
+                    '${SessionSettings.playbackRateLabel(settings.playbackRate)}×',
+                choices: const ['0.5×', '0.75×', '1×', '1.5×'],
+                selected: settings.playbackRate == 0.5
+                    ? '0.5×'
+                    : settings.playbackRate < 0.8
                     ? '0.75×'
-                    : settings.playbackRate >= 1.1
-                    ? '1.25×'
+                    : settings.playbackRate > 1.1
+                    ? '1.5×'
                     : '1×',
                 onSelected: (value) => settings.setPlaybackRate(
-                  value == '0.75×'
+                  value == '0.5×'
+                      ? 0.5
+                      : value == '0.75×'
                       ? 0.75
-                      : value == '1.25×'
-                      ? 1.25
+                      : value == '1.5×'
+                      ? 1.5
                       : 1,
                 ),
               ),

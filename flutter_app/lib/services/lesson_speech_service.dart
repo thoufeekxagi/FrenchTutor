@@ -99,6 +99,7 @@ class LessonSpeechService {
   void Function()? _onPlaybackReady;
   void Function(Object error)? _onError;
   double? _rateOverride;
+  double? _playbackSpeedOverride;
 
   /// Fires with (item index, word index within that item's text) as playback
   /// reaches each word — for word-by-word highlighting during story
@@ -109,14 +110,22 @@ class LessonSpeechService {
   /// roughly where the voice is without needing per-phoneme timing data.
   void Function(int itemIndex, int wordIndex)? _onWordBoundary;
   final List<Timer> _wordTimers = [];
+  final List<double> _wordOffsetsMs = [];
+  double _activePlaybackSpeed = 1.0;
+  double _activePlaybackConsumedMs = 0;
+  int _activePlaybackDurationMs = 0;
+  int _activePlaybackItemIndex = -1;
+  int _activePlaybackGeneration = 0;
+  DateTime? _activePlaybackStartedAt;
   bool _speakStarting = false;
 
   bool isSpeaking = false;
   bool isPaused = false;
   bool isListening = false;
 
-  /// Narration rate: 0.3 (slow) – 0.55 (normal-fast). Persisted via Settings, unless a
-  /// one-off override was passed to `speak(items:rate:)`.
+  /// Legacy Gemini voice-style rate used by callers that do not provide a
+  /// local playback speed. Reading passes [playbackSpeed] instead, so its
+  /// speed never changes the generated clip.
   Future<double> get rate async {
     if (_rateOverride != null) return _rateOverride!;
     final prefs = await SharedPreferences.getInstance();
@@ -126,11 +135,13 @@ class LessonSpeechService {
 
   /// Speaks a sequence of (text, language) items in order. `onItemStart` fires with the
   /// index of each item as it begins (for UI highlight/scroll); `onFinished` fires once the
-  /// whole queue completes (not called if `stop()` is invoked). `rate` overrides the Settings
-  /// rate for this utterance only.
+  /// whole queue completes (not called if `stop()` is invoked). `rate` retains the legacy
+  /// Gemini voice-style override. [playbackSpeed] is a local native-player rate and does not
+  /// affect synthesis or the audio cache.
   Future<void> speak({
     required List<SpeechItem> items,
     double? rate,
+    double? playbackSpeed,
     void Function(int)? onItemStart,
     void Function()? onFinished,
     void Function(int itemIndex, int wordIndex)? onWordBoundary,
@@ -153,6 +164,9 @@ class LessonSpeechService {
       _ttsQueue = items;
       _ttsIndex = 0;
       _rateOverride = rate;
+      _playbackSpeedOverride = playbackSpeed == null
+          ? null
+          : _normalizePlaybackSpeed(playbackSpeed);
       _onItemStart = onItemStart;
       _onFinished = onFinished;
       _onWordBoundary = onWordBoundary;
@@ -167,6 +181,7 @@ class LessonSpeechService {
 
   Future<void> pause() async {
     if (!isSpeaking || isPaused) return;
+    _accountPlaybackProgress();
     isPaused = true;
     // Gemini playback is a fire-and-forget PCM buffer, not a resumable
     // stream — stop cleanly now; resume() replays this item from the top.
@@ -175,6 +190,7 @@ class LessonSpeechService {
       t.cancel();
     }
     _wordTimers.clear();
+    _activePlaybackStartedAt = null;
     await _geminiAudioLazy?.stopPlayback();
   }
 
@@ -202,6 +218,25 @@ class LessonSpeechService {
     _onWordBoundary = null;
     _onPlaybackReady = null;
     _onError = null;
+    _playbackSpeedOverride = null;
+    _resetPlaybackTiming();
+  }
+
+  /// Changes playback speed for the current cached/generated clip. This only
+  /// updates the native player; it never changes the Gemini prompt, cache key,
+  /// or stored PCM bytes.
+  Future<void> setPlaybackSpeed(double speed) async {
+    final normalized = _normalizePlaybackSpeed(speed);
+    if (_playbackSpeedOverride != null) {
+      _playbackSpeedOverride = normalized;
+    }
+    if (isSpeaking && !isPaused && _activePlaybackStartedAt != null) {
+      _accountPlaybackProgress();
+      _activePlaybackSpeed = normalized;
+      _scheduleCompletionTimer();
+      _scheduleWordTimers(skipConsumed: true);
+    }
+    await _geminiAudioLazy?.setPlaybackSpeed(normalized);
   }
 
   Future<void> _speakCurrent(int generation) async {
@@ -218,13 +253,18 @@ class LessonSpeechService {
     _onItemStart?.call(_ttsIndex);
 
     final speakingRate = await rate;
-    final isSlow = speakingRate <= 0.36;
+    final usesLocalPlaybackSpeed = _playbackSpeedOverride != null;
+    // Reading passes playbackSpeed, so its speed control always reuses the
+    // normal cached clip and never asks Gemini for a slow/fast re-render.
+    final isSlow = !usesLocalPlaybackSpeed && speakingRate <= 0.36;
+    final playbackSpeed = _playbackSpeedOverride ?? 1.0;
     final persona = ActiveTutor.current;
 
     final played = await _speakWithGemini(
       item.text,
       voiceName: persona.voiceName,
       slow: isSlow,
+      playbackSpeed: playbackSpeed,
       contentItemId: item.contentItemId,
       generation: generation,
     );
@@ -243,6 +283,7 @@ class LessonSpeechService {
     String text, {
     required String voiceName,
     required bool slow,
+    required double playbackSpeed,
     String? contentItemId,
     required int generation,
   }) async {
@@ -262,6 +303,10 @@ class LessonSpeechService {
       // first-use player race could report “ready” while the buffer was still
       // queued (or had already been dropped), producing silent narration.
       await _geminiAudio.playAudioChunk(bytes, waitForFeed: true);
+      final activePlaybackSpeed = _playbackSpeedOverride == null
+          ? playbackSpeed
+          : _normalizePlaybackSpeed(_playbackSpeedOverride!);
+      await _geminiAudio.setPlaybackSpeed(activePlaybackSpeed);
     } catch (error, stackTrace) {
       debugPrint(
         'LessonSpeechService: Gemini Live playback failed: $error\n$stackTrace',
@@ -274,13 +319,17 @@ class LessonSpeechService {
     // startup, so a startup failure looked like a ready-but-silent lesson.
     _onPlaybackReady?.call();
     // PCM16 mono at 24kHz — mark this item done once it has actually sounded.
+    final activePlaybackSpeed = _playbackSpeedOverride == null
+        ? playbackSpeed
+        : _normalizePlaybackSpeed(_playbackSpeedOverride!);
     final playbackMs = (bytes.length / 2 / 24000 * 1000).round() + 200;
-    _completionTimer = Timer(Duration(milliseconds: playbackMs), () {
-      if (_ttsIndex != myIndex || isPaused || generation != _queueGeneration) {
-        return;
-      }
-      _onUtteranceComplete(generation);
-    });
+    _activePlaybackSpeed = activePlaybackSpeed;
+    _activePlaybackConsumedMs = 0;
+    _activePlaybackDurationMs = playbackMs;
+    _activePlaybackItemIndex = myIndex;
+    _activePlaybackGeneration = generation;
+    _activePlaybackStartedAt = DateTime.now();
+    _scheduleCompletionTimer();
     _scheduleWordBoundaries(
       text,
       playbackMs: playbackMs,
@@ -298,10 +347,9 @@ class LessonSpeechService {
   }) {
     final onWordBoundary = _onWordBoundary;
     if (onWordBoundary == null) return;
-    // Previous item's timers have either already fired or are now no-ops
-    // (guarded by the itemIndex check below) — clear the list so it doesn't
-    // grow for the whole length of a long story.
-    _wordTimers.clear();
+    // Store timings in source-audio milliseconds. The native player can then
+    // reschedule them immediately if the learner changes speed mid-sentence.
+    _wordOffsetsMs.clear();
     final words = text
         .split(RegExp(r'\s+'))
         .where((w) => w.isNotEmpty)
@@ -313,19 +361,85 @@ class LessonSpeechService {
     final msPerUnit = totalUnits > 0 ? playbackMs / totalUnits : 0.0;
     var elapsedMs = 0.0;
     for (var i = 0; i < words.length; i++) {
-      final wordIndex = i;
+      _wordOffsetsMs.add(elapsedMs);
+      elapsedMs += (words[i].length + 1) * msPerUnit;
+    }
+    _scheduleWordTimers();
+  }
+
+  void _scheduleWordTimers({bool skipConsumed = false}) {
+    for (final timer in _wordTimers) {
+      timer.cancel();
+    }
+    _wordTimers.clear();
+    final onWordBoundary = _onWordBoundary;
+    if (onWordBoundary == null || _wordOffsetsMs.isEmpty) return;
+    final itemIndex = _activePlaybackItemIndex;
+    final generation = _activePlaybackGeneration;
+    final consumedMs = skipConsumed ? _activePlaybackConsumedMs : 0.0;
+    for (var i = 0; i < _wordOffsetsMs.length; i++) {
+      final offsetMs = _wordOffsetsMs[i];
+      if (skipConsumed && offsetMs <= consumedMs) continue;
+      final delayMs = skipConsumed
+          ? ((offsetMs - consumedMs) / _activePlaybackSpeed).round()
+          : (offsetMs / _activePlaybackSpeed).round();
       _wordTimers.add(
-        Timer(Duration(milliseconds: elapsedMs.round()), () {
+        Timer(Duration(milliseconds: delayMs.clamp(0, 2147483647)), () {
           if (_ttsIndex != itemIndex ||
               isPaused ||
               generation != _queueGeneration) {
             return;
           }
-          onWordBoundary(itemIndex, wordIndex);
+          onWordBoundary(itemIndex, i);
         }),
       );
-      elapsedMs += (words[i].length + 1) * msPerUnit;
     }
+  }
+
+  void _accountPlaybackProgress() {
+    final startedAt = _activePlaybackStartedAt;
+    if (startedAt == null) return;
+    final elapsedMs =
+        DateTime.now().difference(startedAt).inMicroseconds / 1000;
+    _activePlaybackConsumedMs += elapsedMs * _activePlaybackSpeed;
+    if (_activePlaybackConsumedMs > _activePlaybackDurationMs) {
+      _activePlaybackConsumedMs = _activePlaybackDurationMs.toDouble();
+    }
+    _activePlaybackStartedAt = DateTime.now();
+  }
+
+  void _scheduleCompletionTimer() {
+    _completionTimer?.cancel();
+    if (_activePlaybackDurationMs <= 0 || _activePlaybackStartedAt == null) {
+      return;
+    }
+    final remainingMs = (_activePlaybackDurationMs - _activePlaybackConsumedMs)
+        .clamp(0.0, double.infinity)
+        .toDouble();
+    final delayMs = (remainingMs / _activePlaybackSpeed).round().clamp(
+      1,
+      2147483647,
+    );
+    final itemIndex = _activePlaybackItemIndex;
+    final generation = _activePlaybackGeneration;
+    _completionTimer = Timer(Duration(milliseconds: delayMs), () {
+      if (_ttsIndex != itemIndex ||
+          isPaused ||
+          generation != _queueGeneration) {
+        return;
+      }
+      _activePlaybackStartedAt = null;
+      _onUtteranceComplete(generation);
+    });
+  }
+
+  void _resetPlaybackTiming() {
+    _activePlaybackStartedAt = null;
+    _activePlaybackConsumedMs = 0;
+    _activePlaybackDurationMs = 0;
+    _activePlaybackItemIndex = -1;
+    _activePlaybackGeneration = 0;
+    _wordOffsetsMs.clear();
   }
 
   /// Reading a whole story fires one fresh synthesis call per sentence in
@@ -504,8 +618,17 @@ class LessonSpeechService {
     _onItemStart = null;
     _onWordBoundary = null;
     _onPlaybackReady = null;
+    _playbackSpeedOverride = null;
+    _resetPlaybackTiming();
     unawaited(_geminiAudioLazy?.stopPlayback());
     onError?.call(error);
+  }
+
+  double _normalizePlaybackSpeed(double value) {
+    if ((value - 0.5).abs() < 0.001) return 0.5;
+    if ((value - 0.75).abs() < 0.001) return 0.75;
+    if ((value - 1.5).abs() < 0.001) return 1.5;
+    return 1.0;
   }
 
   /// True if [text] in [voiceName]/[slow] is already synthesized and sitting in
