@@ -1553,15 +1553,19 @@ class _StoryBookHeader extends StatelessWidget {
             ),
             Positioned(
               left: 14,
-              right: selectedWord == null ? 14 : 132,
-              bottom: selectedWord == null ? 18 : 8,
+              right: 14,
+              top: 64,
+              bottom: 52,
               child: selectedWord == null
                   ? const SizedBox.shrink()
-                  : _SelectedWordOverlay(
-                      word: selectedWord!,
-                      accent: accent,
-                      darkMode: darkMode,
-                      onConjugate: onConjugate,
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: _SelectedWordOverlay(
+                        word: selectedWord!,
+                        accent: accent,
+                        darkMode: darkMode,
+                        onConjugate: onConjugate,
+                      ),
                     ),
             ),
             Positioned(

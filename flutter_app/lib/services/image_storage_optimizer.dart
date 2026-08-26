@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 /// Converts generated artwork into small, predictable Storage objects while
-/// preserving the requested visual ratio. Card covers use 4:3; music backdrops
-/// use 9:16 and must never be cropped back to the card ratio.
+/// preserving the requested visual ratio. Standard compact covers use 4:3,
+/// Reading covers use portrait 2:3, and music backdrops use 9:16.
 abstract final class ImageStorageOptimizer {
   static const targetAspectRatio = 4 / 3;
   static const maxWidth = 512;
@@ -52,9 +52,9 @@ abstract final class ImageStorageOptimizer {
         throw const FormatException('Generated cover is not a decodable image');
       }
 
-      // Providers can return a portrait or square image even when the prompt
-      // requests landscape. Normalize at the storage boundary so every card
-      // receives the same 4:3 artwork contract.
+      // Providers can return a different shape even when the prompt requests a
+      // ratio. Normalize at the storage boundary so each consumer receives its
+      // own explicit artwork contract.
       final cropped = _cropToAspectRatio(decoded, targetAspectRatio);
       final baseScale = _scaleFor(
         cropped.width,

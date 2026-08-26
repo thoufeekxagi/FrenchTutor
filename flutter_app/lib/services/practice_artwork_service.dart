@@ -24,14 +24,20 @@ class PracticeArtworkService {
     final context = coverPrompt == null || coverPrompt.trim().isEmpty
         ? 'Show the exact everyday place, objects, and action named by this learning session. Use a friendly book-reference composition; do not invent a protagonist or unrelated cinematic setting.'
         : coverPrompt.trim();
-    final ratioInstruction = aspectRatio == '9:16'
-        ? 'CUSTOM LISTENING BACKDROP: this is a true vertical 9:16 phone player image. '
-              'Ignore every compact-cover, 4:3, square, landscape, card, thumbnail, or crop '
-              'instruction in the source context. Compose directly on a 9:16 canvas with '
-              'important details inside the central 70% safe area, a clean upper area for '
-              'status and controls, and a clean lower area for lyrics and playback controls. '
-              'Do not stretch, crop, or zoom a source composition. '
-        : '';
+    final ratioInstruction = switch (aspectRatio) {
+      '9:16' =>
+        'CUSTOM LISTENING BACKDROP: this is a true vertical 9:16 phone player image. '
+            'Ignore every compact-cover, 4:3, portrait-card, square, landscape, thumbnail, or crop '
+            'instruction in the source context. Compose directly on a 9:16 canvas with '
+            'important details inside the central 70% safe area, a clean upper area for '
+            'status and controls, and a clean lower area for lyrics and playback controls. '
+            'Do not stretch, crop, or zoom a source composition. ',
+      '2:3' =>
+        'CUSTOM READING COVER: this is a portrait 2:3 book-reference image. '
+            'Ignore landscape and 4:3 instructions in the source context. '
+            'Keep the concrete story objects and action readable in the central safe area. ',
+      _ => '',
+    };
     return LessonAgentService.shared.generateStoryCover(
       title: title,
       summary: summary,
@@ -67,12 +73,27 @@ class PracticeArtworkService {
     String? diagnosticRoleplayId,
     String aspectRatio = '4:3',
   }) {
+    final targetAspectRatio = switch (aspectRatio) {
+      '2:3' => 2 / 3,
+      '9:16' => 9 / 16,
+      _ => 4 / 3,
+    };
+    final maxWidth = switch (aspectRatio) {
+      '2:3' => 384,
+      '9:16' => 384,
+      _ => 512,
+    };
+    final maxHeight = switch (aspectRatio) {
+      '2:3' => 576,
+      '9:16' => 682,
+      _ => 384,
+    };
     return sync.uploadGeneratedStoryCover(
       storyId: id,
       diagnosticRoleplayId: diagnosticRoleplayId,
-      targetAspectRatio: aspectRatio == '9:16' ? 9 / 16 : 4 / 3,
-      maxWidth: aspectRatio == '9:16' ? 384 : 512,
-      maxHeight: aspectRatio == '9:16' ? 682 : 384,
+      targetAspectRatio: targetAspectRatio,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
       generate: (attempt) => generate(
         id: '$id-attempt-${attempt + 1}',
         title: title,

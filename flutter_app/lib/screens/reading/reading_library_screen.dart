@@ -224,6 +224,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         topic: story.topic,
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
+        aspectRatio: '2:3',
       );
       if (url == null) return;
       storyStore.updateCoverUrl(story.id, url);
