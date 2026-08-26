@@ -26,6 +26,8 @@ import '../../services/session_recorder.dart';
 import '../../services/tutor_helper_settings.dart';
 import '../../utils/text_fold.dart';
 import '../../utils/transcript_filter.dart';
+import '../../utils/speaking_translation_alignment.dart';
+import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/learning_card.dart';
 import '../../widgets/kicker_text.dart';
 import '../../widgets/primary_action_button.dart';
@@ -159,7 +161,9 @@ class _AgentLedListeningScreenState
   // missing visible speech check without changing that working director.
   final Map<int, String> _learnerAttempts = {};
   final Set<int> _matchedRoleplayBeats = {};
-  final Set<String> _revealedTranslations = {};
+  final Map<String, int> _selectedRoleplayWords = {};
+  final Map<String, List<List<int>>?> _roleplayAlignments = {};
+  bool _roleplayTranslationsVisible = true;
 
   TutorHelperSurface get _helperSurface =>
       _isRoleplay ? TutorHelperSurface.speaking : TutorHelperSurface.listening;
@@ -1097,6 +1101,8 @@ class _AgentLedListeningScreenState
                       if (_errorMessage.isNotEmpty)
                         ErrorNotice(message: _errorMessage),
                       _debugPanel(),
+                      if (_isRoleplay && _currentCard != null)
+                        _roleplayNavigationBar(),
                       _controls(),
                     ],
                   ),
@@ -1454,41 +1460,58 @@ class _AgentLedListeningScreenState
                     ],
                   ),
                 ),
-        ] else ...[
-          const SizedBox(height: 12),
-          // Buttons are the ONLY navigation in the roleplay — no dependency
-          // on speech recognition or the model.
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _segmentIndex == 0 ? null : _goBackFromUserIntent,
-                  icon: const Icon(CupertinoIcons.chevron_left, size: 16),
-                  label: const Text('Back'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: DesignTokens.hairline),
-                    foregroundColor: DesignTokens.text,
-                    // Match PrimaryActionButton's corner radius so Back and
-                    // Next read as one control pair, not two design systems.
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: PrimaryActionButton(
-                  label: 'Next sentence',
-                  icon: CupertinoIcons.arrow_right,
-                  onPressed: _advanceFromUserIntent,
-                ),
-              ),
-            ],
-          ),
         ],
       ],
+    );
+  }
+
+  Widget _roleplayNavigationBar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightCanvas,
+        border: Border(
+          top: BorderSide(color: DesignTokens.nightHairline),
+          bottom: BorderSide(color: DesignTokens.nightHairline),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _segmentIndex == 0 ? null : _goBackFromUserIntent,
+              icon: const Icon(CupertinoIcons.chevron_left, size: 15),
+              label: const Text('Back'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: DesignTokens.nightText,
+                disabledForegroundColor: DesignTokens.nightMuted,
+                side: BorderSide(color: DesignTokens.nightHairline),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: _advanceFromUserIntent,
+              icon: const Icon(CupertinoIcons.arrow_right, size: 17),
+              label: const Text('Next'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                backgroundColor: DesignTokens.nightAccent,
+                foregroundColor: DesignTokens.ink,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1665,7 +1688,9 @@ class _AgentLedListeningScreenState
     required bool matched,
     required String? learnerAttempt,
   }) {
-    final translationVisible = _revealedTranslations.contains(translationKey);
+    final alignment = en?.trim().isNotEmpty == true
+        ? _roleplayAlignmentFor(fr, en!)
+        : null;
     final hasAttempt = learnerAttempt?.trim().isNotEmpty == true;
     final resultColor = !hasAttempt
         ? DesignTokens.nightAccent
@@ -1705,16 +1730,54 @@ class _AgentLedListeningScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      fr,
-                      style: DesignTokens.body(15, weight: FontWeight.w600)
-                          .copyWith(
-                            color: hasAttempt
-                                ? resultColor
-                                : DesignTokens.nightText,
-                            height: 1.2,
+                    child: (en?.trim().isNotEmpty ?? false)
+                        ? BilingualWordText(
+                            source: fr,
+                            translation: en!,
+                            sourceStyle:
+                                DesignTokens.body(
+                                  15,
+                                  weight: FontWeight.w600,
+                                ).copyWith(
+                                  color: hasAttempt
+                                      ? resultColor
+                                      : DesignTokens.nightText,
+                                  height: 1.2,
+                                ),
+                            translationStyle: DesignTokens.body(12).copyWith(
+                              color: DesignTokens.nightMuted,
+                              height: 1.25,
+                            ),
+                            keywords: const [],
+                            sourceToTranslation: alignment,
+                            selectedSourceWord:
+                                _selectedRoleplayWords[translationKey],
+                            showTranslation: _roleplayTranslationsVisible,
+                            strictAlignment: alignment != null,
+                            accentColor: DesignTokens.nightAccent,
+                            onSourceWordTap: (wordIndex) => setState(() {
+                              if (_selectedRoleplayWords[translationKey] ==
+                                  wordIndex) {
+                                _selectedRoleplayWords.remove(translationKey);
+                              } else {
+                                _selectedRoleplayWords[translationKey] =
+                                    wordIndex;
+                              }
+                            }),
+                          )
+                        : Text(
+                            fr,
+                            style:
+                                DesignTokens.body(
+                                  15,
+                                  weight: FontWeight.w600,
+                                ).copyWith(
+                                  color: hasAttempt
+                                      ? resultColor
+                                      : DesignTokens.nightText,
+                                  height: 1.2,
+                                ),
                           ),
-                    ),
                   ),
                   if (hasAttempt)
                     Padding(
@@ -1737,15 +1800,6 @@ class _AgentLedListeningScreenState
                     13,
                     weight: FontWeight.w600,
                   ).copyWith(color: resultColor, height: 1.2),
-                ),
-              ],
-              if (translationVisible && (en?.isNotEmpty ?? false)) ...[
-                const SizedBox(height: 7),
-                Text(
-                  en!,
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.nightMuted, height: 1.25),
                 ),
               ],
               const SizedBox(height: 3),
@@ -1772,41 +1826,6 @@ class _AgentLedListeningScreenState
                             ),
                     ),
                   ),
-                  if (en?.trim().isNotEmpty ?? false) ...[
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => setState(() {
-                        if (translationVisible) {
-                          _revealedTranslations.remove(translationKey);
-                        } else {
-                          _revealedTranslations.add(translationKey);
-                        }
-                      }),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              translationVisible
-                                  ? Icons.translate_rounded
-                                  : Icons.translate_outlined,
-                              size: 17,
-                              color: DesignTokens.nightAccent,
-                            ),
-                            Icon(
-                              translationVisible
-                                  ? Icons.expand_less_rounded
-                                  : Icons.expand_more_rounded,
-                              size: 17,
-                              color: DesignTokens.nightAccent,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ],
@@ -1814,6 +1833,19 @@ class _AgentLedListeningScreenState
         ),
       ),
     );
+  }
+
+  List<List<int>>? _roleplayAlignmentFor(String french, String english) {
+    final key = '$french\u0000$english';
+    if (_roleplayAlignments.containsKey(key)) return _roleplayAlignments[key];
+    try {
+      final alignment = SpeakingTranslationAlignment.forPhrase(french, english);
+      _roleplayAlignments[key] = alignment;
+      return alignment;
+    } on StateError {
+      _roleplayAlignments[key] = null;
+      return null;
+    }
   }
 
   Widget _debugPanel() {
@@ -1841,7 +1873,7 @@ class _AgentLedListeningScreenState
         _callStatus != CallStatus.reconnecting &&
         _callStatus != CallStatus.ended;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.fromLTRB(0, _isRoleplay ? 12 : 20, 0, 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1856,12 +1888,10 @@ class _AgentLedListeningScreenState
           ),
           const SizedBox(height: 14),
           Row(
-            mainAxisAlignment: _isRoleplay
-                ? MainAxisAlignment.center
-                : MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               if (_isRoleplay)
-                SizedBox(width: 104, child: _roleplayStatusIndicator())
+                _roleplayTranslationButton()
               else
                 const SizedBox(width: 76),
               MicPrimaryButton(
@@ -1873,7 +1903,6 @@ class _AgentLedListeningScreenState
                 onHoldStart: _pttDown,
                 onHoldEnd: _pttUp,
               ),
-              if (_isRoleplay) const SizedBox(width: 12),
               _controlButton(
                 icon: CupertinoIcons.phone_down_fill,
                 label: 'End',
@@ -1883,6 +1912,42 @@ class _AgentLedListeningScreenState
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _roleplayTranslationButton() {
+    final color = _roleplayTranslationsVisible
+        ? DesignTokens.nightAccent
+        : DesignTokens.nightText;
+    return Semantics(
+      button: true,
+      toggled: _roleplayTranslationsVisible,
+      label: _roleplayTranslationsVisible
+          ? 'Hide translations'
+          : 'Show translations',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() {
+          _roleplayTranslationsVisible = !_roleplayTranslationsVisible;
+        }),
+        child: SizedBox(
+          width: 76,
+          child: Column(
+            children: [
+              SizedBox(
+                width: 54,
+                height: 54,
+                child: Icon(Icons.translate_rounded, color: color, size: 25),
+              ),
+              const SizedBox(height: DesignTokens.space2),
+              Text(
+                'Translate',
+                style: DesignTokens.body(11).copyWith(color: color),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

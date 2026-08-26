@@ -98,6 +98,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   32: _migrationV32,
   33: _migrationV33,
   34: _migrationV34,
+  35: _migrationV35,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1220,4 +1221,32 @@ void _migrationV34(CommonDatabase db) {
       "ALTER TABLE vocabulary_sessions ADD COLUMN context_examples_json TEXT NOT NULL DEFAULT '{}'",
     );
   }
+}
+
+/// Shared Speaking catalog rows. The payload is deliberately versioned as
+/// JSON because the lesson contract includes optional bilingual alignments,
+/// hints, and roleplay partner lines that should survive reinstall exactly.
+void _migrationV35(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS speaking_lessons (
+      id TEXT PRIMARY KEY,
+      source TEXT NOT NULL CHECK (source IN ('default', 'generated')),
+      mode TEXT NOT NULL CHECK (mode IN ('guided', 'freeTalk', 'roleplay')),
+      level_band TEXT NOT NULL,
+      title TEXT NOT NULL,
+      fingerprint TEXT NOT NULL UNIQUE,
+      lesson_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_speaking_lessons_mode_level '
+    'ON speaking_lessons (mode, level_band, created_at)',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_speaking_lessons_source '
+    'ON speaking_lessons (source, updated_at)',
+  );
 }

@@ -8,6 +8,186 @@ class _FreeTalkHintSet {
 }
 
 const _preparedFreeTalkHints = <String, List<_FreeTalkHintSet>>{
+  'speaking_free_day': [
+    _FreeTalkHintSet(
+      french: ['bien', 'fatigué(e)', 'très bien'],
+      english: ['well', 'tired', 'very well'],
+    ),
+    _FreeTalkHintSet(
+      french: ['travaille', 'étudie', 'prends le petit-déjeuner'],
+      english: ['work', 'study', 'have breakfast'],
+    ),
+    _FreeTalkHintSet(
+      french: ['me repose', 'prépare le dîner', 'lis un livre'],
+      english: ['rest', 'make dinner', 'read a book'],
+    ),
+  ],
+  'speaking_free_food': [
+    _FreeTalkHintSet(
+      french: ['des pommes', 'du riz', 'du poulet'],
+      english: ['apples', 'rice', 'chicken'],
+    ),
+    _FreeTalkHintSet(
+      french: ['sucré', 'bon', 'frais'],
+      english: ['sweet', 'good', 'fresh'],
+    ),
+    _FreeTalkHintSet(
+      french: ['souvent', 'parfois', 'rarement'],
+      english: ['often', 'sometimes', 'rarely'],
+    ),
+  ],
+  'speaking_free_weekend': [
+    _FreeTalkHintSet(
+      french: ['voir mes amis', 'me reposer', 'faire du sport'],
+      english: ['see my friends', 'rest', 'play sports'],
+    ),
+    _FreeTalkHintSet(
+      french: ['ma famille', 'mes amis', 'mon partenaire'],
+      english: ['my family', 'my friends', 'my partner'],
+    ),
+    _FreeTalkHintSet(
+      french: ['c’est relaxant', 'c’est amusant', 'j’aime sortir'],
+      english: ['it is relaxing', 'it is fun', 'I like going out'],
+    ),
+  ],
+  'speaking_free_city': [
+    _FreeTalkHintSet(
+      french: ['Toronto', 'Montréal', 'une petite ville'],
+      english: ['Toronto', 'Montreal', 'a small city'],
+    ),
+    _FreeTalkHintSet(
+      french: ['les parcs', 'les restaurants', 'l’ambiance'],
+      english: ['the parks', 'the restaurants', 'the atmosphere'],
+    ),
+    _FreeTalkHintSet(
+      french: ['le parc', 'le musée', 'ce café'],
+      english: ['the park', 'the museum', 'this café'],
+    ),
+  ],
+  'speaking_free_routine': [
+    _FreeTalkHintSet(
+      french: ['sept heures', 'huit heures', 'très tôt'],
+      english: ["seven o'clock", "eight o'clock", 'very early'],
+    ),
+    _FreeTalkHintSet(
+      french: ['travaille', 'étudie', 'prends le petit-déjeuner'],
+      english: ['work', 'study', 'have breakfast'],
+    ),
+    _FreeTalkHintSet(
+      french: ['prépare le dîner', 'lis', 'me repose'],
+      english: ['make dinner', 'read', 'rest'],
+    ),
+  ],
+  'speaking_free_memory': [
+    _FreeTalkHintSet(
+      french: ['visité un musée', 'fait une promenade', 'regardé un film'],
+      english: ['visited a museum', 'went for a walk', 'watched a film'],
+    ),
+    _FreeTalkHintSet(
+      french: ['ma famille', 'mes amis', 'un collègue'],
+      english: ['my family', 'my friends', 'a colleague'],
+    ),
+    _FreeTalkHintSet(
+      french: ['agréable', 'amusant', 'important'],
+      english: ['pleasant', 'fun', 'important'],
+    ),
+  ],
+  'speaking_free_event': [
+    _FreeTalkHintSet(
+      french: ['un festival', 'une rencontre', 'un changement'],
+      english: ['a festival', 'a meeting', 'a change'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'le programme a changé',
+        'nous avons gagné',
+        'il y a eu un problème',
+      ],
+      english: ['the plan changed', 'we won', 'there was a problem'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'cela m’a aidé',
+        'j’ai appris quelque chose',
+        'ma famille était là',
+      ],
+      english: ['it helped me', 'I learned something', 'my family was there'],
+    ),
+  ],
+  'speaking_free_work_study': [
+    _FreeTalkHintSet(
+      french: [
+        'répondre aux clients',
+        'préparer des projets',
+        'étudier les langues',
+      ],
+      english: ['help clients', 'prepare projects', 'study languages'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'je manque de temps',
+        'le travail est complexe',
+        'je dois pratiquer',
+      ],
+      english: ['I lack time', 'the work is complex', 'I need to practise'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'pratiquant chaque jour',
+        'suivant une formation',
+        'demandant de l’aide',
+      ],
+      english: ['practising every day', 'taking a course', 'asking for help'],
+    ),
+  ],
+  'speaking_free_change': [
+    _FreeTalkHintSet(
+      french: ['mon horaire', 'mes déplacements', 'mon espace de travail'],
+      english: ['my schedule', 'my commute', 'my workspace'],
+    ),
+    _FreeTalkHintSet(
+      french: ['gagner du temps', 'réduire le stress', 'rester flexible'],
+      english: ['save time', 'reduce stress', 'stay flexible'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'cela coûterait cher',
+        'ce serait difficile',
+        'tout le monde ne serait pas d’accord',
+      ],
+      english: [
+        'it would be expensive',
+        'it would be difficult',
+        'not everyone would agree',
+      ],
+    ),
+  ],
+  'speaking_free_choice': [
+    _FreeTalkHintSet(
+      french: ['changer de travail', 'déménager', 'reprendre mes études'],
+      english: ['change jobs', 'move', 'return to school'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'rester où j’étais',
+        'attendre encore',
+        'choisir une autre option',
+      ],
+      english: ['stay where I was', 'wait longer', 'choose another option'],
+    ),
+    _FreeTalkHintSet(
+      french: [
+        'les conditions sont claires',
+        'la situation est similaire',
+        'la personne est prête',
+      ],
+      english: [
+        'the conditions are clear',
+        'the situation is similar',
+        'the person is ready',
+      ],
+    ),
+  ],
   'speaking_free_a1_weather': [
     _FreeTalkHintSet(
       french: ['chaud', 'froid', 'beau'],

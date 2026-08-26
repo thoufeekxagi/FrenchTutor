@@ -1,16 +1,18 @@
 // The active catalog uses the square lesson grid below.
 // ignore_for_file: unused_element
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../data/database/speaking_lesson_codec.dart';
+import '../../data/database/speaking_lesson_store.dart';
 import '../../flow/stage_outcome.dart';
-import '../../models/content_models.dart';
 import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
-import '../../utils/speaking_translation_alignment.dart';
 import 'speak_roleplay_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_lesson_flow_screen.dart';
@@ -32,24 +34,56 @@ class _SpeakingCourseHomeScreenState
     extends ConsumerState<SpeakingCourseHomeScreen> {
   SpeakingCourseMode _mode = SpeakingCourseMode.guided;
   String? _selectedLessonId;
-  final List<SpeakingCourseLesson> _generatedLessons = [];
+  final List<SpeakingCourseLesson> _persistedLessons = [];
   bool _isGenerating = false;
+  bool _isReplenishing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_restoreSpeakingCatalog());
+    });
+  }
+
+  Future<void> _restoreSpeakingCatalog() async {
+    try {
+      await ref.read(syncServiceProvider).hydrateSpeakingLessons();
+      _reloadPersistedLessons();
+      if (mounted) setState(() {});
+      final profile = ref.read(learningStoreProvider).profile();
+      unawaited(_ensureReserve(_mode, _beginnerBand(profile.level)));
+    } catch (error, stackTrace) {
+      debugPrint('Speaking catalog restore failed: $error\n$stackTrace');
+    }
+    // Publishing is deliberately fire-and-forget. The bundled catalog is
+    // already rendered locally, so a network write never delays first paint.
+    unawaited(
+      ref.read(syncServiceProvider).publishDefaultSpeakingCatalog().catchError((
+        error,
+      ) {
+        debugPrint('Speaking catalog publish failed: $error');
+      }),
+    );
+  }
+
+  void _reloadPersistedLessons() {
+    final lessons = ref.read(speakingLessonStoreProvider).list();
+    _persistedLessons
+      ..clear()
+      ..addAll(lessons);
+  }
 
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(learningStoreProvider).profile();
     final level = _beginnerBand(profile.level);
-    final lessons = [
-      ..._lessonsFor(_mode, level),
-      ..._generatedLessons.where(
-        (lesson) => lesson.mode == _mode && lesson.level == level,
-      ),
-    ];
+    final visibleLessons = _lessonsFor(_mode, level);
     final completed = ref.watch(storageServiceProvider).completedContentKeys();
-    final nextLesson = _nextLesson(lessons, completed);
-    final selected = lessons.firstWhere(
+    final nextLesson = _nextLesson(visibleLessons, completed);
+    final selected = visibleLessons.firstWhere(
       (lesson) => lesson.id == _selectedLessonId,
-      orElse: () => nextLesson ?? lessons.first,
+      orElse: () => nextLesson ?? visibleLessons.first,
     );
 
     return Scaffold(
@@ -77,11 +111,9 @@ class _SpeakingCourseHomeScreenState
             const SizedBox(height: 28),
             _sectionLabel(_sectionTitle),
             const SizedBox(height: 10),
-            _lessonGrid(lessons, completed),
-            if (_mode == SpeakingCourseMode.guided) ...[
-              const SizedBox(height: 24),
-              _generateMoreCard(level),
-            ],
+            _lessonGrid(visibleLessons, completed),
+            const SizedBox(height: 24),
+            _generateMoreCard(level),
           ],
         ),
       ),
@@ -98,21 +130,46 @@ class _SpeakingCourseHomeScreenState
     SpeakingCourseMode mode,
     String level,
   ) {
+    List<SpeakingCourseLesson> bundled;
     if (mode == SpeakingCourseMode.freeTalk) {
-      return SpeakingCourseCatalog.freeTalkForLevel(level);
+      bundled = SpeakingCourseCatalog.freeTalkForLevel(level);
+    } else if (mode == SpeakingCourseMode.roleplay) {
+      bundled = SpeakingCourseCatalog.roleplaysForLevel(level);
+    } else {
+      final all = <SpeakingCourseLesson>[
+        for (final collection in SpeakingCourseCatalog.units)
+          for (final lesson in collection.lessons)
+            if (lesson.mode == mode) lesson,
+      ];
+      final exact = all
+          .where((lesson) => lesson.level == level)
+          .toList(growable: false);
+      bundled = exact.isNotEmpty ? exact : all;
     }
-    if (mode == SpeakingCourseMode.roleplay) {
-      return SpeakingCourseCatalog.roleplaysForLevel(level);
+    return _dedupeLessons([
+      ...bundled,
+      ..._persistedLessons.where(
+        (lesson) => lesson.mode == mode && lesson.level == level,
+      ),
+    ]);
+  }
+
+  List<SpeakingCourseLesson> _dedupeLessons(
+    Iterable<SpeakingCourseLesson> lessons,
+  ) {
+    final ids = <String>{};
+    final fingerprints = <String>{};
+    final result = <SpeakingCourseLesson>[];
+    for (final lesson in lessons) {
+      final fingerprint = speakingLessonFingerprint(lesson);
+      if (ids.contains(lesson.id) || fingerprints.contains(fingerprint)) {
+        continue;
+      }
+      ids.add(lesson.id);
+      fingerprints.add(fingerprint);
+      result.add(lesson);
     }
-    final all = <SpeakingCourseLesson>[
-      for (final collection in SpeakingCourseCatalog.units)
-        for (final lesson in collection.lessons)
-          if (lesson.mode == mode) lesson,
-    ];
-    final exact = all
-        .where((lesson) => lesson.level == level)
-        .toList(growable: false);
-    return exact.isNotEmpty ? exact : all;
+    return result;
   }
 
   String _beginnerBand(String raw) {
@@ -176,10 +233,16 @@ class _SpeakingCourseHomeScreenState
             Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => setState(() {
-                  _mode = entry.$1;
-                  _selectedLessonId = null;
-                }),
+                onTap: () {
+                  setState(() {
+                    _mode = entry.$1;
+                    _selectedLessonId = null;
+                  });
+                  final profile = ref.read(learningStoreProvider).profile();
+                  unawaited(
+                    _ensureReserve(entry.$1, _beginnerBand(profile.level)),
+                  );
+                },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   height: 54,
@@ -494,41 +557,23 @@ class _SpeakingCourseHomeScreenState
     final requestedMode = mode ?? _mode;
     setState(() => _isGenerating = true);
     try {
-      final avoidTitles = [
-        ...SpeakingCourseCatalog.units
-            .expand((unit) => unit.lessons)
-            .map((lesson) => lesson.title),
-        ...SpeakingCourseCatalog.freeTalkLessons.map((lesson) => lesson.title),
-        ..._generatedLessons.map((lesson) => lesson.title),
-      ];
-      final passage = requestedMode == SpeakingCourseMode.freeTalk
-          ? await ref
-                .read(lessonAgentServiceProvider)
-                .buildStandaloneFreeTalkTopic(
-                  levelBand: level,
-                  avoidTitles: avoidTitles,
-                )
-          : requestedMode == SpeakingCourseMode.roleplay
-          ? await ref
-                .read(lessonAgentServiceProvider)
-                .buildStandaloneRoleplay(
-                  levelBand: level,
-                  avoidTitles: avoidTitles,
-                )
-          : await ref
-                .read(lessonAgentServiceProvider)
-                .buildStandaloneSpeakingLesson(
-                  levelBand: level,
-                  avoidTitles: avoidTitles,
-                );
-      final lesson = _lessonFromGeneratedPassage(
-        passage,
-        level,
+      final lesson = await _generateValidatedLesson(
+        level: level,
         mode: requestedMode,
+        avoidTitles: _lessonsFor(
+          requestedMode,
+          level,
+        ).map((lesson) => lesson.title),
       );
+      final inserted = ref
+          .read(speakingLessonStoreProvider)
+          .insertGenerated(lesson);
+      if (!inserted) {
+        throw StateError('The generated lesson duplicated an existing lesson.');
+      }
+      _reloadPersistedLessons();
       if (!mounted) return;
       setState(() {
-        _generatedLessons.add(lesson);
         _selectedLessonId = lesson.id;
         _isGenerating = false;
       });
@@ -541,98 +586,83 @@ class _SpeakingCourseHomeScreenState
     }
   }
 
-  SpeakingCourseLesson _lessonFromGeneratedPassage(
-    ReadingPassage passage,
-    String level, {
+  Future<SpeakingCourseLesson> _generateValidatedLesson({
+    required String level,
     required SpeakingCourseMode mode,
-  }) {
-    if (mode == SpeakingCourseMode.guided) {
-      for (final segment in passage.segments) {
-        if (segment.fr.trim().isEmpty || segment.en.trim().isEmpty) {
-          throw StateError(
-            'Generated Guided Speaking lesson contains a missing French or '
-            'English line.',
-          );
-        }
-        // Validate before adding the lesson to the screen. A generated line
-        // must have a real bilingual contract; it may not rely on a visual
-        // fallback when the learner taps a word later.
-        SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en);
-      }
-    }
-    if ((mode == SpeakingCourseMode.freeTalk ||
-            mode == SpeakingCourseMode.roleplay) &&
-        passage.segments.any(
-          (segment) => segment.characterFr?.trim().isNotEmpty != true,
-        )) {
-      throw StateError('Generated speaking scene has an incomplete prompt.');
-    }
-    if (mode == SpeakingCourseMode.freeTalk) {
-      for (final segment in passage.segments) {
-        if (segment.fr.trim().isEmpty || segment.en.trim().isEmpty) {
-          throw StateError(
-            'Generated Free Talk beat is missing its French frame or English meaning.',
-          );
-        }
-        if (segment.characterEn?.trim().isNotEmpty != true) {
-          throw StateError(
-            'Generated Free Talk beat is missing the tutor English meaning.',
-          );
-        }
-        if (segment.hintWords.length < 3) {
-          throw StateError(
-            'Generated Free Talk beat needs at least three independent hint words.',
-          );
-        }
-        if (segment.hintWordsEnglish.length != segment.hintWords.length) {
-          throw StateError(
-            'Generated Free Talk hint words must have matching English meanings.',
-          );
-        }
-        SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en);
-        SpeakingTranslationAlignment.forPhrase(
-          segment.characterFr!,
-          segment.characterEn ?? '',
-        );
-      }
-    }
-    final lines = passage.segments
-        .map(
-          (segment) => SpeakingCourseLine(
-            french: segment.fr,
-            english: segment.en,
-            partnerFrench: segment.characterFr,
-            partnerEnglish: segment.characterEn,
-            tip: segment.pronunciationTip,
-            hintWords: segment.hintWords,
-            hintWordsEnglish: segment.hintWordsEnglish,
-            translationAlignment: mode == SpeakingCourseMode.freeTalk
-                ? SpeakingTranslationAlignment.forPhrase(segment.fr, segment.en)
-                : null,
-            partnerTranslationAlignment: mode == SpeakingCourseMode.freeTalk
-                ? SpeakingTranslationAlignment.forPhrase(
-                    segment.characterFr!,
-                    segment.characterEn ?? '',
-                  )
-                : null,
-            openResponse: mode == SpeakingCourseMode.freeTalk,
+    required Iterable<String> avoidTitles,
+  }) async {
+    Object? lastError;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        final agent = ref.read(lessonAgentServiceProvider);
+        final passage = switch (mode) {
+          SpeakingCourseMode.guided =>
+            await agent.buildStandaloneSpeakingLesson(
+              levelBand: level,
+              avoidTitles: avoidTitles,
+            ),
+          SpeakingCourseMode.freeTalk =>
+            await agent.buildStandaloneFreeTalkTopic(
+              levelBand: level,
+              avoidTitles: avoidTitles,
+            ),
+          SpeakingCourseMode.roleplay => await agent.buildStandaloneRoleplay(
+            levelBand: level,
+            avoidTitles: avoidTitles,
           ),
-        )
-        .toList(growable: false);
-    if (lines.isEmpty) {
-      throw StateError('Generated speaking lesson has no practice lines.');
+        };
+        return SpeakingCourseLessonValidator.fromPassage(
+          passage: passage,
+          id: SpeakingLessonStore.newId(),
+          level: level,
+          mode: mode,
+        );
+      } catch (error) {
+        lastError = error;
+      }
     }
-    return SpeakingCourseLesson(
-      id: passage.id,
-      title: passage.titleEn?.trim().isNotEmpty == true
-          ? passage.titleEn!.trim()
-          : passage.title,
-      subtitle: 'A fresh $level conversation matched to your practice.',
-      level: level,
-      icon: Icons.auto_awesome_rounded,
-      mode: mode,
-      lines: lines,
+    throw StateError(
+      'The generator did not produce a validated ${mode.name} lesson: $lastError',
     );
+  }
+
+  Future<void> _ensureReserve(SpeakingCourseMode mode, String level) async {
+    if (_isReplenishing || _isGenerating) return;
+    final lessons = _lessonsFor(mode, level);
+    final completed = ref.read(storageServiceProvider).completedContentKeys();
+    final remaining = lessons
+        .where((lesson) => !completed.contains(lesson.id))
+        .length;
+    if (remaining >= 10) return;
+
+    _isReplenishing = true;
+    try {
+      for (var index = 0; index < 2; index++) {
+        final current = _lessonsFor(mode, level);
+        final avoidTitles = current.map((lesson) => lesson.title).toList();
+        try {
+          final lesson = await _generateValidatedLesson(
+            level: level,
+            mode: mode,
+            avoidTitles: avoidTitles,
+          );
+          final inserted = ref
+              .read(speakingLessonStoreProvider)
+              .insertGenerated(lesson);
+          if (inserted) {
+            _reloadPersistedLessons();
+            if (mounted) setState(() {});
+          }
+        } catch (error, stackTrace) {
+          // Background replenishment must never change the current lesson or
+          // show a scary error card. The validated row simply is not added;
+          // the next reserve check can try again.
+          debugPrint('Speaking reserve generation failed: $error\n$stackTrace');
+        }
+      }
+    } finally {
+      _isReplenishing = false;
+    }
   }
 
   Future<void> _startLesson(SpeakingCourseLesson lesson) async {
@@ -682,6 +712,7 @@ class _SpeakingCourseHomeScreenState
           stage: lesson.mode.name,
         );
     setState(() {});
+    unawaited(_ensureReserve(lesson.mode, lesson.level));
   }
 
   Widget _sectionLabel(String text) => Text(

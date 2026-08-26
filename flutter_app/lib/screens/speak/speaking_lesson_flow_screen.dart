@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
-import '../../models/agent_tool.dart';
 import '../../models/speaking_course.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
@@ -130,6 +129,7 @@ class _SpeakingLessonFlowScreenState
   final List<int> _selectedSentenceTokens = [];
   final List<_SpeakingChatTurn> _chatHistory = [];
   final Set<String> _selectedHintWords = {};
+  final GlobalKey _currentFreeTalkTurnKey = GlobalKey();
   bool _murrayInputActive = false;
   bool _murrayTurnClosing = false;
   bool _murrayFinalizing = false;
@@ -154,13 +154,14 @@ class _SpeakingLessonFlowScreenState
       sessionType: _murraySessionType,
       lessonContext: () => _murrayContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
-      // Keep the proven Live connection. Guided lessons use explicit
-      // tap-to-record boundaries; free talk keeps its existing behavior.
-      manualLearnerTurns: !_isFreeTalk,
+      // Both speaking modes use the proven tap-to-record Live boundary. The
+      // tutor stays connected while idle, but learner audio reaches Gemini
+      // only between Record and Stop.
+      manualLearnerTurns: true,
       openingPrompt: _openingPrompt,
       onUserTranscript: _onMurrayTranscript,
       onTurnComplete: _onMurrayTurnComplete,
-      tools: _isFreeTalk ? AgentTool.freeTalkSpeakingPalette : const [],
+      tools: const [],
       onToolCall: _onMurrayToolCall,
       onChanged: () {
         if (mounted) setState(() {});
@@ -256,12 +257,10 @@ The app reads the same Live input transcript directly for its immediate visual
 check. Do not call a grading tool and do not advance to a future step.
 
 FREE TALK RESULT RULE: For a Free Talk beat, after the learner turn closes,
-call grade_free_talk_turn exactly once for the current step. Accept a short,
-meaningful on-topic answer even when it differs from the visible sentence
-frame. If the learner used English or needs grammar repair, say one short
-correction and include that same short French correction in the tool result.
-Do not read the visual hint words, add them to the conversation, ask a new
-question, or advance the lesson.
+give one brief beginner-friendly correction or encouragement aloud, then stop.
+The app reads the same Live input transcript directly for its immediate visual
+check, exactly as it does in Guided Speaking. Do not call a grading tool, read
+the visual hint words, ask a new question, or advance the lesson.
 
 BOUNDARY: You are the learner's in-lesson coach. Explain, model, or give one
 short hint about the current target only. Do not create a new lesson, switch
@@ -402,14 +401,25 @@ $instruction
 
   void _onMurrayTranscript(String transcript) {
     if (!mounted || _murrayFinalizing) return;
-    if (!_isFreeTalk) {
-      final cleanTranscript = transcript.trim();
-      if (cleanTranscript.isEmpty) return;
-      final combined = _heard.trim().isEmpty
-          ? cleanTranscript
-          : '${_heard.trim()} $cleanTranscript';
-      setState(() => _heard = combined);
-      if (!_murrayTurnClosing || _murrayGuidedGradeReceived) return;
+    final cleanTranscript = transcript.trim();
+    if (cleanTranscript.isEmpty) return;
+    final combined = _heard.trim().isEmpty
+        ? cleanTranscript
+        : '${_heard.trim()} $cleanTranscript';
+    setState(() => _heard = combined);
+    if (!_murrayTurnClosing) return;
+    if (_isFreeTalk) {
+      if (_murrayFreeTalkGradeReceived) return;
+      _murrayFreeTalkGradeReceived = true;
+      _murrayTurnClosing = false;
+      _applyFreeTalkResult(
+        accepted: _matchesTarget(combined, _step.french),
+        heard: combined,
+        correction: '',
+        feedback: '',
+      );
+    } else {
+      if (_murrayGuidedGradeReceived) return;
       _murrayGuidedGradeReceived = true;
       _guidedGradeTimeout?.cancel();
       _murrayTurnClosing = false;
@@ -418,19 +428,25 @@ $instruction
         heard: combined,
         feedback: '',
       );
-      return;
     }
-    if (!_murrayTurnClosing) return;
-    _murrayFinalizing = true;
-    _murrayInputActive = false;
-    unawaited(_finishRecording(transcript));
   }
 
   void _onMurrayTurnComplete() {
     if (!mounted || !_murrayTurnClosing || _murrayFinalizing) return;
-    if (!_isFreeTalk) {
-      final transcript = _heard.trim();
-      if (transcript.isEmpty || _murrayGuidedGradeReceived) return;
+    final transcript = _heard.trim();
+    if (transcript.isEmpty) return;
+    if (_isFreeTalk) {
+      if (_murrayFreeTalkGradeReceived) return;
+      _murrayFreeTalkGradeReceived = true;
+      _murrayTurnClosing = false;
+      _applyFreeTalkResult(
+        accepted: _matchesTarget(transcript, _step.french),
+        heard: transcript,
+        correction: '',
+        feedback: '',
+      );
+    } else {
+      if (_murrayGuidedGradeReceived) return;
       _murrayGuidedGradeReceived = true;
       _guidedGradeTimeout?.cancel();
       _murrayTurnClosing = false;
@@ -439,13 +455,7 @@ $instruction
         heard: transcript,
         feedback: '',
       );
-      return;
     }
-    // A quiet/unclear turn still needs to resolve visibly instead of leaving
-    // the learner stuck on Checking forever.
-    _murrayFinalizing = true;
-    _murrayInputActive = false;
-    unawaited(_finishRecording(''));
   }
 
   void _onMurrayToolCall(
@@ -453,49 +463,6 @@ $instruction
     Map<String, dynamic> args,
     String callId,
   ) {
-    if (name == 'grade_free_talk_turn' && _isFreeTalk) {
-      final stepIndex = args['step_index'];
-      final accepted = args['accepted'];
-      final heard = args['heard'];
-      final correction = args['correction'];
-      final feedback = args['feedback'];
-      final valid =
-          _murrayTurnClosing &&
-          !_murrayFreeTalkGradeReceived &&
-          stepIndex is int &&
-          stepIndex == _index + 1 &&
-          accepted is bool &&
-          heard is String &&
-          correction is String &&
-          feedback is String;
-      if (!valid) {
-        _murray.sendToolResponse(
-          callId: callId,
-          name: name,
-          result: {
-            'ok': false,
-            'error': 'The result was stale or did not match the current beat.',
-          },
-          scheduling: 'SILENT',
-        );
-        return;
-      }
-      _murrayFreeTalkGradeReceived = true;
-      _murray.sendToolResponse(
-        callId: callId,
-        name: name,
-        result: {'ok': true, 'accepted_step_index': stepIndex},
-        scheduling: 'SILENT',
-      );
-      _murrayTurnClosing = false;
-      _applyFreeTalkResult(
-        accepted: accepted,
-        heard: heard,
-        correction: correction,
-        feedback: feedback,
-      );
-      return;
-    }
     if (name != 'grade_guided_phrase' || _isFreeTalk) {
       _murray.sendToolResponse(
         callId: callId,
@@ -573,6 +540,7 @@ $instruction
     });
     if (accepted) _creditCurrentStep();
     _murrayFinalizing = false;
+    _keepCurrentFreeTalkTurnVisible();
   }
 
   void _applyGuidedResult({
@@ -614,8 +582,8 @@ $instruction
       });
       return;
     }
-    // Fallback only: the normal Murray path resolves through the structured
-    // grade_guided_phrase event and never reaches this local matcher.
+    // Offline tutor-help-disabled path only. Live speaking resolves directly
+    // from Gemini's input transcript and does not make a grading call.
     _murrayInputActive = false;
     _murrayTurnClosing = false;
     setState(() {
@@ -750,22 +718,10 @@ $instruction
       _selectedFreeTalkPartnerWord = null;
       _selectedFreeTalkLearnerWord = null;
     });
-    if (!_isFreeTalk) {
-      // "Practice more" is a retry for the current guided phrase: move
-      // directly into the next Record -> Stop turn instead of showing an
-      // extra idle Record state.
-      await _startRecording();
-      return;
-    }
-    // Retry owns the learner's next recording. Do not replay or re-inject the
-    // current Marie prompt: that makes the tutor sound like it restarted the
-    // beat and can mix the old prompt into the new Live turn.
-    if (_isFreeTalk && _murray.isLive) {
-      _promptMurray(
-        'For this retry, say only "Repeat it, please." in French, then wait. '
-        'Do not repeat the question, the lesson explanation, or the visual word hints.',
-      );
-    }
+    // "Practice more" is a retry for the current phrase in either mode:
+    // immediately reopen Record -> Stop without replaying or reinjecting the
+    // tutor prompt into the same Live turn.
+    await _startRecording();
   }
 
   void _next() {
@@ -807,7 +763,22 @@ $instruction
       _selectedSentenceTokens.clear();
       _selectedHintWords.clear();
     });
+    if (_isFreeTalk) _keepCurrentFreeTalkTurnVisible();
     unawaited(_playCurrentPrompt());
+  }
+
+  void _keepCurrentFreeTalkTurnVisible() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final turnContext = _currentFreeTalkTurnKey.currentContext;
+      if (turnContext == null) return;
+      Scrollable.ensureVisible(
+        turnContext,
+        alignment: 1,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+      );
+    });
   }
 
   Future<void> _playCurrentPrompt() async {
@@ -1077,10 +1048,13 @@ $instruction
   }
 
   Widget _freeTalkChatCard() {
-    return SizedBox(
-      height: 410,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+    // The screen's parent ListView owns vertical scrolling. Keeping a second
+    // fixed-height ListView here trapped the final response card underneath
+    // the pinned hint tray and made the two scroll areas fight each other.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final turn in _chatHistory) ...[
             _chatBubble(
@@ -1108,7 +1082,10 @@ $instruction
               tutor: true,
             ),
           const SizedBox(height: 10),
-          _currentLearnerBubble(),
+          KeyedSubtree(
+            key: _currentFreeTalkTurnKey,
+            child: _currentLearnerBubble(),
+          ),
         ],
       ),
     );
@@ -1161,10 +1138,10 @@ $instruction
                   BilingualWordText(
                     source: french,
                     translation: english!,
-                    sourceStyle: _display(27).copyWith(height: 1.12),
+                    sourceStyle: _display(22).copyWith(height: 1.16),
                     keywords: const [],
                     translationStyle: _body(
-                      13,
+                      12,
                     ).copyWith(color: DesignTokens.nightMuted),
                     sourceToTranslation: keyName == '$_index:partner'
                         ? _step.partnerTranslationAlignment
@@ -1185,7 +1162,7 @@ $instruction
                         : (_) {},
                   )
                 else
-                  Text(french, style: _body(17, weight: FontWeight.w700)),
+                  Text(french, style: _body(22, weight: FontWeight.w700)),
               ],
             ),
           ),
@@ -1239,10 +1216,12 @@ $instruction
                 BilingualWordText(
                   source: _step.french,
                   translation: _step.english,
-                  sourceStyle: _display(27).copyWith(height: 1.12),
+                  sourceStyle: _display(
+                    _isFreeTalk ? 22 : 27,
+                  ).copyWith(height: _isFreeTalk ? 1.16 : 1.12),
                   keywords: const [],
                   translationStyle: _body(
-                    13,
+                    _isFreeTalk ? 12 : 13,
                   ).copyWith(color: DesignTokens.nightMuted),
                   sourceToTranslation: _step.translationAlignment,
                   selectedSourceWord: _isFreeTalk
@@ -1270,11 +1249,12 @@ $instruction
                   const SizedBox(height: 4),
                   Text(
                     _heard,
-                    style: _body(14, weight: FontWeight.w700).copyWith(
-                      color: success
-                          ? DesignTokens.success
-                          : DesignTokens.nightText,
-                    ),
+                    style: _body(_isFreeTalk ? 13 : 14, weight: FontWeight.w700)
+                        .copyWith(
+                          color: success
+                              ? DesignTokens.success
+                              : DesignTokens.nightText,
+                        ),
                   ),
                 ],
                 if (_isFreeTalk &&
@@ -1738,7 +1718,7 @@ $instruction
     final words = _freeTalkHintWords;
     if (words.isEmpty) return const SizedBox.shrink();
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 9, 18, 10),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 9),
       decoration: BoxDecoration(
         color: DesignTokens.nightCanvas,
         border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
@@ -1754,11 +1734,11 @@ $instruction
           const SizedBox(width: 8),
           Expanded(
             child: SizedBox(
-              height: 48,
+              height: 38,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: words.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 7),
+                separatorBuilder: (_, _) => const SizedBox(width: 7),
                 itemBuilder: (context, index) {
                   final word = words[index];
                   final english = index < _step.hintWordsEnglish.length
@@ -1766,16 +1746,11 @@ $instruction
                       : '';
                   final selected = _selectedHintWords.contains(word);
                   return ActionChip(
-                    label: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _showMeaning && english.isNotEmpty ? english : word,
-                        ),
-                        if (_showMeaning && english.isNotEmpty)
-                          Text('[$word]', style: _body(9)),
-                      ],
+                    label: Text(
+                      english.isEmpty ? word : '$word ($english)',
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
                     ),
                     onPressed: () => setState(() {
                       if (selected) {
@@ -2043,17 +2018,20 @@ $instruction
               onTap: () => setState(() => _showMeaning = !_showMeaning),
             ),
           ),
-          _freeTalkRoundAction(
-            recording: recording,
-            checking: checking,
-            submitted: submitted,
-          ),
+          if (submitted)
+            _postSubmissionActions()
+          else
+            _freeTalkRoundAction(
+              recording: recording,
+              checking: checking,
+              submitted: submitted,
+            ),
           Expanded(
             child: _smallControl(
               icon: Icons.volume_up_outlined,
-              label: submitted ? 'Replay' : 'Replay ${_tutor.displayName}',
+              label: 'Replay ${_tutor.displayName}',
               showLabel: true,
-              onTap: checking ? null : _replayFreeTalk,
+              onTap: checking ? null : _playPartnerLine,
             ),
           ),
         ],
@@ -2108,15 +2086,6 @@ $instruction
         ],
       ),
     );
-  }
-
-  Future<void> _replayFreeTalk() async {
-    if (_state == _SpeakingStepState.checking) return;
-    if (_hasSubmittedCurrentPhrase) {
-      await _practiceMore();
-      return;
-    }
-    await _playPartnerLine();
   }
 
   Widget _smallControl({

@@ -1350,7 +1350,7 @@ abstract final class SpeakingCourseCatalog {
     ),
   ];
 
-  static final freeTalkLessons = <SpeakingCourseLesson>[
+  static final _legacyFreeTalkLessons = <SpeakingCourseLesson>[
     SpeakingCourseLesson(
       id: 'speaking_free_day',
       title: 'My day',
@@ -1661,6 +1661,11 @@ abstract final class SpeakingCourseCatalog {
         ),
       ],
     ),
+  ];
+
+  static final freeTalkLessons = <SpeakingCourseLesson>[
+    for (final lesson in _legacyFreeTalkLessons)
+      _completeLegacyFreeTalkLesson(lesson),
     ..._preparedFreeTalkLessons,
   ];
 
@@ -1692,4 +1697,45 @@ abstract final class SpeakingCourseCatalog {
     }
     return lessons;
   }
+}
+
+SpeakingCourseLesson _completeLegacyFreeTalkLesson(
+  SpeakingCourseLesson lesson,
+) {
+  final hints = _preparedFreeTalkHints[lesson.id];
+  if (hints == null || hints.length != lesson.lines.length) {
+    throw StateError(
+      'Legacy Free Talk lesson ${lesson.id} needs one bilingual hint set per beat.',
+    );
+  }
+  return SpeakingCourseLesson(
+    id: lesson.id,
+    title: lesson.title,
+    subtitle: lesson.subtitle,
+    level: lesson.level,
+    icon: lesson.icon,
+    mode: lesson.mode,
+    goal: lesson.goal,
+    lines: [
+      for (var index = 0; index < lesson.lines.length; index++)
+        SpeakingCourseLine(
+          french: lesson.lines[index].french,
+          english: lesson.lines[index].english,
+          partnerFrench: lesson.lines[index].partnerFrench,
+          partnerEnglish: lesson.lines[index].partnerEnglish,
+          tip: lesson.lines[index].tip,
+          hintWords: hints[index].french,
+          hintWordsEnglish: hints[index].english,
+          translationAlignment: SpeakingTranslationAlignment.forPhrase(
+            lesson.lines[index].french,
+            lesson.lines[index].english,
+          ),
+          partnerTranslationAlignment: SpeakingTranslationAlignment.forPhrase(
+            lesson.lines[index].partnerFrench!,
+            lesson.lines[index].partnerEnglish!,
+          ),
+          openResponse: true,
+        ),
+    ],
+  );
 }

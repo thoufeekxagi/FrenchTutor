@@ -103,11 +103,9 @@ void main() {
     () {
       final freeTalkLines = [
         for (final lesson in SpeakingCourseCatalog.freeTalkLessons)
-          if (lesson.id.startsWith('speaking_free_a1_') ||
-              lesson.id.startsWith('speaking_free_a2_'))
-            ...lesson.lines,
+          ...lesson.lines,
       ];
-      expect(freeTalkLines, hasLength(102));
+      expect(freeTalkLines, hasLength(132));
       for (final line in freeTalkLines) {
         expect(line.hintWords.length, greaterThanOrEqualTo(3));
         expect(line.hintWordsEnglish, hasLength(line.hintWords.length));
@@ -140,6 +138,76 @@ void main() {
       }
     },
   );
+
+  test('Free Talk selections map to the intended English meaning', () {
+    final routineQuestion = SpeakingTranslationAlignment.forPhrase(
+      'À quelle heure commence votre journée ?',
+      'What time does your day start?',
+    );
+    expect(routineQuestion[3], [5], reason: 'commence → start');
+
+    final nameQuestion = SpeakingTranslationAlignment.forPhrase(
+      'Comment vous appelez-vous ?',
+      'What is your name?',
+    );
+    expect(nameQuestion[1], [2], reason: 'vous → your');
+    expect(nameQuestion[2], [3], reason: 'appelez-vous → name');
+  });
+
+  test('direction Roleplay words map to their intended English meaning', () {
+    final tutor = SpeakingTranslationAlignment.forPhrase(
+      'Bonjour, je peux vous aider ?',
+      'Hello, can I help you?',
+    );
+    expect(tutor[4], [3], reason: 'aider → help');
+
+    final learner = SpeakingTranslationAlignment.forPhrase(
+      'Je tourne à gauche ?',
+      'Do I turn left?',
+    );
+    expect(learner[1], [2], reason: 'tourne → turn');
+
+    final direction = SpeakingTranslationAlignment.forPhrase(
+      'Oui, puis tout droit.',
+      'Yes, then straight ahead.',
+    );
+    expect(direction[1], [1], reason: 'puis → then');
+    expect(direction[2], [2, 3], reason: 'tout droit → straight ahead');
+  });
+
+  test('every prepared Roleplay line has a complete bilingual alignment', () {
+    final roleplayLines = [
+      for (final lesson in SpeakingCourseCatalog.roleplays) ...lesson.lines,
+    ];
+    final failures = <String>[];
+    for (final line in roleplayLines) {
+      try {
+        expect(line.partnerFrench, isNotNull, reason: line.french);
+        expect(line.partnerEnglish, isNotNull, reason: line.french);
+        final learner = SpeakingTranslationAlignment.forPhrase(
+          line.french,
+          line.english,
+        );
+        final partner = SpeakingTranslationAlignment.forPhrase(
+          line.partnerFrench!,
+          line.partnerEnglish!,
+        );
+        expect(
+          learner,
+          hasLength(_wordCount(line.french)),
+          reason: line.french,
+        );
+        expect(
+          partner,
+          hasLength(_wordCount(line.partnerFrench!)),
+          reason: line.partnerFrench,
+        );
+      } catch (error) {
+        failures.add('$error');
+      }
+    }
+    expect(failures, isEmpty, reason: failures.join('\n'));
+  });
 
   test('a future French-only target is rejected before it can render', () {
     expect(

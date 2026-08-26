@@ -9,6 +9,7 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/speaking_lesson_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
@@ -20,6 +21,8 @@ import '../models/session.dart' as app_session;
 import '../models/profile.dart';
 import '../models/srs_state.dart';
 import '../models/speak_curriculum.dart';
+import '../models/speaking_course.dart';
+import '../data/database/speaking_lesson_codec.dart';
 import 'image_storage_optimizer.dart';
 import '../orchestration/models/competency_state.dart';
 import '../orchestration/models/error_event.dart';
@@ -672,6 +675,68 @@ class SyncService {
     queueRowId: roleplay.id,
   );
 
+  /// Publishes one already-validated Speaking lesson to the shared catalog.
+  /// The app never sends an unvalidated generator payload to this method.
+  Future<void> syncSpeakingLesson(SpeakingCourseLesson lesson) => _guarded(
+    (uid) async {
+      final now = DateTime.now().toUtc().toIso8601String();
+      await _client.from('speaking_lessons').upsert({
+        'id': lesson.id,
+        'source': 'generated',
+        'mode': lesson.mode.name,
+        'level_band': lesson.level,
+        'title': lesson.title,
+        'fingerprint': speakingLessonFingerprint(lesson),
+        'lesson_json': speakingCourseLessonToJson(lesson),
+        'created_by': uid,
+        'is_validated': true,
+        'created_at': now,
+        'updated_at': now,
+      }, onConflict: 'id');
+    },
+    queueTable: 'speaking_lessons',
+    queueRowId: lesson.id,
+  );
+
+  /// Publishes the bundled catalog once per authenticated account. The rows
+  /// are shared and read-only to learners after insertion; the local bundled
+  /// catalog remains the immediate offline copy while this runs.
+  Future<void> publishDefaultSpeakingCatalog() => _guarded((uid) async {
+    final defaults = _defaultSpeakingLessons();
+    if (defaults.isEmpty) return;
+    final ids = defaults.map((lesson) => lesson.id).toList(growable: false);
+    final existing = await _client
+        .from('speaking_lessons')
+        .select('id')
+        .inFilter('id', ids);
+    final existingIds = existing.map((row) => row['id'] as String).toSet();
+    final missing = defaults.where(
+      (lesson) => !existingIds.contains(lesson.id),
+    );
+    final now = DateTime.now().toUtc().toIso8601String();
+    final rows = missing
+        .map(
+          (lesson) => {
+            'id': lesson.id,
+            'source': 'default',
+            'mode': lesson.mode.name,
+            'level_band': lesson.level,
+            'title': lesson.title,
+            'fingerprint': speakingLessonFingerprint(lesson),
+            'lesson_json': speakingCourseLessonToJson(lesson),
+            'created_by': uid,
+            'is_validated': true,
+            'created_at': now,
+            'updated_at': now,
+          },
+        )
+        .toList(growable: false);
+    for (var start = 0; start < rows.length; start += 40) {
+      final end = (start + 40).clamp(0, rows.length);
+      await _client.from('speaking_lessons').insert(rows.sublist(start, end));
+    }
+  });
+
   Future<void> syncGeneratedVocabularySet(GeneratedVocabularySet set) =>
       _guarded(
         (uid) async {
@@ -1271,6 +1336,13 @@ class SyncService {
           if (set == null) return true;
           await syncGeneratedVocabularySet(set);
           return true;
+        case 'speaking_lessons':
+          final lesson = SpeakingLessonStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (lesson == null) return true;
+          await syncSpeakingLesson(lesson);
+          return true;
         case 'adaptive_course_plans':
           final plan = AdaptiveCourseStore(_db).planById(rowId);
           if (plan == null) return true;
@@ -1343,6 +1415,7 @@ class SyncService {
       'generatedWritingTasks': () => _hydrateGeneratedWritingTasks(uid),
       'generatedRoleplays': () => _hydrateGeneratedRoleplays(uid),
       'generatedVocabularySets': () => _hydrateGeneratedVocabularySets(uid),
+      'speakingLessons': () => _hydrateSpeakingLessons(),
       'notes': () => _hydrateNotes(uid),
     };
     await Future.wait(
@@ -1352,7 +1425,16 @@ class SyncService {
         }),
       ),
     );
+    // This is intentionally outside the critical hydration path. The bundled
+    // catalog is already available locally, so publishing it cannot delay the
+    // first screen after sign-in.
+    unawaited(publishDefaultSpeakingCatalog());
   }
+
+  /// Pulls the public, validated Speaking catalog into SQLite. It is safe to
+  /// call on every app start: IDs and fingerprints make the operation
+  /// idempotent, and malformed rows are skipped by the store.
+  Future<void> hydrateSpeakingLessons() => _hydrateSpeakingLessons();
 
   /// Reload generated content into the local store for the current user.
   /// Screens can call this when they become visible without re-running the
@@ -1769,6 +1851,61 @@ class SyncService {
         ],
       );
     }
+  }
+
+  Future<void> _hydrateSpeakingLessons() async {
+    final rows = await _client.from('speaking_lessons').select();
+    final store = SpeakingLessonStore(_db);
+    for (final row in rows) {
+      try {
+        final lessonJson = _jsonOf(row['lesson_json']);
+        final decoded = jsonDecode(lessonJson);
+        if (decoded is! Map) continue;
+        // Decode before writing so a bad shared row is isolated to itself.
+        final lesson = speakingCourseLessonFromJson(
+          decoded.cast<String, dynamic>(),
+        );
+        if (lesson.id != row['id'] ||
+            lesson.mode.name != row['mode'] ||
+            lesson.level != row['level_band']) {
+          throw const FormatException('Speaking catalog metadata mismatch.');
+        }
+        store.upsertFromRemote(
+          id: row['id'] as String,
+          source: row['source'] as String? ?? 'generated',
+          mode: row['mode'] as String,
+          levelBand: row['level_band'] as String,
+          title: row['title'] as String,
+          fingerprint: row['fingerprint'] as String,
+          lessonJson: lessonJson,
+          createdAt: row['created_at'] as String,
+          updatedAt: row['updated_at'] as String,
+        );
+      } catch (error) {
+        debugPrint('Skipping invalid public Speaking lesson: $error');
+      }
+    }
+  }
+
+  List<SpeakingCourseLesson> _defaultSpeakingLessons() {
+    final byId = <String, SpeakingCourseLesson>{};
+    void add(Iterable<SpeakingCourseLesson> lessons) {
+      for (final lesson in lessons) {
+        byId[lesson.id] = lesson;
+      }
+    }
+
+    add(SpeakingCourseCatalog.units.expand((unit) => unit.lessons));
+    add(SpeakingCourseCatalog.freeTalkLessons);
+    add(SpeakingCourseCatalog.roleplays);
+    final byFingerprint = <String, SpeakingCourseLesson>{};
+    for (final lesson in byId.values) {
+      byFingerprint.putIfAbsent(
+        speakingLessonFingerprint(lesson),
+        () => lesson,
+      );
+    }
+    return byFingerprint.values.toList(growable: false);
   }
 
   Future<void> _hydrateGeneratedVocabularySets(String uid) async {
