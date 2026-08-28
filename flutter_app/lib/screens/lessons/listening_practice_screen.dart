@@ -15,6 +15,7 @@ import '../../services/elevenlabs_audio_playback_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
 import '../../services/audio_container_utils.dart';
 import '../../services/gemini_live_audio_service.dart';
+import '../../services/listening_audio_config.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
@@ -33,11 +34,15 @@ class ListeningPracticeScreen extends ConsumerStatefulWidget {
     super.key,
     required this.story,
     this.audioClip,
+    this.audioFuture,
+    this.enrichment,
     this.showFinishButton = false,
   });
 
   final GeneratedStory story;
   final ElevenLabsAudioClip? audioClip;
+  final Future<ElevenLabsAudioClip?>? audioFuture;
+  final Future<ReadingStoryEnrichment>? enrichment;
   final bool showFinishButton;
 
   @override
@@ -130,17 +135,24 @@ class _ListeningPracticeScreenState
         .progress
         .listen(_handlePlaybackProgress);
     _dictationSegment = _findDictationSegment();
+    if (widget.enrichment != null) {
+      unawaited(_adoptEnrichment(widget.enrichment!));
+    }
     if (_audioClip == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_loadSavedStoryAudio());
-      });
+      if (widget.audioFuture != null) {
+        _audioLoading = true;
+        unawaited(_adoptAudio(widget.audioFuture!));
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) unawaited(_loadSavedStoryAudio());
+        });
+      }
     }
     final needsCover = _story.coverUrl == null || _story.coverUrl!.isEmpty;
     final needsListeningBackground =
-        _audioClip != null &&
-        (_story.musicBackgroundUrl == null ||
-            _story.musicBackgroundUrl!.isEmpty ||
-            _isLegacyListeningBackground(_story.musicBackgroundUrl));
+        _story.musicBackgroundUrl == null ||
+        _story.musicBackgroundUrl!.isEmpty ||
+        _isLegacyListeningBackground(_story.musicBackgroundUrl);
     if (needsCover || needsListeningBackground) {
       // Artwork is generated independently so opening a lesson never waits.
       // Keep the already-open player in sync when private uploads finish in
@@ -193,9 +205,8 @@ class _ListeningPracticeScreenState
       );
     }
     final needsListeningBackground =
-        _audioClip != null &&
-        (!hasMusicBackground ||
-            _isLegacyListeningBackground(latest.musicBackgroundUrl));
+        !hasMusicBackground ||
+        _isLegacyListeningBackground(latest.musicBackgroundUrl);
     if (hasCover && !needsListeningBackground) _coverRefreshTimer?.cancel();
   }
 
@@ -223,6 +234,59 @@ class _ListeningPracticeScreenState
         'ListeningPracticeScreen: legacy backdrop regeneration failed: '
         '$error\n$stackTrace',
       );
+    }
+  }
+
+  Future<void> _adoptEnrichment(Future<ReadingStoryEnrichment> future) async {
+    try {
+      final result = await future;
+      if (!mounted) return;
+      setState(() {
+        _story = _story.copyWith(
+          passage: result.passage,
+          quiz: result.quiz,
+          keywords: result.keywords,
+        );
+        _dictationSegment = _findDictationSegment();
+      });
+    } catch (error, stackTrace) {
+      debugPrint(
+        'ListeningPracticeScreen: background enrichment failed: '
+        '$error\n$stackTrace',
+      );
+    }
+  }
+
+  Future<void> _adoptAudio(Future<ElevenLabsAudioClip?> future) async {
+    try {
+      final clip = await future;
+      if (!mounted) return;
+      if (clip != null) {
+        setState(() {
+          _audioClip = clip;
+          _audioLoading = false;
+        });
+        return;
+      }
+      // A recent saved lesson may have missed the prefetch download. Give
+      // the durable path one normal load attempt before showing an error.
+      if (_story.audioPath?.trim().isNotEmpty == true) {
+        await _loadSavedStoryAudio();
+        return;
+      }
+      setState(() => _audioLoading = false);
+      _showAudioError(
+        const ElevenLabsProviderException(
+          'Gemini did not return playable lesson audio.',
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _audioLoading = false;
+        _isPlaying = false;
+      });
+      _showAudioError(error);
     }
   }
 
@@ -512,6 +576,9 @@ class _ListeningPracticeScreenState
       _story.audioMode == 'gemini_live_spoken';
 
   Future<ElevenLabsAudioClip> _synthesizeLineAudio(String text) async {
+    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
+      return _synthesizeGeminiLiveSpokenClip(text: text, format: 'narration');
+    }
     try {
       return await ElevenLabsAudioService.shared.synthesizeNarration(
         text: text,
@@ -531,6 +598,12 @@ class _ListeningPracticeScreenState
       return _synthesizeGeminiLiveSpokenClip(
         text: script.narrationText,
         format: 'narration',
+      );
+    }
+    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
+      return _synthesizeGeminiLiveSpokenClip(
+        text: script.narrationText,
+        format: format,
       );
     }
     try {

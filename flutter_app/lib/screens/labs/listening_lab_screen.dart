@@ -12,6 +12,8 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
 import '../../services/audio_container_utils.dart';
 import '../../services/gemini_live_audio_service.dart';
+import '../../services/listening_audio_config.dart';
+import '../../services/listening_audio_prefetch_cache.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -49,34 +51,22 @@ IconData _topicIcon(String topic) {
 
 const _listeningFormatOptions = [
   _ListeningFormatOption(
-    id: 'surprise',
-    label: 'Surprise me',
-    detail: 'Let the lesson choose the mood',
-    icon: CupertinoIcons.sparkles,
-  ),
-  _ListeningFormatOption(
-    id: 'narration',
-    label: 'Story narration',
-    detail: 'Cinematic, calm, story-first',
+    id: 'story',
+    label: 'Story',
+    detail: 'A short spoken French story',
     icon: CupertinoIcons.book,
   ),
   _ListeningFormatOption(
-    id: 'podcast',
-    label: 'Podcast dialogue',
-    detail: 'Two voices, natural exchange',
-    icon: CupertinoIcons.mic,
+    id: 'narration',
+    label: 'Narration',
+    detail: 'Calm, clear story narration',
+    icon: CupertinoIcons.waveform,
   ),
   _ListeningFormatOption(
     id: 'music',
-    label: 'Music lesson',
-    detail: 'Lyrics-led listening practice',
+    label: 'Music',
+    detail: 'Simple lyrics for listening practice',
     icon: CupertinoIcons.music_note_2,
-  ),
-  _ListeningFormatOption(
-    id: 'educational',
-    label: 'Educational',
-    detail: 'Clear explainer, easy to replay',
-    icon: CupertinoIcons.lightbulb,
   ),
 ];
 
@@ -138,9 +128,10 @@ class ListeningLabScreen extends ConsumerStatefulWidget {
 class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   bool _generatingStory = false;
   List<GeneratedStory>? _stories;
-  // null = "Surprise me" (fully random pick each generation).
+  final Set<String> _artworkRepairInFlight = <String>{};
+  // null = "Surprise me" for the topic, not the audio format.
   String? _selectedTopic;
-  String _selectedFormat = 'surprise';
+  String _selectedFormat = 'story';
 
   @override
   void initState() {
@@ -158,10 +149,39 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     if (!mounted) return;
     if (widget.examMode) return;
     final store = ref.read(generatedStoryStoreProvider);
-    setState(
-      () => _stories = store.list(
-        practiceMode: widget.readingMode ? 'reading' : 'listening',
-      ),
+    final stories = store.list(
+      practiceMode: widget.readingMode ? 'reading' : 'listening',
+    );
+    setState(() => _stories = stories);
+    if (!widget.readingMode) {
+      _prefetchRecentAudio(stories);
+      _repairNewestMissingCover(stories);
+    }
+  }
+
+  void _prefetchRecentAudio(List<GeneratedStory> stories) {
+    if (stories.isEmpty) return;
+    final sync = ref.read(syncServiceProvider);
+    for (final story in stories.take(3)) {
+      unawaited(
+        ListeningAudioPrefetchCache.shared.prefetch(story: story, sync: sync),
+      );
+    }
+  }
+
+  void _repairNewestMissingCover(List<GeneratedStory> stories) {
+    GeneratedStory? candidate;
+    for (final story in stories) {
+      if (story.coverUrl?.trim().isEmpty != false) {
+        candidate = story;
+        break;
+      }
+    }
+    if (candidate == null || !_artworkRepairInFlight.add(candidate.id)) return;
+    unawaited(
+      _generateCover(candidate, null).whenComplete(() {
+        _artworkRepairInFlight.remove(candidate!.id);
+      }),
     );
   }
 
@@ -180,6 +200,10 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     setState(() => _generatingStory = true);
     var generationStage = 'story';
     try {
+      if (!widget.examMode && !widget.readingMode) {
+        await _generateListeningStoryFast();
+        return;
+      }
       final profile = ref.read(learningStoreProvider).profile();
       final levelBand = _cefrLevelFor(profile.level).toUpperCase();
       final existingStories = ref.read(generatedStoryStoreProvider).list();
@@ -297,6 +321,106 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     }
   }
 
+  Future<void> _generateListeningStoryFast() async {
+    final profile = ref.read(learningStoreProvider).profile();
+    final levelBand = _cefrLevelFor(profile.level).toUpperCase();
+    final store = ref.read(generatedStoryStoreProvider);
+    final existingStories = store.list(practiceMode: 'listening');
+    final draft = await LessonAgentService.shared.buildListeningStoryDraft(
+      topic: _topicFor(),
+      levelBand: levelBand,
+      audioFormat: _selectedFormat,
+      avoidTitles: existingStories.map((story) => story.title),
+      avoidOpenings: existingStories.map(
+        (story) => story.passage.segments.isEmpty
+            ? ''
+            : story.passage.segments.first.fr,
+      ),
+    );
+    final story = GeneratedStory(
+      id: newGeneratedStoryId(),
+      passage: draft.passage,
+      quiz: const [],
+      keywords: const [],
+      createdAt: DateTime.now(),
+      levelBand: draft.levelBand,
+      summary: draft.summary,
+      topic: draft.topic,
+      readTimeMinutes: draft.readTimeMinutes,
+      practiceMode: 'listening',
+    );
+
+    // Persist the usable bilingual draft before any slower enrichment,
+    // rendering, or artwork work begins. All three background tasks use this
+    // stable id and independently update SQLite and Supabase.
+    store.insert(story);
+    final enrichment = _enrichListeningStory(story);
+    final audio = _renderAndPersistAudio(story: story, format: _selectedFormat);
+    unawaited(_generateCover(story, draft.coverPrompt));
+    unawaited(_generateListeningBackground(story, draft.coverPrompt));
+
+    if (!mounted) return;
+    _loadStories();
+    final result = await AppRouter.push<Object?>(
+      context,
+      (_) => _lessonScreen(story, audioFuture: audio, enrichment: enrichment),
+      fullscreenDialog: widget.autoStart,
+    );
+    if (widget.autoStart && mounted) {
+      Navigator.of(context).pop(result ?? false);
+    }
+  }
+
+  Future<ReadingStoryEnrichment> _enrichListeningStory(
+    GeneratedStory story,
+  ) async {
+    final store = ref.read(generatedStoryStoreProvider);
+    final result = await LessonAgentService.shared
+        .buildListeningStoryEnrichment(
+          passage: story.passage,
+          levelBand: story.levelBand,
+        );
+    store.updateEnrichment(
+      story.copyWith(
+        passage: result.passage,
+        quiz: result.quiz,
+        keywords: result.keywords,
+      ),
+    );
+    if (mounted) _loadStories();
+    return result;
+  }
+
+  Future<ElevenLabsAudioClip?> _renderAndPersistAudio({
+    required GeneratedStory story,
+    required String format,
+  }) async {
+    final sync = ref.read(syncServiceProvider);
+    final store = ref.read(generatedStoryStoreProvider);
+    final rendered = await _prepareAudioWithQuotaRecovery(
+      story: story,
+      format: format,
+    );
+    final audioPath = await sync.uploadListeningAudio(
+      storyId: story.id,
+      mode: rendered.storageMode,
+      bytes: rendered.clip.bytes,
+      extension: rendered.extension,
+      contentType: rendered.contentType,
+    );
+    if (audioPath == null || audioPath.isEmpty) {
+      throw const ElevenLabsProviderException(
+        'The rendered lesson audio could not be saved. Please try again.',
+      );
+    }
+    store.updateAudio(
+      storyId: story.id,
+      audioPath: audioPath,
+      audioMode: rendered.storageMode,
+    );
+    return rendered.clip;
+  }
+
   Future<void> _showFormatPicker() async {
     final selected = await _showChoiceSheet(
       title: 'Choose audio format',
@@ -356,26 +480,15 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     );
   }
 
-  /// Gemini owns the lesson structure and meanings. ElevenLabs renders the
-  /// selected format from this exact canonical script. Only a detected
-  /// ElevenLabs quota/credit/rate-limit error enters the explicit Gemini Live
-  /// spoken-audio recovery path; every other renderer error stays visible.
+  /// Renders the exact canonical French script through the selected provider.
+  /// Gemini Live is the default Listening renderer; ElevenLabs remains an
+  /// explicit one-line switch in listening_audio_config.dart for later testing.
   Future<_RenderedListeningAudio> _prepareAudioWithQuotaRecovery({
     required GeneratedStory story,
+    String? format,
   }) async {
-    final selectedMode = _selectedFormat == 'surprise'
-        ? 'narration'
-        : _selectedFormat;
-    try {
-      final clip = await _prepareExperimentalAudio(story: story);
-      return _RenderedListeningAudio(
-        clip: clip,
-        storageMode: selectedMode,
-        extension: 'mp3',
-        contentType: 'audio/mpeg',
-      );
-    } on ElevenLabsProviderException catch (error) {
-      if (!error.isQuotaExceeded) rethrow;
+    final selectedMode = _normalizeListeningFormat(format ?? _selectedFormat);
+    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
       final script = CanonicalAudioScript.fromStory(
         story,
         format: selectedMode,
@@ -400,21 +513,33 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         contentType: 'audio/wav',
       );
     }
+    final clip = await _prepareExperimentalAudio(
+      story: story,
+      format: selectedMode,
+    );
+    return _RenderedListeningAudio(
+      clip: clip,
+      storageMode: selectedMode,
+      extension: 'mp3',
+      contentType: 'audio/mpeg',
+    );
   }
 
   Future<ElevenLabsAudioClip> _prepareExperimentalAudio({
     required GeneratedStory story,
+    String? format,
   }) async {
-    final format = _selectedFormat == 'surprise'
-        ? 'narration'
-        : _selectedFormat;
-    final script = CanonicalAudioScript.fromStory(story, format: format);
+    final selectedFormat = _normalizeListeningFormat(format ?? _selectedFormat);
+    final script = CanonicalAudioScript.fromStory(
+      story,
+      format: selectedFormat,
+    );
     if (script.lines.isEmpty) {
       throw const ElevenLabsProviderException(
         'This lesson has no French lines to render yet.',
       );
     }
-    switch (format) {
+    switch (selectedFormat) {
       case 'podcast':
         if (script.lines.length < 2) {
           throw const ElevenLabsProviderException(
@@ -446,6 +571,9 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         );
     }
   }
+
+  String _normalizeListeningFormat(String format) =>
+      format == 'surprise' ? 'story' : format;
 
   Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {
     final sync = ref.read(syncServiceProvider);
@@ -518,7 +646,12 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         : 'a2';
   }
 
-  Widget _lessonScreen(GeneratedStory story, {ElevenLabsAudioClip? audioClip}) {
+  Widget _lessonScreen(
+    GeneratedStory story, {
+    ElevenLabsAudioClip? audioClip,
+    Future<ElevenLabsAudioClip?>? audioFuture,
+    Future<ReadingStoryEnrichment>? enrichment,
+  }) {
     if (widget.examMode) {
       return ExamPracticeScreen(
         story: story,
@@ -533,6 +666,10 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         : ListeningPracticeScreen(
             story: story,
             audioClip: audioClip,
+            audioFuture:
+                audioFuture ??
+                ListeningAudioPrefetchCache.shared.peek(story.id),
+            enrichment: enrichment,
             showFinishButton: widget.autoStart,
           );
   }
@@ -595,7 +732,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
                       : 'listening lesson',
                   detail: widget.readingMode
                       ? 'Shaping a short story around your level and interests.'
-                      : 'Writing the transcript, rendering ${_selectedFormatLabel.toLowerCase()}, then checking every word.',
+                      : 'Writing the lesson; audio, artwork, and checks continue in the background.',
                   icon: CupertinoIcons.headphones,
                 )
               else

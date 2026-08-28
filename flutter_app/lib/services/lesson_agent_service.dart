@@ -1554,6 +1554,118 @@ KEYWORDS: write 6 to 10 useful French words or short phrases that appear in the 
     );
   }
 
+  /// Generates the fast first phase of an ordinary Listening lesson. The
+  /// French lines and their sentence-level English meanings are complete and
+  /// usable immediately; quiz, keyword, and grammar data are deliberately
+  /// moved to [buildListeningStoryEnrichment].
+  Future<ReadingStoryDraft> buildListeningStoryDraft({
+    String? topic,
+    required String levelBand,
+    String? audioFormat,
+    Iterable<String> avoidTitles = const [],
+    Iterable<String> avoidOpenings = const [],
+  }) async {
+    final surpriseMode = topic == null || topic.trim().isEmpty;
+    final format = switch (audioFormat) {
+      'music' =>
+        '''MUSIC: write short, singable lyric lines with a simple
+refrain, but keep every line useful and natural for the learner.''',
+      'narration' =>
+        '''NARRATION: write a calm, vivid spoken story with a
+clear setting, one small change, and a satisfying ending.''',
+      _ =>
+        '''STORY: write one short, natural spoken story with a clear beginning,
+small change, and ending.''',
+    };
+    final system =
+        '''Create one short, polished French LISTENING lesson draft. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string}]}.
+
+Write 7 to 10 short French lines in one coherent lesson. Every line must be
+natural when spoken aloud and useful to a beginner. Provide one accurate,
+natural English meaning for every exact French line. Keep the arrays exactly
+aligned: same count, same order, no empty meanings. Do not add grammar notes,
+keywords, quiz questions, speaker labels, or extra fields in this first phase.
+
+$format
+
+TITLE RULE: `title_en` is the learner-facing English heading and must be a
+clear, natural title. SUMMARY: one inviting English sentence. READ TIME: a
+whole number, normally 2 to 5. COVER PROMPT: one concise English prompt for a
+text-free image containing only the concrete setting, objects, action, and
+mood present in this lesson. Never request letters, numbers, logos, UI, or
+typography.
+
+${_cefrCalibration(levelBand)}
+Keep it wholesome and appropriate for teens and adults. The selected topic is
+the primary semantic anchor; do not drift to an unrelated premise.
+${surpriseMode ? 'Choose a fresh ordinary everyday premise yourself.' : 'Keep the lesson recognisably connected to the selected topic.'}
+''';
+    final titles = avoidTitles.toList(growable: false);
+    final openings = avoidOpenings.toList(growable: false);
+    final priorText = [...titles, ...openings];
+    final exclusion = StoryVarietyService.exclusionPrompt(
+      titles: titles,
+      openings: openings,
+    );
+
+    Future<ReadingStoryDraft> request(String retryInstruction) async {
+      final seed = StoryVarietyService.chooseSeed(avoidTexts: priorText);
+      final nonce =
+          '${DateTime.now().microsecondsSinceEpoch}-${seed.hashCode.abs()}';
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': system + languageGuardrail},
+          {
+            'role': 'user',
+            'content':
+                '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC: $topic'}\n'
+                'LEVEL: $levelBand\n'
+                'FRESH SEED: $seed. Make the premise, setting, and action distinct.\n'
+                '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
+          },
+        ],
+        maxTokens: 1500,
+        temperature: 0.9,
+        jsonMode: true,
+      );
+      return _parseReadingStoryDraft(
+        raw,
+        levelBand: levelBand,
+        topic: topic ?? '',
+      );
+    }
+
+    var draft = await request('');
+    if (StoryVarietyService.isDuplicate(
+      title: draft.passage.title,
+      opening: draft.passage.segments.firstOrNull?.fr ?? '',
+      avoidTitles: titles,
+      avoidOpenings: openings,
+    )) {
+      draft = await request(
+        'DUPLICATE REJECTION: discard the previous draft and create a different title, opening, premise, and visual brief.',
+      );
+      if (StoryVarietyService.isDuplicate(
+        title: draft.passage.title,
+        opening: draft.passage.segments.firstOrNull?.fr ?? '',
+        avoidTitles: titles,
+        avoidOpenings: openings,
+      )) {
+        throw AgentError.duplicateStory;
+      }
+    }
+    return draft;
+  }
+
+  /// Listening uses the same strict frozen-passage enrichment contract as
+  /// Reading. Reusing that validator guarantees that English meanings,
+  /// keywords, and quiz choices cannot be attached to a different French
+  /// sentence while keeping this background phase to one model request.
+  Future<ReadingStoryEnrichment> buildListeningStoryEnrichment({
+    required ReadingPassage passage,
+    required String levelBand,
+  }) => buildReadingStoryEnrichment(passage: passage, levelBand: levelBand);
+
   /// Listening has its own generation contract. It shares the persisted
   /// story shape with reading, but the writing is intentionally spoken-first:
   /// short lines, natural rhythm, and bilingual check questions for beginners.

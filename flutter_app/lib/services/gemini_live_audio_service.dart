@@ -129,11 +129,11 @@ class GeminiLiveAudioService {
     }
   }
 
-  /// Renders a complete listening lesson when the selected ElevenLabs
-  /// renderer is unavailable because its quota is exhausted. This is a
-  /// deliberate, format-aware recovery mode: Gemini Live returns spoken
-  /// lesson audio only. A music selection therefore becomes a spoken lesson
-  /// rather than pretending that Live generated music.
+  /// Renders a complete Listening lesson through Gemini Live. Listening uses
+  /// this as its primary renderer; it returns learner-ready spoken PCM that
+  /// the app stores as a WAV clip. A music selection is intentionally rendered
+  /// as spoken French because Lyria/music generation is not this service's
+  /// narration path.
   Future<Uint8List> synthesizeListeningLesson({
     required String text,
     required String format,
@@ -476,6 +476,8 @@ class GeminiLiveAudioService {
     required String level,
   }) {
     final style = switch (format) {
+      'story' =>
+        'Deliver it as a short, natural French story with clear pauses, a concrete setting, and a satisfying ending. Do not add, remove, or paraphrase any supplied words.',
       'podcast' =>
         'Perform it as a warm spoken dialogue with clear pauses between turns, like two friendly people exchanging ideas. Keep every French word exactly as supplied.',
       'educational' =>

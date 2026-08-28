@@ -123,6 +123,25 @@ class GeneratedStoryStore {
     }
   }
 
+  /// Stores the rendered Listening clip metadata after background audio
+  /// generation/upload completes. The binary remains in private Supabase
+  /// Storage; the generated story row keeps its stable path and provider mode.
+  void updateAudio({
+    required String storyId,
+    required String audioPath,
+    required String audioMode,
+  }) {
+    final now = DateTime.now().toUtc().toIso8601String();
+    _db.execute(
+      '''UPDATE generated_stories
+         SET audio_path = ?, audio_mode = ?, updated_at = ?
+         WHERE id = ?''',
+      [audioPath, audioMode, now, storyId],
+    );
+    final story = _find(storyId);
+    if (story != null) unawaited(_sync?.syncGeneratedStory(story));
+  }
+
   /// Stores the generated cover URL after the image request/upload completes.
   /// A cover failure must never invalidate the already-saved text story.
   void updateCoverUrl(String storyId, String coverUrl) {

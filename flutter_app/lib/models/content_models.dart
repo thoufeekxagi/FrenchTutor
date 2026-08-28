@@ -715,10 +715,9 @@ class GeneratedStory {
   /// lets the app download the same clip every time the lesson is reopened.
   final String? audioPath;
 
-  /// The selected renderer format (`music`, `podcast`, `narration`, or
-  /// `educational`) used to create [audioPath]. A quota-recovered lesson is
-  /// stored as `gemini_live_spoken` so the UI never mislabels spoken audio as
-  /// music.
+  /// The selected Listening format used to create [audioPath]. New lessons
+  /// use the `gemini_live_spoken` provider mode; older ElevenLabs modes remain
+  /// readable from their durable storage path.
   final String? audioMode;
 
   /// Keeps the reading and listening shelves independent while preserving

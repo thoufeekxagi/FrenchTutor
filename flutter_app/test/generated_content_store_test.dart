@@ -59,6 +59,48 @@ void main() {
     );
   });
 
+  test(
+    'generated listening audio metadata updates without replacing enrichment',
+    () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final store = GeneratedStoryStore(db);
+      final story = GeneratedStory(
+        id: const Uuid().v4(),
+        passage: ReadingPassage(
+          id: 'listening-passage',
+          title: 'Une promenade',
+          titleEn: 'A Walk',
+          fullText: 'Je marche dans le parc.',
+          segments: [
+            ReadingSegment(
+              fr: 'Je marche dans le parc.',
+              en: 'I walk in the park.',
+              grammarNote: 'Uses the present tense.',
+              pronunciationTip: '',
+            ),
+          ],
+        ),
+        quiz: const [],
+        keywords: const [],
+        createdAt: DateTime.utc(2026, 8, 28),
+        practiceMode: 'listening',
+      );
+      store.insert(story);
+
+      store.updateAudio(
+        storyId: story.id,
+        audioPath: 'user/listening.wav',
+        audioMode: 'gemini_live_spoken',
+      );
+
+      final saved = store.list(practiceMode: 'listening').single;
+      expect(saved.audioPath, 'user/listening.wav');
+      expect(saved.audioMode, 'gemini_live_spoken');
+      expect(saved.passage.segments.single.en, 'I walk in the park.');
+    },
+  );
+
   test('generated writing tasks survive the local store round trip', () {
     final db = sqlite3.openInMemory();
     addTearDown(db.dispose);
