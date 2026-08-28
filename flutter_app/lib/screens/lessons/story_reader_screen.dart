@@ -53,7 +53,6 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     required this.story,
     this.showFinishButton = false,
     this.enrichment,
-    this.onEnriched,
     this.grammarExplanation,
     this.grammarTabLabel = 'Grammar',
   });
@@ -80,24 +79,13 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
   /// just backs out whenever they're done reading.
   final bool showFinishButton;
 
-  /// The story's Quiz/Keywords, still generating when this screen opens —
+  /// The story's sentence translations, Quiz, and Keywords, still generating
+  /// when this screen opens —
   /// [story] is shown immediately once its passage is ready rather than
   /// making the learner wait through a second Gemini call first; when this
   /// resolves, the Quiz/Keywords tabs populate in place. Null means the
   /// story was opened from the library, already fully generated.
-  final Future<
-    ({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})
-  >?
-  enrichment;
-
-  /// Fires once [enrichment] resolves, so the caller can persist the result
-  /// (e.g. `GeneratedStoryStore.updateEnrichment`) — this screen only holds
-  /// it in memory for display, it doesn't own storage.
-  final void Function(
-    List<MultipleChoiceQuestion> quiz,
-    List<VocabEntry> keywords,
-  )?
-  onEnriched;
+  final Future<ReadingStoryEnrichment>? enrichment;
 
   @override
   ConsumerState<StoryReaderScreen> createState() => _StoryReaderScreenState();
@@ -255,11 +243,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _enriching = true;
       enrichment.then(
         (result) {
-          widget.onEnriched?.call(result.quiz, result.keywords);
           if (!mounted) return;
           setState(() {
             _enriching = false;
             _story = _story.copyWith(
+              passage: result.passage,
               quiz: result.quiz,
               keywords: result.keywords,
             );

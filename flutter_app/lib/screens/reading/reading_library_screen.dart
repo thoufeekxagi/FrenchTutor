@@ -103,61 +103,47 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     try {
       final profile = ref.read(learningStoreProvider).profile();
       final existingStories = ref.read(generatedStoryStoreProvider).list();
-      final package = await LessonAgentService.shared.buildReadingStoryBook(
-        topic: _topicFor(_selectedTopic),
-        levelBand: widget.examLevel ?? _levelFor(profile.level),
-        examName: widget.examMode ? widget.examName : null,
-        examLevel: widget.examMode ? widget.examLevel : null,
-        avoidTitles: existingStories.map((story) => story.title),
-        avoidOpenings: existingStories.map(
-          (story) => story.passage.segments.isEmpty
-              ? ''
-              : story.passage.segments.first.fr,
-        ),
-      );
-      final story = GeneratedStory(
-        id: newGeneratedStoryId(),
-        passage: package.passage,
-        quiz: package.quiz,
-        keywords: package.keywords,
-        createdAt: DateTime.now(),
-        levelBand: package.levelBand,
-        summary: package.summary,
-        topic: package.topic,
-        readTimeMinutes: package.readTimeMinutes,
-        practiceMode: 'reading',
+      final topic = _topicFor(_selectedTopic);
+      final levelBand = widget.examLevel ?? _levelFor(profile.level);
+      final avoidTitles = existingStories.map((story) => story.title);
+      final avoidOpenings = existingStories.map(
+        (story) => story.passage.segments.isEmpty
+            ? ''
+            : story.passage.segments.first.fr,
       );
 
-      final examAttempt = widget.examMode
-          ? ref
-                .read(examPracticeStoreProvider)
-                .startStory(
-                  examName: widget.examName ?? 'Exam practice',
-                  levelBand: widget.examLevel ?? story.levelBand,
-                  skill: 'reading',
-                  story: story,
-                )
-          : null;
-      // Exam content lives only in the readiness store. Regular stories keep
-      // using the course library and its artwork/narration pipeline.
-      if (!widget.examMode) {
-        ref.read(generatedStoryStoreProvider).insert(story);
-        unawaited(_prewarmNarration(story));
-      }
-      if (!mounted) return;
-      if (!widget.examMode) {
-        setState(() {
-          _stories = ref
-              .read(generatedStoryStoreProvider)
-              .list(practiceMode: 'reading');
-          _generating = false;
-        });
-        // Start artwork before opening the reader. The reader watches the
-        // saved story and can replace its placeholder as soon as the upload
-        // completes.
-        unawaited(_generateCover(story, package.coverPrompt));
-      }
       if (widget.examMode) {
+        // Exam content keeps the existing complete payload and readiness
+        // flow. Only ordinary Reading generation uses the passage-first path.
+        final package = await LessonAgentService.shared.buildReadingStoryBook(
+          topic: topic,
+          levelBand: levelBand,
+          examName: widget.examName,
+          examLevel: widget.examLevel,
+          avoidTitles: avoidTitles,
+          avoidOpenings: avoidOpenings,
+        );
+        final story = GeneratedStory(
+          id: newGeneratedStoryId(),
+          passage: package.passage,
+          quiz: package.quiz,
+          keywords: package.keywords,
+          createdAt: DateTime.now(),
+          levelBand: package.levelBand,
+          summary: package.summary,
+          topic: package.topic,
+          readTimeMinutes: package.readTimeMinutes,
+          practiceMode: 'reading',
+        );
+        final examAttempt = ref
+            .read(examPracticeStoreProvider)
+            .startStory(
+              examName: widget.examName ?? 'Exam practice',
+              levelBand: widget.examLevel ?? story.levelBand,
+              skill: 'reading',
+              story: story,
+            );
+        if (!mounted) return;
         final result = await AppRouter.push<ExamPracticeResult>(
           context,
           (_) => ExamPracticeScreen(
@@ -168,7 +154,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
           ),
           fullscreenDialog: true,
         );
-        if (result != null && examAttempt != null) {
+        if (result != null) {
           ref
               .read(examPracticeStoreProvider)
               .complete(
@@ -180,18 +166,56 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         if (widget.autoStart && mounted) {
           Navigator.of(context).pop(result != null);
         }
-      } else {
-        final result = await AppRouter.push<StoryReaderResult>(
-          context,
-          (_) => StoryReaderScreen(
-            story: story,
-            showFinishButton: widget.autoStart,
-          ),
-          fullscreenDialog: widget.autoStart,
-        );
-        if (widget.autoStart && mounted) {
-          Navigator.of(context).pop(result != null);
-        }
+        return;
+      }
+
+      final draft = await LessonAgentService.shared.buildReadingStoryDraft(
+        topic: topic,
+        levelBand: levelBand,
+        avoidTitles: avoidTitles,
+        avoidOpenings: avoidOpenings,
+      );
+      final story = GeneratedStory(
+        id: newGeneratedStoryId(),
+        passage: draft.passage,
+        quiz: const [],
+        keywords: const [],
+        createdAt: DateTime.now(),
+        levelBand: draft.levelBand,
+        summary: draft.summary,
+        topic: draft.topic,
+        readTimeMinutes: draft.readTimeMinutes,
+        practiceMode: 'reading',
+      );
+      final store = ref.read(generatedStoryStoreProvider);
+      store.insert(story);
+
+      // Start the independent background work immediately after the draft is
+      // saved. This keeps persistence and enrichment alive even if the library
+      // screen is disposed while the reader is opening.
+      final enrichment = _enrichReadingStory(story);
+      unawaited(_generateCover(story, draft.coverPrompt));
+      unawaited(_prewarmNarration(story));
+
+      if (!mounted) return;
+      setState(() {
+        _stories = store.list(practiceMode: 'reading');
+        _generating = false;
+      });
+
+      // The saved draft is usable immediately. These tasks share the same
+      // story id and update local SQLite/Supabase independently.
+      final result = await AppRouter.push<StoryReaderResult>(
+        context,
+        (_) => StoryReaderScreen(
+          story: story,
+          enrichment: enrichment,
+          showFinishButton: widget.autoStart,
+        ),
+        fullscreenDialog: widget.autoStart,
+      );
+      if (widget.autoStart && mounted) {
+        Navigator.of(context).pop(result != null);
       }
     } catch (error, stackTrace) {
       debugPrint('Reading story generation failed: $error\n$stackTrace');
@@ -206,6 +230,30 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         );
       }
     }
+  }
+
+  Future<ReadingStoryEnrichment> _enrichReadingStory(
+    GeneratedStory story,
+  ) async {
+    // Capture the store before awaiting the network call. Enrichment is
+    // intentionally independent of this screen's lifetime.
+    final store = ref.read(generatedStoryStoreProvider);
+    final result = await LessonAgentService.shared.buildReadingStoryEnrichment(
+      passage: story.passage,
+      levelBand: story.levelBand,
+    );
+    final enrichedStory = story.copyWith(
+      passage: result.passage,
+      quiz: result.quiz,
+      keywords: result.keywords,
+    );
+    store.updateEnrichment(enrichedStory);
+    if (mounted) {
+      setState(() {
+        _stories = store.list(practiceMode: 'reading');
+      });
+    }
+    return result;
   }
 
   Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {

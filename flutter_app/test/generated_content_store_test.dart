@@ -1,10 +1,64 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:french_tutor/data/database/generated_story_store.dart';
 import 'package:french_tutor/data/database/generated_writing_task_store.dart';
 import 'package:french_tutor/models/content_models.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
+  test('generated story enrichment updates the saved passage translation', () {
+    final db = sqlite3.openInMemory();
+    addTearDown(db.dispose);
+    final store = GeneratedStoryStore(db);
+    final story = GeneratedStory(
+      id: const Uuid().v4(),
+      passage: ReadingPassage(
+        id: 'draft-passage',
+        title: 'Le matin calme',
+        titleEn: 'A Calm Morning',
+        fullText: 'Le matin commence.',
+        segments: [
+          ReadingSegment(
+            fr: 'Le matin commence.',
+            en: 'Morning starts.',
+            grammarNote: '',
+            pronunciationTip: '',
+          ),
+        ],
+      ),
+      quiz: const [],
+      keywords: const [],
+      createdAt: DateTime.utc(2026, 8, 28),
+    );
+    store.insert(story);
+
+    store.updateEnrichment(
+      story.copyWith(
+        passage: ReadingPassage(
+          id: story.passage.id,
+          title: story.passage.title,
+          titleEn: story.passage.titleEn,
+          fullText: story.passage.fullText,
+          segments: [
+            ReadingSegment(
+              fr: 'Le matin commence.',
+              en: 'The morning begins.',
+              grammarNote: 'Uses the present tense.',
+              pronunciationTip: '',
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final saved = store.list().single;
+    expect(saved.passage.segments.single.en, 'The morning begins.');
+    expect(
+      saved.passage.segments.single.grammarNote,
+      'Uses the present tense.',
+    );
+  });
+
   test('generated writing tasks survive the local store round trip', () {
     final db = sqlite3.openInMemory();
     addTearDown(db.dispose);

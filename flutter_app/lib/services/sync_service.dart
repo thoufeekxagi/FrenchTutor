@@ -57,6 +57,11 @@ class SyncService {
 
   final CommonDatabase _db;
 
+  /// Parallel artwork/enrichment callbacks can update one story close
+  /// together. Serialize snapshots per story so a slower network response
+  /// cannot overwrite a newer local snapshot in Supabase.
+  final Map<String, Future<void>> _generatedStorySyncs = {};
+
   SupabaseClient get _client => Supabase.instance.client;
   String? get _userId => _client.auth.currentUser?.id;
   bool get isSignedIn => _userId != null;
@@ -306,7 +311,26 @@ class SyncService {
   // Generated story library
   // ---------------------------------------------------------------------------
 
-  Future<void> syncGeneratedStory(GeneratedStory story) => _guarded(
+  Future<void> syncGeneratedStory(GeneratedStory story) {
+    final previous = _generatedStorySyncs[story.id] ?? Future<void>.value();
+    final next = previous.then((_) => _syncGeneratedStoryNow(story));
+    _generatedStorySyncs[story.id] = next;
+    next.then(
+      (_) {
+        if (identical(_generatedStorySyncs[story.id], next)) {
+          _generatedStorySyncs.remove(story.id);
+        }
+      },
+      onError: (_, _) {
+        if (identical(_generatedStorySyncs[story.id], next)) {
+          _generatedStorySyncs.remove(story.id);
+        }
+      },
+    );
+    return next;
+  }
+
+  Future<void> _syncGeneratedStoryNow(GeneratedStory story) => _guarded(
     (uid) async {
       await _client.from('generated_stories').upsert({
         'id': story.id,

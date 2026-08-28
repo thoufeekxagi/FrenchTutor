@@ -21,23 +21,12 @@ class PracticeArtworkService {
     String? coverPrompt,
     String aspectRatio = '4:3',
   }) {
-    final context = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? 'Show the exact everyday place, objects, and action named by this learning session. Use a friendly book-reference composition; do not invent a protagonist or unrelated cinematic setting.'
-        : coverPrompt.trim();
-    final ratioInstruction = switch (aspectRatio) {
-      '9:16' =>
-        'CUSTOM LISTENING BACKDROP: this is a true vertical 9:16 phone player image. '
-            'Ignore every compact-cover, 4:3, portrait-card, square, landscape, thumbnail, or crop '
-            'instruction in the source context. Compose directly on a 9:16 canvas with '
-            'important details inside the central 70% safe area, a clean upper area for '
-            'status and controls, and a clean lower area for lyrics and playback controls. '
-            'Do not stretch, crop, or zoom a source composition. ',
-      '2:3' =>
-        'CUSTOM READING COVER: this is a portrait 2:3 book-reference image. '
-            'Ignore landscape and 4:3 instructions in the source context. '
-            'Keep the concrete story objects and action readable in the central safe area. ',
-      _ => '',
-    };
+    final anchor = _visualAnchor(
+      title: title,
+      summary: summary,
+      topic: topic,
+      coverPrompt: coverPrompt,
+    );
     return LessonAgentService.shared.generateStoryCover(
       title: title,
       summary: summary,
@@ -45,18 +34,47 @@ class PracticeArtworkService {
       levelBand: levelBand,
       variationSeed: id,
       aspectRatio: aspectRatio,
-      coverPrompt:
-          '$ratioInstruction'
-          'LESSON VISUAL BRIEF: $context\n'
-          'Create one coherent text-free $aspectRatio learning reference image. Match the lesson title, summary, topic, '
-          'and brief exactly. People are optional and only belong if the lesson requires them; never add a generic hero, '
-          'futuristic city, dramatic stranger, fantasy scene, or unrelated landmark. Keep important visual details inside '
-          'the central safe area. Render no text, letters, '
-          'numbers, logos, signs, captions, or other typography. Make the composition, '
-          'camera angle, dominant subject, and color balance distinct from other sessions while staying semantically faithful. '
-          'Use the variation key $id only as an internal visual seed; '
-          'never render it.',
+      coverPrompt: anchor,
     );
+  }
+
+  static String _visualAnchor({
+    required String title,
+    required String summary,
+    required String topic,
+    String? coverPrompt,
+  }) {
+    final brief = coverPrompt?.trim() ?? '';
+    final candidates = [
+      if (brief.isNotEmpty && !_isGenericBrief(brief)) brief,
+      title.trim(),
+      topic.trim(),
+      summary.trim(),
+      brief,
+    ].where((value) => value.isNotEmpty);
+    final source = candidates.isEmpty
+        ? 'an everyday learning scene'
+        : candidates.first;
+    final firstLine = source.split(RegExp(r'[\n.!?]')).first.trim();
+    if (firstLine.length <= 240) return firstLine;
+    return '${firstLine.substring(0, 237).trimRight()}...';
+  }
+
+  static bool _isGenericBrief(String value) {
+    final normalized = value.toLowerCase();
+    return normalized.contains('grounded realistic') ||
+        normalized.contains('french language') ||
+        normalized.contains('vocabulary set') ||
+        normalized.contains('grammar story') ||
+        normalized.contains('render no text') ||
+        normalized.contains('no people') ||
+        normalized.contains('text-free') ||
+        normalized.contains('text free') ||
+        normalized.contains('short everyday story') ||
+        normalized.contains('something related to') ||
+        normalized.contains('could happen in daily life') ||
+        normalized.contains('create a ') ||
+        normalized.contains('create one ');
   }
 
   /// Shared generation and storage path for every practice session. There are

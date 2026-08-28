@@ -19,24 +19,12 @@ import '../prompts/live_prompts.dart';
 /// repeats this contract at the provider boundary, so local previews and
 /// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-LEARNING ARTWORK CONTRACT: create one friendly, coherent visual reference for a
-language-learning lesson, in the requested aspect ratio. For 9:16 music artwork,
-compose directly as a true vertical full-screen player image; do not crop,
-stretch, or adapt a landscape image. Show the concrete place, object, and
-action named by the lesson. The title, summary, topic, and visual brief are the
-same story: do not invent a generic hero, unrelated person, futuristic city,
-fantasy scene, famous landmark, or dramatic movie-poster moment. People are
-optional and may appear only when the lesson actually requires a person; never
-insert a character just to make the image feel cinematic. Prefer a warm,
-approachable editorial storybook/reference illustration with simple readable
-composition, natural light, believable everyday materials, and one clear
-learning subject. A1/A2 scenes should be concrete and uncluttered; B1/B2 may
-add context but must stay semantically tied to the lesson. Keep important
-details inside the central 70% safe area so cards and hero layouts do not crop
-the meaning. Do not render any text at all: no title, letters, words, numbers,
-captions, labels, logos, watermarks, signs, UI, borders, or frames. Avoid
-anime, chibi, flat-vector, collage, fantasy-game, or generic stock-photo
-styles. The app renders the learner-facing title outside the image.
+ARTWORK RULES: use one simple, friendly storybook/editorial illustration based
+only on the visual anchor. Show one ordinary setting or one/two concrete story
+objects. No cinematic poster, generic hero, unrelated landmark, or invented
+character. Absolutely no text, letters, words, numbers, symbols, Chinese
+characters, signs, labels, logos, captions, watermarks, UI, borders, or frames.
+The app renders all learner-facing text outside the image.
 ''';
 
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
@@ -1437,6 +1425,135 @@ $examBlock
     );
   }
 
+  /// Generates only the passage and its sentence-level English meanings.
+  /// This is the fast first phase of ordinary Reading generation. It keeps the
+  /// exact French sentence order stable so the background enrichment can add
+  /// grammar, keywords, and quiz data without replacing the learner's story.
+  Future<ReadingStoryDraft> buildReadingStoryDraft({
+    String? topic,
+    required String levelBand,
+    Iterable<String> avoidTitles = const [],
+    Iterable<String> avoidOpenings = const [],
+  }) async {
+    final surpriseMode = topic == null || topic.trim().isEmpty;
+    final system =
+        '''
+Create one short, polished French READING story draft for a language learner. Return ONLY compact JSON with exactly this shape: {"title": string, "title_en": string, "summary": string, "read_time_minutes": number, "cover_prompt": string, "segments": [{"fr": string, "en": string}]}.
+
+Write 7 to 10 short narrative sentences, one per segment. Together they must form one complete mini-story with a beginning, a small change or problem, and a satisfying ending. This is a reading story, not a dialogue or speaking exercise.
+
+For every exact French sentence, provide a clear, natural English meaning in `en`. Keep the French and English arrays exactly aligned: same count, same order, and no empty meanings. Do not add grammar notes, keywords, quiz questions, or extra fields in this first response.
+
+TITLE RULE: `title_en` is the learner-facing English heading and must be a clear, natural title.
+SUMMARY: one inviting English sentence.
+READ TIME: a whole number, normally 3 to 7.
+COVER PROMPT: one concise English prompt for a text-free image showing only the concrete place, objects, and action present in this story. Never request text, letters, numbers, logos, or UI.
+${_cefrCalibration(levelBand)}
+Keep it wholesome and appropriate for teens and adults. The selected topic is the primary semantic anchor; do not drift to an unrelated premise.
+${surpriseMode ? 'SURPRISE MODE: choose an ordinary fresh everyday premise yourself.' : 'SELECTED CONTEXT: keep the story recognisably connected to the supplied topic.'}
+''';
+    final titles = avoidTitles.toList(growable: false);
+    final openings = avoidOpenings.toList(growable: false);
+    final priorText = [...titles, ...openings];
+    final exclusion = StoryVarietyService.exclusionPrompt(
+      titles: titles,
+      openings: openings,
+    );
+
+    Future<ReadingStoryDraft> request(String retryInstruction) async {
+      final seed = StoryVarietyService.chooseSeed(avoidTexts: priorText);
+      final nonce =
+          '${DateTime.now().microsecondsSinceEpoch}-${seed.hashCode.abs()}';
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': system + languageGuardrail},
+          {
+            'role': 'user',
+            'content':
+                '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (primary story anchor): $topic'}\n'
+                'LEVEL: $levelBand\n'
+                'FRESH SEED: $seed. Use it to make the premise, setting, and small turn distinct.\n'
+                '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
+          },
+        ],
+        maxTokens: 1500,
+        temperature: 0.9,
+        jsonMode: true,
+      );
+      return _parseReadingStoryDraft(
+        raw,
+        levelBand: levelBand,
+        topic: topic ?? '',
+      );
+    }
+
+    var draft = await request('');
+    if (StoryVarietyService.isDuplicate(
+      title: draft.passage.title,
+      opening: draft.passage.segments.firstOrNull?.fr ?? '',
+      avoidTitles: titles,
+      avoidOpenings: openings,
+    )) {
+      draft = await request(
+        'DUPLICATE REJECTION: discard the previous draft and create a different title, opening, premise, and visual brief.',
+      );
+      if (StoryVarietyService.isDuplicate(
+        title: draft.passage.title,
+        opening: draft.passage.segments.firstOrNull?.fr ?? '',
+        avoidTitles: titles,
+        avoidOpenings: openings,
+      )) {
+        throw AgentError.duplicateStory;
+      }
+    }
+    return draft;
+  }
+
+  /// Verifies the draft's sentence meanings and adds the slower teaching
+  /// payload. The model must return the original French sentences verbatim in
+  /// the same order; the local parser rejects any reordering or omission, so
+  /// the UI can never attach an English meaning to the wrong French sentence.
+  Future<ReadingStoryEnrichment> buildReadingStoryEnrichment({
+    required ReadingPassage passage,
+    required String levelBand,
+  }) async {
+    const system = '''
+Complete a French reading lesson from the supplied frozen passage. Return ONLY compact JSON with exactly this shape: {"segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}], "quiz": [{"q": string, "q_en": string, "choices": [string, string, string], "choices_en": [string, string, string], "answerIndex": number}], "keywords": [{"id": string, "fr": string, "en": string, "phonetic": string}]}.
+
+TRANSLATION VERIFICATION: preserve every supplied French segment exactly, in the same order and count. For each one, write the accurate natural English meaning of that exact sentence, not a word-by-word guess. Then add one short English grammar note tied to that sentence and an optional pronunciation tip.
+QUIZ: write 4 to 6 questions about details stated or clearly implied by the passage. Each has exactly 3 French choices, matching choices_en in the exact same order, and one valid zero-based answerIndex. At A1/A2, q_en and choices_en are required.
+KEYWORDS: write 6 to 10 useful French words or short phrases that appear in the passage, with accurate English meanings and simple non-IPA phonetic hints.
+''';
+    final passageJson = jsonEncode({
+      'title': passage.title,
+      'title_en': passage.titleEn,
+      'segments': passage.segments
+          .map((segment) => {'fr': segment.fr, 'en': segment.en})
+          .toList(),
+    });
+    final raw = await _complete(
+      messages: [
+        {
+          'role': 'system',
+          'content': '$system${_cefrCalibration(levelBand)}$languageGuardrail',
+        },
+        {
+          'role': 'user',
+          'content': 'LEVEL: $levelBand\nFROZEN PASSAGE JSON:\n$passageJson',
+        },
+      ],
+      maxTokens: 2200,
+      timeout: const Duration(seconds: 24),
+      temperature: 0.25,
+      jsonMode: true,
+    );
+    return _parseReadingStoryEnrichment(
+      raw,
+      passage: passage,
+      levelBand: levelBand,
+    );
+  }
+
   /// Listening has its own generation contract. It shares the persisted
   /// story shape with reading, but the writing is intentionally spoken-first:
   /// short lines, natural rhythm, and bilingual check questions for beginners.
@@ -1656,29 +1773,27 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
       '2:3' => 'portrait',
       _ => 'landscape',
     };
-    final musicBackdropRule = aspectRatio == '9:16'
-        ? ' This is a true vertical music-player backdrop: compose for a tall screen, leave clean breathing room near the top and bottom for controls, and never crop or stretch a landscape composition.'
-        : '';
-    final qualityDirection =
-        'Create one friendly $orientation learning-reference image in an exact $aspectRatio composition.$musicBackdropRule '
-        'Use a warm editorial storybook/reference style with natural light, believable everyday materials, '
-        'a simple readable composition, and one clear semantic subject. This is not a cinematic movie poster. '
-        'Keep important visual details inside the central safe area. People are optional and must be supported '
-        'by the lesson context; do not invent a generic protagonist. Avoid unrelated landmarks, futuristic cities, '
-        'fantasy scenes, dramatic strangers, anime, chibi, flat vector, collage, split panels, decorative frame, '
-        'or UI mockup styles. Do not render text, letters, numbers, logos, signs, captions, watermarks, or UI.';
-    final lessonAnchor =
-        'LESSON ANCHOR (highest priority): title="$title"; summary="$summary"; '
-        'topic="$topic"; level="$levelBand".';
-    final visualBrief = coverPrompt == null || coverPrompt.trim().isEmpty
-        ? 'VISUAL BRIEF: show only the concrete place, objects, and action stated by the lesson.'
-        : 'VISUAL BRIEF (must stay faithful to the lesson): ${coverPrompt.trim()}';
-    final prompt = '$qualityDirection\n$lessonAnchor\n$visualBrief';
-    final variation = variationSeed == null || variationSeed.trim().isEmpty
-        ? ''
-        : '\nInternal visual variation seed: ${variationSeed.trim()}. '
-              'Use it to choose a fresh composition and do not render it.';
-    final fullPrompt = '$prompt$variation\n$_bookCoverInstruction';
+    final visualAnchor = _compactVisualAnchor(
+      title: title,
+      summary: summary,
+      topic: topic,
+      coverPrompt: coverPrompt,
+    );
+    final styles = const [
+      'simple editorial illustration',
+      'warm storybook illustration',
+      'clean colored-pencil illustration',
+    ];
+    final styleIndex = variationSeed == null || variationSeed.isEmpty
+        ? 0
+        : variationSeed.codeUnits.fold<int>(0, (sum, value) => sum + value) %
+              styles.length;
+    final fullPrompt =
+        '''Create one normal $orientation $aspectRatio illustration for a French learning lesson.
+VISUAL ANCHOR: $visualAnchor
+STYLE: ${styles[styleIndex]}; clear, calm, ordinary, and easy to recognize.
+Show only the visual anchor. Keep important details near the center. Do not add a title or make a poster.
+$_bookCoverInstruction''';
     final resolvedWidth = width ?? (aspectRatio == '4:3' ? 1152 : null);
     final resolvedHeight = height ?? (aspectRatio == '4:3' ? 864 : null);
     if ((resolvedWidth == null) != (resolvedHeight == null)) {
@@ -1698,14 +1813,58 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
           'width': resolvedWidth,
           'height': resolvedHeight,
         },
-      }, timeout: const Duration(seconds: 45));
+      }, timeout: const Duration(seconds: 60));
       final encoded = response['imageBase64'] as String?;
-      if (encoded != null && encoded.isNotEmpty) return base64Decode(encoded);
+      if (encoded != null && encoded.trim().isNotEmpty) {
+        final payload = encoded.startsWith('data:')
+            ? encoded.substring(encoded.indexOf(',') + 1)
+            : encoded;
+        return base64Decode(payload);
+      }
       throw AgentError.badResponse;
     } catch (e) {
       if (e is AgentError) rethrow;
       throw AgentError.badResponse;
     }
+  }
+
+  String _compactVisualAnchor({
+    required String title,
+    required String summary,
+    required String topic,
+    String? coverPrompt,
+  }) {
+    final brief = coverPrompt?.trim() ?? '';
+    final candidates = [
+      if (brief.isNotEmpty && !_isGenericVisualBrief(brief)) brief,
+      title.trim(),
+      topic.trim(),
+      summary.trim(),
+      brief,
+    ].where((value) => value.isNotEmpty);
+    final source = candidates.isEmpty
+        ? 'an everyday learning scene'
+        : candidates.first;
+    final firstLine = source.split(RegExp(r'[\n.!?]')).first.trim();
+    if (firstLine.length <= 260) return firstLine;
+    return '${firstLine.substring(0, 257).trimRight()}...';
+  }
+
+  bool _isGenericVisualBrief(String value) {
+    final normalized = value.toLowerCase();
+    return normalized.contains('grounded realistic') ||
+        normalized.contains('french language') ||
+        normalized.contains('vocabulary set') ||
+        normalized.contains('grammar story') ||
+        normalized.contains('render no text') ||
+        normalized.contains('no people') ||
+        normalized.contains('text-free') ||
+        normalized.contains('text free') ||
+        normalized.contains('short everyday story') ||
+        normalized.contains('something related to') ||
+        normalized.contains('could happen in daily life') ||
+        normalized.contains('create a ') ||
+        normalized.contains('create one ');
   }
 
   /// Generates a story's Quiz and Keywords tabs together, right after
@@ -2413,9 +2572,10 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     Duration timeout = const Duration(seconds: 30),
     double temperature = 0.4,
     bool jsonMode = false,
+    String? provider,
   }) async {
     return _requestTextWithRetry(
-      provider: _primaryTextProvider,
+      provider: provider ?? _primaryTextProvider,
       messages: messages,
       maxTokens: maxTokens,
       timeout: timeout,
@@ -2719,6 +2879,101 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       titleEn: titleEn,
       segments: segments,
       fullText: fullText,
+    );
+  }
+
+  ReadingStoryDraft _parseReadingStoryDraft(
+    String raw, {
+    required String levelBand,
+    required String topic,
+  }) {
+    final obj = _decodeObject(raw);
+    final passage = _parseReadingPassage(raw);
+    if (passage.segments.length < 7 || passage.segments.length > 10) {
+      throw AgentError.badResponse;
+    }
+    if (passage.segments.any((segment) => segment.en.trim().isEmpty)) {
+      throw AgentError.badResponse;
+    }
+    final parsedMinutes = obj['read_time_minutes'];
+    final readTimeMinutes = parsedMinutes is num
+        ? parsedMinutes.round().clamp(3, 12).toInt()
+        : (passage.segments.length / 2).ceil().clamp(3, 12).toInt();
+    final summary = obj['summary']?.toString().trim() ?? '';
+    final coverPrompt = obj['cover_prompt']?.toString().trim() ?? '';
+    if (summary.isEmpty || coverPrompt.isEmpty) throw AgentError.badResponse;
+    return ReadingStoryDraft(
+      passage: passage,
+      levelBand: levelBand.toUpperCase(),
+      summary: summary,
+      topic: topic,
+      readTimeMinutes: readTimeMinutes,
+      coverPrompt: coverPrompt,
+    );
+  }
+
+  ReadingStoryEnrichment _parseReadingStoryEnrichment(
+    String raw, {
+    required ReadingPassage passage,
+    required String levelBand,
+  }) {
+    final obj = _decodeObject(raw);
+    final segmentsRaw = obj['segments'];
+    if (segmentsRaw is! List || segmentsRaw.length != passage.segments.length) {
+      throw AgentError.badResponse;
+    }
+    final segments = <ReadingSegment>[];
+    for (var i = 0; i < segmentsRaw.length; i++) {
+      final value = segmentsRaw[i];
+      if (value is! Map) throw AgentError.badResponse;
+      final map = value.cast<String, dynamic>();
+      final expected = passage.segments[i];
+      final fr = map['fr']?.toString().trim() ?? '';
+      final en = map['en']?.toString().trim() ?? '';
+      final grammar = map['grammar_note']?.toString().trim() ?? '';
+      final pronunciation = map['pronunciation_tip']?.toString().trim() ?? '';
+      if (fr != expected.fr.trim() || en.isEmpty || grammar.isEmpty) {
+        throw AgentError.badResponse;
+      }
+      segments.add(
+        ReadingSegment(
+          fr: expected.fr,
+          en: en,
+          grammarNote: grammar,
+          pronunciationTip: pronunciation,
+          characterFr: expected.characterFr,
+          characterEn: expected.characterEn,
+          hintWords: expected.hintWords,
+          hintWordsEnglish: expected.hintWordsEnglish,
+        ),
+      );
+    }
+    final enrichment = _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
+    final quizIsValid =
+        enrichment.quiz.length >= 4 &&
+        enrichment.quiz.length <= 6 &&
+        enrichment.quiz.every(
+          (question) =>
+              question.qEn?.trim().isNotEmpty == true &&
+              question.choices.length == 3 &&
+              question.choicesEn?.length == 3 &&
+              question.choicesEn!.every((choice) => choice.trim().isNotEmpty),
+        );
+    final keywordsAreValid =
+        enrichment.keywords.length >= 6 &&
+        enrichment.keywords.length <= 10 &&
+        enrichment.keywords.every((keyword) => keyword.en.trim().isNotEmpty);
+    if (!quizIsValid || !keywordsAreValid) throw AgentError.badResponse;
+    return ReadingStoryEnrichment(
+      passage: ReadingPassage(
+        id: passage.id,
+        title: passage.title,
+        titleEn: passage.titleEn,
+        segments: segments,
+        fullText: passage.fullText,
+      ),
+      quiz: enrichment.quiz,
+      keywords: enrichment.keywords,
     );
   }
 

@@ -795,6 +795,42 @@ class StoryBookGeneration {
   final String coverPrompt;
 }
 
+/// The first, deliberately small payload for a generated Reading lesson.
+/// French and English are available immediately; grammar, quiz, and keyword
+/// enrichment can be filled in on the same saved story afterward.
+class ReadingStoryDraft {
+  ReadingStoryDraft({
+    required this.passage,
+    required this.levelBand,
+    required this.summary,
+    required this.topic,
+    required this.readTimeMinutes,
+    required this.coverPrompt,
+  });
+
+  final ReadingPassage passage;
+  final String levelBand;
+  final String summary;
+  final String topic;
+  final int readTimeMinutes;
+  final String coverPrompt;
+}
+
+/// The background payload that completes a [ReadingStoryDraft]. The passage
+/// contains the same French sentences in the same order, with verified
+/// English meanings and teaching notes added.
+class ReadingStoryEnrichment {
+  ReadingStoryEnrichment({
+    required this.passage,
+    required this.quiz,
+    required this.keywords,
+  });
+
+  final ReadingPassage passage;
+  final List<MultipleChoiceQuestion> quiz;
+  final List<VocabEntry> keywords;
+}
+
 /// A learner's own AI-generated roleplay scene, saved to their personal
 /// library so it can be replayed later exactly like the Story library saves
 /// generated stories — walked through live in `AgentLedListeningScreen`,

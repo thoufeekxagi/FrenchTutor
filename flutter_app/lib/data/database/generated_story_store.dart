@@ -105,16 +105,22 @@ class GeneratedStoryStore {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''UPDATE generated_stories
-         SET quiz_json = ?, keywords_json = ?, updated_at = ?
+         SET passage_json = ?, quiz_json = ?, keywords_json = ?, updated_at = ?
          WHERE id = ?''',
       [
+        jsonEncode(story.passage.toJson()),
         jsonEncode(story.quiz.map((q) => q.toJson()).toList()),
         jsonEncode(story.keywords.map((k) => k.toJson()).toList()),
         now,
         story.id,
       ],
     );
-    unawaited(_sync?.syncGeneratedStory(story));
+    // Read the row back after the partial update so a parallel cover update
+    // cannot be lost when this enrichment snapshot reaches Supabase later.
+    final savedStory = _find(story.id);
+    if (savedStory != null) {
+      unawaited(_sync?.syncGeneratedStory(savedStory));
+    }
   }
 
   /// Stores the generated cover URL after the image request/upload completes.
