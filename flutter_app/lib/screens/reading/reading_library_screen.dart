@@ -72,11 +72,26 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       debugPrint('Reading story hydration failed: $error\n$stackTrace');
     }
     if (!mounted) return;
+    final store = ref.read(generatedStoryStoreProvider);
+    final stories = store.list(practiceMode: 'reading');
     setState(() {
-      _stories = ref
-          .read(generatedStoryStoreProvider)
-          .list(practiceMode: 'reading');
+      _stories = stories;
     });
+
+    // A previous deployed image function could fail before returning, leaving
+    // a saved story without artwork. Repair only the newest missing cover when
+    // the shelf refreshes; older rows are repaired when the learner opens
+    // them, so a refresh never starts dozens of paid image generations.
+    GeneratedStory? latestMissing;
+    for (final story in stories) {
+      if (story.coverUrl?.trim().isNotEmpty != true) {
+        latestMissing = story;
+        break;
+      }
+    }
+    if (latestMissing != null) {
+      unawaited(_generateCover(latestMissing, null));
+    }
   }
 
   String _levelFor(String raw) {
