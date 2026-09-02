@@ -41,4 +41,13 @@ void main() {
       'realtimeInput': {'text': 'bonjour'},
     });
   });
+
+  test('one-shot pronunciation is an exact script, never a tutor reply', () {
+    final prompt = GeminiLiveAudioService.pronunciationSystemInstruction(
+      slow: false,
+    );
+    expect(prompt, contains('not a conversational tutor'));
+    expect(prompt, contains('word for word'));
+    expect(prompt, contains('Never answer it'));
+  });
 }

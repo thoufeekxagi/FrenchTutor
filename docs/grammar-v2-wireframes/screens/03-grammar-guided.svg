@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Guided grammar lesson proposal</title>
+  <desc id="desc">Guided grammar exercise with an inline tutor call, dynamic answer tray, translated word bank, listen, hint, translate, and check controls.</desc>
+  <rect width="1200" height="900" fill="#ebe7df"/>
+  <text x="48" y="40" fill="#191612" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="1.4">GRAMMAR V2 · GUIDED</text>
+  <text x="1152" y="40" text-anchor="end" fill="#8a847b" font-family="Arial,sans-serif" font-size="14">no text field · choose a form</text>
+  <g transform="translate(45 68)">
+    <rect width="500" height="788" rx="30" fill="#f9f7f1" stroke="#d9d2c7" stroke-width="2"/>
+    <text x="24" y="39" fill="#191612" font-family="Arial,sans-serif" font-size="18">×</text><text x="250" y="39" text-anchor="middle" fill="#191612" font-family="Arial,sans-serif" font-size="17" font-weight="700">Un or une?</text><text x="474" y="39" text-anchor="end" fill="#191612" font-family="Arial,sans-serif" font-size="13" font-weight="700">1 of 5</text>
+    <rect x="24" y="55" width="452" height="6" rx="3" fill="#e3ded4"/><rect x="24" y="55" width="90" height="6" rx="3" fill="#b9781a"/>
+    <text x="24" y="102" fill="#b9781a" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2">GUIDED · PRESENT</text>
+    <text x="24" y="151" fill="#191612" font-family="Arial,sans-serif" font-size="32" font-weight="700">Choose the form</text><text x="435" y="149" fill="#b9781a" font-family="Arial,sans-serif" font-size="22">☎</text><text x="470" y="149" fill="#6a9f79" font-family="Arial,sans-serif" font-size="20">♩</text>
+    <text x="24" y="188" fill="#858078" font-family="Arial,sans-serif" font-size="16">Use the feminine article before “table”.</text>
+    <text x="24" y="225" fill="#191612" font-family="Arial,sans-serif" font-size="25" font-weight="700">___ table est libre.</text>
+    <text x="24" y="257" fill="#858078" font-family="Arial,sans-serif" font-size="14">A table is free.</text>
+    <text x="24" y="303" fill="#b9781a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="2">ANSWER</text>
+    <rect x="24" y="318" width="452" height="56" rx="16" fill="#fff0ce"/>
+    <text x="48" y="353" fill="#191612" font-family="Arial,sans-serif" font-size="17" font-weight="700">Une</text><text x="448" y="353" text-anchor="end" fill="#b9781a" font-family="Arial,sans-serif" font-size="19">◖</text>
+    <text x="24" y="414" fill="#b9781a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="2">WORD BANK · SHUFFLED</text>
+    <g font-family="Arial,sans-serif"><rect x="24" y="431" width="105" height="64" rx="16" fill="#ffffff" stroke="#dedbd5"/><text x="76" y="459" text-anchor="middle" fill="#191612" font-size="16" font-weight="700">Des</text><text x="76" y="480" text-anchor="middle" fill="#858078" font-size="11">some</text><rect x="139" y="431" width="105" height="64" rx="16" fill="#ffffff" stroke="#dedbd5"/><text x="191" y="459" text-anchor="middle" fill="#191612" font-size="16" font-weight="700">Une</text><text x="191" y="480" text-anchor="middle" fill="#858078" font-size="11">a · feminine</text><rect x="254" y="431" width="105" height="64" rx="16" fill="#ffffff" stroke="#dedbd5"/><text x="306" y="459" text-anchor="middle" fill="#191612" font-size="16" font-weight="700">Un</text><text x="306" y="480" text-anchor="middle" fill="#858078" font-size="11">a · masculine</text></g>
+    <text x="24" y="530" fill="#858078" font-family="Arial,sans-serif" font-size="13">Tap an option, then check. The answer tray stays French-only.</text>
+    <g font-family="Arial,sans-serif" font-size="13" font-weight="700"><rect x="24" y="565" width="134" height="44" rx="22" fill="#ffffff" stroke="#dedbd5"/><text x="91" y="592" text-anchor="middle" fill="#191612">◖  Listen</text><rect x="168" y="565" width="134" height="44" rx="22" fill="#ffffff" stroke="#dedbd5"/><text x="235" y="592" text-anchor="middle" fill="#191612">♧  Hint</text><rect x="312" y="565" width="164" height="44" rx="22" fill="#fff0ce" stroke="#b9781a"/><text x="394" y="592" text-anchor="middle" fill="#b9781a">文A  Translate</text></g>
+    <rect x="24" y="678" width="452" height="52" rx="17" fill="#b9781a"/><text x="250" y="711" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="15" font-weight="700">Check answer</text>
+  </g>
+  <g transform="translate(595 105)">
+    <text x="0" y="0" fill="#191612" font-family="Arial,sans-serif" font-size="18" font-weight="700">Guided state rules</text>
+    <text x="0" y="34" fill="#858078" font-family="Arial,sans-serif" font-size="14">Same flat tray and action row as Writing.</text>
+    <rect y="68" width="542" height="158" rx="20" fill="#f9f7f1" stroke="#d9d2c7"/><text x="22" y="99" fill="#b9781a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">CORRECT</text><text x="22" y="132" fill="#191612" font-family="Arial,sans-serif" font-size="14">“Une” remains selected and shows the rule in one line.</text><text x="22" y="164" fill="#858078" font-family="Arial,sans-serif" font-size="13">Next becomes available; no writing or forced redo.</text><text x="22" y="195" fill="#858078" font-family="Arial,sans-serif" font-size="13">Wrong choices stay on the card with a concise explanation.</text>
+    <rect y="256" width="542" height="160" rx="20" fill="#171719" stroke="#36363a"/><text x="22" y="289" fill="#f0b43a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">DARK MODE MIRROR</text><text x="22" y="322" fill="#f5f4f1" font-family="Arial,sans-serif" font-size="14">Gold selection, green success, muted gloss.</text><text x="22" y="353" fill="#aaa8a3" font-family="Arial,sans-serif" font-size="13">Same 44pt controls and same word order.</text><text x="22" y="384" fill="#aaa8a3" font-family="Arial,sans-serif" font-size="13">No extra card or line appears when translation is on.</text>
+  </g>
+</svg>

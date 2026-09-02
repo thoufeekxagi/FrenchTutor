@@ -263,7 +263,7 @@ class _GrammarLessonFlowScreenState
 
   String _normalizeSentence(String text) => text
       .toLowerCase()
-      .replaceAll(RegExp(r'\s+([,.!?;:])'), r'$1')
+      .replaceAllMapped(RegExp(r'\s+([,.!?;:])'), (match) => match.group(1)!)
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 

@@ -4,10 +4,12 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/content_models.dart';
+import '../models/writing_course.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 import 'gemini_live_audio_service.dart';
@@ -563,6 +565,107 @@ ${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work 
       examMode: examMode,
     );
     return task;
+  }
+
+  /// Generates one bounded Writing V2 lesson for the selected mode. The
+  /// caller validates and persists it before it can appear in the library.
+  Future<WritingCourseLesson> generateWritingCourseLesson({
+    required WritingCourseMode mode,
+    required String levelBand,
+    required String learnerGoal,
+    required List<String> interests,
+    required List<String> knownVocab,
+    required List<({String tag, String description, int count})> mistakeTags,
+    required Iterable<String> avoidTitles,
+  }) async {
+    final level = levelBand.trim().toUpperCase();
+    final stepCount = mode == WritingCourseMode.roleplay ? 4 : 5;
+    final modeContract = switch (mode) {
+      WritingCourseMode.guided =>
+        '''
+MODE: GUIDED. Return exactly five arrange steps. Each step must have kind
+"arrange", a short useful French target sentence, its natural English meaning,
+and a tokens array whose entries reconstruct the target exactly in order. Add
+token_meanings with one short natural English meaning per token in the exact
+same order. Keep punctuation attached to its word. Do not include answer
+distractors.''',
+      WritingCourseMode.complete =>
+        '''
+MODE: COMPLETE. Return exactly five choice steps. Each prompt is one natural
+French sentence containing exactly one "___" blank. target is the missing
+word or short phrase. choices contains exactly three plausible options and
+must include target exactly once. Add choice_meanings with one short English
+meaning per choice in the exact same order. Include a short partner_french
+line when a realistic message makes the context clearer.''',
+      WritingCourseMode.roleplay =>
+        '''
+MODE: ROLEPLAY. Return exactly four text steps forming one bounded written
+exchange. Each step must have kind "text", partner_french, partner_english,
+goal, target, starter, and 1-3 short suggestions. Add suggestion_meanings with
+one short English meaning per suggestion in the exact same order. The learner
+target must directly satisfy the goal. The four partner lines must form one
+coherent scene. This is written messaging, never a voice call or unbounded
+chat.''',
+    };
+    final system =
+        '''
+Create one French writing-practice lesson. Return ONLY compact JSON with this
+shape: {"title":string,"subtitle":string,"goal":string,"steps":[{"prompt":string,"prompt_english":string,"target":string,"kind":"arrange|choice|text","tokens":[string],"token_meanings":[string],"choices":[string],"choice_meanings":[string],"partner_french":string|null,"partner_english":string|null,"goal":string|null,"starter":string|null,"suggestions":[string],"suggestion_meanings":[string],"tip":string}]}.
+
+$modeContract
+
+LEVEL RULES:
+- A1: concrete daily language, mostly 3-10 words per target, present tense,
+  one idea at a time, no abstract scenarios.
+- A2: familiar daily situations, short connected ideas, simple past/future,
+  at most one reason.
+- B1: practical messages and opinions with reasons, 1-2 connectors.
+- B2: precise register, nuance, and realistic exam/work communication.
+
+The lesson must contain exactly $stepCount steps. English fields explain the
+exact French content. Never expose a complete target inside an open prompt.
+Avoid unsafe, sensitive, sexual, political, or medical-diagnostic scenarios.
+Do not use markdown or add keys outside the schema.$languageGuardrail''';
+    final user =
+        '''
+LEVEL: $level
+LEARNER GOAL: ${learnerGoal.trim().isEmpty ? 'everyday French' : learnerGoal}
+INTERESTS: ${interests.isEmpty ? '(none selected)' : interests.take(6).join(', ')}
+KNOWN VOCABULARY: ${knownVocab.isEmpty ? '(use common level-appropriate words)' : knownVocab.take(35).join(', ')}
+RECURRING ERRORS: ${mistakeTags.isEmpty ? '(none recorded)' : mistakeTags.take(3).map((item) => item.description).join('; ')}
+AVOID THESE TITLES OR NEAR-DUPLICATE TOPICS: ${avoidTitles.take(20).join(', ')}
+Create one fresh lesson now.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 1800,
+      temperature: 0.55,
+      jsonMode: true,
+    );
+    final obj = _decodeObject(raw);
+    final steps = (obj['steps'] as List? ?? const [])
+        .whereType<Map>()
+        .map((step) => WritingCourseStep.fromJson(step.cast<String, dynamic>()))
+        .toList(growable: false);
+    final icon = switch (mode) {
+      WritingCourseMode.guided => Icons.edit_note_rounded,
+      WritingCourseMode.complete => Icons.checklist_rounded,
+      WritingCourseMode.roleplay => Icons.forum_outlined,
+    };
+    return WritingCourseValidator.validate(
+      WritingCourseLesson(
+        id: 'writing-${const Uuid().v4()}',
+        title: obj['title']?.toString().trim() ?? '',
+        subtitle: obj['subtitle']?.toString().trim() ?? '',
+        level: level,
+        icon: icon,
+        mode: mode,
+        steps: steps,
+        goal: obj['goal']?.toString().trim() ?? '',
+      ),
+    );
   }
 
   WritingTask _calibrateExamWritingTask(

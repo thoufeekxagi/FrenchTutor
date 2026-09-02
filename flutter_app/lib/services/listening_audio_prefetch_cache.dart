@@ -14,7 +14,10 @@ class ListeningAudioPrefetchCache {
 
   static final shared = ListeningAudioPrefetchCache._();
 
-  static const _capacity = 3;
+  // The library warm-up covers the learner's saved window (up to 15 lessons).
+  // Keep that bounded window available so warming older lessons does not
+  // immediately evict the newer ones before the learner can open them.
+  static const _capacity = 15;
   final Map<String, Future<ElevenLabsAudioClip?>> _entries = {};
   final List<String> _recency = [];
 

@@ -15,6 +15,7 @@ import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/speaking_lesson_store.dart';
+import '../data/database/writing_lesson_store.dart';
 import '../data/database/vocabulary_session_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/exam_practice_store.dart';
@@ -150,6 +151,13 @@ final generatedVocabularySetStoreProvider =
 
 final speakingLessonStoreProvider = Provider<SpeakingLessonStore>((ref) {
   return SpeakingLessonStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
+});
+
+final writingLessonStoreProvider = Provider<WritingLessonStore>((ref) {
+  return WritingLessonStore(
     ref.watch(databaseProvider),
     ref.watch(syncServiceProvider),
   );

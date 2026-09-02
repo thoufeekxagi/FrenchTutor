@@ -13,7 +13,7 @@ import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_recorder.dart';
 import '../lessons/grammar_workshop_screen.dart';
-import '../grammar/grammar_curriculum_home_screen.dart';
+import '../grammar/grammar_v2_home_screen.dart';
 
 /// The Grammar lab — fully replaced the old static Lessons/Topics browsing
 /// list with the same "generate, save, review later" pattern the Story and
@@ -309,7 +309,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
       );
     }
     final history = _history ?? const [];
-    return GrammarCurriculumHomeScreen(
+    return GrammarV2HomeScreen(
       generatedHistory: history,
       isGenerating: _isGenerating,
       generationError: _errorText,

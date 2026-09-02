@@ -39,7 +39,7 @@ class GrammarCurriculumLesson {
   String get progressId => 'grammar_curriculum_$id';
 
   List<String> get sentenceTiles => sentence
-      .replaceAll(RegExp(r'([,.!?;:])'), r' $1')
+      .replaceAllMapped(RegExp(r'([,.!?;:])'), (match) => ' ${match.group(1)}')
       .split(RegExp(r'\s+'))
       .where((token) => token.isNotEmpty)
       .toList(growable: false);

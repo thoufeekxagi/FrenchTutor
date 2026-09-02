@@ -12,6 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
+import '../../services/recent_lesson_warmup_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
@@ -77,6 +78,10 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     setState(() {
       _stories = stories;
     });
+    RecentLessonWarmupService.shared.warm(
+      stories: stories,
+      sync: ref.read(syncServiceProvider),
+    );
 
     // A previous deployed image function could fail before returning, leaving
     // a saved story without artwork. Repair only the newest missing cover when

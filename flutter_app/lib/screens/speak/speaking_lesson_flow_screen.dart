@@ -136,6 +136,7 @@ class _SpeakingLessonFlowScreenState
   bool _murrayGuidedGradeReceived = false;
   bool _murrayFreeTalkGradeReceived = false;
   bool _hasSubmittedCurrentPhrase = false;
+  bool _preparingGuidedRetry = false;
   Timer? _guidedGradeTimeout;
   final Set<int> _creditedSteps = {};
   int? _selectedPhraseWord;
@@ -371,6 +372,14 @@ $instruction
       });
       return;
     }
+    if (!_isFreeTalk && _murray.isLive && !_murray.isReadyForLearnerTurn) {
+      setState(() {
+        _error = _murray.reconnecting
+            ? '${_tutor.displayName} is reconnecting. Please try again in a moment.'
+            : '${_tutor.displayName} is still connecting. Please try again in a moment.';
+      });
+      return;
+    }
     if (_murray.isLive) {
       _guidedGradeTimeout?.cancel();
       _murrayInputActive = true;
@@ -384,7 +393,15 @@ $instruction
         _error = null;
         _guidedFeedback = null;
       });
-      await _murray.startLearnerTurn();
+      final started = await _murray.startLearnerTurn();
+      if (!started && mounted && !_isFreeTalk) {
+        _murrayInputActive = false;
+        setState(() {
+          _state = _SpeakingStepState.ready;
+          _error =
+              '${_tutor.displayName} is not ready to record yet. Please try again in a moment.';
+        });
+      }
       return;
     }
     setState(() {
@@ -705,23 +722,44 @@ $instruction
 
   Future<void> _practiceMore() async {
     if (_isGuidedExercise || !_hasSubmittedCurrentPhrase) return;
-    _guidedGradeTimeout?.cancel();
-    setState(() {
-      _state = _SpeakingStepState.ready;
-      _heard = '';
-      _error = null;
-      _guidedFeedback = null;
-      _hasSubmittedCurrentPhrase = false;
-      _murrayGuidedGradeReceived = false;
-      _murrayFreeTalkGradeReceived = false;
-      _selectedHintWords.clear();
-      _selectedFreeTalkPartnerWord = null;
-      _selectedFreeTalkLearnerWord = null;
-    });
-    // "Practice more" is a retry for the current phrase in either mode:
-    // immediately reopen Record -> Stop without replaying or reinjecting the
-    // tutor prompt into the same Live turn.
-    await _startRecording();
+    if (_preparingGuidedRetry) return;
+    _preparingGuidedRetry = true;
+    try {
+      // Guided's visual result can arrive as soon as Gemini settles the input
+      // transcript, while the short tutor reply is still finishing. Let that
+      // reply close before opening the next learner turn so its callbacks
+      // cannot be attributed to this retry.
+      if (!_isFreeTalk) {
+        final previousTurnFinished = await _murray.waitForTutorTurnToFinish();
+        if (!mounted) return;
+        if (!previousTurnFinished) {
+          setState(() {
+            _error =
+                '${_tutor.displayName} is still finishing the previous reply. Please try again in a moment.';
+          });
+          return;
+        }
+      }
+      _guidedGradeTimeout?.cancel();
+      setState(() {
+        _state = _SpeakingStepState.ready;
+        _heard = '';
+        _error = null;
+        _guidedFeedback = null;
+        _hasSubmittedCurrentPhrase = false;
+        _murrayGuidedGradeReceived = false;
+        _murrayFreeTalkGradeReceived = false;
+        _selectedHintWords.clear();
+        _selectedFreeTalkPartnerWord = null;
+        _selectedFreeTalkLearnerWord = null;
+      });
+      // "Practice more" is a retry for the current phrase in either mode:
+      // immediately reopen Record -> Stop without replaying or reinjecting the
+      // tutor prompt into the same Live turn.
+      await _startRecording();
+    } finally {
+      _preparingGuidedRetry = false;
+    }
   }
 
   void _next() {

@@ -86,6 +86,9 @@ class InlineCallController {
   bool muted = false;
   bool tutorSpeaking = false;
   bool reconnecting = false;
+  Future<void>? _ending;
+  Future<void>? _starting;
+  bool _disposed = false;
 
   // P0.4 pocket/lock-screen handling (same contract as SessionScreen): the
   // mic stream stops on pause so a pocket never gets recorded and sent, and
@@ -97,6 +100,41 @@ class InlineCallController {
   String? lastTutorLine;
 
   bool get isLive => active || connecting;
+
+  /// A learner turn must only open after setup has completed. [isLive] also
+  /// includes the connecting/reconnecting states, which are valid for the
+  /// status UI but cannot accept audio yet.
+  bool get isReadyForLearnerTurn =>
+      active &&
+      !connecting &&
+      !reconnecting &&
+      gemini?.isConnected == true &&
+      audio != null;
+
+  /// Whether the previous tutor reply is still being generated or played.
+  bool get tutorTurnActive =>
+      tutorSpeaking || gemini?.isModelGenerating == true;
+
+  /// Waits briefly for an in-flight tutor reply to finish before a guided
+  /// retry opens a new learner turn. This prevents the old reply's completion
+  /// event from being mistaken for the retry's result.
+  Future<bool> waitForTutorTurnToFinish({
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    final live = gemini;
+    if (live != null) {
+      final remaining = deadline.difference(DateTime.now());
+      if (remaining <= Duration.zero ||
+          !await live.waitForTurnToComplete(timeout: remaining)) {
+        return false;
+      }
+    }
+    while (tutorTurnActive && DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+    }
+    return !tutorTurnActive;
+  }
 
   Future<void> toggle(BuildContext context) async {
     if (active || connecting) {
@@ -110,13 +148,34 @@ class InlineCallController {
   /// Hosts that temporarily pause the helper while they capture a learner
   /// answer can restart the same live stream without making Marie repeat her
   /// opening line.
-  Future<void> start(
+  Future<void> start(BuildContext context, {bool sendOpeningPrompt = true}) {
+    final existing = _starting;
+    if (existing != null) return existing;
+    late Future<void> starting;
+    starting = _start(context, sendOpeningPrompt: sendOpeningPrompt)
+        .whenComplete(() {
+          if (identical(_starting, starting)) _starting = null;
+        });
+    _starting = starting;
+    return starting;
+  }
+
+  Future<void> _start(
     BuildContext context, {
     bool sendOpeningPrompt = true,
   }) async {
+    // Ending a live call closes native recorder/player handles asynchronously.
+    // Wait for that teardown before opening narration or a new call, otherwise
+    // the old tutor stream can bleed into the next lesson audio.
+    final ending = _ending;
+    if (ending != null) await ending;
+    if (_disposed || !context.mounted) return;
     final accepted = await AiVoiceDisclosure.ensureAccepted(context);
     if (!accepted) return;
-    LessonSpeechService.shared.deactivate();
+    // Narration and the inline call share the iOS audio session. This must be
+    // awaited so a queued narration clip cannot race the call's first turn.
+    await LessonSpeechService.shared.deactivate();
+    if (_disposed) return;
     connecting = true;
     error = null;
     lastTutorLine = null;
@@ -278,14 +337,26 @@ class InlineCallController {
     gemini?.queueSpokenContext(trimmed);
   }
 
-  Future<void> startLearnerTurn() async {
-    if (!isLive || gemini == null || audio == null) return;
+  /// Refreshes the host screen's lesson context without opening a tutor turn.
+  /// Scripted hosts call this when the learner advances to a new card while a
+  /// call remains active. Marie absorbs the new context silently and only
+  /// speaks again when the learner asks or starts a turn.
+  void updateLessonContext() {
+    if (!isLive) return;
+    gemini?.injectContext(lessonContext(), expectReply: false);
+  }
+
+  Future<bool> startLearnerTurn() async {
+    if (!isReadyForLearnerTurn || gemini == null || audio == null) {
+      return false;
+    }
     gemini!.beginAudioTurn();
     if (muted) {
       muted = false;
       onChanged();
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
+    return true;
   }
 
   Future<void> endLearnerTurn() async {
@@ -311,10 +382,14 @@ class InlineCallController {
     }
   }
 
-  Future<void> end() async {
-    audio?.stopStreaming();
-    audio?.dispose();
-    gemini?.disconnect();
+  Future<void> end() => _end(notify: true);
+
+  Future<void> _end({required bool notify}) {
+    final existing = _ending;
+    if (existing != null) return existing;
+
+    final currentAudio = audio;
+    final currentGemini = gemini;
     audio = null;
     gemini = null;
     active = false;
@@ -323,7 +398,27 @@ class InlineCallController {
     tutorSpeaking = false;
     reconnecting = false;
     pausedForLifecycle = false;
-    onChanged();
+    if (notify) onChanged();
+
+    // Disconnect first so no new model chunks are accepted, then await the
+    // native audio disposal. AudioStreamingService.dispose() drains all
+    // in-flight playback/feed operations before closing the player; making
+    // that ordering explicit prevents a stale tutor phrase from being heard
+    // when the learner taps Listen on the next/final card.
+    late Future<void> ending;
+    ending =
+        (() async {
+          currentGemini?.disconnect();
+          try {
+            await currentAudio?.dispose();
+          } catch (_) {
+            // Teardown is best-effort; the UI is already safely out of the call.
+          }
+        })().whenComplete(() {
+          if (identical(_ending, ending)) _ending = null;
+        });
+    _ending = ending;
+    return ending;
   }
 
   /// Forward from the host's `didChangeAppLifecycleState`.
@@ -348,9 +443,8 @@ class InlineCallController {
   /// Call from the host's own `dispose()` — does NOT call [onChanged] since
   /// the host is unmounting.
   void dispose() {
-    audio?.stopStreaming();
-    audio?.dispose();
-    gemini?.disconnect();
+    _disposed = true;
+    unawaited(_end(notify: false));
   }
 
   String statusText({required String listeningLabel}) {

@@ -114,6 +114,11 @@ class GeminiLiveService {
 
   bool get isConnected => _isSetupComplete;
 
+  /// True while Gemini is still producing the tutor response for the current
+  /// Live turn. Hosts use this to avoid opening a new learner turn into the
+  /// tail of an older response.
+  bool get isModelGenerating => _isModelGenerating;
+
   // Orphaned-reply suppression. When the app moves a card while Marie is mid-reply, that
   // reply is answering a world that no longer exists ("okay, here's the word…" for the OLD
   // card). Cutting playback alone produced an ugly start-chop-restart stutter: the user
@@ -126,6 +131,7 @@ class GeminiLiveService {
   bool _suppressPreInjection = false;
   Timer? _suppressWatchdog;
   String? _pendingSpokenContext;
+  Completer<void>? _turnCompletionWaiter;
 
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
@@ -180,11 +186,13 @@ class GeminiLiveService {
     _suppressWatchdog?.cancel();
     _reconnectTimer?.cancel();
     _connectTimeoutTimer?.cancel();
+    _completeTurnWaiter();
     _teardownSocket();
     onDisconnected?.call();
   }
 
   void _teardownSocket() {
+    _completeTurnWaiter();
     _sub?.cancel();
     _sub = null;
     _channel?.sink.close();
@@ -241,11 +249,36 @@ class GeminiLiveService {
   /// activityEnd instead.
   void endAudioTurn() {
     if (!_isSetupComplete) return;
+    // Gemini can deliver the final input transcription before it finishes
+    // the model response. Keep a waiter for this exact turn so a Guided
+    // retry cannot start a new learner turn in that gap.
+    _turnCompletionWaiter ??= Completer<void>();
     _send({
       'realtimeInput': manualActivityBoundaries
           ? {'activityEnd': {}}
           : {'audioStreamEnd': true},
     });
+  }
+
+  /// Waits for the server's turnComplete event for the learner turn that was
+  /// just closed. Returns false only when the turn did not close in time.
+  Future<bool> waitForTurnToComplete({
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    final waiter = _turnCompletionWaiter;
+    if (waiter == null) return true;
+    try {
+      await waiter.future.timeout(timeout);
+      return true;
+    } on TimeoutException {
+      return false;
+    }
+  }
+
+  void _completeTurnWaiter() {
+    final waiter = _turnCompletionWaiter;
+    _turnCompletionWaiter = null;
+    if (waiter != null && !waiter.isCompleted) waiter.complete();
   }
 
   /// [expectReply] controls the API-level `turnComplete` flag — this is
@@ -609,6 +642,7 @@ class GeminiLiveService {
     if (interrupted == true) {
       final wasSuppressed = _suppressStaleReply;
       _clearStaleSuppression();
+      _completeTurnWaiter();
       // A suppressed generation officially never happened — don't surface its partial
       // transcript as a spoken tutor line.
       if (wasSuppressed) {
@@ -681,6 +715,7 @@ class GeminiLiveService {
     if (turnComplete == true) {
       final wasSuppressed = _suppressStaleReply;
       _clearStaleSuppression();
+      _completeTurnWaiter();
       _flushUserTranscript();
       if (wasSuppressed) {
         // The stale generation ended naturally before the follow-up injection landed —

@@ -23,6 +23,22 @@ abstract final class DesignTokens {
 
   static Color get ink =>
       isDark ? AppearanceColors.darkText : AppearanceColors.lightText;
+  // Explicit-palette helpers are for transient UI such as settings sheets.
+  // Those surfaces can render a pending mode before the app-wide preference
+  // is committed, so they must not read the current global mode by accident.
+  static Color inkFor(bool dark) =>
+      dark ? AppearanceColors.darkText : AppearanceColors.lightText;
+  static Color mutedFor(bool dark) =>
+      dark ? AppearanceColors.darkMuted : AppearanceColors.lightMuted;
+  static Color canvasFor(bool dark) =>
+      dark ? AppearanceColors.darkCanvas : AppearanceColors.lightCanvas;
+  static Color surfaceFor(bool dark) =>
+      dark ? AppearanceColors.darkSurface : AppearanceColors.lightSurface;
+  static Color raisedSurfaceFor(bool dark) =>
+      dark ? AppearanceColors.darkRaised : AppearanceColors.lightSurface;
+  static Color accentFor(bool dark) =>
+      dark ? AppearanceColors.gold : AppearanceColors.goldDeep;
+  static Color hairlineFor(bool dark) => inkFor(dark).withValues(alpha: 0.09);
   static Color get inkSoft =>
       isDark ? AppearanceColors.darkMuted : AppearanceColors.lightMuted;
   static Color get canvas =>
@@ -108,8 +124,18 @@ abstract final class DesignTokens {
     colors: [canvas, isDark ? AppearanceColors.darkRaised : primarySoft],
   );
 
-  /// Surfaces rely on tonal layers and hairline borders instead of elevation.
-  static List<BoxShadow> get surfaceShadow => const [];
+  /// Light surfaces need a quiet separation from the ivory canvas. Dark mode
+  /// keeps its existing flat tonal treatment; shadows are intentionally
+  /// limited to light mode so the two appearances do not drift.
+  static List<BoxShadow> get surfaceShadow => isDark
+      ? const []
+      : const [
+          BoxShadow(
+            color: Color(0x16000000),
+            blurRadius: 18,
+            offset: Offset(0, 6),
+          ),
+        ];
 
   /// Compatibility name for screens that still use the original card widget.
   static List<BoxShadow> get cardShadow => surfaceShadow;

@@ -27,6 +27,7 @@ class LearningCard extends StatelessWidget {
         color: color ?? DesignTokens.surface,
         borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
         border: Border.all(color: borderColor ?? DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       clipBehavior: clipBehavior,
       child: Padding(padding: EdgeInsets.all(padding), child: child),

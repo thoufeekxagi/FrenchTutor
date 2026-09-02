@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Grammar tense filter proposal</title>
+  <desc id="desc">Tense filter bottom sheet over the Grammar home, with present, past, future, mixed and all choices.</desc>
+  <rect width="1200" height="900" fill="#ebe7df"/>
+  <text x="48" y="40" fill="#191612" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="1.4">GRAMMAR V2 · TENSE FILTER</text>
+  <text x="1152" y="40" text-anchor="end" fill="#8a847b" font-family="Arial,sans-serif" font-size="14">proposal · reversible selection</text>
+  <g transform="translate(45 66)">
+    <rect width="500" height="790" rx="30" fill="#f9f7f1" stroke="#d9d2c7" stroke-width="2"/>
+    <text x="24" y="40" fill="#191612" font-family="Arial,sans-serif" font-size="18">‹</text><text x="250" y="40" text-anchor="middle" fill="#191612" font-family="Arial,sans-serif" font-size="18" font-weight="700">Grammar</text><text x="468" y="40" text-anchor="end" fill="#b9781a" font-family="Arial,sans-serif" font-size="16">A1⌄</text>
+    <text x="26" y="100" fill="#191612" font-family="Arial,sans-serif" font-size="33" font-weight="700">Choose a tense</text>
+    <text x="26" y="128" fill="#858078" font-family="Arial,sans-serif" font-size="16">Your lessons and generated practice follow this focus.</text>
+    <rect x="26" y="154" width="448" height="40" rx="20" fill="#fff0ce" stroke="#b9781a"/>
+    <text x="48" y="180" fill="#b9781a" font-family="Arial,sans-serif" font-size="13" font-weight="700">TENSE</text><text x="128" y="180" fill="#191612" font-family="Arial,sans-serif" font-size="13">Present⌄</text>
+    <g opacity="0.55"><rect x="26" y="214" width="448" height="300" rx="22" fill="#ece8df"/><text x="52" y="254" fill="#8a847b" font-family="Arial,sans-serif" font-size="18" font-weight="700">Grammar lessons</text><rect x="52" y="280" width="110" height="90" rx="16" fill="#ffffff"/><rect x="174" y="280" width="110" height="90" rx="16" fill="#ffffff"/><rect x="296" y="280" width="110" height="90" rx="16" fill="#ffffff"/></g>
+    <rect x="0" y="510" width="500" height="280" rx="30" fill="#ffffff" stroke="#d9d2c7" stroke-width="2"/>
+    <rect x="205" y="526" width="90" height="5" rx="3" fill="#d9d2c7"/>
+    <text x="26" y="570" fill="#191612" font-family="Arial,sans-serif" font-size="22" font-weight="700">Grammar tense</text><text x="26" y="595" fill="#858078" font-family="Arial,sans-serif" font-size="13">Show five ready lessons for one focus.</text>
+    <g font-family="Arial,sans-serif" font-size="14"><rect x="26" y="614" width="448" height="30" rx="15" fill="#fff0ce"/><text x="48" y="634" fill="#b9781a" font-weight="700">✓  Present</text><text x="446" y="634" text-anchor="end" fill="#858078">5 ready</text><text x="48" y="664" fill="#191612">Past</text><text x="446" y="664" text-anchor="end" fill="#858078">5 ready</text><text x="48" y="694" fill="#191612">Future</text><text x="446" y="694" text-anchor="end" fill="#858078">5 ready</text><text x="48" y="724" fill="#191612">Mixed</text><text x="446" y="724" text-anchor="end" fill="#858078">5 ready</text><text x="48" y="754" fill="#191612">All tenses</text><text x="446" y="754" text-anchor="end" fill="#858078">20 ready</text></g>
+  </g>
+  <g transform="translate(590 110)">
+    <text x="0" y="0" fill="#191612" font-family="Arial,sans-serif" font-size="18" font-weight="700">Why a sheet?</text>
+    <text x="0" y="34" fill="#858078" font-family="Arial,sans-serif" font-size="14">It keeps the home calm while making the tense scope explicit.</text>
+    <rect y="66" width="545" height="168" rx="20" fill="#f9f7f1" stroke="#d9d2c7"/>
+    <text x="22" y="98" fill="#b9781a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">GENERATION INPUT</text>
+    <text x="22" y="130" fill="#191612" font-family="Arial,sans-serif" font-size="14">CEFR · selected tense · goal · interests</text>
+    <text x="22" y="158" fill="#191612" font-family="Arial,sans-serif" font-size="14">known vocabulary · mistake tags · avoided titles</text>
+    <text x="22" y="196" fill="#858078" font-family="Arial,sans-serif" font-size="13">Every generated card is validated before it enters the grid.</text>
+    <rect y="265" width="545" height="170" rx="20" fill="#171719" stroke="#36363a"/>
+    <text x="22" y="298" fill="#f0b43a" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">DARK MODE</text>
+    <text x="22" y="332" fill="#f5f4f1" font-family="Arial,sans-serif" font-size="14">The sheet uses the same canvas and surface roles.</text>
+    <text x="22" y="361" fill="#aaa8a3" font-family="Arial,sans-serif" font-size="13">Only semantic colors change; no alternate navigation logic.</text>
+    <text x="22" y="390" fill="#aaa8a3" font-family="Arial,sans-serif" font-size="13">Selecting a tense immediately refreshes the featured card.</text>
+  </g>
+</svg>

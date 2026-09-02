@@ -10,6 +10,7 @@ import '../data/database/generated_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/speaking_lesson_store.dart';
+import '../data/database/writing_lesson_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
@@ -22,6 +23,7 @@ import '../models/profile.dart';
 import '../models/srs_state.dart';
 import '../models/speak_curriculum.dart';
 import '../models/speaking_course.dart';
+import '../models/writing_course.dart';
 import '../data/database/speaking_lesson_codec.dart';
 import 'image_storage_optimizer.dart';
 import '../orchestration/models/competency_state.dart';
@@ -722,6 +724,28 @@ class SyncService {
     queueRowId: lesson.id,
   );
 
+  /// Publishes one locally validated, personalized Writing lesson.
+  Future<void> syncWritingLesson(WritingCourseLesson lesson) => _guarded(
+    (uid) async {
+      final validated = WritingCourseValidator.validate(lesson);
+      final now = DateTime.now().toUtc().toIso8601String();
+      await _client.from('writing_lessons').upsert({
+        'id': validated.id,
+        'mode': validated.mode.name,
+        'level_band': validated.level,
+        'title': validated.title,
+        'fingerprint': writingLessonFingerprint(validated),
+        'lesson_json': validated.toJson(),
+        'created_by': uid,
+        'is_validated': true,
+        'created_at': now,
+        'updated_at': now,
+      }, onConflict: 'id');
+    },
+    queueTable: 'writing_lessons',
+    queueRowId: lesson.id,
+  );
+
   /// Publishes the bundled catalog once per authenticated account. The rows
   /// are shared and read-only to learners after insertion; the local bundled
   /// catalog remains the immediate offline copy while this runs.
@@ -1367,6 +1391,13 @@ class SyncService {
           if (lesson == null) return true;
           await syncSpeakingLesson(lesson);
           return true;
+        case 'writing_lessons':
+          final lesson = WritingLessonStore(
+            _db,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (lesson == null) return true;
+          await syncWritingLesson(lesson);
+          return true;
         case 'adaptive_course_plans':
           final plan = AdaptiveCourseStore(_db).planById(rowId);
           if (plan == null) return true;
@@ -1440,6 +1471,7 @@ class SyncService {
       'generatedRoleplays': () => _hydrateGeneratedRoleplays(uid),
       'generatedVocabularySets': () => _hydrateGeneratedVocabularySets(uid),
       'speakingLessons': () => _hydrateSpeakingLessons(),
+      'writingLessons': () => _hydrateWritingLessons(),
       'notes': () => _hydrateNotes(uid),
     };
     await Future.wait(
@@ -1459,6 +1491,11 @@ class SyncService {
   /// call on every app start: IDs and fingerprints make the operation
   /// idempotent, and malformed rows are skipped by the store.
   Future<void> hydrateSpeakingLessons() => _hydrateSpeakingLessons();
+
+  Future<void> hydrateWritingLessons() async {
+    if (_userId == null) return;
+    await _hydrateWritingLessons();
+  }
 
   /// Reload generated content into the local store for the current user.
   /// Screens can call this when they become visible without re-running the
@@ -1907,6 +1944,38 @@ class SyncService {
         );
       } catch (error) {
         debugPrint('Skipping invalid public Speaking lesson: $error');
+      }
+    }
+  }
+
+  Future<void> _hydrateWritingLessons() async {
+    final rows = await _client.from('writing_lessons').select();
+    final store = WritingLessonStore(_db);
+    for (final row in rows) {
+      try {
+        final lessonJson = _jsonOf(row['lesson_json']);
+        final decoded = jsonDecode(lessonJson);
+        if (decoded is! Map) continue;
+        final lesson = WritingCourseValidator.validate(
+          WritingCourseLesson.fromJson(decoded.cast<String, dynamic>()),
+        );
+        if (lesson.id != row['id'] ||
+            lesson.mode.name != row['mode'] ||
+            lesson.level != row['level_band']) {
+          throw const FormatException('Writing catalog metadata mismatch.');
+        }
+        store.upsertFromRemote(
+          id: row['id'] as String,
+          mode: row['mode'] as String,
+          levelBand: row['level_band'] as String,
+          title: row['title'] as String,
+          fingerprint: row['fingerprint'] as String,
+          lessonJson: lessonJson,
+          createdAt: row['created_at'] as String,
+          updatedAt: row['updated_at'] as String,
+        );
+      } catch (error) {
+        debugPrint('Skipping invalid Writing lesson: $error');
       }
     }
   }

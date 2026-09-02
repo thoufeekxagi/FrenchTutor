@@ -753,23 +753,26 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                           ? _showConjugation
                           : null,
                     ),
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      // Keep the island at its approved position while the
+                      // image fills the remaining space beneath it.
+                      top: 225,
+                      child: _StoryStageIsland(
+                        labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
+                        currentIndex: switch (_tab) {
+                          _StoryTab.story => 0,
+                          _StoryTab.quiz => 1,
+                          _StoryTab.keywords => 2,
+                          _StoryTab.grammar => 3,
+                        },
+                        onIndexTap: _goToStage,
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _StoryStageIsland(
-                    labels: const ['Story', 'Quiz', 'Keywords', 'Grammar'],
-                    currentIndex: switch (_tab) {
-                      _StoryTab.story => 0,
-                      _StoryTab.quiz => 1,
-                      _StoryTab.keywords => 2,
-                      _StoryTab.grammar => 3,
-                    },
-                    onIndexTap: _goToStage,
-                  ),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox.shrink(),
                 Divider(
                   height: 1,
                   color: _darkMode
@@ -1137,7 +1140,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       text: points[i].fr,
                       size: DesignTokens.minTapTarget,
                       iconSize: 20,
-                      label: 'Listen',
                       contentItemId: _story.segmentContentId(
                         _passage.segments.indexOf(points[i]),
                       ),
@@ -1461,9 +1463,9 @@ class _StoryBookHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: SizedBox(
-        height: 246,
+        height: 279,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -1481,9 +1483,9 @@ class _StoryBookHeader extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.36),
-                    Colors.black.withValues(alpha: 0.04),
-                    Colors.black.withValues(alpha: 0.9),
+                    Colors.black.withValues(alpha: 0.48),
+                    Colors.black.withValues(alpha: 0.16),
+                    Colors.black.withValues(alpha: 0.94),
                   ],
                 ),
               ),
@@ -2250,9 +2252,6 @@ class _StoryStageIsland extends StatelessWidget {
       decoration: BoxDecoration(
         color: DesignTokens.nightSurface.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: DesignTokens.nightHairline.withValues(alpha: 0.9),
-        ),
       ),
       child: Row(
         children: [
@@ -2592,10 +2591,10 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final surface = _dark ? DesignTokens.nightSurfaceRaised : Colors.white;
-    final text = _dark ? DesignTokens.nightText : DesignTokens.ink;
-    final muted = _dark ? DesignTokens.nightMuted : DesignTokens.mutedDim;
-    final accent = _dark ? DesignTokens.nightAccent : DesignTokens.primary;
+    final surface = DesignTokens.raisedSurfaceFor(_dark);
+    final text = DesignTokens.inkFor(_dark);
+    final muted = DesignTokens.mutedFor(_dark);
+    final accent = DesignTokens.accentFor(_dark);
     return SafeArea(
       child: Container(
         margin: const EdgeInsets.all(10),

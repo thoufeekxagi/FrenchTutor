@@ -22,7 +22,10 @@ class GeminiLiveAudioService {
 
   static const _model = 'models/gemini-3.1-flash-live-preview';
   static const _bucket = 'vocabulary-audio';
-  static const _cacheVersion = 'live-audio-v1';
+  // v2 invalidates clips generated with the old conversational persona
+  // prompt. Those clips could answer a gratitude sentence instead of reading
+  // it, e.g. “De rien…” for “Merci beaucoup pour votre aide.”.
+  static const _cacheVersion = 'live-audio-v2';
   static const outputSampleRateHz = 24000;
 
   final Map<String, Future<List<int>?>> _inFlight = {};
@@ -50,6 +53,18 @@ class GeminiLiveAudioService {
   static Map<String, dynamic> realtimeTextMessage(String text) => {
     'realtimeInput': {'text': text},
   };
+
+  /// Contract for one-shot lesson/vocabulary pronunciation. This deliberately
+  /// excludes the tutor persona prompt: persona instructions describe how to
+  /// converse, while this path must read an immutable script and never reply
+  /// to its meaning.
+  static String pronunciationSystemInstruction({required bool slow}) =>
+      'You are an exact French pronunciation renderer, not a conversational '
+      'tutor. Treat the realtime text as an immutable script. Speak the '
+      'supplied French text word for word, in the same order, exactly once. '
+      'Never answer it, acknowledge it, correct it, translate it, explain it, '
+      'paraphrase it, or add or omit any words. Do not say anything before or '
+      'after the script. ${slow ? 'Use a measured, extra-clear learning pace.' : 'Use a natural, clear learning pace.'}';
 
   /// Reads private local/Supabase cache first, then generates one clip through
   /// Gemini Live. Supabase persistence is skipped until the learner has an
@@ -374,6 +389,7 @@ class GeminiLiveAudioService {
     final setupComplete = Completer<void>();
     final turnComplete = Completer<void>();
     final audio = <int>[];
+    final outputTranscript = StringBuffer();
     late final StreamSubscription subscription;
 
     void fail(Object error, [StackTrace? stackTrace]) {
@@ -407,6 +423,11 @@ class GeminiLiveAudioService {
           }
           final serverContent = json['serverContent'];
           if (serverContent is! Map) return;
+          final outputTranscription = serverContent['outputTranscription'];
+          if (outputTranscription is Map) {
+            final text = outputTranscription['text'];
+            if (text is String) outputTranscript.write(text);
+          }
           final modelTurn = serverContent['modelTurn'];
           final parts = modelTurn is Map ? modelTurn['parts'] : null;
           if (parts is List) {
@@ -440,6 +461,10 @@ class GeminiLiveAudioService {
             'model': _model,
             'generationConfig': {
               'responseModalities': ['AUDIO'],
+              // Pronunciation is a deterministic read-aloud task, not a
+              // creative conversation. A low temperature reduces semantic
+              // replies on lines such as “Merci…” or “Bonne journée.”.
+              'temperature': 0.1,
               'speechConfig': {
                 'voiceConfig': {
                   'prebuiltVoiceConfig': {'voiceName': persona.voiceName},
@@ -451,16 +476,31 @@ class GeminiLiveAudioService {
                 {
                   'text':
                       systemInstruction ??
-                      '${persona.promptBlock} You are preparing one short pronunciation clip. Speak only the French text supplied by the learner, with no explanation or extra words. ${slow ? 'Use a measured, extra-clear learning pace.' : 'Use a natural, clear learning pace.'}',
+                      pronunciationSystemInstruction(slow: slow),
                 },
               ],
             },
+            // Ask Live for the text it believes it spoke. When available,
+            // _generateLive compares this transcript with the immutable
+            // lesson script and rejects a semantic reply or paraphrase.
+            'outputAudioTranscription': <String, dynamic>{},
           },
         }),
       );
       await setupComplete.future.timeout(const Duration(seconds: 10));
       channel.sink.add(jsonEncode(realtimeTextMessage(text)));
       await turnComplete.future.timeout(const Duration(seconds: 30));
+      final transcript = _normalisePronunciationTranscript(
+        outputTranscript.toString(),
+      );
+      final expected = _normalisePronunciationTranscript(text);
+      if (transcript.isNotEmpty && transcript != expected) {
+        debugPrint(
+          'GeminiLiveAudioService: rejected mismatched pronunciation output '
+          '(expected "$expected", received "$transcript")',
+        );
+        return null;
+      }
       return _validPcm(audio) ? List<int>.unmodifiable(audio) : null;
     } catch (error) {
       debugPrint('GeminiLiveAudioService: Live generation failed: $error');
@@ -491,4 +531,10 @@ class GeminiLiveAudioService {
     };
     return '${ActiveTutor.current.promptBlock} You are rendering a saved French listening lesson for CEFR level $level. $style Use a comfortable learner pace, not rushed speech. Speak only the supplied French text; never add an introduction, explanation, translation, or closing sentence.';
   }
+
+  static String _normalisePronunciationTranscript(String value) => value
+      .toLowerCase()
+      .replaceAll(RegExp(r'''[.,!?;:«»"'’()\[\]{}-]'''), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
 }

@@ -190,6 +190,7 @@ class V3Card extends StatelessWidget {
             : DesignTokens.nightSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor ?? DesignTokens.nightHairline),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: child,
     );

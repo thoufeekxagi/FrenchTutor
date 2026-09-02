@@ -17,6 +17,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/writing_workshop_screen.dart';
+import 'writing_course_home_screen.dart';
 
 class WritingLabScreen extends ConsumerStatefulWidget {
   const WritingLabScreen({
@@ -192,6 +193,9 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.autoStart && !widget.examMode) {
+      return const WritingCourseHomeScreen();
+    }
     if (widget.autoStart) {
       return Scaffold(
         backgroundColor: DesignTokens.canvasDim,

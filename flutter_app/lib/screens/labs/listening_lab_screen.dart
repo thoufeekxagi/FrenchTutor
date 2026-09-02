@@ -15,6 +15,7 @@ import '../../services/gemini_live_audio_service.dart';
 import '../../services/listening_audio_config.dart';
 import '../../services/listening_audio_prefetch_cache.dart';
 import '../../services/practice_artwork_service.dart';
+import '../../services/recent_lesson_warmup_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
@@ -160,13 +161,12 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   }
 
   void _prefetchRecentAudio(List<GeneratedStory> stories) {
-    if (stories.isEmpty) return;
-    final sync = ref.read(syncServiceProvider);
-    for (final story in stories.take(3)) {
-      unawaited(
-        ListeningAudioPrefetchCache.shared.prefetch(story: story, sync: sync),
-      );
-    }
+    // Kept as a small compatibility wrapper for existing callers. The shared
+    // warm-up also covers older saved lessons, not only the latest three.
+    RecentLessonWarmupService.shared.warm(
+      stories: stories,
+      sync: ref.read(syncServiceProvider),
+    );
   }
 
   void _repairNewestMissingCover(List<GeneratedStory> stories) {
@@ -674,14 +674,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
           );
   }
 
-  void _showLibrarySettingsHint() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Open a listening lesson to adjust session settings.'),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.autoStart) {
@@ -707,17 +699,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         toolbarHeight: 78,
         elevation: 0,
         scrolledUnderElevation: 0,
-        actions: [
-          IconButton(
-            tooltip: 'Listening settings',
-            onPressed: _showLibrarySettingsHint,
-            icon: Icon(
-              CupertinoIcons.slider_horizontal_3,
-              color: DesignTokens.nightAccent,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: SafeArea(
         bottom: false,
@@ -1202,6 +1183,7 @@ class _ContinueStoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkMode = DesignTokens.isDark;
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -1249,9 +1231,9 @@ class _ContinueStoryCard extends StatelessWidget {
                     story.displayTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.display(
-                      23,
-                    ).copyWith(color: DesignTokens.nightText),
+                    style: DesignTokens.display(23).copyWith(
+                      color: darkMode ? DesignTokens.nightText : Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 5),
                   Row(
@@ -1259,9 +1241,11 @@ class _ContinueStoryCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '${story.levelBand} · ${story.passage.segments.length} scenes · ${story.readTimeMinutes} min',
-                          style: DesignTokens.body(
-                            12,
-                          ).copyWith(color: DesignTokens.nightMuted),
+                          style: DesignTokens.body(12).copyWith(
+                            color: darkMode
+                                ? DesignTokens.nightMuted
+                                : Colors.white70,
+                          ),
                         ),
                       ),
                       Icon(

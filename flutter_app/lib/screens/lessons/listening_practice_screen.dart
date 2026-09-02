@@ -21,7 +21,6 @@ import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
-import '../../widgets/report_problem_button.dart';
 import '../../widgets/story_cover_image.dart';
 import 'story_reader_screen.dart';
 
@@ -728,38 +727,6 @@ class _ListeningPracticeScreenState
     }
   }
 
-  Future<void> _showMoreMenu() async {
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.72),
-      builder: (_) => _ListeningMoreSheet(
-        isMarkedLearned: _isMarkedLearned,
-        isLyricsVisible: _showTranscript,
-        sessionType: 'Listening: ${_story.displayTitle}',
-      ),
-    );
-    if (!mounted || action == null) return;
-    switch (action) {
-      case 'lyrics':
-        _showTranscript ? _closeLyrics() : _openLyrics();
-      case 'quiz':
-        _selectListeningTab(_ListeningTab.quiz.index);
-      case 'keywords':
-        _selectListeningTab(_ListeningTab.keywords.index);
-      case 'grammar':
-        _selectListeningTab(_ListeningTab.grammar.index);
-      case 'speed':
-        _cycleRate();
-      case 'learn':
-        setState(() => _isMarkedLearned = true);
-      case 'notes':
-        ref.read(notetakerStateProvider).isExpanded = true;
-      case 'settings':
-        await _showSettings();
-    }
-  }
-
   Widget _tabBody() {
     return switch (_tab) {
       _ListeningTab.transcript =>
@@ -1075,6 +1042,7 @@ class _ListeningPracticeScreenState
           _ListeningImmersiveBackground(
             story: _story,
             dimmed: showLyrics || contentTab,
+            isDarkMode: _darkMode,
           ),
           SafeArea(
             child: Stack(
@@ -1085,11 +1053,11 @@ class _ListeningPracticeScreenState
                   right: 14,
                   child: _ListeningTopBar(
                     isMarkedLearned: _isMarkedLearned,
+                    isDarkMode: _darkMode,
                     onBack: _finishAndPop,
                     onMarkLearned: () =>
                         setState(() => _isMarkedLearned = !_isMarkedLearned),
                     onSettings: _showSettings,
-                    onMore: _showMoreMenu,
                   ),
                 ),
                 if (showLyrics)
@@ -1120,6 +1088,7 @@ class _ListeningPracticeScreenState
                       onCycleTextSize: _cycleTextSize,
                       onCopyLine: _copyCurrentLine,
                       onWordTap: _selectListeningWord,
+                      isDarkMode: _darkMode,
                     ),
                   ),
                 if (!showLyrics && contentTab)
@@ -1851,10 +1820,12 @@ class _ListeningImmersiveBackground extends StatelessWidget {
   const _ListeningImmersiveBackground({
     required this.story,
     required this.dimmed,
+    required this.isDarkMode,
   });
 
   final GeneratedStory story;
   final bool dimmed;
+  final bool isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -1875,9 +1846,9 @@ class _ListeningImmersiveBackground extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withValues(alpha: 0.28),
-                Colors.black.withValues(alpha: dimmed ? 0.24 : 0.06),
-                Colors.black.withValues(alpha: dimmed ? 0.93 : 0.82),
+                Colors.black.withValues(alpha: isDarkMode ? 0.34 : 0.30),
+                Colors.black.withValues(alpha: isDarkMode ? 0.26 : 0.22),
+                Colors.black.withValues(alpha: isDarkMode ? 0.94 : 0.88),
               ],
               stops: const [0, 0.45, 1],
             ),
@@ -1887,13 +1858,14 @@ class _ListeningImmersiveBackground extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
                 colors: [
+                  Colors.black.withValues(alpha: isDarkMode ? 0.36 : 0.30),
+                  Colors.black.withValues(alpha: isDarkMode ? 0.12 : 0.08),
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.14),
-                  Colors.black.withValues(alpha: 0.52),
                 ],
+                stops: const [0, 0.48, 1],
               ),
             ),
           ),
@@ -1905,17 +1877,17 @@ class _ListeningImmersiveBackground extends StatelessWidget {
 class _ListeningTopBar extends StatelessWidget {
   const _ListeningTopBar({
     required this.isMarkedLearned,
+    required this.isDarkMode,
     required this.onBack,
     required this.onMarkLearned,
     required this.onSettings,
-    required this.onMore,
   });
 
   final bool isMarkedLearned;
+  final bool isDarkMode;
   final VoidCallback onBack;
   final VoidCallback onMarkLearned;
   final VoidCallback onSettings;
-  final VoidCallback onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -1937,7 +1909,9 @@ class _ListeningTopBar extends StatelessWidget {
           ),
           label: Text(isMarkedLearned ? 'Listened' : 'Mark as listened'),
           style: TextButton.styleFrom(
-            foregroundColor: DesignTokens.nightAccent,
+            foregroundColor: isDarkMode
+                ? DesignTokens.nightAccent
+                : Colors.white,
             backgroundColor: Colors.black.withValues(alpha: 0.28),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             shape: RoundedRectangleBorder(
@@ -1952,13 +1926,7 @@ class _ListeningTopBar extends StatelessWidget {
           icon: CupertinoIcons.slider_horizontal_3,
           tooltip: 'Listening settings',
           onTap: onSettings,
-          accent: true,
-        ),
-        const SizedBox(width: 4),
-        _ListeningRoundButton(
-          icon: CupertinoIcons.ellipsis,
-          tooltip: 'More listening options',
-          onTap: onMore,
+          accent: isDarkMode,
         ),
       ],
     );
@@ -2264,93 +2232,6 @@ class _ListeningUtilityButton extends StatelessWidget {
   }
 }
 
-class _ListeningMoreSheet extends StatelessWidget {
-  const _ListeningMoreSheet({
-    required this.isMarkedLearned,
-    required this.isLyricsVisible,
-    required this.sessionType,
-  });
-
-  final bool isMarkedLearned;
-  final bool isLyricsVisible;
-  final String sessionType;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: DesignTokens.nightSurface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: DesignTokens.nightHairline),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(
-                isLyricsVisible
-                    ? CupertinoIcons.xmark_circle
-                    : CupertinoIcons.text_quote,
-              ),
-              title: Text(isLyricsVisible ? 'Hide lyrics' : 'Open lyrics'),
-              onTap: () => Navigator.pop(context, 'lyrics'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.checkmark_square),
-              title: const Text('Quiz'),
-              onTap: () => Navigator.pop(context, 'quiz'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.textformat),
-              title: const Text('Keywords'),
-              onTap: () => Navigator.pop(context, 'keywords'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.book),
-              title: const Text('Grammar'),
-              onTap: () => Navigator.pop(context, 'grammar'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.speedometer),
-              title: const Text('Playback speed'),
-              onTap: () => Navigator.pop(context, 'speed'),
-            ),
-            ListTile(
-              leading: Icon(
-                isMarkedLearned
-                    ? CupertinoIcons.checkmark_circle_fill
-                    : CupertinoIcons.checkmark_circle,
-              ),
-              title: Text(isMarkedLearned ? 'Learned' : 'Mark as learned'),
-              onTap: isMarkedLearned
-                  ? null
-                  : () => Navigator.pop(context, 'learn'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.square_pencil),
-              title: const Text('Add a note'),
-              onTap: () => Navigator.pop(context, 'notes'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.slider_horizontal_3),
-              title: const Text('Player settings'),
-              onTap: () => Navigator.pop(context, 'settings'),
-            ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.flag),
-              title: const Text('Report a problem'),
-              trailing: ReportProblemButton(sessionType: sessionType),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _ListeningTranscriptLines extends StatelessWidget {
   const _ListeningTranscriptLines({
     required this.segments,
@@ -2363,6 +2244,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
     required this.underlineWords,
     required this.onWordTap,
     required this.showTranslation,
+    required this.isDarkMode,
     this.textScale = 1,
   });
 
@@ -2376,6 +2258,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
   final bool underlineWords;
   final void Function(int segmentIndex, int wordIndex) onWordTap;
   final bool showTranslation;
+  final bool isDarkMode;
   final double textScale;
 
   @override
@@ -2387,9 +2270,6 @@ class _ListeningTranscriptLines extends StatelessWidget {
       );
     }
     final active = currentSegment.clamp(0, segments.length - 1).toInt();
-    final maxStart = segments.length > 4 ? segments.length - 4 : 0;
-    final start = (active - 1).clamp(0, maxStart).toInt();
-    final end = (start + 4).clamp(0, segments.length).toInt();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2400,7 +2280,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
           ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1),
         ),
         const SizedBox(height: 9),
-        for (var index = start; index < end; index++) ...[
+        for (var index = 0; index < segments.length; index++) ...[
           BilingualWordText(
             source: segments[index].fr,
             translation: segments[index].en,
@@ -2408,16 +2288,17 @@ class _ListeningTranscriptLines extends StatelessWidget {
                 DesignTokens.display(
                   (index == active ? 28 : 19) * textScale,
                 ).copyWith(
-                  color: index == active ? Colors.white : Colors.white54,
+                  color: index == active
+                      ? Colors.white
+                      : (isDarkMode ? Colors.white54 : Colors.white70),
                   fontWeight: index == active
                       ? FontWeight.w800
                       : FontWeight.w500,
                   height: 1.18,
                 ),
-            translationStyle: DesignTokens.body(17 * textScale).copyWith(
-              color: index == active ? Colors.white70 : Colors.white38,
-              height: 1.3,
-            ),
+            translationStyle: DesignTokens.body(
+              17 * textScale,
+            ).copyWith(color: Colors.white, height: 1.3),
             keywords: keywords,
             showTranslation: showTranslation,
             highlightSelected: highlightWords,
@@ -2492,6 +2373,7 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
     required this.onCycleTextSize,
     required this.onCopyLine,
     required this.onWordTap,
+    required this.isDarkMode,
   });
 
   final List<ReadingSegment> segments;
@@ -2517,28 +2399,38 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
   final VoidCallback onCycleTextSize;
   final VoidCallback onCopyLine;
   final void Function(int segmentIndex, int wordIndex) onWordTap;
+  final bool isDarkMode;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 36, 18, 26),
-              child: _ListeningTranscriptLines(
-                segments: segments,
-                currentSegment: currentSegment,
-                currentWord: currentWord,
-                selectedSegment: selectedSegment,
-                selectedWord: selectedWord,
-                keywords: keywords,
-                highlightWords: highlightWords,
-                underlineWords: underlineWords,
-                onWordTap: onWordTap,
-                showTranslation: showTranslation,
-                textScale: textScale,
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(18, 28, 18, 26),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 54,
+                ),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: _ListeningTranscriptLines(
+                    segments: segments,
+                    currentSegment: currentSegment,
+                    currentWord: currentWord,
+                    selectedSegment: selectedSegment,
+                    selectedWord: selectedWord,
+                    keywords: keywords,
+                    highlightWords: highlightWords,
+                    underlineWords: underlineWords,
+                    onWordTap: onWordTap,
+                    showTranslation: showTranslation,
+                    textScale: textScale,
+                    isDarkMode: isDarkMode,
+                  ),
+                ),
               ),
             ),
           ),
@@ -2700,6 +2592,7 @@ class _ListeningProgressControls extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation(DesignTokens.nightAccent),
           ),
         ),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -2709,23 +2602,46 @@ class _ListeningProgressControls extends StatelessWidget {
               icon: const Icon(CupertinoIcons.gobackward),
               color: Colors.white,
             ),
-            IconButton(
-              tooltip: isPlaying ? 'Pause' : 'Play',
-              onPressed: isLoading ? null : onToggle,
-              icon: Icon(
-                isLoading
-                    ? CupertinoIcons.hourglass
-                    : isPlaying
-                    ? CupertinoIcons.pause_fill
-                    : CupertinoIcons.play_fill,
-                size: 24,
-              ),
-              color: Colors.black,
-              style: IconButton.styleFrom(
-                backgroundColor: DesignTokens.nightAccent,
-                minimumSize: const Size(54, 54),
-                shape: const CircleBorder(),
-              ),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  tooltip: isLoading
+                      ? 'Loading audio'
+                      : isPlaying
+                      ? 'Pause'
+                      : 'Play',
+                  onPressed: isLoading ? null : onToggle,
+                  icon: Icon(
+                    isPlaying
+                        ? CupertinoIcons.pause_fill
+                        : CupertinoIcons.play_fill,
+                    size: 24,
+                  ),
+                  color: Colors.black,
+                  style: IconButton.styleFrom(
+                    backgroundColor: DesignTokens.nightAccent,
+                    disabledBackgroundColor: DesignTokens.nightAccent,
+                    disabledForegroundColor: Colors.black,
+                    minimumSize: const Size(54, 54),
+                    shape: const CircleBorder(),
+                  ),
+                ),
+                if (isLoading)
+                  const IgnorePointer(
+                    child: Padding(
+                      padding: EdgeInsets.all(1),
+                      child: SizedBox(
+                        width: 54,
+                        height: 54,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation(Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             IconButton(
               tooltip: 'Playback speed',

@@ -99,6 +99,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   33: _migrationV33,
   34: _migrationV34,
   35: _migrationV35,
+  36: _migrationV36,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1248,5 +1249,29 @@ void _migrationV35(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_speaking_lessons_source '
     'ON speaking_lessons (source, updated_at)',
+  );
+}
+
+/// Validated generated lessons for the dedicated Guided, Complete, and
+/// Roleplay Writing surface. Bundled starter lessons remain source-controlled
+/// and are deliberately not duplicated into SQLite.
+void _migrationV36(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS writing_lessons (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      mode TEXT NOT NULL CHECK (mode IN ('guided', 'complete', 'roleplay')),
+      level_band TEXT NOT NULL,
+      title TEXT NOT NULL,
+      fingerprint TEXT NOT NULL UNIQUE,
+      lesson_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_writing_lessons_mode_level '
+    'ON writing_lessons (mode, level_band, created_at)',
   );
 }
