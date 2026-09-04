@@ -15,13 +15,14 @@ import '../../services/review_material_service.dart';
 import '../../widgets/speaking_transcript_strip.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
+import '../labs/writing_lab_screen.dart';
 import 'speak_ui.dart';
 import 'speaking_practice_screen.dart';
 
-/// The only three outputs a learner can request from a cross-app review.
-/// Reading, listening, and speaking all use the same recent-history source;
-/// only the generated activity changes.
-enum SpeakReviewMode { speaking, reading, listening }
+/// The four outputs a learner can request from a cross-app review.
+/// Every mode uses the same universal learner evidence; only the activity
+/// format changes.
+enum SpeakReviewMode { speaking, reading, listening, writing }
 
 class SpeakReviewScreen extends ConsumerStatefulWidget {
   const SpeakReviewScreen({super.key});
@@ -38,7 +39,12 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
     final sessions = ReviewMaterialService.recentSessions(
       ref.watch(storageServiceProvider),
     );
-    final canStart = sessions.isNotEmpty;
+    final plan = ReviewMaterialService.buildPersonalizedPlan(
+      db: ref.watch(databaseProvider),
+      profile: ref.watch(learningStoreProvider).profile(),
+      mode: _modeLabel(_mode),
+    );
+    final canStart = plan.hasEvidence || sessions.isNotEmpty;
 
     return SpeakScaffold(
       child: ListView(
@@ -90,7 +96,10 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                         color: SpeakColors.accentSoft,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.bolt_rounded, color: SpeakColors.accent),
+                      child: Icon(
+                        Icons.bolt_rounded,
+                        color: SpeakColors.accent,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -106,7 +115,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'Built from your 15 most recent practice sessions.',
+                            'Built from your 20 most recent Course + Practice sessions.',
                             style: DesignTokens.body(
                               12,
                             ).copyWith(color: SpeakColors.inkSoft),
@@ -117,7 +126,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                SpeakProgressBar(value: sessions.length / 10),
+                SpeakProgressBar(value: (sessions.length / 20).clamp(0.0, 1.0)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -134,6 +143,16 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  plan.focusLabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    12,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: SpeakColors.inkSoft),
+                ),
                 const SizedBox(height: 16),
                 SpeakPrimaryButton(
                   label: 'Start review',
@@ -141,10 +160,8 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                   onTap: canStart
                       ? () => AppRouter.push(
                           context,
-                          (_) => SpeakReviewLaunchScreen(
-                            mode: _mode,
-                            sessions: sessions,
-                          ),
+                          (_) =>
+                              SpeakReviewLaunchScreen(mode: _mode, plan: plan),
                           fullscreenDialog: true,
                         )
                       : null,
@@ -246,12 +263,14 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
     SpeakReviewMode.reading => 'Reading',
+    SpeakReviewMode.writing => 'Writing',
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
     SpeakReviewMode.reading => Icons.menu_book_rounded,
+    SpeakReviewMode.writing => Icons.edit_rounded,
   };
 }
 
@@ -418,17 +437,17 @@ class _SavedSpeakingTranscriptScreenState
   }
 }
 
-/// Generates the selected review format from completed-session summaries,
+/// Generates the selected review format from the universal learner snapshot,
 /// then hands off to the same lesson screens used everywhere else.
 class SpeakReviewLaunchScreen extends ConsumerStatefulWidget {
   const SpeakReviewLaunchScreen({
     super.key,
     required this.mode,
-    required this.sessions,
+    required this.plan,
   });
 
   final SpeakReviewMode mode;
-  final List<ReviewSessionSummary> sessions;
+  final PersonalizedReviewPlan plan;
 
   @override
   ConsumerState<SpeakReviewLaunchScreen> createState() =>
@@ -469,6 +488,17 @@ class _SpeakReviewLaunchScreenState
             (_) => StoryReaderScreen(story: story),
             fullscreenDialog: true,
           );
+        case SpeakReviewMode.writing:
+          if (!mounted) return;
+          await AppRouter.push(
+            context,
+            (_) => WritingLabScreen(
+              autoStart: true,
+              topic: widget.plan.topic,
+              contextPrompt: widget.plan.contextPrompt,
+            ),
+            fullscreenDialog: true,
+          );
       }
       if (mounted) Navigator.of(context).pop();
     } catch (error, stackTrace) {
@@ -485,7 +515,7 @@ class _SpeakReviewLaunchScreenState
   Future<GeneratedStory> _generateStory({required bool listening}) async {
     final profile = ref.read(learningStoreProvider).profile();
     final level = _levelFor(profile.level);
-    final topic = _reviewTopic();
+    final topic = widget.plan.topic;
     final existingStories = ref.read(generatedStoryStoreProvider).list();
     final avoidTitles = existingStories.map((story) => story.title);
     final avoidOpenings = existingStories.map(
@@ -496,12 +526,14 @@ class _SpeakReviewLaunchScreenState
         ? await LessonAgentService.shared.buildListeningStoryBook(
             topic: topic,
             levelBand: level,
+            contextPrompt: widget.plan.contextPrompt,
             avoidTitles: avoidTitles,
             avoidOpenings: avoidOpenings,
           )
         : await LessonAgentService.shared.buildReadingStoryBook(
             topic: topic,
             levelBand: level,
+            contextPrompt: widget.plan.contextPrompt,
             avoidTitles: avoidTitles,
             avoidOpenings: avoidOpenings,
           );
@@ -554,12 +586,7 @@ class _SpeakReviewLaunchScreenState
   }
 
   String _reviewTopic() {
-    final profile = ref.read(learningStoreProvider).profile();
-    return ReviewMaterialService.modePrompt(
-      _modeLabel(widget.mode),
-      widget.sessions,
-      level: _levelFor(profile.level),
-    );
+    return widget.plan.contextPrompt;
   }
 
   Future<void> _startSpeakingReview() async {
@@ -571,7 +598,7 @@ class _SpeakReviewLaunchScreenState
         autoStart: true,
         request: SpeakingPracticeRequest(
           mode: SpeakingMode.roleplay,
-          topic: 'Recent conversations',
+          topic: widget.plan.topic,
           level: level,
           goal: 'Fluency',
           stage: 'speaking',
@@ -650,7 +677,7 @@ SPEAKING REVIEW CONTRACT
                       const SizedBox(height: 8),
                       Text(
                         _error == null
-                            ? 'Your recent session summaries are being woven into a fresh lesson.'
+                            ? 'Hard spots and recent language are being woven into a fresh lesson.'
                             : 'Your recent practice is still safe. You can retry this review.',
                         style: DesignTokens.body(
                           13,
@@ -682,11 +709,13 @@ SPEAKING REVIEW CONTRACT
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
     SpeakReviewMode.reading => 'Reading',
+    SpeakReviewMode.writing => 'Writing',
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
     SpeakReviewMode.reading => Icons.menu_book_rounded,
+    SpeakReviewMode.writing => Icons.edit_rounded,
   };
 }

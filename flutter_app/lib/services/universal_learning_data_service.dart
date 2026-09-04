@@ -279,7 +279,7 @@ abstract final class UniversalLearningDataService {
       '''SELECT id, started_at, ended_at, summary, topic, content_key, stage,
                 vocabulary
          FROM sessions
-         WHERE deleted_at IS NULL
+         WHERE deleted_at IS NULL AND ended_at IS NOT NULL
          ORDER BY COALESCE(ended_at, started_at) DESC
          LIMIT ?''',
       [sessionLimit],

@@ -7,6 +7,7 @@ import 'package:french_tutor/data/database/adaptive_course_store.dart';
 import 'package:french_tutor/data/database/learning_store.dart';
 import 'package:french_tutor/data/database/storage_service.dart';
 import 'package:french_tutor/models/session.dart';
+import 'package:french_tutor/services/review_material_service.dart';
 import 'package:french_tutor/services/universal_learning_data_service.dart';
 
 void main() {
@@ -136,4 +137,65 @@ void main() {
     expect(reloaded?.targetPhrases, contains('Je travaille dans le marketing'));
     expect(reloaded?.sourceSessionIds, contains('practice-source'));
   });
+
+  test(
+    'Review plan prioritizes hard material and supports every output mode',
+    () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+
+      final learning = LearningStore(db);
+      final profile = learning.profile()
+        ..goal = 'tef_canada'
+        ..level = 'a2';
+      learning.saveProfile(profile);
+
+      final storage = StorageService(db);
+      storage.saveSession(
+        Session(
+          id: 'review-source',
+          startedAt: '2026-09-03T10:00:00.000Z',
+          endedAt: '2026-09-03T10:10:00.000Z',
+          summary: 'Practised asking for help at work.',
+          topic: 'Work',
+          stage: 'speaking',
+          vocabulary: ['Je voudrais de l’aide'],
+        ),
+      );
+      storage.saveMessage(
+        sessionId: 'review-source',
+        role: 'user',
+        content: 'Je voudrais de l’aide, mais je cherche le bon mot.',
+      );
+      learning.saveSubmission(
+        taskId: 'review-writing',
+        text: 'Je voudrais demander de l’aide.',
+        feedback: 'Check the article agreement in the next sentence.',
+      );
+      learning.logMistake(
+        tag: 'article-agreement',
+        description: 'Review masculine and feminine nouns.',
+      );
+
+      final plan = ReviewMaterialService.buildPersonalizedPlan(
+        db: db,
+        profile: profile,
+        mode: 'writing',
+      );
+
+      expect(plan.mode, 'writing');
+      expect(plan.levelBand, 'A2');
+      expect(plan.topic, 'Work');
+      expect(
+        plan.hardSignals,
+        contains('article-agreement: Review masculine and feminine nouns.'),
+      );
+      expect(plan.retrievalTargets, contains('Je voudrais de l’aide'));
+      expect(plan.sourceSessionIds, contains('review-source'));
+      expect(plan.contextPrompt, contains('60% retrieval'));
+      expect(plan.contextPrompt, contains('40% controlled novelty'));
+      expect(plan.contextPrompt, contains('Learner transcript excerpts'));
+      expect(plan.contextPrompt, contains('Writing evidence'));
+    },
+  );
 }

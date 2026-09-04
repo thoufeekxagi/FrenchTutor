@@ -1484,6 +1484,7 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
     required String levelBand,
     String? examName,
     String? examLevel,
+    String? contextPrompt,
     Iterable<String> avoidTitles = const [],
     Iterable<String> avoidOpenings = const [],
   }) async {
@@ -1511,6 +1512,13 @@ The topic is the primary semantic anchor for the story's concrete place, objects
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it as the primary semantic anchor for the concrete place, objects, action, and cover_prompt. It need not appear in every sentence, but do not drift to an unrelated premise; create a new story, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
 $examBlock
+${contextPrompt == null || contextPrompt.trim().isEmpty ? '' : '''
+PERSONALIZED LEARNER CONTEXT:
+$contextPrompt
+Use this context to select what to retrieve and how to make the story slightly
+harder. Do not mention the context, source ids, or the learner's mistakes in
+the story; teach through a natural new situation.
+'''}
 ''';
     return _buildUniqueStoryBook(
       system: system + languageGuardrail,
@@ -1524,6 +1532,7 @@ $examBlock
           '${examName == null ? '' : 'EXAM: $examName\n'}'
           'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
           'A human character is optional; the story may follow an object, animal, place, or natural moment.\n'
+          '${contextPrompt == null || contextPrompt.trim().isEmpty ? '' : 'PERSONALIZED CONTEXT: $contextPrompt\n'}'
           '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
     );
   }
@@ -1778,6 +1787,7 @@ ${surpriseMode ? 'Choose a fresh ordinary everyday premise yourself.' : 'Keep th
     String? examName,
     String? examLevel,
     String? audioFormat,
+    String? contextPrompt,
     Iterable<String> avoidTitles = const [],
     Iterable<String> avoidOpenings = const [],
   }) async {
@@ -1821,6 +1831,13 @@ Keep it wholesome and appropriate for teens and adults. The selected topic is th
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it as the primary semantic anchor for the audio story's concrete place, objects, action, and cover_prompt. It need not appear in every sentence, but do not drift to an unrelated premise or visual setting; create a new listening lesson, not a rewrite or continuation of any previous lesson.'''}
 ${_cefrCalibration(levelBand)}
 $examBlock
+${contextPrompt == null || contextPrompt.trim().isEmpty ? '' : '''
+PERSONALIZED LEARNER CONTEXT:
+$contextPrompt
+Use this context to select what to retrieve and how to make the audio slightly
+harder. Do not mention the context, source ids, or the learner's mistakes in
+the audio; teach through a natural new situation.
+'''}
 ''';
     return _buildUniqueStoryBook(
       system: system + languageGuardrail,
@@ -1833,6 +1850,7 @@ $examBlock
           '${surpriseMode ? 'MODE: SURPRISE ME — no topic supplied' : 'TOPIC (primary story anchor): $topic'}\nLEVEL: $levelBand\n'
           '${examName == null ? '' : 'EXAM: $examName\n'}'
           'SURPRISE SEED: $seed. Build the premise, setting, object, and small turn around this seed.\n'
+          '${contextPrompt == null || contextPrompt.trim().isEmpty ? '' : 'PERSONALIZED CONTEXT: $contextPrompt\n'}'
           '$exclusion\n$retryInstruction\nREQUEST NONCE: $nonce',
     );
   }
