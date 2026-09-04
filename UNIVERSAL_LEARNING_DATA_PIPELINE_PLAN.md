@@ -1,6 +1,6 @@
 # Universal Learning Data Pipeline and Personalized Course Plan
 
-Status: planning document only. No implementation is included here.
+Status: implementation plan plus the first adaptive Course vertical slice.
 
 This document defines the replacement for the legacy Course path. It is intentionally separate from orchestration work. The product does not need a complicated orchestration layer to teach French well. It needs one reliable learning history, one recent learner snapshot, and one lesson builder that uses the teaching engines already used by Practice.
 
