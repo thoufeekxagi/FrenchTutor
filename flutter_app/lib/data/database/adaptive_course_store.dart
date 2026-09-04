@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
 import '../../services/adaptive_curriculum_service.dart';
+import '../../services/universal_learning_data_service.dart';
 import 'app_migrations.dart';
 
 const _adaptiveUuid = Uuid();
@@ -40,6 +41,8 @@ class AdaptiveCourseSessionSpec {
     required this.grammarFocus,
     required this.successCriteria,
     required this.estimatedMinutes,
+    this.targetPhrases = const [],
+    this.sourceSessionIds = const [],
     required this.profileFingerprint,
     required this.status,
     required this.createdAt,
@@ -62,6 +65,8 @@ class AdaptiveCourseSessionSpec {
   final List<String> grammarFocus;
   final List<String> successCriteria;
   final int estimatedMinutes;
+  final List<String> targetPhrases;
+  final List<String> sourceSessionIds;
   final String profileFingerprint;
   final String status; // planned | active | completed | replaced
   final DateTime createdAt;
@@ -74,6 +79,13 @@ class AdaptiveCourseSessionSpec {
 
   /// One-based position within the current twenty-session block.
   int get blockPosition => ((sequence - 1) % adaptiveCourseBlockSize) + 1;
+
+  String get targetPhrasePrompt => targetPhrases.isEmpty
+      ? 'Choose from the competency.'
+      : targetPhrases.join('; ');
+
+  String get learningMix =>
+      'Reuse recent learner language for about 60% of the session and add about 40% new language.';
 
   /// The learner-facing phase of the shared course route. Keeping this on the
   /// stable session specification lets Course, Home, Practice, and Speaking
@@ -102,6 +114,8 @@ Situation: $context
 Primary skill: ${primarySkill.label}
 Supporting skills: ${supportingSkills.map((skill) => skill.label).join(', ')}
 Learning phase: $learningPhase
+Learning mix: $learningMix
+Target phrases: $targetPhrasePrompt
 Grammar focus: ${grammarFocus.isEmpty ? 'Choose only what supports the competency.' : grammarFocus.join(', ')}
 Session length: $estimatedMinutes minutes
 
@@ -115,6 +129,8 @@ GENERATION RULES
 - Explain one idea at a time in one or two short sentences. Never place a long plan, goal, audience, or context paragraph in a heading.
 - Show examples before asking the learner to produce language; keep each example short enough to scan on a phone.
 - Keep stories, quizzes, vocabulary, roleplays, writing tasks, speaking prompts, and cover art coherent with this situation.
+- Reuse the target phrases across more than one activity, then add one small new challenge.
+- Follow the learning mix above. Repetition must be retrieval and use, not a copied explanation or identical question.
 - Do not repeat a previous scene or invent unrelated topics.
 ''';
 
@@ -123,6 +139,8 @@ GENERATION RULES
     String? profileFingerprint,
     String? status,
     DateTime? completedAt,
+    List<String>? targetPhrases,
+    List<String>? sourceSessionIds,
   }) {
     return AdaptiveCourseSessionSpec(
       id: id,
@@ -141,6 +159,8 @@ GENERATION RULES
       grammarFocus: grammarFocus,
       successCriteria: successCriteria,
       estimatedMinutes: estimatedMinutes,
+      targetPhrases: targetPhrases ?? this.targetPhrases,
+      sourceSessionIds: sourceSessionIds ?? this.sourceSessionIds,
       profileFingerprint: profileFingerprint ?? this.profileFingerprint,
       status: status ?? this.status,
       createdAt: createdAt,
@@ -187,6 +207,7 @@ class AdaptiveCoursePlanSnapshot {
 class AdaptiveCourseStore {
   AdaptiveCourseStore(this._db, {this._onPlanChanged, this._onSessionChanged}) {
     runAppMigrations(_db);
+    _ensureLearningEvidenceColumns();
   }
 
   final CommonDatabase _db;
@@ -200,8 +221,28 @@ class AdaptiveCourseStore {
   // learner wait for rich lesson generation when they finish a block.
   static const replanThreshold = 5;
 
+  /// Older local databases may have been opened before the adaptive target
+  /// columns existed. Keep this additive compatibility check next to the
+  /// store so Course remains readable while the Supabase migration rolls out.
+  void _ensureLearningEvidenceColumns() {
+    final columns = _db.select('PRAGMA table_info(adaptive_course_sessions)');
+    if (columns.isEmpty) return;
+    final names = columns.map((row) => row['name']).toSet();
+    if (!names.contains('target_phrases_json')) {
+      _db.execute(
+        "ALTER TABLE adaptive_course_sessions ADD COLUMN target_phrases_json TEXT NOT NULL DEFAULT '[]'",
+      );
+    }
+    if (!names.contains('source_session_ids_json')) {
+      _db.execute(
+        "ALTER TABLE adaptive_course_sessions ADD COLUMN source_session_ids_json TEXT NOT NULL DEFAULT '[]'",
+      );
+    }
+  }
+
   AdaptiveCoursePlanSnapshot ensureCurrentPlan(Profile profile) {
-    final fingerprint = adaptiveProfileFingerprint(profile);
+    final snapshot = UniversalLearningDataService.buildSnapshot(_db, profile);
+    final fingerprint = adaptiveProfileFingerprint(profile, snapshot: snapshot);
     final active = _activePlanRow();
     if (active != null && active['profile_fingerprint'] == fingerprint) {
       final plan = _snapshotFromPlanRow(active);
@@ -210,6 +251,7 @@ class AdaptiveCourseStore {
         profile: profile,
         profileFingerprint: fingerprint,
         minimumSequence: initialBatchSize,
+        snapshot: snapshot,
       );
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
@@ -224,6 +266,7 @@ class AdaptiveCourseStore {
           profileFingerprint: fingerprint,
           startSequence: _nextSequence(reconciled.sessions),
           batchSize: initialBatchSize,
+          snapshot: snapshot,
         );
         final expanded = _snapshotForPlan(reconciled.id);
         _notifyPlan(expanded);
@@ -237,11 +280,13 @@ class AdaptiveCourseStore {
       profileFingerprint: fingerprint,
       previousPlanId: active?['id']?.toString(),
       nextVersion: ((active?['version'] as int?) ?? 0) + 1,
+      snapshot: snapshot,
     );
   }
 
   AdaptiveCoursePlanSnapshot? currentPlan(Profile profile) {
-    final fingerprint = adaptiveProfileFingerprint(profile);
+    final snapshot = UniversalLearningDataService.buildSnapshot(_db, profile);
+    final fingerprint = adaptiveProfileFingerprint(profile, snapshot: snapshot);
     final row = _activePlanRow();
     if (row == null || row['profile_fingerprint'] != fingerprint) return null;
     return _snapshotFromPlanRow(row);
@@ -323,19 +368,25 @@ class AdaptiveCourseStore {
     if (session != null) _notifySession(session);
   }
 
-  static String adaptiveProfileFingerprint(Profile profile) {
+  static String adaptiveProfileFingerprint(
+    Profile profile, {
+    UniversalLearningSnapshot? snapshot,
+  }) {
     final interests =
         profile.interests
             .map((value) => value.trim().toLowerCase())
             .where((value) => value.isNotEmpty)
             .toList()
           ..sort();
-    return [
+    final profileFingerprint = [
       profile.goal.trim().toLowerCase(),
       SpeakCurriculumLevel.normalise(profile.level),
       profile.sessionLength,
       interests.join(','),
     ].join('|');
+    return snapshot == null
+        ? profileFingerprint
+        : profileFingerprint + '|learning:' + snapshot.fingerprint;
   }
 
   AdaptiveCoursePlanSnapshot _createPlan({
@@ -343,6 +394,7 @@ class AdaptiveCourseStore {
     required String profileFingerprint,
     required String? previousPlanId,
     required int nextVersion,
+    required UniversalLearningSnapshot snapshot,
   }) {
     final planId = _adaptiveUuid.v4();
     final now = _now();
@@ -399,6 +451,7 @@ class AdaptiveCourseStore {
       profile: profile,
       profileFingerprint: profileFingerprint,
       minimumSequence: initialBatchSize,
+      snapshot: snapshot,
     );
     final repaired = _snapshotForPlan(planId);
     _appendBatch(
@@ -407,10 +460,11 @@ class AdaptiveCourseStore {
       profileFingerprint: profileFingerprint,
       startSequence: _nextSequence(repaired.sessions),
       batchSize: initialBatchSize,
+      snapshot: snapshot,
     );
-    final snapshot = _snapshotForPlan(planId);
-    _notifyPlan(snapshot);
-    return snapshot;
+    final planSnapshot = _snapshotForPlan(planId);
+    _notifyPlan(planSnapshot);
+    return planSnapshot;
   }
 
   /// Reconnects a locally rebuilt plan to course completions restored through
@@ -448,6 +502,7 @@ class AdaptiveCourseStore {
     required Profile profile,
     required String profileFingerprint,
     required int minimumSequence,
+    required UniversalLearningSnapshot snapshot,
   }) {
     final existing = _sessionsForPlan(planId);
     if (existing.isEmpty) return false;
@@ -464,6 +519,7 @@ class AdaptiveCourseStore {
       profileFingerprint: profileFingerprint,
       startSequence: 1,
       count: target,
+      learningSnapshot: snapshot,
     );
     var repaired = false;
     for (final session in generated) {
@@ -523,6 +579,10 @@ class AdaptiveCourseStore {
         current.successCriteria.join('|') !=
             replacement.successCriteria.join('|') ||
         current.estimatedMinutes != replacement.estimatedMinutes ||
+        current.targetPhrases.join('|') !=
+            replacement.targetPhrases.join('|') ||
+        current.sourceSessionIds.join('|') !=
+            replacement.sourceSessionIds.join('|') ||
         current.profileFingerprint != profileFingerprint;
   }
 
@@ -537,6 +597,7 @@ class AdaptiveCourseStore {
              competency = ?, context = ?, primary_skill = ?,
              supporting_skills_json = ?, grammar_focus_json = ?,
              success_criteria_json = ?, estimated_minutes = ?,
+             target_phrases_json = ?, source_session_ids_json = ?,
              profile_fingerprint = ?, updated_at = ?
          WHERE id = ? AND status NOT IN ('completed', 'replaced')
            AND deleted_at IS NULL''',
@@ -555,6 +616,8 @@ class AdaptiveCourseStore {
         jsonEncode(replacement.grammarFocus),
         jsonEncode(replacement.successCriteria),
         replacement.estimatedMinutes,
+        jsonEncode(replacement.targetPhrases),
+        jsonEncode(replacement.sourceSessionIds),
         profileFingerprint,
         _now(),
         current.id,
@@ -568,6 +631,7 @@ class AdaptiveCourseStore {
     required String profileFingerprint,
     required int startSequence,
     required int batchSize,
+    required UniversalLearningSnapshot snapshot,
   }) {
     final existingSequences = _sessionsForPlan(
       planId,
@@ -578,6 +642,7 @@ class AdaptiveCourseStore {
       profileFingerprint: profileFingerprint,
       startSequence: startSequence,
       count: batchSize,
+      learningSnapshot: snapshot,
     );
     for (final session in generated) {
       if (!existingSequences.contains(session.sequence)) {
@@ -659,8 +724,9 @@ class AdaptiveCourseStore {
         (id, plan_id, content_key, sequence, level, unit, unit_title, title,
          subtitle, competency, context, primary_skill, supporting_skills_json,
          grammar_focus_json, success_criteria_json, estimated_minutes,
-         profile_fingerprint, status, created_at, updated_at, completed_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+         target_phrases_json, source_session_ids_json, profile_fingerprint,
+         status, created_at, updated_at, completed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         id ?? session.id,
         planId,
@@ -680,6 +746,8 @@ class AdaptiveCourseStore {
         jsonEncode(session.grammarFocus),
         jsonEncode(session.successCriteria),
         session.estimatedMinutes,
+        jsonEncode(session.targetPhrases),
+        jsonEncode(session.sourceSessionIds),
         profileFingerprint,
         session.status,
         session.createdAt.toUtc().toIso8601String(),
@@ -719,6 +787,12 @@ class AdaptiveCourseStore {
         row['success_criteria_json'],
       ).map((e) => e.toString()).toList(growable: false),
       estimatedMinutes: row['estimated_minutes'] as int,
+      targetPhrases: decodeList(
+        row['target_phrases_json'],
+      ).map((e) => e.toString()).toList(growable: false),
+      sourceSessionIds: decodeList(
+        row['source_session_ids_json'],
+      ).map((e) => e.toString()).toList(growable: false),
       profileFingerprint: row['profile_fingerprint'] as String,
       status: row['status'] as String,
       createdAt: DateTime.parse(row['created_at'] as String),
@@ -787,9 +861,10 @@ class AdaptiveCourseStore {
          (id, user_id, plan_id, content_key, sequence, level, unit, unit_title,
           title, subtitle, competency, context, primary_skill,
           supporting_skills_json, grammar_focus_json, success_criteria_json,
-          estimated_minutes, profile_fingerprint, status, created_at,
-          updated_at, completed_at, deleted_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          estimated_minutes, target_phrases_json, source_session_ids_json,
+          profile_fingerprint, status, created_at, updated_at, completed_at,
+          deleted_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            user_id = excluded.user_id,
            plan_id = excluded.plan_id,
@@ -807,6 +882,8 @@ class AdaptiveCourseStore {
            grammar_focus_json = excluded.grammar_focus_json,
            success_criteria_json = excluded.success_criteria_json,
            estimated_minutes = excluded.estimated_minutes,
+           target_phrases_json = excluded.target_phrases_json,
+           source_session_ids_json = excluded.source_session_ids_json,
            profile_fingerprint = excluded.profile_fingerprint,
            status = excluded.status,
            updated_at = excluded.updated_at,
@@ -831,6 +908,8 @@ class AdaptiveCourseStore {
         jsonText(row['grammar_focus_json']),
         jsonText(row['success_criteria_json']),
         row['estimated_minutes'],
+        jsonText(row['target_phrases_json']),
+        jsonText(row['source_session_ids_json']),
         row['profile_fingerprint'],
         row['status'],
         row['created_at'],
@@ -863,11 +942,29 @@ abstract final class AdaptiveCoursePlanGenerator {
     required String profileFingerprint,
     required int startSequence,
     required int count,
+    UniversalLearningSnapshot? learningSnapshot,
   }) {
     final track = AdaptiveCurriculumService.forProfile(profile);
     final level = SpeakCurriculumLevel.normalise(profile.level);
     final interest = AdaptiveCurriculumService.relevantInterest(profile);
-    final focusSkills = AdaptiveCurriculumService.focusSkills(profile);
+    final recentFocusSkills =
+        learningSnapshot?.recentSkills
+            .where(
+              (skill) => const {
+                SpeakSkill.speaking,
+                SpeakSkill.listening,
+                SpeakSkill.reading,
+                SpeakSkill.writing,
+                SpeakSkill.grammar,
+                SpeakSkill.vocabulary,
+                SpeakSkill.review,
+              }.contains(skill),
+            )
+            .toList(growable: false) ??
+        const <SpeakSkill>[];
+    final focusSkills = recentFocusSkills.isEmpty
+        ? AdaptiveCurriculumService.focusSkills(profile)
+        : recentFocusSkills;
     final templates = _templatesFor(profile.goal);
     final unitThemes = _unitThemesFor(profile.goal);
     final sessions = <AdaptiveCourseSessionSpec>[];
@@ -897,6 +994,27 @@ abstract final class AdaptiveCoursePlanGenerator {
           : interest == null
           ? baseContext
           : '$baseContext with a light connection to $interest';
+      final personalizedContext =
+          learningSnapshot?.contextForLesson(
+            sequence: sequence,
+            baseContext: context,
+          ) ??
+          context;
+      final targetPhrases =
+          learningSnapshot?.targetsForLesson(
+            sequence: sequence,
+            fallback: template.grammar,
+          ) ??
+          template.grammar;
+      final supportingSkills = <SpeakSkill>[...template.supporting];
+      for (final practicedSkill
+          in learningSnapshot?.recentSkills ?? const <SpeakSkill>[]) {
+        if (practicedSkill != template.primary &&
+            !supportingSkills.contains(practicedSkill) &&
+            supportingSkills.length < 3) {
+          supportingSkills.add(practicedSkill);
+        }
+      }
       final unit = ((sequence - 1) ~/ 5) + 1;
       final unitTheme = unitThemes[(unit - 1) % unitThemes.length];
       final title = template.verb;
@@ -918,12 +1036,18 @@ abstract final class AdaptiveCoursePlanGenerator {
           title: title,
           subtitle: subtitle,
           competency: template.competency,
-          context: context,
+          context: personalizedContext,
           primarySkill: template.primary,
-          supportingSkills: template.supporting,
+          supportingSkills: supportingSkills,
           grammarFocus: template.grammar,
           successCriteria: template.success,
           estimatedMinutes: _minutes(profile.sessionLength, template.primary),
+          targetPhrases: targetPhrases,
+          sourceSessionIds:
+              learningSnapshot?.sourceSessionIds
+                  .take(12)
+                  .toList(growable: false) ??
+              const <String>[],
           profileFingerprint: profileFingerprint,
           status: 'planned',
           createdAt: DateTime.now(),

@@ -208,9 +208,9 @@ class _SpeakCourseSessionScreenState
       SpeakSkill.alphabet => AlphabetLabScreen(deckId: _alphabetDeckId),
       SpeakSkill.connectors => const ConnectorsLabScreen(),
       SpeakSkill.liaison => const LiaisonLabScreen(),
-      SpeakSkill.grammar => GrammarLabScreen(topic: _activityTopic),
-      SpeakSkill.listening => ListeningLabScreen(topic: _activityTopic),
-      SpeakSkill.reading => ReadingLibraryScreen(topic: _activityTopic),
+      SpeakSkill.grammar => GrammarLabScreen(topic: contextPrompt),
+      SpeakSkill.listening => ListeningLabScreen(topic: contextPrompt),
+      SpeakSkill.reading => ReadingLibraryScreen(topic: contextPrompt),
       SpeakSkill.writing => WritingLabScreen(
         topic: _activityTopic,
         contextPrompt: contextPrompt,

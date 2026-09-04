@@ -174,6 +174,8 @@ class SyncService {
                         'grammar_focus_json': session.grammarFocus,
                         'success_criteria_json': session.successCriteria,
                         'estimated_minutes': session.estimatedMinutes,
+                        'target_phrases_json': session.targetPhrases,
+                        'source_session_ids_json': session.sourceSessionIds,
                         'profile_fingerprint': session.profileFingerprint,
                         'status': session.status,
                         'created_at': session.createdAt
@@ -216,6 +218,8 @@ class SyncService {
             'grammar_focus_json': session.grammarFocus,
             'success_criteria_json': session.successCriteria,
             'estimated_minutes': session.estimatedMinutes,
+            'target_phrases_json': session.targetPhrases,
+            'source_session_ids_json': session.sourceSessionIds,
             'profile_fingerprint': session.profileFingerprint,
             'status': session.status,
             'created_at': session.createdAt.toUtc().toIso8601String(),

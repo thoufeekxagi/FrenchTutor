@@ -116,6 +116,7 @@ abstract final class SpeakRoadmapService {
           estimatedMinutes: spec.estimatedMinutes,
           primarySkill: spec.primarySkill,
           supportingSkills: spec.supportingSkills,
+          targetPhrases: spec.targetPhrases,
           contextPrompt: spec.contextPrompt,
         ),
       );
