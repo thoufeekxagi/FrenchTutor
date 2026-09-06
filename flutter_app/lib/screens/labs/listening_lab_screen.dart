@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
+import '../../services/course_artifact_codec.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
 import '../../services/audio_container_utils.dart';
@@ -149,15 +151,49 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   void _loadStories() {
     if (!mounted) return;
     if (widget.examMode) return;
-    final store = ref.read(generatedStoryStoreProvider);
-    final stories = store.list(
-      practiceMode: widget.readingMode ? 'reading' : 'listening',
-    );
+    final stories = _visibleStories();
     setState(() => _stories = stories);
     if (!widget.readingMode) {
       _prefetchRecentAudio(stories);
       _repairNewestMissingCover(stories);
     }
+  }
+
+  /// Course and Practice share one lesson object. Course owns its frozen
+  /// sequence, while this library simply projects every complete Listening
+  /// artifact alongside independently generated Listening lessons.
+  List<GeneratedStory> _visibleStories() {
+    final store = ref.read(generatedStoryStoreProvider);
+    final saved = store.list(
+      practiceMode: widget.readingMode ? 'reading' : 'listening',
+    );
+    if (widget.readingMode) return saved;
+
+    final profile = ref.read(learningStoreProvider).profile();
+    final plan = ref.read(adaptiveCourseStoreProvider).currentPlan(profile);
+    if (plan == null) return saved;
+    final course = <GeneratedStory>[];
+    for (final session in plan.sessions) {
+      if (session.primarySkill != SpeakSkill.listening ||
+          !session.isContentReady ||
+          session.artifact == null) {
+        continue;
+      }
+      try {
+        course.add(CourseArtifactCodec.listening(session.artifact!));
+      } catch (error) {
+        debugPrint(
+          'Listening library skipped incomplete course lesson '
+          '${session.contentKey}: $error',
+        );
+      }
+    }
+    final seen = <String>{};
+    final result = <GeneratedStory>[];
+    for (final story in [...course.reversed, ...saved]) {
+      if (seen.add(story.id)) result.add(story);
+    }
+    return result;
   }
 
   void _prefetchRecentAudio(List<GeneratedStory> stories) {
@@ -166,6 +202,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     RecentLessonWarmupService.shared.warm(
       stories: stories,
       sync: ref.read(syncServiceProvider),
+      storyStore: ref.read(generatedStoryStoreProvider),
     );
   }
 
@@ -188,7 +225,11 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
   Future<void> _refreshStories() async {
     if (widget.examMode) return;
     try {
-      await ref.read(syncServiceProvider).hydrateGeneratedStories();
+      final sync = ref.read(syncServiceProvider);
+      await Future.wait([
+        sync.hydrateGeneratedStories(),
+        sync.hydrateAdaptiveCourses(),
+      ]);
     } catch (error, stackTrace) {
       debugPrint('Listening story hydration failed: $error\n$stackTrace');
     }
@@ -1058,57 +1099,62 @@ class _ListeningChoiceSheet extends StatelessWidget {
           color: DesignTokens.nightSurface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Center(
-              child: Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: DesignTokens.nightHairline,
-                  borderRadius: BorderRadius.circular(4),
+        // The sheet paints a decorated surface behind these tiles. A local
+        // transparent Material prevents ListTile's ink assertion/warning.
+        child: Material(
+          color: Colors.transparent,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.nightHairline,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              style: DesignTokens.display(
-                22,
-              ).copyWith(color: DesignTokens.nightText),
-            ),
-            const SizedBox(height: 12),
-            for (final option in options)
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-                leading: Icon(
-                  option.icon,
-                  color: option.value == selected
-                      ? accent
-                      : DesignTokens.nightMuted,
-                ),
-                title: Text(
-                  option.label,
-                  style: DesignTokens.body(15, weight: FontWeight.w700)
-                      .copyWith(
-                        color: option.value == selected
-                            ? accent
-                            : DesignTokens.nightText,
-                      ),
-                ),
-                subtitle: Text(
-                  option.detail,
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.nightMuted),
-                ),
-                trailing: option.value == selected
-                    ? Icon(CupertinoIcons.checkmark, color: accent)
-                    : null,
-                onTap: () => Navigator.pop(context, option.value),
+              const SizedBox(height: 18),
+              Text(
+                title,
+                style: DesignTokens.display(
+                  22,
+                ).copyWith(color: DesignTokens.nightText),
               ),
-          ],
+              const SizedBox(height: 12),
+              for (final option in options)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  leading: Icon(
+                    option.icon,
+                    color: option.value == selected
+                        ? accent
+                        : DesignTokens.nightMuted,
+                  ),
+                  title: Text(
+                    option.label,
+                    style: DesignTokens.body(15, weight: FontWeight.w700)
+                        .copyWith(
+                          color: option.value == selected
+                              ? accent
+                              : DesignTokens.nightText,
+                        ),
+                  ),
+                  subtitle: Text(
+                    option.detail,
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                  trailing: option.value == selected
+                      ? Icon(CupertinoIcons.checkmark, color: accent)
+                      : null,
+                  onTap: () => Navigator.pop(context, option.value),
+                ),
+            ],
+          ),
         ),
       ),
     );

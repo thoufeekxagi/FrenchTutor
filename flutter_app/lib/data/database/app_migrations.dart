@@ -100,6 +100,10 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   34: _migrationV34,
   35: _migrationV35,
   36: _migrationV36,
+  37: _migrationV37,
+  38: _migrationV38,
+  39: _migrationV39,
+  40: _migrationV40,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -999,6 +1003,59 @@ void _migrationV24(CommonDatabase db) {
   );
 }
 
+/// Connects a generated vocabulary artifact to exactly one Adaptive Course
+/// session and persists its five prepared sentence/story beats. Older library
+/// sets remain valid with no course owner and an empty example map.
+void _migrationV39(CommonDatabase db) {
+  if (!_tableExists(db, 'generated_vocabulary_sets')) return;
+  if (!_columnExists(db, 'generated_vocabulary_sets', 'course_session_id')) {
+    db.execute(
+      'ALTER TABLE generated_vocabulary_sets ADD COLUMN course_session_id TEXT',
+    );
+  }
+  if (!_columnExists(db, 'generated_vocabulary_sets', 'examples_json')) {
+    db.execute(
+      "ALTER TABLE generated_vocabulary_sets ADD COLUMN examples_json TEXT NOT NULL DEFAULT '{}'",
+    );
+  }
+  db.execute(
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_generated_vocabulary_course_session '
+    'ON generated_vocabulary_sets (course_session_id) '
+    'WHERE course_session_id IS NOT NULL AND deleted_at IS NULL',
+  );
+}
+
+/// Stores the complete prepared Course artifact and its durable generation
+/// state on the owning session. Foundation sessions are already deterministic
+/// and therefore ready; personalized sessions enter the server queue.
+void _migrationV40(CommonDatabase db) {
+  if (!_tableExists(db, 'adaptive_course_sessions')) return;
+  final additions = <String, String>{
+    'generation_status': "TEXT NOT NULL DEFAULT 'queued'",
+    'artifact_kind': 'TEXT',
+    'artifact_json': 'TEXT',
+    'generation_version': 'INTEGER NOT NULL DEFAULT 1',
+    'generation_attempts': 'INTEGER NOT NULL DEFAULT 0',
+    'generation_error': 'TEXT',
+  };
+  for (final entry in additions.entries) {
+    if (!_columnExists(db, 'adaptive_course_sessions', entry.key)) {
+      db.execute(
+        'ALTER TABLE adaptive_course_sessions ADD COLUMN ${entry.key} ${entry.value}',
+      );
+    }
+  }
+  db.execute(
+    "UPDATE adaptive_course_sessions SET generation_status = 'ready' "
+    'WHERE sequence <= 5',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_adaptive_course_generation '
+    'ON adaptive_course_sessions (generation_status, sequence) '
+    'WHERE deleted_at IS NULL',
+  );
+}
+
 /// Dedicated local history for exam-readiness practice. This is intentionally
 /// separate from the course-generated content tables so an exam attempt never
 /// appears in Reading or Listening libraries.
@@ -1273,5 +1330,62 @@ void _migrationV36(CommonDatabase db) {
   db.execute(
     'CREATE INDEX IF NOT EXISTS idx_writing_lessons_mode_level '
     'ON writing_lessons (mode, level_band, created_at)',
+  );
+}
+
+/// Personalized Grammar V2 reserves. The three practice modes share the
+/// frozen lesson shape, but each mode/tense pair has its own generated queue.
+void _migrationV37(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS grammar_v2_lessons (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      mode TEXT NOT NULL CHECK (mode IN ('guided', 'complete', 'roleplay')),
+      tense TEXT NOT NULL,
+      level_band TEXT NOT NULL,
+      title TEXT NOT NULL,
+      fingerprint TEXT NOT NULL,
+      lesson_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_grammar_v2_lessons_owner_fingerprint '
+    'ON grammar_v2_lessons (user_id, fingerprint)',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_grammar_v2_lessons_mode_tense_level '
+    'ON grammar_v2_lessons (user_id, mode, tense, level_band, created_at)',
+  );
+}
+
+/// One row per coherent Grammar session. Individual beats stay inside the
+/// JSON payload so the home can never turn them into a flat card library.
+void _migrationV38(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS grammar_course_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      source TEXT NOT NULL CHECK (source IN ('default', 'generated')),
+      mode TEXT NOT NULL CHECK (mode IN ('guided', 'complete', 'roleplay')),
+      tense TEXT NOT NULL,
+      level_band TEXT NOT NULL,
+      title TEXT NOT NULL,
+      fingerprint TEXT NOT NULL,
+      session_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_grammar_course_sessions_owner_fingerprint '
+    'ON grammar_course_sessions (user_id, fingerprint)',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_grammar_course_sessions_mode_tense_level '
+    'ON grammar_course_sessions (user_id, mode, tense, level_band, created_at)',
   );
 }

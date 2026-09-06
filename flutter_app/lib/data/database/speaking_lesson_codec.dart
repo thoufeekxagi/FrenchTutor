@@ -66,7 +66,10 @@ SpeakingCourseLesson speakingCourseLessonFromJson(Map<String, dynamic> json) {
     title: _requiredText(json['title'], 'title'),
     subtitle: _requiredText(json['subtitle'], 'subtitle'),
     level: _requiredText(json['level'], 'level'),
-    icon: speakingIconForMode(mode),
+    icon: speakingIconForText(
+      '${json['title'] ?? ''} ${json['subtitle'] ?? ''}',
+      fallback: speakingIconForMode(mode),
+    ),
     mode: mode,
     goal: json['goal']?.toString() ?? '',
     lines: rawLines
@@ -98,6 +101,36 @@ IconData speakingIconForMode(SpeakingCourseMode mode) => switch (mode) {
   SpeakingCourseMode.freeTalk => Icons.forum_outlined,
   SpeakingCourseMode.roleplay => Icons.theater_comedy_outlined,
 };
+
+IconData speakingIconForText(String rawText, {IconData? fallback}) {
+  final text = rawText.toLowerCase();
+  if (RegExp(r'café|cafe|coffee|restaurant|food|meal').hasMatch(text)) {
+    return Icons.local_cafe_outlined;
+  }
+  if (RegExp(r'marché|market|shop|shopping|magasin').hasMatch(text)) {
+    return Icons.shopping_basket_outlined;
+  }
+  if (RegExp(r'maison|home|house|logement|room').hasMatch(text)) {
+    return Icons.home_outlined;
+  }
+  if (RegExp(r'train|bus|voyage|travel|town|ville|direction').hasMatch(text)) {
+    return Icons.map_outlined;
+  }
+  if (RegExp(
+    r'matin|morning|routine|jour|day|week-end|weekend',
+  ).hasMatch(text)) {
+    return Icons.wb_sunny_outlined;
+  }
+  if (RegExp(r'travail|work|school|école|job').hasMatch(text)) {
+    return Icons.work_outline_rounded;
+  }
+  if (RegExp(
+    r'ami|friend|family|famille|name|nom|greet|bonjour',
+  ).hasMatch(text)) {
+    return Icons.people_outline_rounded;
+  }
+  return fallback ?? Icons.auto_awesome_rounded;
+}
 
 String speakingModeWireName(SpeakingCourseMode mode) => mode.name;
 
@@ -155,7 +188,13 @@ abstract final class SpeakingCourseLessonValidator {
           'Generated ${mode.name} line is missing French or English.',
         );
       }
-      final alignment = SpeakingTranslationAlignment.forPhrase(french, english);
+      // Generated lessons may contain natural paraphrases with no exact
+      // one-to-one word mapping. Preserve the playable line and any matches;
+      // the authored catalog remains validated with strict alignment.
+      final alignment = SpeakingTranslationAlignment.forGeneratedPhrase(
+        french,
+        english,
+      );
 
       final partnerFrench = segment.characterFr?.trim();
       final partnerEnglish = segment.characterEn?.trim();
@@ -169,7 +208,7 @@ abstract final class SpeakingCourseLessonValidator {
             'Generated ${mode.name} line is missing the tutor prompt.',
           );
         }
-        partnerAlignment = SpeakingTranslationAlignment.forPhrase(
+        partnerAlignment = SpeakingTranslationAlignment.forGeneratedPhrase(
           partnerFrench,
           partnerEnglish,
         );
@@ -224,7 +263,10 @@ abstract final class SpeakingCourseLessonValidator {
           : title),
       subtitle: 'A fresh $level conversation matched to your practice.',
       level: level,
-      icon: speakingIconForMode(mode),
+      icon: speakingIconForText(
+        '${passage.title} ${passage.titleEn ?? ''}',
+        fallback: speakingIconForMode(mode),
+      ),
       mode: mode,
       lines: lines,
     );

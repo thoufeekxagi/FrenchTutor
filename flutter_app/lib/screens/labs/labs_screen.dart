@@ -5,13 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../design/app_router.dart';
 import '../../providers/database_provider.dart';
-import '../../models/tutor_persona.dart';
 import '../../services/subscription_gate_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/web/web_layout.dart';
 import '../../widgets/web/web_practice_grid.dart';
 import '../../services/premium_access_gate.dart';
-import '../pathway/vocab_picker_screen.dart';
 import 'alphabet_lab_screen.dart';
 import 'connectors_lab_screen.dart';
 import 'grammar_lab_screen.dart';
@@ -62,7 +60,7 @@ class LabsScreen extends ConsumerWidget {
                           context,
                           ref: ref,
                           labId: 'vocabulary',
-                          builder: (_) => const VocabPickerScreen(),
+                          builder: (_) => const VocabLabScreen(),
                         ),
                       ),
                       const SizedBox(height: DesignTokens.space5),
@@ -96,19 +94,19 @@ class LabsScreen extends ConsumerWidget {
                         icon: CupertinoIcons.mic_fill,
                         title: 'Vocabulary',
                         subtitle:
-                            'Auto-pick or choose words, practice live with ${ActiveTutor.current.displayName}',
+                            'Choose a short set and practise objective flashcards',
                         locked: gate.isLabLocked('vocabulary'),
                         onTap: () => _open(
                           context,
                           ref: ref,
                           labId: 'vocabulary',
-                          builder: (_) => const VocabPickerScreen(),
+                          builder: (_) => const VocabLabScreen(),
                         ),
                       ),
                       _LabTile(
                         icon: CupertinoIcons.square_stack_3d_up,
                         title: 'Flashcards',
-                        subtitle: 'Browse by category, spaced repetition',
+                        subtitle: 'Choose a short set, spaced repetition',
                         locked: gate.isLabLocked('flashcards'),
                         onTap: () => _open(
                           context,
@@ -243,7 +241,7 @@ class LabsScreen extends ConsumerWidget {
           context,
           ref: ref,
           labId: 'vocabulary',
-          builder: (_) => const VocabPickerScreen(),
+          builder: (_) => const VocabLabScreen(),
         ),
       ),
       WebPracticeShortcut(
@@ -375,7 +373,7 @@ class _RecommendedPractice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Review six words from yesterday',
+      label: 'Practice today’s vocabulary',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,

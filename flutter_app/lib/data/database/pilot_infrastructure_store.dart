@@ -157,6 +157,9 @@ class PilotInfrastructureStore {
       'generated_writing_tasks',
       'generated_roleplays',
       'generated_vocabulary_sets',
+      'adaptive_course_plans',
+      'adaptive_course_sessions',
+      'onboarding_trial_adoption',
     };
     const operations = {'upsert', 'delete'};
     if (!tables.contains(tableName) || !operations.contains(operation)) {

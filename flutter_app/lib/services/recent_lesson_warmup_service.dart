@@ -1,37 +1,43 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
 import '../models/content_models.dart';
-import '../models/tutor_persona.dart';
-import 'gemini_live_audio_service.dart';
-import 'listening_audio_prefetch_cache.dart';
+import '../data/database/generated_story_store.dart';
+import 'lesson_asset_prefetch_service.dart';
 import 'sync_service.dart';
 
 /// Warms durable lesson assets after the library has rendered.
 ///
-/// This service deliberately reads only assets that already exist. It never
-/// starts generation, so opening a library cannot consume an LLM quota or
-/// compete with a lesson the learner is currently using.
+/// Existing local/Supabase assets are reused first. Missing starter assets
+/// are prepared through the same Gemini renderer used by the lesson itself,
+/// one lesson at a time, so background warming cannot create a quota burst.
 class RecentLessonWarmupService {
   RecentLessonWarmupService._();
 
   static final shared = RecentLessonWarmupService._();
 
   static const _maxStories = 15;
-  static const _maxConcurrent = 3;
+  // Each narration deck already uses a bounded three-item worker pool. Keep
+  // lesson-level work serial so five starter lessons cannot multiply that
+  // into a burst of sockets and hit Gemini's realtime quota.
+  static const _maxConcurrent = 1;
   final Set<String> _inFlight = <String>{};
 
   void warm({
     required List<GeneratedStory> stories,
     required SyncService sync,
+    GeneratedStoryStore? storyStore,
   }) {
     final selected = stories.take(_maxStories).toList(growable: false);
     if (selected.isEmpty) return;
-    unawaited(_warmQueue(selected, sync));
+    unawaited(_warmQueue(selected, sync, storyStore));
   }
 
   Future<void> _warmQueue(
     List<GeneratedStory> stories,
     SyncService sync,
+    GeneratedStoryStore? storyStore,
   ) async {
     var cursor = 0;
 
@@ -39,10 +45,16 @@ class RecentLessonWarmupService {
       while (true) {
         if (cursor >= stories.length) return;
         final story = stories[cursor++];
-        if (story.practiceMode == 'listening') {
-          await _warmListening(story, sync);
-        } else if (story.practiceMode == 'reading') {
-          await _warmReading(story);
+        try {
+          if (story.practiceMode == 'listening') {
+            await _warmListening(story, sync, storyStore);
+          } else if (story.practiceMode == 'reading') {
+            await _warmReading(story);
+          }
+        } catch (error) {
+          // Prefetch is an optimization. The opened screen can retry the same
+          // shared operation and show an actionable error if it still fails.
+          debugPrint('Lesson asset warm-up skipped for ${story.id}: $error');
         }
       }
     }
@@ -52,13 +64,18 @@ class RecentLessonWarmupService {
     );
   }
 
-  Future<void> _warmListening(GeneratedStory story, SyncService sync) async {
+  Future<void> _warmListening(
+    GeneratedStory story,
+    SyncService sync,
+    GeneratedStoryStore? storyStore,
+  ) async {
     final key = 'listening:${story.id}';
     if (!_inFlight.add(key)) return;
     try {
-      await ListeningAudioPrefetchCache.shared.prefetch(
+      await LessonAssetPrefetchService.shared.prefetchListening(
         story: story,
         sync: sync,
+        storyStore: storyStore,
       );
     } finally {
       _inFlight.remove(key);
@@ -66,19 +83,12 @@ class RecentLessonWarmupService {
   }
 
   Future<void> _warmReading(GeneratedStory story) async {
-    final segments = story.passage.segments.take(2);
-    for (var index = 0; index < segments.length; index++) {
-      final text = segments.elementAt(index).fr;
-      final key = 'reading:${story.id}:$index';
-      if (!_inFlight.add(key)) continue;
-      try {
-        await GeminiLiveAudioService.shared.loadCached(
-          text: text,
-          voiceName: ActiveTutor.current.voiceName,
-        );
-      } finally {
-        _inFlight.remove(key);
-      }
+    final key = 'reading:${story.id}';
+    if (!_inFlight.add(key)) return;
+    try {
+      await LessonAssetPrefetchService.shared.prefetchNarration(story);
+    } finally {
+      _inFlight.remove(key);
     }
   }
 }

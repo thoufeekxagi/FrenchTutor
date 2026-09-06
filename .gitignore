@@ -25,3 +25,6 @@ server/*.db
 # Codex desktop-local configuration and preview artifacts.
 .mcp.json
 .codex-preview/
+
+# Generated marketing content: Reels, carousel exports, captions, and schedules.
+/marketing/

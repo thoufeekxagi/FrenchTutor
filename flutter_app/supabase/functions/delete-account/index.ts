@@ -71,6 +71,7 @@ const USER_DATA_TABLES: Array<[string, string]> = [
   ["daily_session_state", "user_id"],
   ["referral_redemptions", "redeemed_by_user_id"],
   ["referral_codes", "owner_user_id"],
+  ["subscription_invite_redemptions", "redeemed_by_user_id"],
   ["generated_grammar_stories", "user_id"],
   ["generated_roleplays", "user_id"],
   ["generated_stories", "user_id"],
@@ -115,10 +116,28 @@ Deno.serve(async (req: Request) => {
     });
   }
   const userId = callerData.user.id;
+  const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!accessToken) {
+    return new Response(JSON.stringify({ error: "Invalid session" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const admin = createClient(supabaseUrl, serviceRoleKey);
 
   try {
+    // Deleting auth.users does not immediately invalidate access tokens, and
+    // it does not revoke refresh tokens on every device. Revoke all sessions
+    // first so a second device cannot keep refreshing the deleted account.
+    const { error: revokeError } = await admin.auth.admin.signOut(
+      accessToken,
+      "global",
+    );
+    if (revokeError) {
+      throw new Error(`Session revocation failed: ${revokeError.message}`);
+    }
+
     // Supabase Auth refuses to delete an auth user who owns Storage objects.
     // Remove private learner-scoped files through Storage first, not by
     // deleting storage.objects rows directly (which would orphan blobs).

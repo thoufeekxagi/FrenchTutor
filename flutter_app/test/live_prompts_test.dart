@@ -56,6 +56,34 @@ void main() {
       expect(prompt, contains('START THE CALL WITH A WARM GREETING'));
     });
 
+    test('onboarding calibration uses the selected goal and level', () {
+      final role = LivePrompts.forSession(
+        LiveSessionType.onboardingCalibration,
+      );
+      final prompt = LivePrompts.trialLessonContextFor(
+        goal: 'work',
+        level: 'a2',
+        focus: const ['Speaking', 'Grammar'],
+        tutorName: 'Marie',
+      );
+      expect(role, contains('OPTIONAL ONBOARDING CALIBRATION'));
+      expect(
+        prompt,
+        contains('Learner goal: Work and professional life (work)'),
+      );
+      expect(prompt, contains('self-reported level: A2'));
+      expect(prompt, contains('Speaking, Grammar'));
+      expect(prompt, contains('mostly English scaffolding'));
+      expect(prompt, isNot(contains('fixed greetings sequence')));
+      expect(prompt, contains('studied any French before'));
+      expect(prompt, isNot(contains('ordering a coffee')));
+      expect(
+        LivePrompts.trialKickoffFor(goal: 'work', level: 'b1'),
+        allOf(contains('French'), isNot(contains('English sentence'))),
+      );
+      expect(LivePrompts.trialWrapUpNote, isNot(contains('fixed')));
+    });
+
     test('roleplay prompt locks the opposite-character role', () {
       final prompt = LivePrompts.forSession(LiveSessionType.speakingRoleplay);
       expect(prompt, contains('YOU PLAY THE OTHER CHARACTER'));

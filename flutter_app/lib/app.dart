@@ -14,7 +14,9 @@ import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
 import 'screens/onboarding/speak_onboarding_screen.dart';
 import 'services/auth_service.dart';
+import 'services/grammar_audio_warmup_service.dart';
 import 'services/revenue_cat_service.dart';
+import 'services/sync_service.dart';
 
 class FrenchTutorApp extends ConsumerWidget {
   const FrenchTutorApp({super.key});
@@ -57,20 +59,37 @@ class AuthGate extends ConsumerStatefulWidget {
   ConsumerState<AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends ConsumerState<AuthGate> {
+class _AuthGateState extends ConsumerState<AuthGate>
+    with WidgetsBindingObserver {
   bool _hasSession = AuthService.shared.currentSession != null;
   bool _explicitlySignedOut = false;
   bool _signOutMarkerLoaded = false;
   bool? _aiConsented;
+  bool _isRestoringAccount = AuthService.shared.currentSession != null;
+  bool _requiresInstallOnboarding = true;
+  String? _restoreInFlightUserId;
+  String? _restoredUserId;
+  Future<void>? _resumeSyncInFlight;
   StreamSubscription<AuthState>? _subscription;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _requiresInstallOnboarding = !ref
+        .read(learningStoreProvider)
+        .profile()
+        .isOnboarded;
     _subscription = AuthService.shared.onAuthStateChange.listen(
       _onAuthStateChange,
     );
     AuthService.shared.localAuthRevision.addListener(_onLocalAuthRevision);
+    final initialSession = AuthService.shared.currentSession;
+    if (initialSession != null && !_requiresInstallOnboarding) {
+      _isRestoringAccount = _restoredUserId != initialSession.user.id;
+      _prepareSignedInLocalState(initialSession.user.id);
+      _startAccountRestore(initialSession.user.id);
+    }
     AuthService.shared.wasExplicitlySignedOut().then((value) {
       if (!mounted) return;
       setState(() {
@@ -86,13 +105,73 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     });
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_resumePendingCourseWork());
+    }
+  }
+
+  Future<void> _resumePendingCourseWork() {
+    final existing = _resumeSyncInFlight;
+    if (existing != null) return existing;
+    final session = AuthService.shared.currentSession;
+    if (session == null || _requiresInstallOnboarding) {
+      return Future<void>.value();
+    }
+
+    late final Future<void> run;
+    run = _resumePendingCourseWorkNow().whenComplete(() {
+      if (identical(_resumeSyncInFlight, run)) _resumeSyncInFlight = null;
+    });
+    _resumeSyncInFlight = run;
+    return run;
+  }
+
+  Future<void> _resumePendingCourseWorkNow() async {
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      if (!profile.isOnboarded) return;
+      final sync = ref.read(syncServiceProvider);
+      await sync.drainOutbox();
+      final plan = ref
+          .read(adaptiveCourseStoreProvider)
+          .ensureCurrentPlan(profile);
+      if (await sync.syncAdaptiveCoursePlan(plan)) {
+        await sync.prepareAdaptiveCourseLessons();
+      }
+    } catch (error, stackTrace) {
+      debugPrint('Course resume failed: $error\n$stackTrace');
+    }
+  }
+
   void _onLocalAuthRevision() {
     if (!mounted || AuthService.shared.currentSession != null) return;
     setState(() {
       _hasSession = false;
       _explicitlySignedOut = true;
       _signOutMarkerLoaded = true;
+      _isRestoringAccount = false;
+      _restoreInFlightUserId = null;
+      _restoredUserId = null;
     });
+  }
+
+  /// Makes the local account cache safe to use before any remote request
+  /// starts. In particular, a fresh install has to create its profile row
+  /// before the user id can be linked and the remote profile can be restored.
+  void _prepareSignedInLocalState(String userId) {
+    try {
+      final learningStore = ref.read(learningStoreProvider);
+      // This also materializes the row on a fresh install. Linking must happen
+      // after that read or the update-only adoption query has nothing to link.
+      learningStore.profile();
+      learningStore.linkSupabaseUser(userId);
+      ref.read(adaptiveCourseStoreProvider).linkSupabaseUser(userId);
+    } catch (_) {
+      // Keep the account behind the restore gate when the local cache cannot
+      // be prepared. The restore pass will retry through the normal path.
+    }
   }
 
   void _onAuthStateChange(AuthState state) {
@@ -100,6 +179,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (session != null) {
       _explicitlySignedOut = false;
       _signOutMarkerLoaded = true;
+      _isRestoringAccount = _restoredUserId != session.user.id;
+      _prepareSignedInLocalState(session.user.id);
       unawaited(AuthService.shared.clearRememberedSignOut());
       // Apple StoreKit remains the billing authority. RevenueCat uses the
       // Supabase user id only as its stable customer identifier, then sends
@@ -114,27 +195,18 @@ class _AuthGateState extends ConsumerState<AuthGate> {
           onCustomerInfo: _cacheRevenueCatCustomerInfo,
         ),
       );
-      // Stamp the local profile with the Supabase user id (PILOT_PLAN.md
-      // Phase 5's "local rows adopt the new user_id" step). Idempotent —
-      // safe to run on every signed-in event, not just the very first one.
-      try {
-        ref.read(learningStoreProvider).linkSupabaseUser(session.user.id);
-        ref.read(adaptiveCourseStoreProvider).linkSupabaseUser(session.user.id);
-      } catch (_) {
-        // A local DB hiccup must never block showing the signed-in user
-        // their app — the link is retried on the next auth event regardless.
-      }
       // Restore every server-side learner record (vocab/session/mission/
-      // competency state) into the local cache — entirely in the background,
-      // never blocking the app on a spinner. This fires on EVERY auth event
-      // with a session (including a token refresh maybe an hour into an
-      // active lesson, not just the first sign-in), so it must never gate
-      // what's on screen: a returning user on a fresh install briefly sees
-      // whatever is already local (possibly nothing) and it fills in
-      // silently as soon as the pull lands, same "best-effort, eventually
-      // consistent" contract every other sync call in this app already has.
-      _restoreAndSeedContent();
+      // competency state) into the local cache. The signed-in shell stays
+      // behind the restore gate until the profile and adaptive route are
+      // known to be coherent; token refreshes for an already-restored user do
+      // not restart this gate.
+      if (!_requiresInstallOnboarding && _restoredUserId != session.user.id) {
+        _startAccountRestore(session.user.id);
+      }
     } else {
+      _isRestoringAccount = false;
+      _restoreInFlightUserId = null;
+      _restoredUserId = null;
       unawaited(RevenueCatService.shared.logOut());
       final infrastructure = ref.read(pilotInfrastructureStoreProvider);
       infrastructure.clearEntitlements();
@@ -179,41 +251,136 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     ref.invalidate(pilotAccessServiceProvider);
   }
 
-  void _restoreAndSeedContent() {
-    unawaited(() async {
+  void _startAccountRestore(String restoringUserId) {
+    if (_restoreInFlightUserId == restoringUserId) return;
+    _restoreInFlightUserId = restoringUserId;
+    unawaited(_restoreAndSeedContent(restoringUserId));
+  }
+
+  void _retryAccountRestore() {
+    final session = AuthService.shared.currentSession;
+    if (session == null) return;
+    setState(() => _isRestoringAccount = true);
+    _startAccountRestore(session.user.id);
+  }
+
+  void _finishInstallOnboarding() {
+    final session = AuthService.shared.currentSession;
+    setState(() {
+      _requiresInstallOnboarding = false;
+      if (session != null) _isRestoringAccount = true;
+    });
+    if (session != null) {
+      _prepareSignedInLocalState(session.user.id);
+      _startAccountRestore(session.user.id);
+    }
+  }
+
+  Future<void> _restoreAndSeedContent(String restoringUserId) async {
+    SyncHydrationResult? hydration;
+    try {
       try {
-        await ref
-            .read(syncServiceProvider)
-            .hydrateAfterSignIn()
-            .timeout(const Duration(seconds: 8));
+        hydration = await ref.read(syncServiceProvider).hydrateAfterSignIn();
       } catch (_) {
-        // Local starter content still makes the app usable offline; the next
-        // auth event retries the remote restore.
+        // Keep the account behind the restore gate. The finally block exposes
+        // a retry action once the failed request has unwound.
       }
-      try {
-        // Onboarding can finish before account creation. After remote state
-        // is hydrated, explicitly push the current route so a new account
-        // does not lose its pre-auth adaptive course.
-        final profile = ref.read(learningStoreProvider).profile();
-        final plan = ref
-            .read(adaptiveCourseStoreProvider)
-            .ensureCurrentPlan(profile);
-        await ref.read(syncServiceProvider).syncAdaptiveCoursePlan(plan);
-      } catch (error, stackTrace) {
-        debugPrint('Adaptive course restore/push failed: $error\n$stackTrace');
+      final restoreReady =
+          hydration?.profileFetchSucceeded == true &&
+          hydration?.adaptiveCourseFetchSucceeded == true;
+      // The optional onboarding trial was recorded while signed out, so its
+      // per-write sync calls intentionally no-op. Claim and upload those
+      // learner-owned rows explicitly once this account is authenticated. It
+      // is deliberately background work: local Course creation must not wait
+      // on a network timeout after signup.
+      unawaited(
+        ref.read(syncServiceProvider).syncAdoptedOnboardingTrials().catchError((
+          error,
+          stackTrace,
+        ) {
+          debugPrint('Onboarding trial adoption failed: $error\n$stackTrace');
+        }),
+      );
+      if (restoreReady) {
+        try {
+          // Onboarding can finish before account creation. After remote state
+          // is hydrated, explicitly push the current route so a new account
+          // does not lose its pre-auth adaptive course.
+          final profile = ref.read(learningStoreProvider).profile();
+          if (profile.isOnboarded) {
+            final plan = ref
+                .read(adaptiveCourseStoreProvider)
+                .ensureCurrentPlan(profile);
+            final sync = ref.read(syncServiceProvider);
+            await sync.syncProfile(profile);
+            await sync.drainOutbox();
+            final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
+            // Course preparation is independent from lesson taps. Do not
+            // hold account restoration on an AI provider response; the five
+            // fixed foundation lessons remain immediately usable while the
+            // persisted personalized batch is prepared and hydrated.
+            if (coursePersisted) {
+              unawaited(sync.prepareAdaptiveCourseLessons());
+            } else {
+              debugPrint(
+                'Course preparation deferred until its persisted plan retry '
+                'succeeds.',
+              );
+            }
+          }
+        } catch (error, stackTrace) {
+          debugPrint(
+            'Adaptive course restore/push failed: $error\n$stackTrace',
+          );
+        }
       }
-      try {
-        await ref
-            .read(starterContentServiceProvider)
-            .ensureSeededForCurrentUser();
-      } catch (error, stackTrace) {
-        debugPrint('Starter content seeding failed: $error\n$stackTrace');
+      // Hydration updates SQLite directly, so no provider notification is
+      // emitted automatically. Rebuild the gate once the profile and course
+      // route are ready so a fresh install cannot remain on stale onboarding.
+      final profile = ref.read(learningStoreProvider).profile();
+      final profileRestoreCompleted =
+          restoreReady &&
+          (profile.isOnboarded ||
+              (hydration?.profileFetchSucceeded == true &&
+                  hydration?.profileFound == false));
+      if (mounted &&
+          AuthService.shared.currentSession?.user.id == restoringUserId &&
+          profileRestoreCompleted) {
+        setState(() {
+          _isRestoringAccount = false;
+          _restoredUserId = restoringUserId;
+        });
       }
-    }());
+      if (profileRestoreCompleted) {
+        try {
+          await ref
+              .read(starterContentServiceProvider)
+              .ensureSeededForCurrentUser();
+          GrammarAudioWarmupService.shared.warmForLevel(
+            ref.read(learningStoreProvider).profile().level,
+          );
+        } catch (error, stackTrace) {
+          debugPrint('Starter content seeding failed: $error\n$stackTrace');
+        }
+      }
+    } finally {
+      if (_restoreInFlightUserId == restoringUserId) {
+        _restoreInFlightUserId = null;
+        if (mounted &&
+            AuthService.shared.currentSession?.user.id == restoringUserId &&
+            _isRestoringAccount) {
+          // The restore failed or returned incomplete critical data. Rebuild
+          // so the visible gate exposes its retry action instead of leaving a
+          // permanently spinning screen with no recovery path.
+          setState(() {});
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _subscription?.cancel();
     AuthService.shared.localAuthRevision.removeListener(_onLocalAuthRevision);
     super.dispose();
@@ -229,9 +396,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         (_hasSession && AuthService.shared.currentSession == null)) {
       return const SpeakAuthScreen(initialSignUp: false);
     }
-    final onboarded = ref.read(learningStoreProvider).profile().isOnboarded;
-    if (!onboarded) {
-      return SpeakOnboardingScreen(onFinished: () => setState(() {}));
+    if (_requiresInstallOnboarding) {
+      return SpeakOnboardingScreen(onFinished: _finishInstallOnboarding);
+    }
+    if (_hasSession && _isRestoringAccount) {
+      return _RestoringProgressView(
+        onRetry: _restoreInFlightUserId == null ? _retryAccountRestore : null,
+      );
     }
     if (_aiConsented == null) return const _RestoringProgressView();
     if (!_aiConsented!) {
@@ -244,22 +415,39 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 }
 
-/// Shown only for the brief, purely-local SharedPreferences read that decides
-/// whether AI consent has already been given — never for network sync, which
-/// now always runs silently in the background instead of gating any screen.
+/// Shown while a signed-in account restores its profile and course route.
+/// This keeps every startup route read behind the same hydration boundary.
 class _RestoringProgressView extends StatelessWidget {
-  const _RestoringProgressView();
+  const _RestoringProgressView({this.onRetry});
+
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF08090B),
       body: Center(
-        child: Image.asset(
-          'assets/images/pulse_sprint_logo.png',
-          width: 128,
-          height: 128,
-          fit: BoxFit.contain,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/pulse_sprint_logo.png',
+              width: 128,
+              height: 128,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 22),
+            const CircularProgressIndicator(color: Color(0xFFB8F36B)),
+            const SizedBox(height: 14),
+            const Text(
+              'Restoring your progress…',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 8),
+              TextButton(onPressed: onRetry, child: const Text('Try again')),
+            ],
+          ],
         ),
       ),
     );

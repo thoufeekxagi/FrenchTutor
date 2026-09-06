@@ -20,6 +20,7 @@ class GeneratedVocabularySetStore {
   List<GeneratedVocabularySet> list() {
     final rows = _db.select('''
       SELECT id, title, summary, topic, level_band, entries_json,
+             course_session_id, examples_json,
              cover_url, created_at
       FROM generated_vocabulary_sets
       WHERE deleted_at IS NULL
@@ -28,13 +29,25 @@ class GeneratedVocabularySetStore {
     return rows.map(_fromRow).toList(growable: false);
   }
 
+  GeneratedVocabularySet? forCourseSession(String courseSessionId) {
+    final rows = _db.select(
+      '''SELECT id, title, summary, topic, level_band, entries_json,
+                course_session_id, examples_json, cover_url, created_at
+         FROM generated_vocabulary_sets
+         WHERE course_session_id = ? AND deleted_at IS NULL
+         LIMIT 1''',
+      [courseSessionId],
+    );
+    return rows.isEmpty ? null : _fromRow(rows.first);
+  }
+
   void insert(GeneratedVocabularySet set) {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
       '''INSERT INTO generated_vocabulary_sets
-         (id, title, summary, topic, level_band, entries_json, cover_url,
-          created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+         (id, title, summary, topic, level_band, entries_json,
+          course_session_id, examples_json, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         set.id,
         set.title,
@@ -42,6 +55,11 @@ class GeneratedVocabularySetStore {
         set.topic,
         set.levelBand,
         jsonEncode(set.entries.map((entry) => entry.toJson()).toList()),
+        set.courseSessionId,
+        jsonEncode({
+          for (final entry in set.storyExamples.entries)
+            entry.key: entry.value.toJson(),
+        }),
         set.coverUrl,
         set.createdAt.toUtc().toIso8601String(),
         now,
@@ -60,6 +78,7 @@ class GeneratedVocabularySetStore {
     );
     final rows = _db.select(
       '''SELECT id, title, summary, topic, level_band, entries_json,
+                course_session_id, examples_json,
                 cover_url, created_at
          FROM generated_vocabulary_sets
          WHERE id = ? AND deleted_at IS NULL''',
@@ -77,21 +96,25 @@ class GeneratedVocabularySetStore {
     required String topic,
     required String levelBand,
     required String entriesJson,
+    String? courseSessionId,
+    String examplesJson = '{}',
     String? coverUrl,
     required String createdAt,
     required String updatedAt,
   }) {
     _db.execute(
       '''INSERT INTO generated_vocabulary_sets
-         (id, title, summary, topic, level_band, entries_json, cover_url,
-          created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (id, title, summary, topic, level_band, entries_json,
+          course_session_id, examples_json, cover_url, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            title = excluded.title,
            summary = excluded.summary,
            topic = excluded.topic,
            level_band = excluded.level_band,
            entries_json = excluded.entries_json,
+           course_session_id = excluded.course_session_id,
+           examples_json = excluded.examples_json,
            cover_url = excluded.cover_url,
            updated_at = excluded.updated_at
          WHERE excluded.updated_at > generated_vocabulary_sets.updated_at''',
@@ -102,6 +125,8 @@ class GeneratedVocabularySetStore {
         topic,
         levelBand,
         entriesJson,
+        courseSessionId,
+        examplesJson,
         coverUrl,
         createdAt,
         updatedAt,
@@ -114,6 +139,11 @@ class GeneratedVocabularySetStore {
     final decoded = raw is String && raw.trim().isNotEmpty
         ? jsonDecode(raw)
         : const <dynamic>[];
+    final rawExamples = row['examples_json'];
+    final decodedExamples =
+        rawExamples is String && rawExamples.trim().isNotEmpty
+        ? jsonDecode(rawExamples)
+        : const <String, dynamic>{};
     return GeneratedVocabularySet(
       id: row['id'] as String,
       title: row['title'] as String,
@@ -124,6 +154,15 @@ class GeneratedVocabularySetStore {
           .whereType<Map>()
           .map((entry) => VocabEntry.fromJson(entry.cast<String, dynamic>()))
           .toList(),
+      courseSessionId: row['course_session_id'] as String?,
+      storyExamples: decodedExamples is Map
+          ? {
+              for (final entry in decodedExamples.entries)
+                entry.key.toString(): BilingualExample.fromJson(
+                  (entry.value as Map).cast<String, dynamic>(),
+                ),
+            }
+          : const {},
       coverUrl: StarterCoverResolver.resolve(
         title: row['title'] as String,
         coverUrl: row['cover_url'] as String?,

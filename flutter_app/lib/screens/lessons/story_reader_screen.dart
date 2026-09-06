@@ -13,6 +13,7 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_settings.dart';
 import '../../widgets/story_cover_image.dart';
@@ -228,6 +229,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       stage: 'story',
       topic: _story.displayTitle,
     );
+    // Opening any reading-style lesson prepares the full remaining audio
+    // deck immediately. A play tap shares this same in-flight work.
+    unawaited(LessonAssetPrefetchService.shared.prefetchNarration(_story));
     unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -252,6 +256,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               keywords: result.keywords,
             );
           });
+          unawaited(
+            LessonAssetPrefetchService.shared.prefetchNarration(_story),
+          );
         },
         onError: (_) {
           if (mounted) setState(() => _enriching = false);

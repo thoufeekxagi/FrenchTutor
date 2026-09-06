@@ -66,6 +66,16 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Apple buttons use the official high-contrast pairing for the active
+    // appearance. Google keeps its white surface in both themes, but always
+    // uses Google's dark text instead of inheriting the dark app text color.
+    final appleBackground = isDark ? Colors.white : Colors.black;
+    final appleForeground = isDark ? Colors.black : Colors.white;
+    const googleBackground = Colors.white;
+    const googleForeground = Color(0xFF202124);
+    const googleBorder = Color(0xFFDADCE0);
+
     return SpeakScaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(24, 26, 24, 30),
@@ -105,19 +115,19 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
           _providerButton(
             Icons.apple_rounded,
             'Continue with Apple',
-            Colors.black,
-            Colors.white,
+            appleBackground,
+            appleForeground,
             () => _run(AuthService.shared.signInWithApple),
           ),
           const SizedBox(height: 10),
           _providerButton(
             Icons.g_mobiledata_rounded,
             'Continue with Google',
-            Colors.white,
-            DesignTokens.ink,
+            googleBackground,
+            googleForeground,
             () => _run(AuthService.shared.signInWithGoogle),
             outlined: true,
-            borderColor: DesignTokens.primaryReadable,
+            borderColor: googleBorder,
             leading: Image.asset(
               'assets/images/google_logo.png',
               width: 22,

@@ -76,6 +76,8 @@ class GeneratedVocabularySet {
     required this.levelBand,
     required this.entries,
     required this.createdAt,
+    this.courseSessionId,
+    this.storyExamples = const {},
     this.coverUrl,
   });
 
@@ -86,6 +88,13 @@ class GeneratedVocabularySet {
   final String levelBand;
   final List<VocabEntry> entries;
   final DateTime createdAt;
+  final String? courseSessionId;
+
+  /// Prepared sentence/story beats keyed by [VocabEntry.id]. Course lessons
+  /// require one entry for every word before they are marked ready. Keeping
+  /// the context on the persisted set means opening flashcards never needs to
+  /// call the lesson agent.
+  final Map<String, BilingualExample> storyExamples;
   final String? coverUrl;
 
   VocabTheme get asTheme => VocabTheme(id: id, title: title, entries: entries);
@@ -98,6 +107,8 @@ class GeneratedVocabularySet {
     levelBand: levelBand,
     entries: entries,
     createdAt: createdAt,
+    courseSessionId: courseSessionId,
+    storyExamples: storyExamples,
     coverUrl: coverUrl ?? this.coverUrl,
   );
 }
@@ -970,10 +981,18 @@ class WritingTask {
   String get displayTitle {
     final french = title.trim();
     final english = (titleEn ?? _legacyTitleGloss[french])?.trim();
-    if (english == null || english.isEmpty || english == french) return french;
-
     final band = levelBand.trim().toUpperCase();
-    if (band == 'A1' || band == 'A2') return '$english ($french)';
+    if (english == null || english.isEmpty || english == french) {
+      // A1/A2 must never be blocked by a French-only generated heading. A
+      // legacy row can be missing titleEn, so use a neutral English label
+      // until that row is regenerated instead of pretending the French title
+      // is beginner-readable.
+      if ((band == 'A1' || band == 'A2') && _looksFrenchTitle(french)) {
+        return 'Writing practice';
+      }
+      return french;
+    }
+    if (band == 'A1' || band == 'A2') return english;
     return '$french ($english)';
   }
 }
@@ -989,7 +1008,16 @@ const _legacyTitleGloss = <String, String>{
   'Un soir tranquille': 'A quiet evening',
   'Mon projet de demain': 'My plan for tomorrow',
   'Un voyage imaginaire': 'An imaginary trip',
+  'Les projets du week-end': 'Weekend plans',
+  'Décrire mon logement': 'Describe my home',
+  'Au magasin': 'At the store',
+  'Ma routine quotidienne': 'My daily routine',
 };
+
+bool _looksFrenchTitle(String value) => RegExp(
+  r'(^|\s)(le|la|les|un|une|des|mon|ma|mes|au|aux|du|de|dans|pour|avec|décrire|parler|écrire)\b|[àâçéèêëîïôùûüÿœ]',
+  caseSensitive: false,
+).hasMatch(value.trim());
 
 // MARK: - Roadmap
 

@@ -57,7 +57,8 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
       ..onboardedAt = DateTime.now();
     store.saveProfile(profile);
     unawaited(NotificationSchedulerService.sync(profile));
-    ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+    // The pre-auth funnel must only save learner choices. AuthGate creates
+    // and syncs the first adaptive batch (lessons 6–10) after signup.
     await ActiveTutor.set(_tutor);
     await TutorTuning.saveLanguageMix(LearnerLevel.defaultLanguageMix(_level));
     AlphabetPrewarm.maybeStart(isBeginner: _level == 'a1');

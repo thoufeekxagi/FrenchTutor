@@ -571,25 +571,39 @@ Help the learner think and write. Do not write the whole answer for them unless 
                 ).copyWith(color: DesignTokens.inkSoft, letterSpacing: 1),
               ),
               const SizedBox(height: 10),
-              Text(
-                _displayPromptFr,
-                style: DesignTokens.display(24).copyWith(height: 1.35),
-              ),
-              const SizedBox(height: 10),
-              if (_showEnglish)
+              if (_isBeginner) ...[
                 Text(
                   _displayPromptEn,
-                  style: DesignTokens.body(16).copyWith(height: 1.4),
-                )
-              else
-                TextButton(
-                  onPressed: () => setState(() => _showEnglish = true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: DesignTokens.ink,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text('Show English support'),
+                  style: DesignTokens.display(24).copyWith(height: 1.35),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  _displayPromptFr,
+                  style: DesignTokens.body(
+                    16,
+                  ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+                ),
+              ] else ...[
+                Text(
+                  _displayPromptFr,
+                  style: DesignTokens.display(24).copyWith(height: 1.35),
+                ),
+                const SizedBox(height: 10),
+                if (_showEnglish)
+                  Text(
+                    _displayPromptEn,
+                    style: DesignTokens.body(16).copyWith(height: 1.4),
+                  )
+                else
+                  TextButton(
+                    onPressed: () => setState(() => _showEnglish = true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: DesignTokens.ink,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('Show English support'),
+                  ),
+              ],
             ],
           ),
         ),

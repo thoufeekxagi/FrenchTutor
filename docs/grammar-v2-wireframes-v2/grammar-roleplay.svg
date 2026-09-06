@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="980" viewBox="0 0 480 980" role="img" aria-labelledby="title desc">
+  <title id="title">Grammar V2 Roleplay session wireframe</title>
+  <desc id="desc">A Roleplay Grammar session with four connected present-tense turns and a bounded live tutor action.</desc>
+  <rect width="480" height="980" fill="#0b0d0f"/>
+  <style>
+    .phone{fill:#101316;stroke:#34383d;stroke-width:2}.surface{fill:#171a1e;stroke:#30353b;stroke-width:1.5}.gold{fill:#f4b83f}.goldText{fill:#f4b83f;font-family:Arial,sans-serif;font-weight:700}.text{fill:#f5f4ef;font-family:Arial,sans-serif}.muted{fill:#a8a9ad;font-family:Arial,sans-serif}.tiny{font-size:11px;letter-spacing:1.4px}.body{font-size:15px}.title{font-size:28px;font-weight:700}.choice{fill:#171a1e;stroke:#474c53;stroke-width:1.5}
+  </style>
+  <text x="30" y="34" class="goldText" font-size="16">ROLEPLAY · 4 CONNECTED TURNS</text>
+  <g transform="translate(45 58)">
+    <rect class="phone" width="390" height="860" rx="30"/>
+    <text x="22" y="42" class="text body">×</text><text x="195" y="42" text-anchor="middle" class="text" font-size="18" font-weight="700">Order at the café</text><text x="364" y="42" text-anchor="end" class="muted body">A1</text>
+    <rect x="24" y="60" width="342" height="6" rx="3" fill="#34383d"/><rect x="24" y="60" width="86" height="6" rx="3" class="gold"/>
+    <text x="24" y="101" class="goldText tiny">ROLEPLAY · PRESENT</text><text x="24" y="140" class="text title">Reply in the scene</text><text x="24" y="166" class="muted body">STEP 1 OF 4</text><text x="335" y="139" class="goldText" font-size="20">☎</text>
+    <rect x="24" y="190" width="342" height="132" rx="20" class="surface"/><text x="42" y="220" class="goldText tiny">TUTOR</text><text x="42" y="257" class="text" font-size="21">Bonjour, vous désirez ?</text><text x="42" y="286" class="muted body">Hello, what would you like?</text><text x="337" y="256" class="goldText" font-size="18">◖</text>
+    <rect x="24" y="344" width="342" height="74" rx="18" fill="#2b2415" stroke="#f4b83f"/><text x="43" y="374" class="goldText tiny">YOUR GOAL</text><text x="43" y="400" class="text body">Reply with a present-tense order.</text>
+    <text x="24" y="456" class="goldText tiny">CHOOSE YOUR REPLY</text>
+    <rect x="24" y="473" width="342" height="62" rx="16" class="choice"/><text x="42" y="510" class="text body">Je prends un café, s’il vous plaît.</text><text x="341" y="510" class="goldText" font-size="16">◖</text>
+    <rect x="24" y="545" width="342" height="62" rx="16" class="choice"/><text x="42" y="582" class="text body">Je prendre un café, s’il vous plaît.</text><text x="341" y="582" class="goldText" font-size="16">◖</text>
+    <rect x="24" y="617" width="342" height="62" rx="16" class="choice"/><text x="42" y="654" class="text body">Je prend un café, s’il vous plaît.</text><text x="341" y="654" class="goldText" font-size="16">◖</text>
+    <rect x="24" y="714" width="342" height="58" rx="16" fill="#f4b83f"/><text x="195" y="750" text-anchor="middle" fill="#111" font-family="Arial" font-size="16" font-weight="700">Check reply</text>
+  </g>
+</svg>

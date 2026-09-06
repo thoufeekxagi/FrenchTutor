@@ -329,36 +329,41 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: DesignTokens.nightHairline),
       ),
-      child: Column(
-        children: [
-          for (final phrase in phrases)
-            ListTile(
-              dense: true,
-              leading: Icon(
-                Icons.format_quote_rounded,
-                color: DesignTokens.nightAccent,
-              ),
-              title: Text(phrase, style: _body(13, weight: FontWeight.w700)),
-              trailing: IconButton(
-                tooltip: 'Play phrase',
-                onPressed: () => LessonSpeechService.shared.speak(
-                  items: [
-                    SpeechItem(
-                      text: phrase,
-                      language: 'fr-FR',
-                      contentItemId: scene.id,
-                    ),
-                  ],
-                  rate: 0.34,
+      // Keep the tile ink/background on its own Material instead of painting
+      // it through the decorated phrasebook card.
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            for (final phrase in phrases)
+              ListTile(
+                dense: true,
+                leading: Icon(
+                  Icons.format_quote_rounded,
+                  color: DesignTokens.nightAccent,
                 ),
-                icon: Icon(
-                  Icons.volume_up_outlined,
-                  color: DesignTokens.nightText,
-                  size: 19,
+                title: Text(phrase, style: _body(13, weight: FontWeight.w700)),
+                trailing: IconButton(
+                  tooltip: 'Play phrase',
+                  onPressed: () => LessonSpeechService.shared.speak(
+                    items: [
+                      SpeechItem(
+                        text: phrase,
+                        language: 'fr-FR',
+                        contentItemId: scene.id,
+                      ),
+                    ],
+                    rate: 0.34,
+                  ),
+                  icon: Icon(
+                    Icons.volume_up_outlined,
+                    color: DesignTokens.nightText,
+                    size: 19,
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

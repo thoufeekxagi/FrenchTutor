@@ -81,6 +81,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     RecentLessonWarmupService.shared.warm(
       stories: stories,
       sync: ref.read(syncServiceProvider),
+      storyStore: store,
     );
 
     // A previous deployed image function could fail before returning, leaving
@@ -539,50 +540,58 @@ class _GenerateReadingTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
         border: Border.all(color: DesignTokens.nightHairline),
       ),
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: DesignTokens.nightAccentSoft,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: generating
-              ? Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation(
-                      DesignTokens.nightAccent,
+      // Give ListTile its own Material ancestor so its ink/background paints
+      // are not hidden by the decorated card container.
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: DesignTokens.nightAccentSoft,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: generating
+                ? Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(
+                        DesignTokens.nightAccent,
+                      ),
                     ),
+                  )
+                : Icon(
+                    CupertinoIcons.book_fill,
+                    color: DesignTokens.nightAccent,
                   ),
-                )
-              : Icon(CupertinoIcons.book_fill, color: DesignTokens.nightAccent),
+          ),
+          title: Text(
+            'Create a reading story',
+            style: DesignTokens.body(
+              15,
+              weight: FontWeight.w700,
+            ).copyWith(color: DesignTokens.nightText),
+          ),
+          subtitle: Text(
+            generating
+                ? 'Writing your next short book…'
+                : selectedTopic == null
+                ? 'A fresh story shaped to your course level'
+                : 'A fresh story about ${selectedTopic!.toLowerCase()}',
+            style: DesignTokens.body(
+              12.5,
+            ).copyWith(color: DesignTokens.nightMuted),
+          ),
+          trailing: Icon(
+            CupertinoIcons.chevron_right,
+            size: 18,
+            color: DesignTokens.nightAccent,
+          ),
+          onTap: generating ? null : onTap,
         ),
-        title: Text(
-          'Create a reading story',
-          style: DesignTokens.body(
-            15,
-            weight: FontWeight.w700,
-          ).copyWith(color: DesignTokens.nightText),
-        ),
-        subtitle: Text(
-          generating
-              ? 'Writing your next short book…'
-              : selectedTopic == null
-              ? 'A fresh story shaped to your course level'
-              : 'A fresh story about ${selectedTopic!.toLowerCase()}',
-          style: DesignTokens.body(
-            12.5,
-          ).copyWith(color: DesignTokens.nightMuted),
-        ),
-        trailing: Icon(
-          CupertinoIcons.chevron_right,
-          size: 18,
-          color: DesignTokens.nightAccent,
-        ),
-        onTap: generating ? null : onTap,
       ),
     );
   }

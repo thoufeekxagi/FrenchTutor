@@ -8,29 +8,29 @@ import '../../models/speak_curriculum.dart';
 import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
+import '../../services/course_artifact_codec.dart';
+import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
-import '../labs/grammar_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
-import '../labs/listening_lab_screen.dart';
-import '../labs/writing_lab_screen.dart';
-import '../reading/reading_library_screen.dart';
-import 'speak_course_vocabulary_screen.dart';
+import '../labs/vocabulary_flashcards_screen.dart';
+import '../lessons/listening_practice_screen.dart';
+import '../lessons/story_reader_screen.dart';
+import '../lessons/writing_course_lesson_screen.dart';
+import '../grammar/grammar_v2_lesson_screen.dart';
 import 'speak_review_screen.dart';
-import 'speak_roleplay_screen.dart';
 import 'speak_ui.dart';
 import 'speaking_flow_screen.dart';
 import 'speaking_lesson_flow_screen.dart';
 
 /// Opens one course item directly in the matching Practice engine.
 ///
-/// The course catalog owns the context and the primary skill; Practice owns
-/// generation, learner-scoped storage, and the actual lesson UI. This route
-/// is only a short hand-off while a generated item is being prepared, so the
-/// old course activity selector can never become a second competing menu.
+/// Course owns the level, compact learner context, and persisted lesson data;
+/// the existing Practice engines own the actual interaction UI. This route is
+/// only the hand-off between those two responsibilities.
 class SpeakCourseActivityScreen extends ConsumerStatefulWidget {
   const SpeakCourseActivityScreen({super.key, required this.session});
 
@@ -39,6 +39,17 @@ class SpeakCourseActivityScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<SpeakCourseActivityScreen> createState() =>
       _SpeakCourseActivityScreenState();
+}
+
+/// Course has one speaking interaction. Keep legacy roleplay/free-talk rows
+/// compatible by opening them in the same guided phrase engine too.
+SpeakingCourseMode courseSpeakingModeFor(SpeakSkill skill) {
+  if (skill == SpeakSkill.speaking ||
+      skill == SpeakSkill.roleplay ||
+      skill == SpeakSkill.freeTalk) {
+    return SpeakingCourseMode.guided;
+  }
+  throw ArgumentError.value(skill, 'skill', 'Not a speaking Course skill');
 }
 
 class _SpeakCourseActivityScreenState
@@ -58,31 +69,6 @@ class _SpeakCourseActivityScreenState
     return const {'A1', 'A2', 'B1', 'B2'}.contains(keyLevel)
         ? keyLevel
         : ref.read(learningStoreProvider).profile().level.toUpperCase();
-  }
-
-  String get _contextPrompt {
-    final target =
-        session.primarySkill == SpeakSkill.speaking ||
-            session.primarySkill == SpeakSkill.roleplay
-        ? _requiredTargetPhrases
-        : const <String>[];
-    final roleplay = session.roleplay;
-    final targetLine = target.isEmpty
-        ? ''
-        : '\nTarget phrases: ${target.join('; ')}.';
-    return 'Course unit: ${session.unitTitle}. Lesson: ${session.title}. '
-        '${session.contextPrompt}$targetLine'
-        '${roleplay == null ? '' : '\nRoleplay location: ${roleplay.location}. '
-                  'Learner role: ${roleplay.learnerRole}. '
-                  'Tutor role: ${roleplay.tutorRole}. '
-                  'Goal: ${roleplay.goal}.'}';
-  }
-
-  List<String> get _requiredTargetPhrases {
-    if (session.primarySkill == SpeakSkill.freeTalk) {
-      return const [];
-    }
-    return session.targetPhrases;
   }
 
   @override
@@ -159,94 +145,133 @@ class _SpeakCourseActivityScreenState
     if (skill == SpeakSkill.speaking ||
         skill == SpeakSkill.roleplay ||
         skill == SpeakSkill.freeTalk) {
-      final result = await AppRouter.push<SpeakingResult>(
+      final artifact = session.artifact;
+      final isAuthoredFoundation =
+          session.contentKey == SpeakingCourseCatalog.firstA1GuidedLessonId;
+      if (!isAuthoredFoundation &&
+          (!session.contentReady || artifact == null)) {
+        throw StateError('This course lesson is not ready yet.');
+      }
+      final speakingLines =
+          session.contentKey == SpeakingCourseCatalog.firstA1GuidedLessonId
+          ? SpeakingCourseCatalog.firstA1GuidedLesson.lines
+          : CourseArtifactCodec.speaking(artifact ?? const <String, dynamic>{});
+      // Course speaking always uses the existing guided phrase flow. The
+      // Practice app may offer Free Talk and Roleplay, but those are not
+      // silently substituted into a Course lesson.
+      final lesson = SpeakingCourseLesson(
+        id: session.contentKey,
+        title: session.title,
+        subtitle: session.subtitle,
+        level: _level,
+        icon: Icons.mic_none_rounded,
+        mode: courseSpeakingModeFor(skill),
+        lines: speakingLines,
+        goal: session.competency,
+      );
+      final SpeakingResult? result = await AppRouter.push<SpeakingResult>(
         context,
-        (_) => skill == SpeakSkill.speaking
-            ? SpeakingLessonFlowScreen(
-                title: session.title,
-                topic: session.subtitle,
-                level: _level,
-                contentKey: session.contentKey,
-                steps: speakingStepsForLesson(
-                  targets: session.targetPhrases,
-                  title: session.title,
-                  competency: session.competency,
-                  level: _level,
-                ),
-              )
-            : skill == SpeakSkill.roleplay
-            ? SpeakRoleplayScreen(
-                scene: session.roleplay,
-                topic: session.roleplay == null ? session.title : null,
-                contentKey: session.contentKey,
-              )
-            : SpeakingLessonFlowScreen(
-                title: session.title,
-                topic: session.subtitle,
-                level: _level,
-                contentKey: session.contentKey,
-                steps: _freeTalkSteps(session),
-              ),
+        (_) => SpeakingLessonFlowScreen(
+          title: lesson.title,
+          topic: lesson.subtitle,
+          level: lesson.level,
+          contentKey: lesson.id,
+          steps: speakingStepsForCourseLines(lesson.lines, level: lesson.level),
+        ),
         fullscreenDialog: true,
       );
-      // A cancelled, silent, or very short call stays resumable. The course
-      // must only advance after the same connected/utterance/time threshold
-      // used by the speaking completion policy.
-      if (skill == SpeakSkill.speaking) {
-        // The controlled drill has its own completion contract: every phrase
-        // has already been checked before this route returns. Requiring a
-        // 30-second live-call threshold here would make a completed four-line
-        // lesson impossible to finish for a careful beginner.
-        return result?.connected == true &&
-            (result?.learnerUtteranceCount ?? 0) > 0;
+      // Match the dedicated Speaking Course: completing its native flow owns
+      // completion. A dismissed setup returns null/connected=false.
+      return result?.connected ?? false;
+    }
+
+    final artifact = session.artifact;
+    if (!session.contentReady || artifact == null) {
+      throw StateError('This course lesson is not ready yet.');
+    }
+    if (skill == SpeakSkill.vocabulary) {
+      final vocabularySet = CourseArtifactCodec.vocabulary(artifact);
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => VocabularyFlashcardsScreen(
+          title: vocabularySet.title,
+          entries: vocabularySet.entries,
+          source: 'course',
+          topic: vocabularySet.topic,
+          levelBand: vocabularySet.levelBand,
+          studyDepth: VocabularyStudyDepth.wordsAndSentences,
+          storyExamples: vocabularySet.storyExamples,
+          coverUrl: vocabularySet.coverUrl,
+          prefetchAudio: true,
+          preparedContentOnly: true,
+        ),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.reading) {
+      final result = await AppRouter.push<StoryReaderResult>(
+        context,
+        (_) => StoryReaderScreen(
+          story: CourseArtifactCodec.story(artifact),
+          showFinishButton: true,
+        ),
+        fullscreenDialog: true,
+      );
+      return result != null;
+    }
+    if (skill == SpeakSkill.listening) {
+      final story = CourseArtifactCodec.listening(artifact);
+      final audioClip = await LessonAssetPrefetchService.shared
+          .prefetchListening(story: story, sync: ref.read(syncServiceProvider));
+      if (audioClip == null) {
+        throw StateError('The complete listening audio is not ready yet.');
       }
-      return result?.meetsThreshold ?? false;
+      if (!mounted) return false;
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => ListeningPracticeScreen(
+          story: story,
+          audioClip: audioClip,
+          showFinishButton: true,
+        ),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.writing) {
+      final lesson = CourseArtifactCodec.writingCourse(artifact);
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => WritingCourseLessonScreen(lesson: lesson),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.grammar) {
+      final grammarSession = CourseArtifactCodec.grammarCourse(artifact);
+      final result = await AppRouter.push<Object?>(
+        context,
+        (_) => GrammarV2LessonScreen(session: grammarSession),
+        fullscreenDialog: true,
+      );
+      return result != null;
     }
 
     final screen = switch (skill) {
       SpeakSkill.alphabet => AlphabetLabScreen(deckId: _alphabetDeckId),
-      SpeakSkill.connectors => const ConnectorsLabScreen(autoStart: true),
-      SpeakSkill.liaison => const LiaisonLabScreen(autoStart: true),
-      SpeakSkill.grammar => GrammarLabScreen(
-        topic: _contextPrompt,
-        autoStart: true,
-      ),
-      SpeakSkill.listening => ListeningLabScreen(
-        topic: _contextPrompt,
-        autoStart: true,
-      ),
-      SpeakSkill.reading => ReadingLibraryScreen(
-        topic: _contextPrompt,
-        autoStart: true,
-      ),
-      SpeakSkill.writing => WritingLabScreen(
-        topic: session.title,
-        contextPrompt: _contextPrompt,
-        autoStart: true,
-      ),
-      SpeakSkill.vocabulary => SpeakCourseVocabularyScreen(
-        topic: session.unitTitle,
-        sessionTitle: session.title,
-        contextPrompt: _contextPrompt,
-        contentKey: session.contentKey,
-        levelBand: _level,
-        targetPhrases: session.targetPhrases,
-      ),
-      SpeakSkill.roleplay => SpeakRoleplayScreen(
-        scene: session.roleplay,
-        topic: session.roleplay == null ? session.title : null,
-        contentKey: session.contentKey,
-      ),
+      SpeakSkill.connectors => const ConnectorsLabScreen(),
+      SpeakSkill.liaison => const LiaisonLabScreen(),
+      SpeakSkill.grammar ||
+      SpeakSkill.listening ||
+      SpeakSkill.reading ||
+      SpeakSkill.writing ||
+      SpeakSkill.vocabulary => throw StateError('Handled above'),
+      SpeakSkill.roleplay ||
+      SpeakSkill.freeTalk => throw StateError('Handled above'),
       // A review catalog item hands off to the shared review chooser so the
       // learner selects Reading, Listening, or Speaking from recent history.
       SpeakSkill.review => const SpeakReviewScreen(),
-      SpeakSkill.freeTalk => SpeakingLessonFlowScreen(
-        title: session.title,
-        topic: session.subtitle,
-        level: _level,
-        contentKey: session.contentKey,
-        steps: _freeTalkSteps(session),
-      ),
       SpeakSkill.speaking => throw StateError('Speaking is handled above'),
     };
 
@@ -256,24 +281,6 @@ class _SpeakCourseActivityScreenState
       fullscreenDialog: true,
     );
     return result == true;
-  }
-
-  List<SpeakingPhraseStep> _freeTalkSteps(SpeakRoadmapSession session) {
-    final lessons = SpeakingCourseCatalog.freeTalkForLevel(_level);
-    final lessonIndex = session.index < 1
-        ? 0
-        : (session.index - 1) % lessons.length;
-    final lesson = lessons[lessonIndex];
-    return [
-      for (final line in lesson.lines)
-        SpeakingPhraseStep(
-          french: line.french,
-          english: line.english,
-          partnerFrench: line.partnerFrench,
-          partnerEnglish: line.partnerEnglish,
-          openResponse: true,
-        ),
-    ];
   }
 
   String? get _alphabetDeckId {
@@ -290,12 +297,17 @@ class _SpeakCourseActivityScreenState
   @override
   Widget build(BuildContext context) {
     if (_isSpeakingPath) {
-      return SpeakingLessonDetailScreen(session: session, onStart: _launch);
+      return SpeakingLessonDetailScreen(
+        session: session,
+        onStart: _launch,
+        isStarting: _launching,
+        error: _error,
+      );
     }
-    return _legacyLaunchShell(context);
+    return _launchShell(context);
   }
 
-  Widget _legacyLaunchShell(BuildContext context) {
+  Widget _launchShell(BuildContext context) {
     return SpeakScaffold(
       child: Column(
         children: [
@@ -312,20 +324,7 @@ class _SpeakCourseActivityScreenState
               child: Padding(
                 padding: const EdgeInsets.all(28),
                 child: _error == null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 18),
-                          Text(
-                            _launching
-                                ? 'Opening your ${session.primarySkill.label.toLowerCase()} practice…'
-                                : 'Preparing your lesson…',
-                            textAlign: TextAlign.center,
-                            style: DesignTokens.body(15),
-                          ),
-                        ],
-                      )
+                    ? const SizedBox.shrink()
                     : Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

@@ -20,6 +20,8 @@ class GrammarCurriculumLesson {
     required this.translation,
     required this.incorrectSentence,
     required this.generationPoint,
+    this.partnerFrench,
+    this.partnerEnglish,
   });
 
   final String id;
@@ -35,6 +37,8 @@ class GrammarCurriculumLesson {
   final String translation;
   final String incorrectSentence;
   final String generationPoint;
+  final String? partnerFrench;
+  final String? partnerEnglish;
 
   String get progressId => 'grammar_curriculum_$id';
 
@@ -46,6 +50,86 @@ class GrammarCurriculumLesson {
 
   String get writingPrompt =>
       'Write one new French sentence that uses ${pickAnswer.toLowerCase()} correctly.';
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'level': level,
+    'collection': collection,
+    'title': title,
+    'subtitle': subtitle,
+    'tip': tip,
+    'pick_prompt': pickPrompt,
+    'pick_choices': pickChoices,
+    'pick_answer': pickAnswer,
+    'sentence': sentence,
+    'translation': translation,
+    'incorrect_sentence': incorrectSentence,
+    'generation_point': generationPoint,
+    if (partnerFrench != null) 'partner_french': partnerFrench,
+    if (partnerEnglish != null) 'partner_english': partnerEnglish,
+  };
+
+  factory GrammarCurriculumLesson.fromJson(Map<String, dynamic> json) {
+    final choices = (json['pick_choices'] as List? ?? const [])
+        .map((value) => value.toString())
+        .where((value) => value.trim().isNotEmpty)
+        .toList(growable: false);
+    return GrammarCurriculumLesson(
+      id: json['id']?.toString() ?? '',
+      level: json['level']?.toString() ?? 'A1',
+      collection: json['collection']?.toString() ?? 'Present tense',
+      title: json['title']?.toString() ?? '',
+      subtitle: json['subtitle']?.toString() ?? '',
+      tip: json['tip']?.toString() ?? '',
+      pickPrompt: json['pick_prompt']?.toString() ?? '',
+      pickChoices: choices,
+      pickAnswer: json['pick_answer']?.toString() ?? '',
+      sentence: json['sentence']?.toString() ?? '',
+      translation: json['translation']?.toString() ?? '',
+      incorrectSentence: json['incorrect_sentence']?.toString() ?? '',
+      generationPoint: json['generation_point']?.toString() ?? 'Présent',
+      partnerFrench: json['partner_french']?.toString(),
+      partnerEnglish: json['partner_english']?.toString(),
+    );
+  }
+}
+
+abstract final class GrammarCurriculumValidator {
+  static GrammarCurriculumLesson validate(GrammarCurriculumLesson lesson) {
+    if (lesson.id.trim().isEmpty ||
+        lesson.level.trim().isEmpty ||
+        lesson.title.trim().isEmpty ||
+        lesson.subtitle.trim().isEmpty ||
+        lesson.tip.trim().isEmpty ||
+        lesson.pickPrompt.trim().isEmpty ||
+        lesson.pickAnswer.trim().isEmpty ||
+        lesson.sentence.trim().isEmpty ||
+        lesson.translation.trim().isEmpty ||
+        lesson.incorrectSentence.trim().isEmpty ||
+        lesson.generationPoint.trim().isEmpty) {
+      throw const FormatException('Grammar lesson metadata is incomplete.');
+    }
+    if (!lesson.pickPrompt.contains('___') ||
+        lesson.pickChoices.length != 3 ||
+        lesson.pickChoices.toSet().length != 3 ||
+        !lesson.pickChoices.contains(lesson.pickAnswer)) {
+      throw const FormatException(
+        'Grammar lessons require one blank and three unique choices.',
+      );
+    }
+    if (lesson.sentenceTiles.length < 2) {
+      throw const FormatException(
+        'Grammar sentences require at least two words.',
+      );
+    }
+    if ((lesson.partnerFrench ?? '').trim().isNotEmpty &&
+        (lesson.partnerEnglish ?? '').trim().isEmpty) {
+      throw const FormatException(
+        'Grammar partner lines require an English translation.',
+      );
+    }
+    return lesson;
+  }
 }
 
 GrammarCurriculumLesson _lesson(

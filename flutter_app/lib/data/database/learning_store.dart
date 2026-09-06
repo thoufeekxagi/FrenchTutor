@@ -158,16 +158,63 @@ class LearningStore {
     return fresh;
   }
 
-  /// Stamps the local profile row with the Supabase auth user id on first
-  /// sign-in (PILOT_PLAN.md Phase 5's "local rows adopt the new user_id"
-  /// step) — the local row's own `id` (and everything else about it) is
-  /// untouched; every OTHER local table already carries its own nullable
-  /// `user_id` column ready for the same stamp when sync is built.
+  /// Stamps the local profile and the anonymous onboarding trial rows with the
+  /// Supabase auth user id on first sign-in. We deliberately scope adoption to
+  /// `stage = 'trial'`: shared/catalog rows and unrelated local records must
+  /// never be claimed by whichever account happens to sign in next.
   void linkSupabaseUser(String supabaseUserId) {
-    _db.execute(
-      'UPDATE profiles SET user_id = ?, updated_at = ? WHERE deleted_at IS NULL',
-      [supabaseUserId, _now()],
-    );
+    _db.execute('BEGIN');
+    try {
+      final now = _now();
+      bool hasTable(String name) => _db.select(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        [name],
+      ).isNotEmpty;
+      _db.execute(
+        'UPDATE profiles SET user_id = ?, updated_at = ? '
+        'WHERE deleted_at IS NULL AND (user_id IS NULL OR user_id != ?)',
+        [supabaseUserId, now, supabaseUserId],
+      );
+      if (hasTable('ai_sessions')) {
+        _db.execute(
+          "UPDATE ai_sessions SET user_id = ?, updated_at = ? "
+          "WHERE user_id IS NULL AND stage = 'trial' AND deleted_at IS NULL",
+          [supabaseUserId, now],
+        );
+      }
+      if (hasTable('sessions')) {
+        _db.execute(
+          "UPDATE sessions SET user_id = ?, updated_at = ? "
+          "WHERE user_id IS NULL AND stage = 'trial' AND deleted_at IS NULL",
+          [supabaseUserId, now],
+        );
+      }
+      if (hasTable('messages') && hasTable('sessions')) {
+        _db.execute(
+          'UPDATE messages SET user_id = ? WHERE user_id IS NULL AND session_id IN '
+          "(SELECT id FROM sessions WHERE stage = 'trial' AND deleted_at IS NULL)",
+          [supabaseUserId],
+        );
+      }
+      if (hasTable('credit_usage') && hasTable('ai_sessions')) {
+        _db.execute(
+          'UPDATE credit_usage SET user_id = ? WHERE user_id IS NULL AND ai_session_id IN '
+          "(SELECT id FROM ai_sessions WHERE stage = 'trial' AND deleted_at IS NULL)",
+          [supabaseUserId],
+        );
+      }
+      if (hasTable('notes') && hasTable('sessions')) {
+        _db.execute(
+          'UPDATE notes SET user_id = ?, updated_at = ? WHERE user_id IS NULL AND session_id IN '
+          "(SELECT id FROM sessions WHERE stage = 'trial' AND deleted_at IS NULL)",
+          [supabaseUserId, now],
+        );
+      }
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   void saveProfile(Profile p) {

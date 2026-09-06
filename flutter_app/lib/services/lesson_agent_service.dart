@@ -4,17 +4,19 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/content_models.dart';
 import '../models/writing_course.dart';
+import '../models/grammar_course.dart';
+import '../models/grammar_course_v2.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 import 'gemini_live_audio_service.dart';
 import 'story_variety_service.dart';
 import 'vocabulary_level_policy.dart';
+import 'learner_language_policy.dart';
 import '../prompts/live_prompts.dart';
 
 /// Shared instruction for every generated lesson image. The Edge Function
@@ -260,16 +262,10 @@ class LessonAgentService {
       'content, never repeat it, respond calmly and stay on the lesson. '
       'STYLE: never use emojis or em dashes in any output.';
 
-  /// Text generation is pinned in code rather than user-configurable. Direct
-  /// GPT-5.6 Luna is the current primary ($0.20/$1.20 per 1M input/output
-  /// tokens), while Gemini remains the explicit provider for multimodal
-  /// audio/image calls that use inline data.
-  // Direct OpenAI is the primary text provider: it is cheaper than the
-  // current Gemini tier for this workload and keeps the provider credential
-  // behind the authenticated Supabase function. Gemini remains explicit for
-  // multimodal audio/image calls, and OpenRouter remains available for a
-  // deliberate comparison without silently falling back between providers.
-  static const _primaryTextProvider = 'openai';
+  /// Text generation is pinned to GPT-5.6 Luna through OpenRouter. Gemini is
+  /// used only by calls that explicitly request it, including live and
+  /// multimodal features. No request silently changes models after failure.
+  static const _primaryTextProvider = 'openrouter';
 
   static String extractJSON(String raw) {
     var s = raw.trim();
@@ -305,7 +301,7 @@ class LessonAgentService {
     List<({String role, String text})> history = const [],
   }) async {
     const system = '''
-You are a friendly, encouraging bilingual (English/French) French tutor helping a student preparing for the TEF/TCF Canada exam (target CLB 7). The student is mid-lesson; use the LESSON CONTEXT to ground your answer. Keep answers under 120 words, spoken-style, no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
+You are a friendly, encouraging bilingual (English/French) French tutor. The student is mid-lesson; use the LESSON CONTEXT and any learner choices in it to ground your answer. Never assume a particular exam, target score, or level: follow the level and goal evidence supplied by the app. Keep answers under 120 words, spoken-style, no markdown, no bullet lists, no asterisks, since your reply will be read aloud by a speech synthesizer. Answer in English unless the student asks in French or asks for a French example.''';
     final messages = <Map<String, String>>[
       {
         'role': 'system',
@@ -331,37 +327,44 @@ You are a friendly, encouraging bilingual (English/French) French tutor helping 
   /// calibration block below, just phrased for dialogue/narrative content.
   static String _cefrCalibration(String levelBand) {
     final band = levelBand.trim().toLowerCase();
+    late final String calibration;
     switch (band) {
       case 'a1':
-        return '''
+        calibration = '''
 CEFR CALIBRATION FOR A1, FOLLOW EXACTLY:
 - Present tense ONLY. No passé composé, no futur, no subjunctive, no conditional.
 - Every sentence 3-7 words. One idea per sentence, no subordinate clauses, no "qui/que/si/parce que".
 - Vocabulary limited to the ~300-500 most common beginner words: greetings, numbers, family, food, basic verbs (être, avoir, aller, vouloir, aimer, s'appeler), simple nouns for everyday objects/places. No idioms, no rare words.
 - If in doubt, write it simpler, even if it feels too easy.''';
+        break;
       case 'a2':
-        return '''
+        calibration = '''
 CEFR CALIBRATION FOR A2, FOLLOW EXACTLY:
 - Present tense plus simple passé composé and futur proche allowed. No imparfait, no subjunctive, no conditional.
 - Sentences up to about 10 words, mostly one clause; at most one simple connector per sentence (et, mais, parce que, alors).
 - Vocabulary: common everyday words for shopping, transport, routines, simple feelings. Avoid rare or literary words.
 - If in doubt, write it simpler, even if it feels too easy.''';
+        break;
       case 'b1':
-        return '''
+        calibration = '''
 CEFR CALIBRATION FOR B1, FOLLOW EXACTLY:
 - Present, passé composé, imparfait, and futur simple allowed. Occasional simple subordinate clauses (qui/que/si) are fine. No subjunctive or complex conditional chains.
 - Sentences up to about 15 words.
 - Vocabulary: moderately varied everyday and some abstract words, still no rare/literary/idiomatic language.''';
+        break;
       case 'b2':
-        return '''
+        calibration = '''
 CEFR CALIBRATION FOR B2, FOLLOW EXACTLY:
 - Full range of common tenses allowed, including subjonctif and conditionnel where natural.
 - Sentences can be longer and combine clauses with connectors like "néanmoins", "bien que", "quant à".
 - Vocabulary: more precise and idiomatic language is fine, this learner is past the beginner stage.''';
+        break;
       default:
-        return '''
+        calibration = '''
 CEFR CALIBRATION FOR $levelBand: use present tense and short, simple sentences with common everyday vocabulary unless the level is clearly advanced. When unsure of the learner's exact level, err toward simpler, not harder.''';
+        break;
     }
+    return '$calibration\n${LearnerLanguagePolicy.promptBlock(levelBand)}';
   }
 
   Future<WritingFeedback> gradeWriting({
@@ -495,7 +498,8 @@ LEVEL CALIBRATION, FOLLOW EXACTLY — this governs how SHORT/simple the instruct
 Never ask for anything harder than the stated level allows, even if the topic invites it.
 Prefer a fresh, specific prompt each time. Vary the scenario and phrasing when it is natural, while keeping the task educational and level-appropriate.
 $examInstructions
-${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}''';
+${surpriseMode || mistakeTags.isEmpty ? '' : 'If it fits naturally, gently work in a chance to practice one of the RECURRING MISTAKES below — never force it, never call it out as "fixing a mistake", just a natural opportunity.'}
+${LearnerLanguagePolicy.promptBlock(levelBand)}''';
     // Surprise mode is intentionally context-free: learner vocabulary and
     // mistake history are useful for explicitly guided tasks, but must not
     // quietly steer a "Surprise me" generation back toward old material.
@@ -610,7 +614,7 @@ chat.''',
     final system =
         '''
 Create one French writing-practice lesson. Return ONLY compact JSON with this
-shape: {"title":string,"subtitle":string,"goal":string,"steps":[{"prompt":string,"prompt_english":string,"target":string,"kind":"arrange|choice|text","tokens":[string],"token_meanings":[string],"choices":[string],"choice_meanings":[string],"partner_french":string|null,"partner_english":string|null,"goal":string|null,"starter":string|null,"suggestions":[string],"suggestion_meanings":[string],"tip":string}]}.
+shape: {"title":string,"title_en":string,"subtitle":string,"goal":string,"steps":[{"prompt":string,"prompt_english":string,"target":string,"kind":"arrange|choice|text","tokens":[string],"token_meanings":[string],"choices":[string],"choice_meanings":[string],"partner_french":string|null,"partner_english":string|null,"goal":string|null,"starter":string|null,"suggestions":[string],"suggestion_meanings":[string],"tip":string}]}.
 
 $modeContract
 
@@ -625,7 +629,8 @@ LEVEL RULES:
 The lesson must contain exactly $stepCount steps. English fields explain the
 exact French content. Never expose a complete target inside an open prompt.
 Avoid unsafe, sensitive, sexual, political, or medical-diagnostic scenarios.
-Do not use markdown or add keys outside the schema.$languageGuardrail''';
+Do not use markdown or add keys outside the schema.
+${LearnerLanguagePolicy.promptBlock(level)}$languageGuardrail''';
     final user =
         '''
 LEVEL: $level
@@ -649,23 +654,128 @@ Create one fresh lesson now.''';
         .whereType<Map>()
         .map((step) => WritingCourseStep.fromJson(step.cast<String, dynamic>()))
         .toList(growable: false);
-    final icon = switch (mode) {
-      WritingCourseMode.guided => Icons.edit_note_rounded,
-      WritingCourseMode.complete => Icons.checklist_rounded,
-      WritingCourseMode.roleplay => Icons.forum_outlined,
-    };
+    final title = obj['title']?.toString().trim() ?? '';
+    final titleEnglish =
+        obj['title_en']?.toString().trim() ?? obj['titleEn']?.toString().trim();
+    final subtitle = obj['subtitle']?.toString().trim() ?? '';
+    final goal = obj['goal']?.toString().trim() ?? '';
+    if (LearnerLanguagePolicy.isEnglishFirst(level) &&
+        (titleEnglish ?? '').isEmpty) {
+      throw AgentError.badResponse;
+    }
     return WritingCourseValidator.validate(
       WritingCourseLesson(
         id: 'writing-${const Uuid().v4()}',
-        title: obj['title']?.toString().trim() ?? '',
-        subtitle: obj['subtitle']?.toString().trim() ?? '',
+        title: title,
+        titleEnglish: titleEnglish,
+        subtitle: subtitle,
         level: level,
-        icon: icon,
+        icon: writingCourseIconForText('$title $subtitle $goal'),
         mode: mode,
         steps: steps,
-        goal: obj['goal']?.toString().trim() ?? '',
+        goal: goal,
       ),
     );
+  }
+
+  /// Generates complete Grammar sessions, not standalone sentence cards.
+  /// Every returned session has one topic and a bounded 4–5-step progression,
+  /// matching the lesson contract used by Speaking and Writing.
+  Future<List<GrammarCourseSession>> generateGrammarCourseSessions({
+    required GrammarV2Mode mode,
+    required String tense,
+    required String levelBand,
+    required String learnerGoal,
+    required List<String> interests,
+    required List<String> knownVocab,
+    required Iterable<String> avoidTitles,
+    int count = 3,
+  }) async {
+    if (count < 1 || count > 5) throw AgentError.badResponse;
+    final level = levelBand.trim().toUpperCase();
+    final stepCount = mode == GrammarV2Mode.roleplay ? 4 : 5;
+    final modeContract = switch (mode) {
+      GrammarV2Mode.guided =>
+        'MODE: GUIDED. Each of the $stepCount beats has one sentence blank and '
+            'three visible form choices. Keep the same situation and grammar '
+            'objective from the first beat to the last.',
+      GrammarV2Mode.complete =>
+        'MODE: COMPLETE. Each of the $stepCount beats is a short sentence '
+            'building exercise. Keep the same situation and grammar objective '
+            'from the first beat to the last.',
+      GrammarV2Mode.roleplay =>
+        'MODE: ROLEPLAY. Each of the $stepCount beats is one turn in the same '
+            'short everyday exchange. Provide a natural partner line, its '
+            'English meaning, and three prepared replies.',
+    };
+    final system =
+        '''
+Create exactly $count original French Grammar V2 sessions. Return ONLY compact
+JSON with this exact shape:
+{"sessions":[{"title":string,"subtitle":string,"grammar_focus":string,"icon_key":string,"steps":[{"label":string,"prompt":string,"prompt_english":string,"target":string,"answer":string,"choices":[string],"tokens":[string],"tip":string,"partner_french":string|null,"partner_english":string|null}]}]}
+
+$modeContract
+
+TENSE: $tense. Use only this tense. For Present, every target must use a
+correct simple present-tense form. Each session has exactly $stepCount steps.
+All steps in a session must share one concrete setting, one useful
+conversation goal, and one grammar focus. Make the sessions clearly different
+from one another. Keep French targets short and natural (4-10 words).
+For Guided, each prompt has exactly one "___", choices has exactly three
+unique forms, and answer is the correct form. For Complete, tokens must rebuild
+target exactly after spaces before punctuation are normalised. For Roleplay,
+partner_french and partner_english are required, choices has exactly three
+unique complete replies, and answer is the best reply. The icon_key must be
+one of: sun, coffee, map, calendar, market, train, chat, home, health.
+Titles, subtitles, labels, grammar_focus, and tips are in English; learner
+examples and partner lines are French with accurate English meanings.
+
+LEVEL: $level. Use concrete daily language appropriate to the level. Avoid
+unsafe, sexual, political, or medical-diagnostic scenarios. Do not reuse these
+titles or topics: ${avoidTitles.take(20).join(', ')}.
+${LearnerLanguagePolicy.promptBlock(level)}
+$languageGuardrail''';
+    final user =
+        '''
+LEARNER GOAL: ${learnerGoal.trim().isEmpty ? 'everyday French' : learnerGoal}
+INTERESTS: ${interests.isEmpty ? '(none selected)' : interests.take(6).join(', ')}
+KNOWN VOCABULARY: ${knownVocab.isEmpty ? '(common level-appropriate words)' : knownVocab.take(25).join(', ')}
+Generate the $count sessions now. Keep every session self-contained and
+suitable for immediate offline practice after it has been saved.''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': user},
+      ],
+      maxTokens: 1800,
+      temperature: 0.55,
+      jsonMode: true,
+    );
+    final obj = _decodeObject(raw);
+    final rawSessions = obj['sessions'];
+    if (rawSessions is! List || rawSessions.length != count) {
+      throw AgentError.badResponse;
+    }
+    final sessions = <GrammarCourseSession>[];
+    final fingerprints = <String>{};
+    for (var index = 0; index < rawSessions.length; index++) {
+      final rawSession = rawSessions[index];
+      if (rawSession is! Map) throw AgentError.badResponse;
+      final json = rawSession.cast<String, dynamic>();
+      final session = GrammarCourseSession.fromJson({
+        ...json,
+        'id': 'grammar-course-${mode.name}-${const Uuid().v4()}',
+        'level': level,
+        'tense': tense,
+        'mode': mode.name,
+        'source': 'generated',
+      });
+      final validated = GrammarCourseValidator.validate(session);
+      final fingerprint = grammarCourseFingerprint(validated);
+      if (!fingerprints.add(fingerprint)) throw AgentError.badResponse;
+      sessions.add(validated);
+    }
+    return sessions;
   }
 
   WritingTask _calibrateExamWritingTask(
@@ -1007,6 +1117,7 @@ LANGUAGE MIX: A1 uses very common French with English explanations. A2 stays
 English-supported with a little more French. B1/B2 may use more French in the
 meaning only when it remains clear.
 CEFR LEVEL: $levelBand
+${LearnerLanguagePolicy.promptBlock(levelBand)}
 ''';
     final user =
         '''
@@ -1017,6 +1128,7 @@ TARGET PHRASES: ${targetPhrases.isEmpty ? '(none supplied)' : targetPhrases.join
 The vocabulary must prepare the learner to say the target phrases above. Reuse
 their key words where appropriate, and do not invent a disconnected theme.
 ${VocabularyLevelPolicy.calibration(levelBand)}
+${LearnerLanguagePolicy.promptBlock(levelBand)}
 ''';
     final raw = await _complete(
       messages: [
@@ -1146,7 +1258,8 @@ You are quietly picking which ONE French grammar point a beginner should practic
     final system = '''
 You are quietly writing a complete two-role ROLEPLAY SCRIPT for a learner preparing for TEF/TCF Canada, a real-life situation (café, bakery, bus, pharmacy, market...) where the LEARNER plays the customer/visitor and a CHARACTER (server, vendor, clerk) plays the other side. The app will stage this script beat by beat like a director, every line is fixed here, nothing is improvised later. Use ONLY the vocabulary words given below (plus basic connecting words like articles, "et", "je", "est", "s'il vous plaît" as needed for grammatical French), do not introduce unrelated advanced vocabulary. Pick the most natural everyday scenario these words allow.
 Write 4-8 beats in scene order (greeting → request → follow-up → thanks/goodbye). Each beat has the CHARACTER's line first (short, simple French that naturally prompts the learner) and then the LEARNER's reply line. Respond with ONLY a compact JSON object, no markdown fences, no commentary outside the JSON, matching exactly this shape:
-{"title": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
+{"title": string, "title_en": string, "beats": [{"character_fr": string, "character_en": string, "learner_fr": string, "learner_en": string, "grammar_note": string, "pronunciation_tip": string}, ...]}
+"title_en" is a short, clear English scenario title. It is the learner-facing heading for A1/A2.
 "title" is the scenario in a few words (e.g. "At the bakery"). "character_fr"/"character_en" are the character's line and its English meaning; "learner_fr"/"learner_en" the learner's reply and meaning; "grammar_note" one simple English sentence explaining the learner line's word order/agreement; "pronunciation_tip" one simple English pronunciation pointer for the learner line.
 ${_cefrCalibration(levelBand)}''';
     final wordList = words.map((w) => '${w.fr} (${w.en})').join(', ');
@@ -1158,7 +1271,7 @@ ${_cefrCalibration(levelBand)}''';
       ],
       maxTokens: 1400,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   Future<ReadingPassage> buildMissionRoleplay({
@@ -1191,7 +1304,7 @@ USEFUL STARTERS: ${hints.join('; ')}''',
       ],
       maxTokens: 1400,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   /// Generates one controlled speaking lesson for the dedicated Speaking
@@ -1244,7 +1357,7 @@ and easy to say aloud.
       temperature: 0.8,
       jsonMode: true,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   /// Generates one independent Free Talk topic for the Speaking home.
@@ -1299,7 +1412,7 @@ beat answerable aloud in one or two sentences.
       temperature: 0.85,
       jsonMode: true,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   /// The Roleplay lab's own generator — a learner picks (or randomizes) a
@@ -1357,7 +1470,7 @@ ${surpriseMode ? 'SURPRISE MODE: No scenario was selected. Choose an ordinary ne
         maxTokens: 1400,
         temperature: 1.0,
       );
-      return _parseReadingPassage(raw);
+      return _parseReadingPassage(raw, levelBand: levelBand);
     }
 
     var scene = await request('');
@@ -1467,7 +1580,7 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise, and nev
       maxTokens: 1400,
       temperature: 1.0,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   /// Generates the complete short-book payload in one text call. The caller
@@ -1996,6 +2109,7 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     required String topic,
     required String levelBand,
     String? coverPrompt,
+    String? visualStyle,
     String? variationSeed,
     String aspectRatio = '4:3',
     int? width,
@@ -2024,7 +2138,7 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
     final fullPrompt =
         '''Create one normal $orientation $aspectRatio illustration for a French learning lesson.
 VISUAL ANCHOR: $visualAnchor
-STYLE: ${styles[styleIndex]}; clear, calm, ordinary, and easy to recognize.
+STYLE: ${visualStyle?.trim().isNotEmpty == true ? visualStyle!.trim() : styles[styleIndex]}; clear, calm, ordinary, and easy to recognize.
 Show only the visual anchor. Keep important details near the center. Do not add a title or make a poster.
 $_bookCoverInstruction''';
     final resolvedWidth = width ?? (aspectRatio == '4:3' ? 1152 : null);
@@ -2118,7 +2232,13 @@ QUIZ: 4 to 6 multiple-choice comprehension questions about events/details in the
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
         {
           'role': 'user',
           'content': 'LEVEL: $levelBand\nSTORY:\n${passage.fullText}',
@@ -2170,7 +2290,7 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
   }) async {
     final system =
         '''
-Write a short third-person narrative story in French for a language learner that puts the grammar point "$grammarPoint" front and center — most sentences should naturally use that grammar point in context, not just mention it once. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title". Write 6 to 10 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending, using "$grammarPoint" as heavily and naturally as a real story allows. "grammar_note" MUST explain, in one simple English sentence, HOW that specific sentence uses "$grammarPoint" (which form, why that form, how it changes from the infinitive/base) — this is the whole point of the story, not an afterthought like in a generic reading passage. "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
+Write a short third-person narrative story in French for a language learner that puts the grammar point "$grammarPoint" front and center. Return ONLY compact JSON with this exact shape: {"title": string, "title_en": string, "segments": [{"fr": string, "en": string, "grammar_note": string, "pronunciation_tip": string}]}. "title_en" is a short 2-4 word English gloss of "title". Write exactly 5 short sentences, one per segment, that together tell one small complete story with a beginning, a small turn, and an ending, using "$grammarPoint" naturally in every sentence where possible. "grammar_note" MUST explain, in one simple English sentence, HOW that specific sentence uses "$grammarPoint" (which form, why that form, how it changes from the infinitive/base). "pronunciation_tip" is one simple English pronunciation pointer for a tricky word in that sentence (or an empty string if nothing stands out).
 ${_cefrCalibration(levelBand)}
 TENSE OVERRIDE, TAKES PRIORITY OVER THE CALIBRATION ABOVE: the student deliberately chose to practice "$grammarPoint" specifically, even if it's not the tense that calibration band would normally introduce — use "$grammarPoint" as the story's main tense regardless. Everything else from the calibration still applies in full: sentence length, vocabulary difficulty, and overall simplicity must still match the level exactly. A harder tense at a beginner level means SHORT, SIMPLE sentences that happen to use that tense, e.g. one clear action per sentence with common everyday vocabulary, not a complex plot just because the tense is advanced.
 This app's users are teens and adults (13+): keep the story wholesome and educational in tone, appropriate for a general audience.
@@ -2194,7 +2314,17 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or openi
       maxTokens: 1400,
       temperature: 1.0,
     );
-    return _parseReadingPassage(raw);
+    final passage = _parseReadingPassage(raw, levelBand: levelBand);
+    // Generated grammar lessons are five readable sentence cards. Accepting
+    // four keeps older/short model responses usable, while rejecting long
+    // stories prevents the grammar lesson from becoming an unbounded reader.
+    if (passage.segments.length < 4 || passage.segments.length > 5) {
+      throw AgentError.badResponse;
+    }
+    if (passage.segments.any((segment) => segment.en.trim().isEmpty)) {
+      throw AgentError.badResponse;
+    }
+    return passage;
   }
 
   /// Builds the grammar explanation FROM the story that was just generated —
@@ -2254,7 +2384,13 @@ empty. Use an empty string for unknown gender or number. Keep the explanation
 short enough for a mobile bottom sheet.''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
         {
           'role': 'user',
           'content':
@@ -2288,7 +2424,13 @@ conjugation view. Leave unknown gender, number, infinitive, or tense empty.
 Do not invent a meaning unrelated to the sentence.''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
         {
           'role': 'user',
           'content':
@@ -2322,7 +2464,13 @@ QUIZ: 5 to 6 questions. At A1/A2, q must be a simple French question with q_en i
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story (verbatim or their dictionary form), each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA). "id" is a short unique snake_case slug per entry.''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
         {
           'role': 'user',
           'content':
@@ -2404,7 +2552,7 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or openi
       maxTokens: 1400,
       temperature: 1.0,
     );
-    return _parseReadingPassage(raw);
+    return _parseReadingPassage(raw, levelBand: levelBand);
   }
 
   Future<({List<MultipleChoiceQuestion> quiz, List<VocabEntry> keywords})>
@@ -2418,7 +2566,13 @@ QUIZ: 5 to 6 questions. At A1/A2, q must be simple French with q_en in plain Eng
 KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually appear in the story, each with its English meaning and a simple phonetic hint (e.g. "buh-ROH" style, not IPA).''';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
         {
           'role': 'user',
           'content': 'LEVEL: $levelBand\nSTORY:\n${passage.fullText}',
@@ -2439,6 +2593,7 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
     required String tenseTitle,
     required List<String> tenseUsage,
     required List<String> vocabWords,
+    String levelBand = 'A1',
     int count = 6,
   }) async {
     final words = vocabWords.take(6);
@@ -2447,8 +2602,12 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
         '$count beginner French sentences in $tenseTitle$wordList. Pure JSON only: {"cards":[{"fr":"...","en":"...","note":"..."}]}';
     final raw = await _complete(
       messages: [
-        {'role': 'system', 'content': languageGuardrail},
-        {'role': 'user', 'content': user},
+        {
+          'role': 'system',
+          'content':
+              LearnerLanguagePolicy.promptBlock(levelBand) + languageGuardrail,
+        },
+        {'role': 'user', 'content': 'LEVEL: $levelBand\n$user'},
       ],
       maxTokens: 800,
     );
@@ -3065,10 +3224,15 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     );
   }
 
-  ReadingPassage _parseReadingPassage(String raw) {
+  ReadingPassage _parseReadingPassage(String raw, {String? levelBand}) {
     final obj = _decodeObject(raw);
     final title = obj['title'] as String? ?? 'Reading passage';
     final titleEn = obj['title_en'] as String?;
+    if (levelBand != null &&
+        LearnerLanguagePolicy.isEnglishFirst(levelBand) &&
+        (titleEn?.trim().isEmpty ?? true)) {
+      throw AgentError.badResponse;
+    }
     // New script shape ("beats" with both roles' lines) with fallback to the
     // legacy "segments" shape so older cached content keeps loading.
     final beatsRaw =
@@ -3121,7 +3285,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     required String topic,
   }) {
     final obj = _decodeObject(raw);
-    final passage = _parseReadingPassage(raw);
+    final passage = _parseReadingPassage(raw, levelBand: levelBand);
     if (passage.segments.length < 7 || passage.segments.length > 10) {
       throw AgentError.badResponse;
     }
@@ -3216,7 +3380,7 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     required String topic,
   }) {
     final obj = _decodeObject(raw);
-    final passage = _parseReadingPassage(raw);
+    final passage = _parseReadingPassage(raw, levelBand: levelBand);
     final enrichment = _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
     final summary = obj['summary']?.toString().trim() ?? '';
     final coverPrompt = obj['cover_prompt']?.toString().trim() ?? '';

@@ -106,6 +106,7 @@ class WritingCourseLesson {
     required this.mode,
     required this.steps,
     this.goal = '',
+    this.titleEnglish,
   });
 
   final String id;
@@ -117,6 +118,38 @@ class WritingCourseLesson {
   final List<WritingCourseStep> steps;
   final String goal;
 
+  /// English learner-facing title returned by the generator. Older bundled
+  /// lessons do not have one, so the French title remains a safe fallback.
+  final String? titleEnglish;
+
+  String get displayTitle {
+    final english =
+        titleEnglish?.trim() ?? writingCourseEnglishTitleForText(title) ?? '';
+    final band = level.trim().toUpperCase();
+    if (english.isEmpty || english == title.trim()) {
+      if ((band == 'A1' || band == 'A2') && _looksFrenchOnly(title)) {
+        return 'Writing practice';
+      }
+      return title;
+    }
+    return band == 'A1' || band == 'A2' ? english : '$title ($english)';
+  }
+
+  String get displaySubtitle {
+    final value = subtitle.trim();
+    if (value.isEmpty) return 'Practice useful French for this situation.';
+    final band = level.trim().toUpperCase();
+    if ((band == 'A1' || band == 'A2') &&
+        _looksFrenchOnly(value) &&
+        !RegExp(
+          r'\b(the|a|an|about|build|write|say|practice|talk|learn|use|your|with|for)\b',
+          caseSensitive: false,
+        ).hasMatch(value)) {
+      return 'Practice useful French for this situation.';
+    }
+    return value;
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
@@ -126,6 +159,8 @@ class WritingCourseLesson {
     'mode': mode.name,
     'steps': steps.map((step) => step.toJson()).toList(growable: false),
     'goal': goal,
+    if (titleEnglish != null && titleEnglish!.trim().isNotEmpty)
+      'title_en': titleEnglish,
   };
 
   factory WritingCourseLesson.fromJson(Map<String, dynamic> json) {
@@ -134,17 +169,14 @@ class WritingCourseLesson {
       (value) => value.name == rawMode,
       orElse: () => WritingCourseMode.guided,
     );
-    final icon = switch (mode) {
-      WritingCourseMode.guided => Icons.edit_note_rounded,
-      WritingCourseMode.complete => Icons.checklist_rounded,
-      WritingCourseMode.roleplay => Icons.forum_outlined,
-    };
     return WritingCourseLesson(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
       subtitle: json['subtitle']?.toString() ?? '',
       level: json['level']?.toString() ?? 'A1',
-      icon: icon,
+      icon: writingCourseIconForText(
+        '${json['title'] ?? ''} ${json['subtitle'] ?? ''} ${json['goal'] ?? ''}',
+      ),
       mode: mode,
       steps: (json['steps'] as List? ?? const [])
           .whereType<Map>()
@@ -153,6 +185,8 @@ class WritingCourseLesson {
           )
           .toList(growable: false),
       goal: json['goal']?.toString() ?? '',
+      titleEnglish:
+          json['title_en']?.toString() ?? json['titleEnglish']?.toString(),
     );
   }
 }
@@ -270,4 +304,68 @@ String writingLessonFingerprint(WritingCourseLesson lesson) {
     normalise(lesson.title),
     for (final step in lesson.steps) normalise(step.target),
   ].join('|');
+}
+
+/// Topic-aware presentation icon for generated writing lessons. The mode
+/// still controls the activity, but the icon now tells the learner what the
+/// lesson is about instead of making every generated row look identical.
+IconData writingCourseIconForText(String rawText) {
+  final text = rawText.toLowerCase();
+  if (RegExp(r'café|cafe|coffee|restaurant|repas|food|meal').hasMatch(text)) {
+    return Icons.local_cafe_outlined;
+  }
+  if (RegExp(r'marché|market|shop|shopping|magasin|courses').hasMatch(text)) {
+    return Icons.shopping_basket_outlined;
+  }
+  if (RegExp(r'maison|home|house|logement|appartement|room').hasMatch(text)) {
+    return Icons.home_outlined;
+  }
+  if (RegExp(r'train|bus|voyage|travel|town|ville|direction').hasMatch(text)) {
+    return Icons.map_outlined;
+  }
+  if (RegExp(
+    r'matin|morning|routine|jour|day|week-end|weekend|weather|météo',
+  ).hasMatch(text)) {
+    return Icons.wb_sunny_outlined;
+  }
+  if (RegExp(r'travail|work|school|école|job|bureau').hasMatch(text)) {
+    return Icons.work_outline_rounded;
+  }
+  if (RegExp(r'famille|family|ami|friend|person|people').hasMatch(text)) {
+    return Icons.groups_outlined;
+  }
+  if (RegExp(r'message|email|mail|écrire|write|lettre').hasMatch(text)) {
+    return Icons.mail_outline_rounded;
+  }
+  if (RegExp(
+    r'tomorrow|demain|plan|appointment|rendez-vous|calendar',
+  ).hasMatch(text)) {
+    return Icons.calendar_month_outlined;
+  }
+  return Icons.auto_awesome_rounded;
+}
+
+bool _looksFrenchOnly(String value) => RegExp(
+  r'(^|\s)(le|la|les|un|une|des|mon|ma|mes|au|aux|du|de|dans|pour|avec|parler|décrire|écrire)\b|[àâçéèêëîïôùûüÿœ]',
+  caseSensitive: false,
+).hasMatch(value.trim());
+
+String? writingCourseEnglishTitleForText(String rawTitle) {
+  final title = rawTitle.toLowerCase();
+  if (title.contains('week-end') || title.contains('weekend')) {
+    return 'Weekend plans';
+  }
+  if (title.contains('logement') || title.contains('maison')) {
+    return 'Describe my home';
+  }
+  if (title.contains('magasin') || title.contains('marché')) {
+    return 'At the store';
+  }
+  if (title.contains('routine') || title.contains('matin')) {
+    return 'My daily routine';
+  }
+  if (title.contains('café') || title.contains('cafe')) {
+    return 'At the café';
+  }
+  return null;
 }

@@ -1,6 +1,7 @@
 import '../data/content_service.dart';
 import '../data/database/learning_store.dart';
 import '../models/content_models.dart';
+import '../models/profile.dart';
 import '../models/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -172,11 +173,20 @@ class ProgressService {
 
   Future<String> learnerProfileSummary() async {
     final lines = <String>[];
+    final profile = store.profile();
+    final priorities = profile.interests.isEmpty
+        ? 'the complete learning loop'
+        : profile.interests.join(', ');
+    lines.add(
+      'Learner profile: goal ${_goalLabel(profile.goal)}; '
+      'self-reported level ${LearnerLevel.displayLabel(profile.level)}; '
+      'priorities $priorities; preferred session length ${profile.sessionLength}.',
+    );
 
     final month = await currentMonth();
     if (month != null) {
       lines.add(
-        "Currently on month ${month.month} of a 6-month CLB 7 / TEF-TCF Canada plan: ${month.title}.",
+        "Currently on month ${month.month} of the learner's six-month path: ${month.title}.",
       );
     }
 
@@ -226,6 +236,19 @@ class ProgressService {
     );
 
     return lines.join(' ');
+  }
+
+  String _goalLabel(String raw) {
+    return switch (raw.trim().toLowerCase()) {
+      'everyday' => 'Everyday French',
+      'tef_canada' => 'TEF / TCF Canada',
+      'work' => 'Work and professional life',
+      'relocation' => 'Moving and settling in a French-speaking place',
+      'travel' => 'Travel and new places',
+      'culture' => 'Culture, family and connection',
+      '' => 'their chosen French goal',
+      _ => raw.trim(),
+    };
   }
 
   int speakingMinutes(List<Session> sessions) {

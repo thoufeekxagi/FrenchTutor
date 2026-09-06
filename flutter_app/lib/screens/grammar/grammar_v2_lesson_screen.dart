@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/grammar_curriculum_catalog.dart';
 import '../../design/tokens.dart';
+import '../../models/grammar_course.dart';
+import '../../models/grammar_course_session_result.dart';
 import '../../models/grammar_course_v2.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
@@ -15,34 +16,21 @@ import '../../services/lesson_speech_service.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
+import 'grammar_complete_lesson_screen.dart';
+import 'grammar_roleplay_lesson_screen.dart';
 
-class GrammarV2LessonResult {
-  const GrammarV2LessonResult({
-    required this.lessonId,
-    required this.correct,
-    required this.attempted,
-  });
-
-  final String lessonId;
-  final int correct;
-  final int attempted;
-}
-
-/// A bounded, no-typing Grammar session. Each mode has one deterministic task
-/// for a frozen curriculum card; a new card is selected from the home grid for
-/// the next practice turn. Audio is warmed for every visible sentence before
-/// the learner reaches the speaker control.
+/// One continuous Grammar session. The current step changes in place so the
+/// learner experiences one lesson with a beginning, middle, and finish—not a
+/// pile of unrelated sentence cards.
 class GrammarV2LessonScreen extends ConsumerStatefulWidget {
   const GrammarV2LessonScreen({
     super.key,
-    required this.lesson,
-    required this.mode,
-    this.warmupLessons = const [],
+    required this.session,
+    this.warmupSessions = const [],
   });
 
-  final GrammarCurriculumLesson lesson;
-  final GrammarV2Mode mode;
-  final List<GrammarCurriculumLesson> warmupLessons;
+  final GrammarCourseSession session;
+  final List<GrammarCourseSession> warmupSessions;
 
   @override
   ConsumerState<GrammarV2LessonScreen> createState() =>
@@ -51,38 +39,28 @@ class GrammarV2LessonScreen extends ConsumerStatefulWidget {
 
 class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
     with WidgetsBindingObserver {
-  late final List<String> _wordBank;
-  late final List<String> _choiceBank;
   final List<String> _builtSentence = [];
+  List<String> _wordBank = [];
+  List<String> _choiceBank = [];
+  int _index = 0;
   String? _selectedChoice;
-  bool _showTranslations = true;
-  bool _showHint = false;
   bool? _correct;
+  bool _showTranslation = true;
+  bool _showHint = false;
   InlineCallController? _call;
+  int _correctCount = 0;
+  int _attemptedCount = 0;
 
-  bool get _isCompleteMode => widget.mode == GrammarV2Mode.complete;
-  bool get _isRoleplayMode => widget.mode == GrammarV2Mode.roleplay;
-  String get _target => widget.lesson.sentence;
-
-  List<String> get _roleplayChoices {
-    // Keep Roleplay bounded to the same validated forms as Guided. A choice
-    // such as “ne / pas” is not always a literal substring of the finished
-    // sentence, so replacing text would create a misleading distractor.
-    final choices = _choiceBank.take(3).toList();
-    if (!choices.contains(widget.lesson.pickAnswer) && choices.isNotEmpty) {
-      choices[choices.length - 1] = widget.lesson.pickAnswer;
-    }
-    return choices;
-  }
+  GrammarCourseStep get _step => widget.session.steps[_index];
+  bool get _isCompleteMode => widget.session.mode == GrammarV2Mode.complete;
+  bool get _isRoleplayMode => widget.session.mode == GrammarV2Mode.roleplay;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _wordBank = [...widget.lesson.sentenceTiles]
-      ..shuffle(math.Random(widget.lesson.id.hashCode));
-    _choiceBank = [...widget.lesson.pickChoices]
-      ..shuffle(math.Random('${widget.lesson.id}:choices'.hashCode));
+    if (widget.session.mode != GrammarV2Mode.guided) return;
+    _resetStep();
     _call = InlineCallController(
       sessionType: LiveSessionType.grammarStage,
       lessonContext: _lessonContext,
@@ -93,8 +71,19 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
       manualLearnerTurns: false,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_prewarmAudio());
+      if (mounted) unawaited(_prewarmSessionAudio());
     });
+  }
+
+  void _resetStep() {
+    final seed = '${widget.session.id}:$_index'.hashCode;
+    _wordBank = [..._step.tokens]..shuffle(math.Random(seed));
+    _choiceBank = [..._step.choices]
+      ..shuffle(math.Random('$seed:choices'.hashCode));
+    _builtSentence.clear();
+    _selectedChoice = null;
+    _correct = null;
+    _showHint = false;
   }
 
   @override
@@ -104,83 +93,121 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
 
   @override
   void dispose() {
-    unawaited(LessonSpeechService.shared.stop());
     WidgetsBinding.instance.removeObserver(this);
     _call?.dispose();
+    unawaited(LessonSpeechService.shared.stop());
     super.dispose();
   }
 
+  /// The live tutor receives a replacement snapshot whenever anything visible
+  /// changes. Keeping this here (rather than in a separate prompt builder)
+  /// means the call and the screen always share the same current step state.
   String _lessonContext() {
-    final selected = _selectedChoice ?? '(none)';
-    final built = _builtSentence.isEmpty ? '(empty)' : _builtSentence.join(' ');
-    return '''Grammar V2 lesson: ${widget.lesson.title}
-LEVEL: ${widget.lesson.level}
-FOCUS: ${widget.lesson.generationPoint}
-MODE: ${widget.mode.label}
-PROMPT: ${widget.lesson.pickPrompt}
-TARGET SENTENCE: ${widget.lesson.sentence}
-CURRENT CHOICE: $selected
-CURRENT BUILT SENTENCE: $built
-The learner is selecting a frozen answer. Keep help short and grounded in this exact lesson; do not invent a different sentence.''';
+    final visibleChoices = _choiceBank.isEmpty
+        ? '(none)'
+        : _choiceBank.join(' | ');
+    final visibleWordBank = _wordBank.where(_wordIsAvailable).isEmpty
+        ? '(none)'
+        : _wordBank.where(_wordIsAvailable).join(' | ');
+    final answerTray = _builtSentence.isEmpty
+        ? '(empty)'
+        : _builtSentence.join(' ');
+    final result = _correct == null
+        ? 'not checked'
+        : (_correct == true ? 'correct' : 'incorrect');
+
+    return '''
+GRAMMAR SESSION: ${widget.session.title}
+LEVEL: ${widget.session.level}
+TENSE: ${widget.session.tense}
+GRAMMAR FOCUS: ${widget.session.grammarFocus}
+MODE: ${widget.session.mode.label}
+
+CURRENT SCREEN SNAPSHOT — this replaces every older step snapshot:
+STEP: ${_index + 1} of ${widget.session.steps.length}
+STEP LABEL: ${_step.label}
+VISIBLE ENGLISH INSTRUCTION: ${_step.promptEnglish}
+VISIBLE PROMPT: ${_step.prompt}
+VISIBLE TARGET SENTENCE: ${_step.target}
+VISIBLE OPTIONS (in the option area, in display order): $visibleChoices
+VISIBLE WORD BANK (remaining visible words, in display order): $visibleWordBank
+CURRENT ANSWER TRAY: $answerTray
+CURRENT SELECTION: ${_selectedChoice ?? '(none)'}
+CHECK RESULT: $result
+TRANSLATION VISIBLE: $_showTranslation
+HINT VISIBLE: $_showHint${_showHint ? '\nVISIBLE HINT: ${_step.tip}' : ''}
+${_isRoleplayMode ? 'VISIBLE PARTNER FRENCH: ${_step.partnerFrench}\nVISIBLE PARTNER ENGLISH: ${_step.partnerEnglish}\nVISIBLE LEARNER GOAL: ${_step.prompt}' : ''}
+
+PRIVATE ANSWER KEY FOR COACHING: ${_step.answer}
+
+SCOPE RULES:
+- Help only with the current screen snapshot above. Ignore all previous and
+  future steps; do not preview, mention, or teach them.
+- Do not invent a new sentence, new vocabulary, or an unrelated example.
+- Keep explanations to this exact sentence and the visible options/word bank.
+- If the learner asks about past, present, or future, transform only the
+  current target while preserving its meaning and vocabulary, then return to
+  this step. Do not introduce a separate sentence.
+- The app owns answer checking, progression, and completion. Never advance the
+  session or tell the learner to skip ahead.
+''';
   }
 
-  Future<void> _prewarmAudio() async {
-    final lessons = <GrammarCurriculumLesson>[
-      widget.lesson,
-      for (final lesson in widget.warmupLessons)
-        if (lesson.id != widget.lesson.id) lesson,
-    ];
+  void _syncTutorContext() {
+    final call = _call;
+    if (call == null || !call.isLive) return;
+    call.updateLessonContext();
+  }
+
+  Future<void> _prewarmSessionAudio() async {
+    final sessions = [widget.session, ...widget.warmupSessions];
     final items = <SpeechItem>[];
-    for (final lesson in lessons) {
-      if (lesson.sentence.trim().isNotEmpty) {
+    for (final session in sessions) {
+      for (var index = 0; index < session.steps.length; index++) {
+        final step = session.steps[index];
+        final prefix = 'grammar-session:${session.id}:step:$index';
         items.add(
           SpeechItem(
-            text: lesson.sentence,
+            text: step.target,
             language: 'fr-FR',
-            contentItemId: _audioId(lesson, 'target'),
+            contentItemId: '$prefix:target',
           ),
         );
-      }
-      if (lesson.incorrectSentence.trim().isNotEmpty) {
-        items.add(
-          SpeechItem(
-            text: lesson.incorrectSentence,
-            language: 'fr-FR',
-            contentItemId: _audioId(lesson, 'partner'),
-          ),
-        );
-      }
-      if (_isRoleplayMode) {
-        for (var index = 0; index < lesson.pickChoices.length; index++) {
-          final choice = lesson.pickChoices[index];
-          if (choice.trim().isEmpty) continue;
+        if (step.partnerFrench != null) {
           items.add(
             SpeechItem(
-              text: choice,
+              text: step.partnerFrench!,
               language: 'fr-FR',
-              contentItemId: _audioId(lesson, 'choice-$index'),
+              contentItemId: '$prefix:partner',
+            ),
+          );
+        }
+        for (
+          var choiceIndex = 0;
+          choiceIndex < step.choices.length;
+          choiceIndex++
+        ) {
+          items.add(
+            SpeechItem(
+              text: step.choices[choiceIndex],
+              language: 'fr-FR',
+              contentItemId: '$prefix:choice:$choiceIndex',
             ),
           );
         }
       }
     }
-    if (items.isEmpty) return;
     try {
       await LessonSpeechService.shared.prewarmNarration(items);
     } catch (error) {
-      debugPrint('Grammar V2 audio prewarm skipped: $error');
+      debugPrint('Grammar session audio prewarm skipped: $error');
     }
   }
 
-  String _audioId(GrammarCurriculumLesson lesson, String role) =>
-      'grammar-v2:${lesson.id}:$role';
-
   void _selectChoice(String choice) {
     if (_correct != null) return;
-    setState(() {
-      _selectedChoice = choice;
-      _correct = null;
-    });
+    setState(() => _selectedChoice = choice);
+    _syncTutorContext();
   }
 
   void _addWord(String word) {
@@ -189,14 +216,13 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
     final available = _wordBank.where((item) => item == word).length;
     if (used >= available) return;
     setState(() => _builtSentence.add(word));
+    _syncTutorContext();
   }
 
   void _removeWord(int index) {
     if (_correct != null) return;
-    setState(() {
-      _builtSentence.removeAt(index);
-      _correct = null;
-    });
+    setState(() => _builtSentence.removeAt(index));
+    _syncTutorContext();
   }
 
   bool _wordIsAvailable(String word) {
@@ -206,13 +232,18 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
   }
 
   void _check() {
-    final answer = _normalise(
-      _isCompleteMode ? _builtSentence.join(' ') : _selectedChoice ?? '',
-    );
-    final target = _isCompleteMode
-        ? _normalise(_target)
-        : _normalise(widget.lesson.pickAnswer);
-    setState(() => _correct = answer == target);
+    final answer = _isCompleteMode
+        ? _normalise(_builtSentence.join(' '))
+        : _selectedChoice?.trim().toLowerCase() ?? '';
+    final expected = _isCompleteMode
+        ? _normalise(_step.target)
+        : _step.answer.trim().toLowerCase();
+    setState(() {
+      _attemptedCount++;
+      _correct = answer == expected;
+      if (_correct == true) _correctCount++;
+    });
+    _syncTutorContext();
   }
 
   String _normalise(String value) => value
@@ -221,51 +252,91 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 
-  Future<void> _finish() async {
-    final attempted = _correct == null ? 0 : 1;
-    final score = _correct == true ? 1.0 : 0.0;
+  void _nextStep() {
+    if (_correct != true) return;
     ref
         .read(learningStoreProvider)
         .setLessonStatus(
-          widget.lesson.progressId,
-          _correct == true ? 'completed' : 'in_progress',
-          score: score,
+          '${widget.session.progressId}_step_$_index',
+          'completed',
+          score: 1,
         );
-    if (!mounted) return;
-    Navigator.of(context).pop(
-      GrammarV2LessonResult(
-        lessonId: widget.lesson.id,
-        correct: _correct == true ? 1 : 0,
-        attempted: attempted,
-      ),
-    );
+    if (_index == widget.session.steps.length - 1) {
+      final store = ref.read(learningStoreProvider);
+      store.setLessonStatus(widget.session.progressId, 'completed', score: 1);
+      if (!mounted) return;
+      Navigator.of(context).pop(
+        GrammarCourseSessionResult(
+          sessionId: widget.session.id,
+          correct: _correctCount,
+          attempted: _attemptedCount,
+          completed: true,
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _index++;
+      _resetStep();
+    });
+    _syncTutorContext();
+  }
+
+  void _retry() {
+    setState(() {
+      _correct = null;
+      _selectedChoice = null;
+      _builtSentence.clear();
+    });
+    _syncTutorContext();
+  }
+
+  void _toggleHint() {
+    setState(() => _showHint = !_showHint);
+    _syncTutorContext();
+  }
+
+  void _toggleTranslation() {
+    setState(() => _showTranslation = !_showTranslation);
+    _syncTutorContext();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isCompleteMode) {
+      return GrammarCompleteLessonScreen(
+        session: widget.session,
+        warmupSessions: widget.warmupSessions,
+      );
+    }
+    if (_isRoleplayMode) {
+      return GrammarRoleplayLessonScreen(
+        session: widget.session,
+        warmupSessions: widget.warmupSessions,
+      );
+    }
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: WebConstrainedView(
           child: Column(
             children: [
-              _header(context),
+              _header(),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 22, 20, 26),
                   children: [
                     _modeLabel(),
-                    const SizedBox(height: 11),
+                    const SizedBox(height: 10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
                             _heading,
-                            style: DesignTokens.display(31),
+                            style: DesignTokens.display(30),
                           ),
                         ),
-                        const SizedBox(width: 6),
                         if (_call != null)
                           InlineCallActions(
                             controller: _call!,
@@ -273,11 +344,11 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
                           ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 7),
                     Text(
-                      _subheading,
+                      _step.promptEnglish,
                       style: DesignTokens.body(
-                        16,
+                        15,
                       ).copyWith(color: DesignTokens.muted, height: 1.4),
                     ),
                     const SizedBox(height: 20),
@@ -300,352 +371,275 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
     );
   }
 
-  String get _heading => switch (widget.mode) {
-    GrammarV2Mode.guided => 'Fix the form',
-    GrammarV2Mode.complete => 'Build the sentence',
-    GrammarV2Mode.roleplay => 'Choose your reply',
-  };
-
-  String get _subheading => switch (widget.mode) {
-    GrammarV2Mode.guided => widget.lesson.pickPrompt,
-    GrammarV2Mode.complete => widget.lesson.translation,
-    GrammarV2Mode.roleplay => 'Use the right grammar in this short exchange.',
-  };
-
-  Widget _header(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 4, 12, 0),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 54,
-            child: Row(
-              children: [
-                Semantics(
-                  button: true,
-                  label: 'Close grammar lesson',
-                  child: IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(CupertinoIcons.xmark),
-                    color: DesignTokens.ink,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    widget.lesson.title,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    style: DesignTokens.display(18),
-                  ),
-                ),
-                SizedBox(
-                  width: 58,
-                  child: Text(
-                    widget.lesson.level,
-                    textAlign: TextAlign.end,
-                    style: DesignTokens.label(12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
-              child: LinearProgressIndicator(
-                minHeight: 5,
-                value: _correct == null ? 0.35 : 1,
-                backgroundColor: DesignTokens.hairline,
-                valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _modeLabel() => Text(
-    '${widget.mode.label.toUpperCase()} · ${GrammarV2Tenses.labelFor(widget.lesson).toUpperCase()}',
-    style: DesignTokens.label(
-      12,
-      weight: FontWeight.w800,
-    ).copyWith(color: DesignTokens.primary, letterSpacing: 1.1),
-  );
-
-  Widget _exercise() => switch (widget.mode) {
-    GrammarV2Mode.guided => _guidedExercise(),
-    GrammarV2Mode.complete => _completeExercise(),
-    GrammarV2Mode.roleplay => _roleplayExercise(),
-  };
-
-  Widget _guidedExercise() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget _header() => Padding(
+    padding: const EdgeInsets.fromLTRB(8, 4, 12, 0),
+    child: Column(
       children: [
-        _PromptCard(
-          prompt: widget.lesson.pickPrompt,
-          translation: widget.lesson.translation,
-          showTranslation: _showTranslations,
-          audioText: widget.lesson.sentence,
-          contentItemId: _audioId(widget.lesson, 'target'),
-        ),
-        const SizedBox(height: 18),
-        _sectionLabel('CHOOSE THE FORM'),
-        const SizedBox(height: 10),
-        for (final choice in _choiceBank) ...[
-          _ChoiceTile(
-            key: ValueKey(
-              'grammar-v2-guided-choice-${widget.lesson.id}-$choice',
-            ),
-            text: choice,
-            meaning: GrammarCurriculumCatalog.wordMeaning(choice),
-            showMeaning: _showTranslations,
-            selected: choice == _selectedChoice,
-            correct: _correct == null
-                ? null
-                : choice == widget.lesson.pickAnswer,
-            onTap: () => _selectChoice(choice),
-          ),
-          const SizedBox(height: 9),
-        ],
-      ],
-    );
-  }
-
-  Widget _completeExercise() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _AnswerTray(
-          words: _builtSentence,
-          showTranslations: false,
-          onRemove: _removeWord,
-          audioText: widget.lesson.sentence,
-          contentItemId: _audioId(widget.lesson, 'target'),
-        ),
-        const SizedBox(height: 18),
-        _sectionLabel('WORD BANK'),
-        const SizedBox(height: 10),
-        Wrap(spacing: 8, runSpacing: 9, children: [..._wordBankChips()]),
-        const SizedBox(height: 10),
-        Text(
-          'Tap the words in the right order.',
-          style: DesignTokens.body(14).copyWith(color: DesignTokens.muted),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _wordBankChips() {
-    final chips = <Widget>[];
-    for (var index = 0; index < _wordBank.length; index++) {
-      final word = _wordBank[index];
-      if (!_wordIsAvailable(word)) continue;
-      chips.add(
-        _WordChip(
-          key: ValueKey('grammar-v2-word-bank-${widget.lesson.id}-$index'),
-          word: word,
-          meaning: GrammarCurriculumCatalog.wordMeaning(word),
-          showMeaning: _showTranslations,
-          onTap: () => _addWord(word),
-        ),
-      );
-    }
-    return chips;
-  }
-
-  Widget _roleplayExercise() {
-    final choices = _roleplayChoices;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _PartnerCard(
-          french: widget.lesson.incorrectSentence,
-          english: widget.lesson.translation,
-          showTranslation: _showTranslations,
-          audioText: widget.lesson.incorrectSentence,
-          contentItemId: _audioId(widget.lesson, 'partner'),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: DesignTokens.primarySoft,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: DesignTokens.primary.withValues(alpha: 0.36),
-            ),
-          ),
+        SizedBox(
+          height: 54,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.track_changes_rounded, color: DesignTokens.primary),
-              const SizedBox(width: 10),
+              Semantics(
+                button: true,
+                label: 'Close grammar session',
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(CupertinoIcons.xmark),
+                  color: DesignTokens.ink,
+                ),
+              ),
               Expanded(
                 child: Text(
-                  'Choose the reply with: ${widget.lesson.tip}',
-                  style: DesignTokens.body(14, weight: FontWeight.w700),
+                  widget.session.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.display(18),
+                ),
+              ),
+              SizedBox(
+                width: 48,
+                child: Text(
+                  widget.session.level,
+                  textAlign: TextAlign.end,
+                  style: DesignTokens.label(12),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        for (final choice in choices) ...[
-          _ChoiceTile(
-            key: ValueKey(
-              'grammar-v2-roleplay-choice-${widget.lesson.id}-$choice',
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+            child: LinearProgressIndicator(
+              minHeight: 5,
+              value:
+                  (_index + (_correct == true ? 1 : 0)) /
+                  widget.session.steps.length,
+              backgroundColor: DesignTokens.hairline,
+              valueColor: AlwaysStoppedAnimation(DesignTokens.primary),
             ),
-            text: choice,
-            meaning: GrammarCurriculumCatalog.wordMeaning(choice),
-            showMeaning: _showTranslations,
-            selected: choice == _selectedChoice,
-            correct: _correct == null
-                ? null
-                : choice == widget.lesson.pickAnswer,
-            onTap: () => _selectChoice(choice),
           ),
-          const SizedBox(height: 9),
-        ],
+        ),
       ],
-    );
-  }
+    ),
+  );
 
-  Widget _supportRow() {
-    return Row(
+  Widget _modeLabel() => Row(
+    children: [
+      Expanded(
+        child: Text(
+          '${widget.session.mode.label.toUpperCase()} · ${widget.session.tense.toUpperCase()}',
+          style: DesignTokens.label(
+            12,
+            weight: FontWeight.w800,
+          ).copyWith(color: DesignTokens.primary, letterSpacing: 1.1),
+        ),
+      ),
+      Text(
+        'STEP ${_index + 1} OF ${widget.session.steps.length}',
+        style: DesignTokens.label(10).copyWith(color: DesignTokens.muted),
+      ),
+    ],
+  );
+
+  String get _heading => switch (widget.session.mode) {
+    GrammarV2Mode.guided => 'Choose the right form',
+    GrammarV2Mode.complete => 'Build the sentence',
+    GrammarV2Mode.roleplay => 'Reply in the scene',
+  };
+
+  Widget _exercise() => switch (widget.session.mode) {
+    GrammarV2Mode.guided => _guidedExercise(),
+    GrammarV2Mode.complete => _completeExercise(),
+    GrammarV2Mode.roleplay => _roleplayExercise(),
+  };
+
+  Widget _guidedExercise() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _PromptCard(
+        prompt: _step.prompt,
+        translation: _showTranslation ? _step.promptEnglish : null,
+        audioText: _step.target,
+        contentItemId: _audioId('target'),
+      ),
+      const SizedBox(height: 16),
+      _sectionLabel('CHOOSE THE FORM'),
+      const SizedBox(height: 9),
+      for (final choice in _choiceBank) ...[
+        _ChoiceTile(
+          text: choice,
+          selected: choice == _selectedChoice,
+          correct: _correct == null ? null : choice == _step.answer,
+          onTap: () => _selectChoice(choice),
+        ),
+        const SizedBox(height: 9),
+      ],
+    ],
+  );
+
+  Widget _completeExercise() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _AnswerTray(
+        words: _builtSentence,
+        onRemove: _removeWord,
+        audioText: _step.target,
+        contentItemId: _audioId('target'),
+      ),
+      const SizedBox(height: 16),
+      _sectionLabel('WORD BANK'),
+      const SizedBox(height: 9),
+      Wrap(
+        spacing: 8,
+        runSpacing: 9,
+        children: [
+          for (final word in _wordBank)
+            if (_wordIsAvailable(word))
+              _WordChip(word: word, onTap: () => _addWord(word)),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Text(
+        'Tap the words in the right order.',
+        style: DesignTokens.body(14).copyWith(color: DesignTokens.muted),
+      ),
+    ],
+  );
+
+  Widget _roleplayExercise() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _PartnerCard(
+        french: _step.partnerFrench!,
+        english: _step.partnerEnglish!,
+        showTranslation: _showTranslation,
+        audioText: _step.partnerFrench!,
+        contentItemId: _audioId('partner'),
+      ),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: DesignTokens.primarySoft,
+          borderRadius: BorderRadius.circular(17),
+          border: Border.all(
+            color: DesignTokens.primary.withValues(alpha: 0.35),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.track_changes_rounded, color: DesignTokens.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _step.prompt,
+                style: DesignTokens.body(14, weight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      for (final choice in _choiceBank) ...[
+        _ChoiceTile(
+          text: choice,
+          selected: choice == _selectedChoice,
+          correct: _correct == null ? null : choice == _step.answer,
+          onTap: () => _selectChoice(choice),
+        ),
+        const SizedBox(height: 9),
+      ],
+    ],
+  );
+
+  Widget _supportRow() => LayoutBuilder(
+    builder: (context, constraints) => Row(
       children: [
-        Expanded(child: _listenAction()),
+        Expanded(child: _listenButton()),
         const SizedBox(width: 8),
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => setState(() => _showHint = !_showHint),
-            icon: Icon(Icons.lightbulb_outline_rounded, size: 20),
-            label: const Text('Hint'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: DesignTokens.ink,
-              side: BorderSide(color: DesignTokens.hairline),
-              minimumSize: const Size(0, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
+          child: _supportButton(
+            Icons.lightbulb_outline_rounded,
+            'Hint',
+            _toggleHint,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () =>
-                setState(() => _showTranslations = !_showTranslations),
-            icon: const Icon(Icons.translate_rounded, size: 20),
-            label: Text(_showTranslations ? 'Translate on' : 'Translate'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: _showTranslations
-                  ? DesignTokens.primary
-                  : DesignTokens.ink,
-              side: BorderSide(
-                color: _showTranslations
-                    ? DesignTokens.primary
-                    : DesignTokens.hairline,
-              ),
-              minimumSize: const Size(0, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
+          child: _supportButton(
+            Icons.translate_rounded,
+            'Translate',
+            _toggleTranslation,
+            selected: _showTranslation,
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
 
-  Widget _listenAction() {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: DesignTokens.hairline),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TtsPlayButton(
-            text: _isRoleplayMode
-                ? widget.lesson.incorrectSentence
-                : widget.lesson.sentence,
-            contentItemId: _audioId(
-              widget.lesson,
-              _isRoleplayMode ? 'partner' : 'target',
-            ),
-            label: 'Listen to the grammar example',
-            size: 42,
-            iconSize: 20,
-            color: DesignTokens.primary,
-          ),
-          Text('Listen', style: DesignTokens.body(14, weight: FontWeight.w800)),
-        ],
-      ),
-    );
-  }
+  Widget _listenButton() => Container(
+    height: 50,
+    decoration: BoxDecoration(
+      border: Border.all(color: DesignTokens.hairline),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TtsPlayButton(
+          text: _isRoleplayMode ? _step.partnerFrench! : _step.target,
+          contentItemId: _audioId(_isRoleplayMode ? 'partner' : 'target'),
+          size: 42,
+          iconSize: 20,
+          color: DesignTokens.primary,
+        ),
+        Text('Listen', style: DesignTokens.body(13, weight: FontWeight.w800)),
+      ],
+    ),
+  );
 
-  Widget _hintCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: DesignTokens.primarySoft,
-        borderRadius: BorderRadius.circular(16),
+  Widget _supportButton(
+    IconData icon,
+    String label,
+    VoidCallback onPressed, {
+    bool selected = false,
+  }) => OutlinedButton.icon(
+    onPressed: onPressed,
+    icon: Icon(icon, size: 18),
+    label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+    style: OutlinedButton.styleFrom(
+      foregroundColor: selected ? DesignTokens.primary : DesignTokens.ink,
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      minimumSize: const Size(0, 50),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      side: BorderSide(
+        color: selected ? DesignTokens.primary : DesignTokens.hairline,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.tips_and_updates_outlined, color: DesignTokens.primary),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              widget.lesson.tip,
-              style: DesignTokens.body(
-                14,
-                weight: FontWeight.w700,
-              ).copyWith(height: 1.35),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      textStyle: DesignTokens.body(13, weight: FontWeight.w800),
+    ),
+  );
+
+  Widget _hintCard() => _InfoCard(
+    icon: Icons.tips_and_updates_outlined,
+    color: DesignTokens.primarySoft,
+    text: _step.tip,
+  );
 
   Widget _feedbackCard() {
     final correct = _correct == true;
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: correct ? DesignTokens.successSoft : DesignTokens.primarySoft,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            correct
-                ? Icons.check_circle_outline_rounded
-                : Icons.refresh_rounded,
-            color: correct ? DesignTokens.success : DesignTokens.primary,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              correct
-                  ? 'Correct. ${widget.lesson.tip}'
-                  : 'The right sentence is ${widget.lesson.sentence}',
-              style: DesignTokens.body(
-                14,
-                weight: FontWeight.w700,
-              ).copyWith(height: 1.35),
-            ),
-          ),
-        ],
-      ),
+    return _InfoCard(
+      icon: correct
+          ? Icons.check_circle_outline_rounded
+          : Icons.refresh_rounded,
+      color: correct ? DesignTokens.successSoft : DesignTokens.primarySoft,
+      text: correct
+          ? 'Correct. ${_step.tip}'
+          : 'Try again. The target is ${_step.target}',
     );
   }
 
@@ -659,14 +653,10 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
       ),
       child: Row(
         children: [
-          if (checked) ...[
+          if (checked && _correct == false) ...[
             Expanded(
               child: OutlinedButton(
-                onPressed: () => setState(() {
-                  _correct = null;
-                  _selectedChoice = null;
-                  _builtSentence.clear();
-                }),
+                onPressed: _retry,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: DesignTokens.primary,
                   minimumSize: const Size(0, 56),
@@ -675,16 +665,15 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
                     borderRadius: BorderRadius.circular(17),
                   ),
                 ),
-                child: const Text('Redo'),
+                child: const Text('Try again'),
               ),
             ),
             const SizedBox(width: 10),
           ],
           Expanded(
-            flex: checked ? 2 : 1,
             child: ElevatedButton(
               onPressed: checked
-                  ? _finish
+                  ? (_correct == true ? _nextStep : _retry)
                   : _canCheck
                   ? _check
                   : null,
@@ -699,11 +688,13 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
                 ),
               ),
               child: Text(
-                checked ? 'Next lesson' : _checkLabel,
+                checked
+                    ? (_correct == true
+                          ? (_isLastStep ? 'Finish session' : 'Next step')
+                          : 'Try again')
+                    : _checkLabel,
                 style: DesignTokens.body(15, weight: FontWeight.w800).copyWith(
-                  color: checked
-                      ? DesignTokens.onPrimary
-                      : _canCheck
+                  color: checked || _canCheck
                       ? DesignTokens.onPrimary
                       : DesignTokens.muted,
                 ),
@@ -715,14 +706,18 @@ The learner is selecting a frozen answer. Keep help short and grounded in this e
     );
   }
 
+  bool get _isLastStep => _index == widget.session.steps.length - 1;
   bool get _canCheck =>
       _isCompleteMode ? _builtSentence.isNotEmpty : _selectedChoice != null;
 
-  String get _checkLabel => switch (widget.mode) {
+  String get _checkLabel => switch (widget.session.mode) {
     GrammarV2Mode.guided => 'Check form',
     GrammarV2Mode.complete => 'Check sentence',
     GrammarV2Mode.roleplay => 'Check reply',
   };
+
+  String _audioId(String role) =>
+      'grammar-session:${widget.session.id}:step:$_index:$role';
 
   Widget _sectionLabel(String value) => Text(
     value,
@@ -737,56 +732,52 @@ class _PromptCard extends StatelessWidget {
   const _PromptCard({
     required this.prompt,
     required this.translation,
-    required this.showTranslation,
     required this.audioText,
     required this.contentItemId,
   });
 
   final String prompt;
-  final String translation;
-  final bool showTranslation;
+  final String? translation;
   final String audioText;
   final String contentItemId;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(18, 18, 13, 18),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: DesignTokens.hairline),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(prompt, style: DesignTokens.display(24)),
-                if (showTranslation) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    translation,
-                    style: DesignTokens.body(
-                      14,
-                    ).copyWith(color: DesignTokens.muted, height: 1.35),
-                  ),
-                ],
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(18, 18, 13, 18),
+    decoration: BoxDecoration(
+      color: DesignTokens.surface,
+      borderRadius: BorderRadius.circular(21),
+      border: Border.all(color: DesignTokens.hairline),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(prompt, style: DesignTokens.display(24)),
+              if (translation != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  translation!,
+                  style: DesignTokens.body(
+                    14,
+                  ).copyWith(color: DesignTokens.muted, height: 1.35),
+                ),
               ],
-            ),
+            ],
           ),
-          TtsPlayButton(
-            text: audioText,
-            contentItemId: contentItemId,
-            label: 'Listen to the grammar example',
-            color: DesignTokens.primary,
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        TtsPlayButton(
+          text: audioText,
+          contentItemId: contentItemId,
+          size: 42,
+          color: DesignTokens.primary,
+        ),
+      ],
+    ),
+  );
 }
 
 class _PartnerCard extends StatelessWidget {
@@ -805,190 +796,101 @@ class _PartnerCard extends StatelessWidget {
   final String contentItemId;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(17, 15, 12, 15),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: DesignTokens.hairline),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(16, 15, 12, 15),
+    decoration: BoxDecoration(
+      color: DesignTokens.surface,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: DesignTokens.hairline),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'TUTOR',
+                style: DesignTokens.label(
+                  10,
+                  weight: FontWeight.w800,
+                ).copyWith(color: DesignTokens.primary, letterSpacing: 1.1),
+              ),
+              const SizedBox(height: 8),
+              Text(french, style: DesignTokens.display(21)),
+              if (showTranslation) ...[
+                const SizedBox(height: 6),
                 Text(
-                  'PARTNER',
-                  style: DesignTokens.label(
-                    11,
-                    weight: FontWeight.w800,
-                  ).copyWith(color: DesignTokens.primary, letterSpacing: 1),
+                  english,
+                  style: DesignTokens.body(
+                    14,
+                  ).copyWith(color: DesignTokens.muted),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  french,
-                  style: DesignTokens.body(18, weight: FontWeight.w700),
-                ),
-                if (showTranslation) ...[
-                  const SizedBox(height: 5),
-                  Text(
-                    english,
-                    style: DesignTokens.body(
-                      14,
-                    ).copyWith(color: DesignTokens.muted),
-                  ),
-                ],
               ],
-            ),
+            ],
           ),
-          TtsPlayButton(
-            text: audioText,
-            contentItemId: contentItemId,
-            label: 'Listen to the partner line',
-            color: DesignTokens.primary,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AnswerTray extends StatelessWidget {
-  const _AnswerTray({
-    required this.words,
-    required this.showTranslations,
-    required this.onRemove,
-    required this.audioText,
-    required this.contentItemId,
-  });
-
-  final List<String> words;
-  final bool showTranslations;
-  final ValueChanged<int> onRemove;
-  final String audioText;
-  final String contentItemId;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: DesignTokens.durationFast,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: words.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    child: Text(
-                      'Tap a word to begin.',
-                      style: DesignTokens.body(
-                        15,
-                      ).copyWith(color: DesignTokens.muted),
-                    ),
-                  )
-                : Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (var index = 0; index < words.length; index++)
-                        GestureDetector(
-                          onTap: () => onRemove(index),
-                          child: _AnswerChip(word: words[index]),
-                        ),
-                    ],
-                  ),
-          ),
-          TtsPlayButton(
-            text: audioText,
-            contentItemId: contentItemId,
-            label: 'Listen to the target sentence',
-            color: DesignTokens.primary,
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        TtsPlayButton(
+          text: audioText,
+          contentItemId: contentItemId,
+          size: 42,
+          color: DesignTokens.primary,
+        ),
+      ],
+    ),
+  );
 }
 
 class _ChoiceTile extends StatelessWidget {
   const _ChoiceTile({
-    super.key,
     required this.text,
-    required this.meaning,
-    required this.showMeaning,
     required this.selected,
     required this.correct,
     required this.onTap,
   });
 
   final String text;
-  final String meaning;
-  final bool showMeaning;
   final bool selected;
   final bool? correct;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isCorrect = correct == true && selected;
+    final isAnswer = correct == true && selected;
     final isWrong = correct == false && selected;
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: showMeaning ? '$text, $meaning' : text,
+    final color = isAnswer
+        ? DesignTokens.success
+        : isWrong
+        ? DesignTokens.danger
+        : selected
+        ? DesignTokens.primary
+        : DesignTokens.hairline;
+    return Material(
+      color: DesignTokens.surface,
+      borderRadius: BorderRadius.circular(17),
       child: InkWell(
         onTap: correct == null ? onTap : null,
         borderRadius: BorderRadius.circular(17),
-        child: AnimatedContainer(
-          duration: DesignTokens.durationFast,
-          padding: const EdgeInsets.fromLTRB(16, 12, 14, 11),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 58),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           decoration: BoxDecoration(
-            color: isCorrect
-                ? DesignTokens.successSoft
-                : isWrong
-                ? DesignTokens.dangerSoft
-                : DesignTokens.surface,
             borderRadius: BorderRadius.circular(17),
-            border: Border.all(
-              color: isCorrect
-                  ? DesignTokens.success
-                  : isWrong
-                  ? DesignTokens.danger
-                  : selected
-                  ? DesignTokens.primary
-                  : DesignTokens.hairline,
-              width: selected ? 1.5 : 1,
-            ),
+            border: Border.all(color: color, width: selected ? 1.6 : 1),
           ),
           child: Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      text,
-                      style: DesignTokens.body(17, weight: FontWeight.w700),
-                    ),
-                    if (showMeaning) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        '($meaning)',
-                        style: DesignTokens.body(
-                          13,
-                        ).copyWith(color: DesignTokens.muted),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  text,
+                  style: DesignTokens.body(16, weight: FontWeight.w700),
                 ),
               ),
-              if (isCorrect)
-                Icon(Icons.check_circle_outline, color: DesignTokens.success)
+              if (isAnswer)
+                Icon(Icons.check_circle_rounded, color: DesignTokens.success)
               else if (isWrong)
-                Icon(Icons.refresh_rounded, color: DesignTokens.danger),
+                Icon(Icons.cancel_rounded, color: DesignTokens.danger),
             ],
           ),
         ),
@@ -998,71 +900,118 @@ class _ChoiceTile extends StatelessWidget {
 }
 
 class _WordChip extends StatelessWidget {
-  const _WordChip({
-    super.key,
-    required this.word,
-    required this.meaning,
-    required this.showMeaning,
-    required this.onTap,
-  });
+  const _WordChip({required this.word, required this.onTap});
 
   final String word;
-  final String meaning;
-  final bool showMeaning;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: showMeaning ? '$word, $meaning' : word,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(15, 10, 15, showMeaning ? 8 : 10),
-          decoration: BoxDecoration(
-            color: DesignTokens.surface,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: DesignTokens.hairline),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(word, style: DesignTokens.body(16, weight: FontWeight.w700)),
-              if (showMeaning) ...[
-                const SizedBox(height: 2),
-                Text(
-                  '($meaning)',
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.muted),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ActionChip(
+    onPressed: onTap,
+    label: Text(word),
+    backgroundColor: DesignTokens.surface,
+    side: BorderSide(color: DesignTokens.hairline),
+    labelStyle: DesignTokens.body(14, weight: FontWeight.w700),
+    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+  );
 }
 
-class _AnswerChip extends StatelessWidget {
-  const _AnswerChip({required this.word});
+class _AnswerTray extends StatelessWidget {
+  const _AnswerTray({
+    required this.words,
+    required this.onRemove,
+    required this.audioText,
+    required this.contentItemId,
+  });
 
-  final String word;
+  final List<String> words;
+  final ValueChanged<int> onRemove;
+  final String audioText;
+  final String contentItemId;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: DesignTokens.primarySoft,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: DesignTokens.primary.withValues(alpha: 0.5)),
-      ),
-      child: Text(word, style: DesignTokens.body(16, weight: FontWeight.w700)),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(minHeight: 128),
+    padding: const EdgeInsets.fromLTRB(14, 14, 8, 12),
+    decoration: BoxDecoration(
+      color: DesignTokens.surface,
+      borderRadius: BorderRadius.circular(21),
+      border: Border.all(color: DesignTokens.primary.withValues(alpha: 0.5)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                words.isEmpty
+                    ? 'Tap words to build the sentence'
+                    : words.join(' '),
+                style: DesignTokens.display(20),
+              ),
+            ),
+            if (words.isNotEmpty)
+              TtsPlayButton(
+                text: audioText,
+                contentItemId: contentItemId,
+                size: 40,
+                color: DesignTokens.primary,
+              ),
+          ],
+        ),
+        if (words.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var index = 0; index < words.length; index++)
+                InputChip(
+                  label: Text(words[index]),
+                  onDeleted: () => onRemove(index),
+                ),
+            ],
+          ),
+        ],
+      ],
+    ),
+  );
+}
+
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({
+    required this.icon,
+    required this.color,
+    required this.text,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: DesignTokens.primary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: DesignTokens.body(
+              14,
+              weight: FontWeight.w700,
+            ).copyWith(height: 1.35),
+          ),
+        ),
+      ],
+    ),
+  );
 }

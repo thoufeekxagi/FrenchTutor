@@ -68,6 +68,9 @@ else
 fi
 
 SECRETS_FILE="$APP_DIR/secrets.local.properties"
+if [[ ! -f "$SECRETS_FILE" && -f "$APP_DIR/../.env" ]]; then
+  SECRETS_FILE="$APP_DIR/../.env"
+fi
 DEFINE_ARGS=()
 
 get_property() {
@@ -91,20 +94,32 @@ if [[ -f "$SECRETS_FILE" ]]; then
       DEFINE_ARGS+=("--dart-define=$key=$value")
     fi
   done
-  echo "Using local configuration from secrets.local.properties (values hidden)."
+  echo "Using local configuration (values hidden)."
 else
-  echo "No secrets.local.properties found; using built-in public Supabase configuration."
+  echo "No local configuration found; using built-in public Supabase configuration."
   echo "AI requests use the authenticated Supabase Edge Functions."
 fi
 
 case "$MODE" in
   debug)
-    exec "$FLUTTER_BIN" run -d "$DEVICE_ID" "${DEFINE_ARGS[@]}"
+    if [[ ${#DEFINE_ARGS[@]} -gt 0 ]]; then
+      exec "$FLUTTER_BIN" run -d "$DEVICE_ID" "${DEFINE_ARGS[@]}"
+    else
+      exec "$FLUTTER_BIN" run -d "$DEVICE_ID"
+    fi
     ;;
   release)
-    exec "$FLUTTER_BIN" run --release -d "$DEVICE_ID" "${DEFINE_ARGS[@]}"
+    if [[ ${#DEFINE_ARGS[@]} -gt 0 ]]; then
+      exec "$FLUTTER_BIN" run --release -d "$DEVICE_ID" "${DEFINE_ARGS[@]}"
+    else
+      exec "$FLUTTER_BIN" run --release -d "$DEVICE_ID"
+    fi
     ;;
   ipa)
-    exec "$FLUTTER_BIN" build ipa --release "${DEFINE_ARGS[@]}"
+    if [[ ${#DEFINE_ARGS[@]} -gt 0 ]]; then
+      exec "$FLUTTER_BIN" build ipa --release "${DEFINE_ARGS[@]}"
+    else
+      exec "$FLUTTER_BIN" build ipa --release
+    fi
     ;;
 esac

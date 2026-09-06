@@ -194,12 +194,6 @@ class SpeakRoadmapScreen extends ConsumerWidget {
         final cardWidth = constraints.maxWidth * 0.84;
         return Stack(
           children: [
-            Positioned(
-              top: 12,
-              bottom: 12,
-              left: constraints.maxWidth / 2,
-              child: Container(width: 1, color: DesignTokens.nightHairline),
-            ),
             Column(
               children: [
                 for (var index = 0; index < sessions.length; index++) ...[
@@ -234,7 +228,16 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     required bool featured,
     required bool locked,
   }) {
-    final active = featured && !session.completed;
+    final preparing = !session.contentReady && !session.completed;
+    final unavailable = locked || preparing;
+    final active = featured && !session.completed && !preparing;
+    final statusLabel = preparing
+        ? 'preparing'
+        : locked
+        ? 'locked'
+        : session.completed
+        ? 'completed'
+        : 'available';
     final stateIcon = locked
         ? Icons.lock_outline_rounded
         : session.completed
@@ -245,19 +248,16 @@ class SpeakRoadmapScreen extends ConsumerWidget {
         : DesignTokens.nightMuted;
     return Semantics(
       button: true,
-      label:
-          '${session.title}, ${session.primarySkill.label}, ${session.completed
-              ? 'completed'
-              : locked
-              ? 'locked'
-              : 'available'}',
+      label: '${session.title}, ${session.primarySkill.label}, $statusLabel',
       child: V3Card(
         raised: active,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         borderColor: active
             ? DesignTokens.nightAccent
             : DesignTokens.nightHairline,
-        onTap: () => AppRouter.push(context, (_) => _screenFor(session)),
+        onTap: unavailable
+            ? null
+            : () => AppRouter.push(context, (_) => _screenFor(session)),
         child: Row(
           children: [
             Container(
@@ -281,17 +281,36 @@ class SpeakRoadmapScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                session.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: DesignTokens.display(
-                  15,
-                ).copyWith(color: DesignTokens.nightText),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    session.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.display(
+                      15,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  if (preparing) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      session.generationStatus == 'failed'
+                          ? 'Retrying your complete lesson package'
+                          : 'Creating your personalized lesson',
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                ],
               ),
             ),
             const SizedBox(width: 8),
-            Icon(stateIcon, size: 19, color: stateColor),
+            if (preparing)
+              const _LessonPreparationIndicator()
+            else
+              Icon(stateIcon, size: 19, color: stateColor),
           ],
         ),
       ),
@@ -315,4 +334,50 @@ class SpeakRoadmapScreen extends ConsumerWidget {
     SpeakSkill.review => Icons.replay_rounded,
     SpeakSkill.freeTalk => Icons.people_alt_outlined,
   };
+}
+
+class _LessonPreparationIndicator extends StatefulWidget {
+  const _LessonPreparationIndicator();
+
+  @override
+  State<_LessonPreparationIndicator> createState() =>
+      _LessonPreparationIndicatorState();
+}
+
+class _LessonPreparationIndicatorState
+    extends State<_LessonPreparationIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Creating lesson',
+    child: SizedBox.square(
+      dimension: 22,
+      child: RotationTransition(
+        turns: _controller,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.6,
+          strokeCap: StrokeCap.round,
+          backgroundColor: DesignTokens.nightHairline,
+          valueColor: AlwaysStoppedAnimation(DesignTokens.nightAccent),
+        ),
+      ),
+    ),
+  );
 }

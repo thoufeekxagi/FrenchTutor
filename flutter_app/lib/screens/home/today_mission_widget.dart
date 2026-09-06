@@ -14,7 +14,7 @@ import '../../widgets/passeport_primary_button.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/grammar_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
-import '../pathway/vocab_picker_screen.dart';
+import '../labs/vocab_lab_screen.dart';
 import '../speak/speaking_practice_screen.dart';
 
 /// "Today's mission" — not a generated multi-step lesson plan anymore, just
@@ -154,7 +154,7 @@ class _TodayMissionWidgetState extends ConsumerState<TodayMissionWidget> {
     try {
       switch (category) {
         case 'Vocabulary':
-          await AppRouter.push(context, (_) => const VocabPickerScreen());
+          await AppRouter.push(context, (_) => const VocabLabScreen());
         case 'Grammar':
           await AppRouter.push(context, (_) => const GrammarLabScreen());
         case 'Listening':

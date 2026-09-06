@@ -296,7 +296,7 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
     return Scaffold(
       backgroundColor: DesignTokens.canvasDim,
       appBar: AppBar(
-        title: Text(task.title, style: DesignTokens.display(18)),
+        title: Text(task.displayTitle, style: DesignTokens.display(18)),
         backgroundColor: DesignTokens.canvasDim,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -728,37 +728,56 @@ class _WritingTaskScreenState extends ConsumerState<WritingTaskScreen>
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            task.promptFr,
-            style: DesignTokens.display(
-              23,
-              weight: FontWeight.w600,
-            ).copyWith(height: 1.3),
-          ),
-          const SizedBox(height: 8),
-          if (_showEnglish)
+          if (_showEnglish &&
+              (task.levelBand.toUpperCase() == 'A1' ||
+                  task.levelBand.toUpperCase() == 'A2')) ...[
             Text(
               task.promptEn,
+              style: DesignTokens.display(
+                23,
+                weight: FontWeight.w600,
+              ).copyWith(height: 1.3),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              task.promptFr,
               style: DesignTokens.body(
                 16,
               ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
-            )
-          else
-            TextButton(
-              onPressed: () => setState(() => _showEnglish = true),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'Show English translation',
-                style: DesignTokens.body(
-                  14,
-                  weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.primary),
-              ),
             ),
+          ] else ...[
+            Text(
+              task.promptFr,
+              style: DesignTokens.display(
+                23,
+                weight: FontWeight.w600,
+              ).copyWith(height: 1.3),
+            ),
+            const SizedBox(height: 8),
+            if (_showEnglish)
+              Text(
+                task.promptEn,
+                style: DesignTokens.body(
+                  16,
+                ).copyWith(color: DesignTokens.mutedDim, height: 1.4),
+              )
+            else
+              TextButton(
+                onPressed: () => setState(() => _showEnglish = true),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Show English translation',
+                  style: DesignTokens.body(
+                    14,
+                    weight: FontWeight.w600,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
+              ),
+          ],
           if (task.rubricHints.isNotEmpty) ...[
             const SizedBox(height: 18),
             Divider(color: DesignTokens.hairline, height: 1),

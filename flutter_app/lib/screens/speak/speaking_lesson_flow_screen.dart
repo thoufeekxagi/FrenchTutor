@@ -2515,7 +2515,11 @@ SpeakingPhraseStep _guidedSpeechStep(
     blankWord: blank,
     wordChoices: _guidedWordChoices(blank, level: level),
     sentenceTokens: tokens,
-    translationAlignment: SpeakingTranslationAlignment.forPhrase(
+    // Generated course lines can use a natural paraphrase whose words do not
+    // map one-to-one (for example, “ça” in “how are you?”). Keep the lesson
+    // playable and preserve any alignments that do exist; authored catalog
+    // lines continue to use the strict validator above.
+    translationAlignment: SpeakingTranslationAlignment.forGeneratedPhrase(
       phrase,
       english,
     ),

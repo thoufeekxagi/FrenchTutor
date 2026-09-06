@@ -1,3 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
 #include? "XcodeSecrets.xcconfig"
+
+// Xcode 26 can deadlock when CocoaPods signs embedded frameworks in parallel.
+COCOAPODS_PARALLEL_CODE_SIGN = false

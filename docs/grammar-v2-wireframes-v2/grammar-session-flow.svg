@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="1030" viewBox="0 0 860 1030" role="img" aria-labelledby="title desc">
+  <title id="title">Grammar V2 session-first wireframes</title>
+  <desc id="desc">Four phone wireframes showing Grammar home, Guided, Complete, and Roleplay. Home has sessions, and each lesson screen has four or five connected steps.</desc>
+  <rect width="860" height="1030" fill="#0b0d0f"/>
+  <style>
+    .phone{fill:#101316;stroke:#34383d;stroke-width:2}.surface{fill:#171a1e;stroke:#30353b;stroke-width:1.5}.gold{fill:#f4b83f}.goldText{fill:#f4b83f;font-family:Arial,sans-serif;font-weight:700}.text{fill:#f5f4ef;font-family:Arial,sans-serif}.muted{fill:#a8a9ad;font-family:Arial,sans-serif}.tiny{font-size:10px;letter-spacing:1.2px}.body{font-size:13px}.title{font-size:22px;font-weight:700}.smallTitle{font-size:16px;font-weight:700}.line{stroke:#393d42;stroke-width:1}.choice{fill:#171a1e;stroke:#474c53;stroke-width:1.5}.choiceGold{fill:#2b2415;stroke:#f4b83f;stroke-width:1.5}.pill{fill:#f4b83f}.pillText{fill:#111;font-family:Arial,sans-serif;font-size:12px;font-weight:700}
+  </style>
+
+  <text x="32" y="34" class="goldText" font-size="16">GRAMMAR V2 · SESSION-FIRST</text>
+
+  <!-- HOME -->
+  <g transform="translate(30 60)">
+    <rect class="phone" width="380" height="900" rx="28"/>
+    <text x="22" y="38" class="text body">‹</text><text x="190" y="38" text-anchor="middle" class="text smallTitle">Grammar</text><text x="350" y="38" text-anchor="end" class="goldText body">☷</text>
+    <text x="22" y="88" class="text title">Build confidence</text><text x="22" y="116" class="text title">with grammar</text>
+    <text x="22" y="143" class="muted body">Choose one focus and practise a</text><text x="22" y="162" class="muted body">connected session.</text>
+    <rect x="22" y="183" width="54" height="30" rx="15" fill="#312513" stroke="#f4b83f"/><text x="49" y="203" text-anchor="middle" class="goldText body">A1</text><text x="88" y="203" class="muted body">3 sessions ready · 0 complete</text>
+    <text x="22" y="242" class="goldText tiny">GRAMMAR FOCUS</text>
+    <rect x="22" y="254" width="76" height="31" rx="15" class="pill"/><text x="60" y="274" text-anchor="middle" class="pillText">Present</text><rect x="106" y="254" width="65" height="31" rx="15" class="surface"/><text x="138" y="274" text-anchor="middle" class="muted body">Past</text><rect x="179" y="254" width="74" height="31" rx="15" class="surface"/><text x="216" y="274" text-anchor="middle" class="muted body">Future</text><rect x="261" y="254" width="70" height="31" rx="15" class="surface"/><text x="296" y="274" text-anchor="middle" class="muted body">Mixed</text>
+    <rect x="22" y="306" width="336" height="68" rx="17" class="surface"/><rect x="26" y="310" width="104" height="60" rx="14" class="pill"/><text x="78" y="339" text-anchor="middle" class="pillText">✎</text><text x="78" y="358" text-anchor="middle" class="pillText">Guided</text><text x="190" y="339" text-anchor="middle" class="muted body">✓</text><text x="190" y="358" text-anchor="middle" class="muted body">Complete</text><text x="296" y="339" text-anchor="middle" class="muted body">◌</text><text x="296" y="358" text-anchor="middle" class="muted body">Roleplay</text>
+    <text x="22" y="407" class="goldText tiny">NEXT GUIDED SESSION</text>
+    <rect x="22" y="419" width="336" height="240" rx="20" class="surface" stroke="#f4b83f"/>
+    <circle cx="62" cy="460" r="25" fill="#322611"/><text x="62" y="468" text-anchor="middle" class="goldText" font-size="22">☀</text><text x="101" y="455" class="text smallTitle">My morning rhythm</text><text x="101" y="476" class="muted body">A1 · 5 grammar steps</text><text x="38" y="517" class="muted body">Use present-tense verbs through one</text><text x="38" y="537" class="muted body">ordinary morning.</text><line x1="38" x2="342" y1="558" y2="558" class="line"/><text x="90" y="583" text-anchor="middle" class="goldText body">Choose</text><text x="190" y="583" text-anchor="middle" class="goldText body">Check</text><text x="292" y="583" text-anchor="middle" class="goldText body">Tutor</text><rect x="38" y="602" width="304" height="42" rx="13" class="pill"/><text x="190" y="628" text-anchor="middle" class="pillText">Start session</text>
+    <text x="22" y="698" class="goldText tiny">GUIDED SESSIONS</text>
+    <g transform="translate(22 710)"><rect width="103" height="137" rx="15" class="surface"/><text x="18" y="29" class="goldText" font-size="18">☀</text><text x="12" y="84" class="text body">My morning</text><text x="12" y="105" class="muted tiny">5 STEPS</text></g>
+    <g transform="translate(138 710)"><rect width="103" height="137" rx="15" class="surface"/><text x="18" y="29" class="goldText" font-size="18">☕</text><text x="12" y="84" class="text body">At the café</text><text x="12" y="105" class="muted tiny">5 STEPS</text></g>
+    <g transform="translate(254 710)"><rect width="104" height="137" rx="15" class="surface"/><text x="18" y="29" class="goldText" font-size="18">⌖</text><text x="12" y="84" class="text body">Around town</text><text x="12" y="105" class="muted tiny">5 STEPS</text></g>
+  </g>
+
+  <!-- GUIDED -->
+  <g transform="translate(450 60)">
+    <rect class="phone" width="380" height="430" rx="28"/>
+    <text x="22" y="38" class="text body">×</text><text x="190" y="38" text-anchor="middle" class="text smallTitle">My morning rhythm</text><text x="350" y="38" text-anchor="end" class="muted body">A1</text><rect x="22" y="52" width="336" height="5" rx="3" fill="#34383d"/><rect x="22" y="52" width="135" height="5" rx="3" class="gold"/>
+    <text x="22" y="87" class="goldText tiny">GUIDED · PRESENT</text><text x="22" y="121" class="text title">Choose the right form</text><text x="330" y="116" class="goldText" font-size="20">☎</text><text x="22" y="145" class="muted body">STEP 2 OF 5</text>
+    <rect x="22" y="164" width="336" height="79" rx="17" class="surface"/><text x="38" y="199" class="text" font-size="20">Je ___ à sept heures.</text><text x="38" y="224" class="muted body">I get up at seven.</text><text x="332" y="210" class="goldText" font-size="18">◖</text>
+    <text x="22" y="270" class="goldText tiny">CHOOSE THE FORM</text>
+    <rect x="22" y="282" width="336" height="39" rx="12" class="choiceGold"/><text x="40" y="307" class="text body">me lève</text><rect x="22" y="328" width="336" height="39" rx="12" class="choice"/><text x="40" y="353" class="text body">me lèves</text><rect x="22" y="374" width="336" height="39" rx="12" class="choice"/><text x="40" y="399" class="text body">me lever</text>
+  </g>
+
+  <!-- COMPLETE -->
+  <g transform="translate(450 525)">
+    <rect class="phone" width="380" height="430" rx="28"/>
+    <text x="22" y="38" class="text body">×</text><text x="190" y="38" text-anchor="middle" class="text smallTitle">My weekday</text><text x="350" y="38" text-anchor="end" class="muted body">A1</text><rect x="22" y="52" width="336" height="5" rx="3" fill="#34383d"/><rect x="22" y="52" width="202" height="5" rx="3" class="gold"/>
+    <text x="22" y="87" class="goldText tiny">COMPLETE · PRESENT</text><text x="22" y="121" class="text title">Build the sentence</text><text x="22" y="145" class="muted body">STEP 3 OF 5</text>
+    <rect x="22" y="164" width="336" height="79" rx="17" class="surface"/><text x="38" y="198" class="text" font-size="18">Je prends un café le matin.</text><text x="38" y="224" class="muted body">I have a coffee in the morning.</text>
+    <text x="22" y="270" class="goldText tiny">YOUR SENTENCE</text><rect x="22" y="282" width="336" height="53" rx="15" class="surface" stroke="#f4b83f"/><text x="38" y="315" class="muted body">Je  prends  un  café</text><text x="22" y="360" class="goldText tiny">WORD BANK</text>
+    <rect x="22" y="373" width="68" height="34" rx="10" class="choice"/><text x="56" y="395" text-anchor="middle" class="text body">le</text><rect x="97" y="373" width="79" height="34" rx="10" class="choice"/><text x="136" y="395" text-anchor="middle" class="text body">matin</text><rect x="183" y="373" width="74" height="34" rx="10" class="choice"/><text x="220" y="395" text-anchor="middle" class="text body">prends</text><rect x="264" y="373" width="78" height="34" rx="10" class="choice"/><text x="303" y="395" text-anchor="middle" class="text body">café</text>
+  </g>
+
+  <text x="32" y="1008" class="muted" font-size="12">One home card = one complete session · exercise steps stay inside the session route</text>
+</svg>

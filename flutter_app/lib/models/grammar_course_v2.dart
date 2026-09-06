@@ -27,13 +27,16 @@ extension GrammarV2ModeCopy on GrammarV2Mode {
 
 /// A small, stable filter vocabulary used by the Grammar home and generator.
 abstract final class GrammarV2Tenses {
+  /// Kept for compatibility with older saved routes. It is deliberately not
+  /// exposed as a learner-facing filter: the grammar home now has one clear
+  /// mixed starting point plus the three tense views.
   static const all = 'All';
   static const present = 'Present';
   static const past = 'Past';
   static const future = 'Future';
   static const mixed = 'Mixed';
 
-  static const values = [all, present, past, future, mixed];
+  static const values = [present, past, future, mixed];
 
   static bool matches(GrammarCurriculumLesson lesson, String filter) {
     if (filter == all || filter == mixed) return true;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,7 +16,7 @@ import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import 'speak_course_session_screen.dart';
+import 'speak_course_activity_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
 import 'speaking_practice_screen.dart';
@@ -33,12 +35,14 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   late final PageController _featuredController;
   var _featuredPage = 0;
   bool _tourRequested = false;
+  bool _preparingCourse = false;
 
   @override
   void initState() {
     super.initState();
     _featuredController = PageController();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      unawaited(_prepareCourse());
       if (!mounted || MediaQuery.sizeOf(context).width >= 1024) return;
       final requested =
           AppTour.pendingHomeReplay || !await AppTour.hasSeenHome();
@@ -57,9 +61,29 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
       context,
-      (_) => SpeakCourseSessionScreen(session: session),
+      (_) => SpeakCourseActivityScreen(session: session),
     );
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      unawaited(_prepareCourse());
+    }
+  }
+
+  Future<void> _prepareCourse() async {
+    if (_preparingCourse) return;
+    _preparingCourse = true;
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      final plan = ref
+          .read(adaptiveCourseStoreProvider)
+          .ensureCurrentPlan(profile);
+      final sync = ref.read(syncServiceProvider);
+      final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
+      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
+      if (mounted) setState(() {});
+    } finally {
+      _preparingCourse = false;
+    }
   }
 
   Future<void> _callTutor() async {
@@ -73,15 +97,14 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
-    // Home is a read-only surface. The app/onboarding flow is responsible
-    // for creating the persisted adaptive plan; rendering a card must never
-    // create or re-plan course content.
-    final adaptivePlan = ref
-        .read(adaptiveCourseStoreProvider)
-        .currentPlan(profile);
-    if (adaptivePlan == null) {
-      throw StateError('Home requires a persisted adaptive course plan.');
-    }
+    // Home normally reads the plan prepared by onboarding/auth hydration. A
+    // missing or stale plan is a recoverable startup state, though: older
+    // plans use the pre-evidence fingerprint and must be refreshed before the
+    // roadmap can safely be rendered.
+    final adaptiveStore = ref.read(adaptiveCourseStoreProvider);
+    final adaptivePlan =
+        adaptiveStore.currentPlan(profile) ??
+        adaptiveStore.ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
       profile,
       completedContentKeys: completedContentKeys,

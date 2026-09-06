@@ -99,6 +99,28 @@ void main() {
   );
 
   test(
+    'generated paraphrases stay playable when a word has no exact match',
+    () {
+      final alignment = SpeakingTranslationAlignment.forGeneratedPhrase(
+        'Bonjour, comment ça va ?',
+        'Hello, how are you?',
+      );
+
+      expect(alignment, hasLength(5));
+      // “ça” is absorbed by the English paraphrase rather than being forced
+      // onto an unrelated word or rejecting the whole generated lesson.
+      expect(alignment[2], isEmpty);
+      expect(
+        () => SpeakingTranslationAlignment.forPhrase(
+          'Bonjour, comment ça va ?',
+          'Hello, how are you?',
+        ),
+        throwsStateError,
+      );
+    },
+  );
+
+  test(
     'every prepared Free Talk beat has authored hints and both alignments',
     () {
       final freeTalkLines = [

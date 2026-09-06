@@ -4,10 +4,76 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:french_tutor/data/database/adaptive_course_store.dart';
 import 'package:french_tutor/models/profile.dart';
 import 'package:french_tutor/models/speak_curriculum.dart';
+import 'package:french_tutor/models/speaking_course.dart';
 
 void main() {
+  test('listening stays unready until its durable PCM WAV is attached', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final plan = store.ensureCurrentPlan(
+      Profile(
+        id: 'listener-ready-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Listening'],
+      ),
+    );
+    final listening = plan.sessions.firstWhere(
+      (session) =>
+          !session.isFoundation && session.primarySkill == SpeakSkill.listening,
+    );
+    const passageOnly =
+        '{"passage":{"segments":[{"fr":"Bonjour.","en":"Hello."},'
+        '{"fr":"Ça va bien.","en":"I am well."}]},'
+        '"quiz":[{"q":"Ça va ?","choices":["Oui","Non"],"answerIndex":0}]}';
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+      'artifact_json = ? WHERE id = ?',
+      [passageOnly, listening.id],
+    );
+    expect(store.sessionById(listening.id)!.isContentReady, isFalse);
+
+    const complete =
+        '{"passage":{"segments":[{"fr":"Bonjour.","en":"Hello."},'
+        '{"fr":"Ça va bien.","en":"I am well."}]},'
+        '"quiz":[{"q":"Ça va ?","choices":["Oui","Non"],"answerIndex":0}],'
+        '"audioPath":"user/course/listening.wav",'
+        '"audioMode":"gemini_flash_tts"}';
+    db.execute(
+      'UPDATE adaptive_course_sessions SET artifact_json = ? WHERE id = ?',
+      [complete, listening.id],
+    );
+    expect(store.sessionById(listening.id)!.isContentReady, isTrue);
+  });
+
+  test('a cached A1 artifact is not ready when its French is over-level', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final plan = store.ensureCurrentPlan(
+      Profile(
+        id: 'a1-content-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      ),
+    );
+    final speaking = plan.sessions.firstWhere(
+      (session) =>
+          !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+    );
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+      'artifact_json = ? WHERE id = ?',
+      [
+        '{"lines":[{"fr":"Si j\'avais le temps, je pourrais expliquer mon opinion sur ce sujet.","en":"If I had time, I could explain my opinion on this topic."},{"fr":"Bonjour.","en":"Hello."},{"fr":"Merci.","en":"Thank you."}]}',
+        speaking.id,
+      ],
+    );
+    expect(store.sessionById(speaking.id)!.isContentReady, isFalse);
+  });
+
   test(
-    'fresh learner gets twenty adaptive session specifications immediately',
+    'fresh learner gets five foundations and one personalized specification',
     () {
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
       final plan = store.ensureCurrentPlan(
@@ -19,23 +85,23 @@ void main() {
         ),
       );
 
-      expect(plan.sessions, hasLength(20));
+      expect(plan.sessions, hasLength(6));
       expect(
         plan.sessions.map((session) => session.contentKey).toSet(),
-        hasLength(20),
+        hasLength(6),
       );
       expect(plan.sessions.first.context, contains('Meetings'));
       expect(plan.sessions.every((session) => session.level == 'A1'), isTrue);
       expect(
         plan.sessions.map((session) => session.competency).toSet().length,
-        greaterThan(10),
+        greaterThan(4),
       );
       expect(plan.sessions.take(5).map((session) => session.title), [
         'Recognize French sounds',
         'Build vowel confidence',
         'Notice French consonants',
         'Recognize core accent marks',
-        'Connect sound to meaning',
+        'Introduce yourself',
       ]);
       expect(
         plan.sessions
@@ -43,10 +109,37 @@ void main() {
             .every((session) => session.primarySkill == SpeakSkill.alphabet),
         isTrue,
       );
-      expect(plan.sessions[4].primarySkill, SpeakSkill.vocabulary);
-      expect(plan.sessions.skip(5).first.title, 'Introduce yourself naturally');
+      expect(plan.sessions[4].primarySkill, SpeakSkill.speaking);
+      expect(
+        plan.sessions[4].contentKey,
+        SpeakingCourseCatalog.firstA1GuidedLessonId,
+      );
+      expect(
+        plan.sessions[4].targetPhrases,
+        SpeakingCourseCatalog.firstA1GuidedLesson.lines
+            .map((line) => line.french)
+            .toList(),
+      );
       expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
       expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
+      expect(
+        plan.sessions.take(5).every((session) => session.isContentReady),
+        isTrue,
+      );
+      expect(
+        plan.sessions.skip(5).every((session) => !session.isContentReady),
+        isTrue,
+      );
+      final personalizedTitles = plan.sessions
+          .skip(5)
+          .map((session) => session.title.toLowerCase())
+          .toList(growable: false);
+      expect(personalizedTitles.toSet(), hasLength(1));
+      expect(personalizedTitles, isNot(contains('introduce yourself')));
+      expect(
+        personalizedTitles,
+        isNot(contains('introduce yourself naturally')),
+      );
     },
   );
 
@@ -63,102 +156,281 @@ void main() {
         ),
       );
 
+      final personalized = plan.sessions.skip(5).toList(growable: false);
       expect(
-        plan.sessions
-            .skip(3)
-            .where(
-              (session) =>
-                  session.blockPosition != 6 && session.blockPosition != 16,
-            )
-            .every(
-              (session) =>
-                  session.primarySkill == SpeakSkill.listening ||
-                  session.primarySkill == SpeakSkill.reading,
-            ),
+        personalized
+            .take(3)
+            .every((session) => session.primarySkill == SpeakSkill.listening),
+        isTrue,
+      );
+      expect(personalized, hasLength(1));
+      expect(
+        plan.sessions.take(4).map((session) => session.primarySkill),
+        everyElement(SpeakSkill.alphabet),
+      );
+      expect(plan.sessions[4].title, 'Introduce yourself');
+      expect(
+        personalized.every(
+          (session) => !session.title.toLowerCase().contains('introduc'),
+        ),
         isTrue,
       );
     },
   );
 
-  test(
-    'the next twenty are appended only after the current block completes',
-    () {
+  test('session five is authored and session six is new at every level', () {
+    for (final level in ['a1', 'a2', 'b1', 'b2']) {
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
-      final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
-      final first = store.ensureCurrentPlan(profile);
-
-      for (final session in first.sessions.take(15)) {
-        store.markCompleted(session.contentKey);
-      }
-      final stillInFirstBlock = store.ensureCurrentPlan(profile);
-
-      expect(stillInFirstBlock.sessions, hasLength(adaptiveCourseBlockSize));
-      expect(stillInFirstBlock.sessions.last.blockIndex, 0);
-
-      for (final session in first.sessions.skip(15)) {
-        store.markCompleted(session.contentKey);
-      }
-      final expanded = store.ensureCurrentPlan(profile);
-
-      expect(expanded.sessions, hasLength(adaptiveCourseBlockSize * 2));
-      expect(
-        expanded.sessions
-            .take(15)
-            .every((session) => session.status == 'completed'),
-        isTrue,
+      final plan = store.ensureCurrentPlan(
+        Profile(id: 'learner-$level', goal: 'everyday', level: level),
       );
-      expect(expanded.sessions.last.sequence, 40);
-      expect(expanded.sessions.last.blockIndex, 1);
-      expect(expanded.sessions.last.blockPosition, adaptiveCourseBlockSize);
-    },
-  );
 
-  test(
-    'every generated block contains guided speaking and roleplay anchors',
-    () {
-      final store = AdaptiveCourseStore(sqlite3.openInMemory());
-      final profile = Profile(
-        id: 'listener',
+      expect(
+        plan.sessions.take(4).map((session) => session.primarySkill),
+        everyElement(SpeakSkill.alphabet),
+      );
+      expect(plan.sessions[4].title, 'Introduce yourself');
+      expect(
+        plan.sessions[4].contentKey,
+        SpeakingCourseCatalog.firstA1GuidedLessonId,
+      );
+      expect(plan.sessions[5].title.toLowerCase(), isNot(contains('introduc')));
+      if (level == 'a1') {
+        expect(plan.sessions[5].title, isNot('Say hello'));
+        expect(plan.sessions[5].targetPhrases, isNot(contains('bonjour')));
+        expect(plan.sessions[5].targetPhrases, isNot(contains('je m’appelle')));
+      }
+    }
+  });
+
+  test('guided speaking cache rejects instruction prefixes and duplicate cards', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final plan = store.ensureCurrentPlan(
+      Profile(id: 'guided-cache-contract', goal: 'everyday', level: 'a1'),
+    );
+    final speaking = plan.sessions.firstWhere(
+      (session) =>
+          !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+    );
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+      'artifact_json = ? WHERE id = ?',
+      [
+        '{"practiceMode":"guidedConversation","lines":['
+        '{"fr":"Répétez : bonjour.","en":"Repeat hello."},'
+        '{"fr":"Bonjour.","en":"Hello."},'
+        '{"fr":"Bonjour.","en":"Hello."}]}',
+        speaking.id,
+      ],
+    );
+    expect(store.sessionById(speaking.id)!.isContentReady, isFalse);
+  });
+
+  test('Course planner never assigns Free Talk or Roleplay speaking modes', () {
+    final sessions = AdaptiveCoursePlanGenerator.generate(
+      profile: Profile(
+        id: 'guided-course-speaking',
         goal: 'everyday',
-        level: 'b1',
-        interests: const ['Listening'],
-      );
-      final first = store.ensureCurrentPlan(profile);
-      final firstBlock = first.sessions.take(adaptiveCourseBlockSize);
+        level: 'a1',
+        interests: const ['Speaking'],
+      ),
+      planId: 'guided-course-plan',
+      profileFingerprint: 'everyday|A1|10|speaking',
+      startSequence: 1,
+      count: 15,
+    );
 
-      expect(
-        firstBlock.any(
-          (session) => session.primarySkill == SpeakSkill.speaking,
-        ),
-        isTrue,
-      );
-      expect(
-        firstBlock.any(
-          (session) => session.primarySkill == SpeakSkill.roleplay,
-        ),
-        isTrue,
-      );
+    expect(
+      sessions
+          .skip(adaptiveCourseFoundationSize)
+          .every(
+            (session) =>
+                session.primarySkill != SpeakSkill.freeTalk &&
+                session.primarySkill != SpeakSkill.roleplay,
+          ),
+      isTrue,
+    );
+    expect(
+      sessions
+          .skip(adaptiveCourseFoundationSize)
+          .where((session) => session.primarySkill == SpeakSkill.speaking)
+          .every((session) => session.practiceMode == 'guidedConversation'),
+      isTrue,
+    );
+  });
 
-      for (final session in first.sessions) {
-        store.markCompleted(session.contentKey);
+  test('reserve adds one row only after the previous artifact is ready', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'serial-reserve',
+      goal: 'everyday',
+      level: 'a1',
+      interests: const ['Speaking'],
+    );
+    final first = store.ensureCurrentPlan(profile);
+    expect(first.sessions, hasLength(6));
+
+    const readySpeaking =
+        '{"practiceMode":"guidedConversation","lines":['
+        '{"fr":"Bonjour.","en":"Hello."},'
+        '{"fr":"Je m’appelle Léa.","en":"My name is Lea."},'
+        '{"fr":"Merci.","en":"Thank you."}]}';
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+      "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
+      [readySpeaking, first.sessions.last.id],
+    );
+
+    final second = store.ensureCurrentPlan(profile);
+    expect(second.sessions, hasLength(7));
+    expect(second.sessions.last.generationStatus, 'queued');
+    expect(store.ensureCurrentPlan(profile).sessions, hasLength(7));
+
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+      "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
+      [readySpeaking, second.sessions.last.id],
+    );
+    expect(store.ensureCurrentPlan(profile).sessions, hasLength(7));
+
+    store.markCompleted(second.sessions[5].contentKey);
+    final replenished = store.ensureCurrentPlan(profile);
+    expect(replenished.sessions, hasLength(8));
+    expect(replenished.sessions.last.sequence, 8);
+    expect(replenished.sessions.last.generationStatus, 'queued');
+  });
+
+  test(
+    'the first two personalized batches stay in a small CEFR practice lane',
+    () {
+      for (final level in ['a1', 'a2', 'b1', 'b2']) {
+        final store = AdaptiveCourseStore(sqlite3.openInMemory());
+        final profile = Profile(
+          id: 'early-$level',
+          goal: 'everyday',
+          level: level,
+          interests: const [
+            'Speaking',
+            'Listening',
+            'Reading',
+            'Writing',
+            'Grammar',
+            'Vocabulary',
+          ],
+        );
+        var expanded = store.ensureCurrentPlan(profile);
+        for (var index = 0; index < 4; index++) {
+          store.markCompleted(expanded.sessions.last.contentKey);
+          expanded = store.ensureCurrentPlan(profile);
+        }
+        final early = expanded.sessions.skip(5).take(5).toList();
+
+        expect(early, hasLength(5));
+        expect(
+          early.every(
+            (session) => session.contextPrompt.contains('early guided phase'),
+          ),
+          isTrue,
+        );
+        if (level == 'a1') {
+          expect(
+            early.every(
+              (session) =>
+                  !session.competency.toLowerCase().contains('condition') &&
+                  !session.grammarFocus.any(
+                    (value) => value.toLowerCase().contains('condition'),
+                  ),
+            ),
+            isTrue,
+          );
+        }
       }
-      final second = store.ensureCurrentPlan(profile);
-      final secondBlock = second.sessions.skip(adaptiveCourseBlockSize);
-
-      expect(
-        secondBlock.any(
-          (session) => session.primarySkill == SpeakSkill.speaking,
-        ),
-        isTrue,
-      );
-      expect(
-        secondBlock.any(
-          (session) => session.primarySkill == SpeakSkill.roleplay,
-        ),
-        isTrue,
-      );
     },
   );
+
+  test(
+    'upgrades an old generated session five to the authored speaking lesson',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(id: 'learner', goal: 'everyday', level: 'a1');
+      final first = store.ensureCurrentPlan(profile);
+      db.execute(
+        '''UPDATE adaptive_course_sessions
+         SET title = 'Connect sound to meaning', primary_skill = 'vocabulary',
+             content_key = 'adaptive_old_s005', generation_status = 'ready',
+             artifact_kind = 'vocabulary', artifact_json = '{}'
+         WHERE id = ?''',
+        [first.sessions[4].id],
+      );
+
+      final repaired = store.ensureCurrentPlan(profile);
+      final session = repaired.sessions[4];
+      expect(session.title, 'Introduce yourself');
+      expect(session.primarySkill, SpeakSkill.speaking);
+      expect(session.contentKey, SpeakingCourseCatalog.firstA1GuidedLessonId);
+      expect(session.generationStatus, 'ready');
+      expect(session.artifact, isNull);
+    },
+  );
+
+  test('Unit 2 grows one row at a time and stops at five lessons', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
+    var plan = store.ensureCurrentPlan(profile);
+    expect(plan.sessions, hasLength(6));
+
+    for (
+      var personalizedCount = 2;
+      personalizedCount <= 5;
+      personalizedCount++
+    ) {
+      store.markCompleted(plan.sessions.last.contentKey);
+      plan = store.ensureCurrentPlan(profile);
+      expect(
+        plan.sessions,
+        hasLength(adaptiveCourseFoundationSize + personalizedCount),
+      );
+    }
+
+    store.markCompleted(plan.sessions.last.contentKey);
+    final capped = store.ensureCurrentPlan(profile);
+    expect(capped.sessions, hasLength(10));
+    expect(capped.sessions.last.sequence, 10);
+    expect(capped.sessions.last.blockIndex, 1);
+    expect(capped.sessions.last.blockPosition, adaptiveCourseBatchSize);
+  });
+
+  test('personalized batches keep a useful transfer balance', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(
+      id: 'listener',
+      goal: 'everyday',
+      level: 'b1',
+      interests: const ['Listening'],
+    );
+    var expanded = store.ensureCurrentPlan(profile);
+    for (var index = 0; index < 4; index++) {
+      store.markCompleted(expanded.sessions.last.contentKey);
+      expanded = store.ensureCurrentPlan(profile);
+    }
+    final firstBatch = expanded.sessions.skip(5).take(5);
+
+    expect(
+      firstBatch.any((session) => session.primarySkill == SpeakSkill.speaking),
+      isTrue,
+    );
+    expect(
+      firstBatch.any(
+        (session) => session.primarySkill == SpeakSkill.vocabulary,
+      ),
+      isTrue,
+    );
+
+    expect(firstBatch, hasLength(5));
+  });
 
   test(
     'profile changes preserve completed sessions and replace future context',
@@ -231,7 +503,7 @@ void main() {
 
     final after = store.ensureCurrentPlan(profile);
     expect(after.id, before.id);
-    expect(after.sessions, hasLength(20));
+    expect(after.sessions, hasLength(6));
   });
 
   test('remote plan and session rows hydrate into the local route', () {

@@ -302,6 +302,12 @@ class _SpeakingPracticeScreenState
 
   String _contextFor(SpeakingPracticeRequest request, SpeakingTaskPlan plan) {
     final existing = request.lessonContext?.trim();
+    // Onboarding calibration has its own adaptive brief. Appending the normal
+    // free-talk task contract would reintroduce a fixed support-phrase list and
+    // make the optional call feel like a scripted lesson.
+    if (request.stage == 'trial' && existing != null && existing.isNotEmpty) {
+      return existing;
+    }
     if (existing != null && existing.isNotEmpty) {
       return '$existing\n\n${plan.liveContext}';
     }

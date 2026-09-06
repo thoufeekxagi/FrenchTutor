@@ -299,7 +299,7 @@ class _WritingCourseHomeScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(lesson.title, style: DesignTokens.display(18)),
+                    Text(lesson.displayTitle, style: DesignTokens.display(18)),
                     const SizedBox(height: 4),
                     Text(
                       '${lesson.level} · ${lesson.steps.length} writing steps',
@@ -316,7 +316,7 @@ class _WritingCourseHomeScreenState
           ),
           const SizedBox(height: 14),
           Text(
-            lesson.subtitle,
+            lesson.displaySubtitle,
             style: DesignTokens.body(
               14,
             ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
@@ -617,7 +617,7 @@ class _WritingLessonCard extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
     button: true,
     selected: selected,
-    label: '${lesson.title}, ${lesson.subtitle}',
+    label: '${lesson.displayTitle}, ${lesson.displaySubtitle}',
     child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -647,14 +647,14 @@ class _WritingLessonCard extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              lesson.title,
+              lesson.displayTitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.body(12, weight: FontWeight.w700),
             ),
             const SizedBox(height: 3),
             Text(
-              lesson.subtitle,
+              lesson.displaySubtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.body(

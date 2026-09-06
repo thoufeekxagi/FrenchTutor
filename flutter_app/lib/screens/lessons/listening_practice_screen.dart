@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter_sound/flutter_sound.dart' show PlaybackDisposition;
@@ -15,7 +16,7 @@ import '../../services/elevenlabs_audio_playback_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
 import '../../services/audio_container_utils.dart';
 import '../../services/gemini_live_audio_service.dart';
-import '../../services/listening_audio_config.dart';
+import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
@@ -88,6 +89,7 @@ class _ListeningPracticeScreenState
   Duration _playbackPosition = Duration.zero;
   Duration _playbackDuration = Duration.zero;
   bool _hasStartedPlayback = false;
+  bool _usingSentenceDeckPlayback = false;
   late ElevenLabsAudioClip? _audioClip;
   final Map<int, ElevenLabsAudioClip> _lineAudioCache = {};
 
@@ -419,6 +421,61 @@ class _ListeningPracticeScreenState
       await LessonSpeechService.shared.deactivate();
       await ElevenLabsAudioPlaybackService.shared.stop();
       if (!mounted) return;
+      final clip = _audioClip;
+      if (clip == null) {
+        _usingSentenceDeckPlayback = true;
+        setState(() {
+          _isPlaying = true;
+          _hasStartedPlayback = true;
+          _playbackPosition = Duration.zero;
+          _playbackDuration = Duration.zero;
+          _currentSegment = fromIndex;
+        });
+        await LessonSpeechService.shared.speak(
+          items: [
+            for (var index = fromIndex; index < _segments.length; index++)
+              SpeechItem(
+                text: _segments[index].fr,
+                language: 'fr-FR',
+                contentItemId: _story.segmentContentId(index),
+              ),
+          ],
+          playbackSpeed: _rate,
+          onItemStart: (relativeIndex) {
+            if (!mounted || !_usingSentenceDeckPlayback) return;
+            setState(() {
+              _currentSegment = fromIndex + relativeIndex;
+              _isPlaying = true;
+              _audioLoading = false;
+            });
+          },
+          onPlaybackReady: () {
+            if (mounted && _usingSentenceDeckPlayback && _audioLoading) {
+              setState(() => _audioLoading = false);
+            }
+          },
+          onFinished: () {
+            if (!mounted || !_usingSentenceDeckPlayback) return;
+            setState(() {
+              _usingSentenceDeckPlayback = false;
+              _isPlaying = false;
+              _audioLoading = false;
+              _currentSegment = _segments.length - 1;
+            });
+          },
+          onError: (error) {
+            if (!mounted || !_usingSentenceDeckPlayback) return;
+            setState(() {
+              _usingSentenceDeckPlayback = false;
+              _isPlaying = false;
+              _audioLoading = false;
+            });
+            _showAudioError(error);
+          },
+        );
+        return;
+      }
+      _usingSentenceDeckPlayback = false;
       setState(() {
         _isPlaying = true;
         _hasStartedPlayback = true;
@@ -426,12 +483,6 @@ class _ListeningPracticeScreenState
         _playbackDuration = Duration.zero;
         _currentSegment = fromIndex;
       });
-      final clip = _audioClip;
-      if (clip == null) {
-        throw const ElevenLabsProviderException(
-          'This lesson audio is not ready. Try rendering it again.',
-        );
-      }
       await ElevenLabsAudioPlaybackService.shared.play(
         clip.bytes,
         container: clip.container,
@@ -468,6 +519,7 @@ class _ListeningPracticeScreenState
       await LessonSpeechService.shared.deactivate();
       await ElevenLabsAudioPlaybackService.shared.stop();
       if (!mounted) return;
+      _usingSentenceDeckPlayback = false;
       setState(() {
         _isPlaying = true;
         _hasStartedPlayback = true;
@@ -506,8 +558,17 @@ class _ListeningPracticeScreenState
   Future<void> _togglePlayback() async {
     if (_audioLoading) return;
     if (_isPlaying) {
-      await ElevenLabsAudioPlaybackService.shared.pause();
+      if (_usingSentenceDeckPlayback) {
+        await LessonSpeechService.shared.pause();
+      } else {
+        await ElevenLabsAudioPlaybackService.shared.pause();
+      }
       if (mounted) setState(() => _isPlaying = false);
+      return;
+    }
+    if (_usingSentenceDeckPlayback && LessonSpeechService.shared.isPaused) {
+      await LessonSpeechService.shared.resume();
+      if (mounted) setState(() => _isPlaying = true);
       return;
     }
     if (_hasStartedPlayback &&
@@ -523,130 +584,42 @@ class _ListeningPracticeScreenState
 
   Future<void> _loadSavedStoryAudio() async {
     if (!mounted || _audioClip != null) return;
-    setState(() => _audioLoading = true);
     try {
-      final storedPath = _story.audioPath;
-      if (storedPath != null && storedPath.trim().isNotEmpty) {
-        final bytes = await ref
-            .read(syncServiceProvider)
-            .downloadListeningAudio(storedPath);
-        if (bytes == null || bytes.isEmpty) {
-          throw const ElevenLabsProviderException(
-            'The saved lesson audio could not be downloaded.',
-          );
-        }
-        if (!mounted) return;
-        setState(() {
-          _audioClip = ElevenLabsAudioClip(
-            mode: _story.audioMode ?? 'narration',
-            bytes: bytes,
-            container: _isWavAudioPath(storedPath) ? 'wav' : 'mp3',
-          );
-          _audioLoading = false;
-        });
-        return;
+      final clip = await LessonAssetPrefetchService.shared.prefetchListening(
+        story: _story,
+        sync: ref.read(syncServiceProvider),
+        storyStore: ref.read(generatedStoryStoreProvider),
+      );
+      if (clip == null) {
+        throw const ElevenLabsProviderException(
+          'The saved lesson audio could not be prepared.',
+        );
       }
-
-      // Compatibility path for lessons made before durable audio storage was
-      // added. New lessons never use this branch after reopening.
-      final script = CanonicalAudioScript.fromStory(
-        _story,
-        format: _story.audioMode ?? 'narration',
-      );
-      final format = _story.audioMode ?? 'narration';
-      final clip = await _synthesizeSavedAudioWithQuotaRecovery(
-        script: script,
-        format: format,
-      );
       if (!mounted) return;
-      setState(() {
-        _audioClip = clip;
-        _audioLoading = false;
-      });
+      setState(() => _audioClip = clip);
     } catch (error) {
       if (!mounted) return;
-      setState(() => _audioLoading = false);
-      _showAudioError(error);
+      // The sentence deck remains fully usable and retries use the same
+      // Gemini/Supabase path. A background full-track preparation failure
+      // must never pin the visible player in a loading state.
+      debugPrint(
+        'ListeningPracticeScreen: full-track prefetch deferred: $error',
+      );
     }
   }
-
-  bool _isWavAudioPath(String path) =>
-      path.toLowerCase().endsWith('.wav') ||
-      _story.audioMode == 'gemini_live_spoken';
 
   Future<ElevenLabsAudioClip> _synthesizeLineAudio(String text) async {
-    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
-      return _synthesizeGeminiLiveSpokenClip(text: text, format: 'narration');
-    }
-    try {
-      return await ElevenLabsAudioService.shared.synthesizeNarration(
-        text: text,
-        mode: 'narration',
-      );
-    } on ElevenLabsProviderException catch (error) {
-      if (!error.isQuotaExceeded) rethrow;
-      return _synthesizeGeminiLiveSpokenClip(text: text, format: 'narration');
-    }
-  }
-
-  Future<ElevenLabsAudioClip> _synthesizeSavedAudioWithQuotaRecovery({
-    required CanonicalAudioScript script,
-    required String format,
-  }) async {
-    if (format == 'gemini_live_spoken') {
-      return _synthesizeGeminiLiveSpokenClip(
-        text: script.narrationText,
-        format: 'narration',
-      );
-    }
-    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
-      return _synthesizeGeminiLiveSpokenClip(
-        text: script.narrationText,
-        format: format,
-      );
-    }
-    try {
-      return switch (format) {
-        'music' => await ElevenLabsAudioService.shared.composeMusic(
-          lyrics: script.lyricLines,
-          style: 'warm acoustic French pop, clear solo vocals, 86 BPM',
-          musicLengthMs: 45_000,
-        ),
-        'podcast' => await ElevenLabsAudioService.shared.synthesizePodcast(
-          turns: script.podcastTurns,
-        ),
-        'educational' =>
-          await ElevenLabsAudioService.shared.synthesizeNarration(
-            text: script.narrationText,
-            mode: 'educational',
-          ),
-        _ => await ElevenLabsAudioService.shared.synthesizeNarration(
-          text: script.narrationText,
-          mode: 'story',
-        ),
-      };
-    } on ElevenLabsProviderException catch (error) {
-      if (!error.isQuotaExceeded) rethrow;
-      return _synthesizeGeminiLiveSpokenClip(
-        text: script.narrationText,
-        format: format,
-      );
-    }
-  }
-
-  Future<ElevenLabsAudioClip> _synthesizeGeminiLiveSpokenClip({
-    required String text,
-    required String format,
-  }) async {
-    final pcm = await GeminiLiveAudioService.shared.synthesizeListeningLesson(
+    final pcm = await GeminiLiveAudioService.shared.resolve(
       text: text,
-      format: format,
-      level: _story.levelBand,
+      contentItemId: '${_story.id}:listening-line:${text.trim()}',
     );
+    if (pcm == null || pcm.isEmpty) {
+      throw StateError('Gemini returned no line audio.');
+    }
     return ElevenLabsAudioClip(
       mode: 'gemini_live_spoken',
       bytes: pcm16ToWav(
-        pcm,
+        Uint8List.fromList(pcm),
         sampleRate: GeminiLiveAudioService.outputSampleRateHz,
       ),
       container: 'wav',
@@ -851,6 +824,7 @@ class _ListeningPracticeScreenState
     setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(next));
     unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(next));
+    unawaited(LessonSpeechService.shared.setPlaybackSpeed(next));
   }
 
   void _selectQuizAnswer(int answerIndex) {
@@ -1065,6 +1039,7 @@ class _ListeningPracticeScreenState
                     top: 84,
                     bottom: 14,
                     child: _ListeningFullscreenTranscript(
+                      story: _story,
                       segments: _segments,
                       currentSegment: _currentSegment,
                       currentWord: _currentWord,
@@ -2284,18 +2259,13 @@ class _ListeningTranscriptLines extends StatelessWidget {
           BilingualWordText(
             source: segments[index].fr,
             translation: segments[index].en,
-            sourceStyle:
-                DesignTokens.display(
-                  (index == active ? 28 : 19) * textScale,
-                ).copyWith(
-                  color: index == active
-                      ? Colors.white
-                      : (isDarkMode ? Colors.white54 : Colors.white70),
-                  fontWeight: index == active
-                      ? FontWeight.w800
-                      : FontWeight.w500,
-                  height: 1.18,
-                ),
+            sourceStyle: DesignTokens.display(21 * textScale).copyWith(
+              color: index == active
+                  ? Colors.white
+                  : (isDarkMode ? Colors.white54 : Colors.white70),
+              fontWeight: FontWeight.w600,
+              height: 1.18,
+            ),
             translationStyle: DesignTokens.body(
               17 * textScale,
             ).copyWith(color: Colors.white, height: 1.3),
@@ -2350,6 +2320,7 @@ List<String> _listeningWordParts(String value) => value
 
 class _ListeningFullscreenTranscript extends StatelessWidget {
   const _ListeningFullscreenTranscript({
+    required this.story,
     required this.segments,
     required this.currentSegment,
     required this.currentWord,
@@ -2376,6 +2347,7 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
     required this.isDarkMode,
   });
 
+  final GeneratedStory story;
   final List<ReadingSegment> segments;
   final int currentSegment;
   final int? currentWord;
@@ -2416,19 +2388,32 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
                 ),
                 child: Align(
                   alignment: Alignment.bottomLeft,
-                  child: _ListeningTranscriptLines(
-                    segments: segments,
-                    currentSegment: currentSegment,
-                    currentWord: currentWord,
-                    selectedSegment: selectedSegment,
-                    selectedWord: selectedWord,
-                    keywords: keywords,
-                    highlightWords: highlightWords,
-                    underlineWords: underlineWords,
-                    onWordTap: onWordTap,
-                    showTranslation: showTranslation,
-                    textScale: textScale,
-                    isDarkMode: isDarkMode,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        story.displayTitle,
+                        style: DesignTokens.display(
+                          18 * textScale,
+                        ).copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      _ListeningTranscriptLines(
+                        segments: segments,
+                        currentSegment: currentSegment,
+                        currentWord: currentWord,
+                        selectedSegment: selectedSegment,
+                        selectedWord: selectedWord,
+                        keywords: keywords,
+                        highlightWords: highlightWords,
+                        underlineWords: underlineWords,
+                        onWordTap: onWordTap,
+                        showTranslation: showTranslation,
+                        textScale: textScale,
+                        isDarkMode: isDarkMode,
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -21,43 +21,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33,
-          34,
-          35,
-        ],
+        List.generate(40, (index) => index + 1),
       );
     });
 
@@ -168,6 +132,24 @@ void main() {
       expect(pending, hasLength(1));
       expect(pending.single.tableName, 'daily_sessions');
       expect(pending.single.rowId, 'session-1');
+
+      infrastructure.queueMutation(
+        tableName: 'adaptive_course_plans',
+        rowId: 'plan-1',
+        operation: 'upsert',
+      );
+      infrastructure.queueMutation(
+        tableName: 'adaptive_course_sessions',
+        rowId: 'course-session-1',
+        operation: 'upsert',
+      );
+      expect(
+        infrastructure.pendingMutations().map((item) => item.tableName),
+        containsAll(<String>[
+          'adaptive_course_plans',
+          'adaptive_course_sessions',
+        ]),
+      );
       expect(
         () => infrastructure.queueMutation(
           tableName: 'messages',

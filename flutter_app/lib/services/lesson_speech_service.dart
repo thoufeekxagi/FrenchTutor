@@ -173,6 +173,23 @@ class LessonSpeechService {
       _onPlaybackReady = onPlaybackReady;
       _onError = onError;
       isPaused = false;
+      // Universal lesson rule: the first item starts normally while every
+      // later item resolves from local/Supabase cache or warms in parallel.
+      // `resolve` deduplicates the first item with `_speakCurrent`, so this
+      // never creates two provider calls for the same sentence.
+      final persona = ActiveTutor.current;
+      unawaited(
+        GeminiLiveAudioService.shared.warmDeck(
+          voiceName: persona.voiceName,
+          items: [
+            for (var index = 0; index < items.length; index++)
+              (
+                text: items[index].text,
+                contentItemId: items[index].contentItemId ?? 'narration:$index',
+              ),
+          ],
+        ),
+      );
       await _speakCurrent(generation);
     } finally {
       _speakStarting = false;

@@ -8,6 +8,25 @@ class SpeakingTranslationAlignment {
   const SpeakingTranslationAlignment._();
 
   static List<List<int>> forPhrase(String source, String translation) {
+    return _forPhrase(source, translation);
+  }
+
+  /// Builds the best available alignment for generated course lines.
+  ///
+  /// Authored Guided Speaking content still uses [forPhrase], which remains
+  /// strict so catalog mistakes are caught during development. Generated
+  /// lessons are allowed to contain a natural paraphrase that has no exact
+  /// word-level equivalent (for example, “ça” in “how are you?”). Those lines
+  /// must remain playable; unmatched words simply have no translation cue.
+  static List<List<int>> forGeneratedPhrase(String source, String translation) {
+    return _forPhrase(source, translation, allowUnmatchedContentWords: true);
+  }
+
+  static List<List<int>> _forPhrase(
+    String source,
+    String translation, {
+    bool allowUnmatchedContentWords = false,
+  }) {
     final sourceWords = _words(source);
     final translationWords = _words(translation);
     final alignment = List.generate(
@@ -98,6 +117,7 @@ class SpeakingTranslationAlignment {
         ).toSet();
       }
       if (matches.isEmpty) {
+        if (allowUnmatchedContentWords) continue;
         // Function words often have no one-to-one English word in an
         // authored sentence (for example “de”, “le”, or the inversion in
         // “est-ce”). Leave those taps unpaired rather than inventing a

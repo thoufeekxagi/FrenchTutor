@@ -7,6 +7,7 @@ export '../models/speak_curriculum.dart' show SpeakSessionKind, SpeakSkill;
 
 class SpeakRoadmapSession {
   const SpeakRoadmapSession({
+    this.id = '',
     required this.contentKey,
     this.level = 'A1',
     required this.index,
@@ -24,8 +25,14 @@ class SpeakRoadmapSession {
     this.supportingSkills = const [],
     this.targetPhrases = const [],
     this.contextPrompt = '',
+    this.contentReady = true,
+    this.generationStatus = 'ready',
+    this.generationError,
+    this.artifactKind,
+    this.artifact,
   });
 
+  final String id;
   final String contentKey;
   final String level;
   final int index;
@@ -43,6 +50,11 @@ class SpeakRoadmapSession {
   final List<SpeakSkill> supportingSkills;
   final List<String> targetPhrases;
   final String contextPrompt;
+  final bool contentReady;
+  final String generationStatus;
+  final String? generationError;
+  final String? artifactKind;
+  final Map<String, dynamic>? artifact;
 
   List<SpeakSkill> get activitySkills => [primarySkill, ...supportingSkills];
 }
@@ -64,7 +76,8 @@ class SpeakRoadmap {
       sessions.isEmpty ? 0 : completedCount / sessions.length;
   SpeakRoadmapSession? get nextSession =>
       sessions.cast<SpeakRoadmapSession?>().firstWhere(
-        (session) => session != null && !session.completed,
+        (session) =>
+            session != null && !session.completed && session.contentReady,
         orElse: () => null,
       );
 }
@@ -94,14 +107,16 @@ abstract final class SpeakRoadmapService {
     required List<AdaptiveCourseSessionSpec> sessions,
     required Set<String> completedContentKeys,
   }) {
+    final visibleSessions = _visibleCourseSessions(sessions);
     final projected = <SpeakRoadmapSession>[];
-    for (var index = 0; index < sessions.length; index++) {
-      final spec = sessions[index];
+    for (var index = 0; index < visibleSessions.length; index++) {
+      final spec = visibleSessions[index];
       final completed =
           spec.status == 'completed' ||
           completedContentKeys.contains(spec.contentKey);
       projected.add(
         SpeakRoadmapSession(
+          id: spec.id,
           contentKey: spec.contentKey,
           level: spec.level,
           index: index,
@@ -112,12 +127,17 @@ abstract final class SpeakRoadmapService {
           competency: spec.competency,
           kind: _kindFor(spec.primarySkill),
           completed: completed,
-          unlocked: true,
+          unlocked: spec.isContentReady,
           estimatedMinutes: spec.estimatedMinutes,
           primarySkill: spec.primarySkill,
           supportingSkills: spec.supportingSkills,
           targetPhrases: spec.targetPhrases,
           contextPrompt: spec.contextPrompt,
+          contentReady: spec.isContentReady,
+          generationStatus: spec.generationStatus,
+          generationError: spec.generationError,
+          artifactKind: spec.artifactKind,
+          artifact: spec.artifact,
         ),
       );
     }
@@ -126,6 +146,42 @@ abstract final class SpeakRoadmapService {
       sessions: projected,
       trackLabel: AdaptiveCurriculumService.forProfile(profile).label,
     );
+  }
+
+  /// Course generation is a serial pipeline. Older app versions persisted an
+  /// entire future path as queued placeholders, so rendering the raw plan can
+  /// misleadingly show many lessons as if they were generating together.
+  /// Keep completed/ready lessons, but expose only the next single unfinished
+  /// artifact. The server applies the same rule before claiming work.
+  static List<AdaptiveCourseSessionSpec> _visibleCourseSessions(
+    List<AdaptiveCourseSessionSpec> sessions,
+  ) {
+    final ordered = [...sessions]
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+    final foundation = ordered
+        .where((session) => session.isFoundation)
+        .toList(growable: false);
+    final personalized = ordered
+        .where((session) => !session.isFoundation)
+        .take(AdaptiveCourseStore.maxPersonalizedLessons)
+        .toList(growable: false);
+    final visiblePersonalized = <AdaptiveCourseSessionSpec>[];
+    final readyAvailable = personalized
+        .where(
+          (session) => session.status != 'completed' && session.isContentReady,
+        )
+        .length;
+    var includedPending = false;
+    for (final session in personalized) {
+      final completed = session.status == 'completed';
+      if (completed || session.isContentReady) {
+        visiblePersonalized.add(session);
+      } else if (readyAvailable < 2 && !includedPending) {
+        visiblePersonalized.add(session);
+        includedPending = true;
+      }
+    }
+    return [...foundation, ...visiblePersonalized];
   }
 
   static SpeakSessionKind _kindFor(SpeakSkill skill) => switch (skill) {

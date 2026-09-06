@@ -844,6 +844,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   Future<void> _startTrial() async {
     setState(() => _startingTrial = true);
+    // Keep the legacy onboarding entry point on the same contract as the
+    // current flow. The tutor must see the learner's real choices before the
+    // socket opens; otherwise the profile summary falls back to defaults.
+    final store = ref.read(learningStoreProvider);
+    final profile = store.profile()
+      ..goal = _goal
+      ..level = _level
+      ..sessionLength = _sessionLength
+      ..interests = _interests.toList();
+    store.saveProfile(profile);
     // The tutor identity must be live BEFORE dialing — the call captures its
     // persona at construction.
     ActiveTutor.set(_tutor);
@@ -858,13 +868,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         request: SpeakingPracticeRequest(
           mode: SpeakingMode.freeTalk,
           topic: 'First conversation',
-          level: 'A1',
-          goal: 'First conversation',
+          level: LivePrompts.normalizeLevel(_level),
+          goal: _goal,
           durationMinutes: 3,
-          lessonContext: LivePrompts.trialLessonContext,
+          lessonContext: LivePrompts.trialLessonContextFor(
+            goal: _goal,
+            level: _level,
+            focus: _interests.toList(growable: false),
+            tutorName: _tutor.displayName,
+          ),
           stage: 'trial',
-          sessionTopic: 'Your first conversation',
-          kickoffMessage: LivePrompts.trialKickoff,
+          sessionTopic: 'Onboarding calibration · $_goal',
+          kickoffMessage: LivePrompts.trialKickoffFor(
+            goal: _goal,
+            level: _level,
+          ),
           durationLimitSeconds: TrialCallGate.maxSeconds,
           wrapUpNote: LivePrompts.trialWrapUpNote,
           wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
@@ -879,6 +897,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         durationSeconds: result.durationSeconds,
         learnerUtteranceCount: result.learnerUtteranceCount,
       );
+    } else {
+      await TrialCallGate.releaseIfNeverConnected(connected: false);
     }
     if (!mounted) return;
     setState(() {

@@ -4,26 +4,39 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:french_tutor/services/trial_call_gate.dart';
 
 void main() {
-  // The onboarding trial is pre-signup; the separate Edge Function mints its
-  // short-lived token. These tests verify the local single-use gate.
-  test(
-    'trial is single-use: once started it is never available again',
-    () async {
-      SharedPreferences.setMockInitialValues({});
-      await TrialCallGate.markStarted();
-      expect(await TrialCallGate.isAvailable(), isFalse);
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-      // Recording a result never resurrects it.
-      await TrialCallGate.recordResult(
-        durationSeconds: 180,
-        learnerUtteranceCount: 7,
-      );
-      expect(await TrialCallGate.isAvailable(), isFalse);
-    },
-  );
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+  });
 
-  test('hard cap and wrap-up lead are sane', () {
-    expect(TrialCallGate.maxSeconds, 180);
-    expect(TrialCallGate.wrapUpLeadSeconds, lessThan(TrialCallGate.maxSeconds));
+  test('a pre-connect failure releases the one-time trial for retry', () async {
+    await TrialCallGate.markStarted();
+    expect(await TrialCallGate.isAvailable(), isFalse);
+
+    await TrialCallGate.releaseIfNeverConnected(connected: false);
+
+    expect(await TrialCallGate.isAvailable(), isTrue);
+  });
+
+  test('a connected trial stays consumed when release is requested', () async {
+    await TrialCallGate.markStarted();
+    await TrialCallGate.markConnected();
+
+    await TrialCallGate.releaseIfNeverConnected(connected: true);
+
+    expect(await TrialCallGate.isAvailable(), isFalse);
+  });
+
+  test('a stale pre-connect attempt can recover after a force-quit', () async {
+    SharedPreferences.setMockInitialValues({
+      'trial_call_used_at': DateTime.now()
+          .toUtc()
+          .subtract(const Duration(minutes: 6))
+          .toIso8601String(),
+      'trial_call_connected': false,
+    });
+
+    expect(await TrialCallGate.isAvailable(), isTrue);
   });
 }

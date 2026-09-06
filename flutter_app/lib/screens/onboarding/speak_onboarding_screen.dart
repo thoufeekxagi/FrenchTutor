@@ -161,9 +161,9 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
     );
   }
 
-  void _finish() {
+  Profile _profileFromChoices() {
     final store = ref.read(learningStoreProvider);
-    final profile = store.profile()
+    return store.profile()
       ..goal = _goal
       ..level = _level
       ..sessionLength = switch (_minutes) {
@@ -178,15 +178,26 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
       ..notificationPermissionState = _notificationPermissionState
       ..onboardingVersion = 'v3-personal-study-plan'
       ..onboardedAt = DateTime.now();
+  }
+
+  /// Writes the onboarding contract before any optional network call starts.
+  /// The call is allowed to enrich this snapshot, but it must never be the
+  /// only place where the learner's choices exist.
+  void _persistChoices() {
+    ref.read(learningStoreProvider).saveProfile(_profileFromChoices());
+  }
+
+  void _finish() {
+    final store = ref.read(learningStoreProvider);
+    final profile = _profileFromChoices();
     store.saveProfile(profile);
     // The OS schedule is local and survives app termination. If permission
     // was declined, sync() simply clears any older reminders.
     unawaited(NotificationSchedulerService.sync(profile));
-    // Materialize the first adaptive route before the account gate closes so
-    // Home/Course can render immediately after sign-in. These are lightweight
-    // session specifications; rich story/audio/art generation remains on the
-    // practice path and can run independently for the first lesson.
-    ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+    // Do not create personalized sessions 6–10 before authentication. The
+    // account claim is the boundary that makes learner-owned course content
+    // durable and eligible for server preparation. After sign-in, AuthGate
+    // creates and syncs the first five personalized sessions.
     ProductAnalytics.capture(
       'onboarding_completed',
       properties: {
@@ -563,7 +574,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
             padding: const EdgeInsets.fromLTRB(20, 34, 20, 24),
             children: [
               Text(
-                'Your first lesson is on us',
+                'A little extra personalisation',
                 style: DesignTokens.label(
                   11,
                 ).copyWith(color: SpeakColors.accent, letterSpacing: 1.2),
@@ -575,7 +586,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               ),
               const SizedBox(height: 10),
               Text(
-                'Speak with your chosen tutor for free, then decide if ParleSprint is right for you. No card. No commitment.',
+                'Speak with your chosen tutor for a free, optional calibration. We’ll use what you choose and say to shape your first lessons. No card. No commitment.',
                 style: DesignTokens.body(
                   15,
                 ).copyWith(color: SpeakColors.inkSoft, height: 1.45),
@@ -592,7 +603,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                     Divider(height: 24, color: SpeakColors.line),
                     _trialPoint(
                       Icons.timer_outlined,
-                      'A focused 3-minute first lesson',
+                      'A focused 3-minute calibration',
                     ),
                     Divider(height: 24, color: SpeakColors.line),
                     _trialPoint(
@@ -601,6 +612,14 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Your onboarding choices and any conversation are saved on this device first, then linked to your account after signup.',
+                textAlign: TextAlign.center,
+                style: DesignTokens.body(
+                  12,
+                ).copyWith(color: SpeakColors.inkSoft, height: 1.4),
               ),
             ],
           ),
@@ -670,23 +689,40 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   Future<void> _startTrial() async {
     if (_startingTrial) return;
     setState(() => _startingTrial = true);
+    // Persist the selected goal, level, priorities, schedule, and tutor before
+    // dialing. A failed/cancelled trial must still leave a complete local
+    // onboarding record for the later account claim.
+    _persistChoices();
     await ActiveTutor.set(_tutor);
     await TrialCallGate.markStarted();
-    if (!mounted) return;
+    if (!mounted) {
+      // The route can disappear while local preferences are being written. No
+      // socket was dialled yet, so this attempt must remain retryable.
+      await TrialCallGate.releaseIfNeverConnected(connected: false);
+      return;
+    }
     final result = await AppRouter.push<SpeakingResult>(
       context,
       (_) => SpeakingPracticeScreen(
         autoStart: true,
         request: SpeakingPracticeRequest(
           mode: SpeakingMode.freeTalk,
-          topic: 'First conversation',
-          level: 'A1',
-          goal: 'First conversation',
+          topic: 'Onboarding calibration',
+          level: LivePrompts.normalizeLevel(_level),
+          goal: _goal,
           durationMinutes: 3,
-          lessonContext: LivePrompts.trialLessonContext,
+          lessonContext: LivePrompts.trialLessonContextFor(
+            goal: _goal,
+            level: _level,
+            focus: _focus.toList(growable: false),
+            tutorName: _tutor.displayName,
+          ),
           stage: 'trial',
-          sessionTopic: 'Your first conversation',
-          kickoffMessage: LivePrompts.trialKickoff,
+          sessionTopic: 'Onboarding calibration · $_goal',
+          kickoffMessage: LivePrompts.trialKickoffFor(
+            goal: _goal,
+            level: _level,
+          ),
           durationLimitSeconds: TrialCallGate.maxSeconds,
           wrapUpNote: LivePrompts.trialWrapUpNote,
           wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
@@ -701,6 +737,11 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         durationSeconds: result.durationSeconds,
         learnerUtteranceCount: result.learnerUtteranceCount,
       );
+    }
+    if (result == null || !result.connected) {
+      // A token/network failure before the socket connected is not a consumed
+      // trial. Keep the local onboarding choices, but allow a safe retry.
+      await TrialCallGate.releaseIfNeverConnected(connected: false);
     }
     if (!mounted) return;
     setState(() => _startingTrial = false);

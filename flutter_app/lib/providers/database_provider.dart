@@ -16,6 +16,7 @@ import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/speaking_lesson_store.dart';
 import '../data/database/writing_lesson_store.dart';
+import '../data/database/grammar_course_lesson_store.dart';
 import '../data/database/vocabulary_session_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/exam_practice_store.dart';
@@ -28,6 +29,7 @@ import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
 import '../services/subscription_gate_service.dart';
 import '../services/sync_service.dart';
+import '../services/auth_service.dart';
 import '../services/starter_content_service.dart';
 import '../widgets/floating_notetaker.dart';
 
@@ -160,6 +162,14 @@ final writingLessonStoreProvider = Provider<WritingLessonStore>((ref) {
   return WritingLessonStore(
     ref.watch(databaseProvider),
     ref.watch(syncServiceProvider),
+  );
+});
+
+final grammarLessonStoreProvider = Provider<GrammarCourseLessonStore>((ref) {
+  return GrammarCourseLessonStore(
+    ref.watch(databaseProvider),
+    sync: ref.watch(syncServiceProvider),
+    currentUserId: () => AuthService.shared.currentSession?.user.id,
   );
 });
 

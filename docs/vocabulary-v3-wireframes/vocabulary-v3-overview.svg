@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="2000" viewBox="0 0 1400 2000" role="img" aria-labelledby="title desc">
+  <title id="title">Vocabulary V3 minimal workout wireframe overview</title>
+  <desc id="desc">Six minimal dark mobile screens showing a daily vocabulary workout, mode selection, flashcard set preview, Quizlet-style flashcard states, and a simple result.</desc>
+  <defs>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffd36b"/><stop offset="1" stop-color="#e7a52c"/></linearGradient>
+    <linearGradient id="warm" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#d6ad72"/><stop offset="0.48" stop-color="#87604a"/><stop offset="1" stop-color="#26363d"/></linearGradient>
+    <linearGradient id="soft" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#e3cab0"/><stop offset="0.55" stop-color="#879aa0"/><stop offset="1" stop-color="#3c4a52"/></linearGradient>
+    <clipPath id="heroClip"><rect x="24" y="116" width="342" height="204" rx="24"/></clipPath>
+    <clipPath id="cardClip"><rect x="24" y="171" width="342" height="325" rx="26"/></clipPath>
+    <style>
+      .phone{fill:#0b0c0e;stroke:#44464b;stroke-width:3}
+      .surface{fill:#17191c;stroke:#2c2f34;stroke-width:1.5}
+      .surfaceWarm{fill:#2a2115;stroke:#664c22;stroke-width:1.5}
+      .cream{fill:#f8f5ed}
+      .muted{fill:#999ba2}
+      .faint{fill:#64666d}
+      .goldText{fill:#f3ba45}
+      .green{fill:#51c58a}
+      .micro{font-family:Arial,sans-serif;font-size:10px}
+      .body{font-family:Arial,sans-serif;font-size:13px}
+      .bodyBold{font-family:Arial,sans-serif;font-size:13px;font-weight:700}
+      .label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.3px}
+      .title{font-family:Arial,sans-serif;font-size:25px;font-weight:700}
+      .hero{font-family:Arial,sans-serif;font-size:28px;font-weight:700}
+      .word{font-family:Arial,sans-serif;font-size:34px;font-weight:700}
+      .center{text-anchor:middle}
+    </style>
+  </defs>
+
+  <rect width="1400" height="2000" fill="#25272b"/>
+  <text x="48" y="48" fill="#f8f5ed" font-family="Arial,sans-serif" font-size="25" font-weight="700">VOCABULARY V3 · MINIMAL WORKOUT</text>
+  <text x="1352" y="48" text-anchor="end" fill="#9a9ba1" font-family="Arial,sans-serif" font-size="13">fresh concept · 390 × 844 reference</text>
+  <text x="48" y="77" fill="#9a9ba1" font-family="Arial,sans-serif" font-size="14">One review invitation. One mode. One clear next action.</text>
+
+  <!-- 01 HOME -->
+  <g transform="translate(50 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="title cream">Vocabulary</text><text x="366" y="66" text-anchor="end" class="goldText" font-size="20">◉</text>
+    <text x="24" y="92" class="body muted">A few words to use today.</text>
+    <rect x="24" y="116" width="342" height="204" rx="24" fill="url(#warm)"/>
+    <image href="../../landingpage/public/flashcard_bus_stop.png" x="24" y="116" width="342" height="204" preserveAspectRatio="xMidYMid slice" clip-path="url(#heroClip)" opacity=".44"/>
+    <rect x="24" y="116" width="342" height="204" rx="24" fill="#0f1417" opacity=".38"/>
+    <text x="46" y="151" class="label cream">DAILY VOCAB WORKOUT</text>
+    <text x="46" y="192" class="hero cream">5 words due.</text>
+    <text x="46" y="220" class="body cream">A short review from your recent French.</text>
+    <text x="46" y="250" class="body muted">≈ 6 minutes · image + audio ready</text>
+    <rect x="46" y="270" width="143" height="34" rx="17" fill="url(#gold)"/><text x="117" y="292" class="bodyBold center" fill="#141517">Review now  →</text>
+
+    <text x="24" y="364" class="label goldText">YOUR VOCABULARY</text>
+    <text x="24" y="398" class="hero cream">184 learned</text><text x="366" y="398" text-anchor="end" class="body muted">12 to revisit</text>
+    <rect x="24" y="416" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="454" class="bodyBold cream">View word status</text><text x="366" y="454" text-anchor="end" class="goldText" font-size="20">›</text>
+
+    <text x="24" y="511" class="label goldText">RECENTLY PRACTISED</text>
+    <text x="24" y="548" class="bodyBold cream">attendre</text><text x="366" y="548" text-anchor="end" class="micro green">Ready</text>
+    <rect x="24" y="566" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="601" class="bodyBold cream">bonjour</text><text x="366" y="601" text-anchor="end" class="micro goldText">Review tomorrow</text>
+    <rect x="24" y="619" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="654" class="bodyBold cream">addition</text><text x="366" y="654" text-anchor="end" class="micro goldText">Again · 10 min</text>
+
+    <rect x="24" y="755" width="342" height="1" fill="#2d3035"/>
+    <text x="57" y="792" class="goldText center" font-size="18">⌂</text><text x="57" y="816" class="micro goldText center">Home</text>
+    <text x="195" y="792" class="muted center" font-size="18">▦</text><text x="195" y="816" class="micro muted center">Practice</text>
+    <text x="333" y="792" class="muted center" font-size="18">◎</text><text x="333" y="816" class="micro muted center">Progress</text>
+  </g>
+  <text x="245" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">01 · HOME</text>
+  <text x="245" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">one invitation, quiet status</text>
+
+  <!-- 02 MODE SELECT -->
+  <g transform="translate(505 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="cream" font-size="22">‹</text><text x="195" y="68" class="title cream center">Review today</text>
+    <text x="24" y="111" class="hero cream">How would you like</text><text x="24" y="145" class="hero cream">to review?</text>
+    <text x="24" y="174" class="body muted">Same five words. Pick one kind of practice.</text>
+
+    <rect x="24" y="215" width="342" height="73" rx="18" fill="#2a2115" stroke="#f3ba45"/>
+    <text x="52" y="245" class="goldText" font-size="20">♟</text><text x="86" y="245" class="bodyBold cream">Speaking</text><text x="86" y="267" class="micro muted">See the scene. Say the word.</text><text x="340" y="251" text-anchor="end" class="goldText" font-size="20">›</text>
+    <rect x="24" y="301" width="342" height="73" rx="18" class="surface"/>
+    <text x="52" y="331" class="goldText" font-size="20">▣</text><text x="86" y="331" class="bodyBold cream">Flashcards</text><text x="86" y="353" class="micro muted">Reveal, remember, self-grade.</text><text x="340" y="337" text-anchor="end" class="goldText" font-size="20">›</text>
+    <rect x="24" y="387" width="342" height="73" rx="18" class="surface"/>
+    <text x="52" y="417" class="goldText" font-size="20">✎</text><text x="86" y="417" class="bodyBold cream">Writing</text><text x="86" y="439" class="micro muted">Use the word in one sentence.</text><text x="340" y="423" text-anchor="end" class="goldText" font-size="20">›</text>
+    <rect x="24" y="473" width="342" height="73" rx="18" class="surface"/>
+    <text x="52" y="503" class="goldText" font-size="20">▤</text><text x="86" y="503" class="bodyBold cream">Reading</text><text x="86" y="525" class="micro muted">Meet it inside a short passage.</text><text x="340" y="509" text-anchor="end" class="goldText" font-size="20">›</text>
+
+    <text x="24" y="604" class="label goldText">TODAY’S SET</text>
+    <text x="24" y="638" class="hero cream">Daily French · 5 words</text>
+    <text x="24" y="667" class="body muted">Built from your mission and recent practice.</text>
+    <rect x="24" y="733" width="342" height="54" rx="18" fill="url(#gold)"/><text x="195" y="767" class="bodyBold center" fill="#141517">Continue  →</text>
+    <text x="195" y="816" class="micro muted center">You can switch modes later.</text>
+  </g>
+  <text x="700" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">02 · MODE SELECT</text>
+  <text x="700" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">four rows, no feature-card grid</text>
+
+  <!-- 03 SET PREVIEW -->
+  <g transform="translate(960 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="cream" font-size="22">‹</text><text x="195" y="68" class="title cream center">Flashcards</text>
+    <rect x="24" y="101" width="342" height="142" rx="22" fill="url(#soft)"/><image href="../../landingpage/public/flashcard_bus_stop.png" x="24" y="101" width="342" height="142" preserveAspectRatio="xMidYMid slice" opacity=".40"/>
+    <text x="46" y="137" class="label cream">DAILY FRENCH</text><text x="46" y="180" class="hero cream">5 useful words</text><text x="46" y="209" class="body cream">Built from your recent French.</text>
+    <text x="24" y="286" class="label goldText">YOUR PROGRESS</text>
+    <text x="24" y="325" class="hero cream">3 ready</text><text x="366" y="325" text-anchor="end" class="body muted">2 building</text>
+    <rect x="24" y="344" width="342" height="8" rx="4" fill="#2d3035"/><rect x="24" y="344" width="205" height="8" rx="4" fill="url(#gold)"/>
+    <text x="24" y="390" class="label goldText">WORDS IN THIS SET</text>
+    <text x="24" y="431" class="bodyBold cream">attendre</text><text x="366" y="431" text-anchor="end" class="micro green">Ready</text>
+    <rect x="24" y="448" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="487" class="bodyBold cream">bonjour</text><text x="366" y="487" text-anchor="end" class="micro goldText">Building</text>
+    <rect x="24" y="504" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="543" class="bodyBold cream">addition</text><text x="366" y="543" text-anchor="end" class="micro goldText">Building</text>
+    <rect x="24" y="560" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="599" class="bodyBold cream">serveur</text><text x="366" y="599" text-anchor="end" class="micro faint">New</text>
+    <text x="24" y="637" class="micro muted">One image, one example, one audio line per word.</text>
+    <text x="24" y="679" class="body muted">Change mode</text><text x="366" y="679" text-anchor="end" class="goldText" font-size="18">↗</text>
+    <rect x="24" y="730" width="342" height="54" rx="18" fill="url(#gold)"/><text x="195" y="764" class="bodyBold center" fill="#141517">Start flashcards  →</text>
+    <text x="195" y="816" class="micro muted center">5 cards · about 5 minutes</text>
+  </g>
+  <text x="1155" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">03 · SET PREVIEW</text>
+  <text x="1155" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">preview words without a second maze</text>
+
+  <!-- 04 FLASHCARD FRONT -->
+  <g transform="translate(50 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="cream" font-size="22">×</text><text x="195" y="68" class="bodyBold cream center">2 / 5</text><text x="366" y="68" text-anchor="end" class="goldText" font-size="18">⚙</text>
+    <rect x="24" y="96" width="342" height="5" rx="3" fill="#2d3035"/><rect x="24" y="96" width="137" height="5" rx="3" fill="url(#gold)"/>
+    <text x="195" y="145" class="micro muted center">What is this in French?</text>
+    <rect x="24" y="171" width="342" height="325" rx="26" fill="url(#warm)"/>
+    <image href="../../landingpage/public/flashcard_bus_stop.png" x="24" y="171" width="342" height="325" preserveAspectRatio="xMidYMid slice" clip-path="url(#cardClip)" opacity=".56"/>
+    <rect x="24" y="171" width="342" height="325" rx="26" fill="#0e1317" opacity=".30"/>
+    <text x="195" y="310" class="cream center" font-size="42">⌛</text>
+    <text x="195" y="370" class="hero cream center">to wait</text>
+    <text x="195" y="402" class="body cream center">A person waits for the bus.</text>
+    <text x="195" y="466" class="micro cream center">Tap the card when you have an answer.</text>
+
+    <text x="24" y="548" class="label goldText">HELPERS</text>
+    <rect x="24" y="569" width="100" height="50" rx="17" class="surface"/><text x="74" y="591" class="goldText center" font-size="18">◖</text><text x="74" y="608" class="micro muted center">Listen</text>
+    <rect x="145" y="569" width="100" height="50" rx="17" class="surface"/><text x="195" y="591" class="goldText center" font-size="18">?</text><text x="195" y="608" class="micro muted center">Hint</text>
+    <rect x="266" y="569" width="100" height="50" rx="17" class="surface"/><text x="316" y="591" class="goldText center" font-size="18">文</text><text x="316" y="608" class="micro muted center">Translate</text>
+    <rect x="24" y="673" width="342" height="58" rx="18" fill="url(#gold)"/><text x="195" y="708" class="bodyBold center" fill="#141517">Tap to reveal  ↓</text>
+    <text x="195" y="780" class="micro muted center">Swipe is optional · tap is primary</text>
+    <text x="195" y="816" class="micro muted center">attendre · image cue retained after reveal</text>
+  </g>
+  <text x="245" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">04 · FLASHCARD FRONT</text>
+  <text x="245" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">Quizlet-like focus, Babbel-like scene</text>
+
+  <!-- 05 FLASHCARD REVEALED -->
+  <g transform="translate(505 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="cream" font-size="22">×</text><text x="195" y="68" class="bodyBold cream center">2 / 5</text><text x="366" y="68" text-anchor="end" class="goldText" font-size="18">⚙</text>
+    <rect x="24" y="96" width="342" height="5" rx="3" fill="#2d3035"/><rect x="24" y="96" width="137" height="5" rx="3" fill="url(#gold)"/>
+    <rect x="24" y="131" width="342" height="195" rx="24" fill="url(#warm)"/><image href="../../landingpage/public/flashcard_bus_stop.png" x="24" y="131" width="342" height="195" preserveAspectRatio="xMidYMid slice" opacity=".47"/>
+    <text x="24" y="372" class="word cream">attendre</text><text x="340" y="372" text-anchor="end" class="goldText" font-size="20">◖</text>
+    <text x="24" y="401" class="goldText bodyBold">/a.tɑ̃dʁ/</text><text x="24" y="431" class="body muted">to wait</text>
+    <rect x="24" y="457" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="493" class="bodyBold cream">J’attends le bus devant la gare.</text>
+    <text x="24" y="518" class="micro muted">I’m waiting for the bus in front of the station.</text>
+    <text x="24" y="563" class="label goldText">HOW DID IT FEEL?</text>
+    <text x="24" y="591" class="body muted">Choose honestly. We’ll bring it back at the right time.</text>
+
+    <rect x="24" y="624" width="103" height="74" rx="18" fill="#2a2115" stroke="#664c22"/><rect x="143" y="624" width="103" height="74" rx="18" class="surface"/><rect x="262" y="624" width="104" height="74" rx="18" fill="#1b3328" stroke="#397957"/>
+    <text x="75" y="653" class="bodyBold goldText center">Still learning</text><text x="75" y="678" class="micro muted center">10 min</text>
+    <text x="194" y="653" class="bodyBold cream center">Almost</text><text x="194" y="678" class="micro muted center">tomorrow</text>
+    <text x="314" y="653" class="bodyBold green center">Know it</text><text x="314" y="678" class="micro muted center">3 days</text>
+    <text x="195" y="758" class="micro muted center">One tap grades and advances.</text>
+    <text x="195" y="797" class="micro muted center">No silent “good”. No forced swipe.</text>
+  </g>
+  <text x="700" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">05 · REVEALED + GRADE</text>
+  <text x="700" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">image stays; three human choices replace clutter</text>
+
+  <!-- 06 RESULT -->
+  <g transform="translate(960 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="cream" font-size="22">×</text><text x="195" y="68" class="title cream center">Nice work</text>
+    <text x="195" y="137" class="hero cream center">6 of 8 ready</text>
+    <text x="195" y="168" class="body muted center">Two words need one more pass.</text>
+    <rect x="44" y="202" width="302" height="12" rx="6" fill="#2d3035"/><rect x="44" y="202" width="227" height="12" rx="6" fill="url(#gold)"/>
+    <text x="24" y="280" class="label goldText">REVIEW MISSES</text>
+    <text x="24" y="322" class="bodyBold cream">addition</text><text x="366" y="322" text-anchor="end" class="micro goldText">Still learning · 10 min</text>
+    <rect x="24" y="341" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="381" class="bodyBold cream">serveur</text><text x="366" y="381" text-anchor="end" class="micro goldText">Almost · tomorrow</text>
+    <rect x="24" y="400" width="342" height="1" fill="#2d3035"/>
+    <text x="24" y="454" class="label goldText">TODAY YOU PRACTISED</text>
+    <text x="24" y="493" class="bodyBold cream">5 words</text><text x="366" y="493" text-anchor="end" class="body muted">6 minutes</text>
+    <text x="24" y="525" class="body muted">Images · listening · recall</text>
+    <rect x="24" y="615" width="342" height="58" rx="18" fill="url(#gold)"/><text x="195" y="650" class="bodyBold center" fill="#141517">Review the 2 again  →</text>
+    <text x="195" y="714" class="bodyBold goldText center">Done</text>
+    <text x="195" y="774" class="micro muted center">Your status is saved. No streak required.</text>
+    <text x="195" y="816" class="micro muted center">Next review appears when it is useful.</text>
+  </g>
+  <text x="1155" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">06 · RESULT</text>
+  <text x="1155" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">honest result, one next action</text>
+</svg>

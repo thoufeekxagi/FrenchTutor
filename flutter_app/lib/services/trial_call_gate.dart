@@ -23,20 +23,47 @@ class TrialCallGate {
   static const wrapUpLeadSeconds = 30;
 
   static const _usedAtKey = 'trial_call_used_at';
+  static const _connectedKey = 'trial_call_connected';
   static const _secondsKey = 'trial_call_seconds';
   static const _utterancesKey = 'trial_call_utterances';
+  static const _pendingAttemptGrace = Duration(minutes: 5);
 
   /// The onboarding trial intentionally runs before account creation. Its
   /// separate Edge Function mints a short-lived, single-use Live token.
   static Future<bool> isAvailable() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_usedAtKey) == null;
+    final usedAt = prefs.getString(_usedAtKey);
+    if (usedAt == null) return true;
+    // A force-quit can happen after the gate is burned but before the socket
+    // connects. Keep that attempt reserved briefly, then make it retryable if
+    // it never reported a connection. A connected call stays consumed even if
+    // the process dies before its recap is written.
+    final connected = prefs.getBool(_connectedKey) ?? false;
+    if (!connected) {
+      final started = DateTime.tryParse(usedAt);
+      if (started != null &&
+          DateTime.now().toUtc().difference(started.toUtc()) >
+              _pendingAttemptGrace) {
+        await releaseIfNeverConnected(connected: false);
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Burn the trial. Called immediately before dialing.
   static Future<void> markStarted() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_usedAtKey, DateTime.now().toIso8601String());
+    await prefs.setBool(_connectedKey, false);
+  }
+
+  /// Marks the point at which the learner actually received a live tutor.
+  /// This lets the next app launch distinguish an interrupted dial from a
+  /// consumed call without trusting an in-memory flag.
+  static Future<void> markConnected() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_connectedKey, true);
   }
 
   /// What actually happened, for the recap screen and pilot telemetry.
@@ -47,5 +74,20 @@ class TrialCallGate {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_secondsKey, durationSeconds);
     await prefs.setInt(_utterancesKey, learnerUtteranceCount);
+  }
+
+  /// A token request or a cancelled dial can fail before Gemini ever connects.
+  /// In that case the learner has not consumed the experience and should be
+  /// allowed to retry, especially after a temporary network failure. Once a
+  /// call connected, callers must not invoke this method.
+  static Future<void> releaseIfNeverConnected({required bool connected}) async {
+    final prefs = await SharedPreferences.getInstance();
+    // The persisted marker is authoritative when a route closes without
+    // returning its result (for example, an interrupted navigation).
+    if (connected || (prefs.getBool(_connectedKey) ?? false)) return;
+    await prefs.remove(_usedAtKey);
+    await prefs.remove(_connectedKey);
+    await prefs.remove(_secondsKey);
+    await prefs.remove(_utterancesKey);
   }
 }

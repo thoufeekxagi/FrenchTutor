@@ -23,6 +23,11 @@ enum LiveSessionType {
   /// Unstructured "Just talk to Marie" call.
   freeTalk,
 
+  /// Optional pre-sign-up onboarding calibration. This is deliberately a
+  /// separate role from free talk so the tutor can explore the learner's goal
+  /// and level without turning the call into a fixed demo lesson.
+  onboardingCalibration,
+
   /// The Daily Pathway's closing roleplay: Marie plays the opposite character in a
   /// scene built from today's material.
   speakingRoleplay,
@@ -80,7 +85,7 @@ Keep everything family-friendly at all times: never use profanity, slurs, insult
   /// Who the tutor is and how they talk — shared rules, persona-specific identity.
   static String _personaBase(TutorPersona persona) =>
       '''
-${persona.promptBlock} You are speaking to a student on a phone call. The student is working toward CLB 7 on the TEF/TCF Canada exam, they are NOT necessarily a complete beginner, so calibrate from the STUDENT PROFILE you're given rather than assuming. Early in the plan means slow, simple French with English scaffolding; further along means faster French, tougher vocabulary, less hand-holding.
+${persona.promptBlock} You are speaking to a student on a phone call. Their goal, level, and priorities are supplied in the STUDENT PROFILE and LESSON CONTEXT. Never assume TEF/TCF preparation or a fixed target level; calibrate from those fields. Early in the plan means slow, simple French with English scaffolding; further along means faster French, tougher vocabulary, less hand-holding.
 
 SPEECH RULES: FOLLOW EXACTLY:
 1. Reply ONLY as if talking to the student. Never describe your plan, your thoughts, or what you are about to do. Never say "I will" or "My aim is" or "I realize".
@@ -110,6 +115,28 @@ EXAMPLE OF A GOOD REPLY (student asked in English): "Sure! 'My name is' in Frenc
 EXAMPLE OF A BAD REPLY (NEVER DO THIS): "I will now focus on greetings. My aim is to teach 'bonjour'..."
 
 START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROFILE. If a LESSON CONTEXT is provided, jump straight into practicing that material instead of a generic greeting.''';
+
+  static const _onboardingCalibrationRole = '''
+YOUR ROLE: OPTIONAL ONBOARDING CALIBRATION:
+This is a friendly three-minute sample call before sign-up. It is an extra
+personalisation layer, not a pass/fail exam and not a scripted lesson.
+Use the ONBOARDING BRIEF in LESSON CONTEXT as the source of truth. The learner
+has already chosen a goal, level, and priorities; do not ask them to choose a
+topic again or invent a café, coffee, travel, or shopping scenario.
+
+For A1 and A2, speak mostly English. Explain a short French phrase in English
+before asking the learner to try it. Never surprise a beginner with a long
+French question or an unexplained correction. For B1 and B2, use mostly French
+but switch briefly to English whenever the learner is clearly blocked.
+
+Open by acknowledging the selected goal, level, and priorities, then explain
+that you will do one or two tiny checks to understand the starting point. First
+check prior French exposure or simple comprehension, not an open-ended question
+about what they want to order or say. Next, choose one short probe that fits
+the stated goal or priority. Silently observe comprehension, pronunciation,
+vocabulary access, sentence building, and confidence; never announce a score or
+claim a precise placement. If the learner hesitates, simplify; if they answer
+comfortably, add one small follow-up. Ask one question, stop, and wait.''';
 
   /// The closing roleplay (P0.3). The historic failure mode was Marie staying in
   /// generic-tutor mode: never inhabiting the opposite character, not replying to the
@@ -231,11 +258,68 @@ TRIAL RULES: ABSOLUTE:
 - One tiny step at a time, then stop and wait. Celebrate every attempt.
 - Mostly English scaffolding, assume a complete beginner regardless of anything else you were told.''';
 
+  /// Builds the optional calibration brief from the onboarding answers. The
+  /// answers are kept in a separate context block so they can be persisted and
+  /// included in the course snapshot without pretending the trial is a full
+  /// placement test.
+  static String trialLessonContextFor({
+    required String goal,
+    required String level,
+    required List<String> focus,
+    required String tutorName,
+  }) {
+    final cefr = normalizeLevel(level);
+    final goalLabel = _goalLabel(goal);
+    final priorities = focus
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .join(', ');
+    final languageInstruction = cefr == 'A1' || cefr == 'A2'
+        ? 'Use mostly English scaffolding and only short, explained French.'
+        : 'Use mostly French, with brief English support when needed.';
+    final openingInstruction = cefr == 'A1' || cefr == 'A2'
+        ? 'Begin in English by acknowledging the selected goal, level, and priorities, then ask whether they have studied any French before or can recognise one simple French word.'
+        : 'Begin in French by acknowledging the selected goal, level, and priorities, then ask one short question that checks what they can already understand or say.';
+    return '''
+THIS IS AN OPTIONAL 3-MINUTE ONBOARDING CALIBRATION CALL BEFORE SIGN-UP.
+Tutor: $tutorName
+Learner goal: $goalLabel ($goal)
+Learner self-reported level: $cefr
+Learner-selected priorities: ${priorities.isEmpty ? 'the complete learning loop' : priorities}
+$languageInstruction
+
+$openingInstruction Do not ask them to pick a new topic: the profile above is
+already known. Use their answer to choose one tiny goal-relevant speaking or
+listening probe. Let the learner answer in English when they cannot yet produce
+French. Keep each turn short, ask one question, and wait. Do not force a phrase
+list, test every priority, present a score, call this a placement exam, or use a
+generic café/coffee scenario unless the learner's own goal or answer calls for it.''';
+  }
+
+  static String trialKickoffFor({
+    required String goal,
+    required String level,
+  }) =>
+      '(Note from the app, not the student: the learner just joined an optional '
+      'three-minute onboarding calibration. Their goal is "${_goalLabel(goal)}" '
+      'and their '
+      'self-reported level is ${normalizeLevel(level)}. Start with one warm '
+      '${_isBeginner(level) ? 'English' : 'French'} sentence that acknowledges '
+      'the selected profile, then ask one short baseline question about prior '
+      'French experience or what they already understand. Do not ask them to '
+      'choose a new topic and do not invent a café/coffee scenario.)';
+
+  static bool _isBeginner(String level) {
+    final cefr = normalizeLevel(level);
+    return cefr == 'A1' || cefr == 'A2';
+  }
+
   /// Injected by the app when [TrialCallGate.wrapUpLeadSeconds] remain.
   static const trialWrapUpNote =
       '(Note from the app, not the student: about 30 seconds remain. Wrap up '
-      'now exactly as your trial script step 6 says, teach "Au revoir !", one '
-      'warm closing sentence, then say goodbye. Keep it short.)';
+      'the calibration naturally. Briefly reflect one thing the learner tried, '
+      'offer one encouraging next step, and say goodbye in the language mix '
+      'that fits their level. Do not introduce a new test or force a phrase.)';
 
   /// Kickoff for the trial call — fires once the socket is live.
   static const trialKickoff =
@@ -243,6 +327,20 @@ TRIAL RULES: ABSOLUTE:
       'call for their 3-minute free trial. Begin at step 1 of your fixed '
       'mini-lesson NOW: warm English greeting, introduce yourself, then '
       'straight into "Bonjour !".)';
+
+  static String _goalLabel(String raw) {
+    final key = raw.trim().toLowerCase();
+    return switch (key) {
+      'everyday' => 'Everyday French',
+      'tef_canada' => 'TEF / TCF Canada',
+      'work' => 'Work and professional life',
+      'relocation' => 'Moving and settling in a French-speaking place',
+      'travel' => 'Travel and new places',
+      'culture' => 'Culture, family and connection',
+      '' => 'their chosen French goal',
+      _ => raw.trim(),
+    };
+  }
 
   /// Normalizes the many raw level strings this app has accumulated over time
   /// (onboarding wrote 'a1'/'a2'/'b1'/'b2', but older/aliased profiles can
@@ -301,6 +399,7 @@ STUDENT LEVEL: B2 (POLISHING). This is the target ceiling for this call. Use nua
   }) {
     final role = switch (type) {
       LiveSessionType.freeTalk => _freeTalkRole,
+      LiveSessionType.onboardingCalibration => _onboardingCalibrationRole,
       LiveSessionType.speakingRoleplay => _roleplayRole,
       LiveSessionType.speakingGuided => _guidedConversationRole,
       LiveSessionType.speakingExam => _speakingExamRole,

@@ -8,7 +8,6 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/kicker_text.dart';
-import '../../widgets/practice_content_card.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import 'grammar_lesson_flow_screen.dart';
 
@@ -284,34 +283,6 @@ class _GrammarCurriculumHomeScreenState
             ],
             const SizedBox(height: 24),
             _ReviewMistakesCard(onTap: _reviewMistake),
-            if (widget.generatedHistory.isNotEmpty) ...[
-              const SizedBox(height: 26),
-              const KickerText('SAVED GRAMMAR STORIES'),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 244,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: widget.generatedHistory.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 10),
-                  itemBuilder: (context, index) {
-                    final story = widget.generatedHistory[index];
-                    return SizedBox(
-                      width: 210,
-                      child: PracticeContentCard(
-                        title: story.displayTitle,
-                        summary: 'Practice ${story.grammarPoint} in context.',
-                        levelBand: story.levelBand,
-                        meta: '${story.passage.segments.length} scenes',
-                        coverUrl: story.coverUrl,
-                        fallbackIcon: CupertinoIcons.textformat,
-                        onTap: () => widget.onOpenGenerated(story),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
           ],
         ),
       ),

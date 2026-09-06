@@ -25,14 +25,10 @@ void main() {
 
       store.linkSupabaseUser('11111111-1111-1111-1111-111111111111');
 
-      final rows = db.select(
-        'SELECT user_id FROM profiles WHERE id = ?',
-        [profile.id],
-      );
-      expect(
-        rows.first['user_id'],
-        '11111111-1111-1111-1111-111111111111',
-      );
+      final rows = db.select('SELECT user_id FROM profiles WHERE id = ?', [
+        profile.id,
+      ]);
+      expect(rows.first['user_id'], '11111111-1111-1111-1111-111111111111');
     });
 
     test('linkSupabaseUser is idempotent — calling it twice is harmless', () {
@@ -59,11 +55,67 @@ void main() {
 
       store.linkSupabaseUser('should-not-apply');
 
-      final rows = db.select(
-        'SELECT user_id FROM profiles WHERE id = ?',
-        [profile.id],
-      );
+      final rows = db.select('SELECT user_id FROM profiles WHERE id = ?', [
+        profile.id,
+      ]);
       expect(rows.first['user_id'], isNull);
+    });
+
+    test('linkSupabaseUser adopts only anonymous onboarding trial evidence', () {
+      final db = sqlite3.openInMemory();
+      final store = LearningStore(db);
+      store.profile();
+      db.execute(
+        "INSERT INTO ai_sessions (id, stage, created_at, updated_at) VALUES ('trial-ai', 'trial', '2026-09-01', '2026-09-01')",
+      );
+      db.execute(
+        "INSERT INTO ai_sessions (id, stage, created_at, updated_at) VALUES ('other-ai', 'speaking', '2026-09-01', '2026-09-01')",
+      );
+      db.execute(
+        "INSERT INTO sessions (id, started_at, stage) VALUES ('trial-session', '2026-09-01', 'trial')",
+      );
+      db.execute(
+        "INSERT INTO sessions (id, started_at, stage) VALUES ('other-session', '2026-09-01', 'speaking')",
+      );
+      db.execute(
+        "INSERT INTO messages (uuid, session_id, role, content) VALUES ('trial-message', 'trial-session', 'user', 'Bonjour')",
+      );
+      db.execute(
+        "INSERT INTO messages (uuid, session_id, role, content) VALUES ('other-message', 'other-session', 'user', 'Bonjour')",
+      );
+
+      store.linkSupabaseUser('new-user');
+
+      expect(
+        db
+            .select("SELECT user_id FROM ai_sessions WHERE id = 'trial-ai'")
+            .first['user_id'],
+        'new-user',
+      );
+      expect(
+        db
+            .select("SELECT user_id FROM ai_sessions WHERE id = 'other-ai'")
+            .first['user_id'],
+        isNull,
+      );
+      expect(
+        db
+            .select("SELECT user_id FROM sessions WHERE id = 'trial-session'")
+            .first['user_id'],
+        'new-user',
+      );
+      expect(
+        db
+            .select("SELECT user_id FROM messages WHERE uuid = 'trial-message'")
+            .first['user_id'],
+        'new-user',
+      );
+      expect(
+        db
+            .select("SELECT user_id FROM messages WHERE uuid = 'other-message'")
+            .first['user_id'],
+        isNull,
+      );
     });
   });
 }

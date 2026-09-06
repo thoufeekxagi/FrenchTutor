@@ -9,8 +9,10 @@ import 'package:uuid/uuid.dart';
 
 import '../../config/theme.dart';
 import '../../data/database/learning_store.dart';
+import '../../data/database/storage_service.dart';
 import '../../models/chat_message.dart';
 import '../../flow/stage_outcome.dart';
+import '../../models/profile.dart';
 import '../../models/session.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
@@ -24,6 +26,7 @@ import '../../services/session_recorder.dart';
 import '../../services/pilot_access_service.dart';
 import '../../services/product_analytics.dart';
 import '../../services/learning_allowance_service.dart';
+import '../../services/trial_call_gate.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
@@ -117,6 +120,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   late final GeminiLiveService _gemini;
   late final AudioStreamingService _audio;
   late final MicController _mic;
+  // Capture provider-backed dependencies while the route is alive. `_endCall`
+  // also runs from `dispose`, when Riverpod's ConsumerState ref is already
+  // invalid; the final transcript must still be saved in that path.
+  late final StorageService _storage;
+  late final LearningStore _learningStore;
+  late final PilotAccessService _pilotAccess;
+  Profile? _onboardingProfile;
   MicMode _micMode = MicMode.auto;
   final String _sessionId = const Uuid().v4();
 
@@ -136,8 +146,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     super.initState();
     LessonSpeechService.shared.deactivate();
     WidgetsBinding.instance.addObserver(this);
+    _storage = ref.read(storageServiceProvider);
+    _learningStore = ref.read(learningStoreProvider);
+    _pilotAccess = ref.read(pilotAccessServiceProvider);
+    _onboardingProfile = widget.stage == 'trial'
+        ? _learningStore.profile()
+        : null;
     // Deferred to after this frame — see pathway_writing_screen.dart for why.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref.read(notetakerStateProvider).currentContext = 'Speaking';
     });
     _audio = AudioStreamingService();
@@ -146,6 +163,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       isTrial: widget.stage == 'trial',
       sessionType: widget.examMode
           ? LiveSessionType.speakingExam
+          : widget.stage == 'trial'
+          ? LiveSessionType.onboardingCalibration
           : _isGuided
           ? LiveSessionType.speakingGuided
           : _isRoleplay
@@ -153,7 +172,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           : LiveSessionType.freeTalk,
       lessonContext: widget.lessonContext,
       levelOverride: widget.levelOverride,
-      learningStoreForProfile: ref.read(learningStoreProvider),
+      learningStoreForProfile: _learningStore,
     );
     _mic = MicController(
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
@@ -166,6 +185,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       setState(() => _micMode = saved);
     });
     _setupCallbacks();
+    if (widget.stage == 'trial') _checkpointTrialSession();
     _startCall();
   }
 
@@ -228,7 +248,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     final recordId = _aiSessionRecordId;
     if (recordId != null) {
-      final store = ref.read(learningStoreProvider);
+      final store = _learningStore;
       final usedSecondsBefore = store.aiSecondsUsedToday();
       store.endAiSession(
         recordId,
@@ -265,10 +285,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     int usedSecondsBefore,
   ) {
     final usedSecondsAfter = store.aiSecondsUsedToday();
-    final entitlement = ref
-        .read(pilotAccessServiceProvider)
-        .snapshot()
-        .entitlement;
+    final entitlement = _pilotAccess.snapshot().entitlement;
     final baseLimit = PilotAccessService.baseDailyLimitSeconds(entitlement);
     final overageBefore = (usedSecondsBefore - baseLimit).clamp(
       0,
@@ -328,15 +345,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onConnected = () async {
       if (!mounted) return;
       _connectedAt = DateTime.now();
-      _aiSessionRecordId = ref
-          .read(learningStoreProvider)
-          .startAiSession(
-            dailySessionId: widget.dailySessionId,
-            stage: widget.stage,
-            topic:
-                widget.sessionTopic ??
-                (widget.lessonContext != null ? 'lesson' : 'free_talk'),
-          );
+      if (widget.stage == 'trial') {
+        await TrialCallGate.markConnected();
+        if (!mounted) return;
+      }
+      _aiSessionRecordId = _learningStore.startAiSession(
+        dailySessionId: widget.dailySessionId,
+        stage: widget.stage,
+        topic:
+            widget.sessionTopic ??
+            (widget.lessonContext != null ? 'lesson' : 'free_talk'),
+      );
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
 
@@ -456,9 +475,18 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _appendMessage(ChatMessage message) {
+    if (!mounted) return;
     setState(() => _messages.add(message));
+    // Checkpoint finalized turns immediately. This matters most for the
+    // pre-signup trial: a network drop or app termination must not erase the
+    // learner evidence that will later shape Course sessions 6–10.
+    _storage.saveMessage(
+      sessionId: _sessionId,
+      role: message.isUser ? 'user' : 'assistant',
+      content: message.content,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
+      if (!mounted || !_scrollController.hasClients) return;
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 250),
@@ -484,6 +512,24 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     });
   }
 
+  /// Keep the optional onboarding call recoverable even if the process is
+  /// terminated before the normal end-of-call callback runs. Only the trial
+  /// creates this in-progress history row; ordinary practice keeps its current
+  /// completed-session behavior.
+  void _checkpointTrialSession() {
+    final now = DateTime.now().toIso8601String();
+    _storage.saveSession(
+      Session(
+        id: _sessionId,
+        startedAt: now,
+        summary: 'Onboarding calibration in progress.',
+        topic: widget.sessionTopic,
+        contentKey: widget.contentKey,
+        stage: widget.stage,
+      ),
+    );
+  }
+
   void _saveSessionLocally() {
     final now = DateTime.now();
     final summary = _generateLocalSummary();
@@ -499,15 +545,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       contentKey: widget.contentKey,
       stage: widget.stage,
     );
-    final storage = ref.read(storageServiceProvider);
+    final storage = _storage;
     storage.saveSession(session);
-    for (final msg in _messages) {
-      storage.saveMessage(
-        sessionId: _sessionId,
-        role: msg.isUser ? 'user' : 'assistant',
-        content: msg.content,
-      );
-    }
     // Every conversational call gets the same AI recap note the typed
     // screens already do — this was the one live call screen (free talk,
     // the Speaking mission tile, trial, mocks) that never generated one.
@@ -521,12 +560,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
 
     if (_callDuration >= 45) {
-      ref
-          .read(learningStoreProvider)
-          .markHabit(
-            'speaking',
-            minutes: (_callDuration / 60).clamp(1, 999).round(),
-          );
+      _learningStore.markHabit(
+        'speaking',
+        minutes: (_callDuration / 60).clamp(1, 999).round(),
+      );
     }
   }
 
@@ -567,7 +604,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   String _generateLocalSummary() {
-    if (_messages.isEmpty) return 'No conversation recorded.';
+    final onboarding = _onboardingProfile;
+    if (_messages.isEmpty) {
+      return onboarding == null
+          ? 'No conversation recorded.'
+          : 'Onboarding calibration: goal ${onboarding.goal}; '
+                'self-reported level ${onboarding.level}; '
+                'priorities ${onboarding.interests.join(', ')}. '
+                'No conversation was recorded.';
+    }
 
     final userMessages = _messages.where((m) => m.isUser).length;
     final tutorMessages = _messages.where((m) => !m.isUser).length;
@@ -582,6 +627,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     final frenchUsed = words.intersection(_frenchKeywords).toList()..sort();
     if (frenchUsed.isNotEmpty) {
       summary += 'French words used: ${frenchUsed.take(10).join(', ')}. ';
+    }
+
+    if (onboarding != null) {
+      summary +=
+          'Onboarding choices: goal ${onboarding.goal}; '
+          'self-reported level ${onboarding.level}; '
+          'priorities ${onboarding.interests.join(', ')}. ';
     }
 
     summary += userMessages > 3

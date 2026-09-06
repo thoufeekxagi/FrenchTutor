@@ -90,6 +90,7 @@ class WebAudioStreamingService implements AudioStreamingService {
   /// chunks is just "start each one where the last one ended" — no drain loop
   /// or hand-managed queue like the native implementation needs.
   double _nextStartTime = 0;
+  double _playbackSpeed = 1.0;
   final List<web.AudioBufferSourceNode> _scheduled = [];
 
   /// A PCM16 sample is 2 bytes and Gemini's chunk boundaries do not respect
@@ -394,6 +395,7 @@ class WebAudioStreamingService implements AudioStreamingService {
 
     final node = ctx.createBufferSource();
     node.buffer = buffer;
+    node.playbackRate.value = _playbackSpeed;
     node.connect(ctx.destination);
 
     // Sample-accurate gapless scheduling. If the network fell behind and the
@@ -430,6 +432,16 @@ class WebAudioStreamingService implements AudioStreamingService {
   /// with no earpiece-vs-loudspeaker distinction to override.
   @override
   void setSpeakerEnabled(bool enabled) {}
+
+  @override
+  Future<void> setPlaybackSpeed(double speed) async {
+    _playbackSpeed = speed.clamp(0.5, 1.5).toDouble();
+    // Web Audio applies this to buffers that are already scheduled as well as
+    // to future chunks, so a narration speed change remains continuous.
+    for (final node in List.of(_scheduled)) {
+      node.playbackRate.value = _playbackSpeed;
+    }
+  }
 
   @override
   Future<void> dispose() async {

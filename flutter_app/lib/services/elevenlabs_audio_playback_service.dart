@@ -32,7 +32,7 @@ class ElevenLabsAudioPlaybackService {
     if (bytes.isEmpty) throw StateError('ElevenLabs audio is empty');
     await stop();
     if (!_opened) {
-      await _player.openPlayer();
+      await _player.openPlayer().timeout(const Duration(seconds: 10));
       _opened = true;
     }
     await _player.setSubscriptionDuration(const Duration(milliseconds: 200));
@@ -42,15 +42,17 @@ class ElevenLabsAudioPlaybackService {
     );
     isPlaying = true;
     _isPaused = false;
-    final duration = await _player.startPlayer(
-      fromDataBuffer: bytes,
-      codec: container.toLowerCase() == 'wav' ? Codec.pcm16WAV : Codec.mp3,
-      whenFinished: () {
-        isPlaying = false;
-        _isPaused = false;
-        onFinished?.call();
-      },
-    );
+    final duration = await _player
+        .startPlayer(
+          fromDataBuffer: bytes,
+          codec: container.toLowerCase() == 'wav' ? Codec.pcm16WAV : Codec.mp3,
+          whenFinished: () {
+            isPlaying = false;
+            _isPaused = false;
+            onFinished?.call();
+          },
+        )
+        .timeout(const Duration(seconds: 15));
     if (speed != 1) await setSpeed(speed);
     return duration;
   }

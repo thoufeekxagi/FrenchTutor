@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,7 +15,7 @@ import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
-import 'speak_course_session_screen.dart';
+import 'speak_course_activity_screen.dart';
 import 'speaking_flow_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
@@ -30,13 +32,40 @@ class SpeakingStudioScreen extends ConsumerStatefulWidget {
 
 class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   var _carouselPage = 0;
+  bool _preparingCourse = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prepareCourse());
+  }
+
+  Future<void> _prepareCourse() async {
+    if (_preparingCourse) return;
+    _preparingCourse = true;
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      final plan = ref
+          .read(adaptiveCourseStoreProvider)
+          .ensureCurrentPlan(profile);
+      final sync = ref.read(syncServiceProvider);
+      final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
+      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
+      if (mounted) setState(() {});
+    } finally {
+      _preparingCourse = false;
+    }
+  }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
       context,
-      (_) => SpeakCourseSessionScreen(session: session),
+      (_) => SpeakCourseActivityScreen(session: session),
     );
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      unawaited(_prepareCourse());
+    }
   }
 
   Future<void> _callTutor() async {
@@ -50,24 +79,25 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     final completedContentKeys = ref
         .watch(storageServiceProvider)
         .completedContentKeys();
-    // Home is a read-only surface. The app/onboarding flow is responsible
-    // for creating the persisted adaptive plan; rendering a card must never
-    // create or re-plan course content.
-    final adaptivePlan = ref
-        .read(adaptiveCourseStoreProvider)
-        .currentPlan(profile);
-    if (adaptivePlan == null) {
-      throw StateError('Home requires a persisted adaptive course plan.');
-    }
+    // Home normally reads the plan prepared by onboarding/auth hydration. A
+    // missing or stale plan is a recoverable startup state, though: older
+    // plans use the pre-evidence fingerprint and must be refreshed before the
+    // roadmap can safely be rendered.
+    final adaptiveStore = ref.read(adaptiveCourseStoreProvider);
+    final adaptivePlan =
+        adaptiveStore.currentPlan(profile) ??
+        adaptiveStore.ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
       profile,
       completedContentKeys: completedContentKeys,
       adaptiveSessions: adaptivePlan.sessions,
     );
-    final next = roadmap.nextSession ?? roadmap.sessions.first;
-    final lessonCards = _lessonCards(roadmap, next);
+    final next = roadmap.nextSession;
+    final lessonCards = next == null
+        ? const <SpeakRoadmapSession>[]
+        : _lessonCards(roadmap, next);
     final upcoming = lessonCards
-        .where((session) => session.contentKey != next.contentKey)
+        .where((session) => session.contentKey != next?.contentKey)
         .take(2)
         .toList(growable: false);
     final tutor = ActiveTutor.current;
@@ -102,7 +132,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             const SizedBox(height: 26),
             Text('EXPLORE', style: _eyebrow()),
             const SizedBox(height: 10),
-            _modeRail(context, next.primarySkill),
+            _modeRail(context, next?.primarySkill ?? SpeakSkill.speaking),
           ],
         ),
       ),
@@ -502,12 +532,12 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     SpeakRoadmapSession next,
   ) {
     final cards = roadmap.sessions
-        .where((session) => session.index >= next.index)
+        .where((session) => session.index >= next.index && session.contentReady)
         .take(3)
         .toList(growable: true);
     for (final session in roadmap.sessions) {
       if (cards.length == 3) break;
-      if (!cards.contains(session)) cards.add(session);
+      if (session.contentReady && !cards.contains(session)) cards.add(session);
     }
     return cards;
   }
@@ -608,7 +638,10 @@ class _QuickStartCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(minHeight: 94),
+          // The card lives inside Home's vertical ListView, whose children
+          // receive an unbounded height. Give the internal Spacer a finite
+          // height to avoid the RenderFlex/viewport assertion cascade.
+          height: 94,
           padding: const EdgeInsets.fromLTRB(11, 12, 9, 11),
           decoration: BoxDecoration(
             color: DesignTokens.nightSurface,

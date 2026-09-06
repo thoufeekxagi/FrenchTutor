@@ -10,6 +10,7 @@ import '../../data/database/generated_writing_task_store.dart';
 import '../../data/writing_curriculum_catalog.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
+import '../../models/writing_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/passeport_card.dart';
@@ -469,6 +470,11 @@ class _WritingLabScreenState extends ConsumerState<WritingLabScreen> {
 
   IconData _iconForTask(WritingTask? task) {
     if (task == null) return CupertinoIcons.wand_stars;
+    if (task.title.trim().isNotEmpty) {
+      return writingCourseIconForText(
+        '${task.title} ${task.promptEn} ${task.promptFr}',
+      );
+    }
     return switch (task.type) {
       'word' => CupertinoIcons.textformat,
       'sentence' => CupertinoIcons.list_bullet,
@@ -600,7 +606,9 @@ class _GeneratedWritingTaskTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              CupertinoIcons.wand_stars,
+              writingCourseIconForText(
+                '${generated.task.title} ${generated.task.promptEn}',
+              ),
               color: DesignTokens.primary,
               size: 24,
             ),

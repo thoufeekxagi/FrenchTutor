@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="2000" viewBox="0 0 1400 2000" role="img" aria-labelledby="title desc">
+  <title id="title">Vocabulary V2 mobile wireframe overview</title>
+  <desc id="desc">Six dark mobile wireframes for a focused vocabulary home and flashcard practice flow.</desc>
+  <defs>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffd36b"/><stop offset="1" stop-color="#e9a930"/></linearGradient>
+    <linearGradient id="imageA" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#d8b77a"/><stop offset="0.48" stop-color="#65818b"/><stop offset="1" stop-color="#1e2830"/></linearGradient>
+    <linearGradient id="imageB" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#a8c3bd"/><stop offset="0.55" stop-color="#e8d7bd"/><stop offset="1" stop-color="#8e6870"/></linearGradient>
+    <linearGradient id="imageC" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ece2c7"/><stop offset="0.52" stop-color="#ca8a56"/><stop offset="1" stop-color="#334953"/></linearGradient>
+    <clipPath id="clipA"><rect x="24" y="164" width="160" height="112" rx="18"/></clipPath>
+    <clipPath id="clipB"><rect x="204" y="164" width="160" height="112" rx="18"/></clipPath>
+    <clipPath id="clipC"><rect x="24" y="648" width="160" height="92" rx="18"/></clipPath>
+    <clipPath id="clipD"><rect x="204" y="648" width="160" height="92" rx="18"/></clipPath>
+    <clipPath id="clipLearn"><rect x="24" y="234" width="342" height="166" rx="26"/></clipPath>
+    <style>
+      .phone{fill:#0c0d0f;stroke:#45464b;stroke-width:3}
+      .surface{fill:#17191c;stroke:#2b2e33;stroke-width:1.5}
+      .surface2{fill:#202226;stroke:#363940;stroke-width:1.5}
+      .cream{fill:#f8f5ed}
+      .muted{fill:#9a9ba1}
+      .faint{fill:#676970}
+      .gold{fill:#f3ba45}
+      .goldStroke{stroke:#f3ba45}
+      .green{fill:#50c58a}
+      .tiny{font-family:Arial,sans-serif;font-size:9px;letter-spacing:1.2px;font-weight:700}
+      .micro{font-family:Arial,sans-serif;font-size:10px}
+      .body{font-family:Arial,sans-serif;font-size:13px}
+      .bodyBold{font-family:Arial,sans-serif;font-size:13px;font-weight:700}
+      .label{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px}
+      .title{font-family:Arial,sans-serif;font-size:24px;font-weight:700}
+      .hero{font-family:Arial,sans-serif;font-size:30px;font-weight:700}
+      .word{font-family:Arial,sans-serif;font-size:34px;font-weight:700}
+      .center{text-anchor:middle}
+    </style>
+  </defs>
+
+  <rect width="1400" height="2000" fill="#25272b"/>
+  <text x="48" y="48" fill="#f8f5ed" font-family="Arial,sans-serif" font-size="25" font-weight="700">VOCABULARY V2 · WIREFRAME OVERVIEW</text>
+  <text x="1352" y="48" text-anchor="end" fill="#9a9ba1" font-family="Arial,sans-serif" font-size="13">proposal · dark mode · 390 × 844 reference</text>
+  <text x="48" y="77" fill="#9a9ba1" font-family="Arial,sans-serif" font-size="14">A calm home, a small deck, and one purposeful repetition loop.</text>
+
+  <!-- 01 HOME -->
+  <g transform="translate(50 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="68" class="title cream">Vocabulary</text>
+    <text x="366" y="66" text-anchor="end" class="gold" font-family="Arial,sans-serif" font-size="20">✦</text>
+    <text x="24" y="91" class="body muted">Words you can use next.</text>
+
+    <rect x="24" y="116" width="342" height="104" rx="22" fill="#2a2115" stroke="#5e4721"/>
+    <text x="44" y="143" class="label gold">TODAY’S REVIEW</text>
+    <text x="44" y="180" class="hero cream">5 words ready</text>
+    <text x="344" y="181" text-anchor="end" class="body muted">≈ 6 min</text>
+    <rect x="44" y="193" width="280" height="7" rx="4" fill="#4b3c22"/><rect x="44" y="193" width="174" height="7" rx="4" fill="url(#gold)"/>
+
+    <rect x="24" y="236" width="342" height="55" rx="18" fill="url(#gold)"/>
+    <text x="195" y="270" class="bodyBold center" fill="#141517">Continue review  →</text>
+
+    <text x="24" y="330" class="label gold">BUILD A SET</text>
+    <rect x="24" y="345" width="342" height="72" rx="18" class="surface"/>
+    <text x="46" y="374" class="bodyBold cream">From today’s mission</text>
+    <text x="46" y="397" class="micro muted">Recent listening + speaking · 8 words</text>
+    <text x="342" y="384" text-anchor="end" class="gold" font-family="Arial,sans-serif" font-size="20">›</text>
+
+    <text x="24" y="457" class="label gold">EXPLORE SETS</text>
+    <rect x="24" y="472" width="160" height="188" rx="18" class="surface"/>
+    <rect x="204" y="472" width="160" height="188" rx="18" class="surface"/>
+    <rect x="24" y="472" width="160" height="112" rx="18" fill="url(#imageA)"/>
+    <rect x="204" y="472" width="160" height="112" rx="18" fill="url(#imageB)"/>
+    <g opacity=".55"><path d="M24 550 C62 510 88 535 115 505 S166 514 184 490" fill="none" stroke="#f7e7b9" stroke-width="5"/><path d="M204 525 C250 490 286 538 364 490" fill="none" stroke="#f8f5ed" stroke-width="5"/></g>
+    <text x="38" y="612" class="bodyBold cream">Le petit bateau</text><text x="38" y="631" class="micro muted">A1 · 5 words · Ready</text>
+    <text x="218" y="612" class="bodyBold cream">Au café</text><text x="218" y="631" class="micro muted">A1 · 7 words · New</text>
+
+    <rect x="24" y="684" width="342" height="52" rx="18" class="surface2"/>
+    <text x="48" y="716" class="bodyBold cream">Browse all themes</text><text x="342" y="716" text-anchor="end" class="gold" font-family="Arial,sans-serif" font-size="20">›</text>
+    <rect x="24" y="770" width="342" height="1" fill="#2b2e33"/>
+    <text x="57" y="803" class="gold center" font-family="Arial,sans-serif" font-size="18">⌂</text><text x="57" y="824" class="micro gold center">Home</text>
+    <text x="195" y="803" class="muted center" font-family="Arial,sans-serif" font-size="18">▦</text><text x="195" y="824" class="micro muted center">Practice</text>
+    <text x="333" y="803" class="muted center" font-family="Arial,sans-serif" font-size="18">◎</text><text x="333" y="824" class="micro muted center">Progress</text>
+  </g>
+  <text x="245" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">01 · HOME</text>
+  <text x="245" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">answer “what now?” first</text>
+
+  <!-- 02 CHOOSE / CREATE -->
+  <g transform="translate(505 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="67" class="cream" font-family="Arial,sans-serif" font-size="22">‹</text>
+    <text x="195" y="68" class="title cream center">Choose a set</text>
+    <text x="24" y="103" class="body muted">Keep it focused. You can always add another pass.</text>
+
+    <rect x="24" y="128" width="342" height="78" rx="20" fill="#2a2115" stroke="#5e4721"/>
+    <text x="45" y="157" class="label gold">RECOMMENDED</text>
+    <text x="45" y="184" class="bodyBold cream">Today’s mission words</text><text x="340" y="184" text-anchor="end" class="gold bodyBold">8</text>
+
+    <text x="24" y="245" class="label gold">CHOOSE HOW TO BUILD</text>
+    <rect x="24" y="260" width="342" height="74" rx="18" class="surface"/>
+    <text x="47" y="290" class="bodyBold cream">Choose a theme</text><text x="47" y="313" class="micro muted">Travel, work, café, daily life</text><text x="340" y="299" text-anchor="end" class="gold" font-size="22">›</text>
+    <rect x="24" y="346" width="342" height="74" rx="18" class="surface"/>
+    <text x="47" y="376" class="bodyBold cream">Generate with Marie</text><text x="47" y="399" class="micro muted">A custom set from your recent practice</text><text x="340" y="385" text-anchor="end" class="gold" font-size="22">✦</text>
+
+    <text x="24" y="463" class="label gold">SESSION LENGTH</text>
+    <rect x="24" y="478" width="104" height="54" rx="18" fill="#2a2115" stroke="#f3ba45"/>
+    <rect x="143" y="478" width="104" height="54" rx="18" class="surface"/>
+    <rect x="262" y="478" width="104" height="54" rx="18" class="surface"/>
+    <text x="76" y="501" class="bodyBold gold center">Quick</text><text x="76" y="520" class="micro muted center">3–4 items</text>
+    <text x="195" y="501" class="bodyBold cream center">Standard</text><text x="195" y="520" class="micro muted center">5–6 items</text>
+    <text x="314" y="501" class="bodyBold cream center">Deep</text><text x="314" y="520" class="micro muted center">8–10 items</text>
+
+    <rect x="24" y="575" width="342" height="176" rx="22" class="surface"/>
+    <text x="46" y="606" class="label gold">PREVIEW</text>
+    <text x="46" y="640" class="hero cream">au café</text><text x="340" y="640" text-anchor="end" class="body muted">A1</text>
+    <text x="46" y="669" class="body muted">Order a coffee, ask for the bill, and</text><text x="46" y="690" class="body muted">make one polite request.</text>
+    <text x="46" y="724" class="micro muted">7 words · image + audio ready</text>
+    <rect x="24" y="776" width="342" height="52" rx="18" fill="url(#gold)"/><text x="195" y="809" class="bodyBold center" fill="#141517">Start this set  →</text>
+  </g>
+  <text x="700" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">02 · CHOOSE / CREATE</text>
+  <text x="700" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">three options, one primary action</text>
+
+  <!-- 03 LEARN -->
+  <g transform="translate(960 105)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="69" class="cream" font-size="22">‹</text><text x="195" y="68" class="bodyBold cream center">Au café</text><text x="366" y="68" text-anchor="end" class="gold" font-size="18">•••</text>
+    <!-- one line stage bar -->
+    <text x="24" y="105" class="gold tiny">PREVIEW</text><text x="91" y="105" class="gold tiny">LEARN</text><text x="144" y="105" class="faint tiny">RECALL</text><text x="210" y="105" class="faint tiny">CONTEXT</text><text x="288" y="105" class="faint tiny">USE</text><text x="330" y="105" class="faint tiny">DONE</text>
+    <rect x="24" y="116" width="342" height="4" rx="2" fill="#2c2e33"/><rect x="24" y="116" width="114" height="4" rx="2" fill="url(#gold)"/>
+    <text x="24" y="158" class="label gold">02 · LEARN</text>
+    <text x="24" y="195" class="hero cream">Meet the word.</text>
+    <text x="24" y="215" class="body muted">See it, hear it, then use it.</text>
+    <rect x="24" y="234" width="342" height="166" rx="26" fill="#261e15" stroke="#5e4721"/>
+    <rect x="24" y="234" width="342" height="166" rx="26" fill="url(#imageC)" opacity=".7"/>
+    <image href="../../landingpage/public/flashcard_bus_stop.png" x="24" y="234" width="342" height="166" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipLearn)" opacity=".46"/>
+    <path d="M54 348 C91 292 127 339 161 292 S235 336 294 276" fill="none" stroke="#f9eac4" stroke-width="6" opacity=".65"/>
+    <circle cx="314" cy="265" r="22" fill="#17191c" opacity=".88"/><text x="314" y="272" class="cream center" font-size="18">⌁</text>
+    <rect x="24" y="420" width="342" height="186" rx="22" class="surface"/>
+    <text x="47" y="456" class="word cream">serveur</text><text x="47" y="483" class="gold bodyBold">/sɛʁ.vœʁ/</text><text x="47" y="518" class="body muted">waiter · server</text>
+    <rect x="47" y="540" width="112" height="34" rx="17" fill="#2a2115"/><text x="103" y="562" class="micro gold center">▶  Hear word</text>
+    <rect x="47" y="588" width="295" height="1" fill="#2d3035"/>
+    <text x="47" y="622" class="bodyBold cream">Le serveur arrive avec l’addition.</text>
+    <text x="47" y="644" class="micro muted">The waiter brings the bill.</text>
+    <text x="24" y="686" class="micro muted">Tip: notice the final sound in serveur.</text>
+    <rect x="24" y="724" width="342" height="54" rx="18" fill="url(#gold)"/><text x="195" y="758" class="bodyBold center" fill="#141517">I’m ready to recall  →</text>
+    <text x="195" y="812" class="micro muted center">Marie  ·  audio cached  ·  2 of 7</text>
+  </g>
+  <text x="1155" y="977" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">03 · LEARN</text>
+  <text x="1155" y="998" class="muted" font-family="Arial,sans-serif" font-size="12">image carries meaning; card carries use</text>
+
+  <!-- 04 RECALL -->
+  <g transform="translate(50 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="69" class="cream" font-size="22">‹</text><text x="195" y="68" class="bodyBold cream center">Au café</text><text x="366" y="68" text-anchor="end" class="gold" font-size="18">•••</text>
+    <text x="24" y="105" class="gold tiny">PREVIEW</text><text x="91" y="105" class="gold tiny">LEARN</text><text x="144" y="105" class="gold tiny">RECALL</text><text x="210" y="105" class="faint tiny">CONTEXT</text><text x="288" y="105" class="faint tiny">USE</text><text x="330" y="105" class="faint tiny">DONE</text>
+    <rect x="24" y="116" width="342" height="4" rx="2" fill="#2c2e33"/><rect x="24" y="116" width="171" height="4" rx="2" fill="url(#gold)"/>
+    <text x="24" y="158" class="label gold">03 · RECALL</text>
+    <text x="24" y="195" class="hero cream">What was the word?</text>
+    <text x="24" y="215" class="body muted">Try before you reveal the answer.</text>
+    <rect x="24" y="247" width="342" height="224" rx="26" fill="#2a2115" stroke="#5e4721"/>
+    <text x="195" y="330" class="gold center" font-size="42">?</text>
+    <text x="195" y="377" class="bodyBold cream center">The waiter brings the bill.</text>
+    <text x="195" y="407" class="micro muted center">Tap to reveal · or say it aloud</text>
+    <rect x="24" y="495" width="342" height="55" rx="18" class="surface"/><text x="52" y="530" class="bodyBold cream">Reveal answer</text><text x="340" y="530" text-anchor="end" class="gold" font-size="20">⌄</text>
+    <text x="24" y="592" class="label gold">AFTER REVEAL</text>
+    <rect x="24" y="609" width="342" height="100" rx="20" class="surface"/>
+    <text x="47" y="647" class="word cream" font-size="28">serveur</text><text x="47" y="674" class="body muted">waiter · server</text><text x="340" y="658" text-anchor="end" class="gold" font-size="20">🔊</text>
+    <text x="24" y="752" class="micro muted">Grade yourself honestly. The next review is shown.</text>
+    <rect x="24" y="774" width="100" height="52" rx="17" fill="#2a2115" stroke="#5e4721"/><rect x="145" y="774" width="100" height="52" rx="17" class="surface"/><rect x="266" y="774" width="100" height="52" rx="17" fill="#1c3328" stroke="#397957"/>
+    <text x="74" y="797" class="bodyBold gold center">Again</text><text x="74" y="815" class="micro muted center">10 min</text>
+    <text x="195" y="797" class="bodyBold cream center">Almost</text><text x="195" y="815" class="micro muted center">tomorrow</text>
+    <text x="316" y="797" class="bodyBold green center">Got it</text><text x="316" y="815" class="micro muted center">3 days</text>
+  </g>
+  <text x="245" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">04 · RECALL</text>
+  <text x="245" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">self-grade replaces silent swipes</text>
+
+  <!-- 05 CONTEXT / USE -->
+  <g transform="translate(505 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="69" class="cream" font-size="22">‹</text><text x="195" y="68" class="bodyBold cream center">Au café</text><text x="366" y="68" text-anchor="end" class="gold" font-size="18">•••</text>
+    <text x="24" y="105" class="gold tiny">PREVIEW</text><text x="91" y="105" class="gold tiny">LEARN</text><text x="144" y="105" class="gold tiny">RECALL</text><text x="210" y="105" class="gold tiny">CONTEXT</text><text x="288" y="105" class="faint tiny">USE</text><text x="330" y="105" class="faint tiny">DONE</text>
+    <rect x="24" y="116" width="342" height="4" rx="2" fill="#2c2e33"/><rect x="24" y="116" width="228" height="4" rx="2" fill="url(#gold)"/>
+    <text x="24" y="158" class="label gold">04 · CONTEXT</text>
+    <text x="24" y="195" class="hero cream">Make the sentence work.</text>
+    <text x="24" y="215" class="body muted">Choose the word that fits the situation.</text>
+    <rect x="24" y="247" width="342" height="110" rx="22" fill="#10221b" stroke="#32634c"/>
+    <text x="47" y="287" class="hero cream" font-size="24">Le ______ arrive.</text><text x="47" y="326" class="body muted">The waiter arrives.</text>
+    <rect x="24" y="381" width="342" height="58" rx="18" class="surface"/><circle cx="51" cy="410" r="12" fill="none" stroke="#5b5d63" stroke-width="2"/><text x="78" y="415" class="bodyBold cream">serveur</text>
+    <rect x="24" y="451" width="342" height="58" rx="18" class="surface"/><circle cx="51" cy="480" r="12" fill="none" stroke="#5b5d63" stroke-width="2"/><text x="78" y="485" class="bodyBold cream">addition</text>
+    <rect x="24" y="521" width="342" height="58" rx="18" class="surface"/><circle cx="51" cy="550" r="12" fill="none" stroke="#5b5d63" stroke-width="2"/><text x="78" y="555" class="bodyBold cream">comptoir</text>
+    <rect x="24" y="609" width="342" height="54" rx="18" fill="url(#gold)"/><text x="195" y="643" class="bodyBold center" fill="#141517">Check choice  ✓</text>
+    <text x="24" y="705" class="label gold">NEXT · USE</text>
+    <rect x="24" y="720" width="342" height="73" rx="18" class="surface"/><text x="47" y="750" class="bodyBold cream">Write one sentence with serveur.</text><text x="47" y="773" class="micro muted">Optional · get a quick Marie check</text>
+    <text x="340" y="752" text-anchor="end" class="gold" font-size="18">›</text>
+    <text x="195" y="822" class="micro muted center">Context gives recognition a job.</text>
+  </g>
+  <text x="700" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">05 · CONTEXT / USE</text>
+  <text x="700" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">choice first, production second</text>
+
+  <!-- 06 DONE -->
+  <g transform="translate(960 1050)">
+    <rect class="phone" width="390" height="844" rx="34"/>
+    <text x="24" y="30" class="cream micro">9:41</text><text x="366" y="30" text-anchor="end" class="cream micro">▮▮▮  ◉  82%</text>
+    <text x="24" y="69" class="cream" font-size="22">‹</text><text x="195" y="68" class="bodyBold cream center">Au café</text><text x="366" y="68" text-anchor="end" class="gold" font-size="18">•••</text>
+    <text x="24" y="105" class="gold tiny">PREVIEW</text><text x="91" y="105" class="gold tiny">LEARN</text><text x="144" y="105" class="gold tiny">RECALL</text><text x="210" y="105" class="gold tiny">CONTEXT</text><text x="288" y="105" class="gold tiny">USE</text><text x="330" y="105" class="gold tiny">DONE</text>
+    <rect x="24" y="116" width="342" height="4" rx="2" fill="url(#gold)"/>
+    <text x="24" y="158" class="label gold">06 · DONE</text>
+    <text x="24" y="204" class="hero cream">Useful words, kept.</text>
+    <text x="24" y="233" class="body muted">Your recall is saved and the next pass is scheduled.</text>
+    <rect x="24" y="272" width="342" height="126" rx="24" fill="#2a2115" stroke="#5e4721"/>
+    <text x="48" y="307" class="label gold">SESSION RESULT</text>
+    <text x="48" y="350" class="hero cream">6 / 8 ready</text><text x="340" y="350" text-anchor="end" class="body muted">2 revisit</text>
+    <rect x="48" y="369" width="294" height="7" rx="4" fill="#4b3c22"/><rect x="48" y="369" width="221" height="7" rx="4" fill="url(#gold)"/>
+    <text x="24" y="448" class="label gold">REVIEW QUEUE</text>
+    <rect x="24" y="466" width="342" height="56" rx="18" class="surface"/><circle cx="52" cy="494" r="10" fill="#50c58a"/><text x="78" y="499" class="bodyBold cream">serveur</text><text x="340" y="499" text-anchor="end" class="micro green">ready</text>
+    <rect x="24" y="534" width="342" height="56" rx="18" class="surface"/><circle cx="52" cy="562" r="10" fill="#f3ba45"/><text x="78" y="567" class="bodyBold cream">addition</text><text x="340" y="567" text-anchor="end" class="micro gold">again · 10 min</text>
+    <rect x="24" y="602" width="342" height="56" rx="18" class="surface"/><circle cx="52" cy="630" r="10" fill="#f3ba45"/><text x="78" y="635" class="bodyBold cream">comptoir</text><text x="340" y="635" text-anchor="end" class="micro gold">almost · tomorrow</text>
+    <rect x="24" y="697" width="342" height="54" rx="18" fill="url(#gold)"/><text x="195" y="731" class="bodyBold center" fill="#141517">Review the 2 again  →</text>
+    <rect x="24" y="768" width="342" height="52" rx="18" class="surface2"/><text x="195" y="801" class="bodyBold cream center">Back to vocabulary home</text>
+  </g>
+  <text x="1155" y="1922" class="cream" font-family="Arial,sans-serif" font-size="16" font-weight="700">06 · DONE</text>
+  <text x="1155" y="1943" class="muted" font-family="Arial,sans-serif" font-size="12">honest result + immediate next action</text>
+</svg>

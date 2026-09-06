@@ -19,6 +19,7 @@ class PracticeArtworkService {
     required String topic,
     required String levelBand,
     String? coverPrompt,
+    String? visualStyle,
     String aspectRatio = '4:3',
   }) {
     final anchor = _visualAnchor(
@@ -35,6 +36,7 @@ class PracticeArtworkService {
       variationSeed: id,
       aspectRatio: aspectRatio,
       coverPrompt: anchor,
+      visualStyle: visualStyle,
     );
   }
 
@@ -88,6 +90,7 @@ class PracticeArtworkService {
     required String topic,
     required String levelBand,
     String? coverPrompt,
+    String? visualStyle,
     String? diagnosticRoleplayId,
     String aspectRatio = '4:3',
   }) {
@@ -119,6 +122,7 @@ class PracticeArtworkService {
         topic: topic,
         levelBand: levelBand,
         coverPrompt: coverPrompt,
+        visualStyle: visualStyle,
         aspectRatio: aspectRatio,
       ),
     );

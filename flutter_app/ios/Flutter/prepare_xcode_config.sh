@@ -15,6 +15,9 @@ set -eu
 IOS_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 APP_DIR=$(CDPATH= cd -- "$IOS_DIR/.." && pwd)
 SECRETS_FILE="$APP_DIR/secrets.local.properties"
+if [ ! -f "$SECRETS_FILE" ] && [ -f "$APP_DIR/../.env" ]; then
+  SECRETS_FILE="$APP_DIR/../.env"
+fi
 OUTPUT_FILE="$IOS_DIR/Flutter/XcodeSecrets.xcconfig"
 TEMP_FILE="$OUTPUT_FILE.tmp"
 
@@ -80,7 +83,7 @@ done
 mv "$TEMP_FILE" "$OUTPUT_FILE"
 
 if [ -f "$SECRETS_FILE" ]; then
-  echo "Xcode Flutter configuration prepared from secrets.local.properties."
+  echo "Xcode Flutter configuration prepared from local configuration."
 else
-  echo "No secrets.local.properties found; using public Supabase defaults and optional integrations remain unconfigured."
+  echo "No local configuration found; using public Supabase defaults and optional integrations remain unconfigured."
 fi

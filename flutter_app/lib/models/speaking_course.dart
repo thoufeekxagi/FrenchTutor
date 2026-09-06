@@ -78,6 +78,14 @@ class SpeakingCourseUnit {
 /// independent from the mixed-skill adaptive course, so every learner always
 /// sees Unit 1 and can start speaking even before generated content exists.
 abstract final class SpeakingCourseCatalog {
+  /// Stable id used when another course surface links to this authored
+  /// speaking lesson. Keeping the id here prevents the Course path and the
+  /// Speaking tab from inventing separate copies of the same lesson.
+  static const firstA1GuidedLessonId = 'speaking_a1_01_introduce';
+
+  static SpeakingCourseLesson get firstA1GuidedLesson =>
+      units.first.lessons.first;
+
   static const units = <SpeakingCourseUnit>[
     SpeakingCourseUnit(
       number: 1,
@@ -87,7 +95,7 @@ abstract final class SpeakingCourseCatalog {
       icon: Icons.waving_hand_rounded,
       lessons: [
         SpeakingCourseLesson(
-          id: 'speaking_a1_01_introduce',
+          id: firstA1GuidedLessonId,
           title: 'Introduce yourself',
           subtitle: 'Say your name and where you are from.',
           level: 'A1',

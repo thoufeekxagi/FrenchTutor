@@ -9,6 +9,7 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/database/grammar_course_lesson_store.dart';
 import '../data/database/speaking_lesson_store.dart';
 import '../data/database/writing_lesson_store.dart';
 import '../data/database/adaptive_course_store.dart';
@@ -23,6 +24,7 @@ import '../models/profile.dart';
 import '../models/srs_state.dart';
 import '../models/speak_curriculum.dart';
 import '../models/speaking_course.dart';
+import '../models/grammar_course.dart';
 import '../models/writing_course.dart';
 import '../data/database/speaking_lesson_codec.dart';
 import 'image_storage_optimizer.dart';
@@ -39,6 +41,18 @@ class _CoverOptimizationFailure implements Exception {
 
   @override
   String toString() => message;
+}
+
+class SyncHydrationResult {
+  const SyncHydrationResult({
+    required this.profileFetchSucceeded,
+    required this.profileFound,
+    required this.adaptiveCourseFetchSucceeded,
+  });
+
+  final bool profileFetchSucceeded;
+  final bool profileFound;
+  final bool adaptiveCourseFetchSucceeded;
 }
 
 /// The single gateway between local SQLite and Supabase.
@@ -63,6 +77,11 @@ class SyncService {
   /// together. Serialize snapshots per story so a slower network response
   /// cannot overwrite a newer local snapshot in Supabase.
   final Map<String, Future<void>> _generatedStorySyncs = {};
+
+  /// Course preparation has several legitimate foreground callers (account
+  /// restore, Home, and Speaking). They must share one bounded worker or a
+  /// fresh screen can start duplicate Edge Function claims.
+  Future<int>? _coursePreparationInFlight;
 
   SupabaseClient get _client => Supabase.instance.client;
   String? get _userId => _client.auth.currentUser?.id;
@@ -134,102 +153,118 @@ class SyncService {
   // Adaptive course plans and learner-specific session specifications
   // ---------------------------------------------------------------------------
 
-  Future<void> syncAdaptiveCoursePlan(AdaptiveCoursePlanSnapshot plan) =>
-      _guarded(
-        (uid) async {
-          final now = DateTime.now().toUtc().toIso8601String();
-          await _client.from('adaptive_course_plans').upsert({
-            'id': plan.id,
-            'user_id': uid,
-            'goal': plan.goal,
-            'level': plan.level,
-            'profile_fingerprint': plan.profileFingerprint,
-            'version': plan.version,
-            'status': plan.status,
-            'updated_at': now,
-          }, onConflict: 'id');
-          if (plan.sessions.isEmpty) return;
-          await _client
-              .from('adaptive_course_sessions')
-              .upsert(
-                plan.sessions
-                    .map(
-                      (session) => {
-                        'id': session.id,
-                        'user_id': uid,
-                        'plan_id': plan.id,
-                        'content_key': session.contentKey,
-                        'sequence': session.sequence,
-                        'level': session.level,
-                        'unit': session.unit,
-                        'unit_title': session.unitTitle,
-                        'title': session.title,
-                        'subtitle': session.subtitle,
-                        'competency': session.competency,
-                        'context': session.context,
-                        'primary_skill': session.primarySkill.wireName,
-                        'supporting_skills_json': session.supportingSkills
-                            .map((skill) => skill.wireName)
-                            .toList(),
-                        'grammar_focus_json': session.grammarFocus,
-                        'success_criteria_json': session.successCriteria,
-                        'estimated_minutes': session.estimatedMinutes,
-                        'target_phrases_json': session.targetPhrases,
-                        'source_session_ids_json': session.sourceSessionIds,
-                        'profile_fingerprint': session.profileFingerprint,
-                        'status': session.status,
-                        'created_at': session.createdAt
-                            .toUtc()
-                            .toIso8601String(),
-                        'updated_at': now,
-                        'completed_at': session.completedAt
-                            ?.toUtc()
-                            .toIso8601String(),
-                      },
-                    )
-                    .toList(),
-                onConflict: 'id',
-              );
-        },
-        queueTable: 'adaptive_course_plans',
-        queueRowId: plan.id,
+  /// Persists the complete course specification before any generator starts.
+  ///
+  /// Returning false is intentional: callers that launch preparation must not
+  /// ask the worker to claim rows until the server has confirmed they exist.
+  Future<bool> syncAdaptiveCoursePlan(AdaptiveCoursePlanSnapshot plan) async {
+    final uid = _userId;
+    if (uid == null) return false;
+    try {
+      await _syncAdaptiveCoursePlanNow(plan, uid);
+      return true;
+    } catch (error, stackTrace) {
+      debugPrint(
+        'Adaptive course plan push failed (${plan.id}): '
+        '$error\n$stackTrace',
       );
+      try {
+        _outbox.queueMutation(
+          tableName: 'adaptive_course_plans',
+          rowId: plan.id,
+          operation: 'upsert',
+        );
+      } catch (_) {
+        // The local plan remains the UI source. A later foreground pass will
+        // attempt the same confirmed push again.
+      }
+      return false;
+    }
+  }
+
+  Future<void> _syncAdaptiveCoursePlanNow(
+    AdaptiveCoursePlanSnapshot plan,
+    String uid,
+  ) async {
+    final now = DateTime.now().toUtc().toIso8601String();
+    await _client.from('adaptive_course_plans').upsert({
+      'id': plan.id,
+      'user_id': uid,
+      'goal': plan.goal,
+      'level': plan.level,
+      'profile_fingerprint': plan.profileFingerprint,
+      'version': plan.version,
+      'status': plan.status,
+      'updated_at': now,
+    }, onConflict: 'id');
+
+    // Persist specifications independently and in course order. One malformed
+    // row can no longer make the whole five-lesson batch disappear inside one
+    // bulk request.
+    final sessions = [...plan.sessions]
+      ..sort((left, right) => left.sequence.compareTo(right.sequence));
+    for (final session in sessions) {
+      await _syncAdaptiveCourseSessionNow(session, uid, updatedAt: now);
+    }
+  }
 
   Future<void> syncAdaptiveCourseSession(AdaptiveCourseSessionSpec session) =>
       _guarded(
-        (uid) async {
-          await _client.from('adaptive_course_sessions').upsert({
-            'id': session.id,
-            'user_id': uid,
-            'plan_id': session.planId,
-            'content_key': session.contentKey,
-            'sequence': session.sequence,
-            'level': session.level,
-            'unit': session.unit,
-            'unit_title': session.unitTitle,
-            'title': session.title,
-            'subtitle': session.subtitle,
-            'competency': session.competency,
-            'context': session.context,
-            'primary_skill': session.primarySkill.wireName,
-            'supporting_skills_json': session.supportingSkills
-                .map((skill) => skill.wireName)
-                .toList(),
-            'grammar_focus_json': session.grammarFocus,
-            'success_criteria_json': session.successCriteria,
-            'estimated_minutes': session.estimatedMinutes,
-            'target_phrases_json': session.targetPhrases,
-            'source_session_ids_json': session.sourceSessionIds,
-            'profile_fingerprint': session.profileFingerprint,
-            'status': session.status,
-            'created_at': session.createdAt.toUtc().toIso8601String(),
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
-            'completed_at': session.completedAt?.toUtc().toIso8601String(),
-          }, onConflict: 'id');
-        },
+        (uid) => _syncAdaptiveCourseSessionNow(session, uid),
         queueTable: 'adaptive_course_sessions',
         queueRowId: session.id,
       );
+
+  Future<void> _syncAdaptiveCourseSessionNow(
+    AdaptiveCourseSessionSpec session,
+    String uid, {
+    String? updatedAt,
+  }) async {
+    await _client.from('adaptive_course_sessions').upsert({
+      'id': session.id,
+      'user_id': uid,
+      'plan_id': session.planId,
+      'content_key': session.contentKey,
+      'sequence': session.sequence,
+      'level': session.level,
+      'unit': session.unit,
+      'unit_title': session.unitTitle,
+      'title': session.title,
+      'subtitle': session.subtitle,
+      'competency': session.competency,
+      'context': session.context,
+      'primary_skill': session.primarySkill.wireName,
+      'supporting_skills_json': session.supportingSkills
+          .map((skill) => skill.wireName)
+          .toList(),
+      'grammar_focus_json': session.grammarFocus,
+      'success_criteria_json': session.successCriteria,
+      'estimated_minutes': session.estimatedMinutes,
+      'target_phrases_json': session.targetPhrases,
+      'source_session_ids_json': session.sourceSessionIds,
+      'generation_version': session.generationVersion,
+      if (session.isFoundation) 'generation_status': 'ready',
+      if (!session.isFoundation && session.generationStatus == 'queued') ...{
+        'generation_status': 'queued',
+        'artifact_kind': null,
+        'artifact_json': null,
+        'generation_attempts': 0,
+        'generation_error': null,
+      },
+      if (session.contentKey ==
+          SpeakingCourseCatalog.firstA1GuidedLessonId) ...{
+        'artifact_kind': null,
+        'artifact_json': null,
+        'generation_attempts': 0,
+        'generation_error': null,
+      },
+      'profile_fingerprint': session.profileFingerprint,
+      'status': session.status,
+      'created_at': session.createdAt.toUtc().toIso8601String(),
+      'updated_at': updatedAt ?? DateTime.now().toUtc().toIso8601String(),
+      'completed_at': session.completedAt?.toUtc().toIso8601String(),
+    }, onConflict: 'id');
+  }
 
   // ---------------------------------------------------------------------------
   // Vocab / SRS
@@ -750,6 +785,32 @@ class SyncService {
     queueRowId: lesson.id,
   );
 
+  /// Publishes one complete, validated Grammar session. The nested steps are
+  /// kept in one JSON payload so every device sees the same bounded lesson.
+  Future<void> syncGrammarCourseSession(GrammarCourseSession session) =>
+      _guarded(
+        (uid) async {
+          final validated = GrammarCourseValidator.validate(session);
+          final now = DateTime.now().toUtc().toIso8601String();
+          await _client.from('grammar_course_sessions').upsert({
+            'id': validated.id,
+            'mode': validated.mode.name,
+            'tense': validated.tense,
+            'level_band': validated.level,
+            'title': validated.title,
+            'grammar_focus': validated.grammarFocus,
+            'fingerprint': grammarCourseFingerprint(validated),
+            'session_json': validated.toJson(),
+            'created_by': uid,
+            'is_validated': true,
+            'created_at': now,
+            'updated_at': now,
+          }, onConflict: 'id');
+        },
+        queueTable: 'grammar_course_sessions',
+        queueRowId: session.id,
+      );
+
   /// Publishes the bundled catalog once per authenticated account. The rows
   /// are shared and read-only to learners after insertion; the local bundled
   /// catalog remains the immediate offline copy while this runs.
@@ -795,11 +856,16 @@ class SyncService {
           await _client.from('generated_vocabulary_sets').upsert({
             'id': set.id,
             'user_id': uid,
+            'course_session_id': set.courseSessionId,
             'title': set.title,
             'summary': set.summary,
             'topic': set.topic,
             'level_band': set.levelBand,
             'entries_json': set.entries.map((entry) => entry.toJson()).toList(),
+            'examples_json': {
+              for (final entry in set.storyExamples.entries)
+                entry.key: entry.value.toJson(),
+            },
             'cover_url': _remoteCoverUrl(set.coverUrl),
             'created_at': set.createdAt.toUtc().toIso8601String(),
             'updated_at': DateTime.now().toUtc().toIso8601String(),
@@ -857,6 +923,125 @@ class SyncService {
     queueTable: 'chat_messages_state',
     queueRowId: uuid,
   );
+
+  /// Uploads the pre-auth onboarding trial after the account claim. The normal
+  /// per-write sync methods intentionally no-op while signed out, so this
+  /// explicit adoption pass is required to preserve a transcript that was
+  /// recorded before authentication existed. It is idempotent and limited to
+  /// rows tagged `stage = 'trial'`.
+  Future<void> syncAdoptedOnboardingTrials() async {
+    final uid = _userId;
+    if (uid == null) return;
+
+    bool hasTable(String name) => _db.select(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+      [name],
+    ).isNotEmpty;
+    var retryQueued = false;
+    void queueRetry() {
+      if (retryQueued) return;
+      retryQueued = true;
+      try {
+        _outbox.queueMutation(
+          tableName: 'onboarding_trial_adoption',
+          rowId: uid,
+          operation: 'upsert',
+        );
+      } catch (_) {}
+    }
+
+    final aiRows = hasTable('ai_sessions')
+        ? _db.select(
+            "SELECT * FROM ai_sessions WHERE user_id = ? AND stage = 'trial' AND deleted_at IS NULL",
+            [uid],
+          )
+        : const <Map<String, dynamic>>[];
+    for (final row in aiRows) {
+      final id = row['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+      try {
+        await _client.from('ai_session_state').upsert({
+          'id': id,
+          'user_id': uid,
+          'daily_session_id': row['daily_session_id'],
+          'stage': row['stage'],
+          'topic': row['topic'],
+          'connected_at': row['connected_at'],
+          'ended_at': row['ended_at'],
+          'ended_reason': row['ended_reason'],
+          'learner_utterance_count': row['learner_utterance_count'] ?? 0,
+          'transcript_json': row['transcript_json'] == null
+              ? null
+              : _jsonOf(row['transcript_json']),
+          'updated_at':
+              row['updated_at'] ?? DateTime.now().toUtc().toIso8601String(),
+        }, onConflict: 'id');
+      } catch (error, stackTrace) {
+        debugPrint('Onboarding trial upload failed ($id): $error\n$stackTrace');
+        queueRetry();
+      }
+    }
+
+    final sessionRows = hasTable('sessions')
+        ? _db.select(
+            "SELECT * FROM sessions WHERE user_id = ? AND stage = 'trial' AND deleted_at IS NULL",
+            [uid],
+          )
+        : const <Map<String, dynamic>>[];
+    final trialIds = sessionRows.map((row) => row['id'].toString()).toSet();
+    for (final row in sessionRows) {
+      final id = row['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+      try {
+        await _client.from('sessions_state').upsert({
+          'id': id,
+          'user_id': uid,
+          'started_at': row['started_at'],
+          'ended_at': row['ended_at'],
+          'summary': row['summary'],
+          'topic': row['topic'],
+          'content_key': row['content_key'],
+          'vocabulary_json': _jsonOf(row['vocabulary']),
+          'stage': row['stage'],
+          'updated_at':
+              row['updated_at'] ?? DateTime.now().toUtc().toIso8601String(),
+        }, onConflict: 'id');
+      } catch (error, stackTrace) {
+        debugPrint(
+          'Onboarding session upload failed ($id): $error\n$stackTrace',
+        );
+        queueRetry();
+      }
+    }
+
+    if (trialIds.isEmpty) return;
+    final placeholders = List.filled(trialIds.length, '?').join(', ');
+    final messageRows = hasTable('messages')
+        ? _db.select(
+            'SELECT uuid, session_id, role, content FROM messages '
+            'WHERE user_id = ? AND session_id IN ($placeholders)',
+            [uid, ...trialIds],
+          )
+        : const <Map<String, dynamic>>[];
+    for (final row in messageRows) {
+      final id = row['uuid']?.toString();
+      if (id == null || id.isEmpty) continue;
+      try {
+        await _client.from('chat_messages_state').upsert({
+          'id': id,
+          'user_id': uid,
+          'session_id': row['session_id'],
+          'role': row['role'],
+          'content': row['content'],
+        }, onConflict: 'id');
+      } catch (error, stackTrace) {
+        debugPrint(
+          'Onboarding message upload failed ($id): $error\n$stackTrace',
+        );
+        queueRetry();
+      }
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Floating notetaker — both self-typed notes and AI-generated session recaps
@@ -1309,6 +1494,9 @@ class SyncService {
   Future<bool> _retryOne(String tableName, String rowId) async {
     try {
       switch (tableName) {
+        case 'onboarding_trial_adoption':
+          await syncAdoptedOnboardingTrials();
+          return true;
         case 'vocab_cards':
           final rows = _db.select(
             'SELECT * FROM vocab_cards WHERE entry_id = ? AND deleted_at IS NULL',
@@ -1402,15 +1590,28 @@ class SyncService {
           if (lesson == null) return true;
           await syncWritingLesson(lesson);
           return true;
+        case 'grammar_course_sessions':
+          final session = GrammarCourseLessonStore(
+            _db,
+            sync: this,
+            currentUserId: () => _userId,
+          ).list().where((item) => item.id == rowId).firstOrNull;
+          if (session == null) return true;
+          await syncGrammarCourseSession(session);
+          return true;
         case 'adaptive_course_plans':
           final plan = AdaptiveCourseStore(_db).planById(rowId);
           if (plan == null) return true;
-          await syncAdaptiveCoursePlan(plan);
+          final uid = _userId;
+          if (uid == null) return false;
+          await _syncAdaptiveCoursePlanNow(plan, uid);
           return true;
         case 'adaptive_course_sessions':
           final session = AdaptiveCourseStore(_db).sessionById(rowId);
           if (session == null) return true;
-          await syncAdaptiveCourseSession(session);
+          final uid = _userId;
+          if (uid == null) return false;
+          await _syncAdaptiveCourseSessionNow(session, uid);
           return true;
         default:
           // Not yet retryable generically — leave queued rather than drop it.
@@ -1444,19 +1645,35 @@ class SyncService {
   // missing, refresh what's older" pass, never a destructive replace.
   // ---------------------------------------------------------------------------
 
-  Future<void> hydrateAfterSignIn() async {
+  Future<SyncHydrationResult> hydrateAfterSignIn() async {
     final uid = _userId;
-    if (uid == null) return;
-    // Each leg is wrapped so one failing pull (bad row, RLS hiccup, decode
-    // error) can never silently swallow the others — previously a single
-    // exception anywhere in this list, or the whole thing simply taking
-    // longer than the caller's 8s timeout, left NO trace anywhere (app.dart's
-    // `.catchError((_) {})` on the outer call is unconditional and silent).
-    // `debugPrint` here at least makes a real failure visible in device logs
-    // instead of just reading as "progress didn't come back".
+    if (uid == null) {
+      return const SyncHydrationResult(
+        profileFetchSucceeded: false,
+        profileFound: false,
+        adaptiveCourseFetchSucceeded: false,
+      );
+    }
+    // Profile is fetched first because AuthGate uses it to distinguish a
+    // fresh install from an established account. The remaining legs are
+    // isolated so a bad row or one RLS/network failure cannot swallow them;
+    // debugPrint keeps failures visible in device logs.
+    var profileFetchSucceeded = false;
+    var profileFound = false;
+    var adaptiveCourseFetchSucceeded = false;
+    try {
+      profileFound = await _hydrateProfile(uid);
+      profileFetchSucceeded = true;
+    } catch (error) {
+      debugPrint('hydrateAfterSignIn: profile failed: $error');
+    }
+    try {
+      await _hydrateAdaptiveCourses(uid);
+      adaptiveCourseFetchSucceeded = true;
+    } catch (error) {
+      debugPrint('hydrateAfterSignIn: adaptiveCourses failed: $error');
+    }
     final legs = <String, Future<void> Function()>{
-      'profile': () => _hydrateProfile(uid),
-      'adaptiveCourses': () => _hydrateAdaptiveCourses(uid),
       'vocabCards': () => _hydrateVocabCards(uid),
       'dailySessions': () => _hydrateDailySessions(uid),
       'sessions': () => _hydrateSessions(uid),
@@ -1476,6 +1693,7 @@ class SyncService {
       'generatedVocabularySets': () => _hydrateGeneratedVocabularySets(uid),
       'speakingLessons': () => _hydrateSpeakingLessons(),
       'writingLessons': () => _hydrateWritingLessons(),
+      'grammarCourseSessions': () => _hydrateGrammarCourseSessions(),
       'notes': () => _hydrateNotes(uid),
     };
     await Future.wait(
@@ -1489,6 +1707,11 @@ class SyncService {
     // catalog is already available locally, so publishing it cannot delay the
     // first screen after sign-in.
     unawaited(publishDefaultSpeakingCatalog());
+    return SyncHydrationResult(
+      profileFetchSucceeded: profileFetchSucceeded,
+      profileFound: profileFound,
+      adaptiveCourseFetchSucceeded: adaptiveCourseFetchSucceeded,
+    );
   }
 
   /// Pulls the public, validated Speaking catalog into SQLite. It is safe to
@@ -1499,6 +1722,11 @@ class SyncService {
   Future<void> hydrateWritingLessons() async {
     if (_userId == null) return;
     await _hydrateWritingLessons();
+  }
+
+  Future<void> hydrateGrammarCourseSessions() async {
+    if (_userId == null) return;
+    await _hydrateGrammarCourseSessions();
   }
 
   /// Reload generated content into the local store for the current user.
@@ -1538,17 +1766,49 @@ class SyncService {
   /// study-plan preferences/onboarded_at) — previously push-only, never pulled back on sign-in, so
   /// a reinstalled device kept whatever onboarding defaults it was given
   /// locally instead of the real remote profile.
-  Future<void> _hydrateProfile(String uid) async {
+  Future<bool> _hydrateProfile(String uid) async {
     final rows = await _client.from('profiles').select().eq('id', uid).limit(1);
-    if (rows.isEmpty) return;
+    if (rows.isEmpty) return false;
     final r = rows.first;
+    final localRows = _db.select(
+      'SELECT onboarded_at, updated_at FROM profiles '
+      'WHERE user_id = ? AND deleted_at IS NULL LIMIT 1',
+      [uid],
+    );
+    if (localRows.isEmpty) return true;
+
+    // A newly created local profile is stamped with "now", which can be
+    // newer than the server row even though it contains only defaults. Treat
+    // an unonboarded local row as an empty cache and restore the real account
+    // profile whenever the server has completed onboarding.
+    final local = localRows.first;
+    final remoteOnboardedAt = r['onboarded_at']?.toString();
+    final localNeedsRestore =
+        local['onboarded_at'] == null &&
+        remoteOnboardedAt != null &&
+        remoteOnboardedAt.isNotEmpty;
+    final localUpdatedAt = DateTime.tryParse(
+      local['updated_at']?.toString() ?? '',
+    );
+    final remoteUpdatedAt = DateTime.tryParse(
+      r['updated_at']?.toString() ?? '',
+    );
+    final remoteIsNewer =
+        localUpdatedAt != null &&
+        remoteUpdatedAt != null &&
+        remoteUpdatedAt.isAfter(localUpdatedAt);
+    if (!localNeedsRestore && !remoteIsNewer) return true;
+
+    final remoteUpdated = r['updated_at']?.toString();
+    if (remoteUpdated == null || remoteUpdated.isEmpty) return true;
     _db.execute(
       '''
       UPDATE profiles SET
         goal = ?, level = ?, session_length = ?, reminder_time = ?,
         preferred_days = ?, interests = ?, time_zone = ?, notification_permission_state = ?,
         onboarding_version = ?, onboarded_at = ?, updated_at = ?
-      WHERE user_id = ? AND updated_at < ?
+      WHERE user_id = ? AND
+        ((onboarded_at IS NULL AND ? IS NOT NULL) OR updated_at < ?)
       ''',
       [
         r['goal'],
@@ -1563,9 +1823,11 @@ class SyncService {
         r['onboarded_at'],
         r['updated_at'],
         uid,
+        remoteOnboardedAt,
         r['updated_at'],
       ],
     );
+    return true;
   }
 
   Future<void> _hydrateAdaptiveCourses(String uid) async {
@@ -1595,6 +1857,66 @@ class SyncService {
     final uid = _userId;
     if (uid == null) return;
     await _hydrateAdaptiveCourses(uid);
+  }
+
+  /// Prepares one persisted Course lesson independently from lesson opening.
+  /// Each invocation claims a single server row, so a failed provider call
+  /// cannot spoil a whole batch and the next foreground pass can retry it.
+  Future<int> prepareAdaptiveCourseLessons({int maxLessons = 1}) {
+    final existing = _coursePreparationInFlight;
+    if (existing != null) return existing;
+    // The route grows one personalized row at a time. Clamp callers too, so
+    // an accidental batch request can never create a provider request storm.
+    final limit = maxLessons.clamp(0, 1);
+    if (_userId == null || limit == 0) return Future.value(0);
+
+    late final Future<int> run;
+    run = _prepareAdaptiveCourseLessons(limit).whenComplete(() {
+      if (identical(_coursePreparationInFlight, run)) {
+        _coursePreparationInFlight = null;
+      }
+    });
+    _coursePreparationInFlight = run;
+    return run;
+  }
+
+  Future<int> _prepareAdaptiveCourseLessons(int maxLessons) async {
+    var prepared = 0;
+    for (var index = 0; index < maxLessons; index++) {
+      try {
+        final result = await _client.functions.invoke(
+          'prepare-course-lesson',
+          body: const <String, dynamic>{},
+        );
+        final data = result.data;
+        if (data is! Map) {
+          debugPrint(
+            'Course preparation stopped: Edge Function returned invalid data.',
+          );
+          break;
+        }
+        if (data['processed'] != true) break;
+        prepared += 1;
+        // Publish each finished artifact to the local cache immediately. The
+        // learner sees lesson 6 become ready while lesson 7 is still being
+        // prepared instead of waiting for the entire five-lesson batch.
+        await hydrateAdaptiveCourses();
+      } catch (error, stackTrace) {
+        // The Edge Function persists the exact row error in
+        // adaptive_course_sessions.generation_error. Keep the device-side
+        // stack trace too, but stop this bounded batch so a failing provider
+        // cannot create a request storm.
+        debugPrint(
+          'Course preparation stopped after $prepared/$maxLessons lessons: '
+          '$error\n$stackTrace',
+        );
+        break;
+      }
+    }
+    // Also refresh an explicit failed/no-work state so the UI never keeps a
+    // stale hourglass after the server has reached a terminal result.
+    await hydrateAdaptiveCourses();
+    return prepared;
   }
 
   /// Every completed practice session — the exact data `DailyGoalService`
@@ -1984,6 +2306,46 @@ class SyncService {
     }
   }
 
+  Future<void> _hydrateGrammarCourseSessions() async {
+    final uid = _userId;
+    if (uid == null) return;
+    final rows = await _client
+        .from('grammar_course_sessions')
+        .select()
+        .eq('created_by', uid);
+    final store = GrammarCourseLessonStore(_db, currentUserId: () => _userId);
+    for (final row in rows) {
+      try {
+        final sessionJson = _jsonOf(row['session_json']);
+        final decoded = jsonDecode(sessionJson);
+        if (decoded is! Map) continue;
+        final session = GrammarCourseValidator.validate(
+          GrammarCourseSession.fromJson(decoded.cast<String, dynamic>()),
+        );
+        if (session.id != row['id'] ||
+            session.mode.name != row['mode'] ||
+            session.tense != row['tense'] ||
+            session.level != row['level_band']) {
+          throw const FormatException('Grammar session metadata mismatch.');
+        }
+        store.upsertFromRemote(
+          id: row['id'] as String,
+          source: 'generated',
+          mode: row['mode'] as String,
+          tense: row['tense'] as String,
+          levelBand: row['level_band'] as String,
+          title: row['title'] as String,
+          fingerprint: row['fingerprint'] as String,
+          sessionJson: sessionJson,
+          createdAt: row['created_at'] as String,
+          updatedAt: row['updated_at'] as String,
+        );
+      } catch (error) {
+        debugPrint('Skipping invalid Grammar course session: $error');
+      }
+    }
+  }
+
   List<SpeakingCourseLesson> _defaultSpeakingLessons() {
     final byId = <String, SpeakingCourseLesson>{};
     void add(Iterable<SpeakingCourseLesson> lessons) {
@@ -2019,6 +2381,8 @@ class SyncService {
         topic: r['topic'] as String? ?? '',
         levelBand: r['level_band'] as String? ?? 'A1',
         entriesJson: _jsonOf(r['entries_json']),
+        courseSessionId: r['course_session_id'] as String?,
+        examplesJson: _jsonOf(r['examples_json']),
         coverUrl: r['cover_url'] as String?,
         createdAt: r['created_at'] as String,
         updatedAt: r['updated_at'] as String,

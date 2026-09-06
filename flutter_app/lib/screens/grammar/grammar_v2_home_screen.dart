@@ -1,37 +1,38 @@
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/database/generated_grammar_story_store.dart';
-import '../../data/grammar_curriculum_catalog.dart';
+import '../../data/grammar_course_catalog.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../models/grammar_course.dart';
+import '../../models/grammar_course_session_result.dart';
 import '../../models/grammar_course_v2.dart';
 import '../../providers/database_provider.dart';
-import '../../widgets/kicker_text.dart';
-import '../../widgets/practice_content_card.dart';
+import '../../widgets/primary_action_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
+import '../settings/settings_screen.dart';
 import 'grammar_v2_lesson_screen.dart';
 
-/// Writing-style Grammar home. The cards are deliberately sourced from the
-/// existing frozen curriculum so a learner always has five instant lessons;
-/// the selected tense is a view over that same validated content.
+/// Grammar home: the grid contains sessions, never individual exercise
+/// sentences. Each session opens one bounded 4–5-step learning flow.
 class GrammarV2HomeScreen extends ConsumerStatefulWidget {
   const GrammarV2HomeScreen({
     super.key,
-    required this.generatedHistory,
-    required this.isGenerating,
-    required this.generationError,
-    required this.onGenerateAdvanced,
-    required this.onOpenGenerated,
+    required this.generatedSessions,
+    this.isPreparingSessions = false,
+    this.preparationError,
+    this.onRetryPreparation,
+    this.onPrepareSessions,
   });
 
-  final List<GeneratedGrammarStory> generatedHistory;
-  final bool isGenerating;
-  final String? generationError;
-  final Future<void> Function(GrammarCurriculumLesson lesson)
-  onGenerateAdvanced;
-  final ValueChanged<GeneratedGrammarStory> onOpenGenerated;
+  final List<GrammarCourseSession> generatedSessions;
+  final bool isPreparingSessions;
+  final String? preparationError;
+  final VoidCallback? onRetryPreparation;
+  final Future<void> Function(GrammarV2Mode mode, String tense)?
+  onPrepareSessions;
 
   @override
   ConsumerState<GrammarV2HomeScreen> createState() =>
@@ -39,214 +40,118 @@ class GrammarV2HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _GrammarV2HomeScreenState extends ConsumerState<GrammarV2HomeScreen> {
-  late String _level;
   GrammarV2Mode _mode = GrammarV2Mode.guided;
-  String _tense = GrammarV2Tenses.all;
-  String? _selectedLessonId;
+  String _tense = GrammarV2Tenses.present;
+  String? _selectedSessionId;
 
-  @override
-  void initState() {
-    super.initState();
-    _level = GrammarCurriculumCatalog.normalizeLevel(
-      ref.read(learningStoreProvider).profile().level,
+  String get _level => GrammarCourseCatalogLevel.normalize(
+    ref.watch(learningStoreProvider).profile().level,
+  );
+
+  List<GrammarCourseSession> get _sessions {
+    final generated = widget.generatedSessions.where(
+      (session) =>
+          session.mode == _mode &&
+          session.level == _level &&
+          (_tense == GrammarV2Tenses.mixed || session.tense == _tense),
     );
-  }
-
-  List<GrammarCurriculumLesson> get _lessons {
-    final sameLevel = GrammarCurriculumCatalog.forLevel(_level);
-    if (_tense == GrammarV2Tenses.mixed) {
-      final mixed = <GrammarCurriculumLesson>[];
-      final pool = [
-        ...sameLevel,
-        ...grammarV2FallbackLessons,
-        ...GrammarCurriculumCatalog.all,
-      ];
-      for (final filter in [
-        GrammarV2Tenses.present,
-        GrammarV2Tenses.past,
-        GrammarV2Tenses.future,
-      ]) {
-        for (final lesson in pool) {
-          if (GrammarV2Tenses.matches(lesson, filter) &&
-              !mixed.any((existing) => existing.id == lesson.id)) {
-            mixed.add(lesson);
-            break;
-          }
-        }
-      }
-      for (final lesson in pool) {
-        if (!mixed.any((existing) => existing.id == lesson.id)) {
-          mixed.add(lesson);
-        }
-        if (mixed.length >= 5) break;
-      }
-      return mixed.take(5).toList(growable: false);
-    }
-    final selected = sameLevel
-        .where((lesson) => GrammarV2Tenses.matches(lesson, _tense))
+    // Authored sessions are an instant fallback. Once the personalized
+    // reserve exists, it becomes the complete visible set so the home stays
+    // a bounded set of coherent sessions rather than growing forever.
+    final starter = grammarCourseStarterSessions.where(
+      (session) =>
+          session.mode == _mode &&
+          session.level == _level &&
+          (_tense == GrammarV2Tenses.mixed || session.tense == _tense),
+    );
+    final source = generated.isNotEmpty ? generated : starter;
+    final seen = <String>{};
+    return source
+        .where((session) => seen.add(grammarCourseFingerprint(session)))
         .toList(growable: false);
-
-    // Past/future are intentionally available to an A1 learner as a small
-    // preview set. If the current band has fewer than five frozen cards, fill
-    // from the next authored band rather than inventing content at tap time.
-    final fallback =
-        [...grammarV2FallbackLessons, ...GrammarCurriculumCatalog.all].where(
-          (lesson) =>
-              !selected.any((existing) => existing.id == lesson.id) &&
-              GrammarV2Tenses.matches(lesson, _tense),
-        );
-    return [...selected, ...fallback].take(5).toList(growable: false);
   }
 
-  GrammarCurriculumLesson get _selectedLesson {
-    final available = _lessons;
-    for (final lesson in available) {
-      if (lesson.id == _selectedLessonId) return lesson;
+  GrammarCourseSession? get _selectedSession {
+    final sessions = _sessions;
+    if (sessions.isEmpty) return null;
+    for (final session in sessions) {
+      if (session.id == _selectedSessionId) return session;
     }
-    return available.first;
-  }
-
-  Map<String, dynamic> get _progress =>
-      ref.read(learningStoreProvider).allLessonProgress();
-
-  bool _isCompleted(GrammarCurriculumLesson lesson) =>
-      _progress[lesson.progressId]?.status == 'completed';
-
-  Future<void> _openLesson(GrammarCurriculumLesson lesson) async {
-    final store = ref.read(learningStoreProvider);
-    if (store.lessonStatus(lesson.progressId).status == 'not_started') {
-      store.setLessonStatus(lesson.progressId, 'in_progress');
+    for (final session in sessions) {
+      if (!_isCompleted(session)) return session;
     }
-    await AppRouter.push<GrammarV2LessonResult>(
-      context,
-      (_) => GrammarV2LessonScreen(
-        lesson: lesson,
-        mode: _mode,
-        warmupLessons: _lessons,
-      ),
-      fullscreenDialog: true,
-    );
-    if (mounted) setState(() {});
-  }
-
-  void _setMode(GrammarV2Mode mode) => setState(() => _mode = mode);
-
-  void _setTense(String tense) {
-    if (_tense == tense) return;
-    setState(() {
-      _tense = tense;
-      _selectedLessonId = null;
-    });
+    return sessions.first;
   }
 
   @override
   Widget build(BuildContext context) {
-    final lessons = _lessons;
-    final selected = _selectedLesson;
-    final completed = lessons.where(_isCompleted).length;
-
+    final sessions = _sessions;
+    final selected = _selectedSession;
+    final completed = sessions.where(_isCompleted).length;
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: SafeArea(
         child: WebConstrainedView(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
+            padding: const EdgeInsets.fromLTRB(20, 6, 20, 34),
             children: [
               _header(context),
-              const SizedBox(height: 16),
-              Text('Build your grammar', style: DesignTokens.display(34)),
+              const SizedBox(height: 22),
+              Text(
+                'Build confidence with grammar',
+                style: DesignTokens.display(30),
+              ),
               const SizedBox(height: 8),
               Text(
-                'Start with one form, build the sentence, then use it in context.',
+                'Choose one focus, practise a connected session, and use it in context.',
                 style: DesignTokens.body(
-                  16,
-                ).copyWith(color: DesignTokens.muted, height: 1.45),
+                  14,
+                ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
               ),
-              const SizedBox(height: 18),
-              _tensePicker(),
-              const SizedBox(height: 22),
-              _featuredLesson(selected),
-              const SizedBox(height: 24),
-              const KickerText('PRACTICE A SKILL'),
-              const SizedBox(height: 10),
-              _modeGrid(),
-              const SizedBox(height: 26),
+              const SizedBox(height: 16),
               Row(
                 children: [
+                  _levelBadge(level: _level),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: KickerText(
-                      '${_tense.toUpperCase()} · ${_level.toUpperCase()} LESSONS',
+                    child: Text(
+                      '${sessions.length} sessions ready · $completed complete',
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.muted),
                     ),
                   ),
-                  Text(
-                    '$completed/${lessons.length}',
-                    style: DesignTokens.body(
-                      13,
-                      weight: FontWeight.w700,
-                    ).copyWith(color: DesignTokens.muted),
-                  ),
+                  if (widget.isPreparingSessions)
+                    const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                 ],
               ),
+              const SizedBox(height: 20),
+              _focusPicker(),
+              const SizedBox(height: 20),
+              _modePicker(),
+              const SizedBox(height: 24),
+              _sectionLabel('NEXT ${_mode.label.toUpperCase()} SESSION'),
               const SizedBox(height: 10),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: lessons.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (context, index) {
-                  final lesson = lessons[index];
-                  return _LessonCard(
-                    lesson: lesson,
-                    selected: lesson.id == selected.id,
-                    completed: _isCompleted(lesson),
-                    onTap: () async {
-                      setState(() => _selectedLessonId = lesson.id);
-                      await _openLesson(lesson);
-                    },
-                  );
-                },
-              ),
-              if (_level == 'B1' || _level == 'B2') ...[
-                const SizedBox(height: 24),
-                _AdvancedGenerationCard(
-                  level: _level,
-                  lesson: selected,
-                  isGenerating: widget.isGenerating,
-                  errorText: widget.generationError,
-                  onGenerate: () => widget.onGenerateAdvanced(selected),
-                ),
-              ],
-              if (widget.generatedHistory.isNotEmpty) ...[
-                const SizedBox(height: 28),
-                const KickerText('SAVED GRAMMAR STORIES'),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 230,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.generatedHistory.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 10),
-                    itemBuilder: (context, index) {
-                      final story = widget.generatedHistory[index];
-                      return SizedBox(
-                        width: 210,
-                        child: PracticeContentCard(
-                          title: story.displayTitle,
-                          summary: 'Practice ${story.grammarPoint} in context.',
-                          levelBand: story.levelBand,
-                          meta: '${story.passage.segments.length} scenes',
-                          coverUrl: story.coverUrl,
-                          fallbackIcon: CupertinoIcons.textformat,
-                          onTap: () => widget.onOpenGenerated(story),
-                        ),
-                      );
-                    },
-                  ),
+              if (selected != null)
+                _featuredSession(selected)
+              else
+                _emptySessionCard(),
+              const SizedBox(height: 28),
+              _sectionLabel('${_mode.label.toUpperCase()} SESSIONS'),
+              const SizedBox(height: 10),
+              if (sessions.isEmpty)
+                _emptySessionCard(compact: true)
+              else
+                _sessionGrid(sessions),
+              if (widget.preparationError != null) ...[
+                const SizedBox(height: 14),
+                _statusCard(
+                  widget.preparationError!,
+                  action: widget.onRetryPreparation,
                 ),
               ],
             ],
@@ -256,344 +161,412 @@ class _GrammarV2HomeScreenState extends ConsumerState<GrammarV2HomeScreen> {
     );
   }
 
-  Widget _header(BuildContext context) {
-    return SizedBox(
-      height: 50,
+  Widget _header(BuildContext context) => SizedBox(
+    height: 52,
+    child: Row(
+      children: [
+        Semantics(
+          button: true,
+          label: 'Back',
+          child: IconButton(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            color: DesignTokens.ink,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            'Grammar',
+            textAlign: TextAlign.center,
+            style: DesignTokens.display(21),
+          ),
+        ),
+        Semantics(
+          button: true,
+          label: 'Grammar settings',
+          child: IconButton(
+            onPressed: () =>
+                AppRouter.push(context, (_) => const SettingsScreen()),
+            icon: const Icon(Icons.tune_rounded),
+            color: DesignTokens.primary,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _focusPicker() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _sectionLabel('GRAMMAR FOCUS'),
+      const SizedBox(height: 9),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final tense in GrammarV2Tenses.values)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(tense),
+                  selected: _tense == tense,
+                  onSelected: (_) => _setTense(tense),
+                  selectedColor: DesignTokens.primary,
+                  backgroundColor: DesignTokens.surface,
+                  side: BorderSide(color: DesignTokens.hairline),
+                  labelStyle: DesignTokens.label(11).copyWith(
+                    color: _tense == tense
+                        ? DesignTokens.onPrimary
+                        : DesignTokens.inkSoft,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget _modePicker() {
+    const modes = [
+      (GrammarV2Mode.guided, 'Guided', Icons.edit_note_rounded),
+      (GrammarV2Mode.complete, 'Complete', Icons.checklist_rounded),
+      (GrammarV2Mode.roleplay, 'Roleplay', Icons.forum_outlined),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
       child: Row(
         children: [
-          Semantics(
-            button: true,
-            label: 'Close Grammar',
-            child: IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(CupertinoIcons.xmark),
-              color: DesignTokens.ink,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'Grammar',
-              textAlign: TextAlign.center,
-              style: DesignTokens.display(20),
-            ),
-          ),
-          Semantics(
-            button: true,
-            label: 'Change grammar level, current level $_level',
-            child: TextButton(
-              onPressed: _chooseLevel,
-              style: TextButton.styleFrom(
-                foregroundColor: DesignTokens.primary,
-                backgroundColor: DesignTokens.primarySoft,
-                minimumSize: const Size(54, 42),
-                shape: const StadiumBorder(),
+          for (final entry in modes)
+            Expanded(
+              child: Semantics(
+                button: true,
+                selected: _mode == entry.$1,
+                label: '${entry.$2} grammar mode',
+                child: InkWell(
+                  onTap: () => _setMode(entry.$1),
+                  borderRadius: BorderRadius.circular(14),
+                  child: AnimatedContainer(
+                    duration: DesignTokens.durationFast,
+                    constraints: const BoxConstraints(minHeight: 58),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _mode == entry.$1
+                          ? DesignTokens.primary
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          entry.$3,
+                          size: 19,
+                          color: _mode == entry.$1
+                              ? DesignTokens.onPrimary
+                              : DesignTokens.muted,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          entry.$2,
+                          style: DesignTokens.label(10).copyWith(
+                            color: _mode == entry.$1
+                                ? DesignTokens.onPrimary
+                                : DesignTokens.muted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              child: Text(
-                _level,
-                style: DesignTokens.body(
-                  13,
-                  weight: FontWeight.w800,
-                ).copyWith(color: DesignTokens.primary),
-              ),
             ),
-          ),
-          const SizedBox(width: 4),
         ],
       ),
     );
   }
 
-  Widget _tensePicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Expanded(child: KickerText('FOCUS')),
-            Text(
-              'Choose a tense',
-              style: DesignTokens.body(
-                12,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.muted),
-            ),
-          ],
-        ),
-        const SizedBox(height: 9),
-        SizedBox(
-          height: 42,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: GrammarV2Tenses.values.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final tense = GrammarV2Tenses.values[index];
-              final selected = tense == _tense;
-              return ChoiceChip(
-                label: Text(tense),
-                selected: selected,
-                onSelected: (_) => _setTense(tense),
-                labelStyle: DesignTokens.body(13, weight: FontWeight.w700)
-                    .copyWith(
-                      color: selected
-                          ? DesignTokens.onPrimary
-                          : DesignTokens.ink,
-                    ),
-                selectedColor: DesignTokens.primary,
-                backgroundColor: DesignTokens.surface,
-                side: BorderSide(
-                  color: selected
-                      ? DesignTokens.primary
-                      : DesignTokens.hairline,
-                ),
-                shape: const StadiumBorder(),
-                showCheckmark: false,
-              );
-            },
-          ),
-        ),
+  Widget _featuredSession(GrammarCourseSession session) {
+    final complete = _isCompleted(session);
+    final phases = switch (session.mode) {
+      GrammarV2Mode.guided => const [
+        (Icons.touch_app_outlined, 'Choose'),
+        (Icons.check_circle_outline_rounded, 'Check'),
+        (Icons.phone_in_talk_outlined, 'Tutor'),
       ],
-    );
-  }
-
-  Widget _featuredLesson(GrammarCurriculumLesson lesson) {
-    final completed = _isCompleted(lesson);
+      GrammarV2Mode.complete => const [
+        (Icons.menu_book_outlined, 'Read'),
+        (Icons.checklist_rounded, 'Build'),
+        (Icons.refresh_rounded, 'Recall'),
+      ],
+      GrammarV2Mode.roleplay => const [
+        (Icons.chat_bubble_outline_rounded, 'Read'),
+        (Icons.reply_outlined, 'Reply'),
+        (Icons.phone_in_talk_outlined, 'Tutor'),
+      ],
+    };
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: DesignTokens.primarySoft,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: DesignTokens.primary.withValues(alpha: 0.42)),
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+        border: Border.all(color: DesignTokens.primary),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: DesignTokens.surface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  _iconForCollection(lesson.collection),
-                  color: DesignTokens.primary,
-                  size: 27,
-                ),
-              ),
+              _sessionIcon(session, large: true),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      completed ? 'PRACTISE AGAIN' : 'NEXT GRAMMAR LESSON',
-                      style: DesignTokens.label(
-                        11,
-                        weight: FontWeight.w800,
-                      ).copyWith(color: DesignTokens.primary),
-                    ),
+                    Text(session.title, style: DesignTokens.display(18)),
                     const SizedBox(height: 4),
-                    Text(lesson.title, style: DesignTokens.display(22)),
+                    Text(
+                      '${session.level} · ${session.steps.length} grammar steps',
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.muted),
+                    ),
                   ],
                 ),
               ),
+              if (complete)
+                Icon(Icons.check_circle_rounded, color: DesignTokens.success),
             ],
           ),
-          const SizedBox(height: 13),
+          const SizedBox(height: 14),
           Text(
-            _mode.description,
-            style: DesignTokens.body(15).copyWith(color: DesignTokens.inkSoft),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            lesson.tip,
+            session.subtitle,
             style: DesignTokens.body(
               14,
-            ).copyWith(color: DesignTokens.muted, height: 1.35),
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
           ),
-          const SizedBox(height: 17),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: () => _openLesson(lesson),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DesignTokens.primary,
-                foregroundColor: DesignTokens.onPrimary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Text(
-                completed ? 'Practise again' : 'Start now',
-                style: DesignTokens.body(
-                  15,
-                  weight: FontWeight.w800,
-                ).copyWith(color: DesignTokens.onPrimary),
-              ),
-            ),
+          const SizedBox(height: 8),
+          Text(
+            '${session.tense} · ${session.grammarFocus}',
+            style: DesignTokens.body(12).copyWith(color: DesignTokens.muted),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _modeGrid() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var index = 0; index < GrammarV2Mode.values.length; index++) ...[
-          if (index > 0) const SizedBox(width: 10),
-          Expanded(
-            child: _ModeCard(
-              mode: GrammarV2Mode.values[index],
-              selected: _mode == GrammarV2Mode.values[index],
-              onTap: () => _setMode(GrammarV2Mode.values[index]),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Future<void> _chooseLevel() async {
-    final selected = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: DesignTokens.surface,
-      showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 16),
+          Divider(color: DesignTokens.hairline),
+          const SizedBox(height: 14),
+          Row(
             children: [
-              Text('Grammar level', style: DesignTokens.display(22)),
-              const SizedBox(height: 14),
-              for (final level in GrammarCurriculumCatalog.levels)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(level, style: DesignTokens.body(16)),
-                  trailing: level == _level
-                      ? Icon(Icons.check, color: DesignTokens.primary)
-                      : null,
-                  onTap: () => Navigator.of(sheetContext).pop(level),
+              for (final phase in phases)
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(phase.$1, color: DesignTokens.primary, size: 17),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          phase.$2,
+                          style: DesignTokens.label(10),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          PrimaryActionButton(
+            label: complete ? 'Practise again' : 'Start session',
+            onPressed: () => _openSession(session),
+          ),
+        ],
       ),
     );
-    if (!mounted || selected == null || selected == _level) return;
-    setState(() {
-      _level = selected;
-      _selectedLessonId = null;
-    });
   }
-}
 
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
-    required this.mode,
-    required this.selected,
-    required this.onTap,
-  });
+  Widget _sessionGrid(List<GrammarCourseSession> sessions) => GridView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: sessions.length,
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 3,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      childAspectRatio: 1,
+    ),
+    itemBuilder: (context, index) {
+      final session = sessions[index];
+      return _GrammarSessionCard(
+        key: ValueKey(session.id),
+        session: session,
+        selected: session.id == _selectedSessionId,
+        complete: _isCompleted(session),
+        onTap: () => setState(() => _selectedSessionId = session.id),
+      );
+    },
+  );
 
-  final GrammarV2Mode mode;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = switch (mode) {
-      GrammarV2Mode.guided => Icons.edit_note_rounded,
-      GrammarV2Mode.complete => Icons.checklist_rounded,
-      GrammarV2Mode.roleplay => Icons.forum_outlined,
-    };
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '${mode.label}, ${mode.subtitle}',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: AspectRatio(
-          aspectRatio: 0.92,
-          child: AnimatedContainer(
-            duration: DesignTokens.durationFast,
-            padding: const EdgeInsets.all(13),
-            decoration: BoxDecoration(
-              color: DesignTokens.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected ? DesignTokens.primary : DesignTokens.hairline,
-                width: selected ? 1.5 : 1,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, color: DesignTokens.primary, size: 25),
-                const Spacer(),
-                Text(
-                  mode.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.body(13, weight: FontWeight.w800),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  mode.subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.body(
-                    11,
-                  ).copyWith(color: DesignTokens.muted, height: 1.18),
-                ),
-              ],
-            ),
+  Widget _emptySessionCard({bool compact = false}) => Container(
+    padding: EdgeInsets.all(compact ? 15 : 18),
+    decoration: BoxDecoration(
+      color: DesignTokens.surface,
+      borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+      border: Border.all(color: DesignTokens.hairline),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.auto_awesome_rounded, color: DesignTokens.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            widget.isPreparingSessions
+                ? 'Preparing three connected ${_mode.label.toLowerCase()} sessions for $_tense…'
+                : 'This focus is ready to be prepared. Your first session will contain four or five connected steps.',
+            style: DesignTokens.body(
+              14,
+            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
           ),
         ),
-      ),
+      ],
+    ),
+  );
+
+  Widget _statusCard(String message, {VoidCallback? action}) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: DesignTokens.primarySoft,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Text(
+            message,
+            style: DesignTokens.body(13).copyWith(height: 1.35),
+          ),
+        ),
+        if (action != null) ...[
+          const SizedBox(width: 10),
+          TextButton(onPressed: action, child: const Text('Retry')),
+        ],
+      ],
+    ),
+  );
+
+  Widget _sessionIcon(GrammarCourseSession session, {bool large = false}) =>
+      Container(
+        width: large ? 54 : 42,
+        height: large ? 54 : 42,
+        decoration: BoxDecoration(
+          color: DesignTokens.primarySoft,
+          borderRadius: BorderRadius.circular(
+            large ? DesignTokens.radiusCard : 13,
+          ),
+        ),
+        child: Icon(
+          session.icon,
+          color: DesignTokens.primary,
+          size: large ? 27 : 21,
+        ),
+      );
+
+  Widget _sectionLabel(String value) => Text(
+    value,
+    style: DesignTokens.label(
+      12,
+      weight: FontWeight.w800,
+    ).copyWith(color: DesignTokens.primary, letterSpacing: 1.15),
+  );
+
+  Widget _levelBadge({required String level}) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    decoration: BoxDecoration(
+      color: DesignTokens.primarySoft,
+      borderRadius: BorderRadius.circular(100),
+      border: Border.all(color: DesignTokens.primary),
+    ),
+    child: Text(level, style: DesignTokens.label(11, weight: FontWeight.w800)),
+  );
+
+  bool _isCompleted(GrammarCourseSession session) {
+    final store = ref.read(learningStoreProvider);
+    if (store.lessonStatus(session.progressId).status == 'completed') {
+      return true;
+    }
+    return session.steps.asMap().keys.every(
+      (index) =>
+          store.lessonStatus('${session.progressId}_step_$index').status ==
+          'completed',
     );
+  }
+
+  void _setMode(GrammarV2Mode mode) {
+    setState(() {
+      _mode = mode;
+      _selectedSessionId = null;
+    });
+    final prepare = widget.onPrepareSessions;
+    if (prepare != null) unawaited(prepare(mode, _tense));
+  }
+
+  void _setTense(String tense) {
+    setState(() {
+      _tense = tense;
+      _selectedSessionId = null;
+    });
+    final prepare = widget.onPrepareSessions;
+    if (prepare != null) unawaited(prepare(_mode, tense));
+  }
+
+  Future<void> _openSession(GrammarCourseSession session) async {
+    final result = await AppRouter.push<GrammarCourseSessionResult>(
+      context,
+      (_) => GrammarV2LessonScreen(session: session),
+      fullscreenDialog: true,
+    );
+    if (!mounted || result == null) return;
+    setState(() {});
   }
 }
 
-class _LessonCard extends StatelessWidget {
-  const _LessonCard({
-    required this.lesson,
+class _GrammarSessionCard extends StatelessWidget {
+  const _GrammarSessionCard({
+    super.key,
+    required this.session,
     required this.selected,
-    required this.completed,
+    required this.complete,
     required this.onTap,
   });
 
-  final GrammarCurriculumLesson lesson;
+  final GrammarCourseSession session;
   final bool selected;
-  final bool completed;
+  final bool complete;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '${lesson.title}, ${lesson.subtitle}',
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: '${session.title}, ${session.steps.length} step Grammar session',
+    child: Material(
+      color: selected ? DesignTokens.primarySoft : DesignTokens.surface,
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: AnimatedContainer(
-          duration: DesignTokens.durationFast,
-          padding: const EdgeInsets.fromLTRB(12, 13, 11, 11),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 11, 9, 10),
           decoration: BoxDecoration(
-            color: DesignTokens.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: selected ? DesignTokens.primary : DesignTokens.hairline,
-              width: selected ? 1.5 : 1,
             ),
           ),
           child: Column(
@@ -601,15 +574,27 @@ class _LessonCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    _iconForCollection(lesson.collection),
-                    color: DesignTokens.primary,
-                    size: 21,
+                  Container(
+                    width: 31,
+                    height: 31,
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? DesignTokens.primary
+                          : DesignTokens.primarySoft,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      session.icon,
+                      size: 17,
+                      color: selected
+                          ? DesignTokens.onPrimary
+                          : DesignTokens.primary,
+                    ),
                   ),
                   const Spacer(),
-                  if (completed)
+                  if (complete)
                     Icon(
-                      CupertinoIcons.checkmark_circle_fill,
+                      Icons.check_circle_rounded,
                       color: DesignTokens.success,
                       size: 18,
                     ),
@@ -617,14 +602,14 @@ class _LessonCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                lesson.title,
+                session.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: DesignTokens.body(12, weight: FontWeight.w800),
+                style: DesignTokens.body(13, weight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
               Text(
-                '${GrammarV2Tenses.labelFor(lesson)} · ${lesson.level}',
+                '${session.steps.length} connected steps',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: DesignTokens.body(
@@ -635,106 +620,6 @@ class _LessonCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AdvancedGenerationCard extends StatelessWidget {
-  const _AdvancedGenerationCard({
-    required this.level,
-    required this.lesson,
-    required this.isGenerating,
-    required this.errorText,
-    required this.onGenerate,
-  });
-
-  final String level;
-  final GrammarCurriculumLesson lesson;
-  final bool isGenerating;
-  final String? errorText;
-  final VoidCallback onGenerate;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: DesignTokens.hairline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(CupertinoIcons.wand_stars, color: DesignTokens.primary),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Generate a personalized set',
-                  style: DesignTokens.body(16, weight: FontWeight.w800),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Adds a validated ${lesson.generationPoint} lesson for $level using the learner profile.',
-            style: DesignTokens.body(
-              13,
-            ).copyWith(color: DesignTokens.muted, height: 1.35),
-          ),
-          if (errorText != null) ...[
-            const SizedBox(height: 10),
-            Text(
-              errorText!,
-              style: DesignTokens.body(
-                12,
-                weight: FontWeight.w700,
-              ).copyWith(color: DesignTokens.danger),
-            ),
-          ],
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: OutlinedButton.icon(
-              onPressed: isGenerating ? null : onGenerate,
-              icon: isGenerating
-                  ? SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: DesignTokens.primary,
-                      ),
-                    )
-                  : Icon(CupertinoIcons.wand_stars),
-              label: Text(isGenerating ? 'Generating…' : 'Generate lesson'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: DesignTokens.primary,
-                side: BorderSide(color: DesignTokens.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-IconData _iconForCollection(String collection) {
-  final lower = collection.toLowerCase();
-  if (lower.contains('article')) return Icons.article_outlined;
-  if (lower.contains('question')) return Icons.help_outline_rounded;
-  if (lower.contains('past') || lower.contains('future')) {
-    return Icons.schedule_rounded;
-  }
-  if (lower.contains('pronoun')) return Icons.person_outline_rounded;
-  if (lower.contains('comparison')) return Icons.compare_arrows_rounded;
-  if (lower.contains('preposition')) return Icons.place_outlined;
-  return Icons.auto_fix_high_outlined;
+    ),
+  );
 }

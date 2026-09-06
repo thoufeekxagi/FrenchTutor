@@ -6,23 +6,37 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/speaking_course.dart';
 import '../../services/adaptive_curriculum_service.dart';
 import '../../services/universal_learning_data_service.dart';
 import 'app_migrations.dart';
 
 const _adaptiveUuid = Uuid();
 
+Map<String, dynamic>? _decodeMap(Object? value) {
+  if (value == null) return null;
+  if (value is Map) return value.cast<String, dynamic>();
+  final decoded = jsonDecode(value.toString());
+  return decoded is Map ? decoded.cast<String, dynamic>() : null;
+}
+
 /// The unit of course progression shared by onboarding, Home, Course, and
-/// the speaking pathway. A block is generated lazily as specifications; the
-/// rich lesson is still created only when the learner opens a session.
-const adaptiveCourseBlockSize = 20;
+/// the speaking pathway. Foundation contains five fixed sessions and Unit 2+
+/// grows one fully prepared personalized session at a time, up to five.
+const adaptiveCourseFoundationSize = 5;
+const adaptiveCourseBatchSize = 5;
+// The first two personalized batches are a gentle bridge from onboarding to
+// the full practice rotation. Recent evidence can choose the situation and
+// target, but it must not make these early lessons jump ahead of the learner's
+// CEFR band.
+const adaptiveCourseSimplePhaseEnd = 15;
+const adaptiveCourseGenerationVersion = 3;
 
 /// One planned session in the learner's current adaptive route.
 ///
-/// This is intentionally a specification, not the final story/quiz payload.
-/// It gives the Home/Course screens something immediate to render while the
-/// existing practice engines generate the rich lesson when the learner opens
-/// it. The specification is stable once the session is completed.
+/// The specification and its prepared artifact are persisted together. The
+/// existing practice engines render that artifact but never generate it from
+/// a Course tap.
 class AdaptiveCourseSessionSpec {
   const AdaptiveCourseSessionSpec({
     required this.id,
@@ -43,6 +57,12 @@ class AdaptiveCourseSessionSpec {
     required this.estimatedMinutes,
     this.targetPhrases = const [],
     this.sourceSessionIds = const [],
+    this.generationStatus = 'queued',
+    this.artifactKind,
+    this.artifact,
+    this.generationVersion = 1,
+    this.generationAttempts = 0,
+    this.generationError,
     required this.profileFingerprint,
     required this.status,
     required this.createdAt,
@@ -67,18 +87,177 @@ class AdaptiveCourseSessionSpec {
   final int estimatedMinutes;
   final List<String> targetPhrases;
   final List<String> sourceSessionIds;
+  final String generationStatus; // queued | generating | ready | failed
+  final String? artifactKind;
+  final Map<String, dynamic>? artifact;
+  final int generationVersion;
+  final int generationAttempts;
+  final String? generationError;
   final String profileFingerprint;
   final String status; // planned | active | completed | replaced
   final DateTime createdAt;
   final DateTime? completedAt;
 
-  /// Zero-based block number. Session 1–20 are block 0, 21–40 are block 1,
-  /// and so on. Keeping this derived from the stable sequence means no schema
-  /// migration is needed and synced rows remain backwards compatible.
-  int get blockIndex => (sequence - 1) ~/ adaptiveCourseBlockSize;
+  bool get isFoundation => sequence <= adaptiveCourseFoundationSize;
 
-  /// One-based position within the current twenty-session block.
-  int get blockPosition => ((sequence - 1) % adaptiveCourseBlockSize) + 1;
+  /// A personalized lesson is ready only when the artifact needed by its
+  /// practice engine is present. Listening must never expose text-only JSON
+  /// as finished: its durable PCM/WAV path is part of the same package.
+  bool get isContentReady {
+    if (isFoundation) return true;
+    if (generationStatus != 'ready' || artifact == null) return false;
+    final value = artifact!;
+    final normalizedLevel = level.trim().toUpperCase();
+    bool nonEmpty(Object? item) => item?.toString().trim().isNotEmpty == true;
+    bool listHas(Object? item, int minimum) =>
+        item is List && item.length >= minimum;
+    bool safeFrench(Object? item, {int? maxWords}) {
+      final french = item?.toString().trim() ?? '';
+      if (french.isEmpty) return false;
+      final words = french
+          .split(RegExp(r'\s+'))
+          .where((word) => word.isNotEmpty);
+      final limit =
+          maxWords ??
+          (normalizedLevel == 'A1'
+              ? 10
+              : normalizedLevel == 'A2'
+              ? 14
+              : 32);
+      if ((normalizedLevel == 'A1' || normalizedLevel == 'A2') &&
+          words.length > limit) {
+        return false;
+      }
+      if (normalizedLevel == 'A1' &&
+          RegExp(
+            r'\b(conditionnel|subjonctif|à condition que|bien que|cependant|pourtant)\b',
+            caseSensitive: false,
+          ).hasMatch(french)) {
+        return false;
+      }
+      return true;
+    }
+
+    bool storyHasSegments() {
+      final passage = value['passage'];
+      if (passage is! Map ||
+          !listHas(passage['segments'], 2) ||
+          !listHas(value['quiz'], 1)) {
+        return false;
+      }
+      if (normalizedLevel != 'A1' && normalizedLevel != 'A2') return true;
+      return (passage['segments'] as List).every(
+        (segment) =>
+            segment is Map &&
+            nonEmpty(segment['en']) &&
+            safeFrench(segment['fr']),
+      );
+    }
+
+    bool speakingLinesSafe() {
+      if (value['practiceMode']?.toString() != practiceMode) return false;
+      final lines = value['lines'];
+      if (!listHas(lines, 3)) return false;
+      final maxWords = normalizedLevel == 'A1'
+          ? 8
+          : normalizedLevel == 'A2'
+          ? 11
+          : 32;
+      final seen = <String>{};
+      return (lines as List).every(
+        (line) {
+          if (line is! Map ||
+              !nonEmpty(line['en']) ||
+              !safeFrench(line['fr'], maxWords: maxWords)) {
+            return false;
+          }
+          final french = line['fr'].toString().trim();
+          final folded = french
+              .toLowerCase()
+              .replaceAll(RegExp(r'[^a-zà-ÿ0-9 ]', caseSensitive: false), '')
+              .replaceAll(RegExp(r'\s+'), ' ')
+              .trim();
+          if (RegExp(
+            r'^(répétez|repetez|repeat|say|listen)\b',
+            caseSensitive: false,
+          ).hasMatch(french)) {
+            return false;
+          }
+          if (!seen.add(folded)) return false;
+          return true;
+        },
+      );
+    }
+
+    bool writingCourseSafe() {
+      final lesson = value['lesson'];
+      if (lesson is! Map || !listHas(lesson['steps'], 3)) return false;
+      return value['practiceMode']?.toString() == practiceMode &&
+          lesson['mode']?.toString() == practiceMode &&
+          lesson['level']?.toString().toUpperCase() == normalizedLevel;
+    }
+
+    bool grammarCourseSafe() {
+      final session = value['session'];
+      if (session is! Map || !listHas(session['steps'], 4)) return false;
+      return value['practiceMode']?.toString() == practiceMode &&
+          session['mode']?.toString() == practiceMode &&
+          session['level']?.toString().toUpperCase() == normalizedLevel &&
+          nonEmpty(session['grammar_focus']);
+    }
+
+    bool vocabularySafe() {
+      final entries = value['entries'];
+      if (!listHas(entries, 5)) return false;
+      final examples = value['storyExamples'];
+      if (examples is! Map) return false;
+      return (entries as List).every(
+        (entry) =>
+            entry is Map &&
+            nonEmpty(entry['id']) &&
+            nonEmpty(entry['en']) &&
+            safeFrench(
+              entry['fr'],
+              maxWords: normalizedLevel == 'A1' ? 3 : null,
+            ) &&
+            examples[entry['id']] is Map &&
+            nonEmpty((examples[entry['id']] as Map)['fr']) &&
+            nonEmpty((examples[entry['id']] as Map)['en']),
+      );
+    }
+
+    return switch (primarySkill) {
+      SpeakSkill.listening =>
+        storyHasSegments() &&
+            nonEmpty(value['audioPath']) &&
+            nonEmpty(value['audioMode']),
+      SpeakSkill.reading => storyHasSegments(),
+      SpeakSkill.speaking ||
+      SpeakSkill.roleplay ||
+      SpeakSkill.freeTalk => speakingLinesSafe(),
+      SpeakSkill.writing => writingCourseSafe(),
+      SpeakSkill.vocabulary => vocabularySafe(),
+      SpeakSkill.grammar => grammarCourseSafe(),
+      SpeakSkill.alphabet ||
+      SpeakSkill.connectors ||
+      SpeakSkill.liaison ||
+      SpeakSkill.review => true,
+    };
+  }
+
+  /// Foundation is block zero. Every personalized group of five is one frozen
+  /// adaptive batch after it.
+  int get blockIndex => isFoundation
+      ? 0
+      : ((sequence - adaptiveCourseFoundationSize - 1) ~/
+                adaptiveCourseBatchSize) +
+            1;
+
+  int get blockPosition => isFoundation
+      ? sequence
+      : ((sequence - adaptiveCourseFoundationSize - 1) %
+                adaptiveCourseBatchSize) +
+            1;
 
   String get targetPhrasePrompt => targetPhrases.isEmpty
       ? 'Choose from the competency.'
@@ -87,23 +266,60 @@ class AdaptiveCourseSessionSpec {
   String get learningMix =>
       'Reuse recent learner language for about 60% of the session and add about 40% new language.';
 
+  /// The exact existing Practice engine this course row must open. A CEFR
+  /// band can simplify its content, but it must never substitute another
+  /// interaction (for example Writing word-picking inside Speaking).
+  String get practiceMode => switch (primarySkill) {
+    SpeakSkill.speaking ||
+    SpeakSkill.roleplay ||
+    SpeakSkill.freeTalk => 'guidedConversation',
+    SpeakSkill.writing => switch ((sequence - 6) % 3) {
+      1 => 'complete',
+      2 => 'roleplay',
+      _ => 'guided',
+    },
+    SpeakSkill.grammar => switch ((sequence - 6) % 3) {
+      1 => 'complete',
+      2 => 'roleplay',
+      _ => 'guided',
+    },
+    SpeakSkill.listening => switch ((sequence - 6) % 3) {
+      1 => 'narration',
+      2 => 'music',
+      _ => 'story',
+    },
+    SpeakSkill.reading => 'story',
+    SpeakSkill.vocabulary => 'wordsAndSentences',
+    SpeakSkill.alphabet => 'alphabet',
+    SpeakSkill.connectors => 'connectors',
+    SpeakSkill.liaison => 'wordPairs',
+    SpeakSkill.review => 'review',
+  };
+
   /// The learner-facing phase of the shared course route. Keeping this on the
   /// stable session specification lets Course, Home, Practice, and Speaking
   /// describe the same progression without each screen inventing its own
   /// lesson order.
-  String get learningPhase => switch (sequence) {
-    1 => 'Sound foundation: recognize the French alphabet.',
-    2 => 'Sound foundation: hear and produce French vowels.',
-    3 => 'Sound foundation: hear and produce French consonants.',
-    4 => 'Sound foundation: notice accents and spelling clues.',
-    5 => 'Sound foundation: connect sound, spelling, and meaning.',
-    6 || 11 || 16 => 'Discover the key words for this unit.',
-    7 || 12 || 17 => 'Use the words in a controlled sentence.',
-    8 || 13 || 18 => 'Read the language in a short, useful context.',
-    9 || 14 || 19 => 'Listen for the same meaning in connected speech.',
-    10 || 15 || 20 => 'Speak and reuse the unit language in a short exchange.',
-    _ => 'Transfer and repair recent language in a new situation.',
-  };
+  String get learningPhase {
+    if (sequence <= adaptiveCourseFoundationSize) {
+      return switch (sequence) {
+        1 => 'Sound foundation: recognize the French alphabet.',
+        2 => 'Sound foundation: hear and produce French vowels.',
+        3 => 'Sound foundation: hear and produce French consonants.',
+        4 => 'Sound foundation: notice accents and spelling clues.',
+        _ => 'A1 guided speaking: introduce yourself with confidence.',
+      };
+    }
+    return switch (primarySkill) {
+      SpeakSkill.vocabulary => 'Discover five connected words in context.',
+      SpeakSkill.reading => 'Read the language in a short, useful context.',
+      SpeakSkill.listening =>
+        'Listen for meaning and details in connected speech.',
+      SpeakSkill.writing => 'Build a clear written response in context.',
+      SpeakSkill.grammar => 'Notice and use one useful sentence pattern.',
+      _ => 'Speak and reuse the unit language in a short exchange.',
+    };
+  }
 
   String get contextPrompt =>
       '''PERSONALIZED COURSE SESSION
@@ -112,6 +328,7 @@ CEFR level: $level
 Competency: $competency
 Situation: $context
 Primary skill: ${primarySkill.label}
+Exact Practice mode: $practiceMode
 Supporting skills: ${supportingSkills.map((skill) => skill.label).join(', ')}
 Learning phase: $learningPhase
 Learning mix: $learningMix
@@ -125,6 +342,8 @@ ${successCriteria.map((criterion) => '- $criterion').join('\n')}
 GENERATION RULES
 - Teach this competency in the learner's chosen situation, not a generic travel or café lesson.
 - Keep French at exactly $level, even when the context is professional or exam-oriented.
+- This is lesson $sequence. ${sequence <= adaptiveCourseSimplePhaseEnd ? 'It is in the early guided phase: use the matching simple Practice mode before asking for open production.' : 'The learner may now receive a wider version of the same Practice mode.'}
+- The first 60% of a batch should retrieve onboarding focus and recent learner language; use the remaining 40% for one small, level-appropriate extension.
 - Use a compact lesson structure: a short heading, a one-line subtitle, two to four concrete French examples, one controlled check, and one transfer prompt.
 - Explain one idea at a time in one or two short sentences. Never place a long plan, goal, audience, or context paragraph in a heading.
 - Show examples before asking the learner to produce language; keep each example short enough to scan on a phone.
@@ -141,6 +360,12 @@ GENERATION RULES
     DateTime? completedAt,
     List<String>? targetPhrases,
     List<String>? sourceSessionIds,
+    String? generationStatus,
+    String? artifactKind,
+    Map<String, dynamic>? artifact,
+    int? generationVersion,
+    int? generationAttempts,
+    String? generationError,
   }) {
     return AdaptiveCourseSessionSpec(
       id: id,
@@ -161,6 +386,12 @@ GENERATION RULES
       estimatedMinutes: estimatedMinutes,
       targetPhrases: targetPhrases ?? this.targetPhrases,
       sourceSessionIds: sourceSessionIds ?? this.sourceSessionIds,
+      generationStatus: generationStatus ?? this.generationStatus,
+      artifactKind: artifactKind ?? this.artifactKind,
+      artifact: artifact ?? this.artifact,
+      generationVersion: generationVersion ?? this.generationVersion,
+      generationAttempts: generationAttempts ?? this.generationAttempts,
+      generationError: generationError ?? this.generationError,
       profileFingerprint: profileFingerprint ?? this.profileFingerprint,
       status: status ?? this.status,
       createdAt: createdAt,
@@ -197,13 +428,11 @@ class AdaptiveCoursePlanSnapshot {
 
 /// Persists the adaptive route separately from the legacy bundled catalog.
 ///
-/// The store creates twenty lightweight lesson specifications immediately.
-/// The first lesson can open without waiting for the rest, while the remaining
-/// specifications are already available to Home/Course. After the learner
-/// completes the twentieth session in the current block, the next twenty are
-/// appended in the same local transaction on the next plan refresh. A profile
-/// change replaces only unfinished future sessions and copies completed
-/// sessions into the new plan version.
+/// The store keeps the five fixed foundation lessons plus a small personalized
+/// queue. Personalized rows are appended one at a time after the learner
+/// finishes the current row, up to five total Unit 2+ lessons. A profile
+/// change replaces only unfinished future sessions and preserves completed
+/// work.
 class AdaptiveCourseStore {
   AdaptiveCourseStore(this._db, {this._onPlanChanged, this._onSessionChanged}) {
     runAppMigrations(_db);
@@ -215,11 +444,8 @@ class AdaptiveCourseStore {
   final Future<void> Function(AdaptiveCourseSessionSpec session)?
   _onSessionChanged;
 
-  static const initialBatchSize = adaptiveCourseBlockSize;
-  // Add the next block before the learner reaches the last few sessions. The
-  // adaptive rows are lightweight specifications, so this does not make the
-  // learner wait for rich lesson generation when they finish a block.
-  static const replanThreshold = 5;
+  static const initialBatchSize = adaptiveCourseFoundationSize + 1;
+  static const maxPersonalizedLessons = adaptiveCourseBatchSize;
 
   /// Older local databases may have been opened before the adaptive target
   /// columns existed. Keep this additive compatibility check next to the
@@ -256,16 +482,36 @@ class AdaptiveCourseStore {
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
       if (repaired) _notifyPlan(reconciled);
-      if (reconciled.sessions
-              .where((session) => session.status != 'completed')
-              .length <=
-          replanThreshold) {
+      final personalized = reconciled.sessions
+          .where((session) => session.sequence > adaptiveCourseFoundationSize)
+          .toList(growable: false);
+      final availablePersonalized = personalized
+          .where(
+            (session) =>
+                session.status != 'completed' &&
+                session.status != 'replaced' &&
+                session.isContentReady,
+          )
+          .length;
+      final hasPendingPersonalized = personalized.any(
+        (session) =>
+            session.status != 'completed' &&
+            session.status != 'replaced' &&
+            !session.isContentReady,
+      );
+      // Course generation is intentionally serial. The next personalized row
+      // is not inserted until the previous artifact is fully persisted. Keep
+      // fewer than two ready lessons available, but never expose five
+      // simultaneous "creating" rows.
+      if (personalized.length < maxPersonalizedLessons &&
+          availablePersonalized < 2 &&
+          !hasPendingPersonalized) {
         _appendBatch(
           planId: reconciled.id,
           profile: profile,
           profileFingerprint: fingerprint,
           startSequence: _nextSequence(reconciled.sessions),
-          batchSize: initialBatchSize,
+          batchSize: 1,
           snapshot: snapshot,
         );
         final expanded = _snapshotForPlan(reconciled.id);
@@ -384,9 +630,10 @@ class AdaptiveCourseStore {
       profile.sessionLength,
       interests.join(','),
     ].join('|');
-    return snapshot == null
-        ? profileFingerprint
-        : profileFingerprint + '|learning:' + snapshot.fingerprint;
+    // Learning evidence shapes a newly appended five-lesson batch, but it is
+    // not plan identity. Otherwise every transcript or practice event can
+    // replace unfinished lessons and create duplicate remote plans.
+    return profileFingerprint;
   }
 
   AdaptiveCoursePlanSnapshot _createPlan({
@@ -493,8 +740,8 @@ class AdaptiveCourseStore {
   }
 
   /// Repairs a partially hydrated or older plan without replacing its ids or
-  /// completion state. The initial route is always contiguous from sequence 1
-  /// through 20; later gaps are repaired up to the highest known sequence.
+  /// completion state. A new route starts with the five foundations and one
+  /// personalized row; later gaps are repaired up to the highest known sequence.
   /// This makes Unit 1 and Unit 2 durable even when Supabase previously
   /// returned only later rows.
   bool _repairSequenceGaps({
@@ -509,7 +756,12 @@ class AdaptiveCourseStore {
     final highest = existing
         .map((session) => session.sequence)
         .reduce((a, b) => a > b ? a : b);
-    final target = highest > minimumSequence ? highest : minimumSequence;
+    // Never repair the unbounded placeholder paths written by older builds.
+    // Course owns only the five-session personalized reserve after foundation.
+    final maximumSequence =
+        adaptiveCourseFoundationSize + maxPersonalizedLessons;
+    final target = (highest > minimumSequence ? highest : minimumSequence)
+        .clamp(minimumSequence, maximumSequence);
     final existingBySequence = <int, AdaptiveCourseSessionSpec>{
       for (final session in existing) session.sequence: session,
     };
@@ -535,9 +787,14 @@ class AdaptiveCourseStore {
       }
 
       // Upgrade unfinished rows in place so an existing installation gets
-      // the staged Unit 1–4 curriculum without losing its stable id, status,
-      // or progress key. Completed rows remain historical records.
-      if (session.sequence <= initialBatchSize &&
+      // the staged CEFR curriculum without losing its stable id, status, or
+      // progress key. Completed rows remain historical records. The early
+      // personalized phase is included because older installs may already
+      // have persisted an advanced template for lesson 6–15.
+      final needsArtifactContractUpgrade =
+          current.generationVersion < session.generationVersion;
+      if ((session.sequence <= adaptiveCourseSimplePhaseEnd ||
+              needsArtifactContractUpgrade) &&
           current.status != 'completed' &&
           current.status != 'replaced' &&
           _needsCurriculumUpgrade(current, session, profileFingerprint)) {
@@ -563,7 +820,8 @@ class AdaptiveCourseStore {
     AdaptiveCourseSessionSpec replacement,
     String profileFingerprint,
   ) {
-    return current.level != replacement.level ||
+    return current.contentKey != replacement.contentKey ||
+        current.level != replacement.level ||
         current.unit != replacement.unit ||
         current.unitTitle != replacement.unitTitle ||
         current.title != replacement.title ||
@@ -583,7 +841,8 @@ class AdaptiveCourseStore {
             replacement.targetPhrases.join('|') ||
         current.sourceSessionIds.join('|') !=
             replacement.sourceSessionIds.join('|') ||
-        current.profileFingerprint != profileFingerprint;
+        current.profileFingerprint != profileFingerprint ||
+        current.generationVersion < replacement.generationVersion;
   }
 
   void _updatePlannedSessionSpec(
@@ -593,15 +852,21 @@ class AdaptiveCourseStore {
   }) {
     _db.execute(
       '''UPDATE adaptive_course_sessions
-         SET level = ?, unit = ?, unit_title = ?, title = ?, subtitle = ?,
+         SET content_key = ?, level = ?, unit = ?, unit_title = ?, title = ?, subtitle = ?,
              competency = ?, context = ?, primary_skill = ?,
              supporting_skills_json = ?, grammar_focus_json = ?,
              success_criteria_json = ?, estimated_minutes = ?,
              target_phrases_json = ?, source_session_ids_json = ?,
-             profile_fingerprint = ?, updated_at = ?
+             profile_fingerprint = ?, generation_version = ?,
+             generation_status = CASE WHEN ? > ? THEN 'queued' ELSE generation_status END,
+             artifact_kind = CASE WHEN ? > ? THEN NULL ELSE artifact_kind END,
+             artifact_json = CASE WHEN ? > ? THEN NULL ELSE artifact_json END,
+             generation_error = CASE WHEN ? > ? THEN 'Regenerating with CEFR and early-phase rules' ELSE generation_error END,
+             updated_at = ?
          WHERE id = ? AND status NOT IN ('completed', 'replaced')
            AND deleted_at IS NULL''',
       [
+        replacement.contentKey,
         replacement.level,
         replacement.unit,
         replacement.unitTitle,
@@ -619,10 +884,32 @@ class AdaptiveCourseStore {
         jsonEncode(replacement.targetPhrases),
         jsonEncode(replacement.sourceSessionIds),
         profileFingerprint,
+        replacement.generationVersion,
+        replacement.sequence,
+        adaptiveCourseFoundationSize,
+        replacement.sequence,
+        adaptiveCourseFoundationSize,
+        replacement.sequence,
+        adaptiveCourseFoundationSize,
+        replacement.sequence,
+        adaptiveCourseFoundationSize,
         _now(),
         current.id,
       ],
     );
+    // Session 5 used to be a generated vocabulary row. When an existing
+    // installation is upgraded, remove that obsolete payload so the
+    // canonical authored speaking lesson is the only content that can open.
+    if (replacement.sequence == adaptiveCourseFoundationSize) {
+      _db.execute(
+        '''UPDATE adaptive_course_sessions
+           SET generation_status = 'ready', artifact_kind = NULL,
+               artifact_json = NULL, generation_attempts = 0,
+               generation_error = NULL, updated_at = ?
+           WHERE id = ? AND deleted_at IS NULL''',
+        [_now(), current.id],
+      );
+    }
   }
 
   void _appendBatch({
@@ -725,8 +1012,10 @@ class AdaptiveCourseStore {
          subtitle, competency, context, primary_skill, supporting_skills_json,
          grammar_focus_json, success_criteria_json, estimated_minutes,
          target_phrases_json, source_session_ids_json, profile_fingerprint,
-         status, created_at, updated_at, completed_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+         generation_status, artifact_kind, artifact_json, generation_version,
+         generation_attempts, generation_error, status, created_at, updated_at,
+         completed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
       [
         id ?? session.id,
         planId,
@@ -749,6 +1038,12 @@ class AdaptiveCourseStore {
         jsonEncode(session.targetPhrases),
         jsonEncode(session.sourceSessionIds),
         profileFingerprint,
+        session.generationStatus,
+        session.artifactKind,
+        session.artifact == null ? null : jsonEncode(session.artifact),
+        session.generationVersion,
+        session.generationAttempts,
+        session.generationError,
         session.status,
         session.createdAt.toUtc().toIso8601String(),
         now,
@@ -793,6 +1088,16 @@ class AdaptiveCourseStore {
       sourceSessionIds: decodeList(
         row['source_session_ids_json'],
       ).map((e) => e.toString()).toList(growable: false),
+      generationStatus:
+          row['generation_status']?.toString() ??
+          ((row['sequence'] as int) <= adaptiveCourseFoundationSize
+              ? 'ready'
+              : 'queued'),
+      artifactKind: row['artifact_kind']?.toString(),
+      artifact: _decodeMap(row['artifact_json']),
+      generationVersion: (row['generation_version'] as int?) ?? 1,
+      generationAttempts: (row['generation_attempts'] as int?) ?? 0,
+      generationError: row['generation_error']?.toString(),
       profileFingerprint: row['profile_fingerprint'] as String,
       status: row['status'] as String,
       createdAt: DateTime.parse(row['created_at'] as String),
@@ -862,9 +1167,10 @@ class AdaptiveCourseStore {
           title, subtitle, competency, context, primary_skill,
           supporting_skills_json, grammar_focus_json, success_criteria_json,
           estimated_minutes, target_phrases_json, source_session_ids_json,
-          profile_fingerprint, status, created_at, updated_at, completed_at,
-          deleted_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          profile_fingerprint, generation_status, artifact_kind, artifact_json,
+          generation_version, generation_attempts, generation_error, status,
+          created_at, updated_at, completed_at, deleted_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            user_id = excluded.user_id,
            plan_id = excluded.plan_id,
@@ -885,6 +1191,12 @@ class AdaptiveCourseStore {
            target_phrases_json = excluded.target_phrases_json,
            source_session_ids_json = excluded.source_session_ids_json,
            profile_fingerprint = excluded.profile_fingerprint,
+           generation_status = excluded.generation_status,
+           artifact_kind = excluded.artifact_kind,
+           artifact_json = excluded.artifact_json,
+           generation_version = excluded.generation_version,
+           generation_attempts = excluded.generation_attempts,
+           generation_error = excluded.generation_error,
            status = excluded.status,
            updated_at = excluded.updated_at,
            completed_at = excluded.completed_at,
@@ -911,6 +1223,19 @@ class AdaptiveCourseStore {
         jsonText(row['target_phrases_json']),
         jsonText(row['source_session_ids_json']),
         row['profile_fingerprint'],
+        row['generation_status'] ??
+            (((row['sequence'] as int?) ?? 0) <= adaptiveCourseFoundationSize
+                ? 'ready'
+                : 'queued'),
+        row['artifact_kind'],
+        row['artifact_json'] == null
+            ? null
+            : (row['artifact_json'] is String
+                  ? row['artifact_json']
+                  : jsonEncode(row['artifact_json'])),
+        row['generation_version'] ?? 1,
+        row['generation_attempts'] ?? 0,
+        row['generation_error'],
         row['status'],
         row['created_at'],
         row['updated_at'],
@@ -932,9 +1257,8 @@ class AdaptiveCourseStore {
 }
 
 /// Generates structured, non-repeating competency slots. The rich lesson
-/// content is still generated by the existing lesson engines from each slot's
-/// context prompt, so the first route appears immediately without waiting for
-/// twenty network calls.
+/// content is prepared independently and persisted before Course exposes the
+/// lesson as tappable.
 abstract final class AdaptiveCoursePlanGenerator {
   static List<AdaptiveCourseSessionSpec> generate({
     required Profile profile,
@@ -962,25 +1286,60 @@ abstract final class AdaptiveCoursePlanGenerator {
             )
             .toList(growable: false) ??
         const <SpeakSkill>[];
-    final focusSkills = recentFocusSkills.isEmpty
-        ? AdaptiveCurriculumService.focusSkills(profile)
-        : recentFocusSkills;
-    final templates = _templatesFor(profile.goal);
+    final focusSkills = AdaptiveCurriculumService.focusSkills(profile);
+    final templates = _templatesFor(profile.goal, level: level);
     final unitThemes = _unitThemesFor(profile.goal);
     final sessions = <AdaptiveCourseSessionSpec>[];
+    // Session 5 is the permanent authored introduction. Keep the first
+    // personalized batch about new competencies, and keep its titles unique.
+    final usedPersonalizedTitles = <String>{
+      'introduce yourself',
+      'introduce yourself naturally',
+    };
     for (var offset = 0; offset < count; offset++) {
       final sequence = startSequence + offset;
       final cycle = (sequence - 1) ~/ templates.length;
       final guidedPathTemplate = _guidedPathTemplate(level, sequence);
-      final template =
+      final focusSkill = _targetSkillForBatch(
+        focusSkills: focusSkills,
+        recentSkills: recentFocusSkills,
+        sequence: sequence,
+      );
+      final targetSkill = _courseSkillFor(focusSkill, sequence);
+      final selectedTemplate =
           guidedPathTemplate ??
-          _reservedSpeakingTemplate(templates, sequence) ??
           _templateForFocus(
             templates,
-            focusSkills,
+            [focusSkill],
             sequence: sequence,
             cycle: cycle,
+            excludedTitles: usedPersonalizedTitles,
           );
+      var template = _templateForPhase(
+        selectedTemplate,
+        level: level,
+        primarySkill: focusSkill,
+        sequence: sequence,
+      );
+      if (sequence > adaptiveCourseFoundationSize &&
+          sequence <= adaptiveCourseSimplePhaseEnd &&
+          usedPersonalizedTitles.contains(template.verb.toLowerCase())) {
+        for (var variantOffset = 1; variantOffset <= 3; variantOffset++) {
+          final candidate = _earlyTemplateForLevel(
+            level,
+            focusSkill,
+            sequence + variantOffset,
+          );
+          if (!usedPersonalizedTitles.contains(candidate.verb.toLowerCase())) {
+            template = candidate;
+            break;
+          }
+        }
+      }
+      if (sequence > adaptiveCourseFoundationSize) {
+        usedPersonalizedTitles.add(selectedTemplate.verb.toLowerCase());
+        usedPersonalizedTitles.add(template.verb.toLowerCase());
+      }
       final baseContext =
           track.contexts[(sequence - 1) % track.contexts.length];
       final foundationBase =
@@ -989,8 +1348,11 @@ abstract final class AdaptiveCoursePlanGenerator {
           ? foundationBase
           : '$foundationBase with a light connection to $interest';
       final isFoundation = sequence <= 5;
+      final isGuidedIntroduction = sequence == adaptiveCourseFoundationSize;
       final context = isFoundation
-          ? foundationContext
+          ? isGuidedIntroduction
+                ? '$level guided speaking: ${SpeakingCourseCatalog.firstA1GuidedLesson.subtitle}'
+                : foundationContext
           : interest == null
           ? baseContext
           : '$baseContext with a light connection to $interest';
@@ -1000,12 +1362,28 @@ abstract final class AdaptiveCoursePlanGenerator {
             baseContext: context,
           ) ??
           context;
-      final targetPhrases =
-          learningSnapshot?.targetsForLesson(
-            sequence: sequence,
-            fallback: template.grammar,
-          ) ??
-          template.grammar;
+      final rawTargetPhrases = isGuidedIntroduction
+          ? SpeakingCourseCatalog.firstA1GuidedLesson.lines
+                .map((line) => line.french)
+                .toList(growable: false)
+          : isFoundation
+          ? template.grammar
+          : learningSnapshot?.targetsForLesson(
+                  sequence: sequence,
+                  fallback: template.grammar,
+                ) ??
+                template.grammar;
+      final targetPhrases = _safeTargetPhrases(
+        level,
+        rawTargetPhrases,
+        fallback: template.grammar,
+      );
+      final sourceSessionIds = isGuidedIntroduction
+          ? const [SpeakingCourseCatalog.firstA1GuidedLessonId]
+          : learningSnapshot?.sourceSessionIds
+                    .take(4)
+                    .toList(growable: false) ??
+                const <String>[];
       final supportingSkills = <SpeakSkill>[...template.supporting];
       for (final practicedSkill
           in learningSnapshot?.recentSkills ?? const <SpeakSkill>[]) {
@@ -1017,16 +1395,21 @@ abstract final class AdaptiveCoursePlanGenerator {
       }
       final unit = ((sequence - 1) ~/ 5) + 1;
       final unitTheme = unitThemes[(unit - 1) % unitThemes.length];
-      final title = template.verb;
-      final subtitle = cycle == 0
+      final title = isGuidedIntroduction
+          ? SpeakingCourseCatalog.firstA1GuidedLesson.title
+          : template.verb;
+      final subtitle = isGuidedIntroduction
+          ? '${track.label} · ${SpeakingCourseCatalog.firstA1GuidedLesson.subtitle}'
+          : cycle == 0
           ? '${track.label} · ${template.competency}'
           : '${track.label} · Transfer practice · ${template.competency}';
       sessions.add(
         AdaptiveCourseSessionSpec(
           id: _adaptiveUuid.v4(),
           planId: planId,
-          contentKey:
-              'adaptive_${planId}_s${sequence.toString().padLeft(3, '0')}',
+          contentKey: isGuidedIntroduction
+              ? SpeakingCourseCatalog.firstA1GuidedLessonId
+              : 'adaptive_${planId}_s${sequence.toString().padLeft(3, '0')}',
           sequence: sequence,
           level: level,
           unit: unit,
@@ -1037,17 +1420,17 @@ abstract final class AdaptiveCoursePlanGenerator {
           subtitle: subtitle,
           competency: template.competency,
           context: personalizedContext,
-          primarySkill: template.primary,
+          primarySkill: sequence <= adaptiveCourseFoundationSize
+              ? template.primary
+              : targetSkill,
           supportingSkills: supportingSkills,
           grammarFocus: template.grammar,
           successCriteria: template.success,
           estimatedMinutes: _minutes(profile.sessionLength, template.primary),
           targetPhrases: targetPhrases,
-          sourceSessionIds:
-              learningSnapshot?.sourceSessionIds
-                  .take(12)
-                  .toList(growable: false) ??
-              const <String>[],
+          sourceSessionIds: sourceSessionIds,
+          generationStatus: isFoundation ? 'ready' : 'queued',
+          generationVersion: adaptiveCourseGenerationVersion,
           profileFingerprint: profileFingerprint,
           status: 'planned',
           createdAt: DateTime.now(),
@@ -1057,50 +1440,69 @@ abstract final class AdaptiveCoursePlanGenerator {
     return sessions;
   }
 
-  /// The first twenty sessions are a deliberate beginner route rather than a
-  /// rotation of unrelated focus skills. Every five-session unit follows the
-  /// same teach-and-transfer rhythm:
-  /// vocabulary → grammar → reading → listening → speaking/review.
-  ///
-  /// Later blocks remain adaptive and are generated from the learner profile,
-  /// but they continue from this shared foundation instead of replacing it.
+  /// Only the first five sound-foundation sessions are fixed. Every session
+  /// after them belongs to the sequential personalized Unit 2+ reserve.
   static _AdaptiveTemplate? _guidedPathTemplate(String level, int sequence) {
     if (sequence <= 5) {
       return _foundationTemplatesForLevel(level)[sequence - 1];
     }
-    if (sequence <= 20) {
-      return _levelledTemplate(level, _integratedPathTemplates[sequence - 6]);
-    }
     return null;
   }
 
-  static _AdaptiveTemplate _levelledTemplate(
-    String level,
-    _AdaptiveTemplate base,
-  ) {
-    final levelGrammar = switch (level) {
-      'A1' => 'fixed phrases and the present tense',
-      'A2' => 'past and near-future forms with simple reasons',
-      'B1' => 'connectors, time frames, and supported opinions',
-      'B2' => 'nuance, reformulation, and formal or informal register',
-      _ => 'the learner\'s current CEFR grammar',
-    };
-    final levelSuccess = switch (level) {
-      'A1' => 'Keep the response to one or two clear sentences.',
-      'A2' => 'Link several short ideas and add one reason.',
-      'B1' => 'Organize the response with a clear beginning and follow-up.',
-      'B2' =>
-        'Choose precise wording and adjust the register to the situation.',
-      _ => 'Use the target grammar accurately in context.',
-    };
-    return _AdaptiveTemplate(
-      verb: base.verb,
-      competency: '${base.competency} at $level level',
-      primary: base.primary,
-      supporting: base.supporting,
-      grammar: [...base.grammar, levelGrammar],
-      success: [...base.success, levelSuccess],
-    );
+  /// Three of five slots follow onboarding emphasis (60%). The fourth repairs
+  /// a skill absent from recent evidence, and the fifth guarantees useful
+  /// transfer/balance. This is deterministic, so retries rebuild the same
+  /// specification instead of changing the learner's path.
+  static SpeakSkill _targetSkillForBatch({
+    required List<SpeakSkill> focusSkills,
+    required List<SpeakSkill> recentSkills,
+    required int sequence,
+  }) {
+    if (sequence <= adaptiveCourseFoundationSize) return SpeakSkill.alphabet;
+    final preferred = focusSkills.isEmpty
+        ? AdaptiveCurriculumService.coreFocusSkills
+        : focusSkills;
+    final personalizedIndex = sequence - adaptiveCourseFoundationSize - 1;
+    final batchIndex = personalizedIndex ~/ adaptiveCourseBatchSize;
+    final position = personalizedIndex % adaptiveCourseBatchSize;
+    if (position < 3) {
+      return preferred[(batchIndex * 3 + position) % preferred.length];
+    }
+
+    final neglected = AdaptiveCurriculumService.coreFocusSkills
+        .where((skill) => !recentSkills.contains(skill))
+        .toList(growable: false);
+    if (position == 3) {
+      final pool = neglected.isEmpty
+          ? AdaptiveCurriculumService.coreFocusSkills
+          : neglected;
+      return pool[batchIndex % pool.length];
+    }
+
+    final firstFour = <SpeakSkill>[
+      for (var offset = 0; offset < 3; offset++)
+        preferred[(batchIndex * 3 + offset) % preferred.length],
+      if (neglected.isEmpty)
+        AdaptiveCurriculumService.coreFocusSkills[batchIndex %
+            AdaptiveCurriculumService.coreFocusSkills.length]
+      else
+        neglected[batchIndex % neglected.length],
+    ];
+    if (!firstFour.contains(SpeakSkill.speaking)) return SpeakSkill.speaking;
+    if (!firstFour.contains(SpeakSkill.vocabulary)) {
+      return SpeakSkill.vocabulary;
+    }
+    return SpeakSkill.grammar;
+  }
+
+  static SpeakSkill _courseSkillFor(SpeakSkill skill, int sequence) {
+    // Course speaking is always the dedicated guided phrase flow. The
+    // Practice app may offer Free Talk and Roleplay, but those are not
+    // silently substituted into a Course lesson.
+    if (skill == SpeakSkill.roleplay || skill == SpeakSkill.freeTalk) {
+      return SpeakSkill.speaking;
+    }
+    return skill;
   }
 
   static List<_AdaptiveTemplate> _foundationTemplatesForLevel(String level) {
@@ -1146,179 +1548,11 @@ abstract final class AdaptiveCoursePlanGenerator {
         ['accent aigu', 'accent grave', 'accent circonflexe'],
         ['Identify the accent clue.', 'Read the word accurately.'],
       ),
-      _t(
-        'Connect sound to meaning',
-        'reuse essential words with accurate spelling and pronunciation',
-        SpeakSkill.vocabulary,
-        [SpeakSkill.alphabet, SpeakSkill.speaking],
-        ['spelling and pronunciation', 'word families'],
-        ['Read the words.', 'Use them in a short response.'],
-      ),
+      // Session 5 is the same authored self-introduction for every starting
+      // level. It is a stable bridge from sound foundations into the first
+      // personalized session, never another generated introduction.
+      _foundationTemplates[4],
     ];
-  }
-
-  static final _integratedPathTemplates = <_AdaptiveTemplate>[
-    _t(
-      'Learn first-meeting words',
-      'recognize greetings, names, countries, and personal information',
-      SpeakSkill.vocabulary,
-      [SpeakSkill.alphabet, SpeakSkill.grammar],
-      ['greetings', 'names', 'countries', 'être'],
-      ['Recognize the key words.', 'Use three words in a short phrase.'],
-    ),
-    _t(
-      'Build a first introduction',
-      'make a clear first sentence about yourself',
-      SpeakSkill.grammar,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
-      ['subject pronouns', 'être', 'avoir'],
-      ['Choose the correct subject and verb.', 'Build one accurate sentence.'],
-    ),
-    _t(
-      'Read a short introduction',
-      'understand a short introduction and find personal details',
-      SpeakSkill.reading,
-      [SpeakSkill.vocabulary, SpeakSkill.grammar],
-      ['question words', 'personal details'],
-      [
-        'Find who, where, and one detail.',
-        'Connect the detail to the right person.',
-      ],
-    ),
-    _t(
-      'Listen for personal details',
-      'identify names, countries, and simple personal information in speech',
-      SpeakSkill.listening,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
-      ['names', 'countries', 'numbers'],
-      ['Identify the main detail.', 'Confirm one detail you heard.'],
-    ),
-    _t(
-      'Introduce yourself',
-      'say your name, origin, and one personal detail',
-      SpeakSkill.speaking,
-      [SpeakSkill.listening, SpeakSkill.vocabulary],
-      ['être', 'venir de', 'question formation'],
-      [
-        'Say the introduction clearly.',
-        'Ask or answer one follow-up question.',
-      ],
-    ),
-    _t(
-      'Learn café and food words',
-      'recognize common café items, food, drinks, and numbers',
-      SpeakSkill.vocabulary,
-      [SpeakSkill.alphabet, SpeakSkill.listening],
-      ['food and drinks', 'numbers', 'articles'],
-      [
-        'Recognize the target items.',
-        'Choose the right word for a simple request.',
-      ],
-    ),
-    _t(
-      'Make a polite request',
-      'form a short request for food or a drink',
-      SpeakSkill.grammar,
-      [SpeakSkill.vocabulary, SpeakSkill.roleplay],
-      ['je voudrais', 'articles', 'question formation'],
-      ['Build the request in the right order.', 'Use a polite closing.'],
-    ),
-    _t(
-      'Read a simple menu',
-      'find items, prices, and options in a short menu',
-      SpeakSkill.reading,
-      [SpeakSkill.vocabulary, SpeakSkill.grammar],
-      ['prices', 'quantities', 'articles'],
-      ['Find the requested item.', 'Read one price and one option.'],
-    ),
-    _t(
-      'Listen for an order',
-      'follow a short café order and catch the essential details',
-      SpeakSkill.listening,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
-      ['food and drinks', 'numbers', 'polite requests'],
-      ['Identify the order.', 'Confirm the quantity or option.'],
-    ),
-    _t(
-      'Order something simply',
-      'order a food or drink and respond to one follow-up question',
-      SpeakSkill.speaking,
-      [SpeakSkill.listening, SpeakSkill.roleplay],
-      ['je voudrais', 's\'il vous plaît', 'numbers'],
-      ['Make the order clearly.', 'Respond to one choice question.'],
-    ),
-    _t(
-      'Learn numbers and time',
-      'recognize numbers, days, times, and simple schedules',
-      SpeakSkill.vocabulary,
-      [SpeakSkill.listening, SpeakSkill.reading],
-      ['numbers', 'days', 'time expressions'],
-      ['Recognize the target information.', 'Say one time or date accurately.'],
-    ),
-    _t(
-      'Ask a clear question',
-      'form a question about place, time, or a simple need',
-      SpeakSkill.grammar,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
-      ['est-ce que', 'question words', 'word order'],
-      ['Choose the right question form.', 'Ask one complete question.'],
-    ),
-    _t(
-      'Read a schedule or sign',
-      'find a place, time, and action in a practical notice',
-      SpeakSkill.reading,
-      [SpeakSkill.vocabulary, SpeakSkill.listening],
-      ['times', 'locations', 'imperatives'],
-      ['Find the requested details.', 'Explain what the sign asks you to do.'],
-    ),
-    _t(
-      'Listen for directions',
-      'follow a short exchange about a route or appointment',
-      SpeakSkill.listening,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
-      ['directions', 'locations', 'time expressions'],
-      ['Identify the destination.', 'Sequence two actions you heard.'],
-    ),
-    _t(
-      'Use an everyday exchange',
-      'combine first words, requests, directions, and repair strategies',
-      SpeakSkill.speaking,
-      [SpeakSkill.listening, SpeakSkill.review, SpeakSkill.roleplay],
-      ['unit review', 'clarification phrases', 'polite requests'],
-      [
-        'Reach the practical goal.',
-        'Repair one misunderstanding or ask for repetition.',
-      ],
-    ),
-  ];
-
-  /// Every twenty-session block has two deliberate production anchors. This
-  /// prevents a learner who heavily weights listening, grammar, or writing
-  /// from losing the dedicated speaking pathway entirely. The first anchor
-  /// is a controlled speaking lesson; the second is a roleplay transfer.
-  /// A1's first five sound foundations remain untouched.
-  static _AdaptiveTemplate? _reservedSpeakingTemplate(
-    List<_AdaptiveTemplate> templates,
-    int sequence,
-  ) {
-    final position = ((sequence - 1) % adaptiveCourseBlockSize) + 1;
-    final target = switch (position) {
-      6 => SpeakSkill.speaking,
-      16 => SpeakSkill.roleplay,
-      _ => null,
-    };
-    if (target == null) return null;
-    final candidates = templates
-        .where((template) => template.primary == target)
-        .toList(growable: false);
-    if (candidates.isNotEmpty) {
-      return candidates[((sequence - 1) ~/ adaptiveCourseBlockSize) %
-          candidates.length];
-    }
-    throw StateError(
-      'Adaptive course has no dedicated ${target.label} template for '
-      'block position $position.',
-    );
   }
 
   static int _minutes(String sessionLength, SpeakSkill skill) =>
@@ -1333,45 +1567,103 @@ abstract final class AdaptiveCoursePlanGenerator {
     List<SpeakSkill> focusSkills, {
     required int sequence,
     required int cycle,
+    Set<String> excludedTitles = const {},
   }) {
-    final target = focusSkills[(sequence - 4) % focusSkills.length];
-    final rotation = (sequence - 4) ~/ focusSkills.length;
+    final personalizedIndex = sequence - adaptiveCourseFoundationSize - 1;
+    final target = focusSkills[personalizedIndex % focusSkills.length];
+    final rotation = personalizedIndex ~/ focusSkills.length;
     final candidates = templates
         .where(
           (template) =>
-              _matchesFocus(template.primary, target) ||
-              (target == SpeakSkill.vocabulary &&
-                  template.supporting.contains(target)),
+              template.primary == target &&
+              !_isIntroductionTemplate(template) &&
+              !excludedTitles.contains(template.verb.toLowerCase()),
         )
         .toList(growable: false);
     if (candidates.isEmpty) {
-      throw StateError(
-        'Adaptive course has no template for focus ${target.label} '
-        'at sequence $sequence.',
-      );
-    }
-    // Every focus cycle gets a different competency where possible. The
-    // second speaking cycle deliberately introduces roleplay so a learner
-    // gets application practice early instead of a route of abstract drills.
-    if (target == SpeakSkill.speaking && rotation.isOdd) {
-      final roleplay = candidates.where(
-        (template) => template.primary == SpeakSkill.roleplay,
-      );
-      if (roleplay.isNotEmpty) return roleplay.first;
+      final unused = templates
+          .where(
+            (template) =>
+                !_isIntroductionTemplate(template) &&
+                !excludedTitles.contains(template.verb.toLowerCase()),
+          )
+          .toList(growable: false);
+      if (unused.isNotEmpty) {
+        return unused[(rotation + cycle) % unused.length];
+      }
+      return _fallbackTemplateForSkill(target);
     }
     return candidates[(rotation + cycle) % candidates.length];
   }
 
-  static bool _matchesFocus(SpeakSkill primary, SpeakSkill focus) {
-    if (primary == focus) return true;
-    return switch (focus) {
-      SpeakSkill.speaking =>
-        primary == SpeakSkill.roleplay || primary == SpeakSkill.liaison,
-      SpeakSkill.listening => primary == SpeakSkill.reading,
-      SpeakSkill.writing => primary == SpeakSkill.connectors,
-      _ => false,
-    };
+  static bool _isIntroductionTemplate(_AdaptiveTemplate template) {
+    final title = template.verb.toLowerCase();
+    final competency = template.competency.toLowerCase();
+    return title.contains('introduc') || competency.contains('introduc');
   }
+
+  /// Goal-specific banks are intentionally small. This guarantees that every
+  /// learner-facing focus can still own a lesson while the persisted context
+  /// supplies the actual topic and goal adaptation.
+  static _AdaptiveTemplate _fallbackTemplateForSkill(SpeakSkill skill) =>
+      switch (skill) {
+        SpeakSkill.speaking => _t(
+          'Use French in context',
+          'give a short, useful spoken response in the current situation',
+          SpeakSkill.speaking,
+          [SpeakSkill.listening, SpeakSkill.vocabulary],
+          ['useful sentence patterns'],
+          ['Respond clearly.', 'Add one relevant detail.'],
+        ),
+        SpeakSkill.listening => _t(
+          'Listen for useful details',
+          'understand the main idea and two details in the current situation',
+          SpeakSkill.listening,
+          [SpeakSkill.vocabulary, SpeakSkill.speaking],
+          ['meaning from context'],
+          ['Identify the main idea.', 'Confirm two details.'],
+        ),
+        SpeakSkill.reading => _t(
+          'Read for meaning',
+          'understand a short practical text in the current situation',
+          SpeakSkill.reading,
+          [SpeakSkill.vocabulary, SpeakSkill.grammar],
+          ['sentence clues'],
+          ['Find the main idea.', 'Explain one useful detail.'],
+        ),
+        SpeakSkill.writing => _t(
+          'Write a useful message',
+          'write a short message that achieves the current practical goal',
+          SpeakSkill.writing,
+          [SpeakSkill.vocabulary, SpeakSkill.grammar],
+          ['clear sentence order', 'connectors'],
+          ['State the purpose.', 'Add the needed detail.'],
+        ),
+        SpeakSkill.grammar => _t(
+          'Build accurate sentences',
+          'use one grammar pattern accurately in the current situation',
+          SpeakSkill.grammar,
+          [SpeakSkill.vocabulary, SpeakSkill.writing],
+          ['one context-appropriate grammar pattern'],
+          ['Recognize the pattern.', 'Use it in a new sentence.'],
+        ),
+        SpeakSkill.vocabulary => _t(
+          'Learn five connected words',
+          'understand and recall five useful words through one mini-story',
+          SpeakSkill.vocabulary,
+          [SpeakSkill.reading, SpeakSkill.speaking],
+          ['word families and sentence context'],
+          ['Recall all five words.', 'Understand each word in context.'],
+        ),
+        _ => _t(
+          'Review useful French',
+          'reuse recent French in the current situation',
+          SpeakSkill.speaking,
+          [SpeakSkill.vocabulary],
+          ['recent language'],
+          ['Recall the language.', 'Use it in context.'],
+        ),
+      };
 
   static List<String> _unitThemesFor(String goal) => switch (goal) {
     'tef_canada' => const [
@@ -1418,7 +1710,10 @@ abstract final class AdaptiveCoursePlanGenerator {
     ],
   };
 
-  static List<_AdaptiveTemplate> _templatesFor(String goal) {
+  static List<_AdaptiveTemplate> _templatesFor(
+    String goal, {
+    String level = 'A1',
+  }) {
     final templates = switch (goal) {
       'tef_canada' => [
         _t(
@@ -1589,6 +1884,550 @@ abstract final class AdaptiveCoursePlanGenerator {
       _ => _everydayTemplates,
     };
     return templates;
+  }
+
+  static _AdaptiveTemplate _templateForPhase(
+    _AdaptiveTemplate fallback, {
+    required String level,
+    required SpeakSkill primarySkill,
+    required int sequence,
+  }) {
+    if (sequence <= adaptiveCourseSimplePhaseEnd &&
+        sequence > adaptiveCourseFoundationSize) {
+      return _earlyTemplateForLevel(level, primarySkill, sequence);
+    }
+    return _calibrateTemplateForLevel(fallback, level);
+  }
+
+  /// The first fifteen personalised lessons deliberately borrow the small
+  /// building blocks already used by Practice. This is a course-wide rule:
+  /// the topic can come from onboarding/recent evidence, but the activity
+  /// shape stays controlled until the learner has a little momentum.
+  static _AdaptiveTemplate _earlyTemplateForLevel(
+    String level,
+    SpeakSkill skill,
+    int sequence,
+  ) {
+    final band = level.trim().toUpperCase();
+    final variant = (sequence - adaptiveCourseFoundationSize - 1) % 3;
+    final a1 = band == 'A1';
+    final a2 = band == 'A2';
+    final b1 = band == 'B1';
+    final title = switch (skill) {
+      SpeakSkill.speaking => _pick(
+        a1
+            ? const [
+                'Ask a simple question',
+                'Say what you need',
+                'Say what you like',
+              ]
+            : a2
+            ? const [
+                'Talk about your day',
+                'Ask for information',
+                'Make a simple plan',
+              ]
+            : b1
+            ? const [
+                'Share a short experience',
+                'Give a short reason',
+                'Make a short plan',
+              ]
+            : const [
+                'Share a clear experience',
+                'Explain a simple reason',
+                'Make a clear plan',
+              ],
+        variant,
+      ),
+      SpeakSkill.listening => _pick(
+        a1
+            ? const ['Hear a name', 'Hear a number', 'Hear a place']
+            : a2
+            ? const [
+                'Catch the main point',
+                'Follow simple instructions',
+                'Find key details',
+              ]
+            : b1
+            ? const [
+                'Follow a short conversation',
+                'Catch important details',
+                'Understand the main point',
+              ]
+            : const [
+                'Follow a connected conversation',
+                'Catch the key details',
+                'Understand the speaker',
+              ],
+        variant,
+      ),
+      SpeakSkill.reading => _pick(
+        a1
+            ? const [
+                'Read a short message',
+                'Read a simple sign',
+                'Find a name',
+              ]
+            : a2
+            ? const [
+                'Read a short message',
+                'Read a practical note',
+                'Find key information',
+              ]
+            : b1
+            ? const [
+                'Read a practical text',
+                'Find the main idea',
+                'Connect key details',
+              ]
+            : const [
+                'Read a useful text',
+                'Find the central idea',
+                'Connect the details',
+              ],
+        variant,
+      ),
+      SpeakSkill.writing => _pick(
+        a1
+            ? const [
+                'Build a short sentence',
+                'Write a simple note',
+                'Write a short reply',
+              ]
+            : a2
+            ? const [
+                'Write a short message',
+                'Describe a routine',
+                'Make a simple request',
+              ]
+            : b1
+            ? const [
+                'Write a clear message',
+                'Describe an experience',
+                'State an opinion',
+              ]
+            : const [
+                'Write a clear message',
+                'Describe an experience',
+                'State a position',
+              ],
+        variant,
+      ),
+      SpeakSkill.grammar => _pick(
+        a1
+            ? const ['Use être', 'Use avoir', 'Ask a question']
+            : a2
+            ? const ['Use the past', 'Use the near future', 'Join two ideas']
+            : b1
+            ? const ['Use past time', 'Explain a reason', 'Link two ideas']
+            : const [
+                'Control past time',
+                'Explain a reason',
+                'Link ideas clearly',
+              ],
+        variant,
+      ),
+      SpeakSkill.vocabulary => _pick(
+        a1
+            ? const [
+                'Learn common words',
+                'Learn people words',
+                'Learn food words',
+              ]
+            : a2
+            ? const [
+                'Build everyday phrases',
+                'Talk about places',
+                'Talk about plans',
+              ]
+            : b1
+            ? const [
+                'Use useful phrases',
+                'Talk about work',
+                'Describe an experience',
+              ]
+            : const [
+                'Use precise phrases',
+                'Talk about work',
+                'Describe an experience',
+              ],
+        variant,
+      ),
+      _ => 'Review useful French',
+    };
+
+    final competency = switch (skill) {
+      SpeakSkill.speaking => _pick(
+        a1
+            ? const [
+                'ask one short everyday question',
+                'say one simple need',
+                'say one simple preference',
+              ]
+            : a2
+            ? const [
+                'say three short things about your day',
+                'ask one clear everyday question',
+                'say one plan and when it happens',
+              ]
+            : b1
+            ? const [
+                'tell a short experience in order',
+                'give one reason for a choice',
+                'describe one future plan',
+              ]
+            : const [
+                'tell a clear short experience',
+                'support a choice with a reason',
+                'describe a plan with one detail',
+              ],
+        variant,
+      ),
+      SpeakSkill.listening => _pick(
+        a1
+            ? const [
+                'understand a name in a short line',
+                'understand one number',
+                'understand one place word',
+              ]
+            : a2
+            ? const [
+                'understand the main idea',
+                'follow two simple steps',
+                'find two useful details',
+              ]
+            : b1
+            ? const [
+                'understand a short exchange',
+                'find the important details',
+                'identify the speaker’s point',
+              ]
+            : const [
+                'follow a connected exchange',
+                'select the relevant details',
+                'summarize the speaker’s point',
+              ],
+        variant,
+      ),
+      SpeakSkill.reading => _pick(
+        a1
+            ? const [
+                'read one short practical line',
+                'understand a common sign',
+                'find a person’s name',
+              ]
+            : a2
+            ? const [
+                'understand a short message',
+                'understand a practical note',
+                'find key information',
+              ]
+            : b1
+            ? const [
+                'understand a practical text',
+                'identify the main idea',
+                'connect details in a text',
+              ]
+            : const [
+                'understand a useful text',
+                'identify the central idea',
+                'connect supporting details',
+              ],
+        variant,
+      ),
+      SpeakSkill.writing => _pick(
+        a1
+            ? const [
+                'put a few words in order',
+                'write one simple note',
+                'write one short reply',
+              ]
+            : a2
+            ? const [
+                'write a short message',
+                'describe a simple routine',
+                'make a clear request',
+              ]
+            : b1
+            ? const [
+                'write a clear practical message',
+                'describe a recent experience',
+                'state and support an opinion',
+              ]
+            : const [
+                'write a clear practical message',
+                'describe an experience clearly',
+                'state and support a position',
+              ],
+        variant,
+      ),
+      SpeakSkill.grammar => _pick(
+        a1
+            ? const [
+                'use être in one sentence',
+                'use avoir in one sentence',
+                'ask one simple question',
+              ]
+            : a2
+            ? const [
+                'use one past pattern',
+                'use futur proche',
+                'join two short ideas',
+              ]
+            : b1
+            ? const [
+                'use past time accurately',
+                'link a reason and result',
+                'join ideas clearly',
+              ]
+            : const [
+                'control past time accurately',
+                'link a reason and result',
+                'join ideas with nuance',
+              ],
+        variant,
+      ),
+      SpeakSkill.vocabulary => _pick(
+        a1
+            ? const [
+                'recognize five common words',
+                'recognize words for people',
+                'recognize five food words',
+              ]
+            : a2
+            ? const [
+                'use five everyday phrases',
+                'use words for places',
+                'use words for plans',
+              ]
+            : b1
+            ? const [
+                'reuse five useful phrases',
+                'use workplace words',
+                'describe an experience with useful words',
+              ]
+            : const [
+                'reuse precise useful phrases',
+                'use workplace vocabulary',
+                'describe an experience accurately',
+              ],
+        variant,
+      ),
+      _ => 'reuse recent French in a short situation',
+    };
+
+    final grammar = switch (skill) {
+      SpeakSkill.speaking =>
+        a1
+            ? const ['ça va ?', 'je voudrais', 'j’aime']
+            : a2
+            ? const ['présent', 'questions', 'aller + infinitive']
+            : b1
+            ? const ['time markers', 'parce que', 'future']
+            : const ['time markers', 'parce que', 'future contrast'],
+      SpeakSkill.listening =>
+        a1
+            ? const ['names', 'numbers', 'places']
+            : a2
+            ? const ['question words', 'sequence words', 'time words']
+            : const ['question words', 'sequence markers', 'time markers'],
+      SpeakSkill.reading =>
+        a1
+            ? const ['articles', 'common signs', 'names']
+            : a2
+            ? const ['message words', 'dates', 'places']
+            : const ['text clues', 'dates', 'connectors'],
+      SpeakSkill.writing =>
+        a1
+            ? const ['word order', 'je suis', 'merci']
+            : a2
+            ? const ['word order', 'present tense', 'polite requests']
+            : const ['clear order', 'time markers', 'connectors'],
+      SpeakSkill.grammar =>
+        a1
+            ? const ['être', 'avoir', 'question words']
+            : a2
+            ? const ['passé composé', 'futur proche', 'et/mais']
+            : const ['past time', 'cause and result', 'connectors'],
+      SpeakSkill.vocabulary =>
+        a1
+            ? const ['common words', 'people', 'food']
+            : a2
+            ? const ['everyday phrases', 'places', 'plans']
+            : const ['useful phrases', 'work', 'experiences'],
+      _ => const ['recent targets'],
+    };
+
+    final success = a1
+        ? const [
+            'Complete the small guided check.',
+            'Use one target in a new short example.',
+          ]
+        : a2
+        ? const [
+            'Complete the controlled check.',
+            'Use the target in one clear example.',
+          ]
+        : const [
+            'Complete the focused practice.',
+            'Transfer the target to one new example.',
+          ];
+    return _t(
+      title,
+      competency,
+      skill,
+      _supportingFor(skill),
+      grammar,
+      success,
+    );
+  }
+
+  static List<SpeakSkill> _supportingFor(SpeakSkill skill) => switch (skill) {
+    SpeakSkill.speaking => const [SpeakSkill.vocabulary, SpeakSkill.listening],
+    SpeakSkill.listening => const [SpeakSkill.vocabulary, SpeakSkill.speaking],
+    SpeakSkill.reading => const [SpeakSkill.vocabulary, SpeakSkill.grammar],
+    SpeakSkill.writing => const [SpeakSkill.vocabulary, SpeakSkill.grammar],
+    SpeakSkill.grammar => const [SpeakSkill.vocabulary, SpeakSkill.writing],
+    SpeakSkill.vocabulary => const [SpeakSkill.reading, SpeakSkill.speaking],
+    _ => const [SpeakSkill.vocabulary],
+  };
+
+  static String _pick(List<String> values, int index) =>
+      values[index % values.length];
+
+  static List<String> _safeTargetPhrases(
+    String level,
+    List<String> targets, {
+    required List<String> fallback,
+  }) {
+    final normalized = level.trim().toUpperCase();
+    final maxWords = normalized == 'A1'
+        ? 6
+        : normalized == 'A2'
+        ? 9
+        : 14;
+    final blocked = RegExp(
+      r'\b(conditionnel|subjonctif|à condition que|bien que|cependant|pourtant)\b',
+      caseSensitive: false,
+    );
+    final safe = targets
+        .map((value) => value.trim())
+        .where(
+          (value) =>
+              value.isNotEmpty &&
+              value.split(RegExp(r'\s+')).length <= maxWords &&
+              !blocked.hasMatch(value),
+        )
+        .take(6)
+        .toList(growable: false);
+    return safe.isEmpty ? fallback.take(6).toList(growable: false) : safe;
+  }
+
+  /// The competency bank is shared across levels, but its language target is
+  /// not. Keep the same skill rotation while replacing advanced A1/A2
+  /// requirements (conditions, arguments, and past narration) with a small
+  /// beginner-sized task before it is persisted into the learner's plan.
+  static _AdaptiveTemplate _calibrateTemplateForLevel(
+    _AdaptiveTemplate template,
+    String level,
+  ) {
+    final normalized = level.trim().toUpperCase();
+    if (normalized != 'A1' && normalized != 'A2') return template;
+
+    final title = template.verb.toLowerCase();
+    if (title == 'speak about a plan') {
+      return _t(
+        normalized == 'A1' ? 'Talk about tomorrow' : 'Talk about a plan',
+        normalized == 'A1'
+            ? 'say one simple plan for tomorrow'
+            : 'say a simple near-future plan and ask one follow-up',
+        template.primary,
+        template.supporting,
+        normalized == 'A1'
+            ? ['present tense', 'time words']
+            : ['aller', 'demain'],
+        normalized == 'A1'
+            ? ['Say one simple plan.', 'Add when.']
+            : ['State the plan.', 'Ask one follow-up.'],
+      );
+    }
+    if (title == 'describe a past event') {
+      return _t(
+        normalized == 'A1' ? 'Talk about your day' : 'Describe a recent event',
+        normalized == 'A1'
+            ? 'say three simple things about your daily routine'
+            : 'tell a short recent event with simple time markers',
+        template.primary,
+        template.supporting,
+        normalized == 'A1'
+            ? ['present tense', 'time words']
+            : ['passé composé'],
+        normalized == 'A1'
+            ? ['Say three short sentences.', 'Use a time word.']
+            : ['Put the event in order.', 'Use two time markers.'],
+      );
+    }
+    if (title == 'express a reason' || title == 'defend a preference') {
+      return _t(
+        normalized == 'A1' ? 'Say what you like' : 'Explain a preference',
+        normalized == 'A1'
+            ? 'say what you like and ask one simple question'
+            : 'state a preference and give one simple reason',
+        template.primary,
+        template.supporting,
+        normalized == 'A1' ? ['aimer', 'et'] : ['parce que', 'mais'],
+        normalized == 'A1'
+            ? ['Say one preference.', 'Ask one question.']
+            : ['State the preference.', 'Give one reason.'],
+      );
+    }
+    if (title == 'make a polite request' || title == 'respond to a problem') {
+      return _t(
+        normalized == 'A1' ? 'Ask for help' : 'Make a polite request',
+        normalized == 'A1'
+            ? 'ask for one everyday thing with a polite phrase'
+            : 'make a clear polite request in an everyday situation',
+        template.primary,
+        template.supporting,
+        normalized == 'A1'
+            ? ['je voudrais', 's’il vous plaît']
+            : ['polite requests'],
+        normalized == 'A1'
+            ? ['Say the request.', 'Use please.']
+            : ['Make the request.', 'Respond to the answer.'],
+      );
+    }
+    if (title == 'connect two ideas' || title == 'use high-value connectors') {
+      return _t(
+        normalized == 'A1' ? 'Join two ideas' : 'Connect two ideas',
+        normalized == 'A1'
+            ? 'join two short sentences with et or mais'
+            : 'join two everyday ideas in one clear response',
+        template.primary,
+        template.supporting,
+        normalized == 'A1' ? ['et', 'mais'] : ['parce que', 'mais', 'donc'],
+        normalized == 'A1'
+            ? ['Join two short ideas.', 'Keep the sentence clear.']
+            : ['Connect the ideas.', 'Keep the response coherent.'],
+      );
+    }
+    if (title == 'write a short argument' ||
+        title == 'compare two viewpoints') {
+      return _t(
+        normalized == 'A1' ? 'Write a simple opinion' : 'Compare two choices',
+        normalized == 'A1'
+            ? 'write two short sentences about a simple choice'
+            : 'compare two everyday choices and state a preference',
+        template.primary,
+        template.supporting,
+        normalized == 'A1' ? ['aimer', 'mais'] : ['comparisons', 'connectors'],
+        normalized == 'A1'
+            ? ['State your choice.', 'Add one detail.']
+            : ['Compare the choices.', 'State a preference.'],
+      );
+    }
+    return template;
   }
 
   static _AdaptiveTemplate _t(
@@ -1804,12 +2643,12 @@ abstract final class AdaptiveCoursePlanGenerator {
       ['Name each mark.', 'Explain its beginner-friendly sound clue.'],
     ),
     _t(
-      'Connect sound to meaning',
-      'read and say essential words in the learner\'s target context',
-      SpeakSkill.vocabulary,
-      [SpeakSkill.alphabet, SpeakSkill.speaking],
-      ['spelling and pronunciation'],
-      ['Read the words.', 'Say them with a clear rhythm.'],
+      'Introduce yourself',
+      'say your name, where you are from, and one simple personal detail',
+      SpeakSkill.speaking,
+      [SpeakSkill.vocabulary, SpeakSkill.listening],
+      ['être', 's’appeler', 'venir de'],
+      ['Say your name and origin.', 'Add one simple personal detail.'],
     ),
   ];
 

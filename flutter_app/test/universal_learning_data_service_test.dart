@@ -130,7 +130,7 @@ void main() {
     final first = plan.sessions.first;
     final reloaded = store.sessionById(first.id);
 
-    expect(plan.sessions, hasLength(20));
+    expect(plan.sessions, hasLength(10));
     expect(first.context, contains('recent work'));
     expect(first.targetPhrases, contains('Je travaille dans le marketing'));
     expect(first.sourceSessionIds, contains('practice-source'));

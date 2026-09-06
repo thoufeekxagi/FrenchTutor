@@ -20,7 +20,7 @@ void main() {
       adaptiveSessions: plan.sessions,
     );
 
-    expect(roadmap.sessions, hasLength(20));
+    expect(roadmap.sessions, hasLength(6));
     expect(roadmap.trackLabel, 'Professional French');
     expect(roadmap.sessions.first.primarySkill, SpeakSkill.alphabet);
     expect(roadmap.sessions.first.contextPrompt, contains('Meetings'));
@@ -29,26 +29,39 @@ void main() {
   test('completion state and appended batches project into the roadmap', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
-    final first = store.ensureCurrentPlan(profile);
-    for (final session in first.sessions) {
+    var expanded = store.ensureCurrentPlan(profile);
+    for (var index = 0; index < 4; index++) {
+      store.markCompleted(expanded.sessions.last.contentKey);
+      expanded = store.ensureCurrentPlan(profile);
+    }
+    for (final session in expanded.sessions) {
       store.markCompleted(session.contentKey);
     }
-    final expanded = store.ensureCurrentPlan(profile);
+    expanded = store.ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
       profile,
       adaptiveSessions: expanded.sessions,
     );
 
-    expect(roadmap.sessions, hasLength(40));
-    expect(roadmap.completedCount, 20);
-    expect(roadmap.nextSession?.index, 20);
-    expect(roadmap.sessions.every((session) => session.unlocked), isTrue);
+    expect(roadmap.sessions, hasLength(10));
+    expect(roadmap.completedCount, 10);
+    expect(roadmap.nextSession, isNull);
+    expect(roadmap.sessions.every((session) => session.completed), isTrue);
   });
 
   test('adaptive projection retains all practice skill modes', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
-    final profile = Profile(id: 'learner', goal: 'tef_canada', level: 'b1');
-    final plan = store.ensureCurrentPlan(profile);
+    final profile = Profile(
+      id: 'learner',
+      goal: 'tef_canada',
+      level: 'b1',
+      interests: const ['Speaking', 'Listening', 'Writing'],
+    );
+    var plan = store.ensureCurrentPlan(profile);
+    for (var index = 0; index < 4; index++) {
+      store.markCompleted(plan.sessions.last.contentKey);
+      plan = store.ensureCurrentPlan(profile);
+    }
     final roadmap = SpeakRoadmapService.build(
       profile,
       adaptiveSessions: plan.sessions,
@@ -58,7 +71,51 @@ void main() {
         .toSet();
 
     expect(skills, contains(SpeakSkill.listening));
-    expect(skills, contains(SpeakSkill.roleplay));
     expect(skills, contains(SpeakSkill.writing));
+  });
+
+  test('legacy queued paths expose only one generating lesson', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a1');
+    final initial = store.ensureCurrentPlan(profile);
+    final foundation = initial.sessions.take(5).toList();
+    final template = initial.sessions.last;
+    final pending = List.generate(
+      20,
+      (index) => AdaptiveCourseSessionSpec(
+        id: 'pending-$index',
+        planId: template.planId,
+        contentKey: 'pending-$index',
+        sequence: 6 + index,
+        level: template.level,
+        unit: 2 + (index ~/ 5),
+        unitTitle: template.unitTitle,
+        title: template.title,
+        subtitle: template.subtitle,
+        competency: template.competency,
+        context: template.context,
+        primarySkill: template.primarySkill,
+        supportingSkills: template.supportingSkills,
+        grammarFocus: template.grammarFocus,
+        successCriteria: template.successCriteria,
+        estimatedMinutes: template.estimatedMinutes,
+        generationStatus: 'queued',
+        profileFingerprint: template.profileFingerprint,
+        status: 'planned',
+        createdAt: template.createdAt,
+      ),
+    );
+
+    final roadmap = SpeakRoadmapService.build(
+      profile,
+      adaptiveSessions: [...foundation, ...pending],
+    );
+
+    expect(roadmap.sessions, hasLength(6));
+    expect(
+      roadmap.sessions.where((session) => !session.contentReady),
+      hasLength(1),
+    );
+    expect(roadmap.sessions.last.contentKey, 'pending-0');
   });
 }

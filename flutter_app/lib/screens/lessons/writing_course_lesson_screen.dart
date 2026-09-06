@@ -48,6 +48,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
 
   WritingCourseStep get _step => widget.lesson.steps[_index];
   bool get _isLast => _index == widget.lesson.steps.length - 1;
+  bool get _isBeginner {
+    final level = widget.lesson.level.trim().toUpperCase();
+    return level == 'A1' || level == 'A2';
+  }
 
   @override
   void initState() {
@@ -135,7 +139,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
                 ),
                 Expanded(
                   child: Text(
-                    widget.lesson.title,
+                    widget.lesson.displayTitle,
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: DesignTokens.display(18),
@@ -179,14 +183,31 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Text(_step.prompt, style: DesignTokens.display(31)),
+              child: _isBeginner
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _step.promptEnglish,
+                          style: DesignTokens.display(31),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _step.prompt,
+                          style: DesignTokens.body(
+                            17,
+                          ).copyWith(color: DesignTokens.inkSoft, height: 1.35),
+                        ),
+                      ],
+                    )
+                  : Text(_step.prompt, style: DesignTokens.display(31)),
             ),
             const SizedBox(width: 6),
             _tutorCallActions(),
           ],
         ),
-        if (_showTranslations) const SizedBox(height: 10),
-        if (_showTranslations)
+        if (_showTranslations && !_isBeginner) const SizedBox(height: 10),
+        if (_showTranslations && !_isBeginner)
           Text(
             _step.promptEnglish,
             style: DesignTokens.body(
@@ -323,6 +344,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           _PartnerBubble(
             french: _step.partnerFrench!,
             english: _step.partnerEnglish,
+            englishFirst: _isBeginner,
             showTranslation: _showTranslations,
             onListen: () => _speak(_step.partnerFrench!),
           ),
@@ -428,6 +450,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           _PartnerBubble(
             french: widget.lesson.steps[i].partnerFrench ?? '',
             english: widget.lesson.steps[i].partnerEnglish,
+            englishFirst: _isBeginner,
             showTranslation: _showTranslations,
             onListen: () => _speak(widget.lesson.steps[i].partnerFrench ?? ''),
           ),
@@ -441,6 +464,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         _PartnerBubble(
           french: _step.partnerFrench ?? '',
           english: _step.partnerEnglish,
+          englishFirst: _isBeginner,
           showTranslation: _showTranslations,
           onListen: () => _speak(_step.partnerFrench ?? ''),
         ),
@@ -779,7 +803,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
   String get _liveContext =>
       '''
 WRITING GUIDED LESSON
-Lesson: ${widget.lesson.title}
+Lesson: ${widget.lesson.displayTitle}
 Level: ${widget.lesson.level}
 Mode: ${widget.lesson.mode.name}
 Prompt: ${_step.prompt}
@@ -1376,12 +1400,14 @@ class _PartnerBubble extends StatelessWidget {
     required this.french,
     required this.onListen,
     this.english,
+    this.englishFirst = false,
     this.showTranslation = false,
   });
 
   final String french;
   final VoidCallback onListen;
   final String? english;
+  final bool englishFirst;
   final bool showTranslation;
 
   @override
@@ -1417,11 +1443,16 @@ class _PartnerBubble extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(french, style: DesignTokens.body(16)),
+                  if (englishFirst &&
+                      showTranslation &&
+                      (english ?? '').isNotEmpty)
+                    Text(english!, style: DesignTokens.body(16))
+                  else
+                    Text(french, style: DesignTokens.body(16)),
                   if (showTranslation && (english ?? '').isNotEmpty) ...[
                     const SizedBox(height: 3),
                     Text(
-                      '($english)',
+                      englishFirst ? '($french)' : '($english)',
                       style: DesignTokens.body(
                         12,
                       ).copyWith(color: DesignTokens.inkSoft),

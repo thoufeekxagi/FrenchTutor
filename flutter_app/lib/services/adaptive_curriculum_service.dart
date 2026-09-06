@@ -218,10 +218,10 @@ abstract final class AdaptiveCurriculumService {
   static const coreFocusSkills = <SpeakSkill>[
     SpeakSkill.speaking,
     SpeakSkill.listening,
+    SpeakSkill.reading,
     SpeakSkill.writing,
     SpeakSkill.grammar,
     SpeakSkill.vocabulary,
-    SpeakSkill.review,
   ];
 
   static List<SpeakSkill> focusSkills(Profile profile) {

@@ -624,10 +624,14 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
     super.key,
     required this.session,
     this.onStart,
+    this.isStarting = false,
+    this.error,
   });
 
   final SpeakRoadmapSession session;
   final VoidCallback? onStart;
+  final bool isStarting;
+  final String? error;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -716,8 +720,20 @@ class SpeakingLessonDetailScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           _goldAction(
             label: 'Start lesson',
-            onTap: onStart ?? () => _startLesson(context),
+            onTap: isStarting ? null : onStart ?? () => _startLesson(context),
+            isLoading: isStarting,
           ),
+          if (error?.trim().isNotEmpty == true) ...[
+            const SizedBox(height: 10),
+            Text(
+              error!,
+              textAlign: TextAlign.center,
+              style: _detailBody(
+                13,
+                weight: FontWeight.w600,
+              ).copyWith(color: Colors.redAccent),
+            ),
+          ],
         ],
       ),
     );
@@ -1019,25 +1035,43 @@ Widget _phraseRow(String phrase) => Container(
   ),
 );
 
-Widget _goldAction({required String label, required VoidCallback onTap}) =>
-    GestureDetector(
+Widget _goldAction({
+  required String label,
+  required VoidCallback? onTap,
+  bool isLoading = false,
+}) => Semantics(
+  button: true,
+  enabled: onTap != null,
+  label: label,
+  child: Material(
+    color: DesignTokens.nightAccent,
+    borderRadius: BorderRadius.circular(16),
+    clipBehavior: Clip.antiAlias,
+    child: InkWell(
       onTap: onTap,
-      child: Container(
+      child: SizedBox(
         height: 54,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: DesignTokens.nightAccent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: _detailBody(
-            15,
-            weight: FontWeight.w800,
-          ).copyWith(color: Colors.black),
+        child: Center(
+          child: isLoading
+              ? const SizedBox.square(
+                  dimension: 21,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.black,
+                  ),
+                )
+              : Text(
+                  label,
+                  style: _detailBody(
+                    15,
+                    weight: FontWeight.w800,
+                  ).copyWith(color: Colors.black),
+                ),
         ),
       ),
-    );
+    ),
+  ),
+);
 
 TextStyle _detailDisplay(double size) =>
     DesignTokens.display(size).copyWith(color: DesignTokens.nightText);

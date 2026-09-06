@@ -682,7 +682,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   /// the learner model, so extra practice still shapes what comes next.
   ///
   /// Each skill owns its OWN auto-vs-manual choice, made inside that skill's
-  /// screen (e.g. VocabPickerScreen's Auto/category picker), not a single
+  /// screen (e.g. Vocabulary's automatic/course picker), not a single
   /// "Auto" chip out here deciding for every skill at once.
   void _openPractice(PerformanceModality modality) {
     switch (modality) {

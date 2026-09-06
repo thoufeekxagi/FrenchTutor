@@ -9,6 +9,7 @@ import '../data/database/generated_vocabulary_set_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../models/content_models.dart';
 import 'sync_service.dart';
+import 'recent_lesson_warmup_service.dart';
 
 /// The five reusable starter themes. They are assigned into each learner's
 /// own generated-content tables at sign-in, rather than being public rows.
@@ -382,10 +383,18 @@ class StarterContentService {
     }
 
     await _uploadPrivateCovers(coverTargets);
+    // Starter lessons are real lessons, not placeholders. Begin preparing all
+    // sentence PCM and durable Listening WAVs as soon as seeding completes,
+    // so opening Reading or Listening shares already-running cache work.
+    RecentLessonWarmupService.shared.warm(
+      stories: stories.list(),
+      sync: sync,
+      storyStore: stories,
+    );
   }
 
   String _id(String uid, String key) =>
-      _uuid.v5(Uuid.NAMESPACE_URL, 'parlesprint:$uid:starter:$key');
+      _uuid.v5(Namespace.url.value, 'parlesprint:$uid:starter:$key');
 
   ReadingPassage _passage(String id, StarterSeed seed) {
     final segments = seed.sentences
