@@ -146,7 +146,7 @@ Shared catalogs must not be deleted. Deletion happens after the deletion path is
 - Completed: session 5 upgrades old generated vocabulary rows in place, clears their obsolete artifact, and opens the canonical Speaking lesson.
 - Completed: course preparation is capped at five rows per pass, claims one row per Edge Function request, shares one in-flight client worker across foreground callers, and records structured start/success/failure logs.
 - Completed: course plan/session pushes are confirmed before preparation, failed pushes persist in the supported sync outbox, and each generated lesson hydrates immediately before the next worker request.
-- Completed: `tool/delete_test_user.dart` provides a dry-run-first, exact-email-confirmed, allowlisted test-account cleanup path that preserves shared catalogs and verifies Auth/database/Storage removal.
+- Completed: `tool/delete_test_user.dart` provides a reusable, dry-run-first cleanup path with interactive allowlisted email selection, an optional default email, exact-email agent selection, explicit execute confirmation, shared-catalog protection, and Auth/database/Storage verification. Operator instructions are in `flutter_app/tool/README_account_cleanup.md`.
 - Completed: all three authorized production test accounts were permanently deleted.
 - Completed: the in-app delete action calls the authenticated v11 function, revokes all sessions, and clears the local database/preferences only after remote success.
 - Verified: each authorized UUID has zero Auth, profile, adaptive-course, generated-content, session, note, chat, vocabulary-audio-cache, and Storage rows.

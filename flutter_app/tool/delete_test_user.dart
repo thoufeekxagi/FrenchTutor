@@ -1,15 +1,25 @@
-// Permanently removes an allowlisted test learner and all learner-owned data.
+// Permanently removes one explicitly selected learner and all learner-owned
+// data. The tool is allowlist-first for interactive use, dry-run-first, and
+// requires an exact confirmation value before any delete request is sent.
 //
-// Dry run:
+// Interactive (safe default; no deletion):
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
-//     dart run tool/delete_test_user.dart \
-//       --email=thoufeekbaber1@gmail.com
+//   DELETE_ALLOWED_EMAILS='first@example.com,second@example.com' \
+//   DELETE_DEFAULT_EMAIL='first@example.com' \
+//     dart run tool/delete_test_user.dart
 //
-// Execute (the confirmation value must exactly match --email):
+// Execute a selected account (still requires the exact confirmation value):
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
-//   DELETE_TEST_USER_CONFIRM=thoufeekbaber1@gmail.com \
+//   DELETE_ALLOWED_EMAILS='first@example.com,second@example.com' \
+//   DELETE_USER_CONFIRM='first@example.com' \
 //     dart run tool/delete_test_user.dart \
-//       --email=thoufeekbaber1@gmail.com --execute
+//       --email=first@example.com --execute
+//
+// Cloud/agent runs should always pass --email (or DELETE_USER_EMAIL). An
+// exact email selector is allowed without DELETE_ALLOWED_EMAILS, but it still
+// requires DELETE_USER_CONFIRM to match exactly. Interactive runs always
+// require DELETE_ALLOWED_EMAILS so the tool can never enumerate production
+// accounts by accident. Use --list to inspect the allowlisted accounts only.
 //
 // The service-role key is intentionally shell-only. Never put it in the app,
 // Flutter assets, dart-defines, or this repository.
@@ -18,7 +28,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-const _allowedEmails = <String>{'thoufeekbaber1@gmail.com'};
 const _storageBuckets = <String>[
   'story-covers',
   'vocabulary-audio',
@@ -61,15 +70,46 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final email = _argument(args, '--email')?.trim().toLowerCase();
-  if (email == null || email.isEmpty) {
-    stderr.writeln('Missing --email.');
-    _printUsage();
+  final cliEmail = _normalizeEmail(_argument(args, '--email'));
+  final envEmail = _normalizeEmail(Platform.environment['DELETE_USER_EMAIL']);
+  if (cliEmail != null && envEmail != null && cliEmail != envEmail) {
+    stderr.writeln(
+      'Refusing: --email and DELETE_USER_EMAIL select different accounts.',
+    );
     exitCode = 64;
     return;
   }
-  if (!_allowedEmails.contains(email)) {
-    stderr.writeln('Refusing: $email is not an allowlisted test account.');
+  final requestedEmail = cliEmail ?? envEmail;
+  final allowedEmails = _parseEmailList(
+    Platform.environment['DELETE_ALLOWED_EMAILS'],
+  );
+  if (requestedEmail == null && allowedEmails.isEmpty) {
+    stderr.writeln(
+      'Interactive mode requires DELETE_ALLOWED_EMAILS. '
+      'For an agent, pass --email=... and DELETE_USER_CONFIRM=... instead.',
+    );
+    exitCode = 64;
+    return;
+  }
+  if (requestedEmail != null &&
+      allowedEmails.isNotEmpty &&
+      !allowedEmails.contains(requestedEmail)) {
+    stderr.writeln(
+      'Refusing: $requestedEmail is not in DELETE_ALLOWED_EMAILS.',
+    );
+    exitCode = 64;
+    return;
+  }
+
+  final defaultEmail = _normalizeEmail(
+    Platform.environment['DELETE_DEFAULT_EMAIL'],
+  );
+  if (defaultEmail != null &&
+      allowedEmails.isNotEmpty &&
+      !allowedEmails.contains(defaultEmail)) {
+    stderr.writeln(
+      'Refusing: DELETE_DEFAULT_EMAIL must be one of DELETE_ALLOWED_EMAILS.',
+    );
     exitCode = 64;
     return;
   }
@@ -95,6 +135,38 @@ Future<void> main(List<String> args) async {
     serviceRoleKey: serviceRoleKey,
   );
   try {
+    if (requestedEmail == null && !stdin.hasTerminal) {
+      stderr.writeln(
+        'No terminal is attached. Pass --email=... for a non-interactive run.',
+      );
+      exitCode = 64;
+      return;
+    }
+
+    final allowlistedUsers = requestedEmail == null
+        ? await admin.findUsersByEmails(allowedEmails)
+        : const <Map<String, dynamic>>[];
+    if (args.contains('--list')) {
+      if (requestedEmail != null) {
+        stdout.writeln(requestedEmail);
+      } else if (allowlistedUsers.isEmpty) {
+        stdout.writeln('No allowlisted accounts currently exist in Auth.');
+      } else {
+        stdout.writeln('Allowlisted Auth accounts:');
+        for (final user in allowlistedUsers) {
+          stdout.writeln(' - ${user['email']}');
+        }
+      }
+      return;
+    }
+
+    final email =
+        requestedEmail ??
+        _chooseEmail(allowlistedUsers, defaultEmail: defaultEmail);
+    if (email == null) {
+      stdout.writeln('No account selected. Nothing was deleted.');
+      return;
+    }
     final user = await admin.findUserByEmail(email);
     if (user == null) {
       stdout.writeln('No Auth user exists for $email. Nothing was deleted.');
@@ -107,7 +179,7 @@ Future<void> main(List<String> args) async {
     }
 
     final report = await admin.inspectUser(userId);
-    stdout.writeln('Test user: $email');
+    stdout.writeln('Selected account: $email');
     stdout.writeln('User id: $userId');
     stdout.writeln('Learner-owned database rows: ${report.databaseRows}');
     stdout.writeln(
@@ -121,12 +193,13 @@ Future<void> main(List<String> args) async {
       return;
     }
 
-    final confirmation = Platform.environment['DELETE_TEST_USER_CONFIRM']
-        ?.trim()
-        .toLowerCase();
+    final confirmation = _normalizeEmail(
+      Platform.environment['DELETE_USER_CONFIRM'] ??
+          Platform.environment['DELETE_TEST_USER_CONFIRM'],
+    );
     if (confirmation != email) {
       stderr.writeln(
-        'Refusing: DELETE_TEST_USER_CONFIRM must exactly equal $email.',
+        'Refusing: DELETE_USER_CONFIRM must exactly equal $email.',
       );
       exitCode = 64;
       return;
@@ -154,9 +227,61 @@ Future<void> main(List<String> args) async {
 
 void _printUsage() {
   stdout.writeln(
-    'Usage: dart run tool/delete_test_user.dart '
-    '--email=thoufeekbaber1@gmail.com [--execute]',
+    'Usage:\n'
+    '  dart run tool/delete_test_user.dart [--list]\n'
+    '  dart run tool/delete_test_user.dart --email=EMAIL [--execute]\n\n'
+    'Interactive mode uses DELETE_ALLOWED_EMAILS and optional '
+    'DELETE_DEFAULT_EMAIL.\n'
+    'Agent mode may use DELETE_USER_EMAIL instead of --email.\n'
+    'Deletion requires --execute and DELETE_USER_CONFIRM=EMAIL.\n'
+    'DELETE_TEST_USER_CONFIRM is accepted as a backwards-compatible alias.',
   );
+}
+
+String? _normalizeEmail(String? value) {
+  final normalized = value?.trim().toLowerCase();
+  return normalized == null || normalized.isEmpty ? null : normalized;
+}
+
+Set<String> _parseEmailList(String? value) =>
+    (value ?? '').split(',').map(_normalizeEmail).whereType<String>().toSet();
+
+String? _chooseEmail(
+  List<Map<String, dynamic>> users, {
+  required String? defaultEmail,
+}) {
+  if (users.isEmpty) return null;
+  final defaultIndex = defaultEmail == null
+      ? (users.length == 1 ? 0 : null)
+      : users.indexWhere(
+          (user) => _normalizeEmail(user['email']?.toString()) == defaultEmail,
+        );
+  final resolvedDefault = defaultIndex != null && defaultIndex >= 0
+      ? defaultIndex
+      : null;
+
+  stdout.writeln('Select the exact account to inspect/delete:');
+  for (var index = 0; index < users.length; index++) {
+    final marker = index == resolvedDefault ? ' (default)' : '';
+    stdout.writeln('  ${index + 1}) ${users[index]['email']}$marker');
+  }
+  stdout.write(
+    resolvedDefault == null
+        ? 'Choice (1-${users.length}): '
+        : 'Choice [${resolvedDefault + 1}]: ',
+  );
+  final rawChoice = stdin.readLineSync()?.trim();
+  if (rawChoice == null || rawChoice.isEmpty) {
+    return resolvedDefault == null
+        ? null
+        : _normalizeEmail(users[resolvedDefault]['email']?.toString());
+  }
+  final choice = int.tryParse(rawChoice);
+  if (choice == null || choice < 1 || choice > users.length) {
+    stderr.writeln('Invalid choice. Nothing was deleted.');
+    return null;
+  }
+  return _normalizeEmail(users[choice - 1]['email']?.toString());
 }
 
 String? _argument(List<String> args, String name) {
@@ -208,6 +333,17 @@ class _SupabaseAdmin {
       }
       if (users.length < _pageSize) return null;
     }
+  }
+
+  Future<List<Map<String, dynamic>>> findUsersByEmails(
+    Iterable<String> emails,
+  ) async {
+    final users = <Map<String, dynamic>>[];
+    for (final email in emails) {
+      final user = await findUserByEmail(email);
+      if (user != null) users.add(user);
+    }
+    return users;
   }
 
   Future<_UserReport> inspectUser(String userId) async {
