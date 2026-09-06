@@ -47,8 +47,11 @@ void main() {
       adaptiveSessions: expanded.sessions,
     );
 
-    expect(roadmap.sessions, hasLength(11));
-    expect(roadmap.completedCount, 10);
+    // Unit 2 no longer blocks growth once any two of its rows are
+    // uncompleted-but-ready, so each loop iteration below now grows a real
+    // new row immediately (matching Course's own reserve accounting).
+    expect(roadmap.sessions, hasLength(15));
+    expect(roadmap.completedCount, 14);
     // The freshly appended row has no artifact yet in this store-only test,
     // so it is visible as "preparing" rather than actionable.
     expect(roadmap.nextSession, isNull);

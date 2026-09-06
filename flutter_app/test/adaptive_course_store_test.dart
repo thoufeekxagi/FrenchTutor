@@ -616,9 +616,11 @@ void main() {
     final after = store.ensureCurrentPlan(profile);
     expect(after.id, before.id);
     // Foundation and all of authored Unit 2 already exist from the first
-    // call; growth into real AI-personalized territory (sequence 11+)
-    // stays blocked until Unit 2's listening lesson gets its audio.
-    expect(after.sessions, hasLength(10));
+    // call. Unit 2 is fixed, authored content, not part of the "keep two
+    // ready ahead" reserve, so it never blocks growth into real
+    // AI-personalized territory (sequence 11+) — this call grows one more
+    // row immediately, regardless of Unit 2's own completion state.
+    expect(after.sessions, hasLength(11));
   });
 
   test('remote plan and session rows hydrate into the local route', () {

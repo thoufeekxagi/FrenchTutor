@@ -489,8 +489,17 @@ class AdaptiveCourseStore {
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
       if (repaired) _notifyPlan(reconciled);
+      // Growth accounting must only ever look at real AI-generated lessons
+      // (sequence 11+). Unit 2 (6-10) is fixed, authored, permanent content
+      // for every learner — it is not part of the "keep at most two ready
+      // ahead" reserve, and counting its five always-ready rows here would
+      // make availablePersonalized >= 2 forever as long as even two of them
+      // are un-completed, permanently blocking growth past Unit 2 no matter
+      // what the learner does. (This is the exact same bug already fixed in
+      // supabase/functions/prepare-course-lesson/index.ts; this is the
+      // client-side copy of that same accounting that was missed.)
       final personalized = reconciled.sessions
-          .where((session) => session.sequence > adaptiveCourseFoundationSize)
+          .where((session) => session.sequence > initialBatchSize)
           .toList(growable: false);
       final availablePersonalized = personalized
           .where(
