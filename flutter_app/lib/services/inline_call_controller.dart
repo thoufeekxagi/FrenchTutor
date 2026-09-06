@@ -90,6 +90,18 @@ class InlineCallController {
   Future<void>? _starting;
   bool _disposed = false;
 
+  /// Every callback into the host (state changes, transcripts, tool calls)
+  /// must go through here once [dispose] has run. `dispose()` starts the
+  /// Gemini/audio teardown asynchronously (`unawaited`) and returns
+  /// immediately, so a socket callback such as `GeminiLiveService.disconnect`
+  /// can still fire after the host widget has fully unmounted. Relying on the
+  /// host's own `mounted` check is not enough to catch that race, so the
+  /// controller itself must refuse to call back out after disposal.
+  void _notify() {
+    if (_disposed) return;
+    onChanged();
+  }
+
   // P0.4 pocket/lock-screen handling (same contract as SessionScreen): the
   // mic stream stops on pause so a pocket never gets recorded and sent, and
   // resumes on foreground — but only if the student hadn't muted on
@@ -179,12 +191,12 @@ class InlineCallController {
     connecting = true;
     error = null;
     lastTutorLine = null;
-    onChanged();
+    _notify();
     final connected = await _connect();
     if (!connected) {
       connecting = false;
       error ??= "Couldn't connect. Check your connection and try again.";
-      onChanged();
+      _notify();
       return;
     }
     final granted = await audio!.requestPermission();
@@ -193,7 +205,7 @@ class InlineCallController {
       error = 'Microphone permission denied';
       gemini?.disconnect();
       gemini = null;
-      onChanged();
+      _notify();
       return;
     }
     if (manualLearnerTurns) {
@@ -202,13 +214,13 @@ class InlineCallController {
       // taps Record. Gemini's output player is lazy and starts when Marie's
       // first audio chunk arrives.
       muted = true;
-      onChanged();
+      _notify();
     } else {
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
     connecting = false;
     active = true;
-    onChanged();
+    _notify();
     final prompt = sendOpeningPrompt ? openingPrompt?.trim() : null;
     if (prompt != null && prompt.isNotEmpty) {
       gemini?.injectContext(prompt, expectReply: true);
@@ -244,11 +256,11 @@ class InlineCallController {
       a.isOutputActive = false;
       reconnecting = true;
       error = null;
-      onChanged();
+      _notify();
     };
     g.onReconnected = () {
       reconnecting = false;
-      onChanged();
+      _notify();
     };
     g.onError = (msg) {
       error = msg;
@@ -256,7 +268,7 @@ class InlineCallController {
         completer.complete(false);
         return;
       }
-      onChanged();
+      _notify();
     };
     g.onDisconnected = () {
       if (!completer.isCompleted) {
@@ -265,14 +277,16 @@ class InlineCallController {
       }
       active = false;
       reconnecting = false;
-      onChanged();
+      _notify();
     };
     g.onUserTranscript = (text) {
+      if (_disposed) return;
       onUserTranscript?.call(text);
     };
     g.onTutorTranscript = (text) {
       lastTutorLine = text;
-      onChanged();
+      _notify();
+      if (_disposed) return;
       onTutorTranscript?.call(text);
     };
     g.onAudioChunk = (bytes) {
@@ -283,10 +297,14 @@ class InlineCallController {
     g.onTurnComplete = () {
       a.isOutputActive = false;
       tutorSpeaking = false;
-      onChanged();
+      _notify();
+      if (_disposed) return;
       onTurnComplete?.call();
     };
-    g.onToolCall = onToolCall;
+    g.onToolCall = (name, args, callId) {
+      if (_disposed) return;
+      onToolCall?.call(name, args, callId);
+    };
 
     g.connect();
     // Token minting may use the full 10-second server timeout before the
@@ -353,7 +371,7 @@ class InlineCallController {
     gemini!.beginAudioTurn();
     if (muted) {
       muted = false;
-      onChanged();
+      _notify();
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
     return true;
@@ -366,19 +384,19 @@ class InlineCallController {
     gemini!.endAudioTurn();
     await audio!.stopStreaming();
     muted = true;
-    onChanged();
+    _notify();
   }
 
   Future<void> toggleMute() async {
     if (audio == null) return;
     if (muted) {
       muted = false;
-      onChanged();
+      _notify();
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     } else {
       await audio!.stopStreaming();
       muted = true;
-      onChanged();
+      _notify();
     }
   }
 
@@ -398,7 +416,7 @@ class InlineCallController {
     tutorSpeaking = false;
     reconnecting = false;
     pausedForLifecycle = false;
-    if (notify) onChanged();
+    if (notify) _notify();
 
     // Disconnect first so no new model chunks are accepted, then await the
     // native audio disposal. AudioStreamingService.dispose() drains all

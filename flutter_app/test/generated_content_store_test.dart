@@ -153,7 +153,7 @@ void main() {
       levelBand: 'B2',
     );
 
-    expect(beginner.displayTitle, 'My favourite meal (Mon repas favori)');
+    expect(beginner.displayTitle, 'My favourite meal');
     expect(advanced.displayTitle, 'Le travail à distance (Remote work)');
   });
 
@@ -170,6 +170,6 @@ void main() {
       levelBand: 'A1',
     );
 
-    expect(task.displayTitle, 'An imaginary trip (Un voyage imaginaire)');
+    expect(task.displayTitle, 'An imaginary trip');
   });
 }

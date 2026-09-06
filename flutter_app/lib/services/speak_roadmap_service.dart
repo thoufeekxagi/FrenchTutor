@@ -161,9 +161,11 @@ abstract final class SpeakRoadmapService {
     final foundation = ordered
         .where((session) => session.isFoundation)
         .toList(growable: false);
+    // The personalized route is unlimited: every completed or ready lesson
+    // stays visible (course history), plus at most one row that is still
+    // being prepared. There is no cap on how far the route can grow.
     final personalized = ordered
         .where((session) => !session.isFoundation)
-        .take(AdaptiveCourseStore.maxPersonalizedLessons)
         .toList(growable: false);
     final visiblePersonalized = <AdaptiveCourseSessionSpec>[];
     final readyAvailable = personalized

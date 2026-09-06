@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,19 +9,153 @@ import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
+import '../../services/course_artifact_codec.dart';
+import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
+import '../../services/sync_service.dart';
 import 'speak_course_activity_screen.dart';
 import '../../widgets/v3/v3_surface.dart';
 
-class SpeakRoadmapScreen extends ConsumerWidget {
+class SpeakRoadmapScreen extends ConsumerStatefulWidget {
   const SpeakRoadmapScreen({super.key, this.embedded = false});
 
   final bool embedded;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SpeakRoadmapScreen> createState() => _SpeakRoadmapScreenState();
+}
+
+class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
+  bool _preparingCourse = false;
+  Timer? _retryTimer;
+  String? _stuckOnContentKey;
+  int _noProgressAttempts = 0;
+
+  // A stuck lesson (e.g. a real, non-transient backend conflict) must never
+  // turn into a tight infinite request loop, but it must also never be
+  // abandoned for good — this widget is kept alive for the whole app session
+  // (Course sits in an IndexedStack), so "stop retrying" here would mean
+  // "never try again until the app restarts". Back off instead: a real
+  // generation normally finishes in a handful of seconds, so keep checking
+  // quickly at first — the ceiling only exists for a genuinely stuck row,
+  // and even then it is never more than 20 seconds stale.
+  static const _retryBackoff = [
+    Duration(seconds: 2),
+    Duration(seconds: 3),
+    Duration(seconds: 5),
+    Duration(seconds: 8),
+    Duration(seconds: 12),
+    Duration(seconds: 20),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prepareCourse());
+  }
+
+  @override
+  void dispose() {
+    _retryTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Course must drive its own personalized-lesson generation instead of
+  /// relying on the learner having visited Home first. Generation is still
+  /// exactly one lesson at a time (`prepareAdaptiveCourseLessons` enforces
+  /// that server-side); this only makes sure that one-at-a-time work keeps
+  /// happening while the learner is looking at Course, and again right after
+  /// they finish a lesson, without ever running two calls in parallel.
+  Future<void> _prepareCourse() async {
+    if (_preparingCourse) return;
+    _preparingCourse = true;
+    try {
+      final profile = ref.read(learningStoreProvider).profile();
+      final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+      final sync = ref.read(syncServiceProvider);
+      final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
+      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
+      _prefetchUpcomingListeningAudio(profile, sync);
+    } finally {
+      _preparingCourse = false;
+      if (mounted) setState(() {});
+      _scheduleRetryIfStillPreparing();
+    }
+  }
+
+  /// A Listening lesson's audio is a full-track download, not a quick TTS
+  /// line — waiting for it only once the learner taps the card is exactly
+  /// the "opening this takes forever" complaint. As soon as a Listening
+  /// lesson's artifact is ready, start pulling its durable clip in the
+  /// background so it is usually already cached by the time it is opened.
+  void _prefetchUpcomingListeningAudio(Profile profile, SyncService sync) {
+    final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+    for (final session in plan.sessions) {
+      if (session.status == 'completed' ||
+          session.primarySkill != SpeakSkill.listening ||
+          !session.isContentReady ||
+          session.artifact == null) {
+        continue;
+      }
+      final story = CourseArtifactCodec.listening(session.artifact!);
+      unawaited(
+        LessonAssetPrefetchService.shared
+            .prefetchListening(story: story, sync: sync)
+            .catchError((_) => null),
+      );
+    }
+  }
+
+  /// While any personalized row is still `queued`/`generating`/`failed`,
+  /// gently keep asking the server for the next one so a learner who stays
+  /// on this tab sees lessons unlock without needing to background/
+  /// foreground the app or bounce through Home. The same lesson staying
+  /// stuck for a while backs the check off up to once a minute instead of
+  /// hammering the backend every 4 seconds, but it never stops for good.
+  void _scheduleRetryIfStillPreparing() {
+    _retryTimer?.cancel();
+    if (!mounted) return;
+    final profile = ref.read(learningStoreProvider).profile();
+    final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+    final pending = plan.sessions
+        .cast<AdaptiveCourseSessionSpec?>()
+        .firstWhere(
+          (session) =>
+              session != null &&
+              session.status != 'completed' &&
+              !session.isContentReady,
+          orElse: () => null,
+        );
+    if (pending == null) {
+      _stuckOnContentKey = null;
+      _noProgressAttempts = 0;
+      return;
+    }
+    if (pending.contentKey == _stuckOnContentKey) {
+      _noProgressAttempts += 1;
+    } else {
+      _stuckOnContentKey = pending.contentKey;
+      _noProgressAttempts = 1;
+    }
+    final delay =
+        _retryBackoff[(_noProgressAttempts - 1).clamp(0, _retryBackoff.length - 1)];
+    _retryTimer = Timer(delay, () {
+      if (mounted) _prepareCourse();
+    });
+  }
+
+  Future<void> _openSession(SpeakRoadmapSession session) async {
+    await AppRouter.push(context, (_) => _screenFor(session));
+    if (mounted) {
+      setState(() {});
+      unawaited(_prepareCourse());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profile = ref.watch(learningStoreProvider).profile();
     final completedContentKeys = ref
         .watch(storageServiceProvider)
@@ -67,7 +203,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
             title: 'Your course',
             subtitle:
                 '${roadmap.level.toUpperCase()} · ${roadmap.trackLabel} · ${roadmap.sessions.length} sessions · ${language.shortLabel}',
-            leading: embedded ? null : const V3BackButton(),
+            leading: widget.embedded ? null : const V3BackButton(),
             trailing: V3IconButton(
               icon: Icons.tune_rounded,
               tooltip: 'Course options',
@@ -255,9 +391,7 @@ class SpeakRoadmapScreen extends ConsumerWidget {
         borderColor: active
             ? DesignTokens.nightAccent
             : DesignTokens.nightHairline,
-        onTap: unavailable
-            ? null
-            : () => AppRouter.push(context, (_) => _screenFor(session)),
+        onTap: unavailable ? null : () => _openSession(session),
         child: Row(
           children: [
             Container(

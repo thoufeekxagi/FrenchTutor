@@ -127,10 +127,16 @@ void main() {
 
     final store = AdaptiveCourseStore(db);
     final plan = store.ensureCurrentPlan(profile);
-    final first = plan.sessions.first;
+    // The first five sessions are the fixed sound-foundation lessons; the
+    // first personalized lesson (the one that should carry this evidence)
+    // is the one right after them.
+    final first = plan.sessions[adaptiveCourseFoundationSize];
     final reloaded = store.sessionById(first.id);
 
-    expect(plan.sessions, hasLength(10));
+    // The first call only produces the foundation plus one personalized
+    // lesson; growth beyond that is intentionally serial (see
+    // AdaptiveCourseStore.ensureCurrentPlan), not all ten at once.
+    expect(plan.sessions, hasLength(6));
     expect(first.context, contains('recent work'));
     expect(first.targetPhrases, contains('Je travaille dans le marketing'));
     expect(first.sourceSessionIds, contains('practice-source'));

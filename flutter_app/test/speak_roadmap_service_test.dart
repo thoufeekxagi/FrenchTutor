@@ -37,16 +37,21 @@ void main() {
     for (final session in expanded.sessions) {
       store.markCompleted(session.contentKey);
     }
+    // The personalized route is unlimited: finishing everything prepared so
+    // far does not end the course, it just grows one more row.
     expanded = store.ensureCurrentPlan(profile);
     final roadmap = SpeakRoadmapService.build(
       profile,
       adaptiveSessions: expanded.sessions,
     );
 
-    expect(roadmap.sessions, hasLength(10));
+    expect(roadmap.sessions, hasLength(11));
     expect(roadmap.completedCount, 10);
+    // The freshly appended row has no artifact yet in this store-only test,
+    // so it is visible as "preparing" rather than actionable.
     expect(roadmap.nextSession, isNull);
-    expect(roadmap.sessions.every((session) => session.completed), isTrue);
+    expect(roadmap.sessions.last.completed, isFalse);
+    expect(roadmap.sessions.last.contentReady, isFalse);
   });
 
   test('adaptive projection retains all practice skill modes', () {

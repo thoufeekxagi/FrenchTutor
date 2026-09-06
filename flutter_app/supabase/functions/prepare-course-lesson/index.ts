@@ -25,6 +25,22 @@ function boundedText(value: unknown, maxCharacters: number): string {
     : valueText.slice(0, maxCharacters).trimEnd();
 }
 
+// Word-order reconstruction checks (Guided Writing/Grammar, Complete
+// Grammar) exist to verify the token bank rebuilds the target sentence's
+// *words* in order, not to demand a byte-perfect punctuation match. Models
+// routinely vary curly vs straight apostrophes and where a comma/period
+// token attaches, which a literal string comparison rejects even though the
+// word bank is pedagogically correct. Normalize both sides the same way
+// before comparing so only real word-order/word-choice mistakes fail.
+function normalizeForReconstruction(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:«»""]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function list(value: unknown, limit = 4): string[] {
   return Array.isArray(value)
     ? value.map(text).filter(Boolean).slice(0, limit)
@@ -110,13 +126,15 @@ function earlyPhaseRules(level: string, sequence: number, skill: string): string
     return `EARLY COURSE PHASE (lesson ${sequence}, A1): ${shape}
 - Keep every French target concrete, common, and short. Prefer greetings, identity, routine, food, places, numbers, simple requests, and likes.
 - Keep target sentences to one clause and about 3–8 words. No conditionals, abstract opinions, past narration, or long explanations.
-- This is a confidence-building bridge from onboarding, not an exam task or an open-ended challenge.`;
+- This is a confidence-building bridge from onboarding, not an exam task or an open-ended challenge.
+- The learner's stated goal (e.g. exam prep, immigration, work) may choose the SCENE, but not the vocabulary yet. Even inside an administrative or professional situation, teach only the most basic words a total beginner already needs: greetings, yes/no, numbers, please/thank you, simple requests like "I would like...". Do not teach bureaucratic, technical, or exam-register words (for example: formulaire, dossier, service, agence, rendez-vous administratif, demande) at this stage. That vocabulary belongs to a later lesson once the foundation is solid, never the first few personalized lessons.`;
   }
   if (band === "A2") {
     return `EARLY COURSE PHASE (lesson ${sequence}, A2): ${shape}
 - Keep the task concrete and mostly one clause. Use a simple past or futur proche only when it serves the situation.
 - Keep target sentences short (about 4–11 words). Add at most one small new grammar step.
-- Do not turn this early lesson into an essay, debate, or complex roleplay.`;
+- Do not turn this early lesson into an essay, debate, or complex roleplay.
+- The learner's stated goal may choose the scene, but keep the vocabulary itself everyday and concrete. Introduce at most one situation-specific word, glossed clearly; do not stack multiple technical/bureaucratic terms into one early lesson.`;
   }
   return `EARLY COURSE PHASE (lesson ${sequence}, ${band}): ${shape}
 - Keep the lesson compact and controlled before offering one optional extension. Reuse recent language for the 60% retrieval portion and add only 40% new language.`;
@@ -214,8 +232,8 @@ function validateWriting(artifact: Json, level: string) {
       const meanings = list(step.token_meanings, 20);
       if (text(step.kind) !== "arrange" || tokens.length < 2 ||
         meanings.length !== tokens.length ||
-        tokens.join(" ").toLowerCase().replace(/\s+/g, " ").trim() !==
-          target.toLowerCase().replace(/\s+/g, " ").trim()) {
+        normalizeForReconstruction(tokens.join(" ")) !==
+          normalizeForReconstruction(target)) {
         throw new Error("Guided Writing needs one reconstructable bilingual word bank");
       }
     } else if (expectedMode === "complete") {
@@ -283,8 +301,8 @@ function validateGrammar(artifact: Json, level: string) {
     } else if (expectedMode === "complete") {
       const tokens = list(step.tokens, 20);
       if (tokens.length < 2 ||
-        tokens.join(" ").toLowerCase().replace(/\s+/g, " ").trim() !==
-          target.toLowerCase().replace(/\s+/g, " ").trim()) {
+        normalizeForReconstruction(tokens.join(" ")) !==
+          normalizeForReconstruction(target)) {
         throw new Error("Complete Grammar needs a word bank that rebuilds the target");
       }
     } else {
@@ -468,6 +486,27 @@ function promptFor(session: Json, kind: string): string {
   return `${base}${rules}\nThe exact Grammar Practice mode is ${mode}; never combine modes. Return exactly: {"practiceMode":"${mode}","session":{"id":"grammar-${text(session.id)}","title":"short title","subtitle":"short English subtitle","level":"${brief.level || "A1"}","tense":"Present, Past, Future, or Mixed","grammar_focus":"one small level-correct pattern","icon_key":"sparkles","mode":"${mode}","goal":"one short goal","source":"generated","steps":[exactly ${count} ${grammarStep}]}}. Tokens joined with spaces must reconstruct target exactly. Keep one grammar pattern throughout.`;
 }
 
+function validateArtifact(artifact: Json, session: Json, kind: string) {
+  if (kind === "speaking") {
+    validateSpeaking(
+      artifact,
+      text(session.level) || "A1",
+      practiceModeFor(text(session.primary_skill), Number(session.sequence ?? 0)),
+    );
+  }
+  if (kind === "vocabulary") validateVocabulary(artifact, text(session.level) || "A1");
+  if (kind === "reading" || kind === "listening") validateStory(artifact, text(session.level) || "A1", Number(session.sequence ?? 0));
+  if (kind === "writing") validateWriting(artifact, text(session.level) || "A1");
+  if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
+}
+
+// One lesson still means one provider, one fixed model, and no cross-provider
+// fallback. A bad response is repaired in place, on the same provider, by
+// handing the model back its own invalid output and the exact validation
+// error, instead of silently accepting broken content or inventing a
+// different generation path. This is capped, never unlimited retrying.
+const MAX_GENERATION_ATTEMPTS = 3;
+
 async function generateArtifact(
   supabaseUrl: string,
   serviceRoleKey: string,
@@ -480,50 +519,59 @@ async function generateArtifact(
       targetPhrases: list(session.target_phrases_json),
     };
   }
-  const aiResponse = await fetch(`${supabaseUrl}/functions/v1/ai-text`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${serviceRoleKey}`,
-      apikey: serviceRoleKey,
-      "Content-Type": "application/json",
+  // Reading and listening stay on Gemini Flash Lite. Other personalized
+  // course lessons use Luna through OpenRouter. This is fixed routing by
+  // lesson type, never a cross-provider failure fallback.
+  const provider = kind === "reading" || kind === "listening" ? "gemini" : "openrouter";
+  const messages: Array<{ role: string; content: string }> = [
+    {
+      role: "system",
+      content: "You prepare one small, coherent French lesson at a time. Follow the requested JSON schema exactly and keep the learner context minimal.",
     },
-    body: JSON.stringify({
-      // Reading and listening stay on Gemini Flash Lite. Other personalized
-      // course lessons use Luna through OpenRouter. This is fixed routing by
-      // lesson type, never a cross-provider failure fallback.
-      provider: kind === "reading" || kind === "listening"
-        ? "gemini"
-        : "openrouter",
-      messages: [
-        {
-          role: "system",
-          content: "You prepare one small, coherent French lesson at a time. Follow the requested JSON schema exactly and keep the learner context minimal.",
+    { role: "user", content: promptFor(session, kind) },
+  ];
+
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
+    let rawText = "";
+    try {
+      const aiResponse = await fetch(`${supabaseUrl}/functions/v1/ai-text`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${serviceRoleKey}`,
+          apikey: serviceRoleKey,
+          "Content-Type": "application/json",
         },
-        { role: "user", content: promptFor(session, kind) },
-      ],
-      maxTokens: 2600,
-      temperature: 0.35,
-      responseFormat: { type: "json_object" },
-    }),
-  });
-  const aiData = await aiResponse.json().catch(() => ({}));
-  if (!aiResponse.ok) {
-    throw new Error(text(aiData.error) || "Lesson generation failed");
+        body: JSON.stringify({
+          provider,
+          messages,
+          maxTokens: 2600,
+          temperature: 0.35,
+          responseFormat: { type: "json_object" },
+        }),
+      });
+      const aiData = await aiResponse.json().catch(() => ({}));
+      if (!aiResponse.ok) {
+        throw new Error(text(aiData.error) || "Lesson generation failed");
+      }
+      rawText = text(aiData.text);
+      const generated = parseModelJson(rawText);
+      const artifact = { ...baseArtifact(session, kind), ...generated };
+      validateArtifact(artifact, session, kind);
+      return artifact;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      if (attempt === MAX_GENERATION_ATTEMPTS) break;
+      // Hand the exact problem back to the same model so it can repair its
+      // own output, instead of the caller silently retrying blind.
+      messages.push({ role: "assistant", content: rawText || "{}" });
+      messages.push({
+        role: "user",
+        content: `That JSON was rejected: ${lastError.message}. Return corrected JSON only, following the exact schema from the first message. Do not add commentary.`,
+      });
+    }
   }
-  const generated = parseModelJson(aiData.text);
-  const artifact = { ...baseArtifact(session, kind), ...generated };
-  if (kind === "speaking") {
-    validateSpeaking(
-      artifact,
-      text(session.level) || "A1",
-      practiceModeFor(text(session.primary_skill), Number(session.sequence ?? 0)),
-    );
-  }
-  if (kind === "vocabulary") validateVocabulary(artifact, text(session.level) || "A1");
-  if (kind === "reading" || kind === "listening") validateStory(artifact, text(session.level) || "A1", Number(session.sequence ?? 0));
-  if (kind === "writing") validateWriting(artifact, text(session.level) || "A1");
-  if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
-  return artifact;
+  throw lastError ?? new Error("Lesson generation failed");
 }
 
 function pcm16ToWav(pcm: Uint8Array, sampleRate = 24000): Uint8Array {
@@ -782,7 +830,26 @@ Deno.serve(async (request: Request) => {
     attempt: attempts + 1,
   }));
   try {
-    let artifact = await generateArtifact(
+    // Unit 2's listening lesson is authored on the device, not generated:
+    // its text (passage + quiz) is already pushed here as the queued row's
+    // artifact. When that fixed text is already present and valid, skip the
+    // lesson-authoring model entirely and go straight to rendering audio for
+    // it — this call must never re-author text that is already final.
+    const preauthoredText = kind === "listening"
+      ? (() => {
+        const existing = claimed.artifact_json;
+        if (!existing || typeof existing !== "object" || Array.isArray(existing)) {
+          return null;
+        }
+        try {
+          validateStory(existing as Json, text(claimed.level) || "A1", Number(claimed.sequence ?? 0));
+          return existing as Json;
+        } catch {
+          return null;
+        }
+      })()
+      : null;
+    let artifact = preauthoredText ?? await generateArtifact(
       supabaseUrl,
       serviceRoleKey,
       claimed as Json,

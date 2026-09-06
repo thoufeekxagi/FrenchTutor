@@ -499,13 +499,12 @@ class AdaptiveCourseStore {
             session.status != 'replaced' &&
             !session.isContentReady,
       );
-      // Course generation is intentionally serial. The next personalized row
-      // is not inserted until the previous artifact is fully persisted. Keep
-      // fewer than two ready lessons available, but never expose five
-      // simultaneous "creating" rows.
-      if (personalized.length < maxPersonalizedLessons &&
-          availablePersonalized < 2 &&
-          !hasPendingPersonalized) {
+      // Course generation is intentionally serial and unlimited: the route
+      // keeps growing one personalized row at a time for as long as the
+      // learner keeps completing lessons. The next row is never inserted
+      // until the previous artifact is fully persisted, and there is never
+      // more than one row "creating" at once.
+      if (availablePersonalized < 2 && !hasPendingPersonalized) {
         _appendBatch(
           planId: reconciled.id,
           profile: profile,
@@ -756,12 +755,10 @@ class AdaptiveCourseStore {
     final highest = existing
         .map((session) => session.sequence)
         .reduce((a, b) => a > b ? a : b);
-    // Never repair the unbounded placeholder paths written by older builds.
-    // Course owns only the five-session personalized reserve after foundation.
-    final maximumSequence =
-        adaptiveCourseFoundationSize + maxPersonalizedLessons;
-    final target = (highest > minimumSequence ? highest : minimumSequence)
-        .clamp(minimumSequence, maximumSequence);
+    // Course's personalized route is unlimited: repair only ever rebuilds
+    // up to the highest sequence that already exists (never invents rows
+    // ahead of what the learner's route has actually grown to).
+    final target = highest > minimumSequence ? highest : minimumSequence;
     final existingBySequence = <int, AdaptiveCourseSessionSpec>{
       for (final session in existing) session.sequence: session,
     };
@@ -850,6 +847,15 @@ class AdaptiveCourseStore {
     AdaptiveCourseSessionSpec replacement, {
     required String profileFingerprint,
   }) {
+    // Unit 2 is authored, not generated (see `_unitTwoArtifact`): its
+    // recomputed `replacement` already carries the exact ready artifact
+    // every time, deterministically. A repair pass must apply that fresh
+    // authored content directly, never fall back to the ordinary
+    // "personalized rows always start queued" reset — that would throw away
+    // instantly-ready content for no reason.
+    final isAuthored = replacement.artifact != null;
+    final shouldResetPersonalized =
+        replacement.sequence > adaptiveCourseFoundationSize && !isAuthored;
     _db.execute(
       '''UPDATE adaptive_course_sessions
          SET content_key = ?, level = ?, unit = ?, unit_title = ?, title = ?, subtitle = ?,
@@ -858,10 +864,10 @@ class AdaptiveCourseStore {
              success_criteria_json = ?, estimated_minutes = ?,
              target_phrases_json = ?, source_session_ids_json = ?,
              profile_fingerprint = ?, generation_version = ?,
-             generation_status = CASE WHEN ? > ? THEN 'queued' ELSE generation_status END,
-             artifact_kind = CASE WHEN ? > ? THEN NULL ELSE artifact_kind END,
-             artifact_json = CASE WHEN ? > ? THEN NULL ELSE artifact_json END,
-             generation_error = CASE WHEN ? > ? THEN 'Regenerating with CEFR and early-phase rules' ELSE generation_error END,
+             generation_status = CASE WHEN ? = 1 THEN 'queued' WHEN ? = 1 THEN ? ELSE generation_status END,
+             artifact_kind = CASE WHEN ? = 1 THEN NULL WHEN ? = 1 THEN ? ELSE artifact_kind END,
+             artifact_json = CASE WHEN ? = 1 THEN NULL WHEN ? = 1 THEN ? ELSE artifact_json END,
+             generation_error = CASE WHEN ? = 1 THEN 'Regenerating with CEFR and early-phase rules' WHEN ? = 1 THEN NULL ELSE generation_error END,
              updated_at = ?
          WHERE id = ? AND status NOT IN ('completed', 'replaced')
            AND deleted_at IS NULL''',
@@ -885,14 +891,17 @@ class AdaptiveCourseStore {
         jsonEncode(replacement.sourceSessionIds),
         profileFingerprint,
         replacement.generationVersion,
-        replacement.sequence,
-        adaptiveCourseFoundationSize,
-        replacement.sequence,
-        adaptiveCourseFoundationSize,
-        replacement.sequence,
-        adaptiveCourseFoundationSize,
-        replacement.sequence,
-        adaptiveCourseFoundationSize,
+        shouldResetPersonalized ? 1 : 0,
+        isAuthored ? 1 : 0,
+        replacement.generationStatus,
+        shouldResetPersonalized ? 1 : 0,
+        isAuthored ? 1 : 0,
+        replacement.artifactKind,
+        shouldResetPersonalized ? 1 : 0,
+        isAuthored ? 1 : 0,
+        replacement.artifact == null ? null : jsonEncode(replacement.artifact),
+        shouldResetPersonalized ? 1 : 0,
+        isAuthored ? 1 : 0,
         _now(),
         current.id,
       ],
@@ -1269,6 +1278,15 @@ abstract final class AdaptiveCoursePlanGenerator {
     UniversalLearningSnapshot? learningSnapshot,
   }) {
     final track = AdaptiveCurriculumService.forProfile(profile);
+    // The learner's stated goal (exam prep, immigration, work...) must not
+    // pick the SITUATION for the earliest A1/A2 personalized lessons, even
+    // though its grammar is already kept simple. "Immigration and
+    // administrative conversations" is still the wrong first scene for a
+    // total beginner. Borrow the universal "everyday" track's situations for
+    // this early bridge window and only switch to the learner's own track
+    // once the foundation (adaptiveCourseSimplePhaseEnd) is behind them.
+    final earlyBridgeTrack =
+        AdaptiveCurriculumService.tracks['everyday'] ?? track;
     final level = SpeakCurriculumLevel.normalise(profile.level);
     final interest = AdaptiveCurriculumService.relevantInterest(profile);
     final recentFocusSkills =
@@ -1340,8 +1358,13 @@ abstract final class AdaptiveCoursePlanGenerator {
         usedPersonalizedTitles.add(selectedTemplate.verb.toLowerCase());
         usedPersonalizedTitles.add(template.verb.toLowerCase());
       }
+      final useEarlyBridgeContext =
+          sequence > adaptiveCourseFoundationSize &&
+          sequence <= adaptiveCourseSimplePhaseEnd &&
+          (level == 'A1' || level == 'A2');
+      final contextTrack = useEarlyBridgeContext ? earlyBridgeTrack : track;
       final baseContext =
-          track.contexts[(sequence - 1) % track.contexts.length];
+          contextTrack.contexts[(sequence - 1) % contextTrack.contexts.length];
       final foundationBase =
           'French pronunciation foundations for $baseContext';
       final foundationContext = interest == null
@@ -1403,6 +1426,16 @@ abstract final class AdaptiveCoursePlanGenerator {
           : cycle == 0
           ? '${track.label} · ${template.competency}'
           : '${track.label} · Transfer practice · ${template.competency}';
+      final isUnitTwo = _isUnitTwoSequence(sequence);
+      final unitTwoArtifact = isUnitTwo
+          ? _unitTwoArtifact(targetSkill, level)
+          : null;
+      // Unit 2 is authored, not generated: vocabulary, speaking, reading, and
+      // writing are ready the instant this spec exists. Listening's text is
+      // fixed here too, but it still needs one server call for its durable
+      // audio track, so it stays queued with its text artifact already
+      // attached instead of an empty placeholder.
+      final unitTwoReady = isUnitTwo && targetSkill != SpeakSkill.listening;
       sessions.add(
         AdaptiveCourseSessionSpec(
           id: _adaptiveUuid.v4(),
@@ -1429,7 +1462,11 @@ abstract final class AdaptiveCoursePlanGenerator {
           estimatedMinutes: _minutes(profile.sessionLength, template.primary),
           targetPhrases: targetPhrases,
           sourceSessionIds: sourceSessionIds,
-          generationStatus: isFoundation ? 'ready' : 'queued',
+          generationStatus: isFoundation || unitTwoReady
+              ? 'ready'
+              : 'queued',
+          artifactKind: unitTwoReady ? targetSkill.wireName : null,
+          artifact: unitTwoArtifact,
           generationVersion: adaptiveCourseGenerationVersion,
           profileFingerprint: profileFingerprint,
           status: 'planned',
@@ -1449,50 +1486,217 @@ abstract final class AdaptiveCoursePlanGenerator {
     return null;
   }
 
-  /// Three of five slots follow onboarding emphasis (60%). The fourth repairs
-  /// a skill absent from recent evidence, and the fifth guarantees useful
-  /// transfer/balance. This is deterministic, so retries rebuild the same
-  /// specification instead of changing the learner's path.
+  /// Unit 2 (sequences 6-10) is a second fixed, authored block, not an AI
+  /// call. Vocabulary, speaking, reading, and writing are ready the instant
+  /// the plan is created — no network, no waiting, no possibility of a
+  /// malformed generation. Only listening still needs one lean server call
+  /// to render its durable audio track; its text is already fixed here too,
+  /// so that call never invokes the lesson-authoring model, only the TTS
+  /// step. Five words, reused across every one of the five lessons.
+  static const _unitTwoWords = [
+    (id: 'market', en: 'market', fr: 'marché', phonetic: 'mar-shay'),
+    (id: 'apple', en: 'apple', fr: 'pomme', phonetic: 'pom'),
+    (id: 'seller', en: 'seller', fr: 'vendeuse', phonetic: 'von-duhz'),
+    (id: 'price', en: 'price', fr: 'prix', phonetic: 'pree'),
+    (id: 'fresh', en: 'fresh', fr: 'fraîche', phonetic: 'fresh'),
+  ];
+
+  static const _unitTwoSegments = [
+    (
+      fr: 'Le marché est très animé.',
+      en: 'The market is very lively.',
+      note: 'Present tense for a current scene.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Je choisis une pomme rouge.',
+      en: 'I choose a red apple.',
+      note: '"Je choisis" = I choose.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'La vendeuse me sourit.',
+      en: 'The seller smiles at me.',
+      note: '"La vendeuse" = the (female) seller.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Nous parlons du prix.',
+      en: 'We talk about the price.',
+      note: '"Du prix" = about the price.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'La pomme est fraîche.',
+      en: 'The apple is fresh.',
+      note: '"Fraîche" agrees with a feminine noun.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+  ];
+
+  static bool _isUnitTwoSequence(int sequence) =>
+      sequence > adaptiveCourseFoundationSize &&
+      sequence <= adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
+
+  /// Builds the artifact for one Unit 2 lesson. Listening's text (the same
+  /// passage/quiz as reading) is included here too, already complete; only
+  /// its durable audio track is still missing, and is attached server-side
+  /// without ever re-authoring the text.
+  static Map<String, dynamic>? _unitTwoArtifact(
+    SpeakSkill skill,
+    String level,
+  ) {
+    switch (skill) {
+      case SpeakSkill.vocabulary:
+        return {
+          'id': 'unit-two-vocabulary',
+          'title': 'Learn common words',
+          'summary': 'Five words from one French market scene.',
+          'topic': 'Food & shopping',
+          'levelBand': level,
+          'coverUrl': 'asset:assets/starter_covers/market.png',
+          'createdAt': DateTime.now().toUtc().toIso8601String(),
+          'entries': [
+            for (final word in _unitTwoWords)
+              {
+                'id': word.id,
+                'en': word.en,
+                'fr': word.fr,
+                'phonetic': word.phonetic,
+              },
+          ],
+          'storyExamples': {
+            for (var i = 0; i < _unitTwoWords.length; i++)
+              _unitTwoWords[i].id: {
+                'fr': _unitTwoSegments[i].fr,
+                'en': _unitTwoSegments[i].en,
+              },
+          },
+        };
+      case SpeakSkill.speaking:
+        return {
+          'id': 'unit-two-speaking',
+          'practiceMode': 'guidedConversation',
+          'lines': [
+            for (final segment in _unitTwoSegments)
+              {'fr': segment.fr, 'en': segment.en},
+          ],
+        };
+      case SpeakSkill.reading:
+      case SpeakSkill.listening:
+        return {
+          'id': 'unit-two-${skill.wireName}',
+          'title': 'Le marché du matin',
+          'summary': 'A short, simple visit to a French market.',
+          'topic': 'Food & shopping',
+          'levelBand': level,
+          'readTimeMinutes': 3,
+          'coverUrl': 'asset:assets/starter_covers/market.png',
+          'createdAt': DateTime.now().toUtc().toIso8601String(),
+          'passage': {
+            'id': 'unit-two-passage',
+            'title': 'Le marché du matin',
+            'titleEn': 'The morning market',
+            'fullText': _unitTwoSegments.map((s) => s.fr).join(' '),
+            'segments': [
+              for (final segment in _unitTwoSegments)
+                {
+                  'fr': segment.fr,
+                  'en': segment.en,
+                  'grammarNote': segment.note,
+                  'pronunciationTip': segment.tip,
+                },
+            ],
+          },
+          'quiz': [
+            {
+              'q': 'Que fait la vendeuse ?',
+              'q_en': 'What does the seller do?',
+              'choices': ['Elle sourit.', 'Elle dort.', 'Elle chante.'],
+              'choices_en': ['She smiles.', 'She sleeps.', 'She sings.'],
+              'answerIndex': 0,
+            },
+          ],
+          'keywords': [
+            for (final word in _unitTwoWords)
+              {
+                'id': word.id,
+                'en': word.en,
+                'fr': word.fr,
+                'phonetic': word.phonetic,
+              },
+          ],
+        };
+      case SpeakSkill.writing:
+        final choicesPool = _unitTwoWords.map((w) => w.fr).toList();
+        Map<String, dynamic> step(int wordIndex) {
+          final word = _unitTwoWords[wordIndex];
+          final segment = _unitTwoSegments[wordIndex];
+          final blanked = segment.fr.replaceFirst(word.fr, '___');
+          final distractors = choicesPool
+              .where((choice) => choice != word.fr)
+              .take(2)
+              .toList();
+          return {
+            'prompt': blanked,
+            'prompt_english': segment.en,
+            'target': word.fr,
+            'kind': 'choice',
+            'choices': [word.fr, ...distractors],
+            'choice_meanings': [
+              word.en,
+              for (final choice in distractors)
+                _unitTwoWords
+                    .firstWhere((candidate) => candidate.fr == choice)
+                    .en,
+            ],
+            'tip': 'Pick the word that completes the sentence.',
+          };
+        }
+
+        return {
+          'id': 'unit-two-writing',
+          'practiceMode': 'complete',
+          'lesson': {
+            'id': 'writing-unit-two',
+            'title': 'Write a short reply',
+            'title_en': 'Write a short reply',
+            'subtitle': 'Complete each sentence with the right word.',
+            'level': level,
+            'mode': 'complete',
+            'goal': 'Reuse this unit\'s five words in writing.',
+            'steps': [for (var i = 0; i < 5; i++) step(i)],
+          },
+        };
+      default:
+        return null;
+    }
+  }
+
+  /// Every personalized unit of five is taught in one fixed, slow-to-higher
+  /// order: teach the words first, then reuse that same vocabulary to speak,
+  /// read, listen, and finally write about it. This is deliberately not
+  /// re-personalized by onboarding emphasis or recent evidence — a beginner
+  /// needs the words before any of the other four activities can reuse them,
+  /// and the order must stay predictable and simple across every unit.
+  /// [focusSkills] and [recentSkills] are accepted for call-site compatibility
+  /// but no longer change the order.
   static SpeakSkill _targetSkillForBatch({
     required List<SpeakSkill> focusSkills,
     required List<SpeakSkill> recentSkills,
     required int sequence,
   }) {
     if (sequence <= adaptiveCourseFoundationSize) return SpeakSkill.alphabet;
-    final preferred = focusSkills.isEmpty
-        ? AdaptiveCurriculumService.coreFocusSkills
-        : focusSkills;
     final personalizedIndex = sequence - adaptiveCourseFoundationSize - 1;
-    final batchIndex = personalizedIndex ~/ adaptiveCourseBatchSize;
     final position = personalizedIndex % adaptiveCourseBatchSize;
-    if (position < 3) {
-      return preferred[(batchIndex * 3 + position) % preferred.length];
-    }
-
-    final neglected = AdaptiveCurriculumService.coreFocusSkills
-        .where((skill) => !recentSkills.contains(skill))
-        .toList(growable: false);
-    if (position == 3) {
-      final pool = neglected.isEmpty
-          ? AdaptiveCurriculumService.coreFocusSkills
-          : neglected;
-      return pool[batchIndex % pool.length];
-    }
-
-    final firstFour = <SpeakSkill>[
-      for (var offset = 0; offset < 3; offset++)
-        preferred[(batchIndex * 3 + offset) % preferred.length],
-      if (neglected.isEmpty)
-        AdaptiveCurriculumService.coreFocusSkills[batchIndex %
-            AdaptiveCurriculumService.coreFocusSkills.length]
-      else
-        neglected[batchIndex % neglected.length],
+    const unitOrder = [
+      SpeakSkill.vocabulary,
+      SpeakSkill.speaking,
+      SpeakSkill.reading,
+      SpeakSkill.listening,
+      SpeakSkill.writing,
     ];
-    if (!firstFour.contains(SpeakSkill.speaking)) return SpeakSkill.speaking;
-    if (!firstFour.contains(SpeakSkill.vocabulary)) {
-      return SpeakSkill.vocabulary;
-    }
-    return SpeakSkill.grammar;
+    return unitOrder[position % unitOrder.length];
   }
 
   static SpeakSkill _courseSkillFor(SpeakSkill skill, int sequence) {

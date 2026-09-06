@@ -76,12 +76,28 @@ void main() {
     for (final session in initial.sessions.take(9)) {
       store.markCompleted(session.contentKey);
     }
-    final expanded = store.ensureCurrentPlan(profile);
+
+    // Growth is intentionally serial: one call appends at most one new
+    // personalized row, and no further row is queued until that one is
+    // either ready or completed. Drive it forward the same way the app does
+    // after each finished lesson, until the five-lesson personalized reserve
+    // is full (five foundation + five personalized = ten total).
+    var expanded = store.ensureCurrentPlan(profile);
+    var guard = 0;
+    while (expanded.sessions.length < 10 && guard < 20) {
+      for (final session in expanded.sessions) {
+        if (session.status != 'completed') {
+          store.markCompleted(session.contentKey);
+        }
+      }
+      expanded = store.ensureCurrentPlan(profile);
+      guard += 1;
+    }
     expect(expanded.id, initial.id);
-    expect(expanded.sessions, hasLength(15));
+    expect(expanded.sessions, hasLength(10));
     expect(
       expanded.sessions
-          .skip(10)
+          .skip(initial.sessions.length)
           .every(
             (session) => session.sourceSessionIds.contains('practice-evidence'),
           ),

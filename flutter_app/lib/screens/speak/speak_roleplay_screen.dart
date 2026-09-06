@@ -254,11 +254,7 @@ class _SpeakRoleplayScreenState extends ConsumerState<SpeakRoleplayScreen> {
     return Container(
       height: 160,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF7D5423), Color(0xFF282015)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: DesignTokens.nightGradient,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Stack(

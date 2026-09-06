@@ -73,8 +73,8 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
     final appleBackground = isDark ? Colors.white : Colors.black;
     final appleForeground = isDark ? Colors.black : Colors.white;
     const googleBackground = Colors.white;
-    const googleForeground = Color(0xFF202124);
-    const googleBorder = Color(0xFFDADCE0);
+    const googleForeground = DesignTokens.googleButtonForeground;
+    const googleBorder = DesignTokens.googleButtonBorder;
 
     return SpeakScaffold(
       child: ListView(

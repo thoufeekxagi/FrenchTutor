@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/common.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import 'package:french_tutor/data/database/adaptive_course_store.dart';
@@ -6,18 +7,83 @@ import 'package:french_tutor/models/profile.dart';
 import 'package:french_tutor/models/speak_curriculum.dart';
 import 'package:french_tutor/models/speaking_course.dart';
 
+/// Minimal but validator-satisfying A1 artifact JSON for each personalized
+/// skill, used to drive `AdaptiveCourseStore`'s one-row-at-a-time growth
+/// forward in tests without a real generation pipeline.
+String _readyArtifactFor(SpeakSkill skill) {
+  switch (skill) {
+    case SpeakSkill.vocabulary:
+      return '{"entries":['
+          '{"id":"e1","en":"one","fr":"un","phonetic":"uh"},'
+          '{"id":"e2","en":"two","fr":"deux","phonetic":"duh"},'
+          '{"id":"e3","en":"three","fr":"trois","phonetic":"twah"},'
+          '{"id":"e4","en":"four","fr":"quatre","phonetic":"katr"},'
+          '{"id":"e5","en":"five","fr":"cinq","phonetic":"sank"}'
+          '],"storyExamples":{'
+          '"e1":{"fr":"Un chat.","en":"One cat."},'
+          '"e2":{"fr":"Deux chats.","en":"Two cats."},'
+          '"e3":{"fr":"Trois chats.","en":"Three cats."},'
+          '"e4":{"fr":"Quatre chats.","en":"Four cats."},'
+          '"e5":{"fr":"Cinq chats.","en":"Five cats."}'
+          '}}';
+    case SpeakSkill.reading:
+      return '{"passage":{"segments":['
+          '{"fr":"Bonjour.","en":"Hello."},'
+          '{"fr":"Ça va bien.","en":"I am well."}'
+          ']},"quiz":[{"q":"Ça va ?","choices":["Oui","Non"],"answerIndex":0}]}';
+    case SpeakSkill.listening:
+      return '{"passage":{"segments":['
+          '{"fr":"Bonjour.","en":"Hello."},'
+          '{"fr":"Ça va bien.","en":"I am well."}'
+          ']},"quiz":[{"q":"Ça va ?","choices":["Oui","Non"],"answerIndex":0}],'
+          '"audioPath":"user/course/listening.wav",'
+          '"audioMode":"gemini_flash_tts"}';
+    default:
+      return '{"practiceMode":"guidedConversation","lines":['
+          '{"fr":"Bonjour.","en":"Hello."},'
+          '{"fr":"Je m\'appelle Léa.","en":"My name is Lea."},'
+          '{"fr":"Merci beaucoup.","en":"Thank you very much."}'
+          ']}';
+  }
+}
+
+/// Marks the given session ready with valid content, then immediately
+/// completes it (as if the learner finished the lesson) so the store's
+/// "never more than two ready-ahead" rule does not stall growth in a loop.
+void _finishSession(
+  CommonDatabase db,
+  AdaptiveCourseStore store,
+  AdaptiveCourseSessionSpec session,
+) {
+  db.execute(
+    "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+    'artifact_json = ? WHERE id = ?',
+    [_readyArtifactFor(session.primarySkill), session.id],
+  );
+  store.markCompleted(session.contentKey);
+}
+
 void main() {
   test('listening stays unready until its durable PCM WAV is attached', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
-    final plan = store.ensureCurrentPlan(
-      Profile(
-        id: 'listener-ready-contract',
-        goal: 'everyday',
-        level: 'a1',
-        interests: const ['Listening'],
-      ),
+    final profile = Profile(
+      id: 'listener-ready-contract',
+      goal: 'everyday',
+      level: 'a1',
+      interests: const ['Listening'],
     );
+    // Every personalized unit is taught in a fixed order (vocabulary,
+    // speaking, reading, listening, writing), so listening is the fourth
+    // personalized row. Grow the plan up to it the same way the app does:
+    // one row at a time, only after the previous one is marked ready.
+    var plan = store.ensureCurrentPlan(profile);
+    while (!plan.sessions.any(
+      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.listening,
+    )) {
+      _finishSession(db, store, plan.sessions.last);
+      plan = store.ensureCurrentPlan(profile);
+    }
     final listening = plan.sessions.firstWhere(
       (session) =>
           !session.isFoundation && session.primarySkill == SpeakSkill.listening,
@@ -49,17 +115,26 @@ void main() {
   test('a cached A1 artifact is not ready when its French is over-level', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
-    final plan = store.ensureCurrentPlan(
-      Profile(
-        id: 'a1-content-contract',
-        goal: 'everyday',
-        level: 'a1',
-        interests: const ['Speaking'],
-      ),
+    final profile = Profile(
+      id: 'a1-content-contract',
+      goal: 'everyday',
+      level: 'a1',
+      interests: const ['Speaking'],
     );
+    // Speaking is the second personalized row (after vocabulary); mark the
+    // vocabulary row ready first so the store grows to it.
+    var plan = store.ensureCurrentPlan(profile);
+    while (!plan.sessions.any(
+      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+    )) {
+      _finishSession(db, store, plan.sessions.last);
+      plan = store.ensureCurrentPlan(profile);
+    }
     final speaking = plan.sessions.firstWhere(
       (session) =>
-          !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+          !session.isFoundation &&
+          session.primarySkill == SpeakSkill.speaking &&
+          session.status != 'completed',
     );
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
@@ -122,12 +197,11 @@ void main() {
       );
       expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
       expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
+      // Foundation and Unit 2 (sequences 6-10) are both authored, not
+      // generated, so the very first personalized row (vocabulary) is
+      // content-ready immediately too — no AI call, no waiting.
       expect(
-        plan.sessions.take(5).every((session) => session.isContentReady),
-        isTrue,
-      );
-      expect(
-        plan.sessions.skip(5).every((session) => !session.isContentReady),
+        plan.sessions.take(6).every((session) => session.isContentReady),
         isTrue,
       );
       final personalizedTitles = plan.sessions
@@ -144,8 +218,12 @@ void main() {
   );
 
   test(
-    'a single selected focus weights future sessions without removing support',
+    'onboarding interests no longer change the fixed per-unit skill order',
     () {
+      // The learner's interests still choose the situation/context, but the
+      // order of skills within a personalized unit is fixed: vocabulary,
+      // then speaking, reading, listening, writing — regardless of which
+      // interests were selected during onboarding.
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
       final plan = store.ensureCurrentPlan(
         Profile(
@@ -157,13 +235,8 @@ void main() {
       );
 
       final personalized = plan.sessions.skip(5).toList(growable: false);
-      expect(
-        personalized
-            .take(3)
-            .every((session) => session.primarySkill == SpeakSkill.listening),
-        isTrue,
-      );
       expect(personalized, hasLength(1));
+      expect(personalized.single.primarySkill, SpeakSkill.vocabulary);
       expect(
         plan.sessions.take(4).map((session) => session.primarySkill),
         everyElement(SpeakSkill.alphabet),
@@ -206,12 +279,25 @@ void main() {
   test('guided speaking cache rejects instruction prefixes and duplicate cards', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
-    final plan = store.ensureCurrentPlan(
-      Profile(id: 'guided-cache-contract', goal: 'everyday', level: 'a1'),
+    final profile = Profile(
+      id: 'guided-cache-contract',
+      goal: 'everyday',
+      level: 'a1',
     );
+    // Speaking is the second personalized row (after vocabulary); mark the
+    // vocabulary row ready first so the store grows to it.
+    var plan = store.ensureCurrentPlan(profile);
+    while (!plan.sessions.any(
+      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+    )) {
+      _finishSession(db, store, plan.sessions.last);
+      plan = store.ensureCurrentPlan(profile);
+    }
     final speaking = plan.sessions.firstWhere(
       (session) =>
-          !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+          !session.isFoundation &&
+          session.primarySkill == SpeakSkill.speaking &&
+          session.status != 'completed',
     );
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
@@ -269,36 +355,41 @@ void main() {
       level: 'a1',
       interests: const ['Speaking'],
     );
+    // Foundation and Unit 2 (sequences 1-10) are authored, not generated, so
+    // they need no simulated server completion. Fast-forward through them
+    // so this test can focus on the ordinary AI-personalized reserve rule
+    // that starts at sequence 11.
+    var plan = store.ensureCurrentPlan(profile);
+    while (plan.sessions.last.sequence < 10) {
+      store.markCompleted(plan.sessions.last.contentKey);
+      plan = store.ensureCurrentPlan(profile);
+    }
+    store.markCompleted(plan.sessions.last.contentKey);
     final first = store.ensureCurrentPlan(profile);
-    expect(first.sessions, hasLength(6));
+    expect(first.sessions.last.sequence, 11);
+    expect(first.sessions.last.generationStatus, 'queued');
 
-    const readySpeaking =
-        '{"practiceMode":"guidedConversation","lines":['
-        '{"fr":"Bonjour.","en":"Hello."},'
-        '{"fr":"Je m’appelle Léa.","en":"My name is Lea."},'
-        '{"fr":"Merci.","en":"Thank you."}]}';
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
       "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [readySpeaking, first.sessions.last.id],
+      [_readyArtifactFor(first.sessions.last.primarySkill), first.sessions.last.id],
     );
 
     final second = store.ensureCurrentPlan(profile);
-    expect(second.sessions, hasLength(7));
+    expect(second.sessions.last.sequence, 12);
     expect(second.sessions.last.generationStatus, 'queued');
-    expect(store.ensureCurrentPlan(profile).sessions, hasLength(7));
+    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 12);
 
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
       "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [readySpeaking, second.sessions.last.id],
+      [_readyArtifactFor(second.sessions.last.primarySkill), second.sessions.last.id],
     );
-    expect(store.ensureCurrentPlan(profile).sessions, hasLength(7));
+    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 12);
 
-    store.markCompleted(second.sessions[5].contentKey);
+    store.markCompleted(first.sessions.last.contentKey);
     final replenished = store.ensureCurrentPlan(profile);
-    expect(replenished.sessions, hasLength(8));
-    expect(replenished.sessions.last.sequence, 8);
+    expect(replenished.sessions.last.sequence, 13);
     expect(replenished.sessions.last.generationStatus, 'queued');
   });
 
@@ -376,15 +467,19 @@ void main() {
     },
   );
 
-  test('Unit 2 grows one row at a time and stops at five lessons', () {
+  test('Course keeps growing one row at a time past the old five-lesson block', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
     var plan = store.ensureCurrentPlan(profile);
     expect(plan.sessions, hasLength(6));
 
+    // The personalized route is unlimited: keep completing the newest
+    // lesson and asking for the next one well past the old five-lesson
+    // ceiling. It must keep growing one row at a time into a second block
+    // instead of stopping.
     for (
       var personalizedCount = 2;
-      personalizedCount <= 5;
+      personalizedCount <= 6;
       personalizedCount++
     ) {
       store.markCompleted(plan.sessions.last.contentKey);
@@ -395,12 +490,9 @@ void main() {
       );
     }
 
-    store.markCompleted(plan.sessions.last.contentKey);
-    final capped = store.ensureCurrentPlan(profile);
-    expect(capped.sessions, hasLength(10));
-    expect(capped.sessions.last.sequence, 10);
-    expect(capped.sessions.last.blockIndex, 1);
-    expect(capped.sessions.last.blockPosition, adaptiveCourseBatchSize);
+    expect(plan.sessions.last.sequence, 11);
+    expect(plan.sessions.last.blockIndex, 2);
+    expect(plan.sessions.last.blockPosition, 1);
   });
 
   test('personalized batches keep a useful transfer balance', () {
@@ -503,7 +595,10 @@ void main() {
 
     final after = store.ensureCurrentPlan(profile);
     expect(after.id, before.id);
-    expect(after.sessions, hasLength(6));
+    // Unit 2's vocabulary row (sequence 6) was already authored and ready,
+    // so this call grows one more authored row (sequence 7) before the
+    // "no more than two ready ahead" rule stops it.
+    expect(after.sessions, hasLength(7));
   });
 
   test('remote plan and session rows hydrate into the local route', () {

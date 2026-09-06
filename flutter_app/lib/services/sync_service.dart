@@ -244,12 +244,24 @@ class SyncService {
       'source_session_ids_json': session.sourceSessionIds,
       'generation_version': session.generationVersion,
       if (session.isFoundation) 'generation_status': 'ready',
-      if (!session.isFoundation && session.generationStatus == 'queued') ...{
+      if (!session.isFoundation &&
+          session.generationStatus == 'queued' &&
+          session.artifact == null) ...{
         'generation_status': 'queued',
         'artifact_kind': null,
         'artifact_json': null,
         'generation_attempts': 0,
         'generation_error': null,
+      },
+      // Unit 2 is authored on the device (see `_unitTwoArtifact`), so its
+      // artifact must reach the server as-is instead of being nulled out by
+      // the ordinary "queued means nothing generated yet" rule above —
+      // including listening, whose text is already final while only its
+      // audio is still pending.
+      if (!session.isFoundation && session.artifact != null) ...{
+        'generation_status': session.generationStatus,
+        'artifact_kind': session.artifactKind,
+        'artifact_json': session.artifact,
       },
       if (session.contentKey ==
           SpeakingCourseCatalog.firstA1GuidedLessonId) ...{

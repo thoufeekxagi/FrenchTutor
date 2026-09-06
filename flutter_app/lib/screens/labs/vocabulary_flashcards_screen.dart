@@ -77,8 +77,40 @@ class _VocabularyFlashcardsScreenState
   bool _preparing = true;
   bool _completed = false;
   bool _sessionCreated = false;
+  bool _recording = false;
+  String? _pronunciationHint;
   String _preparationStatus = 'Preparing your words…';
   Object? _loadError;
+
+  static const _diacriticMap = {
+    'à': 'a',
+    'â': 'a',
+    'ä': 'a',
+    'ç': 'c',
+    'é': 'e',
+    'è': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'î': 'i',
+    'ï': 'i',
+    'ô': 'o',
+    'ö': 'o',
+    'û': 'u',
+    'ü': 'u',
+    'ù': 'u',
+    'œ': 'oe',
+  };
+
+  String _fold(String text) {
+    var result = text.toLowerCase().trim();
+    _diacriticMap.forEach((accented, plain) {
+      result = result.replaceAll(accented, plain);
+    });
+    return result.replaceAll(RegExp(r'[^a-z0-9 ]'), '').replaceAll(
+      RegExp(r'\s+'),
+      ' ',
+    );
+  }
 
   VocabEntry get _current => _entries[_index];
   bool get _showsSentences =>
@@ -101,7 +133,7 @@ class _VocabularyFlashcardsScreenState
       if (_loadError == null && widget.prefetchAudio) {
         // Course passes a complete persisted set. Warm its word and sentence
         // audio in parallel without regenerating or changing any content.
-        unawaited(_prefetchAudio());
+        unawaited(_prefetchAudioFrom(0));
       }
     } else {
       unawaited(_prepareSet());
@@ -110,7 +142,7 @@ class _VocabularyFlashcardsScreenState
 
   @override
   void dispose() {
-    unawaited(LessonSpeechService.shared.stop());
+    unawaited(LessonSpeechService.shared.deactivate());
     if (_sessionCreated && !_completed) {
       try {
         _sessions.pause(_sessionId);
@@ -122,25 +154,39 @@ class _VocabularyFlashcardsScreenState
     super.dispose();
   }
 
+  /// Only the first word blocks the loading screen. The rest of the set
+  /// keeps preparing in the background (`_prepareRemainingWords`) so a
+  /// learner reaching word two, three, etc. almost never waits — instead of
+  /// this screen sitting on "Preparing…" until the entire five-word deck,
+  /// text and audio alike, is generated.
   Future<void> _prepareSet() async {
     if (_entries.isEmpty) {
       if (mounted) setState(() => _preparing = false);
       return;
     }
 
-    await _prepareExamples();
+    await _prepareExampleFor(0);
     if (widget.prefetchAudio) {
       _setPreparationStatus(
         _showsSentences
             ? 'Caching word and sentence audio…'
             : 'Caching pronunciation audio…',
       );
-      await _prefetchAudio();
+      await _prefetchAudioFor(0);
     }
 
     _createSession();
 
     if (mounted) setState(() => _preparing = false);
+    unawaited(_prepareRemainingWords());
+  }
+
+  Future<void> _prepareRemainingWords() async {
+    for (var index = 1; index < _entries.length; index++) {
+      await _prepareExampleFor(index);
+    }
+    if (widget.prefetchAudio) await _prefetchAudioFrom(1);
+    if (mounted) setState(() {});
   }
 
   void _preparePersistedSet() {
@@ -176,40 +222,54 @@ class _VocabularyFlashcardsScreenState
     }
   }
 
-  Future<void> _prepareExamples() async {
+  Future<void> _prepareExampleFor(int index) async {
     if (!_showsSentences) return;
     if (widget.preparedContentOnly) return;
-    final agent = ref.read(lessonAgentServiceProvider);
-    for (var index = 0; index < _entries.length; index++) {
-      final entry = _entries[index];
-      if (_examples.containsKey(entry.id)) continue;
-      _setPreparationStatus(
-        'Preparing sentence ${index + 1} of ${_entries.length}…',
+    final entry = _entries[index];
+    if (_examples.containsKey(entry.id)) return;
+    _setPreparationStatus('Preparing sentence ${index + 1} of ${_entries.length}…');
+
+    final bundled = ContentService.shared.vocabExamples(entry.id);
+    if (bundled != null) {
+      _examples[entry.id] = bundled;
+      return;
+    }
+
+    try {
+      final agent = ref.read(lessonAgentServiceProvider);
+      _examples[entry.id] = await agent.generateVocabularyContext(
+        word: entry,
+        levelBand: widget.levelBand,
       );
-
-      final bundled = ContentService.shared.vocabExamples(entry.id);
-      if (bundled != null) {
-        _examples[entry.id] = bundled;
-        continue;
-      }
-
-      try {
-        _examples[entry.id] = await agent.generateVocabularyContext(
-          word: entry,
-          levelBand: widget.levelBand,
-        );
-      } catch (error) {
-        // A curated story always supplies this. For a custom set, keep the
-        // lesson usable and let the sentence card show a recoverable state.
-        _loadError = error;
-        debugPrint('Vocabulary sentence preparation failed: $error');
-      }
+    } catch (error) {
+      // A curated story always supplies this. For a custom set, keep the
+      // lesson usable and let the sentence card show a recoverable state.
+      _loadError = error;
+      debugPrint('Vocabulary sentence preparation failed: $error');
     }
   }
 
-  Future<void> _prefetchAudio() async {
+  /// Warms just [index]'s own word/sentence audio. Used to unblock the
+  /// loading screen on the first word only.
+  Future<void> _prefetchAudioFor(int index) => _prefetchAudioItems(
+    _audioItemsFor(index, index),
+    timeout: const Duration(seconds: 30),
+  );
+
+  /// Warms every word from [startIndex] onward, in the background, using
+  /// `warmDeck`'s own small parallel worker pool.
+  Future<void> _prefetchAudioFrom(int startIndex) => _prefetchAudioItems(
+    _audioItemsFor(startIndex, _entries.length - 1),
+    timeout: const Duration(seconds: 60),
+  );
+
+  List<({String text, String contentItemId})> _audioItemsFor(
+    int start,
+    int end,
+  ) {
     final items = <({String text, String contentItemId})>[];
-    for (final entry in _entries) {
+    for (var i = start; i <= end; i++) {
+      final entry = _entries[i];
       items.add((text: entry.fr, contentItemId: _audioId(entry, 'word')));
       final example = _examples[entry.id];
       if (_showsSentences && example != null) {
@@ -219,12 +279,18 @@ class _VocabularyFlashcardsScreenState
         ));
       }
     }
-    if (items.isEmpty) return;
+    return items;
+  }
 
+  Future<void> _prefetchAudioItems(
+    List<({String text, String contentItemId})> items, {
+    required Duration timeout,
+  }) async {
+    if (items.isEmpty) return;
     try {
       await GeminiLiveAudioService.shared
           .warmDeck(items: items, voiceName: ActiveTutor.current.voiceName)
-          .timeout(const Duration(seconds: 60));
+          .timeout(timeout);
     } catch (error) {
       // Audio warming is best effort. The same persistent resolver remains as
       // a safe fallback if a device is offline or the provider is unavailable.
@@ -247,6 +313,76 @@ class _VocabularyFlashcardsScreenState
       _revealedWordIds.add(_current.id);
     });
     _saveProgress();
+  }
+
+  /// Records the learner's attempt and verifies it against the target word
+  /// through the same Gemini transcript path the speaking flow uses. A word
+  /// only becomes complete once the learner is actually heard saying it —
+  /// this must never auto-complete on tap alone.
+  Future<void> _recordAndVerify() async {
+    if (_recording || _wordComplete) return;
+    setState(() {
+      _recording = true;
+      _pronunciationHint = null;
+    });
+    final target = _current;
+    await LessonSpeechService.shared.startListening(
+      locale: 'fr-FR',
+      onPartial: (_) {},
+      onFinal: (transcript) {
+        if (!mounted) return;
+        final heard = _fold(transcript);
+        final wanted = _fold(target.fr);
+        final matches =
+            heard.isNotEmpty &&
+            (heard.contains(wanted) || wanted.contains(heard));
+        setState(() {
+          _recording = false;
+          _pronunciationHint = matches
+              ? null
+              : heard.isEmpty
+              ? "Didn't catch that — tap the mic and try again."
+              : 'Not quite — try saying "${target.fr}" again.';
+        });
+        if (matches && identical(target, _current)) _completeWord();
+      },
+    );
+  }
+
+  Widget _repeatWordControl() {
+    return GestureDetector(
+      onTap: _recording ? null : _recordAndVerify,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _recording
+                  ? DesignTokens.nightAccent.withValues(alpha: 0.18)
+                  : DesignTokens.nightAccentSoft,
+              border: Border.all(
+                color: DesignTokens.nightAccent,
+                width: _recording ? 2 : 1,
+              ),
+            ),
+            child: Icon(
+              _recording ? Icons.graphic_eq_rounded : Icons.mic_none_rounded,
+              color: DesignTokens.nightAccent,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _recording ? 'Listening…' : 'Tap to say it',
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
+          ),
+        ],
+      ),
+    );
   }
 
   void _completeWord() {
@@ -299,6 +435,8 @@ class _VocabularyFlashcardsScreenState
       _index += 1;
       _meaningRevealed = false;
       _wordComplete = false;
+      _recording = false;
+      _pronunciationHint = null;
       _loadError = null;
     });
     _saveProgress();
@@ -329,7 +467,9 @@ class _VocabularyFlashcardsScreenState
             _wordComplete
                 ? 'Repeat the sentence, then move to the next word.'
                 : _meaningRevealed
-                ? 'Say the word out loud, then continue.'
+                ? _recording
+                    ? 'Listening…'
+                    : 'Tap the mic and say the word out loud.'
                 : 'Double-tap the word to reveal its meaning.',
             style: DesignTokens.body(
               15,
@@ -339,11 +479,17 @@ class _VocabularyFlashcardsScreenState
           _wordCard(),
           if (!_wordComplete && _meaningRevealed) ...[
             const SizedBox(height: 16),
-            V3PrimaryButton(
-              label: 'Repeat word',
-              icon: Icons.record_voice_over_rounded,
-              onPressed: _completeWord,
-            ),
+            Center(child: _repeatWordControl()),
+            if (_pronunciationHint != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                _pronunciationHint!,
+                textAlign: TextAlign.center,
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.muted),
+              ),
+            ],
           ],
           if (_wordComplete && _showsSentences) ...[
             const SizedBox(height: 16),
@@ -475,7 +621,6 @@ class _VocabularyFlashcardsScreenState
           const SizedBox(height: 16),
           TtsPlayButton(
             text: entry.fr,
-            label: 'Listen to word',
             contentItemId: _audioId(entry, 'word'),
             audioResolver: () => GeminiLiveAudioService.shared.resolve(
               text: entry.fr,
@@ -573,7 +718,6 @@ class _VocabularyFlashcardsScreenState
                   alignment: Alignment.centerLeft,
                   child: TtsPlayButton(
                     text: example.fr,
-                    label: 'Repeat sentence',
                     contentItemId: _audioId(_current, 'sentence'),
                     audioResolver: () => GeminiLiveAudioService.shared.resolve(
                       text: example.fr,

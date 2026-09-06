@@ -76,16 +76,11 @@ void main() {
     await tester.tap(find.text('faim'));
     await tester.pumpAndSettle();
     expect(find.text('hungry'), findsOneWidget);
-    expect(find.text('Repeat word'), findsOneWidget);
+    // The word only becomes complete once the learner is actually heard
+    // saying it (verified through Gemini's transcript), so this screen must
+    // show the mic prompt here, not an auto-completing button.
+    expect(find.text('Tap to say it'), findsOneWidget);
+    expect(find.text('Repeat word'), findsNothing);
     expect(find.text('J’ai faim ce matin.'), findsNothing);
-
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Repeat word'));
-    await tester.pumpAndSettle();
-    expect(find.text('J’ai faim ce matin.'), findsOneWidget);
-    expect(find.text('I’m hungry this morning.'), findsOneWidget);
-    expect(find.text('Repeat sentence'), findsOneWidget);
-    expect(find.text('œuf'), findsNothing);
   });
 }

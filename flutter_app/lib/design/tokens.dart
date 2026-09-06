@@ -106,6 +106,13 @@ abstract final class DesignTokens {
     colors: [canvas, primarySoft],
   );
 
+  /// Google's own sign-in button colors are fixed by Google's brand
+  /// guidelines and must not follow the app's own light/dark palette. Kept
+  /// here, not inline in the auth screen, so no screen carries a raw hex
+  /// literal.
+  static const Color googleButtonForeground = Color(0xFF202124);
+  static const Color googleButtonBorder = Color(0xFFDADCE0);
+
   // V3 night surface used by the redesigned Home experience. Keeping these
   // values here makes the dark/gold skin reusable by the next screen without
   // scattering brand colors through individual widgets.
