@@ -134,14 +134,22 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
       _noProgressAttempts = 0;
       return;
     }
-    if (pending.contentKey == _stuckOnContentKey) {
-      _noProgressAttempts += 1;
-    } else {
+    // A different pending lesson than last time means the previous one just
+    // finished — real progress, not a stall. Move on to the next one right
+    // away instead of imposing the same "give the backend a moment" floor a
+    // genuinely stuck lesson needs. The backoff ladder exists for the
+    // second case only; the first case is the server already being fast
+    // and the UI has no reason to sit on that for even one extra second.
+    final madeProgress = pending.contentKey != _stuckOnContentKey;
+    if (madeProgress) {
       _stuckOnContentKey = pending.contentKey;
       _noProgressAttempts = 1;
+    } else {
+      _noProgressAttempts += 1;
     }
-    final delay =
-        _retryBackoff[(_noProgressAttempts - 1).clamp(0, _retryBackoff.length - 1)];
+    final delay = madeProgress
+        ? Duration.zero
+        : _retryBackoff[(_noProgressAttempts - 1).clamp(0, _retryBackoff.length - 1)];
     _retryTimer = Timer(delay, () {
       if (mounted) _prepareCourse();
     });
