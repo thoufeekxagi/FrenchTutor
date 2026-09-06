@@ -11,6 +11,7 @@ import '../../models/speak_curriculum.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_artifact_codec.dart';
 import '../../services/lesson_asset_prefetch_service.dart';
+import '../../services/premium_access_gate.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
@@ -154,6 +155,21 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
     }
   }
 
+  /// Tapping a subscription-locked Unit 2+ lesson must show the paywall,
+  /// the same as every other premium area — never a silent no-op.
+  Future<void> _openPaywall(SpeakRoadmapSession session) async {
+    final unlocked = await requirePremiumArea(
+      context,
+      ref,
+      PremiumArea.course,
+      source: 'course_roadmap',
+    );
+    if (unlocked) {
+      setState(() {});
+      await _openSession(session);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(learningStoreProvider).profile();
@@ -284,7 +300,15 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
           for (final unit in units) ...[
             _unitHeader(roadmap, unit),
             const SizedBox(height: 10),
-            _unitPath(context, roadmap, unit, locked: courseLocked),
+            // Unit 1 is the free foundation every new learner needs to try
+            // Course at all; the subscription gate only ever applies from
+            // Unit 2 onward.
+            _unitPath(
+              context,
+              roadmap,
+              unit,
+              locked: courseLocked && unit > 1,
+            ),
             const SizedBox(height: 14),
           ],
         ],
@@ -365,7 +389,10 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
     required bool locked,
   }) {
     final preparing = !session.contentReady && !session.completed;
-    final unavailable = locked || preparing;
+    // A subscription-locked lesson must still be tappable: tapping it is
+    // exactly what should show the paywall, matching Practice's behavior.
+    // Only "not generated yet" truly disables the tap.
+    final unavailable = preparing;
     final active = featured && !session.completed && !preparing;
     final statusLabel = preparing
         ? 'preparing'
@@ -391,7 +418,9 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
         borderColor: active
             ? DesignTokens.nightAccent
             : DesignTokens.nightHairline,
-        onTap: unavailable ? null : () => _openSession(session),
+        onTap: unavailable
+            ? null
+            : () => locked ? _openPaywall(session) : _openSession(session),
         child: Row(
           children: [
             Container(
