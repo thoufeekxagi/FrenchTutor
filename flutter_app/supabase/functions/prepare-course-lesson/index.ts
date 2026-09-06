@@ -10,6 +10,12 @@ const headers = {
 
 type Json = Record<string, unknown>;
 
+// Mirrors adaptiveCourseFoundationSize/adaptiveCourseBatchSize in
+// lib/data/database/adaptive_course_store.dart. Sequences 1-5 (foundation)
+// and 6-10 (Unit 2) are both fixed, authored content for every learner;
+// real AI generation only begins at sequence 11.
+const AUTHORED_SEQUENCE_CEILING = 10;
+
 function response(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
@@ -721,11 +727,19 @@ Deno.serve(async (request: Request) => {
   // maximum five-lesson personalized reserve, and exactly one of those rows
   // may be waiting for generation. Completed and already-ready lessons are
   // preserved; only surplus unfinished placeholders are retired.
+  //
+  // This reserve/retirement accounting must only ever see real AI-generated
+  // lessons (sequence 11+). Unit 2 (6-10) is fixed, authored, permanent
+  // content for every learner, not a cost-driven generation queue: it is
+  // never a "surplus placeholder" to retire, and its instantly-ready rows
+  // must never count toward "already have enough ready ahead" and block
+  // its own listening lesson (the one row that still needs a real
+  // generation call) from ever being claimed.
   const { data: activePersonalized, error: reserveError } = await admin
     .from("adaptive_course_sessions")
     .select("id, sequence, status, generation_status, updated_at, primary_skill, title, artifact_json")
     .eq("user_id", userId)
-    .gt("sequence", 5)
+    .gt("sequence", AUTHORED_SEQUENCE_CEILING)
     .in("status", ["planned", "active"])
     .is("deleted_at", null)
     .order("sequence", { ascending: true });
