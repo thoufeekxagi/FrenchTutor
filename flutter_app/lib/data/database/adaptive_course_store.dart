@@ -1594,8 +1594,8 @@ abstract final class AdaptiveCoursePlanGenerator {
       tip: 'Read once for the general idea.',
     ),
     (
-      fr: 'Une vendeuse leur montre son meilleur panier.',
-      en: 'A seller shows them her best basket.',
+      fr: 'Une vendeuse leur montre un beau panier.',
+      en: 'A seller shows them a nice basket.',
       note: '"Leur" = to them.',
       tip: 'Read once for the general idea.',
     ),
@@ -1613,10 +1613,15 @@ abstract final class AdaptiveCoursePlanGenerator {
     ),
   ];
 
+  // A1 means present tense only, no superlatives, no futur simple — every
+  // line here must hold up on its own as beginner French, not just carry
+  // an "A1" label. (An earlier version of this set used "commence à se
+  // calmer", a superlative "les plus fraîches", and futur simple
+  // "commencera" — all genuinely too advanced for a true beginner.)
   static const _unitTwoListeningSegments = [
     (
-      fr: 'Le soir, le marché commence à se calmer.',
-      en: 'In the evening, the market starts to calm down.',
+      fr: 'Le soir, le marché est calme.',
+      en: 'In the evening, the market is calm.',
       note: 'A new scene: closing time, not morning.',
       tip: 'Listen once, then repeat naturally.',
     ),
@@ -1633,15 +1638,15 @@ abstract final class AdaptiveCoursePlanGenerator {
       tip: 'Listen once, then repeat naturally.',
     ),
     (
-      fr: 'Elle range les pommes les plus fraîches.',
-      en: 'She puts away the freshest apples.',
-      note: '"Les plus fraîches" = the freshest.',
+      fr: 'Elle range les pommes fraîches.',
+      en: 'She puts away the fresh apples.',
+      note: '"Range" = puts away.',
       tip: 'Listen once, then repeat naturally.',
     ),
     (
-      fr: 'Demain, un nouveau marché commencera tôt.',
-      en: 'Tomorrow, a new market will start early.',
-      note: 'A simple future for what happens next.',
+      fr: 'Demain, un nouveau marché ouvre tôt.',
+      en: 'Tomorrow, a new market opens early.',
+      note: 'Present tense with "demain" for the near future.',
       tip: 'Listen once, then repeat naturally.',
     ),
   ];
@@ -1739,8 +1744,8 @@ abstract final class AdaptiveCoursePlanGenerator {
           },
           'quiz': [
             {
-              'q': 'Pourquoi Léa et sa mère vont-elles au marché ?',
-              'q_en': 'Why do Léa and her mother go to the market?',
+              'q': 'Pourquoi est-ce que Léa va au marché ?',
+              'q_en': 'Why does Léa go to the market?',
               'choices': [
                 'Pour un gâteau.',
                 'Pour dormir.',
