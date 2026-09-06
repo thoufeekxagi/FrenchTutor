@@ -148,24 +148,33 @@ abstract final class SpeakRoadmapService {
     );
   }
 
-  /// Course generation is a serial pipeline. Older app versions persisted an
-  /// entire future path as queued placeholders, so rendering the raw plan can
-  /// misleadingly show many lessons as if they were generating together.
-  /// Keep completed/ready lessons, but expose only the next single unfinished
-  /// artifact. The server applies the same rule before claiming work.
+  /// Foundation (1-5) and Unit 2 (6-10) are both authored, not AI-generated,
+  /// and are the same permanent default content for every learner. They are
+  /// always fully listed — including a lesson still preparing its audio —
+  /// the same way foundation always has been; there is no cost reason to
+  /// hide free, fixed content one row at a time.
+  ///
+  /// Sequence 11+ is real AI generation, one lesson at a time. Older app
+  /// versions persisted an entire future path as queued placeholders there,
+  /// so rendering the raw plan could misleadingly show many lessons as if
+  /// they were generating together. Keep completed/ready lessons visible,
+  /// but expose only the next single unfinished artifact. The server applies
+  /// the same rule before claiming work.
   static List<AdaptiveCourseSessionSpec> _visibleCourseSessions(
     List<AdaptiveCourseSessionSpec> sessions,
   ) {
     final ordered = [...sessions]
       ..sort((a, b) => a.sequence.compareTo(b.sequence));
-    final foundation = ordered
-        .where((session) => session.isFoundation)
+    const defaultUnitEnd =
+        adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
+    final alwaysVisible = ordered
+        .where((session) => session.sequence <= defaultUnitEnd)
         .toList(growable: false);
-    // The personalized route is unlimited: every completed or ready lesson
-    // stays visible (course history), plus at most one row that is still
-    // being prepared. There is no cap on how far the route can grow.
+    // The personalized route beyond Unit 2 is unlimited: every completed or
+    // ready lesson stays visible (course history), plus at most one row
+    // that is still being prepared. There is no cap on how far it can grow.
     final personalized = ordered
-        .where((session) => !session.isFoundation)
+        .where((session) => session.sequence > defaultUnitEnd)
         .toList(growable: false);
     final visiblePersonalized = <AdaptiveCourseSessionSpec>[];
     final readyAvailable = personalized
@@ -183,7 +192,7 @@ abstract final class SpeakRoadmapService {
         includedPending = true;
       }
     }
-    return [...foundation, ...visiblePersonalized];
+    return [...alwaysVisible, ...visiblePersonalized];
   }
 
   static SpeakSessionKind _kindFor(SpeakSkill skill) => switch (skill) {

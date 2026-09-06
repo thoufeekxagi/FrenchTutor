@@ -8,11 +8,15 @@ import '../../data/database/vocabulary_session_store.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/srs_state.dart';
+import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../providers/tutor_helper_provider.dart';
 import '../../models/tutor_persona.dart';
 import '../../services/gemini_live_audio_service.dart';
+import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/srs_service.dart';
+import '../../services/tutor_helper_settings.dart';
 import '../../widgets/tts_play_button.dart';
 import '../../widgets/v3/v3_surface.dart';
 
@@ -60,11 +64,13 @@ class VocabularyFlashcardsScreen extends ConsumerStatefulWidget {
 }
 
 class _VocabularyFlashcardsScreenState
-    extends ConsumerState<VocabularyFlashcardsScreen> {
+    extends ConsumerState<VocabularyFlashcardsScreen>
+    with WidgetsBindingObserver {
   late final List<VocabEntry> _entries;
   late final String _sessionId;
   late final SRSService _srs;
   late final VocabularySessionStore _sessions;
+  late final InlineCallController _murray;
 
   final Map<String, String> _grades = {};
   final Map<String, BilingualExample> _examples = {};
@@ -81,6 +87,18 @@ class _VocabularyFlashcardsScreenState
   String? _pronunciationHint;
   String _preparationStatus = 'Preparing your words…';
   Object? _loadError;
+
+  // Sentence testing is optional (the learner can skip straight to Next);
+  // word testing is not.
+  bool _sentenceTested = false;
+  bool _sentenceRecording = false;
+  String? _sentenceHint;
+
+  String? _heard;
+  bool _murrayTurnClosing = false;
+  bool _murrayGradeReceived = false;
+  Timer? _murrayGradeTimeout;
+  bool _testingSentence = false;
 
   static const _diacriticMap = {
     'à': 'a',
@@ -119,6 +137,7 @@ class _VocabularyFlashcardsScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _entries = widget.entries
         .where((entry) => entry.fr.trim().isNotEmpty)
         .take(5)
@@ -128,6 +147,15 @@ class _VocabularyFlashcardsScreenState
     _sessionId =
         'vocabulary-flashcards-${DateTime.now().microsecondsSinceEpoch}';
     _examples.addAll(widget.storyExamples);
+    _murray = InlineCallController(
+      sessionType: LiveSessionType.vocabStage,
+      lessonContext: _murrayContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () => mounted ? setState(() {}) : null,
+      manualLearnerTurns: true,
+      onUserTranscript: _onMurrayTranscript,
+      onTurnComplete: _onMurrayTurnComplete,
+    );
     if (widget.preparedContentOnly) {
       _preparePersistedSet();
       if (_loadError == null && widget.prefetchAudio) {
@@ -138,10 +166,44 @@ class _VocabularyFlashcardsScreenState
     } else {
       unawaited(_prepareSet());
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_maybeStartMurray());
+    });
+  }
+
+  /// Wires the same live pronunciation check speaking uses: connect once,
+  /// silently, when this word/sentence surface's tutor-helper toggle is on.
+  /// A failed or declined connection is not an error — the record button
+  /// simply falls back to the plain mic-capture check.
+  Future<void> _maybeStartMurray() async {
+    final enabled = ref
+        .read(tutorHelperSettingsProvider)
+        .isEnabled(TutorHelperSurface.vocabulary);
+    if (!enabled || !mounted) return;
+    await _murray.start(context, sendOpeningPrompt: false);
+  }
+
+  String _murrayContext() {
+    final entry = _current;
+    final example = _examples[entry.id];
+    return 'Vocabulary pronunciation check. Word ${_index + 1} of '
+        '${_entries.length}: "${entry.fr}" = "${entry.en}".'
+        '${example != null ? ' Example sentence: "${example.fr}" = "${example.en}".' : ''} '
+        'This is a silent pronunciation check only: never speak unless the '
+        'app explicitly asks you to grade an attempt. Do not teach, greet, '
+        'or comment.';
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _murray.handleAppLifecycle(state);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _murrayGradeTimeout?.cancel();
+    _murray.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
     if (_sessionCreated && !_completed) {
       try {
@@ -315,43 +377,111 @@ class _VocabularyFlashcardsScreenState
     _saveProgress();
   }
 
-  /// Records the learner's attempt and verifies it against the target word
-  /// through the same Gemini transcript path the speaking flow uses. A word
-  /// only becomes complete once the learner is actually heard saying it —
-  /// this must never auto-complete on tap alone.
-  Future<void> _recordAndVerify() async {
-    if (_recording || _wordComplete) return;
+  /// Records the learner's attempt and verifies it against the target
+  /// (word, or optionally its sentence) live, through the same Gemini Live
+  /// connection and hear/repeat/check contract the Speaking Guided flow
+  /// uses — not a separate, dumber mechanism. When the tutor helper is off
+  /// or the call is unavailable, this falls back to a plain mic capture and
+  /// transcript check so the learner is never blocked. A word only becomes
+  /// complete once the learner is actually heard saying it — this must
+  /// never auto-complete on tap alone.
+  Future<void> _toggleRecording({required bool sentence}) async {
+    final active = sentence ? _sentenceRecording : _recording;
+    if (active) {
+      if (_murray.isLive) {
+        _murrayTurnClosing = true;
+        await _murray.endLearnerTurn();
+        _murrayGradeTimeout?.cancel();
+        _murrayGradeTimeout = Timer(const Duration(seconds: 12), () {
+          if (!mounted || _murrayGradeReceived) return;
+          _resolveAttempt(_heard ?? '', sentence: sentence);
+        });
+      } else {
+        await LessonSpeechService.shared.stopListening();
+      }
+      return;
+    }
+    if (!sentence && _wordComplete) return;
+    final target = sentence ? (_examples[_current.id]?.fr ?? '') : _current.fr;
+    if (target.trim().isEmpty) return;
     setState(() {
-      _recording = true;
-      _pronunciationHint = null;
+      _testingSentence = sentence;
+      _heard = '';
+      _murrayGradeReceived = false;
+      if (sentence) {
+        _sentenceRecording = true;
+        _sentenceHint = null;
+      } else {
+        _recording = true;
+        _pronunciationHint = null;
+      }
     });
-    final target = _current;
+    if (_murray.isReadyForLearnerTurn) {
+      _murrayTurnClosing = false;
+      final started = await _murray.startLearnerTurn();
+      if (started) return;
+    }
     await LessonSpeechService.shared.startListening(
       locale: 'fr-FR',
       onPartial: (_) {},
-      onFinal: (transcript) {
-        if (!mounted) return;
-        final heard = _fold(transcript);
-        final wanted = _fold(target.fr);
-        final matches =
-            heard.isNotEmpty &&
-            (heard.contains(wanted) || wanted.contains(heard));
-        setState(() {
-          _recording = false;
-          _pronunciationHint = matches
-              ? null
-              : heard.isEmpty
-              ? "Didn't catch that — tap the mic and try again."
-              : 'Not quite — try saying "${target.fr}" again.';
-        });
-        if (matches && identical(target, _current)) _completeWord();
-      },
+      onFinal: (transcript) => _resolveAttempt(transcript, sentence: sentence),
     );
+  }
+
+  void _onMurrayTranscript(String transcript) {
+    if (!mounted) return;
+    final cleaned = transcript.trim();
+    if (cleaned.isEmpty) return;
+    final current = (_heard ?? '').trim();
+    _heard = current.isEmpty ? cleaned : '$current $cleaned';
+    if (!_murrayTurnClosing || _murrayGradeReceived) return;
+    _murrayGradeReceived = true;
+    _murrayGradeTimeout?.cancel();
+    _resolveAttempt(_heard!, sentence: _testingSentence);
+  }
+
+  void _onMurrayTurnComplete() {
+    if (!mounted || !_murrayTurnClosing || _murrayGradeReceived) return;
+    final transcript = (_heard ?? '').trim();
+    if (transcript.isEmpty) return;
+    _murrayGradeReceived = true;
+    _murrayGradeTimeout?.cancel();
+    _resolveAttempt(transcript, sentence: _testingSentence);
+  }
+
+  void _resolveAttempt(String transcript, {required bool sentence}) {
+    if (!mounted) return;
+    final target = sentence ? (_examples[_current.id]?.fr ?? '') : _current.fr;
+    final heard = _fold(transcript);
+    final wanted = _fold(target);
+    final matches =
+        heard.isNotEmpty &&
+        (heard.contains(wanted) || wanted.contains(heard));
+    _murrayTurnClosing = false;
+    setState(() {
+      if (sentence) {
+        _sentenceRecording = false;
+        _sentenceHint = matches
+            ? null
+            : heard.isEmpty
+            ? "Didn't catch that — try again."
+            : 'Not quite — try saying "$target" again.';
+        if (matches) _sentenceTested = true;
+      } else {
+        _recording = false;
+        _pronunciationHint = matches
+            ? null
+            : heard.isEmpty
+            ? "Didn't catch that — tap the mic and try again."
+            : 'Not quite — try saying "$target" again.';
+        if (matches) _completeWord();
+      }
+    });
   }
 
   Widget _repeatWordControl() {
     return GestureDetector(
-      onTap: _recording ? null : _recordAndVerify,
+      onTap: () => _toggleRecording(sentence: false),
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -377,7 +507,53 @@ class _VocabularyFlashcardsScreenState
           ),
           const SizedBox(height: 8),
           Text(
-            _recording ? 'Listening…' : 'Tap to say it',
+            _recording ? 'Tap to stop' : 'Tap to say it',
+            style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The sentence check is optional: the learner may test it the same live
+  /// way as the word, or skip straight to Next.
+  Widget _testSentenceControl() {
+    return GestureDetector(
+      onTap: () => _toggleRecording(sentence: true),
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _sentenceRecording
+                  ? DesignTokens.nightAccent.withValues(alpha: 0.18)
+                  : DesignTokens.nightAccentSoft,
+              border: Border.all(
+                color: DesignTokens.nightAccent,
+                width: _sentenceRecording ? 2 : 1,
+              ),
+            ),
+            child: Icon(
+              _sentenceTested
+                  ? Icons.check_rounded
+                  : _sentenceRecording
+                  ? Icons.graphic_eq_rounded
+                  : Icons.mic_none_rounded,
+              color: DesignTokens.nightAccent,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _sentenceRecording
+                ? 'Tap to stop'
+                : _sentenceTested
+                ? 'Sentence checked'
+                : 'Test this sentence (optional)',
             style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
           ),
         ],
@@ -437,8 +613,12 @@ class _VocabularyFlashcardsScreenState
       _wordComplete = false;
       _recording = false;
       _pronunciationHint = null;
+      _sentenceTested = false;
+      _sentenceRecording = false;
+      _sentenceHint = null;
       _loadError = null;
     });
+    _murray.updateLessonContext();
     _saveProgress();
   }
 
@@ -714,21 +894,34 @@ class _VocabularyFlashcardsScreenState
                   ).copyWith(color: DesignTokens.muted, height: 1.3),
                 ),
                 const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TtsPlayButton(
-                    text: example.fr,
-                    contentItemId: _audioId(_current, 'sentence'),
-                    audioResolver: () => GeminiLiveAudioService.shared.resolve(
+                Row(
+                  children: [
+                    TtsPlayButton(
                       text: example.fr,
                       contentItemId: _audioId(_current, 'sentence'),
-                      voiceName: ActiveTutor.current.voiceName,
+                      audioResolver: () =>
+                          GeminiLiveAudioService.shared.resolve(
+                            text: example.fr,
+                            contentItemId: _audioId(_current, 'sentence'),
+                            voiceName: ActiveTutor.current.voiceName,
+                          ),
+                      color: DesignTokens.nightAccent,
+                      size: 40,
+                      iconSize: 19,
                     ),
-                    color: DesignTokens.nightAccent,
-                    size: 40,
-                    iconSize: 19,
-                  ),
+                    const SizedBox(width: 4),
+                    _testSentenceControl(),
+                  ],
                 ),
+                if (_sentenceHint != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _sentenceHint!,
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.muted),
+                  ),
+                ],
               ],
             ),
     );

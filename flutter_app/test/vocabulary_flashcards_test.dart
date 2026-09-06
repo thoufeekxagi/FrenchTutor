@@ -7,6 +7,7 @@ import 'package:french_tutor/design/app_theme.dart';
 import 'package:french_tutor/models/content_models.dart';
 import 'package:french_tutor/providers/database_provider.dart';
 import 'package:french_tutor/screens/labs/vocabulary_flashcards_screen.dart';
+import 'package:french_tutor/services/tutor_helper_settings.dart';
 import 'package:french_tutor/services/vocabulary_story_catalog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +17,17 @@ VocabEntry word(String id) =>
 
 void main() {
   setUpAll(() async {
-    SharedPreferences.setMockInitialValues({});
+    // Vocabulary's tutor-helper (live pronunciation check) defaults to on;
+    // keep it off here so this test exercises the plain mic-capture fallback
+    // path deterministically, without depending on a real Gemini Live call
+    // or the AI voice consent dialog.
+    SharedPreferences.setMockInitialValues({
+      'tutor_helper_enabled_vocabulary': false,
+    });
+    // Loading is otherwise fire-and-forget from the provider; wait for it
+    // here so the screen never races it and reads the (wrong) in-memory
+    // default before the persisted "off" value has loaded.
+    await TutorHelperSettings.shared.load();
     await Supabase.initialize(
       url: 'https://test.supabase.co',
       publishableKey: 'sb_publishable_test_key',

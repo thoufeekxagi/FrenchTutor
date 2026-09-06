@@ -148,7 +148,7 @@ void main() {
   });
 
   test(
-    'fresh learner gets five foundations and one personalized specification',
+    'fresh learner gets five foundations and a full authored Unit 2',
     () {
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
       final plan = store.ensureCurrentPlan(
@@ -160,10 +160,13 @@ void main() {
         ),
       );
 
-      expect(plan.sessions, hasLength(6));
+      // Foundation (1-5) and Unit 2 (6-10) are both authored, permanent
+      // default content for every learner: all ten rows exist immediately,
+      // no waiting, no AI call.
+      expect(plan.sessions, hasLength(10));
       expect(
         plan.sessions.map((session) => session.contentKey).toSet(),
-        hasLength(6),
+        hasLength(10),
       );
       expect(plan.sessions.first.context, contains('Meetings'));
       expect(plan.sessions.every((session) => session.level == 'A1'), isTrue);
@@ -197,18 +200,33 @@ void main() {
       );
       expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
       expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
-      // Foundation and Unit 2 (sequences 6-10) are both authored, not
-      // generated, so the very first personalized row (vocabulary) is
-      // content-ready immediately too — no AI call, no waiting.
+      // Unit 2's skills are fixed by position (vocabulary, speaking,
+      // reading, listening, writing); only listening still needs its
+      // durable audio track attached server-side.
+      final unitTwo = plan.sessions.skip(5).toList(growable: false);
+      expect(unitTwo.map((s) => s.primarySkill), [
+        SpeakSkill.vocabulary,
+        SpeakSkill.speaking,
+        SpeakSkill.reading,
+        SpeakSkill.listening,
+        SpeakSkill.writing,
+      ]);
       expect(
-        plan.sessions.take(6).every((session) => session.isContentReady),
+        unitTwo
+            .where((s) => s.primarySkill != SpeakSkill.listening)
+            .every((s) => s.isContentReady),
         isTrue,
       );
-      final personalizedTitles = plan.sessions
-          .skip(5)
+      expect(
+        unitTwo
+            .firstWhere((s) => s.primarySkill == SpeakSkill.listening)
+            .isContentReady,
+        isFalse,
+      );
+      final personalizedTitles = unitTwo
           .map((session) => session.title.toLowerCase())
           .toList(growable: false);
-      expect(personalizedTitles.toSet(), hasLength(1));
+      expect(personalizedTitles.toSet(), hasLength(5));
       expect(personalizedTitles, isNot(contains('introduce yourself')));
       expect(
         personalizedTitles,
@@ -235,8 +253,8 @@ void main() {
       );
 
       final personalized = plan.sessions.skip(5).toList(growable: false);
-      expect(personalized, hasLength(1));
-      expect(personalized.single.primarySkill, SpeakSkill.vocabulary);
+      expect(personalized, hasLength(5));
+      expect(personalized.first.primarySkill, SpeakSkill.vocabulary);
       expect(
         plan.sessions.take(4).map((session) => session.primarySkill),
         everyElement(SpeakSkill.alphabet),
@@ -355,16 +373,16 @@ void main() {
       level: 'a1',
       interests: const ['Speaking'],
     );
-    // Foundation and Unit 2 (sequences 1-10) are authored, not generated, so
-    // they need no simulated server completion. Fast-forward through them
-    // so this test can focus on the ordinary AI-personalized reserve rule
-    // that starts at sequence 11.
-    var plan = store.ensureCurrentPlan(profile);
-    while (plan.sessions.last.sequence < 10) {
-      store.markCompleted(plan.sessions.last.contentKey);
-      plan = store.ensureCurrentPlan(profile);
+    // Foundation and Unit 2 (sequences 1-10) are authored, not generated, and
+    // all exist from the first call — no simulated server completion is
+    // needed for them. Complete all of Unit 2 (including the still-unready
+    // listening lesson, which a real learner only reaches once its audio is
+    // attached) so this test can focus on the ordinary AI-personalized
+    // reserve rule that starts at sequence 11.
+    final plan = store.ensureCurrentPlan(profile);
+    for (final session in plan.sessions) {
+      store.markCompleted(session.contentKey);
     }
-    store.markCompleted(plan.sessions.last.contentKey);
     final first = store.ensureCurrentPlan(profile);
     expect(first.sessions.last.sequence, 11);
     expect(first.sessions.last.generationStatus, 'queued');
@@ -471,28 +489,30 @@ void main() {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
     var plan = store.ensureCurrentPlan(profile);
-    expect(plan.sessions, hasLength(6));
+    // Foundation (1-5) and Unit 2 (6-10) are both authored and fully present
+    // immediately.
+    expect(plan.sessions, hasLength(10));
 
-    // The personalized route is unlimited: keep completing the newest
-    // lesson and asking for the next one well past the old five-lesson
-    // ceiling. It must keep growing one row at a time into a second block
-    // instead of stopping.
-    for (
-      var personalizedCount = 2;
-      personalizedCount <= 6;
-      personalizedCount++
-    ) {
-      store.markCompleted(plan.sessions.last.contentKey);
-      plan = store.ensureCurrentPlan(profile);
-      expect(
-        plan.sessions,
-        hasLength(adaptiveCourseFoundationSize + personalizedCount),
-      );
+    // Complete all of Unit 2, as a learner would; real AI-personalized
+    // growth (sequence 11+) only begins once it is out of the way.
+    for (final session in plan.sessions) {
+      store.markCompleted(session.contentKey);
     }
-
+    plan = store.ensureCurrentPlan(profile);
+    expect(plan.sessions, hasLength(11));
     expect(plan.sessions.last.sequence, 11);
     expect(plan.sessions.last.blockIndex, 2);
     expect(plan.sessions.last.blockPosition, 1);
+
+    // The personalized route beyond Unit 2 is unlimited: keep completing the
+    // newest lesson and asking for the next one. It must keep growing one
+    // row at a time instead of stopping.
+    for (var total = 12; total <= 15; total++) {
+      store.markCompleted(plan.sessions.last.contentKey);
+      plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions, hasLength(total));
+    }
+    expect(plan.sessions.last.sequence, 15);
   });
 
   test('personalized batches keep a useful transfer balance', () {
@@ -595,10 +615,10 @@ void main() {
 
     final after = store.ensureCurrentPlan(profile);
     expect(after.id, before.id);
-    // Unit 2's vocabulary row (sequence 6) was already authored and ready,
-    // so this call grows one more authored row (sequence 7) before the
-    // "no more than two ready ahead" rule stops it.
-    expect(after.sessions, hasLength(7));
+    // Foundation and all of authored Unit 2 already exist from the first
+    // call; growth into real AI-personalized territory (sequence 11+)
+    // stays blocked until Unit 2's listening lesson gets its audio.
+    expect(after.sessions, hasLength(10));
   });
 
   test('remote plan and session rows hydrate into the local route', () {

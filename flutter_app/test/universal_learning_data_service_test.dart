@@ -126,17 +126,20 @@ void main() {
     );
 
     final store = AdaptiveCourseStore(db);
-    final plan = store.ensureCurrentPlan(profile);
-    // The first five sessions are the fixed sound-foundation lessons; the
-    // first personalized lesson (the one that should carry this evidence)
-    // is the one right after them.
-    final first = plan.sessions[adaptiveCourseFoundationSize];
+    var plan = store.ensureCurrentPlan(profile);
+    // Sequences 1-5 (foundation) and 6-10 (Unit 2) are both fixed, authored
+    // content shared by every learner, so recent evidence cannot show up
+    // there. The first lesson that can actually carry this evidence is the
+    // first real AI-personalized one, sequence 11 — complete Unit 2 first
+    // so the store grows to it.
+    for (final session in plan.sessions) {
+      store.markCompleted(session.contentKey);
+    }
+    plan = store.ensureCurrentPlan(profile);
+    final first = plan.sessions[adaptiveCourseFoundationSize + adaptiveCourseBatchSize];
     final reloaded = store.sessionById(first.id);
 
-    // The first call only produces the foundation plus one personalized
-    // lesson; growth beyond that is intentionally serial (see
-    // AdaptiveCourseStore.ensureCurrentPlan), not all ten at once.
-    expect(plan.sessions, hasLength(6));
+    expect(plan.sessions, hasLength(11));
     expect(first.context, contains('recent work'));
     expect(first.targetPhrases, contains('Je travaille dans le marketing'));
     expect(first.sourceSessionIds, contains('practice-source'));

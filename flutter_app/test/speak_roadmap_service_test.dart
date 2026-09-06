@@ -20,7 +20,9 @@ void main() {
       adaptiveSessions: plan.sessions,
     );
 
-    expect(roadmap.sessions, hasLength(6));
+    // Foundation (1-5) and Unit 2 (6-10) are both authored and fully
+    // present the instant the plan is created.
+    expect(roadmap.sessions, hasLength(10));
     expect(roadmap.trackLabel, 'Professional French');
     expect(roadmap.sessions.first.primarySkill, SpeakSkill.alphabet);
     expect(roadmap.sessions.first.contextPrompt, contains('Meetings'));
@@ -116,11 +118,14 @@ void main() {
       adaptiveSessions: [...foundation, ...pending],
     );
 
-    expect(roadmap.sessions, hasLength(6));
+    // Sequences 6-10 (Unit 2) are always listed even while unready, since
+    // that content is authored, not generated. Only sequence 11+ (real
+    // personalized generation) still exposes just one pending placeholder.
+    expect(roadmap.sessions, hasLength(11));
     expect(
       roadmap.sessions.where((session) => !session.contentReady),
-      hasLength(1),
+      hasLength(6),
     );
-    expect(roadmap.sessions.last.contentKey, 'pending-0');
+    expect(roadmap.sessions.last.contentKey, 'pending-5');
   });
 }

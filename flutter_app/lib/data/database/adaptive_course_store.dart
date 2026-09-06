@@ -444,7 +444,14 @@ class AdaptiveCourseStore {
   final Future<void> Function(AdaptiveCourseSessionSpec session)?
   _onSessionChanged;
 
-  static const initialBatchSize = adaptiveCourseFoundationSize + 1;
+  // Foundation (1-5) and Unit 2 (6-10) are both authored, not AI-generated,
+  // so there is no cost reason to reveal them one row at a time. A learner
+  // should see the whole free structure — vocabulary, speaking, reading,
+  // listening, writing — the moment their plan is created, the same way
+  // foundation has always been fully visible immediately. Only sequence 11+
+  // (real AI generation) grows one row at a time.
+  static const initialBatchSize =
+      adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
   static const maxPersonalizedLessons = adaptiveCourseBatchSize;
 
   /// Older local databases may have been opened before the adaptive target
