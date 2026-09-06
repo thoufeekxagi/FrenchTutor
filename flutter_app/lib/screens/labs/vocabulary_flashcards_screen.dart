@@ -87,6 +87,7 @@ class _VocabularyFlashcardsScreenState
   String? _pronunciationHint;
   String _preparationStatus = 'Preparing your words…';
   Object? _loadError;
+  String? _audioError;
 
   // Sentence testing is optional (the learner can skip straight to Next);
   // word testing is not.
@@ -582,6 +583,7 @@ class _VocabularyFlashcardsScreenState
       _sentenceRecording = false;
       _sentenceHint = null;
       _loadError = null;
+      _audioError = null;
     });
     _murray.updateLessonContext();
     _saveProgress();
@@ -625,6 +627,16 @@ class _VocabularyFlashcardsScreenState
                 ),
                 const SizedBox(height: 22),
                 _wordCard(),
+                if (_audioError != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _audioError!,
+                    textAlign: TextAlign.center,
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.danger),
+                  ),
+                ],
                 if (_meaningRevealed) ...[
                   const SizedBox(height: 16),
                   _wordFeedbackCard(),
@@ -951,6 +963,12 @@ class _VocabularyFlashcardsScreenState
               contentItemId: _audioId(entry, 'word'),
               voiceName: ActiveTutor.current.voiceName,
             ),
+            onError: (error) {
+              if (!mounted) return;
+              setState(
+                () => _audioError = "Couldn't play audio. Check your connection and try again.",
+              );
+            },
             color: DesignTokens.nightAccent,
             size: 44,
             iconSize: 20,
@@ -1049,6 +1067,12 @@ class _VocabularyFlashcardsScreenState
                             contentItemId: _audioId(_current, 'sentence'),
                             voiceName: ActiveTutor.current.voiceName,
                           ),
+                      onError: (error) {
+                        if (!mounted) return;
+                        setState(
+                          () => _audioError = "Couldn't play audio. Check your connection and try again.",
+                        );
+                      },
                       color: DesignTokens.nightAccent,
                       size: 40,
                       iconSize: 19,
