@@ -824,6 +824,17 @@ Deno.serve(async (request: Request) => {
     text(row.generation_status) === "generating"
   );
   if (readyAvailable >= 2 || generating) {
+    // Visibility into every "did nothing" outcome, not just failures: this
+    // is the only way to tell a legitimately-full reserve apart from a
+    // lesson that is quietly stuck generating for longer than it should.
+    console.info(JSON.stringify({
+      event: "course_lesson_preparation_noop",
+      userId,
+      reason: generating ? "already_generating" : "reserve_full",
+      readyAvailable,
+      reserveSize: reserve.length,
+      reserveSequences: reserve.map((row) => row.sequence),
+    }));
     return response({ processed: false, remaining: 0 });
   }
 
@@ -839,7 +850,14 @@ Deno.serve(async (request: Request) => {
     .limit(1);
   if (findError) return response({ error: findError.message }, 500);
   const candidate = candidates?.[0] as Json | undefined;
-  if (!candidate) return response({ processed: false, remaining: 0 });
+  if (!candidate) {
+    console.info(JSON.stringify({
+      event: "course_lesson_preparation_noop",
+      userId,
+      reason: "nothing_queued",
+    }));
+    return response({ processed: false, remaining: 0 });
+  }
 
   const sessionId = text(candidate.id);
   const attempts = Number(candidate.generation_attempts ?? 0);
@@ -857,7 +875,15 @@ Deno.serve(async (request: Request) => {
     .select("*")
     .maybeSingle();
   if (claimError) return response({ error: claimError.message }, 500);
-  if (!claimed) return response({ processed: false, conflict: true }, 409);
+  if (!claimed) {
+    console.info(JSON.stringify({
+      event: "course_lesson_preparation_noop",
+      userId,
+      sessionId,
+      reason: "claim_conflict",
+    }));
+    return response({ processed: false, conflict: true }, 409);
+  }
 
   const kind = artifactKind(text(claimed.primary_skill));
   console.info(JSON.stringify({
