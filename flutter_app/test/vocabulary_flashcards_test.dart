@@ -89,8 +89,18 @@ void main() {
     expect(find.text('hungry'), findsOneWidget);
     // The word only becomes complete once the learner is actually heard
     // saying it (verified through Gemini's transcript), so this screen must
-    // show the mic prompt here, not an auto-completing button.
-    expect(find.text('Tap to say it'), findsOneWidget);
+    // show the record prompt here, not an auto-completing button — using
+    // the same footer layout (translate / record-stop-next / replay)
+    // Speaking Guided uses.
+    expect(find.text('Record'), findsOneWidget);
+    // The feedback card sits below the word card and can be scrolled past
+    // the fixed test viewport; scroll it into view before asserting on it.
+    await tester.dragUntilVisible(
+      find.text('Speak now'),
+      find.byType(ListView),
+      const Offset(0, -200),
+    );
+    expect(find.text('Speak now'), findsOneWidget);
     expect(find.text('Repeat word'), findsNothing);
     expect(find.text('J’ai faim ce matin.'), findsNothing);
   });

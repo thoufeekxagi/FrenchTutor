@@ -99,6 +99,7 @@ class _VocabularyFlashcardsScreenState
   bool _murrayGradeReceived = false;
   Timer? _murrayGradeTimeout;
   bool _testingSentence = false;
+  final _wordSpeakerKey = GlobalKey<TtsPlayButtonState>();
 
   static const _diacriticMap = {
     'à': 'a',
@@ -479,42 +480,6 @@ class _VocabularyFlashcardsScreenState
     });
   }
 
-  Widget _repeatWordControl() {
-    return GestureDetector(
-      onTap: () => _toggleRecording(sentence: false),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _recording
-                  ? DesignTokens.nightAccent.withValues(alpha: 0.18)
-                  : DesignTokens.nightAccentSoft,
-              border: Border.all(
-                color: DesignTokens.nightAccent,
-                width: _recording ? 2 : 1,
-              ),
-            ),
-            child: Icon(
-              _recording ? Icons.graphic_eq_rounded : Icons.mic_none_rounded,
-              color: DesignTokens.nightAccent,
-              size: 28,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _recording ? 'Tap to stop' : 'Tap to say it',
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// The sentence check is optional: the learner may test it the same live
   /// way as the word, or skip straight to Next.
   Widget _testSentenceControl() {
@@ -631,63 +596,135 @@ class _VocabularyFlashcardsScreenState
     if (_completed) return _completedState();
 
     return V3Scaffold(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+      child: Column(
         children: [
-          _topBar(),
-          const SizedBox(height: 18),
-          _progressLine(),
-          const SizedBox(height: 26),
-          Text(
-            'One word at a time.',
-            style: DesignTokens.display(30).copyWith(height: 1.08),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+              children: [
+                _topBar(),
+                const SizedBox(height: 18),
+                _progressLine(),
+                const SizedBox(height: 26),
+                Text(
+                  'One word at a time.',
+                  style: DesignTokens.display(30).copyWith(height: 1.08),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _wordComplete
+                      ? 'Repeat the sentence, then move to the next word.'
+                      : _meaningRevealed
+                      ? _recording
+                            ? 'Listening…'
+                            : 'Say the word out loud, then continue.'
+                      : 'Double-tap the word to reveal its meaning.',
+                  style: DesignTokens.body(
+                    15,
+                  ).copyWith(color: DesignTokens.muted, height: 1.35),
+                ),
+                const SizedBox(height: 22),
+                _wordCard(),
+                if (_meaningRevealed) ...[
+                  const SizedBox(height: 16),
+                  _wordFeedbackCard(),
+                ],
+                if (_wordComplete && _showsSentences) ...[
+                  const SizedBox(height: 16),
+                  _sentenceCard(),
+                ],
+                if (_loadError != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Your progress is saved. Some optional content could not be prepared.',
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.mutedDim),
+                  ),
+                ],
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            _wordComplete
-                ? 'Repeat the sentence, then move to the next word.'
-                : _meaningRevealed
-                ? _recording
-                    ? 'Listening…'
-                    : 'Tap the mic and say the word out loud.'
-                : 'Double-tap the word to reveal its meaning.',
-            style: DesignTokens.body(
-              15,
-            ).copyWith(color: DesignTokens.muted, height: 1.35),
-          ),
-          const SizedBox(height: 22),
-          _wordCard(),
-          if (!_wordComplete && _meaningRevealed) ...[
-            const SizedBox(height: 16),
-            Center(child: _repeatWordControl()),
-            if (_pronunciationHint != null) ...[
-              const SizedBox(height: 10),
+          _bottomControls(),
+        ],
+      ),
+    );
+  }
+
+  /// Mirrors Speaking Guided's success/attempt card: a neutral prompt before
+  /// any attempt, green with a checkmark and "MATCHED" once the word is
+  /// heard correctly, or a soft retry state otherwise.
+  Widget _wordFeedbackCard() {
+    final success = _wordComplete;
+    final heard = (_heard ?? '').trim();
+    final failed = !success && _pronunciationHint != null;
+    final borderColor = success
+        ? DesignTokens.success
+        : failed
+        ? DesignTokens.danger
+        : DesignTokens.nightHairline;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      decoration: BoxDecoration(
+        color: success
+            ? DesignTokens.success.withValues(alpha: 0.14)
+            : DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: success || failed ? 1.4 : 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                success
+                    ? Icons.check_circle_rounded
+                    : Icons.format_quote_rounded,
+                color: success
+                    ? DesignTokens.success
+                    : failed
+                    ? DesignTokens.danger
+                    : DesignTokens.nightAccent,
+              ),
+              const SizedBox(width: 8),
               Text(
-                _pronunciationHint!,
-                textAlign: TextAlign.center,
-                style: DesignTokens.body(
-                  13,
-                ).copyWith(color: DesignTokens.muted),
+                success
+                    ? 'Nice work'
+                    : failed
+                    ? 'Try it again'
+                    : 'Speak now',
+                style: DesignTokens.body(13, weight: FontWeight.w800).copyWith(
+                  color: success
+                      ? DesignTokens.success
+                      : failed
+                      ? DesignTokens.danger
+                      : DesignTokens.nightAccent,
+                ),
               ),
             ],
-          ],
-          if (_wordComplete && _showsSentences) ...[
-            const SizedBox(height: 16),
-            _sentenceCard(),
-            const SizedBox(height: 18),
-            _nextButton(),
-          ],
-          if (_wordComplete && !_showsSentences) ...[
-            const SizedBox(height: 18),
-            _nextButton(),
-          ],
-          if (_loadError != null) ...[
-            const SizedBox(height: 12),
+          ),
+          if (heard.isNotEmpty) ...[
+            const SizedBox(height: 14),
             Text(
-              'Your progress is saved. Some optional content could not be prepared.',
-              style: DesignTokens.body(
-                12,
-              ).copyWith(color: DesignTokens.mutedDim),
+              success ? 'MATCHED' : 'I HEARD',
+              style: DesignTokens.label(
+                10,
+              ).copyWith(color: DesignTokens.muted, letterSpacing: 1),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              heard,
+              style: DesignTokens.body(14, weight: FontWeight.w700).copyWith(
+                color: success ? DesignTokens.success : DesignTokens.nightText,
+              ),
+            ),
+          ] else if (_pronunciationHint != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              _pronunciationHint!,
+              style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
             ),
           ],
         ],
@@ -695,13 +732,119 @@ class _VocabularyFlashcardsScreenState
     );
   }
 
-  Widget _nextButton() => V3PrimaryButton(
-    label: _index == _entries.length - 1 ? 'Finish set' : 'Next word',
-    icon: _index == _entries.length - 1
-        ? Icons.check_rounded
-        : Icons.arrow_forward_rounded,
-    onPressed: _next,
-  );
+  /// The same translate / record-stop-next / replay footer layout Speaking
+  /// Guided uses, wired to this screen's own word (and, once complete,
+  /// sentence-advance) logic.
+  Widget _bottomControls() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(26, 10, 26, 15),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightCanvas,
+        border: Border(top: BorderSide(color: DesignTokens.nightHairline)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: _smallFooterControl(
+              icon: _meaningRevealed
+                  ? Icons.translate_rounded
+                  : Icons.translate_outlined,
+              label: _meaningRevealed ? 'Meaning on' : 'Meaning off',
+              selected: _meaningRevealed,
+              onTap: _meaningRevealed ? null : _revealMeaning,
+            ),
+          ),
+          _wordRoundAction(),
+          Expanded(
+            child: _smallFooterControl(
+              icon: Icons.volume_up_outlined,
+              label: 'Replay word',
+              onTap: () => _wordSpeakerKey.currentState?.trigger(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _wordRoundAction() {
+    final success = _wordComplete;
+    final active = success
+        ? DesignTokens.success
+        : _recording
+        ? DesignTokens.nightAccent
+        : DesignTokens.nightAccent;
+    final label = success
+        ? (_index == _entries.length - 1 ? 'Finish set' : 'Next word')
+        : _recording
+        ? 'Stop'
+        : 'Record';
+    final VoidCallback? onTap = !_meaningRevealed
+        ? null
+        : success
+        ? _next
+        : () => _toggleRecording(sentence: false);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: onTap == null ? DesignTokens.nightSurfaceRaised : active,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              success
+                  ? Icons.arrow_forward_rounded
+                  : _recording
+                  ? Icons.stop_rounded
+                  : Icons.mic_none_rounded,
+              color: onTap == null ? DesignTokens.muted : Colors.black,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: DesignTokens.body(11, weight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _smallFooterControl({
+    required IconData icon,
+    required String label,
+    bool selected = false,
+    VoidCallback? onTap,
+  }) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Icon(
+            icon,
+            color: onTap == null
+                ? DesignTokens.nightHairline
+                : selected
+                ? DesignTokens.nightAccent
+                : DesignTokens.nightText,
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _topBar() {
     return Row(
@@ -800,6 +943,7 @@ class _VocabularyFlashcardsScreenState
           ],
           const SizedBox(height: 16),
           TtsPlayButton(
+            key: _wordSpeakerKey,
             text: entry.fr,
             contentItemId: _audioId(entry, 'word'),
             audioResolver: () => GeminiLiveAudioService.shared.resolve(
