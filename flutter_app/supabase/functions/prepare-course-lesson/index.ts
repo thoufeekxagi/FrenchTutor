@@ -16,6 +16,22 @@ type Json = Record<string, unknown>;
 // real AI generation only begins at sequence 11.
 const AUTHORED_SEQUENCE_CEILING = 10;
 
+// Mirrors _unitTwoWords in lib/data/database/adaptive_course_store.dart.
+// Unit 2's five words are fixed and identical for every learner, so no AI
+// vocabulary lesson from sequence 11 onward may ever reteach one of them as
+// if it were new — the model has no other way to know they already exist,
+// since they never pass through target_phrases_json like real generated
+// history does.
+const UNIT_TWO_TAUGHT_WORDS = ["marché", "pomme", "vendeuse", "prix", "fraîche"];
+
+function foldFrench(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
 function response(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
@@ -181,6 +197,15 @@ function validateVocabulary(artifact: Json, level: string) {
     }
     if (level.trim().toUpperCase() === "A1" && text(entry.fr).split(/\s+/).length > 3) {
       throw new Error("A1 vocabulary entries must be short words or chunks");
+    }
+    // Enforced, not just requested: Unit 2's five words are permanent and
+    // identical for every learner, so no AI vocabulary lesson may reteach
+    // one as if it were new, regardless of what the model did with the
+    // prompt instruction above.
+    if (UNIT_TWO_TAUGHT_WORDS.some((word) => foldFrench(word) === foldFrench(text(entry.fr)))) {
+      throw new Error(
+        `"${text(entry.fr)}" was already taught in Unit 2; choose a genuinely new word`,
+      );
     }
     validateSimpleFrench(text(example.fr), level, "Vocabulary example", 10);
   }
@@ -467,7 +492,7 @@ function promptFor(session: Json, kind: string): string {
     return `${base}${rules}\nThe exact Course Practice mode is ${brief.practiceMode}; never merge it with another interaction. Return exactly: {"practiceMode":"${brief.practiceMode}","lines":[3 to 5 ${lineShape}]}. Every line must be useful for the competency and fully bilingual. This Course speaking lesson is hear/repeat/repair phrase practice only: no live tutor conversation, Free Talk, Roleplay, word selection, or open response. Each French line must be the phrase the learner repeats, with no prefix such as "Répétez", "Repeat", or "Say". Keep all lines distinct. Reuse suitable targets, but correct mixed-language or incomplete targets instead of copying them.`;
   }
   if (kind === "vocabulary") {
-    return `${base}${rules}\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
+    return `${base}${rules}\nThe learner already knows these exact words from an earlier fixed lesson: ${UNIT_TWO_TAUGHT_WORDS.join(", ")}. None of these five words may appear as one of the five new vocabulary entries below; teach five genuinely different words instead.\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
   }
   if (kind === "reading" || kind === "listening") {
     return `${base}${rules}\nReturn exactly: {"passage":{"id":"passage","title":"French title","titleEn":"English title","segments":[4 to 6 {"fr":"French sentence","en":"English translation","grammarNote":"short useful note","pronunciationTip":"short useful tip"}],"fullText":"the exact French segments joined in order"},"quiz":[2 or 3 {"q":"French question","q_en":"English question","choices":[3 French choices],"choices_en":[3 English choices],"answerIndex":0}],"keywords":[up to 5 {"id":"id","fr":"French","en":"English","phonetic":"pronunciation"}]}. Every answerIndex must be 0, 1, or 2 and point to the correct choice.`;
