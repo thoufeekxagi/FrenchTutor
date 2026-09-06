@@ -183,7 +183,7 @@ Future<void> main(List<String> args) async {
     stdout.writeln('User id: $userId');
     stdout.writeln('Learner-owned database rows: ${report.databaseRows}');
     stdout.writeln(
-      'Learner-owned storage objects: ${report.storagePaths.length}',
+      'Learner-owned storage objects: ${report.storageObjectCount}',
     );
 
     if (!args.contains('--execute')) {
@@ -216,7 +216,7 @@ Future<void> main(List<String> args) async {
       throw StateError(
         'Verification failed: auth=${remainingUser == null ? 0 : 1}, '
         'rows=${remaining.databaseRows}, '
-        'storage=${remaining.storagePaths.length}.',
+        'storage=${remaining.storageObjectCount}.',
       );
     }
     stdout.writeln('Deleted and verified $email.');
@@ -297,6 +297,9 @@ class _UserReport {
 
   final int databaseRows;
   final Map<String, List<String>> storagePaths;
+
+  int get storageObjectCount =>
+      storagePaths.values.fold<int>(0, (total, paths) => total + paths.length);
 }
 
 class _SupabaseAdmin {
