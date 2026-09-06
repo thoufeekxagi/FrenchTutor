@@ -856,6 +856,21 @@ Deno.serve(async (request: Request) => {
       kind,
     );
     if (kind === "listening") {
+      // Persist the finished text the moment it exists, before the slower
+      // audio render/upload/verify round trip. The row's generation_status
+      // stays "generating" (still correctly unclaimable), but any concurrent
+      // reader of this exact row — the client's own background sync pull —
+      // can now see the passage and quiz while audio is still cooking,
+      // instead of the whole lesson being invisible until every step
+      // finishes. This never widens what counts as "ready" for Practice.
+      if (!preauthoredText) {
+        const { error: textOnlyError } = await admin
+          .from("adaptive_course_sessions")
+          .update({ artifact_json: artifact, updated_at: new Date().toISOString() })
+          .eq("id", sessionId)
+          .eq("user_id", userId);
+        if (textOnlyError) throw new Error(textOnlyError.message);
+      }
       artifact = await attachListeningAudio(
         admin,
         userId,
