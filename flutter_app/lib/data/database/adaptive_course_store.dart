@@ -1541,6 +1541,129 @@ abstract final class AdaptiveCoursePlanGenerator {
     ),
   ];
 
+  // Reusing the same five words across a unit is the point (spaced
+  // repetition); reusing the same five SENTENCES verbatim across every
+  // skill is not — that reads as duplicate content, not practice. Each
+  // skill below gets its own sentences built from the same five words in a
+  // different situation, so the word is genuinely being met again, not
+  // re-read.
+  static const _unitTwoSpeakingSegments = [
+    (
+      fr: 'Je vais au marché ce matin.',
+      en: "I'm going to the market this morning.",
+      note: '"Je vais" = I am going.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: "J'aime cette pomme verte.",
+      en: 'I like this green apple.',
+      note: '"J\'aime" = I like.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'La vendeuse est très gentille.',
+      en: 'The seller is very kind.',
+      note: '"Gentille" agrees with a feminine noun.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Quel est le prix, s\'il vous plaît ?',
+      en: 'What is the price, please?',
+      note: 'A short, polite question.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Cette pomme fraîche sent bon.',
+      en: 'This fresh apple smells good.',
+      note: '"Sent bon" = smells good.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+  ];
+
+  static const _unitTwoReadingSegments = [
+    (
+      fr: 'Ce matin, Léa va au marché avec sa mère.',
+      en: 'This morning, Léa goes to the market with her mother.',
+      note: 'Present tense for a habitual morning.',
+      tip: 'Read once for the general idea.',
+    ),
+    (
+      fr: 'Elles cherchent de belles pommes pour un gâteau.',
+      en: 'They are looking for nice apples for a cake.',
+      note: '"Cherchent" = are looking for.',
+      tip: 'Read once for the general idea.',
+    ),
+    (
+      fr: 'Une vendeuse leur montre son meilleur panier.',
+      en: 'A seller shows them her best basket.',
+      note: '"Leur" = to them.',
+      tip: 'Read once for the general idea.',
+    ),
+    (
+      fr: 'Léa demande le prix avec un sourire.',
+      en: 'Léa asks the price with a smile.',
+      note: '"Demande" = asks.',
+      tip: 'Read once for the general idea.',
+    ),
+    (
+      fr: 'Chaque pomme du panier est bien fraîche.',
+      en: 'Every apple in the basket is nicely fresh.',
+      note: '"Chaque" = every/each.',
+      tip: 'Read once for the general idea.',
+    ),
+  ];
+
+  static const _unitTwoListeningSegments = [
+    (
+      fr: 'Le soir, le marché commence à se calmer.',
+      en: 'In the evening, the market starts to calm down.',
+      note: 'A new scene: closing time, not morning.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Une dernière cliente achète encore des pommes.',
+      en: 'One last customer is still buying apples.',
+      note: '"Encore" = still.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'La vendeuse compte le prix de chaque fruit.',
+      en: 'The seller counts the price of every fruit.',
+      note: '"Compte" = counts.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Elle range les pommes les plus fraîches.',
+      en: 'She puts away the freshest apples.',
+      note: '"Les plus fraîches" = the freshest.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+    (
+      fr: 'Demain, un nouveau marché commencera tôt.',
+      en: 'Tomorrow, a new market will start early.',
+      note: 'A simple future for what happens next.',
+      tip: 'Listen once, then repeat naturally.',
+    ),
+  ];
+
+  // Writing's fill-in-the-blank needs its target word to literally appear
+  // in the sentence text, so it gets its own short, plain set rather than
+  // reusing another skill's sentence — same words, still a fourth distinct
+  // context.
+  static const _unitTwoWritingSegments = [
+    (
+      fr: 'Le marché ouvre tôt le samedi.',
+      en: 'The market opens early on Saturday.',
+    ),
+    (fr: "J'achète une pomme verte.", en: "I'm buying a green apple."),
+    (fr: 'La vendeuse pèse les fruits.', en: 'The seller weighs the fruit.'),
+    (
+      fr: "Le prix est affiché sur l'étiquette.",
+      en: 'The price is shown on the label.',
+    ),
+    (fr: 'Cette pomme est bien fraîche.', en: 'This apple is very fresh.'),
+  ];
+
   static bool _isUnitTwoSequence(int sequence) =>
       sequence > adaptiveCourseFoundationSize &&
       sequence <= adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
@@ -1585,28 +1708,27 @@ abstract final class AdaptiveCoursePlanGenerator {
           'id': 'unit-two-speaking',
           'practiceMode': 'guidedConversation',
           'lines': [
-            for (final segment in _unitTwoSegments)
+            for (final segment in _unitTwoSpeakingSegments)
               {'fr': segment.fr, 'en': segment.en},
           ],
         };
       case SpeakSkill.reading:
-      case SpeakSkill.listening:
         return {
-          'id': 'unit-two-${skill.wireName}',
+          'id': 'unit-two-reading',
           'title': 'Le marché du matin',
-          'summary': 'A short, simple visit to a French market.',
+          'summary': "Léa and her mother shop for apples at the market.",
           'topic': 'Food & shopping',
           'levelBand': level,
           'readTimeMinutes': 3,
           'coverUrl': 'asset:assets/starter_covers/market.png',
           'createdAt': DateTime.now().toUtc().toIso8601String(),
           'passage': {
-            'id': 'unit-two-passage',
+            'id': 'unit-two-reading-passage',
             'title': 'Le marché du matin',
             'titleEn': 'The morning market',
-            'fullText': _unitTwoSegments.map((s) => s.fr).join(' '),
+            'fullText': _unitTwoReadingSegments.map((s) => s.fr).join(' '),
             'segments': [
-              for (final segment in _unitTwoSegments)
+              for (final segment in _unitTwoReadingSegments)
                 {
                   'fr': segment.fr,
                   'en': segment.en,
@@ -1617,10 +1739,66 @@ abstract final class AdaptiveCoursePlanGenerator {
           },
           'quiz': [
             {
-              'q': 'Que fait la vendeuse ?',
-              'q_en': 'What does the seller do?',
-              'choices': ['Elle sourit.', 'Elle dort.', 'Elle chante.'],
-              'choices_en': ['She smiles.', 'She sleeps.', 'She sings.'],
+              'q': 'Pourquoi Léa et sa mère vont-elles au marché ?',
+              'q_en': 'Why do Léa and her mother go to the market?',
+              'choices': [
+                'Pour un gâteau.',
+                'Pour dormir.',
+                'Pour chanter.',
+              ],
+              'choices_en': ['For a cake.', 'To sleep.', 'To sing.'],
+              'answerIndex': 0,
+            },
+          ],
+          'keywords': [
+            for (final word in _unitTwoWords)
+              {
+                'id': word.id,
+                'en': word.en,
+                'fr': word.fr,
+                'phonetic': word.phonetic,
+              },
+          ],
+        };
+      case SpeakSkill.listening:
+        return {
+          'id': 'unit-two-listening',
+          'title': 'Le marché ferme',
+          'summary': 'The market winds down as evening comes.',
+          'topic': 'Food & shopping',
+          'levelBand': level,
+          'readTimeMinutes': 3,
+          'coverUrl': 'asset:assets/starter_covers/market.png',
+          'createdAt': DateTime.now().toUtc().toIso8601String(),
+          'passage': {
+            'id': 'unit-two-listening-passage',
+            'title': 'Le marché ferme',
+            'titleEn': 'The market closes',
+            'fullText': _unitTwoListeningSegments.map((s) => s.fr).join(' '),
+            'segments': [
+              for (final segment in _unitTwoListeningSegments)
+                {
+                  'fr': segment.fr,
+                  'en': segment.en,
+                  'grammarNote': segment.note,
+                  'pronunciationTip': segment.tip,
+                },
+            ],
+          },
+          'quiz': [
+            {
+              'q': 'Que fait la vendeuse le soir ?',
+              'q_en': 'What does the seller do in the evening?',
+              'choices': [
+                'Elle range les pommes.',
+                'Elle dort.',
+                'Elle chante.',
+              ],
+              'choices_en': [
+                'She puts away the apples.',
+                'She sleeps.',
+                'She sings.',
+              ],
               'answerIndex': 0,
             },
           ],
@@ -1638,7 +1816,7 @@ abstract final class AdaptiveCoursePlanGenerator {
         final choicesPool = _unitTwoWords.map((w) => w.fr).toList();
         Map<String, dynamic> step(int wordIndex) {
           final word = _unitTwoWords[wordIndex];
-          final segment = _unitTwoSegments[wordIndex];
+          final segment = _unitTwoWritingSegments[wordIndex];
           final blanked = segment.fr.replaceFirst(word.fr, '___');
           final distractors = choicesPool
               .where((choice) => choice != word.fr)
