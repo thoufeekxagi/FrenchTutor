@@ -87,11 +87,12 @@ void main() {
     await tester.tap(find.text('faim'));
     await tester.pumpAndSettle();
     expect(find.text('hungry'), findsOneWidget);
-    // The word only becomes complete once the learner is actually heard
-    // saying it (verified through Gemini's transcript), so this screen must
-    // show the record prompt here, not an auto-completing button — using
-    // the same footer layout (translate / record-stop-next / replay)
-    // Speaking Guided uses.
+    // The word only becomes complete once the learner has actually made a
+    // real recorded attempt (right or wrong — a wrong attempt still unlocks
+    // Next, exactly like Speaking Guided never blocks on a mismatch either),
+    // so this screen must show the record prompt here, not an
+    // auto-completing button — using the same footer layout (translate /
+    // record-stop-next / replay) Speaking Guided uses.
     expect(find.text('Record'), findsOneWidget);
     // The feedback card sits below the word card and can be scrolled past
     // the fixed test viewport; scroll it into view before asserting on it.

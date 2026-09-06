@@ -95,6 +95,13 @@ class _VocabularyFlashcardsScreenState
   bool _sentenceRecording = false;
   String? _sentenceHint;
 
+  /// Whether the last resolved word attempt actually matched, purely for
+  /// feedback display. Separate from [_wordComplete], which only means "the
+  /// learner has attempted this word" and is what unlocks Next — a beginner
+  /// must never be stuck on one hard word with no way forward, exactly like
+  /// Speaking never blocks on a wrong guided attempt either.
+  bool _lastAttemptMatched = false;
+
   String? _heard;
   bool _murrayTurnClosing = false;
   bool _murrayGradeReceived = false;
@@ -403,7 +410,8 @@ class _VocabularyFlashcardsScreenState
       }
       return;
     }
-    if (!sentence && _wordComplete) return;
+    // Once complete, a word stays tappable for "Practice more" — retrying
+    // is always optional, never required, so this must not re-block it.
     final target = sentence ? (_examples[_current.id]?.fr ?? '') : _current.fr;
     if (target.trim().isEmpty) return;
     setState(() {
@@ -471,12 +479,15 @@ class _VocabularyFlashcardsScreenState
         if (matches) _sentenceTested = true;
       } else {
         _recording = false;
+        _lastAttemptMatched = matches;
         _pronunciationHint = matches
             ? null
             : heard.isEmpty
-            ? "Didn't catch that — tap the mic and try again."
-            : 'Not quite — try saying "$target" again.';
-        if (matches) _completeWord();
+            ? "Didn't catch that — that's fine, you can still continue."
+            : 'Not quite — you said something else, but you can still continue.';
+        // Any real attempt unlocks Next, matched or not. A beginner must
+        // never be stuck on one hard word with no way forward.
+        _completeWord(matched: matches);
       }
     });
   }
@@ -527,18 +538,24 @@ class _VocabularyFlashcardsScreenState
     );
   }
 
-  void _completeWord() {
-    if (!_meaningRevealed || _wordComplete) return;
+  /// Marks the current word attempted. Any real recorded attempt counts —
+  /// this must never gate progression on getting the pronunciation right,
+  /// the same way Speaking Guided always offers "Next phrase" alongside
+  /// "Practice more" regardless of whether the last attempt matched.
+  void _completeWord({required bool matched}) {
+    if (!_meaningRevealed) return;
     try {
-      _srs.grade(
-        entryId: _current.id,
-        grade: SRSGrade.good,
-        responseType: SRSResponseType.auto,
-        sessionId: _sessionId,
-      );
-      _grades[_current.id] = 'correct';
-      _completedWordIds.add(_current.id);
-      _saveProgress();
+      if (!_wordComplete) {
+        _srs.grade(
+          entryId: _current.id,
+          grade: matched ? SRSGrade.good : SRSGrade.again,
+          responseType: SRSResponseType.auto,
+          sessionId: _sessionId,
+        );
+        _grades[_current.id] = matched ? 'correct' : 'attempted';
+        _completedWordIds.add(_current.id);
+        _saveProgress();
+      }
       setState(() => _wordComplete = true);
     } catch (error) {
       if (mounted) setState(() => _loadError = error);
@@ -579,6 +596,7 @@ class _VocabularyFlashcardsScreenState
       _wordComplete = false;
       _recording = false;
       _pronunciationHint = null;
+      _lastAttemptMatched = false;
       _sentenceTested = false;
       _sentenceRecording = false;
       _sentenceHint = null;
@@ -667,9 +685,13 @@ class _VocabularyFlashcardsScreenState
   /// any attempt, green with a checkmark and "MATCHED" once the word is
   /// heard correctly, or a soft retry state otherwise.
   Widget _wordFeedbackCard() {
-    final success = _wordComplete;
+    // Whether the learner may proceed (any real attempt) is deliberately
+    // separate from whether that attempt actually matched — this card can
+    // honestly say "not quite" while Next stays unlocked underneath it.
+    final attempted = _wordComplete;
+    final success = attempted && _lastAttemptMatched;
     final heard = (_heard ?? '').trim();
-    final failed = !success && _pronunciationHint != null;
+    final failed = attempted && !_lastAttemptMatched;
     final borderColor = success
         ? DesignTokens.success
         : failed
@@ -705,7 +727,7 @@ class _VocabularyFlashcardsScreenState
                 success
                     ? 'Nice work'
                     : failed
-                    ? 'Try it again'
+                    ? "Good try — keep going"
                     : 'Speak now',
                 style: DesignTokens.body(13, weight: FontWeight.w800).copyWith(
                   color: success
@@ -781,21 +803,14 @@ class _VocabularyFlashcardsScreenState
   }
 
   Widget _wordRoundAction() {
-    final success = _wordComplete;
-    final active = success
-        ? DesignTokens.success
-        : _recording
-        ? DesignTokens.nightAccent
-        : DesignTokens.nightAccent;
-    final label = success
-        ? (_index == _entries.length - 1 ? 'Finish set' : 'Next word')
-        : _recording
-        ? 'Stop'
-        : 'Record';
+    // Once the learner has made a real attempt, Next is always available —
+    // right or wrong — exactly like Speaking Guided always shows "Next
+    // phrase" next to "Practice more" instead of gating on a correct match.
+    if (_wordComplete && !_recording) return _postWordActions();
+    final recording = _recording;
+    final label = recording ? 'Stop' : 'Record';
     final VoidCallback? onTap = !_meaningRevealed
         ? null
-        : success
-        ? _next
         : () => _toggleRecording(sentence: false);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -807,16 +822,14 @@ class _VocabularyFlashcardsScreenState
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: onTap == null ? DesignTokens.nightSurfaceRaised : active,
+              color: onTap == null
+                  ? DesignTokens.nightSurfaceRaised
+                  : DesignTokens.nightAccent,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: Icon(
-              success
-                  ? Icons.arrow_forward_rounded
-                  : _recording
-                  ? Icons.stop_rounded
-                  : Icons.mic_none_rounded,
+              recording ? Icons.stop_rounded : Icons.mic_none_rounded,
               color: onTap == null ? DesignTokens.muted : Colors.black,
               size: 30,
             ),
@@ -825,6 +838,62 @@ class _VocabularyFlashcardsScreenState
           Text(
             label,
             style: DesignTokens.body(11, weight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Shown once the learner has attempted the current word: always offers a
+  /// way forward, plus an optional retry — never a dead end on one hard
+  /// word.
+  Widget _postWordActions() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _compactWordAction(
+          icon: Icons.refresh_rounded,
+          label: 'Practice more',
+          color: DesignTokens.nightAccent,
+          onTap: () => _toggleRecording(sentence: false),
+        ),
+        const SizedBox(width: 10),
+        _compactWordAction(
+          icon: Icons.arrow_forward_rounded,
+          label: _index == _entries.length - 1 ? 'Finish set' : 'Next word',
+          color: DesignTokens.success,
+          onTap: _next,
+        ),
+      ],
+    );
+  }
+
+  Widget _compactWordAction({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.black, size: 25),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: DesignTokens.body(
+              9,
+              weight: FontWeight.w800,
+            ).copyWith(color: DesignTokens.nightText),
           ),
         ],
       ),
