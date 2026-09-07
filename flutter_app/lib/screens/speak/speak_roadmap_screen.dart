@@ -73,9 +73,19 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
     if (_preparingCourse) return;
     _preparingCourse = true;
     try {
+      final sync = ref.read(syncServiceProvider);
+      // hydrateAdaptiveCourses() otherwise only ever runs as a side effect
+      // of a successful generation call below. If every row this device
+      // knows about already looks 'ready' locally, that call finds nothing
+      // to do and returns immediately — so a device whose local rows
+      // drifted out of sync with the server (e.g. a batch that was pushed
+      // successfully but never fully reflected back locally) never
+      // self-heals just by reopening Course, no matter how many times the
+      // learner does it. Pull the real remote state down first, every time,
+      // before this screen decides what (if anything) it still needs.
+      await sync.hydrateAdaptiveCourses();
       final profile = ref.read(learningStoreProvider).profile();
       final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
-      final sync = ref.read(syncServiceProvider);
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
       if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
       _prefetchUpcomingListeningAudio(profile, sync);
