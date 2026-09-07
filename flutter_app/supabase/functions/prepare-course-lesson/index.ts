@@ -464,6 +464,18 @@ function practiceModeFor(skill: string, sequence: number): string {
   }
 }
 
+// Units alternate between two honest, simple postures instead of applying
+// the same 60/40 reuse ratio everywhere. A learner should feel real spaced
+// repetition in some units and real new-ground exploration in others, never
+// the same recycled sentence shape every single time — but every unit still
+// keeps one connected through-line, never a random grab-bag of words.
+function unitBalanceLine(sequence: number): string {
+  const unit = Math.floor((sequence - 1) / 5) + 1;
+  return unit % 2 === 0
+    ? "This unit favors EXPLORATION: reuse only about 30% of recent/onboarding language and spend about 70% on genuinely new words and a new situation, while still keeping one clear through-line so the unit feels cohesive, not a random grab-bag."
+    : "This unit favors REPETITION for spaced practice: reuse about 60% of recent/onboarding language and add about 40% new language.";
+}
+
 function promptFor(session: Json, kind: string): string {
   const primarySkill = text(session.primary_skill);
   const sequence = Number(session.sequence ?? 0);
@@ -484,7 +496,7 @@ function promptFor(session: Json, kind: string): string {
       : [],
   };
   const base = `Create one compact French-learning ${kind} lesson from this frozen brief:\n${JSON.stringify(brief)}\n`;
-  const rules = `Return only valid JSON. Keep all French exactly at ${brief.level || "A1"}. Use the learner goal and the small recent-evidence context naturally; treat any transcript excerpt as a hint, never as a script to copy. Avoid generic travel/cafe filler unless the brief asks for it, and do not mention AI. Reuse about 60% of recent/onboarding language and add about 40% new language. Never return a phrase listed in avoidExact verbatim; make the new lesson a genuinely new card while keeping the same small CEFR-appropriate interaction.\n${cefrRules(brief.level || "A1")}\n${earlyPhaseRules(brief.level || "A1", brief.sequence, brief.primarySkill)}`;
+  const rules = `Return only valid JSON. Keep all French exactly at ${brief.level || "A1"}. Use the learner goal and the small recent-evidence context naturally; treat any transcript excerpt as a hint, never as a script to copy. Avoid generic travel/cafe filler unless the brief asks for it, and do not mention AI. ${unitBalanceLine(sequence)} Never return a phrase listed in avoidExact verbatim; make the new lesson a genuinely new card while keeping the same small CEFR-appropriate interaction.\n${cefrRules(brief.level || "A1")}\n${earlyPhaseRules(brief.level || "A1", brief.sequence, brief.primarySkill)}`;
   if (kind === "speaking") {
     const lineShape = brief.practiceMode === "guidedConversation"
       ? `{"fr":"short learner phrase","en":"exact English meaning"}`
@@ -748,18 +760,15 @@ Deno.serve(async (request: Request) => {
     return response({ error: recoveryError.message }, 500);
   }
 
-  // Normalize placeholder backlogs produced by older clients. Course owns a
-  // maximum five-lesson personalized reserve, and exactly one of those rows
-  // may be waiting for generation. Completed and already-ready lessons are
-  // preserved; only surplus unfinished placeholders are retired.
-  //
-  // This reserve/retirement accounting must only ever see real AI-generated
-  // lessons (sequence 11+). Unit 2 (6-10) is fixed, authored, permanent
-  // content for every learner, not a cost-driven generation queue: it is
-  // never a "surplus placeholder" to retire, and its instantly-ready rows
-  // must never count toward "already have enough ready ahead" and block
-  // its own listening lesson (the one row that still needs a real
-  // generation call) from ever being claimed.
+  // Course growth has exactly one rule that matters here: never run two
+  // generations at once. There is no cap on how many lessons may sit ready
+  // ahead of the learner — the app keeps a small lookahead buffer topped up
+  // (see adaptiveCourseLookahead in lib/data/database/adaptive_course_store.dart)
+  // and simply queues one more row whenever it wants one; this endpoint's only
+  // job is to pick up the oldest queued/failed row and generate it, forever,
+  // unlimited. This must only ever see real AI-generated lessons (sequence
+  // 11+) — Unit 2 (6-10) is fixed, authored, permanent content for every
+  // learner, never part of this accounting.
   const { data: activePersonalized, error: reserveError } = await admin
     .from("adaptive_course_sessions")
     .select("id, sequence, status, generation_status, updated_at, primary_skill, title, artifact_json")
@@ -792,48 +801,17 @@ Deno.serve(async (request: Request) => {
     }
   }
 
-  const reserve = (activePersonalized ?? []).slice(0, 5) as Json[];
-  const surplus = (activePersonalized ?? []).slice(5) as Json[];
-  const readyAvailable = reserve.filter((row) =>
-    text(row.generation_status) === "ready"
-  ).length;
-  const waiting = reserve.filter((row) =>
-    ["queued", "failed"].includes(text(row.generation_status))
-  );
-  const allowedWaiting = readyAvailable < 2 ? 1 : 0;
-  const retired = [
-    ...surplus,
-    ...waiting.slice(allowedWaiting),
-  ].filter((row) => text(row.status) !== "completed");
-  if (retired.length > 0) {
-    const retiredAt = new Date().toISOString();
-    const { error: retireError } = await admin
-      .from("adaptive_course_sessions")
-      .update({
-        status: "replaced",
-        deleted_at: retiredAt,
-        updated_at: retiredAt,
-        generation_error: "Retired legacy parallel course placeholder",
-      })
-      .in("id", retired.map((row) => text(row.id)))
-      .eq("user_id", userId);
-    if (retireError) return response({ error: retireError.message }, 500);
-  }
-
-  const generating = reserve.some((row) =>
+  const generating = (activePersonalized ?? []).some((row) =>
     text(row.generation_status) === "generating"
   );
-  if (readyAvailable >= 2 || generating) {
+  if (generating) {
     // Visibility into every "did nothing" outcome, not just failures: this
-    // is the only way to tell a legitimately-full reserve apart from a
-    // lesson that is quietly stuck generating for longer than it should.
+    // is the only way to tell "another generation is already running" apart
+    // from a lesson that is quietly stuck for longer than it should.
     console.info(JSON.stringify({
       event: "course_lesson_preparation_noop",
       userId,
-      reason: generating ? "already_generating" : "reserve_full",
-      readyAvailable,
-      reserveSize: reserve.length,
-      reserveSequences: reserve.map((row) => row.sequence),
+      reason: "already_generating",
     }));
     return response({ processed: false, remaining: 0 });
   }
@@ -842,7 +820,7 @@ Deno.serve(async (request: Request) => {
     .from("adaptive_course_sessions")
     .select("*")
     .eq("user_id", userId)
-    .gt("sequence", 5)
+    .gt("sequence", AUTHORED_SEQUENCE_CEILING)
     .in("generation_status", ["queued", "failed"])
     .in("status", ["planned", "active"])
     .is("deleted_at", null)
@@ -960,7 +938,7 @@ Deno.serve(async (request: Request) => {
       .from("adaptive_course_sessions")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .gt("sequence", 5)
+      .gt("sequence", AUTHORED_SEQUENCE_CEILING)
       .in("generation_status", ["queued", "failed"])
       .in("status", ["planned", "active"])
       .is("deleted_at", null);

@@ -319,7 +319,44 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             ),
             const SizedBox(height: 14),
           ],
+          _generateNextCard(),
         ],
+      ),
+    );
+  }
+
+  /// A learner should never have to wonder whether more is coming: the
+  /// route already keeps a small buffer of upcoming lessons topped up on
+  /// its own (see adaptiveCourseLookahead), but this gives them an explicit
+  /// way to ask for the next one right now instead of waiting for the
+  /// background retry loop's next tick.
+  Widget _generateNextCard() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: V3Card(
+        child: Row(
+          children: [
+            Icon(Icons.auto_awesome_rounded, color: DesignTokens.nightAccent),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _preparingCourse
+                    ? 'Preparing your next lesson…'
+                    : 'More lessons keep unlocking as you go.',
+                style: DesignTokens.body(
+                  13,
+                ).copyWith(color: DesignTokens.nightMuted),
+              ),
+            ),
+            const SizedBox(width: 10),
+            V3PrimaryButton(
+              label: 'Generate next',
+              icon: Icons.add_rounded,
+              expand: false,
+              onPressed: _preparingCourse ? null : _prepareCourse,
+            ),
+          ],
+        ),
       ),
     );
   }

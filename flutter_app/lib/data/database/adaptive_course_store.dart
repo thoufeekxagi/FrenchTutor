@@ -25,6 +25,10 @@ Map<String, dynamic>? _decodeMap(Object? value) {
 /// grows one fully prepared personalized session at a time, up to five.
 const adaptiveCourseFoundationSize = 5;
 const adaptiveCourseBatchSize = 5;
+// How many real AI-generated lessons (sequence 11+) to always try to keep
+// ready beyond wherever the learner has reached — not a cap, a floor. Growth
+// never stops; this only controls how far ahead the buffer stays topped up.
+const adaptiveCourseLookahead = 2;
 // The first two personalized batches are a gentle bridge from onboarding to
 // the full practice rotation. Recent evidence can choose the situation and
 // target, but it must not make these early lessons jump ahead of the learner's
@@ -489,38 +493,36 @@ class AdaptiveCourseStore {
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
       if (repaired) _notifyPlan(reconciled);
-      // Growth accounting must only ever look at real AI-generated lessons
-      // (sequence 11+). Unit 2 (6-10) is fixed, authored, permanent content
-      // for every learner — it is not part of the "keep at most two ready
-      // ahead" reserve, and counting its five always-ready rows here would
-      // make availablePersonalized >= 2 forever as long as even two of them
-      // are un-completed, permanently blocking growth past Unit 2 no matter
-      // what the learner does. (This is the exact same bug already fixed in
-      // supabase/functions/prepare-course-lesson/index.ts; this is the
-      // client-side copy of that same accounting that was missed.)
+      // Growth only ever looks at real AI-generated lessons (sequence 11+).
+      // Unit 2 (6-10) is fixed, authored content for every learner, never
+      // part of this accounting.
+      //
+      // The only "one at a time" rule that matters is technical: never let
+      // two generations run at once. There is no cap on how many may sit
+      // ready ahead, and growth is never gated on completion — opening a
+      // lesson (even without finishing it, even out of order) counts as
+      // "reached" it. The route simply keeps a rolling lookahead buffer
+      // beyond wherever the learner has reached, refilled one lesson at a
+      // time, forever, so speeding ahead or jumping around never runs out
+      // of fresh content.
       final personalized = reconciled.sessions
           .where((session) => session.sequence > initialBatchSize)
           .toList(growable: false);
-      final availablePersonalized = personalized
-          .where(
-            (session) =>
-                session.status != 'completed' &&
-                session.status != 'replaced' &&
-                session.isContentReady,
-          )
-          .length;
-      final hasPendingPersonalized = personalized.any(
-        (session) =>
-            session.status != 'completed' &&
-            session.status != 'replaced' &&
-            !session.isContentReady,
+      final isGenerating = personalized.any(
+        (session) => session.generationStatus == 'generating',
       );
-      // Course generation is intentionally serial and unlimited: the route
-      // keeps growing one personalized row at a time for as long as the
-      // learner keeps completing lessons. The next row is never inserted
-      // until the previous artifact is fully persisted, and there is never
-      // more than one row "creating" at once.
-      if (availablePersonalized < 2 && !hasPendingPersonalized) {
+      var highestReached = initialBatchSize;
+      var highestExisting = initialBatchSize;
+      for (final session in personalized) {
+        if (session.sequence > highestExisting) {
+          highestExisting = session.sequence;
+        }
+        if (session.status != 'planned' && session.sequence > highestReached) {
+          highestReached = session.sequence;
+        }
+      }
+      if (!isGenerating &&
+          highestExisting < highestReached + adaptiveCourseLookahead) {
         _appendBatch(
           planId: reconciled.id,
           profile: profile,
