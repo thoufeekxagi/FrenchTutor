@@ -1448,12 +1448,11 @@ abstract final class AdaptiveCoursePlanGenerator {
       final unitTwoArtifact = isUnitTwo
           ? _unitTwoArtifact(targetSkill, level)
           : null;
-      // Unit 2 is authored, not generated: vocabulary, speaking, reading, and
-      // writing are ready the instant this spec exists. Listening's text is
-      // fixed here too, but it still needs one server call for its durable
-      // audio track, so it stays queued with its text artifact already
-      // attached instead of an empty placeholder.
-      final unitTwoReady = isUnitTwo && targetSkill != SpeakSkill.listening;
+      // Unit 2 is authored, not generated: every skill including Listening
+      // is ready the instant this spec exists. Listening's durable audio is
+      // a single shared, publicly-readable asset (see _unitTwoArtifact) —
+      // no per-learner server call, no waiting.
+      final unitTwoReady = isUnitTwo;
       sessions.add(
         AdaptiveCourseSessionSpec(
           id: _adaptiveUuid.v4(),
@@ -1505,12 +1504,12 @@ abstract final class AdaptiveCoursePlanGenerator {
   }
 
   /// Unit 2 (sequences 6-10) is a second fixed, authored block, not an AI
-  /// call. Vocabulary, speaking, reading, and writing are ready the instant
-  /// the plan is created — no network, no waiting, no possibility of a
-  /// malformed generation. Only listening still needs one lean server call
-  /// to render its durable audio track; its text is already fixed here too,
-  /// so that call never invokes the lesson-authoring model, only the TTS
-  /// step. Five words, reused across every one of the five lessons.
+  /// call. Every skill including Listening is ready the instant the plan is
+  /// created — no network, no waiting, no possibility of a malformed
+  /// generation. Listening's durable audio is a single shared, publicly
+  /// readable asset (uploaded once via generate-shared-course-listening-
+  /// audio-once), not a fresh per-learner render. Five words, reused across
+  /// every one of the five lessons.
   static const _unitTwoWords = [
     (id: 'market', en: 'market', fr: 'marché', phonetic: 'mar-shay'),
     (id: 'apple', en: 'apple', fr: 'pomme', phonetic: 'pom'),
@@ -1684,10 +1683,10 @@ abstract final class AdaptiveCoursePlanGenerator {
       sequence > adaptiveCourseFoundationSize &&
       sequence <= adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
 
-  /// Builds the artifact for one Unit 2 lesson. Listening's text (the same
-  /// passage/quiz as reading) is included here too, already complete; only
-  /// its durable audio track is still missing, and is attached server-side
-  /// without ever re-authoring the text.
+  /// Builds the artifact for one Unit 2 lesson. Listening's text and its
+  /// durable audio (a single shared asset, identical for every learner) are
+  /// both already complete here — nothing about Unit 2 ever needs a server
+  /// round trip.
   static Map<String, dynamic>? _unitTwoArtifact(
     SpeakSkill skill,
     String level,
@@ -1827,6 +1826,14 @@ abstract final class AdaptiveCoursePlanGenerator {
                 'phonetic': word.phonetic,
               },
           ],
+          // Every learner gets the exact same French text here, so the
+          // durable audio for it is a single shared, publicly-readable
+          // asset (same pattern as the alphabet-audio bucket) instead of a
+          // fresh redundant TTS render per new learner. See migration
+          // shared_course_listening_audio and
+          // generate-shared-course-listening-audio-once.
+          'audioPath': 'course-shared/unit-two-listening.wav',
+          'audioMode': 'gemini_flash_tts',
         };
       case SpeakSkill.writing:
         final choicesPool = _unitTwoWords.map((w) => w.fr).toList();

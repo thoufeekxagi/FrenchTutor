@@ -66,14 +66,17 @@ void main() {
 
       final listening = bySeq[9]!;
       expect(listening.primarySkill, SpeakSkill.listening);
-      // Listening's text is ready but audio is not attached without the
-      // server call, so it must correctly report not-ready, not crash and
-      // not claim readiness it does not have. It is still listed, though.
+      // Listening's durable audio is a single shared asset identical for
+      // every learner (see generate-shared-course-listening-audio-once), so
+      // this must be instantly ready like the rest of Unit 2 — no server
+      // round trip, no per-learner render.
       expect(listening.artifact, isNotNull);
       expect(listening.artifact!['passage'], isNotNull);
-      expect(listening.isContentReady, isFalse);
+      expect(listening.artifact!['audioPath'], isNotNull);
+      expect(listening.generationStatus, 'ready');
+      expect(listening.isContentReady, isTrue);
       print(
-        'listening text ready, audio pending as expected: ${listening.generationStatus}',
+        'listening ready instantly with shared audio: ${listening.artifact!['audioPath']}',
       );
 
       final writing = bySeq[10]!;

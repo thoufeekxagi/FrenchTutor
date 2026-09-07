@@ -201,8 +201,9 @@ void main() {
       expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
       expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
       // Unit 2's skills are fixed by position (vocabulary, speaking,
-      // reading, listening, writing); only listening still needs its
-      // durable audio track attached server-side.
+      // reading, listening, writing). Listening's durable audio is a
+      // single shared asset identical for every learner, so it is ready
+      // instantly like the rest of Unit 2 — no server round trip.
       final unitTwo = plan.sessions.skip(5).toList(growable: false);
       expect(unitTwo.map((s) => s.primarySkill), [
         SpeakSkill.vocabulary,
@@ -211,18 +212,7 @@ void main() {
         SpeakSkill.listening,
         SpeakSkill.writing,
       ]);
-      expect(
-        unitTwo
-            .where((s) => s.primarySkill != SpeakSkill.listening)
-            .every((s) => s.isContentReady),
-        isTrue,
-      );
-      expect(
-        unitTwo
-            .firstWhere((s) => s.primarySkill == SpeakSkill.listening)
-            .isContentReady,
-        isFalse,
-      );
+      expect(unitTwo.every((s) => s.isContentReady), isTrue);
       final personalizedTitles = unitTwo
           .map((session) => session.title.toLowerCase())
           .toList(growable: false);
