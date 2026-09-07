@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -2404,6 +2405,24 @@ short enough for a mobile bottom sheet.''';
     return _decodeObject(raw);
   }
 
+  /// A word's contextual meaning in a given sentence at a given CEFR level
+  /// never changes and carries no learner-specific data, so this is cached
+  /// in a single table shared across every learner (see migration
+  /// word_meaning_cache), not per-device or per-account. Popular authored
+  /// content (Course's Unit 2, curated Practice library stories) is read by
+  /// many learners tapping the same words in the same sentences, so a cache
+  /// hit here is the common case, not the exception, once content has been
+  /// looked at even once by anyone.
+  static String _wordMeaningCacheKey({
+    required String word,
+    required String sentence,
+    required String levelBand,
+  }) {
+    final normalized =
+        '${word.trim().toLowerCase()}|${sentence.trim().toLowerCase()}|${levelBand.trim().toUpperCase()}';
+    return sha256.convert(utf8.encode(normalized)).toString();
+  }
+
   /// Resolves one arbitrary tapped word when the story's compact glossary did
   /// not include it. The sentence and generated translation are passed
   /// together so short or ambiguous words are explained in context.
@@ -2413,12 +2432,34 @@ short enough for a mobile bottom sheet.''';
     required String sentenceTranslation,
     required String levelBand,
   }) async {
+    final cacheKey = _wordMeaningCacheKey(
+      word: word,
+      sentence: sentence,
+      levelBand: levelBand,
+    );
+    try {
+      final cached = await Supabase.instance.client
+          .from('word_meaning_cache')
+          .select('response_json')
+          .eq('cache_key', cacheKey)
+          .maybeSingle()
+          .timeout(const Duration(seconds: 6));
+      final cachedJson = cached?['response_json'];
+      if (cachedJson is Map) return Map<String, dynamic>.from(cachedJson);
+    } catch (_) {
+      // A cache miss/lookup failure just means the call below runs, same as
+      // if this table did not exist at all.
+    }
+
     const system = '''
 You are a concise French vocabulary assistant. Return ONLY compact JSON with
-this exact shape: {"word": string, "translation": string, "part_of_speech": string, "gender": string, "number": string, "infinitive": string, "tense": string, "can_conjugate": boolean}.
+this exact shape: {"word": string, "translation": string, "part_of_speech": string, "gender": string, "number": string, "infinitive": string, "tense": string, "can_conjugate": boolean, "examples": [{"fr": string, "en": string}]}.
 Explain the selected French word exactly as it is used in the supplied sentence.
 "translation" must be a short plain-English meaning, not a full sentence.
-Use English for metadata. Use French only for word and infinitive. Set
+"examples" must contain exactly two short, different example sentences (French
+with English translation) that use the word with this same meaning, one of
+which may reuse the supplied sentence itself. Use English for metadata. Use
+French only for word, infinitive, and the French half of each example. Set
 can_conjugate true only for a conjugated verb or infinitive that can open a
 conjugation view. Leave unknown gender, number, infinitive, or tense empty.
 Do not invent a meaning unrelated to the sentence.''';
@@ -2439,10 +2480,35 @@ Do not invent a meaning unrelated to the sentence.''';
               'ENGLISH SENTENCE: $sentenceTranslation',
         },
       ],
-      maxTokens: 260,
+      maxTokens: 420,
       temperature: 0.1,
+      // Live conversational and multimodal calls stay on the pinned
+      // OpenRouter model above; this is a small, structured, high-volume
+      // lookup (every word tap, across every learner) that does not need a
+      // large conversational model, so it goes straight to Gemini's
+      // cheapest currently-available text tier instead.
+      provider: 'gemini',
     );
-    return _decodeObject(raw);
+    final result = _decodeObject(raw);
+    unawaited(
+      Supabase.instance.client
+          .from('word_meaning_cache')
+          .insert({
+            'cache_key': cacheKey,
+            'word': word,
+            'sentence': sentence,
+            'level_band': levelBand,
+            'response_json': result,
+          })
+          .timeout(const Duration(seconds: 6))
+          .catchError((_) {
+            // Another caller may have inserted the same key first (or the
+            // insert simply failed) -- either way this cache entry is
+            // best-effort, never load-bearing for the answer already
+            // returned below.
+          }),
+    );
+    return result;
   }
 
   /// The quiz half of the grammar-story rebuild — unlike

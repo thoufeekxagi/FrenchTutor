@@ -16,6 +16,7 @@ import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_settings.dart';
+import '../../services/word_meaning_resolver.dart';
 import '../../widgets/story_cover_image.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/bilingual_word_text.dart';
@@ -25,6 +26,8 @@ import '../../widgets/learning_card.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
+import '../../widgets/word_conjugation_sheet.dart';
+import '../../widgets/word_meaning_overlay.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
 
@@ -111,6 +114,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isLiked = false;
   bool? _selectedWordConjugatable;
   VocabEntry? _resolvedWordMeaning;
+  List<WordMeaningExample> _resolvedWordExamples = const [];
   bool _isMarkedLearned = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
@@ -497,11 +501,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         _selectedWordSegment = null;
         _selectedWord = null;
         _resolvedWordMeaning = null;
+        _resolvedWordExamples = const [];
         _selectedWordConjugatable = null;
       } else {
         _selectedWordSegment = segmentIndex;
         _selectedWord = wordIndex;
         _resolvedWordMeaning = _fallbackWordEntry(segmentIndex, wordIndex);
+        _resolvedWordExamples = const [];
         _selectedWordConjugatable = _heuristicWordCanConjugate(segmentIndex);
       }
     });
@@ -667,20 +673,16 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     final segmentIndex = _selectedWordSegment;
     if (entry == null || segmentIndex == null) return;
     final segment = _passage.segments[segmentIndex];
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _ConjugationSheet(
-        darkMode: _darkMode,
+    await showWordConjugationSheet(
+      context,
+      darkMode: _darkMode,
+      word: entry.fr,
+      translation: entry.en,
+      future: LessonAgentService.shared.buildWordConjugation(
         word: entry.fr,
         translation: entry.en,
-        future: LessonAgentService.shared.buildWordConjugation(
-          word: entry.fr,
-          translation: entry.en,
-          sentence: segment.fr,
-          levelBand: _story.levelBand,
-        ),
+        sentence: segment.fr,
+        levelBand: _story.levelBand,
       ),
     );
   }
@@ -693,7 +695,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     final selectedWord = _cleanStoryWord(words[wordIndex]);
     if (selectedWord.isEmpty) return;
     try {
-      final data = await LessonAgentService.shared.buildWordMeaning(
+      final result = await WordMeaningResolver.resolve(
         word: selectedWord,
         sentence: segment.fr,
         sentenceTranslation: segment.en,
@@ -704,23 +706,18 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _selectedWord != wordIndex) {
         return;
       }
-      final translation = data['translation']?.toString().trim() ?? '';
-      final resolvedTranslation = translation.isNotEmpty
-          ? translation
+      final resolvedTranslation = result.entry.en.isNotEmpty
+          ? result.entry.en
           : _fallbackTranslationForWord(segment, wordIndex);
-      final rawWord = data['word']?.toString().trim() ?? '';
-      final resolvedWord = rawWord.isNotEmpty ? rawWord : selectedWord;
-      final partOfSpeech =
-          data['part_of_speech']?.toString().toLowerCase() ?? '';
       setState(() {
         _resolvedWordMeaning = VocabEntry(
           id: 'story:${_story.id}:$segmentIndex:$wordIndex',
-          fr: resolvedWord,
+          fr: result.entry.fr,
           en: resolvedTranslation,
           phonetic: '',
         );
-        _selectedWordConjugatable =
-            data['can_conjugate'] == true || partOfSpeech.contains('verb');
+        _resolvedWordExamples = result.examples;
+        _selectedWordConjugatable = result.canConjugate;
       });
     } catch (_) {
       // The local positional meaning remains visible if the model is
@@ -752,6 +749,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       story: _story,
                       darkMode: _darkMode,
                       selectedWord: _selectedWordEntry(),
+                      selectedWordExamples: _resolvedWordExamples,
                       learned: _isMarkedLearned,
                       onBack: () => Navigator.maybePop(context),
                       onMarkLearned: _markAsLearned,
@@ -968,14 +966,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                   : null,
               playbackSourceWord: _isPlaying && _currentSegment == entry.key
                   ? _currentWord
-                  : null,
-              playbackTranslationWord:
-                  _isPlaying && _currentSegment == entry.key
-                  ? _mappedTranslationWord(
-                      currentWord: _currentWord,
-                      source: entry.value.fr,
-                      translation: entry.value.en,
-                    )
                   : null,
               onSourceWordTap: (wordIndex) => _selectWord(entry.key, wordIndex),
             ),
@@ -1450,6 +1440,7 @@ class _StoryBookHeader extends StatelessWidget {
     required this.story,
     required this.darkMode,
     this.selectedWord,
+    this.selectedWordExamples = const [],
     required this.learned,
     required this.onBack,
     required this.onMarkLearned,
@@ -1460,6 +1451,7 @@ class _StoryBookHeader extends StatelessWidget {
   final GeneratedStory story;
   final bool darkMode;
   final VocabEntry? selectedWord;
+  final List<WordMeaningExample> selectedWordExamples;
   final bool learned;
   final VoidCallback onBack;
   final VoidCallback onMarkLearned;
@@ -1570,10 +1562,11 @@ class _StoryBookHeader extends StatelessWidget {
                   ? const SizedBox.shrink()
                   : Align(
                       alignment: Alignment.centerLeft,
-                      child: _SelectedWordOverlay(
+                      child: WordMeaningOverlay(
                         word: selectedWord!,
                         accent: accent,
                         darkMode: darkMode,
+                        examples: selectedWordExamples,
                         onConjugate: onConjugate,
                       ),
                     ),
@@ -1613,255 +1606,6 @@ class _HeroIconButton extends StatelessWidget {
         style: IconButton.styleFrom(
           backgroundColor: Colors.black.withValues(alpha: 0.38),
           shape: const CircleBorder(),
-        ),
-      ),
-    );
-  }
-}
-
-class _SelectedWordOverlay extends StatelessWidget {
-  const _SelectedWordOverlay({
-    required this.word,
-    required this.accent,
-    required this.darkMode,
-    this.onConjugate,
-  });
-
-  final VocabEntry word;
-  final Color accent;
-  final bool darkMode;
-  final VoidCallback? onConjugate;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          word.fr,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: DesignTokens.display(
-            24,
-          ).copyWith(color: Colors.white, height: 1.05),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          word.en,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: DesignTokens.body(
-            14,
-          ).copyWith(color: Colors.white.withValues(alpha: 0.9), height: 1.25),
-        ),
-        const SizedBox(height: 8),
-        if (onConjugate != null)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: accent,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: InkWell(
-              onTap: onConjugate,
-              borderRadius: BorderRadius.circular(18),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                child: Text(
-                  'Conjugate  →',
-                  style: DesignTokens.body(12, weight: FontWeight.w800)
-                      .copyWith(
-                        color: darkMode
-                            ? DesignTokens.nightCanvas
-                            : Colors.white,
-                      ),
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _ConjugationSheet extends StatelessWidget {
-  const _ConjugationSheet({
-    required this.future,
-    required this.darkMode,
-    required this.word,
-    required this.translation,
-  });
-
-  final Future<Map<String, dynamic>> future;
-  final bool darkMode;
-  final String word;
-  final String translation;
-
-  @override
-  Widget build(BuildContext context) {
-    final surface = darkMode ? DesignTokens.nightSurfaceRaised : Colors.white;
-    final text = darkMode ? DesignTokens.nightText : DesignTokens.ink;
-    final muted = darkMode ? DesignTokens.nightMuted : DesignTokens.mutedDim;
-    final accent = darkMode ? DesignTokens.nightAccent : DesignTokens.primary;
-    return SafeArea(
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 620),
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-        decoration: BoxDecoration(
-          color: surface,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const SizedBox(
-                height: 240,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            if (snapshot.hasError || snapshot.data == null) {
-              return SizedBox(
-                height: 220,
-                child: Center(
-                  child: Text(
-                    'The conjugation is unavailable right now. Try again in a moment.',
-                    textAlign: TextAlign.center,
-                    style: DesignTokens.body(15).copyWith(color: muted),
-                  ),
-                ),
-              );
-            }
-            final data = snapshot.data!;
-            final conjugation = (data['conjugation'] as List? ?? const [])
-                .whereType<Map>()
-                .toList();
-            final metadata = [
-              data['part_of_speech']?.toString() ?? '',
-              data['gender']?.toString() ?? '',
-              data['number']?.toString() ?? '',
-              data['tense']?.toString() ?? '',
-            ].where((value) => value.trim().isNotEmpty).join(' · ');
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 38,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: muted.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          data['title']?.toString().trim().isNotEmpty == true
-                              ? data['title'].toString()
-                              : word,
-                          style: DesignTokens.display(24).copyWith(color: text),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(CupertinoIcons.xmark, color: muted),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    translation,
-                    style: DesignTokens.body(15).copyWith(color: muted),
-                  ),
-                  if (metadata.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      metadata,
-                      style: DesignTokens.mono(11).copyWith(color: accent),
-                    ),
-                  ],
-                  if ((data['summary']?.toString() ?? '').isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    Text(
-                      data['summary'].toString(),
-                      style: DesignTokens.body(
-                        14,
-                      ).copyWith(color: text, height: 1.4),
-                    ),
-                  ],
-                  if (conjugation.isNotEmpty) ...[
-                    const SizedBox(height: 18),
-                    Text(
-                      'CONJUGATION',
-                      style: DesignTokens.mono(
-                        10.5,
-                        weight: FontWeight.w800,
-                      ).copyWith(color: accent, letterSpacing: 0.8),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: muted.withValues(alpha: 0.4)),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          for (var i = 0; i < conjugation.length; i++)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: i.isEven
-                                    ? muted.withValues(alpha: 0.06)
-                                    : Colors.transparent,
-                                border: i == conjugation.length - 1
-                                    ? null
-                                    : Border(
-                                        bottom: BorderSide(
-                                          color: muted.withValues(alpha: 0.2),
-                                        ),
-                                      ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      conjugation[i]['pronoun']?.toString() ??
-                                          '',
-                                      style: DesignTokens.body(
-                                        14,
-                                      ).copyWith(color: muted),
-                                    ),
-                                  ),
-                                  Text(
-                                    conjugation[i]['form']?.toString() ?? '',
-                                    style: DesignTokens.body(
-                                      14,
-                                      weight: FontWeight.w700,
-                                    ).copyWith(color: text),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            );
-          },
         ),
       ),
     );
@@ -2159,19 +1903,6 @@ class _GrammarCueCard extends StatelessWidget {
       ),
     );
   }
-}
-
-int? _mappedTranslationWord({
-  required int? currentWord,
-  required String source,
-  required String translation,
-}) {
-  if (currentWord == null) return null;
-  final sourceCount = _wordParts(source).length;
-  final translationCount = _wordParts(translation).length;
-  if (sourceCount == 0 || translationCount == 0) return null;
-  final mapped = (currentWord * translationCount / sourceCount).floor();
-  return mapped.clamp(0, translationCount - 1);
 }
 
 List<String> _wordParts(String text) =>

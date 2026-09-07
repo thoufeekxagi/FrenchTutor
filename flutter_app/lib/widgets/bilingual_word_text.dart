@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import '../design/tokens.dart';
 import '../models/content_models.dart';
 
-/// Displays a French sentence and its English translation as tappable words.
-///
-/// The selected French word is paired with the matching glossary entry in the
-/// translation, so both sides use the same accent color and underline. The
-/// optional playback indexes preserve the separate word-by-word narration
-/// indicator used by the reading and listening players.
+/// Displays a French sentence and its English translation. Only the French
+/// side is ever tappable/highlightable, whether by tap-to-select or by the
+/// word-by-word narration indicator during playback (Readle's convention):
+/// mapping a highlight onto the English line is frequently wrong, since
+/// English word order and word count rarely line up with the French
+/// original, and a wrong highlight actively misleads a learner. The
+/// translation line is plain, non-interactive text.
 class BilingualWordText extends StatelessWidget {
   const BilingualWordText({
     super.key,
@@ -52,22 +53,13 @@ class BilingualWordText extends StatelessWidget {
   Widget build(BuildContext context) {
     final sourceWords = _wordParts(source);
     final translationWords = _wordParts(translation);
-    final selectedEntry = selectedSourceWord == null
-        ? null
-        : _entryForWord(sourceWords, selectedSourceWord!);
-    final selectedTranslationWords = selectedSourceWord == null
-        ? const <int>{}
-        : _explicitTranslationMatches(
-                selectedSourceWord!,
-                translationWords.length,
-              ) ??
-              _translationMatches(
-                translationWords,
-                selectedEntry?.en,
-                selectedSourceWord!,
-                sourceWords.length,
-                strictAlignment: strictAlignment,
-              );
+    // Readle-style rule: only the French word itself is ever highlighted,
+    // whether tapped or currently narrated. The English line used to mirror
+    // a "matching" word (by glossary lookup during selection, or by a mapped
+    // index during playback), but that match is frequently wrong — English
+    // word order and word count rarely line up with the French original —
+    // and a wrong highlight actively misleads a learner about what a word
+    // means. The translation line is now purely informational text.
 
     return Semantics(
       container: true,
@@ -96,21 +88,7 @@ class BilingualWordText extends StatelessWidget {
           ),
           if (showTranslation && translationWords.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 0,
-              runSpacing: 4,
-              children: [
-                for (var index = 0; index < translationWords.length; index++)
-                  Text(
-                    '${translationWords[index]}${index == translationWords.length - 1 ? '' : ' '}',
-                    style: _wordStyle(
-                      translationStyle,
-                      selected: selectedTranslationWords.contains(index),
-                      playing: playbackTranslationWord == index,
-                    ),
-                  ),
-              ],
-            ),
+            Text(translation, style: translationStyle),
           ],
         ],
       ),
@@ -139,112 +117,7 @@ class BilingualWordText extends StatelessWidget {
     return base;
   }
 
-  VocabEntry? _entryForWord(List<String> words, int index) {
-    if (index < 0 || index >= words.length) return null;
-    final selected = _fold(words[index]);
-    VocabEntry? best;
-    var bestLength = 0;
-    for (final entry in keywords) {
-      final entryWords = _wordParts(entry.fr).map(_fold).toList();
-      if (entryWords.isEmpty || !entryWords.contains(selected)) continue;
-      if (entryWords.length > bestLength) {
-        best = entry;
-        bestLength = entryWords.length;
-      }
-    }
-    return best;
-  }
-
-  Set<int>? _explicitTranslationMatches(int sourceIndex, int translationCount) {
-    final alignment = sourceToTranslation;
-    if (alignment == null ||
-        sourceIndex < 0 ||
-        sourceIndex >= alignment.length) {
-      return null;
-    }
-    return alignment[sourceIndex]
-        .where((index) => index >= 0 && index < translationCount)
-        .toSet();
-  }
-
-  Set<int> _translationMatches(
-    List<String> words,
-    String? target,
-    int sourceIndex,
-    int sourceCount, {
-    bool strictAlignment = false,
-  }) {
-    final foldedWords = words.map(_fold).toList();
-    if (foldedWords.isEmpty) return const <int>{};
-
-    final targetWords = target == null
-        ? const <String>[]
-        : _wordParts(target).map(_fold).toList();
-
-    if (targetWords.isNotEmpty) {
-      for (
-        var start = 0;
-        start <= foldedWords.length - targetWords.length;
-        start++
-      ) {
-        var matches = true;
-        for (var offset = 0; offset < targetWords.length; offset++) {
-          if (foldedWords[start + offset] != targetWords[offset]) {
-            matches = false;
-            break;
-          }
-        }
-        if (matches) {
-          return {
-            for (var offset = 0; offset < targetWords.length; offset++)
-              start + offset,
-          };
-        }
-      }
-
-      // When the generated translation is slightly different from the
-      // glossary, keep the visual cue useful by matching any glossary words
-      // that survive.
-      final individual = <int>{};
-      for (final targetWord in targetWords) {
-        final match = foldedWords.indexOf(targetWord);
-        if (match >= 0) individual.add(match);
-      }
-      if (individual.isNotEmpty) return individual;
-    }
-
-    if (strictAlignment) return const <int>{};
-
-    // Last resort for an omitted glossary entry or paraphrase: point to the
-    // equivalent position in the English sentence instead of silently
-    // dropping the learner's selection. Every tappable source word therefore
-    // gets a visible paired cue.
-    final mapped = (sourceIndex * foldedWords.length / sourceCount).floor();
-    return {mapped.clamp(0, foldedWords.length - 1)};
-  }
 }
 
 List<String> _wordParts(String text) =>
     text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).toList();
-
-String _fold(String value) => value
-    .toLowerCase()
-    .replaceAll(RegExp(r"[.,!?;:«»'()…]"), '')
-    .replaceAll('"', '')
-    .replaceAll('-', ' ')
-    .replaceAll('à', 'a')
-    .replaceAll('â', 'a')
-    .replaceAll('ä', 'a')
-    .replaceAll('é', 'e')
-    .replaceAll('è', 'e')
-    .replaceAll('ê', 'e')
-    .replaceAll('ë', 'e')
-    .replaceAll('î', 'i')
-    .replaceAll('ï', 'i')
-    .replaceAll('ô', 'o')
-    .replaceAll('ö', 'o')
-    .replaceAll('ù', 'u')
-    .replaceAll('û', 'u')
-    .replaceAll('ü', 'u')
-    .replaceAll('ç', 'c')
-    .trim();

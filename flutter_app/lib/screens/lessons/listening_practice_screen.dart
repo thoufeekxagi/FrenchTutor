@@ -20,9 +20,12 @@ import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
+import '../../services/word_meaning_resolver.dart';
 import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/story_cover_image.dart';
+import '../../widgets/word_conjugation_sheet.dart';
+import '../../widgets/word_meaning_overlay.dart';
 import 'story_reader_screen.dart';
 
 enum _ListeningStage { firstListen, check, focus, dictation, shadow, recap }
@@ -66,6 +69,9 @@ class _ListeningPracticeScreenState
   int? _selectedWordSegment;
   int? _lyricsSelectedWordIndex;
   int? _currentWord;
+  VocabEntry? _resolvedWordMeaning;
+  List<WordMeaningExample> _resolvedWordExamples = const [];
+  bool _resolvedWordCanConjugate = false;
   int? _dictationSegment;
   bool _isPlaying = false;
   bool _audioLoading = false;
@@ -341,7 +347,70 @@ class _ListeningPracticeScreenState
     setState(() {
       _selectedWordSegment = isSame ? null : segmentIndex;
       _lyricsSelectedWordIndex = isSame ? null : wordIndex;
+      if (isSame) {
+        _resolvedWordMeaning = null;
+        _resolvedWordExamples = const [];
+        _resolvedWordCanConjugate = false;
+      }
     });
+    if (!isSame) unawaited(_resolveListeningWordMeaning(segmentIndex, wordIndex));
+  }
+
+  /// Same shared lookup Reading/Course uses (see story_reader_screen.dart's
+  /// _resolveWordMeaning) — one word tapped in one sentence at one level
+  /// means the same thing, looks the same, and is billed the same (once,
+  /// ever, across every learner) in both places.
+  Future<void> _resolveListeningWordMeaning(
+    int segmentIndex,
+    int wordIndex,
+  ) async {
+    if (segmentIndex < 0 || segmentIndex >= _segments.length) return;
+    final segment = _segments[segmentIndex];
+    final words = _plainWords(segment.fr);
+    if (wordIndex < 0 || wordIndex >= words.length) return;
+    final selectedWord = words[wordIndex];
+    if (selectedWord.isEmpty) return;
+    try {
+      final result = await WordMeaningResolver.resolve(
+        word: selectedWord,
+        sentence: segment.fr,
+        sentenceTranslation: segment.en,
+        levelBand: _story.levelBand,
+      );
+      if (!mounted ||
+          _selectedWordSegment != segmentIndex ||
+          _lyricsSelectedWordIndex != wordIndex) {
+        return;
+      }
+      setState(() {
+        _resolvedWordMeaning = result.entry;
+        _resolvedWordExamples = result.examples;
+        _resolvedWordCanConjugate = result.canConjugate;
+      });
+    } catch (_) {
+      // No local fallback shown here (unlike Reading's positional guess) --
+      // the panel simply stays hidden until a retry succeeds, which the
+      // learner can trigger by tapping the word again.
+    }
+  }
+
+  Future<void> _showListeningConjugation() async {
+    final entry = _resolvedWordMeaning;
+    final segmentIndex = _selectedWordSegment;
+    if (entry == null || segmentIndex == null) return;
+    final segment = _segments[segmentIndex];
+    await showWordConjugationSheet(
+      context,
+      darkMode: _darkMode,
+      word: entry.fr,
+      translation: entry.en,
+      future: LessonAgentService.shared.buildWordConjugation(
+        word: entry.fr,
+        translation: entry.en,
+        sentence: segment.fr,
+        levelBand: _story.levelBand,
+      ),
+    );
   }
 
   int? _findDictationSegment() {
@@ -1034,6 +1103,24 @@ class _ListeningPracticeScreenState
                     onSettings: _showSettings,
                   ),
                 ),
+                if (_resolvedWordMeaning != null)
+                  Positioned(
+                    left: 14,
+                    right: 14,
+                    top: 60,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: WordMeaningOverlay(
+                        word: _resolvedWordMeaning!,
+                        accent: DesignTokens.nightAccent,
+                        darkMode: _darkMode,
+                        examples: _resolvedWordExamples,
+                        onConjugate: _resolvedWordCanConjugate
+                            ? _showListeningConjugation
+                            : null,
+                      ),
+                    ),
+                  ),
                 if (showLyrics)
                   Positioned.fill(
                     top: 84,
@@ -2276,13 +2363,6 @@ class _ListeningTranscriptLines extends StatelessWidget {
             accentColor: DesignTokens.nightAccent,
             selectedSourceWord: selectedSegment == index ? selectedWord : null,
             playbackSourceWord: _isActive(index, active) ? currentWord : null,
-            playbackTranslationWord: _isActive(index, active)
-                ? _mapListeningTranslationWord(
-                    currentWord: currentWord,
-                    source: segments[index].fr,
-                    translation: segments[index].en,
-                  )
-                : null,
             onSourceWordTap: (wordIndex) => onWordTap(index, wordIndex),
           ),
           const SizedBox(height: 10),
@@ -2298,25 +2378,6 @@ class _ListeningTranscriptLines extends StatelessWidget {
   bool _isActive(int index, int active) => index == active;
 }
 
-int? _mapListeningTranslationWord({
-  required int? currentWord,
-  required String source,
-  required String translation,
-}) {
-  if (currentWord == null || translation.trim().isEmpty) return null;
-  final sourceCount = _listeningWordParts(source).length;
-  final translationCount = _listeningWordParts(translation).length;
-  if (sourceCount == 0 || translationCount == 0) return null;
-  return (currentWord * translationCount / sourceCount)
-      .floor()
-      .clamp(0, translationCount - 1)
-      .toInt();
-}
-
-List<String> _listeningWordParts(String value) => value
-    .split(RegExp(r'\s+'))
-    .where((word) => word.trim().isNotEmpty)
-    .toList();
 
 class _ListeningFullscreenTranscript extends StatelessWidget {
   const _ListeningFullscreenTranscript({
