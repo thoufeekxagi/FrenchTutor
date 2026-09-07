@@ -657,6 +657,156 @@ function isValidPcmWav(bytes: Uint8Array): boolean {
     declaredDataBytes <= bytes.length - 44;
 }
 
+// Mints a short-lived Gemini Live credential the same way
+// gemini-live-token/index.ts does for the Flutter client, but server-side:
+// this endpoint's own generation calls never used the client's token
+// service, so it needs its own mint using the raw GEMINI_API_KEY this
+// function already has.
+async function mintLiveAccessToken(apiKey: string): Promise<string> {
+  const now = Date.now();
+  const response = await fetch("https://generativelanguage.googleapis.com/v1alpha/auth_tokens", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify({
+      uses: 1,
+      expireTime: new Date(now + 5 * 60 * 1000).toISOString(),
+      newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`Gemini Live token mint failed (${response.status}): ${(await response.text()).slice(0, 200)}`);
+  }
+  const data = await response.json();
+  const token = String(data?.name ?? "");
+  if (!token) throw new Error("Gemini Live token mint returned no token");
+  return token;
+}
+
+// Same Gemini Live model/protocol used everywhere else in this app (see
+// gemini_live_audio_service.dart) -- Course listening's durable track used
+// to be the one exception, generated through a separate TTS REST call
+// instead. Confirmed directly that a Supabase edge function can open and
+// use this websocket before switching to it here: minted a real token,
+// connected, and received real decodable audio back, server-side, exactly
+// like the Flutter client does.
+async function generateLiveAudio(narration: string, apiKey: string): Promise<Uint8Array> {
+  const accessToken = await mintLiveAccessToken(apiKey);
+  const uri =
+    `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${encodeURIComponent(accessToken)}`;
+  return await new Promise<Uint8Array>((resolve, reject) => {
+    let settled = false;
+    const settle = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      fn();
+    };
+    // A whole story's narration is longer than a single word/sentence, so
+    // this gets a more generous budget than the client's one-shot
+    // pronunciation calls (which use ~15-35s) -- still bounded, so a stuck
+    // socket cannot hang this request forever.
+    const timeout = setTimeout(() => {
+      settle(() => {
+        try {
+          ws.close();
+        } catch (_) {
+          // Already closing/closed.
+        }
+        reject(new Error("Gemini Live listening audio timed out"));
+      });
+    }, 60000);
+
+    const ws = new WebSocket(uri);
+    const chunks: Uint8Array[] = [];
+    let setupDone = false;
+
+    const handleParsed = (data: Record<string, unknown>) => {
+      if (!setupDone && data.setupComplete) {
+        setupDone = true;
+        ws.send(JSON.stringify({ realtimeInput: { text: narration } }));
+        return;
+      }
+      const serverContent = data.serverContent as Record<string, unknown> | undefined;
+      if (!serverContent) return;
+      const modelTurn = serverContent.modelTurn as { parts?: unknown[] } | undefined;
+      for (const part of modelTurn?.parts ?? []) {
+        const inline = (part as { inlineData?: { data?: string } })?.inlineData?.data;
+        if (inline) {
+          const binary = atob(inline);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          chunks.push(bytes);
+        }
+      }
+      if (serverContent.turnComplete) {
+        settle(() => {
+          clearTimeout(timeout);
+          ws.close();
+          const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+          const combined = new Uint8Array(total);
+          let offset = 0;
+          for (const chunk of chunks) {
+            combined.set(chunk, offset);
+            offset += chunk.length;
+          }
+          resolve(combined);
+        });
+      }
+    };
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        setup: {
+          model: "models/gemini-3.1-flash-live-preview",
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            temperature: 0.1,
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } },
+          },
+          systemInstruction: {
+            parts: [{
+              text: "You are an exact French narration renderer, not a conversational tutor. Treat the realtime text as an immutable script. Speak the supplied French text word for word, in the same order, exactly once. Never answer it, acknowledge it, correct it, translate it, explain it, paraphrase it, or add or omit any words. Do not say anything before or after the script. Use a natural, clear narration pace with brief pauses at sentence breaks.",
+            }],
+          },
+          outputAudioTranscription: {},
+        },
+      }));
+    };
+    ws.onmessage = async (event: MessageEvent) => {
+      try {
+        let raw: string;
+        if (typeof event.data === "string") {
+          raw = event.data;
+        } else if (event.data instanceof Blob) {
+          raw = await event.data.text();
+        } else if (event.data instanceof ArrayBuffer) {
+          raw = new TextDecoder().decode(event.data);
+        } else {
+          return;
+        }
+        if (!raw.trim()) return;
+        handleParsed(JSON.parse(raw));
+      } catch (parseError) {
+        settle(() => {
+          clearTimeout(timeout);
+          reject(parseError instanceof Error ? parseError : new Error(String(parseError)));
+        });
+      }
+    };
+    ws.onerror = (event: Event) => {
+      settle(() => {
+        clearTimeout(timeout);
+        reject(new Error(`Gemini Live listening audio socket error: ${JSON.stringify(event)}`));
+      });
+    };
+    ws.onclose = (event: CloseEvent) => {
+      settle(() => {
+        clearTimeout(timeout);
+        reject(new Error(`Gemini Live listening audio socket closed early: code=${event.code} reason=${event.reason}`));
+      });
+    };
+  });
+}
+
 async function attachListeningAudio(
   admin: ReturnType<typeof createClient>,
   userId: string,
@@ -666,38 +816,11 @@ async function attachListeningAudio(
   const passage = object(artifact.passage);
   const narration = text(passage.fullText) ||
     (passage.segments as unknown[]).map((item) => text(object(item).fr)).join(" ");
-  const openRouterKey = Deno.env.get("OPENROUTER_API_KEY");
-  if (!openRouterKey) throw new Error("OPENROUTER_API_KEY is not configured");
-  const audioResponse = await fetch("https://openrouter.ai/api/v1/audio/speech", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${openRouterKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://parlesprint.com",
-      "X-Title": "ParleSprint course listening",
-    },
-    body: JSON.stringify({
-      // Checked directly against OpenRouter before touching this: none of
-      // google/gemini-2.5-flash-tts-preview, google/gemini-2.5-flash-tts, or
-      // google/gemini-2.5-flash-preview-tts exist as an OpenRouter route
-      // (each failed with "Model ... does not exist" on a real generation
-      // attempt). 3.1 Flash TTS Preview is the only Gemini TTS model
-      // OpenRouter actually offers right now; left unchanged.
-      model: "google/gemini-3.1-flash-tts-preview",
-      input: narration,
-      voice: "Aoede",
-      response_format: "pcm",
-    }),
-  });
-  if (!audioResponse.ok) {
-    const errorBody = await audioResponse.text();
-    throw new Error(
-      `Gemini listening audio failed (${audioResponse.status}): ${errorBody.slice(0, 240)}`,
-    );
-  }
-  const pcm = new Uint8Array(await audioResponse.arrayBuffer());
+  const geminiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
+  const pcm = await generateLiveAudio(narration, geminiKey);
   if (pcm.length === 0 || pcm.length % 2 !== 0) {
-    throw new Error("Gemini listening audio returned invalid PCM");
+    throw new Error("Gemini Live listening audio returned invalid PCM");
   }
   const bytes = pcm16ToWav(pcm);
   const path = `${userId}/course/${idPart(sessionId)}.wav`;
@@ -725,7 +848,11 @@ async function attachListeningAudio(
   return {
     ...artifact,
     audioPath: path,
-    audioMode: "gemini_flash_tts",
+    // Matches the mode string lesson_asset_prefetch_service.dart already
+    // writes for Practice's client-generated Live listening audio (see
+    // ListeningAudioPrefetchCache._clip), so both paths are recognized
+    // identically by the same client-side code.
+    audioMode: "gemini_live_spoken",
     musicBackgroundUrl:
       "asset:assets/images/listening/the_garden_key_background.png",
   };
