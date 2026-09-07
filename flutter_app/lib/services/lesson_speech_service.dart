@@ -286,13 +286,26 @@ class LessonSpeechService {
       generation: generation,
     );
     if (!played) {
-      // Gemini is the only voice engine here — no on-device fallback. Stop
-      // the queue and surface the failure instead of silently skipping every
-      // line and leaving the reader looking like it played.
-      _abortQueue(
-        generation,
-        StateError('Gemini Live returned no playable audio.'),
+      // This line already went through synthesizeWithRetry's 3 attempts
+      // with backoff. A story fires one fresh Gemini Live call per
+      // sentence in quick succession (see warmDeck), which can transiently
+      // trip a rate limit or socket hiccup on one specific sentence even
+      // when every other sentence is fine. Killing the entire remaining
+      // story over one stubborn line used to leave a learner reading
+      // silence for every sentence after it — reported directly as audio
+      // "skipping the last two sentences." Skip just this one line and
+      // keep the story playing; the learner can still tap that sentence
+      // directly to retry it (see _playSelectedSentence).
+      debugPrint(
+        'LessonSpeechService: skipping unplayable line at index $_ttsIndex after retries',
       );
+      // Still surfaces to the caller (a single-item speak, e.g. a vocab
+      // word's speaker tap, has nothing to skip to and would otherwise
+      // fail with no feedback at all) but never stops the rest of a
+      // multi-line story from continuing.
+      _onError?.call(StateError('Gemini Live returned no playable audio.'));
+      _ttsIndex += 1;
+      await _speakCurrent(generation);
     }
   }
 
@@ -614,31 +627,6 @@ class LessonSpeechService {
     if (generation != _queueGeneration) return;
     _ttsIndex += 1;
     _speakCurrent(generation);
-  }
-
-  void _abortQueue(int generation, Object error) {
-    if (generation != _queueGeneration) return;
-    _queueGeneration++;
-    _completionTimer?.cancel();
-    _completionTimer = null;
-    for (final timer in _wordTimers) {
-      timer.cancel();
-    }
-    _wordTimers.clear();
-    _ttsQueue = [];
-    _ttsIndex = 0;
-    isSpeaking = false;
-    isPaused = false;
-    final onError = _onError;
-    _onError = null;
-    _onFinished = null;
-    _onItemStart = null;
-    _onWordBoundary = null;
-    _onPlaybackReady = null;
-    _playbackSpeedOverride = null;
-    _resetPlaybackTiming();
-    unawaited(_geminiAudioLazy?.stopPlayback());
-    onError?.call(error);
   }
 
   double _normalizePlaybackSpeed(double value) {
