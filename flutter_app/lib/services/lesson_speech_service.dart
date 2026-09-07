@@ -94,6 +94,15 @@ class LessonSpeechService {
 
   List<SpeechItem> _ttsQueue = [];
   int _ttsIndex = 0;
+  // Lines that failed all 3 of synthesizeWithRetry's attempts during this
+  // queue's run and were skipped so the rest of the story could keep
+  // playing. By the time the queue finishes, whatever transient
+  // rate-limit/socket contention caused the failure (see warmDeck) has
+  // almost always cleared, so each one gets exactly one more quiet
+  // attempt in the background — not another 3-attempt burst — so the
+  // line is cached and plays correctly next time, without making the
+  // learner wait for it now or spending more calls than necessary.
+  final List<SpeechItem> _skippedItems = [];
   void Function(int)? _onItemStart;
   void Function()? _onFinished;
   void Function()? _onPlaybackReady;
@@ -163,6 +172,7 @@ class LessonSpeechService {
       final generation = ++_queueGeneration;
       _ttsQueue = items;
       _ttsIndex = 0;
+      _skippedItems.clear();
       _rateOverride = rate;
       _playbackSpeedOverride = playbackSpeed == null
           ? null
@@ -263,6 +273,7 @@ class LessonSpeechService {
       final finished = _onFinished;
       _onFinished = null;
       finished?.call();
+      unawaited(_retrySkippedItemsInBackground(generation));
       return;
     }
     isSpeaking = true;
@@ -299,6 +310,7 @@ class LessonSpeechService {
       debugPrint(
         'LessonSpeechService: skipping unplayable line at index $_ttsIndex after retries',
       );
+      _skippedItems.add(item);
       // Still surfaces to the caller (a single-item speak, e.g. a vocab
       // word's speaker tap, has nothing to skip to and would otherwise
       // fail with no feedback at all) but never stops the rest of a
@@ -306,6 +318,36 @@ class LessonSpeechService {
       _onError?.call(StateError('Gemini Live returned no playable audio.'));
       _ttsIndex += 1;
       await _speakCurrent(generation);
+    }
+  }
+
+  /// Every skipped line gets exactly one more quiet attempt after the whole
+  /// story has finished, sequentially (never a burst) and never blocking
+  /// playback — by then, whatever transient contention caused the original
+  /// failure (see warmDeck's concurrent connections) has almost always
+  /// cleared. A success here just warms the shared cache so the line plays
+  /// correctly the next time this story is read or that sentence is tapped
+  /// directly; it never interrupts playback that has already moved on. One
+  /// attempt each, not another 3-attempt burst — real work already went
+  /// into the first try.
+  Future<void> _retrySkippedItemsInBackground(int generation) async {
+    if (_skippedItems.isEmpty) return;
+    final items = List<SpeechItem>.from(_skippedItems);
+    _skippedItems.clear();
+    final persona = ActiveTutor.current;
+    for (final item in items) {
+      if (generation != _queueGeneration) return;
+      try {
+        await synthesize(
+          item.text,
+          voiceName: persona.voiceName,
+          contentItemId: item.contentItemId,
+        );
+      } catch (error) {
+        debugPrint(
+          'LessonSpeechService: background retry for a skipped line failed again: $error',
+        );
+      }
     }
   }
 
