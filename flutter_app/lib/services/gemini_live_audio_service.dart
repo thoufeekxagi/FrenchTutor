@@ -392,12 +392,21 @@ class GeminiLiveAudioService {
     final outputTranscript = StringBuffer();
     late final StreamSubscription subscription;
 
+    // Only one of these two completers ends up actually awaited below — if
+    // setupComplete fails, the code throws out of that await and never
+    // reaches `await turnComplete.future` at all. Without a catchError
+    // attached here, that second, never-awaited completeError becomes an
+    // "Uncaught (in zone) error" that Sentry reports as a crash even though
+    // it changes nothing functionally: the real error is already handled by
+    // this function's own try/catch a few lines down.
     void fail(Object error, [StackTrace? stackTrace]) {
       if (!setupComplete.isCompleted) {
         setupComplete.completeError(error, stackTrace);
+        setupComplete.future.catchError((_) {});
       }
       if (!turnComplete.isCompleted) {
         turnComplete.completeError(error, stackTrace);
+        turnComplete.future.catchError((_) {});
       }
     }
 

@@ -23,8 +23,32 @@ class LessonAssetPrefetchService {
   static final shared = LessonAssetPrefetchService._();
 
   final Map<String, Future<ElevenLabsAudioClip?>> _listeningInFlight = {};
+  final Map<String, Future<void>> _narrationInFlight = {};
+  final Map<String, DateTime> _narrationLastAttemptAt = {};
+
+  // Course's roadmap calls this on every single background refresh pass for
+  // every ready Listening lesson, with no caller-side throttling — that is
+  // by design (see speak_roadmap_screen.dart's _prefetchUpcomingListeningAudio),
+  // so this method itself must be the thing that makes repeated calls cheap.
+  // Without in-flight/cooldown protection here, a persistently failing
+  // Gemini Live socket (bad token, quota, connectivity) turned every single
+  // refresh pass into a fresh full-deck retry storm instead of one bounded
+  // attempt every couple of minutes. warmDeck swallows every individual
+  // clip's error internally (it always resolves, never rejects), so the
+  // cooldown below is keyed on "an attempt just ran" rather than on failure —
+  // a successful attempt is harmless to skip too, since its clips are
+  // already cached and any real cache miss just waits for the next window.
+  static const _narrationRetryCooldown = Duration(minutes: 2);
 
   Future<void> prefetchNarration(GeneratedStory story) {
+    final key = story.id;
+    final existing = _narrationInFlight[key];
+    if (existing != null) return existing;
+    final lastAttempt = _narrationLastAttemptAt[key];
+    if (lastAttempt != null &&
+        DateTime.now().difference(lastAttempt) < _narrationRetryCooldown) {
+      return Future<void>.value();
+    }
     final items = <({String text, String contentItemId})>[
       for (var index = 0; index < story.passage.segments.length; index++)
         (
@@ -35,10 +59,20 @@ class LessonAssetPrefetchService {
         (text: keyword.fr, contentItemId: '${story.id}_kw_${keyword.id}'),
     ];
     if (items.isEmpty) return Future<void>.value();
-    return GeminiLiveAudioService.shared.warmDeck(
+    _narrationLastAttemptAt[key] = DateTime.now();
+    final operation = GeminiLiveAudioService.shared.warmDeck(
       items: items,
       voiceName: ActiveTutor.current.voiceName,
     );
+    _narrationInFlight[key] = operation;
+    unawaited(
+      operation.whenComplete(() {
+        if (identical(_narrationInFlight[key], operation)) {
+          _narrationInFlight.remove(key);
+        }
+      }),
+    );
+    return operation;
   }
 
   Future<ElevenLabsAudioClip?> prefetchListening({
