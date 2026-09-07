@@ -302,32 +302,46 @@ class _ListeningPracticeScreenState
     final position = disposition.position;
     final durationMs = duration.inMilliseconds;
     final positionMs = position.inMilliseconds.clamp(0, durationMs).toInt();
-    final nextSegment = durationMs <= 0 || _segments.isEmpty
-        ? _currentSegment
-        : ((positionMs / durationMs) * _segments.length)
-              .floor()
-              .clamp(0, _segments.length - 1)
-              .toInt();
+    var nextSegment = _currentSegment;
     int? nextWord;
-    var wordCursor = 0;
     if (durationMs > 0 && _segments.isNotEmpty) {
       final totalWords = _segments.fold<int>(
         0,
         (sum, segment) => sum + _plainWords(segment.fr).length,
       );
       if (totalWords > 0) {
+        // The single durable track has no real per-word timestamps, so this
+        // is necessarily an estimate -- but it must be ONE estimate, not
+        // two disagreeing ones. This used to pick the highlighted segment
+        // by dividing playback into equal-time slices per segment (wrong:
+        // "Bonjour, je veux manger." and "La boulangerie est au numéro
+        // cinq." do not take the same time to say), while separately
+        // picking the highlighted word by dividing playback proportionally
+        // by total word count and searching for which segment it falls
+        // in -- then discarding that correct segment index. The result was
+        // a segment highlight and a word highlight that could point at two
+        // different sentences, which is exactly what looked like "the
+        // audio doesn't match the text on screen." Now both come from the
+        // same word-weighted position.
         final globalWord = (positionMs / durationMs * totalWords)
             .floor()
             .clamp(0, totalWords - 1)
             .toInt();
+        var wordCursor = 0;
         for (var index = 0; index < _segments.length; index++) {
           final count = _plainWords(_segments[index].fr).length;
           if (globalWord < wordCursor + count) {
+            nextSegment = index;
             nextWord = globalWord - wordCursor;
             break;
           }
           wordCursor += count;
         }
+      } else {
+        nextSegment = ((positionMs / durationMs) * _segments.length)
+            .floor()
+            .clamp(0, _segments.length - 1)
+            .toInt();
       }
     }
     setState(() {

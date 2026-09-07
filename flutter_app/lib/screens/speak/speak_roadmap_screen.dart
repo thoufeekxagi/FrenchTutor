@@ -329,7 +329,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             ),
             const SizedBox(height: 14),
           ],
-          _generateNextCard(),
+          _generateNextCard(roadmap.sessions),
         ],
       ),
     );
@@ -340,7 +340,20 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
   /// its own (see adaptiveCourseLookahead), but this gives them an explicit
   /// way to ask for the next one right now instead of waiting for the
   /// background retry loop's next tick.
-  Widget _generateNextCard() {
+  Widget _generateNextCard(List<SpeakRoadmapSession> sessions) {
+    // This used to say "in progress" only while _preparingCourse was true --
+    // a network call actually in flight, true for at most a few seconds at
+    // a time. Between retries (the backoff ladder in
+    // _scheduleRetryIfStillPreparing can wait up to 20s), that flag drops
+    // back to false while a lesson tile above is still visibly spinning --
+    // the exact "this looks like it's showing an old, already-finished
+    // state while something is actually still happening" contradiction a
+    // learner would reasonably call a bug. Base this on whether a lesson
+    // genuinely still needs generating, the same check every tile itself
+    // uses, not on this one screen's own transient in-flight flag.
+    final hasPending = sessions.any(
+      (session) => !session.contentReady && !session.completed,
+    );
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: V3Card(
@@ -350,7 +363,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                _preparingCourse
+                hasPending
                     ? 'Preparing your next lesson…'
                     : 'More lessons keep unlocking as you go.',
                 style: DesignTokens.body(
