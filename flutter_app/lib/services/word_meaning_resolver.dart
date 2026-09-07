@@ -1,18 +1,12 @@
 import '../models/content_models.dart';
-import '../widgets/word_meaning_overlay.dart';
 import 'lesson_agent_service.dart';
 
 /// Result of resolving one tapped word's contextual meaning.
 class WordMeaningResult {
-  const WordMeaningResult({
-    required this.entry,
-    required this.canConjugate,
-    required this.examples,
-  });
+  const WordMeaningResult({required this.entry, required this.canConjugate});
 
   final VocabEntry entry;
   final bool canConjugate;
-  final List<WordMeaningExample> examples;
 }
 
 /// Shared "what does this tapped word mean" lookup used identically by
@@ -39,17 +33,6 @@ class WordMeaningResolver {
     final translation = data['translation']?.toString().trim() ?? '';
     final rawWord = data['word']?.toString().trim() ?? '';
     final partOfSpeech = data['part_of_speech']?.toString().toLowerCase() ?? '';
-    final examples = <WordMeaningExample>[];
-    final examplesRaw = data['examples'];
-    if (examplesRaw is List) {
-      for (final rawExample in examplesRaw) {
-        if (rawExample is Map) {
-          final fr = rawExample['fr']?.toString().trim() ?? '';
-          final en = rawExample['en']?.toString().trim() ?? '';
-          if (fr.isNotEmpty) examples.add((fr: fr, en: en));
-        }
-      }
-    }
     return WordMeaningResult(
       entry: VocabEntry(
         id: 'word-meaning:${word.trim().toLowerCase()}',
@@ -59,7 +42,6 @@ class WordMeaningResolver {
       ),
       canConjugate:
           data['can_conjugate'] == true || partOfSpeech.contains('verb'),
-      examples: examples,
     );
   }
 }

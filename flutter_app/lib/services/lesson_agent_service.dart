@@ -2453,15 +2453,16 @@ short enough for a mobile bottom sheet.''';
 
     const system = '''
 You are a concise French vocabulary assistant. Return ONLY compact JSON with
-this exact shape: {"word": string, "translation": string, "part_of_speech": string, "gender": string, "number": string, "infinitive": string, "tense": string, "can_conjugate": boolean, "examples": [{"fr": string, "en": string}]}.
+this exact shape: {"word": string, "translation": string, "part_of_speech": string, "gender": string, "number": string, "infinitive": string, "tense": string, "can_conjugate": boolean}.
 Explain the selected French word exactly as it is used in the supplied sentence.
-"translation" must be a short plain-English meaning, not a full sentence.
-"examples" must contain exactly two short, different example sentences (French
-with English translation) that use the word with this same meaning, one of
-which may reuse the supplied sentence itself. Use English for metadata. Use
-French only for word, infinitive, and the French half of each example. Set
-can_conjugate true only for a conjugated verb or infinitive that can open a
-conjugation view. Leave unknown gender, number, infinitive, or tense empty.
+"translation" is a tap-and-glance gloss, never a sentence or an explanation:
+one to three short words or a few short senses separated by commas (for a
+genuinely ambiguous word, e.g. "pain" -> "bread, pain, suffering"), always
+led by the sense that actually fits the supplied sentence. Never restate the
+sentence, never add "as used here" or similar framing, never write a full
+clause. Use English for metadata. Use French only for word and infinitive.
+Set can_conjugate true only for a conjugated verb or infinitive that can open
+a conjugation view. Leave unknown gender, number, infinitive, or tense empty.
 Do not invent a meaning unrelated to the sentence.''';
     final raw = await _complete(
       messages: [
@@ -2480,7 +2481,7 @@ Do not invent a meaning unrelated to the sentence.''';
               'ENGLISH SENTENCE: $sentenceTranslation',
         },
       ],
-      maxTokens: 420,
+      maxTokens: 220,
       temperature: 0.1,
       // Live conversational and multimodal calls stay on the pinned
       // OpenRouter model above; this is a small, structured, high-volume

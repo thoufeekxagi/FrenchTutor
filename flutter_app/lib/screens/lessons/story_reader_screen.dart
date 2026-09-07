@@ -114,7 +114,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isLiked = false;
   bool? _selectedWordConjugatable;
   VocabEntry? _resolvedWordMeaning;
-  List<WordMeaningExample> _resolvedWordExamples = const [];
   bool _isMarkedLearned = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
@@ -501,13 +500,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         _selectedWordSegment = null;
         _selectedWord = null;
         _resolvedWordMeaning = null;
-        _resolvedWordExamples = const [];
         _selectedWordConjugatable = null;
       } else {
         _selectedWordSegment = segmentIndex;
         _selectedWord = wordIndex;
         _resolvedWordMeaning = _fallbackWordEntry(segmentIndex, wordIndex);
-        _resolvedWordExamples = const [];
         _selectedWordConjugatable = _heuristicWordCanConjugate(segmentIndex);
       }
     });
@@ -716,7 +713,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           en: resolvedTranslation,
           phonetic: '',
         );
-        _resolvedWordExamples = result.examples;
         _selectedWordConjugatable = result.canConjugate;
       });
     } catch (_) {
@@ -749,7 +745,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       story: _story,
                       darkMode: _darkMode,
                       selectedWord: _selectedWordEntry(),
-                      selectedWordExamples: _resolvedWordExamples,
                       learned: _isMarkedLearned,
                       onBack: () => Navigator.maybePop(context),
                       onMarkLearned: _markAsLearned,
@@ -1440,7 +1435,6 @@ class _StoryBookHeader extends StatelessWidget {
     required this.story,
     required this.darkMode,
     this.selectedWord,
-    this.selectedWordExamples = const [],
     required this.learned,
     required this.onBack,
     required this.onMarkLearned,
@@ -1451,7 +1445,6 @@ class _StoryBookHeader extends StatelessWidget {
   final GeneratedStory story;
   final bool darkMode;
   final VocabEntry? selectedWord;
-  final List<WordMeaningExample> selectedWordExamples;
   final bool learned;
   final VoidCallback onBack;
   final VoidCallback onMarkLearned;
@@ -1566,7 +1559,6 @@ class _StoryBookHeader extends StatelessWidget {
                         word: selectedWord!,
                         accent: accent,
                         darkMode: darkMode,
-                        examples: selectedWordExamples,
                         onConjugate: onConjugate,
                       ),
                     ),

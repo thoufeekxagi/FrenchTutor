@@ -70,7 +70,6 @@ class _ListeningPracticeScreenState
   int? _lyricsSelectedWordIndex;
   int? _currentWord;
   VocabEntry? _resolvedWordMeaning;
-  List<WordMeaningExample> _resolvedWordExamples = const [];
   bool _resolvedWordCanConjugate = false;
   int? _dictationSegment;
   bool _isPlaying = false;
@@ -349,7 +348,6 @@ class _ListeningPracticeScreenState
       _lyricsSelectedWordIndex = isSame ? null : wordIndex;
       if (isSame) {
         _resolvedWordMeaning = null;
-        _resolvedWordExamples = const [];
         _resolvedWordCanConjugate = false;
       }
     });
@@ -384,7 +382,6 @@ class _ListeningPracticeScreenState
       }
       setState(() {
         _resolvedWordMeaning = result.entry;
-        _resolvedWordExamples = result.examples;
         _resolvedWordCanConjugate = result.canConjugate;
       });
     } catch (_) {
@@ -1114,7 +1111,6 @@ class _ListeningPracticeScreenState
                         word: _resolvedWordMeaning!,
                         accent: DesignTokens.nightAccent,
                         darkMode: _darkMode,
-                        examples: _resolvedWordExamples,
                         onConjugate: _resolvedWordCanConjugate
                             ? _showListeningConjugation
                             : null,
