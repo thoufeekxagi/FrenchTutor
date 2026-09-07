@@ -264,15 +264,30 @@ class SyncService {
       'source_session_ids_json': session.sourceSessionIds,
       'generation_version': session.generationVersion,
       if (session.isFoundation) 'generation_status': 'ready',
-      if (!session.isFoundation &&
-          session.generationStatus == 'queued' &&
-          session.artifact == null) ...{
-        'generation_status': 'queued',
-        'artifact_kind': null,
-        'artifact_json': null,
-        'generation_attempts': 0,
-        'generation_error': null,
-      },
+      // Deliberately omitting generation_status/artifact_kind/
+      // artifact_json/generation_attempts/generation_error entirely for a
+      // personalized ("queued", no local artifact) session below, rather
+      // than explicitly writing 'queued'/null/0/null the way this used to.
+      // A real production bug: this device's own local cache can still
+      // believe a row is queued for a moment after the server has already
+      // finished generating it (a hydration pull that has not landed yet,
+      // a race on the very first sync after generation completes). Writing
+      // those fields explicitly on every routine sync meant that stale
+      // belief got pushed as fact, silently resetting an already-'ready'
+      // server row back to queued/no-artifact and discarding real work --
+      // a learner would watch a lesson they had already reached start
+      // "generating" all over again. Column defaults ('queued', 0, null)
+      // already give a genuinely brand-new row (a fresh UUID nothing on
+      // the server has ever seen) the exact same values this block used to
+      // set explicitly, so a first insert is unaffected; the only
+      // difference is that updating an EXISTING remote row no longer
+      // touches these columns at all when the local snapshot has nothing
+      // better to say about them, which is exactly the safety this needed.
+      // A postgres trigger (prevent_generation_status_regression) now also
+      // guards this same case at the database level, so no future
+      // client-side mistake of this shape can corrupt a real artifact
+      // either.
+      //
       // Unit 2 is authored on the device (see `_unitTwoArtifact`), so its
       // artifact must reach the server as-is instead of being nulled out by
       // the ordinary "queued means nothing generated yet" rule above —
