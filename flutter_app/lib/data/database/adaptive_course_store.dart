@@ -609,12 +609,24 @@ class AdaptiveCourseStore {
   void markStarted(String contentKey) {
     final plan = _activePlanRow();
     if (plan == null) return;
+    final planId = plan['id'] as String;
+    final now = _now();
+    // Only one session should ever be "the one the learner just opened" at
+    // a time. This never demoted the previous holder, so every lesson ever
+    // opened stayed 'active' forever — three or more rows could show as
+    // active at once, purely from having opened three lessons across
+    // different visits.
+    _db.execute(
+      "UPDATE adaptive_course_sessions SET status = 'planned', updated_at = ? "
+      "WHERE plan_id = ? AND content_key != ? AND status = 'active' AND deleted_at IS NULL",
+      [now, planId, contentKey],
+    );
     _db.execute(
       "UPDATE adaptive_course_sessions SET status = 'active', updated_at = ? "
       "WHERE plan_id = ? AND content_key = ? AND status = 'planned' AND deleted_at IS NULL",
-      [_now(), plan['id'], contentKey],
+      [now, planId, contentKey],
     );
-    final session = _sessionByContentKey(plan['id'] as String, contentKey);
+    final session = _sessionByContentKey(planId, contentKey);
     if (session != null) _notifySession(session);
   }
 
@@ -1435,7 +1447,7 @@ abstract final class AdaptiveCoursePlanGenerator {
         }
       }
       final unit = ((sequence - 1) ~/ 5) + 1;
-      final unitTheme = unitThemes[(unit - 1) % unitThemes.length];
+      final unitTheme = _unitThemeFor(unitThemes, unit);
       final title = isGuidedIntroduction
           ? SpeakingCourseCatalog.firstA1GuidedLesson.title
           : template.verb;
@@ -2076,6 +2088,27 @@ abstract final class AdaptiveCoursePlanGenerator {
           ['Recall the language.', 'Use it in context.'],
         ),
       };
+
+  /// Course grows forever, but every goal's theme list is a fixed five
+  /// entries, so a naive `themes[(unit - 1) % themes.length]` produces an
+  /// exact, word-for-word repeat of an earlier unit's title once the
+  /// learner passes unit 5 -- unit 6 showing "Alphabet & sound foundations"
+  /// again, verbatim, despite being nowhere near the alphabet anymore, is
+  /// confusing/looks like a bug even though the underlying lesson content
+  /// is not actually duplicated. Repeating the same five themes forever is
+  /// fine (the learner explicitly wants recurring practice); repeating the
+  /// exact same TEXT is not. Mark every cycle past the first with a plain
+  /// ordinal suffix so no two units ever show identical text.
+  static String _unitThemeFor(List<String> themes, int unit) {
+    final base = themes[(unit - 1) % themes.length];
+    final cycle = (unit - 1) ~/ themes.length;
+    if (cycle == 0) return base;
+    const ordinals = ['II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+    final suffix = cycle - 1 < ordinals.length
+        ? ordinals[cycle - 1]
+        : '${cycle + 1}';
+    return '$base $suffix';
+  }
 
   static List<String> _unitThemesFor(String goal) => switch (goal) {
     'tef_canada' => const [

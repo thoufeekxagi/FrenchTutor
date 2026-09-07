@@ -673,4 +673,87 @@ void main() {
 
     expect(store.currentPlan(profile)!.sessions.first.status, 'completed');
   });
+
+  test(
+    'markStarted leaves only the most recently opened session active',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'mark-started-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      );
+      final plan = store.ensureCurrentPlan(profile);
+      final first = plan.sessions[0];
+      final second = plan.sessions[1];
+      final third = plan.sessions[2];
+
+      // Opening three different lessons across separate visits (exactly
+      // what a learner exploring several ready-ahead lessons does) must
+      // never leave more than one session 'active' at a time -- an earlier
+      // bug left every opened lesson stuck 'active' forever, which also
+      // silently inflated how far ahead the store thought it needed to
+      // keep generating.
+      store.markStarted(first.contentKey);
+      store.markStarted(second.contentKey);
+      store.markStarted(third.contentKey);
+
+      final sessions = store.currentPlan(profile)!.sessions;
+      final activeCount = sessions
+          .where((session) => session.status == 'active')
+          .length;
+      expect(activeCount, 1);
+      expect(
+        sessions
+            .firstWhere((session) => session.contentKey == third.contentKey)
+            .status,
+        'active',
+      );
+      expect(
+        sessions
+            .firstWhere((session) => session.contentKey == first.contentKey)
+            .status,
+        'planned',
+      );
+      expect(
+        sessions
+            .firstWhere((session) => session.contentKey == second.contentKey)
+            .status,
+        'planned',
+      );
+    },
+  );
+
+  test(
+    'unit themes never repeat identical text once the fixed theme list wraps',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'unit-theme-wraparound-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      );
+      var plan = store.ensureCurrentPlan(profile);
+      // Grow well past unit 5 (sequence 25), where a naive modulo lookup
+      // would repeat unit 1's exact "Alphabet & sound foundations" title --
+      // wrong on its face by then, and indistinguishable from a real
+      // content-duplication bug at a glance.
+      while (plan.sessions.length < 30) {
+        _finishSession(db, store, plan.sessions.last);
+        plan = store.ensureCurrentPlan(profile);
+      }
+      final unitOneTitle = plan.sessions
+          .firstWhere((session) => session.unit == 1)
+          .unitTitle;
+      final unitSixTitle = plan.sessions
+          .firstWhere((session) => session.unit == 6)
+          .unitTitle;
+      expect(unitSixTitle, isNot(equals(unitOneTitle)));
+      expect(unitSixTitle, startsWith(unitOneTitle));
+    },
+  );
 }
