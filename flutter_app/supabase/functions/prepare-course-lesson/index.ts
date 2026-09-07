@@ -775,10 +775,38 @@ Deno.serve(async (request: Request) => {
   // unlimited. This must only ever see real AI-generated lessons (sequence
   // 11+) — Unit 2 (6-10) is fixed, authored, permanent content for every
   // learner, never part of this accounting.
+  // A plan can end up orphaned "active" on the server when a device's local
+  // retirement of its own previous plan never reaches a remote-only plan it
+  // has no record of (a reinstall wiping local state, or a second device).
+  // Every query below has no other reason to know about plan_id, so without
+  // this an orphaned plan's stuck-"generating" row could block this
+  // endpoint from ever touching the learner's actual current plan, or this
+  // endpoint could just as happily generate real content the learner will
+  // never see as content for the plan they are actually on. Scope
+  // everything below to the single newest active plan only.
+  const { data: activePlans, error: activePlanError } = await admin
+    .from("adaptive_course_plans")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (activePlanError) return response({ error: activePlanError.message }, 500);
+  const activePlanId = activePlans?.[0]?.id as string | undefined;
+  if (!activePlanId) {
+    console.info(JSON.stringify({
+      event: "course_lesson_preparation_noop",
+      userId,
+      reason: "no_active_plan",
+    }));
+    return response({ processed: false, remaining: 0 });
+  }
+
   const { data: activePersonalized, error: reserveError } = await admin
     .from("adaptive_course_sessions")
     .select("id, sequence, status, generation_status, updated_at, primary_skill, title, artifact_json")
     .eq("user_id", userId)
+    .eq("plan_id", activePlanId)
     .gt("sequence", AUTHORED_SEQUENCE_CEILING)
     .in("status", ["planned", "active"])
     .is("deleted_at", null)
@@ -826,6 +854,7 @@ Deno.serve(async (request: Request) => {
     .from("adaptive_course_sessions")
     .select("*")
     .eq("user_id", userId)
+    .eq("plan_id", activePlanId)
     .gt("sequence", AUTHORED_SEQUENCE_CEILING)
     .in("generation_status", ["queued", "failed"])
     .in("status", ["planned", "active"])
@@ -944,6 +973,7 @@ Deno.serve(async (request: Request) => {
       .from("adaptive_course_sessions")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
+      .eq("plan_id", activePlanId)
       .gt("sequence", AUTHORED_SEQUENCE_CEILING)
       .in("generation_status", ["queued", "failed"])
       .in("status", ["planned", "active"])

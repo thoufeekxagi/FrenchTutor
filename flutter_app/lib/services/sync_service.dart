@@ -198,6 +198,26 @@ class SyncService {
       'updated_at': now,
     }, onConflict: 'id');
 
+    // AdaptiveCourseStore._createPlan retires other active plans, but only
+    // in this device's own local SQLite. A reinstall (fresh local database)
+    // or a second device has no record of an older remote-only plan, so
+    // that plan can be left stuck 'active' on the server forever — never
+    // shown to the learner (the client only ever reads the newest active
+    // plan), but its rows still sit in the generation queue and
+    // prepare-course-lesson has no reason to know about plan_id at all, so
+    // it wastes real generation calls on an abandoned plan while the
+    // learner's actual current lessons never get reached. Whenever this
+    // (necessarily the newest) plan is pushed as active, retire every
+    // other active plan for this user on the remote side too.
+    if (plan.status == 'active') {
+      await _client
+          .from('adaptive_course_plans')
+          .update({'status': 'replaced', 'updated_at': now})
+          .eq('user_id', uid)
+          .eq('status', 'active')
+          .neq('id', plan.id);
+    }
+
     // Persist specifications independently and in course order. One malformed
     // row can no longer make the whole five-lesson batch disappear inside one
     // bulk request.

@@ -210,7 +210,14 @@ class GeminiLiveAudioService {
       }
     }
 
-    final count = items.length - 1 < 3 ? items.length - 1 : 3;
+    // A whole story/lesson fires these in quick succession with nothing
+    // cached yet. 3 concurrent Live sockets was enough to trip the
+    // per-account Live quota partway through a longer story (see
+    // synthesizeWithRetry's doc comment) — the sentence that lost the race
+    // then burns its own retries before it can play. Keep this modest so a
+    // 5+ sentence story does not front-load a burst of simultaneous
+    // connections it does not need just to prewarm slightly faster.
+    final count = items.length - 1 < 2 ? items.length - 1 : 2;
     await Future.wait(List.generate(count, (_) => worker()));
   }
 
@@ -285,11 +292,17 @@ class GeminiLiveAudioService {
       }
     }
 
+    // A healthy call finishes in a handful of seconds (verified directly:
+    // 4-8s typical). 35s per attempt meant a genuinely stuck story-narration
+    // line (see synthesizeWithRetry's 3 attempts) could take up to ~2
+    // minutes to finally surface an error — long enough that a learner just
+    // assumes playback silently froze and gives up before the retry/error
+    // ever appears. Cut the per-attempt budget well below that.
     final generated = await _generateLive(
       text,
       persona: persona,
       slow: slow,
-    ).timeout(const Duration(seconds: 35), onTimeout: () => null);
+    ).timeout(const Duration(seconds: 15), onTimeout: () => null);
     if (!_validPcm(generated)) return null;
     await _writeLocal(cacheKey, generated!);
 
