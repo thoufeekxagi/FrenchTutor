@@ -148,6 +148,53 @@ void main() {
   });
 
   test(
+    'a vocabulary entry that echoes the English gloss into the French field is not ready',
+    () {
+      // Real defect caught directly from a learner's screenshot: the model
+      // returned entries where "fr" was byte-identical to "en" (e.g.
+      // fr: "milk", en: "milk") while id/phonetic still correctly held the
+      // real French word ("lait", "leh") -- the learner saw
+      // "FRENCH WORD: milk". Word-count/banned-structure checks alone never
+      // catch this since a plain English word passes both.
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'vocab-echo-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      );
+      final plan = store.ensureCurrentPlan(profile);
+      final vocabulary = plan.sessions.firstWhere(
+        (session) =>
+            !session.isFoundation &&
+            session.primarySkill == SpeakSkill.vocabulary,
+      );
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+        'artifact_json = ? WHERE id = ?',
+        [
+          '{"entries":['
+              '{"id":"pain","fr":"pain","en":"bread","phonetic":"pan"},'
+              '{"id":"fromage","fr":"cheese","en":"cheese","phonetic":"fro-mazh"},'
+              '{"id":"lait","fr":"milk","en":"milk","phonetic":"leh"},'
+              '{"id":"banane","fr":"banana","en":"banana","phonetic":"ba-nan"},'
+              '{"id":"manger","fr":"to eat","en":"to eat","phonetic":"mahn-zhay"}'
+              '],"storyExamples":{'
+              '"pain":{"fr":"Je prends du pain.","en":"I am having bread."},'
+              '"fromage":{"fr":"Je prends du fromage.","en":"I am having cheese."},'
+              '"lait":{"fr":"Paul aime le lait.","en":"Paul likes milk."},'
+              '"banane":{"fr":"Voici une banane.","en":"Here is a banana."},'
+              '"manger":{"fr":"Nous allons manger.","en":"We are going to eat."}'
+              '}}',
+          vocabulary.id,
+        ],
+      );
+      expect(store.sessionById(vocabulary.id)!.isContentReady, isFalse);
+    },
+  );
+
+  test(
     'fresh learner gets five foundations and a full authored Unit 2',
     () {
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
@@ -504,6 +551,66 @@ void main() {
     }
     expect(plan.sessions.last.sequence, 15);
   });
+
+  test(
+    'a ready personalized lesson survives ensureCurrentPlan being called again',
+    () {
+      // Real, repeatedly reported bug: competency/context/targetPhrases are
+      // rebuilt from "recent evidence" every time ensureCurrentPlan runs,
+      // and that evidence legitimately changes as the learner does
+      // anything else in the app. An already-ready lesson must never be
+      // reset back to queued/no-artifact just because a freshly
+      // recomputed replacement's evidence-derived narrative differs from
+      // what was true when it was actually generated.
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'evidence-drift-contract',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      );
+      var plan = store.ensureCurrentPlan(profile);
+      final vocabulary = plan.sessions.firstWhere(
+        (session) =>
+            !session.isFoundation &&
+            session.primarySkill == SpeakSkill.vocabulary,
+      );
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+        'artifact_json = ? WHERE id = ?',
+        [_readyArtifactFor(SpeakSkill.vocabulary), vocabulary.id],
+      );
+
+      // Manufacture evidence drift the same way real app usage does: a
+      // freshly recorded session transcript changes what
+      // UniversalLearningDataService.buildSnapshot sees as "recent
+      // evidence" on the very next call, without touching this lesson at
+      // all.
+      db.execute(
+        '''INSERT INTO sessions
+           (id, started_at, ended_at, summary, topic, content_key, vocabulary, stage, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        [
+          'evidence-drift-session',
+          DateTime.now().toUtc().toIso8601String(),
+          DateTime.now().toUtc().toIso8601String(),
+          'Talked about the weather and ordered coffee.',
+          'small talk',
+          'unrelated_content_key',
+          '["café","beau temps"]',
+          'complete',
+          DateTime.now().toUtc().toIso8601String(),
+        ],
+      );
+
+      plan = store.ensureCurrentPlan(profile);
+      final reread = store.sessionById(vocabulary.id)!;
+      expect(reread.generationStatus, 'ready');
+      expect(reread.artifact, isNotNull);
+      expect(reread.isContentReady, isTrue);
+    },
+  );
 
   test('personalized batches keep a useful transfer balance', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());

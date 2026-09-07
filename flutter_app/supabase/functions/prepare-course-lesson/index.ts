@@ -191,9 +191,26 @@ function validateVocabulary(artifact: Json, level: string) {
     }
     if (ids.has(id)) throw new Error("Vocabulary word ids must be unique");
     ids.add(id);
+    // Real generation defect caught directly from a learner's screenshot: the
+    // model can echo the English gloss into the French field too (fr and en
+    // byte-identical), while id/phonetic still correctly hold the real French
+    // word. A learner then sees "FRENCH WORD: milk" for lait. Word-count and
+    // banned-structure checks below never catch this since plain English
+    // words pass both. Reject the whole artifact so it regenerates instead
+    // of ever reaching a learner's screen.
+    if (text(entry.fr).toLowerCase() === text(entry.en).toLowerCase()) {
+      throw new Error(
+        `Vocabulary word "${id}" has the same text for French and English ("${text(entry.fr)}") — the French field must contain the actual French word`,
+      );
+    }
     const example = object(storyExamples[id]);
     if (!text(example.fr) || !text(example.en)) {
       throw new Error("Every vocabulary word needs one prepared bilingual sentence");
+    }
+    if (text(example.fr).toLowerCase() === text(example.en).toLowerCase()) {
+      throw new Error(
+        `Vocabulary word "${id}"'s example sentence has the same text for French and English`,
+      );
     }
     if (level.trim().toUpperCase() === "A1" && text(entry.fr).split(/\s+/).length > 3) {
       throw new Error("A1 vocabulary entries must be short words or chunks");
@@ -220,6 +237,9 @@ function validateStory(artifact: Json, level = "", sequence = 0) {
     const segment = object(raw);
     if (!text(segment.fr) || !text(segment.en)) {
       throw new Error("Every story segment needs French and English");
+    }
+    if (text(segment.fr).toLowerCase() === text(segment.en).toLowerCase()) {
+      throw new Error("A story segment has the same text for French and English");
     }
     if (level) validateSimpleFrench(text(segment.fr), level, "Story line");
   }
@@ -362,6 +382,9 @@ function validateSpeaking(artifact: Json, level: string, expectedMode: string) {
     const french = text(line.fr);
     if (!french || !text(line.en)) {
       throw new Error("Every speaking line needs French and English");
+    }
+    if (french.toLowerCase() === text(line.en).toLowerCase()) {
+      throw new Error("A speaking line has the same text for French and English");
     }
     if (expectedMode !== "guidedConversation" &&
       (!text(line.partnerFr) || !text(line.partnerEn) || line.openResponse !== true)) {

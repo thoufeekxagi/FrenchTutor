@@ -142,6 +142,19 @@ class AdaptiveCourseSessionSpec {
       return true;
     }
 
+    // Real generation defect caught directly from a learner's screenshot:
+    // the model can echo the English gloss into the French field too (fr
+    // and en byte-identical), while id/phonetic still correctly held the
+    // real French word. A learner then saw "FRENCH WORD: milk" for lait.
+    // Word-count and banned-structure checks never catch this since plain
+    // English words pass both. The server now rejects this at generation
+    // time (see validateVocabulary in prepare-course-lesson/index.ts), but
+    // this same check belongs here too so any already-stored artifact of
+    // this shape is never treated as ready on-device either.
+    bool notEchoedEnglish(Object? fr, Object? en) =>
+        fr?.toString().trim().toLowerCase() !=
+        en?.toString().trim().toLowerCase();
+
     bool storyHasSegments() {
       final passage = value['passage'];
       if (passage is! Map ||
@@ -154,7 +167,8 @@ class AdaptiveCourseSessionSpec {
         (segment) =>
             segment is Map &&
             nonEmpty(segment['en']) &&
-            safeFrench(segment['fr']),
+            safeFrench(segment['fr']) &&
+            notEchoedEnglish(segment['fr'], segment['en']),
       );
     }
 
@@ -172,7 +186,8 @@ class AdaptiveCourseSessionSpec {
         (line) {
           if (line is! Map ||
               !nonEmpty(line['en']) ||
-              !safeFrench(line['fr'], maxWords: maxWords)) {
+              !safeFrench(line['fr'], maxWords: maxWords) ||
+              !notEchoedEnglish(line['fr'], line['en'])) {
             return false;
           }
           final french = line['fr'].toString().trim();
@@ -224,9 +239,14 @@ class AdaptiveCourseSessionSpec {
               entry['fr'],
               maxWords: normalizedLevel == 'A1' ? 3 : null,
             ) &&
+            notEchoedEnglish(entry['fr'], entry['en']) &&
             examples[entry['id']] is Map &&
             nonEmpty((examples[entry['id']] as Map)['fr']) &&
-            nonEmpty((examples[entry['id']] as Map)['en']),
+            nonEmpty((examples[entry['id']] as Map)['en']) &&
+            notEchoedEnglish(
+              (examples[entry['id']] as Map)['fr'],
+              (examples[entry['id']] as Map)['en'],
+            ),
       );
     }
 
@@ -847,14 +867,12 @@ class AdaptiveCourseStore {
     AdaptiveCourseSessionSpec replacement,
     String profileFingerprint,
   ) {
-    return current.contentKey != replacement.contentKey ||
+    final structuralChange = current.contentKey != replacement.contentKey ||
         current.level != replacement.level ||
         current.unit != replacement.unit ||
         current.unitTitle != replacement.unitTitle ||
         current.title != replacement.title ||
         current.subtitle != replacement.subtitle ||
-        current.competency != replacement.competency ||
-        current.context != replacement.context ||
         current.primarySkill != replacement.primarySkill ||
         current.supportingSkills.map((skill) => skill.wireName).join('|') !=
             replacement.supportingSkills
@@ -864,12 +882,31 @@ class AdaptiveCourseStore {
         current.successCriteria.join('|') !=
             replacement.successCriteria.join('|') ||
         current.estimatedMinutes != replacement.estimatedMinutes ||
+        current.profileFingerprint != profileFingerprint ||
+        current.generationVersion < replacement.generationVersion;
+    if (structuralChange) return true;
+    // A real, repeatedly reported bug: competency/context/targetPhrases/
+    // sourceSessionIds are all rebuilt from "recent evidence" (the
+    // learner's latest transcripts, completions, vocabulary results),
+    // which legitimately changes every time the learner does anything else
+    // in the app. Comparing an already-generated lesson's stored (historical)
+    // values against a freshly recomputed replacement meant almost any
+    // Course open would see a "difference" and reset a already-'ready'
+    // lesson back to queued/no-artifact -- discarding real generated
+    // content the learner had already reached, over and over. Once a
+    // session has been generated (or is actively generating), the evidence
+    // that shaped it is history, not staleness; only a genuine structural
+    // change (checked above) or a real content-contract version bump
+    // justifies touching it again.
+    if (current.generationStatus != 'queued' || current.artifact != null) {
+      return false;
+    }
+    return current.competency != replacement.competency ||
+        current.context != replacement.context ||
         current.targetPhrases.join('|') !=
             replacement.targetPhrases.join('|') ||
         current.sourceSessionIds.join('|') !=
-            replacement.sourceSessionIds.join('|') ||
-        current.profileFingerprint != profileFingerprint ||
-        current.generationVersion < replacement.generationVersion;
+            replacement.sourceSessionIds.join('|');
   }
 
   void _updatePlannedSessionSpec(
