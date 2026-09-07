@@ -23,6 +23,29 @@ function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers });
 }
 
+// MiniMax has separate Global and Mainland API hosts, and an API key only
+// works against the host for the region where it was created. The app uses
+// the Global account by default; MINIMAX_API_HOST can override this for a
+// Mainland key without putting either the host or the key in the app binary.
+const DEFAULT_MINIMAX_API_HOST = "https://api.minimax.io";
+const ALLOWED_MINIMAX_API_HOSTS = new Set([
+  "https://api.minimax.io",
+  "https://api.minimaxi.com",
+]);
+
+function minimaxImageEndpoints(): string[] | null {
+  const configured = (Deno.env.get("MINIMAX_API_HOST") ?? "").trim();
+  const host = (configured || DEFAULT_MINIMAX_API_HOST).replace(/\/+$/, "");
+  if (!ALLOWED_MINIMAX_API_HOSTS.has(host)) return null;
+  const otherHost = host === "https://api.minimax.io"
+    ? "https://api.minimaxi.com"
+    : "https://api.minimax.io";
+  return [
+    `${host}/v1/image_generation`,
+    `${otherHost}/v1/image_generation`,
+  ];
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers });
   if (request.method !== "POST") return json({ error: "POST required" }, 405);
@@ -40,6 +63,8 @@ Deno.serve(async (request) => {
 
   const apiKey = Deno.env.get("MINIMAX_API_KEY");
   if (!apiKey) return json({ error: "MiniMax is not configured" }, 503);
+  const endpoints = minimaxImageEndpoints();
+  if (!endpoints) return json({ error: "MiniMax host is not configured" }, 503);
 
   const requestBody = JSON.stringify({
     model: "image-01",
@@ -50,28 +75,49 @@ Deno.serve(async (request) => {
     prompt_optimizer: false,
     aigc_watermark: false,
   });
-  try {
-    const response = await fetch("https://api.minimaxi.com/v1/image_generation", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: requestBody,
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const encoded = data?.data?.image_base64;
-      const imageBase64 = Array.isArray(encoded)
-        ? String(encoded[0] ?? "")
-        : String(encoded ?? "");
-      if (imageBase64) return json({ imageBase64 });
+  let lastStatus = 502;
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+      });
+      lastStatus = response.status;
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(raw);
+      } catch (_) {
+        // Keep the provider's raw response out of logs and out of the client.
+      }
+      if (response.ok) {
+        const encoded = data?.data?.image_base64;
+        const imageBase64 = Array.isArray(encoded)
+          ? String(encoded[0] ?? "")
+          : String(encoded ?? "");
+        if (imageBase64) return json({ imageBase64 });
+      }
+      console.error(
+        JSON.stringify({
+          provider: "minimax",
+          host: new URL(endpoint).host,
+          status: response.status,
+          code: data?.base_resp?.status_code ?? null,
+          message: String(data?.base_resp?.status_msg ?? "").slice(0, 160),
+        }),
+      );
+      // A regional key mismatch is unauthorized on one host. Try the other
+      // official host once; never retry a paid generation after a normal API
+      // error because that could charge twice.
+      if (response.status !== 401 && response.status !== 403) break;
+    } catch (_) {
+      lastStatus = 502;
+      break;
     }
-    return json(
-      { error: "Image generation failed" },
-      response.status === 429 ? 429 : 502,
-    );
-  } catch (_) {
-    return json({ error: "Image generation failed" }, 502);
   }
+  return json({ error: "Image generation failed" }, lastStatus === 429 ? 429 : 502);
 });

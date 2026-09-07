@@ -508,19 +508,15 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
   }
 
   Future<void> _showSessionPicker() async {
-    final choice = await showPSActionSheet<int>(
-      context,
-      title: 'Scan sessions',
-      actions: [
-        for (var i = 0; i < _sessions.length; i++)
-          (
-            label:
-                '${_sessions[i].label}${_sessions[i].isClosed ? ' · Closed' : ''}',
-            value: i,
-            destructive: false,
-          ),
-        (label: 'New session', value: -1, destructive: false),
-      ],
+    final choice = await showDialog<int>(
+      context: context,
+      barrierColor: DesignTokens.ink.withValues(alpha: 0.28),
+      builder: (context) => _ScanSessionPickerDialog(
+        sessions: _sessions,
+        activeIndex: _activeSession == null
+            ? -1
+            : _sessions.indexOf(_activeSession!),
+      ),
     );
     if (choice == null) return;
     if (choice == -1) {
@@ -531,6 +527,15 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
       await _closeActiveSession();
       if (mounted) setState(() => _activeSession = _sessions[choice]);
     }
+  }
+
+  Future<void> _showNewSessionDialog() async {
+    final shouldStart = await showDialog<bool>(
+      context: context,
+      barrierColor: DesignTokens.ink.withValues(alpha: 0.28),
+      builder: (context) => const _NewScanSessionDialog(),
+    );
+    if (shouldStart == true) await _startNewSession();
   }
 
   Future<void> _startNewSession() async {
@@ -559,20 +564,21 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Photo tutor', style: DesignTokens.display(18)),
         backgroundColor: DesignTokens.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: _ScanHeaderButton(
+          icon: CupertinoIcons.square_pencil,
+          label: 'Start a new photo tutor session',
+          onPressed: _showNewSessionDialog,
+        ),
         actions: [
           _ScanHeaderButton(
             icon: CupertinoIcons.clock,
             label: 'Photo tutor sessions',
             onPressed: _showSessionPicker,
-          ),
-          _ScanHeaderButton(
-            icon: CupertinoIcons.add,
-            label: 'Start a new photo tutor session',
-            onPressed: _startNewSession,
           ),
           InlineCallActions(controller: _call),
         ],
@@ -580,12 +586,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _SessionToolbar(
-              session: session,
-              onSelect: _showSessionPicker,
-              onClose: canCompose ? _closeActiveSession : null,
-              onNew: _startNewSession,
-            ),
             if (_call.isLive || _call.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
@@ -730,55 +730,322 @@ class _ScanMessageBubble extends StatelessWidget {
   }
 }
 
-class _SessionToolbar extends StatelessWidget {
-  const _SessionToolbar({
-    required this.session,
-    required this.onSelect,
-    required this.onClose,
-    required this.onNew,
-  });
-
-  final _ScanSession? session;
-  final VoidCallback onSelect;
-  final VoidCallback? onClose;
-  final VoidCallback onNew;
+class _NewScanSessionDialog extends StatelessWidget {
+  const _NewScanSessionDialog();
 
   @override
   Widget build(BuildContext context) {
-    final label = session == null
-        ? 'New photo session'
-        : '${session!.label}${session!.isClosed ? ' · Closed' : ''}';
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onSelect,
-              child: SizedBox(
-                height: 44,
-                child: Row(
-                  children: [
-                    Text(
-                      label,
-                      style: DesignTokens.body(
-                        13,
-                        weight: FontWeight.w600,
-                      ).copyWith(color: DesignTokens.inkSoft),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(CupertinoIcons.chevron_down, size: 14),
-                  ],
-                ),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: DesignTokens.primarySoft,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                CupertinoIcons.square_pencil,
+                color: DesignTokens.primary,
+                size: 24,
               ),
             ),
+            const SizedBox(height: 20),
+            Text('Start a new session', style: DesignTokens.display(22)),
+            const SizedBox(height: 8),
+            Text(
+              'Begin a fresh photo chat. Your previous scans will stay in your session history.',
+              style: DesignTokens.body(
+                14,
+              ).copyWith(color: DesignTokens.muted, height: 1.45),
+            ),
+            const SizedBox(height: 24),
+            _ScanDialogButton(
+              label: 'Start new session',
+              icon: CupertinoIcons.arrow_right,
+              primary: true,
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+            const SizedBox(height: 8),
+            _ScanDialogButton(
+              label: 'Cancel',
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScanSessionPickerDialog extends StatelessWidget {
+  const _ScanSessionPickerDialog({
+    required this.sessions,
+    required this.activeIndex,
+  });
+
+  final List<_ScanSession> sessions;
+  final int activeIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.72,
+        ),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+            border: Border.all(color: DesignTokens.hairline),
           ),
-          if (onClose != null)
-            _QuietButton(label: 'Close session', onPressed: onClose!),
-          if (session?.isClosed == true)
-            _QuietButton(label: 'New session', onPressed: onNew),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.canvasDim,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.clock,
+                      color: DesignTokens.inkSoft,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Previous sessions',
+                          style: DesignTokens.display(19),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Return to a scan or start fresh.',
+                          style: DesignTokens.body(
+                            12,
+                          ).copyWith(color: DesignTokens.mutedDim),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _ScanDialogCloseButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: sessions.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 28),
+                        child: Text(
+                          'No previous photo sessions yet.',
+                          style: DesignTokens.body(
+                            14,
+                          ).copyWith(color: DesignTokens.muted),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: sessions.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final session = sessions[index];
+                          final isActive = index == activeIndex;
+                          return _ScanSessionRow(
+                            session: session,
+                            isActive: isActive,
+                            onPressed: () => Navigator.of(context).pop(index),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 12),
+              _ScanDialogButton(
+                label: 'Start a new session',
+                icon: CupertinoIcons.square_pencil,
+                primary: true,
+                onPressed: () => Navigator.of(context).pop(-1),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScanSessionRow extends StatelessWidget {
+  const _ScanSessionRow({
+    required this.session,
+    required this.isActive,
+    required this.onPressed,
+  });
+
+  final _ScanSession session;
+  final bool isActive;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = isActive
+        ? 'Current session'
+        : session.isClosed
+        ? 'Closed'
+        : 'Open';
+    return Semantics(
+      button: true,
+      label: '${session.label}, $status',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: isActive ? DesignTokens.primarySoft : DesignTokens.canvasDim,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isActive ? DesignTokens.primary : DesignTokens.hairline,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        session.label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.body(14, weight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        status,
+                        style: DesignTokens.body(11).copyWith(
+                          color: isActive
+                              ? DesignTokens.primary
+                              : DesignTokens.mutedDim,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 16,
+                  color: isActive ? DesignTokens.primary : DesignTokens.muted,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScanDialogButton extends StatelessWidget {
+  const _ScanDialogButton({
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.primary = false,
+  });
+
+  final String label;
+  final IconData? icon;
+  final VoidCallback onPressed;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: Container(
+          width: double.infinity,
+          height: 52,
+          decoration: BoxDecoration(
+            color: primary ? DesignTokens.primary : DesignTokens.canvasDim,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: DesignTokens.body(14, weight: FontWeight.w700).copyWith(
+                  color: primary ? Colors.white : DesignTokens.inkSoft,
+                ),
+              ),
+              if (icon != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  icon,
+                  size: 18,
+                  color: primary ? Colors.white : DesignTokens.inkSoft,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScanDialogCloseButton extends StatelessWidget {
+  const _ScanDialogCloseButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Close',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(
+            CupertinoIcons.xmark,
+            size: 18,
+            color: DesignTokens.muted,
+          ),
+        ),
       ),
     );
   }
@@ -939,40 +1206,6 @@ class _ComposerIconButton extends StatelessWidget {
       icon,
       size: 20,
       color: filled && active ? Colors.white : DesignTokens.inkSoft,
-    );
-  }
-}
-
-class _QuietButton extends StatelessWidget {
-  const _QuietButton({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPressed,
-        child: SizedBox(
-          height: 44,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Center(
-              child: Text(
-                label,
-                style: DesignTokens.body(
-                  12,
-                  weight: FontWeight.w600,
-                ).copyWith(color: DesignTokens.primary),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

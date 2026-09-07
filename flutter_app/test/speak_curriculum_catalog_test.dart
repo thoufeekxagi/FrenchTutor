@@ -45,26 +45,40 @@ void main() {
   });
 
   test('A1 starts with the alphabet foundation sequence', () {
-    final first = SpeakCurriculumCatalog.bundled('A1').take(3).toList();
+    final first = SpeakCurriculumCatalog.bundled('A1').take(5).toList();
 
     expect(first.map((item) => item.title), [
       'Meet the French alphabet',
       'Master French vowels',
       'Consonants and alphabet review',
+      'Recognize core accent marks',
+      'Connect sound to meaning',
     ]);
     expect(
-      first.every((item) => item.primarySkill == SpeakSkill.alphabet),
+      first.take(4).every((item) => item.primarySkill == SpeakSkill.alphabet),
       isTrue,
     );
+    expect(first[4].primarySkill, SpeakSkill.vocabulary);
     expect(
-      first.every(
-        (item) =>
-            item.activitySkills.length == 2 &&
-            item.activitySkills[0] == SpeakSkill.alphabet &&
-            item.activitySkills[1] == SpeakSkill.vocabulary,
-      ),
+      first
+          .take(4)
+          .every(
+            (item) =>
+                item.activitySkills.length == 2 &&
+                item.activitySkills[0] == SpeakSkill.alphabet &&
+                item.activitySkills[1] == SpeakSkill.vocabulary,
+          ),
       isTrue,
     );
+    expect(first[3].activitySkills, [
+      SpeakSkill.alphabet,
+      SpeakSkill.vocabulary,
+    ]);
+    expect(first[4].activitySkills, [
+      SpeakSkill.vocabulary,
+      SpeakSkill.alphabet,
+      SpeakSkill.speaking,
+    ]);
     expect(
       first.every(
         (item) =>

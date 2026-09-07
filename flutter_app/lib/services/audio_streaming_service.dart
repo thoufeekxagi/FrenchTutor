@@ -483,6 +483,15 @@ class AudioStreamingService {
           await startLatch;
         } catch (_) {}
       }
+      // Do not close the native stream while a feed call is still unwinding.
+      // On iOS that race can leave the next pronunciation tap with a closed
+      // player and no audible response.
+      final activeDrain = _playbackDrainFuture;
+      if (activeDrain != null) {
+        try {
+          await activeDrain;
+        } catch (_) {}
+      }
       try {
         if (!_player.isStopped) await _player.stopPlayer();
       } catch (_) {}

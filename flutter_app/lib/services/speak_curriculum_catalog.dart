@@ -98,8 +98,10 @@ class SpeakCurriculumRepository {
   ) {
     return items
         .map((item) {
-          final isFoundation =
-              level == 'A1' && item.unit == 1 && item.sessionIndex <= 2;
+          final isSoundFoundation =
+              level == 'A1' && item.unit == 1 && item.sessionIndex <= 4;
+          final isAlphabetFoundation =
+              isSoundFoundation && item.sessionIndex <= 3;
           final foundation = switch (item.sessionIndex) {
             0 => (
               'Meet the French alphabet',
@@ -109,9 +111,17 @@ class SpeakCurriculumRepository {
               'Master French vowels',
               'Practise A, E, I, O, U, and Y in simple words.',
             ),
-            _ => (
+            2 => (
               'Consonants and alphabet review',
               'Revisit tricky consonants, then check your recall.',
+            ),
+            3 => (
+              'Recognize core accent marks',
+              'Learn accent aigu, accent grave, and accent circonflexe.',
+            ),
+            _ => (
+              'Connect sound to meaning',
+              'Read a simple word, hear it, and connect both to its meaning.',
             ),
           };
           final pacedMinutes = _pacedMinutes(
@@ -119,7 +129,7 @@ class SpeakCurriculumRepository {
             level,
             item.kind,
           );
-          if (!isFoundation && pacedMinutes == item.estimatedMinutes) {
+          if (!isSoundFoundation && pacedMinutes == item.estimatedMinutes) {
             return item;
           }
           return SpeakCurriculumItem(
@@ -128,18 +138,24 @@ class SpeakCurriculumRepository {
             unit: item.unit,
             unitTitle: item.unitTitle,
             sessionIndex: item.sessionIndex,
-            title: isFoundation ? foundation.$1 : item.title,
-            subtitle: isFoundation ? foundation.$2 : item.subtitle,
-            kind: isFoundation ? 'lesson' : item.kind,
+            title: isSoundFoundation ? foundation.$1 : item.title,
+            subtitle: isSoundFoundation ? foundation.$2 : item.subtitle,
+            kind: isSoundFoundation ? 'lesson' : item.kind,
             estimatedMinutes: pacedMinutes,
-            targetPhrases: isFoundation
+            targetPhrases: isSoundFoundation
                 ? _foundationTargetPhrases(item.sessionIndex)
                 : item.targetPhrases,
             roleplay: item.roleplay,
-            explicitPrimarySkill: isFoundation
-                ? SpeakSkill.alphabet
+            explicitPrimarySkill: isSoundFoundation
+                ? isAlphabetFoundation
+                      ? SpeakSkill.alphabet
+                      : SpeakSkill.vocabulary
                 : item.explicitPrimarySkill,
-            explicitSupportingSkills: item.explicitSupportingSkills,
+            explicitSupportingSkills: isSoundFoundation
+                ? isAlphabetFoundation
+                      ? const [SpeakSkill.vocabulary]
+                      : const [SpeakSkill.alphabet, SpeakSkill.speaking]
+                : item.explicitSupportingSkills,
           );
         })
         .toList(growable: false);
@@ -149,7 +165,9 @@ class SpeakCurriculumRepository {
       switch (sessionIndex) {
         0 => const ['bonjour', 'ami', 'chat', 'demain', 'fromage'],
         1 => const ['ami', 'papa', 'été', 'ici', 'où', 'lune'],
-        _ => const ['chat', 'bonjour', 'fromage', 'demain', 'rue'],
+        2 => const ['chat', 'bonjour', 'fromage', 'demain', 'rue'],
+        3 => const ['été', 'père', 'forêt', 'où', 'garçon'],
+        _ => const ['été', 'père', 'forêt', 'garçon', 'bonjour'],
       };
 
   static int _pacedMinutes(int current, String level, String kind) {
@@ -243,18 +261,31 @@ abstract final class SpeakCurriculumCatalog {
           unitIndex,
           unit,
           3,
-          '${unit.title}: use it in context',
-          'Turn the new language into a natural exchange.',
-          'speaking',
+          unitIndex == 0
+              ? 'Recognize core accent marks'
+              : '${unit.title}: use it in context',
+          unitIndex == 0
+              ? 'Learn accent aigu, accent grave, and accent circonflexe.'
+              : 'Turn the new language into a natural exchange.',
+          unitIndex == 0 ? 'lesson' : 'speaking',
+          primarySkill: unitIndex == 0 ? SpeakSkill.alphabet : null,
         ),
         _item(
           cefr,
           unitIndex,
           unit,
           4,
-          '${unit.title}: tell the story',
-          'Connect a few ideas in your own words.',
-          'story',
+          unitIndex == 0
+              ? 'Connect sound to meaning'
+              : '${unit.title}: tell the story',
+          unitIndex == 0
+              ? 'Read a simple word, hear it, and connect both to its meaning.'
+              : 'Connect a few ideas in your own words.',
+          unitIndex == 0 ? 'lesson' : 'story',
+          primarySkill: unitIndex == 0 ? SpeakSkill.vocabulary : null,
+          supportingSkills: unitIndex == 0
+              ? const [SpeakSkill.alphabet, SpeakSkill.speaking]
+              : const [],
         ),
         _item(
           cefr,

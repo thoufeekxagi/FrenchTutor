@@ -25,6 +25,7 @@ class TtsPlayButton extends StatefulWidget {
     this.contentItemId,
     this.bundledAssetPath,
     this.remoteStoragePath,
+    this.cacheNamespace,
     this.audioResolver,
     this.onError,
     this.label,
@@ -45,6 +46,11 @@ class TtsPlayButton extends StatefulWidget {
   /// Optional public Supabase Storage path for a pre-generated clip. If the
   /// remote file is unavailable, [bundledAssetPath] remains the fallback.
   final String? remoteStoragePath;
+
+  /// Optional cache namespace for assets whose source must not share bytes
+  /// with another provider. Static alphabet clips use this to avoid reusing
+  /// an older, misassigned remote clip from the general TTS cache.
+  final String? cacheNamespace;
 
   /// Optional resolver for generated lesson audio. When supplied, this is the
   /// complete source of PCM bytes for the button.
@@ -114,6 +120,7 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
           voiceName: ActiveTutor.current.voiceName,
           slow: widget.slow,
           contentItemId: widget.contentItemId,
+          cacheNamespace: widget.cacheNamespace,
         );
         if (bytes != null) {
           _readyBytes = bytes;
@@ -130,8 +137,13 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
           voiceName: ActiveTutor.current.voiceName,
           slow: widget.slow,
           contentItemId: widget.contentItemId,
+          cacheNamespace: widget.cacheNamespace,
         );
-        if (bytes == null) return;
+        if (bytes == null) {
+          throw StateError(
+            'Bundled audio asset is unavailable: $bundledAssetPath',
+          );
+        }
         _readyBytes = bytes;
         if (mounted) await _play(bytes);
         return;
@@ -173,6 +185,7 @@ class TtsPlayButtonState extends State<TtsPlayButton> {
     if (oldWidget.text != widget.text ||
         oldWidget.bundledAssetPath != widget.bundledAssetPath ||
         oldWidget.remoteStoragePath != widget.remoteStoragePath ||
+        oldWidget.cacheNamespace != widget.cacheNamespace ||
         oldWidget.audioResolver != widget.audioResolver) {
       _readyBytes = null;
     }

@@ -712,8 +712,8 @@ abstract final class AdaptiveCoursePlanGenerator {
     for (var offset = 0; offset < count; offset++) {
       final sequence = startSequence + offset;
       final cycle = (sequence - 1) ~/ templates.length;
-      final isAlphabetFoundation = level == 'A1' && sequence <= 3;
-      final template = isAlphabetFoundation
+      final isSoundFoundation = level == 'A1' && sequence <= 5;
+      final template = isSoundFoundation
           ? _foundationTemplates[sequence - 1]
           : _templateForFocus(
               templates,
@@ -728,7 +728,7 @@ abstract final class AdaptiveCoursePlanGenerator {
       final foundationContext = interest == null
           ? foundationBase
           : '$foundationBase with a light connection to $interest';
-      final context = isAlphabetFoundation
+      final context = isSoundFoundation
           ? foundationContext
           : interest == null
           ? baseContext
@@ -1226,10 +1226,26 @@ abstract final class AdaptiveCoursePlanGenerator {
       ['Distinguish the sounds.', 'Produce the target words.'],
     ),
     _t(
+      'Notice French consonants',
+      'recognize the consonant names and the few sounds beginners often confuse',
+      SpeakSkill.alphabet,
+      [SpeakSkill.listening, SpeakSkill.vocabulary],
+      ['French consonants'],
+      ['Recognize the target consonants.', 'Repeat the names clearly.'],
+    ),
+    _t(
+      'Recognize core accent marks',
+      'tell accent aigu, accent grave, and accent circonflexe apart',
+      SpeakSkill.alphabet,
+      [SpeakSkill.listening, SpeakSkill.vocabulary],
+      ['accent aigu', 'accent grave', 'accent circonflexe'],
+      ['Name each mark.', 'Explain its beginner-friendly sound clue.'],
+    ),
+    _t(
       'Connect sound to meaning',
       'read and say essential words in the learner\'s target context',
-      SpeakSkill.alphabet,
-      [SpeakSkill.vocabulary, SpeakSkill.speaking],
+      SpeakSkill.vocabulary,
+      [SpeakSkill.alphabet, SpeakSkill.speaking],
       ['spelling and pronunciation'],
       ['Read the words.', 'Say them with a clear rhythm.'],
     ),

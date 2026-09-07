@@ -206,12 +206,16 @@ class SpeakCurriculumItem {
   final SpeakSkill? explicitPrimarySkill;
   final List<SpeakSkill> explicitSupportingSkills;
 
-  /// The first three A1 sessions are pronunciation foundations, not generic
+  /// The first four A1 sessions are pronunciation foundations, not generic
   /// conversation lessons. Older remote rows may still contain a copied
   /// `speaking` support skill, so keep this rule at the model boundary where
   /// every roadmap projection and screen sees the same activity contract.
   bool get isAlphabetFoundation =>
-      level == 'A1' && unit == 1 && sessionIndex <= 2;
+      level == 'A1' && unit == 1 && sessionIndex <= 3;
+
+  /// The first five Unit 1 sessions establish the sound system before the
+  /// learner moves into ordinary course situations.
+  bool get isSoundFoundation => level == 'A1' && unit == 1 && sessionIndex <= 4;
 
   /// The first Unit 1 sessions establish the sound system. After that,
   /// reading/listening/writing/grammar and speaking are mixed around the unit
@@ -254,11 +258,11 @@ class SpeakCurriculumItem {
   List<SpeakSkill> get activitySkills => [primarySkill, ...supportingSkills];
 
   String get contextPrompt {
-    if (isAlphabetFoundation) {
+    if (isSoundFoundation) {
       return 'Use the pronunciation foundation "$title". Keep every '
-          'example tied to French letter names, vowel sounds, and very '
-          'simple words. Do not introduce a travel, station, roleplay, or '
-          'generic conversation scenario. Useful examples: '
+          'example tied to French letter names, vowel sounds, accent marks, '
+          'and very simple words. Do not introduce a travel, station, '
+          'roleplay, or generic conversation scenario. Useful examples: '
           '${targetPhrases.take(8).join('; ')}.';
     }
     return 'Use the course situation "$unitTitle" and the session goal '

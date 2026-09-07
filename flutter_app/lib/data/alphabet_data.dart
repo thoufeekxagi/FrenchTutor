@@ -313,6 +313,12 @@ const List<AlphabetLetter> frenchAccents = [
   ),
 ];
 
+/// The three accent marks a beginner should recognize before connecting
+/// spelling to meaning. Ç and Ë remain available in the complete accents lab,
+/// but these three are the core foundation sequence.
+List<AlphabetLetter> get coreAccentLetters =>
+    frenchAccents.take(3).toList(growable: false);
+
 /// Text used to create the shipped clip. These are French letter names, not
 /// the English-looking one-character strings that made Gemini sometimes say
 /// "Q" as the English name "cue". The generation prompt also explicitly
