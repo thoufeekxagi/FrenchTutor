@@ -677,6 +677,12 @@ async function attachListeningAudio(
       "X-Title": "ParleSprint course listening",
     },
     body: JSON.stringify({
+      // Checked directly against OpenRouter before touching this: none of
+      // google/gemini-2.5-flash-tts-preview, google/gemini-2.5-flash-tts, or
+      // google/gemini-2.5-flash-preview-tts exist as an OpenRouter route
+      // (each failed with "Model ... does not exist" on a real generation
+      // attempt). 3.1 Flash TTS Preview is the only Gemini TTS model
+      // OpenRouter actually offers right now; left unchanged.
       model: "google/gemini-3.1-flash-tts-preview",
       input: narration,
       voice: "Aoede",

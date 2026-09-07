@@ -1,5 +1,13 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
+// Checked directly against this project's own key before touching this:
+// gemini-2.5-flash-lite (the genuinely cheaper option, $0.10/$0.40 per 1M
+// tokens) is blocked for this account ("no longer available to new
+// users"). Google's own error suggests gemini-3.5-flash-lite instead, but
+// that is actually MORE expensive than the current model ($0.30/$2.50 vs
+// $0.25/$1.50) — newer is not cheaper here. gemini-3.1-flash-lite is
+// already the cheapest valid option available on this key; left
+// unchanged.
 const GEMINI_MODEL = "gemini-3.1-flash-lite";
 const OPENROUTER_MODEL = "openai/gpt-5.6-luna";
 const MAX_MESSAGES = 40;

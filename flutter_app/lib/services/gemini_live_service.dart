@@ -58,7 +58,12 @@ class GeminiLiveService {
   /// Partial text must never be used to build a new lesson context.
   final bool deferUserTranscriptUntilTurnComplete;
 
-  static const _model = 'models/gemini-3.1-flash-live-preview';
+  // 2.5 Native Audio is Generally Available (3.1 Live is still Preview) and
+  // roughly half the audio-output cost of 3.1 Live — confirmed against this
+  // project's own Gemini key before switching. Same real-time back-and-forth
+  // conversation, same voice activity detection and turn-taking behavior.
+  static const _model =
+      'models/gemini-2.5-flash-native-audio-preview-12-2025';
 
   /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
   /// was dialed with, even across reconnects — the voice and identity never
