@@ -963,27 +963,19 @@ Deno.serve(async (request: Request) => {
     .order("sequence", { ascending: true });
   if (reserveError) return response({ error: reserveError.message }, 500);
 
-  const staleGuidedRows = (activePersonalized ?? [])
-    .filter((row) => needsGuidedSpeakingRefresh(row as Json)) as Json[];
-  if (staleGuidedRows.length > 0) {
-    const refreshedAt = new Date().toISOString();
-    const { error: refreshError } = await admin
-      .from("adaptive_course_sessions")
-      .update({
-        generation_status: "queued",
-        artifact_kind: null,
-        artifact_json: null,
-        generation_error: "Regenerating stale guided speaking lesson",
-        updated_at: refreshedAt,
-      })
-      .in("id", staleGuidedRows.map((row) => text(row.id)))
-      .eq("user_id", userId);
-    if (refreshError) return response({ error: refreshError.message }, 500);
-    for (const row of staleGuidedRows) {
-      row.generation_status = "queued";
-      row.artifact_json = null;
-    }
-  }
+  // REMOVED: this used to reset a specific, narrowly-detected historical
+  // guided-speaking defect (needsGuidedSpeakingRefresh, still defined
+  // above for reference) back to queued/no-artifact so it would
+  // regenerate. Explicit product decision: a ready lesson with a real
+  // artifact is never touched again, through any path, for any reason --
+  // not even a targeted repair. The database's own
+  // prevent_generation_status_regression trigger now rejects this
+  // unconditionally regardless of what code attempts it, so leaving this
+  // block in would only silently no-op against the trigger while lying
+  // to this function's own in-memory view of the row. If a specific
+  // artifact genuinely needs manual repair in the future, that must be a
+  // deliberate, explicit, out-of-band operation, never a routine
+  // background code path that runs on every Course open.
 
   const generating = (activePersonalized ?? []).some((row) =>
     text(row.generation_status) === "generating"
