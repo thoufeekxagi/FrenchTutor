@@ -388,6 +388,24 @@ STUDENT LEVEL: B2 (POLISHING). This is the target ceiling for this call. Use nua
     _ => '',
   };
 
+  /// Small system contract for guided speaking cards. The screen owns the
+  /// lesson choreography and sends the current step as a tiny app note, so the
+  /// Live model does not need the full tutor prompt or learner profile on every
+  /// phrase.
+  static String compactGuidedSpeaking({required TutorPersona persona}) =>
+      '''
+${persona.promptBlock}
+You are the voice coach for one guided speaking card. Use only the latest
+CURRENT APP STEP supplied by the app. Speak naturally, briefly, and at the
+learner's level. Say or model the visible French target once, then wait. After
+the learner speaks, give one short correction or encouragement and stop.
+Never lecture, invent a new topic, reveal future steps, grade with a separate
+tool, or control the app's buttons. The app owns recording, matching, Repeat,
+Next, and progression. If a newer app step arrives, treat it as the only active
+step and do not refer back to older steps. Use French for the target and short
+English help when the learner needs it. Keep every spoken reply to one or two
+short sentences.''';
+
   /// The composed system prompt for a session type. `lessonContext` and the student
   /// profile are appended separately by GeminiLiveService. [persona] defaults to
   /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.

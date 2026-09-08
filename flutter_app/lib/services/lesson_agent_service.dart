@@ -15,6 +15,7 @@ import '../models/grammar_course_v2.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 import 'gemini_live_audio_service.dart';
+import 'ai_cost_tracker.dart';
 import 'story_variety_service.dart';
 import 'vocabulary_level_policy.dart';
 import 'learner_language_policy.dart';
@@ -35,7 +36,8 @@ The app renders all learner-facing text outside the image.
 /// The "brain" behind lesson labs: answers questions, grades writing, explains
 /// wrong quiz answers — text-only (voice is LessonSpeechService / GeminiLiveService).
 ///
-/// Text generation uses Gemini Flash-Lite.
+/// General text generation uses the pinned OpenRouter GPT-5.6 Luna route;
+/// individual multimodal/transcription callers explicitly request Gemini.
 /// Thrown by any raw Gemini HTTP call in this file (text
 /// generation) instead of the generic [AgentError] so callers can tell a
 /// rate limit (429, back off longer and retry) apart from any other
@@ -649,6 +651,10 @@ Create one fresh lesson now.''';
       maxTokens: 1800,
       temperature: 0.55,
       jsonMode: true,
+      // Grammar generation is an explicit reserve-preparation action. A
+      // malformed result must be shown as a failure, not duplicated into two
+      // or three billable provider requests behind the user's back.
+      maxAttempts: 1,
     );
     final obj = _decodeObject(raw);
     final steps = (obj['steps'] as List? ?? const [])
@@ -976,6 +982,7 @@ Silently audit a French pronunciation attempt (student never sees this). They we
         {'role': 'system', 'content': system},
         {'role': 'user', 'content': user},
       ],
+      traceFeature: 'pronunciation_judge',
     );
     return _parseMistakeJudgment(raw);
   }
@@ -1022,6 +1029,7 @@ STUDENT SAID: $utterance''';
       ],
       maxTokens: 60,
       timeout: const Duration(seconds: 4),
+      traceFeature: 'live_intent',
     );
     final obj = _decodeObject(raw);
     final intentRaw = obj['intent'] as String?;
@@ -1357,6 +1365,11 @@ and easy to say aloud.
       maxTokens: 1200,
       temperature: 0.8,
       jsonMode: true,
+      traceFeature: 'speaking_guided_generation',
+      // Guided Speaking is an explicit, user-triggered generation. Do not
+      // silently spend on provider retries; a failed result stays out of the
+      // lesson store and leaves existing lessons untouched.
+      maxAttempts: 1,
     );
     return _parseReadingPassage(raw, levelBand: levelBand);
   }
@@ -2401,6 +2414,7 @@ short enough for a mobile bottom sheet.''';
       ],
       maxTokens: 700,
       temperature: 0.2,
+      traceFeature: 'word_conjugation',
     );
     return _decodeObject(raw);
   }
@@ -2483,6 +2497,7 @@ Do not invent a meaning unrelated to the sentence.''';
       ],
       maxTokens: 220,
       temperature: 0.1,
+      traceFeature: 'word_meaning',
       // Live conversational and multimodal calls stay on the pinned
       // OpenRouter model above; this is a small, structured, high-volume
       // lookup (every word tap, across every learner) that does not need a
@@ -2823,7 +2838,7 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     bool slow = false,
     String? voiceName,
   }) async {
-    final bytes = await GeminiLiveAudioService.shared.resolve(
+    final bytes = await GeminiLiveAudioService.shared.generateAndCache(
       text: text,
       contentItemId: 'lesson-agent:${text.trim()}',
       voiceName: voiceName ?? ActiveTutor.current.voiceName,
@@ -2847,6 +2862,7 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
     try {
       final response = await _invokeFunction('ai-text', {
         'provider': 'gemini',
+        'traceFeature': 'speech_transcription',
         'contents': [
           {
             'parts': [
@@ -2893,6 +2909,7 @@ Keep the whole note under 70 words total. If the transcript has nothing substant
         : 'No linking consonant may be inserted between "$firstWord" and "$secondWord".';
     final response = await _invokeFunction('ai-text', {
       'provider': 'gemini',
+      'traceFeature': 'liaison_audio_evaluation',
       'contents': [
         {
           'parts': [
@@ -3032,6 +3049,8 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     double temperature = 0.4,
     bool jsonMode = false,
     String? provider,
+    String? traceFeature,
+    int maxAttempts = 3,
   }) async {
     return _requestTextWithRetry(
       provider: provider ?? _primaryTextProvider,
@@ -3040,6 +3059,8 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       timeout: timeout,
       temperature: temperature,
       jsonMode: jsonMode,
+      traceFeature: traceFeature,
+      maxAttempts: maxAttempts,
     );
   }
 
@@ -3053,8 +3074,12 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     required Duration timeout,
     required double temperature,
     required bool jsonMode,
+    String? traceFeature,
+    int maxAttempts = 3,
   }) async {
-    const maxAttempts = 3;
+    if (maxAttempts < 1) {
+      throw ArgumentError.value(maxAttempts, 'maxAttempts', 'must be positive');
+    }
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final response = await _invokeFunction('ai-text', {
@@ -3062,6 +3087,8 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
           'messages': messages,
           'maxTokens': maxTokens,
           'temperature': temperature,
+          'traceFeature': traceFeature,
+          if (maxAttempts == 1) 'retryPolicy': 'none',
           if (jsonMode) 'responseFormat': {'type': 'json_object'},
         }, timeout: timeout);
         final text = response['text'] as String?;
@@ -3088,23 +3115,105 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
     if (Supabase.instance.client.auth.currentSession == null) {
       throw AgentError.requestFailed;
     }
+    final requestId = const Uuid().v4();
+    final requestedProvider = body['provider']?.toString() ?? 'gemini';
+    final traceFeature = body['traceFeature']?.toString() ?? name;
+    unawaited(
+      AiCostTracker.event(
+        feature: traceFeature,
+        event: 'text_request_started',
+        requestId: requestId,
+        extra: {
+          'requested_provider': requestedProvider,
+          'message_count': body['messages'] is List
+              ? (body['messages'] as List).length
+              : (body['contents'] is List
+                    ? (body['contents'] as List).length
+                    : 0),
+          'max_tokens': body['maxTokens'],
+        },
+      ),
+    );
     try {
       final response = await Supabase.instance.client.functions
           .invoke(name, body: body)
           .timeout(timeout);
       final data = response.data;
       if (data is! Map) throw AgentError.badResponse;
-      return Map<String, dynamic>.from(data);
+      final result = Map<String, dynamic>.from(data);
+      final provider = result['provider']?.toString();
+      final model = result['model']?.toString();
+      final usage = result['usage'];
+      if (provider != null &&
+          provider.isNotEmpty &&
+          model != null &&
+          model.isNotEmpty &&
+          usage is Map) {
+        unawaited(
+          AiCostTracker.record(
+            provider: provider,
+            model: model,
+            feature: traceFeature,
+            event: 'text_provider_call',
+            requestId: requestId,
+            inputTokens: (usage['inputTokens'] as num?)?.toInt() ?? 0,
+            outputTokens: (usage['outputTokens'] as num?)?.toInt() ?? 0,
+            extra: {
+              'total_tokens': (usage['totalTokens'] as num?)?.toInt() ?? 0,
+            },
+          ),
+        );
+      } else {
+        unawaited(
+          AiCostTracker.event(
+            feature: traceFeature,
+            event: 'text_request_returned_without_usage',
+            requestId: requestId,
+            extra: {'provider': provider, 'model': model},
+          ),
+        );
+      }
+      return result;
     } on TimeoutException {
+      unawaited(
+        AiCostTracker.event(
+          feature: traceFeature,
+          event: 'text_request_timeout',
+          requestId: requestId,
+          extra: {'timeout_ms': timeout.inMilliseconds},
+        ),
+      );
       throw AgentError.requestFailed;
     } on FunctionException catch (error) {
+      unawaited(
+        AiCostTracker.event(
+          feature: traceFeature,
+          event: 'text_request_provider_error',
+          requestId: requestId,
+          extra: {'status': error.status},
+        ),
+      );
       if (error.status == 401 || error.status == 403) {
         throw AgentError.requestFailed;
       }
       throw GeminiHttpError.fromFunctionException(error);
     } on AgentError {
+      unawaited(
+        AiCostTracker.event(
+          feature: traceFeature,
+          event: 'text_request_app_error',
+          requestId: requestId,
+        ),
+      );
       rethrow;
     } catch (_) {
+      unawaited(
+        AiCostTracker.event(
+          feature: traceFeature,
+          event: 'text_request_exception',
+          requestId: requestId,
+        ),
+      );
       throw AgentError.requestFailed;
     }
   }

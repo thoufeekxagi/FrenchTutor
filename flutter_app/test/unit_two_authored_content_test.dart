@@ -72,7 +72,11 @@ void main() {
       // round trip, no per-learner render.
       expect(listening.artifact, isNotNull);
       expect(listening.artifact!['passage'], isNotNull);
-      expect(listening.artifact!['audioPath'], isNotNull);
+      expect(
+        listening.artifact!['audioPath'],
+        'course-shared/unit-two-listening.wav',
+      );
+      expect(listening.artifact!['audioMode'], 'gemini_flash_tts');
       expect(listening.generationStatus, 'ready');
       expect(listening.isContentReady, isTrue);
       print(

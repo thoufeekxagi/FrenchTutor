@@ -9,10 +9,9 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_speech_service.dart';
 import '../../services/practice_artwork_service.dart';
-import '../../services/recent_lesson_warmup_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
@@ -78,12 +77,6 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     setState(() {
       _stories = stories;
     });
-    RecentLessonWarmupService.shared.warm(
-      stories: stories,
-      sync: ref.read(syncServiceProvider),
-      storyStore: store,
-    );
-
     // A previous deployed image function could fail before returning, leaving
     // a saved story without artwork. Repair only the newest missing cover when
     // the shelf refreshes; older rows are repaired when the learner opens
@@ -216,7 +209,13 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       // screen is disposed while the reader is opening.
       final enrichment = _enrichReadingStory(story);
       unawaited(_generateCover(story, draft.coverPrompt));
-      unawaited(_prewarmNarration(story));
+      final audioReady = await LessonAudioDeckService.shared.prepare(
+        story: story,
+        db: ref.read(databaseProvider),
+      );
+      if (!audioReady) {
+        throw StateError('Reading audio deck could not be prepared.');
+      }
 
       if (!mounted) return;
       setState(() {
@@ -304,23 +303,6 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     } catch (error, stackTrace) {
       debugPrint('Reading cover generation failed: $error\n$stackTrace');
     }
-  }
-
-  Future<void> _prewarmNarration(GeneratedStory story) {
-    return LessonSpeechService.shared.prewarmNarration([
-      for (var i = 0; i < story.passage.segments.length; i++)
-        SpeechItem(
-          text: story.passage.segments[i].fr,
-          language: 'fr-FR',
-          contentItemId: story.segmentContentId(i),
-        ),
-      for (var i = 0; i < story.keywords.length; i++)
-        SpeechItem(
-          text: story.keywords[i].fr,
-          language: 'fr-FR',
-          contentItemId: '${story.id}_kw_${story.keywords[i].id}',
-        ),
-    ]);
   }
 
   void _open(GeneratedStory story) {

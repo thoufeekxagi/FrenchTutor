@@ -13,6 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/database/tts_audio_cache_store.dart';
 import '../models/tutor_persona.dart';
 import 'audio_streaming_service.dart';
+import 'ai_cost_tracker.dart';
 import 'gemini_live_audio_service.dart';
 import 'lesson_agent_service.dart';
 
@@ -94,14 +95,9 @@ class LessonSpeechService {
 
   List<SpeechItem> _ttsQueue = [];
   int _ttsIndex = 0;
-  // Lines that failed all 3 of synthesizeWithRetry's attempts during this
-  // queue's run and were skipped so the rest of the story could keep
-  // playing. By the time the queue finishes, whatever transient
-  // rate-limit/socket contention caused the failure (see warmDeck) has
-  // almost always cleared, so each one gets exactly one more quiet
-  // attempt in the background — not another 3-attempt burst — so the
-  // line is cached and plays correctly next time, without making the
-  // learner wait for it now or spending more calls than necessary.
+  // Lines that failed during an explicit playback run. They are reported to
+  // the UI and can be retried by an explicit tap; they are never regenerated
+  // in a hidden background task.
   final List<SpeechItem> _skippedItems = [];
   void Function(int)? _onItemStart;
   void Function()? _onFinished;
@@ -183,23 +179,9 @@ class LessonSpeechService {
       _onPlaybackReady = onPlaybackReady;
       _onError = onError;
       isPaused = false;
-      // Universal lesson rule: the first item starts normally while every
-      // later item resolves from local/Supabase cache or warms in parallel.
-      // `resolve` deduplicates the first item with `_speakCurrent`, so this
-      // never creates two provider calls for the same sentence.
-      final persona = ActiveTutor.current;
-      unawaited(
-        GeminiLiveAudioService.shared.warmDeck(
-          voiceName: persona.voiceName,
-          items: [
-            for (var index = 0; index < items.length; index++)
-              (
-                text: items[index].text,
-                contentItemId: items[index].contentItemId ?? 'narration:$index',
-              ),
-          ],
-        ),
-      );
+      // Never synthesize the rest of a lesson in the background. A new Live
+      // request is allowed only when the learner explicitly starts playback
+      // for that item; cached clips remain instant.
       await _speakCurrent(generation);
     } finally {
       _speakStarting = false;
@@ -273,7 +255,6 @@ class LessonSpeechService {
       final finished = _onFinished;
       _onFinished = null;
       finished?.call();
-      unawaited(_retrySkippedItemsInBackground(generation));
       return;
     }
     isSpeaking = true;
@@ -297,16 +278,9 @@ class LessonSpeechService {
       generation: generation,
     );
     if (!played) {
-      // This line already went through synthesizeWithRetry's 3 attempts
-      // with backoff. A story fires one fresh Gemini Live call per
-      // sentence in quick succession (see warmDeck), which can transiently
-      // trip a rate limit or socket hiccup on one specific sentence even
-      // when every other sentence is fine. Killing the entire remaining
-      // story over one stubborn line used to leave a learner reading
-      // silence for every sentence after it — reported directly as audio
-      // "skipping the last two sentences." Skip just this one line and
-      // keep the story playing; the learner can still tap that sentence
-      // directly to retry it (see _playSelectedSentence).
+      // Skip only this line so an explicit playback run can continue. A
+      // failed line is retried only when the learner explicitly taps it
+      // again; there is no hidden retry after the lesson finishes.
       debugPrint(
         'LessonSpeechService: skipping unplayable line at index $_ttsIndex after retries',
       );
@@ -318,36 +292,6 @@ class LessonSpeechService {
       _onError?.call(StateError('Gemini Live returned no playable audio.'));
       _ttsIndex += 1;
       await _speakCurrent(generation);
-    }
-  }
-
-  /// Every skipped line gets exactly one more quiet attempt after the whole
-  /// story has finished, sequentially (never a burst) and never blocking
-  /// playback — by then, whatever transient contention caused the original
-  /// failure (see warmDeck's concurrent connections) has almost always
-  /// cleared. A success here just warms the shared cache so the line plays
-  /// correctly the next time this story is read or that sentence is tapped
-  /// directly; it never interrupts playback that has already moved on. One
-  /// attempt each, not another 3-attempt burst — real work already went
-  /// into the first try.
-  Future<void> _retrySkippedItemsInBackground(int generation) async {
-    if (_skippedItems.isEmpty) return;
-    final items = List<SpeechItem>.from(_skippedItems);
-    _skippedItems.clear();
-    final persona = ActiveTutor.current;
-    for (final item in items) {
-      if (generation != _queueGeneration) return;
-      try {
-        await synthesize(
-          item.text,
-          voiceName: persona.voiceName,
-          contentItemId: item.contentItemId,
-        );
-      } catch (error) {
-        debugPrint(
-          'LessonSpeechService: background retry for a skipped line failed again: $error',
-        );
-      }
     }
   }
 
@@ -514,116 +458,44 @@ class LessonSpeechService {
     _wordOffsetsMs.clear();
   }
 
-  /// Reading a whole story fires one fresh synthesis call per sentence in
-  /// quick succession (nothing's cached yet on a first read) — enough to hit
-  /// the Live socket quota partway through, which used to
-  /// fail every remaining sentence instantly with no audio and no retry (the
-  /// highlight still advanced from `_onItemStart`, so it looked like playback
-  /// was working while actually going silent). Retries a few times with
-  /// backoff before finally giving up on a line — longer backoff
-  /// specifically for a 429, since a fixed short delay won't have cleared by
-  /// the time it retries. Shared by live playback and [prewarmNarration].
+  /// Synthesizes one explicit playback request. A failed request is surfaced
+  /// immediately; the learner can tap again. Retrying automatically multiplies
+  /// billable Live sessions, so this path deliberately makes one provider
+  /// attempt only.
   Future<List<int>?> synthesizeWithRetry(
     String text, {
     required String voiceName,
     required bool slow,
     String? contentItemId,
   }) async {
-    const maxAttempts = 3;
-    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        return await synthesize(
-          text,
-          voiceName: voiceName,
-          slow: slow,
-          contentItemId: contentItemId,
-        );
-      } catch (e) {
-        debugPrint(
-          'LessonSpeechService: TTS synth failed (attempt $attempt/$maxAttempts): $e',
-        );
-        if (attempt == maxAttempts) return null;
-        // NOTE: deliberately no `isPaused` check here — this method is
-        // shared by the narration queue, on-demand speaker taps, and
-        // background prewarming, and `isPaused` is queue-only state. It has
-        // no meaning for the other two callers and was silently cutting
-        // their retries short after just one attempt whenever the queue
-        // happened to be paused for an unrelated reason.
-        final isRateLimited = e is GeminiHttpError && e.isRateLimited;
-        await Future.delayed(
-          Duration(
-            milliseconds: isRateLimited ? 2500 * attempt : 400 * attempt,
-          ),
-        );
-      }
-    }
-    return null;
-  }
-
-  /// Synthesizes and caches every line of a freshly generated story right
-  /// after it's written, one at a time (never in parallel — a burst of
-  /// simultaneous calls is exactly what trips the rate limit in the first
-  /// place), so opening it to read hits the persisted `tts_audio_cache`
-  /// (same on-device database the story itself is saved in) instead of
-  /// opening a Live socket for every sentence. Best-effort and
-  /// meant to be fired in the background right after generation — any line
-  /// that doesn't warm here just falls back to live synthesis (with the
-  /// same retry) the first time it's actually played, exactly like before
-  /// this existed, so a partial or total failure here is never fatal.
-  Future<void> prewarmNarration(List<SpeechItem> items) async {
-    if (items.isEmpty) return;
-    final voiceName = ActiveTutor.current.voiceName;
-    await GeminiLiveAudioService.shared.resolve(
-      text: items.first.text,
-      contentItemId: items.first.contentItemId ?? 'narration:0',
-      voiceName: voiceName,
-    );
-    if (items.length > 1) {
-      unawaited(
-        GeminiLiveAudioService.shared.warmDeck(
-          voiceName: voiceName,
-          items: [
-            for (var index = 1; index < items.length; index++)
-              (
-                text: items[index].text,
-                contentItemId: items[index].contentItemId ?? 'narration:$index',
-              ),
-          ],
-        ),
+    try {
+      return await synthesize(
+        text,
+        voiceName: voiceName,
+        slow: slow,
+        contentItemId: contentItemId,
       );
+    } catch (error) {
+      debugPrint('LessonSpeechService: TTS request failed (no retry): $error');
+      return null;
     }
   }
 
-  /// Same as [prewarmNarration], but runs up to [concurrency] requests at
-  /// once instead of one at a time — for a large one-off batch (e.g. every
-  /// letter of the alphabet, ~30 short clips) where strictly sequential
-  /// synthesis is safe but slow, and the caller needs it to finish faster
-  /// without firing all items simultaneously and risking a rate-limit burst.
-  /// Each worker still goes through [synthesizeWithRetry], so an individual
-  /// clip's failure/backoff behavior is identical to the sequential path.
+  /// Legacy compatibility hook. Audio is generated by the owning lesson
+  /// creation transaction (`LessonAudioDeckService.prepare`), never by a
+  /// background prewarm task. Existing callers intentionally become no-ops.
+  Future<void> prewarmNarration(List<SpeechItem> items) async {
+    return;
+  }
+
+  /// Compatibility hook for older callers that used to request a background
+  /// batch. It is intentionally a no-op: generated lesson audio is owned by
+  /// the explicit lesson/audio-deck transaction, never by a warmup batch.
   Future<void> prewarmNarrationBounded(
     List<SpeechItem> items, {
     int concurrency = 4,
   }) async {
-    if (items.isEmpty) return;
-    final voiceName = ActiveTutor.current.voiceName;
-    await GeminiLiveAudioService.shared.resolve(
-      text: items.first.text,
-      contentItemId: items.first.contentItemId ?? 'narration:0',
-      voiceName: voiceName,
-    );
-    if (items.length > 1) {
-      await GeminiLiveAudioService.shared.warmDeck(
-        voiceName: voiceName,
-        items: [
-          for (var index = 1; index < items.length; index++)
-            (
-              text: items[index].text,
-              contentItemId: items[index].contentItemId ?? 'narration:$index',
-            ),
-        ],
-      );
-    }
+    return;
   }
 
   /// Copies pre-generated PCM assets into the same persistent cache used by
@@ -818,23 +690,15 @@ class LessonSpeechService {
     await _geminiAudio.playAudioChunk(bytes, waitForFeed: true);
   }
 
-  /// Returns the PCM16 bytes for [text] in [voiceName], from cache when possible.
-  /// Used both by the queued narration path above and directly by callers that just want
-  /// one clip played on demand (vocab/grammar/listening speaker buttons, roleplay lines) —
-  /// every caller shares the same in-memory + persisted-disk + DB-indexed cache, so a given
-  /// line is ever synthesized once, never once per screen.
+  /// Returns only an already-generated PCM16 clip. Playback is read-only:
+  /// a cache miss is an error, never an implicit Gemini generation request.
   Future<List<int>> synthesize(
     String text, {
     required String voiceName,
     bool slow = false,
     String? contentItemId,
   }) async {
-    final bytes = await GeminiLiveAudioService.shared.resolve(
-      text: text,
-      contentItemId: contentItemId ?? 'audio:${text.trim()}',
-      voiceName: voiceName,
-      slow: slow,
-    );
+    final bytes = await loadCachedAudio(text, voiceName: voiceName, slow: slow);
     if (bytes == null) throw StateError('Gemini Live returned no audio');
     return bytes;
   }
@@ -865,13 +729,9 @@ class LessonSpeechService {
   }
 
   // ---------------------------------------------------------------------------
-  // Persistent cache — the same sentence in the same voice is spoken constantly
-  // (flashcards, replays, repeated lesson visits, roleplay lines heard again in a
-  // later session); persisting synthesized audio in the app's own support directory
-  // (NOT the OS-evictable temp dir) and indexing it in the legacy local cache means most
-  // narration is instant instead of a fresh Gemini round-trip, and survives both app
-  // relaunches and the OS's temp-storage cleanup sweeps. Self-healing: a cache miss
-  // (missing row, or a row whose file somehow vanished) just re-synthesizes.
+  // Persistent cache — generated clips live in the app's support directory and
+  // are indexed locally, so replays never make a provider request. A missing
+  // clip is surfaced to the caller; it is never silently regenerated.
   // ---------------------------------------------------------------------------
 
   Directory? _cacheDirLazy;
@@ -1052,6 +912,13 @@ class LessonSpeechService {
     }
 
     isListening = true;
+    unawaited(
+      AiCostTracker.event(
+        feature: 'speech_capture',
+        event: 'speech_capture_started',
+        extra: {'locale': locale, 'auto_stop_seconds': 6},
+      ),
+    );
     _captureBuffer.clear();
     _onListenFinal = onFinal;
     _onListenFinalWithAudio = onFinalWithAudio;
@@ -1072,15 +939,42 @@ class LessonSpeechService {
     _onListenFinal = null;
     _onListenFinalWithAudio = null;
     if (bytes.isEmpty) {
+      unawaited(
+        AiCostTracker.event(
+          feature: 'speech_capture',
+          event: 'speech_capture_empty',
+        ),
+      );
       callback?.call('');
       audioCallback?.call('', const []);
       return;
     }
     try {
+      unawaited(
+        AiCostTracker.event(
+          feature: 'speech_capture',
+          event: 'speech_transcription_requested',
+          extra: {'pcm_bytes': bytes.length},
+        ),
+      );
       final text = await LessonAgentService.shared.transcribeSpeech(bytes);
+      unawaited(
+        AiCostTracker.event(
+          feature: 'speech_capture',
+          event: 'speech_transcription_finished',
+          extra: {'pcm_bytes': bytes.length, 'transcript_length': text.length},
+        ),
+      );
       callback?.call(text);
       audioCallback?.call(text, bytes);
     } catch (_) {
+      unawaited(
+        AiCostTracker.event(
+          feature: 'speech_capture',
+          event: 'speech_transcription_failed',
+          extra: {'pcm_bytes': bytes.length},
+        ),
+      );
       callback?.call('');
       audioCallback?.call('', bytes);
     }

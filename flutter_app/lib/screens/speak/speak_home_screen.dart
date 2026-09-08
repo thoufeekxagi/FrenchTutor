@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,14 +33,12 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
   late final PageController _featuredController;
   var _featuredPage = 0;
   bool _tourRequested = false;
-  bool _preparingCourse = false;
 
   @override
   void initState() {
     super.initState();
     _featuredController = PageController();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      unawaited(_prepareCourse());
       if (!mounted || MediaQuery.sizeOf(context).width >= 1024) return;
       final requested =
           AppTour.pendingHomeReplay || !await AppTour.hasSeenHome();
@@ -65,24 +61,6 @@ class _SpeakHomeScreenState extends ConsumerState<SpeakHomeScreen> {
     );
     if (mounted) {
       setState(() {});
-      unawaited(_prepareCourse());
-    }
-  }
-
-  Future<void> _prepareCourse() async {
-    if (_preparingCourse) return;
-    _preparingCourse = true;
-    try {
-      final profile = ref.read(learningStoreProvider).profile();
-      final plan = ref
-          .read(adaptiveCourseStoreProvider)
-          .ensureCurrentPlan(profile);
-      final sync = ref.read(syncServiceProvider);
-      final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
-      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
-      if (mounted) setState(() {});
-    } finally {
-      _preparingCourse = false;
     }
   }
 

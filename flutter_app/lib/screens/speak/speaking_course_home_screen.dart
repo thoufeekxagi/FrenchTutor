@@ -36,7 +36,6 @@ class _SpeakingCourseHomeScreenState
   String? _selectedLessonId;
   final List<SpeakingCourseLesson> _persistedLessons = [];
   bool _isGenerating = false;
-  bool _isReplenishing = false;
 
   @override
   void initState() {
@@ -51,8 +50,6 @@ class _SpeakingCourseHomeScreenState
       await ref.read(syncServiceProvider).hydrateSpeakingLessons();
       _reloadPersistedLessons();
       if (mounted) setState(() {});
-      final profile = ref.read(learningStoreProvider).profile();
-      unawaited(_ensureReserve(_mode, _beginnerBand(profile.level)));
     } catch (error, stackTrace) {
       debugPrint('Speaking catalog restore failed: $error\n$stackTrace');
     }
@@ -238,10 +235,6 @@ class _SpeakingCourseHomeScreenState
                     _mode = entry.$1;
                     _selectedLessonId = null;
                   });
-                  final profile = ref.read(learningStoreProvider).profile();
-                  unawaited(
-                    _ensureReserve(entry.$1, _beginnerBand(profile.level)),
-                  );
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
@@ -591,78 +584,27 @@ class _SpeakingCourseHomeScreenState
     required SpeakingCourseMode mode,
     required Iterable<String> avoidTitles,
   }) async {
-    Object? lastError;
-    for (var attempt = 0; attempt < 3; attempt++) {
-      try {
-        final agent = ref.read(lessonAgentServiceProvider);
-        final passage = switch (mode) {
-          SpeakingCourseMode.guided =>
-            await agent.buildStandaloneSpeakingLesson(
-              levelBand: level,
-              avoidTitles: avoidTitles,
-            ),
-          SpeakingCourseMode.freeTalk =>
-            await agent.buildStandaloneFreeTalkTopic(
-              levelBand: level,
-              avoidTitles: avoidTitles,
-            ),
-          SpeakingCourseMode.roleplay => await agent.buildStandaloneRoleplay(
-            levelBand: level,
-            avoidTitles: avoidTitles,
-          ),
-        };
-        return SpeakingCourseLessonValidator.fromPassage(
-          passage: passage,
-          id: SpeakingLessonStore.newId(),
-          level: level,
-          mode: mode,
-        );
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw StateError(
-      'The generator did not produce a validated ${mode.name} lesson: $lastError',
+    final agent = ref.read(lessonAgentServiceProvider);
+    final passage = switch (mode) {
+      SpeakingCourseMode.guided => await agent.buildStandaloneSpeakingLesson(
+        levelBand: level,
+        avoidTitles: avoidTitles,
+      ),
+      SpeakingCourseMode.freeTalk => await agent.buildStandaloneFreeTalkTopic(
+        levelBand: level,
+        avoidTitles: avoidTitles,
+      ),
+      SpeakingCourseMode.roleplay => await agent.buildStandaloneRoleplay(
+        levelBand: level,
+        avoidTitles: avoidTitles,
+      ),
+    };
+    return SpeakingCourseLessonValidator.fromPassage(
+      passage: passage,
+      id: SpeakingLessonStore.newId(),
+      level: level,
+      mode: mode,
     );
-  }
-
-  Future<void> _ensureReserve(SpeakingCourseMode mode, String level) async {
-    if (_isReplenishing || _isGenerating) return;
-    final lessons = _lessonsFor(mode, level);
-    final completed = ref.read(storageServiceProvider).completedContentKeys();
-    final remaining = lessons
-        .where((lesson) => !completed.contains(lesson.id))
-        .length;
-    if (remaining >= 10) return;
-
-    _isReplenishing = true;
-    try {
-      for (var index = 0; index < 2; index++) {
-        final current = _lessonsFor(mode, level);
-        final avoidTitles = current.map((lesson) => lesson.title).toList();
-        try {
-          final lesson = await _generateValidatedLesson(
-            level: level,
-            mode: mode,
-            avoidTitles: avoidTitles,
-          );
-          final inserted = ref
-              .read(speakingLessonStoreProvider)
-              .insertGenerated(lesson);
-          if (inserted) {
-            _reloadPersistedLessons();
-            if (mounted) setState(() {});
-          }
-        } catch (error, stackTrace) {
-          // Background replenishment must never change the current lesson or
-          // show a scary error card. The validated row simply is not added;
-          // the next reserve check can try again.
-          debugPrint('Speaking reserve generation failed: $error\n$stackTrace');
-        }
-      }
-    } finally {
-      _isReplenishing = false;
-    }
   }
 
   Future<void> _startLesson(SpeakingCourseLesson lesson) async {
@@ -712,7 +654,6 @@ class _SpeakingCourseHomeScreenState
           stage: lesson.mode.name,
         );
     setState(() {});
-    unawaited(_ensureReserve(lesson.mode, lesson.level));
   }
 
   Widget _sectionLabel(String text) => Text(

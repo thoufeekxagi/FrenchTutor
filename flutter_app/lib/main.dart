@@ -16,7 +16,9 @@ import 'data/database/competency_store.dart';
 import 'models/tutor_persona.dart';
 import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
+import 'services/alphabet_prewarm.dart';
 import 'services/lesson_speech_service.dart';
+import 'services/ai_cost_tracker.dart';
 import 'services/pilot_access_service.dart';
 import 'services/subscription_gate_service.dart';
 
@@ -36,6 +38,17 @@ void main() {
     appRunner: () => runZonedGuarded(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
+        unawaited(
+          AiCostTracker.event(
+            feature: 'app',
+            event: 'process_boot',
+            extra: {
+              'debug': kDebugMode,
+              'trace_version': 'cost-trace-v2',
+              'stage': 'before_supabase',
+            },
+          ),
+        );
         // Portrait-only on phones for the pilot — no landscape call/lesson
         // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
         if (!kIsWeb) {
@@ -69,6 +82,17 @@ void main() {
             await Posthog().setup(config);
           }
           final db = await openAppDatabase();
+          unawaited(
+            AiCostTracker.event(
+              feature: 'app',
+              event: 'app_boot',
+              extra: {
+                'debug': kDebugMode,
+                'trace_version': 'cost-trace-v2',
+                'platform': _pilotPlatform().name,
+              },
+            ),
+          );
           LessonSpeechService.configure(db);
           final infrastructure = PilotInfrastructureStore(db);
           final platform = _pilotPlatform();
@@ -84,6 +108,10 @@ void main() {
           // The chosen tutor persona must be readable synchronously anywhere
           // (P2.1) — loaded once here, updated only from Settings/Onboarding.
           await ActiveTutor.load();
+          // Alphabet audio is curated and bundled in the app. Seed the selected
+          // tutor's 31 clips into the persistent local cache on first install;
+          // this reads app assets only and never contacts Supabase or Gemini.
+          unawaited(AlphabetPrewarm.maybeStart(isBeginner: true));
           await DevSubscriptionOverride.load();
           const OrchestrationBootstrapper().bootstrap(
             content: ContentService.shared,

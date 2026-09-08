@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../models/tutor_persona.dart';
+import 'ai_cost_tracker.dart';
+import 'gemini_live_service.dart';
 import 'gemini_live_token_service.dart';
 
 /// Resolves short tutor audio clips through the same Gemini Live model and
@@ -35,6 +37,7 @@ class GeminiLiveAudioService {
   // differently, so the same cache-consistency reasoning applies on the way
   // back too.
   static const _cacheVersion = 'live-audio-v4';
+  static const _storedEncoding = 'pcm_s16le+gzip';
   static const outputSampleRateHz = 24000;
 
   final Map<String, Future<List<int>?>> _inFlight = {};
@@ -75,11 +78,20 @@ class GeminiLiveAudioService {
       'paraphrase it, or add or omit any words. Do not say anything before or '
       'after the script. ${slow ? 'Use a measured, extra-clear learning pace.' : 'Use a natural, clear learning pace.'}';
 
-  /// Reads private local/Supabase cache first, then generates one clip through
-  /// Gemini Live. Supabase persistence is skipped until the learner has an
-  /// authenticated owner; the local cache still keeps the current session
-  /// usable without making audio public.
+  /// Reads an already-generated clip from local storage or the private
+  /// Supabase mirror. A playback/cache miss never opens Gemini Live.
   Future<List<int>?> resolve({
+    required String text,
+    required String contentItemId,
+    String? voiceName,
+    bool slow = false,
+  }) async {
+    return loadCached(text: text, voiceName: voiceName, slow: slow);
+  }
+
+  /// Generates one clip only as part of an explicit lesson-generation
+  /// transaction. Playback screens must never call this method.
+  Future<List<int>?> generateAndCache({
     required String text,
     required String contentItemId,
     String? voiceName,
@@ -95,7 +107,25 @@ class GeminiLiveAudioService {
       slow: slow,
     );
     final existing = _inFlight[cacheKey];
-    if (existing != null) return existing;
+    if (existing != null) {
+      unawaited(
+        AiCostTracker.event(
+          feature: contentItemId,
+          event: 'audio_generation_deduplicated',
+          requestId: cacheKey,
+          extra: {'text_length': normalized.length},
+        ),
+      );
+      return existing;
+    }
+    unawaited(
+      AiCostTracker.event(
+        feature: contentItemId,
+        event: 'audio_generation_requested',
+        requestId: cacheKey,
+        extra: {'text_length': normalized.length, 'slow': slow},
+      ),
+    );
     final future = _resolveUnshared(
       normalized,
       contentItemId: contentItemId,
@@ -135,7 +165,20 @@ class GeminiLiveAudioService {
     if (existing != null) return existing;
 
     final local = await _readLocal(cacheKey);
-    if (_validPcm(local)) return local;
+    if (_validPcm(local)) {
+      unawaited(
+        AiCostTracker.record(
+          provider: 'google',
+          model: _model,
+          feature: 'audio_cache',
+          event: 'live_audio_cache_hit_local',
+          requestId: cacheKey,
+          cacheHit: true,
+          extra: {'text_length': text.length},
+        ),
+      );
+      return local;
+    }
 
     final userId = _currentUserId;
     if (userId == null) return null;
@@ -144,81 +187,169 @@ class GeminiLiveAudioService {
           .from(_bucket)
           .download(storagePathFor(userId: userId, cacheKey: cacheKey))
           .timeout(const Duration(seconds: 8));
-      if (!_validPcm(remote)) return null;
-      final bytes = remote.toList(growable: false);
+      final bytes = _decodeStored(remote);
+      if (!_validPcm(bytes)) return null;
       await _writeLocal(cacheKey, bytes);
+      unawaited(
+        AiCostTracker.record(
+          provider: 'google',
+          model: _model,
+          feature: 'audio_cache',
+          event: 'live_audio_cache_hit_remote',
+          requestId: cacheKey,
+          cacheHit: true,
+          outputAudioSeconds: bytes.length / 2 / outputSampleRateHz,
+          extra: {'text_length': normalized.length},
+        ),
+      );
       return bytes;
     } catch (_) {
+      unawaited(
+        AiCostTracker.event(
+          feature: 'audio_cache',
+          event: 'audio_cache_miss',
+          requestId: cacheKey,
+          extra: {'text_length': normalized.length, 'remote_checked': true},
+        ),
+      );
       return null;
     }
   }
 
-  /// Renders a complete Listening lesson through Gemini Live. Listening uses
-  /// this as its primary renderer; it returns learner-ready spoken PCM that
-  /// the app stores as a WAV clip. A music selection is intentionally rendered
-  /// as spoken French because Lyria/music generation is not this service's
-  /// narration path.
-  Future<Uint8List> synthesizeListeningLesson({
+  /// Imports PCM that was generated once as a shared course asset. This is a
+  /// local cache write only: it never contacts Gemini and never uploads a
+  /// learner-specific mirror. The shared object itself remains in the course
+  /// asset bucket and is downloaded by the deck importer.
+  Future<List<int>?> cacheLocally({
     required String text,
-    required String format,
-    required String level,
+    required List<int> bytes,
+    required String contentItemId,
     String? voiceName,
+    bool slow = false,
   }) async {
-    final normalized = text.trim();
-    if (normalized.isEmpty) {
-      throw StateError('Gemini Live recovery requires canonical French text.');
-    }
+    final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ');
     final persona = _personaForVoice(voiceName);
-    if (persona == null) {
-      throw StateError('Gemini Live recovery requires an active tutor voice.');
+    if (normalized.isEmpty || persona == null || !_validPcm(bytes)) {
+      return null;
     }
-    final generated = await _generateLive(
-      normalized,
-      persona: persona,
-      slow: false,
-      systemInstruction: _listeningInstruction(format: format, level: level),
-    ).timeout(const Duration(seconds: 90), onTimeout: () => null);
-    if (!_validPcm(generated)) {
-      throw StateError('Gemini Live returned no listening audio.');
-    }
-    return Uint8List.fromList(generated!);
+    final cacheKey = cacheKeyFor(
+      text: normalized,
+      voiceName: persona.voiceName,
+      slow: slow,
+    );
+    await _writeLocal(cacheKey, bytes);
+    unawaited(
+      AiCostTracker.record(
+        provider: 'local',
+        model: 'shared-course-audio',
+        feature: contentItemId,
+        event: 'shared_audio_imported_local',
+        requestId: cacheKey,
+        cacheHit: true,
+        extra: {'text_length': normalized.length},
+      ),
+    );
+    return bytes;
   }
 
-  /// Warms the first item before returning, then fills the rest with a small
-  /// parallel worker pool so a new lesson never waits for its whole deck.
+  /// Makes sure an already-rendered local clip has its private Supabase
+  /// mirror. Generation and playback never depend on this call succeeding,
+  /// but retrying it on every deck preparation closes the old gap where a
+  /// successful local render could be lost on reinstall if the first upload
+  /// was interrupted.
+  Future<bool> ensureRemote({
+    required String text,
+    required String contentItemId,
+    required String voiceName,
+    required List<int> bytes,
+    bool slow = false,
+  }) async {
+    final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (normalized.isEmpty || bytes.isEmpty || bytes.length.isOdd) return false;
+    final persona = _personaForVoice(voiceName);
+    final userId = _currentUserId;
+    if (persona == null || userId == null) {
+      // Anonymous/development sessions intentionally remain local-first.
+      return true;
+    }
+    final cacheKey = cacheKeyFor(
+      text: normalized,
+      voiceName: persona.voiceName,
+      slow: slow,
+    );
+    final storagePath = storagePathFor(userId: userId, cacheKey: cacheKey);
+    final client = Supabase.instance.client;
+    try {
+      try {
+        await client.storage
+            .from(_bucket)
+            .uploadBinary(
+              storagePath,
+              Uint8List.fromList(_encodeStored(bytes)),
+              fileOptions: const FileOptions(
+                contentType: 'application/gzip',
+                // Keep the mirror compatible with buckets that allow insert
+                // but intentionally deny object updates. A duplicate object
+                // is already the exact cache-keyed clip we need.
+                upsert: false,
+              ),
+            );
+      } catch (_) {
+        final existing = await client.storage
+            .from(_bucket)
+            .download(storagePath)
+            .timeout(const Duration(seconds: 8));
+        if (!_validPcm(_decodeStored(existing))) rethrow;
+      }
+      await client.from('vocabulary_audio_cache').upsert({
+        'user_id': userId,
+        'cache_key': cacheKey,
+        'content_item_id': contentItemId,
+        'spoken_text': normalized,
+        'voice_name': persona.voiceName,
+        'storage_path': storagePath,
+        'sha256': sha256.convert(bytes).toString(),
+        'bytes': _encodeStored(bytes).length,
+        'sample_rate_hz': outputSampleRateHz,
+        'channels': 1,
+        'encoding': _storedEncoding,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,cache_key');
+      unawaited(
+        AiCostTracker.event(
+          feature: contentItemId,
+          event: 'audio_cache_mirrored_remote',
+          requestId: cacheKey,
+          extra: {'stored_bytes': _encodeStored(bytes).length},
+        ),
+      );
+      return true;
+    } catch (error) {
+      debugPrint(
+        'GeminiLiveAudioService: private audio mirror pending: $error',
+      );
+      unawaited(
+        AiCostTracker.event(
+          feature: contentItemId,
+          event: 'audio_cache_mirror_failed',
+          requestId: cacheKey,
+          extra: {'error_type': error.runtimeType.toString()},
+        ),
+      );
+      return false;
+    }
+  }
+
+  /// Legacy compatibility hook. It only checks local/private cached objects;
+  /// it never generates or prewarms audio.
   Future<void> warmDeck({
     required List<({String text, String contentItemId})> items,
     String? voiceName,
   }) async {
     if (items.isEmpty) return;
-    await resolve(
-      text: items.first.text,
-      contentItemId: items.first.contentItemId,
-      voiceName: voiceName,
-    );
-    if (items.length == 1) return;
-    var next = 1;
-    Future<void> worker() async {
-      while (true) {
-        if (next >= items.length) return;
-        final item = items[next++];
-        await resolve(
-          text: item.text,
-          contentItemId: item.contentItemId,
-          voiceName: voiceName,
-        );
-      }
+    for (final item in items) {
+      await loadCached(text: item.text, voiceName: voiceName);
     }
-
-    // A whole story/lesson fires these in quick succession with nothing
-    // cached yet. 3 concurrent Live sockets was enough to trip the
-    // per-account Live quota partway through a longer story (see
-    // synthesizeWithRetry's doc comment) — the sentence that lost the race
-    // then burns its own retries before it can play. Keep this modest so a
-    // 5+ sentence story does not front-load a burst of simultaneous
-    // connections it does not need just to prewarm slightly faster.
-    final count = items.length - 1 < 2 ? items.length - 1 : 2;
-    await Future.wait(List.generate(count, (_) => worker()));
   }
 
   /// Removes the private audio clips belonging to one generated content item.
@@ -282,9 +413,21 @@ class GeminiLiveAudioService {
             .from(_bucket)
             .download(storagePath)
             .timeout(const Duration(seconds: 8));
-        if (_validPcm(remote)) {
-          final bytes = remote.toList(growable: false);
+        final bytes = _decodeStored(remote);
+        if (_validPcm(bytes)) {
           await _writeLocal(cacheKey, bytes);
+          unawaited(
+            AiCostTracker.record(
+              provider: 'google',
+              model: _model,
+              feature: contentItemId,
+              event: 'live_audio_cache_hit_remote',
+              requestId: cacheKey,
+              cacheHit: true,
+              outputAudioSeconds: bytes.length / 2 / outputSampleRateHz,
+              extra: {'text_length': text.length},
+            ),
+          );
           return bytes;
         }
       } catch (_) {
@@ -292,19 +435,89 @@ class GeminiLiveAudioService {
       }
     }
 
+    final generationClock = Stopwatch()..start();
+    unawaited(
+      AiCostTracker.event(
+        feature: contentItemId,
+        event: 'audio_provider_call_started',
+        requestId: cacheKey,
+        extra: {'model': _model, 'text_length': text.length},
+      ),
+    );
     // A healthy call finishes in a handful of seconds (verified directly:
     // 4-8s typical). 35s per attempt meant a genuinely stuck story-narration
-    // line (see synthesizeWithRetry's 3 attempts) could take up to ~2
-    // minutes to finally surface an error — long enough that a learner just
-    // assumes playback silently froze and gives up before the retry/error
-    // ever appears. Cut the per-attempt budget well below that.
+    // line used to be retried by the old narration path and could take up to
+    // ~2 minutes to finally surface an error — long enough that a learner
+    // assumed playback silently froze. The generation path now makes one
+    // bounded attempt only.
+    if (GeminiLiveService.hasActiveSocket) {
+      unawaited(
+        AiCostTracker.event(
+          feature: contentItemId,
+          event: 'audio_generation_deferred_live_socket_active',
+          requestId: cacheKey,
+          extra: {'model': _model, 'text_length': text.length},
+        ),
+      );
+      return null;
+    }
     final generated = await _generateLive(
       text,
       persona: persona,
       slow: slow,
+      traceFeature: contentItemId,
     ).timeout(const Duration(seconds: 15), onTimeout: () => null);
-    if (!_validPcm(generated)) return null;
-    await _writeLocal(cacheKey, generated!);
+    generationClock.stop();
+    if (!_validPcm(generated)) {
+      unawaited(
+        AiCostTracker.record(
+          provider: 'google',
+          model: _model,
+          feature: contentItemId,
+          event: 'live_audio_generation_failed',
+          requestId: cacheKey,
+          success: false,
+          extra: {
+            'text_length': text.length,
+            'billing_unknown': true,
+            'provider_response_audio_seconds': 0,
+          },
+        ),
+      );
+      unawaited(
+        AiCostTracker.event(
+          feature: contentItemId,
+          event: 'audio_provider_call_failed',
+          requestId: cacheKey,
+          extra: {'elapsed_ms': generationClock.elapsedMilliseconds},
+        ),
+      );
+      return null;
+    }
+    final generatedBytes = generated!;
+    unawaited(
+      AiCostTracker.record(
+        provider: 'google',
+        model: _model,
+        feature: contentItemId,
+        event: 'live_audio_generation',
+        requestId: cacheKey,
+        outputAudioSeconds: generatedBytes.length / 2 / outputSampleRateHz,
+        extra: {'text_length': text.length},
+      ),
+    );
+    unawaited(
+      AiCostTracker.event(
+        feature: contentItemId,
+        event: 'audio_provider_call_finished',
+        requestId: cacheKey,
+        extra: {
+          'elapsed_ms': generationClock.elapsedMilliseconds,
+          'output_pcm_bytes': generatedBytes.length,
+        },
+      ),
+    );
+    await _writeLocal(cacheKey, generatedBytes);
 
     if (userId != null && storagePath != null) {
       final client = Supabase.instance.client;
@@ -313,9 +526,9 @@ class GeminiLiveAudioService {
             .from(_bucket)
             .uploadBinary(
               storagePath,
-              Uint8List.fromList(generated),
+              Uint8List.fromList(_encodeStored(generatedBytes)),
               fileOptions: const FileOptions(
-                contentType: 'audio/pcm',
+                contentType: 'application/gzip',
                 upsert: false,
               ),
             );
@@ -332,11 +545,11 @@ class GeminiLiveAudioService {
           'spoken_text': text,
           'voice_name': persona.voiceName,
           'storage_path': storagePath,
-          'sha256': sha256.convert(generated).toString(),
-          'bytes': generated.length,
+          'sha256': sha256.convert(generatedBytes).toString(),
+          'bytes': _encodeStored(generatedBytes).length,
           'sample_rate_hz': 24000,
           'channels': 1,
-          'encoding': 'pcm_s16le',
+          'encoding': _storedEncoding,
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         }, onConflict: 'user_id,cache_key');
       } catch (error) {
@@ -345,7 +558,7 @@ class GeminiLiveAudioService {
         );
       }
     }
-    return generated;
+    return generatedBytes;
   }
 
   TutorPersona? _personaForVoice(String? voiceName) {
@@ -375,7 +588,7 @@ class GeminiLiveAudioService {
   Future<List<int>?> _readLocal(String cacheKey) async {
     try {
       final file = File('${(await _directory).path}/$cacheKey.pcm');
-      if (await file.exists()) return file.readAsBytes();
+      if (await file.exists()) return _decodeStored(await file.readAsBytes());
     } catch (_) {}
     return null;
   }
@@ -384,8 +597,24 @@ class GeminiLiveAudioService {
     try {
       await File(
         '${(await _directory).path}/$cacheKey.pcm',
-      ).writeAsBytes(bytes, flush: false);
+      ).writeAsBytes(_encodeStored(bytes), flush: false);
     } catch (_) {}
+  }
+
+  /// Lossless storage compression. Playback always receives the original
+  /// PCM16 bytes, while local files and Supabase objects occupy less space.
+  /// The decoder accepts old raw-PCM objects so existing caches remain valid.
+  List<int> _encodeStored(List<int> pcm) => gzip.encode(pcm);
+
+  List<int> _decodeStored(List<int> stored) {
+    if (stored.length >= 2 && stored[0] == 0x1f && stored[1] == 0x8b) {
+      try {
+        return gzip.decode(stored);
+      } catch (_) {
+        return const <int>[];
+      }
+    }
+    return stored;
   }
 
   bool _validPcm(List<int>? bytes) =>
@@ -396,6 +625,7 @@ class GeminiLiveAudioService {
     required TutorPersona persona,
     required bool slow,
     String? systemInstruction,
+    String? traceFeature,
   }) async {
     late final String token;
     try {
@@ -442,6 +672,24 @@ class GeminiLiveAudioService {
                         : utf8.decode(message as List<int>),
                   )
                   as Map<String, dynamic>;
+          final usageMetadata = json['usageMetadata'];
+          if (usageMetadata is Map && traceFeature != null) {
+            unawaited(
+              AiCostTracker.event(
+                feature: traceFeature,
+                event: 'live_audio_usage_metadata',
+                extra: {
+                  'provider_prompt_tokens': usageMetadata['promptTokenCount'],
+                  'provider_response_tokens':
+                      usageMetadata['responseTokenCount'] ??
+                      usageMetadata['candidatesTokenCount'],
+                  'provider_total_tokens': usageMetadata['totalTokenCount'],
+                  'cached_content_token_count':
+                      usageMetadata['cachedContentTokenCount'],
+                },
+              ),
+            );
+          }
           final error = json['error'];
           if (error is Map) {
             fail(
@@ -540,27 +788,6 @@ class GeminiLiveAudioService {
       await subscription.cancel();
       await channel.sink.close();
     }
-  }
-
-  String _listeningInstruction({
-    required String format,
-    required String level,
-  }) {
-    final style = switch (format) {
-      'story' =>
-        'Deliver it as a short, natural French story with clear pauses, a concrete setting, and a satisfying ending. Do not add, remove, or paraphrase any supplied words.',
-      'podcast' =>
-        'Perform it as a warm spoken dialogue with clear pauses between turns, like two friendly people exchanging ideas. Keep every French word exactly as supplied.',
-      'educational' =>
-        'Deliver it as a patient, well-paced French mini-lesson. Explain nothing extra and do not add words beyond the supplied French text.',
-      'music' =>
-        'The music renderer is unavailable. Do not sing and do not create music. Deliver the supplied French text as a calm, expressive spoken lesson instead, with a natural rhythm.',
-      'narration' =>
-        'Deliver it as calm, vivid French story narration with deliberate pauses and expressive phrasing. Do not add, remove, or paraphrase any supplied words.',
-      _ =>
-        'Deliver it as clear, natural French listening practice with deliberate pauses. Do not add, remove, or paraphrase any supplied words.',
-    };
-    return '${ActiveTutor.current.promptBlock} You are rendering a saved French listening lesson for CEFR level $level. $style Use a comfortable learner pace, not rushed speech. Speak only the supplied French text; never add an introduction, explanation, translation, or closing sentence.';
   }
 
   static String _normalisePronunciationTranscript(String value) => value

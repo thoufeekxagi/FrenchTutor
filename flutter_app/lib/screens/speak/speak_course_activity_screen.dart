@@ -9,7 +9,6 @@ import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/course_artifact_codec.dart';
-import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
@@ -185,6 +184,43 @@ class _SpeakCourseActivityScreenState
       return result?.connected ?? false;
     }
 
+    // Unit 1's alphabet decks are authored, bundled, and intentionally have
+    // no adaptive JSON artifact. Route them before the generated-artifact
+    // guard; the old order made Alphabet/Consonants/Vowels/Accents report
+    // “This course lesson is not ready yet.”
+    if (skill == SpeakSkill.alphabet) {
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => AlphabetLabScreen(deckId: _alphabetDeckId),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.connectors) {
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => const ConnectorsLabScreen(),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.liaison) {
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => const LiaisonLabScreen(),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+    if (skill == SpeakSkill.review) {
+      final result = await AppRouter.push<bool>(
+        context,
+        (_) => const SpeakReviewScreen(),
+        fullscreenDialog: true,
+      );
+      return result == true;
+    }
+
     final artifact = session.artifact;
     if (!session.contentReady || artifact == null) {
       throw StateError('This course lesson is not ready yet.');
@@ -202,7 +238,6 @@ class _SpeakCourseActivityScreenState
           studyDepth: VocabularyStudyDepth.wordsAndSentences,
           storyExamples: vocabularySet.storyExamples,
           coverUrl: vocabularySet.coverUrl,
-          prefetchAudio: true,
           preparedContentOnly: true,
         ),
         fullscreenDialog: true,
@@ -210,31 +245,21 @@ class _SpeakCourseActivityScreenState
       return result == true;
     }
     if (skill == SpeakSkill.reading) {
+      final story = CourseArtifactCodec.story(artifact);
+      if (!mounted) return false;
       final result = await AppRouter.push<StoryReaderResult>(
         context,
-        (_) => StoryReaderScreen(
-          story: CourseArtifactCodec.story(artifact),
-          showFinishButton: true,
-        ),
+        (_) => StoryReaderScreen(story: story, showFinishButton: true),
         fullscreenDialog: true,
       );
       return result != null;
     }
     if (skill == SpeakSkill.listening) {
       final story = CourseArtifactCodec.listening(artifact);
-      final audioClip = await LessonAssetPrefetchService.shared
-          .prefetchListening(story: story, sync: ref.read(syncServiceProvider));
-      if (audioClip == null) {
-        throw StateError('The complete listening audio is not ready yet.');
-      }
       if (!mounted) return false;
       final result = await AppRouter.push<bool>(
         context,
-        (_) => ListeningPracticeScreen(
-          story: story,
-          audioClip: audioClip,
-          showFinishButton: true,
-        ),
+        (_) => ListeningPracticeScreen(story: story, showFinishButton: true),
         fullscreenDialog: true,
       );
       return result == true;
@@ -323,8 +348,21 @@ class _SpeakCourseActivityScreenState
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(28),
-                child: _error == null
+                child: _error == null && !_launching
                     ? const SizedBox.shrink()
+                    : _error == null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: SpeakColors.accent),
+                          const SizedBox(height: 18),
+                          Text(
+                            'Preparing saved lesson audio once…',
+                            textAlign: TextAlign.center,
+                            style: DesignTokens.body(15),
+                          ),
+                        ],
+                      )
                     : Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

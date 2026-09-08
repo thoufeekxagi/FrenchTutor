@@ -13,7 +13,7 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_asset_prefetch_service.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/word_meaning_resolver.dart';
@@ -232,9 +232,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       stage: 'story',
       topic: _story.displayTitle,
     );
-    // Opening any reading-style lesson prepares the full remaining audio
-    // deck immediately. A play tap shares this same in-flight work.
-    unawaited(LessonAssetPrefetchService.shared.prefetchNarration(_story));
     unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -259,9 +256,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
               keywords: result.keywords,
             );
           });
-          unawaited(
-            LessonAssetPrefetchService.shared.prefetchNarration(_story),
-          );
         },
         onError: (_) {
           if (mounted) setState(() => _enriching = false);
@@ -335,6 +329,21 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _isLoadingAudio = true;
       _currentSegment = fromIndex;
     });
+    try {
+      await _prepareAudioDeckForPlayback();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = false;
+        _isLoadingAudio = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Audio is unavailable right now. Please try again.'),
+        ),
+      );
+      return;
+    }
     await LessonSpeechService.shared.speak(
       items: [
         for (var i = fromIndex; i < segments.length; i++)
@@ -382,6 +391,28 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         });
       },
     );
+  }
+
+  /// Audio preparation belongs to the learner's explicit Play action. A
+  /// reader can open, browse, translate, and take notes without opening a
+  /// Gemini socket; cached/shared PCM is imported here only when playback is
+  /// requested.
+  Future<void> _prepareAudioDeckForPlayback() async {
+    final db = ref.read(databaseProvider);
+    final story = _story;
+    if (LessonAudioDeckService.shared.isPrepared(story: story, db: db)) {
+      return;
+    }
+    final prepared = await LessonAudioDeckService.shared.prepare(
+      story: story,
+      db: db,
+    );
+    if (!prepared) {
+      throw StateError(
+        'Saved lesson audio is unavailable. No background audio request was '
+        'made; try Play again after checking the connection.',
+      );
+    }
   }
 
   void _scrollToCurrent() {
@@ -545,6 +576,21 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _isLoadingAudio = true;
       _currentSegment = index;
     });
+    try {
+      await _prepareAudioDeckForPlayback();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = false;
+        _isLoadingAudio = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Audio is unavailable right now. Please try again.'),
+        ),
+      );
+      return;
+    }
     await LessonSpeechService.shared.speak(
       items: [
         SpeechItem(

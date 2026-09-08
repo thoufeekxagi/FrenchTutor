@@ -198,16 +198,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     super.dispose();
   }
 
-  /// P0.4 — phone calls, app switches, lock screen. On pause the mic stops (never
-  /// stream a pocket recording); on resume it restarts unless the student had muted
-  /// deliberately. If the socket died in the background, the service's auto-reconnect
-  /// picks it up on its own.
+  /// Phone calls, app switches, and lock screen stop the mic and close the
+  /// billable Live socket. A new call requires an explicit learner action.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_callStatus == CallStatus.ended || _sessionSaved) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       _mic.onAppPaused();
+      // A live socket remains billable while the app is backgrounded. End the
+      // call instead of leaving Gemini connected behind the lock screen.
+      _gemini.disconnect();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
         if (mounted) setState(() => _errorMessage = 'Mic error: $e');

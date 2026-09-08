@@ -47,7 +47,6 @@ class _SpeakCourseVocabularyScreenState
         studyDepth: depth,
         storyExamples: set.storyExamples,
         coverUrl: set.coverUrl,
-        prefetchAudio: false,
         preparedContentOnly: true,
       ),
       fullscreenDialog: true,

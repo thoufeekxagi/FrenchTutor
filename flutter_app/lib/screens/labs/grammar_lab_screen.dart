@@ -9,7 +9,6 @@ import '../../models/grammar_course.dart';
 import '../../models/grammar_course_session_result.dart';
 import '../../models/grammar_course_v2.dart';
 import '../../providers/database_provider.dart';
-import '../../services/lesson_speech_service.dart';
 import '../grammar/grammar_v2_home_screen.dart';
 import '../grammar/grammar_v2_lesson_screen.dart';
 
@@ -31,6 +30,7 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
   List<GrammarCourseSession> _generatedSessions = const [];
   final Set<String> _preparingKeys = <String>{};
   String? _preparationError;
+  int _lifecycleGeneration = 0;
 
   @override
   void initState() {
@@ -40,10 +40,14 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
       if (!mounted) return;
       if (widget.autoStart) {
         unawaited(_startCourseSession());
-      } else {
-        unawaited(_preparePresentSessions());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _lifecycleGeneration++;
+    super.dispose();
   }
 
   void _reloadSessions() {
@@ -51,11 +55,14 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
   }
 
   Future<void> _preparePresentSessions() async {
+    final operationGeneration = _lifecycleGeneration;
     for (final mode in GrammarV2Mode.values) {
+      if (!mounted || operationGeneration != _lifecycleGeneration) return;
       await _prepareSessions(
         mode: mode,
         tense: GrammarV2Tenses.present,
         targetCount: _initialSessionCount,
+        operationGeneration: operationGeneration,
       );
     }
   }
@@ -64,7 +71,10 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
     required GrammarV2Mode mode,
     required String tense,
     int targetCount = _initialSessionCount,
+    int? operationGeneration,
   }) async {
+    final generation = operationGeneration ?? _lifecycleGeneration;
+    if (!mounted || generation != _lifecycleGeneration) return;
     final profileStore = ref.read(learningStoreProvider);
     final level = GrammarCourseCatalogLevel.normalize(
       profileStore.profile().level,
@@ -99,11 +109,11 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
             ],
             count: missing,
           );
+      if (!mounted || generation != _lifecycleGeneration) return;
       for (final session in generated) {
         store.insertGenerated(session);
       }
       _reloadSessions();
-      _prewarmSessions();
       if (mounted) setState(() {});
     } catch (error, stackTrace) {
       debugPrint(
@@ -160,48 +170,6 @@ class _GrammarLabScreenState extends ConsumerState<GrammarLabScreen> {
     return sessions
         .where((session) => fingerprints.add(grammarCourseFingerprint(session)))
         .toList(growable: false);
-  }
-
-  void _prewarmSessions() {
-    final items = <SpeechItem>[];
-    for (final session in _generatedSessions) {
-      for (var index = 0; index < session.steps.length; index++) {
-        final step = session.steps[index];
-        final prefix = 'grammar-session:${session.id}:step:$index';
-        items.add(
-          SpeechItem(
-            text: step.target,
-            language: 'fr-FR',
-            contentItemId: '$prefix:target',
-          ),
-        );
-        if (step.partnerFrench != null) {
-          items.add(
-            SpeechItem(
-              text: step.partnerFrench!,
-              language: 'fr-FR',
-              contentItemId: '$prefix:partner',
-            ),
-          );
-        }
-        for (
-          var choiceIndex = 0;
-          choiceIndex < step.choices.length;
-          choiceIndex++
-        ) {
-          items.add(
-            SpeechItem(
-              text: step.choices[choiceIndex],
-              language: 'fr-FR',
-              contentItemId: '$prefix:choice:$choiceIndex',
-            ),
-          );
-        }
-      }
-    }
-    if (items.isNotEmpty) {
-      unawaited(LessonSpeechService.shared.prewarmNarration(items));
-    }
   }
 
   @override

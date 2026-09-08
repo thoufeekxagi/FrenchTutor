@@ -10,6 +10,7 @@ import '../models/tutor_persona.dart';
 import '../prompts/live_prompts.dart';
 import '../services/progress_service.dart';
 import '../utils/generated_text.dart';
+import 'ai_cost_tracker.dart';
 import 'gemini_live_token_service.dart';
 
 /// Ported from GeminiLiveService.swift — bidirectional audio+text streaming over the
@@ -31,6 +32,7 @@ class GeminiLiveService {
     this.autoReconnect = true,
     this.manualActivityBoundaries = false,
     this.deferUserTranscriptUntilTurnComplete = false,
+    this.compactGuidedContext = false,
   });
 
   final String apiKey;
@@ -58,10 +60,57 @@ class GeminiLiveService {
   /// Partial text must never be used to build a new lesson context.
   final bool deferUserTranscriptUntilTurnComplete;
 
+  /// Uses a small guided-speaking system contract and context window. Other
+  /// Live surfaces keep their existing prompt and compression policy.
+  final bool compactGuidedContext;
+
+  // There must be one billable conversational Live socket per app process.
+  // A second lesson/tutor takes ownership and closes the previous owner
+  // before it can authenticate or open a new socket.
+  static GeminiLiveService? _activeOwner;
+  static int _ownerGeneration = 0;
+
+  /// One-shot lesson audio checks this before opening its own socket. A
+  /// conversational call always wins: cached playback remains available, but
+  /// no second billable Live connection is opened beside an active lesson.
+  static bool get hasActiveSocket => _activeOwner != null;
+
+  /// Final app-level safety valve. Individual lesson screens also tear down
+  /// their own service, but the root lifecycle observer uses this method so a
+  /// route that forgets to forward a pause/termination event cannot leave a
+  /// billable socket alive behind the app.
+  static void disconnectActiveSocket() {
+    _activeOwner?.disconnect();
+  }
+
   // Reverted from 2.5 Native Audio back to 3.1 Live: 2.5 was cheaper on
   // paper, but real-device testing showed it not responding reliably.
   // Quality/reliability wins over cost here.
   static const _model = 'models/gemini-3.1-flash-live-preview';
+
+  // Keep only the recent conversational turns that can affect the current
+  // exercise. Guided cards use a smaller window because the app replaces the
+  // active step on every Next tap; other Live surfaces retain the prior policy.
+  static const _defaultContextCompressionTriggerTokens = 8000;
+  static const _defaultContextCompressionTargetTokens = 4000;
+  static const _compactGuidedCompressionTriggerTokens = 2000;
+  static const _compactGuidedCompressionTargetTokens = 1000;
+
+  int get _contextCompressionTriggerTokens => compactGuidedContext
+      ? _compactGuidedCompressionTriggerTokens
+      : _defaultContextCompressionTriggerTokens;
+
+  int get _contextCompressionTargetTokens => compactGuidedContext
+      ? _compactGuidedCompressionTargetTokens
+      : _defaultContextCompressionTargetTokens;
+
+  // Profile and lesson context are useful calibration hints, not a transcript.
+  // Keep the stable tutor instructions intact while preventing accidental
+  // injection of an entire history into every Live setup/reconnect. The profile
+  // cap is a final safety bound because ProgressService already supplies a
+  // compact summary (level, goal, focus, and one recent issue).
+  static const _maxLearnerProfileCharacters = 500;
+  static const _maxLessonContextCharacters = 2200;
 
   /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
   /// was dialed with, even across reconnects — the voice and identity never
@@ -105,7 +154,10 @@ class GeminiLiveService {
   // conversation (context intact) across a new socket; when the server never granted
   // one, the fresh session gets a silent context note instead so Marie doesn't
   // re-greet mid-call.
-  static const _maxReconnectAttempts = 3;
+  // A reconnect opens another billable Live socket. One bounded recovery is
+  // enough for a short network blip; never keep a background session retrying
+  // indefinitely. Hosts also tear down their socket when the app is paused.
+  static const _maxReconnectAttempts = 1;
   static const _connectTimeout = Duration(seconds: 10);
   int _reconnectAttempt = 0;
   bool _isReconnecting = false;
@@ -114,6 +166,14 @@ class GeminiLiveService {
   String? _resumptionHandle;
   Timer? _reconnectTimer;
   Timer? _connectTimeoutTimer;
+
+  String? _usageSocketId;
+  bool _usageSocketConnected = false;
+  int _usageInputPcmBytes = 0;
+  int _usageOutputPcmBytes = 0;
+  int _usagePromptTokens = 0;
+  int _usageResponseTokens = 0;
+  int _usageTotalTokens = 0;
 
   bool get isConnected => _isSetupComplete;
 
@@ -138,22 +198,92 @@ class GeminiLiveService {
 
   Future<void> connect() async {
     _isIntentionalDisconnect = false;
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_connect_requested',
+        extra: {
+          'model': _model,
+          'manual_activity_boundaries': manualActivityBoundaries,
+          'auto_reconnect': autoReconnect,
+          'compact_guided_context': compactGuidedContext,
+          'context_window_compression_trigger_tokens':
+              _contextCompressionTriggerTokens,
+          'context_window_compression_target_tokens':
+              _contextCompressionTargetTokens,
+          'input_audio_transcription': true,
+          'output_audio_transcription': true,
+        },
+      ),
+    );
+    final previous = _activeOwner;
+    if (previous != null && !identical(previous, this)) {
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_previous_owner_disconnected',
+          extra: {'previous_session_type': previous.sessionType.name},
+        ),
+      );
+      previous.disconnect();
+    }
+    _activeOwner = this;
+    final ownerGeneration = ++_ownerGeneration;
     late final Uri uri;
     try {
       final token = await GeminiLiveTokenService.fetch(trial: isTrial);
+      if (!identical(_activeOwner, this) ||
+          ownerGeneration != _ownerGeneration) {
+        return;
+      }
       uri = Uri.parse(
         'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
       );
     } catch (_) {
+      if (identical(_activeOwner, this)) _activeOwner = null;
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_token_fetch_failed',
+        ),
+      );
       _handleConnectionLoss('Could not authenticate Gemini Live');
       return;
     }
+    _usageSocketId =
+        '${sessionType.name}-${DateTime.now().microsecondsSinceEpoch}';
+    _usageSocketConnected = false;
+    _usageInputPcmBytes = 0;
+    _usageOutputPcmBytes = 0;
+    _usagePromptTokens = 0;
+    _usageResponseTokens = 0;
+    _usageTotalTokens = 0;
     try {
+      if (!identical(_activeOwner, this) ||
+          ownerGeneration != _ownerGeneration) {
+        return;
+      }
       _channel = WebSocketChannel.connect(uri);
     } catch (_) {
+      if (identical(_activeOwner, this)) _activeOwner = null;
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_socket_open_failed',
+          requestId: _usageSocketId,
+        ),
+      );
       _handleConnectionLoss('Invalid API key or URL');
       return;
     }
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_socket_opened',
+        requestId: _usageSocketId,
+        extra: {'model': _model},
+      ),
+    );
     // A socket that never reaches setupComplete (bad network, server hiccup) used to
     // hang on "Connecting…" forever — now it's a normal connection loss after 10s.
     _connectTimeoutTimer?.cancel();
@@ -185,6 +315,15 @@ class GeminiLiveService {
 
   void disconnect() {
     _isIntentionalDisconnect = true;
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_disconnect_requested',
+        requestId: _usageSocketId,
+        extra: {'intentional': true},
+      ),
+    );
+    if (identical(_activeOwner, this)) _activeOwner = null;
     _inputFlushTimer?.cancel();
     _suppressWatchdog?.cancel();
     _reconnectTimer?.cancel();
@@ -195,12 +334,46 @@ class GeminiLiveService {
   }
 
   void _teardownSocket() {
+    _recordUsageSocket();
     _completeTurnWaiter();
     _sub?.cancel();
     _sub = null;
     _channel?.sink.close();
     _channel = null;
     _isSetupComplete = false;
+  }
+
+  void _recordUsageSocket() {
+    final socketId = _usageSocketId;
+    if (socketId == null || !_usageSocketConnected) return;
+    _usageSocketId = null;
+    _usageSocketConnected = false;
+    unawaited(
+      AiCostTracker.record(
+        provider: 'google',
+        model: _model,
+        feature: sessionType.name,
+        event: 'live_session_socket_closed',
+        requestId: socketId,
+        inputAudioSeconds: _usageInputPcmBytes / 2 / 16000,
+        outputAudioSeconds: _usageOutputPcmBytes / 2 / 24000,
+        extra: {
+          'input_pcm_bytes': _usageInputPcmBytes,
+          'output_pcm_bytes': _usageOutputPcmBytes,
+          'reconnect': _hasConnectedOnce,
+          'provider_prompt_tokens': _usagePromptTokens,
+          'provider_response_tokens': _usageResponseTokens,
+          'provider_total_tokens': _usageTotalTokens,
+          'cost_estimate_scope': 'direct_audio_only',
+          'context_and_transcription_tokens_are_provider_reported': true,
+        },
+      ),
+    );
+    _usageInputPcmBytes = 0;
+    _usageOutputPcmBytes = 0;
+    _usagePromptTokens = 0;
+    _usageResponseTokens = 0;
+    _usageTotalTokens = 0;
   }
 
   /// Every unintentional path to a dead socket funnels here: stream error, stream done,
@@ -211,12 +384,27 @@ class GeminiLiveService {
     _isSetupComplete = false;
     if (!autoReconnect || _reconnectAttempt >= _maxReconnectAttempts) {
       _isReconnecting = false;
+      if (identical(_activeOwner, this)) _activeOwner = null;
       _teardownSocket();
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_connection_ended',
+          extra: {'reason_type': reason},
+        ),
+      );
       onError?.call(reason);
       onDisconnected?.call();
       return;
     }
     _reconnectAttempt += 1;
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_reconnect_scheduled',
+        extra: {'attempt': _reconnectAttempt, 'reason_type': reason},
+      ),
+    );
     _isReconnecting = true;
     onReconnecting?.call(_reconnectAttempt);
     _teardownSocket();
@@ -232,6 +420,7 @@ class GeminiLiveService {
 
   void sendAudioChunk(List<int> pcmBytes) {
     if (!_isSetupComplete) return;
+    _usageInputPcmBytes += pcmBytes.length;
     final b64 = base64Encode(pcmBytes);
     _send({
       'realtimeInput': {
@@ -322,6 +511,16 @@ class GeminiLiveService {
   }
 
   Future<String> _fullSystemPrompt() async {
+    if (compactGuidedContext && sessionType == LiveSessionType.speakingGuided) {
+      var compactPrompt = LivePrompts.compactGuidedSpeaking(persona: _persona);
+      final ctx = lessonContext;
+      if (ctx != null && ctx.trim().isNotEmpty) {
+        compactPrompt +=
+            '\n\nCURRENT APP STEP (latest screen):\n'
+            '${_boundDynamicContext(ctx, 900)}';
+      }
+      return compactPrompt;
+    }
     var prompt = LivePrompts.forSession(
       sessionType,
       persona: _persona,
@@ -330,8 +529,12 @@ class GeminiLiveService {
     );
     final profile = await _learnerProfile();
     if (profile.isNotEmpty) {
+      final boundedProfile = _boundDynamicContext(
+        profile,
+        _maxLearnerProfileCharacters,
+      );
       prompt +=
-          '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$profile';
+          '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$boundedProfile';
     }
     final level = levelOverride ?? await _learnerLevel();
     if (level != null) {
@@ -339,17 +542,29 @@ class GeminiLiveService {
     }
     final ctx = lessonContext;
     if (ctx != null && ctx.isNotEmpty) {
+      final boundedLessonContext = _boundDynamicContext(
+        ctx,
+        _maxLessonContextCharacters,
+      );
       prompt +=
-          '\n\nLESSON CONTEXT, the student is currently studying this material; steer practice toward it while following ALL rules above:\n$ctx';
+          '\n\nLESSON CONTEXT, the student is currently studying this material; steer practice toward it while following ALL rules above:\n$boundedLessonContext';
     }
     return prompt;
+  }
+
+  String _boundDynamicContext(String value, int maxCharacters) {
+    final normalized = value.trim();
+    if (normalized.length <= maxCharacters) return normalized;
+    return '${normalized.substring(0, maxCharacters)}\n[context truncated]';
   }
 
   Future<String> _learnerProfile() async {
     final store = learningStoreForProfile;
     if (store == null) return '';
     try {
-      return await ProgressService(store: store).learnerProfileSummary();
+      return await ProgressService(
+        store: store,
+      ).learnerProfileSummary(compact: true);
     } catch (_) {
       return '';
     }
@@ -459,6 +674,7 @@ class GeminiLiveService {
   }
 
   Future<void> _sendSetup() async {
+    final systemPrompt = await _fullSystemPrompt();
     final generationConfig = <String, dynamic>{
       'responseModalities': ['AUDIO'],
       'speechConfig': {
@@ -479,8 +695,14 @@ class GeminiLiveService {
       'generationConfig': generationConfig,
       'systemInstruction': {
         'parts': [
-          {'text': await _fullSystemPrompt()},
+          {'text': systemPrompt},
         ],
+      },
+      // Official Live API field names are camelCase on the wire. Compression
+      // is enabled for both the initial connection and any resumed socket.
+      'contextWindowCompression': {
+        'triggerTokens': _contextCompressionTriggerTokens,
+        'slidingWindow': {'targetTokens': _contextCompressionTargetTokens},
       },
       'outputAudioTranscription': <String, dynamic>{},
       'inputAudioTranscription': <String, dynamic>{},
@@ -499,6 +721,24 @@ class GeminiLiveService {
           ? <String, dynamic>{}
           : {'handle': _resumptionHandle},
     };
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_setup_policy',
+        extra: {
+          'model': _model,
+          'compact_guided_context': compactGuidedContext,
+          'prompt_chars': systemPrompt.length,
+          'context_window_compression_trigger_tokens':
+              _contextCompressionTriggerTokens,
+          'context_window_compression_target_tokens':
+              _contextCompressionTargetTokens,
+          'input_audio_transcription': true,
+          'output_audio_transcription': true,
+          'resumed': _isReconnecting && _resumptionHandle != null,
+        },
+      ),
+    );
     _resumedWithHandle = _isReconnecting && _resumptionHandle != null;
     if (tools.isNotEmpty) {
       setupBody['tools'] = [
@@ -567,6 +807,31 @@ class GeminiLiveService {
       return;
     }
 
+    final usageMetadata = json['usageMetadata'];
+    if (usageMetadata is Map) {
+      _usagePromptTokens = _intValue(usageMetadata['promptTokenCount']);
+      _usageResponseTokens = _intValue(
+        usageMetadata['responseTokenCount'] ??
+            usageMetadata['candidatesTokenCount'],
+      );
+      _usageTotalTokens = _intValue(usageMetadata['totalTokenCount']);
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_usage_metadata',
+          requestId: _usageSocketId,
+          extra: {
+            'provider_prompt_tokens': _usagePromptTokens,
+            'provider_response_tokens': _usageResponseTokens,
+            'provider_total_tokens': _usageTotalTokens,
+            'cached_content_token_count': _intValue(
+              usageMetadata['cachedContentTokenCount'],
+            ),
+          },
+        ),
+      );
+    }
+
     final errorObj = json['error'];
     if (errorObj is Map) {
       final message = errorObj['message'] as String? ?? 'Unknown error';
@@ -576,6 +841,15 @@ class GeminiLiveService {
 
     if (json.containsKey('setupComplete')) {
       _isSetupComplete = true;
+      _usageSocketConnected = true;
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'live_setup_complete',
+          requestId: _usageSocketId,
+          extra: {'model': _model, 'resumed': _resumedWithHandle},
+        ),
+      );
       _connectTimeoutTimer?.cancel();
       _reconnectAttempt = 0;
       if (!_hasConnectedOnce) {
@@ -706,7 +980,9 @@ class GeminiLiveService {
             final audioB64 = inlineData['data'] as String?;
             if (audioB64 != null) {
               try {
-                onAudioChunk?.call(base64Decode(audioB64));
+                final bytes = base64Decode(audioB64);
+                _usageOutputPcmBytes += bytes.length;
+                onAudioChunk?.call(bytes);
               } catch (_) {}
             }
           }
@@ -746,4 +1022,11 @@ class GeminiLiveService {
     _currentUserTranscript = '';
     onUserTranscript?.call(t);
   }
+
+  int _intValue(Object? value) => switch (value) {
+    int value => value,
+    num value => value.toInt(),
+    String value => int.tryParse(value) ?? 0,
+    _ => 0,
+  };
 }

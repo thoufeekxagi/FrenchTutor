@@ -104,6 +104,7 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   38: _migrationV38,
   39: _migrationV39,
   40: _migrationV40,
+  41: _migrationV41,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1053,6 +1054,28 @@ void _migrationV40(CommonDatabase db) {
     'CREATE INDEX IF NOT EXISTS idx_adaptive_course_generation '
     'ON adaptive_course_sessions (generation_status, sequence) '
     'WHERE deleted_at IS NULL',
+  );
+}
+
+/// One durable row per lesson sentence in the local PCM deck. The PCM bytes
+/// live in Application Support; this manifest makes the local copy resumable
+/// and lets Course/Practice share the exact same audio contract.
+void _migrationV41(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS lesson_audio_decks (
+      lesson_id TEXT NOT NULL,
+      segment_index INTEGER NOT NULL,
+      spoken_text TEXT NOT NULL,
+      voice_name TEXT NOT NULL,
+      cache_key TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'local_ready',
+      updated_at TEXT NOT NULL,
+      PRIMARY KEY (lesson_id, segment_index)
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_lesson_audio_decks_cache_key '
+    'ON lesson_audio_decks (cache_key)',
   );
 }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -164,6 +165,7 @@ class _SpeakingLessonFlowScreenState
       onTurnComplete: _onMurrayTurnComplete,
       tools: const [],
       onToolCall: _onMurrayToolCall,
+      compactGuidedContext: !_isFreeTalk,
       onChanged: () {
         if (mounted) setState(() {});
       },
@@ -171,9 +173,12 @@ class _SpeakingLessonFlowScreenState
     _sessionClock.start();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      final helperEnabled = ref
-          .read(tutorHelperSettingsProvider)
-          .isEnabled(TutorHelperSurface.speaking);
+      final helperSettings = ref.read(tutorHelperSettingsProvider);
+      await helperSettings.load();
+      if (!mounted) return;
+      final helperEnabled = helperSettings.isEnabled(
+        TutorHelperSurface.speaking,
+      );
       if (helperEnabled) {
         await _startMurray(sendOpeningPrompt: true);
       }
@@ -229,7 +234,20 @@ lesson context.
 ''';
   }
 
-  String get _murrayContext {
+  String get _murrayContext =>
+      _isFreeTalk ? _fullMurrayContext : _compactMurrayContext;
+
+  String get _compactMurrayContext {
+    final step = _step;
+    return '''
+CURRENT APP STEP: ${_index + 1} of ${widget.steps.length}
+LEVEL: ${widget.level}
+FRENCH TARGET: "${step.french}"
+ENGLISH MEANING: "${step.english}"
+${step.tip.trim().isEmpty ? '' : 'PRONUNCIATION TIP: "${step.tip}"'}''';
+  }
+
+  String get _fullMurrayContext {
     final step = _step;
     final partner = step.partnerFrench;
     return '''
@@ -276,6 +294,17 @@ one helpful response so the learner can practise.
 
   void _promptMurray(String instruction) {
     if (!_murray.isLive) return;
+    if (!_isFreeTalk) {
+      _murray.promptTutor('''
+LATEST APP STEP (replace any earlier step details):
+$_murrayContext
+
+APP INSTRUCTION:
+$instruction
+Only respond to this latest step. Do not mention earlier steps.
+''');
+      return;
+    }
     _murray.promptTutor('''
 CURRENT APP STATE (source of truth; it may have changed since this call began):
 $_murrayContext
@@ -296,6 +325,7 @@ $instruction
         setState(() => _state = _SpeakingStepState.ready);
       }
     } else if (!_murray.isLive) {
+      if (mounted) setState(() => _error = null);
       await _startMurray(sendOpeningPrompt: true);
     }
     if (!mounted) return;
@@ -319,7 +349,7 @@ $instruction
     if (_playing || !mounted) return;
     if (_murray.isLive) {
       _promptMurray(
-        'Replay the exact current French target once, slowly and clearly, then give its short English meaning and wait: "${_step.french}".',
+        'Replay the exact current French target once, slowly and clearly, then give its short English meaning and wait.',
       );
       return;
     }
@@ -347,7 +377,7 @@ $instruction
         if (mounted) {
           setState(() {
             _playing = false;
-            _error = 'Audio could not be played: $error';
+            _error = _audioErrorMessage(error);
           });
         }
       },
@@ -824,7 +854,7 @@ $instruction
     if (_murray.isLive && !_isFreeTalk) {
       _promptMurray(
         partner == null
-            ? 'For this guided speaking turn, say the exact French target aloud once at a slow, natural A1/A2 pace, give its short meaning, and then wait for the learner: "${_step.french}".'
+            ? 'For this guided speaking turn, say the exact French target aloud once at a natural pace, give its short meaning, and then wait for the learner.'
             : 'For this roleplay turn, say this exact French partner line once, give its short meaning, and then wait for the learner: "$partner".',
       );
       return;
@@ -916,7 +946,7 @@ $instruction
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
-                  _murrayToggleCard(murrayEnabled),
+                  _murrayHelpCard(murrayEnabled),
                   const SizedBox(height: 14),
                   _progressBar(),
                   const SizedBox(height: 24),
@@ -1023,15 +1053,22 @@ $instruction
     );
   }
 
-  Widget _murrayToggleCard(bool enabled) {
+  Widget _murrayHelpCard(bool enabled) {
     final tutor = _tutor;
-    final status = _murray.isLive
+    final status = _murray.connecting
+        ? 'Connecting for extra guidance…'
+        : _murray.isLive
         ? _murrayInputActive
               ? 'Live · listening to this answer'
               : 'Live · follows this lesson'
         : enabled
-        ? 'On by default · starts with this lesson'
-        : 'Off · practise without in-lesson coaching';
+        ? 'On · tap the phone to reconnect'
+        : 'Off · tap the phone for extra guidance';
+    final phoneColor = _murray.isLive
+        ? DesignTokens.success
+        : enabled
+        ? DesignTokens.nightAccent
+        : DesignTokens.nightMuted;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
       decoration: BoxDecoration(
@@ -1048,13 +1085,7 @@ $instruction
               color: DesignTokens.nightAccentSoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.support_agent_rounded,
-              size: 20,
-              color: enabled
-                  ? DesignTokens.nightAccent
-                  : DesignTokens.nightMuted,
-            ),
+            child: Icon(CupertinoIcons.phone_fill, size: 20, color: phoneColor),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1075,10 +1106,22 @@ $instruction
               ],
             ),
           ),
-          Switch.adaptive(
-            value: enabled,
-            onChanged: _setMurrayEnabled,
-            activeThumbColor: DesignTokens.nightAccent,
+          IconButton(
+            tooltip: _murray.isLive
+                ? 'Turn off extra tutor guidance'
+                : 'Turn on extra tutor guidance',
+            onPressed: _murray.connecting
+                ? null
+                : () => unawaited(_setMurrayEnabled(!_murray.isLive)),
+            icon: _murray.connecting
+                ? SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: DesignTokens.nightAccent,
+                    ),
+                  )
+                : Icon(CupertinoIcons.phone_fill, color: phoneColor),
           ),
         ],
       ),
@@ -1127,6 +1170,18 @@ $instruction
         ],
       ),
     );
+  }
+
+  String _audioErrorMessage(Object error) {
+    final details = error.toString().toLowerCase();
+    final missingPreparedAudio =
+        details.contains('no playable audio') ||
+        details.contains('no audio') ||
+        details.contains('no pcm');
+    if (missingPreparedAudio) {
+      return 'Tap phone for live guidance.';
+    }
+    return 'Audio could not be played: $error';
   }
 
   Widget _chatBubble({
@@ -1709,7 +1764,7 @@ $instruction
     if (line == null || line.trim().isEmpty || _playing || !mounted) return;
     if (_murray.isLive) {
       _promptMurray(
-        'Replay the exact current partner line once, slowly and clearly, then give its short English meaning and wait: "$line".',
+        'Replay the exact current partner line once, slowly and clearly, then give its short English meaning and wait.',
       );
       return;
     }
@@ -1738,7 +1793,7 @@ $instruction
         if (mounted) {
           setState(() {
             _playing = false;
-            _error = '${_tutor.displayName}’s line could not be played: $error';
+            _error = _audioErrorMessage(error);
           });
         }
       },

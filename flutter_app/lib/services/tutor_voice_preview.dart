@@ -90,7 +90,7 @@ class TutorVoicePreviewer extends ChangeNotifier {
       _loadingId = persona.id;
       notifyListeners();
       try {
-        bytes = await GeminiLiveAudioService.shared.resolve(
+        bytes = await GeminiLiveAudioService.shared.generateAndCache(
           text: persona.sampleLine,
           contentItemId: 'tutor-preview:${persona.id}',
           voiceName: persona.voiceName,

@@ -721,14 +721,13 @@ class GeneratedStory {
   /// player does not distort the story's visual context.
   final String? musicBackgroundUrl;
 
-  /// Stable path for the rendered listening clip in the learner-scoped
-  /// Supabase Storage bucket. Keeping a path (rather than an expiring URL)
-  /// lets the app download the same clip every time the lesson is reopened.
+  /// Shared course assets use a `course-shared/...` Storage path. Personalized
+  /// lessons may use a cache marker while their sentence PCM is mirrored in
+  /// the learner's private cache.
   final String? audioPath;
 
-  /// The selected Listening format used to create [audioPath]. New lessons
-  /// use the `gemini_live_spoken` provider mode; older ElevenLabs modes remain
-  /// readable from their durable storage path.
+  /// Audio contract marker. `gemini_flash_tts` is retained for the authored
+  /// Unit 2 shared WAV for compatibility with existing cloud rows.
   final String? audioMode;
 
   /// Keeps the reading and listening shelves independent while preserving

@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
-import 'package:flutter_sound/flutter_sound.dart' show PlaybackDisposition;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,12 +8,9 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/lesson_speech_service.dart';
-import '../../services/elevenlabs_audio_playback_service.dart';
 import '../../services/elevenlabs_audio_service.dart';
-import '../../services/audio_container_utils.dart';
-import '../../services/gemini_live_audio_service.dart';
-import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/session_recorder.dart';
@@ -36,15 +30,11 @@ class ListeningPracticeScreen extends ConsumerStatefulWidget {
   const ListeningPracticeScreen({
     super.key,
     required this.story,
-    this.audioClip,
-    this.audioFuture,
     this.enrichment,
     this.showFinishButton = false,
   });
 
   final GeneratedStory story;
-  final ElevenLabsAudioClip? audioClip;
-  final Future<ElevenLabsAudioClip?>? audioFuture;
   final Future<ReadingStoryEnrichment>? enrichment;
   final bool showFinishButton;
 
@@ -90,13 +80,10 @@ class _ListeningPracticeScreenState
   bool _underlineWords = true;
   bool _darkMode = true;
   Timer? _coverRefreshTimer;
-  StreamSubscription<PlaybackDisposition>? _playbackProgressSubscription;
-  Duration _playbackPosition = Duration.zero;
-  Duration _playbackDuration = Duration.zero;
   bool _hasStartedPlayback = false;
   bool _usingSentenceDeckPlayback = false;
-  late ElevenLabsAudioClip? _audioClip;
-  final Map<int, ElevenLabsAudioClip> _lineAudioCache = {};
+  final Duration _playbackPosition = Duration.zero;
+  final Duration _playbackDuration = Duration.zero;
 
   late GeneratedStory _story;
   List<ReadingSegment> get _segments => _story.passage.segments;
@@ -111,7 +98,6 @@ class _ListeningPracticeScreenState
       ref.read(notetakerStateProvider).currentContext = 'Listening';
     });
     _story = widget.story;
-    _audioClip = widget.audioClip;
     _textScale = _settings.textScale;
     _rate = _settings.playbackRate;
     _showTranslation = _settings.translateSentences;
@@ -136,24 +122,13 @@ class _ListeningPracticeScreenState
       stage: 'reading_listening',
       topic: _story.displayTitle,
     );
-    _playbackProgressSubscription = ElevenLabsAudioPlaybackService
-        .shared
-        .progress
-        .listen(_handlePlaybackProgress);
     _dictationSegment = _findDictationSegment();
     if (widget.enrichment != null) {
       unawaited(_adoptEnrichment(widget.enrichment!));
     }
-    if (_audioClip == null) {
-      if (widget.audioFuture != null) {
-        _audioLoading = true;
-        unawaited(_adoptAudio(widget.audioFuture!));
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) unawaited(_loadSavedStoryAudio());
-        });
-      }
-    }
+    // New lessons arrive with a prepared sentence PCM deck. Legacy full-track
+    // clips are intentionally ignored here; playback always uses the same
+    // Reading-style queue so sentence and word callbacks cannot diverge.
     final needsCover = _story.coverUrl == null || _story.coverUrl!.isEmpty;
     final needsListeningBackground =
         _story.musicBackgroundUrl == null ||
@@ -176,10 +151,8 @@ class _ListeningPracticeScreenState
   @override
   void dispose() {
     _coverRefreshTimer?.cancel();
-    unawaited(_playbackProgressSubscription?.cancel());
     _dictationController.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
-    unawaited(ElevenLabsAudioPlaybackService.shared.stop());
     _finishSession();
     super.dispose();
   }
@@ -263,96 +236,6 @@ class _ListeningPracticeScreenState
     }
   }
 
-  Future<void> _adoptAudio(Future<ElevenLabsAudioClip?> future) async {
-    try {
-      final clip = await future;
-      if (!mounted) return;
-      if (clip != null) {
-        setState(() {
-          _audioClip = clip;
-          _audioLoading = false;
-        });
-        return;
-      }
-      // A recent saved lesson may have missed the prefetch download. Give
-      // the durable path one normal load attempt before showing an error.
-      if (_story.audioPath?.trim().isNotEmpty == true) {
-        await _loadSavedStoryAudio();
-        return;
-      }
-      setState(() => _audioLoading = false);
-      _showAudioError(
-        const ElevenLabsProviderException(
-          'Gemini did not return playable lesson audio.',
-        ),
-      );
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _audioLoading = false;
-        _isPlaying = false;
-      });
-      _showAudioError(error);
-    }
-  }
-
-  void _handlePlaybackProgress(PlaybackDisposition disposition) {
-    if (!mounted) return;
-    final duration = disposition.duration;
-    final position = disposition.position;
-    final durationMs = duration.inMilliseconds;
-    final positionMs = position.inMilliseconds.clamp(0, durationMs).toInt();
-    var nextSegment = _currentSegment;
-    int? nextWord;
-    if (durationMs > 0 && _segments.isNotEmpty) {
-      final totalWords = _segments.fold<int>(
-        0,
-        (sum, segment) => sum + _plainWords(segment.fr).length,
-      );
-      if (totalWords > 0) {
-        // The single durable track has no real per-word timestamps, so this
-        // is necessarily an estimate -- but it must be ONE estimate, not
-        // two disagreeing ones. This used to pick the highlighted segment
-        // by dividing playback into equal-time slices per segment (wrong:
-        // "Bonjour, je veux manger." and "La boulangerie est au numéro
-        // cinq." do not take the same time to say), while separately
-        // picking the highlighted word by dividing playback proportionally
-        // by total word count and searching for which segment it falls
-        // in -- then discarding that correct segment index. The result was
-        // a segment highlight and a word highlight that could point at two
-        // different sentences, which is exactly what looked like "the
-        // audio doesn't match the text on screen." Now both come from the
-        // same word-weighted position.
-        final globalWord = (positionMs / durationMs * totalWords)
-            .floor()
-            .clamp(0, totalWords - 1)
-            .toInt();
-        var wordCursor = 0;
-        for (var index = 0; index < _segments.length; index++) {
-          final count = _plainWords(_segments[index].fr).length;
-          if (globalWord < wordCursor + count) {
-            nextSegment = index;
-            nextWord = globalWord - wordCursor;
-            break;
-          }
-          wordCursor += count;
-        }
-      } else {
-        nextSegment = ((positionMs / durationMs) * _segments.length)
-            .floor()
-            .clamp(0, _segments.length - 1)
-            .toInt();
-      }
-    }
-    setState(() {
-      _playbackDuration = duration;
-      _playbackPosition = position;
-      _currentSegment = nextSegment;
-      _currentWord = nextWord;
-      _isPlaying = ElevenLabsAudioPlaybackService.shared.isPlaying;
-    });
-  }
-
   void _selectListeningWord(int segmentIndex, int wordIndex) {
     final isSame =
         _selectedWordSegment == segmentIndex &&
@@ -365,7 +248,9 @@ class _ListeningPracticeScreenState
         _resolvedWordCanConjugate = false;
       }
     });
-    if (!isSame) unawaited(_resolveListeningWordMeaning(segmentIndex, wordIndex));
+    if (!isSame) {
+      unawaited(_resolveListeningWordMeaning(segmentIndex, wordIndex));
+    }
   }
 
   /// Same shared lookup Reading/Course uses (see story_reader_screen.dart's
@@ -491,93 +376,77 @@ class _ListeningPracticeScreenState
 
   Future<void> _playStory({int fromIndex = 0}) async {
     if (_segments.isEmpty || _audioLoading) return;
-    if (fromIndex > 0) {
-      await _playLine(fromIndex);
-      return;
-    }
     _audioLoading = true;
     if (mounted) setState(() {});
     try {
-      await LessonSpeechService.shared.deactivate();
-      await ElevenLabsAudioPlaybackService.shared.stop();
-      if (!mounted) return;
-      final clip = _audioClip;
-      if (clip == null) {
-        _usingSentenceDeckPlayback = true;
-        setState(() {
-          _isPlaying = true;
-          _hasStartedPlayback = true;
-          _playbackPosition = Duration.zero;
-          _playbackDuration = Duration.zero;
-          _currentSegment = fromIndex;
-        });
-        await LessonSpeechService.shared.speak(
-          items: [
-            for (var index = fromIndex; index < _segments.length; index++)
-              SpeechItem(
-                text: _segments[index].fr,
-                language: 'fr-FR',
-                contentItemId: _story.segmentContentId(index),
-              ),
-          ],
-          playbackSpeed: _rate,
-          onItemStart: (relativeIndex) {
-            if (!mounted || !_usingSentenceDeckPlayback) return;
-            setState(() {
-              _currentSegment = fromIndex + relativeIndex;
-              _isPlaying = true;
-              _audioLoading = false;
-            });
-          },
-          onPlaybackReady: () {
-            if (mounted && _usingSentenceDeckPlayback && _audioLoading) {
-              setState(() => _audioLoading = false);
-            }
-          },
-          onFinished: () {
-            if (!mounted || !_usingSentenceDeckPlayback) return;
-            setState(() {
-              _usingSentenceDeckPlayback = false;
-              _isPlaying = false;
-              _audioLoading = false;
-              _currentSegment = _segments.length - 1;
-            });
-          },
-          onError: (error) {
-            if (!mounted || !_usingSentenceDeckPlayback) return;
-            setState(() {
-              _usingSentenceDeckPlayback = false;
-              _isPlaying = false;
-              _audioLoading = false;
-            });
-            _showAudioError(error);
-          },
+      final db = ref.read(databaseProvider);
+      if (!LessonAudioDeckService.shared.isPrepared(story: _story, db: db)) {
+        final prepared = await LessonAudioDeckService.shared.prepare(
+          story: _story,
+          db: db,
         );
-        return;
+        if (!prepared) {
+          throw StateError('Saved lesson audio is unavailable.');
+        }
       }
-      _usingSentenceDeckPlayback = false;
+      await LessonSpeechService.shared.stop();
+      if (!mounted) return;
+      _usingSentenceDeckPlayback = true;
       setState(() {
         _isPlaying = true;
         _hasStartedPlayback = true;
-        _playbackPosition = Duration.zero;
-        _playbackDuration = Duration.zero;
         _currentSegment = fromIndex;
+        _currentWord = null;
       });
-      await ElevenLabsAudioPlaybackService.shared.play(
-        clip.bytes,
-        container: clip.container,
-        speed: _rate,
-        onFinished: () {
-          if (!mounted) return;
+      await LessonSpeechService.shared.speak(
+        items: [
+          for (var index = fromIndex; index < _segments.length; index++)
+            SpeechItem(
+              text: _segments[index].fr,
+              language: 'fr-FR',
+              contentItemId: _story.segmentContentId(index),
+            ),
+        ],
+        playbackSpeed: _rate,
+        onItemStart: (relativeIndex) {
+          if (!mounted || !_usingSentenceDeckPlayback) return;
           setState(() {
-            _isPlaying = false;
+            _currentSegment = fromIndex + relativeIndex;
+            _currentWord = null;
+            _isPlaying = true;
             _audioLoading = false;
-            _playbackPosition = _playbackDuration;
-            _currentSegment = _segments.isEmpty ? 0 : _segments.length - 1;
           });
         },
+        onWordBoundary: (_, wordIndex) {
+          if (mounted && _usingSentenceDeckPlayback) {
+            setState(() => _currentWord = wordIndex);
+          }
+        },
+        onPlaybackReady: () {
+          if (mounted && _usingSentenceDeckPlayback) {
+            setState(() => _audioLoading = false);
+          }
+        },
+        onFinished: () {
+          if (!mounted || !_usingSentenceDeckPlayback) return;
+          setState(() {
+            _usingSentenceDeckPlayback = false;
+            _isPlaying = false;
+            _audioLoading = false;
+            _currentWord = null;
+            _currentSegment = _segments.length - 1;
+          });
+        },
+        onError: (error) {
+          if (!mounted || !_usingSentenceDeckPlayback) return;
+          setState(() {
+            _usingSentenceDeckPlayback = false;
+            _isPlaying = false;
+            _audioLoading = false;
+          });
+          _showAudioError(error);
+        },
       );
-      if (mounted) setState(() => _audioLoading = false);
     } catch (error) {
       if (mounted) {
         setState(() {
@@ -596,32 +465,62 @@ class _ListeningPracticeScreenState
     _audioLoading = true;
     if (mounted) setState(() {});
     try {
-      await LessonSpeechService.shared.deactivate();
-      await ElevenLabsAudioPlaybackService.shared.stop();
+      await LessonSpeechService.shared.stop();
       if (!mounted) return;
-      _usingSentenceDeckPlayback = false;
+      _usingSentenceDeckPlayback = true;
       setState(() {
         _isPlaying = true;
         _hasStartedPlayback = true;
         _currentSegment = index;
+        _currentWord = null;
       });
-      final clip = _lineAudioCache[index] ??= await _synthesizeLineAudio(
-        _segments[index].fr,
-      );
-      await ElevenLabsAudioPlaybackService.shared.play(
-        clip.bytes,
-        container: clip.container,
-        speed: _rate,
-        onFinished: () {
-          if (mounted) {
+      await LessonSpeechService.shared.speak(
+        items: [
+          SpeechItem(
+            text: _segments[index].fr,
+            language: 'fr-FR',
+            contentItemId: _story.segmentContentId(index),
+          ),
+        ],
+        playbackSpeed: _rate,
+        onItemStart: (_) {
+          if (mounted && _usingSentenceDeckPlayback) {
             setState(() {
-              _isPlaying = false;
               _audioLoading = false;
+              _isPlaying = true;
             });
           }
         },
+        onWordBoundary: (_, wordIndex) {
+          if (mounted && _usingSentenceDeckPlayback) {
+            setState(() => _currentWord = wordIndex);
+          }
+        },
+        onPlaybackReady: () {
+          if (mounted && _usingSentenceDeckPlayback) {
+            setState(() => _audioLoading = false);
+          }
+        },
+        onFinished: () {
+          if (mounted) {
+            setState(() {
+              _usingSentenceDeckPlayback = false;
+              _isPlaying = false;
+              _audioLoading = false;
+              _currentWord = null;
+            });
+          }
+        },
+        onError: (error) {
+          if (!mounted) return;
+          setState(() {
+            _usingSentenceDeckPlayback = false;
+            _isPlaying = false;
+            _audioLoading = false;
+          });
+          _showAudioError(error);
+        },
       );
-      if (mounted) setState(() => _audioLoading = false);
     } catch (error) {
       if (mounted) {
         setState(() {
@@ -638,11 +537,7 @@ class _ListeningPracticeScreenState
   Future<void> _togglePlayback() async {
     if (_audioLoading) return;
     if (_isPlaying) {
-      if (_usingSentenceDeckPlayback) {
-        await LessonSpeechService.shared.pause();
-      } else {
-        await ElevenLabsAudioPlaybackService.shared.pause();
-      }
+      await LessonSpeechService.shared.pause();
       if (mounted) setState(() => _isPlaying = false);
       return;
     }
@@ -651,58 +546,13 @@ class _ListeningPracticeScreenState
       if (mounted) setState(() => _isPlaying = true);
       return;
     }
-    if (_hasStartedPlayback &&
-        ElevenLabsAudioPlaybackService.shared.canResume) {
-      await ElevenLabsAudioPlaybackService.shared.resume();
+    if (_hasStartedPlayback && LessonSpeechService.shared.isPaused) {
+      await LessonSpeechService.shared.resume();
       if (mounted) setState(() => _isPlaying = true);
       return;
     }
     await _playStory(
       fromIndex: _stage == _ListeningStage.firstListen ? 0 : _currentSegment,
-    );
-  }
-
-  Future<void> _loadSavedStoryAudio() async {
-    if (!mounted || _audioClip != null) return;
-    try {
-      final clip = await LessonAssetPrefetchService.shared.prefetchListening(
-        story: _story,
-        sync: ref.read(syncServiceProvider),
-        storyStore: ref.read(generatedStoryStoreProvider),
-      );
-      if (clip == null) {
-        throw const ElevenLabsProviderException(
-          'The saved lesson audio could not be prepared.',
-        );
-      }
-      if (!mounted) return;
-      setState(() => _audioClip = clip);
-    } catch (error) {
-      if (!mounted) return;
-      // The sentence deck remains fully usable and retries use the same
-      // Gemini/Supabase path. A background full-track preparation failure
-      // must never pin the visible player in a loading state.
-      debugPrint(
-        'ListeningPracticeScreen: full-track prefetch deferred: $error',
-      );
-    }
-  }
-
-  Future<ElevenLabsAudioClip> _synthesizeLineAudio(String text) async {
-    final pcm = await GeminiLiveAudioService.shared.resolve(
-      text: text,
-      contentItemId: '${_story.id}:listening-line:${text.trim()}',
-    );
-    if (pcm == null || pcm.isEmpty) {
-      throw StateError('Gemini returned no line audio.');
-    }
-    return ElevenLabsAudioClip(
-      mode: 'gemini_live_spoken',
-      bytes: pcm16ToWav(
-        Uint8List.fromList(pcm),
-        sampleRate: GeminiLiveAudioService.outputSampleRateHz,
-      ),
-      container: 'wav',
     );
   }
 
@@ -903,7 +753,6 @@ class _ListeningPracticeScreenState
         rates[(currentIndex < 0 ? 0 : currentIndex + 1) % rates.length];
     setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(next));
-    unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(next));
     unawaited(LessonSpeechService.shared.setPlaybackSpeed(next));
   }
 
@@ -931,7 +780,6 @@ class _ListeningPracticeScreenState
     // delayed audio callback can make the newly selected line look finished
     // while the old line is still audible.
     await LessonSpeechService.shared.deactivate();
-    await ElevenLabsAudioPlaybackService.shared.stop();
     if (!mounted) return;
     setState(() {
       _focusSegment = next;
@@ -947,7 +795,6 @@ class _ListeningPracticeScreenState
   Future<void> _advanceFocus() async {
     if (_focusSegment >= _segments.length - 1) {
       await LessonSpeechService.shared.deactivate();
-      await ElevenLabsAudioPlaybackService.shared.stop();
       if (mounted) {
         setState(() {
           _tab = _ListeningTab.transcript;
@@ -1081,7 +928,7 @@ class _ListeningPracticeScreenState
       _underlineWords = _settings.underlineWords;
       _darkMode = _settings.darkMode;
     });
-    unawaited(ElevenLabsAudioPlaybackService.shared.setSpeed(_rate));
+    unawaited(LessonSpeechService.shared.setPlaybackSpeed(_rate));
   }
 
   @override
@@ -1114,6 +961,23 @@ class _ListeningPracticeScreenState
                     onSettings: _showSettings,
                   ),
                 ),
+                if (showLyrics)
+                  Positioned(
+                    top: 52,
+                    left: 0,
+                    right: 0,
+                    height: 132,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.42),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (_resolvedWordMeaning != null)
                   Positioned(
                     left: 14,
@@ -1133,7 +997,9 @@ class _ListeningPracticeScreenState
                   ),
                 if (showLyrics)
                   Positioned.fill(
-                    top: 84,
+                    // Keep a fixed meaning/conjugation shelf above the
+                    // transcript so the story never slides underneath it.
+                    top: 178,
                     bottom: 14,
                     child: _ListeningFullscreenTranscript(
                       story: _story,
@@ -1191,7 +1057,6 @@ class _ListeningPracticeScreenState
                     bottom: 14,
                     child: _ListeningPlayerDock(
                       story: _story,
-                      audioClip: _audioClip,
                       segments: _segments,
                       currentSegment: _currentSegment,
                       compact: contentTab,
@@ -1918,8 +1783,8 @@ class _ListeningImmersiveBackground extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withValues(alpha: isDarkMode ? 0.34 : 0.30),
-                Colors.black.withValues(alpha: isDarkMode ? 0.26 : 0.22),
+                Colors.black.withValues(alpha: isDarkMode ? 0.54 : 0.46),
+                Colors.black.withValues(alpha: isDarkMode ? 0.42 : 0.36),
                 Colors.black.withValues(alpha: isDarkMode ? 0.94 : 0.88),
               ],
               stops: const [0, 0.45, 1],
@@ -1933,8 +1798,8 @@ class _ListeningImmersiveBackground extends StatelessWidget {
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
                 colors: [
-                  Colors.black.withValues(alpha: isDarkMode ? 0.36 : 0.30),
-                  Colors.black.withValues(alpha: isDarkMode ? 0.12 : 0.08),
+                  Colors.black.withValues(alpha: isDarkMode ? 0.46 : 0.40),
+                  Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.12),
                   Colors.transparent,
                 ],
                 stops: const [0, 0.48, 1],
@@ -2038,7 +1903,6 @@ class _ListeningRoundButton extends StatelessWidget {
 class _ListeningPlayerDock extends StatelessWidget {
   const _ListeningPlayerDock({
     required this.story,
-    required this.audioClip,
     required this.segments,
     required this.currentSegment,
     required this.compact,
@@ -2059,7 +1923,6 @@ class _ListeningPlayerDock extends StatelessWidget {
   });
 
   final GeneratedStory story;
-  final ElevenLabsAudioClip? audioClip;
   final List<ReadingSegment> segments;
   final int currentSegment;
   final bool compact;
@@ -2078,22 +1941,13 @@ class _ListeningPlayerDock extends StatelessWidget {
   final VoidCallback onCopyLine;
   final VoidCallback onToggleFavorite;
 
-  String get _formatLabel => switch (audioClip?.mode) {
-    'podcast' => 'Podcast dialogue',
-    'music' => 'Music lesson',
-    'educational' => 'Educational',
-    'story' => 'Story narration',
-    'narration' => 'Story narration',
-    'gemini_live_spoken' => 'Spoken lesson',
-    _ => 'Narrated French',
-  };
+  String get _formatLabel => 'Sentence PCM audio';
 
   @override
   Widget build(BuildContext context) {
     if (compact) {
       return _ListeningMiniPlayer(
         story: story,
-        audioClip: audioClip,
         isPlaying: isPlaying,
         isLoading: isLoading,
         onTogglePlayback: onTogglePlayback,
@@ -2215,14 +2069,12 @@ class _ListeningPlayerDock extends StatelessWidget {
 class _ListeningMiniPlayer extends StatelessWidget {
   const _ListeningMiniPlayer({
     required this.story,
-    required this.audioClip,
     required this.isPlaying,
     required this.isLoading,
     required this.onTogglePlayback,
   });
 
   final GeneratedStory story;
-  final ElevenLabsAudioClip? audioClip;
   final bool isPlaying;
   final bool isLoading;
   final VoidCallback onTogglePlayback;
@@ -2254,7 +2106,7 @@ class _ListeningMiniPlayer extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              '${story.displayTitle} · ${audioClip?.mode ?? 'listening'}',
+              '${story.displayTitle} · sentence audio',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: DesignTokens.body(
@@ -2317,6 +2169,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
     required this.onWordTap,
     required this.showTranslation,
     required this.isDarkMode,
+    required this.segmentKeys,
     this.textScale = 1,
   });
 
@@ -2331,6 +2184,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
   final void Function(int segmentIndex, int wordIndex) onWordTap;
   final bool showTranslation;
   final bool isDarkMode;
+  final List<GlobalKey> segmentKeys;
   final double textScale;
 
   @override
@@ -2354,6 +2208,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
         const SizedBox(height: 9),
         for (var index = 0; index < segments.length; index++) ...[
           BilingualWordText(
+            key: index < segmentKeys.length ? segmentKeys[index] : null,
             source: segments[index].fr,
             translation: segments[index].en,
             sourceStyle: DesignTokens.display(21 * textScale).copyWith(
@@ -2388,8 +2243,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
   bool _isActive(int index, int active) => index == active;
 }
 
-
-class _ListeningFullscreenTranscript extends StatelessWidget {
+class _ListeningFullscreenTranscript extends StatefulWidget {
   const _ListeningFullscreenTranscript({
     required this.story,
     required this.segments,
@@ -2445,12 +2299,64 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
   final bool isDarkMode;
 
   @override
+  State<_ListeningFullscreenTranscript> createState() =>
+      _ListeningFullscreenTranscriptState();
+}
+
+class _ListeningFullscreenTranscriptState
+    extends State<_ListeningFullscreenTranscript> {
+  final ScrollController _scrollController = ScrollController();
+  late List<GlobalKey> _segmentKeys;
+
+  @override
+  void initState() {
+    super.initState();
+    _segmentKeys = _keysFor(widget.segments.length);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ListeningFullscreenTranscript oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.segments.length != widget.segments.length) {
+      _segmentKeys = _keysFor(widget.segments.length);
+    }
+    if (oldWidget.currentSegment != widget.currentSegment) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _scrollToCurrent();
+      });
+    }
+  }
+
+  List<GlobalKey> _keysFor(int count) =>
+      List.generate(count, (_) => GlobalKey());
+
+  void _scrollToCurrent() {
+    if (_segmentKeys.isEmpty || !_scrollController.hasClients) return;
+    final index = widget.currentSegment.clamp(0, _segmentKeys.length - 1);
+    final target = _segmentKeys[index].currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      alignment: 0.28,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
+              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(18, 28, 18, 26),
               child: ConstrainedBox(
@@ -2464,25 +2370,26 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        story.displayTitle,
+                        widget.story.displayTitle,
                         style: DesignTokens.display(
-                          18 * textScale,
+                          18 * widget.textScale,
                         ).copyWith(color: Colors.white),
                       ),
                       const SizedBox(height: 10),
                       _ListeningTranscriptLines(
-                        segments: segments,
-                        currentSegment: currentSegment,
-                        currentWord: currentWord,
-                        selectedSegment: selectedSegment,
-                        selectedWord: selectedWord,
-                        keywords: keywords,
-                        highlightWords: highlightWords,
-                        underlineWords: underlineWords,
-                        onWordTap: onWordTap,
-                        showTranslation: showTranslation,
-                        textScale: textScale,
-                        isDarkMode: isDarkMode,
+                        segments: widget.segments,
+                        currentSegment: widget.currentSegment,
+                        currentWord: widget.currentWord,
+                        selectedSegment: widget.selectedSegment,
+                        selectedWord: widget.selectedWord,
+                        keywords: widget.keywords,
+                        highlightWords: widget.highlightWords,
+                        underlineWords: widget.underlineWords,
+                        onWordTap: widget.onWordTap,
+                        showTranslation: widget.showTranslation,
+                        textScale: widget.textScale,
+                        isDarkMode: widget.isDarkMode,
+                        segmentKeys: _segmentKeys,
                       ),
                     ],
                   ),
@@ -2496,37 +2403,39 @@ class _ListeningFullscreenTranscript extends StatelessWidget {
             _ListeningUtilityButton(
               icon: CupertinoIcons.chevron_down,
               label: 'Close lyrics',
-              onTap: onToggleLyrics,
+              onTap: widget.onToggleLyrics,
             ),
             const Spacer(),
             _ListeningUtilityButton(
               icon: Icons.translate,
-              label: showTranslation ? 'Hide translation' : 'Show translation',
-              onTap: onToggleTranslation,
+              label: widget.showTranslation
+                  ? 'Hide translation'
+                  : 'Show translation',
+              onTap: widget.onToggleTranslation,
             ),
             _ListeningUtilityButton(
               icon: CupertinoIcons.textformat_size,
               label: 'Text size',
-              onTap: onCycleTextSize,
+              onTap: widget.onCycleTextSize,
             ),
             _ListeningUtilityButton(
               icon: CupertinoIcons.doc_on_doc,
               label: 'Copy French',
-              onTap: onCopyLine,
+              onTap: widget.onCopyLine,
             ),
           ],
         ),
         _ListeningProgressControls(
-          segments: segments,
-          currentSegment: currentSegment,
-          isPlaying: isPlaying,
-          isLoading: isLoading,
-          rate: rate,
-          playbackPosition: playbackPosition,
-          playbackDuration: playbackDuration,
-          onToggle: onTogglePlayback,
-          onReplay: onReplay,
-          onCycleRate: onCycleRate,
+          segments: widget.segments,
+          currentSegment: widget.currentSegment,
+          isPlaying: widget.isPlaying,
+          isLoading: widget.isLoading,
+          rate: widget.rate,
+          playbackPosition: widget.playbackPosition,
+          playbackDuration: widget.playbackDuration,
+          onToggle: widget.onTogglePlayback,
+          onReplay: widget.onReplay,
+          onCycleRate: widget.onCycleRate,
         ),
       ],
     );

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,29 +30,9 @@ class SpeakingStudioScreen extends ConsumerStatefulWidget {
 
 class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   var _carouselPage = 0;
-  bool _preparingCourse = false;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _prepareCourse());
-  }
-
-  Future<void> _prepareCourse() async {
-    if (_preparingCourse) return;
-    _preparingCourse = true;
-    try {
-      final profile = ref.read(learningStoreProvider).profile();
-      final plan = ref
-          .read(adaptiveCourseStoreProvider)
-          .ensureCurrentPlan(profile);
-      final sync = ref.read(syncServiceProvider);
-      final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
-      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
-      if (mounted) setState(() {});
-    } finally {
-      _preparingCourse = false;
-    }
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
@@ -64,7 +42,6 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     );
     if (mounted) {
       setState(() {});
-      unawaited(_prepareCourse());
     }
   }
 

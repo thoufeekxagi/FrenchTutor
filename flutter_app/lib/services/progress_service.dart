@@ -171,7 +171,9 @@ class ProgressService {
     ];
   }
 
-  Future<String> learnerProfileSummary() async {
+  Future<String> learnerProfileSummary({bool compact = false}) async {
+    if (compact) return _compactLearnerProfileSummary();
+
     final lines = <String>[];
     final profile = store.profile();
     final priorities = profile.interests.isEmpty
@@ -236,6 +238,28 @@ class ProgressService {
     );
 
     return lines.join(' ');
+  }
+
+  /// The Live tutor only needs calibration signals, not the learner's entire
+  /// progress report. Keeping this under roughly fifty words prevents a
+  /// reconnect from re-injecting a large progress history into every socket.
+  String _compactLearnerProfileSummary() {
+    final profile = store.profile();
+    final focus = profile.interests
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .take(2)
+        .join(', ');
+    final mistakes = store.topMistakeTags(limit: 1);
+    final parts = <String>[
+      'Level ${LearnerLevel.displayLabel(profile.level)}.',
+      'Goal ${_goalLabel(profile.goal)}.',
+      if (focus.isNotEmpty) 'Focus: $focus.',
+      'Session length: ${profile.sessionLength}.',
+      if (mistakes.isNotEmpty)
+        'Recent issue to watch: ${mistakes.first.description}.',
+    ];
+    return parts.join(' ');
   }
 
   String _goalLabel(String raw) {

@@ -1,13 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Checked directly against this project's own key before touching this:
-// gemini-2.5-flash-lite (the genuinely cheaper option, $0.10/$0.40 per 1M
-// tokens) is blocked for this account ("no longer available to new
-// users"). Google's own error suggests gemini-3.5-flash-lite instead, but
-// that is actually MORE expensive than the current model ($0.30/$2.50 vs
-// $0.25/$1.50) — newer is not cheaper here. gemini-3.1-flash-lite is
-// already the cheapest valid option available on this key; left
-// unchanged.
+// Gemini fallback for callers that explicitly request Gemini. Course lesson
+// authoring uses the same OpenRouter route as Practice; it must not silently
+// switch Reading/Listening into a separate Gemini billing path. The current
+// 3-series low-cost Gemini text model is 3.1 Flash-Lite. Live audio uses the
+// separate 3.1 Flash Live model in the Live services.
 const GEMINI_MODEL = "gemini-3.1-flash-lite";
 const OPENROUTER_MODEL = "openai/gpt-5.6-luna";
 const MAX_MESSAGES = 40;
@@ -123,11 +120,19 @@ function extractGeminiText(data: unknown): string {
     .trim();
 }
 
-async function callGemini(body: Record<string, unknown>) {
+async function callGemini(
+  body: Record<string, unknown>,
+  options: { traceFeature?: unknown; retryPolicy?: unknown } = {},
+) {
   const apiKey = Deno.env.get("GEMINI_API_KEY");
   if (!apiKey) return json({ error: "Gemini is not configured" }, 503);
+  const traceFeature = String(options.traceFeature ?? "ai-text").slice(0, 80);
   let lastResponse: Response | null = null;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  // Course passes retryPolicy=none. Practice keeps the existing transient
+  // retry behavior, but a Course generation must be exactly one provider
+  // attempt so an invalid/failed response cannot silently multiply spend.
+  const maxAttempts = options.retryPolicy === "none" ? 1 : 2;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
       {
@@ -139,20 +144,47 @@ async function callGemini(body: Record<string, unknown>) {
     if (response.ok) {
       const data = await response.json();
       const text = extractGeminiText(data);
-      return text ? json({ text, provider: "gemini", model: GEMINI_MODEL }) : json({ error: "Gemini returned no text" }, 502);
+      const usage = data?.usageMetadata ?? null;
+      console.info(JSON.stringify({
+        event: "ai_provider_call",
+        feature: traceFeature,
+        provider: "gemini",
+        model: GEMINI_MODEL,
+        promptTokens: usage?.promptTokenCount ?? null,
+        outputTokens: usage?.candidatesTokenCount ?? null,
+        totalTokens: usage?.totalTokenCount ?? null,
+      }));
+      return text
+        ? json({
+          text,
+          provider: "gemini",
+          model: GEMINI_MODEL,
+          usage: usage ? {
+            inputTokens: usage.promptTokenCount ?? 0,
+            outputTokens: usage.candidatesTokenCount ?? 0,
+            totalTokens: usage.totalTokenCount ?? 0,
+          } : null,
+        })
+        : json({ error: "Gemini returned no text" }, 502);
     }
     lastResponse = response;
     if (response.status < 500 && response.status !== 429) break;
-    if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 500));
+    if (attempt + 1 < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
   }
   const response = lastResponse!;
   const details = await response.json().catch(() => ({}));
   return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
 }
 
-async function callOpenRouter(body: Record<string, unknown>) {
+async function callOpenRouter(
+  body: Record<string, unknown>,
+  options: { traceFeature?: unknown } = {},
+) {
   const apiKey = Deno.env.get("OPENROUTER_API_KEY");
   if (!apiKey) return json({ error: "OpenRouter is not configured" }, 503);
+  const traceFeature = String(options.traceFeature ?? "ai-text").slice(0, 80);
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -177,7 +209,28 @@ async function callOpenRouter(body: Record<string, unknown>) {
   const data = await response.json();
   const choices = data?.choices;
   const text = Array.isArray(choices) ? String(choices[0]?.message?.content ?? "").trim() : "";
-  return text ? json({ text, provider: "openrouter", model: OPENROUTER_MODEL }) : json({ error: "OpenRouter returned no text" }, 502);
+  const usage = data?.usage ?? null;
+  console.info(JSON.stringify({
+    event: "ai_provider_call",
+    feature: traceFeature,
+    provider: "openrouter",
+    model: OPENROUTER_MODEL,
+    promptTokens: usage?.prompt_tokens ?? null,
+    outputTokens: usage?.completion_tokens ?? null,
+    totalTokens: usage?.total_tokens ?? null,
+  }));
+  return text
+    ? json({
+      text,
+      provider: "openrouter",
+      model: OPENROUTER_MODEL,
+      usage: usage ? {
+        inputTokens: usage.prompt_tokens ?? 0,
+        outputTokens: usage.completion_tokens ?? 0,
+        totalTokens: usage.total_tokens ?? 0,
+      } : null,
+    })
+    : json({ error: "OpenRouter returned no text" }, 502);
 }
 
 Deno.serve(async (request) => {
@@ -224,7 +277,9 @@ Deno.serve(async (request) => {
       max_tokens: maxTokens,
       ...(responseFormat ? { response_format: responseFormat } : {}),
     };
-    return await callOpenRouter(providerBody);
+    return await callOpenRouter(providerBody, {
+      traceFeature: body.traceFeature,
+    });
   }
 
   const rawContents = body.contents;
@@ -244,5 +299,8 @@ Deno.serve(async (request) => {
   };
   const instruction = body.systemInstruction ?? systemInstruction(messages);
   if (instruction !== undefined) geminiBody.systemInstruction = instruction;
-  return await callGemini(geminiBody);
+  return await callGemini(geminiBody, {
+    traceFeature: body.traceFeature,
+    retryPolicy: body.retryPolicy,
+  });
 });

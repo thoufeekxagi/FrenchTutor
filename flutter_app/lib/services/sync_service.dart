@@ -28,6 +28,7 @@ import '../models/grammar_course.dart';
 import '../models/writing_course.dart';
 import '../data/database/speaking_lesson_codec.dart';
 import 'image_storage_optimizer.dart';
+import 'ai_cost_tracker.dart';
 import '../orchestration/models/competency_state.dart';
 import '../orchestration/models/error_event.dart';
 import '../orchestration/models/evidence_event.dart';
@@ -502,41 +503,6 @@ class SyncService {
       }
       return null;
     }
-  }
-
-  /// Saves the exact rendered listening clip in a private, learner-scoped
-  /// bucket. The database stores only this stable path, never base64 audio or
-  /// an expiring signed URL.
-  Future<String?> uploadListeningAudio({
-    required String storyId,
-    required String mode,
-    required Uint8List bytes,
-    String extension = 'mp3',
-    String contentType = 'audio/mpeg',
-  }) async {
-    final uid = _userId;
-    if (uid == null || bytes.isEmpty) return null;
-    final safeMode = mode.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '-');
-    final safeExtension = extension.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
-    if (safeExtension.isEmpty) {
-      throw ArgumentError.value(extension, 'extension', 'must not be empty');
-    }
-    final path = '$uid/$storyId-$safeMode.$safeExtension';
-    await _client.storage
-        .from('listening-audio')
-        .uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(contentType: contentType, upsert: true),
-        );
-    return path;
-  }
-
-  /// Downloads a previously rendered clip using the current user's JWT, so a
-  /// private bucket remains private while the lesson can still be replayed.
-  Future<Uint8List?> downloadListeningAudio(String path) async {
-    if (_userId == null || path.trim().isEmpty) return null;
-    return _client.storage.from('listening-audio').download(path);
   }
 
   /// Generates and uploads artwork with the single shared retry policy.
@@ -1917,11 +1883,29 @@ class SyncService {
     final limit = maxLessons.clamp(0, 1);
     if (_userId == null || limit == 0) return Future.value(0);
 
+    final requestId = 'course-${DateTime.now().toUtc().microsecondsSinceEpoch}';
+    unawaited(
+      AiCostTracker.event(
+        feature: 'course_generation',
+        event: 'course_prepare_requested',
+        requestId: requestId,
+        extra: {'max_lessons': limit},
+      ),
+    );
+
     late final Future<int> run;
     run = _prepareAdaptiveCourseLessons(limit).whenComplete(() {
       if (identical(_coursePreparationInFlight, run)) {
         _coursePreparationInFlight = null;
       }
+      unawaited(
+        AiCostTracker.event(
+          feature: 'course_generation',
+          event: 'course_prepare_finished',
+          requestId: requestId,
+          extra: {'max_lessons': limit},
+        ),
+      );
     });
     _coursePreparationInFlight = run;
     return run;
@@ -1934,6 +1918,13 @@ class SyncService {
         final result = await _client.functions.invoke(
           'prepare-course-lesson',
           body: const <String, dynamic>{},
+        );
+        unawaited(
+          AiCostTracker.event(
+            feature: 'course_generation',
+            event: 'course_edge_response_received',
+            extra: {'attempt_index': index},
+          ),
         );
         final data = result.data;
         if (data is! Map) {

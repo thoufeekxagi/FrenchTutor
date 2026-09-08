@@ -79,7 +79,8 @@ void main() {
     // one row at a time, only after the previous one is marked ready.
     var plan = store.ensureCurrentPlan(profile);
     while (!plan.sessions.any(
-      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.listening,
+      (session) =>
+          !session.isFoundation && session.primarySkill == SpeakSkill.listening,
     )) {
       _finishSession(db, store, plan.sessions.last);
       plan = store.ensureCurrentPlan(profile);
@@ -125,7 +126,8 @@ void main() {
     // vocabulary row ready first so the store grows to it.
     var plan = store.ensureCurrentPlan(profile);
     while (!plan.sessions.any(
-      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
+      (session) =>
+          !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
     )) {
       _finishSession(db, store, plan.sessions.last);
       plan = store.ensureCurrentPlan(profile);
@@ -194,83 +196,77 @@ void main() {
     },
   );
 
-  test(
-    'fresh learner gets five foundations and a full authored Unit 2',
-    () {
-      final store = AdaptiveCourseStore(sqlite3.openInMemory());
-      final plan = store.ensureCurrentPlan(
-        Profile(
-          id: 'learner',
-          goal: 'work',
-          level: 'a1',
-          interests: const ['Meetings', 'Emails'],
-        ),
-      );
+  test('fresh learner gets five foundations and a full authored Unit 2', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final plan = store.ensureCurrentPlan(
+      Profile(
+        id: 'learner',
+        goal: 'work',
+        level: 'a1',
+        interests: const ['Meetings', 'Emails'],
+      ),
+    );
 
-      // Foundation (1-5) and Unit 2 (6-10) are both authored, permanent
-      // default content for every learner: all ten rows exist immediately,
-      // no waiting, no AI call.
-      expect(plan.sessions, hasLength(10));
-      expect(
-        plan.sessions.map((session) => session.contentKey).toSet(),
-        hasLength(10),
-      );
-      expect(plan.sessions.first.context, contains('Meetings'));
-      expect(plan.sessions.every((session) => session.level == 'A1'), isTrue);
-      expect(
-        plan.sessions.map((session) => session.competency).toSet().length,
-        greaterThan(4),
-      );
-      expect(plan.sessions.take(5).map((session) => session.title), [
-        'Recognize French sounds',
-        'Build vowel confidence',
-        'Notice French consonants',
-        'Recognize core accent marks',
-        'Introduce yourself',
-      ]);
-      expect(
-        plan.sessions
-            .take(4)
-            .every((session) => session.primarySkill == SpeakSkill.alphabet),
-        isTrue,
-      );
-      expect(plan.sessions[4].primarySkill, SpeakSkill.speaking);
-      expect(
-        plan.sessions[4].contentKey,
-        SpeakingCourseCatalog.firstA1GuidedLessonId,
-      );
-      expect(
-        plan.sessions[4].targetPhrases,
-        SpeakingCourseCatalog.firstA1GuidedLesson.lines
-            .map((line) => line.french)
-            .toList(),
-      );
-      expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
-      expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
-      // Unit 2's skills are fixed by position (vocabulary, speaking,
-      // reading, listening, writing). Listening's durable audio is a
-      // single shared asset identical for every learner, so it is ready
-      // instantly like the rest of Unit 2 — no server round trip.
-      final unitTwo = plan.sessions.skip(5).toList(growable: false);
-      expect(unitTwo.map((s) => s.primarySkill), [
-        SpeakSkill.vocabulary,
-        SpeakSkill.speaking,
-        SpeakSkill.reading,
-        SpeakSkill.listening,
-        SpeakSkill.writing,
-      ]);
-      expect(unitTwo.every((s) => s.isContentReady), isTrue);
-      final personalizedTitles = unitTwo
-          .map((session) => session.title.toLowerCase())
-          .toList(growable: false);
-      expect(personalizedTitles.toSet(), hasLength(5));
-      expect(personalizedTitles, isNot(contains('introduce yourself')));
-      expect(
-        personalizedTitles,
-        isNot(contains('introduce yourself naturally')),
-      );
-    },
-  );
+    // Foundation (1-5) and Unit 2 (6-10) are both authored, permanent
+    // default content for every learner: all ten rows exist immediately,
+    // no waiting, no AI call.
+    expect(plan.sessions, hasLength(10));
+    expect(
+      plan.sessions.map((session) => session.contentKey).toSet(),
+      hasLength(10),
+    );
+    expect(plan.sessions.first.context, contains('Meetings'));
+    expect(plan.sessions.every((session) => session.level == 'A1'), isTrue);
+    expect(
+      plan.sessions.map((session) => session.competency).toSet().length,
+      greaterThan(4),
+    );
+    expect(plan.sessions.take(5).map((session) => session.title), [
+      'Recognize French sounds',
+      'Build vowel confidence',
+      'Notice French consonants',
+      'Recognize core accent marks',
+      'Introduce yourself',
+    ]);
+    expect(
+      plan.sessions
+          .take(4)
+          .every((session) => session.primarySkill == SpeakSkill.alphabet),
+      isTrue,
+    );
+    expect(plan.sessions[4].primarySkill, SpeakSkill.speaking);
+    expect(
+      plan.sessions[4].contentKey,
+      SpeakingCourseCatalog.firstA1GuidedLessonId,
+    );
+    expect(
+      plan.sessions[4].targetPhrases,
+      SpeakingCourseCatalog.firstA1GuidedLesson.lines
+          .map((line) => line.french)
+          .toList(),
+    );
+    expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
+    expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
+    // Unit 2's skills are fixed by position (vocabulary, speaking,
+    // reading, listening, writing). Listening's durable audio is a
+    // single shared asset identical for every learner, so it is ready
+    // instantly like the rest of Unit 2 — no server round trip.
+    final unitTwo = plan.sessions.skip(5).toList(growable: false);
+    expect(unitTwo.map((s) => s.primarySkill), [
+      SpeakSkill.vocabulary,
+      SpeakSkill.speaking,
+      SpeakSkill.reading,
+      SpeakSkill.listening,
+      SpeakSkill.writing,
+    ]);
+    expect(unitTwo.every((s) => s.isContentReady), isTrue);
+    final personalizedTitles = unitTwo
+        .map((session) => session.title.toLowerCase())
+        .toList(growable: false);
+    expect(personalizedTitles.toSet(), hasLength(5));
+    expect(personalizedTitles, isNot(contains('introduce yourself')));
+    expect(personalizedTitles, isNot(contains('introduce yourself naturally')));
+  });
 
   test(
     'onboarding interests no longer change the fixed per-unit skill order',
@@ -331,42 +327,47 @@ void main() {
     }
   });
 
-  test('guided speaking cache rejects instruction prefixes and duplicate cards', () {
-    final db = sqlite3.openInMemory();
-    final store = AdaptiveCourseStore(db);
-    final profile = Profile(
-      id: 'guided-cache-contract',
-      goal: 'everyday',
-      level: 'a1',
-    );
-    // Speaking is the second personalized row (after vocabulary); mark the
-    // vocabulary row ready first so the store grows to it.
-    var plan = store.ensureCurrentPlan(profile);
-    while (!plan.sessions.any(
-      (session) => !session.isFoundation && session.primarySkill == SpeakSkill.speaking,
-    )) {
-      _finishSession(db, store, plan.sessions.last);
-      plan = store.ensureCurrentPlan(profile);
-    }
-    final speaking = plan.sessions.firstWhere(
-      (session) =>
-          !session.isFoundation &&
-          session.primarySkill == SpeakSkill.speaking &&
-          session.status != 'completed',
-    );
-    db.execute(
-      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
-      'artifact_json = ? WHERE id = ?',
-      [
-        '{"practiceMode":"guidedConversation","lines":['
-        '{"fr":"Répétez : bonjour.","en":"Repeat hello."},'
-        '{"fr":"Bonjour.","en":"Hello."},'
-        '{"fr":"Bonjour.","en":"Hello."}]}',
-        speaking.id,
-      ],
-    );
-    expect(store.sessionById(speaking.id)!.isContentReady, isFalse);
-  });
+  test(
+    'guided speaking cache rejects instruction prefixes and duplicate cards',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'guided-cache-contract',
+        goal: 'everyday',
+        level: 'a1',
+      );
+      // Speaking is the second personalized row (after vocabulary); mark the
+      // vocabulary row ready first so the store grows to it.
+      var plan = store.ensureCurrentPlan(profile);
+      while (!plan.sessions.any(
+        (session) =>
+            !session.isFoundation &&
+            session.primarySkill == SpeakSkill.speaking,
+      )) {
+        _finishSession(db, store, plan.sessions.last);
+        plan = store.ensureCurrentPlan(profile);
+      }
+      final speaking = plan.sessions.firstWhere(
+        (session) =>
+            !session.isFoundation &&
+            session.primarySkill == SpeakSkill.speaking &&
+            session.status != 'completed',
+      );
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+        'artifact_json = ? WHERE id = ?',
+        [
+          '{"practiceMode":"guidedConversation","lines":['
+              '{"fr":"Répétez : bonjour.","en":"Repeat hello."},'
+              '{"fr":"Bonjour.","en":"Hello."},'
+              '{"fr":"Bonjour.","en":"Hello."}]}',
+          speaking.id,
+        ],
+      );
+      expect(store.sessionById(speaking.id)!.isContentReady, isFalse);
+    },
+  );
 
   test('Course planner never assigns Free Talk or Roleplay speaking modes', () {
     final sessions = AdaptiveCoursePlanGenerator.generate(
@@ -427,7 +428,10 @@ void main() {
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
       "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [_readyArtifactFor(first.sessions.last.primarySkill), first.sessions.last.id],
+      [
+        _readyArtifactFor(first.sessions.last.primarySkill),
+        first.sessions.last.id,
+      ],
     );
 
     final second = store.ensureCurrentPlan(profile);
@@ -438,7 +442,10 @@ void main() {
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
       "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [_readyArtifactFor(second.sessions.last.primarySkill), second.sessions.last.id],
+      [
+        _readyArtifactFor(second.sessions.last.primarySkill),
+        second.sessions.last.id,
+      ],
     );
     expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 12);
 
@@ -522,35 +529,70 @@ void main() {
     },
   );
 
-  test('Course keeps growing one row at a time past the old five-lesson block', () {
-    final store = AdaptiveCourseStore(sqlite3.openInMemory());
-    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
-    var plan = store.ensureCurrentPlan(profile);
-    // Foundation (1-5) and Unit 2 (6-10) are both authored and fully present
-    // immediately.
-    expect(plan.sessions, hasLength(10));
+  test(
+    'restores the authored introduction even when an old session five was completed',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'completed-learner',
+        goal: 'everyday',
+        level: 'a1',
+      );
+      final first = store.ensureCurrentPlan(profile);
+      db.execute(
+        '''UPDATE adaptive_course_sessions
+           SET title = 'Connect sound to meaning', primary_skill = 'vocabulary',
+               content_key = 'adaptive_old_s005', generation_status = 'ready',
+               artifact_kind = 'vocabulary', artifact_json = '{}'
+         WHERE id = ?''',
+        [first.sessions[4].id],
+      );
+      store.markCompleted('adaptive_old_s005');
 
-    // Complete all of Unit 2, as a learner would; real AI-personalized
-    // growth (sequence 11+) only begins once it is out of the way.
-    for (final session in plan.sessions) {
-      store.markCompleted(session.contentKey);
-    }
-    plan = store.ensureCurrentPlan(profile);
-    expect(plan.sessions, hasLength(11));
-    expect(plan.sessions.last.sequence, 11);
-    expect(plan.sessions.last.blockIndex, 2);
-    expect(plan.sessions.last.blockPosition, 1);
+      final repaired = store.ensureCurrentPlan(profile);
+      final session = repaired.sessions[4];
+      expect(session.title, 'Introduce yourself');
+      expect(session.primarySkill, SpeakSkill.speaking);
+      expect(session.contentKey, SpeakingCourseCatalog.firstA1GuidedLessonId);
+      expect(session.generationStatus, 'ready');
+      expect(session.artifact, isNull);
+      expect(session.status, 'completed');
+    },
+  );
 
-    // The personalized route beyond Unit 2 is unlimited: keep completing the
-    // newest lesson and asking for the next one. It must keep growing one
-    // row at a time instead of stopping.
-    for (var total = 12; total <= 15; total++) {
-      store.markCompleted(plan.sessions.last.contentKey);
+  test(
+    'Course keeps growing one row at a time past the old five-lesson block',
+    () {
+      final store = AdaptiveCourseStore(sqlite3.openInMemory());
+      final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
+      var plan = store.ensureCurrentPlan(profile);
+      // Foundation (1-5) and Unit 2 (6-10) are both authored and fully present
+      // immediately.
+      expect(plan.sessions, hasLength(10));
+
+      // Complete all of Unit 2, as a learner would; real AI-personalized
+      // growth (sequence 11+) only begins once it is out of the way.
+      for (final session in plan.sessions) {
+        store.markCompleted(session.contentKey);
+      }
       plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions, hasLength(total));
-    }
-    expect(plan.sessions.last.sequence, 15);
-  });
+      expect(plan.sessions, hasLength(11));
+      expect(plan.sessions.last.sequence, 11);
+      expect(plan.sessions.last.blockIndex, 2);
+      expect(plan.sessions.last.blockPosition, 1);
+
+      // The personalized route beyond Unit 2 is unlimited: keep completing the
+      // newest lesson and asking for the next one. It must keep growing one
+      // row at a time instead of stopping.
+      for (var total = 12; total <= 15; total++) {
+        store.markCompleted(plan.sessions.last.contentKey);
+        plan = store.ensureCurrentPlan(profile);
+        expect(plan.sessions, hasLength(total));
+      }
+      expect(plan.sessions.last.sequence, 15);
+    },
+  );
 
   test(
     'a ready personalized lesson survives ensureCurrentPlan being called again',
@@ -781,57 +823,54 @@ void main() {
     expect(store.currentPlan(profile)!.sessions.first.status, 'completed');
   });
 
-  test(
-    'markStarted leaves only the most recently opened session active',
-    () {
-      final db = sqlite3.openInMemory();
-      final store = AdaptiveCourseStore(db);
-      final profile = Profile(
-        id: 'mark-started-contract',
-        goal: 'everyday',
-        level: 'a1',
-        interests: const ['Speaking'],
-      );
-      final plan = store.ensureCurrentPlan(profile);
-      final first = plan.sessions[0];
-      final second = plan.sessions[1];
-      final third = plan.sessions[2];
+  test('markStarted leaves only the most recently opened session active', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'mark-started-contract',
+      goal: 'everyday',
+      level: 'a1',
+      interests: const ['Speaking'],
+    );
+    final plan = store.ensureCurrentPlan(profile);
+    final first = plan.sessions[0];
+    final second = plan.sessions[1];
+    final third = plan.sessions[2];
 
-      // Opening three different lessons across separate visits (exactly
-      // what a learner exploring several ready-ahead lessons does) must
-      // never leave more than one session 'active' at a time -- an earlier
-      // bug left every opened lesson stuck 'active' forever, which also
-      // silently inflated how far ahead the store thought it needed to
-      // keep generating.
-      store.markStarted(first.contentKey);
-      store.markStarted(second.contentKey);
-      store.markStarted(third.contentKey);
+    // Opening three different lessons across separate visits (exactly
+    // what a learner exploring several ready-ahead lessons does) must
+    // never leave more than one session 'active' at a time -- an earlier
+    // bug left every opened lesson stuck 'active' forever, which also
+    // silently inflated how far ahead the store thought it needed to
+    // keep generating.
+    store.markStarted(first.contentKey);
+    store.markStarted(second.contentKey);
+    store.markStarted(third.contentKey);
 
-      final sessions = store.currentPlan(profile)!.sessions;
-      final activeCount = sessions
-          .where((session) => session.status == 'active')
-          .length;
-      expect(activeCount, 1);
-      expect(
-        sessions
-            .firstWhere((session) => session.contentKey == third.contentKey)
-            .status,
-        'active',
-      );
-      expect(
-        sessions
-            .firstWhere((session) => session.contentKey == first.contentKey)
-            .status,
-        'planned',
-      );
-      expect(
-        sessions
-            .firstWhere((session) => session.contentKey == second.contentKey)
-            .status,
-        'planned',
-      );
-    },
-  );
+    final sessions = store.currentPlan(profile)!.sessions;
+    final activeCount = sessions
+        .where((session) => session.status == 'active')
+        .length;
+    expect(activeCount, 1);
+    expect(
+      sessions
+          .firstWhere((session) => session.contentKey == third.contentKey)
+          .status,
+      'active',
+    );
+    expect(
+      sessions
+          .firstWhere((session) => session.contentKey == first.contentKey)
+          .status,
+      'planned',
+    );
+    expect(
+      sessions
+          .firstWhere((session) => session.contentKey == second.contentKey)
+          .status,
+      'planned',
+    );
+  });
 
   test(
     'unit themes never repeat identical text once the fixed theme list wraps',

@@ -566,12 +566,11 @@ function validateArtifact(artifact: Json, session: Json, kind: string) {
   if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
 }
 
-// One lesson still means one provider, one fixed model, and no cross-provider
-// fallback. A bad response is repaired in place, on the same provider, by
-// handing the model back its own invalid output and the exact validation
-// error, instead of silently accepting broken content or inventing a
-// different generation path. This is capped, never unlimited retrying.
-const MAX_GENERATION_ATTEMPTS = 3;
+// One Course lesson is one provider request. Practice has its own bounded
+// retry policy, but Course must never multiply a failed generation into a
+// repair conversation: a bad result is marked failed and the learner can
+// explicitly request a fresh lesson later.
+const MAX_GENERATION_ATTEMPTS = 1;
 
 async function generateArtifact(
   supabaseUrl: string,
@@ -585,10 +584,12 @@ async function generateArtifact(
       targetPhrases: list(session.target_phrases_json),
     };
   }
-  // Reading and listening stay on Gemini Flash Lite. Other personalized
-  // course lessons use Luna through OpenRouter. This is fixed routing by
-  // lesson type, never a cross-provider failure fallback.
-  const provider = kind === "reading" || kind === "listening" ? "gemini" : "openrouter";
+  // Course authoring deliberately follows Practice's text route for every
+  // skill. The old split sent Reading/Listening through a separate Gemini
+  // path while the rest used Practice's OpenRouter path; that made Course
+  // more expensive without improving the saved artifact. Gemini remains
+  // reserved for explicit Live/audio work, not ordinary lesson JSON.
+  const provider = "openrouter";
   const messages: Array<{ role: string; content: string }> = [
     {
       role: "system",
@@ -601,6 +602,14 @@ async function generateArtifact(
   for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
     let rawText = "";
     try {
+      console.info(JSON.stringify({
+        event: "course_artifact_attempt",
+        session_id: text(session.id),
+        kind,
+        provider,
+        attempt,
+        max_attempts: MAX_GENERATION_ATTEMPTS,
+      }));
       const aiResponse = await fetch(`${supabaseUrl}/functions/v1/ai-text`, {
         method: "POST",
         headers: {
@@ -610,10 +619,12 @@ async function generateArtifact(
         },
         body: JSON.stringify({
           provider,
+          traceFeature: `course_${kind}`,
           messages,
           maxTokens: 2600,
           temperature: 0.35,
           responseFormat: { type: "json_object" },
+          retryPolicy: "none",
         }),
       });
       const aiData = await aiResponse.json().catch(() => ({}));
@@ -624,9 +635,24 @@ async function generateArtifact(
       const generated = parseModelJson(rawText);
       const artifact = { ...baseArtifact(session, kind), ...generated };
       validateArtifact(artifact, session, kind);
+      console.info(JSON.stringify({
+        event: "course_artifact_ready",
+        session_id: text(session.id),
+        kind,
+        provider,
+        attempt,
+      }));
       return artifact;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(JSON.stringify({
+        event: "course_artifact_attempt_failed",
+        session_id: text(session.id),
+        kind,
+        provider,
+        attempt,
+        error_type: lastError.name,
+      }));
       if (attempt === MAX_GENERATION_ATTEMPTS) break;
       // Hand the exact problem back to the same model so it can repair its
       // own output, instead of the caller silently retrying blind.
@@ -640,242 +666,18 @@ async function generateArtifact(
   throw lastError ?? new Error("Lesson generation failed");
 }
 
-function pcm16ToWav(pcm: Uint8Array, sampleRate = 24000): Uint8Array {
-  const channels = 1;
-  const bitsPerSample = 16;
-  const headerSize = 44;
-  const wav = new Uint8Array(headerSize + pcm.length);
-  const view = new DataView(wav.buffer);
-  const ascii = (offset: number, value: string) => {
-    for (let index = 0; index < value.length; index += 1) {
-      wav[offset + index] = value.charCodeAt(index);
-    }
-  };
-  ascii(0, "RIFF");
-  view.setUint32(4, 36 + pcm.length, true);
-  ascii(8, "WAVE");
-  ascii(12, "fmt ");
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, channels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * channels * bitsPerSample / 8, true);
-  view.setUint16(32, channels * bitsPerSample / 8, true);
-  view.setUint16(34, bitsPerSample, true);
-  ascii(36, "data");
-  view.setUint32(40, pcm.length, true);
-  wav.set(pcm, headerSize);
-  return wav;
-}
-
-function isValidPcmWav(bytes: Uint8Array): boolean {
-  if (bytes.length <= 44) return false;
-  const ascii = (start: number, end: number) =>
-    String.fromCharCode(...bytes.slice(start, end));
-  if (ascii(0, 4) !== "RIFF" || ascii(8, 12) !== "WAVE") return false;
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const declaredDataBytes = view.getUint32(40, true);
-  return declaredDataBytes > 0 &&
-    declaredDataBytes % 2 === 0 &&
-    declaredDataBytes <= bytes.length - 44;
-}
-
-// Mints a short-lived Gemini Live credential the same way
-// gemini-live-token/index.ts does for the Flutter client, but server-side:
-// this endpoint's own generation calls never used the client's token
-// service, so it needs its own mint using the raw GEMINI_API_KEY this
-// function already has.
-async function mintLiveAccessToken(apiKey: string): Promise<string> {
-  const now = Date.now();
-  const response = await fetch("https://generativelanguage.googleapis.com/v1alpha/auth_tokens", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-    body: JSON.stringify({
-      uses: 1,
-      expireTime: new Date(now + 5 * 60 * 1000).toISOString(),
-      newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(`Gemini Live token mint failed (${response.status}): ${(await response.text()).slice(0, 200)}`);
-  }
-  const data = await response.json();
-  const token = String(data?.name ?? "");
-  if (!token) throw new Error("Gemini Live token mint returned no token");
-  return token;
-}
-
-// Same Gemini Live model/protocol used everywhere else in this app (see
-// gemini_live_audio_service.dart) -- Course listening's durable track used
-// to be the one exception, generated through a separate TTS REST call
-// instead. Confirmed directly that a Supabase edge function can open and
-// use this websocket before switching to it here: minted a real token,
-// connected, and received real decodable audio back, server-side, exactly
-// like the Flutter client does.
-async function generateLiveAudio(narration: string, apiKey: string): Promise<Uint8Array> {
-  const accessToken = await mintLiveAccessToken(apiKey);
-  const uri =
-    `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${encodeURIComponent(accessToken)}`;
-  return await new Promise<Uint8Array>((resolve, reject) => {
-    let settled = false;
-    const settle = (fn: () => void) => {
-      if (settled) return;
-      settled = true;
-      fn();
-    };
-    // A whole story's narration is longer than a single word/sentence, so
-    // this gets a more generous budget than the client's one-shot
-    // pronunciation calls (which use ~15-35s) -- still bounded, so a stuck
-    // socket cannot hang this request forever.
-    const timeout = setTimeout(() => {
-      settle(() => {
-        try {
-          ws.close();
-        } catch (_) {
-          // Already closing/closed.
-        }
-        reject(new Error("Gemini Live listening audio timed out"));
-      });
-    }, 60000);
-
-    const ws = new WebSocket(uri);
-    const chunks: Uint8Array[] = [];
-    let setupDone = false;
-
-    const handleParsed = (data: Record<string, unknown>) => {
-      if (!setupDone && data.setupComplete) {
-        setupDone = true;
-        ws.send(JSON.stringify({ realtimeInput: { text: narration } }));
-        return;
-      }
-      const serverContent = data.serverContent as Record<string, unknown> | undefined;
-      if (!serverContent) return;
-      const modelTurn = serverContent.modelTurn as { parts?: unknown[] } | undefined;
-      for (const part of modelTurn?.parts ?? []) {
-        const inline = (part as { inlineData?: { data?: string } })?.inlineData?.data;
-        if (inline) {
-          const binary = atob(inline);
-          const bytes = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-          chunks.push(bytes);
-        }
-      }
-      if (serverContent.turnComplete) {
-        settle(() => {
-          clearTimeout(timeout);
-          ws.close();
-          const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-          const combined = new Uint8Array(total);
-          let offset = 0;
-          for (const chunk of chunks) {
-            combined.set(chunk, offset);
-            offset += chunk.length;
-          }
-          resolve(combined);
-        });
-      }
-    };
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        setup: {
-          model: "models/gemini-3.1-flash-live-preview",
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            temperature: 0.1,
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } },
-          },
-          systemInstruction: {
-            parts: [{
-              text: "You are an exact French narration renderer, not a conversational tutor. Treat the realtime text as an immutable script. Speak the supplied French text word for word, in the same order, exactly once. Never answer it, acknowledge it, correct it, translate it, explain it, paraphrase it, or add or omit any words. Do not say anything before or after the script. Use a natural, clear narration pace with brief pauses at sentence breaks.",
-            }],
-          },
-          outputAudioTranscription: {},
-        },
-      }));
-    };
-    ws.onmessage = async (event: MessageEvent) => {
-      try {
-        let raw: string;
-        if (typeof event.data === "string") {
-          raw = event.data;
-        } else if (event.data instanceof Blob) {
-          raw = await event.data.text();
-        } else if (event.data instanceof ArrayBuffer) {
-          raw = new TextDecoder().decode(event.data);
-        } else {
-          return;
-        }
-        if (!raw.trim()) return;
-        handleParsed(JSON.parse(raw));
-      } catch (parseError) {
-        settle(() => {
-          clearTimeout(timeout);
-          reject(parseError instanceof Error ? parseError : new Error(String(parseError)));
-        });
-      }
-    };
-    ws.onerror = (event: Event) => {
-      settle(() => {
-        clearTimeout(timeout);
-        reject(new Error(`Gemini Live listening audio socket error: ${JSON.stringify(event)}`));
-      });
-    };
-    ws.onclose = (event: CloseEvent) => {
-      settle(() => {
-        clearTimeout(timeout);
-        reject(new Error(`Gemini Live listening audio socket closed early: code=${event.code} reason=${event.reason}`));
-      });
-    };
-  });
-}
-
 async function attachListeningAudio(
-  admin: ReturnType<typeof createClient>,
-  userId: string,
   sessionId: string,
   artifact: Json,
 ): Promise<Json> {
-  const passage = object(artifact.passage);
-  const narration = text(passage.fullText) ||
-    (passage.segments as unknown[]).map((item) => text(object(item).fr)).join(" ");
-  const geminiKey = Deno.env.get("GEMINI_API_KEY");
-  if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
-  const pcm = await generateLiveAudio(narration, geminiKey);
-  if (pcm.length === 0 || pcm.length % 2 !== 0) {
-    throw new Error("Gemini Live listening audio returned invalid PCM");
-  }
-  const bytes = pcm16ToWav(pcm);
-  const path = `${userId}/course/${idPart(sessionId)}.wav`;
-  const { error } = await admin.storage.from("listening-audio").upload(
-    path,
-    bytes,
-    { contentType: "audio/wav", upsert: true },
-  );
-  if (error) throw new Error(`Listening audio upload failed: ${error.message}`);
-  // Read the private object back before exposing the lesson. "Ready" means
-  // the exact PCM WAV the phone needs is present and structurally valid, not
-  // merely that the transcript JSON and an upload request were produced.
-  const { data: stored, error: verifyError } = await admin.storage
-    .from("listening-audio")
-    .download(path);
-  if (verifyError || !stored) {
-    throw new Error(
-      `Listening audio verification failed: ${verifyError?.message ?? "missing object"}`,
-    );
-  }
-  const storedBytes = new Uint8Array(await stored.arrayBuffer());
-  if (!isValidPcmWav(storedBytes)) {
-    throw new Error("Listening audio verification returned an invalid PCM WAV");
-  }
+  // Course stores sentence-level PCM on the device and mirrors those exact
+  // clips through GeminiLiveAudioService. A marker keeps the existing course
+  // readiness contract compatible while ensuring this function never pays to
+  // generate a non-seekable full-track WAV without word timings.
   return {
     ...artifact,
-    audioPath: path,
-    // Matches the mode string lesson_asset_prefetch_service.dart already
-    // writes for Practice's client-generated Live listening audio (see
-    // ListeningAudioPrefetchCache._clip), so both paths are recognized
-    // identically by the same client-side code.
-    audioMode: "gemini_live_spoken",
+    audioPath: `pcm-deck-v1:${idPart(sessionId)}`,
+    audioMode: "pcm_deck_v1",
     musicBackgroundUrl:
       "asset:assets/images/listening/the_garden_key_background.png",
   };
@@ -1091,12 +893,7 @@ Deno.serve(async (request: Request) => {
           .eq("user_id", userId);
         if (textOnlyError) throw new Error(textOnlyError.message);
       }
-      artifact = await attachListeningAudio(
-        admin,
-        userId,
-        sessionId,
-        artifact,
-      );
+      artifact = await attachListeningAudio(sessionId, artifact);
     }
     const { error: saveError } = await admin
       .from("adaptive_course_sessions")

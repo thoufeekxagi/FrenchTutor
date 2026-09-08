@@ -14,7 +14,7 @@ import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
 import 'screens/onboarding/speak_onboarding_screen.dart';
 import 'services/auth_service.dart';
-import 'services/grammar_audio_warmup_service.dart';
+import 'services/gemini_live_service.dart';
 import 'services/revenue_cat_service.dart';
 import 'services/sync_service.dart';
 
@@ -107,6 +107,14 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      // Route-level observers normally close their own Live service. Keep a
+      // root guard as well: a forgotten observer must never leave a billable
+      // Gemini socket running after the app is backgrounded or terminated.
+      GeminiLiveService.disconnectActiveSocket();
+    }
     if (state == AppLifecycleState.resumed) {
       unawaited(_resumePendingCourseWork());
     }
@@ -137,9 +145,9 @@ class _AuthGateState extends ConsumerState<AuthGate>
       final plan = ref
           .read(adaptiveCourseStoreProvider)
           .ensureCurrentPlan(profile);
-      if (await sync.syncAdaptiveCoursePlan(plan)) {
-        await sync.prepareAdaptiveCourseLessons();
-      }
+      // Course AI generation is user-triggered only. Resuming the app must
+      // never spend provider credits in the background.
+      await sync.syncAdaptiveCoursePlan(plan);
     } catch (error, stackTrace) {
       debugPrint('Course resume failed: $error\n$stackTrace');
     }
@@ -319,9 +327,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
             // hold account restoration on an AI provider response; the five
             // fixed foundation lessons remain immediately usable while the
             // persisted personalized batch is prepared and hydrated.
-            if (coursePersisted) {
-              unawaited(sync.prepareAdaptiveCourseLessons());
-            } else {
+            if (!coursePersisted) {
               debugPrint(
                 'Course preparation deferred until its persisted plan retry '
                 'succeeds.',
@@ -356,9 +362,9 @@ class _AuthGateState extends ConsumerState<AuthGate>
           await ref
               .read(starterContentServiceProvider)
               .ensureSeededForCurrentUser();
-          GrammarAudioWarmupService.shared.warmForLevel(
-            ref.read(learningStoreProvider).profile().level,
-          );
+          // Audio must remain demand-driven. Warming the entire grammar
+          // catalog here opened dozens of Gemini Live sockets after login,
+          // even when the learner never opened Grammar.
         } catch (error, stackTrace) {
           debugPrint('Starter content seeding failed: $error\n$stackTrace');
         }

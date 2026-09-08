@@ -150,7 +150,6 @@ class SpeakingSessionResultView extends StatelessWidget {
                       ),
                       const SizedBox(height: DesignTokens.space4),
                       _nextPracticeRow(),
-                      const Spacer(),
                       const SizedBox(height: DesignTokens.space8),
                       SizedBox(
                         width: double.infinity,

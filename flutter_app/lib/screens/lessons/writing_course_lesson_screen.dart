@@ -58,10 +58,8 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
     super.initState();
     _shuffleWordBank();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      unawaited(_prewarmLessonAudio());
-    });
+    // Do not synthesize every model/partner line when a Course lesson opens.
+    // Each speaker button generates lazily and the shared cache persists it.
   }
 
   @override
@@ -726,39 +724,6 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
 
   String _speechKeyForStep(int index, String role) =>
       'writing:${widget.lesson.id}:$index:$role';
-
-  Future<void> _prewarmLessonAudio() async {
-    final items = <SpeechItem>[];
-    for (var index = 0; index < widget.lesson.steps.length; index++) {
-      final step = widget.lesson.steps[index];
-      if (step.target.trim().isNotEmpty) {
-        items.add(
-          SpeechItem(
-            text: step.target,
-            language: 'fr-FR',
-            contentItemId: _speechKeyForStep(index, 'guided-model'),
-          ),
-        );
-      }
-      if ((step.partnerFrench ?? '').trim().isNotEmpty) {
-        items.add(
-          SpeechItem(
-            text: step.partnerFrench!,
-            language: 'fr-FR',
-            contentItemId: _speechKeyForStep(index, 'partner'),
-          ),
-        );
-      }
-    }
-    if (items.isEmpty) return;
-    try {
-      await LessonSpeechService.shared.prewarmNarration(items);
-    } catch (error) {
-      // Prewarming is best effort. A cache miss still follows the same
-      // retrying playback path when the learner taps Listen.
-      debugPrint('Writing lesson audio prewarm skipped: $error');
-    }
-  }
 
   Future<void> _requestGuidedHint() async {
     if (_isHintLoading) return;

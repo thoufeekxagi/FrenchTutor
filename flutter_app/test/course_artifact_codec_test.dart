@@ -63,6 +63,15 @@ void main() {
     expect(listening.practiceMode, 'listening');
   });
 
+  test('legacy Unit 2 marker resolves to the shared listening asset', () {
+    final listening = CourseArtifactCodec.listening({
+      ...storyArtifact(audioPath: 'pcm-deck-v1:unit-two-listening'),
+      'id': 'unit-two-listening',
+    });
+    expect(listening.audioPath, 'course-shared/unit-two-listening.wav');
+    expect(listening.audioMode, 'gemini_flash_tts');
+  });
+
   test('writing decodes one prepared task', () {
     final writing = CourseArtifactCodec.writing({
       'createdAt': '2026-09-05T00:00:00Z',

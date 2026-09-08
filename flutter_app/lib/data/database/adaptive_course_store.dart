@@ -182,30 +182,28 @@ class AdaptiveCourseSessionSpec {
           ? 11
           : 32;
       final seen = <String>{};
-      return (lines as List).every(
-        (line) {
-          if (line is! Map ||
-              !nonEmpty(line['en']) ||
-              !safeFrench(line['fr'], maxWords: maxWords) ||
-              !notEchoedEnglish(line['fr'], line['en'])) {
-            return false;
-          }
-          final french = line['fr'].toString().trim();
-          final folded = french
-              .toLowerCase()
-              .replaceAll(RegExp(r'[^a-zà-ÿ0-9 ]', caseSensitive: false), '')
-              .replaceAll(RegExp(r'\s+'), ' ')
-              .trim();
-          if (RegExp(
-            r'^(répétez|repetez|repeat|say|listen)\b',
-            caseSensitive: false,
-          ).hasMatch(french)) {
-            return false;
-          }
-          if (!seen.add(folded)) return false;
-          return true;
-        },
-      );
+      return (lines as List).every((line) {
+        if (line is! Map ||
+            !nonEmpty(line['en']) ||
+            !safeFrench(line['fr'], maxWords: maxWords) ||
+            !notEchoedEnglish(line['fr'], line['en'])) {
+          return false;
+        }
+        final french = line['fr'].toString().trim();
+        final folded = french
+            .toLowerCase()
+            .replaceAll(RegExp(r'[^a-zà-ÿ0-9 ]', caseSensitive: false), '')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
+        if (RegExp(
+          r'^(répétez|repetez|repeat|say|listen)\b',
+          caseSensitive: false,
+        ).hasMatch(french)) {
+          return false;
+        }
+        if (!seen.add(folded)) return false;
+        return true;
+      });
     }
 
     bool writingCourseSafe() {
@@ -840,15 +838,17 @@ class AdaptiveCourseStore {
       // have persisted an advanced template for lesson 6–15.
       final needsArtifactContractUpgrade =
           current.generationVersion < session.generationVersion;
+      final isAuthoredIntroduction = session.sequence == 5;
       if ((session.sequence <= adaptiveCourseSimplePhaseEnd ||
               needsArtifactContractUpgrade) &&
-          current.status != 'completed' &&
           current.status != 'replaced' &&
+          (isAuthoredIntroduction || current.status != 'completed') &&
           _needsCurriculumUpgrade(current, session, profileFingerprint)) {
         _updatePlannedSessionSpec(
           current,
           session,
           profileFingerprint: profileFingerprint,
+          allowCompletedIntroduction: isAuthoredIntroduction,
         );
         repaired = true;
       }
@@ -867,7 +867,8 @@ class AdaptiveCourseStore {
     AdaptiveCourseSessionSpec replacement,
     String profileFingerprint,
   ) {
-    final structuralChange = current.contentKey != replacement.contentKey ||
+    final structuralChange =
+        current.contentKey != replacement.contentKey ||
         current.level != replacement.level ||
         current.unit != replacement.unit ||
         current.unitTitle != replacement.unitTitle ||
@@ -913,6 +914,7 @@ class AdaptiveCourseStore {
     AdaptiveCourseSessionSpec current,
     AdaptiveCourseSessionSpec replacement, {
     required String profileFingerprint,
+    bool allowCompletedIntroduction = false,
   }) {
     // Unit 2 is authored, not generated (see `_unitTwoArtifact`): its
     // recomputed `replacement` already carries the exact ready artifact
@@ -936,7 +938,8 @@ class AdaptiveCourseStore {
              artifact_json = CASE WHEN ? = 1 THEN NULL WHEN ? = 1 THEN ? ELSE artifact_json END,
              generation_error = CASE WHEN ? = 1 THEN 'Regenerating with CEFR and early-phase rules' WHEN ? = 1 THEN NULL ELSE generation_error END,
              updated_at = ?
-         WHERE id = ? AND status NOT IN ('completed', 'replaced')
+         WHERE id = ?
+           AND (? = 1 OR status NOT IN ('completed', 'replaced'))
            AND deleted_at IS NULL''',
       [
         replacement.contentKey,
@@ -971,6 +974,7 @@ class AdaptiveCourseStore {
         isAuthored ? 1 : 0,
         _now(),
         current.id,
+        allowCompletedIntroduction ? 1 : 0,
       ],
     );
     // Session 5 used to be a generated vocabulary row. When an existing
@@ -1267,12 +1271,46 @@ class AdaptiveCourseStore {
            target_phrases_json = excluded.target_phrases_json,
            source_session_ids_json = excluded.source_session_ids_json,
            profile_fingerprint = excluded.profile_fingerprint,
-           generation_status = excluded.generation_status,
-           artifact_kind = excluded.artifact_kind,
-           artifact_json = excluded.artifact_json,
+           -- A remote pull can legitimately be older than the durable local
+           -- artifact (for example while the generation response is still
+           -- propagating). Never let that stale queued/generating snapshot make
+           -- a lesson disappear from the roadmap again.
+           generation_status = CASE
+             WHEN adaptive_course_sessions.artifact_json IS NOT NULL
+                  AND excluded.artifact_json IS NULL
+                  AND excluded.generation_status IN ('queued', 'generating')
+               THEN adaptive_course_sessions.generation_status
+             ELSE excluded.generation_status
+           END,
+           artifact_kind = CASE
+             WHEN adaptive_course_sessions.artifact_json IS NOT NULL
+                  AND excluded.artifact_json IS NULL
+                  AND excluded.generation_status IN ('queued', 'generating')
+               THEN adaptive_course_sessions.artifact_kind
+             ELSE excluded.artifact_kind
+           END,
+           artifact_json = CASE
+             WHEN adaptive_course_sessions.artifact_json IS NOT NULL
+                  AND excluded.artifact_json IS NULL
+                  AND excluded.generation_status IN ('queued', 'generating')
+               THEN adaptive_course_sessions.artifact_json
+             ELSE excluded.artifact_json
+           END,
            generation_version = excluded.generation_version,
-           generation_attempts = excluded.generation_attempts,
-           generation_error = excluded.generation_error,
+           generation_attempts = CASE
+             WHEN adaptive_course_sessions.artifact_json IS NOT NULL
+                  AND excluded.artifact_json IS NULL
+                  AND excluded.generation_status IN ('queued', 'generating')
+               THEN adaptive_course_sessions.generation_attempts
+             ELSE excluded.generation_attempts
+           END,
+           generation_error = CASE
+             WHEN adaptive_course_sessions.artifact_json IS NOT NULL
+                  AND excluded.artifact_json IS NULL
+                  AND excluded.generation_status IN ('queued', 'generating')
+               THEN adaptive_course_sessions.generation_error
+             ELSE excluded.generation_error
+           END,
            status = excluded.status,
            updated_at = excluded.updated_at,
            completed_at = excluded.completed_at,
@@ -1528,9 +1566,7 @@ abstract final class AdaptiveCoursePlanGenerator {
           estimatedMinutes: _minutes(profile.sessionLength, template.primary),
           targetPhrases: targetPhrases,
           sourceSessionIds: sourceSessionIds,
-          generationStatus: isFoundation || unitTwoReady
-              ? 'ready'
-              : 'queued',
+          generationStatus: isFoundation || unitTwoReady ? 'ready' : 'queued',
           artifactKind: unitTwoReady ? targetSkill.wireName : null,
           artifact: unitTwoArtifact,
           generationVersion: adaptiveCourseGenerationVersion,
@@ -1805,11 +1841,7 @@ abstract final class AdaptiveCoursePlanGenerator {
             {
               'q': 'Pourquoi est-ce que Léa va au marché ?',
               'q_en': 'Why does Léa go to the market?',
-              'choices': [
-                'Pour un gâteau.',
-                'Pour dormir.',
-                'Pour chanter.',
-              ],
+              'choices': ['Pour un gâteau.', 'Pour dormir.', 'Pour chanter.'],
               'choices_en': ['For a cake.', 'To sleep.', 'To sing.'],
               'answerIndex': 0,
             },
@@ -1875,12 +1907,11 @@ abstract final class AdaptiveCoursePlanGenerator {
                 'phonetic': word.phonetic,
               },
           ],
-          // Every learner gets the exact same French text here, so the
-          // durable audio for it is a single shared, publicly-readable
-          // asset (same pattern as the alphabet-audio bucket) instead of a
-          // fresh redundant TTS render per new learner. See migration
-          // shared_course_listening_audio and
-          // generate-shared-course-listening-audio-once.
+          // Unit 2 is authored and identical for every learner. Keep the
+          // shared, one-time WAV produced by the course asset generator as
+          // the source of truth; the client imports it into its local
+          // sentence deck without opening Gemini or generating per-user
+          // copies on lesson open.
           'audioPath': 'course-shared/unit-two-listening.wav',
           'audioMode': 'gemini_flash_tts',
         };

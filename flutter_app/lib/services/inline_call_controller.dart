@@ -9,6 +9,7 @@ import '../models/agent_tool.dart';
 import '../prompts/live_prompts.dart';
 import '../widgets/ai_voice_disclosure.dart';
 import 'audio_streaming_service.dart';
+import 'ai_cost_tracker.dart';
 import 'gemini_live_service.dart';
 import 'lesson_speech_service.dart';
 
@@ -40,6 +41,7 @@ class InlineCallController {
     this.tools = const [],
     this.onToolCall,
     this.manualLearnerTurns = false,
+    this.compactGuidedContext = false,
   });
 
   final LiveSessionType sessionType;
@@ -79,6 +81,11 @@ class InlineCallController {
   /// pause inside the sentence must not trigger an early Murray reply.
   final bool manualLearnerTurns;
 
+  /// Guided speaking cards need only the current visible step. When enabled,
+  /// GeminiLiveService uses the compact guided prompt and smaller compression
+  /// window without changing the existing local transcript/matching path.
+  final bool compactGuidedContext;
+
   GeminiLiveService? gemini;
   AudioStreamingService? audio;
   bool connecting = false;
@@ -88,7 +95,14 @@ class InlineCallController {
   bool reconnecting = false;
   Future<void>? _ending;
   Future<void>? _starting;
+  Timer? _manualIdleTimer;
+  // A connect can finish after the learner has already tapped the phone to
+  // stop.  Keep a monotonically increasing intent id so a late Live callback
+  // cannot resurrect the UI or leave an orphaned socket marked active.
+  int _connectionGeneration = 0;
   bool _disposed = false;
+
+  static const _manualIdleLimit = Duration(seconds: 45);
 
   /// Every callback into the host (state changes, transcripts, tool calls)
   /// must go through here once [dispose] has run. `dispose()` starts the
@@ -101,6 +115,9 @@ class InlineCallController {
     if (_disposed) return;
     onChanged();
   }
+
+  bool _isCurrentGeneration(int generation) =>
+      !_disposed && generation == _connectionGeneration;
 
   // P0.4 pocket/lock-screen handling (same contract as SessionScreen): the
   // mic stream stops on pause so a pocket never gets recorded and sent, and
@@ -176,36 +193,63 @@ class InlineCallController {
     BuildContext context, {
     bool sendOpeningPrompt = true,
   }) async {
+    final generation = ++_connectionGeneration;
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'inline_live_start_requested',
+        extra: {'manual_activity_boundaries': manualLearnerTurns},
+      ),
+    );
     // Ending a live call closes native recorder/player handles asynchronously.
     // Wait for that teardown before opening narration or a new call, otherwise
     // the old tutor stream can bleed into the next lesson audio.
     final ending = _ending;
     if (ending != null) await ending;
-    if (_disposed || !context.mounted) return;
+    if (!_isCurrentGeneration(generation) || !context.mounted) return;
     final accepted = await AiVoiceDisclosure.ensureAccepted(context);
-    if (!accepted) return;
+    if (!accepted || !_isCurrentGeneration(generation)) return;
     // Narration and the inline call share the iOS audio session. This must be
     // awaited so a queued narration clip cannot race the call's first turn.
     await LessonSpeechService.shared.deactivate();
-    if (_disposed) return;
+    if (!_isCurrentGeneration(generation)) return;
     connecting = true;
     error = null;
     lastTutorLine = null;
     _notify();
-    final connected = await _connect();
+    final connected = await _connect(generation);
     if (!connected) {
+      if (!_isCurrentGeneration(generation)) return;
       connecting = false;
       error ??= "Couldn't connect. Check your connection and try again.";
       _notify();
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'inline_live_start_failed',
+        ),
+      );
+      return;
+    }
+    if (!_isCurrentGeneration(generation) || audio == null || gemini == null) {
       return;
     }
     final granted = await audio!.requestPermission();
+    if (!_isCurrentGeneration(generation) || audio == null || gemini == null) {
+      return;
+    }
     if (!granted) {
       connecting = false;
       error = 'Microphone permission denied';
       gemini?.disconnect();
       gemini = null;
       _notify();
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'inline_live_microphone_denied',
+        ),
+      );
       return;
     }
     if (manualLearnerTurns) {
@@ -220,6 +264,14 @@ class InlineCallController {
     }
     connecting = false;
     active = true;
+    _scheduleManualIdleLimit();
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'inline_live_active',
+        extra: {'manual_activity_boundaries': manualLearnerTurns},
+      ),
+    );
     _notify();
     final prompt = sendOpeningPrompt ? openingPrompt?.trim() : null;
     if (prompt != null && prompt.isNotEmpty) {
@@ -227,7 +279,7 @@ class InlineCallController {
     }
   }
 
-  Future<bool> _connect() async {
+  Future<bool> _connect(int generation) async {
     final completer = Completer<bool>();
     final a = AudioStreamingService();
     final g = GeminiLiveService(
@@ -243,15 +295,19 @@ class InlineCallController {
       // Speaking screens consume Gemini's input transcript as it settles so
       // their UI can resolve independently of Marie's spoken-output duration.
       deferUserTranscriptUntilTurnComplete: false,
+      compactGuidedContext: compactGuidedContext,
       tools: tools,
     );
     audio = a;
     gemini = g;
 
     g.onConnected = () {
-      if (!completer.isCompleted) completer.complete(true);
+      if (_isCurrentGeneration(generation) && !completer.isCompleted) {
+        completer.complete(true);
+      }
     };
     g.onReconnecting = (_) {
+      if (!_isCurrentGeneration(generation)) return;
       a.stopPlayback();
       a.isOutputActive = false;
       reconnecting = true;
@@ -259,10 +315,12 @@ class InlineCallController {
       _notify();
     };
     g.onReconnected = () {
+      if (!_isCurrentGeneration(generation)) return;
       reconnecting = false;
       _notify();
     };
     g.onError = (msg) {
+      if (!_isCurrentGeneration(generation)) return;
       error = msg;
       if (!completer.isCompleted) {
         completer.complete(false);
@@ -271,6 +329,7 @@ class InlineCallController {
       _notify();
     };
     g.onDisconnected = () {
+      if (!_isCurrentGeneration(generation)) return;
       if (!completer.isCompleted) {
         completer.complete(false);
         return;
@@ -280,29 +339,32 @@ class InlineCallController {
       _notify();
     };
     g.onUserTranscript = (text) {
-      if (_disposed) return;
+      if (!_isCurrentGeneration(generation)) return;
       onUserTranscript?.call(text);
     };
     g.onTutorTranscript = (text) {
+      if (!_isCurrentGeneration(generation)) return;
       lastTutorLine = text;
       _notify();
-      if (_disposed) return;
       onTutorTranscript?.call(text);
     };
     g.onAudioChunk = (bytes) {
+      if (!_isCurrentGeneration(generation)) return;
       a.isOutputActive = true;
       tutorSpeaking = true;
       a.playAudioChunk(bytes);
     };
     g.onTurnComplete = () {
+      if (!_isCurrentGeneration(generation)) return;
       a.isOutputActive = false;
       tutorSpeaking = false;
+      _scheduleManualIdleLimit();
       _notify();
       if (_disposed) return;
       onTurnComplete?.call();
     };
     g.onToolCall = (name, args, callId) {
-      if (_disposed) return;
+      if (!_isCurrentGeneration(generation)) return;
       onToolCall?.call(name, args, callId);
     };
 
@@ -314,11 +376,12 @@ class InlineCallController {
       const Duration(seconds: 22),
       onTimeout: () => false,
     );
-    if (!connected) {
+    if (!connected || !_isCurrentGeneration(generation)) {
       g.disconnect();
       await a.dispose();
-      gemini = null;
-      audio = null;
+      if (identical(gemini, g)) gemini = null;
+      if (identical(audio, a)) audio = null;
+      return false;
     }
     return connected;
   }
@@ -369,6 +432,8 @@ class InlineCallController {
       return false;
     }
     gemini!.beginAudioTurn();
+    _manualIdleTimer?.cancel();
+    _manualIdleTimer = null;
     if (muted) {
       muted = false;
       _notify();
@@ -384,7 +449,27 @@ class InlineCallController {
     gemini!.endAudioTurn();
     await audio!.stopStreaming();
     muted = true;
+    _scheduleManualIdleLimit();
     _notify();
+  }
+
+  void _scheduleManualIdleLimit() {
+    _manualIdleTimer?.cancel();
+    _manualIdleTimer = null;
+    if (!manualLearnerTurns || !active || _disposed) return;
+    _manualIdleTimer = Timer(_manualIdleLimit, () {
+      _manualIdleTimer = null;
+      if (_disposed || !isLive || !muted) return;
+      if (tutorTurnActive) {
+        _scheduleManualIdleLimit();
+        return;
+      }
+      // A connected manual-turn helper with no learner audio is idle spend.
+      // Close it locally; the learner can explicitly reconnect when ready.
+      unawaited(_end(notify: false));
+      error = 'Tutor paused after 45 seconds without a learner turn.';
+      _notify();
+    });
   }
 
   Future<void> toggleMute() async {
@@ -406,8 +491,25 @@ class InlineCallController {
     final existing = _ending;
     if (existing != null) return existing;
 
+    // Invalidate callbacks before clearing references.  Gemini can deliver
+    // setupComplete/onConnected on the same event loop turn as disconnect;
+    // those callbacks must not turn a stopped helper back on.
+    _connectionGeneration++;
     final currentAudio = audio;
     final currentGemini = gemini;
+    _manualIdleTimer?.cancel();
+    _manualIdleTimer = null;
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'inline_live_end_requested',
+        extra: {
+          'notify': notify,
+          'was_active': active,
+          'was_connecting': connecting,
+        },
+      ),
+    );
     audio = null;
     gemini = null;
     active = false;
@@ -441,20 +543,13 @@ class InlineCallController {
 
   /// Forward from the host's `didChangeAppLifecycleState`.
   void handleAppLifecycle(AppLifecycleState state) {
-    if (!active) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      if (!muted) {
-        audio?.stopPlayback();
-        audio?.isOutputActive = false;
-        audio?.stopStreaming();
-        pausedForLifecycle = true;
-      }
-    } else if (state == AppLifecycleState.resumed) {
-      if (pausedForLifecycle && !muted && audio != null && gemini != null) {
-        pausedForLifecycle = false;
-        audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
-      }
+      // A Live socket is billable even while the app is backgrounded and the
+      // learner is muted. End it at the lifecycle boundary; resuming the app
+      // must require an explicit tutor tap. This also prevents an IndexedStack
+      // child or a stale route from keeping a session alive indefinitely.
+      if (isLive) unawaited(_end(notify: false));
     }
   }
 
@@ -462,6 +557,8 @@ class InlineCallController {
   /// the host is unmounting.
   void dispose() {
     _disposed = true;
+    _manualIdleTimer?.cancel();
+    _manualIdleTimer = null;
     unawaited(_end(notify: false));
   }
 

@@ -11,13 +11,8 @@ import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../services/course_artifact_codec.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/elevenlabs_audio_service.dart';
-import '../../services/audio_container_utils.dart';
-import '../../services/gemini_live_audio_service.dart';
-import '../../services/listening_audio_config.dart';
-import '../../services/listening_audio_prefetch_cache.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/practice_artwork_service.dart';
-import '../../services/recent_lesson_warmup_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../exam/exam_practice_screen.dart';
@@ -87,20 +82,6 @@ class _ListeningFormatOption {
   final IconData icon;
 }
 
-class _RenderedListeningAudio {
-  const _RenderedListeningAudio({
-    required this.clip,
-    required this.storageMode,
-    required this.extension,
-    required this.contentType,
-  });
-
-  final ElevenLabsAudioClip clip;
-  final String storageMode;
-  final String extension;
-  final String contentType;
-}
-
 /// The learner's personal library of AI-generated stories — the "Read a new
 /// story" tile at top always generates a fresh one (Story + Quiz + Keywords +
 /// Grammar, all AI-generated together) and opens it immediately; every story
@@ -154,7 +135,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     final stories = _visibleStories();
     setState(() => _stories = stories);
     if (!widget.readingMode) {
-      _prefetchRecentAudio(stories);
       _repairNewestMissingCover(stories);
     }
   }
@@ -194,16 +174,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       if (seen.add(story.id)) result.add(story);
     }
     return result;
-  }
-
-  void _prefetchRecentAudio(List<GeneratedStory> stories) {
-    // Kept as a small compatibility wrapper for existing callers. The shared
-    // warm-up also covers older saved lessons, not only the latest three.
-    RecentLessonWarmupService.shared.warm(
-      stories: stories,
-      sync: ref.read(syncServiceProvider),
-      storyStore: ref.read(generatedStoryStoreProvider),
-    );
   }
 
   void _repairNewestMissingCover(List<GeneratedStory> stories) {
@@ -273,31 +243,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         readTimeMinutes: package.readTimeMinutes,
         practiceMode: 'listening',
       );
-      generationStage = 'audio';
-      final renderedAudio = widget.examMode || widget.readingMode
-          ? null
-          : await _prepareAudioWithQuotaRecovery(story: story);
       var persistedStory = story;
-      if (!widget.examMode && !widget.readingMode && renderedAudio != null) {
-        final audioPath = await ref
-            .read(syncServiceProvider)
-            .uploadListeningAudio(
-              storyId: story.id,
-              mode: renderedAudio.storageMode,
-              bytes: renderedAudio.clip.bytes,
-              extension: renderedAudio.extension,
-              contentType: renderedAudio.contentType,
-            );
-        if (audioPath == null || audioPath.isEmpty) {
-          throw const ElevenLabsProviderException(
-            'The rendered lesson audio could not be saved. Please try again.',
-          );
-        }
-        persistedStory = story.copyWith(
-          audioPath: audioPath,
-          audioMode: renderedAudio.storageMode,
-        );
-      }
       final examAttempt = widget.examMode
           ? ref
                 .read(examPracticeStoreProvider)
@@ -324,7 +270,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       }
       final result = await AppRouter.push<Object?>(
         context,
-        (_) => _lessonScreen(persistedStory, audioClip: renderedAudio?.clip),
+        (_) => _lessonScreen(persistedStory),
         fullscreenDialog: widget.autoStart,
       );
       if (widget.examMode &&
@@ -396,7 +342,13 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     // stable id and independently update SQLite and Supabase.
     store.insert(story);
     final enrichment = _enrichListeningStory(story);
-    final audio = _renderAndPersistAudio(story: story, format: _selectedFormat);
+    final audioReady = await LessonAudioDeckService.shared.prepare(
+      story: story,
+      db: ref.read(databaseProvider),
+    );
+    if (!audioReady) {
+      throw StateError('Listening audio deck could not be prepared.');
+    }
     unawaited(_generateCover(story, draft.coverPrompt));
     unawaited(_generateListeningBackground(story, draft.coverPrompt));
 
@@ -404,7 +356,7 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     _loadStories();
     final result = await AppRouter.push<Object?>(
       context,
-      (_) => _lessonScreen(story, audioFuture: audio, enrichment: enrichment),
+      (_) => _lessonScreen(story, enrichment: enrichment),
       fullscreenDialog: widget.autoStart,
     );
     if (widget.autoStart && mounted) {
@@ -430,36 +382,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     );
     if (mounted) _loadStories();
     return result;
-  }
-
-  Future<ElevenLabsAudioClip?> _renderAndPersistAudio({
-    required GeneratedStory story,
-    required String format,
-  }) async {
-    final sync = ref.read(syncServiceProvider);
-    final store = ref.read(generatedStoryStoreProvider);
-    final rendered = await _prepareAudioWithQuotaRecovery(
-      story: story,
-      format: format,
-    );
-    final audioPath = await sync.uploadListeningAudio(
-      storyId: story.id,
-      mode: rendered.storageMode,
-      bytes: rendered.clip.bytes,
-      extension: rendered.extension,
-      contentType: rendered.contentType,
-    );
-    if (audioPath == null || audioPath.isEmpty) {
-      throw const ElevenLabsProviderException(
-        'The rendered lesson audio could not be saved. Please try again.',
-      );
-    }
-    store.updateAudio(
-      storyId: story.id,
-      audioPath: audioPath,
-      audioMode: rendered.storageMode,
-    );
-    return rendered.clip;
   }
 
   Future<void> _showFormatPicker() async {
@@ -520,101 +442,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
       ),
     );
   }
-
-  /// Renders the exact canonical French script through the selected provider.
-  /// Gemini Live is the default Listening renderer; ElevenLabs remains an
-  /// explicit one-line switch in listening_audio_config.dart for later testing.
-  Future<_RenderedListeningAudio> _prepareAudioWithQuotaRecovery({
-    required GeneratedStory story,
-    String? format,
-  }) async {
-    final selectedMode = _normalizeListeningFormat(format ?? _selectedFormat);
-    if (listeningAudioProvider == ListeningAudioProvider.geminiLive) {
-      final script = CanonicalAudioScript.fromStory(
-        story,
-        format: selectedMode,
-      );
-      final pcm = await GeminiLiveAudioService.shared.synthesizeListeningLesson(
-        text: script.narrationText,
-        format: selectedMode,
-        level: story.levelBand,
-      );
-      final wav = pcm16ToWav(
-        pcm,
-        sampleRate: GeminiLiveAudioService.outputSampleRateHz,
-      );
-      return _RenderedListeningAudio(
-        clip: ElevenLabsAudioClip(
-          mode: 'gemini_live_spoken',
-          bytes: wav,
-          container: 'wav',
-        ),
-        storageMode: 'gemini_live_spoken',
-        extension: 'wav',
-        contentType: 'audio/wav',
-      );
-    }
-    final clip = await _prepareExperimentalAudio(
-      story: story,
-      format: selectedMode,
-    );
-    return _RenderedListeningAudio(
-      clip: clip,
-      storageMode: selectedMode,
-      extension: 'mp3',
-      contentType: 'audio/mpeg',
-    );
-  }
-
-  Future<ElevenLabsAudioClip> _prepareExperimentalAudio({
-    required GeneratedStory story,
-    String? format,
-  }) async {
-    final selectedFormat = _normalizeListeningFormat(format ?? _selectedFormat);
-    final script = CanonicalAudioScript.fromStory(
-      story,
-      format: selectedFormat,
-    );
-    if (script.lines.isEmpty) {
-      throw const ElevenLabsProviderException(
-        'This lesson has no French lines to render yet.',
-      );
-    }
-    switch (selectedFormat) {
-      case 'podcast':
-        if (script.lines.length < 2) {
-          throw const ElevenLabsProviderException(
-            'Podcast lessons need at least two canonical lines.',
-          );
-        }
-        return ElevenLabsAudioService.shared.synthesizePodcast(
-          turns: script.podcastTurns,
-        );
-      case 'music':
-        return ElevenLabsAudioService.shared.composeMusic(
-          lyrics: script.lyricLines,
-          style:
-              'warm acoustic French pop, clear solo vocals, gentle drums, '
-              'memorable chorus, conversational verses, 86 BPM, no spoken delivery, '
-              'no English lyrics, no explicit content',
-          musicLengthMs: 45_000,
-        );
-      case 'educational':
-        return ElevenLabsAudioService.shared.synthesizeNarration(
-          text: script.narrationText,
-          mode: 'educational',
-        );
-      case 'narration':
-      default:
-        return ElevenLabsAudioService.shared.synthesizeNarration(
-          text: script.narrationText,
-          mode: 'story',
-        );
-    }
-  }
-
-  String _normalizeListeningFormat(String format) =>
-      format == 'surprise' ? 'story' : format;
 
   Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {
     final sync = ref.read(syncServiceProvider);
@@ -689,8 +516,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
 
   Widget _lessonScreen(
     GeneratedStory story, {
-    ElevenLabsAudioClip? audioClip,
-    Future<ElevenLabsAudioClip?>? audioFuture,
     Future<ReadingStoryEnrichment>? enrichment,
   }) {
     if (widget.examMode) {
@@ -706,10 +531,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         ? StoryReaderScreen(story: story, showFinishButton: widget.autoStart)
         : ListeningPracticeScreen(
             story: story,
-            audioClip: audioClip,
-            audioFuture:
-                audioFuture ??
-                ListeningAudioPrefetchCache.shared.peek(story.id),
             enrichment: enrichment,
             showFinishButton: widget.autoStart,
           );

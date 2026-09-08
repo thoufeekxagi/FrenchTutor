@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,14 +6,15 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
-import '../../services/course_artifact_codec.dart';
-import '../../services/lesson_asset_prefetch_service.dart';
 import '../../services/premium_access_gate.dart';
+import '../../services/course_artifact_codec.dart';
+import '../../services/gemini_live_audio_service.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
-import '../../services/sync_service.dart';
 import 'speak_course_activity_screen.dart';
 import '../../widgets/v3/v3_surface.dart';
 
@@ -28,50 +27,42 @@ class SpeakRoadmapScreen extends ConsumerStatefulWidget {
   ConsumerState<SpeakRoadmapScreen> createState() => _SpeakRoadmapScreenState();
 }
 
-class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
+class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
+    with WidgetsBindingObserver {
   bool _preparingCourse = false;
-  Timer? _retryTimer;
-  String? _stuckOnContentKey;
-  int _noProgressAttempts = 0;
-
-  // A stuck lesson (e.g. a real, non-transient backend conflict) must never
-  // turn into a tight infinite request loop, but it must also never be
-  // abandoned for good — this widget is kept alive for the whole app session
-  // (Course sits in an IndexedStack), so "stop retrying" here would mean
-  // "never try again until the app restarts". Back off instead: a real
-  // generation normally finishes in a handful of seconds, so keep checking
-  // quickly at first — the ceiling only exists for a genuinely stuck row,
-  // and even then it is never more than 20 seconds stale.
-  static const _retryBackoff = [
-    Duration(seconds: 2),
-    Duration(seconds: 3),
-    Duration(seconds: 5),
-    Duration(seconds: 8),
-    Duration(seconds: 12),
-    Duration(seconds: 20),
-  ];
+  int _generationEpoch = 0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _prepareCourse());
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    _retryTimer?.cancel();
+    _generationEpoch++;
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  /// Course must drive its own personalized-lesson generation instead of
-  /// relying on the learner having visited Home first. Generation is still
-  /// exactly one lesson at a time (`prepareAdaptiveCourseLessons` enforces
-  /// that server-side); this only makes sure that one-at-a-time work keeps
-  /// happening while the learner is looking at Course, and again right after
-  /// they finish a lesson, without ever running two calls in parallel.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // A provider request already in flight cannot be recalled safely, but its
+    // continuation must not start the next PCM/Live request after the learner
+    // backgrounds the app. A new explicit Generate tap can resume later.
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _generationEpoch++;
+    }
+  }
+
+  /// Explicitly prepares one personalized Course lesson. This is called only
+  /// by the Generate action; merely opening Course never reaches a provider.
   Future<void> _prepareCourse() async {
     if (_preparingCourse) return;
     _preparingCourse = true;
+    final operationEpoch = _generationEpoch;
     try {
       final sync = ref.read(syncServiceProvider);
       // hydrateAdaptiveCourses() otherwise only ever runs as a side effect
@@ -84,93 +75,92 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
       // learner does it. Pull the real remote state down first, every time,
       // before this screen decides what (if anything) it still needs.
       await sync.hydrateAdaptiveCourses();
+      if (!mounted || operationEpoch != _generationEpoch) return;
       final profile = ref.read(learningStoreProvider).profile();
-      final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
+      final plan = ref
+          .read(adaptiveCourseStoreProvider)
+          .ensureCurrentPlan(profile);
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
-      if (coursePersisted) await sync.prepareAdaptiveCourseLessons();
-      _prefetchUpcomingListeningAudio(profile, sync);
+      if (!mounted || operationEpoch != _generationEpoch) return;
+      if (coursePersisted) {
+        await sync.prepareAdaptiveCourseLessons();
+      }
+      // Audio repair is still explicit, but it must not depend on the text
+      // endpoint reporting `generated > 0`. A lesson can be ready after text
+      // succeeded while one PCM clip timed out; the next deliberate Generate
+      // action should inspect the saved lesson and repair only that missing
+      // cache entry, without regenerating the lesson text.
+      if (!mounted || operationEpoch != _generationEpoch) return;
+      await sync.hydrateAdaptiveCourses();
+      if (!mounted || operationEpoch != _generationEpoch) return;
+      final refreshed = ref
+          .read(adaptiveCourseStoreProvider)
+          .ensureCurrentPlan(profile);
+      for (final candidate in refreshed.sessions.reversed) {
+        if (candidate.isFoundation ||
+            candidate.generationStatus != 'ready' ||
+            candidate.artifact == null ||
+            (candidate.primarySkill != SpeakSkill.reading &&
+                candidate.primarySkill != SpeakSkill.listening &&
+                candidate.primarySkill != SpeakSkill.vocabulary)) {
+          continue;
+        }
+        try {
+          if (!mounted || operationEpoch != _generationEpoch) return;
+          if (candidate.primarySkill == SpeakSkill.vocabulary) {
+            final set = CourseArtifactCodec.vocabulary(candidate.artifact!);
+            final voice = ActiveTutor.current.voiceName;
+            for (final entry in set.entries) {
+              if (!mounted || operationEpoch != _generationEpoch) return;
+              await GeminiLiveAudioService.shared.generateAndCache(
+                text: entry.fr,
+                contentItemId: '${candidate.contentKey}:${entry.id}:word',
+                voiceName: voice,
+              );
+              final example = set.storyExamples[entry.id];
+              if (example != null) {
+                if (!mounted || operationEpoch != _generationEpoch) return;
+                await GeminiLiveAudioService.shared.generateAndCache(
+                  text: example.fr,
+                  contentItemId: '${candidate.contentKey}:${entry.id}:sentence',
+                  voiceName: voice,
+                );
+              }
+            }
+          } else {
+            final story = candidate.primarySkill == SpeakSkill.listening
+                ? CourseArtifactCodec.listening(candidate.artifact!)
+                : CourseArtifactCodec.story(candidate.artifact!);
+            if (!mounted || operationEpoch != _generationEpoch) return;
+            await LessonAudioDeckService.shared.prepare(
+              story: story,
+              db: ref.read(databaseProvider),
+            );
+          }
+        } catch (error, stackTrace) {
+          // Text lesson generation remains persisted. The next explicit
+          // Generate action can finish a missing audio deck; no silent
+          // retry is scheduled here.
+          debugPrint(
+            'Course audio generation deferred for ${candidate.contentKey}: '
+            '$error\n$stackTrace',
+          );
+        }
+        break;
+      }
     } finally {
       _preparingCourse = false;
       if (mounted) setState(() {});
-      _scheduleRetryIfStillPreparing();
     }
-  }
-
-  /// A Listening lesson's audio is a full-track download, not a quick TTS
-  /// line — waiting for it only once the learner taps the card is exactly
-  /// the "opening this takes forever" complaint. As soon as a Listening
-  /// lesson's artifact is ready, start pulling its durable clip in the
-  /// background so it is usually already cached by the time it is opened.
-  void _prefetchUpcomingListeningAudio(Profile profile, SyncService sync) {
-    final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
-    for (final session in plan.sessions) {
-      if (session.status == 'completed' ||
-          session.primarySkill != SpeakSkill.listening ||
-          !session.isContentReady ||
-          session.artifact == null) {
-        continue;
-      }
-      final story = CourseArtifactCodec.listening(session.artifact!);
-      unawaited(
-        LessonAssetPrefetchService.shared
-            .prefetchListening(story: story, sync: sync)
-            .catchError((_) => null),
-      );
-    }
-  }
-
-  /// While any personalized row is still `queued`/`generating`/`failed`,
-  /// gently keep asking the server for the next one so a learner who stays
-  /// on this tab sees lessons unlock without needing to background/
-  /// foreground the app or bounce through Home. The same lesson staying
-  /// stuck for a while backs the check off up to once a minute instead of
-  /// hammering the backend every 4 seconds, but it never stops for good.
-  void _scheduleRetryIfStillPreparing() {
-    _retryTimer?.cancel();
-    if (!mounted) return;
-    final profile = ref.read(learningStoreProvider).profile();
-    final plan = ref.read(adaptiveCourseStoreProvider).ensureCurrentPlan(profile);
-    final pending = plan.sessions
-        .cast<AdaptiveCourseSessionSpec?>()
-        .firstWhere(
-          (session) =>
-              session != null &&
-              session.status != 'completed' &&
-              !session.isContentReady,
-          orElse: () => null,
-        );
-    if (pending == null) {
-      _stuckOnContentKey = null;
-      _noProgressAttempts = 0;
-      return;
-    }
-    // A different pending lesson than last time means the previous one just
-    // finished — real progress, not a stall. Move on to the next one right
-    // away instead of imposing the same "give the backend a moment" floor a
-    // genuinely stuck lesson needs. The backoff ladder exists for the
-    // second case only; the first case is the server already being fast
-    // and the UI has no reason to sit on that for even one extra second.
-    final madeProgress = pending.contentKey != _stuckOnContentKey;
-    if (madeProgress) {
-      _stuckOnContentKey = pending.contentKey;
-      _noProgressAttempts = 1;
-    } else {
-      _noProgressAttempts += 1;
-    }
-    final delay = madeProgress
-        ? Duration.zero
-        : _retryBackoff[(_noProgressAttempts - 1).clamp(0, _retryBackoff.length - 1)];
-    _retryTimer = Timer(delay, () {
-      if (mounted) _prepareCourse();
-    });
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
-    await AppRouter.push(context, (_) => _screenFor(session));
-    if (mounted) {
-      setState(() {});
-      unawaited(_prepareCourse());
-    }
+    await AppRouter.push<Object?>(context, (_) => _screenFor(session));
+    if (!mounted) return;
+    setState(() {});
+    // Completion is local progress only. It must never start another model
+    // request; a new generated lesson is created only by the explicit
+    // Generate next action.
   }
 
   /// Tapping a subscription-locked Unit 2+ lesson must show the paywall,
@@ -321,12 +311,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             // Unit 1 is the free foundation every new learner needs to try
             // Course at all; the subscription gate only ever applies from
             // Unit 2 onward.
-            _unitPath(
-              context,
-              roadmap,
-              unit,
-              locked: courseLocked && unit > 1,
-            ),
+            _unitPath(context, roadmap, unit, locked: courseLocked && unit > 1),
             const SizedBox(height: 14),
           ],
           _generateNextCard(roadmap.sessions),
@@ -335,25 +320,17 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
     );
   }
 
-  /// A learner should never have to wonder whether more is coming: the
-  /// route already keeps a small buffer of upcoming lessons topped up on
-  /// its own (see adaptiveCourseLookahead), but this gives them an explicit
-  /// way to ask for the next one right now instead of waiting for the
-  /// background retry loop's next tick.
+  /// Generation is deliberately explicit. This card gives the learner one
+  /// clear action for creating the next personalized row; there is no hidden
+  /// buffer timer or background retry loop to spend provider quota.
   Widget _generateNextCard(List<SpeakRoadmapSession> sessions) {
-    // This used to say "in progress" only while _preparingCourse was true --
-    // a network call actually in flight, true for at most a few seconds at
-    // a time. Between retries (the backoff ladder in
-    // _scheduleRetryIfStillPreparing can wait up to 20s), that flag drops
-    // back to false while a lesson tile above is still visibly spinning --
-    // the exact "this looks like it's showing an old, already-finished
-    // state while something is actually still happening" contradiction a
-    // learner would reasonably call a bug. Base this on whether a lesson
-    // genuinely still needs generating, the same check every tile itself
-    // uses, not on this one screen's own transient in-flight flag.
-    final hasPending = sessions.any(
-      (session) => !session.contentReady && !session.completed,
-    );
+    // A queued row is deliberately idle: only the explicit Generate action
+    // may claim it and call the provider. Treating every non-ready row as
+    // "preparing" made an idle queued lesson look like a background request
+    // forever, even though no network work was running.
+    final hasInFlight =
+        _preparingCourse ||
+        sessions.any((session) => session.generationStatus == 'generating');
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: V3Card(
@@ -363,9 +340,9 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                hasPending
-                    ? 'Preparing your next lesson…'
-                    : 'More lessons keep unlocking as you go.',
+                hasInFlight
+                    ? 'Generating one lesson…'
+                    : 'Tap Generate next when you want another lesson.',
                 style: DesignTokens.body(
                   13,
                 ).copyWith(color: DesignTokens.nightMuted),
@@ -456,14 +433,20 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
     required bool featured,
     required bool locked,
   }) {
-    final preparing = !session.contentReady && !session.completed;
+    final preparing = session.generationStatus == 'generating';
+    final queued = session.generationStatus == 'queued';
+    final failed = session.generationStatus == 'failed';
     // A subscription-locked lesson must still be tappable: tapping it is
     // exactly what should show the paywall, matching Practice's behavior.
     // Only "not generated yet" truly disables the tap.
-    final unavailable = preparing;
-    final active = featured && !session.completed && !preparing;
+    final unavailable = !session.contentReady;
+    final active = featured && !session.completed && !preparing && !queued;
     final statusLabel = preparing
-        ? 'preparing'
+        ? 'generating'
+        : queued
+        ? 'queued'
+        : failed
+        ? 'generation failed'
         : locked
         ? 'locked'
         : session.completed
@@ -501,9 +484,9 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                session.completed
-                    ? Icons.check_rounded
-                    : _iconFor(session.primarySkill),
+                // The leading icon identifies the lesson's skill. Completion
+                // is communicated independently by the trailing status icon.
+                _iconFor(session.primarySkill),
                 size: 19,
                 color: active
                     ? DesignTokens.nightAccent
@@ -523,12 +506,14 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
                       15,
                     ).copyWith(color: DesignTokens.nightText),
                   ),
-                  if (preparing) ...[
+                  if (!session.contentReady && !session.completed) ...[
                     const SizedBox(height: 3),
                     Text(
-                      session.generationStatus == 'failed'
-                          ? 'Retrying your complete lesson package'
-                          : 'Creating your personalized lesson',
+                      preparing
+                          ? 'Creating your personalized lesson'
+                          : failed
+                          ? 'Generation failed — tap Generate next to retry'
+                          : 'Waiting for Generate next',
                       style: DesignTokens.body(
                         11,
                       ).copyWith(color: DesignTokens.nightMuted),
@@ -540,6 +525,12 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen> {
             const SizedBox(width: 8),
             if (preparing)
               const _LessonPreparationIndicator()
+            else if (queued || failed)
+              Icon(
+                failed ? Icons.error_outline_rounded : Icons.schedule_rounded,
+                size: 19,
+                color: DesignTokens.nightMuted,
+              )
             else
               Icon(stateIcon, size: 19, color: stateColor),
           ],

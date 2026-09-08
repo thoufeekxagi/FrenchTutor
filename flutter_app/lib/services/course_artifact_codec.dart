@@ -128,15 +128,27 @@ abstract final class CourseArtifactCodec {
 
   static GeneratedStory listening(Map<String, dynamic> json) {
     // The worker's artifact kind already identifies this as Listening. Stamp
-    // the shared story object accordingly so library warm-up downloads the
-    // durable full track instead of treating it like Reading narration.
-    final story = CourseArtifactCodec.story({
+    // the shared story object accordingly so the sentence deck can be reused
+    // by both the Course activity and the Practice listening screen.
+    final decoded = CourseArtifactCodec.story({
       ...json,
       'practiceMode': 'listening',
     });
+    // Repair the short-lived marker written by the broken Unit 2 client. The
+    // authored lesson has one shared Storage WAV; normalizing at the decode
+    // boundary lets existing cloud rows recover without a data migration or
+    // any provider call.
+    final story =
+        decoded.id == 'unit-two-listening' &&
+            decoded.audioPath == 'pcm-deck-v1:unit-two-listening'
+        ? decoded.copyWith(
+            audioPath: 'course-shared/unit-two-listening.wav',
+            audioMode: 'gemini_flash_tts',
+          )
+        : decoded;
     if (story.audioPath?.trim().isEmpty ?? true) {
       throw const FormatException(
-        'Course listening requires prepared durable audio.',
+        'Course listening requires a sentence-audio marker.',
       );
     }
     return story;

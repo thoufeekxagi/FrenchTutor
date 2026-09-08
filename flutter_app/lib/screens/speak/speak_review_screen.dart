@@ -9,7 +9,7 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_speech_service.dart';
+import '../../services/lesson_audio_deck_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/review_material_service.dart';
 import '../../widgets/speaking_transcript_strip.dart';
@@ -555,15 +555,14 @@ class _SpeakReviewLaunchScreenState
     return story;
   }
 
-  Future<void> _prewarmStory(GeneratedStory story) {
-    return LessonSpeechService.shared.prewarmNarration([
-      for (var i = 0; i < story.passage.segments.length; i++)
-        SpeechItem(
-          text: story.passage.segments[i].fr,
-          language: 'fr-FR',
-          contentItemId: story.segmentContentId(i),
-        ),
-    ]);
+  Future<void> _prewarmStory(GeneratedStory story) async {
+    // This runs only inside the explicit “generate review” transaction. It
+    // creates the durable sentence deck once; opening/replaying the story is
+    // cache-only and never reaches Gemini.
+    await LessonAudioDeckService.shared.prepare(
+      story: story,
+      db: ref.read(databaseProvider),
+    );
   }
 
   Future<void> _attachStoryCover(GeneratedStory story, String prompt) async {

@@ -33,12 +33,13 @@ extension TutorHelperSurfaceDetails on TutorHelperSurface {
       'Keep writing focused; turn tutor help on when you need it',
   };
 
-  /// Defaults reflect the intended first-run experience: active coaching in
-  /// interactive/audio practice, optional coaching in reading and writing.
+  /// Speaking lessons currently start with the tutor connected so the learner
+  /// can test the guided flow immediately. Other surfaces remain opt-in. A
+  /// saved learner choice still wins over this first-run default.
   bool get defaultEnabled => switch (this) {
     TutorHelperSurface.speaking => true,
-    TutorHelperSurface.listening => true,
-    TutorHelperSurface.vocabulary => true,
+    TutorHelperSurface.listening => false,
+    TutorHelperSurface.vocabulary => false,
     TutorHelperSurface.reading => false,
     TutorHelperSurface.writing => false,
   };

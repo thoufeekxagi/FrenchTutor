@@ -266,9 +266,8 @@ class _AgentLedListeningScreenState
     super.dispose();
   }
 
-  /// P0.4 — same contract as SessionScreen's: mic never streams from a
-  /// backgrounded app, and restarts on return unless the student muted
-  /// deliberately.
+  /// Backgrounding ends the billable Live session. A new session requires an
+  /// explicit learner action after returning to the app.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_finished) return;
@@ -277,6 +276,7 @@ class _AgentLedListeningScreenState
       _audio.stopPlayback();
       _audio.isOutputActive = false;
       _mic.onAppPaused();
+      _teardown();
     } else if (state == AppLifecycleState.resumed) {
       _mic.onAppResumed().catchError((e) {
         if (mounted) setState(() => _errorMessage = 'Mic error: $e');
