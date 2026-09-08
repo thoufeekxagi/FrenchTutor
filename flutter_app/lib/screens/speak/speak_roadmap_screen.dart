@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,8 +12,10 @@ import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/course_artifact_codec.dart';
+import '../../services/course_generation_test_harness.dart';
 import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_audio_deck_service.dart';
+import '../../services/ai_cost_tracker.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
@@ -57,9 +61,13 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     }
   }
 
-  /// Explicitly prepares one personalized Course lesson. This is called only
-  /// by the Generate action; merely opening Course never reaches a provider.
-  Future<void> _prepareCourse() async {
+  /// Prepares one personalized Course lesson. Production calls this only from
+  /// the explicit Generate action. The development harness may call it once
+  /// immediately after the selected lesson is completed.
+  Future<void> _prepareCourse({
+    String? harnessSkill,
+    bool onlyIfNewHarnessRow = false,
+  }) async {
     if (_preparingCourse) return;
     _preparingCourse = true;
     final operationEpoch = _generationEpoch;
@@ -77,13 +85,28 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       await sync.hydrateAdaptiveCourses();
       if (!mounted || operationEpoch != _generationEpoch) return;
       final profile = ref.read(learningStoreProvider).profile();
-      final plan = ref
-          .read(adaptiveCourseStoreProvider)
-          .ensureCurrentPlan(profile);
+      final store = ref.read(adaptiveCourseStoreProvider);
+      final before = onlyIfNewHarnessRow ? store.currentPlan(profile) : null;
+      final beforeHighest = before == null
+          ? AdaptiveCourseStore.initialBatchSize
+          : before.sessions.fold<int>(
+              adaptiveCourseFoundationSize + adaptiveCourseBatchSize,
+              (highest, session) =>
+                  session.sequence > highest ? session.sequence : highest,
+            );
+      final plan = store.ensureCurrentPlan(profile);
+      if (onlyIfNewHarnessRow) {
+        final highest = plan.sessions.fold<int>(
+          adaptiveCourseFoundationSize + adaptiveCourseBatchSize,
+          (current, session) =>
+              session.sequence > current ? session.sequence : current,
+        );
+        if (highest <= beforeHighest) return;
+      }
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
       if (!mounted || operationEpoch != _generationEpoch) return;
       if (coursePersisted) {
-        await sync.prepareAdaptiveCourseLessons();
+        await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
       }
       // Audio repair is still explicit, but it must not depend on the text
       // endpoint reporting `generated > 0`. A lesson can be ready after text
@@ -155,12 +178,34 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
-    await AppRouter.push<Object?>(context, (_) => _screenFor(session));
+    final result = await AppRouter.push<Object?>(
+      context,
+      (_) => _screenFor(session),
+    );
     if (!mounted) return;
     setState(() {});
-    // Completion is local progress only. It must never start another model
-    // request; a new generated lesson is created only by the explicit
-    // Generate next action.
+    final harness = CourseGenerationTestHarness.current;
+    if (result == true &&
+        harness.shouldAdvanceAfter(
+          sequence: session.sequence,
+          primarySkill: session.primarySkill,
+        )) {
+      unawaited(
+        AiCostTracker.event(
+          feature: 'course_generation_harness',
+          event: 'advance_triggered',
+          extra: {
+            'source_sequence': session.sequence,
+            'source_skill': session.primarySkill.wireName,
+            'target_skill': harness.targetWireName,
+          },
+        ),
+      );
+      await _prepareCourse(
+        harnessSkill: harness.targetWireName,
+        onlyIfNewHarnessRow: true,
+      );
+    }
   }
 
   /// Tapping a subscription-locked Unit 2+ lesson must show the paywall,
@@ -211,6 +256,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // must not unlock this level's path.
       completedContentKeys: completedContentKeys,
       adaptiveSessions: adaptiveSessions,
+      generationHarness: CourseGenerationTestHarness.current,
     );
     final language = SpeakLanguageProfile.forLevel(roadmap.level);
     final courseLocked = ref
@@ -353,7 +399,16 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               label: 'Generate next',
               icon: Icons.add_rounded,
               expand: false,
-              onPressed: _preparingCourse ? null : _prepareCourse,
+              onPressed: _preparingCourse
+                  ? null
+                  : () {
+                      final harness = CourseGenerationTestHarness.current;
+                      _prepareCourse(
+                        harnessSkill: harness.active
+                            ? harness.targetWireName
+                            : null,
+                      );
+                    },
             ),
           ],
         ),

@@ -3,6 +3,7 @@ import 'package:sqlite3/sqlite3.dart';
 
 import 'package:french_tutor/data/database/adaptive_course_store.dart';
 import 'package:french_tutor/models/profile.dart';
+import 'package:french_tutor/services/course_generation_test_harness.dart';
 import 'package:french_tutor/services/speak_roadmap_service.dart';
 
 void main() {
@@ -130,5 +131,36 @@ void main() {
       hasLength(6),
     );
     expect(roadmap.sessions.last.contentKey, 'pending-5');
+  });
+
+  test('development harness hides non-target personalized skills', () {
+    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a1');
+    final sessions = AdaptiveCoursePlanGenerator.generate(
+      profile: profile,
+      planId: 'harness-plan',
+      profileFingerprint: 'everyday|A1|10|',
+      startSequence: 1,
+      count: 15,
+    );
+    const harness = CourseGenerationTestHarness(
+      enabled: true,
+      skill: CourseGenerationHarnessSkill.speaking,
+    );
+    final roadmap = SpeakRoadmapService.build(
+      profile,
+      adaptiveSessions: sessions,
+      generationHarness: harness,
+    );
+
+    final personalized = roadmap.sessions.where(
+      (session) => session.sequence > 10,
+    );
+    expect(personalized, isNotEmpty);
+    expect(
+      personalized.every(
+        (session) => session.primarySkill == SpeakSkill.speaking,
+      ),
+      isTrue,
+    );
   });
 }

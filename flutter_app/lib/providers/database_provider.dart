@@ -24,6 +24,7 @@ import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
 import '../services/srs_service.dart';
+import '../services/course_generation_test_harness.dart';
 import '../services/progress_service.dart';
 import '../services/lesson_agent_service.dart';
 import '../services/pilot_access_service.dart';
@@ -63,6 +64,7 @@ final adaptiveCourseStoreProvider = Provider<AdaptiveCourseStore>((ref) {
     ref.watch(databaseProvider),
     onPlanChanged: sync.syncAdaptiveCoursePlan,
     onSessionChanged: sync.syncAdaptiveCourseSession,
+    generationHarness: CourseGenerationTestHarness.current,
   );
 });
 

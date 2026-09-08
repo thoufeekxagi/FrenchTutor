@@ -6,6 +6,7 @@ import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
+import '../../services/course_generation_test_harness.dart';
 import '../../services/free_talk_session_launcher.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
@@ -68,6 +69,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       profile,
       completedContentKeys: completedContentKeys,
       adaptiveSessions: adaptivePlan.sessions,
+      generationHarness: CourseGenerationTestHarness.current,
     );
     final next = roadmap.nextSession;
     final lessonCards = next == null

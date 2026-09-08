@@ -8,6 +8,7 @@ import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/speaking_course.dart';
 import '../../services/adaptive_curriculum_service.dart';
+import '../../services/course_generation_test_harness.dart';
 import '../../services/universal_learning_data_service.dart';
 import 'app_migrations.dart';
 
@@ -456,7 +457,13 @@ class AdaptiveCoursePlanSnapshot {
 /// change replaces only unfinished future sessions and preserves completed
 /// work.
 class AdaptiveCourseStore {
-  AdaptiveCourseStore(this._db, {this._onPlanChanged, this._onSessionChanged}) {
+  AdaptiveCourseStore(
+    this._db, {
+    this._onPlanChanged,
+    this._onSessionChanged,
+    CourseGenerationTestHarness? generationHarness,
+  }) : generationHarness =
+           generationHarness ?? CourseGenerationTestHarness.disabled {
     runAppMigrations(_db);
     _ensureLearningEvidenceColumns();
   }
@@ -465,6 +472,7 @@ class AdaptiveCourseStore {
   final Future<void> Function(AdaptiveCoursePlanSnapshot plan)? _onPlanChanged;
   final Future<void> Function(AdaptiveCourseSessionSpec session)?
   _onSessionChanged;
+  final CourseGenerationTestHarness generationHarness;
 
   // Foundation (1-5) and Unit 2 (6-10) are both authored, not AI-generated,
   // so there is no cost reason to reveal them one row at a time. A learner
@@ -507,10 +515,21 @@ class AdaptiveCourseStore {
         profileFingerprint: fingerprint,
         minimumSequence: initialBatchSize,
         snapshot: snapshot,
+        forcedPersonalizedSkill: generationHarness.active
+            ? generationHarness.targetSkill
+            : null,
       );
       _reconcileCompletedSessions(plan.id);
       final reconciled = _snapshotForPlan(plan.id);
       if (repaired) _notifyPlan(reconciled);
+      if (generationHarness.active) {
+        return _ensureHarnessNext(
+          plan: reconciled,
+          profile: profile,
+          profileFingerprint: fingerprint,
+          snapshot: snapshot,
+        );
+      }
       // Growth only ever looks at real AI-generated lessons (sequence 11+).
       // Unit 2 (6-10) is fixed, authored content for every learner, never
       // part of this accounting.
@@ -797,6 +816,7 @@ class AdaptiveCourseStore {
     required String profileFingerprint,
     required int minimumSequence,
     required UniversalLearningSnapshot snapshot,
+    SpeakSkill? forcedPersonalizedSkill,
   }) {
     final existing = _sessionsForPlan(planId);
     if (existing.isEmpty) return false;
@@ -817,6 +837,7 @@ class AdaptiveCourseStore {
       startSequence: 1,
       count: target,
       learningSnapshot: snapshot,
+      forcedPersonalizedSkill: forcedPersonalizedSkill,
     );
     var repaired = false;
     for (final session in generated) {
@@ -860,6 +881,58 @@ class AdaptiveCourseStore {
       );
     }
     return repaired;
+  }
+
+  /// Development-only serial lane. It deliberately bypasses the production
+  /// lookahead rule: the selected Unit 2 activity is the gate for sequence 11,
+  /// and every later row is appended only after the previous selected-skill
+  /// row is completed. Existing rows are never deleted or rewritten here.
+  AdaptiveCoursePlanSnapshot _ensureHarnessNext({
+    required AdaptiveCoursePlanSnapshot plan,
+    required Profile profile,
+    required String profileFingerprint,
+    required UniversalLearningSnapshot snapshot,
+  }) {
+    final targetSkill = generationHarness.targetSkill;
+    final unitTwoGateCompleted = plan.sessions.any(
+      (session) =>
+          session.sequence > adaptiveCourseFoundationSize &&
+          session.sequence <= initialBatchSize &&
+          session.primarySkill == targetSkill &&
+          session.status == 'completed',
+    );
+    if (!unitTwoGateCompleted) return plan;
+
+    final personalized =
+        plan.sessions
+            .where(
+              (session) =>
+                  session.sequence > initialBatchSize &&
+                  session.status != 'replaced',
+            )
+            .toList(growable: false)
+          ..sort((left, right) => left.sequence.compareTo(right.sequence));
+    if (personalized.isNotEmpty) {
+      final latest = personalized.last;
+      final waiting =
+          latest.generationStatus == 'queued' ||
+          latest.generationStatus == 'generating' ||
+          latest.generationStatus == 'failed';
+      if (waiting || latest.status != 'completed') return plan;
+    }
+
+    _appendBatch(
+      planId: plan.id,
+      profile: profile,
+      profileFingerprint: profileFingerprint,
+      startSequence: _nextSequence(plan.sessions),
+      batchSize: 1,
+      snapshot: snapshot,
+      forcedPersonalizedSkill: targetSkill,
+    );
+    final expanded = _snapshotForPlan(plan.id);
+    _notifyPlan(expanded);
+    return expanded;
   }
 
   bool _needsCurriculumUpgrade(
@@ -999,6 +1072,7 @@ class AdaptiveCourseStore {
     required int startSequence,
     required int batchSize,
     required UniversalLearningSnapshot snapshot,
+    SpeakSkill? forcedPersonalizedSkill,
   }) {
     final existingSequences = _sessionsForPlan(
       planId,
@@ -1010,6 +1084,7 @@ class AdaptiveCourseStore {
       startSequence: startSequence,
       count: batchSize,
       learningSnapshot: snapshot,
+      forcedPersonalizedSkill: forcedPersonalizedSkill,
     );
     for (final session in generated) {
       if (!existingSequences.contains(session.sequence)) {
@@ -1381,6 +1456,7 @@ abstract final class AdaptiveCoursePlanGenerator {
     required int startSequence,
     required int count,
     UniversalLearningSnapshot? learningSnapshot,
+    SpeakSkill? forcedPersonalizedSkill,
   }) {
     final track = AdaptiveCurriculumService.forProfile(profile);
     // The learner's stated goal (exam prep, immigration, work...) must not
@@ -1423,11 +1499,15 @@ abstract final class AdaptiveCoursePlanGenerator {
       final sequence = startSequence + offset;
       final cycle = (sequence - 1) ~/ templates.length;
       final guidedPathTemplate = _guidedPathTemplate(level, sequence);
-      final focusSkill = _targetSkillForBatch(
-        focusSkills: focusSkills,
-        recentSkills: recentFocusSkills,
-        sequence: sequence,
-      );
+      final focusSkill =
+          forcedPersonalizedSkill != null &&
+              sequence > adaptiveCourseFoundationSize + adaptiveCourseBatchSize
+          ? forcedPersonalizedSkill
+          : _targetSkillForBatch(
+              focusSkills: focusSkills,
+              recentSkills: recentFocusSkills,
+              sequence: sequence,
+            );
       final targetSkill = _courseSkillFor(focusSkill, sequence);
       final selectedTemplate =
           guidedPathTemplate ??

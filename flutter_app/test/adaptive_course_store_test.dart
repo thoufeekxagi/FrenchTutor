@@ -6,6 +6,7 @@ import 'package:french_tutor/data/database/adaptive_course_store.dart';
 import 'package:french_tutor/models/profile.dart';
 import 'package:french_tutor/models/speak_curriculum.dart';
 import 'package:french_tutor/models/speaking_course.dart';
+import 'package:french_tutor/services/course_generation_test_harness.dart';
 
 /// Minimal but validator-satisfying A1 artifact JSON for each personalized
 /// skill, used to drive `AdaptiveCourseStore`'s one-row-at-a-time growth
@@ -454,6 +455,86 @@ void main() {
     expect(replenished.sessions.last.sequence, 13);
     expect(replenished.sessions.last.generationStatus, 'queued');
   });
+
+  test(
+    'development harness gates and serializes one selected personalized skill',
+    () {
+      final db = sqlite3.openInMemory();
+      final store = AdaptiveCourseStore(
+        db,
+        generationHarness: const CourseGenerationTestHarness(
+          enabled: true,
+          skill: CourseGenerationHarnessSkill.speaking,
+        ),
+      );
+      final profile = Profile(
+        id: 'speaking-harness',
+        goal: 'everyday',
+        level: 'a1',
+        interests: const ['Speaking'],
+      );
+
+      var plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions, hasLength(10));
+      expect(plan.sessions.where((session) => session.sequence > 10), isEmpty);
+
+      final unitTwoSpeaking = plan.sessions.firstWhere(
+        (session) =>
+            session.sequence > 5 &&
+            session.sequence <= 10 &&
+            session.primarySkill == SpeakSkill.speaking,
+      );
+      store.markCompleted(unitTwoSpeaking.contentKey);
+
+      plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions.last.sequence, 11);
+      expect(plan.sessions.last.primarySkill, SpeakSkill.speaking);
+      expect(
+        plan.sessions.where((session) => session.sequence > 10),
+        hasLength(1),
+      );
+
+      // A ready row is still not enough to advance; completion is the only
+      // trigger in the development lane.
+      final firstGenerated = plan.sessions.last;
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+        'artifact_kind = ?, artifact_json = ? WHERE id = ?',
+        ['speaking', _readyArtifactFor(SpeakSkill.speaking), firstGenerated.id],
+      );
+      plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions.last.sequence, 11);
+
+      store.markCompleted(firstGenerated.contentKey);
+      plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions.last.sequence, 12);
+      expect(plan.sessions.last.primarySkill, SpeakSkill.speaking);
+
+      // Keep the same harness connection/path for several more completions;
+      // each completion creates exactly one next sequence and nothing else.
+      for (
+        var expectedSequence = 12;
+        expectedSequence <= 14;
+        expectedSequence++
+      ) {
+        final current = plan.sessions.last;
+        db.execute(
+          "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+          'artifact_kind = ?, artifact_json = ? WHERE id = ?',
+          ['speaking', _readyArtifactFor(SpeakSkill.speaking), current.id],
+        );
+        store.markCompleted(current.contentKey);
+        plan = store.ensureCurrentPlan(profile);
+        expect(plan.sessions.last.sequence, expectedSequence + 1);
+      }
+      expect(
+        plan.sessions
+            .where((session) => session.sequence > 10)
+            .every((session) => session.primarySkill == SpeakSkill.speaking),
+        isTrue,
+      );
+    },
+  );
 
   test(
     'the first two personalized batches stay in a small CEFR practice lane',

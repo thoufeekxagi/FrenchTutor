@@ -1875,7 +1875,10 @@ class SyncService {
   /// Prepares one persisted Course lesson independently from lesson opening.
   /// Each invocation claims a single server row, so a failed provider call
   /// cannot spoil a whole batch and the next foreground pass can retry it.
-  Future<int> prepareAdaptiveCourseLessons({int maxLessons = 1}) {
+  Future<int> prepareAdaptiveCourseLessons({
+    int maxLessons = 1,
+    String? harnessSkill,
+  }) {
     final existing = _coursePreparationInFlight;
     if (existing != null) return existing;
     // The route grows one personalized row at a time. Clamp callers too, so
@@ -1889,41 +1892,54 @@ class SyncService {
         feature: 'course_generation',
         event: 'course_prepare_requested',
         requestId: requestId,
-        extra: {'max_lessons': limit},
+        extra: {
+          'max_lessons': limit,
+          if (harnessSkill != null) 'harness_skill': harnessSkill,
+        },
       ),
     );
 
     late final Future<int> run;
-    run = _prepareAdaptiveCourseLessons(limit).whenComplete(() {
-      if (identical(_coursePreparationInFlight, run)) {
-        _coursePreparationInFlight = null;
-      }
-      unawaited(
-        AiCostTracker.event(
-          feature: 'course_generation',
-          event: 'course_prepare_finished',
-          requestId: requestId,
-          extra: {'max_lessons': limit},
-        ),
-      );
-    });
+    run = _prepareAdaptiveCourseLessons(limit, harnessSkill: harnessSkill)
+        .whenComplete(() {
+          if (identical(_coursePreparationInFlight, run)) {
+            _coursePreparationInFlight = null;
+          }
+          unawaited(
+            AiCostTracker.event(
+              feature: 'course_generation',
+              event: 'course_prepare_finished',
+              requestId: requestId,
+              extra: {
+                'max_lessons': limit,
+                if (harnessSkill != null) 'harness_skill': harnessSkill,
+              },
+            ),
+          );
+        });
     _coursePreparationInFlight = run;
     return run;
   }
 
-  Future<int> _prepareAdaptiveCourseLessons(int maxLessons) async {
+  Future<int> _prepareAdaptiveCourseLessons(
+    int maxLessons, {
+    String? harnessSkill,
+  }) async {
     var prepared = 0;
     for (var index = 0; index < maxLessons; index++) {
       try {
         final result = await _client.functions.invoke(
           'prepare-course-lesson',
-          body: const <String, dynamic>{},
+          body: {if (harnessSkill != null) 'harness_skill': harnessSkill},
         );
         unawaited(
           AiCostTracker.event(
             feature: 'course_generation',
             event: 'course_edge_response_received',
-            extra: {'attempt_index': index},
+            extra: {
+              'attempt_index': index,
+              if (harnessSkill != null) 'harness_skill': harnessSkill,
+            },
           ),
         );
         final data = result.data;

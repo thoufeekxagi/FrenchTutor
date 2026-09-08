@@ -702,6 +702,20 @@ Deno.serve(async (request: Request) => {
 
   const userId = callerData.user.id;
   const admin = createClient(supabaseUrl, serviceRoleKey);
+  // The development Course harness can constrain this single foreground
+  // preparation request to one skill. Production callers omit the field and
+  // keep the normal queue behavior. This is a filter only; it never creates,
+  // rewrites, or retries a row.
+  let harnessSkill = "";
+  try {
+    const body = await request.json() as Json;
+    const requested = text(body.harness_skill).replace('-', '_');
+    if (["speaking", "vocabulary", "reading", "listening", "writing"].includes(requested)) {
+      harnessSkill = requested;
+    }
+  } catch {
+    // An empty body is the normal production request.
+  }
   const staleBefore = new Date(Date.now() - 5 * 60 * 1000).toISOString();
   const { error: recoveryError } = await admin
     .from("adaptive_course_sessions")
@@ -754,7 +768,7 @@ Deno.serve(async (request: Request) => {
     return response({ processed: false, remaining: 0 });
   }
 
-  const { data: activePersonalized, error: reserveError } = await admin
+  let activePersonalizedQuery = admin
     .from("adaptive_course_sessions")
     .select("id, sequence, status, generation_status, updated_at, primary_skill, title, artifact_json")
     .eq("user_id", userId)
@@ -763,6 +777,7 @@ Deno.serve(async (request: Request) => {
     .in("status", ["planned", "active"])
     .is("deleted_at", null)
     .order("sequence", { ascending: true });
+  const { data: activePersonalized, error: reserveError } = await activePersonalizedQuery;
   if (reserveError) return response({ error: reserveError.message }, 500);
 
   // REMOVED: this used to reset a specific, narrowly-detected historical
@@ -794,7 +809,7 @@ Deno.serve(async (request: Request) => {
     return response({ processed: false, remaining: 0 });
   }
 
-  const { data: candidates, error: findError } = await admin
+  let candidatesQuery = admin
     .from("adaptive_course_sessions")
     .select("*")
     .eq("user_id", userId)
@@ -805,6 +820,8 @@ Deno.serve(async (request: Request) => {
     .is("deleted_at", null)
     .order("sequence", { ascending: true })
     .limit(1);
+  if (harnessSkill) candidatesQuery = candidatesQuery.eq("primary_skill", harnessSkill);
+  const { data: candidates, error: findError } = await candidatesQuery;
   if (findError) return response({ error: findError.message }, 500);
   const candidate = candidates?.[0] as Json | undefined;
   if (!candidate) {
@@ -849,6 +866,7 @@ Deno.serve(async (request: Request) => {
     sessionId,
     sequence: claimed.sequence,
     kind,
+    harnessSkill: harnessSkill || null,
     attempt: attempts + 1,
   }));
   try {
@@ -908,7 +926,7 @@ Deno.serve(async (request: Request) => {
       .eq("user_id", userId);
     if (saveError) throw new Error(saveError.message);
 
-    const { count } = await admin
+    let remainingQuery = admin
       .from("adaptive_course_sessions")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
@@ -917,12 +935,15 @@ Deno.serve(async (request: Request) => {
       .in("generation_status", ["queued", "failed"])
       .in("status", ["planned", "active"])
       .is("deleted_at", null);
+    if (harnessSkill) remainingQuery = remainingQuery.eq("primary_skill", harnessSkill);
+    const { count } = await remainingQuery;
     console.info(JSON.stringify({
       event: "course_lesson_preparation_succeeded",
       userId,
       sessionId,
       sequence: claimed.sequence,
       kind,
+      harnessSkill: harnessSkill || null,
       remaining: count ?? 0,
     }));
     return response({ processed: true, sessionId, kind, remaining: count ?? 0 });

@@ -2,6 +2,7 @@ import '../models/profile.dart';
 import '../models/speak_curriculum.dart';
 import '../data/database/adaptive_course_store.dart';
 import 'adaptive_curriculum_service.dart';
+import 'course_generation_test_harness.dart';
 
 export '../models/speak_curriculum.dart' show SpeakSessionKind, SpeakSkill;
 
@@ -11,6 +12,7 @@ class SpeakRoadmapSession {
     required this.contentKey,
     this.level = 'A1',
     required this.index,
+    required this.sequence,
     required this.unit,
     required this.unitTitle,
     required this.title,
@@ -36,6 +38,7 @@ class SpeakRoadmapSession {
   final String contentKey;
   final String level;
   final int index;
+  final int sequence;
   final int unit;
   final String unitTitle;
   final String title;
@@ -89,6 +92,8 @@ abstract final class SpeakRoadmapService {
     Profile profile, {
     Set<String> completedContentKeys = const {},
     required List<AdaptiveCourseSessionSpec> adaptiveSessions,
+    CourseGenerationTestHarness generationHarness =
+        CourseGenerationTestHarness.disabled,
   }) {
     if (adaptiveSessions.isEmpty) {
       throw StateError(
@@ -97,7 +102,16 @@ abstract final class SpeakRoadmapService {
     }
     return _buildAdaptive(
       profile,
-      sessions: adaptiveSessions,
+      sessions: generationHarness.active
+          ? adaptiveSessions
+                .where(
+                  (session) => generationHarness.includeInRoadmap(
+                    sequence: session.sequence,
+                    primarySkill: session.primarySkill,
+                  ),
+                )
+                .toList(growable: false)
+          : adaptiveSessions,
       completedContentKeys: completedContentKeys,
     );
   }
@@ -120,6 +134,7 @@ abstract final class SpeakRoadmapService {
           contentKey: spec.contentKey,
           level: spec.level,
           index: index,
+          sequence: spec.sequence,
           unit: spec.unit,
           unitTitle: spec.unitTitle,
           title: spec.title,
