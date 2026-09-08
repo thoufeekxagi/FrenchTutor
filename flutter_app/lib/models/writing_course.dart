@@ -61,20 +61,29 @@ class WritingCourseStep {
 
   factory WritingCourseStep.fromJson(Map<String, dynamic> json) {
     final rawKind = json['kind']?.toString();
+    final kind = WritingInputKind.values.firstWhere(
+      (value) => value.name == rawKind,
+      orElse: () => WritingInputKind.arrange,
+    );
+    final rawTokens = (json['tokens'] as List? ?? const [])
+        .map((value) => value.toString())
+        .toList(growable: false);
+    final rawTokenMeanings = (json['token_meanings'] as List? ?? const [])
+        .map((value) => value.toString())
+        .toList(growable: false);
+    final guidedBank = kind == WritingInputKind.arrange
+        ? _cleanGuidedBank(rawTokens, rawTokenMeanings)
+        : (tokens: rawTokens, meanings: rawTokenMeanings);
+    final rawTarget = json['target']?.toString() ?? '';
     return WritingCourseStep(
       prompt: json['prompt']?.toString() ?? '',
       promptEnglish: json['prompt_english']?.toString() ?? '',
-      target: json['target']?.toString() ?? '',
-      kind: WritingInputKind.values.firstWhere(
-        (value) => value.name == rawKind,
-        orElse: () => WritingInputKind.arrange,
-      ),
-      tokens: (json['tokens'] as List? ?? const [])
-          .map((value) => value.toString())
-          .toList(growable: false),
-      tokenMeanings: (json['token_meanings'] as List? ?? const [])
-          .map((value) => value.toString())
-          .toList(growable: false),
+      target: kind == WritingInputKind.arrange
+          ? _stripGuidedSentencePunctuation(rawTarget)
+          : rawTarget,
+      kind: kind,
+      tokens: guidedBank.tokens,
+      tokenMeanings: guidedBank.meanings,
       choices: (json['choices'] as List? ?? const [])
           .map((value) => value.toString())
           .toList(growable: false),
@@ -94,6 +103,34 @@ class WritingCourseStep {
       tip: json['tip']?.toString() ?? '',
     );
   }
+
+  /// Punctuation belongs to the sentence, not to a selectable word-bank
+  /// chip. Older/generated artifacts sometimes returned a comma, period, or
+  /// question mark as its own token (or attached to a word). Clean that at
+  /// the decoding boundary so legacy rows remain usable and the UI never asks
+  /// a learner to select punctuation as if it were vocabulary.
+  static ({List<String> tokens, List<String> meanings}) _cleanGuidedBank(
+    List<String> rawTokens,
+    List<String> rawMeanings,
+  ) {
+    final tokens = <String>[];
+    final meanings = <String>[];
+    for (var index = 0; index < rawTokens.length; index++) {
+      final token = rawTokens[index]
+          .replaceFirst(RegExp(r'^[.,!?;:«»"“”]+'), '')
+          .replaceFirst(RegExp(r'[.,!?;:«»"“”]+$'), '')
+          .trim();
+      if (token.isEmpty) continue;
+      tokens.add(token);
+      meanings.add(index < rawMeanings.length ? rawMeanings[index] : '');
+    }
+    return (tokens: tokens, meanings: meanings);
+  }
+
+  static String _stripGuidedSentencePunctuation(String value) => value
+      .replaceAll(RegExp(r'[.,!?;:«»"“”]'), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
 }
 
 class WritingCourseLesson {
@@ -287,8 +324,12 @@ abstract final class WritingCourseValidator {
     return lesson;
   }
 
-  static String _normalise(String value) =>
-      value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  static String _normalise(String value) => value
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[’‘]'), "'")
+      .replaceAll(RegExp(r'[.,!?;:«»"“”]'), '')
+      .replaceAll(RegExp(r'\s+'), ' ');
 }
 
 String writingLessonFingerprint(WritingCourseLesson lesson) {

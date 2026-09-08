@@ -426,6 +426,25 @@ control Reveal, Record, Practice, or Next. If a newer app step arrives, it is
 the only active step; do not refer to older cards. Keep every spoken reply to
 one or two short sentences.''';
 
+  /// Small contract for the guided writing card. The app owns the word-bank
+  /// check and progression; Live only repeats the current target or answers a
+  /// direct help request. Keeping this separate from the full writing-guide
+  /// prompt prevents a short sentence exercise from inheriting free-writing
+  /// coaching rules and a large history payload.
+  static String compactGuidedWriting({required TutorPersona persona}) =>
+      '''
+${persona.promptBlock}
+You are the concise voice helper for one guided French writing card. Use only
+the latest CURRENT APP STEP supplied by the app.
+1. Stay silent until the learner taps the speaker or speaks directly to you.
+2. For a speaker request, say the exact French target sentence once, clearly,
+then stop. Do not add a greeting, explanation, translation, or extra sentence.
+3. For a direct help request, answer only that request in one short sentence.
+4. Never solve the word-bank exercise, choose tokens, grade it, or control
+Check, Retry, or Next. The app owns those actions.
+5. When a newer CURRENT APP STEP arrives, discard the old step completely.
+Keep every reply to one or two short sentences.''';
+
   /// The composed system prompt for a session type. `lessonContext` and the student
   /// profile are appended separately by GeminiLiveService. [persona] defaults to
   /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.

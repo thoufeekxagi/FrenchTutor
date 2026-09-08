@@ -120,6 +120,34 @@ void main() {
     expect(lesson.steps.every((step) => step.kind.name == 'arrange'), isTrue);
   });
 
+  test('guided writing keeps punctuation out of selectable word chips', () {
+    final lesson = CourseArtifactCodec.writingCourse({
+      'practiceMode': 'guided',
+      'lesson': {
+        'id': 'writing-punctuation-1',
+        'title': 'Dire bonjour',
+        'subtitle': 'Build five short greetings.',
+        'level': 'A1',
+        'mode': 'guided',
+        'goal': 'Write a greeting.',
+        'steps': List.generate(
+          5,
+          (index) => {
+            'prompt': 'Écris la phrase.',
+            'prompt_english': 'Write the sentence.',
+            'target': 'Bonjour Marie.',
+            'kind': 'arrange',
+            'tokens': ['Bonjour', 'Marie.', '.'],
+            'token_meanings': ['Hello', 'Marie', ''],
+            'tip': 'Start with hello.',
+          },
+        ),
+      },
+    });
+    expect(lesson.steps.first.target, 'Bonjour Marie');
+    expect(lesson.steps.first.tokens, ['Bonjour', 'Marie']);
+  });
+
   test('course grammar enters the exact native Grammar mode', () {
     final session = CourseArtifactCodec.grammarCourse({
       'practiceMode': 'complete',

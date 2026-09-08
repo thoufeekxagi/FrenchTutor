@@ -71,6 +71,59 @@ function normalizeForReconstruction(value: string): string {
     .trim();
 }
 
+function stripGuidedTokenPunctuation(value: unknown): string {
+  return text(value)
+    .replace(/^[.,!?;:«»"“”]+/u, "")
+    .replace(/[.,!?;:«»"“”]+$/u, "")
+    .trim();
+}
+
+function stripGuidedSentencePunctuation(value: unknown): string {
+  return text(value)
+    .replace(/[.,!?;:«»"“”]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Guided Writing chips represent selectable words or short chunks. Punctuation
+// stays out of the target and out of the word bank so the learner only orders
+// language-bearing items. Clean the model artifact once at the server boundary
+// so older punctuation-heavy responses follow the same contract before
+// validation and persistence.
+function normalizeGuidedWritingArtifact(artifact: Json): Json {
+  if (text(artifact.practiceMode) !== "guided") return artifact;
+  const lessonValue = artifact.lesson;
+  if (!lessonValue || typeof lessonValue !== "object" || Array.isArray(lessonValue)) {
+    return artifact;
+  }
+  const lesson = object(lessonValue);
+  if (!Array.isArray(lesson.steps)) return artifact;
+  const steps = lesson.steps.map((raw) => {
+    const step = object(raw);
+    if (text(step.kind) !== "arrange" || !Array.isArray(step.tokens)) {
+      return raw;
+    }
+    const rawMeanings = Array.isArray(step.token_meanings)
+      ? step.token_meanings
+      : [];
+    const tokens: string[] = [];
+    const meanings: string[] = [];
+    step.tokens.forEach((rawToken, index) => {
+      const token = stripGuidedTokenPunctuation(rawToken);
+      if (!token) return;
+      tokens.push(token);
+      meanings.push(text(rawMeanings[index]));
+    });
+    return {
+      ...step,
+      target: stripGuidedSentencePunctuation(step.target),
+      tokens,
+      token_meanings: meanings,
+    };
+  });
+  return { ...artifact, lesson: { ...lesson, steps } };
+}
+
 function list(value: unknown, limit = 4): string[] {
   return Array.isArray(value)
     ? value.map(text).filter(Boolean).slice(0, limit)
@@ -583,7 +636,10 @@ function promptFor(
       : mode === "complete"
       ? `{"prompt":"one French sentence containing exactly one ___ blank","prompt_english":"exact English meaning","target":"the missing answer","kind":"choice","choices":["exactly three choices including target"],"choice_meanings":["one English meaning per matching choice"],"tip":"short English hint"}`
       : `{"prompt":"short French reply instruction","prompt_english":"short English instruction","target":"short model French reply","kind":"text","partner_french":"short partner message","partner_english":"exact English meaning","goal":"one clear reply goal","suggestions":["up to three short French supports"],"suggestion_meanings":["one English meaning per support"],"tip":"short English hint"}`;
-    return `${base}${rules}\nThe exact Writing Practice mode is ${mode}; never mix it with Speaking or another Writing mode. Return exactly: {"practiceMode":"${mode}","lesson":{"id":"writing-${text(session.id)}","title":"short learner-facing title","title_en":"short English title","subtitle":"one short English subtitle","level":"${brief.level || "A1"}","mode":"${mode}","goal":"one short goal","steps":[exactly ${count} ${step}]}}. For arrange steps, tokens joined with spaces must reconstruct target exactly and token_meanings must have the same length. Keep A1/A2 output tiny and controlled.`;
+    const guidedRule = mode === "guided"
+      ? "For guided arrange steps, target and tokens contain words or short chunks only: do not include commas, periods, question marks, or other sentence punctuation anywhere. Do not emit punctuation-only tokens or attach punctuation to a token. Keep each target to one short sentence."
+      : "";
+    return `${base}${rules}\nThe exact Writing Practice mode is ${mode}; never mix it with Speaking or another Writing mode. Return exactly: {"practiceMode":"${mode}","lesson":{"id":"writing-${text(session.id)}","title":"short learner-facing title","title_en":"short English title","subtitle":"one short English subtitle","level":"${brief.level || "A1"}","mode":"${mode}","goal":"one short goal","steps":[exactly ${count} ${step}]}}. ${guidedRule} For arrange steps, cleaned tokens joined with spaces must reconstruct the target words in order and token_meanings must have the same length with one meaning per selectable token. Keep output short and controlled at every CEFR level.`;
   }
   const mode = brief.practiceMode;
   const count = mode === "roleplay" ? 4 : 5;
@@ -618,11 +674,12 @@ function validateArtifact(
   if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
 }
 
-// One Course lesson is one provider request. Practice has its own bounded
-// retry policy, but Course must never multiply a failed generation into a
-// repair conversation: a bad result is marked failed and the learner can
-// explicitly request a fresh lesson later.
-const MAX_GENERATION_ATTEMPTS = 1;
+// Course normally uses one provider request. If the model returns JSON that
+// the local validator rejects, give the same model one repair turn containing
+// the exact rejection reason and the rejected JSON. This is bounded at two
+// total calls so a malformed artifact can self-correct without becoming a
+// retry storm or silently multiplying spend.
+const MAX_GENERATION_ATTEMPTS = 2;
 
 async function generateArtifact(
   supabaseUrl: string,
@@ -678,7 +735,11 @@ async function generateArtifact(
           // authoring budget separate from story/reading lessons so a verbose
           // model response cannot turn one queued card set into an expensive
           // text request.
-          maxTokens: kind === "vocabulary" ? 1200 : 2600,
+          maxTokens: kind === "vocabulary"
+            ? 1200
+            : kind === "writing"
+            ? 2200
+            : 2600,
           temperature: 0.35,
           responseFormat: { type: "json_object" },
           retryPolicy: "none",
@@ -690,7 +751,10 @@ async function generateArtifact(
       }
       rawText = text(aiData.text);
       const generated = parseModelJson(rawText);
-      const artifact = { ...baseArtifact(session, kind), ...generated };
+      const artifact = normalizeGuidedWritingArtifact({
+        ...baseArtifact(session, kind),
+        ...generated,
+      });
       validateArtifact(artifact, session, kind, vocabularyCandidates);
       console.info(JSON.stringify({
         event: "course_artifact_ready",

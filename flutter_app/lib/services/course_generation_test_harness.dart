@@ -73,10 +73,10 @@ class CourseGenerationTestHarness {
     skill: CourseGenerationHarnessSkillValues.parse(
       String.fromEnvironment(
         'PARLESPRINT_COURSE_HARNESS_SKILL',
-        // Speaking has completed its verification pass. Vocabulary is the
-        // next development-only lane; an explicit dart-define can still
+        // Speaking and Vocabulary have completed their verification passes.
+        // Writing is the next development-only lane; an explicit dart-define can still
         // select any supported skill when the build tool preserves it.
-        defaultValue: 'vocabulary',
+        defaultValue: 'writing',
       ),
     ),
   );

@@ -95,13 +95,19 @@ class GeminiLiveService {
   static const _defaultContextCompressionTargetTokens = 4000;
   static const _compactGuidedCompressionTriggerTokens = 2000;
   static const _compactGuidedCompressionTargetTokens = 1000;
+  static const _compactWritingCompressionTriggerTokens = 1000;
+  static const _compactWritingCompressionTargetTokens = 500;
 
   int get _contextCompressionTriggerTokens => compactGuidedContext
-      ? _compactGuidedCompressionTriggerTokens
+      ? sessionType == LiveSessionType.writingGuide
+            ? _compactWritingCompressionTriggerTokens
+            : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
   int get _contextCompressionTargetTokens => compactGuidedContext
-      ? _compactGuidedCompressionTargetTokens
+      ? sessionType == LiveSessionType.writingGuide
+            ? _compactWritingCompressionTargetTokens
+            : _compactGuidedCompressionTargetTokens
       : _defaultContextCompressionTargetTokens;
 
   // Profile and lesson context are useful calibration hints, not a transcript.
@@ -513,15 +519,22 @@ class GeminiLiveService {
   Future<String> _fullSystemPrompt() async {
     if (compactGuidedContext &&
         (sessionType == LiveSessionType.speakingGuided ||
-            sessionType == LiveSessionType.vocabStage)) {
-      var compactPrompt = sessionType == LiveSessionType.vocabStage
-          ? LivePrompts.compactVocabulary(persona: _persona)
-          : LivePrompts.compactGuidedSpeaking(persona: _persona);
+            sessionType == LiveSessionType.vocabStage ||
+            sessionType == LiveSessionType.writingGuide)) {
+      var compactPrompt = switch (sessionType) {
+        LiveSessionType.vocabStage => LivePrompts.compactVocabulary(
+          persona: _persona,
+        ),
+        LiveSessionType.writingGuide => LivePrompts.compactGuidedWriting(
+          persona: _persona,
+        ),
+        _ => LivePrompts.compactGuidedSpeaking(persona: _persona),
+      };
       final ctx = lessonContext;
       if (ctx != null && ctx.trim().isNotEmpty) {
         compactPrompt +=
             '\n\nCURRENT APP STEP (latest screen):\n'
-            '${_boundDynamicContext(ctx, 900)}';
+            '${_boundDynamicContext(ctx, sessionType == LiveSessionType.writingGuide ? 700 : 900)}';
       }
       return compactPrompt;
     }
