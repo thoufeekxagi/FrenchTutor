@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
+import '../../data/database/adaptive_course_store.dart';
 import '../../design/tokens.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
@@ -30,6 +31,25 @@ class SpeakingStudioScreen extends ConsumerStatefulWidget {
 
 class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   var _carouselPage = 0;
+  AdaptiveCoursePlanSnapshot? _adaptivePlan;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdaptivePlan();
+  }
+
+  void _loadAdaptivePlan() {
+    Future<AdaptiveCoursePlanSnapshot>(() {
+      final profile = ref.read(learningStoreProvider).profile();
+      final store = ref.read(adaptiveCourseStoreProvider);
+      return store.currentPlan(profile) ?? store.ensureCurrentPlan(profile);
+    }).then((plan) {
+      if (mounted) setState(() => _adaptivePlan = plan);
+    }).catchError((_) {
+      // Keep the shell usable if local storage is temporarily unavailable.
+    });
+  }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
     await AppRouter.push(
@@ -53,12 +73,8 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
     // Home is a read-only surface. The app/onboarding flow is responsible
     // for creating the persisted adaptive plan; rendering a card must never
     // create or re-plan course content.
-    final adaptivePlan = ref
-        .read(adaptiveCourseStoreProvider)
-        .currentPlan(profile);
-    if (adaptivePlan == null) {
-      throw StateError('Home requires a persisted adaptive course plan.');
-    }
+    final adaptivePlan = _adaptivePlan;
+    if (adaptivePlan == null) return _loadingHome();
     final roadmap = SpeakRoadmapService.build(
       profile,
       completedContentKeys: completedContentKeys,
@@ -103,6 +119,22 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             Text('EXPLORE', style: _eyebrow()),
             const SizedBox(height: 10),
             _modeRail(context, next.primarySkill),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _loadingHome() {
+    return Scaffold(
+      backgroundColor: DesignTokens.nightCanvas,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: DesignTokens.nightAccent),
+            const SizedBox(height: 16),
+            Text('Preparing your course…', style: _body(14, color: DesignTokens.nightMuted)),
           ],
         ),
       ),
@@ -619,7 +651,7 @@ class _QuickStartCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(icon, color: DesignTokens.nightAccent, size: 20),
-              const Spacer(),
+              const SizedBox(height: 12),
               Text(
                 label,
                 maxLines: 1,
