@@ -59,10 +59,17 @@ class CourseGenerationTestHarness {
   /// [active] as the second guard, so a release/profile build cannot turn this
   /// path on accidentally even if a dart-define is left in a build script.
   static final current = CourseGenerationTestHarness(
-    enabled: bool.fromEnvironment(
-      'PARLESPRINT_COURSE_HARNESS_ENABLED',
-      defaultValue: false,
-    ),
+    // Development verification must not depend on an Xcode-generated
+    // DART_DEFINES entry surviving a device reinstall. Keep the lane on for
+    // every Debug run, while [active] still prevents it from ever running in
+    // Profile or Release. The define remains available for documentation and
+    // future lane selection.
+    enabled:
+        kDebugMode ||
+        bool.fromEnvironment(
+          'PARLESPRINT_COURSE_HARNESS_ENABLED',
+          defaultValue: false,
+        ),
     skill: CourseGenerationHarnessSkillValues.parse(
       String.fromEnvironment(
         'PARLESPRINT_COURSE_HARNESS_SKILL',

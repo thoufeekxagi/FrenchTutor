@@ -47,6 +47,10 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     // once when the roadmap opens. This path is compile-time/debug-only and
     // never retries a failed row or changes the production Generate flow.
     final harness = CourseGenerationTestHarness.current;
+    debugPrint(
+      '[COURSE_HARNESS] active=${harness.active} enabled=${harness.enabled} '
+      'target=${harness.targetWireName}',
+    );
     if (harness.active) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
