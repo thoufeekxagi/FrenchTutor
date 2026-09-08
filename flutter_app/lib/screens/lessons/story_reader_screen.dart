@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../data/database/story_favorite_store.dart';
 import '../../models/content_models.dart';
-import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
@@ -24,7 +23,6 @@ import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/learning_card.dart';
 import '../../widgets/report_problem_button.dart';
-import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../widgets/word_conjugation_sheet.dart';
 import '../../widgets/word_meaning_overlay.dart';
@@ -117,7 +115,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isMarkedLearned = false;
   final Map<int, GlobalKey> _segmentKeys = {};
   final Map<int, int> _quizAnswers = {};
-  final Map<String, GlobalKey<TtsPlayButtonState>> _keywordAudioKeys = {};
 
   /// The sentence the learner tapped to read from — null means "no pick, play
   /// the whole story from the top". Tapping the same sentence again clears the
@@ -590,6 +587,25 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _currentWord = null;
         });
       },
+    );
+  }
+
+  /// Keyword and grammar replay deliberately use the already-connected Marie
+  /// socket. Story narration is the only surface that uses the PCM deck; a
+  /// one-word or one-sentence tap must never start a second synthesis request
+  /// or wait on a cache lookup.
+  void _speakWithLive(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+    if (!_call.isLive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Connect Marie first to hear this.')),
+      );
+      return;
+    }
+    _call.promptTutor(
+      'App playback request. Say this French text exactly once, clearly and '
+      'naturally, then stop. Do not translate or explain it: "$trimmed"',
     );
   }
 
@@ -1131,12 +1147,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                             ),
                       ),
                     ),
-                    TtsPlayButton(
-                      text: points[i].fr,
-                      size: DesignTokens.minTapTarget,
-                      iconSize: 20,
-                      contentItemId: _story.segmentContentId(
-                        _passage.segments.indexOf(points[i]),
+                    IconButton(
+                      tooltip: 'Replay this sentence with Marie',
+                      onPressed: () => _speakWithLive(points[i].fr),
+                      icon: Icon(
+                        CupertinoIcons.speaker_2_fill,
+                        color: _darkMode
+                            ? DesignTokens.nightAccent
+                            : DesignTokens.primary,
+                        size: 20,
                       ),
                     ),
                   ],
@@ -1329,10 +1348,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final entry = keywords[index];
-        final audioKey = _keywordAudioKeys.putIfAbsent(
-          entry.id,
-          GlobalKey<TtsPlayButtonState>.new,
-        );
         return LearningCard(
           padding: 16,
           color: _darkMode ? DesignTokens.nightSurface : DesignTokens.surface,
@@ -1344,7 +1359,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
             label: 'Play pronunciation for ${entry.fr}',
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => audioKey.currentState?.trigger(),
+              onTap: () => _speakWithLive(entry.fr),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -1389,24 +1404,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  IgnorePointer(
-                    child: TtsPlayButton(
-                      key: audioKey,
-                      text: entry.fr,
-                      contentItemId: '${widget.story.id}_kw_${entry.id}',
-                      audioResolver: () => _loadCachedKeywordAudio(entry),
-                      onError: (error) {
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Audio failed: $error')),
-                        );
-                      },
-                      size: DesignTokens.minTapTarget,
-                      iconSize: 20,
-                      color: _darkMode
-                          ? DesignTokens.nightAccent
-                          : DesignTokens.primary,
-                    ),
+                  Icon(
+                    CupertinoIcons.speaker_2_fill,
+                    color: _darkMode
+                        ? DesignTokens.nightAccent
+                        : DesignTokens.primary,
+                    size: 20,
                   ),
                 ],
               ),
@@ -1417,20 +1420,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
   }
 
-  /// Use the PCM cache first. If this individual keyword was not prewarmed
-  /// yet, resolve the same French tutor voice live and cache the PCM before
-  /// playing it. The card never silently does nothing.
-  Future<List<int>?> _loadCachedKeywordAudio(VocabEntry entry) async {
-    final cached = await LessonSpeechService.shared
-        .loadCachedAudio(entry.fr)
-        .timeout(const Duration(seconds: 6));
-    if (cached != null && cached.isNotEmpty) return cached;
-    return LessonSpeechService.shared.synthesize(
-      entry.fr,
-      voiceName: ActiveTutor.current.voiceName,
-      contentItemId: '${widget.story.id}_kw_${entry.id}',
-    );
-  }
 }
 
 class _StoryBookHeader extends StatelessWidget {

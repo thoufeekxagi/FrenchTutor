@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,7 +57,12 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           _prepareCourse(
             harnessSkill: harness.targetWireName,
             reconcileQueuedHarnessRow: true,
-          ),
+            openWhenReady: true,
+          ).then((nextSession) {
+            if (nextSession != null && mounted) {
+              return _openSession(nextSession);
+            }
+          }),
         );
       });
     }
@@ -84,12 +90,13 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
   /// Prepares one personalized Course lesson. Production calls this only from
   /// the explicit Generate action. The development harness may call it once
   /// immediately after the selected lesson is completed.
-  Future<void> _prepareCourse({
+  Future<SpeakRoadmapSession?> _prepareCourse({
     String? harnessSkill,
     bool onlyIfNewHarnessRow = false,
     bool reconcileQueuedHarnessRow = false,
+    bool openWhenReady = false,
   }) async {
-    if (_preparingCourse) return;
+    if (_preparingCourse) return null;
     _preparingCourse = true;
     final operationEpoch = _generationEpoch;
     try {
@@ -104,10 +111,15 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // learner does it. Pull the real remote state down first, every time,
       // before this screen decides what (if anything) it still needs.
       await sync.hydrateAdaptiveCourses();
-      if (!mounted || operationEpoch != _generationEpoch) return;
+      if (!mounted || operationEpoch != _generationEpoch) return null;
       final profile = ref.read(learningStoreProvider).profile();
       final store = ref.read(adaptiveCourseStoreProvider);
-      final before = onlyIfNewHarnessRow ? store.currentPlan(profile) : null;
+      final current = store.currentPlan(profile);
+      final before = onlyIfNewHarnessRow ? current : null;
+      final beforeState = <String, String>{
+        for (final session in current?.sessions ?? const <AdaptiveCourseSessionSpec>[])
+          session.contentKey: _generationState(session),
+      };
       final beforeHighest = before == null
           ? AdaptiveCourseStore.initialBatchSize
           : before.sessions.fold<int>(
@@ -123,14 +135,27 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               session.primarySkill.wireName == harnessSkill &&
               session.generationStatus == 'queued',
         );
-        if (!queuedHarnessRow) return;
-        unawaited(
-          AiCostTracker.event(
-            feature: 'course_generation_harness',
-            event: 'reconcile_queued_triggered',
-            extra: {'target_skill': harnessSkill},
-          ),
-        );
+        if (queuedHarnessRow) {
+          unawaited(
+            AiCostTracker.event(
+              feature: 'course_generation_harness',
+              event: 'reconcile_queued_triggered',
+              extra: {'target_skill': harnessSkill},
+            ),
+          );
+        } else {
+          // A stale ready row can be just as blocked as a queued row: older
+          // builds occasionally saved a Speaking artifact in a Reading row.
+          // Still make the one bounded repair request so the server can
+          // requeue that row instead of leaving the roadmap waiting forever.
+          unawaited(
+            AiCostTracker.event(
+              feature: 'course_generation_harness',
+              event: 'reconcile_stale_ready_triggered',
+              extra: {'target_skill': harnessSkill},
+            ),
+          );
+        }
       }
       if (onlyIfNewHarnessRow) {
         final highest = plan.sessions.fold<int>(
@@ -151,11 +176,11 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                     CourseGenerationTestHarness.current.targetSkill &&
                 session.generationStatus == 'queued',
           );
-          if (!queuedHarnessRow) return;
+          if (!queuedHarnessRow) return null;
         }
       }
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
-      if (!mounted || operationEpoch != _generationEpoch) return;
+      if (!mounted || operationEpoch != _generationEpoch) return null;
       // A reconcile can legitimately have no local plan diff: the queued row
       // was already persisted by an earlier run. It still needs the one
       // explicit provider claim. Production keeps the existing persisted-plan
@@ -177,9 +202,9 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // succeeded while one PCM clip timed out; the next deliberate Generate
       // action should inspect the saved lesson and repair only that missing
       // cache entry, without regenerating the lesson text.
-      if (!mounted || operationEpoch != _generationEpoch) return;
+      if (!mounted || operationEpoch != _generationEpoch) return null;
       await sync.hydrateAdaptiveCourses();
-      if (!mounted || operationEpoch != _generationEpoch) return;
+      if (!mounted || operationEpoch != _generationEpoch) return null;
       if (harnessSkill == 'vocabulary') {
         // Vocabulary is intentionally Live-only. Do not let this shared
         // roadmap callback repair an unrelated reading/listening deck while
@@ -191,12 +216,37 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
             extra: {'audio_generation_calls': 0},
           ),
         );
-        return;
+        return null;
       }
       final refreshed = ref
           .read(adaptiveCourseStoreProvider)
           .ensureCurrentPlan(profile);
-      for (final candidate in refreshed.sessions.reversed) {
+      AdaptiveCourseSessionSpec? generatedCandidate;
+      if (openWhenReady) {
+        for (final candidate in refreshed.sessions) {
+          if (candidate.isFoundation ||
+              (harnessSkill != null &&
+                  candidate.primarySkill.wireName != harnessSkill) ||
+              !candidate.isContentReady) {
+            continue;
+          }
+          final previous = beforeState[candidate.contentKey];
+          if (previous == null || previous != _generationState(candidate)) {
+            generatedCandidate = candidate;
+            break;
+          }
+        }
+      }
+      final audioCandidates = <AdaptiveCourseSessionSpec>[];
+      if (generatedCandidate != null) {
+        audioCandidates.add(generatedCandidate);
+      }
+      audioCandidates.addAll(
+        refreshed.sessions.reversed.where(
+          (candidate) => candidate.contentKey != generatedCandidate?.contentKey,
+        ),
+      );
+      for (final candidate in audioCandidates) {
         if (candidate.isFoundation ||
             candidate.generationStatus != 'ready' ||
             candidate.artifact == null ||
@@ -205,15 +255,28 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           continue;
         }
         try {
-          if (!mounted || operationEpoch != _generationEpoch) return;
+          if (!mounted || operationEpoch != _generationEpoch) return null;
           final story = candidate.primarySkill == SpeakSkill.listening
               ? CourseArtifactCodec.listening(candidate.artifact!)
               : CourseArtifactCodec.story(candidate.artifact!);
-          if (!mounted || operationEpoch != _generationEpoch) return;
-          await LessonAudioDeckService.shared.prepare(
-            story: story,
-            db: ref.read(databaseProvider),
-          );
+          if (!mounted || operationEpoch != _generationEpoch) return null;
+          // Text is the critical path. Warm the story deck in the background
+          // so the reader opens as soon as the valid passage is hydrated;
+          // playback resolves the first missing clip on demand while later
+          // clips continue warming in parallel.
+          unawaited(() async {
+            try {
+              await LessonAudioDeckService.shared.prepare(
+                story: story,
+                db: ref.read(databaseProvider),
+              );
+            } catch (error, stackTrace) {
+              debugPrint(
+                'Course audio generation deferred for ${candidate.contentKey}: '
+                '$error\n$stackTrace',
+              );
+            }
+          }());
         } catch (error, stackTrace) {
           // Text lesson generation remains persisted. The next explicit
           // Generate action can finish a missing audio deck; no silent
@@ -225,10 +288,27 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
         }
         break;
       }
+      if (generatedCandidate != null && mounted) {
+        final completed = ref
+            .read(storageServiceProvider)
+            .completedContentKeys();
+        final projected = SpeakRoadmapService.build(
+          profile,
+          completedContentKeys: completed,
+          adaptiveSessions: refreshed.sessions,
+          generationHarness: CourseGenerationTestHarness.current,
+        ).sessions;
+        for (final session in projected) {
+          if (session.contentKey == generatedCandidate.contentKey) {
+            return session;
+          }
+        }
+      }
     } finally {
       _preparingCourse = false;
       if (mounted) setState(() {});
     }
+    return null;
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
@@ -255,11 +335,27 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           },
         ),
       );
-      await _prepareCourse(
+      final nextSession = await _prepareCourse(
         harnessSkill: harness.targetWireName,
         onlyIfNewHarnessRow: true,
+        openWhenReady: true,
       );
+      if (nextSession != null && mounted) {
+        await _openSession(nextSession);
+      }
     }
+  }
+
+  String _generationState(AdaptiveCourseSessionSpec session) {
+    final artifact = session.artifact;
+    final keys = artifact == null
+        ? const <String>[]
+        : (artifact.keys.map((key) => key.toString()).toList()..sort());
+    return jsonEncode({
+      'status': session.generationStatus,
+      'kind': session.artifactKind,
+      'keys': keys,
+    });
   }
 
   /// Tapping a subscription-locked Unit 2+ lesson must show the paywall,
@@ -457,11 +553,16 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                   ? null
                   : () {
                       final harness = CourseGenerationTestHarness.current;
-                      _prepareCourse(
+                      unawaited(_prepareCourse(
                         harnessSkill: harness.active
                             ? harness.targetWireName
                             : null,
-                      );
+                        openWhenReady: true,
+                      ).then((nextSession) {
+                        if (nextSession != null && mounted) {
+                          return _openSession(nextSession);
+                        }
+                      }));
                     },
             ),
           ],

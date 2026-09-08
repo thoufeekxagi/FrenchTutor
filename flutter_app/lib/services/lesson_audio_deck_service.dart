@@ -409,6 +409,10 @@ class LessonAudioDeckService {
         text: text,
         contentItemId: story.segmentContentId(index),
         voiceName: voiceName,
+        // This is a brand-new lesson deck. The local cache was already
+        // checked by generateAndCache; skip the remote miss round-trip here
+        // and let ensureRemote mirror the successful bytes afterward.
+        checkRemote: false,
       );
       if (bytes == null || bytes.isEmpty || bytes.length.isOdd) {
         _upsert(

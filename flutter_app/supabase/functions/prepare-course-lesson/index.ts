@@ -589,6 +589,48 @@ function writingArtifactMatchesCurrentCourseMode(row: Json): boolean {
     text((lesson as Json).mode) === expected;
 }
 
+/// A row can survive an older client/server release with `ready` status while
+/// its JSON belongs to a different Course skill (for example a Speaking
+/// `lines` artifact stored in a Reading row).  Treat that state as repairable
+/// rather than returning it forever as if it were openable content.
+function readyArtifactMatchesCurrentCourseSkill(row: Json): boolean {
+  if (text(row.generation_status) !== "ready") return true;
+  const skill = text(row.primary_skill);
+  const artifact = row.artifact_json;
+  if (!artifact || typeof artifact !== "object" || Array.isArray(artifact)) {
+    return false;
+  }
+  const value = artifact as Json;
+  try {
+    switch (skill) {
+      case "reading":
+        validateStory(value, text(row.level) || "A1", Number(row.sequence ?? 0));
+        return true;
+      case "listening":
+        validateStory(value, text(row.level) || "A1", Number(row.sequence ?? 0));
+        return text(value.audioPath).length > 0;
+      case "speaking":
+      case "roleplay":
+      case "free_talk":
+        return Array.isArray(value.lines) && value.lines.length >= 3;
+      case "vocabulary":
+        return Array.isArray(value.entries) && value.entries.length === 5 &&
+          !!value.storyExamples && typeof value.storyExamples === "object" &&
+          !Array.isArray(value.storyExamples);
+      case "writing":
+        return writingArtifactMatchesCurrentCourseMode(row);
+      case "grammar":
+        return !!value.session && typeof value.session === "object" &&
+          !Array.isArray(value.session) &&
+          Array.isArray((value.session as Json).steps);
+      default:
+        return true;
+    }
+  } catch {
+    return false;
+  }
+}
+
 // Units alternate between two honest, simple postures instead of applying
 // the same 60/40 reuse ratio everywhere. A learner should feel real spaced
 // repetition in some units and real new-ground exploration in others, never
@@ -938,28 +980,25 @@ Deno.serve(async (request: Request) => {
   const { data: activePersonalized, error: reserveError } = await activePersonalizedQuery;
   if (reserveError) return response({ error: reserveError.message }, 500);
 
-  // A previous Course build could persist Writing role-play content as
-  // `ready`. The current contract accepts only `complete` or `guided`, so
-  // that row is not openable and a queued-only lookup can never repair it.
-  // Repair only this deterministic mismatch; valid ready content is never
-  // regenerated. The transition goes through `failed` first so the database
-  // guard that protects valid ready artifacts from accidental queued
-  // regressions remains effective.
-  const staleWriting = (activePersonalized ?? []).find((row) =>
-    text(row.primary_skill) === "writing" &&
+  // A previous Course build can persist a valid artifact under the wrong
+  // skill (for example Speaking `lines` in a Reading row).  A queued-only
+  // lookup can never repair a row that is already marked `ready`, so move the
+  // first mismatched row back through `failed`.  Valid ready content is never
+  // regenerated, and the database guard still protects the transition.
+  const staleArtifact = (activePersonalized ?? []).find((row) =>
     text(row.generation_status) === "ready" &&
-    !writingArtifactMatchesCurrentCourseMode(row as Json) &&
-    (!harnessSkill || harnessSkill === "writing")
+    !readyArtifactMatchesCurrentCourseSkill(row as Json) &&
+    (!harnessSkill || harnessSkill === text(row.primary_skill))
   ) as Json | undefined;
-  if (staleWriting) {
-    const staleId = text(staleWriting.id);
+  if (staleArtifact) {
+    const staleId = text(staleArtifact.id);
     const { error: repairError } = await admin
       .from("adaptive_course_sessions")
       .update({
         generation_status: "failed",
         artifact_kind: null,
         artifact_json: null,
-        generation_error: "Repairing stale Writing artifact for the current Course mode",
+        generation_error: `Repairing stale ${text(staleArtifact.primary_skill) || "Course"} artifact for the current Course contract`,
         updated_at: new Date().toISOString(),
       })
       .eq("id", staleId)
@@ -967,10 +1006,11 @@ Deno.serve(async (request: Request) => {
       .eq("generation_status", "ready");
     if (repairError) return response({ error: repairError.message }, 500);
     console.info(JSON.stringify({
-      event: "course_stale_writing_artifact_requeued",
+      event: "course_stale_artifact_requeued",
       userId,
       sessionId: staleId,
-      sequence: staleWriting.sequence,
+      sequence: staleArtifact.sequence,
+      primarySkill: text(staleArtifact.primary_skill),
     }));
   }
 

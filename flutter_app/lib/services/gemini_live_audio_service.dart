@@ -96,6 +96,7 @@ class GeminiLiveAudioService {
     required String contentItemId,
     String? voiceName,
     bool slow = false,
+    bool checkRemote = true,
   }) async {
     final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (normalized.isEmpty) return null;
@@ -132,6 +133,7 @@ class GeminiLiveAudioService {
       persona: persona,
       cacheKey: cacheKey,
       slow: slow,
+      checkRemote: checkRemote,
     );
     _inFlight[cacheKey] = future;
     try {
@@ -399,6 +401,7 @@ class GeminiLiveAudioService {
     required TutorPersona persona,
     required String cacheKey,
     required bool slow,
+    required bool checkRemote,
   }) async {
     final local = await _readLocal(cacheKey);
     if (_validPcm(local)) return local;
@@ -407,7 +410,7 @@ class GeminiLiveAudioService {
     final storagePath = userId == null
         ? null
         : storagePathFor(userId: userId, cacheKey: cacheKey);
-    if (storagePath != null) {
+    if (checkRemote && storagePath != null) {
       try {
         final remote = await Supabase.instance.client.storage
             .from(_bucket)
