@@ -416,6 +416,10 @@ class LessonAudioDeckService {
         // checked by generateAndCache; skip the remote miss round-trip here
         // and let ensureRemote mirror the successful bytes afterward.
         checkRemote: false,
+        // The deck owns the awaited mirror below. Keeping the generation
+        // service's fire-and-forget mirror off here prevents both paths from
+        // upserting the same cache row concurrently.
+        mirrorRemote: false,
       );
       if (bytes == null || bytes.isEmpty || bytes.length.isOdd) {
         _upsert(

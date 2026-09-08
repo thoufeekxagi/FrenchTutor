@@ -97,6 +97,7 @@ class GeminiLiveAudioService {
     String? voiceName,
     bool slow = false,
     bool checkRemote = true,
+    bool mirrorRemote = true,
   }) async {
     final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (normalized.isEmpty) return null;
@@ -134,6 +135,7 @@ class GeminiLiveAudioService {
       cacheKey: cacheKey,
       slow: slow,
       checkRemote: checkRemote,
+      mirrorRemote: mirrorRemote,
     );
     _inFlight[cacheKey] = future;
     try {
@@ -402,6 +404,7 @@ class GeminiLiveAudioService {
     required String cacheKey,
     required bool slow,
     required bool checkRemote,
+    required bool mirrorRemote,
   }) async {
     final local = await _readLocal(cacheKey);
     if (_validPcm(local)) return local;
@@ -530,7 +533,7 @@ class GeminiLiveAudioService {
     );
     await _writeLocal(cacheKey, generatedBytes);
 
-    if (userId != null && storagePath != null) {
+    if (mirrorRemote && userId != null && storagePath != null) {
       // The local write is the playback critical path. Mirror the exact
       // lossless gzip payload in the background so a first-use tap never
       // waits for Storage or the cache-index round trip after Gemini has
