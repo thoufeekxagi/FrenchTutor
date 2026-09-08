@@ -105,6 +105,7 @@ class InlineCallController {
   void Function(List<int>)? _externalNarrationAudio;
   void Function(String)? _externalNarrationTranscript;
   Completer<void>? _externalNarrationCompletion;
+  Timer? _externalNarrationFirstAudioTimer;
   Timer? _externalNarrationAudioIdleTimer;
   bool _externalNarrationReceivedAudio = false;
   // A connect can finish after the learner has already tapped the phone to
@@ -606,11 +607,23 @@ class InlineCallController {
     final generation = ++_externalNarrationGeneration;
     final completion = Completer<void>();
     _externalNarrationCompletion = completion;
+    _externalNarrationFirstAudioTimer?.cancel();
     _externalNarrationAudioIdleTimer?.cancel();
     _externalNarrationReceivedAudio = false;
+    _externalNarrationFirstAudioTimer = Timer(const Duration(seconds: 6), () {
+      if (generation == _externalNarrationGeneration &&
+          !_externalNarrationReceivedAudio &&
+          !completion.isCompleted) {
+        completion.completeError(
+          TimeoutException('Marie returned no narration audio'),
+        );
+      }
+    });
     _externalNarrationAudio = (bytes) {
-      if (generation == _externalNarrationGeneration) onAudioChunk(bytes);
       if (generation == _externalNarrationGeneration) {
+        _externalNarrationFirstAudioTimer?.cancel();
+        _externalNarrationFirstAudioTimer = null;
+        onAudioChunk(bytes);
         _externalNarrationReceivedAudio = true;
         _externalNarrationAudioIdleTimer?.cancel();
         _externalNarrationAudioIdleTimer = Timer(
@@ -647,6 +660,8 @@ class InlineCallController {
         },
       );
     } finally {
+      _externalNarrationFirstAudioTimer?.cancel();
+      _externalNarrationFirstAudioTimer = null;
       _externalNarrationAudioIdleTimer?.cancel();
       _externalNarrationAudioIdleTimer = null;
       if (generation == _externalNarrationGeneration) {
@@ -673,6 +688,8 @@ class InlineCallController {
     _externalNarrationGeneration++;
     _externalNarrationAudio = null;
     _externalNarrationTranscript = null;
+    _externalNarrationFirstAudioTimer?.cancel();
+    _externalNarrationFirstAudioTimer = null;
     final narration = _externalNarrationCompletion;
     if (narration != null && !narration.isCompleted) {
       narration.completeError(StateError('Story narration stopped'));
