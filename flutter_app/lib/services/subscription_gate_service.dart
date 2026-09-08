@@ -1,9 +1,16 @@
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kDebugMode;
 import 'package:sqlite3/common.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/database/pilot_infrastructure_store.dart';
 import '../orchestration/models/competency.dart';
+
+/// Android debug builds are used for UI/content verification before Play
+/// Billing is configured. Keep this bypass explicitly debug-only so release
+/// Android builds and every iOS build retain the real entitlement gates.
+bool get androidTestingBuild =>
+    kDebugMode && defaultTargetPlatform == TargetPlatform.android;
 
 /// Debug-build-only "unlock everything" switch for testing paid-tier UI
 /// without a real purchase. Mirrors ActiveTutor's
@@ -102,7 +109,7 @@ class SubscriptionGateService {
   }
 
   bool get hasPremiumAccess {
-    if (DevSubscriptionOverride.enabled) return true;
+    if (androidTestingBuild || DevSubscriptionOverride.enabled) return true;
     return infrastructure.entitlement().isPaidActive;
   }
 

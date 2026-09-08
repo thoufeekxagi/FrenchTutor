@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../config/api_keys.dart';
+import 'subscription_gate_service.dart';
 
 /// Cross-platform paywall/entitlement client (iOS StoreKit + Android Play
 /// Billing via RevenueCat's SDK). Apple/Google store transactions are the
@@ -28,6 +29,7 @@ class RevenueCatService {
 
   bool get isConfigured =>
       !kIsWeb &&
+      !androidTestingBuild &&
       ((Platform.isIOS && ApiKeys.revenueCatIosKey.isNotEmpty) ||
           (Platform.isAndroid && ApiKeys.revenueCatAndroidKey.isNotEmpty));
 
@@ -36,6 +38,13 @@ class RevenueCatService {
     CustomerInfoUpdateListener? onCustomerInfo,
   }) async {
     _customerInfoListener ??= onCustomerInfo;
+    if (androidTestingBuild) {
+      debugPrint(
+        'RevenueCatService: Android debug test build — billing disabled; '
+        'all premium content is unlocked locally.',
+      );
+      return;
+    }
     if (!isConfigured) {
       debugPrint(
         'RevenueCatService: not configured — no API key for this platform '

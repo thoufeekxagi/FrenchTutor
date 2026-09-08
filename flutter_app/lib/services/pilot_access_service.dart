@@ -49,7 +49,9 @@ class PilotAccessService {
   /// snapshot was built from, not a stale flat constant.
   static int baseDailyLimitSeconds(PilotEntitlement entitlement) {
     final subscribed =
-        DevSubscriptionOverride.enabled || entitlement.isPaidActive;
+        androidTestingBuild ||
+        DevSubscriptionOverride.enabled ||
+        entitlement.isPaidActive;
     return subscribed ? subscribedDailyLimitSeconds : freeDailyLimitSeconds;
   }
 }

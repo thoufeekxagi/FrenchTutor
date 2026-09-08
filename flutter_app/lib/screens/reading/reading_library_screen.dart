@@ -753,6 +753,15 @@ class _ReadingCover extends StatelessWidget {
   }
 
   Widget _fallback() {
+    // Previous-story thumbnails are intentionally compact (130px tall). Keep
+    // their cover copy within the bounded card instead of allowing the icon,
+    // title and footer to overflow below the thumbnail.
+    final compact = height <= 150;
+    final contentPadding = compact ? 12.0 : 16.0;
+    final iconSize = compact ? 24.0 : 28.0;
+    final titleSize = compact ? 14.0 : 15.0;
+    final titleLines = compact ? 2 : 4;
+
     return SizedBox(
       width: width,
       height: height,
@@ -776,10 +785,10 @@ class _ReadingCover extends StatelessWidget {
           ),
           Positioned(
             left: -28,
-            bottom: 26,
+            bottom: compact ? 18 : 26,
             child: Container(
-              width: 112,
-              height: 112,
+              width: compact ? 96 : 112,
+              height: compact ? 96 : 112,
               decoration: BoxDecoration(
                 color: DesignTokens.info.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
@@ -787,24 +796,26 @@ class _ReadingCover extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(contentPadding),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   CupertinoIcons.book_fill,
                   color: Colors.white,
-                  size: 28,
+                  size: iconSize,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: compact ? 6 : 10),
                 Text(
                   story.displayTitle,
-                  maxLines: 4,
+                  maxLines: titleLines,
                   overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.display(15).copyWith(color: Colors.white),
+                  style: DesignTokens.display(
+                    titleSize,
+                  ).copyWith(color: Colors.white),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   'FRENCH READING',
                   style: DesignTokens.label(
