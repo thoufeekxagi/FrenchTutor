@@ -154,7 +154,11 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       }
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
       if (!mounted || operationEpoch != _generationEpoch) return;
-      if (coursePersisted) {
+      // A reconcile can legitimately have no local plan diff: the queued row
+      // was already persisted by an earlier run. It still needs the one
+      // explicit provider claim. Production keeps the existing persisted-plan
+      // gate; only the debug harness may prepare an unchanged queued row.
+      if (coursePersisted || reconcileQueuedHarnessRow) {
         await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
       }
       // Audio repair is still explicit, but it must not depend on the text
