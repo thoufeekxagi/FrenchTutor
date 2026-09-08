@@ -546,7 +546,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               _selectedChoice = choice;
               _message = null;
             }),
-            onListen: () => _speak(choice),
+            onListen: () => _repeatWordWithLive(choice),
           ),
           const SizedBox(height: 10),
         ],
@@ -938,20 +938,10 @@ sentence exactly once, then stop.
   }
 
   Future<void> _repeatCurrentSentence() async {
-    try {
-      final call = _ensureCall();
-      if (!call.active) {
-        await call.start(context, sendOpeningPrompt: false);
-      }
-      if (!call.active) return;
-      call.promptTutor(
-        'APP COMMAND: Say the current French target sentence exactly once: '
-        '${_step.target}. Do not explain it, translate it, or add anything. '
-        'Then stop and wait.',
-      );
-    } catch (error) {
-      debugPrint('Writing Live sentence repeat failed: $error');
-    }
+    await _repeatWithLive(
+      _step.target,
+      'Say the current French target sentence exactly once',
+    );
   }
 
   Future<void> _repeatVisibleSentence() async {
@@ -964,6 +954,17 @@ sentence exactly once, then stop.
   }
 
   Future<void> _repeatSentenceWithLive(String sentence) async {
+    await _repeatWithLive(
+      sentence,
+      'Say this current French sentence exactly once',
+    );
+  }
+
+  Future<void> _repeatWordWithLive(String word) async {
+    await _repeatWithLive(word, 'Say only this exact French word once');
+  }
+
+  Future<void> _repeatWithLive(String text, String instruction) async {
     try {
       final call = _ensureCall();
       if (!call.active) {
@@ -971,8 +972,8 @@ sentence exactly once, then stop.
       }
       if (!call.active) return;
       call.promptTutor(
-        'APP COMMAND: Say this current French sentence exactly once: '
-        '$sentence. Do not explain it, translate it, or add anything. Then stop.',
+        'APP COMMAND: $instruction: $text. Do not explain it, translate it, '
+        'or add anything. Then stop and wait.',
       );
     } catch (error) {
       debugPrint('Writing Live sentence repeat failed: $error');

@@ -204,13 +204,9 @@ class InlineTutorConnectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: connected
-              ? DesignTokens.success.withValues(alpha: 0.55)
-              : failed
-              ? DesignTokens.primary.withValues(alpha: 0.45)
-              : DesignTokens.hairline,
-        ),
+        // The Speaking/Vocabulary card keeps a neutral outline in every
+        // state; connection is communicated by the phone color and subtitle.
+        border: Border.all(color: DesignTokens.hairline),
       ),
       child: Row(
         children: [
