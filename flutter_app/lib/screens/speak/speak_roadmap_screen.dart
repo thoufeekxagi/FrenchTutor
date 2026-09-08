@@ -19,6 +19,7 @@ import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
 import 'speak_course_activity_screen.dart';
+import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/v3/v3_surface.dart';
 
 class SpeakRoadmapScreen extends ConsumerStatefulWidget {
@@ -117,7 +118,8 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       final current = store.currentPlan(profile);
       final before = onlyIfNewHarnessRow ? current : null;
       final beforeState = <String, String>{
-        for (final session in current?.sessions ?? const <AdaptiveCourseSessionSpec>[])
+        for (final session
+            in current?.sessions ?? const <AdaptiveCourseSessionSpec>[])
           session.contentKey: _generationState(session),
       };
       final beforeHighest = before == null
@@ -526,6 +528,17 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     final hasInFlight =
         _preparingCourse ||
         sessions.any((session) => session.generationStatus == 'generating');
+    if (hasInFlight) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 6),
+        child: PersonalizedGenerationLoader(
+          content: 'your next lesson',
+          detail: 'Building the lesson buffer…',
+          icon: Icons.auto_awesome_rounded,
+          compact: true,
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: V3Card(
@@ -552,16 +565,18 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                   ? null
                   : () {
                       final harness = CourseGenerationTestHarness.current;
-                      unawaited(_prepareCourse(
-                        harnessSkill: harness.active
-                            ? harness.targetWireName
-                            : null,
-                        openWhenReady: true,
-                      ).then((nextSession) {
-                        if (nextSession != null && mounted) {
-                          return _openSession(nextSession);
-                        }
-                      }));
+                      unawaited(
+                        _prepareCourse(
+                          harnessSkill: harness.active
+                              ? harness.targetWireName
+                              : null,
+                          openWhenReady: true,
+                        ).then((nextSession) {
+                          if (nextSession != null && mounted) {
+                            return _openSession(nextSession);
+                          }
+                        }),
+                      );
                     },
             ),
           ],
@@ -732,7 +747,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               ),
             ),
             const SizedBox(width: 8),
-            if (preparing)
+            if (preparing || (_preparingCourse && queued))
               const _LessonPreparationIndicator()
             else if (queued || failed)
               Icon(

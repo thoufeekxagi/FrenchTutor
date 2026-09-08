@@ -659,6 +659,17 @@ class InlineCallController {
           throw TimeoutException('Marie narration timed out');
         },
       );
+      // A Live turn can occasionally close cleanly without carrying a model
+      // audio chunk (or deliver that first chunk just after turnComplete).
+      // Treating that as success made the story player silently advance and
+      // skip a sentence. Give the ordered WebSocket callbacks a short grace
+      // window, then fail the current sentence instead of moving past it.
+      if (!_externalNarrationReceivedAudio) {
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+        if (!_externalNarrationReceivedAudio) {
+          throw StateError('Marie returned no narration audio');
+        }
+      }
     } finally {
       _externalNarrationFirstAudioTimer?.cancel();
       _externalNarrationFirstAudioTimer = null;

@@ -474,10 +474,21 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Future<void> _playLiveSegment(int index, int generation) async {
     final segment = _passage.segments[index];
     if (!mounted || generation != _livePlaybackGeneration) return;
+    // A previous Live turn can signal turnComplete a fraction before the last
+    // native feed has settled. Drain that hand-off before opening a new
+    // sentence so a late chunk can never be attributed to the next line.
+    await _liveNarrationAudio.waitForPlaybackDrained();
     _narrationHighlightTimer?.cancel();
     _liveNarrationAudio.resetPlaybackTimeline();
     _liveOutputTranscript = '';
     _liveTranscriptWordIndex = null;
+    // Audio chunks arrive from the WebSocket through a void callback. Keep a
+    // local awaitable tail anyway: without it, the reader could observe an
+    // empty queue while the first chunk was still opening the native player,
+    // advance to the next sentence, and then lose the late chunk at the
+    // generation boundary.
+    var audioFeedTail = Future<void>.value();
+    var audioFeedFailed = false;
     setState(() {
       _currentSegment = index;
       _currentWord = null;
@@ -490,21 +501,35 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     _scrollToCurrent();
     await _call.narrateExternalText(
       instruction:
-          'APP_NARRATION sentence_id=$index. Say this exact French sentence once and stop: ${segment.fr}',
+          'APP_NARRATION sentence_id=$index AUDIO_REQUIRED. Say this exact '
+          'French sentence once and stop. Do not skip it, combine it with '
+          'another sentence, or explain it: ${segment.fr}',
       onAudioChunk: (bytes) {
         if (!mounted || generation != _livePlaybackGeneration) return;
-        unawaited(
-          _liveNarrationAudio.playAudioChunk(bytes, playbackSpeed: _rate),
-        );
-        if (_isLoadingAudio || _currentWord == null) {
-          // Give the first audible frame an honest starting position while
-          // the local playback timeline catches the first frame. Later words
-          // are advanced by that timeline, not by transcript arrival.
-          setState(() {
-            _isLoadingAudio = false;
-            _currentWord ??= 0;
-          });
-        }
+        audioFeedTail = audioFeedTail.then((_) async {
+          try {
+            await _liveNarrationAudio.playAudioChunk(
+              bytes,
+              playbackSpeed: _rate,
+            );
+            if (!mounted || generation != _livePlaybackGeneration) return;
+            if (_isLoadingAudio || _currentWord == null) {
+              // Give the first audible frame an honest starting position while
+              // the local playback timeline catches the first frame. Later
+              // words are advanced by that timeline, not transcript arrival.
+              setState(() {
+                _isLoadingAudio = false;
+                _currentWord ??= 0;
+              });
+            }
+          } catch (error, stackTrace) {
+            audioFeedFailed = true;
+            debugPrint(
+              'Story narration audio feed failed for segment $index: '
+              '$error\n$stackTrace',
+            );
+          }
+        });
       },
       onTranscriptDelta: (delta) {
         if (!mounted || generation != _livePlaybackGeneration) return;
@@ -523,6 +548,11 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         }
       },
     );
+    await audioFeedTail;
+    if (!mounted || generation != _livePlaybackGeneration) return;
+    if (audioFeedFailed) {
+      throw StateError('Story narration audio could not be queued');
+    }
     await _liveNarrationAudio.waitForPlaybackDrained();
     _narrationHighlightTimer?.cancel();
     _narrationHighlightTimer = null;
@@ -1162,85 +1192,79 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           style: DesignTokens.display(29).copyWith(color: text, height: 1.08),
         ),
         const SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Wrap(
-                alignment: WrapAlignment.start,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 2,
-                runSpacing: 2,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: accent.withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      _story.levelBand,
-                      style: DesignTokens.mono(
-                        11,
-                        weight: FontWeight.w800,
-                      ).copyWith(color: accent),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '• ${_story.readTimeMinutes} min read',
-                    style: DesignTokens.body(
-                      13,
-                      weight: FontWeight.w600,
-                    ).copyWith(color: muted),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    onPressed: _toggleTranslation,
-                    tooltip: _translateSentences
-                        ? 'Hide translation'
-                        : 'Show translation',
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      Icons.translate,
-                      color: _translateSentences ? accent : muted,
-                      size: 22,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _cycleTextSize,
-                    tooltip: 'Text size: ${_textSizeLabel(_textScale)}',
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      CupertinoIcons.textformat_size,
-                      color: muted,
-                      size: 23,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _toggleFavorite,
-                    tooltip: _isLiked ? 'Unlike story' : 'Like story',
-                    visualDensity: VisualDensity.compact,
-                    icon: Icon(
-                      _isLiked
-                          ? CupertinoIcons.heart_fill
-                          : CupertinoIcons.heart,
-                      color: _isLiked ? accent : muted,
-                      size: 23,
-                    ),
-                  ),
-                  ReportProblemButton(
-                    sessionType: 'Story: ${_story.displayTitle}',
-                  ),
-                ],
+        // Keep every story control in one horizontal lane. A wrapping row
+        // pushed the report flag onto a second line as soon as Marie showed
+        // her call state, which made the header jump while the learner read.
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  _story.levelBand,
+                  style: DesignTokens.mono(
+                    11,
+                    weight: FontWeight.w800,
+                  ).copyWith(color: accent),
+                ),
               ),
-            ),
-            const SizedBox(width: 4),
-            _ReadingCallState(controller: _call, accent: accent),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                '• ${_story.readTimeMinutes} min',
+                style: DesignTokens.body(
+                  13,
+                  weight: FontWeight.w600,
+                ).copyWith(color: muted),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                onPressed: _toggleTranslation,
+                tooltip: _translateSentences
+                    ? 'Hide translation'
+                    : 'Show translation',
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  Icons.translate,
+                  color: _translateSentences ? accent : muted,
+                  size: 22,
+                ),
+              ),
+              IconButton(
+                onPressed: _cycleTextSize,
+                tooltip: 'Text size: ${_textSizeLabel(_textScale)}',
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  CupertinoIcons.textformat_size,
+                  color: muted,
+                  size: 23,
+                ),
+              ),
+              IconButton(
+                onPressed: _toggleFavorite,
+                tooltip: _isLiked ? 'Unlike story' : 'Like story',
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  _isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                  color: _isLiked ? accent : muted,
+                  size: 23,
+                ),
+              ),
+              ReportProblemButton(sessionType: 'Story: ${_story.displayTitle}'),
+              const SizedBox(width: 4),
+              _ReadingCallState(controller: _call, accent: accent),
+            ],
+          ),
         ),
       ],
     );
