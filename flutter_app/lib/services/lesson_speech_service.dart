@@ -490,7 +490,7 @@ class LessonSpeechService {
         debugPrint('LessonSpeechService: TTS attempt $attempt failed: $error');
       }
     }
-    debugPrint('LessonSpeechService: TTS request exhausted two attempts');
+    debugPrint('LessonSpeechService: TTS request exhausted one attempt');
     return null;
   }
 
