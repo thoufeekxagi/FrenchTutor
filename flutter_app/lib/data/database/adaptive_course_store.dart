@@ -908,6 +908,7 @@ class AdaptiveCourseStore {
             .where(
               (session) =>
                   session.sequence > initialBatchSize &&
+                  session.primarySkill == targetSkill &&
                   session.status != 'replaced',
             )
             .toList(growable: false)

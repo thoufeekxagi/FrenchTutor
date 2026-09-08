@@ -39,7 +39,7 @@ extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
 
 /// Development-only policy for serial Course generation verification.
 ///
-/// Enable a debug build to test Speaking with the default lane. The next lane
+/// Enable a debug build to test one skill with the default lane. The next lane
 /// can be selected without creating another implementation:
 ///
 /// `--dart-define=PARLESPRINT_COURSE_HARNESS_SKILL=vocabulary`
@@ -73,7 +73,10 @@ class CourseGenerationTestHarness {
     skill: CourseGenerationHarnessSkillValues.parse(
       String.fromEnvironment(
         'PARLESPRINT_COURSE_HARNESS_SKILL',
-        defaultValue: 'speaking',
+        // Speaking has completed its verification pass. Vocabulary is the
+        // next development-only lane; an explicit dart-define can still
+        // select any supported skill when the build tool preserves it.
+        defaultValue: 'vocabulary',
       ),
     ),
   );
