@@ -561,7 +561,7 @@ class GeminiLiveService {
     if (ctx != null && ctx.isNotEmpty) {
       final boundedLessonContext = _boundDynamicContext(
         ctx,
-        _maxLessonContextCharacters,
+        _lessonContextLimit,
       );
       prompt +=
           '\n\nLESSON CONTEXT, the student is currently studying this material; steer practice toward it while following ALL rules above:\n$boundedLessonContext';
@@ -574,6 +574,11 @@ class GeminiLiveService {
     if (normalized.length <= maxCharacters) return normalized;
     return '${normalized.substring(0, maxCharacters)}\n[context truncated]';
   }
+
+  int get _lessonContextLimit => switch (sessionType) {
+    LiveSessionType.readingNarration => 8000,
+    _ => _maxLessonContextCharacters,
+  };
 
   Future<String> _learnerProfile() async {
     final store = learningStoreForProfile;

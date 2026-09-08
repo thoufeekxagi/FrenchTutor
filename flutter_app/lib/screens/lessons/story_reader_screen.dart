@@ -12,8 +12,7 @@ import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_audio_deck_service.dart';
-import '../../services/lesson_speech_service.dart';
+import '../../services/audio_streaming_service.dart';
 import '../../services/session_settings.dart';
 import '../../services/word_meaning_resolver.dart';
 import '../../widgets/story_cover_image.dart';
@@ -102,6 +101,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
+  int _livePlaybackGeneration = 0;
+  String _liveOutputTranscript = '';
+  Timer? _liveHighlightTimer;
+  late final AudioStreamingService _liveNarrationAudio;
   double _rate = 1.0;
   double _textScale = 1;
   bool _translateSentences = true;
@@ -130,10 +133,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   int? _selectedWord;
 
   /// Which word (by index, split on whitespace) within the currently-playing
-  /// segment's French text the narration has reached — null when nothing is
-  /// playing, or once a segment's estimated timing runs past its last word.
-  /// Timing comes from `LessonSpeechService`'s `onWordBoundary`, estimated
-  /// from the known playback duration, not exact phoneme timing.
+  /// segment's French text the Live narration has reached.
   int? _currentWord;
 
   /// Artwork is generated independently of the story text so the learner can
@@ -150,12 +150,25 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   String get _lessonContext {
     final base = ref.read(contentServiceProvider).storyContext(_passage);
+    final context = StringBuffer(base)
+      ..writeln()
+      ..writeln('STORY SENTENCE PAIRS (use for explanations, never read automatically):');
+    for (var i = 0; i < _passage.segments.length; i++) {
+      final segment = _passage.segments[i];
+      context.writeln('[$i] FR: ${segment.fr} | EN: ${segment.en}');
+      if (segment.grammarNote.isNotEmpty) {
+        context.writeln('[$i] NOTE: ${segment.grammarNote}');
+      }
+    }
+    for (final keyword in _story.keywords) {
+      context.writeln('KEYWORD: ${keyword.fr} = ${keyword.en}');
+    }
     final explanation = widget.grammarExplanation;
-    if (explanation == null) return base;
+    if (explanation == null) return context.toString();
     // Marie needs the FULL taught explanation, not just the story — this is
     // what lets her actually answer "how does this change from present to
     // past" instead of only being able to talk about the story's sentences.
-    final buf = StringBuffer(base)
+    final buf = StringBuffer(context)
       ..writeln()
       ..writeln('GRAMMAR POINT BEING TAUGHT: ${explanation.title}')
       ..writeln(explanation.summary)
@@ -188,8 +201,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _favorites = ref.read(storyFavoriteStoreProvider);
+    _liveNarrationAudio = AudioStreamingService();
     _call = InlineCallController(
-      sessionType: LiveSessionType.labAssistant,
+      sessionType: LiveSessionType.readingNarration,
       lessonContext: () => _lessonContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
       onChanged: () {
@@ -235,15 +249,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       stage: 'story',
       topic: _story.displayTitle,
     );
-    // Warm every sentence in the background, but never hold the reader at a
-    // loading gate. The first explicit Play tap resolves its clip directly;
-    // later clips are usually already local by the time playback reaches them.
-    unawaited(
-      LessonAudioDeckService.shared.prepare(
-        story: _story,
-        db: ref.read(databaseProvider),
-      ),
-    );
     unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -288,7 +293,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     WidgetsBinding.instance.removeObserver(this);
     _coverRefreshTimer?.cancel();
     _call.dispose();
-    LessonSpeechService.shared.stop();
+    _livePlaybackGeneration++;
+    _liveHighlightTimer?.cancel();
+    unawaited(_liveNarrationAudio.dispose());
     _finishSession();
     super.dispose();
   }
@@ -336,75 +343,153 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Future<void> _playAll({int fromIndex = 0}) async {
     final segments = _passage.segments;
     if (segments.isEmpty) return;
+    if (!await _ensureMarieReady()) return;
+    final generation = ++_livePlaybackGeneration;
     setState(() {
       _isPlaying = true;
-      _isLoadingAudio = true;
+      _isLoadingAudio = false;
       _currentSegment = fromIndex;
     });
-    final pauseCall = _call.isLive;
-    if (pauseCall) await _call.beginExternalPlayback();
-    var releasedCall = false;
-    void releaseCall() {
-      if (!pauseCall || releasedCall) return;
-      releasedCall = true;
-      unawaited(_call.endExternalPlayback());
-    }
-
+    await _call.beginExternalPlayback();
     try {
-      await LessonSpeechService.shared.speak(
-        items: [
-          for (var i = fromIndex; i < segments.length; i++)
-            SpeechItem(
-              text: segments[i].fr,
-              language: 'fr-FR',
-              contentItemId: _story.segmentContentId(i),
-            ),
-        ],
-        playbackSpeed: _rate,
-        onItemStart: (i) {
-          if (!mounted) return;
-          setState(() {
-            _currentSegment = fromIndex + i;
-            _currentWord = null;
-          });
-          _scrollToCurrent();
-        },
-        onPlaybackReady: () {
-          if (mounted) setState(() => _isLoadingAudio = false);
-        },
-        onError: (error) {
-          if (!mounted) return;
-          setState(() {
-            _isPlaying = false;
-            _isLoadingAudio = false;
-            _currentWord = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Audio is unavailable right now. Please try again.',
-              ),
-            ),
-          );
-        },
-        onWordBoundary: (_, wordIndex) {
-          if (!mounted) return;
-          setState(() => _currentWord = wordIndex);
-        },
-        onFinished: () {
-          releaseCall();
-          if (!mounted) return;
-          setState(() {
-            _isPlaying = false;
-            _isLoadingAudio = false;
-            _currentWord = null;
-          });
-        },
-      );
-    } catch (_) {
-      releaseCall();
-      rethrow;
+      for (var index = fromIndex; index < segments.length; index++) {
+        if (!mounted || generation != _livePlaybackGeneration) break;
+        await _playLiveSegment(index, generation);
+      }
+    } catch (error) {
+      if (mounted && generation == _livePlaybackGeneration) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Marie could not narrate this story: $error')),
+        );
+      }
+    } finally {
+      _liveHighlightTimer?.cancel();
+      await _liveNarrationAudio.stopPlayback(hardStop: true);
+      await _call.endExternalPlayback();
+      if (mounted && generation == _livePlaybackGeneration) {
+        setState(() {
+          _isPlaying = false;
+          _isLoadingAudio = false;
+          _currentWord = null;
+        });
+      }
     }
+  }
+
+  Future<bool> _ensureMarieReady() async {
+    if (!_call.isLive) {
+      await _call.start(context, sendOpeningPrompt: false);
+    }
+    final deadline = DateTime.now().add(const Duration(seconds: 12));
+    while (mounted && !_call.isReadyForLearnerTurn &&
+        DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+    }
+    if (_call.isReadyForLearnerTurn) return true;
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Marie is not connected yet. Try again.')),
+      );
+    }
+    return false;
+  }
+
+  Future<void> _playLiveSegment(int index, int generation) async {
+    final segment = _passage.segments[index];
+    if (!mounted || generation != _livePlaybackGeneration) return;
+    _liveOutputTranscript = '';
+    _liveHighlightTimer?.cancel();
+    setState(() {
+      _currentSegment = index;
+      _currentWord = null;
+      _isLoadingAudio = true;
+    });
+    _scrollToCurrent();
+    _startLiveHighlightFallback(segment.fr, generation);
+    await _call.narrateExternalText(
+      instruction:
+          'APP_NARRATION sentence_id=$index. Say this exact French sentence once and stop: ${segment.fr}',
+      onAudioChunk: (bytes) {
+        if (!mounted || generation != _livePlaybackGeneration) return;
+        unawaited(_liveNarrationAudio.playAudioChunk(bytes));
+        if (_isLoadingAudio) setState(() => _isLoadingAudio = false);
+      },
+      onTranscriptDelta: (delta) {
+        if (!mounted || generation != _livePlaybackGeneration) return;
+        _liveOutputTranscript += delta;
+        final next = _highlightIndexFromTranscript(
+          segment.fr,
+          _liveOutputTranscript,
+        );
+        if (next != null && (_currentWord == null || next > _currentWord!)) {
+          setState(() => _currentWord = next);
+        }
+      },
+    );
+    await _liveNarrationAudio.waitForPlaybackDrained();
+    _liveHighlightTimer?.cancel();
+    if (mounted && generation == _livePlaybackGeneration) {
+      setState(() => _currentWord = null);
+    }
+  }
+
+  void _startLiveHighlightFallback(String sentence, int generation) {
+    final words = _storyWords(sentence);
+    if (words.isEmpty) return;
+    _liveHighlightTimer = Timer.periodic(const Duration(milliseconds: 260), (_) {
+      if (!mounted || generation != _livePlaybackGeneration || !_isPlaying ||
+          _isLoadingAudio) {
+        _liveHighlightTimer?.cancel();
+        return;
+      }
+      final next = (_currentWord ?? -1) + 1;
+      if (next >= words.length) return;
+      setState(() => _currentWord = next);
+    });
+  }
+
+  List<String> _storyWords(String text) => text
+      .replaceAll(RegExp(r"[^A-Za-zÀ-ÿ0-9'’-]+"), ' ')
+      .split(RegExp(r'\s+'))
+      .where((word) => word.trim().isNotEmpty)
+      .toList();
+
+  String _normaliseNarration(String value) => value
+      .toLowerCase()
+      .replaceAll('œ', 'oe')
+      .replaceAll('æ', 'ae')
+      .replaceAll(RegExp(r"[^a-zà-ÿ0-9']+"), ' ')
+      .replaceAll('à', 'a')
+      .replaceAll('â', 'a')
+      .replaceAll('ä', 'a')
+      .replaceAll('é', 'e')
+      .replaceAll('è', 'e')
+      .replaceAll('ê', 'e')
+      .replaceAll('ë', 'e')
+      .replaceAll('î', 'i')
+      .replaceAll('ï', 'i')
+      .replaceAll('ô', 'o')
+      .replaceAll('ö', 'o')
+      .replaceAll('ù', 'u')
+      .replaceAll('û', 'u')
+      .replaceAll('ü', 'u')
+      .replaceAll('ç', 'c')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+
+  int? _highlightIndexFromTranscript(String sentence, String transcript) {
+    final expected = _storyWords(sentence).map(_normaliseNarration).toList();
+    final actual = _storyWords(transcript).map(_normaliseNarration).toList();
+    if (expected.isEmpty || actual.isEmpty) return null;
+    var matched = 0;
+    for (final token in actual) {
+      if (matched >= expected.length) break;
+      final target = expected[matched];
+      if (token == target || token.contains(target) || target.contains(token)) {
+        matched++;
+      }
+    }
+    return matched == 0 ? null : matched - 1;
   }
 
   void _scrollToCurrent() {
@@ -420,16 +505,17 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }
 
   Future<void> _togglePlayPause() async {
-    final speech = LessonSpeechService.shared;
-    if (_isLoadingAudio) return;
-    if (_isPlaying && !speech.isPaused) {
-      await speech.pause();
+    if (_isPlaying) {
+      ++_livePlaybackGeneration;
+      _liveHighlightTimer?.cancel();
+      await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
-      if (mounted) setState(() => _isPlaying = false);
-    } else if (speech.isPaused) {
-      if (_call.isLive) await _call.beginExternalPlayback();
-      await speech.resume();
-      if (mounted) setState(() => _isPlaying = true);
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _currentWord = null;
+        });
+      }
     } else {
       await _playAll(fromIndex: _selectedSegment ?? 0);
     }
@@ -492,7 +578,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   };
 
   Future<void> _stop() async {
-    await LessonSpeechService.shared.stop();
+    ++_livePlaybackGeneration;
+    _liveHighlightTimer?.cancel();
+    await _liveNarrationAudio.stopPlayback(hardStop: true);
     await _call.endExternalPlayback();
     if (mounted) {
       setState(() {
@@ -566,77 +654,39 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     final segments = _passage.segments;
     final index = _selectedSegment ?? _currentSegment;
     if (index < 0 || index >= segments.length) return;
+    if (!await _ensureMarieReady()) return;
+    final generation = ++_livePlaybackGeneration;
     setState(() {
       _isPlaying = true;
-      _isLoadingAudio = true;
+      _isLoadingAudio = false;
       _currentSegment = index;
     });
-    final pauseCall = _call.isLive;
-    if (pauseCall) await _call.beginExternalPlayback();
-    var releasedCall = false;
-    void releaseCall() {
-      if (!pauseCall || releasedCall) return;
-      releasedCall = true;
-      unawaited(_call.endExternalPlayback());
-    }
-
+    await _call.beginExternalPlayback();
     try {
-      await LessonSpeechService.shared.speak(
-        items: [
-          SpeechItem(
-            text: segments[index].fr,
-            language: 'fr-FR',
-            contentItemId: _story.segmentContentId(index),
-          ),
-        ],
-        playbackSpeed: _rate,
-        onItemStart: (_) {
-          if (!mounted) return;
-          setState(() => _currentWord = null);
-          _scrollToCurrent();
-        },
-        onPlaybackReady: () {
-          if (mounted) setState(() => _isLoadingAudio = false);
-        },
-        onError: (error) {
-          if (!mounted) return;
-          setState(() {
-            _isPlaying = false;
-            _isLoadingAudio = false;
-            _currentWord = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Audio is unavailable right now. Please try again.',
-              ),
-            ),
-          );
-        },
-        onWordBoundary: (_, wordIndex) {
-          if (!mounted) return;
-          setState(() => _currentWord = wordIndex);
-        },
-        onFinished: () {
-          releaseCall();
-          if (!mounted) return;
-          setState(() {
-            _isPlaying = false;
-            _isLoadingAudio = false;
-            _currentWord = null;
-          });
-        },
-      );
-    } catch (_) {
-      releaseCall();
-      rethrow;
+      await _playLiveSegment(index, generation);
+    } catch (error) {
+      if (mounted && generation == _livePlaybackGeneration) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Marie could not narrate this sentence: $error')),
+        );
+      }
+    } finally {
+      _liveHighlightTimer?.cancel();
+      await _liveNarrationAudio.stopPlayback(hardStop: true);
+      await _call.endExternalPlayback();
+      if (mounted && generation == _livePlaybackGeneration) {
+        setState(() {
+          _isPlaying = false;
+          _isLoadingAudio = false;
+          _currentWord = null;
+        });
+      }
     }
   }
 
-  /// Keyword and grammar replay use the Marie socket. If the learner opened
-  /// the story while the call was off (or the socket was reclaimed in the
-  /// background), the first tap reconnects it transparently and then queues
-  /// the exact script. Story narration remains the only PCM-backed surface.
+  /// Keyword and grammar replay use the same Marie socket as story narration.
+  /// If the learner opened the story while the call was off (or the socket was
+  /// reclaimed in the background), the first tap reconnects it transparently.
   Future<void> _speakWithLive(String text) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
@@ -673,7 +723,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         rates[(currentIndex < 0 ? 0 : currentIndex + 1) % rates.length];
     setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(_rate));
-    unawaited(LessonSpeechService.shared.setPlaybackSpeed(_rate));
   }
 
   Future<void> _showSettings() async {
@@ -703,7 +752,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setPlaybackRate(_rate));
-    unawaited(LessonSpeechService.shared.setPlaybackSpeed(_rate));
     unawaited(_settings.setTranslateSentences(_translateSentences));
     unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));

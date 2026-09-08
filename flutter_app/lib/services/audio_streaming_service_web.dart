@@ -85,6 +85,9 @@ class WebAudioStreamingService implements AudioStreamingService {
   bool _isStreaming = false;
   bool _starting = false;
 
+  @override
+  bool get isStreaming => _isStreaming;
+
   /// Scheduled-playback cursor, in the output context's clock. Web Audio gives
   /// us sample-accurate scheduling, so gapless playback of network-bursty
   /// chunks is just "start each one where the last one ended" — no drain loop
@@ -440,6 +443,19 @@ class WebAudioStreamingService implements AudioStreamingService {
     // to future chunks, so a narration speed change remains continuous.
     for (final node in List.of(_scheduled)) {
       node.playbackRate.value = _playbackSpeed;
+    }
+  }
+
+  @override
+  Future<void> waitForPlaybackDrained({
+    Duration timeout = const Duration(seconds: 12),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    while (_scheduled.isNotEmpty && DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+    }
+    if (DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
     }
   }
 

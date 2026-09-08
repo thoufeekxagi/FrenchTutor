@@ -101,6 +101,10 @@ class InlineCallController {
   // back to Marie as if it were learner speech.
   bool _externalPlaybackPaused = false;
   bool _externalPlaybackShouldResume = false;
+  int _externalNarrationGeneration = 0;
+  void Function(List<int>)? _externalNarrationAudio;
+  void Function(String)? _externalNarrationTranscript;
+  Completer<void>? _externalNarrationCompletion;
   // A connect can finish after the learner has already tapped the phone to
   // stop.  Keep a monotonically increasing intent id so a late Live callback
   // cannot resurrect the UI or leave an orphaned socket marked active.
@@ -326,6 +330,10 @@ class InlineCallController {
     };
     g.onError = (msg) {
       if (!_isCurrentGeneration(generation)) return;
+      final narration = _externalNarrationCompletion;
+      if (narration != null && !narration.isCompleted) {
+        narration.completeError(StateError(msg));
+      }
       error = msg;
       if (!completer.isCompleted) {
         completer.complete(false);
@@ -335,6 +343,10 @@ class InlineCallController {
     };
     g.onDisconnected = () {
       if (!_isCurrentGeneration(generation)) return;
+      final narration = _externalNarrationCompletion;
+      if (narration != null && !narration.isCompleted) {
+        narration.completeError(StateError('Marie disconnected during narration'));
+      }
       if (!completer.isCompleted) {
         completer.complete(false);
         return;
@@ -353,12 +365,18 @@ class InlineCallController {
     };
     g.onTutorTranscript = (text) {
       if (!_isCurrentGeneration(generation)) return;
+      if (_externalNarrationCompletion != null) return;
       lastTutorLine = text;
       _notify();
       onTutorTranscript?.call(text);
     };
     g.onAudioChunk = (bytes) {
       if (!_isCurrentGeneration(generation)) return;
+      final externalAudio = _externalNarrationAudio;
+      if (_externalPlaybackPaused && externalAudio != null) {
+        externalAudio(bytes);
+        return;
+      }
       // Suppress any already-buffered tutor reply while the story player owns
       // the phone speaker. Without this guard a late Live chunk can reopen
       // the call's player over the narration we are trying to play.
@@ -367,12 +385,30 @@ class InlineCallController {
       tutorSpeaking = true;
       a.playAudioChunk(bytes);
     };
+    g.onTranscriptDelta = (delta) {
+      if (!_isCurrentGeneration(generation)) return;
+      _externalNarrationTranscript?.call(delta);
+    };
+    g.onInterrupted = () {
+      if (!_isCurrentGeneration(generation)) return;
+      final narration = _externalNarrationCompletion;
+      if (narration != null && !narration.isCompleted) {
+        narration.completeError(
+          StateError('Marie narration was interrupted before completion'),
+        );
+      }
+    };
     g.onTurnComplete = () {
       if (!_isCurrentGeneration(generation)) return;
       a.isOutputActive = false;
       tutorSpeaking = false;
       _scheduleManualIdleLimit();
       _notify();
+      final narration = _externalNarrationCompletion;
+      if (narration != null && !narration.isCompleted) {
+        narration.complete();
+        return;
+      }
       if (_disposed) return;
       onTurnComplete?.call();
     };
@@ -510,7 +546,7 @@ class InlineCallController {
   }
 
   /// Pauses learner microphone capture while another lesson surface (for
-  /// example the Reading story PCM player) owns the phone speaker. This is
+  /// example the Reading story Live narrator) owns the phone speaker. This is
   /// deliberately separate from [muted]: the user did not mute Marie, and the
   /// mic should resume automatically when the external playback finishes.
   Future<void> beginExternalPlayback() async {
@@ -534,12 +570,68 @@ class InlineCallController {
     _notify();
   }
 
+  /// Sends one app-owned narration command through the already-connected Marie
+  /// socket. The caller must hold [beginExternalPlayback] while this runs; the
+  /// microphone is then stopped and only this callback receives model audio.
+  /// No generated PCM/cache path is involved.
+  Future<void> narrateExternalText({
+    required String instruction,
+    required void Function(List<int>) onAudioChunk,
+    required void Function(String) onTranscriptDelta,
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
+    if (!_externalPlaybackPaused || !isLive || gemini == null) {
+      throw StateError('Marie is not ready for story narration');
+    }
+    if (gemini!.isModelGenerating) {
+      final previousTurnFinished = await waitForTutorTurnToFinish(
+        timeout: const Duration(seconds: 3),
+      );
+      if (!previousTurnFinished) {
+        throw StateError('Marie is still finishing the previous reply');
+      }
+    }
+    final previous = _externalNarrationCompletion;
+    if (previous != null && !previous.isCompleted) {
+      throw StateError('A story narration is already in progress');
+    }
+    final generation = ++_externalNarrationGeneration;
+    final completion = Completer<void>();
+    _externalNarrationCompletion = completion;
+    _externalNarrationAudio = (bytes) {
+      if (generation == _externalNarrationGeneration) onAudioChunk(bytes);
+    };
+    _externalNarrationTranscript = (delta) {
+      if (generation == _externalNarrationGeneration) {
+        onTranscriptDelta(delta);
+      }
+    };
+    try {
+      gemini!.sendText(instruction);
+      await completion.future.timeout(timeout);
+    } finally {
+      if (generation == _externalNarrationGeneration) {
+        _externalNarrationAudio = null;
+        _externalNarrationTranscript = null;
+        _externalNarrationCompletion = null;
+      }
+    }
+  }
+
   /// Releases the external-playback gate and restores the mic only when it was
   /// actually open before narration started. Repeated calls are harmless, so
   /// both the story completion callback and a tab change can call this safely.
   Future<void> endExternalPlayback() async {
     if (!_externalPlaybackPaused) return;
     final shouldResume = _externalPlaybackShouldResume;
+    _externalNarrationGeneration++;
+    _externalNarrationAudio = null;
+    _externalNarrationTranscript = null;
+    final narration = _externalNarrationCompletion;
+    if (narration != null && !narration.isCompleted) {
+      narration.completeError(StateError('Story narration stopped'));
+    }
+    _externalNarrationCompletion = null;
     _externalPlaybackPaused = false;
     _externalPlaybackShouldResume = false;
     if (!_disposed &&
@@ -588,6 +680,10 @@ class InlineCallController {
     pausedForLifecycle = false;
     _externalPlaybackPaused = false;
     _externalPlaybackShouldResume = false;
+    _externalNarrationGeneration++;
+    _externalNarrationAudio = null;
+    _externalNarrationTranscript = null;
+    _externalNarrationCompletion = null;
     if (notify) _notify();
 
     // Disconnect first so no new model chunks are accepted, then await the

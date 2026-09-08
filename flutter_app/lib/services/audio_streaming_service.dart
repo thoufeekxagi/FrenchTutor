@@ -427,6 +427,35 @@ class AudioStreamingService {
     }
   }
 
+  /// Waits until all received Live audio has been handed to the native player
+  /// and its scheduled tail has finished. This is used before reopening the
+  /// microphone so the phone speaker cannot be transcribed as learner speech.
+  Future<void> waitForPlaybackDrained({
+    Duration timeout = const Duration(seconds: 12),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    while (DateTime.now().isBefore(deadline)) {
+      final drain = _playbackDrainFuture;
+      if (_playbackQueue.isEmpty && drain == null) break;
+      if (drain != null) {
+        try {
+          await drain.timeout(deadline.difference(DateTime.now()));
+        } on TimeoutException {
+          return;
+        } catch (_) {}
+      } else {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+    }
+    final remaining = _scheduledPlaybackEndTime.difference(DateTime.now());
+    if (remaining > Duration.zero && DateTime.now().add(remaining).isBefore(deadline)) {
+      await Future<void>.delayed(remaining);
+    }
+    if (DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+    }
+  }
+
   /// Feeds queued chunks to the player strictly one at a time, always awaiting the previous
   /// `feedUint8FromStream` call before starting the next. Safe to call repeatedly — re-entrant
   /// calls while a drain is already running just return immediately, since the running loop

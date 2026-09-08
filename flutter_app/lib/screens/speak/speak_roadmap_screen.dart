@@ -256,14 +256,13 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
         }
         try {
           if (!mounted || operationEpoch != _generationEpoch) return null;
-          final story = candidate.primarySkill == SpeakSkill.listening
-              ? CourseArtifactCodec.listening(candidate.artifact!)
-              : CourseArtifactCodec.story(candidate.artifact!);
+          // Reading stories now narrate through the already-connected Gemini
+          // Live session. Keep the legacy deck warm-up only for listening
+          // until that surface is migrated too.
+          if (candidate.primarySkill != SpeakSkill.listening) break;
+          final story = CourseArtifactCodec.listening(candidate.artifact!);
           if (!mounted || operationEpoch != _generationEpoch) return null;
-          // Text is the critical path. Warm the story deck in the background
-          // so the reader opens as soon as the valid passage is hydrated;
-          // playback resolves the first missing clip on demand while later
-          // clips continue warming in parallel.
+          // Listening still uses its existing deck while reading uses Live.
           unawaited(() async {
             try {
               await LessonAudioDeckService.shared.prepare(

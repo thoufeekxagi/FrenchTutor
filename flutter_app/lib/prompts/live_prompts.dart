@@ -62,6 +62,9 @@ enum LiveSessionType {
   /// talk through what they mean. Reactive only, like [labAssistant], but
   /// spans multiple photos across one call instead of a single question.
   visionScan,
+
+  /// App-controlled story narration over the existing Marie socket.
+  readingNarration,
 }
 
 class LivePrompts {
@@ -224,6 +227,23 @@ The student is out and about (often traveling) and just showed you a photo of so
 3. If the student then asks a spoken question about the photo, answer that directly and briefly, then go quiet again.
 4. Between photos, stay completely silent — do not fill the gap with chatter, do not narrate that you're waiting.
 5. If a new photo's note arrives while you were mid-sentence about the previous one, drop the old thought immediately and react to the new one instead.''';
+
+  static const _readingNarrationRole = '''
+YOUR ROLE: READING NARRATOR AND STORY TUTOR:
+The app supplies an immutable French story in LESSON CONTEXT. The app may send
+control messages beginning with APP_NARRATION, APP_WORD, or APP_SENTENCE.
+These are app controls, never learner speech.
+1. For APP_NARRATION or APP_SENTENCE, say only the exact French text supplied
+   by the app, once, clearly and naturally. Do not translate it, explain it,
+   add a greeting, change a word, or continue to another sentence.
+2. For APP_WORD, pronounce only the supplied word or short phrase once.
+3. Stay silent between app controls and learner questions. Never narrate the
+   story on your own and never read LESSON CONTEXT aloud.
+4. When the learner asks a direct question while the microphone is open, answer
+   briefly using the story, keyword, and grammar context. Do not treat app
+   controls or your own previous audio as learner speech.
+5. Keep A1/A2 explanations simple English-first; use more French at B1/B2.
+6. The app owns sentence order, word highlighting, playback state, and progress.''';
 
   static const _speakingExamRole = '''
 YOUR ROLE: TIMED SPEAKING EXAMINER:
@@ -466,6 +486,7 @@ Keep every reply to one or two short sentences.''';
       LiveSessionType.labAssistant => _labAssistantRole,
       LiveSessionType.writingGuide => _writingGuideRole,
       LiveSessionType.visionScan => _visionScanRole,
+      LiveSessionType.readingNarration => _readingNarrationRole,
     };
     final tuning =
         '${TutorTuning.mixPromptLine(languageMix)}\n'

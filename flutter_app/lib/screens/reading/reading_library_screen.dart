@@ -9,7 +9,6 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
-import '../../services/lesson_audio_deck_service.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
@@ -208,15 +207,8 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       // saved. This keeps persistence and enrichment alive even if the library
       // screen is disposed while the reader is opening.
       final enrichment = _enrichReadingStory(story);
-      // Audio and artwork are independent of navigation. Open the reader as
-      // soon as the text is saved; the first Play tap can resolve one clip
-      // while the bounded deck workers continue filling the rest.
-      unawaited(
-        LessonAudioDeckService.shared.prepare(
-          story: story,
-          db: ref.read(databaseProvider),
-        ),
-      );
+      // Story narration is handled by the already-connected Gemini Live
+      // session when the reader opens. Do not pre-generate or cache PCM here.
       unawaited(_generateCoverFromStory(story, draft.coverPrompt));
 
       if (!mounted) return;
