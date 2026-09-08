@@ -35,7 +35,10 @@ const adaptiveCourseLookahead = 2;
 // target, but it must not make these early lessons jump ahead of the learner's
 // CEFR band.
 const adaptiveCourseSimplePhaseEnd = 15;
-const adaptiveCourseGenerationVersion = 3;
+// Bump this whenever authored Unit 2 content changes. Existing local plans
+// are repaired in place so a completed debug lesson can be re-opened with the
+// current artifact instead of leaving an old cached story on the device.
+const adaptiveCourseGenerationVersion = 4;
 
 /// One planned session in the learner's current adaptive route.
 ///
@@ -858,16 +861,23 @@ class AdaptiveCourseStore {
       final needsArtifactContractUpgrade =
           current.generationVersion < session.generationVersion;
       final isAuthoredIntroduction = session.sequence == 5;
+      final isAuthoredUnitTwo =
+          session.sequence > adaptiveCourseFoundationSize &&
+          session.sequence <=
+              adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
       if ((session.sequence <= adaptiveCourseSimplePhaseEnd ||
               needsArtifactContractUpgrade) &&
           current.status != 'replaced' &&
-          (isAuthoredIntroduction || current.status != 'completed') &&
+          (isAuthoredIntroduction ||
+              isAuthoredUnitTwo ||
+              current.status != 'completed') &&
           _needsCurriculumUpgrade(current, session, profileFingerprint)) {
         _updatePlannedSessionSpec(
           current,
           session,
           profileFingerprint: profileFingerprint,
-          allowCompletedIntroduction: isAuthoredIntroduction,
+          allowCompletedIntroduction:
+              isAuthoredIntroduction || isAuthoredUnitTwo,
         );
         repaired = true;
       }

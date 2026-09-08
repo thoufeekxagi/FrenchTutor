@@ -469,14 +469,12 @@ class LessonSpeechService {
     required bool slow,
     String? contentItemId,
   }) async {
-    final cached = await loadCachedAudio(
-      text,
-      voiceName: voiceName,
-      slow: slow,
-    );
-    if (cached != null && cached.isNotEmpty) return cached;
     final itemId = contentItemId?.trim();
     if (itemId == null || itemId.isEmpty) return null;
+    // generateAndCache performs one cache resolution (local, then Supabase,
+    // then Gemini). Do not call loadCachedAudio first: on a true miss that
+    // used to perform the same remote lookup twice and made the first line
+    // appear to buffer for up to two timeout windows.
     for (var attempt = 1; attempt <= 2; attempt++) {
       try {
         final generated = await GeminiLiveAudioService.shared.generateAndCache(

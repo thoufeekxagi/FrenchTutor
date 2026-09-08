@@ -401,14 +401,11 @@ class LessonAudioDeckService {
       ),
     );
     try {
-      // loadCached never opens a Gemini socket. This preserves an already
-      // generated local/cloud clip even when a previous manifest write was
-      // interrupted.
-      var bytes = await GeminiLiveAudioService.shared.loadCached(
-        text: text,
-        voiceName: voiceName,
-      );
-      bytes ??= await GeminiLiveAudioService.shared.generateAndCache(
+      // generateAndCache owns the single local -> remote -> Live resolution
+      // path. Calling loadCached first duplicated the remote Storage lookup
+      // on every miss, which could add two timeout windows before the first
+      // sentence was rendered.
+      final bytes = await GeminiLiveAudioService.shared.generateAndCache(
         text: text,
         contentItemId: story.segmentContentId(index),
         voiceName: voiceName,

@@ -412,7 +412,7 @@ class GeminiLiveAudioService {
         final remote = await Supabase.instance.client.storage
             .from(_bucket)
             .download(storagePath)
-            .timeout(const Duration(seconds: 8));
+            .timeout(const Duration(seconds: 3));
         final bytes = _decodeStored(remote);
         if (_validPcm(bytes)) {
           await _writeLocal(cacheKey, bytes);
@@ -461,12 +461,16 @@ class GeminiLiveAudioService {
       );
       return null;
     }
+    // Keep the timeout inside _generateLive so its finally block can cancel
+    // the WebSocket before a retry starts. Wrapping the Future from outside
+    // lets the old socket linger for its full 30-second turn timeout, which
+    // made the next sentence wait or fail even though the caller had moved on.
     final generated = await _generateLive(
       text,
       persona: persona,
       slow: slow,
       traceFeature: contentItemId,
-    ).timeout(const Duration(seconds: 15), onTimeout: () => null);
+    );
     generationClock.stop();
     if (!_validPcm(generated)) {
       unawaited(
@@ -768,7 +772,7 @@ class GeminiLiveAudioService {
       );
       await setupComplete.future.timeout(const Duration(seconds: 10));
       channel.sink.add(jsonEncode(realtimeTextMessage(text)));
-      await turnComplete.future.timeout(const Duration(seconds: 30));
+      await turnComplete.future.timeout(const Duration(seconds: 15));
       final transcript = _normalisePronunciationTranscript(
         outputTranscript.toString(),
       );
