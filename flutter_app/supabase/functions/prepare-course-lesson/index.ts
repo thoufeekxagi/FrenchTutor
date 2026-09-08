@@ -573,6 +573,22 @@ function practiceModeFor(skill: string, sequence: number): string {
   }
 }
 
+function writingArtifactMatchesCurrentCourseMode(row: Json): boolean {
+  const sequence = Number(row.sequence ?? 0);
+  const expected = practiceModeFor("writing", sequence);
+  const artifact = row.artifact_json;
+  if (!artifact || typeof artifact !== "object" || Array.isArray(artifact)) {
+    return false;
+  }
+  const value = artifact as Json;
+  const lesson = value.lesson;
+  if (!lesson || typeof lesson !== "object" || Array.isArray(lesson)) {
+    return false;
+  }
+  return text(value.practiceMode) === expected &&
+    text((lesson as Json).mode) === expected;
+}
+
 // Units alternate between two honest, simple postures instead of applying
 // the same 60/40 reuse ratio everywhere. A learner should feel real spaced
 // repetition in some units and real new-ground exploration in others, never
@@ -922,19 +938,41 @@ Deno.serve(async (request: Request) => {
   const { data: activePersonalized, error: reserveError } = await activePersonalizedQuery;
   if (reserveError) return response({ error: reserveError.message }, 500);
 
-  // REMOVED: this used to reset a specific, narrowly-detected historical
-  // guided-speaking defect (needsGuidedSpeakingRefresh, still defined
-  // above for reference) back to queued/no-artifact so it would
-  // regenerate. Explicit product decision: a ready lesson with a real
-  // artifact is never touched again, through any path, for any reason --
-  // not even a targeted repair. The database's own
-  // prevent_generation_status_regression trigger now rejects this
-  // unconditionally regardless of what code attempts it, so leaving this
-  // block in would only silently no-op against the trigger while lying
-  // to this function's own in-memory view of the row. If a specific
-  // artifact genuinely needs manual repair in the future, that must be a
-  // deliberate, explicit, out-of-band operation, never a routine
-  // background code path that runs on every Course open.
+  // A previous Course build could persist Writing role-play content as
+  // `ready`. The current contract accepts only `complete` or `guided`, so
+  // that row is not openable and a queued-only lookup can never repair it.
+  // Repair only this deterministic mismatch; valid ready content is never
+  // regenerated. The transition goes through `failed` first so the database
+  // guard that protects valid ready artifacts from accidental queued
+  // regressions remains effective.
+  const staleWriting = (activePersonalized ?? []).find((row) =>
+    text(row.primary_skill) === "writing" &&
+    text(row.generation_status) === "ready" &&
+    !writingArtifactMatchesCurrentCourseMode(row as Json) &&
+    (!harnessSkill || harnessSkill === "writing")
+  ) as Json | undefined;
+  if (staleWriting) {
+    const staleId = text(staleWriting.id);
+    const { error: repairError } = await admin
+      .from("adaptive_course_sessions")
+      .update({
+        generation_status: "failed",
+        artifact_kind: null,
+        artifact_json: null,
+        generation_error: "Repairing stale Writing artifact for the current Course mode",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", staleId)
+      .eq("user_id", userId)
+      .eq("generation_status", "ready");
+    if (repairError) return response({ error: repairError.message }, 500);
+    console.info(JSON.stringify({
+      event: "course_stale_writing_artifact_requeued",
+      userId,
+      sessionId: staleId,
+      sequence: staleWriting.sequence,
+    }));
+  }
 
   const generating = (activePersonalized ?? []).some((row) =>
     text(row.generation_status) === "generating"

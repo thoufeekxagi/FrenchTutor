@@ -160,7 +160,16 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // was already persisted by an earlier run. It still needs the one
       // explicit provider claim. Production keeps the existing persisted-plan
       // gate; only the debug harness may prepare an unchanged queued row.
-      if (coursePersisted || reconcileQueuedHarnessRow) {
+      // The debug lane must also invoke the provider when the persisted row
+      // is already present but its artifact is stale for the current course
+      // contract (for example an older Writing role-play artifact). In that
+      // case there is no local plan diff, so gating this call on
+      // `coursePersisted` makes Generate next look like a no-op forever.
+      // Production remains explicit and unchanged; only the development
+      // harness gets this bounded repair request.
+      if (coursePersisted ||
+          reconcileQueuedHarnessRow ||
+          harnessSkill != null) {
         await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
       }
       // Audio repair is still explicit, but it must not depend on the text
