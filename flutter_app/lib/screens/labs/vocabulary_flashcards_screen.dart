@@ -80,7 +80,6 @@ class _VocabularyFlashcardsScreenState
   final Set<String> _completedWordIds = {};
 
   int _index = 0;
-  bool _meaningRevealed = false;
   bool _wordComplete = false;
   bool _preparing = true;
   bool _completed = false;
@@ -162,6 +161,7 @@ class _VocabularyFlashcardsScreenState
         .where((entry) => entry.fr.trim().isNotEmpty)
         .take(5)
         .toList(growable: false);
+    if (_entries.isNotEmpty) _revealedWordIds.add(_entries.first.id);
     _srs = ref.read(srsServiceProvider);
     _sessions = ref.read(vocabularySessionStoreProvider);
     _sessionId =
@@ -192,7 +192,7 @@ class _VocabularyFlashcardsScreenState
     final example = _examples[entry.id];
     return 'Vocabulary card ${_index + 1}/${_entries.length}. '
         'Word: "${entry.fr}". Meaning: "${entry.en}".'
-        '${example != null ? ' Sentence: "${example.fr}".' : ''} '
+        '${example != null ? ' DORMANT SENTENCE (do not mention until the app sends an explicit sentence-card request): "${example.fr}".' : ''} '
         'The app controls reveal, record, practice, and next. Speak only '
         'when the app explicitly asks for pronunciation or brief guidance.';
   }
@@ -320,7 +320,7 @@ class _VocabularyFlashcardsScreenState
         entries: _entries,
         contextExamples: _examples,
         focusNote:
-            'One word at a time. Reveal the meaning, repeat the word, then review its sentence.',
+            'Review each word, repeat it, then optionally review its sentence.',
       );
       _sessionCreated = true;
     } catch (error) {
@@ -362,15 +362,6 @@ class _VocabularyFlashcardsScreenState
 
   void _setPreparationStatus(String value) {
     if (mounted) setState(() => _preparationStatus = value);
-  }
-
-  void _revealMeaning() {
-    if (_meaningRevealed || _wordComplete) return;
-    setState(() {
-      _meaningRevealed = true;
-      _revealedWordIds.add(_current.id);
-    });
-    _saveProgress();
   }
 
   /// Records the learner's attempt and verifies it against the target
@@ -448,6 +439,7 @@ class _VocabularyFlashcardsScreenState
 
   void _resolveAttempt(String transcript, {required bool sentence}) {
     if (!mounted) return;
+    _heard = transcript.trim();
     final target = sentence ? (_examples[_current.id]?.fr ?? '') : _current.fr;
     final heard = _fold(transcript);
     final wanted = _fold(target);
@@ -481,45 +473,36 @@ class _VocabularyFlashcardsScreenState
   /// The sentence check is optional: the learner may test it the same live
   /// way as the word, or skip straight to Next.
   Widget _testSentenceControl() {
-    return GestureDetector(
-      onTap: () => _toggleRecording(sentence: true),
-      behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _sentenceRecording
-                  ? DesignTokens.nightAccent.withValues(alpha: 0.18)
-                  : DesignTokens.nightAccentSoft,
-              border: Border.all(
-                color: DesignTokens.nightAccent,
-                width: _sentenceRecording ? 2 : 1,
-              ),
-            ),
-            child: Icon(
-              _sentenceTested
-                  ? Icons.check_rounded
-                  : _sentenceRecording
-                  ? Icons.graphic_eq_rounded
-                  : Icons.mic_none_rounded,
+    return Semantics(
+      button: true,
+      label: _sentenceRecording ? 'Stop sentence recording' : 'Record sentence',
+      child: GestureDetector(
+        onTap: () => _toggleRecording(sentence: true),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _sentenceRecording
+                ? DesignTokens.nightAccent.withValues(alpha: 0.18)
+                : DesignTokens.nightAccentSoft,
+            border: Border.all(
               color: DesignTokens.nightAccent,
-              size: 18,
+              width: _sentenceRecording ? 2 : 1,
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
+          alignment: Alignment.center,
+          child: Icon(
             _sentenceRecording
-                ? 'Tap to stop'
+                ? Icons.stop_rounded
                 : _sentenceTested
-                ? 'Sentence checked'
-                : 'Test this sentence (optional)',
-            style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
+                ? Icons.check_rounded
+                : Icons.mic_none_rounded,
+            color: DesignTokens.nightAccent,
+            size: 20,
           ),
-        ],
+        ),
       ),
     );
   }
@@ -529,7 +512,6 @@ class _VocabularyFlashcardsScreenState
   /// the same way Speaking Guided always offers "Next phrase" alongside
   /// "Practice more" regardless of whether the last attempt matched.
   void _completeWord({required bool matched}) {
-    if (!_meaningRevealed) return;
     try {
       if (!_wordComplete) {
         _srs.grade(
@@ -578,14 +560,18 @@ class _VocabularyFlashcardsScreenState
     }
     setState(() {
       _index += 1;
-      _meaningRevealed = false;
+      _revealedWordIds.add(_entries[_index].id);
       _wordComplete = false;
       _recording = false;
+      _heard = '';
       _pronunciationHint = null;
       _lastAttemptMatched = false;
       _sentenceTested = false;
       _sentenceRecording = false;
       _sentenceHint = null;
+      _murrayGradeReceived = false;
+      _murrayTurnClosing = false;
+      _testingSentence = false;
       _loadError = null;
       _audioError = null;
     });
@@ -614,18 +600,11 @@ class _VocabularyFlashcardsScreenState
                 _progressLine(),
                 const SizedBox(height: 26),
                 Text(
-                  'One word at a time.',
-                  style: DesignTokens.display(30).copyWith(height: 1.08),
-                ),
-                const SizedBox(height: 8),
-                Text(
                   _wordComplete
-                      ? 'Repeat the sentence, then move to the next word.'
-                      : _meaningRevealed
-                      ? _recording
-                            ? 'Listening…'
-                            : 'Say the word out loud, then continue.'
-                      : 'Double-tap the word to reveal its meaning.',
+                      ? 'Choose the next word or try again.'
+                      : _recording
+                      ? 'Listening…'
+                      : 'Say the word out loud, then continue.',
                   style: DesignTokens.body(
                     15,
                   ).copyWith(color: DesignTokens.muted, height: 1.35),
@@ -642,10 +621,8 @@ class _VocabularyFlashcardsScreenState
                     ).copyWith(color: DesignTokens.danger),
                   ),
                 ],
-                if (_meaningRevealed) ...[
-                  const SizedBox(height: 16),
-                  _wordFeedbackCard(),
-                ],
+                const SizedBox(height: 16),
+                _wordFeedbackCard(),
                 if (_wordComplete && _showsSentences) ...[
                   const SizedBox(height: 16),
                   _sentenceCard(),
@@ -771,12 +748,10 @@ class _VocabularyFlashcardsScreenState
         children: [
           Expanded(
             child: _smallFooterControl(
-              icon: _meaningRevealed
-                  ? Icons.translate_rounded
-                  : Icons.translate_outlined,
-              label: _meaningRevealed ? 'Meaning on' : 'Meaning off',
-              selected: _meaningRevealed,
-              onTap: _meaningRevealed ? null : _revealMeaning,
+              icon: Icons.translate_rounded,
+              label: 'Meaning shown',
+              selected: true,
+              onTap: null,
             ),
           ),
           _wordRoundAction(),
@@ -801,9 +776,7 @@ class _VocabularyFlashcardsScreenState
     if (_wordComplete && !_recording) return _postWordActions();
     final recording = _recording;
     final label = recording ? 'Stop' : 'Record';
-    final VoidCallback? onTap = !_meaningRevealed
-        ? null
-        : () => _toggleRecording(sentence: false);
+    void onTap() => _toggleRecording(sentence: false);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -814,15 +787,13 @@ class _VocabularyFlashcardsScreenState
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: onTap == null
-                  ? DesignTokens.nightSurfaceRaised
-                  : DesignTokens.nightAccent,
+              color: DesignTokens.nightAccent,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: Icon(
               recording ? Icons.stop_rounded : Icons.mic_none_rounded,
-              color: onTap == null ? DesignTokens.muted : Colors.black,
+              color: Colors.black,
               size: 30,
             ),
           ),
@@ -905,10 +876,10 @@ class _VocabularyFlashcardsScreenState
           height: 48,
           child: Icon(
             icon,
-            color: onTap == null
-                ? DesignTokens.nightHairline
-                : selected
+            color: selected
                 ? DesignTokens.nightAccent
+                : onTap == null
+                ? DesignTokens.nightHairline
                 : DesignTokens.nightText,
           ),
         ),
@@ -917,45 +888,94 @@ class _VocabularyFlashcardsScreenState
   }
 
   Widget _topBar() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        V3BackButton(onPressed: () => Navigator.of(context).maybePop()),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            widget.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: DesignTokens.display(21),
-          ),
+        Row(
+          children: [
+            V3BackButton(onPressed: () => Navigator.of(context).maybePop()),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                widget.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: DesignTokens.display(21),
+              ),
+            ),
+            Text(
+              widget.levelBand,
+              style: DesignTokens.label(
+                12,
+              ).copyWith(color: DesignTokens.nightAccent),
+            ),
+          ],
         ),
-        Text(
-          widget.levelBand,
-          style: DesignTokens.label(
-            12,
-          ).copyWith(color: DesignTokens.nightAccent),
-        ),
-        const SizedBox(width: 8),
+        const SizedBox(height: 14),
         Semantics(
+          button: true,
           label: _murrayEnabled
-              ? 'Turn Marie pronunciation help off'
-              : 'Turn Marie pronunciation help on',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.phone_in_talk_outlined,
-                size: 18,
-                color: _murrayEnabled
-                    ? DesignTokens.nightAccent
-                    : DesignTokens.mutedDim,
+              ? 'Turn Marie live guidance off'
+              : 'Turn Marie live guidance on',
+          child: GestureDetector(
+            onTap: () => _setMurrayEnabled(!_murrayEnabled),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              decoration: BoxDecoration(
+                color: DesignTokens.nightSurface,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: DesignTokens.nightHairline),
               ),
-              Switch.adaptive(
-                value: _murrayEnabled,
-                onChanged: _setMurrayEnabled,
-                activeThumbColor: DesignTokens.nightAccent,
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: DesignTokens.nightAccent.withValues(alpha: 0.18),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.phone_in_talk_rounded,
+                      color: _murrayEnabled
+                          ? DesignTokens.success
+                          : DesignTokens.muted,
+                      size: 23,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Marie help',
+                          style: DesignTokens.body(16, weight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _murrayEnabled
+                              ? 'Live · follows this lesson'
+                              : 'Tap phone for live guidance',
+                          style: DesignTokens.body(
+                            12,
+                          ).copyWith(color: DesignTokens.muted),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.phone_in_talk_rounded,
+                    color: _murrayEnabled
+                        ? DesignTokens.success
+                        : DesignTokens.mutedDim,
+                    size: 24,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ],
@@ -1067,18 +1087,14 @@ class _VocabularyFlashcardsScreenState
             ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
           ),
           const SizedBox(height: 16),
-          GestureDetector(
-            onDoubleTap: _revealMeaning,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              child: Text(
-                entry.fr,
-                textAlign: TextAlign.center,
-                style: DesignTokens.display(
-                  48,
-                ).copyWith(color: DesignTokens.primary, height: 1),
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Text(
+              entry.fr,
+              textAlign: TextAlign.center,
+              style: DesignTokens.display(
+                48,
+              ).copyWith(color: DesignTokens.primary, height: 1),
             ),
           ),
           if (entry.phonetic.trim().isNotEmpty) ...[
@@ -1090,6 +1106,21 @@ class _VocabularyFlashcardsScreenState
               ).copyWith(color: DesignTokens.muted, letterSpacing: 0.4),
             ),
           ],
+          const SizedBox(height: 20),
+          Divider(color: DesignTokens.nightHairline),
+          const SizedBox(height: 16),
+          Text(
+            'MEANING',
+            style: DesignTokens.label(
+              10,
+            ).copyWith(color: DesignTokens.muted, letterSpacing: 1.2),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            entry.en,
+            textAlign: TextAlign.center,
+            style: DesignTokens.display(28).copyWith(height: 1.1),
+          ),
           const SizedBox(height: 16),
           _pronunciationButton(
             text: entry.fr,
@@ -1098,23 +1129,6 @@ class _VocabularyFlashcardsScreenState
             size: 44,
             iconSize: 20,
           ),
-          if (_meaningRevealed) ...[
-            const SizedBox(height: 20),
-            Divider(color: DesignTokens.nightHairline),
-            const SizedBox(height: 16),
-            Text(
-              'MEANING',
-              style: DesignTokens.label(
-                10,
-              ).copyWith(color: DesignTokens.muted, letterSpacing: 1.2),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              entry.en,
-              textAlign: TextAlign.center,
-              style: DesignTokens.display(28).copyWith(height: 1.1),
-            ),
-          ],
           const SizedBox(height: 18),
           if (_wordComplete)
             Row(
@@ -1136,9 +1150,7 @@ class _VocabularyFlashcardsScreenState
             )
           else
             Text(
-              _meaningRevealed
-                  ? 'Repeat it once, then continue.'
-                  : 'Double-tap the word when you are ready.',
+              'Say it once, then continue.',
               textAlign: TextAlign.center,
               style: DesignTokens.body(
                 12,
@@ -1182,6 +1194,7 @@ class _VocabularyFlashcardsScreenState
                 ),
                 const SizedBox(height: 10),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _pronunciationButton(
                       text: example.fr,
@@ -1201,6 +1214,26 @@ class _VocabularyFlashcardsScreenState
                     style: DesignTokens.body(
                       12,
                     ).copyWith(color: DesignTokens.muted),
+                  ),
+                ],
+                if ((_sentenceTested || _sentenceHint != null) &&
+                    (_heard ?? '').trim().isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _sentenceTested ? 'MATCHED' : 'I HEARD',
+                    style: DesignTokens.label(
+                      10,
+                    ).copyWith(color: DesignTokens.muted, letterSpacing: 1),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _heard!.trim(),
+                    style: DesignTokens.body(14, weight: FontWeight.w700)
+                        .copyWith(
+                          color: _sentenceTested
+                              ? DesignTokens.success
+                              : DesignTokens.nightText,
+                        ),
                   ),
                 ],
               ],
@@ -1236,7 +1269,7 @@ class _VocabularyFlashcardsScreenState
               ),
               const SizedBox(height: 8),
               Text(
-                'Your words, sentences, and audio will be ready before the first word.',
+                'Your words and examples will be ready before the first word.',
                 textAlign: TextAlign.center,
                 style: DesignTokens.body(
                   12,
