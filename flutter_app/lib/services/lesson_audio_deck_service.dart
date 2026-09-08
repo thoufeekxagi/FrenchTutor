@@ -312,15 +312,13 @@ class LessonAudioDeckService {
     if (story.passage.segments.isEmpty) return false;
     // Three bounded workers keep the deck close to real time without opening
     // an unbounded provider-sized burst for every sentence. A failed sentence
-    // is retried once in a second wave while the other sentences continue
-    // progressing. The first sentence is still index 0, so playback can use
-    // the earliest completed clip immediately. A later explicit generation
-    // pass can repair a failed clip; never hold the learner through another
-    // long retry wave here.
+    // gets exactly one quick retry after three seconds while the other
+    // sentences continue progressing. There is no third attempt or hidden
+    // retry wave; an explicit refresh can later repair only the missing rows.
     const workerCount = 3;
     var pending = List<int>.generate(story.passage.segments.length, (i) => i);
     var attempt = 1;
-    while (pending.isNotEmpty && attempt <= 1) {
+    while (pending.isNotEmpty && attempt <= 2) {
       final wave = pending;
       final failed = <int>[];
       var nextIndex = 0;
@@ -345,6 +343,21 @@ class LessonAudioDeckService {
       );
       pending = failed;
       attempt++;
+      if (pending.isNotEmpty && attempt <= 2) {
+        unawaited(
+          AiCostTracker.event(
+            feature: 'lesson_audio_deck',
+            event: 'deck_retry_wave_started',
+            requestId: story.id,
+            extra: {
+              'lesson_id': story.id,
+              'failed_segments': List<int>.from(pending),
+              'delay_seconds': 3,
+            },
+          ),
+        );
+        await Future<void>.delayed(const Duration(seconds: 3));
+      }
     }
     final complete = pending.isEmpty;
     unawaited(

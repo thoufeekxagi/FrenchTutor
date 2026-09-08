@@ -341,53 +341,70 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _isLoadingAudio = true;
       _currentSegment = fromIndex;
     });
-    await LessonSpeechService.shared.speak(
-      items: [
-        for (var i = fromIndex; i < segments.length; i++)
-          SpeechItem(
-            text: segments[i].fr,
-            language: 'fr-FR',
-            contentItemId: _story.segmentContentId(i),
-          ),
-      ],
-      playbackSpeed: _rate,
-      onItemStart: (i) {
-        if (!mounted) return;
-        setState(() {
-          _currentSegment = fromIndex + i;
-          _currentWord = null;
-        });
-        _scrollToCurrent();
-      },
-      onPlaybackReady: () {
-        if (mounted) setState(() => _isLoadingAudio = false);
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() {
-          _isPlaying = false;
-          _isLoadingAudio = false;
-          _currentWord = null;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Audio is unavailable right now. Please try again.'),
-          ),
-        );
-      },
-      onWordBoundary: (_, wordIndex) {
-        if (!mounted) return;
-        setState(() => _currentWord = wordIndex);
-      },
-      onFinished: () {
-        if (!mounted) return;
-        setState(() {
-          _isPlaying = false;
-          _isLoadingAudio = false;
-          _currentWord = null;
-        });
-      },
-    );
+    final pauseCall = _call.isLive;
+    if (pauseCall) await _call.beginExternalPlayback();
+    var releasedCall = false;
+    void releaseCall() {
+      if (!pauseCall || releasedCall) return;
+      releasedCall = true;
+      unawaited(_call.endExternalPlayback());
+    }
+
+    try {
+      await LessonSpeechService.shared.speak(
+        items: [
+          for (var i = fromIndex; i < segments.length; i++)
+            SpeechItem(
+              text: segments[i].fr,
+              language: 'fr-FR',
+              contentItemId: _story.segmentContentId(i),
+            ),
+        ],
+        playbackSpeed: _rate,
+        onItemStart: (i) {
+          if (!mounted) return;
+          setState(() {
+            _currentSegment = fromIndex + i;
+            _currentWord = null;
+          });
+          _scrollToCurrent();
+        },
+        onPlaybackReady: () {
+          if (mounted) setState(() => _isLoadingAudio = false);
+        },
+        onError: (error) {
+          if (!mounted) return;
+          setState(() {
+            _isPlaying = false;
+            _isLoadingAudio = false;
+            _currentWord = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Audio is unavailable right now. Please try again.',
+              ),
+            ),
+          );
+        },
+        onWordBoundary: (_, wordIndex) {
+          if (!mounted) return;
+          setState(() => _currentWord = wordIndex);
+        },
+        onFinished: () {
+          releaseCall();
+          if (!mounted) return;
+          setState(() {
+            _isPlaying = false;
+            _isLoadingAudio = false;
+            _currentWord = null;
+          });
+        },
+      );
+    } catch (_) {
+      releaseCall();
+      rethrow;
+    }
   }
 
   void _scrollToCurrent() {
@@ -407,8 +424,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     if (_isLoadingAudio) return;
     if (_isPlaying && !speech.isPaused) {
       await speech.pause();
+      await _call.endExternalPlayback();
       if (mounted) setState(() => _isPlaying = false);
     } else if (speech.isPaused) {
+      if (_call.isLive) await _call.beginExternalPlayback();
       await speech.resume();
       if (mounted) setState(() => _isPlaying = true);
     } else {
@@ -474,6 +493,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Future<void> _stop() async {
     await LessonSpeechService.shared.stop();
+    await _call.endExternalPlayback();
     if (mounted) {
       setState(() {
         _isPlaying = false;
@@ -551,49 +571,66 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _isLoadingAudio = true;
       _currentSegment = index;
     });
-    await LessonSpeechService.shared.speak(
-      items: [
-        SpeechItem(
-          text: segments[index].fr,
-          language: 'fr-FR',
-          contentItemId: _story.segmentContentId(index),
-        ),
-      ],
-      playbackSpeed: _rate,
-      onItemStart: (_) {
-        if (!mounted) return;
-        setState(() => _currentWord = null);
-        _scrollToCurrent();
-      },
-      onPlaybackReady: () {
-        if (mounted) setState(() => _isLoadingAudio = false);
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() {
-          _isPlaying = false;
-          _isLoadingAudio = false;
-          _currentWord = null;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Audio is unavailable right now. Please try again.'),
+    final pauseCall = _call.isLive;
+    if (pauseCall) await _call.beginExternalPlayback();
+    var releasedCall = false;
+    void releaseCall() {
+      if (!pauseCall || releasedCall) return;
+      releasedCall = true;
+      unawaited(_call.endExternalPlayback());
+    }
+
+    try {
+      await LessonSpeechService.shared.speak(
+        items: [
+          SpeechItem(
+            text: segments[index].fr,
+            language: 'fr-FR',
+            contentItemId: _story.segmentContentId(index),
           ),
-        );
-      },
-      onWordBoundary: (_, wordIndex) {
-        if (!mounted) return;
-        setState(() => _currentWord = wordIndex);
-      },
-      onFinished: () {
-        if (!mounted) return;
-        setState(() {
-          _isPlaying = false;
-          _isLoadingAudio = false;
-          _currentWord = null;
-        });
-      },
-    );
+        ],
+        playbackSpeed: _rate,
+        onItemStart: (_) {
+          if (!mounted) return;
+          setState(() => _currentWord = null);
+          _scrollToCurrent();
+        },
+        onPlaybackReady: () {
+          if (mounted) setState(() => _isLoadingAudio = false);
+        },
+        onError: (error) {
+          if (!mounted) return;
+          setState(() {
+            _isPlaying = false;
+            _isLoadingAudio = false;
+            _currentWord = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Audio is unavailable right now. Please try again.',
+              ),
+            ),
+          );
+        },
+        onWordBoundary: (_, wordIndex) {
+          if (!mounted) return;
+          setState(() => _currentWord = wordIndex);
+        },
+        onFinished: () {
+          releaseCall();
+          if (!mounted) return;
+          setState(() {
+            _isPlaying = false;
+            _isLoadingAudio = false;
+            _currentWord = null;
+          });
+        },
+      );
+    } catch (_) {
+      releaseCall();
+      rethrow;
+    }
   }
 
   /// Keyword and grammar replay use the Marie socket. If the learner opened
@@ -1437,7 +1474,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       },
     );
   }
-
 }
 
 class _StoryBookHeader extends StatelessWidget {

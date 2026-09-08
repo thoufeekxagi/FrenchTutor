@@ -99,6 +99,11 @@ class AudioStreamingService {
   /// output audio quality).
   bool isOutputActive = false;
 
+  /// Whether the recorder is currently forwarding microphone PCM to its
+  /// callback. Call controllers use this to pause learner input while a
+  /// separate lesson narrator is playing through the shared phone speaker.
+  bool get isStreaming => _isStreaming;
+
   /// `isOutputActive` is set false the moment the SERVER signals turnComplete — but network
   /// delivery outruns real-time playback, so scheduled audio can still be physically playing
   /// through the speaker for seconds after that. Reopening the mic at turnComplete would let

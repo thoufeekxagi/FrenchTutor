@@ -96,6 +96,11 @@ class InlineCallController {
   Future<void>? _ending;
   Future<void>? _starting;
   Timer? _manualIdleTimer;
+  // Story/lesson narration uses a separate AudioStreamingService from this
+  // call. Keep an explicit bridge between the two so narration is never sent
+  // back to Marie as if it were learner speech.
+  bool _externalPlaybackPaused = false;
+  bool _externalPlaybackShouldResume = false;
   // A connect can finish after the learner has already tapped the phone to
   // stop.  Keep a monotonically increasing intent id so a late Live callback
   // cannot resurrect the UI or leave an orphaned socket marked active.
@@ -259,7 +264,7 @@ class InlineCallController {
       // first audio chunk arrives.
       muted = true;
       _notify();
-    } else {
+    } else if (!_externalPlaybackPaused) {
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
     connecting = false;
@@ -340,6 +345,10 @@ class InlineCallController {
     };
     g.onUserTranscript = (text) {
       if (!_isCurrentGeneration(generation)) return;
+      // A stale transcript can arrive just after the recorder is stopped for
+      // external story narration. It belongs to the speaker output, never to
+      // the learner, so discard it at the controller boundary.
+      if (_externalPlaybackPaused) return;
       onUserTranscript?.call(text);
     };
     g.onTutorTranscript = (text) {
@@ -350,6 +359,10 @@ class InlineCallController {
     };
     g.onAudioChunk = (bytes) {
       if (!_isCurrentGeneration(generation)) return;
+      // Suppress any already-buffered tutor reply while the story player owns
+      // the phone speaker. Without this guard a late Live chunk can reopen
+      // the call's player over the narration we are trying to play.
+      if (_externalPlaybackPaused) return;
       a.isOutputActive = true;
       tutorSpeaking = true;
       a.playAudioChunk(bytes);
@@ -434,7 +447,10 @@ class InlineCallController {
   }
 
   Future<bool> startLearnerTurn() async {
-    if (!isReadyForLearnerTurn || gemini == null || audio == null) {
+    if (_externalPlaybackPaused ||
+        !isReadyForLearnerTurn ||
+        gemini == null ||
+        audio == null) {
       return false;
     }
     gemini!.beginAudioTurn();
@@ -483,11 +499,51 @@ class InlineCallController {
     if (muted) {
       muted = false;
       _notify();
-      await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
+      if (!_externalPlaybackPaused) {
+        await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
+      }
     } else {
       await audio!.stopStreaming();
       muted = true;
       _notify();
+    }
+  }
+
+  /// Pauses learner microphone capture while another lesson surface (for
+  /// example the Reading story PCM player) owns the phone speaker. This is
+  /// deliberately separate from [muted]: the user did not mute Marie, and the
+  /// mic should resume automatically when the external playback finishes.
+  Future<void> beginExternalPlayback() async {
+    if (!isLive || _externalPlaybackPaused) return;
+    _externalPlaybackPaused = true;
+    final currentAudio = audio;
+    _externalPlaybackShouldResume =
+        currentAudio?.isStreaming == true || (!manualLearnerTurns && !muted);
+    suppressCurrentReply();
+    if (currentAudio != null) {
+      await currentAudio.stopStreaming();
+      // A tutor reply may already be queued in the Live player. Drop it so a
+      // late chunk cannot bleed into the story narration.
+      await currentAudio.stopPlayback(hardStop: true);
+    }
+  }
+
+  /// Releases the external-playback gate and restores the mic only when it was
+  /// actually open before narration started. Repeated calls are harmless, so
+  /// both the story completion callback and a tab change can call this safely.
+  Future<void> endExternalPlayback() async {
+    if (!_externalPlaybackPaused) return;
+    final shouldResume = _externalPlaybackShouldResume;
+    _externalPlaybackPaused = false;
+    _externalPlaybackShouldResume = false;
+    if (!_disposed &&
+        shouldResume &&
+        active &&
+        audio != null &&
+        gemini != null &&
+        !muted &&
+        !audio!.isStreaming) {
+      await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
   }
 
@@ -524,6 +580,8 @@ class InlineCallController {
     tutorSpeaking = false;
     reconnecting = false;
     pausedForLifecycle = false;
+    _externalPlaybackPaused = false;
+    _externalPlaybackShouldResume = false;
     if (notify) _notify();
 
     // Disconnect first so no new model chunks are accepted, then await the
