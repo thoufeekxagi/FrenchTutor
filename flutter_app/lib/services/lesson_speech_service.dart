@@ -474,9 +474,10 @@ class LessonSpeechService {
     // generateAndCache performs one cache resolution (local, then Supabase,
     // then Gemini). Do not call loadCachedAudio first: on a true miss that
     // used to perform the same remote lookup twice and made the first line
-    // appear to buffer for up to two timeout windows. A true miss gets one
-    // retry after three seconds, then returns control to the learner.
-    for (var attempt = 1; attempt <= 2; attempt++) {
+    // appear to buffer for up to two timeout windows. The deck owns the one
+    // delayed retry; an explicit playback tap makes one request only so it
+    // cannot create a third hidden provider attempt after the deck failed.
+    for (var attempt = 1; attempt <= 1; attempt++) {
       try {
         final generated = await GeminiLiveAudioService.shared.generateAndCache(
           text: text,
@@ -487,9 +488,6 @@ class LessonSpeechService {
         if (generated != null && generated.isNotEmpty) return generated;
       } catch (error) {
         debugPrint('LessonSpeechService: TTS attempt $attempt failed: $error');
-      }
-      if (attempt == 1) {
-        await Future<void>.delayed(const Duration(seconds: 3));
       }
     }
     debugPrint('LessonSpeechService: TTS request exhausted two attempts');
