@@ -777,9 +777,12 @@ class GeminiLiveAudioService {
           },
         }),
       );
-      await setupComplete.future.timeout(const Duration(seconds: 10));
+      // Do not let one unavailable Live turn block the rest of the deck. A
+      // healthy short pronunciation response is normally ready well below
+      // this bound; a later explicit pass can retry a missing clip.
+      await setupComplete.future.timeout(const Duration(seconds: 8));
       channel.sink.add(jsonEncode(realtimeTextMessage(text)));
-      await turnComplete.future.timeout(const Duration(seconds: 15));
+      await turnComplete.future.timeout(const Duration(seconds: 8));
       final transcript = _normalisePronunciationTranscript(
         outputTranscript.toString(),
       );

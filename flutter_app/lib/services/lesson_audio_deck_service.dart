@@ -314,11 +314,13 @@ class LessonAudioDeckService {
     // an unbounded provider-sized burst for every sentence. A failed sentence
     // is retried once in a second wave while the other sentences continue
     // progressing. The first sentence is still index 0, so playback can use
-    // the earliest completed clip immediately.
+    // the earliest completed clip immediately. A later explicit generation
+    // pass can repair a failed clip; never hold the learner through another
+    // long retry wave here.
     const workerCount = 3;
     var pending = List<int>.generate(story.passage.segments.length, (i) => i);
     var attempt = 1;
-    while (pending.isNotEmpty && attempt <= 2) {
+    while (pending.isNotEmpty && attempt <= 1) {
       final wave = pending;
       final failed = <int>[];
       var nextIndex = 0;
@@ -342,20 +344,6 @@ class LessonAudioDeckService {
         List.generate(math.min(workerCount, wave.length), (_) => worker()),
       );
       pending = failed;
-      if (pending.isNotEmpty && attempt == 1) {
-        unawaited(
-          AiCostTracker.event(
-            feature: 'lesson_audio_deck',
-            event: 'deck_retry_wave_started',
-            requestId: story.id,
-            extra: {
-              'lesson_id': story.id,
-              'retry_segment_count': pending.length,
-              'worker_count': workerCount,
-            },
-          ),
-        );
-      }
       attempt++;
     }
     final complete = pending.isEmpty;
