@@ -530,6 +530,8 @@ class InlineCallController {
       // late chunk cannot bleed into the story narration.
       await currentAudio.stopPlayback(hardStop: true);
     }
+    tutorSpeaking = false;
+    _notify();
   }
 
   /// Releases the external-playback gate and restores the mic only when it was
