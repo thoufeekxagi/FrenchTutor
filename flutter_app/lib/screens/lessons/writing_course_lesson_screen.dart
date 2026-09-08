@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/database/learning_store.dart';
 import '../../design/tokens.dart';
-import '../../models/tutor_persona.dart';
 import '../../models/writing_course.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
@@ -14,6 +13,7 @@ import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../widgets/primary_action_button.dart';
+import '../../widgets/inline_call_bar.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 class WritingCourseLessonScreen extends StatefulWidget {
@@ -64,10 +64,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
     // sentence speaker or addresses Marie directly.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      // Guided writing is the compact, sentence-by-sentence Live experience.
-      // Keep Complete and Roleplay local until their explicit Live controls
-      // are used so opening a lesson never creates an unnecessary socket.
-      if (widget.lesson.mode != WritingCourseMode.guided) return;
+      // Course Writing uses one compact Live connection for its two supported
+      // formats. Roleplay is not a Course format and therefore never opens a
+      // tutor socket here.
+      if (widget.lesson.mode == WritingCourseMode.roleplay) return;
       final call = _ensureCall();
       unawaited(call.start(context, sendOpeningPrompt: false));
     });
@@ -201,15 +201,6 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         ),
         const SizedBox(height: 22),
         _guidedAnswerTray(),
-        const SizedBox(height: 12),
-        Center(
-          child: _audioButton(
-            _step.target,
-            'Hear the correct French sentence',
-            speechKey: _speechKey('guided-model'),
-            onPressed: _repeatCurrentSentence,
-          ),
-        ),
         if (_correct) ...[const SizedBox(height: 14), _correctSentenceCard()],
         const SizedBox(height: 22),
         _sectionLabel('WORD BANK'),
@@ -238,20 +229,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           style: DesignTokens.body(13).copyWith(color: DesignTokens.muted),
         ),
         const SizedBox(height: 24),
-        Row(
-          children: [
-            Expanded(
-              child: _secondaryAction(
-                icon: Icons.lightbulb_outline_rounded,
-                label: 'Hint',
-                loading: _isHintLoading,
-                onTap: _requestGuidedHint,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(child: _translationToggle(fillWidth: true, compact: true)),
-          ],
-        ),
+        _guidedControls(),
         if (_showHint) ...[
           const SizedBox(height: 14),
           _InlineNotice(
@@ -315,71 +293,126 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
 
   Widget _liveConnectionCard() {
     final call = _call;
-    final connected = call?.active == true;
-    final connecting = call?.connecting == true;
-    final error = call?.error;
-    final status = error != null
-        ? 'Tap the phone to reconnect'
-        : connecting
-        ? 'Connecting quietly…'
-        : connected
-        ? 'Connected · waiting for you'
-        : 'Starting tutor help…';
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: error != null
-              ? DesignTokens.primary.withValues(alpha: 0.35)
-              : connected
-              ? DesignTokens.success.withValues(alpha: 0.35)
-              : DesignTokens.hairline,
-        ),
+    if (call == null) return const SizedBox.shrink();
+    return InlineTutorConnectionCard(controller: call, onTap: _toggleCall);
+  }
+
+  Widget _guidedControls() {
+    final buttonStyle = OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 48),
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
       ),
-      child: Row(
-        children: [
-          Icon(
-            error != null
-                ? Icons.phone_disabled_rounded
-                : Icons.phone_in_talk_rounded,
-            color: error != null
-                ? DesignTokens.primary
-                : connected
-                ? DesignTokens.success
-                : DesignTokens.primary,
-            size: 22,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${ActiveTutor.current.displayName} help',
-                  style: DesignTokens.body(14, weight: FontWeight.w700),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  status,
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.mutedDim),
-                ),
-              ],
+      side: const BorderSide(color: Colors.transparent),
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _iconAction(
+          icon: Icons.lightbulb_outline_rounded,
+          label: _isHintLoading ? 'Loading hint' : 'Hint',
+          active: _showHint,
+          onTap: _requestGuidedHint,
+          style: buttonStyle,
+        ),
+        const SizedBox(width: 10),
+        _iconAction(
+          icon: _showTranslations
+              ? Icons.translate_rounded
+              : Icons.translate_outlined,
+          label: _showTranslations ? 'Hide translations' : 'Show translations',
+          active: _showTranslations,
+          onTap: () => setState(() => _showTranslations = !_showTranslations),
+          style: buttonStyle,
+        ),
+        const SizedBox(width: 10),
+        _iconAction(
+          icon: Icons.volume_up_rounded,
+          label: 'Hear the correct French sentence',
+          active: false,
+          onTap: _repeatVisibleSentence,
+          style: buttonStyle,
+        ),
+      ],
+    );
+  }
+
+  Widget _completeControls() {
+    final buttonStyle = OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 48),
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+      ),
+      side: const BorderSide(color: Colors.transparent),
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _iconAction(
+          icon: Icons.lightbulb_outline_rounded,
+          label: 'Hint',
+          active: _showHint,
+          onTap: () => setState(() => _showHint = true),
+          style: buttonStyle,
+        ),
+        const SizedBox(width: 10),
+        _iconAction(
+          icon: _showTranslations
+              ? Icons.translate_rounded
+              : Icons.translate_outlined,
+          label: _showTranslations ? 'Hide translations' : 'Show translations',
+          active: _showTranslations,
+          onTap: () => setState(() => _showTranslations = !_showTranslations),
+          style: buttonStyle,
+        ),
+        const SizedBox(width: 10),
+        _iconAction(
+          icon: Icons.volume_up_rounded,
+          label: 'Hear the current French sentence',
+          active: false,
+          onTap: _repeatVisibleSentence,
+          style: buttonStyle,
+        ),
+      ],
+    );
+  }
+
+  Widget _iconAction({
+    required IconData icon,
+    required String label,
+    required bool active,
+    required VoidCallback onTap,
+    required ButtonStyle style,
+  }) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: SizedBox.square(
+        dimension: 48,
+        child: OutlinedButton(
+          onPressed: _isHintLoading && label == 'Loading hint' ? null : onTap,
+          style: style.copyWith(
+            backgroundColor: WidgetStatePropertyAll(
+              active ? DesignTokens.primarySoft : DesignTokens.surface,
+            ),
+            foregroundColor: WidgetStatePropertyAll(
+              active ? DesignTokens.primary : DesignTokens.muted,
+            ),
+            side: WidgetStatePropertyAll(
+              BorderSide(
+                color: active ? DesignTokens.primary : DesignTokens.hairline,
+              ),
             ),
           ),
-          IconButton(
-            tooltip: connected ? 'End tutor help' : 'Connect tutor help',
-            onPressed: connecting ? null : _toggleCall,
-            icon: Icon(
-              connected ? Icons.phone_enabled_rounded : Icons.phone_rounded,
-            ),
-            color: connected ? DesignTokens.success : DesignTokens.primary,
-          ),
-        ],
+          child: _isHintLoading && label == 'Loading hint'
+              ? const SizedBox.square(
+                  dimension: 17,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(icon, size: 20),
+        ),
       ),
     );
   }
@@ -460,6 +493,8 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _liveConnectionCard(),
+        const SizedBox(height: 18),
         _modeLabel('COMPLETE'),
         const SizedBox(height: 12),
         Text('Choose the best word', style: DesignTokens.display(31)),
@@ -523,14 +558,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               : 'Tap Hint to see a short strategy.',
         ),
         const SizedBox(height: 14),
-        Align(
-          alignment: Alignment.center,
-          child: _secondaryAction(
-            icon: Icons.lightbulb_outline_rounded,
-            label: 'Hint',
-            onTap: () => setState(() => _showHint = true),
-          ),
-        ),
+        _completeControls(),
         if (_message != null) ...[
           const SizedBox(height: 14),
           _InlineNotice(
@@ -730,7 +758,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.lesson.mode != WritingCourseMode.guided) ...[
+          if (widget.lesson.mode == WritingCourseMode.roleplay) ...[
             _translationToggle(),
             const SizedBox(height: 8),
           ],
@@ -816,6 +844,17 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
       _isHintLoading = true;
       _dynamicHint = null;
     });
+    // Beginner hints stay local and English-only. This keeps A1/A2 guidance
+    // immediate and prevents an occasional French model hint from leaking
+    // into the beginner exercise.
+    if (_isBeginner) {
+      if (!mounted || stepAtRequest != _step) return;
+      setState(() {
+        _dynamicHint = _fallbackGuidedHint;
+        _isHintLoading = false;
+      });
+      return;
+    }
     try {
       final hint = await LessonAgentService.shared
           .getWritingHint(
@@ -842,8 +881,9 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
     }
   }
 
-  String get _fallbackGuidedHint =>
-      _step.tip.isEmpty ? 'Start with ${_step.tokens.first}.' : _step.tip;
+  String get _fallbackGuidedHint => _isBeginner
+      ? 'Put the words in the same order as the sentence.'
+      : (_step.tip.isEmpty ? 'Start with ${_step.tokens.first}.' : _step.tip);
 
   String get _liveContext =>
       '''
@@ -908,6 +948,31 @@ sentence exactly once, then stop.
         'APP COMMAND: Say the current French target sentence exactly once: '
         '${_step.target}. Do not explain it, translate it, or add anything. '
         'Then stop and wait.',
+      );
+    } catch (error) {
+      debugPrint('Writing Live sentence repeat failed: $error');
+    }
+  }
+
+  Future<void> _repeatVisibleSentence() async {
+    if (widget.lesson.mode == WritingCourseMode.complete) {
+      final sentence = _step.prompt.replaceFirst('___', _step.target).trim();
+      await _repeatSentenceWithLive(sentence);
+      return;
+    }
+    await _repeatCurrentSentence();
+  }
+
+  Future<void> _repeatSentenceWithLive(String sentence) async {
+    try {
+      final call = _ensureCall();
+      if (!call.active) {
+        await call.start(context, sendOpeningPrompt: false);
+      }
+      if (!call.active) return;
+      call.promptTutor(
+        'APP COMMAND: Say this current French sentence exactly once: '
+        '$sentence. Do not explain it, translate it, or add anything. Then stop.',
       );
     } catch (error) {
       debugPrint('Writing Live sentence repeat failed: $error');

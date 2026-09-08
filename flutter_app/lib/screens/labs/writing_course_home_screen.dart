@@ -66,7 +66,19 @@ class _WritingCourseHomeScreenState
     };
   }
 
+  bool get _beginnerLevel => _profileLevel == 'A1' || _profileLevel == 'A2';
+
+  List<(WritingCourseMode, String, IconData)> get _availableModes => [
+    (WritingCourseMode.guided, 'Guided', Icons.edit_note_rounded),
+    (WritingCourseMode.complete, 'Complete', Icons.checklist_rounded),
+    if (!_beginnerLevel)
+      (WritingCourseMode.roleplay, 'Roleplay', Icons.forum_outlined),
+  ];
+
   List<WritingCourseLesson> _lessonsFor(WritingCourseMode mode) {
+    if (_beginnerLevel && mode == WritingCourseMode.roleplay) {
+      return const [];
+    }
     final lessons = <WritingCourseLesson>[
       ...WritingCourseCatalog.forMode(mode),
       ..._generated.where(
@@ -182,11 +194,7 @@ class _WritingCourseHomeScreenState
   );
 
   Widget _modePicker() {
-    const modes = [
-      (WritingCourseMode.guided, 'Guided', Icons.edit_note_rounded),
-      (WritingCourseMode.complete, 'Complete', Icons.checklist_rounded),
-      (WritingCourseMode.roleplay, 'Roleplay', Icons.forum_outlined),
-    ];
+    final modes = _availableModes;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -491,6 +499,15 @@ class _WritingCourseHomeScreenState
     WritingCourseMode mode, {
     required bool manual,
   }) async {
+    if (_beginnerLevel && mode == WritingCourseMode.roleplay) {
+      if (manual && mounted) {
+        setState(
+          () => _generationError =
+              'Roleplay is not available for A1/A2 writing yet.',
+        );
+      }
+      return;
+    }
     if (manual) {
       setState(() {
         _isGenerating = true;

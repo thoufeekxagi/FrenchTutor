@@ -296,11 +296,9 @@ class AdaptiveCourseSessionSpec {
     SpeakSkill.speaking ||
     SpeakSkill.roleplay ||
     SpeakSkill.freeTalk => 'guidedConversation',
-    SpeakSkill.writing => switch ((sequence - 6) % 3) {
-      1 => 'complete',
-      2 => 'roleplay',
-      _ => 'guided',
-    },
+    // Course Writing alternates the two release-safe formats only. Roleplay
+    // remains Practice-only and must not be queued or opened from Course.
+    SpeakSkill.writing => (sequence - 6) % 2 == 0 ? 'complete' : 'guided',
     SpeakSkill.grammar => switch ((sequence - 6) % 3) {
       1 => 'complete',
       2 => 'roleplay',

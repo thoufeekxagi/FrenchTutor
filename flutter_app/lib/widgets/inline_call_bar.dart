@@ -169,3 +169,116 @@ class InlineCallStatusCard extends StatelessWidget {
     );
   }
 }
+
+/// The single inline tutor connection card used by lesson surfaces.
+///
+/// It intentionally has one action: tap the phone to connect, tap it again to
+/// end the same Live socket. Keeping this presentation shared prevents each
+/// lesson from inventing a different "starting/connected" state.
+class InlineTutorConnectionCard extends StatelessWidget {
+  const InlineTutorConnectionCard({
+    super.key,
+    required this.controller,
+    this.onTap,
+  });
+
+  final InlineCallController controller;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final connected = controller.active;
+    final connecting = controller.connecting;
+    final failed = controller.error != null;
+    final color = connected ? DesignTokens.success : DesignTokens.primary;
+    final subtitle = failed
+        ? 'Tap the phone to reconnect'
+        : connecting
+        ? 'Connecting…'
+        : connected
+        ? 'Connected · waiting for you'
+        : 'Tap the phone for live guidance';
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: connected
+              ? DesignTokens.success.withValues(alpha: 0.55)
+              : failed
+              ? DesignTokens.primary.withValues(alpha: 0.45)
+              : DesignTokens.hairline,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: connected
+                  ? DesignTokens.success.withValues(alpha: 0.14)
+                  : DesignTokens.primarySoft,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              failed
+                  ? Icons.phone_disabled_rounded
+                  : Icons.phone_in_talk_rounded,
+              size: 20,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${ActiveTutor.current.displayName} help',
+                  style: DesignTokens.body(14, weight: FontWeight.w800),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: DesignTokens.mutedDim),
+                ),
+              ],
+            ),
+          ),
+          Semantics(
+            button: true,
+            label: connected
+                ? 'Disconnect live guidance'
+                : 'Connect live guidance',
+            child: IconButton(
+              tooltip: connected
+                  ? 'Disconnect live guidance'
+                  : 'Connect live guidance',
+              onPressed: connecting
+                  ? null
+                  : (onTap ?? () => controller.toggle(context)),
+              icon: connecting
+                  ? const SizedBox.square(
+                      dimension: 21,
+                      child: PSProgressIndicator(),
+                    )
+                  : Icon(
+                      connected
+                          ? Icons.phone_enabled_rounded
+                          : Icons.phone_rounded,
+                    ),
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

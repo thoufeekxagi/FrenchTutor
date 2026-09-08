@@ -337,7 +337,11 @@ function validateStory(artifact: Json, level = "", sequence = 0) {
 
 function validateWriting(artifact: Json, level: string) {
   const expectedMode = text(artifact.practiceMode);
-  if (!["guided", "complete", "roleplay"].includes(expectedMode)) {
+  // Course Writing is intentionally limited to the two beginner-safe
+  // interactions that are stable across every CEFR band: word-bank ordering
+  // and choose-the-missing-word. Roleplay remains a separate Practice-only
+  // surface and must never be persisted by this Course generator.
+  if (!["guided", "complete"].includes(expectedMode)) {
     throw new Error("Writing Practice mode is invalid");
   }
   const lesson = object(artifact.lesson);
@@ -352,7 +356,7 @@ function validateWriting(artifact: Json, level: string) {
     throw new Error("Writing level band does not match the session");
   }
   const steps = lesson.steps;
-  const expectedCount = expectedMode === "roleplay" ? 4 : 5;
+  const expectedCount = 5;
   if (!Array.isArray(steps) || steps.length !== expectedCount) {
     throw new Error(`Writing ${expectedMode} requires exactly ${expectedCount} steps`);
   }
@@ -383,14 +387,7 @@ function validateWriting(artifact: Json, level: string) {
         throw new Error("Complete Writing needs one blank and three bilingual choices");
       }
     } else {
-      const suggestions = list(step.suggestions, 3);
-      const meanings = list(step.suggestion_meanings, 3);
-      if (text(step.kind) !== "text" || !text(step.partner_french) ||
-        !text(step.partner_english) || !text(step.goal) ||
-        suggestions.length !== meanings.length) {
-        throw new Error("Writing roleplay needs a translated partner, goal, and bilingual supports");
-      }
-      validateSimpleFrench(text(step.partner_french), level, "Writing partner line");
+      throw new Error("Writing roleplay is disabled for Course generation");
     }
   }
 }
@@ -565,7 +562,9 @@ function practiceModeFor(skill: string, sequence: number): string {
     case "speaking":
     case "roleplay":
     case "free_talk": return "guidedConversation";
-    case "writing": return ["guided", "complete", "roleplay"][variant];
+    // Course Writing deliberately alternates only between word-bank ordering
+    // and fill-in-the-blank. Roleplay is Practice-only until a later release.
+    case "writing": return ["complete", "guided"][Math.max(0, sequence - 6) % 2];
     case "grammar": return ["guided", "complete", "roleplay"][variant];
     case "listening": return ["story", "narration", "music"][variant];
     case "reading": return "story";
