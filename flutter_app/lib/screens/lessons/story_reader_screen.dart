@@ -422,7 +422,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           'APP_NARRATION sentence_id=$index. Say this exact French sentence once and stop: ${segment.fr}',
       onAudioChunk: (bytes) {
         if (!mounted || generation != _livePlaybackGeneration) return;
-        unawaited(_liveNarrationAudio.playAudioChunk(bytes));
+        unawaited(
+          _liveNarrationAudio.playAudioChunk(bytes, playbackSpeed: _rate),
+        );
         if (_isLoadingAudio || _currentWord == null) {
           // Give the first audible frame an honest starting position while
           // the local playback timeline catches the first frame. Later words
@@ -712,6 +714,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         rates[(currentIndex < 0 ? 0 : currentIndex + 1) % rates.length];
     setState(() => _rate = next);
     unawaited(_settings.setPlaybackRate(_rate));
+    unawaited(_liveNarrationAudio.setPlaybackSpeed(_rate));
   }
 
   Future<void> _showSettings() async {
@@ -741,6 +744,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setPlaybackRate(_rate));
+    unawaited(_liveNarrationAudio.setPlaybackSpeed(_rate));
     unawaited(_settings.setTranslateSentences(_translateSentences));
     unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));

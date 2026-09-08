@@ -118,6 +118,7 @@ class AudioStreamingService {
   /// relying on server-side word timestamps.
   DateTime? _playbackTimelineStartTime;
   Duration _playbackTimelineDuration = Duration.zero;
+  double _playbackSpeed = 1.0;
 
   /// Amount of output audio currently represented by the local playback
   /// timeline. Reset when a new utterance starts or playback is stopped.
@@ -365,6 +366,13 @@ class AudioStreamingService {
           : 16384,
     );
     _isPlayerStarted = true;
+    if (_playbackSpeed != 1.0) {
+      try {
+        await _player.setSpeed(_playbackSpeed);
+      } catch (error) {
+        debugPrint('AudioStreamingService: initial speed failed: $error');
+      }
+    }
   }
 
   /// Queues a chunk of Marie's voice (24kHz mono PCM16) for playback and extends the
@@ -373,6 +381,11 @@ class AudioStreamingService {
   /// directly here — so bursty network delivery can't starve or race the player.
   Future<void> playAudioChunk(
     List<int> pcmBytes, {
+
+    /// Optional per-utterance speed. Live story narration passes its current
+    /// reader setting here so the first chunk applies the setting immediately
+    /// after the native player opens.
+    double? playbackSpeed,
 
     /// One-shot clips (vocabulary, grammar, and pronunciation buttons) need
     /// confirmation that the native player accepted the buffer before the
@@ -409,6 +422,11 @@ class AudioStreamingService {
     // buffer's own duration. Extend the tracked timeline instead of resetting it.
     final frameCount = bytes.length / 2; // 16-bit mono samples
     final bufferDurationSeconds = frameCount / _outputSampleRate;
+    final activeSpeed = (playbackSpeed ?? _playbackSpeed)
+        .clamp(0.5, 1.5)
+        .toDouble();
+    _playbackSpeed = activeSpeed;
+    final playbackDurationSeconds = bufferDurationSeconds / activeSpeed;
     final now = DateTime.now();
     if (_playbackTimelineStartTime == null ||
         !_scheduledPlaybackEndTime.isAfter(now)) {
@@ -416,14 +434,14 @@ class AudioStreamingService {
       _playbackTimelineDuration = Duration.zero;
     }
     _playbackTimelineDuration += Duration(
-      microseconds: (bufferDurationSeconds * Duration.microsecondsPerSecond)
+      microseconds: (playbackDurationSeconds * Duration.microsecondsPerSecond)
           .round(),
     );
     final base = _scheduledPlaybackEndTime.isAfter(now)
         ? _scheduledPlaybackEndTime
         : now;
     _scheduledPlaybackEndTime = base.add(
-      Duration(milliseconds: (bufferDurationSeconds * 1000).round()),
+      Duration(milliseconds: (playbackDurationSeconds * 1000).round()),
     );
 
     // This is genuinely new, wanted audio — cancel any mute a previous
@@ -435,6 +453,7 @@ class AudioStreamingService {
     unawaited(_player.setVolume(1.0).catchError((_) {}));
 
     await _ensurePlayerStarted();
+    await setPlaybackSpeed(activeSpeed);
     if (playbackGeneration != _playbackGeneration) return;
     _playbackQueue.add(bytes);
     _drainPlaybackQueue(playbackGeneration);
@@ -459,9 +478,10 @@ class AudioStreamingService {
   /// audio bytes or opening another Gemini request. This is used for cached
   /// lesson narration; live-call callers never change this value.
   Future<void> setPlaybackSpeed(double speed) async {
+    _playbackSpeed = speed.clamp(0.5, 1.5).toDouble();
     if (!_isPlayerStarted) return;
     try {
-      await _player.setSpeed(speed.clamp(0.5, 1.5).toDouble());
+      await _player.setSpeed(_playbackSpeed);
     } catch (error) {
       debugPrint('AudioStreamingService: playback speed change failed: $error');
     }
