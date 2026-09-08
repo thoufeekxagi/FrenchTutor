@@ -136,11 +136,13 @@ void main() {
       store.markCompleted(session.contentKey);
     }
     plan = store.ensureCurrentPlan(profile);
-    final first = plan.sessions[adaptiveCourseFoundationSize + adaptiveCourseBatchSize];
+    final first =
+        plan.sessions[adaptiveCourseFoundationSize + adaptiveCourseBatchSize];
     final reloaded = store.sessionById(first.id);
 
     expect(plan.sessions, hasLength(11));
-    expect(first.context, contains('recent work'));
+    expect(first.context, contains('Unit 3 situation anchor'));
+    expect(first.context, contains('Prior topics are retrieval evidence only'));
     expect(first.targetPhrases, contains('Je travaille dans le marketing'));
     expect(first.sourceSessionIds, contains('practice-source'));
     expect(reloaded?.targetPhrases, contains('Je travaille dans le marketing'));

@@ -55,6 +55,8 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     required this.story,
     this.showFinishButton = false,
     this.enrichment,
+    this.generateCoverIfMissing = false,
+    this.coverGenerator,
     this.grammarExplanation,
     this.grammarTabLabel = 'Grammar',
   });
@@ -88,6 +90,13 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
   /// resolves, the Quiz/Keywords tabs populate in place. Null means the
   /// story was opened from the library, already fully generated.
   final Future<ReadingStoryEnrichment>? enrichment;
+
+  /// Course readings open as soon as their text is ready. When the artifact
+  /// has no cover (or still carries the legacy bundled asset), the caller can
+  /// supply a background generator. The cover is swapped into the visible
+  /// header when it arrives; artwork never delays the lesson itself.
+  final bool generateCoverIfMissing;
+  final Future<String?> Function()? coverGenerator;
 
   @override
   ConsumerState<StoryReaderScreen> createState() => _StoryReaderScreenState();
@@ -263,6 +272,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         (_) => _refreshCoverFromStore(),
       );
     }
+    if (widget.generateCoverIfMissing &&
+        widget.coverGenerator != null &&
+        (_story.coverUrl == null ||
+            _story.coverUrl!.isEmpty ||
+            _story.coverUrl!.startsWith('asset:'))) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_generateCoverInBackground());
+      });
+    }
     final enrichment = widget.enrichment;
     if (enrichment != null) {
       _enriching = true;
@@ -282,6 +300,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           if (mounted) setState(() => _enriching = false);
         },
       );
+    }
+  }
+
+  Future<void> _generateCoverInBackground() async {
+    final generator = widget.coverGenerator;
+    if (generator == null) return;
+    try {
+      final coverUrl = await generator();
+      if (!mounted || coverUrl == null || coverUrl.isEmpty) return;
+      setState(() => _story = _story.copyWith(coverUrl: coverUrl));
+    } catch (error) {
+      // Artwork is enrichment, not a reason to block a readable lesson.
+      debugPrint('Course story cover generation failed: $error');
     }
   }
 

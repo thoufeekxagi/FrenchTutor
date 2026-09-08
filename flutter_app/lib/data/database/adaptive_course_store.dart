@@ -35,10 +35,10 @@ const adaptiveCourseLookahead = 2;
 // target, but it must not make these early lessons jump ahead of the learner's
 // CEFR band.
 const adaptiveCourseSimplePhaseEnd = 15;
-// Bump this whenever authored Unit 2 content changes. Existing local plans
-// are repaired in place so a completed debug lesson can be re-opened with the
-// current artifact instead of leaving an old cached story on the device.
-const adaptiveCourseGenerationVersion = 4;
+// Bump this whenever the unit-anchor or generation contract changes. Existing
+// unfinished personalized rows are repaired in place so an old repeated-scene
+// story is not left in the queue; completed lessons remain historical.
+const adaptiveCourseGenerationVersion = 5;
 
 /// One planned session in the learner's current adaptive route.
 ///
@@ -290,7 +290,7 @@ class AdaptiveCourseSessionSpec {
       : targetPhrases.join('; ');
 
   String get learningMix =>
-      'Reuse recent learner language for about 60% of the session and add about 40% new language.';
+      'Reuse recent learner language for about 50% of the session and add about 50% new language. This ratio applies to words and sentence patterns, never to the story setting.';
 
   /// The exact existing Practice engine this course row must open. A CEFR
   /// band can simplify its content, but it must never substitute another
@@ -367,7 +367,7 @@ GENERATION RULES
 - Teach this competency in the learner's chosen situation, not a generic travel or café lesson.
 - Keep French at exactly $level, even when the context is professional or exam-oriented.
 - This is lesson $sequence. ${sequence <= adaptiveCourseSimplePhaseEnd ? 'It is in the early guided phase: use the matching simple Practice mode before asking for open production.' : 'The learner may now receive a wider version of the same Practice mode.'}
-- The first 60% of a batch should retrieve onboarding focus and recent learner language; use the remaining 40% for one small, level-appropriate extension.
+- Reuse about 50% of the recent language targets and add about 50% new, level-appropriate language. This is lexical retrieval, not permission to copy a previous story setting.
 - Use a compact lesson structure: a short heading, a one-line subtitle, two to four concrete French examples, one controlled check, and one transfer prompt.
 - Explain one idea at a time in one or two short sentences. Never place a long plan, goal, audience, or context paragraph in a heading.
 - Show examples before asking the learner to produce language; keep each example short enough to scan on a phone.
@@ -679,6 +679,35 @@ class AdaptiveCourseStore {
     );
     final session = _sessionByContentKey(plan['id'] as String, contentKey);
     if (session != null) _notifySession(session);
+  }
+
+  /// Persists a background-generated reading cover without changing the
+  /// lesson's generation state. Course text is usable immediately; artwork is
+  /// enrichment that can arrive later and sync through the normal session
+  /// outbox.
+  void updateArtifactCover({
+    required String contentKey,
+    required String coverUrl,
+  }) {
+    final cleanUrl = coverUrl.trim();
+    if (cleanUrl.isEmpty) return;
+    final plan = _activePlanRow();
+    if (plan == null) return;
+    final planId = plan['id'] as String;
+    final session = _sessionByContentKey(planId, contentKey);
+    final artifact = session?.artifact;
+    if (session == null || artifact == null) return;
+    final updatedArtifact = <String, dynamic>{
+      ...artifact,
+      'coverUrl': cleanUrl,
+    };
+    final now = _now();
+    _db.execute(
+      'UPDATE adaptive_course_sessions SET artifact_json = ?, updated_at = ? '
+      'WHERE id = ? AND deleted_at IS NULL',
+      [jsonEncode(updatedArtifact), now, session.id],
+    );
+    _notifySession(session.copyWith(artifact: updatedArtifact));
   }
 
   static String adaptiveProfileFingerprint(
@@ -1557,8 +1586,22 @@ abstract final class AdaptiveCoursePlanGenerator {
           sequence <= adaptiveCourseSimplePhaseEnd &&
           (level == 'A1' || level == 'A2');
       final contextTrack = useEarlyBridgeContext ? earlyBridgeTrack : track;
-      final baseContext =
+      final unit = ((sequence - 1) ~/ 5) + 1;
+      final unitTopic = AdaptiveCurriculumService.unitTopicFor(
+        goal: profile.goal,
+        unit: unit,
+      );
+      final unitVariation = AdaptiveCurriculumService.unitVariationFor(
+        unit: unit,
+        sequence: sequence,
+      );
+      final lessonAngle =
           contextTrack.contexts[(sequence - 1) % contextTrack.contexts.length];
+      final baseContext =
+          'Unit $unit situation anchor: $unitTopic. Lesson angle: $lessonAngle. '
+          'Surface variation: $unitVariation. '
+          'Keep all five lessons in this unit connected to this anchor while '
+          'varying the action and language task.';
       final foundationBase =
           'French pronunciation foundations for $baseContext';
       final foundationContext = interest == null
@@ -1572,7 +1615,7 @@ abstract final class AdaptiveCoursePlanGenerator {
                 : foundationContext
           : interest == null
           ? baseContext
-          : '$baseContext with a light connection to $interest';
+          : '$baseContext Add only a light connection to learner interest: $interest.';
       final personalizedContext =
           learningSnapshot?.contextForLesson(
             sequence: sequence,
@@ -1610,7 +1653,6 @@ abstract final class AdaptiveCoursePlanGenerator {
           supportingSkills.add(practicedSkill);
         }
       }
-      final unit = ((sequence - 1) ~/ 5) + 1;
       final unitTheme = _unitThemeFor(unitThemes, unit);
       final title = isGuidedIntroduction
           ? SpeakingCourseCatalog.firstA1GuidedLesson.title

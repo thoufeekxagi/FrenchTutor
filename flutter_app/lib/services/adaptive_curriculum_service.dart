@@ -53,6 +53,118 @@ class AdaptiveLessonItem {
 }
 
 abstract final class AdaptiveCurriculumService {
+  /// The shared situation bank for adaptive Course units.
+  ///
+  /// A unit is five lessons, so the plan generator selects one entry here and
+  /// keeps it as the scene anchor for all five lessons. Language retrieval can
+  /// still come from prior lessons, but prior retrieval must never replace the
+  /// unit's situation (which is what made many stories drift back to trains).
+  /// Keep this list stable: its order is part of deterministic course
+  /// generation and lets a repaired plan produce the same unit again offline.
+  static const courseUnitTopics = <String>[
+    'making breakfast with a friend',
+    'planning a picnic in a city park',
+    'meeting a new neighbour',
+    'choosing fruit at a local market',
+    'borrowing a book from a library',
+    'preparing a simple family meal',
+    'fixing a bicycle before a ride',
+    'visiting a pharmacy for basic help',
+    'finding a lost key at home',
+    'inviting a friend for coffee',
+    'planning a weekend walk',
+    'buying a gift for a friend',
+    'taking care of a houseplant',
+    'arranging a doctor appointment',
+    'learning a new recipe',
+    'helping a child with homework',
+    'joining a community activity',
+    'choosing clothes for rainy weather',
+    'preparing for a small meeting',
+    'sending a short work message',
+    'welcoming a new colleague',
+    'organizing a shared work task',
+    'asking for clarification at work',
+    'planning a work lunch',
+    'describing a simple work problem',
+    'checking into a hotel',
+    'asking for directions in a new town',
+    'buying a bus or metro ticket',
+    'ordering a meal',
+    'visiting a museum',
+    'choosing a travel alternative',
+    'packing for a short trip',
+    'renting a bicycle',
+    'changing a travel plan',
+    'talking about a holiday photo',
+    'moving into a new apartment',
+    'asking about a utility bill',
+    'visiting a school or community center',
+    'planning a family visit',
+    'describing the weather',
+    'attending a local event',
+    'discussing a film or song',
+    'sharing a personal preference',
+    'comparing two everyday choices',
+    'returning an item to a shop',
+    'preparing for a job interview',
+    'setting a weekly routine',
+    'caring for a pet',
+    'solving a small misunderstanding',
+    'planning a simple celebration',
+  ];
+
+  // Different onboarding goals start at different points in the same broad
+  // bank. This prevents every goal from opening with the same first scene,
+  // while retaining a predictable result that can be reproduced on another
+  // device or after a plan repair.
+  static const _courseTopicOffsets = <String, int>{
+    'everyday': 0,
+    'tef_canada': 10,
+    'work': 19,
+    'relocation': 27,
+    'travel': 31,
+    'culture': 40,
+    'unsure': 0,
+  };
+
+  static String unitTopicFor({required String goal, required int unit}) {
+    final normalizedGoal = goal.trim().toLowerCase();
+    final offset = _courseTopicOffsets[normalizedGoal] ?? 0;
+    final safeUnit = unit < 1 ? 1 : unit;
+    // Unit 2 is the authored market block shared by every onboarding goal;
+    // keep its adaptive anchor honest instead of telling the model that the
+    // fixed market artifact belongs to a different generated scene.
+    if (safeUnit == 2) return 'choosing fruit at a local market';
+    final index = (offset + safeUnit - 1) % courseUnitTopics.length;
+    return courseUnitTopics[index];
+  }
+
+  /// Gives repeated passes through the 50-topic bank a different, explicit
+  /// surface treatment. The anchor can recur after the bank is exhausted, but
+  /// the generated scene is never allowed to be an unlabelled copy.
+  static String unitVariationFor({required int unit, required int sequence}) {
+    final safeUnit = unit < 1 ? 1 : unit;
+    final cycle = ((safeUnit - 1) ~/ courseUnitTopics.length) + 1;
+    final lessonInUnit = ((sequence - 1) % 5) + 1;
+    const facets = <String>[
+      'meet the people and establish the situation',
+      'make a practical choice',
+      'ask for or give one useful detail',
+      'solve a small problem',
+      'finish with a result or next step',
+    ];
+    const cycleModes = <String>[
+      'use the natural first setting for the topic',
+      'change the object or service while keeping the same language family',
+      'change the location and participants while keeping the same goal',
+      'introduce a small practical obstacle and resolve it',
+      'show a follow-up or outcome rather than repeating the opening scene',
+    ];
+    final cycleMode = cycleModes[(cycle - 1) % cycleModes.length];
+    return 'cycle $cycle · $cycleMode · lesson facet $lessonInUnit: ${facets[lessonInUnit - 1]}';
+  }
+
   static const _interestTokens = <String, Set<String>>{
     'everyday': {
       'speaking',

@@ -54,4 +54,19 @@ void main() {
       [SpeakSkill.listening],
     );
   });
+
+  test('the unit topic bank has fifty stable, distinct anchors', () {
+    expect(AdaptiveCurriculumService.courseUnitTopics, hasLength(50));
+    expect(AdaptiveCurriculumService.courseUnitTopics.toSet(), hasLength(50));
+    expect(
+      AdaptiveCurriculumService.unitTopicFor(goal: 'everyday', unit: 1),
+      isNot(AdaptiveCurriculumService.unitTopicFor(goal: 'everyday', unit: 2)),
+    );
+    expect(
+      AdaptiveCurriculumService.unitVariationFor(unit: 1, sequence: 1),
+      isNot(
+        AdaptiveCurriculumService.unitVariationFor(unit: 51, sequence: 251),
+      ),
+    );
+  });
 }

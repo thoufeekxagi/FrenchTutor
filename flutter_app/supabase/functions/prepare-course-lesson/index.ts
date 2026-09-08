@@ -158,7 +158,11 @@ function baseArtifact(session: Json, kind: string): Json {
     topic: text(session.context),
     levelBand: text(session.level) || "A1",
     createdAt: now,
-    coverUrl: "asset:assets/starter_covers/lantern.png",
+    // Generated course readings get their artwork in the app immediately
+    // after the text opens. Do not stamp the generic lantern here: that makes
+    // the client believe artwork already exists and prevents a real cover
+    // from ever being requested.
+    coverUrl: kind === "reading" ? null : "asset:assets/starter_covers/lantern.png",
   };
 }
 
@@ -220,7 +224,7 @@ function earlyPhaseRules(level: string, sequence: number, skill: string): string
 - The learner's stated goal may choose the scene, but keep the vocabulary itself everyday and concrete. Introduce at most one situation-specific word, glossed clearly; do not stack multiple technical/bureaucratic terms into one early lesson.`;
   }
   return `EARLY COURSE PHASE (lesson ${sequence}, ${band}): ${shape}
-- Keep the lesson compact and controlled before offering one optional extension. Reuse recent language for the 60% retrieval portion and add only 40% new language.`;
+- Keep the lesson compact and controlled before offering one optional extension. Reuse recent language for about 50% of the retrieval targets and add about 50% new language; this ratio applies to words and sentence patterns, never to the story setting.`;
 }
 
 function validateSimpleFrench(value: string, level: string, label: string, maxWords?: number) {
@@ -631,16 +635,12 @@ function readyArtifactMatchesCurrentCourseSkill(row: Json): boolean {
   }
 }
 
-// Units alternate between two honest, simple postures instead of applying
-// the same 60/40 reuse ratio everywhere. A learner should feel real spaced
-// repetition in some units and real new-ground exploration in others, never
-// the same recycled sentence shape every single time — but every unit still
-// keeps one connected through-line, never a random grab-bag of words.
+// Every unit uses the same explicit 50/50 retrieval contract. Repetition is
+// for language targets; the unit's situation remains a stable through-line
+// and must not be replaced by a previous story scene.
 function unitBalanceLine(sequence: number): string {
   const unit = Math.floor((sequence - 1) / 5) + 1;
-  return unit % 2 === 0
-    ? "This unit favors EXPLORATION: reuse only about 30% of recent/onboarding language and spend about 70% on genuinely new words and a new situation, while still keeping one clear through-line so the unit feels cohesive, not a random grab-bag."
-    : "This unit favors REPETITION for spaced practice: reuse about 60% of recent/onboarding language and add about 40% new language.";
+  return `Unit ${unit} uses a balanced retrieval contract: reuse about 50% of recent language targets and introduce about 50% new language. Keep the unit situation coherent, but never reuse a previous story scene just to satisfy retrieval.`;
 }
 
 function promptFor(
@@ -657,6 +657,7 @@ function promptFor(
     title: text(session.title),
     competency: boundedText(session.competency, 180),
     context: boundedText(session.context, 360),
+    generationAttempt: Number(session.generation_attempts ?? 0),
     primarySkill,
     practiceMode: practiceModeFor(primarySkill, sequence),
     grammarFocus: list(session.grammar_focus_json, 2),
@@ -667,7 +668,7 @@ function promptFor(
       : [],
   };
   const base = `Create one compact French-learning ${kind} lesson from this frozen brief:\n${JSON.stringify(brief)}\n`;
-  const rules = `Return only valid JSON. Keep all French exactly at ${brief.level || "A1"}. Use the learner goal and the small recent-evidence context naturally; treat any transcript excerpt as a hint, never as a script to copy. Avoid generic travel/cafe filler unless the brief asks for it, and do not mention AI. ${unitBalanceLine(sequence)} Never return a phrase listed in avoidExact verbatim; make the new lesson a genuinely new card while keeping the same small CEFR-appropriate interaction.\n${cefrRules(brief.level || "A1")}\n${earlyPhaseRules(brief.level || "A1", brief.sequence, brief.primarySkill)}`;
+  const rules = `Return only valid JSON. Keep all French exactly at ${brief.level || "A1"}. Use the learner goal and the small recent-evidence context naturally; treat any transcript excerpt as a hint, never as a script to copy. Avoid generic travel/cafe filler unless the brief asks for it, and do not mention AI. The frozen brief.context contains the authoritative unit situation anchor. For Reading and Listening, keep every lesson in this unit connected to that anchor; recent targets and prior topics are retrieval evidence only and must never replace the unit setting or cause the story to repeat a previous scene (especially a train or station scene). If generationAttempt is greater than zero, change the title, opening sentence, participants, and concrete action from the rejected candidate while preserving the unit anchor. ${unitBalanceLine(sequence)} Never return a phrase listed in avoidExact verbatim; make the new lesson a genuinely new card while keeping the same small CEFR-appropriate interaction.\n${cefrRules(brief.level || "A1")}\n${earlyPhaseRules(brief.level || "A1", brief.sequence, brief.primarySkill)}`;
   if (kind === "speaking") {
     const lineShape = brief.practiceMode === "guidedConversation"
       ? `{"fr":"short learner phrase","en":"exact English meaning"}`

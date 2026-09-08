@@ -120,9 +120,6 @@ class UniversalLearningSnapshot {
     required String baseContext,
   }) {
     if (!hasEvidence) return baseContext;
-    final topic = recentTopics.isEmpty
-        ? baseContext
-        : recentTopics[(sequence - 1) % recentTopics.length];
     final targets = targetPhrases.isEmpty
         ? 'the learner’s recent language'
         : targetPhrases
@@ -157,13 +154,18 @@ class UniversalLearningSnapshot {
     final material = sourceMaterial.isEmpty
         ? ''
         : ' Learner evidence: ' + sourceMaterial.join(' | ') + '.';
+    final priorScenes = recentTopics.isEmpty
+        ? ''
+        : ' Prior topics are retrieval evidence only; do not copy their setting, '
+                  'premise, or characters into this lesson. Vary away from: ' +
+              recentTopics.take(4).join('; ') +
+              '.';
     return _bounded(
       baseContext +
-          '. Connect this lesson to the learner’s recent work on ' +
-          topic +
-          '. Reuse these targets naturally: ' +
+          '. Keep this lesson anchored to the unit situation above. Reuse these targets naturally: ' +
           targets +
           '.' +
+          priorScenes +
           repair +
           results +
           material,

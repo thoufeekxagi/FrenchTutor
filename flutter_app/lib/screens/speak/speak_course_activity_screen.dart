@@ -9,6 +9,7 @@ import '../../models/speaking_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/course_artifact_codec.dart';
+import '../../services/practice_artwork_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/subscription_gate_service.dart';
@@ -249,7 +250,37 @@ class _SpeakCourseActivityScreenState
       if (!mounted) return false;
       final result = await AppRouter.push<StoryReaderResult>(
         context,
-        (_) => StoryReaderScreen(story: story, showFinishButton: true),
+        (_) => StoryReaderScreen(
+          story: story,
+          showFinishButton: true,
+          generateCoverIfMissing: true,
+          coverGenerator: () async {
+            final coverUrl = await PracticeArtworkService.generateAndUpload(
+              sync: ref.read(syncServiceProvider),
+              id: story.id,
+              title: story.title,
+              summary: story.summary,
+              topic: story.topic,
+              levelBand: story.levelBand,
+              coverPrompt: story.topic,
+              visualStyle:
+                  'Text-free editorial scene for a French reading lesson; '
+                  'no letters, numbers, signs, logos, faces, or characters.',
+              maxBytes: 100 * 1024,
+              retryMaxBytes: 160 * 1024,
+              aspectRatio: '2:3',
+            );
+            if (coverUrl != null && coverUrl.isNotEmpty) {
+              ref
+                  .read(adaptiveCourseStoreProvider)
+                  .updateArtifactCover(
+                    contentKey: session.contentKey,
+                    coverUrl: coverUrl,
+                  );
+            }
+            return coverUrl;
+          },
+        ),
         fullscreenDialog: true,
       );
       return result != null;
