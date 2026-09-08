@@ -531,45 +531,70 @@ class GeminiLiveAudioService {
     await _writeLocal(cacheKey, generatedBytes);
 
     if (userId != null && storagePath != null) {
-      final client = Supabase.instance.client;
-      try {
-        await client.storage
-            .from(_bucket)
-            .uploadBinary(
-              storagePath,
-              Uint8List.fromList(_encodeStored(generatedBytes)),
-              fileOptions: const FileOptions(
-                contentType: 'application/gzip',
-                upsert: false,
-              ),
-            );
-      } catch (error) {
-        debugPrint(
-          'GeminiLiveAudioService: private audio upload skipped: $error',
-        );
-      }
-      try {
-        await client.from('vocabulary_audio_cache').upsert({
-          'user_id': userId,
-          'cache_key': cacheKey,
-          'content_item_id': contentItemId,
-          'spoken_text': text,
-          'voice_name': persona.voiceName,
-          'storage_path': storagePath,
-          'sha256': sha256.convert(generatedBytes).toString(),
-          'bytes': _encodeStored(generatedBytes).length,
-          'sample_rate_hz': 24000,
-          'channels': 1,
-          'encoding': _storedEncoding,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        }, onConflict: 'user_id,cache_key');
-      } catch (error) {
-        debugPrint(
-          'GeminiLiveAudioService: private audio index skipped: $error',
-        );
-      }
+      // The local write is the playback critical path. Mirror the exact
+      // lossless gzip payload in the background so a first-use tap never
+      // waits for Storage or the cache-index round trip after Gemini has
+      // already returned usable PCM.
+      unawaited(
+        _mirrorGenerated(
+          userId: userId,
+          storagePath: storagePath,
+          cacheKey: cacheKey,
+          contentItemId: contentItemId,
+          text: text,
+          persona: persona,
+          bytes: generatedBytes,
+        ),
+      );
     }
     return generatedBytes;
+  }
+
+  Future<void> _mirrorGenerated({
+    required String userId,
+    required String storagePath,
+    required String cacheKey,
+    required String contentItemId,
+    required String text,
+    required TutorPersona persona,
+    required List<int> bytes,
+  }) async {
+    final client = Supabase.instance.client;
+    final stored = _encodeStored(bytes);
+    try {
+      await client.storage
+          .from(_bucket)
+          .uploadBinary(
+            storagePath,
+            Uint8List.fromList(stored),
+            fileOptions: const FileOptions(
+              contentType: 'application/gzip',
+              upsert: false,
+            ),
+          );
+    } catch (error) {
+      debugPrint(
+        'GeminiLiveAudioService: private audio upload skipped: $error',
+      );
+    }
+    try {
+      await client.from('vocabulary_audio_cache').upsert({
+        'user_id': userId,
+        'cache_key': cacheKey,
+        'content_item_id': contentItemId,
+        'spoken_text': text,
+        'voice_name': persona.voiceName,
+        'storage_path': storagePath,
+        'sha256': sha256.convert(bytes).toString(),
+        'bytes': stored.length,
+        'sample_rate_hz': outputSampleRateHz,
+        'channels': 1,
+        'encoding': _storedEncoding,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,cache_key');
+    } catch (error) {
+      debugPrint('GeminiLiveAudioService: private audio index skipped: $error');
+    }
   }
 
   TutorPersona? _personaForVoice(String? voiceName) {
