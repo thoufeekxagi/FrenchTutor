@@ -1756,33 +1756,33 @@ abstract final class AdaptiveCoursePlanGenerator {
 
   static const _unitTwoReadingSegments = [
     (
-      fr: 'Ce matin, Léa va au marché avec sa mère.',
-      en: 'This morning, Léa goes to the market with her mother.',
-      note: 'Present tense for a habitual morning.',
+      fr: 'Léa va au marché.',
+      en: 'Léa goes to the market.',
+      note: 'A simple present-tense sentence.',
       tip: 'Read once for the general idea.',
     ),
     (
-      fr: 'Elles cherchent de belles pommes pour un gâteau.',
-      en: 'They are looking for nice apples for a cake.',
-      note: '"Cherchent" = are looking for.',
+      fr: 'Elle voit des pommes.',
+      en: 'She sees some apples.',
+      note: '"Voit" = sees.',
       tip: 'Read once for the general idea.',
     ),
     (
-      fr: 'Une vendeuse leur montre un beau panier.',
-      en: 'A seller shows them a nice basket.',
-      note: '"Leur" = to them.',
+      fr: 'Elle veut une pomme.',
+      en: 'She wants an apple.',
+      note: '"Veut" = wants.',
       tip: 'Read once for the general idea.',
     ),
     (
-      fr: 'Léa demande le prix avec un sourire.',
-      en: 'Léa asks the price with a smile.',
-      note: '"Demande" = asks.',
+      fr: 'La vendeuse dit le prix.',
+      en: 'The seller says the price.',
+      note: '"Dit" = says.',
       tip: 'Read once for the general idea.',
     ),
     (
-      fr: 'Chaque pomme du panier est bien fraîche.',
-      en: 'Every apple in the basket is nicely fresh.',
-      note: '"Chaque" = every/each.',
+      fr: 'Léa achète une pomme.',
+      en: 'Léa buys an apple.',
+      note: '"Achète" = buys.',
       tip: 'Read once for the general idea.',
     ),
   ];

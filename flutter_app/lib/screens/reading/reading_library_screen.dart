@@ -89,7 +89,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       }
     }
     if (latestMissing != null) {
-      unawaited(_generateCover(latestMissing, null));
+      unawaited(_generateCoverFromStory(latestMissing, null));
     }
   }
 
@@ -208,14 +208,16 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
       // saved. This keeps persistence and enrichment alive even if the library
       // screen is disposed while the reader is opening.
       final enrichment = _enrichReadingStory(story);
-      unawaited(_generateCover(story, draft.coverPrompt));
-      final audioReady = await LessonAudioDeckService.shared.prepare(
-        story: story,
-        db: ref.read(databaseProvider),
+      // Audio and artwork are independent of navigation. Open the reader as
+      // soon as the text is saved; the first Play tap can resolve one clip
+      // while the bounded deck workers continue filling the rest.
+      unawaited(
+        LessonAudioDeckService.shared.prepare(
+          story: story,
+          db: ref.read(databaseProvider),
+        ),
       );
-      if (!audioReady) {
-        throw StateError('Reading audio deck could not be prepared.');
-      }
+      unawaited(_generateCoverFromStory(story, draft.coverPrompt));
 
       if (!mounted) return;
       setState(() {
@@ -292,6 +294,10 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         topic: story.topic,
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
+        visualStyle:
+            'FrenchTutor Reading editorial illustration: consistent warm natural light, clean readable shapes, restrained detail, grounded everyday setting, no text or lettering, no people, no animals, no faces or hands, no logos, no borders, no interface elements.',
+        maxBytes: 100 * 1024,
+        retryMaxBytes: 160 * 1024,
         aspectRatio: '2:3',
       );
       if (url == null) return;
@@ -303,6 +309,23 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
     } catch (error, stackTrace) {
       debugPrint('Reading cover generation failed: $error\n$stackTrace');
     }
+  }
+
+  Future<void> _generateCoverFromStory(
+    GeneratedStory story,
+    String? fallbackPrompt,
+  ) async {
+    String? visualPrompt = fallbackPrompt;
+    try {
+      visualPrompt = await LessonAgentService.shared.buildReadingVisualPrompt(
+        passage: story.passage,
+        levelBand: story.levelBand,
+        fallback: fallbackPrompt,
+      );
+    } catch (error) {
+      debugPrint('Reading visual brief failed; using draft prompt: $error');
+    }
+    await _generateCover(story, visualPrompt);
   }
 
   void _open(GeneratedStory story) {

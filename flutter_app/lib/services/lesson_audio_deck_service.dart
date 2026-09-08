@@ -310,28 +310,53 @@ class LessonAudioDeckService {
     required String voiceName,
   }) async {
     if (story.passage.segments.isEmpty) return false;
-    var nextIndex = 0;
-    var complete = true;
-    Future<void> worker() async {
-      while (true) {
-        final index = nextIndex++;
-        if (index >= story.passage.segments.length) return;
-        final prepared = await _prepareSegment(
-          story: story,
-          db: db,
-          index: index,
-          voiceName: voiceName,
-        );
-        if (!prepared) complete = false;
+    // Two bounded workers keep the deck close to real time without opening a
+    // provider-sized burst for every sentence. A failed sentence is retried
+    // once in a second wave while the other sentences continue progressing.
+    const workerCount = 2;
+    var pending = List<int>.generate(story.passage.segments.length, (i) => i);
+    var attempt = 1;
+    while (pending.isNotEmpty && attempt <= 2) {
+      final wave = pending;
+      final failed = <int>[];
+      var nextIndex = 0;
+      Future<void> worker() async {
+        while (true) {
+          final cursor = nextIndex++;
+          if (cursor >= wave.length) return;
+          final index = wave[cursor];
+          final prepared = await _prepareSegment(
+            story: story,
+            db: db,
+            index: index,
+            voiceName: voiceName,
+            attempt: attempt,
+          );
+          if (!prepared) failed.add(index);
+        }
       }
-    }
 
-    // Keep this deliberately serialized. Audio preparation is an explicit,
-    // one-time transaction; parallel Live sockets create a quota burst and
-    // make a partial failure look like a lesson-wide failure. Every segment
-    // still reuses local/cloud PCM before opening a provider call.
-    const workerCount = 1;
-    await Future.wait(List.generate(workerCount, (_) => worker()));
+      await Future.wait(
+        List.generate(math.min(workerCount, wave.length), (_) => worker()),
+      );
+      pending = failed;
+      if (pending.isNotEmpty && attempt == 1) {
+        unawaited(
+          AiCostTracker.event(
+            feature: 'lesson_audio_deck',
+            event: 'deck_retry_wave_started',
+            requestId: story.id,
+            extra: {
+              'lesson_id': story.id,
+              'retry_segment_count': pending.length,
+              'worker_count': workerCount,
+            },
+          ),
+        );
+      }
+      attempt++;
+    }
+    final complete = pending.isEmpty;
     unawaited(
       AiCostTracker.event(
         feature: 'lesson_audio_deck',
@@ -342,6 +367,8 @@ class LessonAudioDeckService {
           'segment_count': story.passage.segments.length,
           'complete': complete,
           'worker_count': workerCount,
+          'attempts': attempt - 1,
+          'failed_segments': pending,
         },
       ),
     );
@@ -353,6 +380,7 @@ class LessonAudioDeckService {
     required CommonDatabase db,
     required int index,
     required String voiceName,
+    int attempt = 1,
   }) async {
     final text = story.passage.segments[index].fr.trim();
     final cacheKey = GeminiLiveAudioService.cacheKeyFor(
@@ -365,7 +393,11 @@ class LessonAudioDeckService {
         feature: 'lesson_audio_deck',
         event: 'deck_segment_started',
         requestId: '${story.id}:$index',
-        extra: {'lesson_id': story.id, 'segment_index': index},
+        extra: {
+          'lesson_id': story.id,
+          'segment_index': index,
+          'attempt': attempt,
+        },
       ),
     );
     try {
@@ -396,7 +428,11 @@ class LessonAudioDeckService {
             feature: 'lesson_audio_deck',
             event: 'deck_segment_failed',
             requestId: '${story.id}:$index',
-            extra: {'lesson_id': story.id, 'segment_index': index},
+            extra: {
+              'lesson_id': story.id,
+              'segment_index': index,
+              'attempt': attempt,
+            },
           ),
         );
         return false;
@@ -425,6 +461,7 @@ class LessonAudioDeckService {
             'lesson_id': story.id,
             'segment_index': index,
             'pcm_bytes': bytes.length,
+            'attempt': attempt,
           },
         ),
       );
@@ -444,7 +481,11 @@ class LessonAudioDeckService {
           feature: 'lesson_audio_deck',
           event: 'deck_segment_exception',
           requestId: '${story.id}:$index',
-          extra: {'lesson_id': story.id, 'segment_index': index},
+          extra: {
+            'lesson_id': story.id,
+            'segment_index': index,
+            'attempt': attempt,
+          },
         ),
       );
       return false;

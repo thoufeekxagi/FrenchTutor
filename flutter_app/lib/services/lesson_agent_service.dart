@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -1633,7 +1634,7 @@ CEFR CONTRACT: Keep sentence length, verb forms, vocabulary, inference load, and
 
 TEACHING FIELDS: For each exact French sentence, write a clear English meaning, one short English grammar note that points to a real pattern in that sentence, and one short pronunciation tip (or an empty string). Include 6 to 10 useful words or short phrases that actually appear in the story. Write 4 to 6 comprehension questions. In regular lessons, provide q_en and choices_en as learner support at every level. If an EXAM READINESS OVERRIDE appears below, it takes precedence: follow its language policy exactly. Each has exactly 3 choices and one valid zero-based answerIndex.
 
-SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a text-free 4:3 friendly book-reference image. It must name only concrete setting, objects, action, and mood that are present in this lesson. Do not add a generic protagonist, dramatic landmark, cinematic poster treatment, or unrelated future/fantasy imagery. Do not request typography or text of any kind.
+SUMMARY: One inviting English sentence. READ TIME: a whole number, normally 3 to 7 minutes. COVER PROMPT: one concise English prompt for a text-free portrait 2:3 friendly book-reference image. It must name only concrete setting, objects, action, and mood that are present in this lesson. Do not add a generic protagonist, dramatic landmark, cinematic poster treatment, or unrelated future/fantasy imagery. Do not request typography or text of any kind.
 
 The topic is the primary semantic anchor for the story's concrete place, objects, and action. It need not appear in every sentence, but the story and cover_prompt must remain recognisably connected to it; do not drift into an unrelated cinematic setting. Keep the story wholesome and appropriate for teens and adults. Prefer a fresh, specific premise and vary it naturally.
 ${surpriseMode ? '''SURPRISE MODE: No topic was selected. Choose an ordinary new everyday premise yourself. Keep it natural and calibrated to the requested level; do not rely on onboarding interests or a fixed default.''' : '''SELECTED CONTEXT: The learner supplied a topic. Use it as the primary semantic anchor for the concrete place, objects, action, and cover_prompt. It need not appear in every sentence, but do not drift to an unrelated premise; create a new story, not a rewrite or continuation of any previous lesson.'''}
@@ -1686,7 +1687,7 @@ For every exact French sentence, provide a clear, natural English meaning in `en
 TITLE RULE: `title_en` is the learner-facing English heading and must be a clear, natural title.
 SUMMARY: one inviting English sentence.
 READ TIME: a whole number, normally 3 to 7.
-COVER PROMPT: one concise English prompt for a text-free image showing only the concrete place, objects, and action present in this story. Never request text, letters, numbers, logos, or UI.
+COVER PROMPT: one concise English prompt for a text-free portrait 2:3 image showing only the concrete place, objects, and action present in this story. Never request text, letters, numbers, logos, or UI.
 ${_cefrCalibration(levelBand)}
 Keep it wholesome and appropriate for teens and adults. The selected topic is the primary semantic anchor; do not drift to an unrelated premise.
 ${surpriseMode ? 'SURPRISE MODE: choose an ordinary fresh everyday premise yourself.' : 'SELECTED CONTEXT: keep the story recognisably connected to the supplied topic.'}
@@ -1746,6 +1747,72 @@ ${surpriseMode ? 'SURPRISE MODE: choose an ordinary fresh everyday premise yours
       }
     }
     return draft;
+  }
+
+  /// Builds a separate visual brief so the story call stays focused on
+  /// learner text and MiniMax receives only concrete, text-free scene details.
+  Future<String?> buildReadingVisualPrompt({
+    required ReadingPassage passage,
+    required String levelBand,
+    String? fallback,
+  }) async {
+    const system = '''
+Create one compact visual brief for a FrenchTutor Reading cover. Return ONLY
+JSON in exactly this shape: {"setting": string, "objects": [string], "action": string, "mood": string}.
+Use only concrete objects, place, lighting, and action present in the supplied
+story. Do not add people, faces, hands, animals, logos, flags, signs, letters,
+numbers, labels, UI, borders, or readable text. For A1/A2 keep the scene
+literal and easy to recognise; never make it cinematic, fantasy, or symbolic.
+The brief is for a portrait 2:3 editorial illustration.
+''';
+    final story = passage.segments
+        .map((segment) => segment.fr.trim())
+        .where((segment) => segment.isNotEmpty)
+        .join(' ');
+    try {
+      final raw = await _complete(
+        messages: [
+          {'role': 'system', 'content': '$system$languageGuardrail'},
+          {
+            'role': 'user',
+            'content':
+                'LEVEL: $levelBand\nTITLE: ${passage.titleEn ?? passage.title}\nSTORY: $story',
+          },
+        ],
+        maxTokens: 420,
+        timeout: const Duration(seconds: 18),
+        temperature: 0.2,
+        jsonMode: true,
+        traceFeature: 'reading_visual_brief',
+        maxAttempts: 2,
+      );
+      final decoded = jsonDecode(extractJSON(raw));
+      if (decoded is Map) {
+        final setting = decoded['setting']?.toString().trim() ?? '';
+        final action = decoded['action']?.toString().trim() ?? '';
+        final mood = decoded['mood']?.toString().trim() ?? '';
+        final objects =
+            (decoded['objects'] as List?)
+                ?.map((value) => value.toString().trim())
+                .where((value) => value.isNotEmpty)
+                .take(6)
+                .toList(growable: false) ??
+            const <String>[];
+        if (setting.isNotEmpty && action.isNotEmpty) {
+          return [
+            setting,
+            if (objects.isNotEmpty) 'Objects: ${objects.join(', ')}.',
+            'Action: $action.',
+            if (mood.isNotEmpty) 'Mood and light: $mood.',
+          ].join(' ');
+        }
+      }
+    } catch (error) {
+      // Artwork is secondary to the lesson; the caller can use the draft
+      // prompt when this optional refinement is unavailable.
+      debugPrint('Reading visual brief request failed: $error');
+    }
+    return fallback?.trim().isNotEmpty == true ? fallback!.trim() : null;
   }
 
   /// Verifies the draft's sentence meanings and adds the slower teaching

@@ -92,6 +92,8 @@ class PracticeArtworkService {
     String? coverPrompt,
     String? visualStyle,
     String? diagnosticRoleplayId,
+    int maxBytes = 25 * 1024,
+    int? retryMaxBytes,
     String aspectRatio = '4:3',
   }) {
     final targetAspectRatio = switch (aspectRatio) {
@@ -115,6 +117,8 @@ class PracticeArtworkService {
       targetAspectRatio: targetAspectRatio,
       maxWidth: maxWidth,
       maxHeight: maxHeight,
+      maxBytes: maxBytes,
+      retryMaxBytes: retryMaxBytes,
       generate: (attempt) => generate(
         id: '$id-attempt-${attempt + 1}',
         title: title,

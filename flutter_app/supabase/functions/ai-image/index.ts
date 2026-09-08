@@ -11,9 +11,10 @@ const headers = {
 const BOOK_COVER_INSTRUCTION = `
 FINAL ARTWORK REQUIREMENT: create one simple, ordinary, text-free illustration
 based only on the visual anchor. Show one setting or one/two concrete objects.
-No poster, generic hero, unrelated landmark, or invented character. Never render
-text, letters, words, numbers, symbols, Chinese characters, signs, labels, logos,
-captions, watermarks, UI, borders, or frames. Keep the subject near the center.
+No poster, generic hero, unrelated landmark, person, face, hand, animal, or
+invented character. Never render text, letters, words, numbers, symbols, Chinese
+characters, signs, labels, logos, captions, watermarks, UI, borders, or frames.
+Keep the subject near the center and use a calm, coherent editorial style.
 `;
 
 const ALLOWED_ASPECT_RATIOS = new Set([
