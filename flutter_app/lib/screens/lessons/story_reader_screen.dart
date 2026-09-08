@@ -25,6 +25,7 @@ import '../../widgets/report_problem_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../../widgets/word_conjugation_sheet.dart';
 import '../../widgets/word_meaning_overlay.dart';
+import '../../utils/narration_alignment.dart';
 
 enum _StoryTab { story, grammar, quiz, keywords }
 
@@ -103,7 +104,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isLoadingAudio = false;
   int _livePlaybackGeneration = 0;
   String _liveOutputTranscript = '';
-  Timer? _liveHighlightTimer;
   late final AudioStreamingService _liveNarrationAudio;
   double _rate = 1.0;
   double _textScale = 1;
@@ -152,7 +152,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     final base = ref.read(contentServiceProvider).storyContext(_passage);
     final context = StringBuffer(base)
       ..writeln()
-      ..writeln('STORY SENTENCE PAIRS (use for explanations, never read automatically):');
+      ..writeln(
+        'STORY SENTENCE PAIRS (use for explanations, never read automatically):',
+      );
     for (var i = 0; i < _passage.segments.length; i++) {
       final segment = _passage.segments[i];
       context.writeln('[$i] FR: ${segment.fr} | EN: ${segment.en}');
@@ -294,7 +296,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     _coverRefreshTimer?.cancel();
     _call.dispose();
     _livePlaybackGeneration++;
-    _liveHighlightTimer?.cancel();
     unawaited(_liveNarrationAudio.dispose());
     _finishSession();
     super.dispose();
@@ -363,7 +364,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         );
       }
     } finally {
-      _liveHighlightTimer?.cancel();
       await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
       if (mounted && generation == _livePlaybackGeneration) {
@@ -381,7 +381,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       await _call.start(context, sendOpeningPrompt: false);
     }
     final deadline = DateTime.now().add(const Duration(seconds: 12));
-    while (mounted && !_call.isReadyForLearnerTurn &&
+    while (mounted &&
+        !_call.isReadyForLearnerTurn &&
         DateTime.now().isBefore(deadline)) {
       await Future<void>.delayed(const Duration(milliseconds: 40));
     }
@@ -398,26 +399,36 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     final segment = _passage.segments[index];
     if (!mounted || generation != _livePlaybackGeneration) return;
     _liveOutputTranscript = '';
-    _liveHighlightTimer?.cancel();
     setState(() {
       _currentSegment = index;
       _currentWord = null;
       _isLoadingAudio = true;
     });
     _scrollToCurrent();
-    _startLiveHighlightFallback(segment.fr, generation);
     await _call.narrateExternalText(
       instruction:
           'APP_NARRATION sentence_id=$index. Say this exact French sentence once and stop: ${segment.fr}',
       onAudioChunk: (bytes) {
         if (!mounted || generation != _livePlaybackGeneration) return;
         unawaited(_liveNarrationAudio.playAudioChunk(bytes));
-        if (_isLoadingAudio) setState(() => _isLoadingAudio = false);
+        if (_isLoadingAudio || _currentWord == null) {
+          // Give the first audible frame an honest starting position while
+          // waiting for Live's first output-transcription delta. There is no
+          // timer that guesses later words; transcript alignment is the sole
+          // authority after this initial frame.
+          setState(() {
+            _isLoadingAudio = false;
+            _currentWord ??= 0;
+          });
+        }
       },
       onTranscriptDelta: (delta) {
         if (!mounted || generation != _livePlaybackGeneration) return;
-        _liveOutputTranscript += delta;
-        final next = _highlightIndexFromTranscript(
+        _liveOutputTranscript = NarrationAlignment.appendTranscriptDelta(
+          _liveOutputTranscript,
+          delta,
+        );
+        final next = NarrationAlignment.currentWordIndex(
           segment.fr,
           _liveOutputTranscript,
         );
@@ -427,69 +438,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       },
     );
     await _liveNarrationAudio.waitForPlaybackDrained();
-    _liveHighlightTimer?.cancel();
     if (mounted && generation == _livePlaybackGeneration) {
       setState(() => _currentWord = null);
     }
-  }
-
-  void _startLiveHighlightFallback(String sentence, int generation) {
-    final words = _storyWords(sentence);
-    if (words.isEmpty) return;
-    _liveHighlightTimer = Timer.periodic(const Duration(milliseconds: 260), (_) {
-      if (!mounted || generation != _livePlaybackGeneration || !_isPlaying ||
-          _isLoadingAudio) {
-        _liveHighlightTimer?.cancel();
-        return;
-      }
-      final next = (_currentWord ?? -1) + 1;
-      if (next >= words.length) return;
-      setState(() => _currentWord = next);
-    });
-  }
-
-  List<String> _storyWords(String text) => text
-      .replaceAll(RegExp(r"[^A-Za-zÀ-ÿ0-9'’-]+"), ' ')
-      .split(RegExp(r'\s+'))
-      .where((word) => word.trim().isNotEmpty)
-      .toList();
-
-  String _normaliseNarration(String value) => value
-      .toLowerCase()
-      .replaceAll('œ', 'oe')
-      .replaceAll('æ', 'ae')
-      .replaceAll(RegExp(r"[^a-zà-ÿ0-9']+"), ' ')
-      .replaceAll('à', 'a')
-      .replaceAll('â', 'a')
-      .replaceAll('ä', 'a')
-      .replaceAll('é', 'e')
-      .replaceAll('è', 'e')
-      .replaceAll('ê', 'e')
-      .replaceAll('ë', 'e')
-      .replaceAll('î', 'i')
-      .replaceAll('ï', 'i')
-      .replaceAll('ô', 'o')
-      .replaceAll('ö', 'o')
-      .replaceAll('ù', 'u')
-      .replaceAll('û', 'u')
-      .replaceAll('ü', 'u')
-      .replaceAll('ç', 'c')
-      .replaceAll(RegExp(r'\s+'), ' ')
-      .trim();
-
-  int? _highlightIndexFromTranscript(String sentence, String transcript) {
-    final expected = _storyWords(sentence).map(_normaliseNarration).toList();
-    final actual = _storyWords(transcript).map(_normaliseNarration).toList();
-    if (expected.isEmpty || actual.isEmpty) return null;
-    var matched = 0;
-    for (final token in actual) {
-      if (matched >= expected.length) break;
-      final target = expected[matched];
-      if (token == target || token.contains(target) || target.contains(token)) {
-        matched++;
-      }
-    }
-    return matched == 0 ? null : matched - 1;
   }
 
   void _scrollToCurrent() {
@@ -507,7 +458,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Future<void> _togglePlayPause() async {
     if (_isPlaying) {
       ++_livePlaybackGeneration;
-      _liveHighlightTimer?.cancel();
       await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
       if (mounted) {
@@ -579,7 +529,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Future<void> _stop() async {
     ++_livePlaybackGeneration;
-    _liveHighlightTimer?.cancel();
     await _liveNarrationAudio.stopPlayback(hardStop: true);
     await _call.endExternalPlayback();
     if (mounted) {
@@ -667,11 +616,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     } catch (error) {
       if (mounted && generation == _livePlaybackGeneration) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Marie could not narrate this sentence: $error')),
+          SnackBar(
+            content: Text('Marie could not narrate this sentence: $error'),
+          ),
         );
       }
     } finally {
-      _liveHighlightTimer?.cancel();
       await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
       if (mounted && generation == _livePlaybackGeneration) {
