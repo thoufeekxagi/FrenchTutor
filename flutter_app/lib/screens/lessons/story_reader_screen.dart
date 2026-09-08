@@ -362,9 +362,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       }
     } catch (error) {
       if (mounted && generation == _livePlaybackGeneration) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Marie could not narrate this story: $error')),
-        );
+        _showStoryMessage(_friendlyNarrationError(error, 'story'));
       }
     } finally {
       _narrationHighlightTimer?.cancel();
@@ -393,11 +391,53 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     }
     if (_call.isReadyForLearnerTurn) return true;
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Marie is not connected yet. Try again.')),
-      );
+      _showStoryMessage('Marie is not connected yet. Tap play to reconnect.');
     }
     return false;
+  }
+
+  void _showStoryMessage(String message) {
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              height: 1.25,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: const Color(0xFF202024),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(18)),
+            side: BorderSide(color: Colors.white24),
+          ),
+        ),
+      );
+  }
+
+  String _friendlyNarrationError(Object error, String kind) {
+    final raw = error.toString().toLowerCase();
+    if (error is TimeoutException ||
+        raw.contains('timeoutexception') ||
+        raw.contains('future not completed')) {
+      return 'Marie took too long to start this $kind. Tap play to try again.';
+    }
+    if (raw.contains('still finishing')) {
+      return 'Marie is finishing the previous line. Tap play again in a moment.';
+    }
+    if (raw.contains('disconnected') || raw.contains('not connected')) {
+      return 'Marie lost the connection. Tap play to reconnect.';
+    }
+    return 'Marie could not narrate this $kind. Tap play to try again.';
   }
 
   Future<void> _playLiveSegment(int index, int generation) async {
@@ -655,11 +695,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       await _playLiveSegment(index, generation);
     } catch (error) {
       if (mounted && generation == _livePlaybackGeneration) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Marie could not narrate this sentence: $error'),
-          ),
-        );
+        _showStoryMessage(_friendlyNarrationError(error, 'sentence'));
       }
     } finally {
       await _liveNarrationAudio.stopPlayback(hardStop: true);
@@ -686,16 +722,16 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         await _call.start(context, sendOpeningPrompt: false);
       } catch (error) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Marie could not connect: $error')),
+        _showStoryMessage(
+          'Marie could not connect. Tap the call button to retry.',
         );
         return;
       }
     }
     if (!_call.active) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Marie is still connecting. Try again.')),
+      _showStoryMessage(
+        'Marie is still connecting. Tap the call button again.',
       );
       return;
     }
@@ -758,9 +794,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _finish();
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Story marked as learned.')));
+    _showStoryMessage('Story marked as learned.');
   }
 
   bool get _selectedWordCanConjugate {

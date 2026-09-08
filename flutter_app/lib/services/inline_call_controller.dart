@@ -105,6 +105,8 @@ class InlineCallController {
   void Function(List<int>)? _externalNarrationAudio;
   void Function(String)? _externalNarrationTranscript;
   Completer<void>? _externalNarrationCompletion;
+  Timer? _externalNarrationAudioIdleTimer;
+  bool _externalNarrationReceivedAudio = false;
   // A connect can finish after the learner has already tapped the phone to
   // stop.  Keep a monotonically increasing intent id so a late Live callback
   // cannot resurrect the UI or leave an orphaned socket marked active.
@@ -345,7 +347,9 @@ class InlineCallController {
       if (!_isCurrentGeneration(generation)) return;
       final narration = _externalNarrationCompletion;
       if (narration != null && !narration.isCompleted) {
-        narration.completeError(StateError('Marie disconnected during narration'));
+        narration.completeError(
+          StateError('Marie disconnected during narration'),
+        );
       }
       if (!completer.isCompleted) {
         completer.complete(false);
@@ -405,9 +409,13 @@ class InlineCallController {
       _scheduleManualIdleLimit();
       _notify();
       final narration = _externalNarrationCompletion;
-      if (narration != null && !narration.isCompleted) {
-        narration.complete();
-        return;
+      if (narration != null) {
+        _completeExternalNarration();
+        if (narration.isCompleted) {
+          _externalNarrationAudioIdleTimer?.cancel();
+          _externalNarrationAudioIdleTimer = null;
+          return;
+        }
       }
       if (_disposed) return;
       onTurnComplete?.call();
@@ -598,8 +606,24 @@ class InlineCallController {
     final generation = ++_externalNarrationGeneration;
     final completion = Completer<void>();
     _externalNarrationCompletion = completion;
+    _externalNarrationAudioIdleTimer?.cancel();
+    _externalNarrationReceivedAudio = false;
     _externalNarrationAudio = (bytes) {
       if (generation == _externalNarrationGeneration) onAudioChunk(bytes);
+      if (generation == _externalNarrationGeneration) {
+        _externalNarrationReceivedAudio = true;
+        _externalNarrationAudioIdleTimer?.cancel();
+        _externalNarrationAudioIdleTimer = Timer(
+          const Duration(milliseconds: 1400),
+          () {
+            if (generation != _externalNarrationGeneration ||
+                !_externalNarrationReceivedAudio) {
+              return;
+            }
+            _completeExternalNarration();
+          },
+        );
+      }
     };
     _externalNarrationTranscript = (delta) {
       if (generation == _externalNarrationGeneration) {
@@ -608,13 +632,35 @@ class InlineCallController {
     };
     try {
       gemini!.sendText(instruction);
-      await completion.future.timeout(timeout);
+      await completion.future.timeout(
+        timeout,
+        onTimeout: () {
+          // A small number of Live turns deliver all audio but omit the final
+          // turnComplete event. Once audio has arrived, treating that missing
+          // bookkeeping event as success is safer than showing a false error;
+          // the story player still waits for its own audio queue to drain.
+          if (_externalNarrationReceivedAudio) {
+            _completeExternalNarration();
+            return;
+          }
+          throw TimeoutException('Marie narration timed out');
+        },
+      );
     } finally {
+      _externalNarrationAudioIdleTimer?.cancel();
+      _externalNarrationAudioIdleTimer = null;
       if (generation == _externalNarrationGeneration) {
         _externalNarrationAudio = null;
         _externalNarrationTranscript = null;
         _externalNarrationCompletion = null;
       }
+    }
+  }
+
+  void _completeExternalNarration() {
+    final completion = _externalNarrationCompletion;
+    if (completion != null && !completion.isCompleted) {
+      completion.complete();
     }
   }
 
@@ -631,6 +677,8 @@ class InlineCallController {
     if (narration != null && !narration.isCompleted) {
       narration.completeError(StateError('Story narration stopped'));
     }
+    _externalNarrationAudioIdleTimer?.cancel();
+    _externalNarrationAudioIdleTimer = null;
     _externalNarrationCompletion = null;
     _externalPlaybackPaused = false;
     _externalPlaybackShouldResume = false;
