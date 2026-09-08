@@ -519,7 +519,11 @@ class InlineCallController {
     final currentAudio = audio;
     _externalPlaybackShouldResume =
         currentAudio?.isStreaming == true || (!manualLearnerTurns && !muted);
-    suppressCurrentReply();
+    // Only arm Gemini's stale-reply suppression while it is actually
+    // generating. Calling suppressCurrentReply while Marie is idle sets a
+    // pre-injection flag that would otherwise swallow her next natural
+    // learner response after narration ends.
+    if (gemini?.isModelGenerating == true) suppressCurrentReply();
     if (currentAudio != null) {
       await currentAudio.stopStreaming();
       // A tutor reply may already be queued in the Live player. Drop it so a
