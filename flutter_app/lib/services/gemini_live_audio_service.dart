@@ -453,16 +453,20 @@ class GeminiLiveAudioService {
     // ~2 minutes to finally surface an error — long enough that a learner
     // assumed playback silently froze. The generation path now makes one
     // bounded attempt only.
+    //
+    // Story PCM is allowed to use its own bounded audio socket while Marie's
+    // conversational socket is active. The old guard returned null whenever
+    // the learner had Marie connected, which made the exact keyword/grammar
+    // workflow we want (Live help + PCM story playback) impossible.
     if (GeminiLiveService.hasActiveSocket) {
       unawaited(
         AiCostTracker.event(
           feature: contentItemId,
-          event: 'audio_generation_deferred_live_socket_active',
+          event: 'audio_generation_concurrent_live_socket',
           requestId: cacheKey,
           extra: {'model': _model, 'text_length': text.length},
         ),
       );
-      return null;
     }
     // Keep the timeout inside _generateLive so its finally block can cancel
     // the WebSocket before a retry starts. Wrapping the Future from outside

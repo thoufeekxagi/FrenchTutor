@@ -223,6 +223,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notetakerStateProvider).currentContext = 'Story';
+      // Keep Marie available while the learner explores the story. The call
+      // starts silently (no opening tutor turn); keyword and grammar taps can
+      // then speak immediately instead of asking the learner to reconnect.
+      if (mounted && !_call.isLive) {
+        unawaited(_call.start(context, sendOpeningPrompt: false));
+      }
     });
     _recorder = SessionRecorder(
       storage: ref.read(storageServiceProvider),
@@ -590,16 +596,28 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
   }
 
-  /// Keyword and grammar replay deliberately use the already-connected Marie
-  /// socket. Story narration is the only surface that uses the PCM deck; a
-  /// one-word or one-sentence tap must never start a second synthesis request
-  /// or wait on a cache lookup.
-  void _speakWithLive(String text) {
+  /// Keyword and grammar replay use the Marie socket. If the learner opened
+  /// the story while the call was off (or the socket was reclaimed in the
+  /// background), the first tap reconnects it transparently and then queues
+  /// the exact script. Story narration remains the only PCM-backed surface.
+  Future<void> _speakWithLive(String text) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
-    if (!_call.isLive) {
+    if (!_call.active) {
+      try {
+        await _call.start(context, sendOpeningPrompt: false);
+      } catch (error) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Marie could not connect: $error')),
+        );
+        return;
+      }
+    }
+    if (!_call.active) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Connect Marie first to hear this.')),
+        const SnackBar(content: Text('Marie is still connecting. Try again.')),
       );
       return;
     }

@@ -310,10 +310,12 @@ class LessonAudioDeckService {
     required String voiceName,
   }) async {
     if (story.passage.segments.isEmpty) return false;
-    // Two bounded workers keep the deck close to real time without opening a
-    // provider-sized burst for every sentence. A failed sentence is retried
-    // once in a second wave while the other sentences continue progressing.
-    const workerCount = 2;
+    // Three bounded workers keep the deck close to real time without opening
+    // an unbounded provider-sized burst for every sentence. A failed sentence
+    // is retried once in a second wave while the other sentences continue
+    // progressing. The first sentence is still index 0, so playback can use
+    // the earliest completed clip immediately.
+    const workerCount = 3;
     var pending = List<int>.generate(story.passage.segments.length, (i) => i);
     var attempt = 1;
     while (pending.isNotEmpty && attempt <= 2) {
