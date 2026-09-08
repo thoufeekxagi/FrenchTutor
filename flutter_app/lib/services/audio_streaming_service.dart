@@ -117,23 +117,25 @@ class AudioStreamingService {
   /// rate. Consumers such as story highlighting can use this clock without
   /// relying on server-side word timestamps.
   DateTime? _playbackTimelineStartTime;
-  Duration _playbackTimelineDuration = Duration.zero;
+  Duration _playbackTimelineQueuedDuration = Duration.zero;
   double _playbackSpeed = 1.0;
 
   /// Amount of output audio currently represented by the local playback
   /// timeline. Reset when a new utterance starts or playback is stopped.
-  Duration get playbackTimelineDuration => _playbackTimelineDuration;
+  Duration get playbackTimelineDuration => _playbackTimelineQueuedDuration;
 
   /// Best-effort position in the local playback timeline. This is based on
   /// the exact PCM duration accepted for playback, not transcript arrival.
   Duration get playbackTimelinePosition {
     final start = _playbackTimelineStartTime;
-    if (start == null || _playbackTimelineDuration <= Duration.zero) {
+    if (start == null || _playbackTimelineQueuedDuration <= Duration.zero) {
       return Duration.zero;
     }
     final elapsed = DateTime.now().difference(start);
     if (elapsed <= Duration.zero) return Duration.zero;
-    if (elapsed >= _playbackTimelineDuration) return _playbackTimelineDuration;
+    if (elapsed >= _playbackTimelineQueuedDuration) {
+      return _playbackTimelineQueuedDuration;
+    }
     return elapsed;
   }
 
@@ -141,7 +143,23 @@ class AudioStreamingService {
   /// the native player. Story narration calls this between sentences.
   void resetPlaybackTimeline() {
     _playbackTimelineStartTime = null;
-    _playbackTimelineDuration = Duration.zero;
+    _playbackTimelineQueuedDuration = Duration.zero;
+  }
+
+  void _retimePlaybackTimeline(double previousSpeed, double nextSpeed) {
+    if (_playbackTimelineStartTime == null ||
+        _playbackTimelineQueuedDuration <= Duration.zero ||
+        (previousSpeed - nextSpeed).abs() < 0.001) {
+      return;
+    }
+    final position = playbackTimelinePosition;
+    final remaining = _playbackTimelineQueuedDuration - position;
+    if (remaining <= Duration.zero) return;
+    final scaledRemaining = Duration(
+      microseconds: (remaining.inMicroseconds * previousSpeed / nextSpeed)
+          .round(),
+    );
+    _playbackTimelineQueuedDuration = position + scaledRemaining;
   }
 
   static const _inputSampleRate = 16000;
@@ -425,15 +443,15 @@ class AudioStreamingService {
     final activeSpeed = (playbackSpeed ?? _playbackSpeed)
         .clamp(0.5, 1.5)
         .toDouble();
+    _retimePlaybackTimeline(_playbackSpeed, activeSpeed);
     _playbackSpeed = activeSpeed;
     final playbackDurationSeconds = bufferDurationSeconds / activeSpeed;
     final now = DateTime.now();
-    if (_playbackTimelineStartTime == null ||
-        !_scheduledPlaybackEndTime.isAfter(now)) {
-      _playbackTimelineStartTime = now;
-      _playbackTimelineDuration = Duration.zero;
+    if (!_scheduledPlaybackEndTime.isAfter(now)) {
+      _playbackTimelineStartTime = null;
+      _playbackTimelineQueuedDuration = Duration.zero;
     }
-    _playbackTimelineDuration += Duration(
+    _playbackTimelineQueuedDuration += Duration(
       microseconds: (playbackDurationSeconds * Duration.microsecondsPerSecond)
           .round(),
     );
@@ -478,7 +496,9 @@ class AudioStreamingService {
   /// audio bytes or opening another Gemini request. This is used for cached
   /// lesson narration; live-call callers never change this value.
   Future<void> setPlaybackSpeed(double speed) async {
-    _playbackSpeed = speed.clamp(0.5, 1.5).toDouble();
+    final nextSpeed = speed.clamp(0.5, 1.5).toDouble();
+    _retimePlaybackTimeline(_playbackSpeed, nextSpeed);
+    _playbackSpeed = nextSpeed;
     if (!_isPlayerStarted) return;
     try {
       await _player.setSpeed(_playbackSpeed);
@@ -549,6 +569,7 @@ class AudioStreamingService {
           playbackGeneration == _playbackGeneration) {
         final bytes = _playbackQueue.removeFirst();
         try {
+          _playbackTimelineStartTime ??= DateTime.now();
           await _player.feedUint8FromStream(bytes);
         } catch (error, stackTrace) {
           // Keep the live call alive on a transient chunk failure, but expose
