@@ -418,6 +418,12 @@ class InlineCallController {
     gemini?.queueSpokenContext(trimmed);
   }
 
+  /// Drops any stale tutor audio before a host screen replaces its current
+  /// card, without closing the persistent socket.
+  void suppressCurrentReply() {
+    gemini?.suppressCurrentReply();
+  }
+
   /// Refreshes the host screen's lesson context without opening a tutor turn.
   /// Scripted hosts call this when the learner advances to a new card while a
   /// call remains active. Marie absorbs the new context silently and only

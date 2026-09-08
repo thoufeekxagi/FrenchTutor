@@ -10,6 +10,14 @@ const headers = {
 
 type Json = Record<string, unknown>;
 
+type VocabularyCandidate = Json & {
+  id: string;
+  fr: string;
+  en: string;
+  phonetic: string;
+  role: "review" | "new";
+};
+
 // Mirrors adaptiveCourseFoundationSize/adaptiveCourseBatchSize in
 // lib/data/database/adaptive_course_store.dart. Sequences 1-5 (foundation)
 // and 6-10 (Unit 2) are both fixed, authored content for every learner;
@@ -175,7 +183,11 @@ function validateSimpleFrench(value: string, level: string, label: string, maxWo
   }
 }
 
-function validateVocabulary(artifact: Json, level: string) {
+function validateVocabulary(
+  artifact: Json,
+  level: string,
+  vocabularyCandidates: VocabularyCandidate[] = [],
+) {
   const entries = artifact.entries;
   const examples = artifact.storyExamples;
   if (!Array.isArray(entries) || entries.length !== 5) {
@@ -183,6 +195,11 @@ function validateVocabulary(artifact: Json, level: string) {
   }
   const storyExamples = object(examples);
   const ids = new Set<string>();
+  const candidateById = new Map(
+    vocabularyCandidates.map((candidate) => [candidate.id, candidate]),
+  );
+  let reviewCount = 0;
+  let newCount = 0;
   for (const raw of entries) {
     const entry = object(raw);
     const id = text(entry.id);
@@ -191,6 +208,14 @@ function validateVocabulary(artifact: Json, level: string) {
     }
     if (ids.has(id)) throw new Error("Vocabulary word ids must be unique");
     ids.add(id);
+    if (vocabularyCandidates.length > 0) {
+      const candidate = candidateById.get(id);
+      if (!candidate || foldFrench(candidate.fr) !== foldFrench(text(entry.fr))) {
+        throw new Error(`Vocabulary word "${id}" was not selected from the app lexicon`);
+      }
+      if (candidate.role === "review") reviewCount += 1;
+      if (candidate.role === "new") newCount += 1;
+    }
     // Real generation defect caught directly from a learner's screenshot: the
     // model can echo the English gloss into the French field too (fr and en
     // byte-identical), while id/phonetic still correctly hold the real French
@@ -215,16 +240,25 @@ function validateVocabulary(artifact: Json, level: string) {
     if (level.trim().toUpperCase() === "A1" && text(entry.fr).split(/\s+/).length > 3) {
       throw new Error("A1 vocabulary entries must be short words or chunks");
     }
-    // Enforced, not just requested: Unit 2's five words are permanent and
-    // identical for every learner, so no AI vocabulary lesson may reteach
-    // one as if it were new, regardless of what the model did with the
-    // prompt instruction above.
-    if (UNIT_TWO_TAUGHT_WORDS.some((word) => foldFrench(word) === foldFrench(text(entry.fr)))) {
+    // When a lexical candidate payload is present, previously learned words
+    // are deliberate review material. Without that payload, keep the older
+    // safety rule for production callers that have not yet shipped the
+    // client-side lexicon slice.
+    if (vocabularyCandidates.length === 0 && UNIT_TWO_TAUGHT_WORDS.some((word) => foldFrench(word) === foldFrench(text(entry.fr)))) {
       throw new Error(
         `"${text(entry.fr)}" was already taught in Unit 2; choose a genuinely new word`,
       );
     }
     validateSimpleFrench(text(example.fr), level, "Vocabulary example", 10);
+  }
+  if (vocabularyCandidates.length > 0) {
+    const availableReview = vocabularyCandidates.filter((candidate) => candidate.role === "review").length;
+    const availableNew = vocabularyCandidates.filter((candidate) => candidate.role === "new").length;
+    const requiredReview = Math.min(2, availableReview);
+    const requiredNew = Math.min(3, availableNew);
+    if (reviewCount < requiredReview || newCount < requiredNew) {
+      throw new Error("Vocabulary must balance reviewed and new lexical items");
+    }
   }
 }
 
@@ -499,7 +533,11 @@ function unitBalanceLine(sequence: number): string {
     : "This unit favors REPETITION for spaced practice: reuse about 60% of recent/onboarding language and add about 40% new language.";
 }
 
-function promptFor(session: Json, kind: string): string {
+function promptFor(
+  session: Json,
+  kind: string,
+  vocabularyCandidates: VocabularyCandidate[] = [],
+): string {
   const primarySkill = text(session.primary_skill);
   const sequence = Number(session.sequence ?? 0);
   const brief = {
@@ -527,7 +565,12 @@ function promptFor(session: Json, kind: string): string {
     return `${base}${rules}\nThe exact Course Practice mode is ${brief.practiceMode}; never merge it with another interaction. Return exactly: {"practiceMode":"${brief.practiceMode}","lines":[3 to 5 ${lineShape}]}. Every line must be useful for the competency and fully bilingual. This Course speaking lesson is hear/repeat/repair phrase practice only: no live tutor conversation, Free Talk, Roleplay, word selection, or open response. Each French line must be the phrase the learner repeats, with no prefix such as "Répétez", "Repeat", or "Say". Keep all lines distinct. Reuse suitable targets, but correct mixed-language or incomplete targets instead of copying them.`;
   }
   if (kind === "vocabulary") {
-    return `${base}${rules}\nThe learner already knows these exact words from an earlier fixed lesson: ${UNIT_TWO_TAUGHT_WORDS.join(", ")}. None of these five words may appear as one of the five new vocabulary entries below; teach five genuinely different words instead.\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
+    const candidateText = vocabularyCandidates.length === 0
+      ? "No client lexicon slice was supplied; use only safe, common vocabulary and do not repeat the fixed Unit 2 words."
+      : vocabularyCandidates
+        .map((candidate) => `${candidate.id}|${candidate.fr}|${candidate.en}|${candidate.phonetic}|${candidate.role}`)
+        .join("; ");
+    return `${base}${rules}\nChoose every entry from this app lexicon slice only. Each candidate is marked review or new. Aim for two reviewed words and three new words when the supplied pools allow it; never invent a French word or id. LEXICON: ${candidateText}\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
   }
   if (kind === "reading" || kind === "listening") {
     return `${base}${rules}\nReturn exactly: {"passage":{"id":"passage","title":"French title","titleEn":"English title","segments":[4 to 6 {"fr":"French sentence","en":"English translation","grammarNote":"short useful note","pronunciationTip":"short useful tip"}],"fullText":"the exact French segments joined in order"},"quiz":[2 or 3 {"q":"French question","q_en":"English question","choices":[3 French choices],"choices_en":[3 English choices],"answerIndex":0}],"keywords":[up to 5 {"id":"id","fr":"French","en":"English","phonetic":"pronunciation"}]}. Every answerIndex must be 0, 1, or 2 and point to the correct choice.`;
@@ -552,7 +595,12 @@ function promptFor(session: Json, kind: string): string {
   return `${base}${rules}\nThe exact Grammar Practice mode is ${mode}; never combine modes. Return exactly: {"practiceMode":"${mode}","session":{"id":"grammar-${text(session.id)}","title":"short title","subtitle":"short English subtitle","level":"${brief.level || "A1"}","tense":"Present, Past, Future, or Mixed","grammar_focus":"one small level-correct pattern","icon_key":"sparkles","mode":"${mode}","goal":"one short goal","source":"generated","steps":[exactly ${count} ${grammarStep}]}}. Tokens joined with spaces must reconstruct target exactly. Keep one grammar pattern throughout.`;
 }
 
-function validateArtifact(artifact: Json, session: Json, kind: string) {
+function validateArtifact(
+  artifact: Json,
+  session: Json,
+  kind: string,
+  vocabularyCandidates: VocabularyCandidate[] = [],
+) {
   if (kind === "speaking") {
     validateSpeaking(
       artifact,
@@ -560,7 +608,11 @@ function validateArtifact(artifact: Json, session: Json, kind: string) {
       practiceModeFor(text(session.primary_skill), Number(session.sequence ?? 0)),
     );
   }
-  if (kind === "vocabulary") validateVocabulary(artifact, text(session.level) || "A1");
+  if (kind === "vocabulary") validateVocabulary(
+    artifact,
+    text(session.level) || "A1",
+    vocabularyCandidates,
+  );
   if (kind === "reading" || kind === "listening") validateStory(artifact, text(session.level) || "A1", Number(session.sequence ?? 0));
   if (kind === "writing") validateWriting(artifact, text(session.level) || "A1");
   if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
@@ -577,6 +629,7 @@ async function generateArtifact(
   serviceRoleKey: string,
   session: Json,
   kind: string,
+  vocabularyCandidates: VocabularyCandidate[] = [],
 ): Promise<Json> {
   if (kind === "deterministic") {
     return {
@@ -595,7 +648,7 @@ async function generateArtifact(
       role: "system",
       content: "You prepare one small, coherent French lesson at a time. Follow the requested JSON schema exactly and keep the learner context minimal.",
     },
-    { role: "user", content: promptFor(session, kind) },
+    { role: "user", content: promptFor(session, kind, vocabularyCandidates) },
   ];
 
   let lastError: Error | null = null;
@@ -621,7 +674,11 @@ async function generateArtifact(
           provider,
           traceFeature: `course_${kind}`,
           messages,
-          maxTokens: 2600,
+          // Vocabulary is deliberately a small five-card artifact. Keep its
+          // authoring budget separate from story/reading lessons so a verbose
+          // model response cannot turn one queued card set into an expensive
+          // text request.
+          maxTokens: kind === "vocabulary" ? 1200 : 2600,
           temperature: 0.35,
           responseFormat: { type: "json_object" },
           retryPolicy: "none",
@@ -634,7 +691,7 @@ async function generateArtifact(
       rawText = text(aiData.text);
       const generated = parseModelJson(rawText);
       const artifact = { ...baseArtifact(session, kind), ...generated };
-      validateArtifact(artifact, session, kind);
+      validateArtifact(artifact, session, kind, vocabularyCandidates);
       console.info(JSON.stringify({
         event: "course_artifact_ready",
         session_id: text(session.id),
@@ -707,11 +764,33 @@ Deno.serve(async (request: Request) => {
   // keep the normal queue behavior. This is a filter only; it never creates,
   // rewrites, or retries a row.
   let harnessSkill = "";
+  let vocabularyCandidates: VocabularyCandidate[] = [];
   try {
     const body = await request.json() as Json;
     const requested = text(body.harness_skill).replace('-', '_');
     if (["speaking", "vocabulary", "reading", "listening", "writing"].includes(requested)) {
       harnessSkill = requested;
+    }
+    if (Array.isArray(body.vocabulary_candidates)) {
+      vocabularyCandidates = body.vocabulary_candidates
+        .map((raw) => {
+          const candidate = object(raw);
+          const role = text(candidate.role);
+          if (!text(candidate.id) || !text(candidate.fr) || !text(candidate.en) ||
+              !text(candidate.phonetic) || (role !== "review" && role !== "new")) {
+            return null;
+          }
+          return {
+            ...candidate,
+            id: text(candidate.id),
+            fr: text(candidate.fr),
+            en: text(candidate.en),
+            phonetic: text(candidate.phonetic),
+            role: role as "review" | "new",
+          } as VocabularyCandidate;
+        })
+        .filter((candidate): candidate is VocabularyCandidate => candidate != null)
+        .slice(0, 24);
     }
   } catch {
     // An empty body is the normal production request.
@@ -894,6 +973,7 @@ Deno.serve(async (request: Request) => {
       serviceRoleKey,
       claimed as Json,
       kind,
+      vocabularyCandidates,
     );
     if (kind === "listening") {
       // Persist the finished text the moment it exists, before the slower

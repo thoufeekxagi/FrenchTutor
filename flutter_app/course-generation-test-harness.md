@@ -18,6 +18,12 @@ old generated Speaking rows are preserved but no longer block or appear in
 this lane. The authored Vocabulary lesson in Unit 2 remains the gate and must
 be completed before the first generated Vocabulary row can be appended.
 
+Vocabulary generation is now text-first and Live-guided: Luna selects five
+words from a small review/new lexicon slice, and Course does not fan out ten
+Gemini PCM calls for every new row. The card's phone control reuses one compact
+Live socket for explicit pronunciation or sentence guidance; local matching
+still handles the recorded check.
+
 It preserves the authored route:
 
 - Sequences 1–5: authored Unit 1 foundation.

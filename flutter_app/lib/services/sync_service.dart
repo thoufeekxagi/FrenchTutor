@@ -9,6 +9,8 @@ import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
+import '../data/content_service.dart';
+import '../data/database/learning_store.dart';
 import '../data/database/grammar_course_lesson_store.dart';
 import '../data/database/speaking_lesson_store.dart';
 import '../data/database/writing_lesson_store.dart';
@@ -1928,9 +1930,14 @@ class SyncService {
     var prepared = 0;
     for (var index = 0; index < maxLessons; index++) {
       try {
+        final vocabularyCandidates = _courseVocabularyCandidates();
         final result = await _client.functions.invoke(
           'prepare-course-lesson',
-          body: {if (harnessSkill != null) 'harness_skill': harnessSkill},
+          body: {
+            if (harnessSkill != null) 'harness_skill': harnessSkill,
+            if (vocabularyCandidates.isNotEmpty)
+              'vocabulary_candidates': vocabularyCandidates,
+          },
         );
         unawaited(
           AiCostTracker.event(
@@ -1971,6 +1978,78 @@ class SyncService {
     // stale hourglass after the server has reached a terminal result.
     await hydrateAdaptiveCourses();
     return prepared;
+  }
+
+  /// Sends a small, level-filtered slice of the bundled lexical library to
+  /// Course generation. The edge function remains the authority that chooses
+  /// and validates the five words; this payload only prevents Luna from
+  /// inventing vocabulary outside the app's reviewed lexicon.
+  List<Map<String, dynamic>> _courseVocabularyCandidates() {
+    try {
+      final rows = _db.select(
+        '''
+        SELECT sequence, level
+        FROM adaptive_course_sessions
+        WHERE sequence > ?
+          AND primary_skill = 'vocabulary'
+          AND generation_status IN ('queued', 'failed')
+          AND status IN ('planned', 'active')
+          AND deleted_at IS NULL
+        ORDER BY sequence ASC
+        LIMIT 1
+      ''',
+        [AdaptiveCourseStore.initialBatchSize],
+      );
+      if (rows.isEmpty) return const [];
+      final sequence = (rows.first['sequence'] as int?) ?? 11;
+      final level = rows.first['level']?.toString() ?? 'A1';
+      final entries = ContentService.shared.vocabEntriesForLevel(level);
+      if (entries.isEmpty) return const [];
+
+      final srs = LearningStore(_db).allSRSStates();
+      final review = <VocabEntry>[];
+      final fresh = <VocabEntry>[];
+      for (final entry in entries) {
+        final state = srs[entry.id];
+        if (state != null && state.reps > 0) {
+          review.add(entry);
+        } else {
+          fresh.add(entry);
+        }
+      }
+
+      // Rotate through each pool as the serial lane advances. This keeps a
+      // five-lesson debug run from repeatedly offering the first asset words.
+      List<VocabEntry> rotated(List<VocabEntry> source, int take) {
+        if (source.isEmpty) return const [];
+        final offset = ((sequence - 11) * 5) % source.length;
+        final result = <VocabEntry>[];
+        for (
+          var index = 0;
+          index < source.length && result.length < take;
+          index++
+        ) {
+          result.add(source[(offset + index) % source.length]);
+        }
+        return result;
+      }
+
+      final candidates = [...rotated(review, 12), ...rotated(fresh, 12)];
+      return candidates
+          .map(
+            (entry) => {
+              'id': entry.id,
+              'fr': entry.fr,
+              'en': entry.en,
+              'phonetic': entry.phonetic,
+              'role': (srs[entry.id]?.reps ?? 0) > 0 ? 'review' : 'new',
+            },
+          )
+          .toList(growable: false);
+    } catch (error) {
+      debugPrint('Vocabulary candidate slice unavailable: $error');
+      return const [];
+    }
   }
 
   /// Every completed practice session — the exact data `DailyGoalService`

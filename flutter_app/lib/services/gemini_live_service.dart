@@ -511,8 +511,12 @@ class GeminiLiveService {
   }
 
   Future<String> _fullSystemPrompt() async {
-    if (compactGuidedContext && sessionType == LiveSessionType.speakingGuided) {
-      var compactPrompt = LivePrompts.compactGuidedSpeaking(persona: _persona);
+    if (compactGuidedContext &&
+        (sessionType == LiveSessionType.speakingGuided ||
+            sessionType == LiveSessionType.vocabStage)) {
+      var compactPrompt = sessionType == LiveSessionType.vocabStage
+          ? LivePrompts.compactVocabulary(persona: _persona)
+          : LivePrompts.compactGuidedSpeaking(persona: _persona);
       final ctx = lessonContext;
       if (ctx != null && ctx.trim().isNotEmpty) {
         compactPrompt +=

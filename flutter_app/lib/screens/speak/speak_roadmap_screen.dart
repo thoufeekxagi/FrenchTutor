@@ -8,12 +8,10 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
-import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/course_artifact_codec.dart';
 import '../../services/course_generation_test_harness.dart';
-import '../../services/gemini_live_audio_service.dart';
 import '../../services/lesson_audio_deck_service.dart';
 import '../../services/ai_cost_tracker.dart';
 import '../../services/speak_language_profile.dart';
@@ -173,6 +171,19 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       if (!mounted || operationEpoch != _generationEpoch) return;
       await sync.hydrateAdaptiveCourses();
       if (!mounted || operationEpoch != _generationEpoch) return;
+      if (harnessSkill == 'vocabulary') {
+        // Vocabulary is intentionally Live-only. Do not let this shared
+        // roadmap callback repair an unrelated reading/listening deck while
+        // the Vocabulary harness is being measured.
+        unawaited(
+          AiCostTracker.event(
+            feature: 'course_generation',
+            event: 'vocabulary_audio_deferred_live_only',
+            extra: {'audio_generation_calls': 0},
+          ),
+        );
+        return;
+      }
       final refreshed = ref
           .read(adaptiveCourseStoreProvider)
           .ensureCurrentPlan(profile);
@@ -181,42 +192,19 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
             candidate.generationStatus != 'ready' ||
             candidate.artifact == null ||
             (candidate.primarySkill != SpeakSkill.reading &&
-                candidate.primarySkill != SpeakSkill.listening &&
-                candidate.primarySkill != SpeakSkill.vocabulary)) {
+                candidate.primarySkill != SpeakSkill.listening)) {
           continue;
         }
         try {
           if (!mounted || operationEpoch != _generationEpoch) return;
-          if (candidate.primarySkill == SpeakSkill.vocabulary) {
-            final set = CourseArtifactCodec.vocabulary(candidate.artifact!);
-            final voice = ActiveTutor.current.voiceName;
-            for (final entry in set.entries) {
-              if (!mounted || operationEpoch != _generationEpoch) return;
-              await GeminiLiveAudioService.shared.generateAndCache(
-                text: entry.fr,
-                contentItemId: '${candidate.contentKey}:${entry.id}:word',
-                voiceName: voice,
-              );
-              final example = set.storyExamples[entry.id];
-              if (example != null) {
-                if (!mounted || operationEpoch != _generationEpoch) return;
-                await GeminiLiveAudioService.shared.generateAndCache(
-                  text: example.fr,
-                  contentItemId: '${candidate.contentKey}:${entry.id}:sentence',
-                  voiceName: voice,
-                );
-              }
-            }
-          } else {
-            final story = candidate.primarySkill == SpeakSkill.listening
-                ? CourseArtifactCodec.listening(candidate.artifact!)
-                : CourseArtifactCodec.story(candidate.artifact!);
-            if (!mounted || operationEpoch != _generationEpoch) return;
-            await LessonAudioDeckService.shared.prepare(
-              story: story,
-              db: ref.read(databaseProvider),
-            );
-          }
+          final story = candidate.primarySkill == SpeakSkill.listening
+              ? CourseArtifactCodec.listening(candidate.artifact!)
+              : CourseArtifactCodec.story(candidate.artifact!);
+          if (!mounted || operationEpoch != _generationEpoch) return;
+          await LessonAudioDeckService.shared.prepare(
+            story: story,
+            db: ref.read(databaseProvider),
+          );
         } catch (error, stackTrace) {
           // Text lesson generation remains persisted. The next explicit
           // Generate action can finish a missing audio deck; no silent

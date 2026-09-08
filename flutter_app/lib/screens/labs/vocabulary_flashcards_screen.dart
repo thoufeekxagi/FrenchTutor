@@ -171,6 +171,7 @@ class _VocabularyFlashcardsScreenState
       sessionType: LiveSessionType.vocabStage,
       lessonContext: _murrayContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
+      compactGuidedContext: true,
       onChanged: () => mounted ? setState(() {}) : null,
       manualLearnerTurns: true,
       onUserTranscript: _onMurrayTranscript,
@@ -189,12 +190,30 @@ class _VocabularyFlashcardsScreenState
   String _murrayContext() {
     final entry = _current;
     final example = _examples[entry.id];
-    return 'Vocabulary pronunciation check. Word ${_index + 1} of '
-        '${_entries.length}: "${entry.fr}" = "${entry.en}".'
-        '${example != null ? ' Example sentence: "${example.fr}" = "${example.en}".' : ''} '
-        'This is a silent pronunciation check only: never speak unless the '
-        'app explicitly asks you to grade an attempt. Do not teach, greet, '
-        'or comment.';
+    return 'Vocabulary card ${_index + 1}/${_entries.length}. '
+        'Word: "${entry.fr}". Meaning: "${entry.en}".'
+        '${example != null ? ' Sentence: "${example.fr}".' : ''} '
+        'The app controls reveal, record, practice, and next. Speak only '
+        'when the app explicitly asks for pronunciation or brief guidance.';
+  }
+
+  /// Uses the already-open Live socket for explicit pronunciation only. This
+  /// never creates a PCM clip or a second connection; the next card silently
+  /// replaces the context on the same socket.
+  void _askLiveToSpeak({required bool sentence}) {
+    if (!_murrayEnabled) {
+      if (!mounted) return;
+      setState(() => _audioError = 'Tap the phone for live guidance.');
+      return;
+    }
+    if (_murray.tutorTurnActive) return;
+    _audioError = null;
+    _murray.promptTutor(
+      sentence
+          ? 'Pronounce the current French sentence once, clearly, then stop.'
+          : 'Pronounce the current French word once, clearly. Give only a very short English meaning if needed, then stop.',
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _setMurrayEnabled(bool enabled) async {
@@ -570,6 +589,7 @@ class _VocabularyFlashcardsScreenState
       _loadError = null;
       _audioError = null;
     });
+    _murray.suppressCurrentReply();
     _murray.updateLessonContext();
     _saveProgress();
   }
@@ -764,7 +784,9 @@ class _VocabularyFlashcardsScreenState
             child: _smallFooterControl(
               icon: Icons.volume_up_outlined,
               label: 'Replay word',
-              onTap: () => _wordSpeakerKey.currentState?.trigger(),
+              onTap: _murrayEnabled
+                  ? () => _askLiveToSpeak(sentence: false)
+                  : () => _wordSpeakerKey.currentState?.trigger(),
             ),
           ),
         ],
@@ -940,6 +962,62 @@ class _VocabularyFlashcardsScreenState
     );
   }
 
+  Widget _pronunciationButton({
+    required String text,
+    required String contentItemId,
+    required bool sentence,
+    required double size,
+    required double iconSize,
+  }) {
+    if (_murrayEnabled) {
+      return Semantics(
+        button: true,
+        label: sentence
+            ? 'Pronounce the current sentence with live guidance'
+            : 'Pronounce the current word with live guidance',
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _askLiveToSpeak(sentence: sentence),
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: DesignTokens.nightAccentSoft,
+              border: Border.all(color: DesignTokens.nightAccent),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.volume_up_outlined,
+              color: DesignTokens.nightAccent,
+              size: iconSize,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return TtsPlayButton(
+      key: sentence ? null : _wordSpeakerKey,
+      text: text,
+      contentItemId: contentItemId,
+      // This is cache-only. Vocabulary must never open a one-shot PCM Live
+      // request from a playback tap; the phone control above is the explicit
+      // Live path.
+      audioResolver: () => GeminiLiveAudioService.shared.loadCached(
+        text: text,
+        voiceName: ActiveTutor.current.voiceName,
+      ),
+      onError: (error) {
+        if (!mounted) return;
+        setState(() => _audioError = 'Tap the phone for live guidance.');
+      },
+      color: DesignTokens.nightAccent,
+      size: size,
+      iconSize: iconSize,
+    );
+  }
+
   Widget _progressLine() {
     final progress = (_index + (_wordComplete ? 1 : 0)) / _entries.length;
     return Column(
@@ -1013,25 +1091,10 @@ class _VocabularyFlashcardsScreenState
             ),
           ],
           const SizedBox(height: 16),
-          TtsPlayButton(
-            key: _wordSpeakerKey,
+          _pronunciationButton(
             text: entry.fr,
             contentItemId: _audioId(entry, 'word'),
-            audioResolver: () => GeminiLiveAudioService.shared.resolve(
-              text: entry.fr,
-              contentItemId: _audioId(entry, 'word'),
-              voiceName: ActiveTutor.current.voiceName,
-            ),
-            onError: (error) {
-              if (!mounted) return;
-              setState(
-                () => _audioError = widget.preparedContentOnly
-                    ? 'This saved lesson has no prepared audio for this '
-                          'word yet.'
-                    : "Couldn't play audio. Check your connection and try again.",
-              );
-            },
-            color: DesignTokens.nightAccent,
+            sentence: false,
             size: 44,
             iconSize: 20,
           ),
@@ -1120,25 +1183,10 @@ class _VocabularyFlashcardsScreenState
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    TtsPlayButton(
+                    _pronunciationButton(
                       text: example.fr,
                       contentItemId: _audioId(_current, 'sentence'),
-                      audioResolver: () =>
-                          GeminiLiveAudioService.shared.resolve(
-                            text: example.fr,
-                            contentItemId: _audioId(_current, 'sentence'),
-                            voiceName: ActiveTutor.current.voiceName,
-                          ),
-                      onError: (error) {
-                        if (!mounted) return;
-                        setState(
-                          () => _audioError = widget.preparedContentOnly
-                              ? 'This saved lesson has no prepared audio '
-                                    'for this sentence yet.'
-                              : "Couldn't play audio. Check your connection and try again.",
-                        );
-                      },
-                      color: DesignTokens.nightAccent,
+                      sentence: true,
                       size: 40,
                       iconSize: 19,
                     ),
