@@ -101,7 +101,21 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           (current, session) =>
               session.sequence > current ? session.sequence : current,
         );
-        if (highest <= beforeHighest) return;
+        if (highest <= beforeHighest) {
+          // The roadmap can rebuild between Navigator.pop and this callback.
+          // In that case ensureCurrentPlan may already have appended the one
+          // queued row locally, even though no provider request has started.
+          // Completion is still the explicit trigger, so prepare that row;
+          // never reopen a ready or failed row automatically.
+          final queuedHarnessRow = plan.sessions.any(
+            (session) =>
+                session.sequence > AdaptiveCourseStore.initialBatchSize &&
+                session.primarySkill ==
+                    CourseGenerationTestHarness.current.targetSkill &&
+                session.generationStatus == 'queued',
+          );
+          if (!queuedHarnessRow) return;
+        }
       }
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
       if (!mounted || operationEpoch != _generationEpoch) return;
