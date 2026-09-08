@@ -40,6 +40,24 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // A debug harness run can be interrupted after the Unit 2 completion has
+    // already been persisted (for example by a hot restart or a device
+    // reconnect). In that case the queued target row is still valid work, but
+    // there is no Navigator result left to trigger preparation. Reconcile it
+    // once when the roadmap opens. This path is compile-time/debug-only and
+    // never retries a failed row or changes the production Generate flow.
+    final harness = CourseGenerationTestHarness.current;
+    if (harness.active) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(
+          _prepareCourse(
+            harnessSkill: harness.targetWireName,
+            reconcileQueuedHarnessRow: true,
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -67,6 +85,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
   Future<void> _prepareCourse({
     String? harnessSkill,
     bool onlyIfNewHarnessRow = false,
+    bool reconcileQueuedHarnessRow = false,
   }) async {
     if (_preparingCourse) return;
     _preparingCourse = true;
@@ -95,6 +114,22 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                   session.sequence > highest ? session.sequence : highest,
             );
       final plan = store.ensureCurrentPlan(profile);
+      if (reconcileQueuedHarnessRow && harnessSkill != null) {
+        final queuedHarnessRow = plan.sessions.any(
+          (session) =>
+              session.sequence > AdaptiveCourseStore.initialBatchSize &&
+              session.primarySkill.wireName == harnessSkill &&
+              session.generationStatus == 'queued',
+        );
+        if (!queuedHarnessRow) return;
+        unawaited(
+          AiCostTracker.event(
+            feature: 'course_generation_harness',
+            event: 'reconcile_queued_triggered',
+            extra: {'target_skill': harnessSkill},
+          ),
+        );
+      }
       if (onlyIfNewHarnessRow) {
         final highest = plan.sessions.fold<int>(
           adaptiveCourseFoundationSize + adaptiveCourseBatchSize,
