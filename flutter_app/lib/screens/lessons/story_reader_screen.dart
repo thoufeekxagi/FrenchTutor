@@ -104,6 +104,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   bool _isLoadingAudio = false;
   int _livePlaybackGeneration = 0;
   String _liveOutputTranscript = '';
+  int? _liveTranscriptWordIndex;
+  Timer? _narrationHighlightTimer;
   late final AudioStreamingService _liveNarrationAudio;
   double _rate = 1.0;
   double _textScale = 1;
@@ -294,6 +296,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _coverRefreshTimer?.cancel();
+    _narrationHighlightTimer?.cancel();
     _call.dispose();
     _livePlaybackGeneration++;
     unawaited(_liveNarrationAudio.dispose());
@@ -364,6 +367,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         );
       }
     } finally {
+      _narrationHighlightTimer?.cancel();
+      _narrationHighlightTimer = null;
       await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
       if (mounted && generation == _livePlaybackGeneration) {
@@ -398,12 +403,19 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Future<void> _playLiveSegment(int index, int generation) async {
     final segment = _passage.segments[index];
     if (!mounted || generation != _livePlaybackGeneration) return;
+    _narrationHighlightTimer?.cancel();
+    _liveNarrationAudio.resetPlaybackTimeline();
     _liveOutputTranscript = '';
+    _liveTranscriptWordIndex = null;
     setState(() {
       _currentSegment = index;
       _currentWord = null;
       _isLoadingAudio = true;
     });
+    _narrationHighlightTimer = Timer.periodic(
+      const Duration(milliseconds: 40),
+      (_) => _tickNarrationHighlight(segment.fr, generation),
+    );
     _scrollToCurrent();
     await _call.narrateExternalText(
       instruction:
@@ -413,9 +425,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         unawaited(_liveNarrationAudio.playAudioChunk(bytes));
         if (_isLoadingAudio || _currentWord == null) {
           // Give the first audible frame an honest starting position while
-          // waiting for Live's first output-transcription delta. There is no
-          // timer that guesses later words; transcript alignment is the sole
-          // authority after this initial frame.
+          // the local playback timeline catches the first frame. Later words
+          // are advanced by that timeline, not by transcript arrival.
           setState(() {
             _isLoadingAudio = false;
             _currentWord ??= 0;
@@ -432,15 +443,37 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           segment.fr,
           _liveOutputTranscript,
         );
-        if (next != null && (_currentWord == null || next > _currentWord!)) {
-          setState(() => _currentWord = next);
+        if (next != null &&
+            (_liveTranscriptWordIndex == null ||
+                next > _liveTranscriptWordIndex!)) {
+          _liveTranscriptWordIndex = next;
         }
       },
     );
     await _liveNarrationAudio.waitForPlaybackDrained();
+    _narrationHighlightTimer?.cancel();
+    _narrationHighlightTimer = null;
     if (mounted && generation == _livePlaybackGeneration) {
-      setState(() => _currentWord = null);
+      setState(() {
+        _currentWord = null;
+        _liveTranscriptWordIndex = null;
+      });
     }
+  }
+
+  void _tickNarrationHighlight(String sentence, int generation) {
+    if (!mounted || generation != _livePlaybackGeneration) return;
+    if (_liveNarrationAudio.playbackTimelineDuration <= Duration.zero) return;
+    final next = NarrationAlignment.playbackWordIndex(
+      sentence,
+      playbackPosition: _liveNarrationAudio.playbackTimelinePosition,
+      queuedAudioDuration: _liveNarrationAudio.playbackTimelineDuration,
+      transcriptWordIndex: _liveTranscriptWordIndex,
+    );
+    if (next == null || (_currentWord != null && next <= _currentWord!)) {
+      return;
+    }
+    setState(() => _currentWord = next);
   }
 
   void _scrollToCurrent() {
@@ -458,12 +491,15 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   Future<void> _togglePlayPause() async {
     if (_isPlaying) {
       ++_livePlaybackGeneration;
+      _narrationHighlightTimer?.cancel();
+      _narrationHighlightTimer = null;
       await _liveNarrationAudio.stopPlayback(hardStop: true);
       await _call.endExternalPlayback();
       if (mounted) {
         setState(() {
           _isPlaying = false;
           _currentWord = null;
+          _liveTranscriptWordIndex = null;
         });
       }
     } else {
@@ -529,6 +565,8 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   Future<void> _stop() async {
     ++_livePlaybackGeneration;
+    _narrationHighlightTimer?.cancel();
+    _narrationHighlightTimer = null;
     await _liveNarrationAudio.stopPlayback(hardStop: true);
     await _call.endExternalPlayback();
     if (mounted) {
@@ -629,6 +667,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _isPlaying = false;
           _isLoadingAudio = false;
           _currentWord = null;
+          _liveTranscriptWordIndex = null;
         });
       }
     }

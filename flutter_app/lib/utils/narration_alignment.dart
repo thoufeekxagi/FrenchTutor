@@ -67,6 +67,48 @@ abstract final class NarrationAlignment {
     return expected.length - 1;
   }
 
+  /// Chooses the word that should be highlighted for a locally measured audio
+  /// position. Gemini Live can deliver the complete output transcript before
+  /// the corresponding audio has played, so transcript progress is only a
+  /// ceiling; the real streamed-audio timeline is the clock.
+  static int? playbackWordIndex(
+    String sentence, {
+    required Duration playbackPosition,
+    required Duration queuedAudioDuration,
+    int? transcriptWordIndex,
+  }) {
+    final expected = words(sentence);
+    if (expected.isEmpty) return null;
+
+    final weights = expected.map(_wordPlaybackWeight).toList(growable: false);
+    final totalWeight = weights.fold<double>(0, (sum, value) => sum + value);
+    if (totalWeight <= 0) return null;
+
+    // The estimate is only a floor. Once Live has queued enough audio, the
+    // actual PCM timeline takes over and naturally follows the model's pace.
+    final estimatedTotalMs = totalWeight;
+    final queuedMs = queuedAudioDuration.inMicroseconds / 1000;
+    final totalMs = queuedMs > estimatedTotalMs ? queuedMs : estimatedTotalMs;
+    final positionMs = playbackPosition.inMicroseconds / 1000;
+    final progress = (positionMs / totalMs).clamp(0.0, 0.999999);
+    final targetWeight = totalWeight * progress;
+
+    var cumulative = 0.0;
+    var index = expected.length - 1;
+    for (var i = 0; i < weights.length; i++) {
+      cumulative += weights[i];
+      if (targetWeight < cumulative) {
+        index = i;
+        break;
+      }
+    }
+
+    if (transcriptWordIndex != null) {
+      index = index.clamp(0, transcriptWordIndex).toInt();
+    }
+    return index;
+  }
+
   /// Deliberately mirrors the tokenization used by [BilingualWordText], so a
   /// returned index always addresses the same rendered word.
   static List<String> words(String text) => text
@@ -99,4 +141,17 @@ abstract final class NarrationAlignment {
       .replaceAll('ç', 'c')
       .replaceAll('’', "'")
       .replaceAll(RegExp(r'[^a-z0-9]+'), '');
+
+  static double _wordPlaybackWeight(String word) {
+    final letters = _canonical(word).length;
+    // Content-based timing: longer words receive more of the sentence's
+    // playback window, and punctuation contributes a natural pause.
+    var weight = 110 + (letters * 35);
+    if (word.endsWith(',') || word.endsWith(';') || word.endsWith(':')) {
+      weight += 90;
+    } else if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
+      weight += 180;
+    }
+    return weight.toDouble();
+  }
 }

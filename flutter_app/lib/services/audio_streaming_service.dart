@@ -112,6 +112,37 @@ class AudioStreamingService {
   DateTime _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
   static const _playbackTailGraceSeconds = 0.35;
 
+  /// Timeline for the currently queued output utterance. Gemini delivers PCM
+  /// in bursts, while the native player drains it at the device's playback
+  /// rate. Consumers such as story highlighting can use this clock without
+  /// relying on server-side word timestamps.
+  DateTime? _playbackTimelineStartTime;
+  Duration _playbackTimelineDuration = Duration.zero;
+
+  /// Amount of output audio currently represented by the local playback
+  /// timeline. Reset when a new utterance starts or playback is stopped.
+  Duration get playbackTimelineDuration => _playbackTimelineDuration;
+
+  /// Best-effort position in the local playback timeline. This is based on
+  /// the exact PCM duration accepted for playback, not transcript arrival.
+  Duration get playbackTimelinePosition {
+    final start = _playbackTimelineStartTime;
+    if (start == null || _playbackTimelineDuration <= Duration.zero) {
+      return Duration.zero;
+    }
+    final elapsed = DateTime.now().difference(start);
+    if (elapsed <= Duration.zero) return Duration.zero;
+    if (elapsed >= _playbackTimelineDuration) return _playbackTimelineDuration;
+    return elapsed;
+  }
+
+  /// Starts a fresh timing window without touching audio already accepted by
+  /// the native player. Story narration calls this between sentences.
+  void resetPlaybackTimeline() {
+    _playbackTimelineStartTime = null;
+    _playbackTimelineDuration = Duration.zero;
+  }
+
   static const _inputSampleRate = 16000;
   static const _outputSampleRate = 24000;
 
@@ -379,6 +410,15 @@ class AudioStreamingService {
     final frameCount = bytes.length / 2; // 16-bit mono samples
     final bufferDurationSeconds = frameCount / _outputSampleRate;
     final now = DateTime.now();
+    if (_playbackTimelineStartTime == null ||
+        !_scheduledPlaybackEndTime.isAfter(now)) {
+      _playbackTimelineStartTime = now;
+      _playbackTimelineDuration = Duration.zero;
+    }
+    _playbackTimelineDuration += Duration(
+      microseconds: (bufferDurationSeconds * Duration.microsecondsPerSecond)
+          .round(),
+    );
     final base = _scheduledPlaybackEndTime.isAfter(now)
         ? _scheduledPlaybackEndTime
         : now;
@@ -448,7 +488,8 @@ class AudioStreamingService {
       }
     }
     final remaining = _scheduledPlaybackEndTime.difference(DateTime.now());
-    if (remaining > Duration.zero && DateTime.now().add(remaining).isBefore(deadline)) {
+    if (remaining > Duration.zero &&
+        DateTime.now().add(remaining).isBefore(deadline)) {
       await Future<void>.delayed(remaining);
     }
     if (DateTime.now().isBefore(deadline)) {
@@ -549,6 +590,7 @@ class AudioStreamingService {
       } catch (_) {}
       _isPlayerStarted = false;
       _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+      resetPlaybackTimeline();
       return;
     }
 
@@ -584,6 +626,7 @@ class AudioStreamingService {
     // The tracked timeline is now stale — without this reset the mic gate would keep
     // blocking uploads until a time that no longer corresponds to any audio actually playing.
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+    resetPlaybackTimeline();
     if (waitForSilence && remainingMs > 0) {
       await Future<void>.delayed(Duration(milliseconds: muteMs));
     }

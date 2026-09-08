@@ -48,4 +48,40 @@ void main() {
       3,
     );
   });
+
+  test(
+    'playback pacing does not jump to the final word on a full transcript',
+    () {
+      const sentence = 'Je prends le train demain';
+      const queued = Duration(seconds: 2);
+
+      final early = NarrationAlignment.playbackWordIndex(
+        sentence,
+        playbackPosition: const Duration(milliseconds: 180),
+        queuedAudioDuration: queued,
+        transcriptWordIndex: 4,
+      );
+      final middle = NarrationAlignment.playbackWordIndex(
+        sentence,
+        playbackPosition: const Duration(milliseconds: 1050),
+        queuedAudioDuration: queued,
+        transcriptWordIndex: 4,
+      );
+
+      expect(early, isNot(4));
+      expect(middle, isNot(4));
+      expect(middle, greaterThan(early!));
+    },
+  );
+
+  test('transcript progress remains a ceiling for playback pacing', () {
+    final index = NarrationAlignment.playbackWordIndex(
+      'Je prends le train demain',
+      playbackPosition: const Duration(seconds: 4),
+      queuedAudioDuration: const Duration(seconds: 4),
+      transcriptWordIndex: 1,
+    );
+
+    expect(index, lessThanOrEqualTo(1));
+  });
 }
