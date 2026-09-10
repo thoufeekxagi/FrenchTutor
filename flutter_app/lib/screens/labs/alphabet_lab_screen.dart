@@ -336,7 +336,7 @@ class _CompactLetterCardState extends State<_CompactLetterCard> {
                     // phonetic hint wrap on narrow phones. The old
                     // mainAxisSize.min row overflowed for labels such as
                     // "accent circonflexe" and made the card report a
-                    // RenderFlex overflow in Sentry.
+                    // RenderFlex overflow on narrow phones.
                     TtsPlayButton(
                       key: _ttsKey,
                       text: alphabetSpokenText(letter),

@@ -14,6 +14,15 @@ export function SiteFooter() {
           <Link href="/stories" className="text-sm font-semibold text-[#007BFF] hover:underline">
             Learner stories
           </Link>
+          <Link href="/privacy" className="text-sm font-semibold text-[#007BFF] hover:underline">
+            Privacy
+          </Link>
+          <Link href="/terms" className="text-sm font-semibold text-[#007BFF] hover:underline">
+            Terms
+          </Link>
+          <Link href="/support" className="text-sm font-semibold text-[#007BFF] hover:underline">
+            Support
+          </Link>
         </div>
         <p className="text-sm font-medium text-[#6b7280]">
           &copy; {new Date().getFullYear()} ParleSprint. Guided French practice for serious learners.

@@ -38,6 +38,8 @@ class SessionSettings extends ChangeNotifier {
   bool highlightWords = true;
   bool underlineWords = true;
   bool autoPlayWordAudio = false;
+  // Compatibility value for focused-session widgets. The current release is
+  // dark-only, so persisted light-mode choices are ignored.
   bool darkMode = true;
 
   Future<void> load() async {
@@ -48,7 +50,7 @@ class SessionSettings extends ChangeNotifier {
     highlightWords = prefs.getBool(_highlightKey) ?? true;
     underlineWords = prefs.getBool(_underlineKey) ?? true;
     autoPlayWordAudio = prefs.getBool(_autoPlayKey) ?? false;
-    darkMode = prefs.getBool(_darkModeKey) ?? true;
+    darkMode = true;
     notifyListeners();
   }
 
@@ -95,12 +97,12 @@ class SessionSettings extends ChangeNotifier {
   }
 
   Future<void> setDarkMode(bool value) async {
-    darkMode = value;
-    AppAppearanceSettings.shared.adoptDarkMode(value);
+    darkMode = true;
+    AppAppearanceSettings.shared.adoptDarkMode(true);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_darkModeKey, value);
-    await prefs.setBool('app_dark_mode', value);
+    await prefs.setBool(_darkModeKey, true);
+    await prefs.setBool('app_dark_mode', true);
   }
 
   double _validRate(double value) {

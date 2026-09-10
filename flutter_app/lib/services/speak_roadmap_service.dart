@@ -163,13 +163,13 @@ abstract final class SpeakRoadmapService {
     );
   }
 
-  /// Foundation (1-5) and Unit 2 (6-10) are both authored, not AI-generated,
+  /// Foundation (1-5) and Unit 2 (6-11) are both authored, not AI-generated,
   /// and are the same permanent default content for every learner. They are
   /// always fully listed — including a lesson still preparing its audio —
   /// the same way foundation always has been; there is no cost reason to
   /// hide free, fixed content one row at a time.
   ///
-  /// Sequence 11+ is real AI generation, one lesson at a time. Older app
+  /// Sequence 12+ is real AI generation, one lesson at a time. Older app
   /// versions persisted an entire future path as queued placeholders there,
   /// so rendering the raw plan could misleadingly show many lessons as if
   /// they were generating together. Keep completed/ready lessons visible,

@@ -14,6 +14,7 @@ enum CourseGenerationHarnessSkill {
   reading,
   listening,
   writing,
+  grammar,
 }
 
 extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
@@ -23,6 +24,7 @@ extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
     CourseGenerationHarnessSkill.reading => SpeakSkill.reading,
     CourseGenerationHarnessSkill.listening => SpeakSkill.listening,
     CourseGenerationHarnessSkill.writing => SpeakSkill.writing,
+    CourseGenerationHarnessSkill.grammar => SpeakSkill.grammar,
   };
 
   String get wireName => speakSkill.wireName;
@@ -33,6 +35,7 @@ extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
         'reading' => CourseGenerationHarnessSkill.reading,
         'listening' => CourseGenerationHarnessSkill.listening,
         'writing' || 'write' => CourseGenerationHarnessSkill.writing,
+        'grammar' || 'gram' => CourseGenerationHarnessSkill.grammar,
         _ => CourseGenerationHarnessSkill.speaking,
       };
 }
@@ -42,7 +45,7 @@ extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
 /// Enable a debug build to test one skill with the default lane. The next lane
 /// can be selected without creating another implementation:
 ///
-/// `--dart-define=PARLESPRINT_COURSE_HARNESS_SKILL=vocabulary`
+/// `--dart-define=PARLESPRINT_COURSE_HARNESS_SKILL=grammar`
 /// `--dart-define=PARLESPRINT_COURSE_HARNESS_ENABLED=false`
 class CourseGenerationTestHarness {
   const CourseGenerationTestHarness({
@@ -73,11 +76,9 @@ class CourseGenerationTestHarness {
     skill: CourseGenerationHarnessSkillValues.parse(
       String.fromEnvironment(
         'PARLESPRINT_COURSE_HARNESS_SKILL',
-        // Speaking, Vocabulary, and Writing have completed their verification
-        // passes. Reading is the active development-only lane now; an
-        // explicit dart-define can still select any supported skill when the
-        // build tool preserves it.
-        defaultValue: 'reading',
+        // Grammar is the active development-only lane for this verification
+        // pass. The define remains available for every supported skill.
+        defaultValue: 'grammar',
       ),
     ),
   );
@@ -91,7 +92,7 @@ class CourseGenerationTestHarness {
 
   String get targetWireName => skill.wireName;
 
-  /// Unit 1 is the foundation and Unit 2 is the authored five-skill block.
+  /// Unit 1 is the foundation and Unit 2 is the authored six-skill block.
   /// The harness begins only after the authored boundary, but its trigger is
   /// the selected Unit 2 skill rather than completion of unrelated activities.
   bool shouldAdvanceAfter({
@@ -99,7 +100,7 @@ class CourseGenerationTestHarness {
     required SpeakSkill primarySkill,
   }) => active && sequence > 5 && primarySkill == targetSkill;
 
-  bool shouldForcePersonalizedSkill(int sequence) => active && sequence > 10;
+  bool shouldForcePersonalizedSkill(int sequence) => active && sequence > 11;
 
   /// Existing non-target personalized rows are hidden from the development
   /// roadmap. They are never deleted or rewritten; this only keeps the test
@@ -107,5 +108,5 @@ class CourseGenerationTestHarness {
   bool includeInRoadmap({
     required int sequence,
     required SpeakSkill primarySkill,
-  }) => !active || sequence <= 10 || primarySkill == targetSkill;
+  }) => !active || sequence <= 11 || primarySkill == targetSkill;
 }

@@ -107,7 +107,7 @@ class AppleGoalView extends StatelessWidget {
                   onPressed: selectedGoal != null ? onContinue : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.onPrimary,
                     disabledBackgroundColor: DesignTokens.canvasDim,
                     disabledForegroundColor: DesignTokens.muted,
                     elevation: 0,
@@ -214,12 +214,9 @@ class _LuxuryGoalCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? DesignTokens.primarySoft : DesignTokens.surface,
+            color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
-              width: isSelected ? 2 : 1,
-            ),
+            border: Border.all(color: DesignTokens.canvasDim),
             boxShadow: [
               BoxShadow(
                 color: isSelected
@@ -230,82 +227,96 @@ class _LuxuryGoalCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              // Tinted Vector Squircle Badge
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? DesignTokens.primary.withValues(alpha: 0.12)
-                      : DesignTokens.canvas,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isSelected
-                        ? DesignTokens.primary.withValues(alpha: 0.24)
-                        : DesignTokens.canvasDim,
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: isSelected
-                      ? DesignTokens.primary
-                      : DesignTokens.inkSoft,
-                ),
-              ),
-              const SizedBox(width: 16),
-
-              // Title & Subtitle
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: DesignTokens.ink,
-                        letterSpacing: -0.2,
+              Row(
+                children: [
+                  // Tinted Vector Squircle Badge
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.primarySoft,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isSelected
+                            ? DesignTokens.primary.withValues(alpha: 0.24)
+                            : DesignTokens.canvasDim,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 12.5,
-                        color: DesignTokens.inkSoft,
+                    child: Icon(
+                      icon,
+                      size: 22,
+                      color: isSelected
+                          ? DesignTokens.primary
+                          : DesignTokens.inkSoft,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  // Title & Subtitle
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: DesignTokens.ink,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            color: DesignTokens.inkSoft,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Apple Selection Indicator
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? DesignTokens.primary
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: isSelected
+                            ? DesignTokens.primary
+                            : DesignTokens.canvasDim,
+                        width: 2,
                       ),
                     ),
-                  ],
-                ),
+                    child: isSelected
+                        ? Icon(
+                            CupertinoIcons.checkmark,
+                            size: 14,
+                            color: DesignTokens.onPrimary,
+                          )
+                        : null,
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-
-              // Apple Selection Indicator
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? DesignTokens.primary : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected
-                        ? DesignTokens.primary
-                        : DesignTokens.canvasDim,
-                    width: 2,
+              if (isSelected)
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 4,
+                      child: ColoredBox(color: DesignTokens.primary),
+                    ),
                   ),
                 ),
-                child: isSelected
-                    ? const Icon(
-                        CupertinoIcons.checkmark,
-                        size: 14,
-                        color: Colors.white,
-                      )
-                    : null,
-              ),
             ],
           ),
         ),

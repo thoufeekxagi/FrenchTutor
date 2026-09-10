@@ -47,11 +47,13 @@ class SpeakingPracticeRequest {
     this.contentKey,
     this.kickoffMessage,
     this.durationLimitSeconds,
+    this.liveContextCharacterLimit,
     this.wrapUpNote,
     this.wrapUpLeadSeconds = 30,
     this.examMode = false,
     this.popResultImmediately = false,
     this.skipQuota = false,
+    this.reviewSession = false,
   });
 
   final SpeakingMode mode;
@@ -65,11 +67,17 @@ class SpeakingPracticeRequest {
   final String? contentKey;
   final String? kickoffMessage;
   final int? durationLimitSeconds;
+  final int? liveContextCharacterLimit;
   final String? wrapUpNote;
   final int wrapUpLeadSeconds;
   final bool examMode;
   final bool popResultImmediately;
   final bool skipQuota;
+
+  /// Smart Review has a different Live contract from a normal roleplay. When
+  /// true, the live screen must use only the supplied review blueprint and
+  /// must not append or activate the stock roleplay scene prompt.
+  final bool reviewSession;
 
   SpeakingPracticeRequest copyWith({
     SpeakingMode? mode,
@@ -90,11 +98,13 @@ class SpeakingPracticeRequest {
       contentKey: contentKey,
       kickoffMessage: kickoffMessage,
       durationLimitSeconds: durationLimitSeconds,
+      liveContextCharacterLimit: liveContextCharacterLimit,
       wrapUpNote: wrapUpNote,
       wrapUpLeadSeconds: wrapUpLeadSeconds,
       examMode: examMode,
       popResultImmediately: popResultImmediately,
       skipQuota: skipQuota,
+      reviewSession: reviewSession,
     );
   }
 }
@@ -161,8 +171,11 @@ class _SpeakingPracticeScreenState
     _goal = request.goal;
     _durationMinutes = request.durationMinutes;
     if (widget.autoStart) {
+      // Auto-start callers (onboarding/course/review) should never flash the
+      // universal speaking setup screen before the live session opens.
+      _launching = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_launch());
+        if (mounted) unawaited(_launch(alreadyMarkedLaunching: true));
       });
     }
   }
@@ -182,12 +195,14 @@ class _SpeakingPracticeScreenState
     return ref.read(learningStoreProvider).profile().level;
   }
 
-  Future<void> _launch() async {
-    if (_launching) return;
-    setState(() {
-      _launching = true;
-      _error = null;
-    });
+  Future<void> _launch({bool alreadyMarkedLaunching = false}) async {
+    if (_launching && !alreadyMarkedLaunching) return;
+    if (!alreadyMarkedLaunching) {
+      setState(() {
+        _launching = true;
+        _error = null;
+      });
+    }
 
     try {
       if (!widget.request.skipQuota) {
@@ -220,6 +235,7 @@ class _SpeakingPracticeScreenState
           sessionTopic: request.sessionTopic ?? plan.title,
           contentKey: request.contentKey,
           stage: _stageFor(request),
+          reviewSession: request.reviewSession,
           examMode:
               request.examMode ||
               request.mode == SpeakingMode.examTask ||
@@ -232,6 +248,7 @@ class _SpeakingPracticeScreenState
               _kickoffFor(plan, introduceTutor: introduceTutor),
           durationLimitSeconds:
               request.durationLimitSeconds ?? request.durationMinutes * 60,
+          lessonContextCharacterLimit: request.liveContextCharacterLimit,
           wrapUpNote: request.wrapUpNote ?? _wrapUpNoteFor(request),
           wrapUpLeadSeconds: request.wrapUpLeadSeconds,
           popResultImmediately: request.popResultImmediately,
@@ -306,6 +323,12 @@ class _SpeakingPracticeScreenState
     // free-talk task contract would reintroduce a fixed support-phrase list and
     // make the optional call feel like a scripted lesson.
     if (request.stage == 'trial' && existing != null && existing.isNotEmpty) {
+      return existing;
+    }
+    // Review supplies its own immutable blueprint. Appending the generic
+    // roleplay task plan here adds "set the scene" instructions and is exactly
+    // how a deterministic review could drift into a station/café roleplay.
+    if (request.reviewSession && existing != null && existing.isNotEmpty) {
       return existing;
     }
     if (existing != null && existing.isNotEmpty) {
@@ -397,6 +420,12 @@ class _SpeakingPracticeScreenState
 
   @override
   Widget build(BuildContext context) {
+    if (widget.autoStart && _launching) {
+      return Scaffold(
+        backgroundColor: DesignTokens.nightCanvas,
+        body: const SizedBox.expand(),
+      );
+    }
     final recentSpeaking =
         ReviewMaterialService.recentSessions(ref.watch(storageServiceProvider))
             .where(
@@ -989,7 +1018,7 @@ class _CompactSelection extends StatelessWidget {
                 weight: FontWeight.w700,
               ).copyWith(color: DesignTokens.nightMuted),
             ),
-            const Spacer(),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(

@@ -172,6 +172,8 @@ class V3Card extends StatelessWidget {
     this.raised = false,
     this.onTap,
     this.borderColor,
+    this.leadingAccent = false,
+    this.leadingAccentAttached = false,
   });
 
   final Widget child;
@@ -179,11 +181,18 @@ class V3Card extends StatelessWidget {
   final bool raised;
   final VoidCallback? onTap;
   final Color? borderColor;
+  final bool leadingAccent;
+  /// Draw the accent rail against the card edge instead of inside its padding.
+  /// This matches the attached-border treatment used by the Review surface.
+  final bool leadingAccentAttached;
 
   @override
   Widget build(BuildContext context) {
     final card = Container(
-      padding: padding,
+      clipBehavior: leadingAccentAttached
+          ? Clip.hardEdge
+          : Clip.none,
+      padding: leadingAccentAttached ? EdgeInsets.zero : padding,
       decoration: BoxDecoration(
         color: raised
             ? DesignTokens.nightSurfaceRaised
@@ -192,7 +201,21 @@ class V3Card extends StatelessWidget {
         border: Border.all(color: borderColor ?? DesignTokens.nightHairline),
         boxShadow: DesignTokens.surfaceShadow,
       ),
-      child: child,
+      child: Stack(
+        children: [
+          leadingAccentAttached
+              ? Padding(padding: padding, child: child)
+              : child,
+          if (leadingAccent)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 4,
+              child: ColoredBox(color: DesignTokens.nightAccent),
+            ),
+        ],
+      ),
     );
     if (onTap == null) return card;
     return Semantics(

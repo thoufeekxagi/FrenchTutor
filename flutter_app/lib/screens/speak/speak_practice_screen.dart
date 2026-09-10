@@ -131,7 +131,7 @@ class SpeakPracticeScreen extends ConsumerWidget {
           _skillRow(
             context,
             ref: ref,
-            icon: Icons.auto_fix_high_outlined,
+            icon: Icons.spellcheck_rounded,
             title: 'Grammar',
             subtitle: 'Learn patterns through stories',
             screen: const GrammarLabScreen(),

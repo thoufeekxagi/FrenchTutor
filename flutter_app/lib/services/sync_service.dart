@@ -15,6 +15,7 @@ import '../data/database/grammar_course_lesson_store.dart';
 import '../data/database/speaking_lesson_store.dart';
 import '../data/database/writing_lesson_store.dart';
 import '../data/database/adaptive_course_store.dart';
+import '../data/database/review_store.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
@@ -301,6 +302,19 @@ class SyncService {
         'artifact_kind': session.artifactKind,
         'artifact_json': session.artifact,
       },
+      // The harness/store may explicitly requeue a failed row once. Its
+      // retained attempt count plus marker distinguish that intentional
+      // transition from an ordinary stale local `queued` snapshot, which we
+      // deliberately omit so it can never regress a ready remote artifact.
+      if (!session.isFoundation &&
+          session.artifact == null &&
+          session.generationStatus == 'queued' &&
+          session.generationAttempts > 0 &&
+          session.generationError == 'Retrying failed lesson once') ...{
+        'generation_status': 'queued',
+        'generation_error': null,
+        'generation_attempts': session.generationAttempts,
+      },
       if (session.contentKey ==
           SpeakingCourseCatalog.firstA1GuidedLessonId) ...{
         'artifact_kind': null,
@@ -470,6 +484,92 @@ class SyncService {
     },
     queueTable: 'story_favorites',
     queueRowId: storyId,
+  );
+
+  // ---------------------------------------------------------------------------
+  // Review / Warm-up provenance
+  // ---------------------------------------------------------------------------
+
+  Future<void> syncReviewPlan(String planId) => _guarded(
+    (uid) async {
+      final plans = _db.select(
+        'SELECT * FROM review_plans WHERE id = ? AND deleted_at IS NULL',
+        [planId],
+      );
+      if (plans.isEmpty) return;
+      final plan = plans.first;
+      await _client.from('review_plans').upsert({
+        'id': plan['id'],
+        'user_id': uid,
+        'kind': plan['kind'],
+        'requested_mode': plan['requested_mode'],
+        'resolved_mode': plan['resolved_mode'],
+        'level_band': plan['level_band'],
+        'goal': plan['goal'],
+        'duration_minutes': plan['duration_minutes'],
+        'topic': plan['topic'],
+        'source_fingerprint': plan['source_fingerprint'],
+        'brief_json': _jsonValue(plan['brief_json']) ?? <String, dynamic>{},
+        'generated_json': _jsonValue(plan['generated_json']),
+        'status': plan['status'],
+        'created_at': plan['created_at'],
+        'updated_at': plan['updated_at'],
+        'deleted_at': plan['deleted_at'],
+      }, onConflict: 'id');
+      final targets = _db.select(
+        'SELECT * FROM review_plan_targets WHERE plan_id = ? AND deleted_at IS NULL',
+        [planId],
+      );
+      for (final target in targets) {
+        await _client.from('review_plan_targets').upsert({
+          'id': target['id'],
+          'plan_id': planId,
+          'target_key': target['target_key'],
+          'target_type': target['target_type'],
+          'display_text': target['display_text'],
+          'reason': target['reason'],
+          'priority': target['priority'],
+          'source_ids_json':
+              _jsonValue(target['source_ids_json']) ?? const <String>[],
+          'evidence_json':
+              _jsonValue(target['evidence_json']) ?? <String, dynamic>{},
+          'created_at': target['created_at'],
+          'updated_at': target['updated_at'],
+          'deleted_at': target['deleted_at'],
+        }, onConflict: 'id');
+      }
+    },
+    queueTable: 'review_plans',
+    queueRowId: planId,
+  );
+
+  Future<void> syncReviewAttempt(String attemptId) => _guarded(
+    (uid) async {
+      final rows = _db.select(
+        'SELECT * FROM review_attempts WHERE id = ? AND deleted_at IS NULL',
+        [attemptId],
+      );
+      if (rows.isEmpty) return;
+      final row = rows.first;
+      await _client.from('review_attempts').upsert({
+        'id': row['id'],
+        'user_id': uid,
+        'plan_id': row['plan_id'],
+        'activity_id': row['activity_id'],
+        'session_id': row['session_id'],
+        'mode': row['mode'],
+        'status': row['status'],
+        'score': row['score'],
+        'result_json': _jsonValue(row['result_json']),
+        'started_at': row['started_at'],
+        'completed_at': row['completed_at'],
+        'created_at': row['created_at'],
+        'updated_at': row['updated_at'],
+        'deleted_at': row['deleted_at'],
+      }, onConflict: 'id');
+    },
+    queueTable: 'review_attempts',
+    queueRowId: attemptId,
   );
 
   /// Uploads a generated cover to the learner-scoped private bucket and
@@ -1628,6 +1728,12 @@ class SyncService {
           if (uid == null) return false;
           await _syncAdaptiveCourseSessionNow(session, uid);
           return true;
+        case 'review_plans':
+          await syncReviewPlan(rowId);
+          return true;
+        case 'review_attempts':
+          await syncReviewAttempt(rowId);
+          return true;
         default:
           // Not yet retryable generically — leave queued rather than drop it.
           return false;
@@ -1709,6 +1815,7 @@ class SyncService {
       'speakingLessons': () => _hydrateSpeakingLessons(),
       'writingLessons': () => _hydrateWritingLessons(),
       'grammarCourseSessions': () => _hydrateGrammarCourseSessions(),
+      'review': () => _hydrateReviewData(uid),
       'notes': () => _hydrateNotes(uid),
     };
     await Future.wait(
@@ -1868,6 +1975,41 @@ class SyncService {
     }
   }
 
+  /// Restores the frozen Review/Warm-up planner inputs as well as attempts.
+  /// These rows are separate from the raw learning evidence so an uninstall
+  /// can restore an already-generated review and let the learner retry it
+  /// without waiting for GPT or Gemini to recreate the plan.
+  Future<void> _hydrateReviewData(String uid) async {
+    final store = ReviewStore(_db);
+    final plans = await _client
+        .from('review_plans')
+        .select()
+        .eq('user_id', uid);
+    final planIds = <String>{};
+    for (final row in plans) {
+      final mapped = Map<String, dynamic>.from(row);
+      final id = mapped['id']?.toString();
+      if (id != null && id.isNotEmpty) planIds.add(id);
+      store.upsertPlanFromRemote(mapped);
+    }
+    if (planIds.isNotEmpty) {
+      final targets = await _client
+          .from('review_plan_targets')
+          .select()
+          .inFilter('plan_id', planIds.toList(growable: false));
+      for (final row in targets) {
+        store.upsertTargetFromRemote(Map<String, dynamic>.from(row));
+      }
+    }
+    final attempts = await _client
+        .from('review_attempts')
+        .select()
+        .eq('user_id', uid);
+    for (final row in attempts) {
+      store.upsertAttemptFromRemote(Map<String, dynamic>.from(row));
+    }
+  }
+
   Future<void> hydrateAdaptiveCourses() async {
     final uid = _userId;
     if (uid == null) return;
@@ -1956,6 +2098,18 @@ class SyncService {
           );
           break;
         }
+        // Keep the foreground harness diagnosable without logging response
+        // bodies that may contain lesson text. These fields are the complete
+        // state machine needed to explain a queued card in Debug/production.
+        debugPrint(
+          'Course preparation response: '
+          'processed=${data['processed']} '
+          'remaining=${data['remaining']} '
+          'session=${data['sessionId']} '
+          'kind=${data['kind']} '
+          'conflict=${data['conflict']} '
+          'error=${data['error']}',
+        );
         if (data['processed'] != true) break;
         prepared += 1;
         // Publish each finished artifact to the local cache immediately. The
@@ -2101,14 +2255,20 @@ class SyncService {
         .select()
         .eq('user_id', uid);
     for (final r in rows) {
-      _db.execute(
-        '''
-        INSERT INTO messages (uuid, session_id, role, content, created_at)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(uuid) DO NOTHING
-        ''',
-        [r['id'], r['session_id'], r['role'], r['content'], r['created_at']],
+      // Very old local databases may have the uuid column without its
+      // partial unique index. Avoid requiring an ON CONFLICT target so one
+      // stale install cannot abort the entire sign-in hydration batch.
+      final exists = _db.select(
+        'SELECT 1 FROM messages WHERE uuid = ? LIMIT 1',
+        [r['id']],
       );
+      if (exists.isEmpty) {
+        _db.execute(
+          '''INSERT INTO messages (uuid, session_id, role, content, created_at)
+             VALUES (?, ?, ?, ?, ?)''',
+          [r['id'], r['session_id'], r['role'], r['content'], r['created_at']],
+        );
+      }
     }
   }
 
@@ -2530,30 +2690,46 @@ class SyncService {
   Future<void> _hydrateNotes(String uid) async {
     final rows = await _client.from('notes_state').select().eq('user_id', uid);
     for (final r in rows) {
-      _db.execute(
-        '''
-        INSERT INTO notes (uuid, tag, text, source, session_id, created_at, updated_at, deleted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(uuid) DO UPDATE SET
-          tag = excluded.tag,
-          text = excluded.text,
-          source = excluded.source,
-          session_id = excluded.session_id,
-          updated_at = excluded.updated_at,
-          deleted_at = excluded.deleted_at
-        WHERE excluded.updated_at > notes.updated_at
-        ''',
-        [
-          r['id'],
-          r['tag'],
-          r['text'],
-          r['source'] ?? 'user',
-          r['session_id'],
-          r['created_at'],
-          r['updated_at'],
-          r['deleted_at'],
-        ],
+      // Tolerate a legacy install that never created the partial UUID index.
+      // The explicit lookup preserves last-write-wins without making SQLite
+      // require a unique ON CONFLICT target.
+      final existing = _db.select(
+        'SELECT updated_at FROM notes WHERE uuid = ? LIMIT 1',
+        [r['id']],
       );
+      if (existing.isEmpty) {
+        _db.execute(
+          '''INSERT INTO notes (uuid, tag, text, source, session_id, created_at, updated_at, deleted_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+          [
+            r['id'],
+            r['tag'],
+            r['text'],
+            r['source'] ?? 'user',
+            r['session_id'],
+            r['created_at'],
+            r['updated_at'],
+            r['deleted_at'],
+          ],
+        );
+      } else if ((r['updated_at']?.toString() ?? '').compareTo(
+            existing.first['updated_at']?.toString() ?? '',
+          ) >
+          0) {
+        _db.execute(
+          '''UPDATE notes SET tag = ?, text = ?, source = ?, session_id = ?,
+             updated_at = ?, deleted_at = ? WHERE uuid = ?''',
+          [
+            r['tag'],
+            r['text'],
+            r['source'] ?? 'user',
+            r['session_id'],
+            r['updated_at'],
+            r['deleted_at'],
+            r['id'],
+          ],
+        );
+      }
     }
   }
 
@@ -2599,23 +2775,30 @@ class SyncService {
         .select()
         .eq('user_id', uid);
     for (final r in rows) {
+      final restoreId = '${uid}_${r['local_date']}_restore';
+      // Keep the restore row separate from device-recorded usage. Recomputing
+      // its delta makes repeated sign-in hydration idempotent instead of
+      // inserting the same primary key a second time.
       final existing = _db.select(
-        "SELECT COALESCE(SUM(seconds_used), 0) AS s FROM credit_usage WHERE local_date = ? AND ai_session_id IS NULL",
-        [r['local_date']],
+        "SELECT COALESCE(SUM(seconds_used), 0) AS s FROM credit_usage WHERE local_date = ? AND ai_session_id IS NULL AND id != ?",
+        [r['local_date'], restoreId],
       );
-      final localSynthetic = existing.first['s'] as int;
+      final localSynthetic = (existing.first['s'] as int?) ?? 0;
       final remote = r['seconds_used'] as int? ?? 0;
-      if (remote > localSynthetic) {
+      final delta = remote - localSynthetic;
+      if (delta > 0) {
         _db.execute(
-          '''INSERT INTO credit_usage (id, local_date, seconds_used, ai_session_id, created_at)
+          '''INSERT OR REPLACE INTO credit_usage (id, local_date, seconds_used, ai_session_id, created_at)
              VALUES (?, ?, ?, NULL, ?)''',
           [
-            '${uid}_${r['local_date']}_restore',
+            restoreId,
             r['local_date'],
-            remote - localSynthetic,
+            delta,
             DateTime.now().toUtc().toIso8601String(),
           ],
         );
+      } else {
+        _db.execute('DELETE FROM credit_usage WHERE id = ?', [restoreId]);
       }
     }
   }
@@ -2859,5 +3042,16 @@ class SyncService {
     if (value is String) return value;
     if (value == null) return '{}';
     return jsonEncode(value);
+  }
+
+  dynamic _jsonValue(Object? value) {
+    if (value == null) return null;
+    if (value is Map || value is List) return value;
+    if (value is! String || value.isEmpty) return null;
+    try {
+      return jsonDecode(value);
+    } catch (_) {
+      return null;
+    }
   }
 }

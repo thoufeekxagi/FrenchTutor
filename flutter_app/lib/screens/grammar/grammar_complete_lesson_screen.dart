@@ -9,8 +9,11 @@ import '../../design/tokens.dart';
 import '../../models/grammar_course.dart';
 import '../../models/grammar_course_session_result.dart';
 import '../../providers/database_provider.dart';
-import '../../services/lesson_speech_service.dart';
-import '../../widgets/tts_play_button.dart';
+import '../../prompts/live_prompts.dart';
+import '../../services/inline_call_controller.dart';
+import '../../widgets/ai_voice_disclosure.dart';
+import '../../widgets/grammar_live_audio_button.dart';
+import '../../widgets/inline_call_bar.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 /// Complete is a compact grammar workshop, not another sentence-card deck.
@@ -31,7 +34,8 @@ class GrammarCompleteLessonScreen extends ConsumerStatefulWidget {
 }
 
 class _GrammarCompleteLessonScreenState
-    extends ConsumerState<GrammarCompleteLessonScreen> {
+    extends ConsumerState<GrammarCompleteLessonScreen>
+    with WidgetsBindingObserver {
   final List<String> _builtSentence = [];
   List<String> _wordBank = [];
   List<String> _choices = [];
@@ -40,6 +44,7 @@ class _GrammarCompleteLessonScreenState
   bool? _correct;
   int _correctCount = 0;
   int _attemptedCount = 0;
+  late final InlineCallController _call;
 
   GrammarCourseStep get _step => widget.session.steps[_index];
   bool get _isLastStep => _index == widget.session.steps.length - 1;
@@ -63,10 +68,33 @@ class _GrammarCompleteLessonScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _resetStep();
+    _call = InlineCallController(
+      sessionType: LiveSessionType.grammarStage,
+      lessonContext: _lessonContext,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      openingPrompt: _openingPrompt(),
+      manualLearnerTurns: false,
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_prewarmAudio());
+      if (mounted) unawaited(_autoConnectMarie());
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _call.dispose();
+    super.dispose();
   }
 
   void _resetStep() {
@@ -78,26 +106,103 @@ class _GrammarCompleteLessonScreenState
     _correct = null;
   }
 
-  Future<void> _prewarmAudio() async {
-    final items = <SpeechItem>[];
-    for (final session in [widget.session, ...widget.warmupSessions]) {
-      for (var index = 0; index < session.steps.length; index++) {
-        final step = session.steps[index];
-        final prefix = 'grammar-session:${session.id}:step:$index';
-        items.add(
-          SpeechItem(
-            text: step.target,
-            language: 'fr-FR',
-            contentItemId: '$prefix:target',
+  Future<void> _autoConnectMarie() async {
+    if (!mounted || !await AiVoiceDisclosure.isAccepted()) return;
+    if (!mounted) return;
+    await _call.start(context, sendOpeningPrompt: true);
+  }
+
+  String _screenEnglish() {
+    var value = _step.promptEnglish.trim();
+    if (value.isEmpty) return '(no English meaning or instruction supplied)';
+    // Complete-mode choices are visible, but the correct choice is still
+    // secret until the app checks it. Mask a malformed English artifact that
+    // accidentally contains one of the French answers.
+    if (_index >= 2 && _correct != true) {
+      final hidden = <String>{_step.target, ..._choices};
+      for (final candidate in hidden) {
+        final word = candidate.trim();
+        if (word.length < 3) continue;
+        value = value.replaceAll(
+          RegExp(
+            r'(?<![A-Za-zÀ-ÿ])' + RegExp.escape(word) + r'(?![A-Za-zÀ-ÿ])',
+            caseSensitive: false,
           ),
+          '[hidden French form]',
         );
       }
     }
-    try {
-      await LessonSpeechService.shared.prewarmNarration(items);
-    } catch (error) {
-      debugPrint('Complete Grammar audio prewarm skipped: $error');
-    }
+    return value;
+  }
+
+  String _visibleOptions() =>
+      (_index == 2 || _index == 3) && _choices.isNotEmpty
+      ? _choices.join(' | ')
+      : '(none)';
+
+  String _visibleOptionMeanings() =>
+      (_index == 2 || _index == 3) && _choices.isNotEmpty
+      ? _choices
+            .map(
+              (choice) => '$choice = ${_choiceMeaning(choice) ?? '(no gloss)'}',
+            )
+            .join(' | ')
+      : '(none)';
+
+  String _visibleWordBank() => _index == _stageLabels.length - 1
+      ? _wordBank.where(_wordIsAvailable).join(' | ')
+      : '(none)';
+
+  String _openingPrompt() =>
+      '''
+APP SCREEN OPENING — use this exact current screen, not a generic lesson summary:
+SESSION: "${widget.session.title}" · STAGE ${_index + 1} OF ${widget.session.steps.length}
+STAGE: "${_stageTitles[_index]}" · TENSE: "${widget.session.tense}"
+GRAMMAR FOCUS: "${widget.session.grammarFocus}"
+VISIBLE FRENCH EXAMPLE: "${_index < 2 ? _step.target : '(not shown; use the choices or word bank)'}"
+VISIBLE ENGLISH MEANING OR INSTRUCTION: "${_screenEnglish()}"
+VISIBLE OPTIONS: "${_visibleOptions()}"
+VISIBLE WORD BANK: "${_visibleWordBank()}"
+Explain this exact stage in at most two short English sentences, then wait.
+For Learn/Notice, explain the visible example and what to notice, then name the
+button action. For Transform/Repair, explain the visible instruction and name
+the options, then ask the learner to choose without identifying the answer. For
+Use, explain the visible instruction and word bank, then ask the learner to
+build one sentence. Never invent a different example or preview another stage.
+Never reveal a hidden answer before the learner submits it.
+''';
+
+  String _lessonContext() =>
+      '''
+GRAMMAR COMPLETE SESSION: ${widget.session.title}
+LEVEL: ${widget.session.level}
+TENSE: ${widget.session.tense}
+GRAMMAR FOCUS: ${widget.session.grammarFocus}
+CURRENT STAGE: ${_index + 1} of ${widget.session.steps.length} (${_stageLabels[_index]})
+VISIBLE FRENCH EXAMPLE: ${_index < 2 ? _step.target : '(not shown; use only the visible choices or word bank)'}
+VISIBLE ENGLISH MEANING OR INSTRUCTION: ${_screenEnglish()}
+VISIBLE OPTIONS (display order): ${_visibleOptions()}
+VISIBLE OPTION MEANINGS (display order): ${_visibleOptionMeanings()}
+VISIBLE WORD BANK (remaining display order): ${_visibleWordBank()}
+CURRENT ANSWER STATE: ${_selectedChoice ?? (_builtSentence.isEmpty ? '(none)' : _builtSentence.join(' '))}
+COMPLETED TARGET: ${_correct == true ? _step.target : '(hidden until the learner answers correctly)'}
+LEARNER STATE: ${_correct == null
+          ? 'working'
+          : _correct == true
+          ? 'correct'
+          : 'try again'}
+SCOPE: explain or pronounce only the current stage shown above. Use the exact
+visible example, meaning, tense, options, or word bank; never invent a different
+screen. Before a correct CHECK RESULT, never reveal, spell, translate, or
+complete a hidden answer. The app owns answer checking and supplies the result
+after submission. Never advance the app; keep replies short.
+''';
+
+  String? _choiceMeaning(String choice) {
+    final index = _step.choices.indexOf(choice);
+    if (index < 0 || index >= _step.choiceMeanings.length) return null;
+    final meaning = _step.choiceMeanings[index].trim();
+    return meaning.isEmpty ? null : meaning;
   }
 
   List<String> _choicesForStep() {
@@ -201,6 +306,15 @@ class _GrammarCompleteLessonScreenState
       _correct = answer == expected;
       if (_correct == true) _correctCount++;
     });
+    _call.updateLessonContext();
+    final feedback = _correct == true
+        ? 'Speak only this short line in English: "Correct. The complete '
+              'French sentence is: ${_step.target}" Then wait. Do not add a '
+              'reason, lecture, question, or translation.'
+        : 'Speak only this short line in English: "Try again. Keep the same '
+              'meaning and check the ${widget.session.tense.toLowerCase()} '
+              'form." Then wait. Never reveal, spell, or translate the answer.';
+    _call.promptTutor('APP FEEDBACK: $feedback');
   }
 
   void _nextStep() {
@@ -228,6 +342,9 @@ class _GrammarCompleteLessonScreenState
       _index++;
       _resetStep();
     });
+    _call.suppressCurrentReply();
+    _call.updateLessonContext();
+    _call.promptTutor(_openingPrompt());
   }
 
   void _retry() {
@@ -236,6 +353,7 @@ class _GrammarCompleteLessonScreenState
       _selectedChoice = null;
       _builtSentence.clear();
     });
+    _call.updateLessonContext();
   }
 
   void _addWord(String word) {
@@ -265,6 +383,10 @@ class _GrammarCompleteLessonScreenState
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                 children: [
                   _metaRow(),
+                  if (_call.isLive || _call.error != null) ...[
+                    const SizedBox(height: 12),
+                    InlineTutorConnectionCard(controller: _call),
+                  ],
                   const SizedBox(height: 9),
                   Text(_stageTitles[_index], style: DesignTokens.display(30)),
                   const SizedBox(height: 6),
@@ -417,11 +539,10 @@ class _GrammarCompleteLessonScreenState
                 ).copyWith(height: 1.35),
               ),
             ),
-            TtsPlayButton(
+            GrammarLiveAudioButton(
+              controller: _call,
               text: _step.target,
-              contentItemId: _audioId('target'),
               size: 40,
-              color: DesignTokens.primary,
             ),
           ],
         ),
@@ -554,10 +675,32 @@ class _GrammarCompleteLessonScreenState
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                choice,
-                style: DesignTokens.body(15, weight: FontWeight.w700),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    choice,
+                    style: DesignTokens.body(15, weight: FontWeight.w700),
+                  ),
+                  if (_choiceMeaning(choice) != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      _choiceMeaning(choice)!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.muted),
+                    ),
+                  ],
+                ],
               ),
+            ),
+            GrammarLiveAudioButton(
+              controller: _call,
+              text: choice,
+              size: 38,
+              iconSize: 19,
             ),
             if (answerShown)
               Icon(Icons.check_circle_rounded, color: DesignTokens.success)
@@ -605,11 +748,10 @@ class _GrammarCompleteLessonScreenState
                 ),
               ),
               if (_builtSentence.isNotEmpty)
-                TtsPlayButton(
+                GrammarLiveAudioButton(
+                  controller: _call,
                   text: _step.target,
-                  contentItemId: _audioId('target'),
                   size: 38,
-                  color: DesignTokens.primary,
                 ),
             ],
           ),
@@ -662,7 +804,7 @@ class _GrammarCompleteLessonScreenState
           Expanded(
             child: Text(
               correct
-                  ? 'Correct. ${_step.tip}'
+                  ? 'Correct. ${_step.target}'
                   : 'Try again and keep the same meaning.',
               style: DesignTokens.body(
                 13,
@@ -734,7 +876,4 @@ class _GrammarCompleteLessonScreenState
       ),
     );
   }
-
-  String _audioId(String role) =>
-      'grammar-session:${widget.session.id}:step:$_index:$role';
 }

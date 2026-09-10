@@ -3,8 +3,8 @@ import 'package:french_tutor/data/liaison_curriculum_catalog.dart';
 
 void main() {
   group('LiaisonCurriculumCatalog', () {
-    test('contains the frozen 60-lesson level split', () {
-      expect(LiaisonCurriculumCatalog.all, hasLength(60));
+    test('contains the frozen 70-lesson level split', () {
+      expect(LiaisonCurriculumCatalog.all, hasLength(70));
       expect(LiaisonCurriculumCatalog.forLevel('A1'), hasLength(30));
       expect(LiaisonCurriculumCatalog.forLevel('A2'), hasLength(20));
       expect(LiaisonCurriculumCatalog.forLevel('B1'), hasLength(10));

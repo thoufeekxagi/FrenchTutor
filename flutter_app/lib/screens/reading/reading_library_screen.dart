@@ -273,8 +273,8 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
   Future<void> _generateCover(GeneratedStory story, String? coverPrompt) async {
     // Capture providers before awaiting network/image work. This task is
     // intentionally fire-and-forget, so the screen may be disposed before it
-    // completes; using `ref` after that point would recreate the Sentry crash
-    // seen in other async screens.
+    // completes; using `ref` after that point would recreate an async lifecycle
+    // crash seen in other screens.
     final syncService = ref.read(syncServiceProvider);
     final storyStore = ref.read(generatedStoryStoreProvider);
     try {
@@ -286,8 +286,7 @@ class _ReadingLibraryScreenState extends ConsumerState<ReadingLibraryScreen> {
         topic: story.topic,
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
-        visualStyle:
-            'FrenchTutor Reading editorial illustration: consistent warm natural light, clean readable shapes, restrained detail, grounded everyday setting, no text or lettering, no people, no animals, no faces or hands, no logos, no borders, no interface elements.',
+        visualStyle: PracticeArtworkService.architecturalVisualStyle,
         maxBytes: 100 * 1024,
         retryMaxBytes: 160 * 1024,
         aspectRatio: '2:3',

@@ -21,9 +21,9 @@ void main() {
       adaptiveSessions: plan.sessions,
     );
 
-    // Foundation (1-5) and Unit 2 (6-10) are both authored and fully
+    // Foundation (1-5) and Unit 2 (6-11) are both authored and fully
     // present the instant the plan is created.
-    expect(roadmap.sessions, hasLength(10));
+    expect(roadmap.sessions, hasLength(11));
     expect(roadmap.trackLabel, 'Professional French');
     expect(roadmap.sessions.first.primarySkill, SpeakSkill.alphabet);
     expect(roadmap.sessions.first.contextPrompt, contains('Meetings'));
@@ -51,8 +51,8 @@ void main() {
     // Unit 2 no longer blocks growth once any two of its rows are
     // uncompleted-but-ready, so each loop iteration below now grows a real
     // new row immediately (matching Course's own reserve accounting).
-    expect(roadmap.sessions, hasLength(15));
-    expect(roadmap.completedCount, 14);
+    expect(roadmap.sessions, hasLength(16));
+    expect(roadmap.completedCount, 15);
     // The freshly appended row has no artifact yet in this store-only test,
     // so it is visible as "preparing" rather than actionable.
     expect(roadmap.nextSession, isNull);
@@ -122,15 +122,15 @@ void main() {
       adaptiveSessions: [...foundation, ...pending],
     );
 
-    // Sequences 6-10 (Unit 2) are always listed even while unready, since
-    // that content is authored, not generated. Only sequence 11+ (real
+    // Sequences 6-11 (Unit 2) are always listed even while unready, since
+    // that content is authored, not generated. Only sequence 12+ (real
     // personalized generation) still exposes just one pending placeholder.
-    expect(roadmap.sessions, hasLength(11));
+    expect(roadmap.sessions, hasLength(12));
     expect(
       roadmap.sessions.where((session) => !session.contentReady),
-      hasLength(6),
+      hasLength(7),
     );
-    expect(roadmap.sessions.last.contentKey, 'pending-5');
+    expect(roadmap.sessions.last.contentKey, 'pending-6');
   });
 
   test('development harness hides non-target personalized skills', () {
@@ -140,7 +140,7 @@ void main() {
       planId: 'harness-plan',
       profileFingerprint: 'everyday|A1|10|',
       startSequence: 1,
-      count: 15,
+      count: 16,
     );
     const harness = CourseGenerationTestHarness(
       enabled: true,
@@ -153,7 +153,7 @@ void main() {
     );
 
     final personalized = roadmap.sessions.where(
-      (session) => session.sequence > 10,
+      (session) => session.sequence > 11,
     );
     expect(personalized, isNotEmpty);
     expect(

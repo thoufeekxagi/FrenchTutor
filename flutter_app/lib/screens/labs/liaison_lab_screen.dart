@@ -30,17 +30,19 @@ class LiaisonLabScreen extends ConsumerStatefulWidget {
 }
 
 class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
-  LiaisonStartMode _mode = LiaisonStartMode.wordPairs;
   bool _isGenerating = false;
   String? _generationStage;
   String? _errorText;
+  bool _isGeneratingQueue = false;
 
   String get _selectedLevel => LiaisonCurriculumCatalog.normalizeLevel(
     ref.read(learningStoreProvider).profile().level,
   );
 
-  List<LiaisonCurriculumLesson> get _lessons =>
-      LiaisonCurriculumCatalog.forLevel(_selectedLevel);
+  List<LiaisonCurriculumLesson> get _lessons => [
+    ...LiaisonCurriculumCatalog.forLevel(_selectedLevel),
+    ...ref.read(liaisonGeneratedLessonStoreProvider).list(_selectedLevel),
+  ];
 
   LiaisonCurriculumLesson get _nextLesson {
     final store = ref.read(learningStoreProvider);
@@ -57,7 +59,14 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
     super.initState();
     if (widget.autoStart) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_openLesson(_nextLesson, closeAfter: true));
+        if (mounted) {
+          unawaited(_ensureGeneratedQueue());
+          unawaited(_openLesson(_nextLesson, closeAfter: true));
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_ensureGeneratedQueue());
       });
     }
   }
@@ -68,12 +77,49 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
   }) async {
     final result = await AppRouter.push<bool>(
       context,
-      (_) => LiaisonLessonScreen(lesson: lesson, startMode: _mode),
+      (_) => LiaisonLessonScreen(lesson: lesson),
       fullscreenDialog: true,
     );
     if (!mounted) return;
     setState(() {});
+    unawaited(_ensureGeneratedQueue());
     if (closeAfter) Navigator.of(context).pop(result == true);
+  }
+
+  Future<void> _ensureGeneratedQueue() async {
+    if (_isGeneratingQueue || !mounted) return;
+    final store = ref.read(learningStoreProvider);
+    final allLessons = _lessons;
+    final remaining = allLessons
+        .where(
+          (lesson) =>
+              store.lessonStatus(lesson.progressId).status != 'completed',
+        )
+        .length;
+    final generated = ref
+        .read(liaisonGeneratedLessonStoreProvider)
+        .list(_selectedLevel);
+    if (remaining > 3 && generated.isNotEmpty) return;
+    _isGeneratingQueue = true;
+    try {
+      final excludePairs = allLessons
+          .map((lesson) => '${lesson.firstWord} ${lesson.secondWord}')
+          .toList(growable: false);
+      final batch = await ref
+          .read(lessonAgentServiceProvider)
+          .generateLiaisonLessonBatch(
+            levelBand: _selectedLevel,
+            count: 5,
+            excludePairs: excludePairs,
+          );
+      ref.read(liaisonGeneratedLessonStoreProvider).insertAll(batch);
+      if (mounted) setState(() {});
+    } catch (_) {
+      // The frozen path remains fully usable when the background queue cannot
+      // be generated. A later resume or lesson completion retries it.
+    } finally {
+      _isGeneratingQueue = false;
+    }
   }
 
   Future<void> _generateStory() async {
@@ -204,40 +250,6 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
                 14,
               ).copyWith(color: SpeakColors.inkSoft, height: 1.45),
             ),
-            const SizedBox(height: 22),
-            Row(
-              children: [
-                Expanded(
-                  child: _ModeCard(
-                    icon: CupertinoIcons.link,
-                    title: 'Word pairs',
-                    selected: _mode == LiaisonStartMode.wordPairs,
-                    onTap: () =>
-                        setState(() => _mode = LiaisonStartMode.wordPairs),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _ModeCard(
-                    icon: CupertinoIcons.text_quote,
-                    title: 'Sentences',
-                    selected: _mode == LiaisonStartMode.sentences,
-                    onTap: () =>
-                        setState(() => _mode = LiaisonStartMode.sentences),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _ModeCard(
-                    icon: CupertinoIcons.book,
-                    title: 'Read aloud',
-                    selected: _mode == LiaisonStartMode.readAloud,
-                    onTap: () =>
-                        setState(() => _mode = LiaisonStartMode.readAloud),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 24),
             KickerText('Continue · $completed of ${_lessons.length}'),
             const SizedBox(height: 10),
@@ -343,54 +355,14 @@ class _LiaisonLabScreenState extends ConsumerState<LiaisonLabScreen> {
   void _openRecent(Session session) {
     final lesson = session.contentKey == null
         ? null
-        : LiaisonCurriculumCatalog.byProgressId(session.contentKey!);
+        : _lessons.where((candidate) {
+            return candidate.progressId == session.contentKey;
+          }).firstOrNull;
     if (lesson == null) {
       setState(() => _errorText = 'This saved liaison lesson is unavailable.');
       return;
     }
     unawaited(_openLesson(lesson));
-  }
-}
-
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
-    required this.icon,
-    required this.title,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        height: 104,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: SpeakColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected ? SpeakColors.accent : SpeakColors.line,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Icon(icon, color: SpeakColors.accent, size: 22),
-            Text(title, style: DesignTokens.body(12, weight: FontWeight.w700)),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -447,12 +419,7 @@ class _LessonTile extends StatelessWidget {
     onTap: onTap,
     child: Row(
       children: [
-        Icon(
-          completed
-              ? CupertinoIcons.check_mark_circled_solid
-              : CupertinoIcons.waveform,
-          color: completed ? DesignTokens.success : SpeakColors.accent,
-        ),
+        Icon(CupertinoIcons.waveform, color: SpeakColors.accent),
         const SizedBox(width: 13),
         Expanded(
           child: Column(
@@ -474,7 +441,13 @@ class _LessonTile extends StatelessWidget {
             ],
           ),
         ),
-        const Icon(CupertinoIcons.chevron_right, size: 17),
+        Icon(
+          completed
+              ? CupertinoIcons.check_mark_circled_solid
+              : CupertinoIcons.chevron_right,
+          color: completed ? DesignTokens.success : null,
+          size: 17,
+        ),
       ],
     ),
   );

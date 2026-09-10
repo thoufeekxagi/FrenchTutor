@@ -161,6 +161,10 @@ La médiathèque du quartier sera exceptionnellement fermée mardi matin pour de
         lessonContext: examContext,
         stage: stage,
         examMode: true,
+        // Keep the complete TEF/TCF task contract available to Gemini Live.
+        // The service still applies a hard cap; this raises it from the
+        // ordinary 2,200-character helper window to the exam budget.
+        lessonContextCharacterLimit: 8000,
         durationLimitSeconds: interaction ? 180 : 60,
         kickoffMessage:
             '(App instruction, not the learner: begin the assessed task now. Follow the exam role and LESSON CONTEXT exactly. Do not greet, explain, or coach.)',

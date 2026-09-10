@@ -112,6 +112,66 @@ class AgentTool {
     ),
   ];
 
+  /// One structured result for a Liaison learner turn. Gemini receives the
+  /// current pair and the approved pronunciation contract in the Live lesson
+  /// context, then reports the acoustic decision once so the screen does not
+  /// need a second blocking audio-evaluation request.
+  static final liaisonPalette = [
+    AgentTool(
+      name: 'grade_liaison_attempt',
+      description:
+          'Grade the learner\'s just-finished pronunciation attempt for the current Liaison card. '
+          'Call exactly once after the learner turn closes, before speaking one short feedback sentence. '
+          'Use the approved rule in the current app step; do not invent a different liaison rule.',
+      parameters: _object(
+        {
+          'step_index': {
+            'type': 'INTEGER',
+            'description': 'The zero-based current Liaison step index.',
+          },
+          'audio_clear': {
+            'type': 'BOOLEAN',
+            'description':
+                'Whether the learner audio was clear enough to judge.',
+          },
+          'words_match': {
+            'type': 'BOOLEAN',
+            'description':
+                'Whether the learner said the expected words in order.',
+          },
+          'liaison_match': {
+            'type': 'BOOLEAN',
+            'description':
+                'Whether the expected obligatory/forbidden/optional liaison behavior was produced. For optional rules, accept either valid form.',
+          },
+          'confidence': {
+            'type': 'NUMBER',
+            'description': 'Acoustic judgment confidence from 0.0 to 1.0.',
+          },
+          'heard': {
+            'type': 'STRING',
+            'description':
+                'A short transcript of what the learner said, or empty if unclear.',
+          },
+          'feedback': {
+            'type': 'STRING',
+            'description':
+                'One short, specific, encouraging feedback sentence.',
+          },
+        },
+        required: [
+          'step_index',
+          'audio_clear',
+          'words_match',
+          'liaison_match',
+          'confidence',
+          'heard',
+          'feedback',
+        ],
+      ),
+    ),
+  ];
+
   /// One result event for an open Free Talk answer. The tutor keeps the
   /// conversation natural, while the screen receives the same judgment the
   /// tutor has just spoken aloud.

@@ -86,7 +86,6 @@ if [[ -f "$SECRETS_FILE" ]]; then
     GOOGLE_WEB_CLIENT_ID \
     REVENUECAT_IOS_KEY \
     REVENUECAT_ANDROID_KEY \
-    SENTRY_DSN \
     POSTHOG_API_KEY \
     POSTHOG_HOST; do
     value=$(get_property "$key")

@@ -42,6 +42,8 @@ class InlineCallController {
     this.onToolCall,
     this.manualLearnerTurns = false,
     this.compactGuidedContext = false,
+    this.levelOverride,
+    this.lessonContextCharacterLimit,
   });
 
   final LiveSessionType sessionType;
@@ -85,6 +87,15 @@ class InlineCallController {
   /// GeminiLiveService uses the compact guided prompt and smaller compression
   /// window without changing the existing local transcript/matching path.
   final bool compactGuidedContext;
+
+  /// Optional lesson-owned CEFR contract. Guided lessons use this when the
+  /// card level should win over a broader profile level.
+  final String? levelOverride;
+
+  /// Optional screen-owned context budget. Exam and story surfaces can keep
+  /// their complete script/questions available without changing the smaller
+  /// default used by ordinary inline helpers.
+  final int? lessonContextCharacterLimit;
 
   GeminiLiveService? gemini;
   AudioStreamingService? audio;
@@ -225,6 +236,23 @@ class InlineCallController {
     // awaited so a queued narration clip cannot race the call's first turn.
     await LessonSpeechService.shared.deactivate();
     if (!_isCurrentGeneration(generation)) return;
+    audio ??= AudioStreamingService();
+    final microphoneReady = await audio!.requestPermission();
+    if (!_isCurrentGeneration(generation)) return;
+    if (!microphoneReady) {
+      connecting = false;
+      error = 'Microphone permission denied';
+      await audio?.dispose();
+      audio = null;
+      _notify();
+      unawaited(
+        AiCostTracker.event(
+          feature: sessionType.name,
+          event: 'inline_live_microphone_denied',
+        ),
+      );
+      return;
+    }
     connecting = true;
     error = null;
     lastTutorLine = null;
@@ -244,24 +272,6 @@ class InlineCallController {
       return;
     }
     if (!_isCurrentGeneration(generation) || audio == null || gemini == null) {
-      return;
-    }
-    final granted = await audio!.requestPermission();
-    if (!_isCurrentGeneration(generation) || audio == null || gemini == null) {
-      return;
-    }
-    if (!granted) {
-      connecting = false;
-      error = 'Microphone permission denied';
-      gemini?.disconnect();
-      gemini = null;
-      _notify();
-      unawaited(
-        AiCostTracker.event(
-          feature: sessionType.name,
-          event: 'inline_live_microphone_denied',
-        ),
-      );
       return;
     }
     if (manualLearnerTurns) {
@@ -293,12 +303,13 @@ class InlineCallController {
 
   Future<bool> _connect(int generation) async {
     final completer = Completer<bool>();
-    final a = AudioStreamingService();
+    final a = audio ?? AudioStreamingService();
     final g = GeminiLiveService(
       apiKey: ApiKeys.geminiKey,
       sessionType: sessionType,
       lessonContext: lessonContext(),
       learningStoreForProfile: learningStoreForProfile,
+      levelOverride: levelOverride,
       // Keep Gemini on the proven legacy audioStreamEnd/automatic-VAD
       // protocol. manualLearnerTurns only gates the local microphone; it must
       // not switch the Live socket to the newer activityStart/activityEnd
@@ -308,6 +319,7 @@ class InlineCallController {
       // their UI can resolve independently of Marie's spoken-output duration.
       deferUserTranscriptUntilTurnComplete: false,
       compactGuidedContext: compactGuidedContext,
+      lessonContextCharacterLimit: lessonContextCharacterLimit,
       tools: tools,
     );
     audio = a;
@@ -482,6 +494,30 @@ class InlineCallController {
     gemini?.suppressCurrentReply();
   }
 
+  /// Stops any buffered or currently generating tutor reply without closing
+  /// the Live socket. Vocabulary learners often tap Next immediately after an
+  /// attempt; the card change must win over the tail of Marie's feedback while
+  /// the same connection remains ready for the next word.
+  Future<void> interruptTutorReply() async {
+    final currentGemini = gemini;
+    final currentAudio = audio;
+    // Arm stale-output suppression even when the model has just reported its
+    // turn complete: a final audio chunk can still be queued on the socket.
+    // beginAudioTurn() clears the pre-injection guard for the next recording.
+    currentGemini?.suppressCurrentReply();
+    if (currentAudio != null) {
+      try {
+        await currentAudio.stopPlayback();
+        currentAudio.isOutputActive = false;
+      } catch (_) {
+        // The route may be leaving at the same time as Next. Socket/audio
+        // teardown is best-effort; the stale reply is already suppressed.
+      }
+    }
+    tutorSpeaking = false;
+    _notify();
+  }
+
   /// Refreshes the host screen's lesson context without opening a tutor turn.
   /// Scripted hosts call this when the learner advances to a new card while a
   /// call remains active. Marie absorbs the new context silently and only
@@ -491,12 +527,31 @@ class InlineCallController {
     gemini?.injectContext(lessonContext(), expectReply: false);
   }
 
-  Future<bool> startLearnerTurn() async {
+  /// Starts a learner turn, optionally cutting the tutor's current reply first.
+  ///
+  /// Guided cards use this for a deliberate barge-in: the learner's recording
+  /// is more important than waiting for a long tutor phrase to finish. The
+  /// Live socket stays open; only already-buffered tutor audio is discarded.
+  /// Suppression is armed only while Gemini is actually generating so a late
+  /// tap cannot swallow the learner's next legitimate response.
+  Future<bool> startLearnerTurn({bool interruptTutor = false}) async {
     if (_externalPlaybackPaused ||
         !isReadyForLearnerTurn ||
         gemini == null ||
         audio == null) {
       return false;
+    }
+    if (interruptTutor && tutorTurnActive) {
+      if (gemini!.isModelGenerating) {
+        gemini!.suppressCurrentReply();
+      }
+      // Gentle stopping clears queued Live PCM without tearing down the native
+      // player. This avoids the close/reopen race that can make the next turn
+      // silent on iOS, while silencing the tutor immediately for barge-in.
+      await audio!.stopPlayback();
+      tutorSpeaking = false;
+      audio!.isOutputActive = false;
+      _notify();
     }
     gemini!.beginAudioTurn();
     _manualIdleTimer?.cancel();
@@ -719,6 +774,17 @@ class InlineCallController {
         !audio!.isStreaming) {
       await audio!.startStreaming(onChunk: gemini!.sendAudioChunk);
     }
+  }
+
+  /// Fully refreshes the Live socket after an app-owned narration finishes.
+  ///
+  /// A completed external turn can leave Gemini Live in a reconnecting or
+  /// model-generating state even though the last audio queue drained. Closing
+  /// that socket here makes the next replay start from a clean learner-turn
+  /// boundary instead of timing out on stale session state.
+  Future<void> refreshAfterExternalPlayback() async {
+    await endExternalPlayback();
+    if (!_disposed && isLive) await end();
   }
 
   Future<void> end() => _end(notify: true);

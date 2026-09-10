@@ -8,7 +8,7 @@ import 'package:french_tutor/services/course_artifact_codec.dart';
 
 void main() {
   test(
-    'Unit 2 (sequences 6-10) is fully present and decodable the instant the plan is created',
+    'Unit 2 (sequences 6-11) is fully present and decodable the instant the plan is created',
     () {
       final stopwatch = Stopwatch()..start();
       final db = sqlite3.openInMemory();
@@ -22,10 +22,10 @@ void main() {
       );
       expect(stopwatch.elapsedMilliseconds, lessThan(500));
 
-      // Foundation (1-5) and all of authored Unit 2 (6-10) exist immediately
+      // Foundation (1-5) and all of authored Unit 2 (6-11) exist immediately
       // — this is permanent default content for every learner, not
       // revealed one row at a time like real AI generation.
-      expect(plan.sessions, hasLength(10));
+      expect(plan.sessions, hasLength(11));
       final bySeq = {for (final s in plan.sessions) s.sequence: s};
 
       final vocab = bySeq[6]!;
@@ -43,17 +43,7 @@ void main() {
         'vocabulary words: ${vocabSet.entries.map((e) => '${e.fr}=${e.en}').join(', ')}',
       );
 
-      final speaking = bySeq[7]!;
-      expect(speaking.primarySkill, SpeakSkill.speaking);
-      expect(speaking.generationStatus, 'ready');
-      expect(speaking.isContentReady, isTrue);
-      final speakingLines = CourseArtifactCodec.speaking(speaking.artifact!);
-      expect(speakingLines.length, greaterThanOrEqualTo(3));
-      print(
-        'speaking lines: ${speakingLines.map((l) => l.french).join(' | ')}',
-      );
-
-      final reading = bySeq[8]!;
+      final reading = bySeq[7]!;
       expect(reading.primarySkill, SpeakSkill.reading);
       expect(reading.generationStatus, 'ready');
       expect(reading.isContentReady, isTrue);
@@ -64,7 +54,7 @@ void main() {
         'reading story: ${story.passage.segments.map((s) => s.fr).join(' ')}',
       );
 
-      final listening = bySeq[9]!;
+      final listening = bySeq[8]!;
       expect(listening.primarySkill, SpeakSkill.listening);
       // Listening's durable audio is a single shared asset identical for
       // every learner (see generate-shared-course-listening-audio-once), so
@@ -83,7 +73,7 @@ void main() {
         'listening ready instantly with shared audio: ${listening.artifact!['audioPath']}',
       );
 
-      final writing = bySeq[10]!;
+      final writing = bySeq[9]!;
       expect(writing.primarySkill, SpeakSkill.writing);
       expect(writing.generationStatus, 'ready');
       expect(writing.isContentReady, isTrue);
@@ -96,6 +86,33 @@ void main() {
       }
       print(
         'writing steps: ${writingLesson.steps.map((s) => s.prompt).join(' | ')}',
+      );
+
+      final speaking = bySeq[10]!;
+      expect(speaking.primarySkill, SpeakSkill.speaking);
+      expect(speaking.generationStatus, 'ready');
+      expect(speaking.isContentReady, isTrue);
+      final speakingLines = CourseArtifactCodec.speaking(speaking.artifact!);
+      expect(speakingLines.length, greaterThanOrEqualTo(3));
+      print(
+        'speaking lines: ${speakingLines.map((l) => l.french).join(' | ')}',
+      );
+
+      final grammar = bySeq[11]!;
+      expect(grammar.primarySkill, SpeakSkill.grammar);
+      expect(grammar.generationStatus, 'ready');
+      expect(grammar.isContentReady, isTrue);
+      final grammarLesson = CourseArtifactCodec.grammarCourse(
+        grammar.artifact!,
+      );
+      expect(grammarLesson.mode.name, 'guided');
+      expect(grammarLesson.steps, hasLength(5));
+      expect(grammarLesson.grammarFocus, contains('Present-tense'));
+      for (final step in grammarLesson.steps) {
+        expect(step.choices, contains(step.answer));
+      }
+      print(
+        'grammar steps: ${grammarLesson.steps.map((s) => s.prompt).join(' | ')}',
       );
     },
   );

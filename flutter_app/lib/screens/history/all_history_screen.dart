@@ -52,10 +52,15 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
       'Vocab',
       'Grammar',
       'Reading',
+      'Listening',
       'Roleplay',
       'Writing',
       'Speaking',
       'Story',
+      'Alphabet',
+      'Connectors',
+      'Liaison',
+      'Review',
     ];
     return known.where(present.contains).toList();
   }
@@ -112,10 +117,13 @@ class _AllHistoryScreenState extends ConsumerState<AllHistoryScreen> {
                               final session = _filteredSessions[index];
                               return GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTap: () => AppRouter.push(
-                                  context,
-                                  (_) => HistoryScreen(session: session),
-                                ),
+                                onTap: () async {
+                                  await AppRouter.push(
+                                    context,
+                                    (_) => HistoryScreen(session: session),
+                                  );
+                                  if (mounted) _reload();
+                                },
                                 child: SessionRow(session: session),
                               );
                             },

@@ -1,4 +1,5 @@
 import '../../widgets/adaptive/adaptive.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -57,9 +58,11 @@ class SessionScreen extends ConsumerStatefulWidget {
     this.sessionTopic,
     this.contentKey,
     this.dailySessionId,
+    this.reviewSession = false,
     this.examMode = false,
     this.kickoffMessage,
     this.durationLimitSeconds,
+    this.lessonContextCharacterLimit,
     this.wrapUpNote,
     this.wrapUpLeadSeconds = 30,
     this.popResultImmediately = false,
@@ -79,6 +82,11 @@ class SessionScreen extends ConsumerStatefulWidget {
   final String? kickoffMessage;
   final int? durationLimitSeconds;
 
+  /// Feature-owned bound for dynamic lesson context. Review/Warm-up passes a
+  /// larger bounded value so ranked learner evidence is not cut at the
+  /// generic free-talk limit.
+  final int? lessonContextCharacterLimit;
+
   /// Optional app-injected context note sent [wrapUpLeadSeconds] before the
   /// [durationLimitSeconds] cutoff, so the tutor lands the goodbye instead of
   /// being cut mid-sentence. Only meaningful with a duration limit.
@@ -93,6 +101,10 @@ class SessionScreen extends ConsumerStatefulWidget {
   /// Set when this call is the Daily Pathway's speaking stage — links the
   /// ai_sessions record to today's pathway row.
   final String? dailySessionId;
+
+  /// Smart Review is retrieval-only. It must not use the normal speaking
+  /// roleplay system prompt, which is intentionally allowed to create a scene.
+  final bool reviewSession;
 
   @override
   ConsumerState<SessionScreen> createState() => _SessionScreenState();
@@ -129,11 +141,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   Profile? _onboardingProfile;
   MicMode _micMode = MicMode.auto;
   final String _sessionId = const Uuid().v4();
+  bool _microphonePermissionRequestInFlight = false;
 
   bool get _isRoleplay => widget.stage == 'speaking';
   bool get _isGuided => widget.stage == 'speaking_guided';
+  bool get _isFreeTalk => widget.stage == null || widget.stage == 'free_talk';
 
   String get _practiceLabel {
+    if (widget.reviewSession) return 'Personal review';
     if (_isGuided) return 'Guided conversation';
     if (_isRoleplay) return 'Guided roleplay';
     if (widget.stage == 'speaking_exam') return 'TEF / TCF practice';
@@ -165,6 +180,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           ? LiveSessionType.speakingExam
           : widget.stage == 'trial'
           ? LiveSessionType.onboardingCalibration
+          : widget.reviewSession
+          ? LiveSessionType.speakingReview
           : _isGuided
           ? LiveSessionType.speakingGuided
           : _isRoleplay
@@ -173,6 +190,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       lessonContext: widget.lessonContext,
       levelOverride: widget.levelOverride,
       learningStoreForProfile: _learningStore,
+      lessonContextCharacterLimit: widget.lessonContextCharacterLimit,
     );
     _mic = MicController(
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
@@ -203,6 +221,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_callStatus == CallStatus.ended || _sessionSaved) return;
+    // iOS emits `inactive` while its native microphone permission alert is
+    // visible. That is not the app going into the background. Disconnecting
+    // here used to make the onboarding trial look like a completed call and
+    // advance to the next onboarding page before the learner ever spoke.
+    if (_microphonePermissionRequestInFlight) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       _mic.onAppPaused();
@@ -218,7 +241,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   Future<void> _startCall() async {
     final accepted = await AiVoiceDisclosure.ensureAccepted(context);
-    if (!mounted) return;
+    if (!mounted || _sessionSaved) return;
     if (!accepted) {
       // `maybePop()` consults the screen's PopScope (canPop: false, meant to
       // force an "End Call?" confirmation on an in-progress call) and gets
@@ -229,6 +252,33 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       Navigator.of(context).pop();
       return;
     }
+
+    // Permission is deliberately completed before opening Gemini Live. The
+    // native iOS permission alert temporarily makes the Flutter app inactive;
+    // requesting it after the socket connected caused the lifecycle handler to
+    // disconnect the call and skip the onboarding trial. The disclosure above
+    // is the only in-app permission surface; the next surface is Apple's
+    // native microphone alert.
+    var microphoneReady = await _audio.microphonePermissionGranted;
+    if (!microphoneReady) {
+      _microphonePermissionRequestInFlight = true;
+      try {
+        microphoneReady = await _audio.requestPermission();
+      } finally {
+        _microphonePermissionRequestInFlight = false;
+      }
+    }
+    if (!mounted || _sessionSaved) return;
+    if (!microphoneReady) {
+      _endedReason = 'microphone_permission_denied';
+      _endCall();
+      return;
+    }
+
+    // The learner can end the call while the native permission prompt is
+    // visible. Never open Gemini after that route has already been ended.
+    if (!mounted || _sessionSaved) return;
+
     // GeminiLiveService obtains a short-lived credential from Supabase. The
     // old build gate checked the legacy embedded Gemini API-key field here;
     // that field is intentionally empty now for security, so the gate made
@@ -240,6 +290,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   void _endCall() {
     if (_sessionSaved) return;
     _sessionSaved = true;
+    AppTour.dismissActive();
 
     _timer?.cancel();
     _audio.stopStreaming();
@@ -359,40 +410,37 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       );
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
-
-      // First-call walkthrough: Auto/Hold, the mic button, and End — shown
-      // once the call is actually live so every control is on screen.
-      if (!await AppTour.hasSeenCall()) {
-        if (mounted) AppTour.playCall(context);
-      }
-
-      final granted = await _audio.requestPermission();
-      if (!mounted) return;
-      if (granted) {
-        try {
-          await _mic.onConnected();
-          // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
-          // "what do you want to practice?" greetings broke the roleplay contract.
-          _gemini.sendText(
-            widget.kickoffMessage ??
-                (_isGuided
-                    ? '(Note from the app, not the student: the learner just joined a '
-                          'guided conversation. Begin the first stage from the speaking task '
-                          'plan: introduce one phrase, model it once, then stop and wait for '
-                          'the learner to repeat it. Do not jump ahead.)'
-                    : _isRoleplay
-                    ? '(Note from the app, not the student: the student just joined the '
-                          'roleplay call. Open the scene NOW exactly as your role rules say, '
-                          'one short English sentence to set the scene from today\'s material, '
-                          'then your first line in French, in character. Do not greet '
-                          'generically, do not ask what they want to practice.)'
-                    : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)"),
-          );
-        } catch (e) {
-          setState(() => _errorMessage = 'Mic error: $e');
-        }
-      } else {
-        setState(() => _errorMessage = 'Microphone permission denied');
+      try {
+        await _mic.onConnected();
+        // Ending while audio is preparing must win over this async callback.
+        // Without this guard a late callback could send the kickoff into a
+        // call the learner had already closed.
+        if (!mounted || _sessionSaved || !_gemini.isConnected) return;
+        // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
+        // "what do you want to practice?" greetings broke the roleplay contract.
+        _gemini.sendText(
+          widget.kickoffMessage ??
+              (widget.reviewSession
+                  ? '(Note from the app, not the student: the learner just joined a '
+                        'deterministic review. Ask one short French retrieval question '
+                        'about an exact target in the REVIEW BLUEPRINT, then stop and wait. '
+                        'Do not create a scene, character, café, station, travel situation, '
+                        'or generic roleplay.)'
+                  : _isGuided
+                  ? '(Note from the app, not the student: the learner just joined a '
+                        'guided conversation. Begin the first stage from the speaking task '
+                        'plan: introduce one phrase, model it once, then stop and wait for '
+                        'the learner to repeat it. Do not jump ahead.)'
+                  : _isRoleplay
+                  ? '(Note from the app, not the student: the student just joined the '
+                        'roleplay call. Open the scene NOW exactly as your role rules say, '
+                        'one short English sentence to set the scene from today\'s material, '
+                        'then your first line in French, in character. Do not greet '
+                        'generically, do not ask what they want to practice.)'
+                  : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)"),
+        );
+      } catch (e) {
+        setState(() => _errorMessage = 'Mic error: $e');
       }
     };
 
@@ -430,6 +478,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     _gemini.onError = (msg) {
       if (!mounted) return;
+      // Gemini can send a transient protocol/provider error while the current
+      // socket is still delivering the tutor turn. Showing that as a fatal
+      // banner made a healthy call say "Connection lost" while it was still
+      // responding. A final socket loss is reported through onDisconnected;
+      // only surface errors that arrive after the socket is no longer usable.
+      if (_gemini.isConnected) {
+        debugPrint('Gemini Live transient error while connected: $msg');
+        return;
+      }
       setState(() => _errorMessage = msg);
     };
 
@@ -444,10 +501,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     _gemini.onTutorTranscript = (text) {
       if (!mounted) return;
+      _clearStaleConnectionError();
       _appendMessage(ChatMessage(role: 'tutor', content: text));
     };
 
     _gemini.onAudioChunk = (audioData) {
+      _clearStaleConnectionError();
       _audio.isOutputActive = true;
       _audio.playAudioChunk(audioData);
       if (mounted && _callStatus != CallStatus.tutorSpeaking) {
@@ -475,12 +534,22 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
   }
 
+  /// A provider error can arrive just before a valid queued tutor turn. Do not
+  /// leave a stale connection banner over a live conversation.
+  void _clearStaleConnectionError() {
+    if (!mounted || !_gemini.isConnected) return;
+    if (_errorMessage == 'Connection lost' ||
+        _errorMessage.startsWith('Connection closed')) {
+      setState(() => _errorMessage = '');
+    }
+  }
+
   void _appendMessage(ChatMessage message) {
     if (!mounted) return;
     setState(() => _messages.add(message));
     // Checkpoint finalized turns immediately. This matters most for the
     // pre-signup trial: a network drop or app termination must not erase the
-    // learner evidence that will later shape Course sessions 6–10.
+    // learner evidence that will later shape the six-skill Course unit.
     _storage.saveMessage(
       sessionId: _sessionId,
       role: message.isUser ? 'user' : 'assistant',
@@ -600,6 +669,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     // post-frame callback. Make completion idempotent and keep the route
     // result type explicit at the navigation boundary.
     if (_didFinishResult || !mounted) return;
+    // A confirmation dialog or permission sheet may still be completing its
+    // dismissal animation. Popping here would pop that bool-valued route with
+    // SpeakingResult, which is the source of the route-type exception that
+    // left the call screen stuck. Retry after the route becomes current.
+    final route = ModalRoute.of(context);
+    if (route == null || !route.isCurrent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_didFinishResult) _finishResult();
+      });
+      return;
+    }
     _didFinishResult = true;
     Navigator.of(context).pop<SpeakingResult>(_result);
   }
@@ -752,6 +832,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Future<void> _confirmEnd() async {
+    if (_sessionSaved) return;
     final shouldEnd = await showPSConfirmDialog(
       context,
       title: 'End Call?',
@@ -759,13 +840,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       confirmLabel: 'End Call',
       destructive: true,
     );
-    if (shouldEnd) {
+    if (shouldEnd && mounted && !_sessionSaved) {
       _endedReason = 'completed';
       _endCall();
     }
   }
-
-  bool _poppedResult = false;
 
   @override
   Widget build(BuildContext context) {
@@ -773,8 +852,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (widget.popResultImmediately) {
         // The hosting flow (onboarding trial) renders its own recap — hand the
         // result straight back. Post-frame: popping during build is illegal.
-        if (!_poppedResult) {
-          _poppedResult = true;
+        if (!_didFinishResult) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _finishResult();
           });
@@ -928,7 +1006,112 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  Widget _callControls() {
+  Widget _callControls() =>
+      _isFreeTalk ? _freeTalkControls() : _legacyCallControls();
+
+  Widget _freeTalkControls() {
+    final enabled =
+        _callStatus != CallStatus.connecting &&
+        _callStatus != CallStatus.reconnecting &&
+        _callStatus != CallStatus.ended;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Voice controls',
+                      style: DesignTokens.body(
+                        14,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Keep the mic open and speak naturally.',
+                      style: DesignTokens.body(
+                        11.5,
+                      ).copyWith(color: DesignTokens.nightMuted, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              KeyedSubtree(
+                key: AppTour.micModeKey,
+                child: MicModeBar(
+                  mode: _micMode,
+                  isHolding: _mic.isHeld,
+                  dark: true,
+                  inline: true,
+                  enabled: enabled,
+                  onModeChanged: _setMicMode,
+                  onHoldStart: _pttDown,
+                  onHoldEnd: _pttUp,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Divider(height: 1, color: DesignTokens.nightHairline),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _controlButton(
+                icon: _isSpeakerOn
+                    ? CupertinoIcons.speaker_2_fill
+                    : CupertinoIcons.ear,
+                label: _isSpeakerOn ? 'Speaker' : 'Earpiece',
+                color: DesignTokens.nightText,
+                onTap: _callStatus == CallStatus.connecting
+                    ? null
+                    : _toggleSpeaker,
+              ),
+              KeyedSubtree(
+                key: AppTour.micButtonKey,
+                child: MicPrimaryButton(
+                  mode: _micMode,
+                  isHolding: _mic.isHeld,
+                  isMuted: _callStatus == CallStatus.muted,
+                  dark: true,
+                  enabled: enabled,
+                  onAutoTap: _toggleMute,
+                  onHoldStart: _pttDown,
+                  onHoldEnd: _pttUp,
+                ),
+              ),
+              KeyedSubtree(
+                key: AppTour.endCallKey,
+                child: _controlButton(
+                  icon: CupertinoIcons.phone_down_fill,
+                  label: 'End',
+                  color: DesignTokens.primary,
+                  onTap: _confirmEnd,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _legacyCallControls() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
       decoration: BoxDecoration(

@@ -15,7 +15,7 @@ import '../../services/vocabulary_level_policy.dart';
 import '../../services/vocabulary_story_catalog.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
-import '../settings/settings_screen.dart';
+import '../speak/v3_settings_screen.dart';
 import 'vocabulary_flashcards_screen.dart';
 import '../../widgets/v3/v3_surface.dart';
 
@@ -210,7 +210,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
           label: 'Vocabulary settings',
           child: IconButton(
             onPressed: () =>
-                AppRouter.push(context, (_) => const SettingsScreen()),
+                AppRouter.push(context, (_) => const V3SettingsScreen()),
             icon: const Icon(Icons.tune_rounded),
             color: DesignTokens.primary,
           ),

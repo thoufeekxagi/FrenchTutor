@@ -12,7 +12,7 @@ import '../../models/grammar_course_v2.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
-import '../settings/settings_screen.dart';
+import '../speak/v3_settings_screen.dart';
 import 'grammar_v2_lesson_screen.dart';
 
 /// Grammar home: the grid contains sessions, never individual exercise
@@ -186,7 +186,7 @@ class _GrammarV2HomeScreenState extends ConsumerState<GrammarV2HomeScreen> {
           label: 'Grammar settings',
           child: IconButton(
             onPressed: () =>
-                AppRouter.push(context, (_) => const SettingsScreen()),
+                AppRouter.push(context, (_) => const V3SettingsScreen()),
             icon: const Icon(Icons.tune_rounded),
             color: DesignTokens.primary,
           ),

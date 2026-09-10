@@ -47,7 +47,7 @@ for encoded in $generated_defines; do
   [ -n "$encoded" ] || continue
   decoded=$(printf '%s' "$encoded" | base64 -D 2>/dev/null || printf '%s' "$encoded" | base64 -d 2>/dev/null || true)
   case "$decoded" in
-    SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|SENTRY_DSN=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
+    SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
       continue
       ;;
   esac
@@ -64,7 +64,6 @@ for key in \
   GOOGLE_WEB_CLIENT_ID \
   REVENUECAT_IOS_KEY \
   REVENUECAT_ANDROID_KEY \
-  SENTRY_DSN \
   POSTHOG_API_KEY \
   POSTHOG_HOST; do
   value=$(property "$key")

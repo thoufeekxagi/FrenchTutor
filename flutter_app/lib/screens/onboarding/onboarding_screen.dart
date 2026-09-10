@@ -406,7 +406,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           backgroundColor: enabled
               ? DesignTokens.primary
               : DesignTokens.canvasDim,
-          foregroundColor: enabled ? DesignTokens.surface : DesignTokens.muted,
+          foregroundColor: enabled
+              ? DesignTokens.onPrimary
+              : DesignTokens.muted,
           disabledBackgroundColor: DesignTokens.canvasDim,
           disabledForegroundColor: DesignTokens.muted,
           shape: RoundedRectangleBorder(
@@ -439,50 +441,60 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           constraints: const BoxConstraints(minHeight: 68),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           decoration: BoxDecoration(
-            color: selected ? DesignTokens.primarySoft : DesignTokens.surface,
+            color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-            border: Border.all(
-              color: selected ? DesignTokens.primary : DesignTokens.hairline,
-              width: selected ? 2 : 1,
-            ),
+            border: Border.all(color: DesignTokens.hairline),
           ),
-          child: Row(
+          child: Stack(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: DesignTokens.body(15, weight: FontWeight.w700)
-                          .copyWith(
-                            color: selected
-                                ? DesignTokens.primaryDeep
-                                : DesignTokens.ink,
-                          ),
-                    ),
-                    if (detail != null) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        detail,
-                        style: DesignTokens.body(12.5).copyWith(
-                          color: selected
-                              ? DesignTokens.primaryDeep.withValues(alpha: 0.82)
-                              : DesignTokens.mutedDim,
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: DesignTokens.body(
+                            15,
+                            weight: FontWeight.w700,
+                          ).copyWith(color: DesignTokens.ink),
                         ),
-                      ),
-                    ],
+                        if (detail != null) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            detail,
+                            style: DesignTokens.body(
+                              12.5,
+                            ).copyWith(color: DesignTokens.mutedDim),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (trailing != null) ...[
+                    trailing,
+                    const SizedBox(width: 10),
                   ],
+                  Icon(
+                    selected
+                        ? CupertinoIcons.checkmark_circle_fill
+                        : CupertinoIcons.circle,
+                    color: selected ? DesignTokens.primary : DesignTokens.muted,
+                    size: 22,
+                  ),
+                ],
+              ),
+              if (selected)
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 4,
+                      child: ColoredBox(color: DesignTokens.primary),
+                    ),
+                  ),
                 ),
-              ),
-              if (trailing != null) ...[trailing, const SizedBox(width: 10)],
-              Icon(
-                selected
-                    ? CupertinoIcons.checkmark_circle_fill
-                    : CupertinoIcons.circle,
-                color: selected ? DesignTokens.primaryDeep : DesignTokens.muted,
-                size: 22,
-              ),
             ],
           ),
         ),
@@ -640,23 +652,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? DesignTokens.primarySoft
-                      : DesignTokens.canvasDim,
+                  color: DesignTokens.canvasDim,
                   borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
-                  border: Border.all(
-                    color: selected
-                        ? DesignTokens.primary
-                        : DesignTokens.hairline,
-                    width: selected ? 2 : 1,
-                  ),
+                  border: Border.all(color: DesignTokens.hairline),
                 ),
-                child: Text(
-                  topic,
-                  style: DesignTokens.body(
-                    14,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: DesignTokens.inkSoft),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (selected) ...[
+                      Container(
+                        width: 4,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: DesignTokens.primary,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      topic,
+                      style: DesignTokens.body(
+                        14,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: DesignTokens.inkSoft),
+                    ),
+                  ],
                 ),
               ),
             );

@@ -202,7 +202,7 @@ class WebOnboardingWelcome extends StatelessWidget {
               label: const Text('Get started'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: DesignTokens.primary,
-                foregroundColor: DesignTokens.surface,
+                foregroundColor: DesignTokens.onPrimary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(

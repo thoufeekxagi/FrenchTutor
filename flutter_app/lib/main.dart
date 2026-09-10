@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 import 'design/tokens.dart';
@@ -23,120 +22,108 @@ import 'services/pilot_access_service.dart';
 import 'services/subscription_gate_service.dart';
 
 void main() {
-  // SentryFlutter.init wraps runZonedGuarded below via appRunner rather than
-  // replacing it — it auto-wires FlutterError.onError and platform-dispatcher
-  // errors on top, while the existing zone handler and try/catch below still
-  // run exactly as before. An empty DSN (no Sentry project configured yet)
-  // makes the SDK a silent no-op, same "not configured" pattern as every
-  // other optional key in ApiKeys.
-  SentryFlutter.init(
-    (options) {
-      options.dsn = ApiKeys.sentryDsn;
-      // Crash/error reporting only — no performance-trace overhead needed here.
-      options.tracesSampleRate = 0.0;
-    },
-    appRunner: () => runZonedGuarded(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+  // Keep startup failures visible in the app and terminal. Crash reporting is
+  // intentionally not installed in the pilot, so layout/audio failures stay
+  // local and do not leave the app through a third-party SDK.
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      unawaited(
+        AiCostTracker.event(
+          feature: 'app',
+          event: 'process_boot',
+          extra: {
+            'debug': kDebugMode,
+            'trace_version': 'cost-trace-v2',
+            'stage': 'before_supabase',
+          },
+        ),
+      );
+      // Portrait-only on phones for the pilot — no landscape call/lesson
+      // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
+      if (!kIsWeb) {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+      try {
+        if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
+          throw StateError(
+            'Supabase public configuration is empty. Set SUPABASE_URL and '
+            'SUPABASE_ANON_KEY with --dart-define or restore the production '
+            'public defaults in lib/config/api_keys.dart.',
+          );
+        }
+        await Supabase.initialize(
+          url: ApiKeys.supabaseUrl,
+          // The modern "publishable" key (sb_publishable_...), not the
+          // legacy anon JWT — see ApiKeys.supabaseAnonKey's doc comment.
+          publishableKey: ApiKeys.supabaseAnonKey,
+        );
+        // Product-usage analytics only. Empty key means no PostHog project is
+        // wired yet, so this
+        // is a silent no-op, matching every other optional key's pattern.
+        if (ApiKeys.posthogApiKey.isNotEmpty) {
+          final config = PostHogConfig(ApiKeys.posthogApiKey)
+            ..host = ApiKeys.posthogHost
+            ..captureApplicationLifecycleEvents = true
+            ..debug = kDebugMode;
+          await Posthog().setup(config);
+        }
+        final db = await openAppDatabase();
         unawaited(
           AiCostTracker.event(
             feature: 'app',
-            event: 'process_boot',
+            event: 'app_boot',
             extra: {
               'debug': kDebugMode,
               'trace_version': 'cost-trace-v2',
-              'stage': 'before_supabase',
+              'platform': _pilotPlatform().name,
             },
           ),
         );
-        // Portrait-only on phones for the pilot — no landscape call/lesson
-        // layouts have been designed or tested (PILOT_PLAN.md Phase 4).
-        if (!kIsWeb) {
-          await SystemChrome.setPreferredOrientations([
-            DeviceOrientation.portraitUp,
-            DeviceOrientation.portraitDown,
-          ]);
+        LessonSpeechService.configure(db);
+        final infrastructure = PilotInfrastructureStore(db);
+        final platform = _pilotPlatform();
+        final installationId = infrastructure.installationId(platform.name);
+        if (ApiKeys.posthogApiKey.isNotEmpty) {
+          await Posthog().identify(userId: installationId);
         }
-        try {
-          if (ApiKeys.supabaseUrl.isEmpty || ApiKeys.supabaseAnonKey.isEmpty) {
-            throw StateError(
-              'Supabase public configuration is empty. Set SUPABASE_URL and '
-              'SUPABASE_ANON_KEY with --dart-define or restore the production '
-              'public defaults in lib/config/api_keys.dart.',
-            );
-          }
-          await Supabase.initialize(
-            url: ApiKeys.supabaseUrl,
-            // The modern "publishable" key (sb_publishable_...), not the
-            // legacy anon JWT — see ApiKeys.supabaseAnonKey's doc comment.
-            publishableKey: ApiKeys.supabaseAnonKey,
-          );
-          // Product-usage analytics (not crash reporting — that's Sentry
-          // above). Empty key means no PostHog project is wired yet, so this
-          // is a silent no-op, matching every other optional key's pattern.
-          if (ApiKeys.posthogApiKey.isNotEmpty) {
-            final config = PostHogConfig(ApiKeys.posthogApiKey)
-              ..host = ApiKeys.posthogHost
-              ..captureApplicationLifecycleEvents = true
-              ..debug = kDebugMode;
-            await Posthog().setup(config);
-          }
-          final db = await openAppDatabase();
-          unawaited(
-            AiCostTracker.event(
-              feature: 'app',
-              event: 'app_boot',
-              extra: {
-                'debug': kDebugMode,
-                'trace_version': 'cost-trace-v2',
-                'platform': _pilotPlatform().name,
-              },
-            ),
-          );
-          LessonSpeechService.configure(db);
-          final infrastructure = PilotInfrastructureStore(db);
-          final platform = _pilotPlatform();
-          final installationId = infrastructure.installationId(platform.name);
-          if (ApiKeys.posthogApiKey.isNotEmpty) {
-            await Posthog().identify(userId: installationId);
-          }
-          PilotTelemetry(
-            infrastructure: infrastructure,
-            installationId: installationId,
-          ).appStarted(platform: platform);
-          await ContentService.shared.preload();
-          // The chosen tutor persona must be readable synchronously anywhere
-          // (P2.1) — loaded once here, updated only from Settings/Onboarding.
-          await ActiveTutor.load();
-          // Alphabet audio is curated and bundled in the app. Seed the selected
-          // tutor's 31 clips into the persistent local cache on first install;
-          // this reads app assets only and never contacts Supabase or Gemini.
-          unawaited(AlphabetPrewarm.maybeStart(isBeginner: true));
-          await DevSubscriptionOverride.load();
-          const OrchestrationBootstrapper().bootstrap(
-            content: ContentService.shared,
-            store: CompetencyStore(db),
-          );
+        PilotTelemetry(
+          infrastructure: infrastructure,
+          installationId: installationId,
+        ).appStarted(platform: platform);
+        await ContentService.shared.preload();
+        // The chosen tutor persona must be readable synchronously anywhere
+        // (P2.1) — loaded once here, updated only from Settings/Onboarding.
+        await ActiveTutor.load();
+        // Alphabet audio is curated and bundled in the app. Seed the selected
+        // tutor's 31 clips into the persistent local cache on first install;
+        // this reads app assets only and never contacts Supabase or Gemini.
+        unawaited(AlphabetPrewarm.maybeStart(isBeginner: true));
+        await DevSubscriptionOverride.load();
+        const OrchestrationBootstrapper().bootstrap(
+          content: ContentService.shared,
+          store: CompetencyStore(db),
+        );
 
-          runApp(
-            ProviderScope(
-              overrides: [databaseProvider.overrideWithValue(db)],
-              child: const FrenchTutorApp(),
-            ),
-          );
-        } catch (error, stackTrace) {
-          await Sentry.captureException(error, stackTrace: stackTrace);
-          runApp(_StartupErrorApp(error: error, stackTrace: stackTrace));
-        }
-      },
-      (error, stackTrace) {
-        // Catches anything thrown asynchronously outside the try/catch above (e.g. a
-        // dangling Future from a plugin's platform channel) so the app can never go
-        // silently blank — always show something rather than nothing.
-        debugPrint('Uncaught zone error: $error\n$stackTrace');
-        Sentry.captureException(error, stackTrace: stackTrace);
-      },
-    ),
+        runApp(
+          ProviderScope(
+            overrides: [databaseProvider.overrideWithValue(db)],
+            child: const FrenchTutorApp(),
+          ),
+        );
+      } catch (error, stackTrace) {
+        runApp(_StartupErrorApp(error: error, stackTrace: stackTrace));
+      }
+    },
+    (error, stackTrace) {
+      // Catches anything thrown asynchronously outside the try/catch above (e.g. a
+      // dangling Future from a plugin's platform channel) so the app can never go
+      // silently blank — always show something rather than nothing.
+      debugPrint('Uncaught zone error: $error\n$stackTrace');
+    },
   );
 }
 

@@ -6,6 +6,7 @@ import '../../models/session.dart';
 import '../../models/chat_message.dart';
 import '../../models/note.dart';
 import '../../services/sync_service.dart';
+import '../../services/review_context_cache_service.dart';
 
 class StorageService {
   StorageService(this._db, [this._sync]) {
@@ -105,6 +106,34 @@ class StorageService {
     // streak/momentum/"this week's practice" reads (DailyGoalService), so
     // losing this on reinstall was the "starts from zero" bug.
     unawaited(_sync?.syncSession(session, updatedAt: now));
+    // Review indexing is additive and deliberately not awaited. The session
+    // row above is already durable before this optimization starts.
+    if (session.endedAt != null && session.endedAt!.isNotEmpty) {
+      _saveCourseMaterialSnapshotIfNeeded(session);
+      ReviewContextCacheService.schedule(_db);
+    }
+  }
+
+  /// A typed Writing/Grammar/Vocabulary Course screen may finish without a
+  /// conversational transcript.  Persist one compact material snapshot next
+  /// to the completion row so Review/Warm-up can still recover the actual
+  /// generated lesson on a later install, even if the adaptive artifact has
+  /// not hydrated yet. Conversational sessions already have turns and do not
+  /// get a duplicate snapshot.
+  void _saveCourseMaterialSnapshotIfNeeded(Session session) {
+    final key = session.contentKey?.trim() ?? '';
+    if (key.isEmpty || getSessionMessages(sessionId: session.id).isNotEmpty) {
+      return;
+    }
+    final details = getSessionReviewDetails(
+      sessionId: session.id,
+      contentKey: key,
+    );
+    if (details.isEmpty) return;
+    _saveBoundedCourseMaterial(
+      sessionId: session.id,
+      material: details.join('\n'),
+    );
   }
 
   List<Session> getAllSessions() {
@@ -129,6 +158,7 @@ class StorageService {
     required String contentKey,
     required String topic,
     required String stage,
+    String? lessonMaterial,
   }) {
     final existing = _db.select(
       'SELECT 1 FROM sessions WHERE content_key = ? AND deleted_at IS NULL LIMIT 1',
@@ -136,16 +166,43 @@ class StorageService {
     );
     if (existing.isNotEmpty) return;
     final now = DateTime.now().toUtc().toIso8601String();
-    saveSession(
-      Session(
-        id: _uuid.v4(),
-        startedAt: now,
-        endedAt: now,
-        summary: 'Completed the course session: $topic',
-        topic: topic,
-        contentKey: contentKey,
-        stage: stage,
-      ),
+    final session = Session(
+      id: _uuid.v4(),
+      startedAt: now,
+      endedAt: now,
+      summary: 'Completed the course session: $topic',
+      topic: topic,
+      contentKey: contentKey,
+      stage: stage,
+    );
+    saveSession(session);
+    // The roadmap already has the generated artifact in memory. Keep a
+    // bounded fallback beside the completion row in case the local adaptive
+    // artifact is still waiting on its own sync transaction.
+    if (lessonMaterial != null &&
+        lessonMaterial.trim().isNotEmpty &&
+        getSessionMessages(sessionId: session.id).isEmpty) {
+      _saveBoundedCourseMaterial(
+        sessionId: session.id,
+        material: lessonMaterial,
+      );
+      ReviewContextCacheService.schedule(_db);
+    }
+  }
+
+  void _saveBoundedCourseMaterial({
+    required String sessionId,
+    required String material,
+  }) {
+    final normalized = material.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (normalized.isEmpty) return;
+    final bounded = normalized.length <= 1800
+        ? normalized
+        : '${normalized.substring(0, 1799).trimRight()}…';
+    saveMessage(
+      sessionId: sessionId,
+      role: 'assistant',
+      content: 'Course lesson material:\n$bounded',
     );
   }
 
@@ -191,6 +248,98 @@ class StorageService {
           ),
         )
         .toList();
+  }
+
+  /// Returns a bounded, learner-facing description of the material that was
+  /// actually practised in a session.  A generic Course completion row only
+  /// contains its heading, so Review also joins the persisted adaptive lesson
+  /// artifact and any saved learner/tutor turns here.
+  ///
+  /// This is deliberately read-only and best-effort: older installs may not
+  /// have the adaptive table or one of its newer columns yet.  In that case
+  /// the normal session summary still remains available to Review.
+  List<String> getSessionReviewDetails({
+    required String sessionId,
+    String? contentKey,
+  }) {
+    final details = <String>[];
+    void add(String value, {int max = 420}) {
+      final clean = value.replaceAll(RegExp(r'\s+'), ' ').trim();
+      if (clean.isEmpty || details.contains(clean)) return;
+      details.add(
+        clean.length <= max
+            ? clean
+            : '${clean.substring(0, max - 1).trimRight()}…',
+      );
+    }
+
+    for (final message in getSessionMessages(sessionId: sessionId).take(12)) {
+      add(
+        '${message.isUser ? 'Learner' : 'Tutor'}: ${message.content}',
+        max: 320,
+      );
+    }
+
+    final key = contentKey?.trim() ?? '';
+    if (key.isEmpty) return details;
+    try {
+      final rows = _db.select(
+        '''SELECT title, subtitle, context, competency,
+                  grammar_focus_json, success_criteria_json,
+                  target_phrases_json, artifact_json
+           FROM adaptive_course_sessions
+           WHERE content_key = ? AND deleted_at IS NULL
+           ORDER BY updated_at DESC LIMIT 1''',
+        [key],
+      );
+      if (rows.isEmpty) return details;
+      final row = rows.first;
+      add('Lesson: ${row['title'] ?? ''}');
+      add('Context: ${row['context'] ?? row['subtitle'] ?? ''}');
+      add('Competency: ${row['competency'] ?? ''}');
+      add(
+        'Grammar focus: ${_reviewJsonList(row['grammar_focus_json']).join('; ')}',
+      );
+      add(
+        'Success criteria: ${_reviewJsonList(row['success_criteria_json']).join('; ')}',
+      );
+      add(
+        'Target language: ${_reviewJsonList(row['target_phrases_json']).join('; ')}',
+      );
+      final artifact = _reviewJsonMap(row['artifact_json']);
+      if (artifact.isNotEmpty) {
+        // Keep the complete generated payload available to the saved review,
+        // but bound it so a large listening deck can never bloat the screen.
+        add('Generated activity: ${jsonEncode(artifact)}', max: 1400);
+      }
+    } catch (_) {
+      // Course artifacts are optional for legacy and partially migrated DBs.
+    }
+    return details;
+  }
+
+  List<String> _reviewJsonList(Object? raw) {
+    if (raw is List) return raw.map((value) => value.toString()).toList();
+    if (raw is! String || raw.trim().isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is List
+          ? decoded.map((value) => value.toString()).toList()
+          : const [];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Map<String, dynamic> _reviewJsonMap(Object? raw) {
+    if (raw is Map) return raw.cast<String, dynamic>();
+    if (raw is! String || raw.trim().isEmpty) return const {};
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is Map ? decoded.cast<String, dynamic>() : const {};
+    } catch (_) {
+      return const {};
+    }
   }
 
   void deleteSession(String id) {

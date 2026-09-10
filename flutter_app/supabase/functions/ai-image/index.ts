@@ -9,12 +9,13 @@ const headers = {
 // Keep the provider boundary aligned with the shared Flutter artwork contract:
 // artwork is image-only and the app renders titles and controls separately.
 const BOOK_COVER_INSTRUCTION = `
-FINAL ARTWORK REQUIREMENT: create one simple, ordinary, text-free illustration
-based only on the visual anchor. Show one setting or one/two concrete objects.
-No poster, generic hero, unrelated landmark, person, face, hand, animal, or
-invented character. Never render text, letters, words, numbers, symbols, Chinese
+FINAL ARTWORK REQUIREMENT: create one calm architectural editorial illustration
+based only on the visual anchor. Express one ordinary setting through clean
+architectural forms, warm natural light, and restrained detail. No poster,
+generic hero, unrelated landmark, person, face, hand, animal, or invented
+character. Never render text, letters, words, numbers, symbols, Chinese
 characters, signs, labels, logos, captions, watermarks, UI, borders, or frames.
-Keep the subject near the center and use a calm, coherent editorial style.
+Keep the subject near the center and use a coherent architectural composition.
 `;
 
 const ALLOWED_ASPECT_RATIOS = new Set([

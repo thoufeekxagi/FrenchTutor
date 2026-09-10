@@ -99,6 +99,11 @@ class AudioStreamingService {
   /// output audio quality).
   bool isOutputActive = false;
 
+  /// Lets the live session show its in-app microphone explanation only when
+  /// the OS permission has not already been granted.
+  Future<bool> get microphonePermissionGranted async =>
+      Permission.microphone.isGranted;
+
   /// Whether the recorder is currently forwarding microphone PCM to its
   /// callback. Call controllers use this to pause learner input while a
   /// separate lesson narrator is playing through the shared phone speaker.

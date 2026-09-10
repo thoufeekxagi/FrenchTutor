@@ -194,10 +194,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
     // The OS schedule is local and survives app termination. If permission
     // was declined, sync() simply clears any older reminders.
     unawaited(NotificationSchedulerService.sync(profile));
-    // Do not create personalized sessions 6–10 before authentication. The
+    // Do not create personalized sessions 6–11 before authentication. The
     // account claim is the boundary that makes learner-owned course content
     // durable and eligible for server preparation. After sign-in, AuthGate
-    // creates and syncs the first five personalized sessions.
+    // creates and syncs the authored six-skill Unit 2 block.
     ProductAnalytics.capture(
       'onboarding_completed',
       properties: {
@@ -450,116 +450,128 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
+          color: SpeakColors.surface,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: selected ? SpeakColors.accent : SpeakColors.line,
-            width: selected ? 2 : 1,
-          ),
+          border: Border.all(color: SpeakColors.line),
         ),
-        child: Row(
+        child: Stack(
           children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: selected ? SpeakColors.accent : SpeakColors.accentSoft,
-                shape: BoxShape.circle,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Image.asset(
-                persona.portraitAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-                errorBuilder: (context, error, stackTrace) => Center(
-                  child: Text(
-                    persona.initial,
-                    style: DesignTokens.display(23).copyWith(
-                      color: selected
-                          ? SpeakColors.onAccent
-                          : SpeakColors.accent,
+            Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: SpeakColors.accentSoft,
+                    shape: BoxShape.circle,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    persona.portraitAsset,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Text(
+                        persona.initial,
+                        style: DesignTokens.display(
+                          23,
+                        ).copyWith(color: SpeakColors.accent),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        child: Text(
-                          persona.displayName,
-                          overflow: TextOverflow.ellipsis,
-                          style: DesignTokens.body(16, weight: FontWeight.w700),
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              persona.displayName,
+                              overflow: TextOverflow.ellipsis,
+                              style: DesignTokens.body(
+                                16,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            persona.accent.label,
+                            style: DesignTokens.body(
+                              11,
+                              weight: FontWeight.w600,
+                            ).copyWith(color: SpeakColors.inkSoft),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 7),
+                      const SizedBox(height: 3),
                       Text(
-                        persona.accent.label,
+                        persona.tagline,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: DesignTokens.body(
-                          11,
-                          weight: FontWeight.w600,
+                          12,
                         ).copyWith(color: SpeakColors.inkSoft),
+                      ),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => _previewTutor(persona),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isLoading
+                                  ? Icons.hourglass_top_rounded
+                                  : isPlaying
+                                  ? Icons.stop_circle_outlined
+                                  : Icons.play_circle_outline_rounded,
+                              color: SpeakColors.accent,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              isLoading
+                                  ? 'Preparing voice…'
+                                  : isPlaying
+                                  ? 'Stop voice'
+                                  : 'Play voice',
+                              style: DesignTokens.body(
+                                11,
+                                weight: FontWeight.w700,
+                              ).copyWith(color: SpeakColors.accent),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    persona.tagline,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(
-                      12,
-                    ).copyWith(color: SpeakColors.inkSoft),
+                ),
+                Icon(
+                  isActive
+                      ? Icons.volume_up_rounded
+                      : selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: selected || isActive
+                      ? SpeakColors.accent
+                      : SpeakColors.line,
+                  size: 21,
+                ),
+              ],
+            ),
+            if (selected)
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 4,
+                    child: ColoredBox(color: SpeakColors.accent),
                   ),
-                  const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: () => _previewTutor(persona),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isLoading
-                              ? Icons.hourglass_top_rounded
-                              : isPlaying
-                              ? Icons.stop_circle_outlined
-                              : Icons.play_circle_outline_rounded,
-                          color: SpeakColors.accent,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          isLoading
-                              ? 'Preparing voice…'
-                              : isPlaying
-                              ? 'Stop voice'
-                              : 'Play voice',
-                          style: DesignTokens.body(
-                            11,
-                            weight: FontWeight.w700,
-                          ).copyWith(color: SpeakColors.accent),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Icon(
-              isActive
-                  ? Icons.volume_up_rounded
-                  : selected
-                  ? Icons.check_circle_rounded
-                  : Icons.radio_button_unchecked_rounded,
-              color: selected || isActive
-                  ? SpeakColors.accent
-                  : SpeakColors.line,
-              size: 21,
-            ),
           ],
         ),
       ),
@@ -896,6 +908,15 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
   }
 
   Widget _focusActions() {
+    final buttonStyle = OutlinedButton.styleFrom(
+      foregroundColor: SpeakColors.accent,
+      minimumSize: const Size.fromHeight(48),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      side: BorderSide(color: SpeakColors.line),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      textStyle: DesignTokens.body(12, weight: FontWeight.w700),
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -903,14 +924,18 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
           Expanded(
             child: OutlinedButton.icon(
               onPressed: _selectAllFocus,
+              style: buttonStyle,
               icon: const Icon(Icons.done_all_rounded, size: 18),
               label: const Text('Select all six'),
             ),
           ),
           const SizedBox(width: 10),
-          TextButton(
-            onPressed: _focus.length > 1 ? _clearFocus : null,
-            child: const Text('Clear'),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _focus.length > 1 ? _clearFocus : null,
+              style: buttonStyle,
+              child: const Text('Clear'),
+            ),
           ),
         ],
       ),
@@ -957,40 +982,51 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
+          color: SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected ? SpeakColors.accent : SpeakColors.line,
-            width: selected ? 2 : 1,
-          ),
+          border: Border.all(color: SpeakColors.line),
         ),
-        child: Row(
+        child: Stack(
           children: [
-            Icon(icon, color: SpeakColors.accent, size: 21),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: DesignTokens.body(14, weight: FontWeight.w700),
+            Row(
+              children: [
+                Icon(icon, color: SpeakColors.accent, size: 21),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: DesignTokens.body(14, weight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: SpeakColors.inkSoft),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: DesignTokens.body(
-                      12,
-                    ).copyWith(color: SpeakColors.inkSoft),
+                ),
+                Icon(
+                  selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                  color: selected ? SpeakColors.accent : SpeakColors.line,
+                  size: 21,
+                ),
+              ],
+            ),
+            if (selected)
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 4,
+                    child: ColoredBox(color: SpeakColors.accent),
                   ),
-                ],
+                ),
               ),
-            ),
-            Icon(
-              selected ? Icons.check_circle_rounded : Icons.circle_outlined,
-              color: selected ? SpeakColors.accent : SpeakColors.line,
-              size: 21,
-            ),
           ],
         ),
       ),
@@ -1033,103 +1069,118 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         _dayChoices(),
         const SizedBox(height: 16),
         SpeakCard(
-          color: SpeakColors.accentSoft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          color: SpeakColors.surface,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Text(
-                'Your reminder time',
-                style: DesignTokens.body(14, weight: FontWeight.w700),
+              Positioned(
+                left: -16,
+                top: -16,
+                bottom: -16,
+                child: SizedBox(
+                  width: 4,
+                  child: ColoredBox(color: SpeakColors.accent),
+                ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '${_formatReminderTime(_reminderTime)} · ${_timeZoneLabel()}',
-                style: DesignTokens.body(
-                  12,
-                ).copyWith(color: SpeakColors.inkSoft),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Reminders',
-                    style: DesignTokens.body(13, weight: FontWeight.w700),
+                    'Your reminder time',
+                    style: DesignTokens.body(14, weight: FontWeight.w700),
                   ),
-                  Switch.adaptive(
-                    value: _remindersEnabled,
-                    onChanged: (enabled) {
-                      setState(() => _remindersEnabled = enabled);
-                      if (enabled &&
-                          _notificationPermissionState == 'not_requested') {
-                        unawaited(_requestNotificationPermission());
-                      }
-                    },
-                    activeThumbColor: SpeakColors.accent,
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_formatReminderTime(_reminderTime)} · ${_timeZoneLabel()}',
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: SpeakColors.inkSoft),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Reminders',
+                        style: DesignTokens.body(13, weight: FontWeight.w700),
+                      ),
+                      Switch.adaptive(
+                        value: _remindersEnabled,
+                        onChanged: (enabled) {
+                          setState(() => _remindersEnabled = enabled);
+                          if (enabled &&
+                              _notificationPermissionState == 'not_requested') {
+                            unawaited(_requestNotificationPermission());
+                          }
+                        },
+                        activeThumbColor: SpeakColors.accent,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _reminderWheel(
+                          key: const ValueKey('reminder-hour-wheel'),
+                          label: 'Hour',
+                          controller: _reminderHourController,
+                          itemCount: 24,
+                          selectedValue: _reminderHour,
+                          onChanged: (hour) => _setReminderTime(hour: hour),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 28),
+                        child: Text(
+                          ':',
+                          style: DesignTokens.display(
+                            27,
+                          ).copyWith(color: DesignTokens.ink),
+                        ),
+                      ),
+                      Expanded(
+                        child: _reminderWheel(
+                          key: const ValueKey('reminder-minute-wheel'),
+                          label: 'Minute',
+                          controller: _reminderMinuteController,
+                          itemCount: 60,
+                          selectedValue: _reminderMinute,
+                          onChanged: (minute) =>
+                              _setReminderTime(minute: minute),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_remindersEnabled &&
+                      _notificationPermissionState != 'granted') ...[
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton.icon(
+                        onPressed: _requestingNotificationPermission
+                            ? null
+                            : _requestNotificationPermission,
+                        icon: const Icon(Icons.notifications_active_outlined),
+                        label: Text(
+                          _requestingNotificationPermission
+                              ? 'Checking notification access…'
+                              : 'Turn on reminders',
+                        ),
+                      ),
+                    ),
+                  ],
+                  Text(
+                    _remindersEnabled
+                        ? _notificationPermissionState == 'granted'
+                              ? 'Reminders are scheduled for your selected days and time.'
+                              : 'Turn on reminders for your chosen days and time.'
+                        : 'You can turn reminders on later in Settings.',
+                    style: DesignTokens.body(
+                      11.5,
+                    ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
                   ),
                 ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Expanded(
-                    child: _reminderWheel(
-                      key: const ValueKey('reminder-hour-wheel'),
-                      label: 'Hour',
-                      controller: _reminderHourController,
-                      itemCount: 24,
-                      selectedValue: _reminderHour,
-                      onChanged: (hour) => _setReminderTime(hour: hour),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 28),
-                    child: Text(
-                      ':',
-                      style: DesignTokens.display(
-                        27,
-                      ).copyWith(color: DesignTokens.ink),
-                    ),
-                  ),
-                  Expanded(
-                    child: _reminderWheel(
-                      key: const ValueKey('reminder-minute-wheel'),
-                      label: 'Minute',
-                      controller: _reminderMinuteController,
-                      itemCount: 60,
-                      selectedValue: _reminderMinute,
-                      onChanged: (minute) => _setReminderTime(minute: minute),
-                    ),
-                  ),
-                ],
-              ),
-              if (_remindersEnabled &&
-                  _notificationPermissionState != 'granted') ...[
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    onPressed: _requestingNotificationPermission
-                        ? null
-                        : _requestNotificationPermission,
-                    icon: const Icon(Icons.notifications_active_outlined),
-                    label: Text(
-                      _requestingNotificationPermission
-                          ? 'Checking notification access…'
-                          : 'Turn on reminders',
-                    ),
-                  ),
-                ),
-              ],
-              Text(
-                _remindersEnabled
-                    ? _notificationPermissionState == 'granted'
-                          ? 'Reminders are scheduled for your selected days and time.'
-                          : 'Turn on reminders for your chosen days and time.'
-                    : 'You can turn reminders on later in Settings.',
-                style: DesignTokens.body(
-                  11.5,
-                ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
               ),
             ],
           ),
@@ -1247,11 +1298,10 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               ),
               child: Text(
                 day.$2,
-                style: DesignTokens.body(13, weight: FontWeight.w800).copyWith(
-                  color: _preferredDays.contains(day.$1)
-                      ? Colors.white
-                      : SpeakColors.inkSoft,
-                ),
+                style: DesignTokens.body(
+                  13,
+                  weight: FontWeight.w800,
+                ).copyWith(color: Colors.black),
               ),
             ),
           ),
@@ -1482,54 +1532,61 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
         margin: const EdgeInsets.only(bottom: 11),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? SpeakColors.accentSoft : SpeakColors.surface,
+          color: SpeakColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected ? SpeakColors.accent : SpeakColors.line,
-            width: selected ? 2 : 1,
-          ),
+          border: Border.all(color: SpeakColors.line),
         ),
-        child: Row(
+        child: Stack(
           children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: selected ? SpeakColors.accent : SpeakColors.accentSoft,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                leading,
-                color: selected ? SpeakColors.onAccent : SpeakColors.accent,
-                size: 19,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: DesignTokens.body(14, weight: FontWeight.w700),
+            Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: SpeakColors.accentSoft,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: DesignTokens.body(
-                      12,
-                    ).copyWith(color: SpeakColors.inkSoft),
+                  child: Icon(leading, color: SpeakColors.accent, size: 19),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: DesignTokens.body(14, weight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: SpeakColors.inkSoft),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                Icon(
+                  selected
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: selected ? SpeakColors.accent : SpeakColors.line,
+                  size: 21,
+                ),
+              ],
+            ),
+            if (selected)
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 4,
+                    child: ColoredBox(color: SpeakColors.accent),
+                  ),
+                ),
               ),
-            ),
-            Icon(
-              selected
-                  ? Icons.check_circle_rounded
-                  : Icons.radio_button_unchecked_rounded,
-              color: selected ? SpeakColors.accent : SpeakColors.line,
-              size: 21,
-            ),
           ],
         ),
       ),

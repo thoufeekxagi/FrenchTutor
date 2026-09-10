@@ -46,6 +46,16 @@ const _destinations = [
   ),
 ];
 
+/// Visual preview switch for the floating mobile navigation island.
+///
+/// The product default is intentionally borderless (`none`). To preview the
+/// alternate gold treatment without changing layout code, run with
+/// `--dart-define=PARLESPRINT_NAV_BORDER=gold`.
+const _mobileNavBorderVariant = String.fromEnvironment(
+  'PARLESPRINT_NAV_BORDER',
+  defaultValue: 'none',
+);
+
 class MainTabScreen extends ConsumerStatefulWidget {
   const MainTabScreen({super.key});
 
@@ -133,6 +143,10 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
 
   Widget _mobileIslandNavigation() {
     final night = ref.read(appearanceSettingsProvider).darkMode;
+    final navBorder = switch (_mobileNavBorderVariant.toLowerCase()) {
+      'gold' => Border.all(color: DesignTokens.nightAccent, width: 1.2),
+      _ => null,
+    };
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(12, 0, 12, 8),
@@ -146,11 +160,7 @@ class _MainTabScreenState extends ConsumerState<MainTabScreen> {
               color: (night ? DesignTokens.nightSurface : DesignTokens.surface)
                   .withValues(alpha: night ? 0.72 : 0.78),
               borderRadius: BorderRadius.circular(34),
-              border: Border.all(
-                color:
-                    (night ? DesignTokens.nightHairline : DesignTokens.hairline)
-                        .withValues(alpha: 0.9),
-              ),
+              border: navBorder,
             ),
             child: Row(
               children: [

@@ -39,6 +39,32 @@ String _readyArtifactFor(SpeakSkill skill) {
           ']},"quiz":[{"q":"Ça va ?","choices":["Oui","Non"],"answerIndex":0}],'
           '"audioPath":"user/course/listening.wav",'
           '"audioMode":"gemini_flash_tts"}';
+    case SpeakSkill.grammar:
+      return '{"practiceMode":"guided","session":{'
+          '"id":"grammar-test","title":"Test grammar",'
+          '"subtitle":"Use the pattern.","level":"A1",'
+          '"tense":"Present","grammar_focus":"Present-tense -er verbs",'
+          '"mode":"guided","goal":"Use the pattern.","steps":['
+          '{"label":"One","prompt":"Je ___ ici.",'
+          '"prompt_english":"I speak here.","target":"Je parle ici.",'
+          '"answer":"parle","choices":["parle","parles","parler"],'
+          '"tokens":[],"tip":"Je uses -e."},'
+          '{"label":"Two","prompt":"Tu ___ ici.",'
+          '"prompt_english":"You speak here.","target":"Tu parles ici.",'
+          '"answer":"parles","choices":["parles","parle","parler"],'
+          '"tokens":[],"tip":"Tu uses -es."},'
+          '{"label":"Three","prompt":"Il ___ ici.",'
+          '"prompt_english":"He speaks here.","target":"Il parle ici.",'
+          '"answer":"parle","choices":["parle","parles","parler"],'
+          '"tokens":[],"tip":"Il uses -e."},'
+          '{"label":"Four","prompt":"Nous ___ ici.",'
+          '"prompt_english":"We speak here.","target":"Nous parlons ici.",'
+          '"answer":"parlons","choices":["parlons","parlez","parler"],'
+          '"tokens":[],"tip":"Nous uses -ons."},'
+          '{"label":"Five","prompt":"Ils ___ ici.",'
+          '"prompt_english":"They speak here.","target":"Ils parlent ici.",'
+          '"answer":"parlent","choices":["parlent","parle","parler"],'
+          '"tokens":[],"tip":"Ils uses -ent."}]}}';
     default:
       return '{"practiceMode":"guidedConversation","lines":['
           '{"fr":"Bonjour.","en":"Hello."},'
@@ -65,6 +91,32 @@ void _finishSession(
 }
 
 void main() {
+  test('media buffer adds reading and listening slots for the next unit', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(id: 'media-buffer', goal: 'everyday', level: 'a1');
+
+    var plan = store.ensureMediaBuffer(profile);
+    expect(plan.sessions.where((session) => session.unit == 3), isEmpty);
+    for (final session in plan.sessions.where((session) => session.unit == 2)) {
+      store.markCompleted(session.contentKey);
+    }
+    plan = store.ensureMediaBuffer(profile);
+    final upcoming = plan.sessions
+        .where((session) => session.unit == 3)
+        .toList(growable: false);
+
+    expect(upcoming.map((session) => session.primarySkill), [
+      SpeakSkill.vocabulary,
+      SpeakSkill.reading,
+      SpeakSkill.listening,
+    ]);
+    expect(
+      upcoming.every((session) => session.generationStatus == 'queued'),
+      isTrue,
+    );
+  });
+
   test('listening stays unready until its durable PCM WAV is attached', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
@@ -208,13 +260,13 @@ void main() {
       ),
     );
 
-    // Foundation (1-5) and Unit 2 (6-10) are both authored, permanent
-    // default content for every learner: all ten rows exist immediately,
+    // Foundation (1-5) and Unit 2 (6-11) are both authored, permanent
+    // default content for every learner: all eleven rows exist immediately,
     // no waiting, no AI call.
-    expect(plan.sessions, hasLength(10));
+    expect(plan.sessions, hasLength(11));
     expect(
       plan.sessions.map((session) => session.contentKey).toSet(),
-      hasLength(10),
+      hasLength(11),
     );
     expect(plan.sessions.first.context, contains('Meetings'));
     expect(plan.sessions.every((session) => session.level == 'A1'), isTrue);
@@ -248,23 +300,24 @@ void main() {
     );
     expect(plan.sessions.skip(5).first.unitTitle, isNotEmpty);
     expect(plan.sessions.skip(5).first.title, isNot(contains('Meetings')));
-    // Unit 2's skills are fixed by position (vocabulary, speaking,
-    // reading, listening, writing). Listening's durable audio is a
+    // Unit 2's skills are fixed by position (vocabulary, reading, listening,
+    // writing, speaking, grammar). Listening's durable audio is a
     // single shared asset identical for every learner, so it is ready
     // instantly like the rest of Unit 2 — no server round trip.
     final unitTwo = plan.sessions.skip(5).toList(growable: false);
     expect(unitTwo.map((s) => s.primarySkill), [
       SpeakSkill.vocabulary,
-      SpeakSkill.speaking,
       SpeakSkill.reading,
       SpeakSkill.listening,
       SpeakSkill.writing,
+      SpeakSkill.speaking,
+      SpeakSkill.grammar,
     ]);
     expect(unitTwo.every((s) => s.isContentReady), isTrue);
     final personalizedTitles = unitTwo
         .map((session) => session.title.toLowerCase())
         .toList(growable: false);
-    expect(personalizedTitles.toSet(), hasLength(5));
+    expect(personalizedTitles.toSet(), hasLength(6));
     expect(personalizedTitles, isNot(contains('introduce yourself')));
     expect(personalizedTitles, isNot(contains('introduce yourself naturally')));
   });
@@ -274,7 +327,7 @@ void main() {
     () {
       // The learner's interests still choose the situation/context, but the
       // order of skills within a personalized unit is fixed: vocabulary,
-      // then speaking, reading, listening, writing — regardless of which
+      // then reading, listening, writing, speaking, grammar — regardless of which
       // interests were selected during onboarding.
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
       final plan = store.ensureCurrentPlan(
@@ -287,7 +340,7 @@ void main() {
       );
 
       final personalized = plan.sessions.skip(5).toList(growable: false);
-      expect(personalized, hasLength(5));
+      expect(personalized, hasLength(6));
       expect(personalized.first.primarySkill, SpeakSkill.vocabulary);
       expect(
         plan.sessions.take(4).map((session) => session.primarySkill),
@@ -412,7 +465,7 @@ void main() {
       level: 'a1',
       interests: const ['Speaking'],
     );
-    // Foundation and Unit 2 (sequences 1-10) are authored, not generated, and
+    // Foundation and Unit 2 (sequences 1-11) are authored, not generated, and
     // all exist from the first call — no simulated server completion is
     // needed for them. Complete all of Unit 2 (including the still-unready
     // listening lesson, which a real learner only reaches once its audio is
@@ -423,7 +476,7 @@ void main() {
       store.markCompleted(session.contentKey);
     }
     final first = store.ensureCurrentPlan(profile);
-    expect(first.sessions.last.sequence, 11);
+    expect(first.sessions.last.sequence, 12);
     expect(first.sessions.last.generationStatus, 'queued');
 
     db.execute(
@@ -436,9 +489,9 @@ void main() {
     );
 
     final second = store.ensureCurrentPlan(profile);
-    expect(second.sessions.last.sequence, 12);
+    expect(second.sessions.last.sequence, 13);
     expect(second.sessions.last.generationStatus, 'queued');
-    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 12);
+    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 13);
 
     db.execute(
       "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
@@ -448,11 +501,11 @@ void main() {
         second.sessions.last.id,
       ],
     );
-    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 12);
+    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 13);
 
     store.markCompleted(first.sessions.last.contentKey);
     final replenished = store.ensureCurrentPlan(profile);
-    expect(replenished.sessions.last.sequence, 13);
+    expect(replenished.sessions.last.sequence, 14);
     expect(replenished.sessions.last.generationStatus, 'queued');
   });
 
@@ -475,22 +528,22 @@ void main() {
       );
 
       var plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions, hasLength(10));
-      expect(plan.sessions.where((session) => session.sequence > 10), isEmpty);
+      expect(plan.sessions, hasLength(11));
+      expect(plan.sessions.where((session) => session.sequence > 11), isEmpty);
 
       final unitTwoSpeaking = plan.sessions.firstWhere(
         (session) =>
             session.sequence > 5 &&
-            session.sequence <= 10 &&
+            session.sequence <= 11 &&
             session.primarySkill == SpeakSkill.speaking,
       );
       store.markCompleted(unitTwoSpeaking.contentKey);
 
       plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions.last.sequence, 11);
+      expect(plan.sessions.last.sequence, 12);
       expect(plan.sessions.last.primarySkill, SpeakSkill.speaking);
       expect(
-        plan.sessions.where((session) => session.sequence > 10),
+        plan.sessions.where((session) => session.sequence > 11),
         hasLength(1),
       );
 
@@ -503,18 +556,18 @@ void main() {
         ['speaking', _readyArtifactFor(SpeakSkill.speaking), firstGenerated.id],
       );
       plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions.last.sequence, 11);
+      expect(plan.sessions.last.sequence, 12);
 
       store.markCompleted(firstGenerated.contentKey);
       plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions.last.sequence, 12);
+      expect(plan.sessions.last.sequence, 13);
       expect(plan.sessions.last.primarySkill, SpeakSkill.speaking);
 
       // Keep the same harness connection/path for several more completions;
       // each completion creates exactly one next sequence and nothing else.
       for (
-        var expectedSequence = 12;
-        expectedSequence <= 14;
+        var expectedSequence = 13;
+        expectedSequence <= 15;
         expectedSequence++
       ) {
         final current = plan.sessions.last;
@@ -529,12 +582,91 @@ void main() {
       }
       expect(
         plan.sessions
-            .where((session) => session.sequence > 10)
+            .where((session) => session.sequence > 11)
             .every((session) => session.primarySkill == SpeakSkill.speaking),
         isTrue,
       );
+
+      // A provider/validator failure must not strand the harness lane. The
+      // first failed claim is requeued exactly once; a terminal second
+      // failure remains visible instead of being regenerated on every plan
+      // rebuild.
+      final failed = plan.sessions.last;
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'failed', "
+        'generation_attempts = 1, generation_error = ? WHERE id = ?',
+        ['validator rejected artifact', failed.id],
+      );
+      plan = store.ensureCurrentPlan(profile);
+      final retried = plan.sessions.last;
+      expect(retried.id, failed.id);
+      expect(retried.generationStatus, 'queued');
+      expect(retried.generationAttempts, 1);
+      expect(retried.generationError, 'Retrying failed lesson once');
+
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'failed', "
+        'generation_attempts = 2 WHERE id = ?',
+        [failed.id],
+      );
+      plan = store.ensureCurrentPlan(profile);
+      expect(plan.sessions.last.generationStatus, 'failed');
+      expect(plan.sessions.last.generationAttempts, 2);
     },
   );
+
+  test('grammar harness advances five personalized lessons serially', () {
+    final db = sqlite3.openInMemory();
+    addTearDown(db.dispose);
+    final store = AdaptiveCourseStore(
+      db,
+      generationHarness: const CourseGenerationTestHarness(
+        enabled: true,
+        skill: CourseGenerationHarnessSkill.grammar,
+      ),
+    );
+    final profile = Profile(
+      id: 'grammar-harness',
+      goal: 'everyday',
+      level: 'a1',
+    );
+
+    var plan = store.ensureCurrentPlan(profile);
+    final unitTwoGrammar = plan.sessions.firstWhere(
+      (session) =>
+          session.sequence > 5 &&
+          session.sequence <= 11 &&
+          session.primarySkill == SpeakSkill.grammar,
+    );
+    store.markCompleted(unitTwoGrammar.contentKey);
+
+    for (var completed = 0; completed < 5; completed++) {
+      plan = store.ensureCurrentPlan(profile);
+      final current = plan.sessions.last;
+      expect(current.primarySkill, SpeakSkill.grammar);
+      expect(current.generationStatus, 'queued');
+      db.execute(
+        "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+        'artifact_kind = ?, artifact_json = ? WHERE id = ?',
+        ['grammar', _readyArtifactFor(SpeakSkill.grammar), current.id],
+      );
+      store.markCompleted(current.contentKey);
+    }
+
+    plan = store.ensureCurrentPlan(profile);
+    expect(
+      plan.sessions.where((session) => session.sequence > 11),
+      hasLength(6),
+    );
+    expect(
+      plan.sessions
+          .where((session) => session.sequence > 11)
+          .take(5)
+          .every((session) => session.status == 'completed'),
+      isTrue,
+    );
+    expect(plan.sessions.last.generationStatus, 'queued');
+  });
 
   test(
     'the first two personalized batches stay in a small CEFR practice lane',
@@ -648,9 +780,9 @@ void main() {
       final store = AdaptiveCourseStore(sqlite3.openInMemory());
       final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
       var plan = store.ensureCurrentPlan(profile);
-      // Foundation (1-5) and Unit 2 (6-10) are both authored and fully present
+      // Foundation (1-5) and Unit 2 (6-11) are both authored and fully present
       // immediately.
-      expect(plan.sessions, hasLength(10));
+      expect(plan.sessions, hasLength(11));
 
       // Complete all of Unit 2, as a learner would; real AI-personalized
       // growth (sequence 11+) only begins once it is out of the way.
@@ -658,20 +790,20 @@ void main() {
         store.markCompleted(session.contentKey);
       }
       plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions, hasLength(11));
-      expect(plan.sessions.last.sequence, 11);
+      expect(plan.sessions, hasLength(12));
+      expect(plan.sessions.last.sequence, 12);
       expect(plan.sessions.last.blockIndex, 2);
       expect(plan.sessions.last.blockPosition, 1);
 
       // The personalized route beyond Unit 2 is unlimited: keep completing the
       // newest lesson and asking for the next one. It must keep growing one
       // row at a time instead of stopping.
-      for (var total = 12; total <= 15; total++) {
+      for (var total = 13; total <= 16; total++) {
         store.markCompleted(plan.sessions.last.contentKey);
         plan = store.ensureCurrentPlan(profile);
         expect(plan.sessions, hasLength(total));
       }
-      expect(plan.sessions.last.sequence, 15);
+      expect(plan.sessions.last.sequence, 16);
     },
   );
 
@@ -840,7 +972,7 @@ void main() {
     // ready ahead" reserve, so it never blocks growth into real
     // AI-personalized territory (sequence 11+) — this call grows one more
     // row immediately, regardless of Unit 2's own completion state.
-    expect(after.sessions, hasLength(11));
+    expect(after.sessions, hasLength(12));
   });
 
   test('remote plan and session rows hydrate into the local route', () {

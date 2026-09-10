@@ -1,6 +1,7 @@
 import '../data/database/generated_grammar_story_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../models/grammar_course.dart';
+import '../models/grammar_course_v2.dart';
 import '../models/content_models.dart';
 import '../models/speaking_course.dart';
 import '../models/writing_course.dart';
@@ -58,6 +59,11 @@ abstract final class CourseArtifactCodec {
     if (practiceMode(json, validated.mode.name) != validated.mode.name) {
       throw const FormatException(
         'Course and Grammar Practice modes do not match.',
+      );
+    }
+    if (validated.mode != GrammarV2Mode.guided) {
+      throw const FormatException(
+        'Course Grammar requires the Guided blank-choice mode.',
       );
     }
     return validated;

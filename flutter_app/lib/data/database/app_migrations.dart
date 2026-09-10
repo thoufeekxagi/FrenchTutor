@@ -105,6 +105,10 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   39: _migrationV39,
   40: _migrationV40,
   41: _migrationV41,
+  42: _migrationV42,
+  43: _migrationV43,
+  44: _migrationV44,
+  45: _migrationV45,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1077,6 +1081,132 @@ void _migrationV41(CommonDatabase db) {
     'CREATE INDEX IF NOT EXISTS idx_lesson_audio_decks_cache_key '
     'ON lesson_audio_decks (cache_key)',
   );
+}
+
+/// Validated GPT-authored Liaison cards generated after the learner approaches
+/// the end of the frozen path. Existing curriculum progress remains separate.
+void _migrationV42(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS liaison_generated_lessons (
+      id TEXT PRIMARY KEY,
+      level TEXT NOT NULL,
+      lesson_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_liaison_generated_lessons_level_created '
+    'ON liaison_generated_lessons (level, created_at)',
+  );
+}
+
+/// Freezes the bounded evidence used to generate a Review or Warm-up and
+/// records the generated attempt separately from the normal lesson stores.
+/// The existing learning tables remain the source of truth; these tables are
+/// only the provenance/resume layer for this cross-skill feature.
+void _migrationV43(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS review_plans (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      kind TEXT NOT NULL CHECK (kind IN ('review', 'warmup')),
+      requested_mode TEXT NOT NULL,
+      resolved_mode TEXT NOT NULL,
+      level_band TEXT NOT NULL,
+      goal TEXT NOT NULL DEFAULT '',
+      duration_minutes INTEGER NOT NULL DEFAULT 10,
+      topic TEXT NOT NULL DEFAULT '',
+      source_fingerprint TEXT NOT NULL,
+      brief_json TEXT NOT NULL,
+      generated_json TEXT,
+      status TEXT NOT NULL DEFAULT 'planned',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_review_plans_kind_status '
+    'ON review_plans (kind, status, created_at DESC)',
+  );
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS review_plan_targets (
+      id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL,
+      target_key TEXT NOT NULL,
+      target_type TEXT NOT NULL,
+      display_text TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      priority REAL NOT NULL DEFAULT 0,
+      source_ids_json TEXT NOT NULL DEFAULT '[]',
+      evidence_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_review_plan_targets_plan '
+    'ON review_plan_targets (plan_id, priority DESC)',
+  );
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS review_attempts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      plan_id TEXT NOT NULL,
+      activity_id TEXT,
+      session_id TEXT,
+      mode TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'started',
+      score REAL,
+      result_json TEXT,
+      started_at TEXT NOT NULL,
+      completed_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_review_attempts_plan_started '
+    'ON review_attempts (plan_id, started_at DESC)',
+  );
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_review_attempts_session '
+    'ON review_attempts (session_id)',
+  );
+}
+
+/// A local, replaceable projection used to make Review open quickly after a
+/// Course or Practice completion. The normal learning tables remain the source
+/// of truth; this cache is safe to rebuild or discard at any time.
+void _migrationV44(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS review_context_cache (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      source_fingerprint TEXT NOT NULL,
+      dossier_json TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_review_context_cache_updated '
+    'ON review_context_cache (updated_at DESC)',
+  );
+}
+
+/// Adds recency metadata to the legacy mistake aggregate. Older rows remain
+/// intentionally unscoped; Review must not treat them as evidence for a new
+/// recent-session window.
+void _migrationV45(CommonDatabase db) {
+  if (_tableExists(db, 'mistake_tags') &&
+      !_columnExists(db, 'mistake_tags', 'updated_at')) {
+    db.execute('ALTER TABLE mistake_tags ADD COLUMN updated_at TEXT');
+  }
 }
 
 /// Dedicated local history for exam-readiness practice. This is intentionally

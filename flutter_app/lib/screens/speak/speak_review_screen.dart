@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/generated_story_store.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../flow/stage_outcome.dart';
 import '../../models/content_models.dart';
+import '../../models/writing_course.dart';
 import '../../providers/database_provider.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_audio_deck_service.dart';
@@ -15,40 +17,60 @@ import '../../services/review_material_service.dart';
 import '../../widgets/speaking_transcript_strip.dart';
 import '../lessons/listening_practice_screen.dart';
 import '../lessons/story_reader_screen.dart';
-import '../labs/writing_lab_screen.dart';
+import '../lessons/writing_course_lesson_screen.dart';
 import 'speak_ui.dart';
+import 'speaking_lesson_flow_screen.dart';
 import 'speaking_practice_screen.dart';
+import 'smart_review_lesson_screen.dart';
 
-/// The four outputs a learner can request from a cross-app review.
+/// The output formats a learner can request from a cross-app plan.
 /// Every mode uses the same universal learner evidence; only the activity
 /// format changes.
-enum SpeakReviewMode { speaking, reading, listening, writing }
+enum SpeakReviewMode { smart, speaking, reading, listening, writing }
 
 class SpeakReviewScreen extends ConsumerStatefulWidget {
-  const SpeakReviewScreen({super.key});
+  const SpeakReviewScreen({super.key, this.kind = 'review', this.initialMode});
+
+  final String kind;
+  final SpeakReviewMode? initialMode;
 
   @override
   ConsumerState<SpeakReviewScreen> createState() => _SpeakReviewScreenState();
 }
 
 class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
-  var _mode = SpeakReviewMode.speaking;
+  var _mode = SpeakReviewMode.smart;
+
+  @override
+  void initState() {
+    super.initState();
+    _mode = widget.initialMode ?? SpeakReviewMode.smart;
+  }
 
   @override
   Widget build(BuildContext context) {
     final sessions = ReviewMaterialService.recentSessions(
       ref.watch(storageServiceProvider),
     );
-    final plan = ReviewMaterialService.buildPersonalizedPlan(
-      db: ref.watch(databaseProvider),
-      profile: ref.watch(learningStoreProvider).profile(),
-      mode: _modeLabel(_mode),
-    );
-    final canStart = plan.hasEvidence || sessions.isNotEmpty;
+    final plan = widget.kind == 'warmup'
+        ? ReviewMaterialService.buildWarmupPlan(
+            db: ref.watch(databaseProvider),
+            profile: ref.watch(learningStoreProvider).profile(),
+            mode: _modeLabel(_mode),
+          )
+        : ReviewMaterialService.buildPersonalizedPlan(
+            db: ref.watch(databaseProvider),
+            profile: ref.watch(learningStoreProvider).profile(),
+            mode: _modeLabel(_mode),
+          );
+    final canStart = widget.kind == 'warmup'
+        ? plan.futureContext != null || plan.hasEvidence
+        : plan.hasEvidence || sessions.isNotEmpty;
+    final isWarmup = widget.kind == 'warmup';
 
     return SpeakScaffold(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 36),
         children: [
           SpeakHeader(
             leading: GestureDetector(
@@ -63,144 +85,376 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                 ),
               ),
             ),
-            title: 'Review',
-            subtitle: 'Revisit the French from your latest practice.',
+            title: isWarmup ? 'Warm-up' : 'Review',
+            subtitle: isWarmup
+                ? 'A quick start before your next lesson.'
+                : 'Keep the French you have already learned active.',
           ),
-          const SizedBox(height: 20),
-          const SpeakSectionTitle(title: 'Choose how to review'),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 40,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: SpeakReviewMode.values.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final mode = SpeakReviewMode.values[index];
-                return _modePill(mode, _modeLabel(mode), _modeIcon(mode));
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          SpeakCard(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: SpeakColors.accentSoft,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        Icons.bolt_rounded,
-                        color: SpeakColors.accent,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Smart Review',
-                            style: DesignTokens.body(
-                              16,
-                              weight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            'Built from your 20 most recent Course + Practice sessions.',
-                            style: DesignTokens.body(
-                              12,
-                            ).copyWith(color: SpeakColors.inkSoft),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                SpeakProgressBar(value: (sessions.length / 20).clamp(0.0, 1.0)),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Text(
-                      '${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'} ready',
-                      style: DesignTokens.body(12, weight: FontWeight.w600),
-                    ),
-                    const Spacer(),
-                    Text(
-                      canStart ? '5 min' : 'Practice first',
-                      style: DesignTokens.body(
-                        12,
-                      ).copyWith(color: SpeakColors.inkSoft),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  plan.focusLabel,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.body(
-                    12,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: SpeakColors.inkSoft),
-                ),
-                const SizedBox(height: 16),
-                SpeakPrimaryButton(
-                  label: 'Start review',
-                  icon: Icons.arrow_forward_rounded,
-                  onTap: canStart
-                      ? () => AppRouter.push(
-                          context,
-                          (_) =>
-                              SpeakReviewLaunchScreen(mode: _mode, plan: plan),
-                          fullscreenDialog: true,
-                        )
-                      : null,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 26),
-          const SpeakSectionTitle(title: 'Recent practice'),
-          const SizedBox(height: 12),
-          if (sessions.isEmpty)
-            const SpeakCard(
-              child: Text(
-                'Finish a practice session and its summary will appear here.',
-              ),
-            )
-          else
-            SpeakCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  for (var i = 0; i < sessions.length; i++) ...[
-                    if (i > 0) Divider(height: 1, color: SpeakColors.line),
-                    _materialRow(sessions[i]),
-                  ],
-                ],
-              ),
-            ),
+          const SizedBox(height: 24),
+          _formatSection(),
+          const SizedBox(height: 18),
+          _planCard(context, plan, sessions, canStart, isWarmup),
+          const SizedBox(height: 28),
+          _recentPractice(sessions),
+          if (sessions.isNotEmpty) ...[
+            const SizedBox(height: 22),
+            _retrySavedPractice(sessions),
+          ],
         ],
       ),
     );
   }
 
-  Widget _modePill(SpeakReviewMode mode, String label, IconData icon) {
-    return SpeakPill(
-      label: label,
-      icon: icon,
-      selected: _mode == mode,
-      onTap: () => setState(() => _mode = mode),
+  Widget _formatSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'PRACTICE FORMAT',
+          style: DesignTokens.body(
+            11,
+            weight: FontWeight.w800,
+          ).copyWith(color: SpeakColors.accent, letterSpacing: 1.6),
+        ),
+        const SizedBox(height: 5),
+        Text('How do you want to practise?', style: DesignTokens.display(22)),
+        const SizedBox(height: 12),
+        Container(
+          height: 58,
+          decoration: BoxDecoration(
+            color: SpeakColors.surface,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: SpeakColors.line),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 4,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: SpeakColors.accent,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ),
+              DropdownButtonHideUnderline(
+                child: DropdownButton<SpeakReviewMode>(
+                  value: _mode,
+                  isExpanded: true,
+                  padding: const EdgeInsets.only(left: 17),
+                  icon: Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: SpeakColors.accent,
+                      size: 24,
+                    ),
+                  ),
+                  dropdownColor: SpeakColors.surface,
+                  borderRadius: BorderRadius.circular(15),
+                  selectedItemBuilder: (context) => [
+                    for (final mode in SpeakReviewMode.values)
+                      _formatMenuItem(mode, selected: true, showCheck: false),
+                  ],
+                  items: [
+                    for (final mode in SpeakReviewMode.values)
+                      DropdownMenuItem<SpeakReviewMode>(
+                        value: mode,
+                        child: _formatMenuItem(mode),
+                      ),
+                  ],
+                  onChanged: (mode) {
+                    if (mode != null) setState(() => _mode = mode);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _formatMenuItem(
+    SpeakReviewMode mode, {
+    bool selected = false,
+    bool showCheck = true,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          _modeIcon(mode),
+          size: 19,
+          color: selected ? SpeakColors.accent : SpeakColors.inkSoft,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            _modeLabel(mode),
+            style: DesignTokens.body(14, weight: FontWeight.w700).copyWith(
+              color: selected ? SpeakColors.accent : SpeakColors.inkSoft,
+            ),
+          ),
+        ),
+        if (selected && showCheck)
+          Icon(Icons.check_rounded, color: SpeakColors.accent, size: 18),
+      ],
+    );
+  }
+
+  Widget _planCard(
+    BuildContext context,
+    PersonalizedReviewPlan plan,
+    List<ReviewSessionSummary> sessions,
+    bool canStart,
+    bool isWarmup,
+  ) {
+    final focusItems = _focusItems(plan);
+    return Container(
+      decoration: BoxDecoration(
+        color: SpeakColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: SpeakColors.line),
+      ),
+      // The accent is an attached edge of the card, as in the smart-review
+      // generation state; clipping keeps it inside the rounded surface.
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(width: 5, color: SpeakColors.accent),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 19, 18, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          isWarmup
+                              ? Icons.auto_awesome_rounded
+                              : Icons.replay_rounded,
+                          size: 18,
+                          color: SpeakColors.accent,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isWarmup
+                              ? 'COURSE WINDOW PREVIEW'
+                              : 'PERSONAL REVIEW',
+                          style: DesignTokens.body(10, weight: FontWeight.w800)
+                              .copyWith(
+                                color: SpeakColors.accent,
+                                letterSpacing: 1.35,
+                              ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${plan.durationMinutes} min',
+                          style: DesignTokens.body(
+                            12,
+                            weight: FontWeight.w700,
+                          ).copyWith(color: SpeakColors.inkSoft),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 13),
+                    Text(
+                      isWarmup
+                          ? 'Get ready for what’s next'
+                          : 'Review what matters',
+                      style: DesignTokens.display(24),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      isWarmup
+                          ? 'A short preview built from the next available Course lessons.'
+                          : 'A focused lesson built from your recent Course and Practice history.',
+                      style: DesignTokens.body(
+                        13,
+                      ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+                    ),
+                    const SizedBox(height: 17),
+                    Text(
+                      isWarmup ? 'YOU’LL PREVIEW' : 'YOU’LL REVISIT',
+                      style: DesignTokens.body(10, weight: FontWeight.w800)
+                          .copyWith(
+                            color: SpeakColors.inkSoft,
+                            letterSpacing: 1.2,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    for (final item in focusItems) ...[
+                      _focusRow(item),
+                      if (item != focusItems.last) const SizedBox(height: 7),
+                    ],
+                    if (focusItems.isEmpty)
+                      Text(
+                        plan.focusLabel,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: SpeakColors.inkSoft),
+                      ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.layers_outlined,
+                          size: 16,
+                          color: SpeakColors.inkSoft,
+                        ),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: Text(
+                            isWarmup
+                                ? 'Based on ${plan.futureSessionIds.length} upcoming Course lesson${plan.futureSessionIds.length == 1 ? '' : 's'}'
+                                : '${sessions.length} recent sessions available',
+                            style: DesignTokens.body(
+                              11,
+                            ).copyWith(color: SpeakColors.inkSoft),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    SpeakPrimaryButton(
+                      label: isWarmup ? 'Start warm-up' : 'Start review',
+                      icon: Icons.arrow_forward_rounded,
+                      onTap: canStart
+                          ? () => AppRouter.push(
+                              context,
+                              (_) => SpeakReviewLaunchScreen(
+                                mode: _mode,
+                                plan: plan,
+                              ),
+                              fullscreenDialog: true,
+                            )
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<String> _focusItems(PersonalizedReviewPlan plan) {
+    if (plan.kind == 'warmup' && plan.futureLessonSummaries.isNotEmpty) {
+      return plan.futureLessonSummaries.take(3).toList(growable: false);
+    }
+    final targetItems = plan.targets
+        .map((target) => target.text.trim())
+        .where((text) => text.isNotEmpty)
+        .take(3)
+        .toList(growable: false);
+    if (targetItems.isNotEmpty) return targetItems;
+    return [...plan.retrievalTargets, ...plan.hardSignals]
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .take(3)
+        .toList();
+  }
+
+  Widget _focusRow(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(Icons.check_rounded, size: 15, color: SpeakColors.accent),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: DesignTokens.body(13, weight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _recentPractice(List<ReviewSessionSummary> sessions) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text('Recent practice', style: DesignTokens.display(20)),
+            ),
+            if (sessions.isNotEmpty)
+              Text(
+                '${sessions.length} saved',
+                style: DesignTokens.body(
+                  11,
+                  weight: FontWeight.w700,
+                ).copyWith(color: SpeakColors.inkSoft),
+              ),
+          ],
+        ),
+        const SizedBox(height: 11),
+        if (sessions.isEmpty)
+          const SpeakCard(
+            child: Text('Finish a practice session to build your review list.'),
+          )
+        else
+          _sessionListCard(sessions, label: 'Open saved practice'),
+      ],
+    );
+  }
+
+  Widget _retrySavedPractice(List<ReviewSessionSummary> sessions) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Retry a saved session', style: DesignTokens.display(20)),
+        const SizedBox(height: 6),
+        Text(
+          'Open the exercise details, then practise the same skill again.',
+          style: DesignTokens.body(13).copyWith(color: SpeakColors.inkSoft),
+        ),
+        const SizedBox(height: 11),
+        _sessionListCard(sessions, label: 'Open and practise again'),
+      ],
+    );
+  }
+
+  Widget _sessionListCard(
+    List<ReviewSessionSummary> sessions, {
+    required String label,
+  }) {
+    final visible = sessions.take(20).toList(growable: false);
+    final height = visible.length <= 4 ? visible.length * 78.0 : 320.0;
+    return Semantics(
+      label: '$label, ${visible.length} sessions',
+      child: SpeakCard(
+        padding: EdgeInsets.zero,
+        child: SizedBox(
+          height: height,
+          child: ListView.separated(
+            primary: false,
+            padding: EdgeInsets.zero,
+            itemCount: visible.length,
+            separatorBuilder: (_, _) =>
+                Divider(height: 1, color: SpeakColors.line),
+            itemBuilder: (context, index) => _materialRow(visible[index]),
+          ),
+        ),
+      ),
     );
   }
 
@@ -211,26 +465,35 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
       'Exam speaking',
     }.contains(session.skill);
     return Semantics(
-      button: isSpeaking,
-      label: isSpeaking
-          ? 'Open saved transcript for ${session.displayTitle}'
-          : '${session.skill} ${session.displayTitle}',
+      button: true,
+      label: 'Open saved ${session.skill} practice for ${session.displayTitle}',
       child: InkWell(
-        onTap: isSpeaking
-            ? () => AppRouter.push(
-                context,
-                (_) => SavedSpeakingTranscriptScreen(session: session),
-              )
-            : null,
+        onTap: () => AppRouter.push(
+          context,
+          (_) => isSpeaking
+              ? SavedSpeakingTranscriptScreen(session: session)
+              : SavedPracticeSessionScreen(session: session),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                session.summary,
+                session.displaySummary,
                 style: DesignTokens.body(14, weight: FontWeight.w700),
               ),
+              if (session.details.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  session.details.first,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: DesignTokens.body(
+                    12,
+                  ).copyWith(color: SpeakColors.inkSoft),
+                ),
+              ],
               const SizedBox(height: 4),
               Row(
                 children: [
@@ -244,12 +507,11 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
                       ).copyWith(color: SpeakColors.inkSoft),
                     ),
                   ),
-                  if (isSpeaking)
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 14,
-                      color: SpeakColors.inkSoft,
-                    ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: SpeakColors.inkSoft,
+                  ),
                 ],
               ),
             ],
@@ -260,6 +522,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
   }
 
   String _modeLabel(SpeakReviewMode mode) => switch (mode) {
+    SpeakReviewMode.smart => 'Smart',
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
     SpeakReviewMode.reading => 'Reading',
@@ -267,6 +530,7 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
+    SpeakReviewMode.smart => Icons.auto_awesome_rounded,
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
     SpeakReviewMode.reading => Icons.menu_book_rounded,
@@ -437,6 +701,173 @@ class _SavedSpeakingTranscriptScreenState
   }
 }
 
+/// Read-only history surface for every non-speaking session.  Course rows
+/// used to be headings only; the Review projection now supplies the saved
+/// turns and generated activity payload so a learner can verify what they
+/// actually practised before choosing to retry it.
+class SavedPracticeSessionScreen extends ConsumerWidget {
+  const SavedPracticeSessionScreen({super.key, required this.session});
+
+  final ReviewSessionSummary session;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storage = ref.watch(storageServiceProvider);
+    final messages = storage.getSessionMessages(sessionId: session.sessionId);
+    final details = session.details;
+    final turnsAlreadyIncluded = details.any(
+      (value) => value.startsWith('Learner:') || value.startsWith('Tutor:'),
+    );
+    return Scaffold(
+      backgroundColor: DesignTokens.nightCanvas,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: DesignTokens.nightText,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      'Saved practice',
+                      style: DesignTokens.display(
+                        21,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                  ),
+                  Text(
+                    session.skill,
+                    style: DesignTokens.body(
+                      12,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightAccent),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                children: [
+                  Text(
+                    session.displayTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.display(
+                      25,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    session.displaySummary,
+                    style: DesignTokens.body(
+                      13,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'WHAT YOU PRACTISED',
+                    style: DesignTokens.body(11, weight: FontWeight.w800)
+                        .copyWith(
+                          color: DesignTokens.nightAccent,
+                          letterSpacing: 1.4,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  if (details.isEmpty && messages.isEmpty)
+                    _detailCard('No saved exercise details for this session.')
+                  else ...[
+                    for (final detail in details) ...[
+                      _detailCard(detail),
+                      const SizedBox(height: 8),
+                    ],
+                    if (messages.isNotEmpty && !turnsAlreadyIncluded) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'SAVED TURNS',
+                        style: DesignTokens.body(11, weight: FontWeight.w800)
+                            .copyWith(
+                              color: DesignTokens.nightAccent,
+                              letterSpacing: 1.4,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      for (final message in messages.take(20)) ...[
+                        _detailCard(
+                          '${message.isUser ? 'Learner' : 'Tutor'}: ${message.content}',
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ],
+                  ],
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: () => AppRouter.push(
+                        context,
+                        (_) => SpeakReviewScreen(
+                          initialMode: _modeFor(session.skill),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: DesignTokens.nightAccent,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        'Practice again',
+                        style: DesignTokens.body(
+                          15,
+                          weight: FontWeight.w800,
+                        ).copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailCard(String text) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: DesignTokens.nightSurface,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: DesignTokens.nightHairline),
+    ),
+    child: Text(
+      text,
+      style: DesignTokens.body(13).copyWith(color: DesignTokens.nightText),
+    ),
+  );
+
+  SpeakReviewMode _modeFor(String skill) => switch (skill.toLowerCase()) {
+    'reading' || 'exam reading' => SpeakReviewMode.reading,
+    'listening' || 'exam listening' => SpeakReviewMode.listening,
+    'writing' || 'exam writing' => SpeakReviewMode.writing,
+    'speaking' || 'roleplay' || 'exam speaking' => SpeakReviewMode.speaking,
+    _ => SpeakReviewMode.smart,
+  };
+}
+
 /// Generates the selected review format from the universal learner snapshot,
 /// then hands off to the same lesson screens used everywhere else.
 class SpeakReviewLaunchScreen extends ConsumerStatefulWidget {
@@ -458,6 +889,8 @@ class _SpeakReviewLaunchScreenState
     extends ConsumerState<SpeakReviewLaunchScreen> {
   String? _error;
   bool _running = false;
+  String? _planId;
+  String? _attemptId;
 
   @override
   void initState() {
@@ -469,11 +902,67 @@ class _SpeakReviewLaunchScreenState
     if (_running) return;
     _running = true;
     try {
-      switch (widget.mode) {
+      final store = ref.read(reviewStoreProvider);
+      _planId ??= store.createPlan(
+        kind: widget.plan.kind,
+        requestedMode: widget.plan.requestedMode,
+        resolvedMode: widget.plan.mode,
+        levelBand: widget.plan.levelBand,
+        goal: widget.plan.learnerGoal,
+        durationMinutes: widget.plan.durationMinutes,
+        topic: widget.plan.topic,
+        sourceFingerprint: widget.plan.snapshot.fingerprint,
+        brief: widget.plan.briefJson,
+      );
+      // Review-only intelligence runs after the durable plan exists. If the
+      // model call fails, the Review route reports the failure, while Course,
+      // Practice, and their already-saved evidence remain untouched.
+      final blueprint = await LessonAgentService.shared.composeReviewBlueprint(
+        plan: widget.plan,
+      );
+      final effectiveMode = _resolvedMode(widget.mode);
+      final teachingContext = _teachingContext(blueprint);
+      store.updateResolvedMode(_planId!, blueprint.mode);
+      store.markGenerated(_planId!, {
+        'kind': widget.plan.kind,
+        'mode': blueprint.mode,
+        'composer': blueprint.toJson(),
+        'composerInput': {
+          'provider': 'openrouter',
+          'model': 'openai/gpt-5.6-luna',
+          'requestedMode': widget.plan.requestedMode,
+          'resolvedModeBeforeComposer': widget.plan.mode,
+          'sourceFingerprint': widget.plan.snapshot.fingerprint,
+          'sourceSessionIds': widget.plan.sourceSessionIds
+              .take(24)
+              .toList(growable: false),
+          'recentSessionCount': widget.plan.snapshot.evidence.length,
+          'transcriptExcerptCount':
+              widget.plan.snapshot.transcriptExcerpts.length,
+          'vocabularySignalCount':
+              widget.plan.snapshot.vocabularySignals.length,
+          'performanceSignalCount':
+              widget.plan.snapshot.performanceSignals.length,
+          'repeatedMistakeCount': widget.plan.snapshot.repeatedMistakes.length,
+          'dossierPolicy': 'recent-session-scoped; optional evidence trimmed',
+        },
+        'sourceFingerprint': widget.plan.snapshot.fingerprint,
+      });
+      _attemptId ??= store.startAttempt(planId: _planId!, mode: blueprint.mode);
+      switch (effectiveMode) {
+        case SpeakReviewMode.smart:
+          await _startSmartReview(
+            blueprint: blueprint,
+            teachingContext: teachingContext,
+          );
         case SpeakReviewMode.speaking:
-          await _startSpeakingReview();
+          await _startSpeakingReview(blueprint: blueprint);
         case SpeakReviewMode.listening:
-          final story = await _generateStory(listening: true);
+          final story = await _generateStory(
+            listening: true,
+            teachingContext: teachingContext,
+            topic: blueprint.topic,
+          );
           if (!mounted) return;
           await AppRouter.push(
             context,
@@ -481,7 +970,11 @@ class _SpeakReviewLaunchScreenState
             fullscreenDialog: true,
           );
         case SpeakReviewMode.reading:
-          final story = await _generateStory(listening: false);
+          final story = await _generateStory(
+            listening: false,
+            teachingContext: teachingContext,
+            topic: blueprint.topic,
+          );
           if (!mounted) return;
           await AppRouter.push(
             context,
@@ -489,20 +982,20 @@ class _SpeakReviewLaunchScreenState
             fullscreenDialog: true,
           );
         case SpeakReviewMode.writing:
-          if (!mounted) return;
-          await AppRouter.push(
-            context,
-            (_) => WritingLabScreen(
-              autoStart: true,
-              topic: widget.plan.topic,
-              contextPrompt: widget.plan.contextPrompt,
-            ),
-            fullscreenDialog: true,
+          await _openWritingReview(
+            blueprint: blueprint,
+            teachingContext: teachingContext,
           );
+      }
+      if (_attemptId != null) {
+        store.completeAttempt(_attemptId!);
       }
       if (mounted) Navigator.of(context).pop();
     } catch (error, stackTrace) {
       debugPrint('Review launch failed: $error\n$stackTrace');
+      if (_planId != null) {
+        ref.read(reviewStoreProvider).markPlanFailed(_planId!, error);
+      }
       if (mounted) {
         setState(() {
           _running = false;
@@ -512,10 +1005,187 @@ class _SpeakReviewLaunchScreenState
     }
   }
 
-  Future<GeneratedStory> _generateStory({required bool listening}) async {
+  Future<void> _startSmartReview({
+    required ReviewBlueprint blueprint,
+    required String teachingContext,
+  }) async {
+    // Smart Review is one transaction. Prepare each child lesson once, then
+    // pass the immutable artifacts into the sequence screen. Tapping a block
+    // later can only open an existing artifact; it can never generate another
+    // story or listening lesson.
+    final readingFuture = _generateStory(
+      listening: false,
+      teachingContext: teachingContext,
+      topic: blueprint.topic,
+    );
+    final listeningFuture = _generateStory(
+      listening: true,
+      teachingContext: teachingContext,
+      topic: blueprint.topic,
+    );
+    final writingFuture = _generateWritingReview(
+      blueprint: blueprint,
+      teachingContext: teachingContext,
+    );
+    final reading = await readingFuture;
+    final listening = await listeningFuture;
+    final writing = await writingFuture;
+    if (!mounted) return;
+    await AppRouter.push(
+      context,
+      (_) => SmartReviewLessonScreen(
+        blueprint: blueprint,
+        reading: reading,
+        listening: listening,
+        writing: writing,
+        onSpeaking: () => _openGuidedSpeaking(blueprint),
+        onReading: () => _openReadingStory(reading),
+        onListening: () => _openListeningStory(listening),
+        onWriting: () => _openWritingLesson(writing),
+      ),
+      fullscreenDialog: true,
+    );
+  }
+
+  Future<bool> _openWritingReview({
+    required ReviewBlueprint blueprint,
+    required String teachingContext,
+  }) async {
+    final lesson = await _generateWritingReview(
+      blueprint: blueprint,
+      teachingContext: teachingContext,
+    );
+    return _openWritingLesson(lesson);
+  }
+
+  Future<WritingCourseLesson> _generateWritingReview({
+    required ReviewBlueprint blueprint,
+    required String teachingContext,
+  }) async {
     final profile = ref.read(learningStoreProvider).profile();
     final level = _levelFor(profile.level);
-    final topic = widget.plan.topic;
+    final learningStore = ref.read(learningStoreProvider);
+    final content = ref.read(contentServiceProvider);
+    final currentLessons = ref
+        .read(writingLessonStoreProvider)
+        .list(level: level);
+    final lesson = await ref
+        .read(lessonAgentServiceProvider)
+        .generateWritingCourseLesson(
+          mode: WritingCourseMode.guided,
+          levelBand: level,
+          learnerGoal: profile.goal,
+          interests: profile.interests,
+          knownVocab: content.knownVocabWords(learningStore.allSRSStates()),
+          mistakeTags: [
+            for (final mistake in learningStore.topMistakeTags(limit: 5))
+              (
+                tag: mistake.tag,
+                description: mistake.description,
+                count: mistake.count,
+              ),
+          ],
+          avoidTitles: [
+            ...currentLessons.map((item) => item.title),
+            blueprint.title,
+          ],
+          contextPrompt: teachingContext,
+        );
+    // Keep the validated Course lesson in the same durable Writing catalog as
+    // every other generated Course lesson. The review ledger separately
+    // records that this artifact was created for this Review attempt.
+    ref.read(writingLessonStoreProvider).insertGenerated(lesson);
+    if (_planId != null) {
+      ref.read(reviewStoreProvider).markGenerated(_planId!, {
+        'kind': widget.plan.kind,
+        'mode': 'writing',
+        'topic': blueprint.topic,
+        'activityId': lesson.id,
+        'courseLesson': lesson.toJson(),
+        'sourceFingerprint': widget.plan.snapshot.fingerprint,
+      });
+    }
+    return lesson;
+  }
+
+  Future<bool> _openWritingLesson(WritingCourseLesson lesson) async {
+    if (!mounted) return false;
+    final result = await AppRouter.push<bool>(
+      context,
+      (_) => WritingCourseLessonScreen(lesson: lesson),
+      fullscreenDialog: true,
+    );
+    return result == true;
+  }
+
+  Future<bool> _openReadingStory(GeneratedStory story) async {
+    if (!mounted) return false;
+    final result = await AppRouter.push<StoryReaderResult>(
+      context,
+      (_) => StoryReaderScreen(
+        story: story,
+        showFinishButton: true,
+        generateCoverIfMissing: true,
+      ),
+      fullscreenDialog: true,
+    );
+    return result != null;
+  }
+
+  Future<bool> _openListeningStory(GeneratedStory story) async {
+    if (!mounted) return false;
+    final result = await AppRouter.push<bool>(
+      context,
+      (_) => ListeningPracticeScreen(
+        story: story,
+        showFinishButton: true,
+        courseContentKey: 'review_listening_${story.id}',
+      ),
+      fullscreenDialog: true,
+    );
+    return result == true;
+  }
+
+  Future<bool> _openGuidedSpeaking(ReviewBlueprint blueprint) async {
+    final profile = ref.read(learningStoreProvider).profile();
+    final level = _levelFor(profile.level);
+    final steps = speakingStepsForReviewTargets(
+      blueprint.speakingTargets.map(
+        (target) =>
+            (french: target.french, english: target.english, tip: target.tip),
+      ),
+      level: level,
+    );
+    if (!mounted) return false;
+    final result = await AppRouter.push<SpeakingResult>(
+      context,
+      (_) => SpeakingLessonFlowScreen(
+        title: blueprint.title,
+        topic: blueprint.topic,
+        level: level,
+        contentKey: 'review_speaking_${DateTime.now().microsecondsSinceEpoch}',
+        steps: steps,
+      ),
+      fullscreenDialog: true,
+    );
+    return result?.connected == true;
+  }
+
+  String _teachingContext(ReviewBlueprint blueprint) {
+    return '''
+${widget.plan.contextPrompt}
+
+${blueprint.teachingContext}
+''';
+  }
+
+  Future<GeneratedStory> _generateStory({
+    required bool listening,
+    required String teachingContext,
+    required String topic,
+  }) async {
+    final profile = ref.read(learningStoreProvider).profile();
+    final level = _levelFor(profile.level);
     final existingStories = ref.read(generatedStoryStoreProvider).list();
     final avoidTitles = existingStories.map((story) => story.title);
     final avoidOpenings = existingStories.map(
@@ -526,14 +1196,14 @@ class _SpeakReviewLaunchScreenState
         ? await LessonAgentService.shared.buildListeningStoryBook(
             topic: topic,
             levelBand: level,
-            contextPrompt: widget.plan.contextPrompt,
+            contextPrompt: teachingContext,
             avoidTitles: avoidTitles,
             avoidOpenings: avoidOpenings,
           )
         : await LessonAgentService.shared.buildReadingStoryBook(
             topic: topic,
             levelBand: level,
-            contextPrompt: widget.plan.contextPrompt,
+            contextPrompt: teachingContext,
             avoidTitles: avoidTitles,
             avoidOpenings: avoidOpenings,
           );
@@ -550,6 +1220,16 @@ class _SpeakReviewLaunchScreenState
       practiceMode: listening ? 'listening' : 'reading',
     );
     ref.read(generatedStoryStoreProvider).insert(story);
+    if (_planId != null) {
+      ref.read(reviewStoreProvider).markGenerated(_planId!, {
+        'kind': widget.plan.kind,
+        'mode': listening ? 'listening' : 'reading',
+        'activityId': story.id,
+        'title': story.title,
+        'topic': story.topic,
+        'sourceFingerprint': widget.plan.snapshot.fingerprint,
+      });
+    }
     unawaited(_prewarmStory(story));
     unawaited(_attachStoryCover(story, package.coverPrompt));
     return story;
@@ -584,44 +1264,26 @@ class _SpeakReviewLaunchScreenState
     }
   }
 
-  String _reviewTopic() {
-    return widget.plan.contextPrompt;
+  Future<void> _startSpeakingReview({
+    required ReviewBlueprint blueprint,
+  }) async {
+    if (_planId != null) {
+      ref.read(reviewStoreProvider).markGenerated(_planId!, {
+        'kind': widget.plan.kind,
+        'mode': 'speaking',
+        'topic': widget.plan.topic,
+        'sourceFingerprint': widget.plan.snapshot.fingerprint,
+      });
+    }
+    await _openGuidedSpeaking(blueprint);
   }
 
-  Future<void> _startSpeakingReview() async {
-    final profile = ref.read(learningStoreProvider).profile();
-    final level = _levelFor(profile.level);
-    await AppRouter.push(
-      context,
-      (_) => SpeakingPracticeScreen(
-        autoStart: true,
-        request: SpeakingPracticeRequest(
-          mode: SpeakingMode.roleplay,
-          topic: widget.plan.topic,
-          level: level,
-          goal: 'Fluency',
-          stage: 'speaking',
-          sessionTopic: 'Personalized speaking review',
-          contentKey:
-              'review_speaking_${DateTime.now().microsecondsSinceEpoch}',
-          lessonContext:
-              '''
-${_reviewTopic()}
-
-SPEAKING REVIEW CONTRACT
-- Keep the interaction in a realistic French situation chosen from the recent history.
-- Start with one short, level-appropriate prompt; do not dump a lesson or a list of questions.
-- Let the learner answer before correcting.
-- After each answer, give one concise correction and one stronger reusable phrase.
-- Use English support only for A1/A2 when it prevents confusion. For B1/B2, keep the review in French.
-- Finish with a short spoken recap of the learner's strongest improvement and next priority.
-''',
-          kickoffMessage:
-              '(App instruction, not the student: begin a personalized $level speaking review from the learner history. Ask one short question in French and wait for the learner.)',
-        ),
-      ),
-      fullscreenDialog: true,
-    );
+  SpeakReviewMode _resolvedMode(SpeakReviewMode requested) {
+    // The local planner owns the route. In particular, Smart must never be
+    // reinterpreted as Speaking merely because the model included speaking
+    // targets in the mixed blueprint.
+    if (requested == SpeakReviewMode.smart) return SpeakReviewMode.smart;
+    return requested;
   }
 
   String _levelFor(String raw) {
@@ -649,51 +1311,76 @@ SPEAKING REVIEW CONTRACT
                 ),
               ),
             ),
-            title: 'Building review',
-            subtitle: 'Using your recent practice material.',
+            title: widget.plan.kind == 'warmup'
+                ? 'Building warm-up'
+                : 'Building review',
+            subtitle: widget.plan.kind == 'warmup'
+                ? 'Previewing the next Course lesson.'
+                : 'Using your recent practice material.',
           ),
           Expanded(
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: SpeakCard(
-                  color: SpeakColors.accentSoft,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        _modeIcon(widget.mode),
-                        color: SpeakColors.accent,
-                        size: 36,
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        _error ??
-                            'Preparing ${_modeLabel(widget.mode).toLowerCase()} review…',
-                        style: DesignTokens.display(22),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _error == null
-                            ? 'Hard spots and recent language are being woven into a fresh lesson.'
-                            : 'Your recent practice is still safe. You can retry this review.',
-                        style: DesignTokens.body(
-                          13,
-                        ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 16),
-                        SpeakPrimaryButton(
-                          label: 'Try again',
-                          icon: Icons.refresh_rounded,
-                          onTap: _launch,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: SpeakColors.surface,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: SpeakColors.line),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(width: 5, color: SpeakColors.accent),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  _modeIcon(widget.mode),
+                                  color: SpeakColors.accent,
+                                  size: 36,
+                                ),
+                                const SizedBox(height: 14),
+                                Text(
+                                  _error ??
+                                      'Preparing ${_modeLabel(widget.mode).toLowerCase()} ${widget.plan.kind == 'warmup' ? 'warm-up' : 'review'}…',
+                                  style: DesignTokens.display(22),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _error == null
+                                      ? 'Hard spots and recent language are being woven into a fresh lesson.'
+                                      : 'Your recent practice is still safe. You can retry this review.',
+                                  style: DesignTokens.body(13).copyWith(
+                                    color: SpeakColors.inkSoft,
+                                    height: 1.35,
+                                  ),
+                                ),
+                                if (_error != null) ...[
+                                  const SizedBox(height: 16),
+                                  SpeakPrimaryButton(
+                                    label: 'Try again',
+                                    icon: Icons.refresh_rounded,
+                                    onTap: _launch,
+                                  ),
+                                ] else ...[
+                                  const SizedBox(height: 18),
+                                  const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                         ),
-                      ] else ...[
-                        const SizedBox(height: 18),
-                        const Center(child: CircularProgressIndicator()),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -705,6 +1392,7 @@ SPEAKING REVIEW CONTRACT
   }
 
   String _modeLabel(SpeakReviewMode mode) => switch (mode) {
+    SpeakReviewMode.smart => 'Smart',
     SpeakReviewMode.speaking => 'Speaking',
     SpeakReviewMode.listening => 'Listening',
     SpeakReviewMode.reading => 'Reading',
@@ -712,6 +1400,7 @@ SPEAKING REVIEW CONTRACT
   };
 
   IconData _modeIcon(SpeakReviewMode mode) => switch (mode) {
+    SpeakReviewMode.smart => Icons.auto_awesome_rounded,
     SpeakReviewMode.speaking => Icons.mic_rounded,
     SpeakReviewMode.listening => Icons.headphones_rounded,
     SpeakReviewMode.reading => Icons.menu_book_rounded,

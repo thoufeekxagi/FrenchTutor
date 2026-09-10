@@ -89,6 +89,13 @@ class _LessonQAOverlayState extends ConsumerState<LessonQAOverlay> {
       final accepted = await AiVoiceDisclosure.ensureAccepted(context);
       if (!mounted) return;
       if (!accepted) return;
+      _audio ??= AudioStreamingService();
+      final microphoneReady = await _audio!.requestPermission();
+      if (!mounted) return;
+      if (!microphoneReady) {
+        setState(() => _errorText = 'Microphone permission denied');
+        return;
+      }
       setState(() => _isConnecting = true);
       final connected = await _connectLive();
       if (!mounted) return;

@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../design/tokens.dart';
+import '../../services/ai_privacy_preferences.dart';
 
 /// Apple Guideline 5.1.2(i) requires clear, upfront, standalone consent
 /// before any personal data leaves the device for a third-party AI
@@ -12,23 +12,18 @@ import '../../design/tokens.dart';
 /// first display and then never show again on a fresh install, which is a
 /// real rejection reason). This gate is gated purely on "has the user
 /// *accepted*", is its own screen, and blocks every AI feature in the app
-/// until it is accepted. Same gradient/card language as the onboarding
-/// welcome step so it reads as part of the app, not a bolted-on legal popup.
+/// until it is accepted.
 class AiConsentScreen extends StatelessWidget {
   const AiConsentScreen({super.key, required this.onAccepted});
 
   final VoidCallback onAccepted;
 
-  static const prefsKey = 'ai_data_consent_v1';
+  static const prefsKey = AiPrivacyPreferences.consentKey;
 
-  static Future<bool> hasConsented() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(prefsKey) == true;
-  }
+  static Future<bool> hasConsented() => AiPrivacyPreferences.hasConsented();
 
   Future<void> _accept() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(prefsKey, true);
+    await AiPrivacyPreferences.acceptAll();
     onAccepted();
   }
 
@@ -101,7 +96,7 @@ class AiConsentScreen extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Before we\nstart speaking.',
+                'Privacy\n& AI.',
                 style: DesignTokens.display(42, weight: FontWeight.w700)
                     .copyWith(
                       color: Colors.white,
@@ -111,7 +106,7 @@ class AiConsentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'One clear note about how AI practice works, so you can choose with context.',
+                'Review what is shared with your tutor before you begin.',
                 style: DesignTokens.body(17).copyWith(
                   color: Colors.white.withValues(alpha: 0.72),
                   height: 1.55,
@@ -139,7 +134,7 @@ class AiConsentScreen extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'PRIVACY FIRST  /  CLEAR BY DESIGN',
+                'AI PRACTICE  /  CLEAR CONTROLS',
                 style: DesignTokens.mono(11, weight: FontWeight.w600).copyWith(
                   color: Colors.white.withValues(alpha: 0.45),
                   letterSpacing: 1.3,
@@ -185,13 +180,13 @@ class AiConsentScreen extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         Text(
-          'How your practice works',
+          'Privacy & AI',
           textAlign: centered ? TextAlign.center : TextAlign.left,
           style: DesignTokens.display(27).copyWith(color: primaryText),
         ),
         const SizedBox(height: 10),
         Text(
-          'A short explanation before your first AI-powered lesson.',
+          'Review what is shared with your tutor before you begin.',
           textAlign: centered ? TextAlign.center : TextAlign.left,
           style: DesignTokens.body(
             14,
@@ -199,7 +194,7 @@ class AiConsentScreen extends StatelessWidget {
         ),
         const SizedBox(height: 28),
         Container(
-          padding: const EdgeInsets.all(20),
+          clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: panelColor,
             borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
@@ -209,27 +204,52 @@ class AiConsentScreen extends StatelessWidget {
                   : DesignTokens.hairline,
             ),
           ),
-          child: Column(
+          child: Stack(
             children: [
-              _consentPoint(
-                '01',
-                'Your practice powers feedback',
-                'Audio, text, and answers from practice are sent to Google, which powers your AI tutor.',
-                onDark,
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: SizedBox(
+                  width: 3,
+                  child: ColoredBox(
+                    color: onDark ? Colors.white : DesignTokens.primary,
+                  ),
+                ),
               ),
-              const SizedBox(height: 18),
-              _consentPoint(
-                '02',
-                'Photos stay in your control',
-                'If you use Live Vision Scan, photos or PDFs you choose are sent to Google for explanation. You decide when to share them.',
-                onDark,
-              ),
-              const SizedBox(height: 18),
-              _consentPoint(
-                '03',
-                'Your choice stays visible',
-                "We don't sell your data, and Google doesn't use it to train its other products.",
-                onDark,
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    _consentPoint(
+                      CupertinoIcons.mic_fill,
+                      'Voice',
+                      'Sent to Google Gemini Live for real-time tutor replies and a transcript.',
+                      onDark,
+                    ),
+                    const SizedBox(height: 18),
+                    _consentPoint(
+                      CupertinoIcons.text_bubble_fill,
+                      'Text & progress',
+                      'Sent to Google Gemini or OpenRouter, which may route to OpenAI, for lessons, feedback, and review.',
+                      onDark,
+                    ),
+                    const SizedBox(height: 18),
+                    _consentPoint(
+                      CupertinoIcons.doc_text_viewfinder,
+                      'Photos & PDFs',
+                      'Sent to Google Gemini only when you choose Scan for an explanation.',
+                      onDark,
+                    ),
+                    const SizedBox(height: 18),
+                    _consentPoint(
+                      CupertinoIcons.sparkles,
+                      'Generated media',
+                      'Limited lesson context is sent to ElevenLabs for audio or MiniMax for images.',
+                      onDark,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -247,7 +267,7 @@ class AiConsentScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               foregroundColor: linkColor,
             ),
-            child: const Text('Read the full privacy policy'),
+            child: const Text('See the full privacy policy'),
           ),
         ),
         const SizedBox(height: 20),
@@ -257,8 +277,8 @@ class AiConsentScreen extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => _accept(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: onDark ? Colors.white : DesignTokens.primary,
-              foregroundColor: onDark ? DesignTokens.primaryDeep : Colors.white,
+              backgroundColor: DesignTokens.primary,
+              foregroundColor: DesignTokens.onPrimary,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -273,7 +293,7 @@ class AiConsentScreen extends StatelessWidget {
   }
 
   Widget _consentPoint(
-    String number,
+    IconData icon,
     String title,
     String detail,
     bool onDark,
@@ -281,15 +301,23 @@ class AiConsentScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          number,
-          style: DesignTokens.mono(11, weight: FontWeight.w700).copyWith(
+        Container(
+          width: 34,
+          height: 34,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
             color: onDark
-                ? Colors.white.withValues(alpha: 0.66)
-                : DesignTokens.primary,
+                ? Colors.white.withValues(alpha: 0.10)
+                : DesignTokens.primarySoft,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 17,
+            color: onDark ? Colors.white : DesignTokens.primary,
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

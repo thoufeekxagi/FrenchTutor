@@ -10,9 +10,9 @@ import '../../models/grammar_course_session_result.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/inline_call_controller.dart';
-import '../../services/lesson_speech_service.dart';
+import '../../widgets/ai_voice_disclosure.dart';
+import '../../widgets/grammar_live_audio_button.dart';
 import '../../widgets/inline_call_bar.dart';
-import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
 /// A grammar roleplay is one short live scene, not a multiple-choice deck.
@@ -69,8 +69,14 @@ class _GrammarRoleplayLessonScreenState
       manualLearnerTurns: true,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_prewarmAudio());
+      if (mounted) unawaited(_autoConnectMarie());
     });
+  }
+
+  Future<void> _autoConnectMarie() async {
+    if (!mounted || !await AiVoiceDisclosure.isAccepted()) return;
+    if (!mounted) return;
+    await _call.start(context, sendOpeningPrompt: true);
   }
 
   @override
@@ -83,7 +89,6 @@ class _GrammarRoleplayLessonScreenState
     WidgetsBinding.instance.removeObserver(this);
     _checkingTimeout?.cancel();
     _call.dispose();
-    unawaited(LessonSpeechService.shared.stop());
     super.dispose();
   }
 
@@ -109,7 +114,7 @@ TURN: ${_index + 1} of ${widget.session.steps.length}
 CURRENT PARTNER FRENCH: ${_step.partnerFrench}
 CURRENT PARTNER ENGLISH: ${_step.partnerEnglish}
 VISIBLE LEARNER GOAL: ${_step.prompt}
-VISIBLE ENGLISH GOAL: ${_step.promptEnglish}
+VISIBLE ENGLISH GOAL: ${_matched == true ? _step.promptEnglish : '(context withheld until the learner matches the target)'}
 LEARNER STATE: ${_recording
           ? 'recording'
           : _checking
@@ -121,48 +126,18 @@ LEARNER STATE: ${_recording
           : 'ready'}
 LATEST LEARNER TRANSCRIPT: ${_heard.trim().isEmpty ? '(none)' : _heard.trim()}
 
-PRIVATE ANSWER KEY: ${_step.answer}
-
 STRICT ROLEPLAY SCOPE:
 - Coach only this exact current turn and grammar target.
 - Stay in character as the partner and respond to the learner's current reply.
+- Before the app reports a match, never say, spell, translate, paraphrase, or
+  complete the learner's hidden target. Do not use the English goal to supply
+  the missing form. The app owns answer checking.
 - Never reveal or offer the private answer key as a list of choices.
 - Never introduce a new sentence, new vocabulary, future turn, or unrelated example.
 - If explaining past, present, or future, transform only the current target while
   preserving its meaning and vocabulary, then return to this turn.
 - The app owns recording, grading, progression, and completion. Never advance it.
 ''';
-
-  Future<void> _prewarmAudio() async {
-    final items = <SpeechItem>[];
-    for (final session in [widget.session, ...widget.warmupSessions]) {
-      for (var index = 0; index < session.steps.length; index++) {
-        final step = session.steps[index];
-        final prefix = 'grammar-session:${session.id}:step:$index';
-        items.add(
-          SpeechItem(
-            text: step.target,
-            language: 'fr-FR',
-            contentItemId: '$prefix:target',
-          ),
-        );
-        if (step.partnerFrench != null) {
-          items.add(
-            SpeechItem(
-              text: step.partnerFrench!,
-              language: 'fr-FR',
-              contentItemId: '$prefix:partner',
-            ),
-          );
-        }
-      }
-    }
-    try {
-      await LessonSpeechService.shared.prewarmNarration(items);
-    } catch (error) {
-      debugPrint('Roleplay Grammar audio prewarm skipped: $error');
-    }
-  }
 
   Future<void> _startRecording() async {
     if (_submitted || _checking || _recording) return;
@@ -253,6 +228,15 @@ STRICT ROLEPLAY SCOPE:
       if (matched) _correctCount++;
     });
     _call.updateLessonContext();
+    _call.promptTutor(
+      matched
+          ? 'APP FEEDBACK: The learner matched this turn. Say one short '
+                'encouraging English sentence explaining that the reply fits the '
+                '${widget.session.tense.toLowerCase()} grammar focus, then wait.'
+          : 'APP FEEDBACK: The learner did not match this turn. Give one short '
+                'English clue about the subject and grammar focus without saying '
+                'the answer, then wait.',
+    );
   }
 
   void _retry() {
@@ -528,11 +512,10 @@ line once, give its short meaning, then wait: "${_step.partnerFrench}".
             ],
           ),
         ),
-        TtsPlayButton(
+        GrammarLiveAudioButton(
+          controller: _call,
           text: _step.partnerFrench!,
-          contentItemId: _audioId('partner'),
           size: 42,
-          color: DesignTokens.primary,
         ),
       ],
     ),
@@ -689,7 +672,4 @@ line once, give its short meaning, then wait: "${_step.partnerFrench}".
       ),
     );
   }
-
-  String _audioId(String role) =>
-      'grammar-session:${widget.session.id}:step:$_index:$role';
 }

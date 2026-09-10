@@ -29,7 +29,8 @@ class V3PracticeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recent = ReviewMaterialService.recentSessions(
       ref.watch(storageServiceProvider),
-    ).take(3).toList(growable: false);
+      limit: 20,
+    );
     return V3Scaffold(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 34),
@@ -113,7 +114,7 @@ class V3PracticeScreen extends ConsumerWidget {
           _skill(
             context,
             ref,
-            Icons.auto_fix_high_outlined,
+            Icons.spellcheck_rounded,
             'Grammar',
             'Learn patterns through examples',
             const GrammarLabScreen(),
@@ -147,19 +148,32 @@ class V3PracticeScreen extends ConsumerWidget {
             onTap: () =>
                 AppRouter.push(context, (_) => const SpeakReviewScreen()),
           ),
+          const SizedBox(height: 8),
+          V3Row(
+            icon: Icons.auto_awesome_rounded,
+            title: 'Warm-up next lesson',
+            subtitle: 'Preview the next Course lesson before you start it.',
+            onTap: () => AppRouter.push(
+              context,
+              (_) => const SpeakReviewScreen(kind: 'warmup'),
+            ),
+          ),
           if (recent.isNotEmpty) ...[
             const SizedBox(height: 20),
-            V3SectionLabel('Recent practice'),
+            Row(
+              children: [
+                Expanded(child: V3SectionLabel('Recent practice')),
+                Text(
+                  '${recent.length} saved',
+                  style: DesignTokens.body(
+                    11,
+                    weight: FontWeight.w700,
+                  ).copyWith(color: DesignTokens.nightMuted),
+                ),
+              ],
+            ),
             const SizedBox(height: 9),
-            for (final session in recent) ...[
-              V3Row(
-                icon: _iconFor(session.skill),
-                title: session.displayTitle,
-                subtitle: '${session.skill} · Open saved review',
-                onTap: () => _openRecent(context, session),
-              ),
-              const SizedBox(height: 8),
-            ],
+            _recentPracticeCard(context, recent),
           ],
         ],
       ),
@@ -243,9 +257,81 @@ class V3PracticeScreen extends ConsumerWidget {
     'reading' => Icons.menu_book_outlined,
     'listening' => Icons.headphones_outlined,
     'writing' => Icons.edit_note_rounded,
-    'grammar' => Icons.auto_fix_high_outlined,
+    'grammar' => Icons.spellcheck_rounded,
     _ => Icons.replay_rounded,
   };
+
+  Widget _recentPracticeCard(
+    BuildContext context,
+    List<ReviewSessionSummary> sessions,
+  ) {
+    final visible = sessions.take(20).toList(growable: false);
+    return V3Card(
+      padding: EdgeInsets.zero,
+      child: SizedBox(
+        height: visible.length <= 4 ? visible.length * 78.0 : 320,
+        child: ListView.separated(
+          primary: false,
+          padding: EdgeInsets.zero,
+          itemCount: visible.length,
+          separatorBuilder: (_, _) =>
+              Divider(height: 1, color: DesignTokens.nightHairline),
+          itemBuilder: (context, index) {
+            final session = visible[index];
+            return InkWell(
+              onTap: () => _openRecent(context, session),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 13,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _iconFor(session.skill),
+                      color: DesignTokens.nightAccent,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            session.displayTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: DesignTokens.body(
+                              13.5,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            '${session.skill} · ${session.details.isEmpty ? session.displaySummary : session.details.first}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: DesignTokens.body(
+                              11.5,
+                            ).copyWith(color: DesignTokens.nightMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: DesignTokens.nightMuted,
+                      size: 19,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
   void _openRecent(BuildContext context, ReviewSessionSummary session) {
     final speaking = switch (session.skill.toLowerCase()) {
@@ -256,7 +342,7 @@ class V3PracticeScreen extends ConsumerWidget {
       context,
       (_) => speaking
           ? SavedSpeakingTranscriptScreen(session: session)
-          : const SpeakReviewScreen(),
+          : SavedPracticeSessionScreen(session: session),
     );
   }
 }

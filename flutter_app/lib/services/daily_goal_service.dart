@@ -55,13 +55,18 @@ class DailyGoalService {
   /// the daily goal (nothing today writes an uncounted stage, but a session
   /// with a stage this map doesn't recognize is safer to ignore than crash).
   static String? categoryFor(String? stage) => switch (stage) {
-    'vocab' => 'Vocabulary',
+    'vocab' || 'vocabulary' => 'Vocabulary',
     'grammar' => 'Grammar',
-    'reading_listening' => 'Listening',
+    'reading_listening' || 'listening' => 'Listening',
     'story' => 'Listening',
     'roleplay' => 'Roleplay',
     'writing' => 'Writing',
-    'speaking' => 'Speaking',
+    'speaking' ||
+    'speaking_guided' ||
+    'free_talk' ||
+    'speaking_exam' ||
+    'picture_description' ||
+    'pronunciation_repair' => 'Speaking',
     _ => null,
   };
 

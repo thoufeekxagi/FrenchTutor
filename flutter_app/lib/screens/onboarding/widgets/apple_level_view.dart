@@ -141,7 +141,7 @@ class AppleLevelView extends StatelessWidget {
                   onPressed: selectedLevel != null ? onContinue : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.onPrimary,
                     disabledBackgroundColor: DesignTokens.canvasDim,
                     disabledForegroundColor: DesignTokens.muted,
                     elevation: 0,
@@ -248,12 +248,9 @@ class _LevelCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? DesignTokens.primarySoft : DesignTokens.surface,
+            color: DesignTokens.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected ? DesignTokens.primary : DesignTokens.canvasDim,
-              width: isSelected ? 2 : 1,
-            ),
+            border: Border.all(color: DesignTokens.canvasDim),
             boxShadow: [
               BoxShadow(
                 color: isSelected
@@ -264,77 +261,91 @@ class _LevelCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              // Vector Squircle Badge
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? DesignTokens.primary.withValues(alpha: 0.12)
-                      : DesignTokens.canvas,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  size: 19,
-                  color: isSelected
-                      ? DesignTokens.primary
-                      : DesignTokens.inkSoft,
-                ),
-              ),
-              const SizedBox(width: 14),
+              Row(
+                children: [
+                  // Vector Squircle Badge
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.primarySoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 19,
+                      color: isSelected
+                          ? DesignTokens.primary
+                          : DesignTokens.inkSoft,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
 
-              // Title & Subtitle
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: DesignTokens.ink,
-                        letterSpacing: -0.2,
+                  // Title & Subtitle
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: DesignTokens.ink,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: DesignTokens.inkSoft,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Apple Checkmark or Radio
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? DesignTokens.primary
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: isSelected
+                            ? DesignTokens.primary
+                            : DesignTokens.canvasDim,
+                        width: 2,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: DesignTokens.inkSoft,
-                      ),
-                    ),
-                  ],
-                ),
+                    child: isSelected
+                        ? Icon(
+                            CupertinoIcons.checkmark,
+                            size: 13,
+                            color: DesignTokens.onPrimary,
+                          )
+                        : null,
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-
-              // Apple Checkmark or Radio
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? DesignTokens.primary : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected
-                        ? DesignTokens.primary
-                        : DesignTokens.canvasDim,
-                    width: 2,
+              if (isSelected)
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 4,
+                      child: ColoredBox(color: DesignTokens.primary),
+                    ),
                   ),
                 ),
-                child: isSelected
-                    ? const Icon(
-                        CupertinoIcons.checkmark,
-                        size: 13,
-                        color: Colors.white,
-                      )
-                    : null,
-              ),
             ],
           ),
         ),

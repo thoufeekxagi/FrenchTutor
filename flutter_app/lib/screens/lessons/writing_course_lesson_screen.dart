@@ -12,6 +12,7 @@ import '../../providers/database_provider.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_agent_service.dart';
 import '../../services/lesson_speech_service.dart';
+import '../../widgets/grammar_live_audio_button.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -42,8 +43,6 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
   bool _roleplayReview = false;
   bool _isHintLoading = false;
   String? _dynamicHint;
-  bool _audioLoading = false;
-  String? _activeAudioKey;
   InlineCallController? _call;
   LearningStore? _learningStore;
 
@@ -59,17 +58,24 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
     super.initState();
     _shuffleWordBank();
     WidgetsBinding.instance.addObserver(this);
-    // The writing lesson owns one quiet Live socket. It connects once after
-    // the screen is visible, but it never speaks until the learner taps the
-    // sentence speaker or addresses Marie directly.
+    // The writing lesson owns one Live socket, using the same screen-aware
+    // opening and step hand-off as Grammar. Marie explains the current card,
+    // then stays quiet until the learner asks for help or checks an answer.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       // Course Writing uses one compact Live connection for its two supported
       // formats. Roleplay is not a Course format and therefore never opens a
       // tutor socket here.
       if (widget.lesson.mode == WritingCourseMode.roleplay) return;
-      final call = _ensureCall();
-      unawaited(call.start(context, sendOpeningPrompt: false));
+      try {
+        final call = _ensureCall();
+        unawaited(call.start(context, sendOpeningPrompt: true));
+      } catch (error) {
+        // Widget tests and a few embedded surfaces do not provide the database
+        // container. The card remains usable; a real course route gets the
+        // provider-backed Live connection above.
+        debugPrint('Writing Live tutor unavailable: $error');
+      }
     });
   }
 
@@ -323,7 +329,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               : Icons.translate_outlined,
           label: _showTranslations ? 'Hide translations' : 'Show translations',
           active: _showTranslations,
-          onTap: () => setState(() => _showTranslations = !_showTranslations),
+          onTap: _toggleTranslations,
           style: buttonStyle,
         ),
         const SizedBox(width: 10),
@@ -354,7 +360,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           icon: Icons.lightbulb_outline_rounded,
           label: 'Hint',
           active: _showHint,
-          onTap: () => setState(() => _showHint = true),
+          onTap: () {
+            setState(() => _showHint = true);
+            _syncTutorContext();
+          },
           style: buttonStyle,
         ),
         const SizedBox(width: 10),
@@ -364,7 +373,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               : Icons.translate_outlined,
           label: _showTranslations ? 'Hide translations' : 'Show translations',
           active: _showTranslations,
-          onTap: () => setState(() => _showTranslations = !_showTranslations),
+          onTap: _toggleTranslations,
           style: buttonStyle,
         ),
         const SizedBox(width: 10),
@@ -478,11 +487,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               style: DesignTokens.body(18, weight: FontWeight.w700),
             ),
           ),
-          _audioButton(
-            _step.target,
-            'Hear the correct French sentence again',
-            speechKey: _speechKey('guided-model'),
-            onPressed: _repeatCurrentSentence,
+          GrammarLiveAudioButton(
+            controller: _call,
+            text: _step.target,
+            size: 42,
           ),
         ],
       ),
@@ -505,7 +513,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
             english: _step.partnerEnglish,
             englishFirst: _isBeginner,
             showTranslation: _showTranslations,
-            onListen: () => _speak(_step.partnerFrench!),
+            onListen: () => _repeatSentenceWithLive(_step.partnerFrench!),
           ),
         ],
         const SizedBox(height: 24),
@@ -542,10 +550,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
             showMeaning: _showTranslations,
             selected: choice == _selectedChoice,
             locked: _correct,
-            onTap: () => setState(() {
-              _selectedChoice = choice;
-              _message = null;
-            }),
+            onTap: () => _selectChoice(choice),
             onListen: () => _repeatWordWithLive(choice),
           ),
           const SizedBox(height: 10),
@@ -604,7 +609,9 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
             english: widget.lesson.steps[i].partnerEnglish,
             englishFirst: _isBeginner,
             showTranslation: _showTranslations,
-            onListen: () => _speak(widget.lesson.steps[i].partnerFrench ?? ''),
+            onListen: () => _repeatSentenceWithLive(
+              widget.lesson.steps[i].partnerFrench ?? '',
+            ),
           ),
           const SizedBox(height: 8),
           Align(
@@ -618,7 +625,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           english: _step.partnerEnglish,
           englishFirst: _isBeginner,
           showTranslation: _showTranslations,
-          onListen: () => _speak(_step.partnerFrench ?? ''),
+          onListen: () => _repeatSentenceWithLive(_step.partnerFrench ?? ''),
         ),
         const SizedBox(height: 28),
         Container(
@@ -691,7 +698,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               child: _secondaryAction(
                 icon: Icons.lightbulb_outline_rounded,
                 label: 'Hint',
-                onTap: () => setState(() => _showHint = true),
+                onTap: () {
+                  setState(() => _showHint = true);
+                  _syncTutorContext();
+                },
               ),
             ),
             const SizedBox(width: 12),
@@ -699,7 +709,10 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
               child: _secondaryAction(
                 icon: Icons.menu_book_outlined,
                 label: 'Grammar',
-                onTap: () => setState(() => _showHint = true),
+                onTap: () {
+                  setState(() => _showHint = true);
+                  _syncTutorContext();
+                },
               ),
             ),
           ],
@@ -792,8 +805,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
           width: fillWidth ? double.infinity : null,
           height: 48,
           child: OutlinedButton.icon(
-            onPressed: () =>
-                setState(() => _showTranslations = !_showTranslations),
+            onPressed: _toggleTranslations,
             icon: Icon(
               _showTranslations
                   ? Icons.translate_rounded
@@ -828,14 +840,24 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         ),
       );
 
-  String _speechKey(String role) => _speechKeyForStep(_index, role);
-
-  String _speechKeyForStep(int index, String role) =>
-      'writing:${widget.lesson.id}:$index:$role';
-
   Future<void> _requestGuidedHint() async {
     if (_isHintLoading) return;
     final stepAtRequest = _step;
+    // An arrange card has an authored, validated answer already. Show that
+    // exact order immediately instead of asking the text model for a vague
+    // strategy ("arrange the words") that does not help a learner who is
+    // explicitly asking for the answer. The generated lesson's target and
+    // token meanings are the source of truth, so this cannot hallucinate a
+    // different sentence or introduce a second network request.
+    if (widget.lesson.mode == WritingCourseMode.guided) {
+      setState(() {
+        _showHint = true;
+        _isHintLoading = false;
+        _dynamicHint = _guidedAnswerHint(stepAtRequest);
+      });
+      _syncTutorContext();
+      return;
+    }
     final draft = _selectedTokenIndexes
         .map((index) => _wordBank[index])
         .join(' ');
@@ -844,6 +866,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
       _isHintLoading = true;
       _dynamicHint = null;
     });
+    _syncTutorContext();
     // Beginner hints stay local and English-only. This keeps A1/A2 guidance
     // immediate and prevents an occasional French model hint from leaking
     // into the beginner exercise.
@@ -853,6 +876,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         _dynamicHint = _fallbackGuidedHint;
         _isHintLoading = false;
       });
+      _syncTutorContext();
       return;
     }
     try {
@@ -871,6 +895,7 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         _dynamicHint = message.isEmpty ? _fallbackGuidedHint : message;
         _isHintLoading = false;
       });
+      _syncTutorContext();
     } catch (error) {
       debugPrint('Writing guided hint fallback: $error');
       if (!mounted || stepAtRequest != _step) return;
@@ -878,25 +903,194 @@ class _WritingCourseLessonScreenState extends State<WritingCourseLessonScreen>
         _dynamicHint = _fallbackGuidedHint;
         _isHintLoading = false;
       });
+      _syncTutorContext();
     }
   }
 
   String get _fallbackGuidedHint => _isBeginner
-      ? 'Put the words in the same order as the sentence.'
+      ? _guidedAnswerHint(_step)
       : (_step.tip.isEmpty ? 'Start with ${_step.tokens.first}.' : _step.tip);
 
-  String get _liveContext =>
-      '''
-CURRENT WRITING STEP — replace any older step completely.
-Level: ${widget.lesson.level}
-Target French sentence: ${_step.target}
-English meaning: ${_step.promptEnglish}
-Word bank: ${_wordBank.join(' | ')}
-Selected order: ${_selectedTokenIndexes.isEmpty ? '(none)' : _selectedTokenIndexes.map((index) => _wordBank[index]).join(' ')}
-The app owns word selection, checking, retry, and next. Speak only after an
-explicit speaker/help request. For the speaker request, say the target French
-sentence exactly once, then stop.
+  String _guidedAnswerHint(WritingCourseStep step) {
+    final answerLines = <String>[];
+    for (var index = 0; index < step.tokens.length; index++) {
+      final token = step.tokens[index].trim();
+      if (token.isEmpty) continue;
+      final meaning = index < step.tokenMeanings.length
+          ? step.tokenMeanings[index].trim()
+          : '';
+      answerLines.add(meaning.isEmpty ? token : '$token — $meaning');
+    }
+    final answer = step.target.trim().isEmpty
+        ? step.tokens.join(' ').trim()
+        : step.target.trim();
+    if (answerLines.isEmpty) return 'Answer: $answer';
+    return 'Answer order:\n${answerLines.join('\n')}\n\nComplete sentence: $answer';
+  }
+
+  /// The Live tutor receives the same replacement snapshot contract as
+  /// Grammar. Only data currently visible in the writing card is authoritative;
+  /// the target stays masked until the app reports a correct answer or the
+  /// learner explicitly opens the answer hint.
+  String get _liveContext {
+    final visibleBank = _wordBank.isEmpty ? '(none)' : _wordBank.join(' | ');
+    final visibleBankMeanings = !_showTranslations
+        ? '(hidden because Translate is off)'
+        : _wordBank.isEmpty
+        ? '(none)'
+        : [
+            for (var index = 0; index < _wordBank.length; index++)
+              '${_wordBank[index]} = ${_meaningForToken(index)}',
+          ].join(' | ');
+    final selected = _selectedTokenIndexes.isEmpty
+        ? '(empty)'
+        : _selectedTokenIndexes.map((index) => _wordBank[index]).join(' ');
+    final choices = _step.choices.isEmpty
+        ? '(none)'
+        : _step.choices.join(' | ');
+    final choiceMeanings = _step.choiceMeanings.isEmpty
+        ? '(none)'
+        : _step.choiceMeanings.join(' | ');
+    final result = _message == null
+        ? 'not checked'
+        : (_correct ? 'correct' : 'incorrect');
+    final answerVisible =
+        _correct ||
+        (widget.lesson.mode == WritingCourseMode.guided && _showHint);
+    final targetForCoach = answerVisible
+        ? _step.target
+        : '(hidden until the learner answers correctly; never infer or say it)';
+    final visibleMeaning =
+        _showTranslations && widget.lesson.mode == WritingCourseMode.complete
+        ? _answerSafeEnglishMeaning()
+        : '(not shown on this writing card)';
+    final visibleHint = _showHint
+        ? (_dynamicHint ??
+              (widget.lesson.mode == WritingCourseMode.roleplay
+                  ? _roleplayHint
+                  : _fallbackGuidedHint))
+        : null;
+    final privateAnswerKey = widget.lesson.mode == WritingCourseMode.guided
+        ? '\nPRIVATE ANSWER KEY (do not volunteer; use only when the learner '
+              'explicitly asks for the answer): ${_guidedAnswerHint(_step)}'
+        : '';
+    final roleplayDetails = widget.lesson.mode == WritingCourseMode.roleplay
+        ? '''
+VISIBLE PARTNER FRENCH: ${_step.partnerFrench ?? '(none)'}
+VISIBLE PARTNER ENGLISH: ${_showTranslations ? (_step.partnerEnglish ?? '(none)') : '(hidden because Translate is off)'}
+VISIBLE LEARNER GOAL: ${_step.goal ?? _step.promptEnglish}
+CURRENT DRAFT: ${_controller.text.trim().isEmpty ? '(empty)' : _controller.text.trim()}
+'''
+        : '';
+
+    return '''
+WRITING SESSION: ${widget.lesson.displayTitle}
+LEVEL: ${widget.lesson.level}
+MODE: ${widget.lesson.mode.name}
+
+CURRENT SCREEN SNAPSHOT — this replaces every older step completely.
+STEP: ${_index + 1} of ${widget.lesson.steps.length}
+VISIBLE TASK: ${widget.lesson.mode == WritingCourseMode.guided
+        ? 'Arrange the visible French words in the correct order.'
+        : widget.lesson.mode == WritingCourseMode.complete
+        ? 'Choose the visible French form that completes the blank.'
+        : 'Write a short French reply for the visible goal.'}
+VISIBLE FRENCH PROMPT: ${widget.lesson.mode == WritingCourseMode.roleplay ? (_step.partnerFrench ?? '(none)') : _step.prompt}
+VISIBLE ENGLISH MEANING: $visibleMeaning
+VISIBLE WORD BANK: $visibleBank
+VISIBLE WORD BANK MEANINGS (display order): $visibleBankMeanings
+VISIBLE OPTIONS: $choices
+VISIBLE OPTION MEANINGS: $choiceMeanings
+CURRENT ANSWER / SELECTION: ${widget.lesson.mode == WritingCourseMode.guided ? selected : (_selectedChoice ?? '(none)')}
+VISIBLE COMPLETED TARGET: $targetForCoach
+CHECK RESULT: $result
+TRANSLATION VISIBLE: $_showTranslations
+HINT VISIBLE: $_showHint${visibleHint == null ? '' : '\nVISIBLE HINT: $visibleHint'}
+$privateAnswerKey
+$roleplayDetails
+SCOPE RULES:
+- Explain and guide only this current screen snapshot. Ignore every previous
+  and future step; never preview or mention one.
+- Do not invent a sentence, answer, option, or example that is not visible.
+- Before CHECK RESULT is correct, never say, spell, translate, or assemble the
+  missing French target unless the app has explicitly revealed it in VISIBLE
+  HINT or the learner directly asks for the answer. When VISIBLE HINT contains
+  the answer, or the learner asks for it, repeat only the exact private answer
+  key and its displayed meanings. The visible word bank/options are choices,
+  not an answer to volunteer.
+- The app owns selection, checking, retry, and next. Never advance the lesson
+  or tell the learner to skip ahead.
+- Keep help brief: one short explanation of the task, then ask the learner to
+  choose or arrange. After a wrong answer, give only a clue; do not reveal it.
 ''';
+  }
+
+  String _openingPrompt() =>
+      '''
+APP OPENING — describe the writing card that is actually on screen.
+CURRENT TASK: ${widget.lesson.mode == WritingCourseMode.guided
+          ? 'Arrange the visible French words in the correct order.'
+          : widget.lesson.mode == WritingCourseMode.complete
+          ? 'Choose the French form that completes the visible blank.'
+          : 'Write a short French reply for the visible goal.'}
+VISIBLE FRENCH PROMPT: ${widget.lesson.mode == WritingCourseMode.roleplay ? (_step.partnerFrench ?? '(none)') : _step.prompt}
+VISIBLE ENGLISH MEANING: ${_showTranslations ? _answerSafeEnglishMeaning() : '(hidden because Translate is off)'}
+VISIBLE WORD BANK: ${_wordBank.isEmpty ? '(none)' : _wordBank.join(', ')}
+VISIBLE WORD BANK MEANINGS: ${_showTranslations ? _visibleWordBankMeaningsForPrompt : '(hidden because Translate is off)'}
+VISIBLE OPTIONS: ${_step.choices.isEmpty ? '(none)' : _step.choices.join(', ')}
+Say at most two short English sentences. Explain this exact task and the
+visible blank/options or word bank, then ask the learner to choose or arrange.
+Never fill the blank, assemble the answer, identify the correct option, or
+repeat the hidden target. Then wait.
+''';
+
+  String _stepChangePrompt() =>
+      '''
+APP SCREEN CHANGED — explain only the new writing card.
+STEP: ${_index + 1} of ${widget.lesson.steps.length}
+TASK: ${widget.lesson.mode == WritingCourseMode.guided
+          ? 'Arrange the visible French words.'
+          : widget.lesson.mode == WritingCourseMode.complete
+          ? 'Choose the French form that completes the blank.'
+          : 'Write a short French reply for the goal.'}
+VISIBLE FRENCH PROMPT: ${widget.lesson.mode == WritingCourseMode.roleplay ? (_step.partnerFrench ?? '(none)') : _step.prompt}
+VISIBLE ENGLISH MEANING: ${_showTranslations ? _answerSafeEnglishMeaning() : '(hidden because Translate is off)'}
+VISIBLE WORD BANK: ${_wordBank.isEmpty ? '(none)' : _wordBank.join(', ')}
+VISIBLE WORD BANK MEANINGS: ${_showTranslations ? _visibleWordBankMeaningsForPrompt : '(hidden because Translate is off)'}
+VISIBLE OPTIONS: ${_step.choices.isEmpty ? '(none)' : _step.choices.join(', ')}
+Use at most two short English sentences: explain this exact task, mention the
+visible choices without identifying the answer, and ask the learner to act.
+Preserve the blank and wait. Do not mention the previous step.
+''';
+
+  String _answerSafeEnglishMeaning() {
+    var meaning = _step.promptEnglish.trim();
+    if (meaning.isEmpty) return '(no English meaning supplied)';
+    final hidden = <String>{_step.target, ..._step.choices};
+    for (final candidate in hidden) {
+      final value = candidate.trim();
+      if (value.length < 3) continue;
+      meaning = meaning.replaceAll(
+        RegExp(
+          r'(?<![A-Za-zÀ-ÿ])' + RegExp.escape(value) + r'(?![A-Za-zÀ-ÿ])',
+          caseSensitive: false,
+        ),
+        '[missing French form]',
+      );
+    }
+    return meaning;
+  }
+
+  String get _visibleWordBankMeaningsForPrompt => [
+    for (var index = 0; index < _wordBank.length; index++)
+      '${_wordBank[index]} = ${_meaningForToken(index)}',
+  ].join(', ');
+
+  void _syncTutorContext() {
+    final call = _call;
+    if (call == null || !call.isLive) return;
+    call.updateLessonContext();
+  }
 
   InlineCallController _ensureCall() {
     final existing = _call;
@@ -912,7 +1106,7 @@ sentence exactly once, then stop.
       lessonContext: () => _liveContext,
       learningStoreForProfile: _learningStore!,
       compactGuidedContext: true,
-      openingPrompt: null,
+      openingPrompt: _openingPrompt(),
       onChanged: () {
         if (mounted) setState(() {});
       },
@@ -935,6 +1129,11 @@ sentence exactly once, then stop.
       }
     }
     if (mounted) setState(() {});
+  }
+
+  void _toggleTranslations() {
+    setState(() => _showTranslations = !_showTranslations);
+    _syncTutorContext();
   }
 
   Future<void> _repeatCurrentSentence() async {
@@ -993,6 +1192,8 @@ sentence exactly once, then stop.
               ? 'That sentence is in the right order.'
               : 'Not quite. Move the words and try again.';
         });
+        _syncTutorContext();
+        _promptCheckFeedback();
       case WritingCourseMode.complete:
         setState(() {
           _correct = _selectedChoice == _step.target;
@@ -1000,9 +1201,42 @@ sentence exactly once, then stop.
               ? '${_step.target} completes the meaning.'
               : 'That word does not fit this context. Try another one.';
         });
+        _syncTutorContext();
+        _promptCheckFeedback();
       case WritingCourseMode.roleplay:
         _checkRoleplay();
     }
+  }
+
+  void _promptCheckFeedback() {
+    final call = _call;
+    if (call == null || !call.isLive) return;
+    if (_correct) {
+      final sentence = _completedFrenchSentence();
+      call.promptTutor('''
+APP FEEDBACK — the app already checked the learner's visible answer.
+Say only this short English line: "Correct. The complete French sentence is:
+$sentence" Then wait. Do not add a reason, lecture, question, or translation.
+''');
+      return;
+    }
+    final clue = widget.lesson.mode == WritingCourseMode.guided
+        ? 'Check the word order and the sentence meaning, then arrange the words again.'
+        : 'Check the subject and the tense against the visible sentence meaning, then choose again.';
+    call.promptTutor('''
+APP FEEDBACK — the app marked the visible answer incorrect.
+Say only this short English clue: "$clue" Then wait. Never reveal, spell,
+translate, or assemble the missing French form.
+''');
+  }
+
+  String _completedFrenchSentence() {
+    final prompt = _step.prompt.trim();
+    if (prompt.contains('___')) {
+      return prompt.replaceFirst('___', _step.target).trim();
+    }
+    if (widget.lesson.mode == WritingCourseMode.guided) return _step.target;
+    return prompt.isEmpty ? _step.target : prompt;
   }
 
   void _checkRoleplay() {
@@ -1032,6 +1266,7 @@ sentence exactly once, then stop.
       _showHint = false;
       _controller.clear();
     });
+    _syncTutorContext();
   }
 
   bool _communicatesGoal(String answer) {
@@ -1097,15 +1332,13 @@ sentence exactly once, then stop.
       _showHint = false;
       _dynamicHint = null;
       _isHintLoading = false;
-      _audioLoading = false;
-      _activeAudioKey = null;
       _roleplayReview = false;
     });
     _shuffleWordBank();
-    // Keep a live tutor call attached to the lesson as the learner moves
-    // between cards. This is deliberately silent; the tutor uses the new
-    // context only on the next learner request.
-    _call?.updateLessonContext();
+    // Replace the old snapshot before speaking so a queued reply can never
+    // describe the previous card.
+    _syncTutorContext();
+    _call?.promptTutor(_stepChangePrompt());
   }
 
   void _selectToken(int index) {
@@ -1114,6 +1347,7 @@ sentence exactly once, then stop.
       _selectedTokenIndexes.add(index);
       _message = null;
     });
+    _syncTutorContext();
   }
 
   void _removeToken(int index) {
@@ -1121,6 +1355,16 @@ sentence exactly once, then stop.
       _selectedTokenIndexes.remove(index);
       _message = null;
     });
+    _syncTutorContext();
+  }
+
+  void _selectChoice(String choice) {
+    if (_correct) return;
+    setState(() {
+      _selectedChoice = choice;
+      _message = null;
+    });
+    _syncTutorContext();
   }
 
   void _shuffleWordBank() {
@@ -1187,91 +1431,7 @@ sentence exactly once, then stop.
       selection: TextSelection.collapsed(offset: next.length),
     );
     setState(() => _message = null);
-  }
-
-  Future<void> _speak(String text, {String? speechKey}) async {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
-    final key = speechKey ?? _speechKey('line-$trimmed');
-    if (_audioLoading && _activeAudioKey == key) return;
-    if (mounted) {
-      setState(() {
-        _audioLoading = true;
-        _activeAudioKey = key;
-      });
-    }
-    try {
-      await LessonSpeechService.shared.speak(
-        items: [
-          SpeechItem(text: trimmed, language: 'fr-FR', contentItemId: key),
-        ],
-        onPlaybackReady: () {
-          if (!mounted || _activeAudioKey != key) return;
-          setState(() => _audioLoading = false);
-        },
-        onFinished: () {
-          if (!mounted || _activeAudioKey != key) return;
-          setState(() {
-            _audioLoading = false;
-            _activeAudioKey = null;
-          });
-        },
-        onError: (_) {
-          if (!mounted || _activeAudioKey != key) return;
-          setState(() {
-            _audioLoading = false;
-            _activeAudioKey = null;
-          });
-        },
-      );
-    } catch (error) {
-      debugPrint('Writing lesson audio playback failed: $error');
-      if (mounted && _activeAudioKey == key) {
-        setState(() {
-          _audioLoading = false;
-          _activeAudioKey = null;
-        });
-      }
-    }
-  }
-
-  Widget _audioButton(
-    String text,
-    String semanticsLabel, {
-    String? speechKey,
-    VoidCallback? onPressed,
-  }) {
-    final key = speechKey ?? _speechKey('line-$text');
-    final loading = _audioLoading && _activeAudioKey == key;
-    return Semantics(
-      label: semanticsLabel,
-      button: true,
-      child: IconButton(
-        onPressed: loading
-            ? null
-            : (onPressed ?? () => _speak(text, speechKey: key)),
-        tooltip: semanticsLabel,
-        icon: _audioIcon(loading),
-        color: DesignTokens.primary,
-      ),
-    );
-  }
-
-  Widget _audioIcon(bool loading) {
-    if (!loading) return const Icon(Icons.volume_up_outlined);
-    return SizedBox.square(
-      dimension: 24,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          const SizedBox.square(
-            dimension: 24,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          Icon(Icons.volume_up_outlined, size: 13, color: DesignTokens.primary),
-        ],
-      ),
-    );
+    _syncTutorContext();
   }
 
   Widget _modeLabel(String label) => Text(

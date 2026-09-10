@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
-import '../../services/lesson_speech_service.dart';
+import '../../prompts/live_prompts.dart';
+import '../../providers/database_provider.dart';
+import '../../services/audio_streaming_service.dart';
+import '../../services/inline_call_controller.dart';
 import '../speak/speak_ui.dart';
 import '../../widgets/web/web_constrained_view.dart';
 
@@ -16,7 +22,7 @@ class ExamPracticeResult {
 /// A focused exam surface for a generated Reading or Listening attempt.
 /// Regular lesson navigation, vocabulary cards, translations, and enrichment
 /// tabs are intentionally absent: this route behaves like a mobile QCM.
-class ExamPracticeScreen extends StatefulWidget {
+class ExamPracticeScreen extends ConsumerStatefulWidget {
   const ExamPracticeScreen({
     super.key,
     required this.story,
@@ -33,15 +39,21 @@ class ExamPracticeScreen extends StatefulWidget {
   bool get isListening => skill == 'listening';
 
   @override
-  State<ExamPracticeScreen> createState() => _ExamPracticeScreenState();
+  ConsumerState<ExamPracticeScreen> createState() => _ExamPracticeScreenState();
 }
 
-class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
+class _ExamPracticeScreenState extends ConsumerState<ExamPracticeScreen>
+    with WidgetsBindingObserver {
   final Map<int, int> _answers = {};
   bool _audioStarted = false;
   bool _audioComplete = false;
   bool _audioPlaying = false;
   bool _submitted = false;
+  String? _audioError;
+
+  late final AudioStreamingService _liveNarrationAudio;
+  late final InlineCallController _call;
+  int _playbackGeneration = 0;
 
   List<MultipleChoiceQuestion> get _questions => widget.story.quiz;
 
@@ -49,43 +61,166 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
     return _answers[entry.key] == entry.value.answerIndex;
   }).length;
 
+  String get _lessonContext {
+    final buffer = StringBuffer()
+      ..writeln('EXAM READINESS LISTENING PRACTICE')
+      ..writeln('EXAM: ${widget.examName}')
+      ..writeln('LEVEL: ${widget.levelBand}')
+      ..writeln(
+        'The app controls the order and sends one APP_NARRATION command per '
+        'audio line. Never read this context on your own.',
+      )
+      ..writeln('CURRENT AUDIO SCRIPT (French lines are exact):');
+    for (var i = 0; i < widget.story.passage.segments.length; i++) {
+      final segment = widget.story.passage.segments[i];
+      buffer.writeln('[$i] FR: ${segment.fr} | EN: ${segment.en}');
+    }
+    buffer.writeln('COMPREHENSION QUESTIONS (audio is the only source):');
+    for (var i = 0; i < _questions.length; i++) {
+      final question = _questions[i];
+      buffer.writeln('Q${i + 1}: ${question.q}');
+      for (var choice = 0; choice < question.choices.length; choice++) {
+        buffer.writeln('  ${choice + 1}. ${question.choices[choice]}');
+      }
+    }
+    return buffer.toString();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _liveNarrationAudio = AudioStreamingService();
+    _call = InlineCallController(
+      sessionType: LiveSessionType.readingNarration,
+      lessonContext: () => _lessonContext,
+      lessonContextCharacterLimit: 8000,
+      levelOverride: widget.levelBand,
+      learningStoreForProfile: ref.read(learningStoreProvider),
+      onChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
   @override
   void dispose() {
-    LessonSpeechService.shared.stop();
+    WidgetsBinding.instance.removeObserver(this);
+    _playbackGeneration++;
+    _call.dispose();
+    unawaited(_liveNarrationAudio.dispose());
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _call.handleAppLifecycle(state);
+  }
+
+  Future<bool> _ensureMarieReady() async {
+    if (!_call.isLive) {
+      await _call.start(context, sendOpeningPrompt: false);
+    }
+    final deadline = DateTime.now().add(const Duration(seconds: 12));
+    while (mounted &&
+        !_call.isReadyForLearnerTurn &&
+        DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+    }
+    if (_call.isReadyForLearnerTurn) return true;
+    if (mounted) {
+      setState(() => _audioError = 'Marie is not connected yet. Try again.');
+    }
+    return false;
+  }
+
   Future<void> _startListening() async {
-    if (_audioStarted || _audioPlaying || _audioComplete) return;
+    if (_audioPlaying || _audioComplete) return;
     final segments = widget.story.passage.segments;
     if (segments.isEmpty) {
       setState(() {
         _audioStarted = true;
         _audioComplete = true;
+        _audioError = null;
       });
       return;
     }
+    if (!await _ensureMarieReady()) return;
+
+    final generation = ++_playbackGeneration;
     setState(() {
       _audioStarted = true;
       _audioPlaying = true;
+      _audioError = null;
     });
-    await LessonSpeechService.shared.speak(
-      items: [
-        for (var i = 0; i < segments.length; i++)
-          SpeechItem(
-            text: segments[i].fr,
-            language: 'fr-FR',
-            contentItemId: widget.story.segmentContentId(i),
-          ),
-      ],
-      onFinished: () {
-        if (!mounted) return;
+    await _call.beginExternalPlayback();
+    try {
+      for (var index = 0; index < segments.length; index++) {
+        if (!mounted || generation != _playbackGeneration) break;
+        await _playLiveSegment(index, generation);
+      }
+      if (mounted && generation == _playbackGeneration) {
         setState(() {
           _audioPlaying = false;
           _audioComplete = true;
         });
+      }
+    } catch (error, stackTrace) {
+      debugPrint('Exam listening narration failed: $error\n$stackTrace');
+      if (mounted && generation == _playbackGeneration) {
+        setState(() {
+          _audioStarted = false;
+          _audioPlaying = false;
+          _audioError = 'Marie could not narrate this recording. Try again.';
+        });
+      }
+    } finally {
+      await _liveNarrationAudio.stopPlayback(hardStop: true);
+      await _call.refreshAfterExternalPlayback();
+      if (mounted && generation == _playbackGeneration) {
+        setState(() => _audioPlaying = false);
+      }
+    }
+  }
+
+  Future<void> _playLiveSegment(int index, int generation) async {
+    final segment = widget.story.passage.segments[index];
+    if (!mounted || generation != _playbackGeneration) return;
+
+    // Match Course listening: drain the previous line before asking Live for
+    // the next one, so a late PCM chunk cannot be heard out of order.
+    await _liveNarrationAudio.waitForPlaybackDrained();
+    await _liveNarrationAudio.stopPlayback(hardStop: true);
+    var audioFeedTail = Future<void>.value();
+    var audioFeedFailed = false;
+
+    await _call.narrateExternalText(
+      instruction:
+          'APP_NARRATION sentence_id=$index AUDIO_REQUIRED. Say this exact '
+          'French sentence once and stop. Do not skip it, combine it with '
+          'another sentence, or explain it: ${segment.fr}',
+      onAudioChunk: (bytes) {
+        if (!mounted || generation != _playbackGeneration) return;
+        audioFeedTail = audioFeedTail.then((_) async {
+          try {
+            await _liveNarrationAudio.playAudioChunk(bytes);
+          } catch (error, stackTrace) {
+            audioFeedFailed = true;
+            debugPrint(
+              'Exam listening audio feed failed for segment $index: '
+              '$error\n$stackTrace',
+            );
+          }
+        });
       },
+      onTranscriptDelta: (_) {},
     );
+    await audioFeedTail;
+    if (!mounted || generation != _playbackGeneration) return;
+    if (audioFeedFailed) {
+      throw StateError('Exam listening audio could not be queued');
+    }
+    await _liveNarrationAudio.waitForPlaybackDrained();
   }
 
   void _submit() {
@@ -190,49 +325,63 @@ class _ExamPracticeScreenState extends State<ExamPracticeScreen> {
   Widget _audioPanel() {
     return _ExamSurface(
       color: DesignTokens.nightSurfaceRaised,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            _audioComplete
-                ? Icons.check_circle_outline_rounded
-                : Icons.headphones_rounded,
-            color: DesignTokens.nightText,
-            size: 30,
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _audioComplete ? 'Audio completed' : 'Listen once',
-                  style: DesignTokens.body(
-                    16,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: DesignTokens.nightText),
+          Row(
+            children: [
+              Icon(
+                _audioComplete
+                    ? Icons.check_circle_outline_rounded
+                    : Icons.headphones_rounded,
+                color: DesignTokens.nightText,
+                size: 30,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _audioComplete ? 'Audio completed' : 'Listen once',
+                      style: DesignTokens.body(
+                        16,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: DesignTokens.nightText),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      _audioComplete
+                          ? 'Answer the questions below.'
+                          : 'The recording plays once, like the exam.',
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  _audioComplete
-                      ? 'Answer the questions below.'
-                      : 'The recording plays once, like the exam.',
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.nightMuted),
+              ),
+              FilledButton(
+                onPressed: _audioStarted || _audioPlaying
+                    ? null
+                    : _startListening,
+                style: FilledButton.styleFrom(
+                  backgroundColor: DesignTokens.nightAccent,
+                  foregroundColor: DesignTokens.onPrimary,
+                  disabledBackgroundColor: DesignTokens.nightHairline,
+                  disabledForegroundColor: DesignTokens.nightMuted,
                 ),
-              ],
-            ),
+                child: Text(_audioPlaying ? 'Playing…' : 'Start'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: _audioStarted ? null : _startListening,
-            style: FilledButton.styleFrom(
-              backgroundColor: DesignTokens.nightAccent,
-              foregroundColor: DesignTokens.onPrimary,
-              disabledBackgroundColor: DesignTokens.nightHairline,
-              disabledForegroundColor: DesignTokens.nightMuted,
+          if (_audioError != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              _audioError!,
+              style: DesignTokens.body(12).copyWith(color: DesignTokens.danger),
             ),
-            child: Text(_audioPlaying ? 'Playing…' : 'Start'),
-          ),
+          ],
         ],
       ),
     );

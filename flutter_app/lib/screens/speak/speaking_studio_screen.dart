@@ -1,13 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../models/session.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_generation_test_harness.dart';
 import '../../services/free_talk_session_launcher.dart';
+import '../../services/learning_streak_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
 import '../labs/listening_lab_screen.dart';
@@ -15,6 +19,7 @@ import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import 'speak_course_activity_screen.dart';
+import 'speak_review_screen.dart';
 import 'speaking_flow_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
@@ -31,9 +36,77 @@ class SpeakingStudioScreen extends ConsumerStatefulWidget {
 
 class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   var _carouselPage = 0;
+  List<Session> _sessions = const [];
+
   @override
   void initState() {
     super.initState();
+    _loadSessions();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _ensureUpcomingMedia();
+    });
+  }
+
+  void _loadSessions() {
+    final sessions = ref.read(storageServiceProvider).getAllSessions();
+    if (mounted) setState(() => _sessions = sessions);
+  }
+
+  /// Home is also a valid entry point to Course, so do not wait for the
+  /// roadmap screen to be opened before filling the unit's Reading and
+  /// Listening buffer. The work is idempotent and guarded by SyncService's
+  /// single in-flight generation gate.
+  Future<void> _ensureUpcomingMedia() async {
+    // The debug generation harness intentionally serializes one selected
+    // skill; Home must not consume that lane with ordinary media requests.
+    if (CourseGenerationTestHarness.current.active) return;
+    final sync = ref.read(syncServiceProvider);
+    try {
+      await sync.hydrateAdaptiveCourses();
+      if (!mounted) return;
+      final profile = ref.read(learningStoreProvider).profile();
+      final store = ref.read(adaptiveCourseStoreProvider);
+      var plan = store.ensureMediaBuffer(profile);
+      await sync.syncAdaptiveCoursePlan(plan);
+      for (var attempt = 0; attempt < 3; attempt++) {
+        if (!mounted) return;
+        final sessions = plan.sessions;
+        final units =
+            sessions
+                .where((session) => session.unit >= 3)
+                .map((session) => session.unit)
+                .toSet()
+                .toList()
+              ..sort();
+        final ready = units.any((unit) {
+          final unitSessions = sessions.where((s) => s.unit == unit);
+          final reading = unitSessions.where(
+            (s) => s.primarySkill == SpeakSkill.reading,
+          );
+          final listening = unitSessions.where(
+            (s) => s.primarySkill == SpeakSkill.listening,
+          );
+          return reading.isNotEmpty &&
+              listening.isNotEmpty &&
+              reading.every(
+                (s) => s.status == 'completed' || s.isContentReady,
+              ) &&
+              listening.every(
+                (s) => s.status == 'completed' || s.isContentReady,
+              );
+        });
+        if (ready) break;
+        final prepared = await sync.prepareAdaptiveCourseLessons();
+        if (prepared == 0) break;
+        await sync.hydrateAdaptiveCourses();
+        plan = store.ensureMediaBuffer(profile);
+      }
+      if (mounted) setState(() {});
+    } catch (error, stackTrace) {
+      // Home remains usable offline; the next foreground/reopen pass can
+      // resume the same queued rows later.
+      debugPrint('Home media buffer preparation failed: $error\n$stackTrace');
+    }
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
@@ -42,13 +115,18 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       (_) => SpeakCourseActivityScreen(session: session),
     );
     if (mounted) {
+      _loadSessions();
       setState(() {});
+      unawaited(_ensureUpcomingMedia());
     }
   }
 
   Future<void> _callTutor() async {
     await openFreeTalkSession(context, ref);
-    if (mounted) setState(() {});
+    if (mounted) {
+      _loadSessions();
+      setState(() {});
+    }
   }
 
   @override
@@ -72,13 +150,8 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       generationHarness: CourseGenerationTestHarness.current,
     );
     final next = roadmap.nextSession;
-    final lessonCards = next == null
-        ? const <SpeakRoadmapSession>[]
-        : _lessonCards(roadmap, next);
-    final upcoming = lessonCards
-        .where((session) => session.contentKey != next?.contentKey)
-        .take(2)
-        .toList(growable: false);
+    final lessonCards = _lessonCards(roadmap);
+    final courseSessions = _courseSessions(roadmap);
     final tutor = ActiveTutor.current;
 
     return Scaffold(
@@ -103,11 +176,11 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             const SizedBox(height: 10),
             _quickStartRow(context),
             const SizedBox(height: 26),
-            _progressSignal(roadmap),
+            _weeklyStreak(),
             const SizedBox(height: 26),
-            Text('YOUR PATH', style: _eyebrow()),
+            Text('YOUR COURSE', style: _eyebrow()),
             const SizedBox(height: 10),
-            _upcomingList(upcoming),
+            _courseList(courseSessions),
             const SizedBox(height: 26),
             Text('EXPLORE', style: _eyebrow()),
             const SizedBox(height: 10),
@@ -406,11 +479,23 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       children: [
         Expanded(
           child: _QuickStartCard(
-            icon: Icons.edit_note_rounded,
-            label: 'Warm up',
-            detail: 'Writing',
+            icon: Icons.rate_review_rounded,
+            label: 'Review',
+            detail: 'Past lessons',
             onTap: () =>
-                AppRouter.push(context, (_) => const WritingLabScreen()),
+                AppRouter.push(context, (_) => const SpeakReviewScreen()),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QuickStartCard(
+            icon: Icons.auto_awesome_rounded,
+            label: 'Warm-up',
+            detail: 'Next lesson',
+            onTap: () => AppRouter.push(
+              context,
+              (_) => const SpeakReviewScreen(kind: 'warmup'),
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -422,101 +507,188 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             onTap: _callTutor,
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _QuickStartCard(
-            icon: Icons.headphones_rounded,
-            label: 'Listening',
-            detail: 'Catch the meaning',
-            onTap: () =>
-                AppRouter.push(context, (_) => const ListeningLabScreen()),
-          ),
-        ),
       ],
     );
   }
 
-  Widget _progressSignal(SpeakRoadmap roadmap) {
-    final total = roadmap.sessions.length;
-    final progress = roadmap.progress.clamp(0.0, 1.0).toDouble();
+  Widget _weeklyStreak() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+    final weekDays = List.generate(
+      7,
+      (index) => monday.add(Duration(days: index)),
+    );
+    final streak = LearningStreakService.summarize(_sessions, now: now);
+    final completedDays = weekDays.where(streak.isActiveOn).length;
+    const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 15, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
       decoration: BoxDecoration(
         color: DesignTokens.nightSurface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: DesignTokens.nightHairline),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      // Keep the accent attached to the card edge and clipped to its rounded
+      // corners. Without this, the negative inset below can paint outside the
+      // surface and make the rail look detached from the model card.
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          Row(
+          Positioned(
+            left: -16,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 4, color: DesignTokens.nightAccent),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.route_rounded,
-                color: DesignTokens.nightAccent,
-                size: 19,
+              Row(
+                children: [
+                  Icon(
+                    Icons.local_fire_department_rounded,
+                    color: DesignTokens.nightAccent,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      'Keep your practice going',
+                      style: _body(15, weight: FontWeight.w700),
+                    ),
+                  ),
+                  Text(
+                    '$completedDays of 7 days',
+                    style: _body(12, color: DesignTokens.nightMuted),
+                  ),
+                ],
               ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Text(
-                  'Your speaking path',
-                  style: _body(15, weight: FontWeight.w700),
-                ),
-              ),
+              const SizedBox(height: 3),
               Text(
-                '${roadmap.completedCount}/$total scenes',
+                'Complete one session each day',
                 style: _body(12, color: DesignTokens.nightMuted),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: DesignTokens.nightHairline,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                DesignTokens.nightAccent,
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (var index = 0; index < weekDays.length; index++)
+                    _streakDay(
+                      label: labels[index],
+                      active: streak.isActiveOn(weekDays[index]),
+                    ),
+                ],
               ),
-            ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _upcomingList(List<SpeakRoadmapSession> sessions) {
-    if (sessions.isEmpty) {
-      return Text(
-        'Your next scene will appear here after this one.',
-        style: _body(13, color: DesignTokens.nightMuted),
-      );
-    }
+  Widget _streakDay({required String label, required bool active}) {
     return Column(
       children: [
-        for (var index = 0; index < sessions.length; index++) ...[
-          _UpcomingSessionRow(
-            session: sessions[index],
-            onTap: () => _openSession(sessions[index]),
+        Text(label, style: _body(11, color: DesignTokens.nightMuted)),
+        const SizedBox(height: 6),
+        Container(
+          width: 29,
+          height: 29,
+          decoration: BoxDecoration(
+            color: active ? DesignTokens.nightAccent : Colors.transparent,
+            shape: BoxShape.circle,
+            border: active
+                ? null
+                : Border.all(color: DesignTokens.nightMuted, width: 1.5),
           ),
-          if (index != sessions.length - 1) const SizedBox(height: 8),
-        ],
+          child: active
+              ? const Icon(Icons.check_rounded, color: Colors.black, size: 18)
+              : null,
+        ),
       ],
     );
   }
 
-  List<SpeakRoadmapSession> _lessonCards(
-    SpeakRoadmap roadmap,
-    SpeakRoadmapSession next,
-  ) {
-    final cards = roadmap.sessions
-        .where((session) => session.index >= next.index && session.contentReady)
-        .take(3)
-        .toList(growable: true);
-    for (final session in roadmap.sessions) {
-      if (cards.length == 3) break;
-      if (session.contentReady && !cards.contains(session)) cards.add(session);
+  List<SpeakRoadmapSession> _courseSessions(SpeakRoadmap roadmap) {
+    const imageBacked = {SpeakSkill.reading, SpeakSkill.listening};
+    return roadmap.sessions
+        .where(
+          (session) =>
+              !session.completed &&
+              session.contentReady &&
+              !imageBacked.contains(session.primarySkill),
+        )
+        .take(2)
+        .toList(growable: false);
+  }
+
+  Widget _courseList(List<SpeakRoadmapSession> sessions) {
+    if (sessions.isEmpty) {
+      return Text(
+        'Your next course lessons will appear here.',
+        style: _body(13, color: DesignTokens.nightMuted),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        color: DesignTokens.nightSurface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: DesignTokens.nightHairline),
+      ),
+      // Match the smart-generation card: the rail is part of the surface,
+      // not a separately painted decoration around it.
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 4, color: DesignTokens.nightAccent),
+          ),
+          Column(
+            children: [
+              for (var index = 0; index < sessions.length; index++) ...[
+                _CourseSessionRow(
+                  session: sessions[index],
+                  onTap: () => _openSession(sessions[index]),
+                ),
+                if (index != sessions.length - 1)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 62),
+                    child: Container(
+                      height: 1,
+                      color: DesignTokens.nightHairline,
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The hero carousel is reserved for the two image-backed lesson types.
+  ///
+  /// Grammar, speaking, writing, and the other generated activities remain in
+  /// Course/Practice. Keeping them out of this carousel prevents a lesson
+  /// without artwork from being presented as an image-led Home destination.
+  List<SpeakRoadmapSession> _lessonCards(SpeakRoadmap roadmap) {
+    final cards = <SpeakRoadmapSession>[];
+    for (final skill in const [SpeakSkill.reading, SpeakSkill.listening]) {
+      SpeakRoadmapSession? nextForSkill;
+      for (final session in roadmap.sessions) {
+        if (session.primarySkill == skill &&
+            !session.completed &&
+            session.contentReady) {
+          nextForSkill = session;
+          break;
+        }
+      }
+      if (nextForSkill != null) cards.add(nextForSkill);
     }
     return cards;
   }
@@ -658,8 +830,8 @@ class _QuickStartCard extends StatelessWidget {
   }
 }
 
-class _UpcomingSessionRow extends StatelessWidget {
-  const _UpcomingSessionRow({required this.session, required this.onTap});
+class _CourseSessionRow extends StatelessWidget {
+  const _CourseSessionRow({required this.session, required this.onTap});
 
   final SpeakRoadmapSession session;
   final VoidCallback onTap;
@@ -671,25 +843,16 @@ class _UpcomingSessionRow extends StatelessWidget {
       label: 'Open ${session.title}',
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: DesignTokens.nightSurface,
-            borderRadius: BorderRadius.circular(17),
-            border: Border.all(color: DesignTokens.nightHairline),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  _coverAsset(session),
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                ),
+              Icon(
+                _courseIcon(session.primarySkill),
+                color: DesignTokens.nightAccent,
+                size: 23,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 13),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -703,7 +866,7 @@ class _UpcomingSessionRow extends StatelessWidget {
                         weight: FontWeight.w700,
                       ).copyWith(color: DesignTokens.nightText),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 4),
                     Text(
                       '${session.level}  ·  ${session.primarySkill.label}  ·  ${session.estimatedMinutes} min',
                       maxLines: 1,
@@ -728,6 +891,17 @@ class _UpcomingSessionRow extends StatelessWidget {
     );
   }
 }
+
+IconData _courseIcon(SpeakSkill skill) => switch (skill) {
+  SpeakSkill.vocabulary => Icons.style_rounded,
+  SpeakSkill.grammar => Icons.bar_chart_rounded,
+  SpeakSkill.writing => Icons.edit_note_rounded,
+  SpeakSkill.speaking || SpeakSkill.roleplay => Icons.graphic_eq_rounded,
+  SpeakSkill.connectors || SpeakSkill.liaison => Icons.link_rounded,
+  SpeakSkill.alphabet => Icons.record_voice_over_rounded,
+  SpeakSkill.review => Icons.rate_review_rounded,
+  _ => Icons.school_rounded,
+};
 
 String _coverAsset(SpeakRoadmapSession session) {
   final resolved = StarterCoverResolver.resolve(title: session.title);

@@ -20,13 +20,13 @@ type VocabularyCandidate = Json & {
 
 // Mirrors adaptiveCourseFoundationSize/adaptiveCourseBatchSize in
 // lib/data/database/adaptive_course_store.dart. Sequences 1-5 (foundation)
-// and 6-10 (Unit 2) are both fixed, authored content for every learner;
-// real AI generation only begins at sequence 11.
-const AUTHORED_SEQUENCE_CEILING = 10;
+// and 6-11 (Unit 2) are both fixed, authored content for every learner;
+// real AI generation only begins at sequence 12.
+const AUTHORED_SEQUENCE_CEILING = 11;
 
 // Mirrors _unitTwoWords in lib/data/database/adaptive_course_store.dart.
 // Unit 2's five words are fixed and identical for every learner, so no AI
-// vocabulary lesson from sequence 11 onward may ever reteach one of them as
+// vocabulary lesson from sequence 12 onward may ever reteach one of them as
 // if it were new — the model has no other way to know they already exist,
 // since they never pass through target_phrases_json like real generated
 // history does.
@@ -37,6 +37,7 @@ function foldFrench(value: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -227,6 +228,21 @@ function earlyPhaseRules(level: string, sequence: number, skill: string): string
 - Keep the lesson compact and controlled before offering one optional extension. Reuse recent language for about 50% of the retrieval targets and add about 50% new language; this ratio applies to words and sentence patterns, never to the story setting.`;
 }
 
+function grammarLevelRules(level: string): string {
+  switch (level.trim().toUpperCase()) {
+    case "A1":
+      return "Grammar level contract: teach one concrete present-tense pattern (être, avoir, regular -er verbs, articles, negation, or simple questions). Use one-clause examples of about 3–8 words; do not use subordinate clauses or abstract explanations.";
+    case "A2":
+      return "Grammar level contract: teach one practical pattern such as passé composé, futur proche, agreement, pronouns, or one simple connector. Keep examples short and concrete; do not use conditional or subjunctive forms.";
+    case "B1":
+      return "Grammar level contract: increase difficulty gradually with one useful contrast or connection, such as passé composé versus imparfait, reasons, pronouns, or a relative clause. Keep the same legacy interaction: every step is one French sentence with exactly one ___ blank and three selectable forms. Use short natural two-clause examples when helpful, but never switch to a word bank, free response, or roleplay.";
+    case "B2":
+      return "Grammar level contract: provide the highest difficulty in this lane through one nuanced but common pattern, such as tense contrast, register, conditionals, or connectors. Keep the same legacy interaction: every step is one French sentence with exactly one ___ blank and three plausible selectable forms. Use richer clauses and realistic register, but avoid rare literary forms and never switch to a word bank, free response, or roleplay.";
+    default:
+      return "Grammar level contract: choose one small, concrete pattern and err simpler when the level is unclear.";
+  }
+}
+
 function validateSimpleFrench(value: string, level: string, label: string, maxWords?: number) {
   const band = level.trim().toUpperCase();
   const words = value.split(/\s+/).filter(Boolean);
@@ -398,8 +414,12 @@ function validateWriting(artifact: Json, level: string) {
 
 function validateGrammar(artifact: Json, level: string) {
   const expectedMode = text(artifact.practiceMode);
-  if (!["guided", "complete", "roleplay"].includes(expectedMode)) {
-    throw new Error("Grammar Practice mode is invalid");
+  // Course Grammar intentionally uses the legacy blank-choice interaction.
+  // Complete's word-bank workshop and Roleplay remain Practice surfaces and
+  // must never leak into the adaptive Course queue, even if the model ignores
+  // the prompt and returns a different mode.
+  if (expectedMode !== "guided") {
+    throw new Error("Course Grammar requires the Guided blank-choice mode");
   }
   const session = object(artifact.session);
   const band = level.trim().toUpperCase();
@@ -414,7 +434,7 @@ function validateGrammar(artifact: Json, level: string) {
     throw new Error("Grammar level band does not match the session");
   }
   const steps = session.steps;
-  const expectedCount = expectedMode === "roleplay" ? 4 : 5;
+  const expectedCount = 5;
   if (!Array.isArray(steps) || steps.length !== expectedCount) {
     throw new Error(`Grammar ${expectedMode} requires exactly ${expectedCount} steps`);
   }
@@ -433,25 +453,23 @@ function validateGrammar(artifact: Json, level: string) {
     validateSimpleFrench(target, level, "Grammar target");
     if (expectedMode === "guided") {
       const choices = list(step.choices, 3);
-      if (!prompt.includes("___") || choices.length !== 3 ||
-        new Set(choices).size !== 3 || !choices.includes(answer)) {
+      // Keep the contract strict about the learner-visible interaction, but
+      // tolerant about harmless model variation (case, accents, and spacing).
+      // A valid French answer such as "étais" must not be rejected merely
+      // because the model returned "ETais" or an extra space. Glosses are
+      // optional for backwards compatibility with already queued artifacts;
+      // new prompts still request them and the client displays them when
+      // present.
+      const foldedChoices = choices.map(foldFrench);
+      const foldedAnswer = foldFrench(answer);
+      const choiceMeanings = list(step.choice_meanings, 3);
+      const blankCount = (prompt.match(/___/g) ?? []).length;
+      if (blankCount !== 1 || choices.length !== 3 ||
+        new Set(foldedChoices).size !== 3 ||
+        !foldedChoices.includes(foldedAnswer) ||
+        (choiceMeanings.length !== 0 && choiceMeanings.length !== choices.length)) {
         throw new Error("Guided Grammar needs one blank and three unique choices");
       }
-    } else if (expectedMode === "complete") {
-      const tokens = list(step.tokens, 20);
-      if (tokens.length < 2 ||
-        normalizeForReconstruction(tokens.join(" ")) !==
-          normalizeForReconstruction(target)) {
-        throw new Error("Complete Grammar needs a word bank that rebuilds the target");
-      }
-    } else {
-      const choices = list(step.choices, 3);
-      if (!text(step.partner_french) || !text(step.partner_english) ||
-        choices.length !== 3 || new Set(choices).size !== 3 ||
-        !choices.includes(answer)) {
-        throw new Error("Grammar roleplay needs a translated partner and three replies");
-      }
-      validateSimpleFrench(text(step.partner_french), level, "Grammar partner line");
     }
   }
 }
@@ -561,15 +579,24 @@ function needsGuidedSpeakingRefresh(row: Json): boolean {
 }
 
 function practiceModeFor(skill: string, sequence: number): string {
-  const variant = Math.max(0, sequence - 6) % 3;
+  // The skill rotation is six slots per personalized unit. A mode that is
+  // chosen once per unit stays stable across that unit's single lesson for
+  // the skill instead of changing based on the absolute sequence number.
+  const unitIndex = Math.floor(Math.max(0, sequence - 6) / 6);
+  const variant = unitIndex % 3;
   switch (skill) {
     case "speaking":
     case "roleplay":
     case "free_talk": return "guidedConversation";
     // Course Writing deliberately alternates only between word-bank ordering
     // and fill-in-the-blank. Roleplay is Practice-only until a later release.
-    case "writing": return ["complete", "guided"][Math.max(0, sequence - 6) % 2];
-    case "grammar": return ["guided", "complete", "roleplay"][variant];
+    case "writing": return ["complete", "guided"][unitIndex % 2];
+    // Course Grammar is the legacy blank-choice lesson: every generated
+    // Course row must open as Guided (one `___` blank and three forms). The
+    // Complete word-bank workshop remains a Practice-only mode. Keeping this
+    // contract stable prevents a later unit from silently changing the
+    // learner's interaction after the first blank-choice lesson.
+    case "grammar": return "guided";
     case "listening": return ["story", "narration", "music"][variant];
     case "reading": return "story";
     case "vocabulary": return "wordsAndSentences";
@@ -624,9 +651,10 @@ function readyArtifactMatchesCurrentCourseSkill(row: Json): boolean {
       case "writing":
         return writingArtifactMatchesCurrentCourseMode(row);
       case "grammar":
-        return !!value.session && typeof value.session === "object" &&
-          !Array.isArray(value.session) &&
-          Array.isArray((value.session as Json).steps);
+        if (text(value.practiceMode) !==
+          practiceModeFor("grammar", Number(row.sequence ?? 0))) return false;
+        validateGrammar(value, text(row.level) || "A1");
+        return true;
       default:
         return true;
     }
@@ -639,7 +667,9 @@ function readyArtifactMatchesCurrentCourseSkill(row: Json): boolean {
 // for language targets; the unit's situation remains a stable through-line
 // and must not be replaced by a previous story scene.
 function unitBalanceLine(sequence: number): string {
-  const unit = Math.floor((sequence - 1) / 5) + 1;
+  const unit = sequence <= 5
+    ? 1
+    : Math.floor((sequence - 6) / 6) + 2;
   return `Unit ${unit} uses a balanced retrieval contract: reuse about 50% of recent language targets and introduce about 50% new language. Keep the unit situation coherent, but never reuse a previous story scene just to satisfy retrieval.`;
 }
 
@@ -699,14 +729,13 @@ function promptFor(
       : "";
     return `${base}${rules}\nThe exact Writing Practice mode is ${mode}; never mix it with Speaking or another Writing mode. Return exactly: {"practiceMode":"${mode}","lesson":{"id":"writing-${text(session.id)}","title":"short learner-facing title","title_en":"short English title","subtitle":"one short English subtitle","level":"${brief.level || "A1"}","mode":"${mode}","goal":"one short goal","steps":[exactly ${count} ${step}]}}. ${guidedRule} For arrange steps, cleaned tokens joined with spaces must reconstruct the target words in order and token_meanings must have the same length with one meaning per selectable token. Keep output short and controlled at every CEFR level.`;
   }
-  const mode = brief.practiceMode;
-  const count = mode === "roleplay" ? 4 : 5;
-  const grammarStep = mode === "guided"
-    ? `{"label":"unique short label","prompt":"French sentence with exactly one ___ blank","prompt_english":"English meaning","target":"complete French sentence","answer":"missing form","choices":["exactly three choices including answer"],"tokens":[],"tip":"short English rule"}`
-    : mode === "complete"
-    ? `{"label":"unique short label","prompt":"short instruction","prompt_english":"English instruction","target":"complete French sentence","answer":"same complete French sentence","choices":[],"tokens":["every","target","token","in","exact","order"],"tip":"short English rule"}`
-    : `{"label":"unique short label","prompt":"reply goal in French","prompt_english":"reply goal in English","target":"correct learner reply","answer":"same correct learner reply","choices":["exactly three replies including answer"],"tokens":[],"tip":"short English rule","partner_french":"short partner line","partner_english":"exact English meaning"}`;
-  return `${base}${rules}\nThe exact Grammar Practice mode is ${mode}; never combine modes. Return exactly: {"practiceMode":"${mode}","session":{"id":"grammar-${text(session.id)}","title":"short title","subtitle":"short English subtitle","level":"${brief.level || "A1"}","tense":"Present, Past, Future, or Mixed","grammar_focus":"one small level-correct pattern","icon_key":"sparkles","mode":"${mode}","goal":"one short goal","source":"generated","steps":[exactly ${count} ${grammarStep}]}}. Tokens joined with spaces must reconstruct target exactly. Keep one grammar pattern throughout.`;
+  const count = 5;
+  // Keep the grammar schema unambiguous. There is no alternate branch here:
+  // Course Grammar is always the legacy fill-in-the-blank interaction. The
+  // Practice-only Complete/Roleplay schemas must not be shown to the model as
+  // options it can accidentally select.
+  const grammarStep = `{"label":"unique short label","prompt":"French sentence with exactly one ___ blank","prompt_english":"English meaning","target":"complete French sentence","answer":"missing form","choices":["exactly three choices including answer"],"choice_meanings":["one concise English gloss for each choice in the same order"],"tokens":[],"tip":"short English rule"}`;
+  return `${base}${rules}\n${grammarLevelRules(brief.level || "A1")} Course Grammar is always Guided: the learner sees one French sentence with exactly one \\"___\\" blank and chooses one of three visible forms. Complete word-bank and Roleplay interactions are Practice-only and must never be returned for a Course row. Return exactly: {"practiceMode":"guided","session":{"id":"grammar-${text(session.id)}","title":"short title","subtitle":"short English subtitle","level":"${brief.level || "A1"}","tense":"Present, Past, Future, or Mixed","grammar_focus":"one small level-correct pattern","icon_key":"sparkles","mode":"guided","goal":"one short goal","source":"generated","steps":[exactly ${count} ${grammarStep}]}}. Every Guided prompt must contain exactly one \\"___\\" blank, choices must contain exactly three unique forms including answer, and choice_meanings must match choices in order. Keep one grammar pattern throughout and reuse the unit vocabulary naturally.`;
 }
 
 function validateArtifact(
@@ -890,7 +919,7 @@ Deno.serve(async (request: Request) => {
   try {
     const body = await request.json() as Json;
     const requested = text(body.harness_skill).replace('-', '_');
-    if (["speaking", "vocabulary", "reading", "listening", "writing"].includes(requested)) {
+    if (["speaking", "vocabulary", "reading", "listening", "writing", "grammar"].includes(requested)) {
       harnessSkill = requested;
     }
     if (Array.isArray(body.vocabulary_candidates)) {
@@ -937,11 +966,13 @@ Deno.serve(async (request: Request) => {
   // generations at once. There is no cap on how many lessons may sit ready
   // ahead of the learner — the app keeps a small lookahead buffer topped up
   // (see adaptiveCourseLookahead in lib/data/database/adaptive_course_store.dart)
-  // and simply queues one more row whenever it wants one; this endpoint's only
-  // job is to pick up the oldest queued/failed row and generate it, forever,
-  // unlimited. This must only ever see real AI-generated lessons (sequence
-  // 11+) — Unit 2 (6-10) is fixed, authored, permanent content for every
-  // learner, never part of this accounting.
+  // and simply queues one more row whenever it wants one. A failed row gets
+  // one endpoint-level retry (the model itself already receives one repair
+  // turn); after two failed claims it becomes terminal until the user makes a
+  // fresh explicit retry. This prevents a bad artifact from burning requests
+  // on every foreground refresh. This must only ever see real AI-generated
+  // lessons (sequence 12+) — Unit 2 (6-11) is fixed, authored, permanent
+  // content for every learner, never part of this accounting.
   // A plan can end up orphaned "active" on the server when a device's local
   // retirement of its own previous plan never reaches a remote-only plan it
   // has no record of (a reinstall wiping local state, or a second device).
@@ -1030,13 +1061,15 @@ Deno.serve(async (request: Request) => {
     return response({ processed: false, remaining: 0 });
   }
 
+  const retryableGenerationFilter =
+    "generation_status.eq.queued,and(generation_status.eq.failed,generation_attempts.lt.2)";
   let candidatesQuery = admin
     .from("adaptive_course_sessions")
     .select("*")
     .eq("user_id", userId)
     .eq("plan_id", activePlanId)
     .gt("sequence", AUTHORED_SEQUENCE_CEILING)
-    .in("generation_status", ["queued", "failed"])
+    .or(retryableGenerationFilter)
     .in("status", ["planned", "active"])
     .is("deleted_at", null)
     .order("sequence", { ascending: true })
@@ -1066,7 +1099,7 @@ Deno.serve(async (request: Request) => {
     })
     .eq("id", sessionId)
     .eq("user_id", userId)
-    .in("generation_status", ["queued", "failed"])
+    .or(retryableGenerationFilter)
     .select("*")
     .maybeSingle();
   if (claimError) return response({ error: claimError.message }, 500);
@@ -1154,7 +1187,7 @@ Deno.serve(async (request: Request) => {
       .eq("user_id", userId)
       .eq("plan_id", activePlanId)
       .gt("sequence", AUTHORED_SEQUENCE_CEILING)
-      .in("generation_status", ["queued", "failed"])
+      .or(retryableGenerationFilter)
       .in("status", ["planned", "active"])
       .is("deleted_at", null);
     if (harnessSkill) remainingQuery = remainingQuery.eq("primary_skill", harnessSkill);

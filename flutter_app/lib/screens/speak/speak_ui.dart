@@ -11,6 +11,9 @@ abstract final class SpeakColors {
   static Color get accent => DesignTokens.primary;
   static Color get accentSoft => DesignTokens.primarySoft;
   static Color get navy => DesignTokens.ink;
+  // Compatibility alias for older speaking/language-lab surfaces that use
+  // the semantic name directly instead of `navy`.
+  static Color get ink => DesignTokens.ink;
   static Color get inkSoft => DesignTokens.inkSoft;
   static Color get line => DesignTokens.canvasDim;
   static Color get green => DesignTokens.success;

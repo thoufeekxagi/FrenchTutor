@@ -8,6 +8,7 @@ import '../../models/daily_session.dart';
 import '../../models/profile.dart';
 import '../../models/srs_state.dart';
 import '../../services/sync_service.dart';
+import '../../services/review_context_cache_service.dart';
 import 'app_migrations.dart';
 
 class LessonProgress {
@@ -103,9 +104,14 @@ class LearningStore {
         tag TEXT PRIMARY KEY,
         description TEXT NOT NULL DEFAULT '',
         count INTEGER NOT NULL DEFAULT 1,
-        resolved INTEGER NOT NULL DEFAULT 0
+        resolved INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT
       )
     ''');
+    final mistakeColumns = _db.select('PRAGMA table_info(mistake_tags)');
+    if (!mistakeColumns.any((row) => row['name'] == 'updated_at')) {
+      _db.execute('ALTER TABLE mistake_tags ADD COLUMN updated_at TEXT');
+    }
     _db.execute('''
       CREATE TABLE IF NOT EXISTS session_diary (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -337,6 +343,7 @@ class LearningStore {
         reviewedAt: DateTime.parse(now),
       ),
     );
+    ReviewContextCacheService.schedule(_db);
   }
 
   /// Cards first graded today — counted from the explicit introduced_on column,
@@ -623,6 +630,9 @@ class LearningStore {
       [lessonId, status, score],
     );
     unawaited(_sync?.syncLessonStatus(lessonId, status, score: score));
+    if (status == 'completed') {
+      ReviewContextCacheService.schedule(_db);
+    }
   }
 
   Map<String, LessonProgress> allLessonProgress() {
@@ -704,6 +714,7 @@ class LearningStore {
         feedback: feedback,
       ),
     );
+    ReviewContextCacheService.schedule(_db);
   }
 
   List<WritingSubmission> submissions() {
@@ -725,12 +736,16 @@ class LearningStore {
   // --- Mistake tags ---
 
   void logMistake({required String tag, required String description}) {
+    final now = _now();
     _db.execute(
-      '''INSERT INTO mistake_tags (tag, description, count) VALUES (?, ?, 1)
-         ON CONFLICT(tag) DO UPDATE SET count = count + 1, description = excluded.description''',
-      [tag, description],
+      '''INSERT INTO mistake_tags (tag, description, count, updated_at)
+         VALUES (?, ?, 1, ?)
+         ON CONFLICT(tag) DO UPDATE SET count = count + 1,
+           description = excluded.description, updated_at = excluded.updated_at''',
+      [tag, description, now],
     );
     unawaited(_sync?.logMistake(tag: tag, description: description));
+    ReviewContextCacheService.schedule(_db);
   }
 
   List<MistakeTag> topMistakeTags({int limit = 5}) {

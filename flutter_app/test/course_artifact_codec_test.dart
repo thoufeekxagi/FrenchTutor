@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:french_tutor/models/grammar_course_v2.dart';
 import 'package:french_tutor/services/course_artifact_codec.dart';
 
 Map<String, dynamic> storyArtifact({String? audioPath}) => {
@@ -148,36 +149,68 @@ void main() {
     expect(lesson.steps.first.tokens, ['Bonjour', 'Marie']);
   });
 
-  test('course grammar enters the exact native Grammar mode', () {
+  test('course grammar accepts only the legacy Guided blank-choice mode', () {
+    expect(
+      () => CourseArtifactCodec.grammarCourse({
+        'practiceMode': 'complete',
+        'session': {
+          'id': 'grammar-course-1',
+          'title': 'Dire son nom',
+          'subtitle': 'Build one simple sentence.',
+          'level': 'A1',
+          'tense': 'Present',
+          'grammar_focus': 'Je m’appelle',
+          'icon_key': 'chat',
+          'mode': 'complete',
+          'goal': 'Say your name.',
+          'source': 'generated',
+          'steps': List.generate(
+            5,
+            (index) => {
+              'label': 'Step ${index + 1}',
+              'prompt': 'Construis la phrase.',
+              'prompt_english': 'Build the sentence.',
+              'target': 'Je m’appelle Sam.',
+              'answer': 'Je m’appelle Sam.',
+              'choices': <String>[],
+              'tokens': ['Je', 'm’appelle', 'Sam.'],
+              'tip': 'Put the subject first.',
+            },
+          ),
+        },
+      }),
+      throwsFormatException,
+    );
+
     final session = CourseArtifactCodec.grammarCourse({
-      'practiceMode': 'complete',
+      'practiceMode': 'guided',
       'session': {
-        'id': 'grammar-course-1',
+        'id': 'grammar-course-2',
         'title': 'Dire son nom',
-        'subtitle': 'Build one simple sentence.',
+        'subtitle': 'Choose the correct form.',
         'level': 'A1',
         'tense': 'Present',
-        'grammar_focus': 'Je m’appelle',
+        'grammar_focus': 'Present-tense -er verbs',
         'icon_key': 'chat',
-        'mode': 'complete',
+        'mode': 'guided',
         'goal': 'Say your name.',
         'source': 'generated',
         'steps': List.generate(
           5,
           (index) => {
             'label': 'Step ${index + 1}',
-            'prompt': 'Construis la phrase.',
-            'prompt_english': 'Build the sentence.',
-            'target': 'Je m’appelle Sam.',
-            'answer': 'Je m’appelle Sam.',
-            'choices': <String>[],
-            'tokens': ['Je', 'm’appelle', 'Sam.'],
-            'tip': 'Put the subject first.',
+            'prompt': 'Je ___ ici.',
+            'prompt_english': 'I speak here.',
+            'target': 'Je parle ici.',
+            'answer': 'parle',
+            'choices': ['parle', 'parles', 'parler'],
+            'tokens': <String>[],
+            'tip': 'Je uses -e.',
           },
         ),
       },
     });
-    expect(session.mode.name, 'complete');
+    expect(session.mode, GrammarV2Mode.guided);
     expect(session.steps, hasLength(5));
   });
 

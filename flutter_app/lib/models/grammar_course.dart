@@ -12,6 +12,7 @@ class GrammarCourseStep {
     required this.target,
     required this.answer,
     required this.choices,
+    this.choiceMeanings = const [],
     required this.tokens,
     required this.tip,
     this.partnerFrench,
@@ -24,6 +25,10 @@ class GrammarCourseStep {
   final String target;
   final String answer;
   final List<String> choices;
+
+  /// English glosses shown under Guided/Roleplay choices when translation is on.
+  /// Older saved sessions may omit this field; the French choice remains valid.
+  final List<String> choiceMeanings;
   final List<String> tokens;
   final String tip;
   final String? partnerFrench;
@@ -36,6 +41,7 @@ class GrammarCourseStep {
     'target': target,
     'answer': answer,
     'choices': choices,
+    if (choiceMeanings.isNotEmpty) 'choice_meanings': choiceMeanings,
     'tokens': tokens,
     'tip': tip,
     if (partnerFrench != null) 'partner_french': partnerFrench,
@@ -55,6 +61,9 @@ class GrammarCourseStep {
       target: json['target']?.toString() ?? '',
       answer: json['answer']?.toString() ?? '',
       choices: values('choices'),
+      choiceMeanings: values('choice_meanings').isNotEmpty
+          ? values('choice_meanings')
+          : values('choices_en'),
       tokens: values('tokens'),
       tip: json['tip']?.toString() ?? '',
       partnerFrench: json['partner_french']?.toString(),
@@ -183,11 +192,20 @@ abstract final class GrammarCourseValidator {
           !labels.add(step.label.trim().toLowerCase())) {
         throw const FormatException('A Grammar session step is incomplete.');
       }
+      final foldedChoices = step.choices.map(_normaliseChoice).toSet();
+      final answerMatches = step.choices
+          .map(_normaliseChoice)
+          .contains(_normaliseChoice(step.answer));
       if (session.mode == GrammarV2Mode.guided &&
           (step.choices.length != 3 ||
-              step.choices.toSet().length != 3 ||
+              foldedChoices.length != 3 ||
               !step.prompt.contains('___') ||
-              !step.choices.contains(step.answer))) {
+              !answerMatches ||
+              (step.choiceMeanings.isNotEmpty &&
+                  (step.choiceMeanings.length != step.choices.length ||
+                      step.choiceMeanings.any(
+                        (meaning) => meaning.trim().isEmpty,
+                      ))))) {
         throw const FormatException(
           'Guided Grammar steps need one blank and three unique choices.',
         );
@@ -203,8 +221,13 @@ abstract final class GrammarCourseValidator {
           ((step.partnerFrench ?? '').trim().isEmpty ||
               (step.partnerEnglish ?? '').trim().isEmpty ||
               step.choices.length != 3 ||
-              step.choices.toSet().length != 3 ||
-              !step.choices.contains(step.answer))) {
+              foldedChoices.length != 3 ||
+              !answerMatches ||
+              (step.choiceMeanings.isNotEmpty &&
+                  (step.choiceMeanings.length != step.choices.length ||
+                      step.choiceMeanings.any(
+                        (meaning) => meaning.trim().isEmpty,
+                      ))))) {
         throw const FormatException(
           'Roleplay Grammar steps need a translated partner and three replies.',
         );
@@ -218,6 +241,9 @@ abstract final class GrammarCourseValidator {
       .replaceAllMapped(RegExp(r'\s+([,.!?;:])'), (match) => match.group(1)!)
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
+
+  static String _normaliseChoice(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
 }
 
 IconData grammarCourseIconForKey(String key) => switch (key) {
@@ -230,8 +256,10 @@ IconData grammarCourseIconForKey(String key) => switch (key) {
   'chat' => Icons.chat_bubble_outline_rounded,
   'home' => Icons.home_outlined,
   'health' => Icons.local_pharmacy_outlined,
-  'sparkles' => Icons.auto_awesome_rounded,
-  _ => Icons.auto_awesome_rounded,
+  // Grammar is a pattern/checking skill. Keep the icon semantic and
+  // consistent across Course, Practice, and generated sessions.
+  'sparkles' => Icons.spellcheck_rounded,
+  _ => Icons.spellcheck_rounded,
 };
 
 String? grammarCourseIconKeyForText(String rawText) {

@@ -16,13 +16,28 @@ class SessionRow extends StatelessWidget {
   /// screen writes via `SessionRecorder` must have an entry here or it just
   /// shows with no badge (still fine, just less informative).
   static String? stageLabel(String? stage) => switch (stage) {
-    'vocab' => 'Vocab',
+    'vocab' || 'vocabulary' => 'Vocab',
     'grammar' => 'Grammar',
-    'reading_listening' => 'Reading',
+    'reading' => 'Reading',
+    'reading_listening' || 'listening' => 'Listening',
     'roleplay' => 'Roleplay',
     'writing' => 'Writing',
-    'speaking' => 'Speaking',
+    'speaking' ||
+    'speaking_guided' ||
+    'free_talk' ||
+    'speaking_exam' ||
+    'picture_description' ||
+    'pronunciation_repair' ||
+    'trial' => 'Speaking',
     'story' => 'Story',
+    'alphabet' => 'Alphabet',
+    'connectors' => 'Connectors',
+    'liaison' => 'Liaison',
+    'review' => 'Review',
+    'exam_reading' => 'Reading',
+    'exam_listening' => 'Listening',
+    'exam_writing' => 'Writing',
+    'exam_speaking' => 'Speaking',
     _ => null,
   };
 

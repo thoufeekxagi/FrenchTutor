@@ -10,7 +10,7 @@ import '../../providers/database_provider.dart';
 import '../../widgets/primary_action_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import '../lessons/writing_course_lesson_screen.dart';
-import '../settings/settings_screen.dart';
+import '../speak/v3_settings_screen.dart';
 
 class WritingCourseHomeScreen extends ConsumerStatefulWidget {
   const WritingCourseHomeScreen({super.key});
@@ -184,7 +184,7 @@ class _WritingCourseHomeScreenState
           label: 'Writing settings',
           child: IconButton(
             onPressed: () =>
-                AppRouter.push(context, (_) => const SettingsScreen()),
+                AppRouter.push(context, (_) => const V3SettingsScreen()),
             icon: const Icon(Icons.tune_rounded),
             color: DesignTokens.primary,
           ),

@@ -12,6 +12,15 @@ import 'sync_service.dart';
 class PracticeArtworkService {
   const PracticeArtworkService._();
 
+  /// One visual language for generated artwork across the app. The app owns
+  /// titles and controls, so generated images remain architectural, calm, and
+  /// completely text-free.
+  static const architecturalVisualStyle =
+      'FrenchTutor architectural editorial illustration: a coherent everyday '
+      'place expressed through clean architectural forms, warm natural light, '
+      'restrained detail, grounded composition, no text or lettering, no people, '
+      'no animals, no faces or hands, no logos, no borders, no interface elements.';
+
   static Future<Uint8List> generate({
     required String id,
     required String title,
@@ -149,8 +158,8 @@ class PracticeArtworkService {
       targetAspectRatio: 9 / 16,
       maxWidth: 768,
       maxHeight: 1365,
-      maxBytes: 160 * 1024,
-      retryMaxBytes: 240 * 1024,
+      maxBytes: 150 * 1024,
+      retryMaxBytes: 200 * 1024,
       generate: (attempt) => generate(
         id: '$id-music-attempt-${attempt + 1}',
         title: title,
@@ -158,6 +167,7 @@ class PracticeArtworkService {
         topic: topic,
         levelBand: levelBand,
         coverPrompt: coverPrompt,
+        visualStyle: architecturalVisualStyle,
         aspectRatio: '9:16',
       ),
     );

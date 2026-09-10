@@ -127,10 +127,10 @@ void main() {
 
     final store = AdaptiveCourseStore(db);
     var plan = store.ensureCurrentPlan(profile);
-    // Sequences 1-5 (foundation) and 6-10 (Unit 2) are both fixed, authored
+    // Sequences 1-5 (foundation) and 6-11 (Unit 2) are both fixed, authored
     // content shared by every learner, so recent evidence cannot show up
     // there. The first lesson that can actually carry this evidence is the
-    // first real AI-personalized one, sequence 11 — complete Unit 2 first
+    // first real AI-personalized one, sequence 12 — complete Unit 2 first
     // so the store grows to it.
     for (final session in plan.sessions) {
       store.markCompleted(session.contentKey);
@@ -140,7 +140,7 @@ void main() {
         plan.sessions[adaptiveCourseFoundationSize + adaptiveCourseBatchSize];
     final reloaded = store.sessionById(first.id);
 
-    expect(plan.sessions, hasLength(11));
+    expect(plan.sessions, hasLength(12));
     expect(first.context, contains('Unit 3 situation anchor'));
     expect(first.context, contains('Prior topics are retrieval evidence only'));
     expect(first.targetPhrases, contains('Je travaille dans le marketing'));
@@ -196,7 +196,7 @@ void main() {
 
       expect(plan.mode, 'writing');
       expect(plan.levelBand, 'A2');
-      expect(plan.topic, 'Work');
+      expect(plan.topic, 'recent French writing targets');
       expect(
         plan.hardSignals,
         contains('article-agreement: Review masculine and feminine nouns.'),
@@ -209,4 +209,54 @@ void main() {
       expect(plan.contextPrompt, contains('Writing evidence'));
     },
   );
+
+  test('Review ignores unscoped SRS ids from outside recent sessions', () {
+    final db = sqlite3.openInMemory();
+    addTearDown(db.dispose);
+
+    final learning = LearningStore(db);
+    final profile = learning.profile()..level = 'a2';
+    learning.saveProfile(profile);
+    final storage = StorageService(db);
+    storage.saveSession(
+      Session(
+        id: 'recent-session',
+        startedAt: '2026-09-07T10:00:00.000Z',
+        endedAt: '2026-09-07T10:10:00.000Z',
+        summary: 'Practised describing a change.',
+        topic: 'Describing changes',
+        stage: 'grammar',
+      ),
+    );
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    db.execute(
+      '''INSERT INTO vocab_reviews
+         (id, entry_id, grade, response_type, session_id, reviewed_at, created_at)
+         VALUES (?, ?, ?, ?, NULL, ?, ?)''',
+      ['old-review', 'at-the-cafe-word-3', 'again', 'flashcard', now, now],
+    );
+    db.execute(
+      '''INSERT INTO vocab_cards
+         (id, entry_id, ease, interval_days, reps, due_at, introduced_on,
+          last_reviewed_at, last_grade, created_at, updated_at)
+         VALUES (?, ?, 2.5, 0, 1, ?, ?, ?, ?, ?, ?)''',
+      [
+        'old-card',
+        'at-the-cafe-word-3',
+        now,
+        '2026-09-01',
+        now,
+        'again',
+        now,
+        now,
+      ],
+    );
+
+    final snapshot = UniversalLearningDataService.buildSnapshot(db, profile);
+
+    expect(snapshot.vocabularySignals.join(' '), isNot(contains('cafe')));
+    expect(snapshot.repeatedMistakes.join(' '), isNot(contains('cafe')));
+    expect(snapshot.targetPhrases.join(' '), isNot(contains('cafe')));
+  });
 }

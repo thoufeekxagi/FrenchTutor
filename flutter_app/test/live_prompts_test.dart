@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:french_tutor/models/tutor_persona.dart';
 import 'package:french_tutor/prompts/live_prompts.dart';
 import 'package:french_tutor/services/lesson_agent_service.dart';
 
@@ -95,6 +96,15 @@ void main() {
       expect(prompt, isNot(contains('one simple follow-up question')));
     });
 
+    test('Smart Review speaking prompt cannot fall into a stock roleplay', () {
+      final prompt = LivePrompts.forSession(LiveSessionType.speakingReview);
+      expect(prompt, contains('DETERMINISTIC PERSONAL REVIEW COACH'));
+      expect(prompt, contains('Do not turn this call into a roleplay'));
+      expect(prompt, contains('Never invent or mention a café'));
+      expect(prompt, contains('Never use a stock roleplay opening'));
+      expect(prompt, isNot(contains('YOU PLAY THE OTHER CHARACTER')));
+    });
+
     test(
       'guided conversation prompt enforces repeat, repair, and transfer',
       () {
@@ -132,6 +142,48 @@ void main() {
         );
       }
     });
+
+    test('grammar stage never leaks a hidden answer before submission', () {
+      final prompt = LivePrompts.forSession(LiveSessionType.grammarStage);
+      expect(prompt, contains('missing French form and completed target'));
+      expect(
+        prompt,
+        contains('Do not read the English instruction as a translation'),
+      );
+      expect(prompt, contains('without naming any option'));
+    });
+
+    test('compact vocabulary feedback is specific and restrained', () {
+      final prompt = LivePrompts.compactVocabulary(persona: TutorPersona.marie);
+      expect(prompt, contains('judge only that current target'));
+      expect(prompt, contains('specific confirmation such as'));
+      expect(prompt, contains('Vary the wording naturally'));
+      expect(prompt, contains('pronunciation"'));
+      expect(prompt, contains('one concrete'));
+      expect(prompt, contains('could not hear'));
+      expect(prompt, contains('generic motivational filler'));
+      expect(prompt, contains('fantastic'));
+      expect(prompt, contains('learner in control of the pace'));
+      expect(prompt, isNot(contains('one short correction or encouragement')));
+    });
+
+    test(
+      'compact writing course guide follows the grammar screen contract',
+      () {
+        final prompt = LivePrompts.compactGuidedWriting(
+          persona: TutorPersona.marie,
+        );
+        expect(prompt, contains('APP OPENING'));
+        expect(prompt, contains('APP SCREEN CHANGED'));
+        expect(prompt, contains('APP FEEDBACK'));
+        expect(prompt, contains('Never fill the blank'));
+        expect(prompt, contains('never name, spell, translate, or assemble'));
+        expect(prompt, contains('VISIBLE HINT'));
+        expect(prompt, contains('explicitly asks for the answer'));
+        expect(prompt, contains('APP COMMAND'));
+        expect(prompt, contains('Never select, grade, advance'));
+      },
+    );
   });
 
   group('LessonAgentService guardrail', () {

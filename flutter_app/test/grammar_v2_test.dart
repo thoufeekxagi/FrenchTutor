@@ -149,6 +149,12 @@ void main() {
           find.byIcon(Icons.translate_rounded, skipOffstage: false),
           findsOneWidget,
         );
+        // The meaning of the sentence is part of the guided blank card from
+        // the start, not only after the answer is checked.
+        expect(
+          find.text(session.steps.first.promptEnglish, skipOffstage: false),
+          findsOneWidget,
+        );
       } else if (mode == GrammarV2Mode.complete) {
         expect(find.text('Learn the pattern'), findsOneWidget);
       } else {

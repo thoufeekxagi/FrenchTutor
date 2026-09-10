@@ -159,6 +159,8 @@ class PilotInfrastructureStore {
       'generated_vocabulary_sets',
       'adaptive_course_plans',
       'adaptive_course_sessions',
+      'review_plans',
+      'review_attempts',
       'onboarding_trial_adoption',
     };
     const operations = {'upsert', 'delete'};

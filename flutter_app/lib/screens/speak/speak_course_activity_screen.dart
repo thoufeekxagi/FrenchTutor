@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +8,7 @@ import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/speak_curriculum.dart';
 import '../../models/speaking_course.dart';
+import '../../models/grammar_course_session_result.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_progress_service.dart';
 import '../../services/course_artifact_codec.dart';
@@ -125,6 +128,7 @@ class _SpeakCourseActivityScreenState
               contentKey: session.contentKey,
               topic: session.title,
               stage: session.primarySkill.wireName,
+              lessonMaterial: _courseLessonMaterial,
             );
         ref.read(adaptiveCourseStoreProvider).markCompleted(session.contentKey);
       }
@@ -137,6 +141,24 @@ class _SpeakCourseActivityScreenState
         _launching = false;
         _error = error.toString().replaceFirst('Bad state: ', '');
       });
+    }
+  }
+
+  /// A last-resort local snapshot for typed/choice Course activities. The
+  /// adaptive artifact is normally joined by [contentKey] when the session is
+  /// saved, but keeping the in-memory payload here closes the race where the
+  /// completion row is written before the artifact transaction is visible.
+  String? get _courseLessonMaterial {
+    final artifact = session.artifact;
+    if (artifact == null || artifact.isEmpty) return null;
+    try {
+      return [
+        'Lesson: ${session.title}',
+        if (session.subtitle.trim().isNotEmpty) 'Context: ${session.subtitle}',
+        'Generated activity: ${jsonEncode(artifact)}',
+      ].join('\n');
+    } catch (_) {
+      return null;
     }
   }
 
@@ -253,6 +275,7 @@ class _SpeakCourseActivityScreenState
         (_) => StoryReaderScreen(
           story: story,
           showFinishButton: true,
+          courseContentKey: session.contentKey,
           generateCoverIfMissing: true,
           coverGenerator: () async {
             final coverUrl = await PracticeArtworkService.generateAndUpload(
@@ -290,7 +313,11 @@ class _SpeakCourseActivityScreenState
       if (!mounted) return false;
       final result = await AppRouter.push<bool>(
         context,
-        (_) => ListeningPracticeScreen(story: story, showFinishButton: true),
+        (_) => ListeningPracticeScreen(
+          story: story,
+          showFinishButton: true,
+          courseContentKey: session.contentKey,
+        ),
         fullscreenDialog: true,
       );
       return result == true;
@@ -311,7 +338,11 @@ class _SpeakCourseActivityScreenState
         (_) => GrammarV2LessonScreen(session: grammarSession),
         fullscreenDialog: true,
       );
-      return result != null;
+      // Grammar's guided/complete/roleplay screens return a structured
+      // result. Require its explicit completion flag, just like the other
+      // course activities require `true`; a cancelled route or an unrelated
+      // Navigator payload must never unlock the next generated lesson.
+      return result is GrammarCourseSessionResult && result.completed;
     }
 
     final screen = switch (skill) {

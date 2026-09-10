@@ -13,6 +13,7 @@ import '../models/content_models.dart';
 import '../models/writing_course.dart';
 import '../models/grammar_course.dart';
 import '../models/grammar_course_v2.dart';
+import '../data/liaison_curriculum_catalog.dart';
 import '../utils/generated_text.dart';
 import '../models/tutor_persona.dart';
 import 'gemini_live_audio_service.dart';
@@ -20,17 +21,19 @@ import 'ai_cost_tracker.dart';
 import 'story_variety_service.dart';
 import 'vocabulary_level_policy.dart';
 import 'learner_language_policy.dart';
+import 'review_material_service.dart';
 import '../prompts/live_prompts.dart';
 
 /// Shared instruction for every generated lesson image. The Edge Function
 /// repeats this contract at the provider boundary, so local previews and
 /// release builds produce the same text-free story artwork.
 const _bookCoverInstruction = '''
-ARTWORK RULES: use one simple, friendly storybook/editorial illustration based
-only on the visual anchor. Show one ordinary setting or one/two concrete story
-objects. No cinematic poster, generic hero, unrelated landmark, or invented
-character. Absolutely no text, letters, words, numbers, symbols, Chinese
-characters, signs, labels, logos, captions, watermarks, UI, borders, or frames.
+ARTWORK RULES: use one calm architectural editorial illustration based only on
+the visual anchor. Express the ordinary setting through clean architectural
+forms, warm natural light, and restrained detail. No cinematic poster, generic
+hero, unrelated landmark, or invented character. Absolutely no text, letters,
+words, numbers, symbols, Chinese characters, signs, labels, logos, captions,
+watermarks, UI, borders, or frames.
 The app renders all learner-facing text outside the image.
 ''';
 
@@ -124,6 +127,24 @@ class LiaisonAttemptAssessment {
   final bool liaisonMatch;
   final double confidence;
   final String feedback;
+}
+
+/// A small repair payload for approved Liaison cards whose example sentence or
+/// read-aloud passage is missing. Content generation is deliberately separate
+/// from Gemini Live: GPT-5.6 Luna authors the French material, then Live speaks
+/// and coaches it interactively.
+class LiaisonPracticeExample {
+  const LiaisonPracticeExample({
+    required this.sentence,
+    required this.sentenceEnglish,
+    required this.passage,
+    required this.passageEnglish,
+  });
+
+  final String sentence;
+  final String sentenceEnglish;
+  final String passage;
+  final String passageEnglish;
 }
 
 class WritingFeedback {
@@ -585,6 +606,7 @@ ${LearnerLanguagePolicy.promptBlock(levelBand)}''';
     required List<String> knownVocab,
     required List<({String tag, String description, int count})> mistakeTags,
     required Iterable<String> avoidTitles,
+    String contextPrompt = '',
   }) async {
     final level = levelBand.trim().toUpperCase();
     final stepCount = mode == WritingCourseMode.roleplay ? 4 : 5;
@@ -643,6 +665,7 @@ INTERESTS: ${interests.isEmpty ? '(none selected)' : interests.take(6).join(', '
 KNOWN VOCABULARY: ${knownVocab.isEmpty ? '(use common level-appropriate words)' : knownVocab.take(35).join(', ')}
 RECURRING ERRORS: ${mistakeTags.isEmpty ? '(none recorded)' : mistakeTags.take(3).map((item) => item.description).join('; ')}
 AVOID THESE TITLES OR NEAR-DUPLICATE TOPICS: ${avoidTitles.take(20).join(', ')}
+${contextPrompt.trim().isEmpty ? '' : 'COURSE-ALIGNED REVIEW CONTEXT: ${_reviewGenerationContext(contextPrompt)}'}
 Create one fresh lesson now.''';
     final raw = await _complete(
       messages: [
@@ -686,6 +709,12 @@ Create one fresh lesson now.''';
     );
   }
 
+  String _reviewGenerationContext(String value) {
+    final clean = value.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (clean.length <= 2400) return clean;
+    return '${clean.substring(0, 2399).trimRight()}…';
+  }
+
   /// Generates complete Grammar sessions, not standalone sentence cards.
   /// Every returned session has one topic and a bounded 4–5-step progression,
   /// matching the lesson contract used by Speaking and Writing.
@@ -720,7 +749,7 @@ Create one fresh lesson now.''';
         '''
 Create exactly $count original French Grammar V2 sessions. Return ONLY compact
 JSON with this exact shape:
-{"sessions":[{"title":string,"subtitle":string,"grammar_focus":string,"icon_key":string,"steps":[{"label":string,"prompt":string,"prompt_english":string,"target":string,"answer":string,"choices":[string],"tokens":[string],"tip":string,"partner_french":string|null,"partner_english":string|null}]}]}
+{"sessions":[{"title":string,"subtitle":string,"grammar_focus":string,"icon_key":string,"steps":[{"label":string,"prompt":string,"prompt_english":string,"target":string,"answer":string,"choices":[string],"choice_meanings":[string],"tokens":[string],"tip":string,"partner_french":string|null,"partner_english":string|null}]}]}
 
 $modeContract
 
@@ -736,7 +765,10 @@ partner_french and partner_english are required, choices has exactly three
 unique complete replies, and answer is the best reply. The icon_key must be
 one of: sun, coffee, map, calendar, market, train, chat, home, health.
 Titles, subtitles, labels, grammar_focus, and tips are in English; learner
-examples and partner lines are French with accurate English meanings.
+examples and partner lines are French with accurate English meanings. For every
+Guided or Roleplay choice, return choice_meanings with one concise English
+gloss in the exact same order as choices. Never put a blank placeholder in a
+choice meaning.
 
 LEVEL: $level. Use concrete daily language appropriate to the level. Avoid
 unsafe, sexual, political, or medical-diagnostic scenarios. Do not reuse these
@@ -2208,9 +2240,9 @@ The learner's target level is $levelBand. Match sentence length, grammar, vocabu
       coverPrompt: coverPrompt,
     );
     final styles = const [
-      'simple editorial illustration',
-      'warm storybook illustration',
-      'clean colored-pencil illustration',
+      'architectural editorial illustration with clean forms and warm natural light',
+      'architectural story illustration with restrained detail and grounded composition',
+      'clean modern architectural illustration with calm colors and readable structure',
     ];
     final styleIndex = variationSeed == null || variationSeed.isEmpty
         ? 0
@@ -2664,6 +2696,8 @@ ${_cefrCalibration(levelBand)}''';
         {'role': 'user', 'content': 'LEVEL: $levelBand'},
       ],
       maxTokens: 1200,
+      provider: _primaryTextProvider,
+      traceFeature: 'liaison_explanation_generation',
     );
     return GrammarExplanation.fromJson(_decodeObject(raw));
   }
@@ -2700,6 +2734,8 @@ INVENT A FRESH, SPECIFIC STORY EVERY TIME: never reuse the same premise or openi
       ],
       maxTokens: 1400,
       temperature: 1.0,
+      provider: _primaryTextProvider,
+      traceFeature: 'liaison_story_generation',
     );
     return _parseReadingPassage(raw, levelBand: levelBand);
   }
@@ -2728,9 +2764,201 @@ KEYWORDS: 6 to 10 entries for useful French words or short phrases that actually
         },
       ],
       maxTokens: 1400,
+      provider: _primaryTextProvider,
+      traceFeature: 'liaison_quiz_generation',
     );
     return _parseStoryQuizAndKeywords(raw, levelBand: levelBand);
   }
+
+  /// Repairs only missing example material on an approved Liaison card. The
+  /// card's pair, level, rule, and link sound are authoritative and cannot be
+  /// changed by the model. The normal route is GPT-5.6 Luna through the
+  /// pinned OpenRouter text provider; Gemini Live is reserved for audio and
+  /// turn-by-turn coaching after this content exists.
+  Future<LiaisonPracticeExample> generateLiaisonPracticeExample({
+    required String levelBand,
+    required String firstWord,
+    required String secondWord,
+    required String ruleType,
+    required String linkSound,
+  }) async {
+    const system = '''
+Create missing example material for one approved French Liaison card. Return
+ONLY compact JSON with this exact shape: {"sentence": string,
+"sentence_en": string, "passage": string, "passage_en": string}.
+Keep the supplied word pair exactly as written. The sentence must be natural,
+short, and appropriate for the stated CEFR level. The passage must contain
+exactly two or three short sentences and must not contain instructions to the
+learner, translations, labels, or meta-commentary. Respect the liaison rule:
+obligatory means the sound is required, forbidden means do not force a link,
+and optional means either pronunciation may be heard. Do not invent a new
+rule or change the expected consonant.''';
+    final raw = await _complete(
+      messages: [
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
+        {
+          'role': 'user',
+          'content':
+              'LEVEL: $levelBand\nPAIR: $firstWord $secondWord\n'
+              'RULE: $ruleType\nEXPECTED LINK SOUND: $linkSound',
+        },
+      ],
+      maxTokens: 360,
+      temperature: 0.25,
+      jsonMode: true,
+      provider: _primaryTextProvider,
+      traceFeature: 'liaison_example_repair',
+      maxAttempts: 2,
+    );
+    final object = _decodeObject(raw);
+    String requiredText(String key) {
+      final value = object[key]?.toString().trim() ?? '';
+      if (value.isEmpty) throw AgentError.badResponse;
+      return value;
+    }
+
+    final sentence = requiredText('sentence');
+    final sentenceEnglish = requiredText('sentence_en');
+    final passage = requiredText('passage');
+    final passageEnglish = requiredText('passage_en');
+    final normalizedPassage = passage.toLowerCase();
+    if (!normalizedPassage.contains(firstWord.toLowerCase()) ||
+        !normalizedPassage.contains(secondWord.toLowerCase())) {
+      throw AgentError.badResponse;
+    }
+    return LiaisonPracticeExample(
+      sentence: sentence,
+      sentenceEnglish: sentenceEnglish,
+      passage: passage,
+      passageEnglish: passageEnglish,
+    );
+  }
+
+  /// Generates the next small Liaison queue when a learner is close to the
+  /// end of the approved catalog. GPT-5.6 Luna authors the content, while the
+  /// parser below rejects incomplete or contradictory cards before storage.
+  Future<List<LiaisonCurriculumLesson>> generateLiaisonLessonBatch({
+    required String levelBand,
+    required int count,
+    List<String> excludePairs = const [],
+  }) async {
+    final boundedCount = count.clamp(3, 5);
+    const system = '''
+Create a batch of original French Liaison practice cards for the requested
+CEFR level. Return ONLY compact JSON with this exact shape:
+{"lessons":[{"title":string,"subtitle":string,"collection":string,
+"first_word":string,"second_word":string,"linked_display":string,
+"sound_hint":string,"link_sound":string,"rule_type":"obligatory|optional|forbidden",
+"explanation":string,"sentence":string,"sentence_english":string,
+"passage":string,"passage_english":string}]}.
+Every card must teach one real liaison boundary. Keep A1 concrete and short;
+A2 practical; B1 varied with register awareness; B2 nuanced and natural.
+Never force a forbidden liaison. For optional links, explain that linked and
+unlinked speech can both be acceptable. The pair must appear naturally in the
+sentence and passage. Do not include instructions, labels, markdown, or
+placeholder text in learner content. Do not duplicate any excluded pair.''';
+    final raw = await _complete(
+      messages: [
+        {
+          'role': 'system',
+          'content':
+              system +
+              LearnerLanguagePolicy.promptBlock(levelBand) +
+              languageGuardrail,
+        },
+        {
+          'role': 'user',
+          'content':
+              'LEVEL: $levelBand\nCOUNT: $boundedCount\n'
+              'EXCLUDED PAIRS: ${excludePairs.take(40).join(', ')}',
+        },
+      ],
+      maxTokens: 1800,
+      temperature: 0.55,
+      jsonMode: true,
+      provider: _primaryTextProvider,
+      traceFeature: 'liaison_lesson_batch_generation',
+      maxAttempts: 2,
+    );
+    final object = _decodeObject(raw);
+    final rows = object['lessons'];
+    if (rows is! List || rows.length < 3) throw AgentError.badResponse;
+    final excluded = excludePairs.map(_normalizeLiaisonPair).toSet();
+    final seen = <String>{};
+    final lessons = <LiaisonCurriculumLesson>[];
+    for (final row in rows.take(boundedCount)) {
+      if (row is! Map) continue;
+      final json = row.cast<String, dynamic>();
+      final first = json['first_word']?.toString().trim() ?? '';
+      final second = json['second_word']?.toString().trim() ?? '';
+      final pairKey = _normalizeLiaisonPair('$first $second');
+      if (first.isEmpty ||
+          second.isEmpty ||
+          excluded.contains(pairKey) ||
+          !seen.add(pairKey)) {
+        continue;
+      }
+      final rawRule = json['rule_type']?.toString().trim() ?? '';
+      final rule = LiaisonRuleType.values
+          .where((value) => value.name == rawRule)
+          .firstOrNull;
+      if (rule == null) continue;
+      String field(String key) => json[key]?.toString().trim() ?? '';
+      final values = [
+        field('title'),
+        field('subtitle'),
+        field('linked_display'),
+        field('sound_hint'),
+        field('link_sound'),
+        field('explanation'),
+        field('sentence'),
+        field('sentence_english'),
+        field('passage'),
+        field('passage_english'),
+      ];
+      if (values.any((value) => value.isEmpty)) {
+        continue;
+      }
+      final sentence = field('sentence').toLowerCase();
+      if (!sentence.contains(first.toLowerCase()) ||
+          !sentence.contains(second.toLowerCase())) {
+        continue;
+      }
+      lessons.add(
+        LiaisonCurriculumLesson(
+          id: 'generated_${const Uuid().v4()}',
+          level: LivePrompts.normalizeLevel(levelBand),
+          collection: field('collection').isEmpty
+              ? 'Generated links'
+              : field('collection'),
+          title: field('title'),
+          subtitle: field('subtitle'),
+          firstWord: first,
+          secondWord: second,
+          linkedDisplay: field('linked_display'),
+          soundHint: field('sound_hint'),
+          linkSound: field('link_sound'),
+          ruleType: rule,
+          explanation: field('explanation'),
+          sentence: field('sentence'),
+          sentenceEnglish: field('sentence_english'),
+          passage: field('passage'),
+          passageEnglish: field('passage_english'),
+        ),
+      );
+    }
+    if (lessons.length < 3) throw AgentError.badResponse;
+    return lessons;
+  }
+
+  String _normalizeLiaisonPair(String value) =>
+      value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   /// Runs ONCE, right after a tense/topic is chosen for the Grammar stage — builds a short
   /// deck of `GrammarPracticeCard`s (one short French sentence in the chosen tense per card,
@@ -3105,6 +3333,297 @@ Reply with ONE short, direct answer: what it says and/or means, translated/expla
       temperature: 0.35,
     );
     return reply.trim();
+  }
+
+  /// Lets GPT-5.6 Luna analyze the learner dossier once and return the
+  /// personalized Review blueprint used by the existing lesson engines.
+  ///
+  /// This is intentionally separate from Course/Practice generation. It is an
+  /// additive Review-only call: the normal lesson flows keep their current
+  /// prompts and storage contracts, while Review gets a model-authored choice
+  /// of focus, targets, pedagogy, and format.
+  Future<ReviewBlueprint> composeReviewBlueprint({
+    required PersonalizedReviewPlan plan,
+  }) async {
+    const system = '''
+You are the Review Director for a French-learning app. Analyze the learner's
+structured Course and Practice dossier and create one highly personalized
+review blueprint. Use only evidence in the dossier. Do not invent mistakes.
+
+The review must feel like a useful continuation of the learner's real work:
+retrieve important vocabulary, grammar, sentence patterns, and situations;
+repair repeated weaknesses; and add only a small controlled challenge. The app
+has already resolved the mode and primary theme deterministically. Do not
+replace them and do not invent a new setting, café, character, or scenario.
+
+Return ONLY valid compact JSON with exactly these fields:
+{"mode":"smart|speaking|reading|listening|writing","title":"string","topic":"string","summary":"string","rationale":"string","objectives":["string"],"vocabulary":["string"],"grammar":["string"],"steps":["string"],"speakingTargets":[{"french":"string","english":"string","tip":"string"}],"sourceSessionIds":["string"],"contextPrompt":"string"}
+
+Rules:
+- Return the exact `localSuggestedMode` and exact `primaryTopic` supplied in
+  the dossier. `smart` means one unified mixed lesson, not a Live audio lesson,
+  roleplay, or Free Talk session.
+- Keep every target and objective traceable to the supplied recent evidence.
+- If the evidence is sparse, make a short generic retrieval lesson around the
+  supplied primary topic; never fill the gap with a remembered stock scenario.
+- Select 3 to 6 objectives, 3 to 8 vocabulary items, 1 to 3 grammar targets,
+  and 4 to 7 short lesson steps.
+- When mode is `smart`, the lesson steps must cover vocabulary, grammar,
+  reading, listening, writing, and a short guided speaking drill. Prefix each
+  step with its format in brackets, for example `[GRAMMAR]` or `[WRITING]`.
+- When mode is `smart` or `speaking`, return 2 to 5 `speakingTargets`. Each
+  target must contain a short exact French phrase and its English meaning.
+  These targets are used by the existing guided Course/Practice speaking flow;
+  never write a roleplay scene, character setup, or open-ended conversation.
+- `contextPrompt` is a practical teaching contract for the next lesson engine.
+  It must explain what to retrieve, what to correct, what to vary, and how to
+  keep the activity at the learner's level. Do not include raw transcript
+  dumps, internal ids, or unsupported claims.
+- `sourceSessionIds` must contain only ids present in recentSessions.
+- For warm-up, look forward to the supplied next Course lesson and do not
+  present future content as already mastered.
+- Keep the result concise enough for another lesson engine to use directly.
+''';
+    final raw = await _complete(
+      messages: [
+        {'role': 'system', 'content': system + languageGuardrail},
+        {
+          'role': 'user',
+          // The Edge Function intentionally caps each text field at 12k
+          // characters. Keep the structured dossier below that ceiling while
+          // preserving its shape; this trims optional evidence before it can
+          // make the composer request fail.
+          'content':
+              'REQUESTED REVIEW PLAN:\n${jsonEncode(_boundedReviewDossier(plan))}',
+        },
+      ],
+      maxTokens: 2600,
+      temperature: 0.25,
+      jsonMode: true,
+      traceFeature: 'review_composer',
+      maxAttempts: 2,
+    );
+    return _parseReviewBlueprint(raw, plan);
+  }
+
+  Map<String, dynamic> _boundedReviewDossier(PersonalizedReviewPlan plan) {
+    final decoded = jsonDecode(jsonEncode(plan.gptDossier));
+    if (decoded is! Map) {
+      throw StateError('Review dossier is not a JSON object');
+    }
+    final dossier = decoded.cast<String, dynamic>();
+    final coverage = dossier['courseAndPracticeCoverage'];
+    if (coverage is Map) {
+      final ids = coverage['sourceSessionIds'];
+      if (ids is List) {
+        coverage['sourceSessionIds'] = ids.take(24).toList(growable: false);
+      }
+    }
+
+    // Keep the highest-value recent evidence first. The final loop is a
+    // guard for unusually verbose stored summaries or transcripts.
+    const listLimits = <String, int>{
+      'recentSessions': 16,
+      'recentLearnerTranscriptExcerpts': 10,
+      'vocabularyEvidence': 20,
+      'learnerPhrases': 20,
+      'repeatedMistakes': 10,
+      'performanceSignals': 24,
+      'writingEvidence': 6,
+      'examEvidence': 6,
+    };
+    for (final entry in listLimits.entries) {
+      final value = dossier[entry.key];
+      if (value is List) {
+        dossier[entry.key] = value.take(entry.value).toList(growable: false);
+      }
+    }
+
+    final shrinkKeys = <String>[
+      'performanceSignals',
+      'recentLearnerTranscriptExcerpts',
+      'vocabularyEvidence',
+      'learnerPhrases',
+      'recentSessions',
+      'repeatedMistakes',
+      'writingEvidence',
+      'examEvidence',
+    ];
+    while (jsonEncode(dossier).length > 11000) {
+      var removed = false;
+      for (final key in shrinkKeys) {
+        final value = dossier[key];
+        if (value is List && value.length > 1) {
+          dossier[key] = value.sublist(0, value.length - 1);
+          removed = true;
+          break;
+        }
+      }
+      if (!removed) break;
+    }
+    return dossier;
+  }
+
+  ReviewBlueprint _parseReviewBlueprint(
+    String raw,
+    PersonalizedReviewPlan plan,
+  ) {
+    final decoded = jsonDecode(extractJSON(raw));
+    if (decoded is! Map) throw AgentError.badJSON(raw);
+    final json = decoded.cast<String, dynamic>();
+    const allowed = {'smart', 'speaking', 'reading', 'listening', 'writing'};
+    // The local planner is the source of truth for mode. GPT composes the
+    // lesson, but it does not get to re-route Smart on a second decision.
+    final mode = plan.mode;
+    if (!allowed.contains(mode)) throw AgentError.badJSON(raw);
+    final sourceIds = _reviewStringList(
+      json['sourceSessionIds'],
+    ).where(plan.sourceSessionIds.contains).take(12).toList(growable: false);
+    final context = _reviewBounded(_reviewString(json['contextPrompt']), 6400);
+    if (context.isEmpty) throw AgentError.badJSON(raw);
+    if (plan.kind == 'review' &&
+        (mode == 'smart' || mode == 'speaking') &&
+        _containsUnscopedReviewSetting(json, context, plan)) {
+      // Never let a malformed composer response reach a Review activity. A
+      // Review with an unsupported stock setting must fail the bounded
+      // composer call, not silently become a café/station roleplay.
+      throw AgentError.badResponse;
+    }
+    final speakingTargets = <ReviewSpeakingTarget>[];
+    final rawSpeakingTargets = json['speakingTargets'];
+    if (rawSpeakingTargets is List) {
+      for (final item in rawSpeakingTargets) {
+        if (item is! Map) continue;
+        final french = _reviewBounded(_reviewString(item['french']), 120);
+        final english = _reviewBounded(_reviewString(item['english']), 160);
+        if (french.isEmpty || english.isEmpty) continue;
+        speakingTargets.add(
+          ReviewSpeakingTarget(
+            french: french,
+            english: english,
+            tip: _reviewBounded(_reviewString(item['tip']), 180),
+          ),
+        );
+        if (speakingTargets.length == 5) break;
+      }
+    }
+    if ((mode == 'smart' || mode == 'speaking') && speakingTargets.isEmpty) {
+      throw AgentError.badResponse;
+    }
+    return ReviewBlueprint(
+      mode: mode,
+      title: _reviewBounded(
+        _reviewString(json['title']).isEmpty ? plan.topic : json['title'],
+        120,
+      ),
+      // The topic is deliberately not model-selected. This is the hard guard
+      // that prevents an unrelated old SRS item from turning into a Live
+      // speaking scenario.
+      topic: _reviewBounded(plan.topic, 180),
+      summary: _reviewBounded(_reviewString(json['summary']), 280),
+      rationale: _reviewBounded(_reviewString(json['rationale']), 360),
+      contextPrompt: context,
+      objectives: _reviewStringList(
+        json['objectives'],
+      ).take(6).toList(growable: false),
+      vocabulary: _reviewStringList(
+        json['vocabulary'],
+      ).take(8).toList(growable: false),
+      grammar: _reviewStringList(
+        json['grammar'],
+      ).take(3).toList(growable: false),
+      steps: _reviewStringList(json['steps']).take(7).toList(growable: false),
+      sourceSessionIds: sourceIds,
+      speakingTargets: speakingTargets,
+    );
+  }
+
+  static String _reviewString(Object? value) => value?.toString().trim() ?? '';
+
+  static List<String> _reviewStringList(Object? value) => value is List
+      ? value
+            .map(_reviewString)
+            .where((item) => item.isNotEmpty)
+            .toList(growable: false)
+      : const [];
+
+  static bool _containsUnscopedReviewSetting(
+    Map<String, dynamic> json,
+    String context,
+    PersonalizedReviewPlan plan,
+  ) {
+    // The composer contract itself mentions examples such as “do not use a
+    // station”. Scanning the raw contract treated those negative guardrails as
+    // a positive scene and rejected an otherwise valid blueprint. Only inspect
+    // sentences that present a setting positively; the hard topic/evidence
+    // check below still blocks an actual unsupported scene.
+    final output = [
+      _positiveReviewText(context),
+      _reviewString(json['title']),
+      _reviewString(json['summary']),
+      _reviewString(json['rationale']),
+      ..._reviewStringList(json['objectives']),
+      ..._reviewStringList(json['vocabulary']),
+      ..._reviewStringList(json['grammar']),
+      ..._reviewStringList(json['steps']),
+      if (json['speakingTargets'] is List)
+        ...(json['speakingTargets'] as List)
+            .whereType<Map>()
+            .expand(
+              (item) => [
+                _reviewString(item['french']),
+                _reviewString(item['english']),
+                _reviewString(item['tip']),
+              ],
+            ),
+    ].join(' ').toLowerCase();
+    final allowed = [
+      ...plan.retrievalTargets,
+      ...plan.hardSignals,
+    ].join(' ').toLowerCase();
+    const aliases = <List<String>>[
+      ['cafe', 'café', 'coffee'],
+      ['station', 'gare'],
+      ['restaurant'],
+      ['airport', 'aéroport'],
+      ['shop', 'store', 'magasin', 'boutique'],
+      ['travel', 'voyage', 'train', 'bus'],
+    ];
+    for (final variants in aliases) {
+      final appearsInOutput = _containsReviewAlias(output, variants);
+      final appearsInEvidence = _containsReviewAlias(allowed, variants);
+      if (appearsInOutput && !appearsInEvidence) return true;
+    }
+    return false;
+  }
+
+  static bool _containsReviewAlias(String value, List<String> aliases) {
+    final tokens = value
+        .toLowerCase()
+        .split(RegExp(r'[^a-zA-ZÀ-ÿ0-9]+'))
+        .where((token) => token.isNotEmpty)
+        .toSet();
+    return aliases.any(tokens.contains);
+  }
+
+  static String _positiveReviewText(String value) {
+    final sentences = value
+        .split(RegExp(r'[.!?\n]+'))
+        .map((sentence) => sentence.trim())
+        .where((sentence) => sentence.isNotEmpty)
+        .where(
+          (sentence) => !RegExp(
+            r"\b(?:do not|don't|dont|avoid|never|no|not|without|sans|aucun|aucune)\b",
+            caseSensitive: false,
+          ).hasMatch(sentence),
+        );
+    return sentences.join(' ');
+  }
+
+  static String _reviewBounded(String value, int maxCharacters) {
+    final clean = value.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (clean.length <= maxCharacters) return clean;
+    return '${clean.substring(0, maxCharacters - 1).trimRight()}…';
   }
 
   // MARK: - Networking

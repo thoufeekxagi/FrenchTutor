@@ -15,6 +15,7 @@ class UniversalLearningEvidence {
     required this.topic,
     required this.summary,
     required this.occurredAt,
+    this.details = const [],
   });
 
   final String id;
@@ -23,6 +24,9 @@ class UniversalLearningEvidence {
   final String topic;
   final String summary;
   final DateTime occurredAt;
+
+  /// Bounded learner-facing material from a generated Course activity.
+  final List<String> details;
 }
 
 /// Compact context shared by Course and standalone Practice generation.
@@ -110,6 +114,13 @@ class UniversalLearningSnapshot {
           .join('; ');
       lines.add('Learner transcript excerpts: ' + excerpts + '.');
     }
+    final material = evidence
+        .expand((item) => item.details)
+        .take(4)
+        .toList(growable: false);
+    if (material.isNotEmpty) {
+      lines.add('Recent lesson material: ' + material.join(' | '));
+    }
     return _bounded(lines.join('\n'), 2200);
   }
 
@@ -150,6 +161,11 @@ class UniversalLearningSnapshot {
         .firstWhere((value) => value.isNotEmpty, orElse: () => '');
     if (summary.isNotEmpty) {
       sourceMaterial.add('Summary: ' + summary);
+    }
+    if (evidence.isNotEmpty && evidence.first.details.isNotEmpty) {
+      sourceMaterial.add(
+        'Lesson material: ' + evidence.first.details.take(2).join(' | '),
+      );
     }
     final material = sourceMaterial.isEmpty
         ? ''
@@ -273,8 +289,19 @@ abstract final class UniversalLearningDataService {
     final mistakes = <String>[];
     final targets = <String>[];
     final skills = <SpeakSkill>[];
+    final scopedSessionIds = <String>{};
+    final vocabularyLabels = <String, String>{};
+    final scopedVocabularyEntryIds = <String>{};
+    DateTime? evidenceWindowStart;
     var courseCount = 0;
     var practiceCount = 0;
+
+    void includeInEvidenceWindow(DateTime occurredAt) {
+      if (evidenceWindowStart == null ||
+          occurredAt.isBefore(evidenceWindowStart!)) {
+        evidenceWindowStart = occurredAt;
+      }
+    }
 
     final sessions = _safeSelect(
       db,
@@ -292,10 +319,28 @@ abstract final class UniversalLearningDataService {
       final stage = _text(row['stage']).toLowerCase();
       final topic = _clean(_text(row['topic']));
       final summary = _clean(_text(row['summary']));
-      final source = _text(row['content_key']).startsWith('adaptive_')
+      final occurredAt = _date(row['ended_at'] ?? row['started_at']);
+      final contentKey = _text(row['content_key']);
+      final courseRows = contentKey.isEmpty
+          ? const <Map<String, dynamic>>[]
+          : _safeSelect(
+              db,
+              '''SELECT context, grammar_focus_json, target_phrases_json,
+                        artifact_json
+                 FROM adaptive_course_sessions
+                 WHERE content_key = ? AND deleted_at IS NULL
+                 ORDER BY updated_at DESC LIMIT 1''',
+              [contentKey],
+            );
+      final source = courseRows.isNotEmpty || contentKey.startsWith('adaptive_')
           ? 'course'
           : 'practice';
+      final details = courseRows.isEmpty
+          ? const <String>[]
+          : _courseArtifactDetails(courseRows.first);
       sourceIds.add(id);
+      scopedSessionIds.add(id);
+      includeInEvidenceWindow(occurredAt);
       evidence.add(
         UniversalLearningEvidence(
           id: id,
@@ -303,7 +348,8 @@ abstract final class UniversalLearningDataService {
           mode: _modeForStage(stage),
           topic: topic,
           summary: summary,
-          occurredAt: _date(row['ended_at'] ?? row['started_at']),
+          occurredAt: occurredAt,
+          details: details,
         ),
       );
       if (source == 'course') {
@@ -316,6 +362,53 @@ abstract final class UniversalLearningDataService {
       _extractVocabulary(row['vocabulary'], targets);
     }
 
+    // Adaptive Course keeps its own completion/artifact row. Most lesson
+    // screens also write a generic `sessions` row, but reading the Course
+    // ledger directly makes that guarantee explicit and covers offline or
+    // interrupted flows where only the Course row was finalized.
+    for (final row in _safeSelect(
+      db,
+      '''SELECT * FROM adaptive_course_sessions
+         WHERE deleted_at IS NULL AND status = 'completed'
+         ORDER BY COALESCE(completed_at, updated_at) DESC
+         LIMIT ?''',
+      [sessionLimit],
+    )) {
+      final id = _text(row['id']);
+      if (id.isEmpty || sourceIds.contains(id)) continue;
+      final title = _clean(_text(row['title']));
+      final context = _clean(_text(row['context']));
+      final skill = _text(row['primary_skill']);
+      final occurredAt = _date(row['completed_at'] ?? row['updated_at']);
+      final details = _courseArtifactDetails(row);
+      sourceIds.add(id);
+      scopedSessionIds.add(id);
+      includeInEvidenceWindow(occurredAt);
+      courseCount++;
+      evidence.add(
+        UniversalLearningEvidence(
+          id: id,
+          source: 'course',
+          mode: _modeForStage(skill),
+          topic: title,
+          summary: context.isEmpty ? title : context,
+          occurredAt: occurredAt,
+          details: details,
+        ),
+      );
+      _addUnique(topics, title, limit: 12);
+      _addSkill(skills, _skillForStage(skill));
+      _extractVocabulary(row['target_phrases_json'], targets);
+      final grammar = _decodeList(
+        row['grammar_focus_json'],
+      ).map(_text).where((value) => value.isNotEmpty).take(4).join('; ');
+      _addUnique(
+        performance,
+        'course lesson $title completed${grammar.isEmpty ? '' : ' · grammar: $grammar'}',
+        limit: 24,
+      );
+    }
+
     final userMessages = _safeSelect(
       db,
       '''SELECT session_id, content
@@ -323,14 +416,14 @@ abstract final class UniversalLearningDataService {
          WHERE role = 'user'
          ORDER BY id DESC
          LIMIT ?''',
-      [defaultTranscriptLimit * 4],
+      [defaultTranscriptLimit * 12],
     );
     for (final row in userMessages) {
+      if (!scopedSessionIds.contains(_text(row['session_id']))) continue;
       final content = _bounded(_text(row['content']), 180);
       if (content.isEmpty) continue;
       _addUnique(transcripts, content, limit: defaultTranscriptLimit);
       _extractPhrases(content, targets);
-      _addUnique(sourceIds, _text(row['session_id']), limit: 40);
     }
 
     final aiSessions = _safeSelect(
@@ -343,7 +436,10 @@ abstract final class UniversalLearningDataService {
       [defaultTranscriptLimit],
     );
     for (final row in aiSessions) {
+      final occurredAt = row['ended_at'] ?? row['created_at'];
+      if (!_isAtOrAfter(occurredAt, evidenceWindowStart)) continue;
       _addUnique(sourceIds, _text(row['id']), limit: 40);
+      scopedSessionIds.add(_text(row['id']));
       _addUnique(topics, _clean(_text(row['topic'])), limit: 12);
       _addSkill(skills, _skillForStage(_text(row['stage'])));
       for (final turn in _decodeList(row['transcript_json'])) {
@@ -442,6 +538,7 @@ abstract final class UniversalLearningDataService {
          ORDER BY updated_at DESC
          LIMIT 8''',
     )) {
+      if (!_isAtOrAfter(row['updated_at'], evidenceWindowStart)) continue;
       _extractVocabulary(row['entries_json'], targets);
       final recall = _decodeMap(row['recall_grades_json']);
       final context = _decodeMap(row['context_results_json']);
@@ -541,26 +638,51 @@ abstract final class UniversalLearningDataService {
       );
     }
 
+    // Resolve generated Course vocabulary before reading SRS results. Review
+    // must show learner-facing French, never an internal id such as
+    // `at-the-cafe-word-3`.
+    for (final row in _safeSelect(db, '''SELECT course_session_id, entries_json
+         FROM generated_vocabulary_sets
+         WHERE deleted_at IS NULL AND course_session_id IS NOT NULL''')) {
+      final courseSessionId = _text(row['course_session_id']);
+      if (!scopedSessionIds.contains(courseSessionId)) continue;
+      for (final entry in _decodeList(row['entries_json'])) {
+        if (entry is! Map) continue;
+        final id = _text(entry['id']);
+        final french = _clean(_text(entry['fr'] ?? entry['french']));
+        final english = _clean(_text(entry['en'] ?? entry['english']));
+        if (id.isEmpty || french.isEmpty) continue;
+        vocabularyLabels[id] = english.isEmpty ? french : '$french — $english';
+      }
+    }
+
+    // SRS history is account-wide, but a Review is not. Only grades tied to
+    // one of the selected recent sessions may become Review evidence.
     for (final row in _safeSelect(
       db,
-      '''SELECT entry_id, grade, response_type
+      '''SELECT entry_id, grade, response_type, session_id, reviewed_at
          FROM vocab_reviews
+         WHERE session_id IS NOT NULL AND session_id != ''
          ORDER BY reviewed_at DESC
          LIMIT ?''',
-      [defaultVocabularyLimit],
+      [defaultVocabularyLimit * 8],
     )) {
-      final entry = _text(row['entry_id']);
-      final grade = _text(row['grade']);
+      final sessionId = _text(row['session_id']);
+      if (!scopedSessionIds.contains(sessionId) ||
+          !_isAtOrAfter(row['reviewed_at'], evidenceWindowStart)) {
+        continue;
+      }
+      final rawEntry = _text(row['entry_id']);
+      final entry = _displayVocabulary(rawEntry, vocabularyLabels);
       if (entry.isEmpty) continue;
+      scopedVocabularyEntryIds.add(rawEntry);
+      final grade = _text(row['grade']);
       _addUnique(
         vocabulary,
         entry + ' (' + grade + ', ' + _text(row['response_type']) + ')',
         limit: defaultVocabularyLimit,
       );
-      if (_looksLikeUsefulTarget(entry)) {
-        _addUnique(targets, entry, limit: 24);
-      }
-      if (grade == 'again' || grade == 'hard') {
+      if (grade == 'again' || grade == 'hard' || grade == 'due') {
         _addUnique(
           mistakes,
           'vocabulary target ' + entry + ' (' + grade + ')',
@@ -569,6 +691,8 @@ abstract final class UniversalLearningDataService {
       }
     }
 
+    // Current SRS state has no session id, so it is only eligible when the
+    // entry was proven to belong to a recent scoped grade above.
     for (final row in _safeSelect(
       db,
       '''SELECT entry_id
@@ -576,21 +700,22 @@ abstract final class UniversalLearningDataService {
          WHERE deleted_at IS NULL AND due_at IS NOT NULL
          ORDER BY due_at ASC
          LIMIT ?''',
-      [defaultVocabularyLimit],
+      [defaultVocabularyLimit * 4],
     )) {
-      final entry = _text(row['entry_id']);
+      final rawEntry = _text(row['entry_id']);
+      if (!scopedVocabularyEntryIds.contains(rawEntry)) continue;
+      final entry = _displayVocabulary(rawEntry, vocabularyLabels);
       if (entry.isEmpty) continue;
       _addUnique(vocabulary, entry + ' (due)', limit: defaultVocabularyLimit);
-      if (_looksLikeUsefulTarget(entry)) {
-        _addUnique(targets, entry, limit: 24);
-      }
+      _addUnique(targets, entry, limit: 24);
     }
 
-    for (final row in _safeSelect(db, '''SELECT tag, description
+    for (final row in _safeSelect(db, '''SELECT tag, description, updated_at
          FROM mistake_tags
-         WHERE resolved = 0
+         WHERE resolved = 0 AND updated_at IS NOT NULL
          ORDER BY count DESC
          LIMIT 8''')) {
+      if (!_isAtOrAfter(row['updated_at'], evidenceWindowStart)) continue;
       final tag = _clean(_text(row['tag']));
       final description = _clean(_text(row['description']));
       final value = description.isEmpty ? tag : tag + ': ' + description;
@@ -672,6 +797,37 @@ abstract final class UniversalLearningDataService {
       // Optional legacy sources must not make Course unavailable.
       return const [];
     }
+  }
+
+  static List<String> _courseArtifactDetails(Map<String, dynamic> row) {
+    final details = <String>[];
+    void add(String value, {int max = 520}) {
+      final clean = value.replaceAll(RegExp(r'\s+'), ' ').trim();
+      if (clean.isEmpty || details.contains(clean)) return;
+      details.add(
+        clean.length <= max
+            ? clean
+            : clean.substring(0, max - 1).trimRight() + '…',
+      );
+    }
+
+    add('Context: ' + _text(row['context']));
+    add(
+      'Grammar focus: ' +
+          _decodeList(row['grammar_focus_json']).map(_text).join('; '),
+    );
+    add(
+      'Target language: ' +
+          _decodeList(row['target_phrases_json']).map(_text).join('; '),
+    );
+    final artifact = _decodeMap(row['artifact_json']);
+    if (artifact.isNotEmpty) {
+      // The JSON is the canonical generated lesson payload. Keep it bounded
+      // but intact enough for GPT and the saved Review screen to see prompts,
+      // passages, choices, and learner-facing translations.
+      add('Generated activity: ' + jsonEncode(artifact), max: 1400);
+    }
+    return details;
   }
 
   static List<dynamic> _decodeList(Object? raw) {
@@ -770,6 +926,27 @@ abstract final class UniversalLearningDataService {
         word.toLowerCase().replaceAll(RegExp(r"[^a-zàâçéèêëîïôùûüÿœæ]"), ''),
       ),
     );
+  }
+
+  static String _displayVocabulary(String entryId, Map<String, String> labels) {
+    final label = labels[entryId];
+    if (label != null && label.isNotEmpty) return label;
+    final normalized = entryId.trim();
+    if (normalized.isEmpty) return '';
+    // Never leak internal generated-card ids into learner-facing Review copy.
+    if (RegExp(
+      r'(^|[-_])(word|entry|card)[-_]?\d*$|^[0-9a-f]{8}-[0-9a-f-]{27,}$',
+      caseSensitive: false,
+    ).hasMatch(normalized)) {
+      return '';
+    }
+    return _looksLikeUsefulTarget(normalized) ? normalized : '';
+  }
+
+  static bool _isAtOrAfter(Object? raw, DateTime? start) {
+    if (start == null) return true;
+    final parsed = DateTime.tryParse(_text(raw));
+    return parsed != null && !parsed.isBefore(start);
   }
 
   static void _addUnique(

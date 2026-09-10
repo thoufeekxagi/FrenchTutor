@@ -21,6 +21,12 @@ class AppTour {
   static bool pendingHomeReplay = false;
   static bool pendingPracticeReplay = false;
 
+  // Keep the walkthrough as a single app-level overlay. A route can rebuild
+  // while the package is still scheduling its overlay for the next frame, so
+  // the opening flag closes that small race as well as duplicate taps.
+  static TutorialCoachMark? _activeTour;
+  static bool _tourOpening = false;
+
   // Current shell targets — attached in MainTabScreen and the dedicated
   // speaking workspace/setup surfaces.
   static final homeTabKey = GlobalKey(debugLabel: 'tour_home_tab');
@@ -111,7 +117,11 @@ class AppTour {
         _target(
           key: homeTabKey,
           step: 1,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            homeTabKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Home',
           body:
               'Start here each day. Home brings together your next lesson, '
@@ -120,7 +130,11 @@ class AppTour {
         _target(
           key: nextSessionKey,
           step: 2,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            nextSessionKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Continue your course',
           body:
               'Your next lesson is ready here. Open it when you want to keep '
@@ -129,7 +143,11 @@ class AppTour {
         _target(
           key: courseTabKey,
           step: 3,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            courseTabKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Course',
           body:
               'See the full level-by-level path, with speaking, listening, '
@@ -138,7 +156,11 @@ class AppTour {
         _target(
           key: practiceTabKey,
           step: 4,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            practiceTabKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Practice',
           body:
               'Repeat a skill, start Free Talk, review recent learning, or '
@@ -147,7 +169,11 @@ class AppTour {
         _target(
           key: photoTutorTabKey,
           step: 5,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            photoTutorTabKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Photo tutor',
           body:
               'Take a photo or upload a document and ask about the French '
@@ -156,7 +182,11 @@ class AppTour {
         _target(
           key: profileTabKey,
           step: 6,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            profileTabKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Profile',
           body:
               'Change your tutor, language preferences, and account settings '
@@ -174,7 +204,11 @@ class AppTour {
         _target(
           key: micModeKey,
           step: 1,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            micModeKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'Auto or Hold',
           body:
               'Auto keeps the mic open, your tutor hears you as you speak. '
@@ -183,7 +217,11 @@ class AppTour {
         _target(
           key: micButtonKey,
           step: 2,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            micButtonKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'The mic button',
           body:
               'Auto mode: tap to mute or unmute. Hold mode: press and hold '
@@ -192,7 +230,11 @@ class AppTour {
         _target(
           key: endCallKey,
           step: 3,
-          align: ContentAlign.top,
+          align: _adaptiveAlign(
+            context,
+            endCallKey,
+            preferred: ContentAlign.top,
+          ),
           title: 'End the call',
           body:
               'Hang up whenever you are done. Your progress is saved '
@@ -210,7 +252,7 @@ class AppTour {
         _target(
           key: practiceFreeTalkKey,
           step: 1,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceFreeTalkKey,
             preferred: ContentAlign.bottom,
@@ -223,7 +265,7 @@ class AppTour {
         _target(
           key: practiceReviewKey,
           step: 2,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceReviewKey,
             preferred: ContentAlign.bottom,
@@ -236,7 +278,7 @@ class AppTour {
         _target(
           key: practiceReadingKey,
           step: 3,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceReadingKey,
             preferred: ContentAlign.top,
@@ -249,7 +291,7 @@ class AppTour {
         _target(
           key: practiceListeningKey,
           step: 4,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceListeningKey,
             preferred: ContentAlign.top,
@@ -262,7 +304,7 @@ class AppTour {
         _target(
           key: practiceWritingKey,
           step: 5,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceWritingKey,
             preferred: ContentAlign.top,
@@ -275,7 +317,7 @@ class AppTour {
         _target(
           key: practiceGrammarKey,
           step: 6,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceGrammarKey,
             preferred: ContentAlign.top,
@@ -288,7 +330,7 @@ class AppTour {
         _target(
           key: practiceVocabularyKey,
           step: 7,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceVocabularyKey,
             preferred: ContentAlign.top,
@@ -301,7 +343,7 @@ class AppTour {
         _target(
           key: practiceRoleplayKey,
           step: 8,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceRoleplayKey,
             preferred: ContentAlign.top,
@@ -314,7 +356,7 @@ class AppTour {
         _target(
           key: practiceExamKey,
           step: 9,
-          align: _practiceAlign(
+          align: _adaptiveAlign(
             context,
             practiceExamKey,
             preferred: ContentAlign.top,
@@ -329,10 +371,11 @@ class AppTour {
   }
 
   /// Chooses the side of the highlighted control that can actually contain
-  /// the coachmark. The practice list has targets both near the top and near
-  /// the bottom of the viewport, so one fixed alignment makes some steps
-  /// render behind the status bar or below the screen.
-  static ContentAlign _practiceAlign(
+  /// the coachmark. Call controls sit near the bottom of the viewport while
+  /// practice controls can be anywhere in a scroll view, so one fixed
+  /// alignment makes some steps render behind the status bar or below the
+  /// screen.
+  static ContentAlign _adaptiveAlign(
     BuildContext context,
     GlobalKey key, {
     required ContentAlign preferred,
@@ -347,7 +390,7 @@ class AppTour {
     final targetRect = targetOrigin & renderObject.size;
     final mediaQuery = MediaQuery.of(context);
     const edgeGap = 16.0;
-    const estimatedCoachmarkHeight = 250.0;
+    const estimatedCoachmarkHeight = 210.0;
     final topSpace = targetRect.top - mediaQuery.padding.top - edgeGap;
     final bottomSpace =
         mediaQuery.size.height -
@@ -375,22 +418,47 @@ class AppTour {
     required String seenKey,
     required List<TargetFocus> targets,
   }) {
-    TutorialCoachMark(
+    if (_tourOpening || _activeTour?.isShowing == true) return;
+    _tourOpening = true;
+
+    late final TutorialCoachMark tour;
+    tour = TutorialCoachMark(
       targets: targets,
       colorShadow: DesignTokens.ink,
-      opacityShadow: 0.68,
-      paddingFocus: 6,
-      hideSkip: false,
-      textSkip: 'Skip',
+      opacityShadow: 0.34,
+      paddingFocus: 8,
+      useSafeArea: true,
+      // The card owns the only skip action. Hiding the package-level skip
+      // control prevents a second floating control from appearing above the
+      // approved single-card coachmark.
+      hideSkip: true,
       focusAnimationDuration: Duration.zero,
       unFocusAnimationDuration: Duration.zero,
       pulseEnable: false,
-      onFinish: () => _markSeen(seenKey),
+      onFinish: () {
+        _tourOpening = false;
+        if (identical(_activeTour, tour)) _activeTour = null;
+        _markSeen(seenKey);
+      },
       onSkip: () {
+        _tourOpening = false;
+        if (identical(_activeTour, tour)) _activeTour = null;
         _markSeen(seenKey);
         return true;
       },
-    ).show(context: context);
+    );
+    _activeTour = tour;
+    tour.show(context: context, rootOverlay: true);
+  }
+
+  /// Removes the single active walkthrough before its route disappears.
+  /// `finish` also marks it seen, which prevents it from reopening over a
+  /// result screen after the learner has left the call.
+  static void dismissActive() {
+    final tour = _activeTour;
+    _activeTour = null;
+    _tourOpening = false;
+    tour?.finish();
   }
 
   static TargetFocus _target({
@@ -439,88 +507,88 @@ class _TourCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 14),
-      padding: const EdgeInsets.all(16),
-      constraints: const BoxConstraints(maxWidth: 320),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [DesignTokens.primaryDeep, DesignTokens.primary],
+    return SafeArea(
+      minimum: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        constraints: const BoxConstraints(maxWidth: 320),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 26,
+                  height: 26,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: DesignTokens.primary,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$step',
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.onPrimary),
                   ),
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$step',
-                  style: DesignTokens.body(
-                    13,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: Colors.white),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(child: Text(title, style: DesignTokens.display(17))),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            body,
-            style: DesignTokens.body(
-              13.5,
-            ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: onSkip,
-                child: Text(
-                  'Skip tour',
-                  style: DesignTokens.body(
-                    13,
-                    weight: FontWeight.w500,
-                  ).copyWith(color: DesignTokens.mutedDim),
-                ),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: DesignTokens.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
+                const SizedBox(width: 10),
+                Expanded(child: Text(title, style: DesignTokens.display(17))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              body,
+              style: DesignTokens.body(
+                13.5,
+              ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: onSkip,
+                  child: Text(
+                    'Skip tour',
+                    style: DesignTokens.body(
+                      13,
+                      weight: FontWeight.w500,
+                    ).copyWith(color: DesignTokens.mutedDim),
                   ),
                 ),
-                onPressed: onNext,
-                child: Text(
-                  'Next',
-                  style: DesignTokens.body(
-                    13.5,
-                    weight: FontWeight.w600,
-                  ).copyWith(color: Colors.white),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: DesignTokens.primary,
+                    foregroundColor: DesignTokens.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                  ),
+                  onPressed: onNext,
+                  child: Text(
+                    'Next',
+                    style: DesignTokens.body(
+                      13.5,
+                      weight: FontWeight.w600,
+                    ).copyWith(color: DesignTokens.onPrimary),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

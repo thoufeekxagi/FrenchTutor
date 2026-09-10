@@ -44,10 +44,55 @@ class LiaisonCurriculumLesson {
   final String passage;
   final String passageEnglish;
 
+  factory LiaisonCurriculumLesson.fromJson(Map<String, dynamic> json) {
+    final rawRule = json['rule_type']?.toString() ?? 'obligatory';
+    final ruleType = LiaisonRuleType.values.firstWhere(
+      (value) => value.name == rawRule,
+      orElse: () => LiaisonRuleType.obligatory,
+    );
+    return LiaisonCurriculumLesson(
+      id: json['id']?.toString() ?? 'generated_liaison',
+      level: json['level']?.toString() ?? 'A1',
+      collection: json['collection']?.toString() ?? 'Generated links',
+      title: json['title']?.toString() ?? 'Liaison practice',
+      subtitle: json['subtitle']?.toString() ?? 'Practice a connected sound',
+      firstWord: json['first_word']?.toString() ?? '',
+      secondWord: json['second_word']?.toString() ?? '',
+      linkedDisplay: json['linked_display']?.toString() ?? '',
+      soundHint: json['sound_hint']?.toString() ?? '',
+      linkSound: json['link_sound']?.toString() ?? 'none',
+      ruleType: ruleType,
+      explanation: json['explanation']?.toString() ?? '',
+      sentence: json['sentence']?.toString() ?? '',
+      sentenceEnglish: json['sentence_english']?.toString() ?? '',
+      passage: json['passage']?.toString() ?? '',
+      passageEnglish: json['passage_english']?.toString() ?? '',
+    );
+  }
+
   String get phrase => '$firstWord $secondWord';
   String get progressId => 'liaison_curriculum_$id';
   bool get expectsLink => ruleType != LiaisonRuleType.forbidden;
   bool get requiresLink => ruleType == LiaisonRuleType.obligatory;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'level': level,
+    'collection': collection,
+    'title': title,
+    'subtitle': subtitle,
+    'first_word': firstWord,
+    'second_word': secondWord,
+    'linked_display': linkedDisplay,
+    'sound_hint': soundHint,
+    'link_sound': linkSound,
+    'rule_type': ruleType.name,
+    'explanation': explanation,
+    'sentence': sentence,
+    'sentence_english': sentenceEnglish,
+    'passage': passage,
+    'passage_english': passageEnglish,
+  };
 }
 
 LiaisonCurriculumLesson _lesson({
@@ -90,12 +135,13 @@ LiaisonCurriculumLesson _lesson({
 );
 
 abstract final class LiaisonCurriculumCatalog {
-  static const levels = ['A1', 'A2', 'B1'];
+  static const levels = ['A1', 'A2', 'B1', 'B2'];
 
   static String normalizeLevel(String raw) =>
       switch (raw.trim().toUpperCase()) {
         'A2' => 'A2',
-        'B1' || 'B2' => 'B1',
+        'B1' => 'B1',
+        'B2' => 'B2',
         _ => 'A1',
       };
 
@@ -1107,6 +1153,174 @@ abstract final class LiaisonCurriculumCatalog {
           'De temps en temps, nous avons une réunion. Nos invités arrivent ensemble, mais les héros du projet restent discrets.',
       passageEnglish:
           'From time to time, we have a meeting. Our guests arrive together, but the project’s heroes remain discreet.',
+    ),
+
+    // B2 — register, nuance, and deliberate control of connected speech (10).
+    _lesson(
+      id: 'b2_anciens_habitants',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'Long-time residents',
+      subtitle: 'Link a plural determiner naturally',
+      firstWord: 'les',
+      secondWord: 'anciens',
+      linkedDisplay: 'les‿anciens',
+      soundHint: 'The final s sounds like z.',
+      linkSound: 'z',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation: 'The plural article links before a vowel sound.',
+      sentence: 'Les anciens habitants connaissent bien le quartier.',
+      sentenceEnglish: 'The long-time residents know the neighborhood well.',
+    ),
+    _lesson(
+      id: 'b2_vous_avez',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'You have',
+      subtitle: 'Keep a pronoun and verb connected',
+      firstWord: 'vous',
+      secondWord: 'avez',
+      linkedDisplay: 'vous‿avez',
+      soundHint: 'The final s sounds like z.',
+      linkSound: 'z',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation:
+          'A subject pronoun links to a following vowel-starting verb.',
+      sentence: 'Vous avez parfaitement compris la nuance.',
+      sentenceEnglish: 'You have understood the nuance perfectly.',
+    ),
+    _lesson(
+      id: 'b2_deux_options',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'Two options',
+      subtitle: 'Link a number before a vowel sound',
+      firstWord: 'deux',
+      secondWord: 'options',
+      linkedDisplay: 'deux‿options',
+      soundHint: 'The final x sounds like z.',
+      linkSound: 'z',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation: 'The number deux links before a vowel sound.',
+      sentence: 'Nous avons deux options raisonnables.',
+      sentenceEnglish: 'We have two reasonable options.',
+    ),
+    _lesson(
+      id: 'b2_grand_hotel',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'A grand hotel',
+      subtitle: 'Hear the adjective link before a noun',
+      firstWord: 'grand',
+      secondWord: 'hôtel',
+      linkedDisplay: 'grand‿hôtel',
+      soundHint: 'The final d is heard as t.',
+      linkSound: 't',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation:
+          'A short adjective before a vowel-starting noun can carry an obligatory link.',
+      sentence: 'Ils ont réservé un grand hôtel au centre-ville.',
+      sentenceEnglish: 'They booked a large hotel downtown.',
+    ),
+    _lesson(
+      id: 'b2_bien_entendu',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'Of course',
+      subtitle: 'Connect a common adverbial expression',
+      firstWord: 'bien',
+      secondWord: 'entendu',
+      linkedDisplay: 'bien‿entendu',
+      soundHint: 'The final n links into the next vowel sound.',
+      linkSound: 'n',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation:
+          'The fixed expression bien entendu is pronounced as one connected rhythm group.',
+      sentence: 'Bien entendu, nous respecterons cette décision.',
+      sentenceEnglish: 'Of course, we will respect this decision.',
+    ),
+    _lesson(
+      id: 'b2_tres_utile',
+      level: 'B2',
+      collection: 'Register and nuance',
+      title: 'Very useful',
+      subtitle: 'Link a short adverb naturally',
+      firstWord: 'très',
+      secondWord: 'utile',
+      linkedDisplay: 'très‿utile',
+      soundHint: 'The final s sounds like z.',
+      linkSound: 'z',
+      ruleType: LiaisonRuleType.obligatory,
+      explanation: 'The short adverb très links before a vowel sound.',
+      sentence: 'Cette distinction est très utile à l’oral.',
+      sentenceEnglish: 'This distinction is very useful in spoken French.',
+    ),
+    _lesson(
+      id: 'b2_et_eux',
+      level: 'B2',
+      collection: 'Avoid over-linking',
+      title: 'And them',
+      subtitle: 'Do not link after et',
+      firstWord: 'et',
+      secondWord: 'eux',
+      linkedDisplay: 'et · eux',
+      soundHint: 'Never add a t after et.',
+      linkSound: 'none',
+      ruleType: LiaisonRuleType.forbidden,
+      explanation: 'Liaison is forbidden after et, even before a vowel sound.',
+      sentence: 'Elle a invité Marc et eux à la réunion.',
+      sentenceEnglish: 'She invited Marc and them to the meeting.',
+    ),
+    _lesson(
+      id: 'b2_sujet_interessant',
+      level: 'B2',
+      collection: 'Avoid over-linking',
+      title: 'An interesting subject',
+      subtitle: 'Avoid a noun-to-adjective link',
+      firstWord: 'sujet',
+      secondWord: 'intéressant',
+      linkedDisplay: 'sujet · intéressant',
+      soundHint: 'Do not create a t after a singular noun.',
+      linkSound: 'none',
+      ruleType: LiaisonRuleType.forbidden,
+      explanation:
+          'A singular noun does not normally link to a following adjective.',
+      sentence: 'C’est un sujet intéressant mais complexe.',
+      sentenceEnglish: 'It is an interesting but complex subject.',
+    ),
+    _lesson(
+      id: 'b2_quand_il',
+      level: 'B2',
+      collection: 'Formal rhythm',
+      title: 'When he arrives',
+      subtitle: 'Recognize a formal optional link',
+      firstWord: 'quand',
+      secondWord: 'il',
+      linkedDisplay: 'quand(‿t‿)il',
+      soundHint: 'The t may be heard in careful speech.',
+      linkSound: 't',
+      ruleType: LiaisonRuleType.optional,
+      explanation:
+          'The link in quand il is common in careful speech and can soften in casual speech.',
+      sentence: 'Quand il arrivera, nous commencerons.',
+      sentenceEnglish: 'When he arrives, we will begin.',
+    ),
+    _lesson(
+      id: 'b2_doivent_etre',
+      level: 'B2',
+      collection: 'Formal rhythm',
+      title: 'Must be',
+      subtitle: 'Compare formal and casual rhythm',
+      firstWord: 'doivent',
+      secondWord: 'être',
+      linkedDisplay: 'doivent(‿t‿)être',
+      soundHint: 'The t is possible in formal careful speech.',
+      linkSound: 't',
+      ruleType: LiaisonRuleType.optional,
+      explanation:
+          'Verb-to-infinitive liaison is register-sensitive and is not required in casual speech.',
+      sentence: 'Les résultats doivent être vérifiés attentivement.',
+      sentenceEnglish: 'The results must be checked carefully.',
     ),
   ];
 }

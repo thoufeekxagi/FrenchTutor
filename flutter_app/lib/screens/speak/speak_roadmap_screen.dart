@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,14 +8,14 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/speak_curriculum.dart';
+import '../../models/grammar_course_session_result.dart';
 import '../../providers/database_provider.dart';
 import '../../services/premium_access_gate.dart';
-import '../../services/course_artifact_codec.dart';
 import '../../services/course_generation_test_harness.dart';
-import '../../services/lesson_audio_deck_service.dart';
 import '../../services/ai_cost_tracker.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
+import '../../services/sync_service.dart';
 import '../../services/subscription_gate_service.dart';
 import 'speak_course_activity_screen.dart';
 import '../../widgets/personalized_generation_loader.dart';
@@ -45,7 +44,8 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     // reconnect). In that case the queued target row is still valid work, but
     // there is no Navigator result left to trigger preparation. Reconcile it
     // once when the roadmap opens. This path is compile-time/debug-only and
-    // never retries a failed row or changes the production Generate flow.
+    // only retries a failed row once; it never changes the production
+    // completion-driven flow.
     final harness = CourseGenerationTestHarness.current;
     debugPrint(
       '[COURSE_HARNESS] active=${harness.active} enabled=${harness.enabled} '
@@ -58,13 +58,17 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           _prepareCourse(
             harnessSkill: harness.targetWireName,
             reconcileQueuedHarnessRow: true,
-            openWhenReady: true,
-          ).then((nextSession) {
-            if (nextSession != null && mounted) {
-              return _openSession(nextSession);
-            }
-          }),
+          ),
         );
+      });
+    } else {
+      // Recover a completion that happened just before an app update, force
+      // quit, or network transition. Older releases left the successor row
+      // queued; a roadmap reopen now safely resumes only when a generated
+      // lesson is already completed and another generated row is waiting.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(_recoverPendingProductionGeneration());
       });
     }
   }
@@ -80,28 +84,133 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // A provider request already in flight cannot be recalled safely, but its
     // continuation must not start the next PCM/Live request after the learner
-    // backgrounds the app. A new explicit Generate tap can resume later.
+    // backgrounds the app. The next foreground/resume pass can safely retry.
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
       _generationEpoch++;
+    } else if (state == AppLifecycleState.resumed &&
+        !CourseGenerationTestHarness.current.active &&
+        mounted) {
+      unawaited(_recoverPendingProductionGeneration());
     }
   }
 
-  /// Prepares one personalized Course lesson. Production calls this only from
-  /// the explicit Generate action. The development harness may call it once
-  /// immediately after the selected lesson is completed.
-  Future<SpeakRoadmapSession?> _prepareCourse({
+  Future<void> _recoverPendingProductionGeneration() async {
+    if (_preparingCourse) return;
+    final sync = ref.read(syncServiceProvider);
+    try {
+      await sync.drainOutbox(limit: 25);
+      await sync.hydrateAdaptiveCourses();
+      if (!mounted) return;
+      final profile = ref.read(learningStoreProvider).profile();
+      final plan = ref.read(adaptiveCourseStoreProvider).currentPlan(profile);
+      if (plan == null) return;
+      final hasCompletedLesson = plan.sessions.any(
+        (session) => session.status == 'completed',
+      );
+      final hasPendingGenerated = plan.sessions.any(
+        (session) =>
+            session.sequence > AdaptiveCourseStore.initialBatchSize &&
+            session.status != 'completed' &&
+            (session.generationStatus == 'queued' ||
+                session.generationStatus == 'failed'),
+      );
+      if (!hasCompletedLesson || !hasPendingGenerated) return;
+      // Force the bounded provider claim even when the queued row was already
+      // persisted by a previous run. There may be no local plan diff left to
+      // signal that work is still waiting.
+      await _prepareCourse(forcePrepare: true);
+    } catch (error, stackTrace) {
+      // Recovery is best-effort. The status lane remains informative if the
+      // device is offline or the endpoint is temporarily unavailable.
+      debugPrint(
+        'Pending Course generation recovery failed: $error\n$stackTrace',
+      );
+    }
+  }
+
+  /// Fills the two image-backed lessons for the first active personalized
+  /// unit. The Edge Function still claims exactly one row per call; this
+  /// bounded loop simply makes the vocabulary -> reading -> listening buffer
+  /// available before the learner reaches the next card.
+  Future<void> _prepareMediaBuffer(
+    SyncService sync,
+    AdaptiveCourseStore store,
+    Profile profile,
+    int operationEpoch,
+  ) async {
+    for (var attempt = 0; attempt < 3; attempt++) {
+      if (!mounted || operationEpoch != _generationEpoch) return;
+      final plan = store.ensureMediaBuffer(profile);
+      if (_mediaBufferReady(plan)) return;
+      // The append above is idempotent, but explicitly await its push so a
+      // second device cannot miss the newly-created Reading/Listening rows.
+      await sync.syncAdaptiveCoursePlan(plan);
+      if (!mounted || operationEpoch != _generationEpoch) return;
+      final prepared = await sync.prepareAdaptiveCourseLessons();
+      if (prepared == 0) return;
+      await sync.hydrateAdaptiveCourses();
+    }
+  }
+
+  bool _mediaBufferReady(AdaptiveCoursePlanSnapshot plan) {
+    final units =
+        plan.sessions
+            .where((session) => session.unit >= 3)
+            .map((session) => session.unit)
+            .toSet()
+            .toList()
+          ..sort();
+    if (units.isEmpty) return false;
+    for (final unit in units) {
+      final sessions = plan.sessions
+          .where((session) => session.unit == unit)
+          .toList(growable: false);
+      final reading = sessions.where(
+        (session) => session.primarySkill == SpeakSkill.reading,
+      );
+      final listening = sessions.where(
+        (session) => session.primarySkill == SpeakSkill.listening,
+      );
+      if (reading.isEmpty || listening.isEmpty) return false;
+      if (sessions.any((session) => session.status != 'completed')) {
+        return reading.every(
+              (session) =>
+                  session.status == 'completed' || session.isContentReady,
+            ) &&
+            listening.every(
+              (session) =>
+                  session.status == 'completed' || session.isContentReady,
+            );
+      }
+    }
+    // Every currently-known unit is complete. ensureMediaBuffer() will have
+    // appended the next unit on the next pass; keep the caller bounded here.
+    return false;
+  }
+
+  /// Prepares one personalized Course lesson. Production calls this after a
+  /// completed lesson (and during bounded recovery); the development harness
+  /// may also call it once immediately after its selected lesson.
+  Future<void> _prepareCourse({
     String? harnessSkill,
     bool onlyIfNewHarnessRow = false,
     bool reconcileQueuedHarnessRow = false,
-    bool openWhenReady = false,
+    bool forcePrepare = false,
   }) async {
-    if (_preparingCourse) return null;
+    if (_preparingCourse) return;
     _preparingCourse = true;
     final operationEpoch = _generationEpoch;
     try {
       final sync = ref.read(syncServiceProvider);
+      // A completed activity writes its adaptive row and its normal session
+      // record independently. Flush that tiny outbox first so the remote
+      // completion is visible before we hydrate; otherwise a quick return to
+      // the roadmap can pull the older `planned` snapshot back over the
+      // just-completed local row and leave the next lesson queued forever.
+      await sync.drainOutbox(limit: 25);
+      if (!mounted || operationEpoch != _generationEpoch) return;
       // hydrateAdaptiveCourses() otherwise only ever runs as a side effect
       // of a successful generation call below. If every row this device
       // knows about already looks 'ready' locally, that call finds nothing
@@ -112,16 +221,11 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // learner does it. Pull the real remote state down first, every time,
       // before this screen decides what (if anything) it still needs.
       await sync.hydrateAdaptiveCourses();
-      if (!mounted || operationEpoch != _generationEpoch) return null;
+      if (!mounted || operationEpoch != _generationEpoch) return;
       final profile = ref.read(learningStoreProvider).profile();
       final store = ref.read(adaptiveCourseStoreProvider);
       final current = store.currentPlan(profile);
       final before = onlyIfNewHarnessRow ? current : null;
-      final beforeState = <String, String>{
-        for (final session
-            in current?.sessions ?? const <AdaptiveCourseSessionSpec>[])
-          session.contentKey: _generationState(session),
-      };
       final beforeHighest = before == null
           ? AdaptiveCourseStore.initialBatchSize
           : before.sessions.fold<int>(
@@ -129,7 +233,12 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               (highest, session) =>
                   session.sequence > highest ? session.sequence : highest,
             );
-      final plan = store.ensureCurrentPlan(profile);
+      // Keep one fresh Reading and one fresh Listening lesson in the active
+      // unit's persisted buffer. The store only appends through the
+      // Listening slot; generation itself remains serial and bounded below.
+      final plan = harnessSkill == null
+          ? store.ensureMediaBuffer(profile)
+          : store.ensureCurrentPlan(profile);
       if (reconcileQueuedHarnessRow && harnessSkill != null) {
         final queuedHarnessRow = plan.sessions.any(
           (session) =>
@@ -170,7 +279,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           // In that case ensureCurrentPlan may already have appended the one
           // queued row locally, even though no provider request has started.
           // Completion is still the explicit trigger, so prepare that row;
-          // never reopen a ready or failed row automatically.
+          // a failed row is retried only once by the harness policy.
           final queuedHarnessRow = plan.sessions.any(
             (session) =>
                 session.sequence > AdaptiveCourseStore.initialBatchSize &&
@@ -178,11 +287,11 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                     CourseGenerationTestHarness.current.targetSkill &&
                 session.generationStatus == 'queued',
           );
-          if (!queuedHarnessRow) return null;
+          if (!queuedHarnessRow) return;
         }
       }
       final coursePersisted = await sync.syncAdaptiveCoursePlan(plan);
-      if (!mounted || operationEpoch != _generationEpoch) return null;
+      if (!mounted || operationEpoch != _generationEpoch) return;
       // A reconcile can legitimately have no local plan diff: the queued row
       // was already persisted by an earlier run. It still needs the one
       // explicit provider claim. Production keeps the existing persisted-plan
@@ -191,22 +300,25 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // is already present but its artifact is stale for the current course
       // contract (for example an older Writing role-play artifact). In that
       // case there is no local plan diff, so gating this call on
-      // `coursePersisted` makes Generate next look like a no-op forever.
-      // Production remains explicit and unchanged; only the development
-      // harness gets this bounded repair request.
+      // `coursePersisted` makes automatic completion hand-off look like a
+      // no-op forever. A completion callback is a preparation request even
+      // when the queued row was already persisted by a previous callback.
+      // `syncAdaptiveCoursePlan` correctly returns false for that no-op push,
+      // so using only `coursePersisted` here strands the row forever in a
+      // queued state. Generation never implies navigation; opening remains a
+      // separate, explicit learner action.
       if (coursePersisted ||
           reconcileQueuedHarnessRow ||
-          harnessSkill != null) {
+          harnessSkill != null ||
+          forcePrepare) {
         await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
+        if (harnessSkill == null) {
+          await _prepareMediaBuffer(sync, store, profile, operationEpoch);
+        }
       }
-      // Audio repair is still explicit, but it must not depend on the text
-      // endpoint reporting `generated > 0`. A lesson can be ready after text
-      // succeeded while one PCM clip timed out; the next deliberate Generate
-      // action should inspect the saved lesson and repair only that missing
-      // cache entry, without regenerating the lesson text.
-      if (!mounted || operationEpoch != _generationEpoch) return null;
+      if (!mounted || operationEpoch != _generationEpoch) return;
       await sync.hydrateAdaptiveCourses();
-      if (!mounted || operationEpoch != _generationEpoch) return null;
+      if (!mounted || operationEpoch != _generationEpoch) return;
       if (harnessSkill == 'vocabulary') {
         // Vocabulary is intentionally Live-only. Do not let this shared
         // roadmap callback repair an unrelated reading/listening deck while
@@ -218,98 +330,42 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
             extra: {'audio_generation_calls': 0},
           ),
         );
-        return null;
+        return;
       }
-      final refreshed = ref
+      var refreshed = ref
           .read(adaptiveCourseStoreProvider)
           .ensureCurrentPlan(profile);
-      AdaptiveCourseSessionSpec? generatedCandidate;
-      if (openWhenReady) {
-        for (final candidate in refreshed.sessions) {
-          if (candidate.isFoundation ||
-              (harnessSkill != null &&
-                  candidate.primarySkill.wireName != harnessSkill) ||
-              !candidate.isContentReady) {
-            continue;
-          }
-          final previous = beforeState[candidate.contentKey];
-          if (previous == null || previous != _generationState(candidate)) {
-            generatedCandidate = candidate;
-            break;
-          }
-        }
+      // A failed Grammar (or other harness) artifact is requeued locally at
+      // most once by AdaptiveCourseStore. Persist that explicit transition
+      // and immediately spend the single bounded endpoint retry while the
+      // learner is still on the roadmap, instead of leaving an hourglass that
+      // only changes after a full app restart. The server still caps provider
+      // repair attempts and terminal rows are never retried in a loop.
+      if (harnessSkill != null &&
+          refreshed.sessions.any(
+            (session) =>
+                session.primarySkill.wireName == harnessSkill &&
+                session.generationStatus == 'queued' &&
+                session.generationAttempts > 0 &&
+                session.generationError == 'Retrying failed lesson once',
+          )) {
+        await sync.syncAdaptiveCoursePlan(refreshed);
+        if (!mounted || operationEpoch != _generationEpoch) return;
+        await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
+        if (!mounted || operationEpoch != _generationEpoch) return;
+        await sync.hydrateAdaptiveCourses();
+        if (!mounted || operationEpoch != _generationEpoch) return;
+        refreshed = ref
+            .read(adaptiveCourseStoreProvider)
+            .ensureCurrentPlan(profile);
       }
-      final audioCandidates = <AdaptiveCourseSessionSpec>[];
-      if (generatedCandidate != null) {
-        audioCandidates.add(generatedCandidate);
-      }
-      audioCandidates.addAll(
-        refreshed.sessions.reversed.where(
-          (candidate) => candidate.contentKey != generatedCandidate?.contentKey,
-        ),
-      );
-      for (final candidate in audioCandidates) {
-        if (candidate.isFoundation ||
-            candidate.generationStatus != 'ready' ||
-            candidate.artifact == null ||
-            (candidate.primarySkill != SpeakSkill.reading &&
-                candidate.primarySkill != SpeakSkill.listening)) {
-          continue;
-        }
-        try {
-          if (!mounted || operationEpoch != _generationEpoch) return null;
-          // Reading stories now narrate through the already-connected Gemini
-          // Live session. Keep the legacy deck warm-up only for listening
-          // until that surface is migrated too.
-          if (candidate.primarySkill != SpeakSkill.listening) break;
-          final story = CourseArtifactCodec.listening(candidate.artifact!);
-          if (!mounted || operationEpoch != _generationEpoch) return null;
-          // Listening still uses its existing deck while reading uses Live.
-          unawaited(() async {
-            try {
-              await LessonAudioDeckService.shared.prepare(
-                story: story,
-                db: ref.read(databaseProvider),
-              );
-            } catch (error, stackTrace) {
-              debugPrint(
-                'Course audio generation deferred for ${candidate.contentKey}: '
-                '$error\n$stackTrace',
-              );
-            }
-          }());
-        } catch (error, stackTrace) {
-          // Text lesson generation remains persisted. The next explicit
-          // Generate action can finish a missing audio deck; no silent
-          // retry is scheduled here.
-          debugPrint(
-            'Course audio generation deferred for ${candidate.contentKey}: '
-            '$error\n$stackTrace',
-          );
-        }
-        break;
-      }
-      if (generatedCandidate != null && mounted) {
-        final completed = ref
-            .read(storageServiceProvider)
-            .completedContentKeys();
-        final projected = SpeakRoadmapService.build(
-          profile,
-          completedContentKeys: completed,
-          adaptiveSessions: refreshed.sessions,
-          generationHarness: CourseGenerationTestHarness.current,
-        ).sessions;
-        for (final session in projected) {
-          if (session.contentKey == generatedCandidate.contentKey) {
-            return session;
-          }
-        }
-      }
+      // Deliberately do not return or open a generated row here. Completion
+      // prepares and persists the next lesson, but selecting it is always an
+      // explicit learner action on the roadmap or home screen.
     } finally {
       _preparingCourse = false;
       if (mounted) setState(() {});
     }
-    return null;
   }
 
   Future<void> _openSession(SpeakRoadmapSession session) async {
@@ -320,11 +376,26 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     if (!mounted) return;
     setState(() {});
     final harness = CourseGenerationTestHarness.current;
-    if (result == true &&
-        harness.shouldAdvanceAfter(
-          sequence: session.sequence,
-          primarySkill: session.primarySkill,
-        )) {
+    // Most course activities bubble up a boolean, while Grammar's native
+    // five-step flow returns its richer result object. Treat both as a
+    // completed activity so the next queued lesson is prepared in production
+    // as well as in the serial debug lane.
+    final completed =
+        result == true ||
+        (result is GrammarCourseSessionResult && result.completed);
+    if (!completed) return;
+
+    final store = ref.read(adaptiveCourseStoreProvider);
+    final shouldAdvanceHarness = harness.shouldAdvanceAfter(
+      sequence: session.sequence,
+      primarySkill: session.primarySkill,
+    );
+    if (shouldAdvanceHarness) {
+      // The activity wrapper normally records completion after its practice
+      // route returns. Keep the harness trigger self-contained as well: a
+      // short debug grammar run must advance even when the wrapper's
+      // time/evidence gate has not accumulated enough seconds yet.
+      store.markCompleted(session.contentKey);
       unawaited(
         AiCostTracker.event(
           feature: 'course_generation_harness',
@@ -336,27 +407,25 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           },
         ),
       );
-      final nextSession = await _prepareCourse(
-        harnessSkill: harness.targetWireName,
-        onlyIfNewHarnessRow: true,
-        openWhenReady: true,
-      );
-      if (nextSession != null && mounted) {
-        await _openSession(nextSession);
-      }
     }
-  }
 
-  String _generationState(AdaptiveCourseSessionSpec session) {
-    final artifact = session.artifact;
-    final keys = artifact == null
-        ? const <String>[]
-        : (artifact.keys.map((key) => key.toString()).toList()..sort());
-    return jsonEncode({
-      'status': session.generationStatus,
-      'kind': session.artifactKind,
-      'keys': keys,
-    });
+    // Production completion normally already marked the adaptive row. Read
+    // the current local spec rather than trusting the projected roadmap row,
+    // then explicitly await its push before `_prepareCourse` hydrates remote
+    // state. This closes the race that previously left Unit 3 reading and
+    // listening in `queued` forever after Unit 3 vocabulary finished.
+    final completedSpec = store.sessionById(session.id);
+    if (completedSpec?.status != 'completed') return;
+    await ref
+        .read(syncServiceProvider)
+        .syncAdaptiveCourseSession(completedSpec!);
+    if (!mounted) return;
+
+    await _prepareCourse(
+      harnessSkill: harness.active ? harness.targetWireName : null,
+      onlyIfNewHarnessRow: shouldAdvanceHarness,
+      forcePrepare: true,
+    );
   }
 
   /// Tapping a subscription-locked Unit 2+ lesson must show the paywall,
@@ -517,14 +586,11 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     );
   }
 
-  /// Generation is deliberately explicit. This card gives the learner one
-  /// clear action for creating the next personalized row; there is no hidden
-  /// buffer timer or background retry loop to spend provider quota.
+  /// The next personalized row is prepared automatically after completion.
+  /// This lane is status-only: learners do not manually generate course
+  /// lessons, so the UI cannot accidentally create duplicate rows or skip the
+  /// one-at-a-time progression contract.
   Widget _generateNextCard(List<SpeakRoadmapSession> sessions) {
-    // A queued row is deliberately idle: only the explicit Generate action
-    // may claim it and call the provider. Treating every non-ready row as
-    // "preparing" made an idle queued lesson look like a background request
-    // forever, even though no network work was running.
     final hasInFlight =
         _preparingCourse ||
         sessions.any((session) => session.generationStatus == 'generating');
@@ -548,36 +614,13 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                hasInFlight
-                    ? 'Generating one lesson…'
-                    : 'Tap Generate next when you want another lesson.',
+                sessions.any((session) => session.generationStatus == 'failed')
+                    ? 'We’ll retry the next lesson automatically.'
+                    : 'Your next lesson is prepared automatically after you finish.',
                 style: DesignTokens.body(
                   13,
                 ).copyWith(color: DesignTokens.nightMuted),
               ),
-            ),
-            const SizedBox(width: 10),
-            V3PrimaryButton(
-              label: 'Generate next',
-              icon: Icons.add_rounded,
-              expand: false,
-              onPressed: _preparingCourse
-                  ? null
-                  : () {
-                      final harness = CourseGenerationTestHarness.current;
-                      unawaited(
-                        _prepareCourse(
-                          harnessSkill: harness.active
-                              ? harness.targetWireName
-                              : null,
-                          openWhenReady: true,
-                        ).then((nextSession) {
-                          if (nextSession != null && mounted) {
-                            return _openSession(nextSession);
-                          }
-                        }),
-                      );
-                    },
             ),
           ],
         ),
@@ -660,6 +703,13 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     final preparing = session.generationStatus == 'generating';
     final queued = session.generationStatus == 'queued';
     final failed = session.generationStatus == 'failed';
+    final personalized =
+        session.sequence > AdaptiveCourseStore.initialBatchSize;
+    final buffered =
+        personalized &&
+        !session.completed &&
+        session.contentReady &&
+        session.generationStatus == 'ready';
     // A subscription-locked lesson must still be tappable: tapping it is
     // exactly what should show the paywall, matching Practice's behavior.
     // Only "not generated yet" truly disables the tap.
@@ -734,13 +784,22 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                     const SizedBox(height: 3),
                     Text(
                       preparing
-                          ? 'Creating your personalized lesson'
+                          ? 'Preparing automatically'
                           : failed
-                          ? 'Generation failed — tap Generate next to retry'
-                          : 'Waiting for Generate next',
+                          ? 'Generation failed — retrying automatically'
+                          : 'Preparing automatically',
                       style: DesignTokens.body(
                         11,
                       ).copyWith(color: DesignTokens.nightMuted),
+                    ),
+                  ],
+                  if (buffered) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      'Ready in your lesson buffer',
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.nightAccent),
                     ),
                   ],
                 ],
@@ -771,7 +830,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     SpeakSkill.vocabulary => Icons.style_outlined,
     SpeakSkill.reading => Icons.menu_book_outlined,
     SpeakSkill.listening => Icons.headphones_outlined,
-    SpeakSkill.grammar => Icons.auto_fix_high_outlined,
+    SpeakSkill.grammar => Icons.spellcheck_rounded,
     SpeakSkill.connectors => Icons.link_rounded,
     SpeakSkill.liaison => Icons.record_voice_over_outlined,
     SpeakSkill.writing => Icons.edit_note_rounded,

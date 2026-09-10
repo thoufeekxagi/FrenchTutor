@@ -22,11 +22,13 @@ Map<String, dynamic>? _decodeMap(Object? value) {
 }
 
 /// The unit of course progression shared by onboarding, Home, Course, and
-/// the speaking pathway. Foundation contains five fixed sessions and Unit 2+
-/// grows one fully prepared personalized session at a time, up to five.
-const adaptiveCourseFoundationSize = 5;
-const adaptiveCourseBatchSize = 5;
-// How many real AI-generated lessons (sequence 11+) to always try to keep
+/// the speaking pathway. The five-row sound foundation is followed by a
+/// recurring six-skill unit: vocabulary, reading, listening, writing,
+/// speaking, and grammar.
+const adaptiveCourseFoundationSize =
+    AdaptiveCurriculumService.courseFoundationSize;
+const adaptiveCourseBatchSize = AdaptiveCurriculumService.courseUnitSize;
+// How many real AI-generated lessons (sequence 12+) to always try to keep
 // ready beyond wherever the learner has reached — not a cap, a floor. Growth
 // never stops; this only controls how far ahead the buffer stays topped up.
 const adaptiveCourseLookahead = 2;
@@ -38,7 +40,7 @@ const adaptiveCourseSimplePhaseEnd = 15;
 // Bump this whenever the unit-anchor or generation contract changes. Existing
 // unfinished personalized rows are repaired in place so an old repeated-scene
 // story is not left in the queue; completed lessons remain historical.
-const adaptiveCourseGenerationVersion = 5;
+const adaptiveCourseGenerationVersion = 7;
 
 /// One planned session in the learner's current adaptive route.
 ///
@@ -220,8 +222,36 @@ class AdaptiveCourseSessionSpec {
 
     bool grammarCourseSafe() {
       final session = value['session'];
-      if (session is! Map || !listHas(session['steps'], 4)) return false;
-      return value['practiceMode']?.toString() == practiceMode &&
+      // Course Grammar intentionally exposes the legacy blank-choice
+      // interaction. Complete's word-bank workshop is Practice-only; treating
+      // it as ready here would let an old alternating artifact bypass the
+      // Guided contract and return the wrong screen to the learner.
+      if (practiceMode != 'guided') return false;
+      final expectedSteps = 5;
+      if (session is! Map ||
+          session['steps'] is! List ||
+          (session['steps'] as List).length != expectedSteps) {
+        return false;
+      }
+      final steps = session['steps'] as List;
+      final guidedSteps = steps.every((step) {
+        final prompt = step is Map ? step['prompt']?.toString() ?? '' : '';
+        final blankCount = RegExp(r'___').allMatches(prompt).length;
+        if (step is! Map ||
+            blankCount != 1 ||
+            step['choices'] is! List ||
+            (step['choices'] as List).length != 3) {
+          return false;
+        }
+        final choices = (step['choices'] as List)
+            .map((choice) => choice.toString().trim().toLowerCase())
+            .where((choice) => choice.isNotEmpty)
+            .toSet();
+        return choices.length == 3 &&
+            choices.contains(step['answer']?.toString().trim().toLowerCase());
+      });
+      return guidedSteps &&
+          value['practiceMode']?.toString() == practiceMode &&
           session['mode']?.toString() == practiceMode &&
           session['level']?.toString().toUpperCase() == normalizedLevel &&
           nonEmpty(session['grammar_focus']);
@@ -271,7 +301,7 @@ class AdaptiveCourseSessionSpec {
     };
   }
 
-  /// Foundation is block zero. Every personalized group of five is one frozen
+  /// Foundation is block zero. Every personalized group of six is one frozen
   /// adaptive batch after it.
   int get blockIndex => isFoundation
       ? 0
@@ -301,13 +331,12 @@ class AdaptiveCourseSessionSpec {
     SpeakSkill.freeTalk => 'guidedConversation',
     // Course Writing alternates the two release-safe formats only. Roleplay
     // remains Practice-only and must not be queued or opened from Course.
-    SpeakSkill.writing => (sequence - 6) % 2 == 0 ? 'complete' : 'guided',
-    SpeakSkill.grammar => switch ((sequence - 6) % 3) {
-      1 => 'complete',
-      2 => 'roleplay',
-      _ => 'guided',
-    },
-    SpeakSkill.listening => switch ((sequence - 6) % 3) {
+    SpeakSkill.writing => _courseUnitIndex % 2 == 0 ? 'complete' : 'guided',
+    // Course Grammar is always the legacy blank-choice interaction. Complete
+    // and Roleplay remain Practice-only and cannot be selected by a Course
+    // unit, so every generated row opens the same predictable screen.
+    SpeakSkill.grammar => 'guided',
+    SpeakSkill.listening => switch (_courseUnitIndex % 3) {
       1 => 'narration',
       2 => 'music',
       _ => 'story',
@@ -319,6 +348,11 @@ class AdaptiveCourseSessionSpec {
     SpeakSkill.liaison => 'wordPairs',
     SpeakSkill.review => 'review',
   };
+
+  int get _courseUnitIndex => sequence <= adaptiveCourseFoundationSize
+      ? 0
+      : (sequence - adaptiveCourseFoundationSize - 1) ~/
+            adaptiveCourseBatchSize;
 
   /// The learner-facing phase of the shared course route. Keeping this on the
   /// stable session specification lets Course, Home, Practice, and Speaking
@@ -454,7 +488,7 @@ class AdaptiveCoursePlanSnapshot {
 ///
 /// The store keeps the five fixed foundation lessons plus a small personalized
 /// queue. Personalized rows are appended one at a time after the learner
-/// finishes the current row, up to five total Unit 2+ lessons. A profile
+/// finishes the current row, with six core lessons per unit. A profile
 /// change replaces only unfinished future sessions and preserves completed
 /// work.
 class AdaptiveCourseStore {
@@ -475,11 +509,11 @@ class AdaptiveCourseStore {
   _onSessionChanged;
   final CourseGenerationTestHarness generationHarness;
 
-  // Foundation (1-5) and Unit 2 (6-10) are both authored, not AI-generated,
+  // Foundation (1-5) and Unit 2 (6-11) are both authored, not AI-generated,
   // so there is no cost reason to reveal them one row at a time. A learner
-  // should see the whole free structure — vocabulary, speaking, reading,
-  // listening, writing — the moment their plan is created, the same way
-  // foundation has always been fully visible immediately. Only sequence 11+
+  // should see the whole free structure — vocabulary, reading, listening,
+  // writing, speaking, grammar — the moment their plan is created, the same way
+  // foundation has always been fully visible immediately. Only sequence 12+
   // (real AI generation) grows one row at a time.
   static const initialBatchSize =
       adaptiveCourseFoundationSize + adaptiveCourseBatchSize;
@@ -531,8 +565,8 @@ class AdaptiveCourseStore {
           snapshot: snapshot,
         );
       }
-      // Growth only ever looks at real AI-generated lessons (sequence 11+).
-      // Unit 2 (6-10) is fixed, authored content for every learner, never
+      // Growth only ever looks at real AI-generated lessons (sequence 12+).
+      // Unit 2 (6-11) is fixed, authored content for every learner, never
       // part of this accounting.
       //
       // The only "one at a time" rule that matters is technical: never let
@@ -583,6 +617,89 @@ class AdaptiveCourseStore {
       nextVersion: ((active?['version'] as int?) ?? 0) + 1,
       snapshot: snapshot,
     );
+  }
+
+  /// Ensures the active unit has both of its image-backed lessons (Reading
+  /// and Listening) represented in the persisted route before the learner
+  /// reaches them.  The normal route still grows one lesson at a time; this
+  /// small, deterministic buffer only adds the missing rows through the
+  /// unit's Listening slot.  Their artifacts are prepared by SyncService in
+  /// bounded serial calls, so a provider failure cannot create a request
+  /// storm or skip the rest of the unit.
+  ///
+  /// Keeping this separate from [ensureCurrentPlan] preserves older local
+  /// plans and the one-row progression contract for non-media lessons while
+  /// fixing the Home/Course case where Reading or Listening was absent from
+  /// the upcoming unit entirely.
+  AdaptiveCoursePlanSnapshot ensureMediaBuffer(Profile profile) {
+    var plan = ensureCurrentPlan(profile);
+    final sessions = [...plan.sessions]
+      ..sort((left, right) => left.sequence.compareTo(right.sequence));
+    var targetUnit = 3;
+    while (true) {
+      final unitSessions = sessions
+          .where((session) => session.unit == targetUnit)
+          .toList(growable: false);
+      if (unitSessions.isEmpty) {
+        // Keep the route sequential: a future unit's media is not created
+        // until the preceding unit is actually complete. This preserves the
+        // existing unlock behavior while still filling both media slots as
+        // soon as the new unit becomes active.
+        final previousUnitSessions = sessions
+            .where((session) => session.unit == targetUnit - 1)
+            .toList(growable: false);
+        if (previousUnitSessions.isNotEmpty &&
+            previousUnitSessions.any(
+              (session) => session.status != 'completed',
+            )) {
+          return plan;
+        }
+        break;
+      }
+      final reading = unitSessions.any(
+        (session) => session.primarySkill == SpeakSkill.reading,
+      );
+      final listening = unitSessions.any(
+        (session) => session.primarySkill == SpeakSkill.listening,
+      );
+      if (!reading || !listening) break;
+      if (unitSessions.length < adaptiveCourseBatchSize) {
+        // Reading/Listening may be opened directly from Home, but that must
+        // not make the planner skip the unit's writing, speaking, or grammar
+        // slots when choosing the next media buffer.
+        return plan;
+      }
+      // Do not pre-create the next unit while this one still has ordinary
+      // speaking/writing/grammar work. Its media buffer becomes eligible as
+      // soon as every lesson in the current unit is complete.
+      if (unitSessions.any((session) => session.status != 'completed')) {
+        return plan;
+      }
+      targetUnit += 1;
+    }
+
+    final mediaEndSequence =
+        adaptiveCourseFoundationSize +
+        ((targetUnit - 2) * adaptiveCourseBatchSize) +
+        3;
+    final highestExisting = sessions.isEmpty
+        ? 0
+        : sessions
+              .map((session) => session.sequence)
+              .reduce((left, right) => left > right ? left : right);
+    if (highestExisting >= mediaEndSequence) return plan;
+
+    _appendBatch(
+      planId: plan.id,
+      profile: profile,
+      profileFingerprint: plan.profileFingerprint,
+      startSequence: highestExisting + 1,
+      batchSize: mediaEndSequence - highestExisting,
+      snapshot: UniversalLearningDataService.buildSnapshot(_db, profile),
+    );
+    plan = _snapshotForPlan(plan.id);
+    _notifyPlan(plan);
+    return plan;
   }
 
   AdaptiveCoursePlanSnapshot? currentPlan(Profile profile) {
@@ -710,6 +827,33 @@ class AdaptiveCourseStore {
     _notifySession(session.copyWith(artifact: updatedArtifact));
   }
 
+  /// Persists the separate portrait artwork used by a Listening lesson.
+  /// Artwork is enrichment and must not change the lesson's generation state.
+  void updateArtifactMusicBackground({
+    required String contentKey,
+    required String musicBackgroundUrl,
+  }) {
+    final cleanUrl = musicBackgroundUrl.trim();
+    if (cleanUrl.isEmpty) return;
+    final plan = _activePlanRow();
+    if (plan == null) return;
+    final planId = plan['id'] as String;
+    final session = _sessionByContentKey(planId, contentKey);
+    final artifact = session?.artifact;
+    if (session == null || artifact == null) return;
+    final updatedArtifact = <String, dynamic>{
+      ...artifact,
+      'musicBackgroundUrl': cleanUrl,
+    };
+    final now = _now();
+    _db.execute(
+      'UPDATE adaptive_course_sessions SET artifact_json = ?, updated_at = ? '
+      'WHERE id = ? AND deleted_at IS NULL',
+      [jsonEncode(updatedArtifact), now, session.id],
+    );
+    _notifySession(session.copyWith(artifact: updatedArtifact));
+  }
+
   static String adaptiveProfileFingerprint(
     Profile profile, {
     UniversalLearningSnapshot? snapshot,
@@ -726,7 +870,7 @@ class AdaptiveCourseStore {
       profile.sessionLength,
       interests.join(','),
     ].join('|');
-    // Learning evidence shapes a newly appended five-lesson batch, but it is
+    // Learning evidence shapes a newly appended six-lesson batch, but it is
     // not plan identity. Otherwise every transcript or practice event can
     // replace unfinished lessons and create duplicate remote plans.
     return profileFingerprint;
@@ -836,8 +980,8 @@ class AdaptiveCourseStore {
   }
 
   /// Repairs a partially hydrated or older plan without replacing its ids or
-  /// completion state. A new route starts with the five foundations and one
-  /// personalized row; later gaps are repaired up to the highest known sequence.
+  /// completion state. A new route starts with the five foundations and six
+  /// personalized rows; later gaps are repaired up to the highest known sequence.
   /// This makes Unit 1 and Unit 2 durable even when Supabase previously
   /// returned only later rows.
   bool _repairSequenceGaps({
@@ -905,8 +1049,11 @@ class AdaptiveCourseStore {
           current,
           session,
           profileFingerprint: profileFingerprint,
-          allowCompletedIntroduction:
-              isAuthoredIntroduction || isAuthoredUnitTwo,
+          // Unit 2's skill order changed from five slots to six. Never
+          // rewrite a completed historical row into a different skill; only
+          // unfinished Unit 2 rows are upgraded in place. A new grammar row
+          // is inserted for the missing sixth slot.
+          allowCompletedIntroduction: isAuthoredIntroduction,
         );
         repaired = true;
       }
@@ -921,7 +1068,7 @@ class AdaptiveCourseStore {
   }
 
   /// Development-only serial lane. It deliberately bypasses the production
-  /// lookahead rule: the selected Unit 2 activity is the gate for sequence 11,
+  /// lookahead rule: the selected Unit 2 activity is the gate for sequence 12,
   /// and every later row is appended only after the previous selected-skill
   /// row is completed. Existing rows are never deleted or rewritten here.
   AdaptiveCoursePlanSnapshot _ensureHarnessNext({
@@ -952,6 +1099,26 @@ class AdaptiveCourseStore {
           ..sort((left, right) => left.sequence.compareTo(right.sequence));
     if (personalized.isNotEmpty) {
       final latest = personalized.last;
+      // A provider/validator failure must not strand the debug lane forever.
+      // Requeue one failed row exactly once (the remote preparation endpoint
+      // already gives the model one bounded repair turn). Keeping the retry
+      // local and marking it with a non-null error lets SyncService persist
+      // this explicit transition without confusing it with a stale queued
+      // snapshot from another device.
+      if (latest.generationStatus == 'failed' &&
+          latest.generationAttempts < 2) {
+        _db.execute(
+          '''UPDATE adaptive_course_sessions
+             SET generation_status = 'queued',
+                 generation_error = 'Retrying failed lesson once',
+                 updated_at = ?
+             WHERE id = ? AND generation_status = 'failed' ''',
+          [_now(), latest.id],
+        );
+        final retried = _snapshotForPlan(plan.id);
+        _notifyPlan(retried);
+        return retried;
+      }
       final waiting =
           latest.generationStatus == 'queued' ||
           latest.generationStatus == 'generating' ||
@@ -1586,7 +1753,7 @@ abstract final class AdaptiveCoursePlanGenerator {
           sequence <= adaptiveCourseSimplePhaseEnd &&
           (level == 'A1' || level == 'A2');
       final contextTrack = useEarlyBridgeContext ? earlyBridgeTrack : track;
-      final unit = ((sequence - 1) ~/ 5) + 1;
+      final unit = AdaptiveCurriculumService.courseUnitForSequence(sequence);
       final unitTopic = AdaptiveCurriculumService.unitTopicFor(
         goal: profile.goal,
         unit: unit,
@@ -1600,7 +1767,7 @@ abstract final class AdaptiveCoursePlanGenerator {
       final baseContext =
           'Unit $unit situation anchor: $unitTopic. Lesson angle: $lessonAngle. '
           'Surface variation: $unitVariation. '
-          'Keep all five lessons in this unit connected to this anchor while '
+          'Keep all six lessons in this unit connected to this anchor while '
           'varying the action and language task.';
       final foundationBase =
           'French pronunciation foundations for $baseContext';
@@ -1719,13 +1886,13 @@ abstract final class AdaptiveCoursePlanGenerator {
     return null;
   }
 
-  /// Unit 2 (sequences 6-10) is a second fixed, authored block, not an AI
+  /// Unit 2 (sequences 6-11) is a second fixed, authored block, not an AI
   /// call. Every skill including Listening is ready the instant the plan is
   /// created — no network, no waiting, no possibility of a malformed
   /// generation. Listening's durable audio is a single shared, publicly
   /// readable asset (uploaded once via generate-shared-course-listening-
   /// audio-once), not a fresh per-learner render. Five words, reused across
-  /// every one of the five lessons.
+  /// every one of the six lessons.
   static const _unitTwoWords = [
     (id: 'market', en: 'market', fr: 'marché', phonetic: 'mar-shay'),
     (id: 'apple', en: 'apple', fr: 'pomme', phonetic: 'pom'),
@@ -2087,16 +2254,110 @@ abstract final class AdaptiveCoursePlanGenerator {
             'steps': [for (var i = 0; i < 5; i++) step(i)],
           },
         };
+      case SpeakSkill.grammar:
+        // Unit 2's grammar is an authored A1/A2-safe guided session. It is
+        // deliberately built from the same five market words as the other
+        // lessons while teaching one pattern only: present-tense -er verbs.
+        // Later units use the server generator with the same contract.
+        Map<String, dynamic> step({
+          required String label,
+          required String prompt,
+          required String promptEnglish,
+          required String answer,
+          required String target,
+          required String tip,
+          required List<String> choices,
+          required List<String> choiceMeanings,
+        }) => {
+          'label': label,
+          'prompt': prompt,
+          'prompt_english': promptEnglish,
+          'target': target,
+          'answer': answer,
+          'choices': choices,
+          'choice_meanings': choiceMeanings,
+          'tokens': const <String>[],
+          'tip': tip,
+        };
+        final session = {
+          'id': 'grammar-unit-two',
+          'title': 'Talk about the market',
+          'subtitle': 'Use the present tense with market words.',
+          'level': level,
+          'tense': 'Present',
+          'grammar_focus': 'Present-tense -er verbs',
+          'icon_key': 'market',
+          'mode': 'guided',
+          'goal': 'Use one present-tense pattern in the market situation.',
+          'source': 'authored',
+          'steps': [
+            step(
+              label: 'Buy an apple',
+              prompt: "J'___ une pomme.",
+              promptEnglish: 'I buy an apple.',
+              answer: 'achète',
+              target: "J'achète une pomme.",
+              tip: 'With je, acheter becomes achète.',
+              choices: ['achète', 'achètes', 'acheter'],
+              choiceMeanings: ['buys', 'buy (you)', 'to buy'],
+            ),
+            step(
+              label: 'Look at the price',
+              prompt: 'Tu ___ le prix.',
+              promptEnglish: 'You look at the price.',
+              answer: 'regardes',
+              target: 'Tu regardes le prix.',
+              tip: 'With tu, a regular -er verb ends in -es.',
+              choices: ['regardes', 'regarde', 'regarder'],
+              choiceMeanings: ['look (you)', 'looks', 'to look'],
+            ),
+            step(
+              label: 'Weigh the fruit',
+              prompt: 'La vendeuse ___ les fruits.',
+              promptEnglish: 'The seller weighs the fruit.',
+              answer: 'pèse',
+              target: 'La vendeuse pèse les fruits.',
+              tip: 'A singular subject uses the -e form.',
+              choices: ['pèse', 'pèsent', 'peser'],
+              choiceMeanings: ['weighs', 'weigh (they)', 'to weigh'],
+            ),
+            step(
+              label: 'Talk about the price',
+              prompt: 'Nous ___ du prix.',
+              promptEnglish: 'We talk about the price.',
+              answer: 'parlons',
+              target: 'Nous parlons du prix.',
+              tip: 'With nous, parler becomes parlons.',
+              choices: ['parlons', 'parlez', 'parler'],
+              choiceMeanings: ['talk (we)', 'talk (you)', 'to talk'],
+            ),
+            step(
+              label: 'Close the market',
+              prompt: 'Ils ___ tôt.',
+              promptEnglish: 'They close early.',
+              answer: 'ferment',
+              target: 'Ils ferment tôt.',
+              tip: 'With ils, a regular -er verb ends in -ent.',
+              choices: ['ferment', 'ferme', 'fermer'],
+              choiceMeanings: ['close (they)', 'closes', 'to close'],
+            ),
+          ],
+        };
+        return {
+          'id': 'unit-two-grammar',
+          'practiceMode': 'guided',
+          'session': session,
+        };
       default:
         return null;
     }
   }
 
-  /// Every personalized unit of five is taught in one fixed, slow-to-higher
-  /// order: teach the words first, then reuse that same vocabulary to speak,
-  /// read, listen, and finally write about it. This is deliberately not
+  /// Every personalized unit of six is taught in one fixed, predictable order:
+  /// teach the words, read them, hear them, write them, speak them, and then
+  /// make the grammar explicit. This is deliberately not
   /// re-personalized by onboarding emphasis or recent evidence — a beginner
-  /// needs the words before any of the other four activities can reuse them,
+  /// needs the words before the other five activities can reuse them,
   /// and the order must stay predictable and simple across every unit.
   /// [focusSkills] and [recentSkills] are accepted for call-site compatibility
   /// but no longer change the order.
@@ -2110,10 +2371,11 @@ abstract final class AdaptiveCoursePlanGenerator {
     final position = personalizedIndex % adaptiveCourseBatchSize;
     const unitOrder = [
       SpeakSkill.vocabulary,
-      SpeakSkill.speaking,
       SpeakSkill.reading,
       SpeakSkill.listening,
       SpeakSkill.writing,
+      SpeakSkill.speaking,
+      SpeakSkill.grammar,
     ];
     return unitOrder[position % unitOrder.length];
   }

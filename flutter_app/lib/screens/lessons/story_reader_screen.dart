@@ -18,6 +18,7 @@ import '../../services/word_meaning_resolver.dart';
 import '../../widgets/story_cover_image.dart';
 import '../../services/session_recorder.dart';
 import '../../widgets/bilingual_word_text.dart';
+import '../../widgets/dark_error_snackbar.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/inline_call_bar.dart';
 import '../../widgets/learning_card.dart';
@@ -59,6 +60,7 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     this.coverGenerator,
     this.grammarExplanation,
     this.grammarTabLabel = 'Grammar',
+    this.courseContentKey,
   });
 
   final GeneratedStory story;
@@ -75,6 +77,10 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
   /// default, "Liaison" for a liaison-practice session. Purely cosmetic;
   /// both share the exact same tab/reader/explanation-card machinery.
   final String grammarTabLabel;
+
+  /// Generated Course readers use this key to join the transcript/session to
+  /// the persisted lesson artifact in Review and Warm-up.
+  final String? courseContentKey;
 
   /// True when this screen is a step in a larger flow (e.g. a mission) that
   /// needs the learner to explicitly finish and hand back a graded result —
@@ -233,7 +239,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     _highlightWords = _settings.highlightWords;
     _underlineWords = _settings.underlineWords;
     _autoPlayWordAudio = _settings.autoPlayWordAudio;
-    _darkMode = _settings.darkMode;
+    _darkMode = true;
     unawaited(
       _settings.load().then((_) {
         if (!mounted) return;
@@ -244,7 +250,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           _highlightWords = _settings.highlightWords;
           _underlineWords = _settings.underlineWords;
           _autoPlayWordAudio = _settings.autoPlayWordAudio;
-          _darkMode = _settings.darkMode;
+          _darkMode = true;
         });
       }),
     );
@@ -261,6 +267,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       storage: ref.read(storageServiceProvider),
       stage: 'story',
       topic: _story.displayTitle,
+      contentKey: widget.courseContentKey,
     );
     unawaited(_loadFavorite());
     if (_story.coverUrl == null || _story.coverUrl!.isEmpty) {
@@ -399,7 +406,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _narrationHighlightTimer?.cancel();
       _narrationHighlightTimer = null;
       await _liveNarrationAudio.stopPlayback(hardStop: true);
-      await _call.endExternalPlayback();
+      await _call.refreshAfterExternalPlayback();
       if (mounted && generation == _livePlaybackGeneration) {
         setState(() {
           _isPlaying = false;
@@ -429,30 +436,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   void _showStoryMessage(String message) {
     if (!mounted) return;
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    if (messenger == null) return;
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              height: 1.25,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          backgroundColor: const Color(0xFF202024),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(18)),
-            side: BorderSide(color: Colors.white24),
-          ),
-        ),
-      );
+    showDarkErrorSnackBar(context, message);
   }
 
   String _friendlyNarrationError(Object error, String kind) {
@@ -760,7 +744,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       }
     } finally {
       await _liveNarrationAudio.stopPlayback(hardStop: true);
-      await _call.endExternalPlayback();
+      await _call.refreshAfterExternalPlayback();
       if (mounted && generation == _livePlaybackGeneration) {
         setState(() {
           _isPlaying = false;
@@ -837,7 +821,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       _highlightWords = result.highlightWords;
       _underlineWords = result.underlineWords;
       _autoPlayWordAudio = result.autoPlayWordAudio;
-      _darkMode = result.darkMode;
+      _darkMode = true;
     });
     unawaited(_settings.setTextScale(_textScale));
     unawaited(_settings.setPlaybackRate(_rate));
@@ -846,7 +830,6 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     unawaited(_settings.setHighlightWords(_highlightWords));
     unawaited(_settings.setUnderlineWords(_underlineWords));
     unawaited(_settings.setAutoPlayWordAudio(_autoPlayWordAudio));
-    unawaited(_settings.setDarkMode(_darkMode));
   }
 
   void _markAsLearned() {
@@ -2481,7 +2464,13 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
   late bool _highlight = widget.highlightWords;
   late bool _underline = widget.underlineWords;
   late bool _autoPlay = widget.autoPlayWordAudio;
-  late bool _dark = widget.darkMode;
+  late final bool _dark;
+
+  @override
+  void initState() {
+    super.initState();
+    _dark = widget.darkMode;
+  }
 
   void _close() => Navigator.of(context).pop(
     _ReaderSettingsResult(
@@ -2623,15 +2612,6 @@ class _StorySettingsSheetState extends State<_StorySettingsSheet> {
                 'Play a word when it is selected.',
                 _autoPlay,
                 (v) => setState(() => _autoPlay = v),
-                text,
-                muted,
-                accent,
-              ),
-              _switchRow(
-                'Dark mode',
-                'Use the focused dark reading canvas.',
-                _dark,
-                (v) => setState(() => _dark = v),
                 text,
                 muted,
                 accent,

@@ -8,14 +8,16 @@ GrammarCourseStep _guided(
   String answer,
   String target,
   String tip,
-  List<String> choices,
-) => GrammarCourseStep(
+  List<String> choices, {
+  List<String> choiceMeanings = const [],
+}) => GrammarCourseStep(
   label: label,
   prompt: prompt,
   promptEnglish: promptEnglish,
   target: target,
   answer: answer,
   choices: choices,
+  choiceMeanings: choiceMeanings,
   tokens: const [],
   tip: tip,
 );
@@ -45,14 +47,16 @@ GrammarCourseStep _roleplay(
   String promptEnglish,
   String answer,
   String tip,
-  List<String> choices,
-) => GrammarCourseStep(
+  List<String> choices, {
+  List<String> choiceMeanings = const [],
+}) => GrammarCourseStep(
   label: label,
   prompt: prompt,
   promptEnglish: promptEnglish,
   target: answer,
   answer: answer,
   choices: choices,
+  choiceMeanings: choiceMeanings,
   tokens: const [],
   tip: tip,
   partnerFrench: partnerFrench,

@@ -58,7 +58,7 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
     store.saveProfile(profile);
     unawaited(NotificationSchedulerService.sync(profile));
     // The pre-auth funnel must only save learner choices. AuthGate creates
-    // and syncs the first adaptive batch (lessons 6–10) after signup.
+    // and syncs the authored six-skill block (lessons 6–11) after signup.
     await ActiveTutor.set(_tutor);
     await TutorTuning.saveLanguageMix(LearnerLevel.defaultLanguageMix(_level));
     AlphabetPrewarm.maybeStart(isBeginner: _level == 'a1');
@@ -301,7 +301,7 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
       ('Listening', Icons.headphones_outlined),
       ('Reading', Icons.menu_book_outlined),
       ('Writing', Icons.edit_note_rounded),
-      ('Grammar', Icons.auto_fix_high_outlined),
+      ('Grammar', Icons.spellcheck_rounded),
       ('Vocabulary', Icons.style_outlined),
     ];
     return Column(
@@ -323,10 +323,7 @@ class _V3OnboardingScreenState extends ConsumerState<V3OnboardingScreen> {
         const SizedBox(height: 22),
         for (final choice in choices) ...[
           V3Card(
-            raised: _focus.contains(choice.$1),
-            borderColor: _focus.contains(choice.$1)
-                ? DesignTokens.nightAccent
-                : null,
+            leadingAccent: _focus.contains(choice.$1),
             onTap: () => setState(() {
               if (_focus.contains(choice.$1)) {
                 if (_focus.length > 1) _focus.remove(choice.$1);

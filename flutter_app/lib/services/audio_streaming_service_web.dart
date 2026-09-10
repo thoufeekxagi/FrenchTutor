@@ -85,8 +85,37 @@ class WebAudioStreamingService implements AudioStreamingService {
   bool _isStreaming = false;
   bool _starting = false;
 
+  DateTime? _playbackTimelineStart;
+  Duration _playbackTimelineDuration = Duration.zero;
+
   @override
   bool get isStreaming => _isStreaming;
+
+  @override
+  Future<bool> get microphonePermissionGranted async => _micStream != null;
+
+  @override
+  Duration get playbackTimelineDuration => _playbackTimelineDuration;
+
+  @override
+  Duration get playbackTimelinePosition {
+    final start = _playbackTimelineStart;
+    if (start == null || _playbackTimelineDuration <= Duration.zero) {
+      return Duration.zero;
+    }
+    final elapsed = DateTime.now().difference(start);
+    if (elapsed <= Duration.zero) return Duration.zero;
+    if (elapsed >= _playbackTimelineDuration) {
+      return _playbackTimelineDuration;
+    }
+    return elapsed;
+  }
+
+  @override
+  void resetPlaybackTimeline() {
+    _playbackTimelineStart = null;
+    _playbackTimelineDuration = Duration.zero;
+  }
 
   /// Scheduled-playback cursor, in the output context's clock. Web Audio gives
   /// us sample-accurate scheduling, so gapless playback of network-bursty
@@ -360,9 +389,16 @@ class WebAudioStreamingService implements AudioStreamingService {
   @override
   Future<void> playAudioChunk(
     List<int> pcmBytes, {
+    double? playbackSpeed,
     bool waitForFeed = false,
   }) async {
     if (pcmBytes.isEmpty) return;
+    if (playbackSpeed != null) {
+      _playbackSpeed = playbackSpeed.clamp(0.5, 1.5).toDouble();
+      for (final scheduled in List.of(_scheduled)) {
+        scheduled.playbackRate.value = _playbackSpeed;
+      }
+    }
     _ensureOutputContext();
     final ctx = _outputContext;
     if (ctx == null) return;
@@ -407,7 +443,11 @@ class WebAudioStreamingService implements AudioStreamingService {
     final now = ctx.currentTime;
     if (_nextStartTime < now) _nextStartTime = now;
     node.start(_nextStartTime);
-    _nextStartTime += buffer.duration;
+    _nextStartTime += buffer.duration / _playbackSpeed;
+    _playbackTimelineStart ??= DateTime.now();
+    _playbackTimelineDuration += Duration(
+      microseconds: (buffer.duration * 1000000 / _playbackSpeed).round(),
+    );
 
     _scheduled.add(node);
     node.onended = ((web.Event _) => _scheduled.remove(node)).toJS;
@@ -427,6 +467,7 @@ class WebAudioStreamingService implements AudioStreamingService {
     }
     _scheduled.clear();
     _pendingOddByte = null;
+    resetPlaybackTimeline();
     final ctx = _outputContext;
     if (ctx != null) _nextStartTime = ctx.currentTime;
   }

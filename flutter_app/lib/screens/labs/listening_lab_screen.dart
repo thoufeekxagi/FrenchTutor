@@ -7,11 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/speak_curriculum.dart';
-import '../../providers/database_provider.dart';
 import '../../data/database/generated_story_store.dart';
+import '../../providers/database_provider.dart';
 import '../../services/course_artifact_codec.dart';
 import '../../services/lesson_agent_service.dart';
-import '../../services/lesson_audio_deck_service.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../widgets/personalized_generation_loader.dart';
 import '../../widgets/web/web_constrained_view.dart';
@@ -342,13 +341,6 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
     // stable id and independently update SQLite and Supabase.
     store.insert(story);
     final enrichment = _enrichListeningStory(story);
-    final audioReady = await LessonAudioDeckService.shared.prepare(
-      story: story,
-      db: ref.read(databaseProvider),
-    );
-    if (!audioReady) {
-      throw StateError('Listening audio deck could not be prepared.');
-    }
     unawaited(_generateCover(story, draft.coverPrompt));
     unawaited(_generateListeningBackground(story, draft.coverPrompt));
 
@@ -455,6 +447,10 @@ class _ListeningLabScreenState extends ConsumerState<ListeningLabScreen> {
         topic: story.topic,
         levelBand: story.levelBand,
         coverPrompt: coverPrompt,
+        visualStyle: PracticeArtworkService.architecturalVisualStyle,
+        maxBytes: 100 * 1024,
+        retryMaxBytes: 160 * 1024,
+        aspectRatio: '2:3',
       );
       if (url == null) return;
       store.updateCoverUrl(story.id, url);

@@ -33,6 +33,7 @@ class GeminiLiveService {
     this.manualActivityBoundaries = false,
     this.deferUserTranscriptUntilTurnComplete = false,
     this.compactGuidedContext = false,
+    this.lessonContextCharacterLimit,
   });
 
   final String apiKey;
@@ -63,6 +64,11 @@ class GeminiLiveService {
   /// Uses a small guided-speaking system contract and context window. Other
   /// Live surfaces keep their existing prompt and compression policy.
   final bool compactGuidedContext;
+
+  /// Optional feature-owned context budget. Review/Warm-up uses this to keep
+  /// the ranked learner evidence intact while still applying a hard bound.
+  /// Normal Live surfaces retain [_maxLessonContextCharacters].
+  final int? lessonContextCharacterLimit;
 
   // There must be one billable conversational Live socket per app process.
   // A second lesson/tutor takes ownership and closes the previous owner
@@ -95,17 +101,28 @@ class GeminiLiveService {
   static const _defaultContextCompressionTargetTokens = 4000;
   static const _compactGuidedCompressionTriggerTokens = 2000;
   static const _compactGuidedCompressionTargetTokens = 1000;
-  static const _compactWritingCompressionTriggerTokens = 1000;
-  static const _compactWritingCompressionTargetTokens = 500;
+  static const _compactLiaisonCompressionTriggerTokens = 1400;
+  static const _compactLiaisonCompressionTargetTokens = 700;
+  // Writing cards carry a visible word bank plus one English meaning per
+  // token. Keeping only 500 tokens after compression was enough to drop that
+  // mapping after the first learner turn, so Marie could still hear the task
+  // but no longer knew which words were on the card. Keep the current card
+  // intact while remaining much smaller than a full conversation window.
+  static const _compactWritingCompressionTriggerTokens = 2200;
+  static const _compactWritingCompressionTargetTokens = 1100;
 
   int get _contextCompressionTriggerTokens => compactGuidedContext
-      ? sessionType == LiveSessionType.writingGuide
+      ? sessionType == LiveSessionType.liaisonStage
+            ? _compactLiaisonCompressionTriggerTokens
+            : sessionType == LiveSessionType.writingGuide
             ? _compactWritingCompressionTriggerTokens
             : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
   int get _contextCompressionTargetTokens => compactGuidedContext
-      ? sessionType == LiveSessionType.writingGuide
+      ? sessionType == LiveSessionType.liaisonStage
+            ? _compactLiaisonCompressionTargetTokens
+            : sessionType == LiveSessionType.writingGuide
             ? _compactWritingCompressionTargetTokens
             : _compactGuidedCompressionTargetTokens
       : _defaultContextCompressionTargetTokens;
@@ -437,6 +454,10 @@ class GeminiLiveService {
 
   void beginAudioTurn() {
     if (!_isSetupComplete || !manualActivityBoundaries) return;
+    // A prior card change may have suppressed a stale reply while the socket
+    // stayed open. The learner's next explicit recording starts a fresh turn,
+    // so its feedback must be delivered normally.
+    _suppressPreInjection = false;
     _send({
       'realtimeInput': {'activityStart': {}},
     });
@@ -520,12 +541,16 @@ class GeminiLiveService {
     if (compactGuidedContext &&
         (sessionType == LiveSessionType.speakingGuided ||
             sessionType == LiveSessionType.vocabStage ||
-            sessionType == LiveSessionType.writingGuide)) {
+            sessionType == LiveSessionType.writingGuide ||
+            sessionType == LiveSessionType.liaisonStage)) {
       var compactPrompt = switch (sessionType) {
         LiveSessionType.vocabStage => LivePrompts.compactVocabulary(
           persona: _persona,
         ),
         LiveSessionType.writingGuide => LivePrompts.compactGuidedWriting(
+          persona: _persona,
+        ),
+        LiveSessionType.liaisonStage => LivePrompts.compactGuidedLiaison(
           persona: _persona,
         ),
         _ => LivePrompts.compactGuidedSpeaking(persona: _persona),
@@ -534,7 +559,7 @@ class GeminiLiveService {
       if (ctx != null && ctx.trim().isNotEmpty) {
         compactPrompt +=
             '\n\nCURRENT APP STEP (latest screen):\n'
-            '${_boundDynamicContext(ctx, sessionType == LiveSessionType.writingGuide ? 700 : 900)}';
+            '${_boundDynamicContext(ctx, _lessonContextLimit)}';
       }
       return compactPrompt;
     }
@@ -544,14 +569,20 @@ class GeminiLiveService {
       languageMix: await TutorTuning.languageMix(),
       voiceSpeed: await TutorTuning.voiceSpeed(),
     );
-    final profile = await _learnerProfile();
-    if (profile.isNotEmpty) {
-      final boundedProfile = _boundDynamicContext(
-        profile,
-        _maxLearnerProfileCharacters,
-      );
-      prompt +=
-          '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$boundedProfile';
+    // Review already carries a frozen, session-scoped evidence boundary in
+    // LESSON CONTEXT. Do not append the global compact profile here: its
+    // account-wide "recent issue" can reintroduce an old stock topic (for
+    // example, station) after the Review planner deliberately excluded it.
+    if (sessionType != LiveSessionType.speakingReview) {
+      final profile = await _learnerProfile();
+      if (profile.isNotEmpty) {
+        final boundedProfile = _boundDynamicContext(
+          profile,
+          _maxLearnerProfileCharacters,
+        );
+        prompt +=
+            '\n\nSTUDENT PROFILE, use this to calibrate level and pacing; never read it aloud:\n$boundedProfile';
+      }
     }
     final level = levelOverride ?? await _learnerLevel();
     if (level != null) {
@@ -575,10 +606,14 @@ class GeminiLiveService {
     return '${normalized.substring(0, maxCharacters)}\n[context truncated]';
   }
 
-  int get _lessonContextLimit => switch (sessionType) {
-    LiveSessionType.readingNarration => 8000,
-    _ => _maxLessonContextCharacters,
-  };
+  int get _lessonContextLimit {
+    final explicit = lessonContextCharacterLimit;
+    if (explicit != null) return explicit.clamp(2200, 12000).toInt();
+    return switch (sessionType) {
+      LiveSessionType.readingNarration => 8000,
+      _ => _maxLessonContextCharacters,
+    };
+  }
 
   Future<String> _learnerProfile() async {
     final store = learningStoreForProfile;

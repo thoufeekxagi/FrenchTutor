@@ -11,13 +11,10 @@ import '../../models/srs_state.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../providers/tutor_helper_provider.dart';
-import '../../models/tutor_persona.dart';
-import '../../services/gemini_live_audio_service.dart';
 import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/srs_service.dart';
 import '../../services/tutor_helper_settings.dart';
-import '../../widgets/tts_play_button.dart';
 import '../../widgets/v3/v3_surface.dart';
 
 enum VocabularyStudyDepth { wordsOnly, wordsAndSentences }
@@ -108,7 +105,6 @@ class _VocabularyFlashcardsScreenState
   bool _murrayGradeReceived = false;
   Timer? _murrayGradeTimeout;
   bool _testingSentence = false;
-  final _wordSpeakerKey = GlobalKey<TtsPlayButtonState>();
 
   static const _diacriticMap = {
     'à': 'a',
@@ -197,14 +193,17 @@ class _VocabularyFlashcardsScreenState
         'when the app explicitly asks for pronunciation or brief guidance.';
   }
 
-  /// Uses the already-open Live socket for explicit pronunciation only. This
-  /// never creates a PCM clip or a second connection; the next card silently
-  /// replaces the context on the same socket.
-  void _askLiveToSpeak({required bool sentence}) {
-    if (!_murrayEnabled) {
-      if (!mounted) return;
-      setState(() => _audioError = 'Tap the phone for live guidance.');
-      return;
+  /// Uses the shared Live tutor for explicit pronunciation. A speaker tap is
+  /// itself a valid request to connect, so a learner never gets sent to the
+  /// separate phone control just because the socket is still cold. This path
+  /// never creates a one-shot PCM clip or a second connection; the next card
+  /// silently replaces the context on the same Live socket.
+  Future<void> _askLiveToSpeak({required bool sentence}) async {
+    if (_murray.tutorTurnActive || _murray.connecting) return;
+    if (!_murray.isLive) {
+      if (mounted) setState(() => _audioError = null);
+      await _setMurrayEnabled(true);
+      if (!mounted || !_murray.isLive) return;
     }
     if (_murray.tutorTurnActive) return;
     _audioError = null;
@@ -357,9 +356,6 @@ class _VocabularyFlashcardsScreenState
     }
   }
 
-  String _audioId(VocabEntry entry, String kind) =>
-      'vocabulary:${widget.title}:${entry.id}:$kind';
-
   void _setPreparationStatus(String value) {
     if (mounted) setState(() => _preparationStatus = value);
   }
@@ -406,7 +402,7 @@ class _VocabularyFlashcardsScreenState
     });
     if (_murray.isReadyForLearnerTurn) {
       _murrayTurnClosing = false;
-      final started = await _murray.startLearnerTurn();
+      final started = await _murray.startLearnerTurn(interruptTutor: true);
       if (started) return;
     }
     await LessonSpeechService.shared.startListening(
@@ -549,6 +545,9 @@ class _VocabularyFlashcardsScreenState
 
   void _next() {
     if (!_wordComplete) return;
+    // Next is an explicit pace decision, including the final card. Cut any
+    // remaining Marie audio while preserving the Live socket for the lesson.
+    unawaited(_murray.interruptTutorReply());
     if (_index >= _entries.length - 1) {
       try {
         _sessions.complete(_sessionId);
@@ -575,7 +574,6 @@ class _VocabularyFlashcardsScreenState
       _loadError = null;
       _audioError = null;
     });
-    _murray.suppressCurrentReply();
     _murray.updateLessonContext();
     _saveProgress();
   }
@@ -759,9 +757,7 @@ class _VocabularyFlashcardsScreenState
             child: _smallFooterControl(
               icon: Icons.volume_up_outlined,
               label: 'Replay word',
-              onTap: _murrayEnabled
-                  ? () => _askLiveToSpeak(sentence: false)
-                  : () => _wordSpeakerKey.currentState?.trigger(),
+              onTap: () => unawaited(_askLiveToSpeak(sentence: false)),
             ),
           ),
         ],
@@ -888,6 +884,7 @@ class _VocabularyFlashcardsScreenState
   }
 
   Widget _topBar() {
+    final connecting = _murray.connecting;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -956,7 +953,9 @@ class _VocabularyFlashcardsScreenState
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _murrayEnabled
+                          connecting
+                              ? 'Connecting…'
+                              : _murrayEnabled
                               ? 'Live · follows this lesson'
                               : 'Tap phone for live guidance',
                           style: DesignTokens.body(
@@ -966,13 +965,18 @@ class _VocabularyFlashcardsScreenState
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.phone_in_talk_rounded,
-                    color: _murrayEnabled
-                        ? DesignTokens.success
-                        : DesignTokens.mutedDim,
-                    size: 24,
-                  ),
+                  connecting
+                      ? const SizedBox.square(
+                          dimension: 21,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(
+                          Icons.phone_in_talk_rounded,
+                          color: _murrayEnabled
+                              ? DesignTokens.success
+                              : DesignTokens.mutedDim,
+                          size: 24,
+                        ),
                 ],
               ),
             ),
@@ -983,58 +987,41 @@ class _VocabularyFlashcardsScreenState
   }
 
   Widget _pronunciationButton({
-    required String text,
-    required String contentItemId,
     required bool sentence,
     required double size,
     required double iconSize,
   }) {
-    if (_murrayEnabled) {
-      return Semantics(
-        button: true,
-        label: sentence
-            ? 'Pronounce the current sentence with live guidance'
-            : 'Pronounce the current word with live guidance',
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => _askLiveToSpeak(sentence: sentence),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: DesignTokens.nightAccentSoft,
-              border: Border.all(color: DesignTokens.nightAccent),
-            ),
-            alignment: Alignment.center,
-            child: Icon(
-              Icons.volume_up_outlined,
-              color: DesignTokens.nightAccent,
-              size: iconSize,
-            ),
+    return Semantics(
+      button: true,
+      label: sentence
+          ? 'Pronounce the current sentence with Gemini Live'
+          : 'Pronounce the current word with Gemini Live',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => unawaited(_askLiveToSpeak(sentence: sentence)),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _murray.connecting
+                ? DesignTokens.nightSurfaceRaised
+                : DesignTokens.nightAccentSoft,
+            border: Border.all(color: DesignTokens.nightAccent),
           ),
+          alignment: Alignment.center,
+          child: _murray.connecting
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(
+                  Icons.volume_up_outlined,
+                  color: DesignTokens.nightAccent,
+                  size: iconSize,
+                ),
         ),
-      );
-    }
-
-    return TtsPlayButton(
-      key: sentence ? null : _wordSpeakerKey,
-      text: text,
-      contentItemId: contentItemId,
-      // This is cache-only. Vocabulary must never open a one-shot PCM Live
-      // request from a playback tap; the phone control above is the explicit
-      // Live path.
-      audioResolver: () => GeminiLiveAudioService.shared.loadCached(
-        text: text,
-        voiceName: ActiveTutor.current.voiceName,
       ),
-      onError: (error) {
-        if (!mounted) return;
-        setState(() => _audioError = 'Tap the phone for live guidance.');
-      },
-      color: DesignTokens.nightAccent,
-      size: size,
-      iconSize: iconSize,
     );
   }
 
@@ -1122,13 +1109,7 @@ class _VocabularyFlashcardsScreenState
             style: DesignTokens.display(28).copyWith(height: 1.1),
           ),
           const SizedBox(height: 16),
-          _pronunciationButton(
-            text: entry.fr,
-            contentItemId: _audioId(entry, 'word'),
-            sentence: false,
-            size: 44,
-            iconSize: 20,
-          ),
+          _pronunciationButton(sentence: false, size: 44, iconSize: 20),
           const SizedBox(height: 18),
           if (_wordComplete)
             Row(
@@ -1197,8 +1178,6 @@ class _VocabularyFlashcardsScreenState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _pronunciationButton(
-                      text: example.fr,
-                      contentItemId: _audioId(_current, 'sentence'),
                       sentence: true,
                       size: 40,
                       iconSize: 19,

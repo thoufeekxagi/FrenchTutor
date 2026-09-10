@@ -11,6 +11,7 @@ import '../data/database/generated_scene_cache_store.dart';
 import '../data/database/generated_story_store.dart';
 import '../data/database/story_favorite_store.dart';
 import '../data/database/generated_grammar_story_store.dart';
+import '../data/database/liaison_generated_store.dart';
 import '../data/database/generated_roleplay_store.dart';
 import '../data/database/generated_writing_task_store.dart';
 import '../data/database/generated_vocabulary_set_store.dart';
@@ -20,6 +21,7 @@ import '../data/database/grammar_course_lesson_store.dart';
 import '../data/database/vocabulary_session_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/exam_practice_store.dart';
+import '../data/database/review_store.dart';
 import '../data/database/plan_store.dart';
 import '../orchestration/runtime/orchestration_service.dart';
 import '../data/content_service.dart';
@@ -32,6 +34,7 @@ import '../services/subscription_gate_service.dart';
 import '../services/sync_service.dart';
 import '../services/auth_service.dart';
 import '../services/starter_content_service.dart';
+import '../services/review_context_cache_service.dart';
 import '../widgets/floating_notetaker.dart';
 
 final databaseProvider = Provider<CommonDatabase>((ref) {
@@ -63,7 +66,12 @@ final adaptiveCourseStoreProvider = Provider<AdaptiveCourseStore>((ref) {
   return AdaptiveCourseStore(
     ref.watch(databaseProvider),
     onPlanChanged: sync.syncAdaptiveCoursePlan,
-    onSessionChanged: sync.syncAdaptiveCourseSession,
+    onSessionChanged: (session) async {
+      await sync.syncAdaptiveCourseSession(session);
+      if (session.status == 'completed') {
+        ReviewContextCacheService.schedule(ref.read(databaseProvider));
+      }
+    },
     generationHarness: CourseGenerationTestHarness.current,
   );
 });
@@ -129,6 +137,11 @@ final generatedGrammarStoryStoreProvider = Provider<GeneratedGrammarStoryStore>(
   },
 );
 
+final liaisonGeneratedLessonStoreProvider =
+    Provider<LiaisonGeneratedLessonStore>((ref) {
+      return LiaisonGeneratedLessonStore(ref.watch(databaseProvider));
+    });
+
 final generatedRoleplayStoreProvider = Provider<GeneratedRoleplayStore>((ref) {
   return GeneratedRoleplayStore(
     ref.watch(databaseProvider),
@@ -181,6 +194,13 @@ final vocabularySessionStoreProvider = Provider<VocabularySessionStore>((ref) {
 
 final examPracticeStoreProvider = Provider<ExamPracticeStore>((ref) {
   return ExamPracticeStore(ref.watch(databaseProvider));
+});
+
+final reviewStoreProvider = Provider<ReviewStore>((ref) {
+  return ReviewStore(
+    ref.watch(databaseProvider),
+    ref.watch(syncServiceProvider),
+  );
 });
 
 final starterContentServiceProvider = Provider<StarterContentService>((ref) {

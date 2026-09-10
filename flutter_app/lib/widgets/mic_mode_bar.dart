@@ -23,6 +23,7 @@ class MicModeBar extends StatefulWidget {
     required this.onHoldStart,
     required this.onHoldEnd,
     this.dark = false,
+    this.inline = false,
   });
 
   final MicMode mode;
@@ -32,6 +33,7 @@ class MicModeBar extends StatefulWidget {
   final VoidCallback onHoldStart;
   final VoidCallback onHoldEnd;
   final bool dark;
+  final bool inline;
 
   @override
   State<MicModeBar> createState() => _MicModeBarState();
@@ -69,6 +71,8 @@ class _MicModeBarState extends State<MicModeBar>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.inline) return _modePill();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Stack(
@@ -218,7 +222,9 @@ class _MicModeBarState extends State<MicModeBar>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: selected
-                ? (widget.dark ? DesignTokens.nightSurface : DesignTokens.surface)
+                ? (widget.dark
+                      ? DesignTokens.nightSurface
+                      : DesignTokens.surface)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(100),
             boxShadow: selected
@@ -250,7 +256,9 @@ class _MicModeBarState extends State<MicModeBar>
                 label,
                 style: DesignTokens.body(12, weight: FontWeight.w600).copyWith(
                   color: selected
-                      ? (widget.dark ? DesignTokens.nightText : DesignTokens.ink)
+                      ? (widget.dark
+                            ? DesignTokens.nightText
+                            : DesignTokens.ink)
                       : (widget.dark
                             ? DesignTokens.nightMuted
                             : DesignTokens.mutedDim),

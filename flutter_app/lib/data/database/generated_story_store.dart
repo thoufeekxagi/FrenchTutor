@@ -69,7 +69,7 @@ class GeneratedStoryStore {
   void insert(GeneratedStory story) {
     final now = DateTime.now().toUtc().toIso8601String();
     _db.execute(
-      '''INSERT INTO generated_stories
+      '''INSERT OR IGNORE INTO generated_stories
          (id, title, passage_json, quiz_json, keywords_json, level_band,
           summary, topic, read_time_minutes, cover_url, music_background_url,
           audio_path, audio_mode, practice_mode, created_at, updated_at)

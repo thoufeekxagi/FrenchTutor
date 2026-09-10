@@ -201,6 +201,28 @@ void main() {
     expect(find.text('Next'), findsOneWidget);
   });
 
+  testWidgets('guided hint reveals the authored order with meanings', (
+    tester,
+  ) async {
+    AppAppearanceSettings.shared.adoptDarkMode(false);
+    final lesson = WritingCourseCatalog.forMode(WritingCourseMode.guided).first;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.themeData(darkMode: false),
+        home: WritingCourseLessonScreen(lesson: lesson),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('Hint'));
+    await tester.pump();
+
+    expect(find.textContaining('Answer order:'), findsOneWidget);
+    expect(find.textContaining('Bonjour'), findsWidgets);
+    expect(find.textContaining('hello'), findsOneWidget);
+    expect(find.textContaining('Complete sentence:'), findsOneWidget);
+  });
+
   testWidgets('writing surfaces stay usable on a narrow, enlarged-text phone', (
     tester,
   ) async {

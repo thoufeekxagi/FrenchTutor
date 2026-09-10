@@ -8,6 +8,7 @@ import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
 import '../../models/speaking_course.dart';
 import '../../models/tutor_persona.dart';
+import '../../services/session_recorder.dart';
 import '../../providers/database_provider.dart';
 import '../../providers/tutor_helper_provider.dart';
 import '../../prompts/live_prompts.dart';
@@ -96,6 +97,7 @@ class SpeakingLessonFlowScreen extends ConsumerStatefulWidget {
     this.topic,
     this.contentKey,
     this.tutor,
+    this.enableTutorHelper = true,
   });
 
   final String title;
@@ -108,6 +110,10 @@ class SpeakingLessonFlowScreen extends ConsumerStatefulWidget {
   /// learner selected in Settings for both lesson audio and live coaching.
   final TutorPersona? tutor;
 
+  /// Review uses the same controlled phrase UI as Course, but must not open a
+  /// Gemini Live helper session behind that UI.
+  final bool enableTutorHelper;
+
   @override
   ConsumerState<SpeakingLessonFlowScreen> createState() =>
       _SpeakingLessonFlowScreenState();
@@ -118,6 +124,7 @@ class _SpeakingLessonFlowScreenState
     with WidgetsBindingObserver {
   final Stopwatch _sessionClock = Stopwatch();
   late final InlineCallController _murray;
+  late final SessionRecorder _recorder;
   int _index = 0;
   int _successful = 0;
   bool _playing = false;
@@ -143,6 +150,7 @@ class _SpeakingLessonFlowScreenState
   int? _selectedPhraseWord;
   int? _selectedFreeTalkPartnerWord;
   int? _selectedFreeTalkLearnerWord;
+  bool _sessionRecorded = false;
 
   SpeakingPhraseStep get _step => widget.steps[_index];
   TutorPersona get _tutor => widget.tutor ?? ActiveTutor.current;
@@ -152,6 +160,12 @@ class _SpeakingLessonFlowScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _recorder = SessionRecorder(
+      storage: ref.read(storageServiceProvider),
+      stage: _isFreeTalk ? 'free_talk' : 'speaking_guided',
+      topic: widget.title,
+      contentKey: widget.contentKey,
+    );
     _murray = InlineCallController(
       sessionType: _murraySessionType,
       lessonContext: () => _murrayContext,
@@ -176,9 +190,9 @@ class _SpeakingLessonFlowScreenState
       final helperSettings = ref.read(tutorHelperSettingsProvider);
       await helperSettings.load();
       if (!mounted) return;
-      final helperEnabled = helperSettings.isEnabled(
-        TutorHelperSurface.speaking,
-      );
+      final helperEnabled =
+          widget.enableTutorHelper &&
+          helperSettings.isEnabled(TutorHelperSurface.speaking);
       if (helperEnabled) {
         await _startMurray(sendOpeningPrompt: true);
       }
@@ -200,7 +214,32 @@ class _SpeakingLessonFlowScreenState
     _murray.dispose();
     unawaited(LessonSpeechService.shared.deactivate());
     _sessionClock.stop();
+    if (!_sessionRecorded &&
+        (_successful > 0 || _index > 0 || _heard.trim().isNotEmpty)) {
+      _sessionRecorded = true;
+      _recorder.finish(
+        summary:
+            'Practised "${widget.title}" ($_successful/${widget.steps.length} speaking steps completed).',
+      );
+    }
     super.dispose();
+  }
+
+  /// Keep only one bounded learner/tutor pair per visible step.  This is
+  /// enough for Review/Warm-up to understand what was practised without
+  /// persisting every Live socket event or partial transcript.
+  void _recordAttempt({
+    required String heard,
+    required String target,
+    String feedback = '',
+  }) {
+    _recorder.logUser(heard.trim().isEmpty ? '(no response)' : heard.trim());
+    final cleanFeedback = feedback.trim();
+    _recorder.logTutor(
+      cleanFeedback.isEmpty
+          ? 'Target: $target'
+          : 'Target: $target. Feedback: $cleanFeedback',
+    );
   }
 
   @override
@@ -571,6 +610,11 @@ $instruction
       cleanCorrection,
       cleanFeedback,
     ].where((value) => value.isNotEmpty).join(' ');
+    _recordAttempt(
+      heard: cleanHeard,
+      target: _step.french,
+      feedback: visibleFeedback,
+    );
     _murrayInputActive = false;
     _hasSubmittedCurrentPhrase = true;
     setState(() {
@@ -599,6 +643,11 @@ $instruction
     _guidedGradeTimeout?.cancel();
     final cleanHeard = heard.trim();
     final cleanFeedback = feedback.trim();
+    _recordAttempt(
+      heard: cleanHeard,
+      target: _step.french,
+      feedback: cleanFeedback,
+    );
     _murrayInputActive = false;
     _hasSubmittedCurrentPhrase = true;
     setState(() {
@@ -643,6 +692,7 @@ $instruction
     final match = _step.openResponse
         ? _fold(_heard).split(' ').where((word) => word.isNotEmpty).length >= 2
         : _matchesTarget(_heard, _step.french);
+    _recordAttempt(heard: _heard, target: _step.french);
     setState(() {
       _state = match ? _SpeakingStepState.success : _SpeakingStepState.retry;
       _hasSubmittedCurrentPhrase = true;
@@ -875,8 +925,14 @@ $instruction
   }
 
   void _finishLesson() {
+    if (_sessionRecorded) return;
+    _sessionRecorded = true;
     _sessionClock.stop();
     final seconds = _sessionClock.elapsed.inSeconds;
+    _recorder.finish(
+      summary:
+          'Practised "${widget.title}" ($_successful/${widget.steps.length} speaking steps completed).',
+    );
     Navigator.of(context).pop(
       SpeakingResult(
         connected: true,
@@ -2348,6 +2404,30 @@ List<SpeakingPhraseStep> speakingStepsForTargets(
     meanings: _speakingMeanings,
     level: level,
   );
+}
+
+/// Builds the same controlled Course/Practice speaking flow from a bounded
+/// Review blueprint. This path has no roleplay scene and no open response.
+List<SpeakingPhraseStep> speakingStepsForReviewTargets(
+  Iterable<({String french, String english, String tip})> targets, {
+  String level = 'A1',
+}) {
+  final cleaned = targets
+      .where((target) => target.french.trim().isNotEmpty)
+      .take(5)
+      .toList(growable: false);
+  if (cleaned.isEmpty) {
+    throw StateError('This speaking review has no bilingual target phrases.');
+  }
+  return [
+    for (final target in cleaned)
+      _guidedSpeechStep(
+        target.french.trim(),
+        english: target.english.trim(),
+        level: level,
+        tip: target.tip.trim(),
+      ),
+  ];
 }
 
 /// Provides the authored first-course scripts for adaptive rows. Adaptive

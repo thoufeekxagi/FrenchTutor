@@ -10,6 +10,7 @@ class SessionRecorder {
     required StorageService storage,
     required this.stage,
     required this.topic,
+    this.contentKey,
   }) : _storage = storage, // ignore: prefer_initializing_formals
        sessionId = const Uuid().v4(),
        _startedAt = DateTime.now().toIso8601String();
@@ -18,22 +19,48 @@ class SessionRecorder {
   final String sessionId;
   final String stage;
   final String topic;
+
+  /// Links a practice transcript to its generated Course artifact.  Keeping
+  /// this on the session row lets Review/Warm-up recover the bounded lesson
+  /// material after reinstall instead of seeing only a title.
+  final String? contentKey;
   final String _startedAt;
+  static const _maxTurns = 24;
+  static const _maxTurnCharacters = 360;
+  static const _maxTranscriptCharacters = 6000;
+  var _savedTurns = 0;
+  var _savedTranscriptCharacters = 0;
+  String? _lastSavedUser;
+  String? _lastSavedTutor;
 
   void logUser(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
-    _storage.saveMessage(sessionId: sessionId, role: 'user', content: trimmed);
+    _saveTurn(role: 'user', text: text);
   }
 
   void logTutor(String text) {
+    _saveTurn(role: 'assistant', text: text);
+  }
+
+  void _saveTurn({required String role, required String text}) {
     final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
-    _storage.saveMessage(
-      sessionId: sessionId,
-      role: 'assistant',
-      content: trimmed,
-    );
+    if (trimmed.isEmpty || _savedTurns >= _maxTurns) return;
+    final previous = role == 'user' ? _lastSavedUser : _lastSavedTutor;
+    if (previous == trimmed) return;
+    final bounded = trimmed.length <= _maxTurnCharacters
+        ? trimmed
+        : '${trimmed.substring(0, _maxTurnCharacters - 1).trimRight()}…';
+    if (_savedTranscriptCharacters + bounded.length >
+        _maxTranscriptCharacters) {
+      return;
+    }
+    _storage.saveMessage(sessionId: sessionId, role: role, content: bounded);
+    _savedTurns++;
+    _savedTranscriptCharacters += bounded.length;
+    if (role == 'user') {
+      _lastSavedUser = trimmed;
+    } else {
+      _lastSavedTutor = trimmed;
+    }
   }
 
   /// [autoNote] off skips the AI recap (used by non-conversational stages
@@ -48,6 +75,7 @@ class SessionRecorder {
         endedAt: now,
         summary: summary,
         topic: topic,
+        contentKey: contentKey,
         stage: stage,
       ),
     );
@@ -73,13 +101,27 @@ class SessionRecorder {
   /// mission categories, which fold story into Listening) since the notes
   /// review screen already has its own icon/color for a separate Story tag.
   static String tagForStage(String? stage) => switch (stage) {
-    'vocab' => 'Vocabulary',
+    'vocab' || 'vocabulary' => 'Vocabulary',
     'grammar' => 'Grammar',
-    'reading_listening' => 'Listening',
+    'reading_listening' || 'listening' => 'Listening',
+    'reading' => 'Reading',
     'roleplay' => 'Roleplay',
     'writing' => 'Writing',
     'story' => 'Story',
-    'speaking' || 'trial' => 'Speaking',
+    'speaking' ||
+    'speaking_guided' ||
+    'free_talk' ||
+    'speaking_exam' ||
+    'picture_description' ||
+    'pronunciation_repair' ||
+    'trial' => 'Speaking',
+    'alphabet' => 'Alphabet',
+    'connectors' => 'Connectors',
+    'liaison' => 'Liaison',
+    'exam_reading' => 'Reading',
+    'exam_listening' => 'Listening',
+    'exam_writing' => 'Writing',
+    'exam_speaking' => 'Speaking',
     _ => 'General',
   };
 

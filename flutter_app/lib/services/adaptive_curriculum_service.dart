@@ -53,10 +53,32 @@ class AdaptiveLessonItem {
 }
 
 abstract final class AdaptiveCurriculumService {
+  /// A personalized Course unit contains one lesson for each core skill.
+  /// The first five rows remain the sound/pronunciation foundation; the
+  /// six-slot rotation starts at Unit 2.
+  static const courseFoundationSize = 5;
+  static const courseUnitSize = 6;
+
+  /// Maps an adaptive sequence to the learner-facing unit. Keeping the
+  /// foundation outside the six-slot rotation means Unit 2 is always the
+  /// first complete vocabulary/reading/listening/writing/speaking/grammar
+  /// unit, even on a freshly created plan.
+  static int courseUnitForSequence(int sequence) {
+    if (sequence <= courseFoundationSize) return 1;
+    return ((sequence - courseFoundationSize - 1) ~/ courseUnitSize) + 2;
+  }
+
+  /// Returns the one-based lesson position inside a personalized unit. The
+  /// foundation rows retain their natural positions for diagnostics.
+  static int courseLessonInUnitFor(int sequence) {
+    if (sequence <= courseFoundationSize) return sequence;
+    return ((sequence - courseFoundationSize - 1) % courseUnitSize) + 1;
+  }
+
   /// The shared situation bank for adaptive Course units.
   ///
-  /// A unit is five lessons, so the plan generator selects one entry here and
-  /// keeps it as the scene anchor for all five lessons. Language retrieval can
+  /// A unit is six lessons, so the plan generator selects one entry here and
+  /// keeps it as the scene anchor for all six lessons. Language retrieval can
   /// still come from prior lessons, but prior retrieval must never replace the
   /// unit's situation (which is what made many stories drift back to trains).
   /// Keep this list stable: its order is part of deterministic course
@@ -146,14 +168,7 @@ abstract final class AdaptiveCurriculumService {
   static String unitVariationFor({required int unit, required int sequence}) {
     final safeUnit = unit < 1 ? 1 : unit;
     final cycle = ((safeUnit - 1) ~/ courseUnitTopics.length) + 1;
-    final lessonInUnit = ((sequence - 1) % 5) + 1;
-    const facets = <String>[
-      'meet the people and establish the situation',
-      'make a practical choice',
-      'ask for or give one useful detail',
-      'solve a small problem',
-      'finish with a result or next step',
-    ];
+    final lessonInUnit = courseLessonInUnitFor(sequence);
     const cycleModes = <String>[
       'use the natural first setting for the topic',
       'change the object or service while keeping the same language family',
@@ -162,6 +177,14 @@ abstract final class AdaptiveCurriculumService {
       'show a follow-up or outcome rather than repeating the opening scene',
     ];
     final cycleMode = cycleModes[(cycle - 1) % cycleModes.length];
+    const facets = <String>[
+      'learn the unit words in the situation',
+      'notice the text and its meaning',
+      'hear the same language in connected speech',
+      'write a short useful response',
+      'say the language in a short exchange',
+      'notice and use one grammar pattern',
+    ];
     return 'cycle $cycle · $cycleMode · lesson facet $lessonInUnit: ${facets[lessonInUnit - 1]}';
   }
 
@@ -328,12 +351,12 @@ abstract final class AdaptiveCurriculumService {
   /// of them; the course still uses supporting skills such as roleplay,
   /// reading, pronunciation, and connectors when they make the lesson work.
   static const coreFocusSkills = <SpeakSkill>[
-    SpeakSkill.speaking,
-    SpeakSkill.listening,
-    SpeakSkill.reading,
-    SpeakSkill.writing,
-    SpeakSkill.grammar,
     SpeakSkill.vocabulary,
+    SpeakSkill.reading,
+    SpeakSkill.listening,
+    SpeakSkill.writing,
+    SpeakSkill.speaking,
+    SpeakSkill.grammar,
   ];
 
   static List<SpeakSkill> focusSkills(Profile profile) {

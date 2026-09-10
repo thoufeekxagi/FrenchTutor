@@ -12,9 +12,9 @@ import '../../models/grammar_course_v2.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/inline_call_controller.dart';
-import '../../services/lesson_speech_service.dart';
+import '../../widgets/ai_voice_disclosure.dart';
+import '../../widgets/grammar_live_audio_button.dart';
 import '../../widgets/inline_call_bar.dart';
-import '../../widgets/tts_play_button.dart';
 import '../../widgets/web/web_constrained_view.dart';
 import 'grammar_complete_lesson_screen.dart';
 import 'grammar_roleplay_lesson_screen.dart';
@@ -65,14 +65,27 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
       sessionType: LiveSessionType.grammarStage,
       lessonContext: _lessonContext,
       learningStoreForProfile: ref.read(learningStoreProvider),
+      openingPrompt: _openingPrompt(),
       onChanged: () {
         if (mounted) setState(() {});
       },
       manualLearnerTurns: false,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_prewarmSessionAudio());
+      if (!mounted) return;
+      // Keep Grammar on the same speaking-level contract as Writing and the
+      // reading/listening lessons: Marie is ready by default and gives one
+      // short orientation before waiting for the learner.
+      unawaited(_autoConnectMarie());
     });
+  }
+
+  Future<void> _autoConnectMarie() async {
+    if (!mounted || _call == null || !await AiVoiceDisclosure.isAccepted()) {
+      return;
+    }
+    if (!mounted) return;
+    await _call!.start(context, sendOpeningPrompt: true);
   }
 
   void _resetStep() {
@@ -95,7 +108,6 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _call?.dispose();
-    unawaited(LessonSpeechService.shared.stop());
     super.dispose();
   }
 
@@ -106,6 +118,14 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
     final visibleChoices = _choiceBank.isEmpty
         ? '(none)'
         : _choiceBank.join(' | ');
+    final visibleChoiceMeanings = _choiceBank.isEmpty
+        ? '(none)'
+        : _choiceBank
+              .map(
+                (choice) =>
+                    '$choice = ${_choiceMeaning(choice) ?? '(no meaning supplied)'}',
+              )
+              .join(' | ');
     final visibleWordBank = _wordBank.where(_wordIsAvailable).isEmpty
         ? '(none)'
         : _wordBank.where(_wordIsAvailable).join(' | ');
@@ -115,6 +135,13 @@ class _GrammarV2LessonScreenState extends ConsumerState<GrammarV2LessonScreen>
     final result = _correct == null
         ? 'not checked'
         : (_correct == true ? 'correct' : 'incorrect');
+
+    final targetForCoach = _correct != true
+        ? '(hidden until the learner answers correctly; never infer or say the missing form)'
+        : _step.target;
+    final meaningForCoach = _showTranslation
+        ? _answerSafeEnglishMeaning()
+        : '(hidden because Translate is off)';
 
     return '''
 GRAMMAR SESSION: ${widget.session.title}
@@ -126,10 +153,12 @@ MODE: ${widget.session.mode.label}
 CURRENT SCREEN SNAPSHOT — this replaces every older step snapshot:
 STEP: ${_index + 1} of ${widget.session.steps.length}
 STEP LABEL: ${_step.label}
-VISIBLE ENGLISH INSTRUCTION: ${_step.promptEnglish}
+VISIBLE ENGLISH INSTRUCTION: ${_correct == true ? _step.promptEnglish : '(context withheld until the learner answers correctly)'}
+ON-SCREEN ENGLISH MEANING (explanation only): $meaningForCoach
 VISIBLE PROMPT: ${_step.prompt}
-VISIBLE TARGET SENTENCE: ${_step.target}
+VISIBLE COMPLETED TARGET: $targetForCoach
 VISIBLE OPTIONS (in the option area, in display order): $visibleChoices
+VISIBLE OPTION MEANINGS (display order): $visibleChoiceMeanings
 VISIBLE WORD BANK (remaining visible words, in display order): $visibleWordBank
 CURRENT ANSWER TRAY: $answerTray
 CURRENT SELECTION: ${_selectedChoice ?? '(none)'}
@@ -138,13 +167,16 @@ TRANSLATION VISIBLE: $_showTranslation
 HINT VISIBLE: $_showHint${_showHint ? '\nVISIBLE HINT: ${_step.tip}' : ''}
 ${_isRoleplayMode ? 'VISIBLE PARTNER FRENCH: ${_step.partnerFrench}\nVISIBLE PARTNER ENGLISH: ${_step.partnerEnglish}\nVISIBLE LEARNER GOAL: ${_step.prompt}' : ''}
 
-PRIVATE ANSWER KEY FOR COACHING: ${_step.answer}
-
 SCOPE RULES:
 - Help only with the current screen snapshot above. Ignore all previous and
   future steps; do not preview, mention, or teach them.
 - Do not invent a new sentence, new vocabulary, or an unrelated example.
 - Keep explanations to this exact sentence and the visible options/word bank.
+- Before CHECK RESULT is correct, never say, spell, translate, or hint with the
+  missing French form. Do not read or paraphrase the completed target. The
+  English instruction is context only, not an answer to repeat aloud.
+- The app owns the answer key and evaluates the selection. Use only the
+  app-provided CHECK RESULT for feedback; never reconstruct the hidden answer.
 - If the learner asks about past, present, or future, transform only the
   current target while preserving its meaning and vocabulary, then return to
   this step. Do not introduce a separate sentence.
@@ -159,49 +191,44 @@ SCOPE RULES:
     call.updateLessonContext();
   }
 
-  Future<void> _prewarmSessionAudio() async {
-    final sessions = [widget.session, ...widget.warmupSessions];
-    final items = <SpeechItem>[];
-    for (final session in sessions) {
-      for (var index = 0; index < session.steps.length; index++) {
-        final step = session.steps[index];
-        final prefix = 'grammar-session:${session.id}:step:$index';
-        items.add(
-          SpeechItem(
-            text: step.target,
-            language: 'fr-FR',
-            contentItemId: '$prefix:target',
-          ),
-        );
-        if (step.partnerFrench != null) {
-          items.add(
-            SpeechItem(
-              text: step.partnerFrench!,
-              language: 'fr-FR',
-              contentItemId: '$prefix:partner',
-            ),
-          );
-        }
-        for (
-          var choiceIndex = 0;
-          choiceIndex < step.choices.length;
-          choiceIndex++
-        ) {
-          items.add(
-            SpeechItem(
-              text: step.choices[choiceIndex],
-              language: 'fr-FR',
-              contentItemId: '$prefix:choice:$choiceIndex',
-            ),
-          );
-        }
-      }
-    }
+  String _openingPrompt() =>
+      '''
+APP OPENING — read the current screen, not a generic lesson summary:
+CURRENT FRENCH BLANK: "${_step.prompt}"
+ENGLISH MEANING SHOWN UNDER IT: "${_answerSafeEnglishMeaning()}"
+GRAMMAR TENSE: "${widget.session.tense}"
+VISIBLE OPTIONS (names only; do not identify the correct one): "${_choiceBank.join(', ')}"
+Say at most two short English sentences. First, explain what this exact blank
+sentence means and that the learner must choose the French form. Second, name
+the visible options briefly and ask the learner to choose one. Preserve the
+blank; never fill it, translate an option into the answer, or say which option
+is correct. Then wait.
+''';
+
+  Future<void> _speakWithLive(String text, {required String reason}) async {
+    final call = _call;
+    if (call == null || text.trim().isEmpty || !mounted) return;
     try {
-      await LessonSpeechService.shared.prewarmNarration(items);
+      if (!call.active) {
+        await call.start(context, sendOpeningPrompt: false);
+      }
+      if (!mounted || !call.active) return;
+      call.promptTutor('''
+APP COMMAND: $reason.
+Speak only the exact text below in French, clearly and at a learner-friendly
+pace. Do not translate it, explain it, or add any other words. Then wait.
+EXACT TEXT: "$text"
+''');
     } catch (error) {
-      debugPrint('Grammar session audio prewarm skipped: $error');
+      debugPrint('Grammar Live pronunciation failed: $error');
     }
+  }
+
+  String? _choiceMeaning(String choice) {
+    final index = _step.choices.indexOf(choice);
+    if (index < 0 || index >= _step.choiceMeanings.length) return null;
+    final meaning = _step.choiceMeanings[index].trim();
+    return meaning.isEmpty ? null : meaning;
   }
 
   void _selectChoice(String choice) {
@@ -244,7 +271,54 @@ SCOPE RULES:
       if (_correct == true) _correctCount++;
     });
     _syncTutorContext();
+    final feedback = _correct == true
+        ? 'Speak only this short line in English: "Correct. The complete '
+              'French sentence is: ${_step.target}" Then wait. Do not add a '
+              'reason, lecture, question, or translation.'
+        : 'Speak only this short line in English: "Try again. Check the '
+              'subject and the ${widget.session.tense.toLowerCase()} form, then '
+              'choose again." Then wait. Never reveal, spell, or translate the '
+              'missing French form.';
+    _call?.promptTutor('''
+APP FEEDBACK (the app already checked the visible choice):
+$feedback
+''');
   }
+
+  /// The English meaning is useful for a screen announcement, but a malformed
+  /// generated artifact must never smuggle a French choice into Marie's
+  /// pre-answer context. Mask only whole-word choice strings (short forms such
+  /// as "a" and "es" are ignored because they collide with ordinary English).
+  String _answerSafeEnglishMeaning() {
+    var meaning = _step.promptEnglish.trim();
+    if (meaning.isEmpty) return '(no English meaning supplied)';
+    final hidden = <String>{_step.answer, ..._step.choices};
+    for (final candidate in hidden) {
+      final value = candidate.trim();
+      if (value.length < 3) continue;
+      final pattern = RegExp(
+        r'(?<![A-Za-zÀ-ÿ])' + RegExp.escape(value) + r'(?![A-Za-zÀ-ÿ])',
+        caseSensitive: false,
+      );
+      meaning = meaning.replaceAll(pattern, '[missing French form]');
+    }
+    return meaning;
+  }
+
+  String _stepChangePrompt() =>
+      '''
+APP SCREEN CHANGED: The app has advanced to step ${_index + 1} of ${widget.session.steps.length}.
+CURRENT SCREEN DATA (source of truth):
+- Step label: "${_step.label}"
+- Blank sentence: "${_step.prompt}"
+- English meaning shown under the blank: "${_answerSafeEnglishMeaning()}"
+- Grammar tense: "${widget.session.tense}"
+- Visible options (names only; do not identify the correct one): "${_choiceBank.join(', ')}"
+Use only this latest screen. Speak at most two short English sentences: explain
+this exact blank and its meaning, then briefly name the visible options and ask
+the learner to choose. Preserve the blank; never fill it, identify the correct
+option, or mention any previous step. Then wait.
+''';
 
   String _normalise(String value) => value
       .toLowerCase()
@@ -279,7 +353,11 @@ SCOPE RULES:
       _index++;
       _resetStep();
     });
+    // If the learner advances while Marie is still finishing feedback for the
+    // old card, discard that stale reply before announcing the new screen.
+    _call?.suppressCurrentReply();
     _syncTutorContext();
+    _call?.promptTutor(_stepChangePrompt());
   }
 
   void _retry() {
@@ -327,6 +405,11 @@ SCOPE RULES:
                   padding: const EdgeInsets.fromLTRB(20, 22, 20, 26),
                   children: [
                     _modeLabel(),
+                    if (_call != null &&
+                        (_call!.isLive || _call!.error != null)) ...[
+                      const SizedBox(height: 12),
+                      InlineTutorConnectionCard(controller: _call!),
+                    ],
                     const SizedBox(height: 10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,16 +420,13 @@ SCOPE RULES:
                             style: DesignTokens.display(30),
                           ),
                         ),
-                        if (_call != null)
-                          InlineCallActions(
-                            controller: _call!,
-                            accentColor: DesignTokens.primary,
-                          ),
                       ],
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      _step.promptEnglish,
+                      _correct == true
+                          ? _step.promptEnglish
+                          : 'Choose the French form that completes the sentence.',
                       style: DesignTokens.body(
                         15,
                       ).copyWith(color: DesignTokens.muted, height: 1.4),
@@ -461,9 +541,15 @@ SCOPE RULES:
     children: [
       _PromptCard(
         prompt: _step.prompt,
-        translation: _showTranslation ? _step.promptEnglish : null,
+        // The translation belongs directly under the blank so the learner
+        // has the meaning while choosing a form. It is visual context only;
+        // the live tutor still receives the answer-safe context above and is
+        // explicitly forbidden from revealing the missing French form.
+        translation: _showTranslation && _step.promptEnglish.trim().isNotEmpty
+            ? _step.promptEnglish.trim()
+            : null,
         audioText: _step.target,
-        contentItemId: _audioId('target'),
+        controller: _call,
       ),
       const SizedBox(height: 16),
       _sectionLabel('CHOOSE THE FORM'),
@@ -471,6 +557,11 @@ SCOPE RULES:
       for (final choice in _choiceBank) ...[
         _ChoiceTile(
           text: choice,
+          meaning: _choiceMeaning(choice),
+          showTranslation: _showTranslation,
+          onListen: () => unawaited(
+            _speakWithLive(choice, reason: 'Pronounce only this French form'),
+          ),
           selected: choice == _selectedChoice,
           correct: _correct == null ? null : choice == _step.answer,
           onTap: () => _selectChoice(choice),
@@ -487,7 +578,6 @@ SCOPE RULES:
         words: _builtSentence,
         onRemove: _removeWord,
         audioText: _step.target,
-        contentItemId: _audioId('target'),
       ),
       const SizedBox(height: 16),
       _sectionLabel('WORD BANK'),
@@ -517,7 +607,7 @@ SCOPE RULES:
         english: _step.partnerEnglish!,
         showTranslation: _showTranslation,
         audioText: _step.partnerFrench!,
-        contentItemId: _audioId('partner'),
+        controller: _call,
       ),
       const SizedBox(height: 16),
       Container(
@@ -547,6 +637,11 @@ SCOPE RULES:
       for (final choice in _choiceBank) ...[
         _ChoiceTile(
           text: choice,
+          meaning: _choiceMeaning(choice),
+          showTranslation: _showTranslation,
+          onListen: () => unawaited(
+            _speakWithLive(choice, reason: 'Pronounce only this French reply'),
+          ),
           selected: choice == _selectedChoice,
           correct: _correct == null ? null : choice == _step.answer,
           onTap: () => _selectChoice(choice),
@@ -590,12 +685,11 @@ SCOPE RULES:
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TtsPlayButton(
+        GrammarLiveAudioButton(
+          controller: _call,
           text: _isRoleplayMode ? _step.partnerFrench! : _step.target,
-          contentItemId: _audioId(_isRoleplayMode ? 'partner' : 'target'),
           size: 42,
           iconSize: 20,
-          color: DesignTokens.primary,
         ),
         Text('Listen', style: DesignTokens.body(13, weight: FontWeight.w800)),
       ],
@@ -639,7 +733,7 @@ SCOPE RULES:
       color: correct ? DesignTokens.successSoft : DesignTokens.primarySoft,
       text: correct
           ? 'Correct. ${_step.tip}'
-          : 'Try again. The target is ${_step.target}',
+          : 'Try again. Check the subject and the tense, then choose the form that fits.',
     );
   }
 
@@ -716,9 +810,6 @@ SCOPE RULES:
     GrammarV2Mode.roleplay => 'Check reply',
   };
 
-  String _audioId(String role) =>
-      'grammar-session:${widget.session.id}:step:$_index:$role';
-
   Widget _sectionLabel(String value) => Text(
     value,
     style: DesignTokens.label(
@@ -733,13 +824,13 @@ class _PromptCard extends StatelessWidget {
     required this.prompt,
     required this.translation,
     required this.audioText,
-    required this.contentItemId,
+    this.controller,
   });
 
   final String prompt;
   final String? translation;
   final String audioText;
-  final String contentItemId;
+  final InlineCallController? controller;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -769,11 +860,10 @@ class _PromptCard extends StatelessWidget {
             ],
           ),
         ),
-        TtsPlayButton(
+        GrammarLiveAudioButton(
+          controller: controller,
           text: audioText,
-          contentItemId: contentItemId,
           size: 42,
-          color: DesignTokens.primary,
         ),
       ],
     ),
@@ -786,14 +876,14 @@ class _PartnerCard extends StatelessWidget {
     required this.english,
     required this.showTranslation,
     required this.audioText,
-    required this.contentItemId,
+    this.controller,
   });
 
   final String french;
   final String english;
   final bool showTranslation;
   final String audioText;
-  final String contentItemId;
+  final InlineCallController? controller;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -831,11 +921,10 @@ class _PartnerCard extends StatelessWidget {
             ],
           ),
         ),
-        TtsPlayButton(
+        GrammarLiveAudioButton(
+          controller: controller,
           text: audioText,
-          contentItemId: contentItemId,
           size: 42,
-          color: DesignTokens.primary,
         ),
       ],
     ),
@@ -845,12 +934,18 @@ class _PartnerCard extends StatelessWidget {
 class _ChoiceTile extends StatelessWidget {
   const _ChoiceTile({
     required this.text,
+    required this.meaning,
+    required this.showTranslation,
+    required this.onListen,
     required this.selected,
     required this.correct,
     required this.onTap,
   });
 
   final String text;
+  final String? meaning;
+  final bool showTranslation;
+  final VoidCallback onListen;
   final bool selected;
   final bool? correct;
   final VoidCallback onTap;
@@ -882,10 +977,33 @@ class _ChoiceTile extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  text,
-                  style: DesignTokens.body(16, weight: FontWeight.w700),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      text,
+                      style: DesignTokens.body(16, weight: FontWeight.w700),
+                    ),
+                    if (showTranslation && meaning != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        meaning!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: DesignTokens.body(
+                          12,
+                        ).copyWith(color: DesignTokens.muted),
+                      ),
+                    ],
+                  ],
                 ),
+              ),
+              IconButton(
+                onPressed: onListen,
+                tooltip: 'Hear $text',
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.volume_up_rounded, size: 20),
+                color: DesignTokens.primary,
               ),
               if (isAnswer)
                 Icon(Icons.check_circle_rounded, color: DesignTokens.success)
@@ -921,13 +1039,11 @@ class _AnswerTray extends StatelessWidget {
     required this.words,
     required this.onRemove,
     required this.audioText,
-    required this.contentItemId,
   });
 
   final List<String> words;
   final ValueChanged<int> onRemove;
   final String audioText;
-  final String contentItemId;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -952,11 +1068,10 @@ class _AnswerTray extends StatelessWidget {
               ),
             ),
             if (words.isNotEmpty)
-              TtsPlayButton(
+              GrammarLiveAudioButton(
+                controller: null,
                 text: audioText,
-                contentItemId: contentItemId,
                 size: 40,
-                color: DesignTokens.primary,
               ),
           ],
         ),

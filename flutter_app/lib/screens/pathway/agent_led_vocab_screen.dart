@@ -268,6 +268,13 @@ class _AgentLedVocabScreenState extends ConsumerState<AgentLedVocabScreen>
       Navigator.of(context).maybePop();
       return;
     }
+    final microphoneReady = await _audio.requestPermission();
+    if (!mounted) return;
+    if (!microphoneReady) {
+      setState(() => _errorMessage = 'Microphone permission denied');
+      Navigator.of(context).maybePop();
+      return;
+    }
     _gemini.connect();
   }
 
