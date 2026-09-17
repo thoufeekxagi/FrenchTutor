@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="960" viewBox="0 0 1800 960">
+  <defs>
+    <style>
+      .ui { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .display { font-family: "Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .white { fill: #F5F4F0; }
+      .muted { fill: #9A9CA3; }
+      .gold { fill: #F5BA45; }
+      .green { fill: #36B978; }
+      .tiny { font-size: 11px; }
+      .small { font-size: 13px; }
+      .body { font-size: 15px; }
+      .title { font-size: 18px; font-weight: 700; }
+      .section { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; }
+      .card { fill: #151619; stroke: #303238; stroke-width: 1; }
+      .rule { stroke: #303238; stroke-width: 1; }
+    </style>
+    <g id="status">
+      <text class="ui white" x="22" y="25" font-size="15" font-weight="700">9:41</text>
+      <g fill="#F5F4F0" transform="translate(304 12)">
+        <rect x="0" y="10" width="3" height="7" rx="1"/><rect x="5" y="7" width="3" height="10" rx="1"/>
+        <rect x="10" y="4" width="3" height="13" rx="1"/><path d="M25 7c5-5 13-5 18 0l-2 2c-4-4-10-4-14 0zM29 11c3-3 7-3 10 0l-2 2c-2-2-4-2-6 0z"/>
+        <rect x="49" y="4" width="19" height="13" rx="3" fill="none" stroke="#F5F4F0" stroke-width="1.4"/><rect x="68" y="8" width="2" height="5" rx="1"/><rect x="51" y="6" width="12" height="9" rx="1.5"/>
+      </g>
+    </g>
+    <g id="back">
+      <path d="M25 0 17 8l8 8M18 8h14" fill="none" stroke="#F5F4F0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="chevron">
+      <path d="m0 0 5 5-5 5" fill="none" stroke="#9699A0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="speaker">
+      <path d="M0 5h4l5-4v14l-5-4H0zM12 5c2 2 2 4 0 6M14 2c4 4 4 8 0 12" fill="none" stroke="#F5BA45" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="check">
+      <path d="m0 5 4 4 8-9" fill="none" stroke="#101114" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <rect width="1800" height="960" fill="#0D1014"/>
+  <circle cx="85" cy="31" r="15" fill="none" stroke="#F5BA45" stroke-width="1.4"/><text class="ui gold" x="85" y="36" font-size="12" font-weight="700" text-anchor="middle">01</text><text class="ui gold" x="117" y="36" font-size="14" font-weight="700" letter-spacing="1.4">OVERVIEW</text>
+  <path d="M430 30h24m-7-7 7 7-7 7" fill="none" stroke="#F5BA45" stroke-width="1.7"/>
+  <circle cx="509" cy="31" r="15" fill="none" stroke="#F5BA45" stroke-width="1.4"/><text class="ui gold" x="509" y="36" font-size="12" font-weight="700" text-anchor="middle">02</text><text class="ui gold" x="541" y="36" font-size="14" font-weight="700" letter-spacing="1.4">WORDS</text>
+  <path d="M854 30h24m-7-7 7 7-7 7" fill="none" stroke="#F5BA45" stroke-width="1.7"/>
+  <circle cx="933" cy="31" r="15" fill="none" stroke="#F5BA45" stroke-width="1.4"/><text class="ui gold" x="933" y="36" font-size="12" font-weight="700" text-anchor="middle">03</text><text class="ui gold" x="965" y="36" font-size="14" font-weight="700" letter-spacing="1.4">CORRECTIONS</text>
+  <path d="M1278 30h24m-7-7 7 7-7 7" fill="none" stroke="#F5BA45" stroke-width="1.7"/>
+  <circle cx="1357" cy="31" r="15" fill="none" stroke="#F5BA45" stroke-width="1.4"/><text class="ui gold" x="1357" y="36" font-size="12" font-weight="700" text-anchor="middle">04</text><text class="ui gold" x="1389" y="36" font-size="14" font-weight="700" letter-spacing="1.4">WEEKLY PLAN</text>
+
+  <!-- Screen 1: overview -->
+  <g transform="translate(69 72)">
+    <rect width="390" height="844" rx="23" fill="#050608" stroke="#424750" stroke-width="1.4"/>
+    <use href="#status"/>
+    <use href="#back" x="18" y="57"/>
+    <text class="display white" x="195" y="72" font-size="18" font-weight="700" text-anchor="middle">Your French this week</text>
+    <text class="ui muted" x="195" y="93" font-size="13" text-anchor="middle">Sep 9–15</text>
+
+    <text class="display white" x="20" y="145" font-size="25" font-weight="750">Your French moved</text>
+    <text class="display white" x="20" y="174" font-size="25" font-weight="750">forward.</text>
+    <text class="ui muted" x="20" y="200" font-size="14">4 active days  ·  7 lessons  ·  42 minutes</text>
+
+    <rect class="card" x="18" y="221" width="354" height="99" rx="17"/>
+    <g class="ui muted" font-size="11" text-anchor="middle">
+      <text x="49" y="246">M</text><text x="97" y="246">T</text><text x="145" y="246">W</text><text x="193" y="246">T</text><text x="241" y="246">F</text><text x="289" y="246">S</text><text x="337" y="246">S</text>
+    </g>
+    <g>
+      <circle cx="49" cy="270" r="15" fill="#1B1D22" stroke="#71747B"/><circle cx="97" cy="270" r="15" fill="#F5BA45"/><use href="#check" x="91" y="265"/>
+      <circle cx="145" cy="270" r="15" fill="#F5BA45"/><use href="#check" x="139" y="265"/>
+      <circle cx="193" cy="270" r="15" fill="#F5BA45"/><use href="#check" x="187" y="265"/>
+      <circle cx="241" cy="270" r="15" fill="#F5BA45"/><use href="#check" x="235" y="265"/>
+      <circle cx="289" cy="270" r="15" fill="#1B1D22" stroke="#71747B"/><circle cx="337" cy="270" r="15" fill="#1B1D22" stroke="#71747B"/>
+    </g>
+    <rect class="card" x="18" y="363" width="354" height="153" rx="17"/>
+    <g class="ui">
+      <circle cx="50" cy="396" r="17" fill="#332918"/><text x="50" y="401" class="gold" font-size="14" text-anchor="middle">▤</text>
+      <text class="white" x="78" y="400" font-size="14" font-weight="650">Words practised</text><text class="muted" x="315" y="400" font-size="12" text-anchor="end">18 words</text><use href="#chevron" x="344" y="392"/>
+      <path class="rule" d="M32 420h326"/>
+      <circle cx="50" cy="446" r="17" fill="#332918"/><text x="50" y="451" class="gold" font-size="14" text-anchor="middle">↻</text>
+      <text class="white" x="78" y="450" font-size="14" font-weight="650">Corrections to revisit</text><text class="muted" x="315" y="450" font-size="12" text-anchor="end">5 saved</text><use href="#chevron" x="344" y="442"/>
+      <path class="rule" d="M32 470h326"/>
+      <circle cx="50" cy="496" r="17" fill="#332918"/><text x="50" y="501" class="gold" font-size="14" text-anchor="middle">♩</text>
+      <text class="white" x="78" y="500" font-size="14" font-weight="650">Speaking practice</text><text class="muted" x="315" y="500" font-size="12" text-anchor="end">12 sentences</text><use href="#chevron" x="344" y="492"/>
+    </g>
+
+    <text class="ui gold section" x="20" y="549">THIS WEEK’S WIN</text>
+    <rect class="card" x="18" y="562" width="354" height="83" rx="17"/>
+    <text class="display white" x="34" y="594" font-size="18" font-weight="700">Je vais au marché demain.</text>
+    <text class="ui muted" x="34" y="619" font-size="12">Used successfully 3 times</text>
+    <circle cx="325" cy="603" r="21" fill="#332918" stroke="#F5BA45"/><use href="#speaker" x="316" y="595"/>
+
+    <rect x="18" y="766" width="354" height="54" rx="15" fill="#F5BA45"/>
+    <text class="ui" x="195" y="799" font-size="15" font-weight="700" text-anchor="middle" fill="#101114">See my weekly plan  →</text>
+  </g>
+
+  <!-- Screen 2: words detail -->
+  <g transform="translate(493 72)">
+    <rect width="390" height="844" rx="23" fill="#050608" stroke="#424750" stroke-width="1.4"/>
+    <use href="#status"/>
+    <use href="#back" x="18" y="57"/>
+    <text class="display white" x="195" y="72" font-size="18" font-weight="700" text-anchor="middle">Words from your week</text>
+    <text class="ui muted" x="195" y="93" font-size="13" text-anchor="middle">18 practised · 6 remembered</text>
+
+    <g class="ui" font-size="12" font-weight="650" text-anchor="middle">
+      <rect x="18" y="122" width="94" height="34" rx="12" fill="#F5BA45"/><text x="65" y="144" fill="#101114">All</text>
+      <rect x="120" y="122" width="94" height="34" rx="12" fill="#151619" stroke="#303238"/><text x="167" y="144" class="muted">Strong</text>
+      <rect x="222" y="122" width="150" height="34" rx="12" fill="#151619" stroke="#303238"/><text x="297" y="144" class="muted">Needs review</text>
+    </g>
+
+    <g class="ui">
+      <rect class="card" x="18" y="174" width="354" height="106" rx="17"/>
+      <text class="display white" x="36" y="205" font-size="20" font-weight="700">marché</text><text class="muted" x="36" y="227" font-size="14">market</text>
+      <circle cx="184" cy="244" r="12" fill="#133B2A" stroke="#36B978"/><use href="#check" x="179" y="240"/><text class="green" x="205" y="241" font-size="12">Remembered</text><text class="green" x="205" y="258" font-size="12">4 times</text>
+      <circle cx="337" cy="224" r="20" fill="#332918"/><use href="#speaker" x="328" y="216"/>
+
+      <rect class="card" x="18" y="292" width="354" height="106" rx="17"/>
+      <text class="display white" x="36" y="323" font-size="20" font-weight="700">voisin</text><text class="muted" x="36" y="345" font-size="14">neighbour</text>
+      <circle cx="184" cy="362" r="12" fill="#133B2A" stroke="#36B978"/><use href="#check" x="179" y="358"/><text class="green" x="205" y="359" font-size="12">Used in</text><text class="green" x="205" y="376" font-size="12">a sentence</text>
+      <circle cx="337" cy="342" r="20" fill="#332918"/><use href="#speaker" x="328" y="334"/>
+
+      <rect class="card" x="18" y="410" width="354" height="106" rx="17"/>
+      <text class="display white" x="36" y="441" font-size="20" font-weight="700">rendez-vous</text><text class="muted" x="36" y="463" font-size="14">appointment</text>
+      <circle cx="184" cy="480" r="12" fill="#332918" stroke="#F5BA45"/><text class="gold" x="184" y="485" font-size="13" text-anchor="middle">↻</text><text class="gold" x="205" y="477" font-size="12">Review</text><text class="gold" x="205" y="494" font-size="12">tomorrow</text>
+      <circle cx="337" cy="460" r="20" fill="#332918"/><use href="#speaker" x="328" y="452"/>
+    </g>
+
+    <rect class="card" x="18" y="539" width="354" height="120" rx="17"/>
+    <circle cx="53" cy="579" r="21" fill="#332918"/><text class="gold" x="53" y="585" font-size="18" text-anchor="middle">✦</text>
+    <text class="ui white" x="84" y="572" font-size="13" font-weight="650">You remember words better</text>
+    <text class="ui white" x="84" y="591" font-size="13" font-weight="650">after using them in a sentence.</text>
+    <text class="ui muted" x="84" y="618" font-size="11">Words used in conversation are more likely to stick.</text>
+
+    <rect x="18" y="766" width="354" height="54" rx="15" fill="#F5BA45"/>
+    <text class="ui" x="195" y="799" font-size="15" font-weight="700" text-anchor="middle" fill="#101114">Review 4 words  →</text>
+  </g>
+
+  <!-- Screen 3: corrections -->
+  <g transform="translate(917 72)">
+    <rect width="390" height="844" rx="23" fill="#050608" stroke="#424750" stroke-width="1.4"/>
+    <use href="#status"/>
+    <use href="#back" x="18" y="57"/>
+    <text class="display white" x="195" y="72" font-size="18" font-weight="700" text-anchor="middle">Corrections worth keeping</text>
+    <text class="ui muted" x="195" y="93" font-size="13" text-anchor="middle">Patterns from your real practice</text>
+
+    <rect class="card" x="18" y="123" width="354" height="190" rx="17"/>
+    <text class="ui muted" x="34" y="150" font-size="12">You said</text>
+    <text class="ui muted" x="34" y="177" font-size="16" text-decoration="line-through">Je suis travailler demain</text>
+    <circle cx="337" cy="158" r="20" fill="#332918"/><use href="#speaker" x="328" y="150"/>
+    <text class="ui gold" x="34" y="209" font-size="12" font-weight="650">Natural French</text>
+    <text class="display white" x="34" y="235" font-size="18" font-weight="700">Je vais travailler demain.</text>
+    <text class="ui muted" x="34" y="269" font-size="12">Use aller + infinitive for a near-future plan.</text>
+
+    <rect class="card" x="18" y="326" width="354" height="164" rx="17"/>
+    <text class="ui muted" x="34" y="353" font-size="12">You said</text>
+    <text class="ui muted" x="34" y="380" font-size="16" text-decoration="line-through">au le marché</text>
+    <circle cx="337" cy="361" r="20" fill="#332918"/><use href="#speaker" x="328" y="353"/>
+    <text class="ui gold" x="34" y="412" font-size="12" font-weight="650">Natural French</text>
+    <text class="display white" x="34" y="438" font-size="18" font-weight="700">au marché</text>
+    <text class="ui muted" x="34" y="466" font-size="12">à + le contracts to au.</text>
+
+    <rect class="card" x="18" y="503" width="354" height="172" rx="17"/>
+    <circle cx="57" cy="543" r="22" fill="#1B1D22"/><text class="ui gold" x="57" y="550" font-size="20" text-anchor="middle">♩</text>
+    <text class="display white" x="91" y="540" font-size="15" font-weight="700">French R is getting clearer</text>
+    <text class="ui muted" x="91" y="562" font-size="12">Improved in marché and travailler.</text>
+    <path class="rule" d="M34 584h322"/>
+    <circle cx="57" cy="627" r="22" fill="#25272C"/><path d="m53 617 14 10-14 10z" fill="#F5F4F0"/>
+    <g stroke="#989BA2" stroke-width="2" stroke-linecap="round">
+      <path d="M92 625v4m7-9v14m7-10v6m7-13v20m7-16v12m7-8v4m7-11v18m7-14v10m7-6v2m7-13v20m7-15v10m7-6v2m7-11v16m7-12v8m7-4v1m7-11v18m7-14v10m7-5v2m7-9v13m7-10v6"/>
+    </g>
+    <text class="ui muted tiny" x="343" y="632" text-anchor="end">0:05</text>
+
+    <rect x="18" y="766" width="354" height="54" rx="15" fill="#F5BA45"/>
+    <text class="ui" x="195" y="799" font-size="15" font-weight="700" text-anchor="middle" fill="#101114">Practise these corrections  →</text>
+  </g>
+
+  <!-- Screen 4: weekly plan -->
+  <g transform="translate(1341 72)">
+    <rect width="390" height="844" rx="23" fill="#050608" stroke="#424750" stroke-width="1.4"/>
+    <use href="#status"/>
+    <use href="#back" x="18" y="57"/>
+    <text class="display white" x="195" y="72" font-size="18" font-weight="700" text-anchor="middle">Your next best step</text>
+    <text class="ui muted" x="195" y="93" font-size="13" text-anchor="middle">Built from what you practised</text>
+
+    <rect class="card" x="18" y="123" width="354" height="428" rx="17"/>
+    <circle cx="61" cy="173" r="28" fill="#332918"/><circle cx="61" cy="173" r="16" fill="none" stroke="#F5BA45" stroke-width="2"/><circle cx="61" cy="173" r="6" fill="none" stroke="#F5BA45" stroke-width="2"/><path d="m61 173 17-17m-4 0h6v6" fill="none" stroke="#F5BA45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="display white" x="103" y="162" font-size="17" font-weight="700">Make market French</text>
+    <text class="display white" x="103" y="184" font-size="17" font-weight="700">automatic</text>
+    <text class="ui muted" x="103" y="209" font-size="12">Short, focused practice from your week.</text>
+
+    <path class="rule" d="M34 234h322"/>
+    <circle cx="54" cy="277" r="18" fill="#332918" stroke="#F5BA45"/><text class="ui gold" x="54" y="282" font-size="13" font-weight="700" text-anchor="middle">1</text>
+    <text class="ui white" x="84" y="282" font-size="14" font-weight="650">Review 4 words</text><text class="ui muted" x="322" y="282" font-size="12" text-anchor="end">2 min</text><use href="#chevron" x="344" y="273"/>
+    <path class="rule" d="M34 310h322"/>
+    <circle cx="54" cy="356" r="18" fill="#332918" stroke="#F5BA45"/><text class="ui gold" x="54" y="361" font-size="13" font-weight="700" text-anchor="middle">2</text>
+    <text class="ui white" x="84" y="351" font-size="13" font-weight="650">Repeat 2 corrected</text><text class="ui white" x="84" y="370" font-size="13" font-weight="650">sentences</text><text class="ui muted" x="322" y="361" font-size="12" text-anchor="end">2 min</text><use href="#chevron" x="344" y="353"/>
+    <path class="rule" d="M34 397h322"/>
+    <circle cx="54" cy="445" r="18" fill="#332918" stroke="#F5BA45"/><text class="ui gold" x="54" y="450" font-size="13" font-weight="700" text-anchor="middle">3</text>
+    <text class="ui white" x="84" y="440" font-size="13" font-weight="650">Complete a market</text><text class="ui white" x="84" y="459" font-size="13" font-weight="650">conversation</text><text class="ui muted" x="322" y="450" font-size="12" text-anchor="end">5 min</text><use href="#chevron" x="344" y="442"/>
+    <path class="rule" d="M34 488h322"/>
+    <circle cx="54" cy="520" r="12" fill="none" stroke="#A6A8AE" stroke-width="1.5"/><path d="M54 513v8l5 3" fill="none" stroke="#A6A8AE" stroke-width="1.5" stroke-linecap="round"/>
+    <text class="ui white" x="78" y="525" font-size="13" font-weight="650">9-minute personalised review</text>
+
+    <text class="ui muted" x="20" y="585" font-size="13">Nothing random. Every activity comes from your week.</text>
+    <rect x="18" y="766" width="354" height="54" rx="15" fill="#F5BA45"/>
+    <text class="ui" x="195" y="799" font-size="15" font-weight="700" text-anchor="middle" fill="#101114">Start weekly review  →</text>
+  </g>
+</svg>
