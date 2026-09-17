@@ -15,7 +15,6 @@ import '../../services/course_generation_test_harness.dart';
 import '../../services/ai_cost_tracker.dart';
 import '../../services/speak_language_profile.dart';
 import '../../services/speak_roadmap_service.dart';
-import '../../services/sync_service.dart';
 import '../../services/subscription_gate_service.dart';
 import 'speak_course_activity_screen.dart';
 import '../../widgets/personalized_generation_loader.dart';
@@ -33,6 +32,7 @@ class SpeakRoadmapScreen extends ConsumerStatefulWidget {
 class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     with WidgetsBindingObserver {
   bool _preparingCourse = false;
+  String? _automaticRetrySessionId;
   int _generationEpoch = 0;
 
   @override
@@ -113,8 +113,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
         (session) =>
             session.sequence > AdaptiveCourseStore.initialBatchSize &&
             session.status != 'completed' &&
-            (session.generationStatus == 'queued' ||
-                session.generationStatus == 'failed'),
+            session.generationStatus == 'queued',
       );
       if (!hasCompletedLesson || !hasPendingGenerated) return;
       // Force the bounded provider claim even when the queued row was already
@@ -130,74 +129,16 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     }
   }
 
-  /// Fills the two image-backed lessons for the first active personalized
-  /// unit. The Edge Function still claims exactly one row per call; this
-  /// bounded loop simply makes the vocabulary -> reading -> listening buffer
-  /// available before the learner reaches the next card.
-  Future<void> _prepareMediaBuffer(
-    SyncService sync,
-    AdaptiveCourseStore store,
-    Profile profile,
-    int operationEpoch,
-  ) async {
-    for (var attempt = 0; attempt < 3; attempt++) {
-      if (!mounted || operationEpoch != _generationEpoch) return;
-      final plan = store.ensureMediaBuffer(profile);
-      if (_mediaBufferReady(plan)) return;
-      // The append above is idempotent, but explicitly await its push so a
-      // second device cannot miss the newly-created Reading/Listening rows.
-      await sync.syncAdaptiveCoursePlan(plan);
-      if (!mounted || operationEpoch != _generationEpoch) return;
-      final prepared = await sync.prepareAdaptiveCourseLessons();
-      if (prepared == 0) return;
-      await sync.hydrateAdaptiveCourses();
-    }
-  }
-
-  bool _mediaBufferReady(AdaptiveCoursePlanSnapshot plan) {
-    final units =
-        plan.sessions
-            .where((session) => session.unit >= 3)
-            .map((session) => session.unit)
-            .toSet()
-            .toList()
-          ..sort();
-    if (units.isEmpty) return false;
-    for (final unit in units) {
-      final sessions = plan.sessions
-          .where((session) => session.unit == unit)
-          .toList(growable: false);
-      final reading = sessions.where(
-        (session) => session.primarySkill == SpeakSkill.reading,
-      );
-      final listening = sessions.where(
-        (session) => session.primarySkill == SpeakSkill.listening,
-      );
-      if (reading.isEmpty || listening.isEmpty) return false;
-      if (sessions.any((session) => session.status != 'completed')) {
-        return reading.every(
-              (session) =>
-                  session.status == 'completed' || session.isContentReady,
-            ) &&
-            listening.every(
-              (session) =>
-                  session.status == 'completed' || session.isContentReady,
-            );
-      }
-    }
-    // Every currently-known unit is complete. ensureMediaBuffer() will have
-    // appended the next unit on the next pass; keep the caller bounded here.
-    return false;
-  }
-
   /// Prepares one personalized Course lesson. Production calls this after a
   /// completed lesson (and during bounded recovery); the development harness
   /// may also call it once immediately after its selected lesson.
   Future<void> _prepareCourse({
     String? harnessSkill,
+    String? targetSessionId,
     bool onlyIfNewHarnessRow = false,
     bool reconcileQueuedHarnessRow = false,
     bool forcePrepare = false,
+    bool allowAutomaticRetry = true,
   }) async {
     if (_preparingCourse) return;
     _preparingCourse = true;
@@ -233,12 +174,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               (highest, session) =>
                   session.sequence > highest ? session.sequence : highest,
             );
-      // Keep one fresh Reading and one fresh Listening lesson in the active
-      // unit's persisted buffer. The store only appends through the
-      // Listening slot; generation itself remains serial and bounded below.
-      final plan = harnessSkill == null
-          ? store.ensureMediaBuffer(profile)
-          : store.ensureCurrentPlan(profile);
+      final plan = store.ensureCurrentPlan(profile);
       if (reconcileQueuedHarnessRow && harnessSkill != null) {
         final queuedHarnessRow = plan.sessions.any(
           (session) =>
@@ -311,14 +247,35 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
           reconcileQueuedHarnessRow ||
           harnessSkill != null ||
           forcePrepare) {
-        await sync.prepareAdaptiveCourseLessons(harnessSkill: harnessSkill);
-        if (harnessSkill == null) {
-          await _prepareMediaBuffer(sync, store, profile, operationEpoch);
-        }
+        await sync.prepareAdaptiveCourseLessons(
+          harnessSkill: harnessSkill,
+          sessionId: targetSessionId,
+        );
       }
       if (!mounted || operationEpoch != _generationEpoch) return;
       await sync.hydrateAdaptiveCourses();
       if (!mounted || operationEpoch != _generationEpoch) return;
+
+      // Production gets one delayed automatic retry of the exact same row.
+      // A second failure is terminal until the learner taps the retry icon;
+      // lifecycle recovery and rebuilds never retry failed rows.
+      if (harnessSkill == null &&
+          targetSessionId != null &&
+          allowAutomaticRetry) {
+        final firstResult = store.sessionById(targetSessionId);
+        if (firstResult?.generationStatus == 'failed' &&
+            firstResult?.generationAttempts == 1) {
+          _automaticRetrySessionId = targetSessionId;
+          if (mounted) setState(() {});
+          await Future<void>.delayed(const Duration(seconds: 5));
+          if (!mounted || operationEpoch != _generationEpoch) return;
+          await sync.prepareAdaptiveCourseLessons(sessionId: targetSessionId);
+          if (!mounted || operationEpoch != _generationEpoch) return;
+          await sync.hydrateAdaptiveCourses();
+          _automaticRetrySessionId = null;
+          if (mounted) setState(() {});
+        }
+      }
       if (harnessSkill == 'vocabulary') {
         // Vocabulary is intentionally Live-only. Do not let this shared
         // roadmap callback repair an unrelated reading/listening deck while
@@ -363,6 +320,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
       // prepares and persists the next lesson, but selecting it is always an
       // explicit learner action on the roadmap or home screen.
     } finally {
+      _automaticRetrySessionId = null;
       _preparingCourse = false;
       if (mounted) setState(() {});
     }
@@ -421,10 +379,46 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
         .syncAdaptiveCourseSession(completedSpec!);
     if (!mounted) return;
 
+    final profile = ref.read(learningStoreProvider).profile();
+    final successorPlan = store.ensureSuccessorForCompleted(
+      profile,
+      completedSpec.contentKey,
+    );
+    final successorUnit = completedSpec.unit + 1;
+    AdaptiveCourseSessionSpec? successor;
+    for (final candidate in successorPlan.sessions) {
+      if (candidate.unit == successorUnit &&
+          candidate.primarySkill == completedSpec.primarySkill &&
+          candidate.status != 'replaced') {
+        successor = candidate;
+        break;
+      }
+    }
+    await ref.read(syncServiceProvider).syncAdaptiveCoursePlan(successorPlan);
+    if (!mounted) return;
+
     await _prepareCourse(
       harnessSkill: harness.active ? harness.targetWireName : null,
+      targetSessionId: harness.active ? null : successor?.id,
       onlyIfNewHarnessRow: shouldAdvanceHarness,
       forcePrepare: true,
+    );
+  }
+
+  Future<void> _retryFailedSession(SpeakRoadmapSession session) async {
+    if (_preparingCourse) return;
+    final store = ref.read(adaptiveCourseStoreProvider);
+    final failed = store.sessionById(session.id);
+    if (failed?.generationStatus != 'failed') return;
+    final queued = store.requeueFailedSession(session.id);
+    if (queued == null || queued.generationStatus != 'queued') return;
+    setState(() {});
+    await ref.read(syncServiceProvider).syncAdaptiveCourseSession(queued);
+    if (!mounted) return;
+    await _prepareCourse(
+      targetSessionId: session.id,
+      forcePrepare: true,
+      allowAutomaticRetry: false,
     );
   }
 
@@ -586,10 +580,9 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     );
   }
 
-  /// The next personalized row is prepared automatically after completion.
-  /// This lane is status-only: learners do not manually generate course
-  /// lessons, so the UI cannot accidentally create duplicate rows or skip the
-  /// one-at-a-time progression contract.
+  /// The next same-skill row is prepared automatically after completion. A
+  /// terminal failure is recoverable only from the retry icon on that exact
+  /// row, preventing duplicate rows and background retry loops.
   Widget _generateNextCard(List<SpeakRoadmapSession> sessions) {
     final hasInFlight =
         _preparingCourse ||
@@ -615,8 +608,8 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
             Expanded(
               child: Text(
                 sessions.any((session) => session.generationStatus == 'failed')
-                    ? 'We’ll retry the next lesson automatically.'
-                    : 'Your next lesson is prepared automatically after you finish.',
+                    ? 'Tap the retry icon on a lesson if preparation could not finish.'
+                    : 'Finish a lesson to prepare the same skill in the next unit.',
                 style: DesignTokens.body(
                   13,
                 ).copyWith(color: DesignTokens.nightMuted),
@@ -703,6 +696,7 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
     final preparing = session.generationStatus == 'generating';
     final queued = session.generationStatus == 'queued';
     final failed = session.generationStatus == 'failed';
+    final automaticallyRetrying = _automaticRetrySessionId == session.id;
     final personalized =
         session.sequence > AdaptiveCourseStore.initialBatchSize;
     final buffered =
@@ -785,8 +779,10 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
                     Text(
                       preparing
                           ? 'Preparing automatically'
+                          : automaticallyRetrying
+                          ? 'Trying once more…'
                           : failed
-                          ? 'Generation failed — retrying automatically'
+                          ? 'Couldn’t prepare this lesson. Tap retry.'
                           : 'Preparing automatically',
                       style: DesignTokens.body(
                         11,
@@ -806,11 +802,23 @@ class _SpeakRoadmapScreenState extends ConsumerState<SpeakRoadmapScreen>
               ),
             ),
             const SizedBox(width: 8),
-            if (preparing || (_preparingCourse && queued))
+            if (preparing ||
+                automaticallyRetrying ||
+                (_preparingCourse && queued))
               const _LessonPreparationIndicator()
-            else if (queued || failed)
+            else if (failed)
+              IconButton(
+                tooltip: 'Retry lesson preparation',
+                onPressed: _preparingCourse
+                    ? null
+                    : () => _retryFailedSession(session),
+                icon: const Icon(Icons.refresh_rounded),
+                iconSize: 21,
+                color: DesignTokens.nightAccent,
+              )
+            else if (queued)
               Icon(
-                failed ? Icons.error_outline_rounded : Icons.schedule_rounded,
+                Icons.schedule_rounded,
                 size: 19,
                 color: DesignTokens.nightMuted,
               )

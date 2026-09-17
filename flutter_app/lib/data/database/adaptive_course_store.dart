@@ -28,10 +28,6 @@ Map<String, dynamic>? _decodeMap(Object? value) {
 const adaptiveCourseFoundationSize =
     AdaptiveCurriculumService.courseFoundationSize;
 const adaptiveCourseBatchSize = AdaptiveCurriculumService.courseUnitSize;
-// How many real AI-generated lessons (sequence 12+) to always try to keep
-// ready beyond wherever the learner has reached — not a cap, a floor. Growth
-// never stops; this only controls how far ahead the buffer stays topped up.
-const adaptiveCourseLookahead = 2;
 // The first two personalized batches are a gentle bridge from onboarding to
 // the full practice rotation. Recent evidence can choose the situation and
 // target, but it must not make these early lessons jump ahead of the learner's
@@ -565,48 +561,10 @@ class AdaptiveCourseStore {
           snapshot: snapshot,
         );
       }
-      // Growth only ever looks at real AI-generated lessons (sequence 12+).
-      // Unit 2 (6-11) is fixed, authored content for every learner, never
-      // part of this accounting.
-      //
-      // The only "one at a time" rule that matters is technical: never let
-      // two generations run at once. There is no cap on how many may sit
-      // ready ahead, and growth is never gated on completion — opening a
-      // lesson (even without finishing it, even out of order) counts as
-      // "reached" it. The route simply keeps a rolling lookahead buffer
-      // beyond wherever the learner has reached, refilled one lesson at a
-      // time, forever, so speeding ahead or jumping around never runs out
-      // of fresh content.
-      final personalized = reconciled.sessions
-          .where((session) => session.sequence > initialBatchSize)
-          .toList(growable: false);
-      final isGenerating = personalized.any(
-        (session) => session.generationStatus == 'generating',
-      );
-      var highestReached = initialBatchSize;
-      var highestExisting = initialBatchSize;
-      for (final session in personalized) {
-        if (session.sequence > highestExisting) {
-          highestExisting = session.sequence;
-        }
-        if (session.status != 'planned' && session.sequence > highestReached) {
-          highestReached = session.sequence;
-        }
-      }
-      if (!isGenerating &&
-          highestExisting < highestReached + adaptiveCourseLookahead) {
-        _appendBatch(
-          planId: reconciled.id,
-          profile: profile,
-          profileFingerprint: fingerprint,
-          startSequence: _nextSequence(reconciled.sessions),
-          batchSize: 1,
-          snapshot: snapshot,
-        );
-        final expanded = _snapshotForPlan(reconciled.id);
-        _notifyPlan(expanded);
-        return expanded;
-      }
+      // Production growth is completion-driven. Merely opening Course or a
+      // lesson must never spend an AI request or create a different skill.
+      // [ensureSuccessorForCompleted] appends the one same-skill successor
+      // after the owning activity has durably recorded completion.
       return reconciled;
     }
 
@@ -619,87 +577,66 @@ class AdaptiveCourseStore {
     );
   }
 
-  /// Ensures the active unit has both of its image-backed lessons (Reading
-  /// and Listening) represented in the persisted route before the learner
-  /// reaches them.  The normal route still grows one lesson at a time; this
-  /// small, deterministic buffer only adds the missing rows through the
-  /// unit's Listening slot.  Their artifacts are prepared by SyncService in
-  /// bounded serial calls, so a provider failure cannot create a request
-  /// storm or skip the rest of the unit.
-  ///
-  /// Keeping this separate from [ensureCurrentPlan] preserves older local
-  /// plans and the one-row progression contract for non-media lessons while
-  /// fixing the Home/Course case where Reading or Listening was absent from
-  /// the upcoming unit entirely.
-  AdaptiveCoursePlanSnapshot ensureMediaBuffer(Profile profile) {
-    var plan = ensureCurrentPlan(profile);
-    final sessions = [...plan.sessions]
-      ..sort((left, right) => left.sequence.compareTo(right.sequence));
-    var targetUnit = 3;
-    while (true) {
-      final unitSessions = sessions
-          .where((session) => session.unit == targetUnit)
-          .toList(growable: false);
-      if (unitSessions.isEmpty) {
-        // Keep the route sequential: a future unit's media is not created
-        // until the preceding unit is actually complete. This preserves the
-        // existing unlock behavior while still filling both media slots as
-        // soon as the new unit becomes active.
-        final previousUnitSessions = sessions
-            .where((session) => session.unit == targetUnit - 1)
-            .toList(growable: false);
-        if (previousUnitSessions.isNotEmpty &&
-            previousUnitSessions.any(
-              (session) => session.status != 'completed',
-            )) {
-          return plan;
-        }
+  /// Creates exactly one next-unit lesson in the same skill lane as a
+  /// completed Unit 2+ lesson. The canonical six-slot spacing keeps a Reading
+  /// successor in the Reading position of the next unit (and likewise for
+  /// every other skill), while allowing units to stay sparse when the learner
+  /// chooses not to continue a lane.
+  AdaptiveCoursePlanSnapshot ensureSuccessorForCompleted(
+    Profile profile,
+    String completedContentKey,
+  ) {
+    final plan = ensureCurrentPlan(profile);
+    AdaptiveCourseSessionSpec? completed;
+    for (final session in plan.sessions) {
+      if (session.contentKey == completedContentKey) {
+        completed = session;
         break;
       }
-      final reading = unitSessions.any(
-        (session) => session.primarySkill == SpeakSkill.reading,
-      );
-      final listening = unitSessions.any(
-        (session) => session.primarySkill == SpeakSkill.listening,
-      );
-      if (!reading || !listening) break;
-      if (unitSessions.length < adaptiveCourseBatchSize) {
-        // Reading/Listening may be opened directly from Home, but that must
-        // not make the planner skip the unit's writing, speaking, or grammar
-        // slots when choosing the next media buffer.
-        return plan;
-      }
-      // Do not pre-create the next unit while this one still has ordinary
-      // speaking/writing/grammar work. Its media buffer becomes eligible as
-      // soon as every lesson in the current unit is complete.
-      if (unitSessions.any((session) => session.status != 'completed')) {
-        return plan;
-      }
-      targetUnit += 1;
+    }
+    if (completed == null ||
+        completed.status != 'completed' ||
+        completed.unit < 2) {
+      return plan;
     }
 
-    final mediaEndSequence =
-        adaptiveCourseFoundationSize +
-        ((targetUnit - 2) * adaptiveCourseBatchSize) +
-        3;
-    final highestExisting = sessions.isEmpty
-        ? 0
-        : sessions
-              .map((session) => session.sequence)
-              .reduce((left, right) => left > right ? left : right);
-    if (highestExisting >= mediaEndSequence) return plan;
+    final successorUnit = completed.unit + 1;
+    final existing = plan.sessions.any(
+      (session) =>
+          session.status != 'replaced' &&
+          session.unit == successorUnit &&
+          session.primarySkill == completed!.primarySkill,
+    );
+    if (existing) return plan;
+
+    final successorSequence = completed.sequence + adaptiveCourseBatchSize;
+    final sequenceOccupied = plan.sessions.any(
+      (session) =>
+          session.status != 'replaced' && session.sequence == successorSequence,
+    );
+    // A canonical slot can only represent one skill. An older plan may have
+    // already filled it; never create a duplicate or overwrite learner work.
+    if (sequenceOccupied) return plan;
 
     _appendBatch(
       planId: plan.id,
       profile: profile,
       profileFingerprint: plan.profileFingerprint,
-      startSequence: highestExisting + 1,
-      batchSize: mediaEndSequence - highestExisting,
+      startSequence: successorSequence,
+      batchSize: 1,
       snapshot: UniversalLearningDataService.buildSnapshot(_db, profile),
+      forcedPersonalizedSkill: completed.primarySkill,
     );
-    plan = _snapshotForPlan(plan.id);
-    _notifyPlan(plan);
-    return plan;
+    final expanded = _snapshotForPlan(plan.id);
+    _notifyPlan(expanded);
+    return expanded;
+  }
+
+  /// Compatibility entry point retained for Home and older call sites.
+  /// Course no longer pre-creates Reading/Listening: every lane advances only
+  /// from completion through [ensureSuccessorForCompleted].
+  AdaptiveCoursePlanSnapshot ensureMediaBuffer(Profile profile) {
+    return ensureCurrentPlan(profile);
   }
 
   AdaptiveCoursePlanSnapshot? currentPlan(Profile profile) {
@@ -726,6 +663,25 @@ class AdaptiveCourseStore {
     );
     if (rows.isEmpty) return null;
     return _sessionFromRow(Map<String, dynamic>.from(rows.first));
+  }
+
+  /// Requeues one terminal failed lesson after an explicit learner tap.
+  /// Attempts are deliberately retained: production can distinguish a manual
+  /// retry from the single automatic retry and will never loop it itself.
+  AdaptiveCourseSessionSpec? requeueFailedSession(String sessionId) {
+    final now = _now();
+    _db.execute(
+      '''UPDATE adaptive_course_sessions
+         SET generation_status = 'queued',
+             generation_error = 'Manual retry requested',
+             updated_at = ?
+         WHERE id = ? AND generation_status = 'failed'
+           AND status IN ('planned', 'active') AND deleted_at IS NULL''',
+      [now, sessionId],
+    );
+    final session = sessionById(sessionId);
+    if (session != null) _notifySession(session);
+    return session;
   }
 
   /// Associates the pre-auth onboarding route with the authenticated account
@@ -940,12 +896,11 @@ class AdaptiveCourseStore {
       minimumSequence: initialBatchSize,
       snapshot: snapshot,
     );
-    final repaired = _snapshotForPlan(planId);
     _appendBatch(
       planId: planId,
       profile: profile,
       profileFingerprint: profileFingerprint,
-      startSequence: _nextSequence(repaired.sessions),
+      startSequence: 1,
       batchSize: initialBatchSize,
       snapshot: snapshot,
     );
@@ -979,11 +934,10 @@ class AdaptiveCourseStore {
     }
   }
 
-  /// Repairs a partially hydrated or older plan without replacing its ids or
-  /// completion state. A new route starts with the five foundations and six
-  /// personalized rows; later gaps are repaired up to the highest known sequence.
-  /// This makes Unit 1 and Unit 2 durable even when Supabase previously
-  /// returned only later rows.
+  /// Repairs the permanent authored foundation and Unit 2 without replacing
+  /// ids or completion state. Personalized Unit 3+ plans are intentionally
+  /// sparse skill lanes, so a missing future sequence is a learner choice,
+  /// not a gap to fill.
   bool _repairSequenceGaps({
     required String planId,
     required Profile profile,
@@ -994,13 +948,7 @@ class AdaptiveCourseStore {
   }) {
     final existing = _sessionsForPlan(planId);
     if (existing.isEmpty) return false;
-    final highest = existing
-        .map((session) => session.sequence)
-        .reduce((a, b) => a > b ? a : b);
-    // Course's personalized route is unlimited: repair only ever rebuilds
-    // up to the highest sequence that already exists (never invents rows
-    // ahead of what the learner's route has actually grown to).
-    final target = highest > minimumSequence ? highest : minimumSequence;
+    final target = minimumSequence;
     final existingBySequence = <int, AdaptiveCourseSessionSpec>{
       for (final session in existing) session.sequence: session,
     };

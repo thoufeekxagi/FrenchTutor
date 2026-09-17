@@ -302,15 +302,17 @@ class SyncService {
         'artifact_kind': session.artifactKind,
         'artifact_json': session.artifact,
       },
-      // The harness/store may explicitly requeue a failed row once. Its
-      // retained attempt count plus marker distinguish that intentional
-      // transition from an ordinary stale local `queued` snapshot, which we
-      // deliberately omit so it can never regress a ready remote artifact.
+      // The store may explicitly requeue a failed row for either the bounded
+      // harness retry or a learner's retry-icon tap. The retained attempt
+      // count plus marker distinguish that intentional transition from an
+      // ordinary stale local `queued` snapshot, which we deliberately omit
+      // so it can never regress a ready remote artifact.
       if (!session.isFoundation &&
           session.artifact == null &&
           session.generationStatus == 'queued' &&
           session.generationAttempts > 0 &&
-          session.generationError == 'Retrying failed lesson once') ...{
+          (session.generationError == 'Retrying failed lesson once' ||
+              session.generationError == 'Manual retry requested')) ...{
         'generation_status': 'queued',
         'generation_error': null,
         'generation_attempts': session.generationAttempts,
@@ -2022,6 +2024,7 @@ class SyncService {
   Future<int> prepareAdaptiveCourseLessons({
     int maxLessons = 1,
     String? harnessSkill,
+    String? sessionId,
   }) {
     final existing = _coursePreparationInFlight;
     if (existing != null) return existing;
@@ -2039,13 +2042,18 @@ class SyncService {
         extra: {
           'max_lessons': limit,
           if (harnessSkill != null) 'harness_skill': harnessSkill,
+          if (sessionId != null) 'session_id': sessionId,
         },
       ),
     );
 
     late final Future<int> run;
-    run = _prepareAdaptiveCourseLessons(limit, harnessSkill: harnessSkill)
-        .whenComplete(() {
+    run =
+        _prepareAdaptiveCourseLessons(
+          limit,
+          harnessSkill: harnessSkill,
+          sessionId: sessionId,
+        ).whenComplete(() {
           if (identical(_coursePreparationInFlight, run)) {
             _coursePreparationInFlight = null;
           }
@@ -2057,6 +2065,7 @@ class SyncService {
               extra: {
                 'max_lessons': limit,
                 if (harnessSkill != null) 'harness_skill': harnessSkill,
+                if (sessionId != null) 'session_id': sessionId,
               },
             ),
           );
@@ -2068,6 +2077,7 @@ class SyncService {
   Future<int> _prepareAdaptiveCourseLessons(
     int maxLessons, {
     String? harnessSkill,
+    String? sessionId,
   }) async {
     var prepared = 0;
     for (var index = 0; index < maxLessons; index++) {
@@ -2077,6 +2087,7 @@ class SyncService {
           'prepare-course-lesson',
           body: {
             if (harnessSkill != null) 'harness_skill': harnessSkill,
+            if (sessionId != null) 'session_id': sessionId,
             if (vocabularyCandidates.isNotEmpty)
               'vocabulary_candidates': vocabularyCandidates,
           },

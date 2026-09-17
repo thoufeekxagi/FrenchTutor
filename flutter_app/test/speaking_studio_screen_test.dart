@@ -68,7 +68,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Home keeps the batch stable and uses evidence on refill', (
+  testWidgets('Home keeps the authored route stable until a lesson completes', (
     tester,
   ) async {
     final db = sqlite3.openInMemory();
@@ -99,24 +99,15 @@ void main() {
       ],
     );
     expect(store.currentPlan(profile)?.id, initial.id);
-    // Foundation (1-5) and Unit 2 (6-11) are both authored, fixed content
-    // shared by every learner, so this practice evidence cannot show up
-    // there. Complete all of it so growth reaches sequence 12, the first
-    // lesson that can actually carry the evidence.
+    // Foundation (1-5) and Unit 2 (6-11) are authored, fixed content shared
+    // by every learner. Merely reopening Home must not append a random lesson;
+    // the owning lesson-completion flow advances its same-skill lane.
     for (final session in initial.sessions) {
       store.markCompleted(session.contentKey);
     }
     final expanded = store.ensureCurrentPlan(profile);
     expect(expanded.id, initial.id);
-    expect(expanded.sessions, hasLength(12));
-    expect(
-      expanded.sessions
-          .skip(initial.sessions.length)
-          .every(
-            (session) => session.sourceSessionIds.contains('practice-evidence'),
-          ),
-      isTrue,
-    );
+    expect(expanded.sessions, hasLength(11));
 
     await tester.pumpWidget(
       ProviderScope(

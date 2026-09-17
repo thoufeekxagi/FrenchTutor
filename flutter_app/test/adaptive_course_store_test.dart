@@ -91,30 +91,47 @@ void _finishSession(
 }
 
 void main() {
-  test('media buffer adds reading and listening slots for the next unit', () {
+  test('completion creates only the same skill in the next unit', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
-    final profile = Profile(id: 'media-buffer', goal: 'everyday', level: 'a1');
+    final profile = Profile(id: 'skill-lane', goal: 'everyday', level: 'a1');
 
-    var plan = store.ensureMediaBuffer(profile);
+    var plan = store.ensureCurrentPlan(profile);
     expect(plan.sessions.where((session) => session.unit == 3), isEmpty);
-    for (final session in plan.sessions.where((session) => session.unit == 2)) {
-      store.markCompleted(session.contentKey);
-    }
-    plan = store.ensureMediaBuffer(profile);
+    final reading = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+    );
+    store.markCompleted(reading.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, reading.contentKey);
     final upcoming = plan.sessions
         .where((session) => session.unit == 3)
         .toList(growable: false);
 
-    expect(upcoming.map((session) => session.primarySkill), [
-      SpeakSkill.vocabulary,
-      SpeakSkill.reading,
-      SpeakSkill.listening,
-    ]);
-    expect(
-      upcoming.every((session) => session.generationStatus == 'queued'),
-      isTrue,
+    expect(upcoming, hasLength(1));
+    expect(upcoming.single.primarySkill, SpeakSkill.reading);
+    expect(upcoming.single.generationStatus, 'queued');
+
+    // Rebuilding or repeating the completion callback is idempotent.
+    plan = store.ensureSuccessorForCompleted(profile, reading.contentKey);
+    expect(plan.sessions.where((session) => session.unit == 3), hasLength(1));
+  });
+
+  test('an unfinished skill creates no future lesson', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(id: 'skip-lane', goal: 'everyday', level: 'a1');
+    final plan = store.ensureCurrentPlan(profile);
+    final vocabulary = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.vocabulary,
     );
+
+    final unchanged = store.ensureSuccessorForCompleted(
+      profile,
+      vocabulary.contentKey,
+    );
+    expect(unchanged.sessions.where((session) => session.unit == 3), isEmpty);
   });
 
   test('listening stays unready until its durable PCM WAV is attached', () {
@@ -456,57 +473,30 @@ void main() {
     );
   });
 
-  test('reserve adds one row only after the previous artifact is ready', () {
+  test('terminal failure is requeued only by an explicit retry action', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
-    final profile = Profile(
-      id: 'serial-reserve',
-      goal: 'everyday',
-      level: 'a1',
-      interests: const ['Speaking'],
+    final profile = Profile(id: 'manual-retry', goal: 'everyday', level: 'a1');
+    var plan = store.ensureCurrentPlan(profile);
+    final reading = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.reading,
     );
-    // Foundation and Unit 2 (sequences 1-11) are authored, not generated, and
-    // all exist from the first call — no simulated server completion is
-    // needed for them. Complete all of Unit 2 (including the still-unready
-    // listening lesson, which a real learner only reaches once its audio is
-    // attached) so this test can focus on the ordinary AI-personalized
-    // reserve rule that starts at sequence 11.
-    final plan = store.ensureCurrentPlan(profile);
-    for (final session in plan.sessions) {
-      store.markCompleted(session.contentKey);
-    }
-    final first = store.ensureCurrentPlan(profile);
-    expect(first.sessions.last.sequence, 12);
-    expect(first.sessions.last.generationStatus, 'queued');
-
+    store.markCompleted(reading.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, reading.contentKey);
+    final successor = plan.sessions.firstWhere((session) => session.unit == 3);
     db.execute(
-      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
-      "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [
-        _readyArtifactFor(first.sessions.last.primarySkill),
-        first.sessions.last.id,
-      ],
+      "UPDATE adaptive_course_sessions SET generation_status = 'failed', "
+      'generation_attempts = 2, generation_error = ? WHERE id = ?',
+      ['provider unavailable', successor.id],
     );
 
-    final second = store.ensureCurrentPlan(profile);
-    expect(second.sessions.last.sequence, 13);
-    expect(second.sessions.last.generationStatus, 'queued');
-    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 13);
-
-    db.execute(
-      "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
-      "artifact_kind = 'speaking', artifact_json = ? WHERE id = ?",
-      [
-        _readyArtifactFor(second.sessions.last.primarySkill),
-        second.sessions.last.id,
-      ],
-    );
-    expect(store.ensureCurrentPlan(profile).sessions.last.sequence, 13);
-
-    store.markCompleted(first.sessions.last.contentKey);
-    final replenished = store.ensureCurrentPlan(profile);
-    expect(replenished.sessions.last.sequence, 14);
-    expect(replenished.sessions.last.generationStatus, 'queued');
+    expect(store.sessionById(successor.id)!.generationStatus, 'failed');
+    final retried = store.requeueFailedSession(successor.id)!;
+    expect(retried.id, successor.id);
+    expect(retried.generationStatus, 'queued');
+    expect(retried.generationAttempts, 2);
+    expect(retried.generationError, 'Manual retry requested');
   });
 
   test(
@@ -774,38 +764,31 @@ void main() {
     },
   );
 
-  test(
-    'Course keeps growing one row at a time past the old five-lesson block',
-    () {
-      final store = AdaptiveCourseStore(sqlite3.openInMemory());
-      final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
-      var plan = store.ensureCurrentPlan(profile);
-      // Foundation (1-5) and Unit 2 (6-11) are both authored and fully present
-      // immediately.
-      expect(plan.sessions, hasLength(11));
+  test('a skill lane grows one completed unit at a time', () {
+    final store = AdaptiveCourseStore(sqlite3.openInMemory());
+    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
+    var plan = store.ensureCurrentPlan(profile);
+    expect(plan.sessions, hasLength(11));
 
-      // Complete all of Unit 2, as a learner would; real AI-personalized
-      // growth (sequence 11+) only begins once it is out of the way.
-      for (final session in plan.sessions) {
-        store.markCompleted(session.contentKey);
-      }
-      plan = store.ensureCurrentPlan(profile);
-      expect(plan.sessions, hasLength(12));
-      expect(plan.sessions.last.sequence, 12);
-      expect(plan.sessions.last.blockIndex, 2);
-      expect(plan.sessions.last.blockPosition, 1);
+    final reading = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+    );
+    store.markCompleted(reading.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, reading.contentKey);
+    expect(plan.sessions, hasLength(12));
+    final unitThree = plan.sessions.firstWhere((session) => session.unit == 3);
+    expect(unitThree.primarySkill, SpeakSkill.reading);
+    expect(unitThree.sequence, reading.sequence + adaptiveCourseBatchSize);
 
-      // The personalized route beyond Unit 2 is unlimited: keep completing the
-      // newest lesson and asking for the next one. It must keep growing one
-      // row at a time instead of stopping.
-      for (var total = 13; total <= 16; total++) {
-        store.markCompleted(plan.sessions.last.contentKey);
-        plan = store.ensureCurrentPlan(profile);
-        expect(plan.sessions, hasLength(total));
-      }
-      expect(plan.sessions.last.sequence, 16);
-    },
-  );
+    store.markCompleted(unitThree.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, unitThree.contentKey);
+    final unitFour = plan.sessions.firstWhere((session) => session.unit == 4);
+    expect(unitFour.primarySkill, SpeakSkill.reading);
+    expect(unitFour.sequence, unitThree.sequence + adaptiveCourseBatchSize);
+    expect(plan.sessions.where((session) => session.unit == 3), hasLength(1));
+    expect(plan.sessions.where((session) => session.unit == 4), hasLength(1));
+  });
 
   test(
     'a ready personalized lesson survives ensureCurrentPlan being called again',
@@ -967,12 +950,9 @@ void main() {
 
     final after = store.ensureCurrentPlan(profile);
     expect(after.id, before.id);
-    // Foundation and all of authored Unit 2 already exist from the first
-    // call. Unit 2 is fixed, authored content, not part of the "keep two
-    // ready ahead" reserve, so it never blocks growth into real
-    // AI-personalized territory (sequence 11+) — this call grows one more
-    // row immediately, regardless of Unit 2's own completion state.
-    expect(after.sessions, hasLength(12));
+    // Adoption alone never grows or spends on the course. Completion is the
+    // only trigger for a personalized successor.
+    expect(after.sessions, hasLength(11));
   });
 
   test('remote plan and session rows hydrate into the local route', () {
@@ -1097,13 +1077,20 @@ void main() {
         interests: const ['Speaking'],
       );
       var plan = store.ensureCurrentPlan(profile);
-      // Grow well past unit 5 (sequence 25), where a naive modulo lookup
-      // would repeat unit 1's exact "Alphabet & sound foundations" title --
-      // wrong on its face by then, and indistinguishable from a real
-      // content-duplication bug at a glance.
-      while (plan.sessions.length < 30) {
-        _finishSession(db, store, plan.sessions.last);
-        plan = store.ensureCurrentPlan(profile);
+      var current = plan.sessions.firstWhere(
+        (session) =>
+            session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+      );
+      // Advance one real skill lane through Unit 6. Sparse units must still
+      // receive stable, non-repeating titles.
+      while (current.unit < 6) {
+        _finishSession(db, store, current);
+        plan = store.ensureSuccessorForCompleted(profile, current.contentKey);
+        current = plan.sessions.firstWhere(
+          (session) =>
+              session.unit == current.unit + 1 &&
+              session.primarySkill == SpeakSkill.reading,
+        );
       }
       final unitOneTitle = plan.sessions
           .firstWhere((session) => session.unit == 1)

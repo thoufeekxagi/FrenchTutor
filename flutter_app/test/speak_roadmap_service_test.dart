@@ -29,35 +29,29 @@ void main() {
     expect(roadmap.sessions.first.contextPrompt, contains('Meetings'));
   });
 
-  test('completion state and appended batches project into the roadmap', () {
+  test('same-skill successor projects into the roadmap', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(id: 'learner', goal: 'everyday', level: 'a2');
     var expanded = store.ensureCurrentPlan(profile);
-    for (var index = 0; index < 4; index++) {
-      store.markCompleted(expanded.sessions.last.contentKey);
-      expanded = store.ensureCurrentPlan(profile);
-    }
-    for (final session in expanded.sessions) {
-      store.markCompleted(session.contentKey);
-    }
-    // The personalized route is unlimited: finishing everything prepared so
-    // far does not end the course, it just grows one more row.
-    expanded = store.ensureCurrentPlan(profile);
+    final reading = expanded.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+    );
+    store.markCompleted(reading.contentKey);
+    expanded = store.ensureSuccessorForCompleted(profile, reading.contentKey);
     final roadmap = SpeakRoadmapService.build(
       profile,
       adaptiveSessions: expanded.sessions,
     );
 
-    // Unit 2 no longer blocks growth once any two of its rows are
-    // uncompleted-but-ready, so each loop iteration below now grows a real
-    // new row immediately (matching Course's own reserve accounting).
-    expect(roadmap.sessions, hasLength(16));
-    expect(roadmap.completedCount, 15);
-    // The freshly appended row has no artifact yet in this store-only test,
-    // so it is visible as "preparing" rather than actionable.
-    expect(roadmap.nextSession, isNull);
-    expect(roadmap.sessions.last.completed, isFalse);
-    expect(roadmap.sessions.last.contentReady, isFalse);
+    expect(roadmap.sessions, hasLength(12));
+    expect(roadmap.completedCount, 1);
+    final successor = roadmap.sessions.firstWhere(
+      (session) => session.unit == 3,
+    );
+    expect(successor.primarySkill, SpeakSkill.reading);
+    expect(successor.completed, isFalse);
+    expect(successor.contentReady, isFalse);
   });
 
   test('adaptive projection retains all practice skill modes', () {

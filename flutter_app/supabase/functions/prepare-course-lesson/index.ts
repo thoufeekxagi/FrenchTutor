@@ -761,12 +761,12 @@ function validateArtifact(
   if (kind === "grammar") validateGrammar(artifact, text(session.level) || "A1");
 }
 
-// Course normally uses one provider request. If the model returns JSON that
-// the local validator rejects, give the same model one repair turn containing
-// the exact rejection reason and the rejected JSON. This is bounded at two
-// total calls so a malformed artifact can self-correct without becoming a
-// retry storm or silently multiplying spend.
-const MAX_GENERATION_ATTEMPTS = 2;
+// One endpoint claim spends exactly one provider request. The app owns the
+// only automatic retry and waits before making it; after two failed claims a
+// lesson is terminal until the learner taps its retry icon. Keeping the
+// provider helper single-shot prevents hidden nested retries and makes the
+// persisted generation_attempts counter truthful.
+const MAX_GENERATION_ATTEMPTS = 1;
 
 async function generateArtifact(
   supabaseUrl: string,
@@ -915,9 +915,11 @@ Deno.serve(async (request: Request) => {
   // keep the normal queue behavior. This is a filter only; it never creates,
   // rewrites, or retries a row.
   let harnessSkill = "";
+  let requestedSessionId = "";
   let vocabularyCandidates: VocabularyCandidate[] = [];
   try {
     const body = await request.json() as Json;
+    requestedSessionId = text(body.session_id).trim();
     const requested = text(body.harness_skill).replace('-', '_');
     if (["speaking", "vocabulary", "reading", "listening", "writing", "grammar"].includes(requested)) {
       harnessSkill = requested;
@@ -963,16 +965,11 @@ Deno.serve(async (request: Request) => {
   }
 
   // Course growth has exactly one rule that matters here: never run two
-  // generations at once. There is no cap on how many lessons may sit ready
-  // ahead of the learner — the app keeps a small lookahead buffer topped up
-  // (see adaptiveCourseLookahead in lib/data/database/adaptive_course_store.dart)
-  // and simply queues one more row whenever it wants one. A failed row gets
-  // one endpoint-level retry (the model itself already receives one repair
-  // turn); after two failed claims it becomes terminal until the user makes a
-  // fresh explicit retry. This prevents a bad artifact from burning requests
-  // on every foreground refresh. This must only ever see real AI-generated
-  // lessons (sequence 12+) — Unit 2 (6-11) is fixed, authored, permanent
-  // content for every learner, never part of this accounting.
+  // generations at once. Production creates one same-skill successor after a
+  // completion. A failed row gets one delayed app-level retry; after two
+  // failed claims it is terminal until the learner explicitly retries that
+  // exact session id. This must only ever see real AI-generated lessons
+  // (sequence 12+) — Unit 2 (6-11) is fixed authored content.
   // A plan can end up orphaned "active" on the server when a device's local
   // retirement of its own previous plan never reaches a remote-only plan it
   // has no record of (a reinstall wiping local state, or a second device).
@@ -1075,6 +1072,7 @@ Deno.serve(async (request: Request) => {
     .order("sequence", { ascending: true })
     .limit(1);
   if (harnessSkill) candidatesQuery = candidatesQuery.eq("primary_skill", harnessSkill);
+  if (requestedSessionId) candidatesQuery = candidatesQuery.eq("id", requestedSessionId);
   const { data: candidates, error: findError } = await candidatesQuery;
   if (findError) return response({ error: findError.message }, 500);
   const candidate = candidates?.[0] as Json | undefined;
@@ -1191,6 +1189,7 @@ Deno.serve(async (request: Request) => {
       .in("status", ["planned", "active"])
       .is("deleted_at", null);
     if (harnessSkill) remainingQuery = remainingQuery.eq("primary_skill", harnessSkill);
+    if (requestedSessionId) remainingQuery = remainingQuery.eq("id", requestedSessionId);
     const { count } = await remainingQuery;
     console.info(JSON.stringify({
       event: "course_lesson_preparation_succeeded",

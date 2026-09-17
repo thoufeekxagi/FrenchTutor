@@ -127,17 +127,15 @@ void main() {
 
     final store = AdaptiveCourseStore(db);
     var plan = store.ensureCurrentPlan(profile);
-    // Sequences 1-5 (foundation) and 6-11 (Unit 2) are both fixed, authored
-    // content shared by every learner, so recent evidence cannot show up
-    // there. The first lesson that can actually carry this evidence is the
-    // first real AI-personalized one, sequence 12 — complete Unit 2 first
-    // so the store grows to it.
-    for (final session in plan.sessions) {
-      store.markCompleted(session.contentKey);
-    }
-    plan = store.ensureCurrentPlan(profile);
-    final first =
-        plan.sessions[adaptiveCourseFoundationSize + adaptiveCourseBatchSize];
+    // Authored Unit 2 cannot carry learner evidence. Completing one lesson
+    // creates only its same-skill Unit 3 successor, which can use that evidence.
+    final completed = plan.sessions.firstWhere((session) => session.unit == 2);
+    store.markCompleted(completed.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, completed.contentKey);
+    final first = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 3 && session.primarySkill == completed.primarySkill,
+    );
     final reloaded = store.sessionById(first.id);
 
     expect(plan.sessions, hasLength(12));
