@@ -4,7 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -322,6 +322,10 @@ class LiveIntentVerdict {
 }
 
 class LessonAgentService {
+  static const _reviewRequestPrefix = 'REQUESTED REVIEW PLAN:\n';
+  // The ai-text Edge Function accepts at most 12,000 characters per message.
+  // Leave room for encoding differences and future envelope fields.
+  static const _reviewRequestBudget = 10_500;
   LessonAgentService._();
 
   static final LessonAgentService shared = LessonAgentService._();
@@ -3437,7 +3441,7 @@ Rules:
   present future content as already mastered.
 - Keep the result concise enough for another lesson engine to use directly.
 ''';
-    Future<String> request(Map<String, dynamic> dossier) => _complete(
+    Future<String> request({bool compactWarmup = false}) => _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {
@@ -3445,7 +3449,7 @@ Rules:
           // Review and Warm-up deliberately share this request contract. The
           // only difference is the bounded dossier window supplied by the
           // planner, never the provider or generation path.
-          'content': 'REQUESTED REVIEW PLAN:\n${jsonEncode(dossier)}',
+          'content': _reviewComposerMessage(plan, compactWarmup: compactWarmup),
         },
       ],
       maxTokens: 2600,
@@ -3456,7 +3460,7 @@ Rules:
     );
 
     try {
-      final raw = await request(_boundedReviewDossier(plan));
+      final raw = await request();
       return _parseReviewBlueprint(raw, plan);
     } on AiProviderHttpError catch (error) {
       // A future Course artifact can contain a verbose generated payload. If
@@ -3464,22 +3468,91 @@ Rules:
       // flow* with only the compact future summaries. Review itself is not
       // changed, and no Gemini fallback is introduced.
       if (plan.kind != 'warmup' || error.statusCode != 400) rethrow;
-      final raw = await request(
-        _boundedReviewDossier(plan, compactWarmup: true),
-      );
+      final raw = await request(compactWarmup: true);
       return _parseReviewBlueprint(raw, plan);
     }
   }
 
-  Map<String, dynamic> _boundedReviewDossier(
+  String _reviewComposerMessage(
     PersonalizedReviewPlan plan, {
     bool compactWarmup = false,
+  }) => buildBoundedReviewMessageForTest(
+    plan.gptDossier,
+    compactWarmup: compactWarmup && plan.kind == 'warmup',
+  );
+
+  /// Encodes the exact user message sent by both Review and Warm-up.
+  ///
+  /// Public only for a boundary regression test. Keeping the limit here means
+  /// nested generated lesson artifacts can never violate the Edge Function's
+  /// 12,000-character message contract.
+  @visibleForTesting
+  static String buildBoundedReviewMessageForTest(
+    Map<String, dynamic> rawDossier, {
+    bool compactWarmup = false,
   }) {
-    final decoded = jsonDecode(jsonEncode(plan.gptDossier));
+    final decoded = jsonDecode(jsonEncode(rawDossier));
     if (decoded is! Map) {
       throw StateError('Review dossier is not a JSON object');
     }
     final dossier = decoded.cast<String, dynamic>();
+    _boundReviewDossier(dossier, compactWarmup: compactWarmup);
+
+    var message = '$_reviewRequestPrefix${jsonEncode(dossier)}';
+    if (message.length <= _reviewRequestBudget) return message;
+
+    // This projection is a final deterministic safety net. It retains the
+    // request direction and strongest teaching evidence, but excludes verbose
+    // raw artifacts. Review and Warm-up use this identical projection.
+    final request = dossier['request'];
+    final minimal = <String, dynamic>{
+      if (dossier['version'] != null) 'version': dossier['version'],
+      if (request is Map)
+        'request': <String, dynamic>{
+          for (final key in const [
+            'kind',
+            'requestedMode',
+            'localSuggestedMode',
+            'primaryTopic',
+            'durationMinutes',
+            'futureSessionId',
+            'futureSessionIds',
+            'futureLessonSummaries',
+            'futureCourseContext',
+          ])
+            if (request[key] != null) key: request[key],
+        },
+      if (dossier['learner'] != null) 'learner': dossier['learner'],
+      if (dossier['learnerProfile'] != null)
+        'learnerProfile': dossier['learnerProfile'],
+      if (dossier['courseAndPracticeCoverage'] != null)
+        'courseAndPracticeCoverage': dossier['courseAndPracticeCoverage'],
+      for (final key in const [
+        'recentSessions',
+        'vocabularyEvidence',
+        'learnerPhrases',
+        'repeatedMistakes',
+        'performanceSignals',
+      ])
+        if (dossier[key] is List)
+          key: (dossier[key] as List).take(4).toList(growable: false),
+    };
+    _clampJsonStrings(minimal, 360);
+    message = '$_reviewRequestPrefix${jsonEncode(minimal)}';
+    if (message.length > _reviewRequestBudget) {
+      _removeEvidenceUntilWithinBudget(minimal);
+      message = '$_reviewRequestPrefix${jsonEncode(minimal)}';
+    }
+    if (message.length > _reviewRequestBudget) {
+      throw StateError('Unable to safely encode Review dossier');
+    }
+    return message;
+  }
+
+  static void _boundReviewDossier(
+    Map<String, dynamic> dossier, {
+    required bool compactWarmup,
+  }) {
     final coverage = dossier['courseAndPracticeCoverage'];
     if (coverage is Map) {
       final ids = coverage['sourceSessionIds'];
@@ -3488,8 +3561,17 @@ Rules:
       }
     }
 
-    if (compactWarmup && plan.kind == 'warmup') {
-      final request = dossier['request'];
+    final request = dossier['request'];
+    if (request is Map) {
+      for (final key in const ['futureSessionIds', 'futureLessonSummaries']) {
+        final value = request[key];
+        if (value is List) {
+          request[key] = value.take(3).toList(growable: false);
+        }
+      }
+    }
+
+    if (compactWarmup) {
       if (request is Map) {
         final futureSummaries = request['futureLessonSummaries'];
         final compactFuture = futureSummaries is List
@@ -3525,6 +3607,11 @@ Rules:
       }
     }
 
+    // Stored generated lessons may contain long nested prompts or artifacts.
+    // Bound nested strings before measuring the final request; top-level list
+    // counts alone cannot protect the provider contract.
+    _clampJsonStrings(dossier, compactWarmup ? 500 : 900);
+
     final shrinkKeys = <String>[
       'performanceSignals',
       'recentLearnerTranscriptExcerpts',
@@ -3535,11 +3622,12 @@ Rules:
       'writingEvidence',
       'examEvidence',
     ];
-    while (jsonEncode(dossier).length > 11000) {
+    while ('$_reviewRequestPrefix${jsonEncode(dossier)}'.length >
+        _reviewRequestBudget) {
       var removed = false;
       for (final key in shrinkKeys) {
         final value = dossier[key];
-        if (value is List && value.length > 1) {
+        if (value is List && value.isNotEmpty) {
           dossier[key] = value.sublist(0, value.length - 1);
           removed = true;
           break;
@@ -3547,7 +3635,58 @@ Rules:
       }
       if (!removed) break;
     }
-    return dossier;
+  }
+
+  static void _clampJsonStrings(Object? value, int limit) {
+    if (value is Map) {
+      for (final key in value.keys.toList()) {
+        final item = value[key];
+        if (item is String && item.length > limit) {
+          value[key] = item.substring(0, limit);
+        } else {
+          _clampJsonStrings(item, limit);
+        }
+      }
+    } else if (value is List) {
+      for (var index = 0; index < value.length; index++) {
+        final item = value[index];
+        if (item is String && item.length > limit) {
+          value[index] = item.substring(0, limit);
+        } else {
+          _clampJsonStrings(item, limit);
+        }
+      }
+    }
+  }
+
+  static void _removeEvidenceUntilWithinBudget(Map<String, dynamic> dossier) {
+    const keys = [
+      'performanceSignals',
+      'recentSessions',
+      'learnerPhrases',
+      'vocabularyEvidence',
+      'repeatedMistakes',
+    ];
+    while ('$_reviewRequestPrefix${jsonEncode(dossier)}'.length >
+        _reviewRequestBudget) {
+      var removed = false;
+      for (final key in keys) {
+        final value = dossier[key];
+        if (value is List && value.isNotEmpty) {
+          value.removeLast();
+          removed = true;
+          break;
+        }
+      }
+      if (!removed) {
+        final request = dossier['request'];
+        if (request is Map && request['futureCourseContext'] != null) {
+          request.remove('futureCourseContext');
+          removed = true;
+        }
+      }
+      if (!removed) break;
+    }
   }
 
   ReviewBlueprint _parseReviewBlueprint(
@@ -3653,15 +3792,13 @@ Rules:
       ..._reviewStringList(json['grammar']),
       ..._reviewStringList(json['steps']),
       if (json['speakingTargets'] is List)
-        ...(json['speakingTargets'] as List)
-            .whereType<Map>()
-            .expand(
-              (item) => [
-                _reviewString(item['french']),
-                _reviewString(item['english']),
-                _reviewString(item['tip']),
-              ],
-            ),
+        ...(json['speakingTargets'] as List).whereType<Map>().expand(
+          (item) => [
+            _reviewString(item['french']),
+            _reviewString(item['english']),
+            _reviewString(item['tip']),
+          ],
+        ),
     ].join(' ').toLowerCase();
     final allowed = [
       ...plan.retrievalTargets,

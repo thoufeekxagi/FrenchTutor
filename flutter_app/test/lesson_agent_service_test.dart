@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:french_tutor/data/alphabet_data.dart';
@@ -57,5 +59,35 @@ void main() {
       'OpenRouterHttpError(400): invalid response format',
     );
     expect(error.isRateLimited, isFalse);
+  });
+
+  test('warm-up request keeps only three future lessons and stays bounded', () {
+    final huge = List.filled(20000, 'x').join();
+    final message = LessonAgentService.buildBoundedReviewMessageForTest({
+      'version': 1,
+      'request': {
+        'kind': 'warmup',
+        'localSuggestedMode': 'smart',
+        'primaryTopic': 'Upcoming course work',
+        'futureSessionIds': List.generate(8, (index) => 'future-$index'),
+        'futureLessonSummaries': List.generate(
+          8,
+          (index) => 'Lesson $index $huge',
+        ),
+        'futureCourseContext': huge,
+      },
+      'recentSessions': List.generate(
+        20,
+        (index) => {'id': 'recent-$index', 'summary': huge},
+      ),
+      'vocabularyEvidence': List.generate(20, (_) => huge),
+    });
+
+    expect(message.length, lessThanOrEqualTo(10500));
+    final dossier = jsonDecode(message.split('\n').skip(1).join('\n')) as Map;
+    final request = dossier['request'] as Map;
+    expect(request['kind'], 'warmup');
+    expect(request['futureSessionIds'], hasLength(3));
+    expect(request['futureLessonSummaries'], hasLength(3));
   });
 }
