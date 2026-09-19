@@ -3441,27 +3441,58 @@ Rules:
   present future content as already mastered.
 - Keep the result concise enough for another lesson engine to use directly.
 ''';
-    Future<String> request({bool minimalWarmup = false}) => _complete(
-      messages: [
-        {'role': 'system', 'content': system + languageGuardrail},
-        {
-          'role': 'user',
-          // Review keeps its proven bounded dossier contract. Warm-up has a
-          // deliberately smaller forward-looking contract: one completed
-          // Course lesson plus up to three upcoming Course lessons. This
-          // prevents future rows (which do not have review history) from
-          // being serialized as malformed review evidence.
-          'content': plan.kind == 'warmup'
-              ? _warmupOpenAiMessage(plan)
-              : _reviewComposerMessage(plan, minimalWarmup: minimalWarmup),
-        },
-      ],
-      maxTokens: 2600,
-      temperature: 0.25,
-      jsonMode: true,
-      traceFeature: 'review_composer',
-      maxAttempts: 2,
-    );
+    Future<String> request({bool minimalWarmup = false}) async {
+      final userContent = plan.kind == 'warmup'
+          ? _warmupOpenAiMessage(plan)
+          : _reviewComposerMessage(plan, minimalWarmup: minimalWarmup);
+      final systemContent = system + languageGuardrail;
+      if (plan.kind == 'warmup') {
+        unawaited(
+          AiCostTracker.event(
+            feature: 'warmup_composer',
+            event: 'warmup_prompt_prepared',
+            extra: {
+              'system_chars': systemContent.length,
+              'user_chars': userContent.length,
+              'total_chars': systemContent.length + userContent.length,
+              'future_session_ids': plan.futureSessionIds.take(3).toList(),
+              'future_summary_count': plan.futureLessonSummaries.take(3).length,
+              'minimal_retry': minimalWarmup,
+            },
+          ),
+        );
+      }
+      try {
+        return await _complete(
+          messages: [
+            {'role': 'system', 'content': systemContent},
+            {'role': 'user', 'content': userContent},
+          ],
+          maxTokens: 2600,
+          temperature: 0.25,
+          jsonMode: true,
+          traceFeature: 'review_composer',
+          maxAttempts: 2,
+        );
+      } catch (error) {
+        if (plan.kind == 'warmup') {
+          unawaited(
+            AiCostTracker.event(
+              feature: 'warmup_composer',
+              event: 'warmup_prompt_failed',
+              extra: {
+                'system_chars': systemContent.length,
+                'user_chars': userContent.length,
+                'total_chars': systemContent.length + userContent.length,
+                'error': error.toString().substring(0, 500),
+                'minimal_retry': minimalWarmup,
+              },
+            ),
+          );
+        }
+        rethrow;
+      }
+    }
 
     try {
       final raw = await request();
@@ -4058,6 +4089,12 @@ Rules:
     final requestId = const Uuid().v4();
     final requestedProvider = body['provider']?.toString() ?? 'gemini';
     final traceFeature = body['traceFeature']?.toString() ?? name;
+    final messageLengths = body['messages'] is List
+        ? (body['messages'] as List)
+              .whereType<Map>()
+              .map((message) => message['content']?.toString().length ?? 0)
+              .toList(growable: false)
+        : const <int>[];
     unawaited(
       AiCostTracker.event(
         feature: traceFeature,
@@ -4071,6 +4108,14 @@ Rules:
                     ? (body['contents'] as List).length
                     : 0),
           'max_tokens': body['maxTokens'],
+          'message_lengths': messageLengths,
+          'max_message_chars': messageLengths.isEmpty
+              ? 0
+              : messageLengths.reduce((a, b) => a > b ? a : b),
+          'total_message_chars': messageLengths.fold<int>(
+            0,
+            (sum, length) => sum + length,
+          ),
         },
       ),
     );
@@ -4125,12 +4170,19 @@ Rules:
       );
       throw AgentError.requestFailed;
     } on FunctionException catch (error) {
+      final detailsText = error.details?.toString() ?? '';
       unawaited(
         AiCostTracker.event(
           feature: traceFeature,
           event: 'text_request_provider_error',
           requestId: requestId,
-          extra: {'status': error.status},
+          extra: {
+            'status': error.status,
+            'details': detailsText.length > 500
+                ? detailsText.substring(0, 500)
+                : detailsText,
+            'message_lengths': messageLengths,
+          },
         ),
       );
       if (error.status == 401 || error.status == 403) {

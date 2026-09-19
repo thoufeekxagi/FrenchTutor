@@ -1175,11 +1175,24 @@ class _SpeakReviewLaunchScreenState
   }
 
   String _teachingContext(ReviewBlueprint blueprint) {
-    return '''
-${widget.plan.contextPrompt}
-
-${blueprint.teachingContext}
-''';
+    final raw = widget.plan.kind == 'warmup'
+        ? [
+            'WARM-UP COURSE WINDOW (future lessons only; not mastered):',
+            for (
+              var index = 0;
+              index < widget.plan.futureLessonSummaries.length && index < 3;
+              index++
+            )
+              '- Lesson ${index + 1}: ${widget.plan.futureLessonSummaries[index]}',
+            '',
+            blueprint.teachingContext,
+          ].join('\n')
+        : '${widget.plan.contextPrompt}\n\n${blueprint.teachingContext}';
+    // The story/writing generators have their own large system prompts. Keep
+    // this handoff bounded so the warm-up course window cannot make a single
+    // user message exceed the Edge Function/OpenRouter limit.
+    final clean = raw.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return clean.length <= 3800 ? clean : '${clean.substring(0, 3799)}…';
   }
 
   Future<GeneratedStory> _generateStory({
