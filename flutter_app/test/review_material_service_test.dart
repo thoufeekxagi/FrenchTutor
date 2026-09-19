@@ -64,6 +64,72 @@ void main() {
     expect(storage.getSessionMessages(sessionId: saved.id), hasLength(2));
   });
 
+  test('ordinary course practice history does not imply course completion', () {
+    final storage = StorageService(sqlite3.openInMemory());
+    storage.saveSession(
+      Session(
+        id: 'reading-attempt',
+        startedAt: '2026-09-09T09:00:00.000Z',
+        endedAt: '2026-09-09T09:01:00.000Z',
+        summary: 'Read "A short story."',
+        topic: 'A short story',
+        contentKey: 'unit-3-reading',
+        stage: 'story',
+      ),
+    );
+
+    expect(storage.completedContentKeys(), isEmpty);
+  });
+
+  test('course completion marks an existing practice row exactly once', () {
+    final storage = StorageService(sqlite3.openInMemory());
+    storage.saveSession(
+      Session(
+        id: 'listening-attempt',
+        startedAt: '2026-09-09T09:00:00.000Z',
+        endedAt: '2026-09-09T09:04:00.000Z',
+        summary: 'Listened to "At the market."',
+        topic: 'At the market',
+        contentKey: 'unit-3-listening',
+        stage: 'reading_listening',
+      ),
+    );
+    storage.saveMessage(
+      sessionId: 'listening-attempt',
+      role: 'user',
+      content: 'I heard the price and the location.',
+    );
+
+    expect(storage.completedContentKeys(), isEmpty);
+
+    storage.markCourseSessionCompleted(
+      contentKey: 'unit-3-listening',
+      topic: 'At the market',
+      stage: 'listening',
+      lessonMaterial: 'Lesson: At the market',
+    );
+
+    final completed = storage.getAllSessions().single;
+    expect(storage.completedContentKeys(), {'unit-3-listening'});
+    expect(completed.id, 'listening-attempt');
+    expect(
+      completed.summary,
+      startsWith('Completed the course session: At the market'),
+    );
+    expect(completed.summary, contains('Practice: Listened to'));
+    expect(
+      storage.getSessionMessages(sessionId: 'listening-attempt'),
+      hasLength(1),
+    );
+
+    storage.markCourseSessionCompleted(
+      contentKey: 'unit-3-listening',
+      topic: 'At the market',
+      stage: 'listening',
+    );
+    expect(storage.getAllSessions(), hasLength(1));
+  });
+
   test('all speaking stage variants appear in recent speaking history', () {
     final storage = StorageService(sqlite3.openInMemory());
     final stages = [

@@ -3,7 +3,13 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart'
-    show ValueListenable, ValueNotifier, kIsWeb;
+    show
+        TargetPlatform,
+        ValueListenable,
+        ValueNotifier,
+        defaultTargetPlatform,
+        kIsWeb,
+        visibleForTesting;
 import 'package:google_sign_in/google_sign_in.dart' as google;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,9 +22,18 @@ import '../config/api_keys.dart';
 /// native sheet" (say nothing) apart from "something actually went wrong"
 /// (show an error), and apart from "it worked, but check your email" (email
 /// sign-up with confirmation enabled never returns an active session).
-enum AuthOutcome { success, cancelled, needsEmailConfirmation, failure }
+enum AuthOutcome {
+  success,
+  cancelled,
+  needsEmailConfirmation,
+  accountMayAlreadyExist,
+  failure,
+}
 
 class AuthResult {
+  static const accountMayAlreadyExistMessage =
+      'This email may already have an account. If you signed up with Google, choose Continue with Google. Otherwise, switch to Sign in.';
+
   const AuthResult._(this.outcome, {this.message});
 
   final AuthOutcome outcome;
@@ -28,6 +43,9 @@ class AuthResult {
   static const success = AuthResult._(AuthOutcome.success);
   static const needsEmailConfirmation = AuthResult._(
     AuthOutcome.needsEmailConfirmation,
+  );
+  static const accountMayAlreadyExist = AuthResult._(
+    AuthOutcome.accountMayAlreadyExist,
   );
   static AuthResult failure(String message) =>
       AuthResult._(AuthOutcome.failure, message: message);
@@ -44,12 +62,41 @@ class AuthService {
   static final AuthService shared = AuthService._();
   static const _signedOutMarkerKey = 'auth_gate_signed_out_v1';
 
+  /// iOS custom URL callback used by Supabase's email verification flow.
+  /// This scheme is also registered in Runner/Info.plist and must be
+  /// allow-listed in Supabase Auth > URL Configuration.
+  static const iosEmailAuthCallbackUrl =
+      'com.thoufeekx.frenchtutor://auth-callback';
+
+  /// Resolves to an exact URL already registered in Supabase Auth. Web uses
+  /// the current origin; iOS uses the app callback; Android stays on the
+  /// configured Site URL until its app-link callback is registered.
+  @visibleForTesting
+  static String? emailRedirectToForPlatform({
+    required bool isWeb,
+    required TargetPlatform platform,
+    Uri? webUri,
+  }) {
+    if (isWeb) return webUri?.origin;
+    if (platform == TargetPlatform.iOS) return iosEmailAuthCallbackUrl;
+    return null;
+  }
+
   // Supabase emits SIGNED_OUT as soon as its local session is removed, but
   // this signal also gives the app shell a synchronous fallback if a stream
   // delivery is delayed by a platform lifecycle transition.
   final ValueNotifier<int> _localAuthRevision = ValueNotifier<int>(0);
 
   SupabaseClient get _client => Supabase.instance.client;
+
+  /// The confirmation callback is deliberately platform-specific. iOS is
+  /// registered in this change; other native platforms keep their existing
+  /// Site URL behavior until their callback schemes are configured too.
+  String? get _emailRedirectTo => emailRedirectToForPlatform(
+    isWeb: kIsWeb,
+    platform: defaultTargetPlatform,
+    webUri: Uri.base,
+  );
 
   /// True once real Google OAuth client IDs have been configured (Google
   /// Cloud Console — see BUILD_FLUTTER_TO_IPHONE.md). Until then the Google
@@ -260,21 +307,39 @@ class AuthService {
   }) async {
     try {
       final response = await _client.auth.signUp(
-        email: email,
+        email: email.trim(),
         password: password,
+        emailRedirectTo: _emailRedirectTo,
       );
-      // With email confirmation required (the project default), signUp
-      // succeeds but returns no active session until the user clicks the
-      // link in their inbox — that is success, just not an active login yet.
-      if (response.session == null) {
+      return classifySignUpResponse(
+        user: response.user,
+        session: response.session,
+      );
+    } on AuthException catch (e) {
+      if (_requiresEmailConfirmation(e)) {
         return AuthResult.needsEmailConfirmation;
       }
-      return AuthResult.success;
-    } on AuthException catch (e) {
       return AuthResult.failure(e.message);
     } catch (e) {
       return AuthResult.failure('Sign-up failed: $e');
     }
+  }
+
+  /// Supabase intentionally returns a successful-looking user with no
+  /// identities when an email already belongs to another account. It sends no
+  /// confirmation email in that case to prevent account enumeration. Detect
+  /// that response so the UI can guide the learner to their original sign-in
+  /// method instead of telling them to check an inbox that will stay empty.
+  @visibleForTesting
+  static AuthResult classifySignUpResponse({
+    required User? user,
+    required Session? session,
+  }) {
+    if (user != null && user.identities != null && user.identities!.isEmpty) {
+      return AuthResult.accountMayAlreadyExist;
+    }
+    if (session == null) return AuthResult.needsEmailConfirmation;
+    return AuthResult.success;
   }
 
   Future<AuthResult> signInWithEmail({
@@ -282,23 +347,77 @@ class AuthService {
     required String password,
   }) async {
     try {
-      await _client.auth.signInWithPassword(email: email, password: password);
+      await _client.auth.signInWithPassword(
+        email: email.trim(),
+        password: password,
+      );
       return AuthResult.success;
     } on AuthException catch (e) {
+      if (_requiresEmailConfirmation(e)) {
+        return AuthResult.needsEmailConfirmation;
+      }
       return AuthResult.failure(e.message);
     } catch (e) {
       return AuthResult.failure('Sign-in failed: $e');
     }
   }
 
+  /// Sends another Supabase-generated signup confirmation link. Supabase
+  /// remains the source of the one-time token; the redirect only tells the
+  /// verified link where to return after it has been consumed.
+  Future<AuthResult> resendSignupConfirmation(String email) async {
+    try {
+      await _client.auth.resend(
+        type: OtpType.signup,
+        email: email.trim(),
+        emailRedirectTo: _emailRedirectTo,
+      );
+      return AuthResult.success;
+    } on AuthException catch (e) {
+      return AuthResult.failure(e.message);
+    } catch (e) {
+      return AuthResult.failure('Couldn\'t resend the confirmation email: $e');
+    }
+  }
+
+  bool _requiresEmailConfirmation(AuthException error) {
+    final code = error.code?.toLowerCase();
+    final message = error.message.toLowerCase();
+    return code == 'email_not_confirmed' ||
+        message.contains('email not confirmed') ||
+        message.contains('email_not_confirmed');
+  }
+
   Future<AuthResult> sendPasswordReset(String email) async {
     try {
-      await _client.auth.resetPasswordForEmail(email);
+      await _client.auth.resetPasswordForEmail(
+        email.trim(),
+        redirectTo: _emailRedirectTo,
+      );
       return AuthResult.success;
     } on AuthException catch (e) {
       return AuthResult.failure(e.message);
     } catch (e) {
       return AuthResult.failure('Couldn\'t send the reset email: $e');
+    }
+  }
+
+  /// Changes a password only after Supabase has returned a verified recovery
+  /// session to this device. It never attempts an admin or unauthenticated
+  /// password update.
+  Future<AuthResult> updatePasswordAfterRecovery(String password) async {
+    try {
+      if (_client.auth.currentSession == null) {
+        return AuthResult.failure(
+          'This reset link is no longer active. Request a fresh one and try again.',
+        );
+      }
+      await _client.auth.updateUser(UserAttributes(password: password));
+      return AuthResult.success;
+    } on AuthException catch (e) {
+      return AuthResult.failure(e.message);
+    } catch (e) {
+      return AuthResult.failure('Couldn\'t update the password: $e');
     }
   }
 

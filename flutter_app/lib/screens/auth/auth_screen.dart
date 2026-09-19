@@ -58,6 +58,9 @@ class _AuthScreenState extends State<AuthScreen> {
           _infoMessage =
               'Check your email to confirm your account, then sign in.';
           break;
+        case AuthOutcome.accountMayAlreadyExist:
+          _errorMessage = AuthResult.accountMayAlreadyExistMessage;
+          break;
         case AuthOutcome.failure:
           _errorMessage = result.message;
       }

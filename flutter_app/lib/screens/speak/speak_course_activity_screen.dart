@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/database/adaptive_course_store.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../flow/stage_outcome.dart';
@@ -15,7 +17,6 @@ import '../../services/course_artifact_codec.dart';
 import '../../services/practice_artwork_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/speak_roadmap_service.dart';
-import '../../services/subscription_gate_service.dart';
 import '../labs/alphabet_lab_screen.dart';
 import '../labs/connectors_lab_screen.dart';
 import '../labs/liaison_lab_screen.dart';
@@ -58,6 +59,8 @@ SpeakingCourseMode courseSpeakingModeFor(SpeakSkill skill) {
 class _SpeakCourseActivityScreenState
     extends ConsumerState<SpeakCourseActivityScreen> {
   bool _launching = false;
+  bool _courseCompletionCommitted = false;
+  bool _speakingAccessResolved = false;
   String? _error;
 
   SpeakRoadmapSession get session => widget.session;
@@ -77,11 +80,29 @@ class _SpeakCourseActivityScreenState
   @override
   void initState() {
     super.initState();
-    if (!_isSpeakingPath) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (_isSpeakingPath) {
+        unawaited(_resolveSpeakingAccess());
+      } else {
         if (mounted) _launch();
-      });
+      }
+    });
+  }
+
+  Future<void> _resolveSpeakingAccess() async {
+    final allowed = await requireCourseUnitAccess(
+      context,
+      ref,
+      session.unit,
+      source: 'course',
+    );
+    if (!mounted) return;
+    if (!allowed) {
+      Navigator.of(context).pop(false);
+      return;
     }
+    setState(() => _speakingAccessResolved = true);
   }
 
   Future<void> _launch() async {
@@ -91,10 +112,10 @@ class _SpeakCourseActivityScreenState
       _error = null;
     });
     try {
-      final allowed = await requirePremiumArea(
+      final allowed = await requireCourseUnitAccess(
         context,
         ref,
-        PremiumArea.course,
+        session.unit,
         source: 'course',
       );
       if (!allowed || !mounted) {
@@ -102,35 +123,20 @@ class _SpeakCourseActivityScreenState
         return;
       }
       final startedAt = DateTime.now();
+      _courseCompletionCommitted = false;
       ref.read(adaptiveCourseStoreProvider).markStarted(session.contentKey);
-      final completed = await _openPractice();
+      final completed = await _openPractice(startedAt: startedAt);
       if (!mounted) return;
       if (!completed) {
         Navigator.of(context).pop(false);
         return;
       }
 
-      final progress = CourseProgressService();
-      await progress.recordActivity(
-        contentKey: session.contentKey,
-        skill: session.primarySkill,
-        elapsed: DateTime.now().difference(startedAt),
-      );
-      final shouldComplete = await progress.shouldAutoComplete(
-        contentKey: session.contentKey,
-        estimatedMinutes: session.estimatedMinutes,
-        requiredSkills: {session.primarySkill},
-      );
-      if (shouldComplete) {
-        ref
-            .read(storageServiceProvider)
-            .markCourseSessionCompleted(
-              contentKey: session.contentKey,
-              topic: session.title,
-              stage: session.primarySkill.wireName,
-              lessonMaterial: _courseLessonMaterial,
-            );
-        ref.read(adaptiveCourseStoreProvider).markCompleted(session.contentKey);
+      if (!_courseCompletionCommitted) {
+        // A child Course activity only returns `true` after its own finish
+        // action. Persist and queue immediately, but do not keep a loading
+        // shell visible while progress sync or successor generation runs.
+        _commitCourseActivityInBackground(startedAt);
       }
       if (!mounted) return;
       Navigator.of(context).pop(true);
@@ -141,6 +147,137 @@ class _SpeakCourseActivityScreenState
         _launching = false;
         _error = error.toString().replaceFirst('Bad state: ', '');
       });
+    }
+  }
+
+  /// Persists completion and starts successor preparation without waiting on
+  /// network work. Reading and Listening call this as soon as their first
+  /// narration completes; other skills call it when their finish action
+  /// returns. It never closes the learner's lesson route.
+  void _commitCourseActivityInBackground(DateTime startedAt) {
+    if (_courseCompletionCommitted) return;
+    _courseCompletionCommitted = true;
+    final progress = CourseProgressService();
+    unawaited(
+      progress
+          .recordActivity(
+            contentKey: session.contentKey,
+            skill: session.primarySkill,
+            elapsed: DateTime.now().difference(startedAt),
+          )
+          .catchError((Object error, StackTrace stackTrace) {
+            debugPrint('[COURSE_AUTO] lesson progress save failed: $error');
+          }),
+    );
+    try {
+      ref
+          .read(storageServiceProvider)
+          .markCourseSessionCompleted(
+            contentKey: session.contentKey,
+            topic: session.title,
+            stage: session.primarySkill.wireName,
+            lessonMaterial: _courseLessonMaterial,
+          );
+    } catch (error, stackTrace) {
+      debugPrint(
+        '[COURSE_AUTO] lesson history save failed: $error\n$stackTrace',
+      );
+    }
+    unawaited(_completeAndPrepareSuccessor());
+  }
+
+  /// Every Course entry point uses this activity, so completion must own the
+  /// same automatic progression whether the learner opened it from Course,
+  /// Home, or another lesson shortcut. The exact successor row is persisted
+  /// before the Edge Function is asked to claim it. Generation never navigates
+  /// to the new lesson; selecting/opening remains a learner action.
+  Future<void> _completeAndPrepareSuccessor() async {
+    try {
+      final store = ref.read(adaptiveCourseStoreProvider);
+      final sync = ref.read(syncServiceProvider);
+      final profile = ref.read(learningStoreProvider).profile();
+      final plan = store.completeAndEnsureSuccessor(
+        profile,
+        session.contentKey,
+      );
+      final completed = store.sessionById(session.id);
+      if (completed == null || completed.status != 'completed') {
+        debugPrint(
+          '[COURSE_AUTO] completion did not commit: session=${session.id} '
+          'status=${completed?.status ?? 'missing'}',
+        );
+        return;
+      }
+
+      // Unit 1 and the authored Unit 2 are already part of the default
+      // course. Sync their completion, but only Unit 2+ completion grows a
+      // personalized same-skill lane (Unit 2 -> Unit 3, Unit 3 -> Unit 4,
+      // and so on).
+      var planPersisted = await sync.syncAdaptiveCoursePlan(plan);
+      if (!planPersisted) {
+        // The first attempt has already queued the plan in the durable sync
+        // outbox. Flush once and retry before giving up, so a transient write
+        // failure cannot strand the worker behind a missing server row.
+        await sync.drainOutbox(limit: 25);
+        planPersisted = await sync.syncAdaptiveCoursePlan(plan);
+      }
+      if (!planPersisted) {
+        debugPrint(
+          '[COURSE_AUTO] successor held for sync: completed=${completed.id} '
+          'unit=${completed.unit}',
+        );
+        return;
+      }
+      if (completed.unit < 2) return;
+
+      AdaptiveCourseSessionSpec? successor;
+      for (final candidate in plan.sessions) {
+        if (candidate.unit == completed.unit + 1 &&
+            candidate.primarySkill == completed.primarySkill &&
+            candidate.status != 'replaced') {
+          successor = candidate;
+          break;
+        }
+      }
+      if (successor == null) {
+        debugPrint(
+          '[COURSE_AUTO] successor row missing: completed=${completed.id} '
+          'skill=${completed.primarySkill.wireName} '
+          'unit=${completed.unit + 1}',
+        );
+        return;
+      }
+
+      debugPrint(
+        '[COURSE_AUTO] preparing successor: completed=${completed.id} '
+        'skill=${completed.primarySkill.wireName} '
+        'target=${successor.id} unit=${successor.unit}',
+      );
+      // Retry this exact row once after a transient provider failure. A second
+      // bounded claim also covers the server's normal "another lesson is
+      // generating" response, which leaves this persisted row queued without
+      // consuming an attempt. Never fan out to another skill or batch.
+      for (var attempt = 0; attempt < 2; attempt++) {
+        if (attempt > 0) {
+          final pending = store.sessionById(successor.id);
+          final retryableFailure =
+              pending?.generationStatus == 'failed' &&
+              pending?.generationAttempts == 1;
+          final stillQueued = pending?.generationStatus == 'queued';
+          if (!retryableFailure && !stillQueued) break;
+          await Future<void>.delayed(const Duration(seconds: 5));
+        }
+        await sync.prepareAdaptiveCourseLessons(sessionId: successor.id);
+        await sync.hydrateAdaptiveCourses();
+      }
+    } catch (error, stackTrace) {
+      // Completion is already durable locally. A temporary cloud/generator
+      // failure must not turn the finished lesson into an apparent failure;
+      // the queued successor is recovered on the next Course foreground pass.
+      debugPrint(
+        '[COURSE_AUTO] successor preparation deferred: '
+        '$error\n$stackTrace',
+      );
     }
   }
 
@@ -162,7 +299,7 @@ class _SpeakCourseActivityScreenState
     }
   }
 
-  Future<bool> _openPractice() async {
+  Future<bool> _openPractice({required DateTime startedAt}) async {
     final skill = session.primarySkill;
     if (skill == SpeakSkill.speaking ||
         skill == SpeakSkill.roleplay ||
@@ -276,6 +413,8 @@ class _SpeakCourseActivityScreenState
           story: story,
           showFinishButton: true,
           courseContentKey: session.contentKey,
+          completeOnFirstVoiceover: true,
+          onCourseCompleted: () => _commitCourseActivityInBackground(startedAt),
           generateCoverIfMissing: true,
           coverGenerator: () async {
             final coverUrl = await PracticeArtworkService.generateAndUpload(
@@ -317,6 +456,8 @@ class _SpeakCourseActivityScreenState
           story: story,
           showFinishButton: true,
           courseContentKey: session.contentKey,
+          completeOnFirstVoiceover: true,
+          onCourseCompleted: () => _commitCourseActivityInBackground(startedAt),
         ),
         fullscreenDialog: true,
       );
@@ -384,6 +525,25 @@ class _SpeakCourseActivityScreenState
   @override
   Widget build(BuildContext context) {
     if (_isSpeakingPath) {
+      if (!_speakingAccessResolved) {
+        return SpeakScaffold(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: SpeakColors.accent),
+                const SizedBox(height: 16),
+                Text(
+                  'Checking lesson access…',
+                  style: DesignTokens.body(
+                    14,
+                  ).copyWith(color: SpeakColors.inkSoft),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
       return SpeakingLessonDetailScreen(
         session: session,
         onStart: _launch,

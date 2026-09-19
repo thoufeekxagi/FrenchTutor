@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -23,11 +24,14 @@ void main() {
   });
 
   group('AuthService.signInWithGoogle unconfigured path', () {
-    test('returns a friendly failure instead of attempting native sign-in', () async {
-      final result = await AuthService.shared.signInWithGoogle();
-      expect(result.outcome, AuthOutcome.failure);
-      expect(result.message, contains('set up yet'));
-    });
+    test(
+      'returns a friendly failure instead of attempting native sign-in',
+      () async {
+        final result = await AuthService.shared.signInWithGoogle();
+        expect(result.outcome, AuthOutcome.failure);
+        expect(result.message, contains('set up yet'));
+      },
+    );
   });
 
   group('AuthService session/state surface', () {
@@ -62,6 +66,108 @@ void main() {
       final result = AuthResult.failure('nope');
       expect(result.outcome, AuthOutcome.failure);
       expect(result.message, 'nope');
+    });
+  });
+
+  group('AuthService signup response classification', () {
+    test('recognizes Supabase obfuscated duplicate-email response', () {
+      final user = User.fromJson({'id': 'existing-user', 'identities': []});
+
+      final result = AuthService.classifySignUpResponse(
+        user: user,
+        session: null,
+      );
+
+      expect(result.outcome, AuthOutcome.accountMayAlreadyExist);
+      expect(result.message, isNull);
+    });
+
+    test('keeps a new email signup on the confirmation path', () {
+      final user = User.fromJson({
+        'id': 'new-user',
+        'identities': [
+          {
+            'id': 'new-user',
+            'user_id': 'new-user',
+            'identity_id': 'email-identity',
+            'provider': 'email',
+          },
+        ],
+      });
+
+      final result = AuthService.classifySignUpResponse(
+        user: user,
+        session: null,
+      );
+
+      expect(result.outcome, AuthOutcome.needsEmailConfirmation);
+    });
+
+    test('keeps autoconfirmed signups successful', () {
+      final user = User.fromJson({
+        'id': 'new-user',
+        'identities': [
+          {
+            'id': 'new-user',
+            'user_id': 'new-user',
+            'identity_id': 'email-identity',
+            'provider': 'email',
+          },
+        ],
+      })!;
+      final session = Session(
+        accessToken: 'test-token',
+        tokenType: 'bearer',
+        user: user,
+      );
+
+      final result = AuthService.classifySignUpResponse(
+        user: user,
+        session: session,
+      );
+
+      expect(result.outcome, AuthOutcome.success);
+    });
+  });
+
+  group('email confirmation callback', () {
+    test('uses the registered iOS app scheme and callback host', () {
+      final callback = Uri.parse(AuthService.iosEmailAuthCallbackUrl);
+
+      expect(callback.scheme, 'com.thoufeekx.frenchtutor');
+      expect(callback.host, 'auth-callback');
+      expect(callback.path, isEmpty);
+    });
+
+    test('uses the same iOS callback for recovery mail', () {
+      expect(
+        AuthService.emailRedirectToForPlatform(
+          isWeb: false,
+          platform: TargetPlatform.iOS,
+        ),
+        AuthService.iosEmailAuthCallbackUrl,
+      );
+    });
+
+    test('uses the current site origin on web', () {
+      expect(
+        AuthService.emailRedirectToForPlatform(
+          isWeb: true,
+          platform: TargetPlatform.macOS,
+          webUri: Uri.parse('https://parlesprint.com/path?from=reset'),
+        ),
+        'https://parlesprint.com',
+      );
+    });
+
+    test('does not invent an Android callback before it is configured', () {
+      expect(
+        AuthService.emailRedirectToForPlatform(
+          isWeb: false,
+          platform: TargetPlatform.android,
+        ),
+        isNull,
+      );
     });
   });
 

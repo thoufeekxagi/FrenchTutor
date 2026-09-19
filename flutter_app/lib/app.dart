@@ -9,6 +9,7 @@ import 'design/app_theme.dart';
 import 'models/pilot_access.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
+import 'screens/auth/password_recovery_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
 import 'screens/onboarding/speak_onboarding_screen.dart';
@@ -65,6 +66,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
   bool _hasSession = AuthService.shared.currentSession != null;
   bool _explicitlySignedOut = false;
   bool _signOutMarkerLoaded = false;
+  bool _passwordRecoveryPending = false;
   bool? _aiConsented;
   bool _isRestoringAccount = AuthService.shared.currentSession != null;
   bool _requiresInstallOnboarding = true;
@@ -185,6 +187,9 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   void _onAuthStateChange(AuthState state) {
     final session = state.session;
+    if (state.event == AuthChangeEvent.passwordRecovery) {
+      _passwordRecoveryPending = true;
+    }
     if (session != null) {
       _explicitlySignedOut = false;
       _signOutMarkerLoaded = true;
@@ -224,6 +229,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
     setState(() {
       _hasSession = session != null;
       if (state.event == AuthChangeEvent.signedOut) {
+        _passwordRecoveryPending = false;
         _explicitlySignedOut = true;
         _signOutMarkerLoaded = true;
       }
@@ -395,6 +401,14 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   @override
   Widget build(BuildContext context) {
+    if (_passwordRecoveryPending) {
+      return PasswordRecoveryScreen(
+        onContinue: () {
+          if (mounted) setState(() => _passwordRecoveryPending = false);
+        },
+        onCancel: AuthService.shared.signOut,
+      );
+    }
     if (!_signOutMarkerLoaded) return const _RestoringProgressView();
     // This check intentionally precedes onboarding. Sign-out clears the
     // account's local profile, so evaluating onboarding first would reopen

@@ -46,7 +46,7 @@ extension CourseGenerationHarnessSkillValues on CourseGenerationHarnessSkill {
 /// can be selected without creating another implementation:
 ///
 /// `--dart-define=PARLESPRINT_COURSE_HARNESS_SKILL=grammar`
-/// `--dart-define=PARLESPRINT_COURSE_HARNESS_ENABLED=false`
+/// `--dart-define=PARLESPRINT_COURSE_HARNESS_ENABLED=true`
 class CourseGenerationTestHarness {
   const CourseGenerationTestHarness({
     required this.enabled,
@@ -58,21 +58,14 @@ class CourseGenerationTestHarness {
     skill: CourseGenerationHarnessSkill.speaking,
   );
 
-  /// The app's current development configuration. `kDebugMode` is checked in
-  /// [active] as the second guard, so a release/profile build cannot turn this
-  /// path on accidentally even if a dart-define is left in a build script.
+  /// The app's current development configuration. The lane is opt-in even in
+  /// Debug builds; leaving the test skill implicit used to hijack normal
+  /// same-skill Course generation for every developer account.
   static final current = CourseGenerationTestHarness(
-    // Development verification must not depend on an Xcode-generated
-    // DART_DEFINES entry surviving a device reinstall. Keep the lane on for
-    // every Debug run, while [active] still prevents it from ever running in
-    // Profile or Release. The define remains available for documentation and
-    // future lane selection.
-    enabled:
-        kDebugMode ||
-        bool.fromEnvironment(
-          'PARLESPRINT_COURSE_HARNESS_ENABLED',
-          defaultValue: false,
-        ),
+    enabled: bool.fromEnvironment(
+      'PARLESPRINT_COURSE_HARNESS_ENABLED',
+      defaultValue: false,
+    ),
     skill: CourseGenerationHarnessSkillValues.parse(
       String.fromEnvironment(
         'PARLESPRINT_COURSE_HARNESS_SKILL',

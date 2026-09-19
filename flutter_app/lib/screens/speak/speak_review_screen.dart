@@ -999,7 +999,8 @@ class _SpeakReviewLaunchScreenState
       if (mounted) {
         setState(() {
           _running = false;
-          _error = 'Review generation failed: $error';
+          final label = widget.plan.kind == 'warmup' ? 'Warm-up' : 'Review';
+          _error = '$label generation failed: $error';
         });
       }
     }

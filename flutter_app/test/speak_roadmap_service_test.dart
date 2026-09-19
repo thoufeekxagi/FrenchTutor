@@ -54,6 +54,89 @@ void main() {
     expect(successor.contentReady, isFalse);
   });
 
+  test(
+    'debug grammar lane keeps restored ready Unit 3 skills visible on free account',
+    () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      const debugHarness = CourseGenerationTestHarness(
+        enabled: true,
+        skill: CourseGenerationHarnessSkill.grammar,
+      );
+      final store = AdaptiveCourseStore(db, generationHarness: debugHarness);
+      final profile = Profile(
+        id: 'restored-learner',
+        goal: 'everyday',
+        level: 'a1',
+        sessionLength: 'standard',
+        interests: const ['Speaking', 'Listening', 'Writing', 'Grammar'],
+      );
+
+      var plan = store.ensureCurrentPlan(profile);
+      for (final skill in const [
+        SpeakSkill.reading,
+        SpeakSkill.listening,
+        SpeakSkill.writing,
+      ]) {
+        plan = store.ensureSuccessorForSkill(profile, skill);
+      }
+
+      const readingArtifact =
+          '{"passage":{"segments":['
+          '{"fr":"Bonjour, je cherche la pharmacie.","en":"Hello, I am looking for the pharmacy."},'
+          '{"fr":"Elle est près de la gare.","en":"It is near the station."}]},'
+          '"quiz":[{},{},{}]}';
+      const listeningArtifact =
+          '{"passage":{"segments":['
+          '{"fr":"Bonjour, je cherche la pharmacie.","en":"Hello, I am looking for the pharmacy."},'
+          '{"fr":"Elle est près de la gare.","en":"It is near the station."}]},'
+          '"quiz":[{},{},{}],"audioPath":"pcm-deck-v1:test",'
+          '"audioMode":"pcm_deck_v1"}';
+      const writingArtifact =
+          '{"practiceMode":"guided","lesson":{"mode":"guided",'
+          '"level":"A1","steps":[{},{},{},{},{}]}}';
+
+      for (final session in plan.sessions.where((item) => item.unit == 3)) {
+        final artifact = switch (session.primarySkill) {
+          SpeakSkill.reading => readingArtifact,
+          SpeakSkill.listening => listeningArtifact,
+          SpeakSkill.writing => writingArtifact,
+          _ => throw StateError('Unexpected Unit 3 skill'),
+        };
+        db.execute(
+          "UPDATE adaptive_course_sessions SET generation_status = 'ready', "
+          'artifact_kind = ?, artifact_json = ? WHERE id = ?',
+          [session.primarySkill.name, artifact, session.id],
+        );
+      }
+
+      // A new store instance models the SQLite cache read after sign-in
+      // hydration. Subscription and the debug-only generation lane are not
+      // visibility filters: saved generated content stays on the roadmap.
+      final restoredStore = AdaptiveCourseStore(
+        db,
+        generationHarness: debugHarness,
+      );
+      final restoredPlan = restoredStore.currentPlan(profile)!;
+      final roadmap = SpeakRoadmapService.build(
+        profile,
+        adaptiveSessions: restoredPlan.sessions,
+      );
+      final unitThree = roadmap.sessions.where((session) => session.unit == 3);
+
+      expect(unitThree, hasLength(3));
+      expect(
+        unitThree.map((session) => session.primarySkill).toSet(),
+        containsAll([
+          SpeakSkill.reading,
+          SpeakSkill.listening,
+          SpeakSkill.writing,
+        ]),
+      );
+      expect(unitThree.every((session) => session.contentReady), isTrue);
+    },
+  );
+
   test('adaptive projection retains all practice skill modes', () {
     final store = AdaptiveCourseStore(sqlite3.openInMemory());
     final profile = Profile(
@@ -125,36 +208,5 @@ void main() {
       hasLength(7),
     );
     expect(roadmap.sessions.last.contentKey, 'pending-6');
-  });
-
-  test('development harness hides non-target personalized skills', () {
-    final profile = Profile(id: 'learner', goal: 'everyday', level: 'a1');
-    final sessions = AdaptiveCoursePlanGenerator.generate(
-      profile: profile,
-      planId: 'harness-plan',
-      profileFingerprint: 'everyday|A1|10|',
-      startSequence: 1,
-      count: 16,
-    );
-    const harness = CourseGenerationTestHarness(
-      enabled: true,
-      skill: CourseGenerationHarnessSkill.speaking,
-    );
-    final roadmap = SpeakRoadmapService.build(
-      profile,
-      adaptiveSessions: sessions,
-      generationHarness: harness,
-    );
-
-    final personalized = roadmap.sessions.where(
-      (session) => session.sequence > 11,
-    );
-    expect(personalized, isNotEmpty);
-    expect(
-      personalized.every(
-        (session) => session.primarySkill == SpeakSkill.speaking,
-      ),
-      isTrue,
-    );
   });
 }

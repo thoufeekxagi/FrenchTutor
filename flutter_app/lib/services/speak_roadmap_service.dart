@@ -2,7 +2,6 @@ import '../models/profile.dart';
 import '../models/speak_curriculum.dart';
 import '../data/database/adaptive_course_store.dart';
 import 'adaptive_curriculum_service.dart';
-import 'course_generation_test_harness.dart';
 
 export '../models/speak_curriculum.dart' show SpeakSessionKind, SpeakSkill;
 
@@ -92,8 +91,6 @@ abstract final class SpeakRoadmapService {
     Profile profile, {
     Set<String> completedContentKeys = const {},
     required List<AdaptiveCourseSessionSpec> adaptiveSessions,
-    CourseGenerationTestHarness generationHarness =
-        CourseGenerationTestHarness.disabled,
   }) {
     if (adaptiveSessions.isEmpty) {
       throw StateError(
@@ -102,16 +99,10 @@ abstract final class SpeakRoadmapService {
     }
     return _buildAdaptive(
       profile,
-      sessions: generationHarness.active
-          ? adaptiveSessions
-                .where(
-                  (session) => generationHarness.includeInRoadmap(
-                    sequence: session.sequence,
-                    primarySkill: session.primarySkill,
-                  ),
-                )
-                .toList(growable: false)
-          : adaptiveSessions,
+      // The development harness narrows which new lesson is generated, not
+      // which saved course data a learner can see. In particular, a debug
+      // build must not hide already-generated non-target skills on restore.
+      sessions: adaptiveSessions,
       completedContentKeys: completedContentKeys,
     );
   }

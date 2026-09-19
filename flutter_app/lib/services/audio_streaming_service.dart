@@ -109,6 +109,14 @@ class AudioStreamingService {
   /// separate lesson narrator is playing through the shared phone speaker.
   bool get isStreaming => _isStreaming;
 
+  /// Whether tutor audio is still generating or scheduled to leave the player.
+  /// This includes the buffered tail after the Live server has completed its
+  /// turn, which is important when a learner deliberately barges in.
+  bool get hasPendingPlayback =>
+      isOutputActive ||
+      _playbackQueue.isNotEmpty ||
+      _scheduledPlaybackEndTime.isAfter(DateTime.now());
+
   /// `isOutputActive` is set false the moment the SERVER signals turnComplete — but network
   /// delivery outruns real-time playback, so scheduled audio can still be physically playing
   /// through the speaker for seconds after that. Reopening the mic at turnComplete would let
@@ -595,6 +603,7 @@ class AudioStreamingService {
   Future<void> stopPlayback({
     bool hardStop = false,
     bool waitForSilence = false,
+    Duration fadeOutDuration = Duration.zero,
   }) async {
     _playbackGeneration++;
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
@@ -655,14 +664,21 @@ class AudioStreamingService {
         : 0;
     final muteMs = remainingMs > 450 ? remainingMs + 50 : 450;
 
-    // Gentle cut: muting the player silences the tail cleanly (a volume change, not a
-    // buffer tear), then volume is restored once the tail has drained silently. The
-    // generation counter makes a rapid second cut extend the mute instead of the first
-    // cut's restore unmuting it early.
+    // Gentle cut: optionally fade the player volume down instead of cutting it
+    // at full level. Other callers keep the existing immediate mute by default.
+    // The generation counter lets fresh playback cancel an in-flight fade or
+    // restore timer, so the old stop cannot mute newly queued audio.
     final generation = ++_muteGeneration;
-    try {
-      await _player.setVolume(0);
-    } catch (_) {}
+    if (fadeOutDuration > Duration.zero) {
+      await _fadePlayerToSilence(generation, fadeOutDuration);
+    } else {
+      try {
+        await _player.setVolume(0);
+      } catch (_) {}
+    }
+    // A new chunk can arrive while setVolume is awaiting the native player.
+    // Its generation owns both volume and timeline from this point onward.
+    if (generation != _muteGeneration) return;
     Future.delayed(Duration(milliseconds: muteMs), () async {
       if (generation != _muteGeneration) return;
       try {
@@ -675,6 +691,31 @@ class AudioStreamingService {
     resetPlaybackTimeline();
     if (waitForSilence && remainingMs > 0) {
       await Future<void>.delayed(Duration(milliseconds: muteMs));
+    }
+  }
+
+  Future<void> _fadePlayerToSilence(int generation, Duration duration) async {
+    const steps = 8;
+    final stepDuration = Duration(
+      microseconds: duration.inMicroseconds ~/ steps,
+    );
+    for (var step = 1; step <= steps; step++) {
+      await Future<void>.delayed(stepDuration);
+      if (generation != _muteGeneration) return;
+      final remainingLevel = 1 - (step / steps);
+      final easedVolume = remainingLevel * remainingLevel;
+      try {
+        await _player.setVolume(easedVolume);
+      } catch (_) {
+        // If the native volume transition fails, prefer silencing the stale
+        // tutor tail over opening the mic while it is still audible.
+        if (generation == _muteGeneration) {
+          try {
+            await _player.setVolume(0);
+          } catch (_) {}
+        }
+        return;
+      }
     }
   }
 

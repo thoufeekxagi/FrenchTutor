@@ -16,6 +16,7 @@ import '../data/database/speaking_lesson_store.dart';
 import '../data/database/writing_lesson_store.dart';
 import '../data/database/adaptive_course_store.dart';
 import '../data/database/review_store.dart';
+import 'serial_request_queue.dart';
 import '../data/database/pilot_infrastructure_store.dart';
 import '../models/content_models.dart';
 import '../models/daily_session.dart';
@@ -83,9 +84,11 @@ class SyncService {
   final Map<String, Future<void>> _generatedStorySyncs = {};
 
   /// Course preparation has several legitimate foreground callers (account
-  /// restore, Home, and Speaking). They must share one bounded worker or a
-  /// fresh screen can start duplicate Edge Function claims.
-  Future<int>? _coursePreparationInFlight;
+  /// restore, Home, and Speaking). Serialize them while coalescing only an
+  /// identical target; returning an unrelated in-flight Future used to lose
+  /// the later lesson's generation request.
+  final SerialRequestQueue<String, int> _coursePreparationQueue =
+      SerialRequestQueue<String, int>();
 
   SupabaseClient get _client => Supabase.instance.client;
   String? get _userId => _client.auth.currentUser?.id;
@@ -2026,52 +2029,44 @@ class SyncService {
     String? harnessSkill,
     String? sessionId,
   }) {
-    final existing = _coursePreparationInFlight;
-    if (existing != null) return existing;
     // The route grows one personalized row at a time. Clamp callers too, so
     // an accidental batch request can never create a provider request storm.
     final limit = maxLessons.clamp(0, 1);
     if (_userId == null || limit == 0) return Future.value(0);
 
-    final requestId = 'course-${DateTime.now().toUtc().microsecondsSinceEpoch}';
-    unawaited(
-      AiCostTracker.event(
-        feature: 'course_generation',
-        event: 'course_prepare_requested',
-        requestId: requestId,
-        extra: {
-          'max_lessons': limit,
-          if (harnessSkill != null) 'harness_skill': harnessSkill,
-          if (sessionId != null) 'session_id': sessionId,
-        },
-      ),
-    );
+    final requestKey = '$limit|${harnessSkill ?? ''}|${sessionId ?? ''}';
+    final requestMetadata = <String, Object?>{'max_lessons': limit};
+    if (harnessSkill != null) requestMetadata['harness_skill'] = harnessSkill;
+    if (sessionId != null) requestMetadata['session_id'] = sessionId;
+    return _coursePreparationQueue.run(requestKey, () async {
+      final requestId =
+          'course-${DateTime.now().toUtc().microsecondsSinceEpoch}';
+      unawaited(
+        AiCostTracker.event(
+          feature: 'course_generation',
+          event: 'course_prepare_requested',
+          requestId: requestId,
+          extra: requestMetadata,
+        ),
+      );
 
-    late final Future<int> run;
-    run =
-        _prepareAdaptiveCourseLessons(
+      try {
+        return await _prepareAdaptiveCourseLessons(
           limit,
           harnessSkill: harnessSkill,
           sessionId: sessionId,
-        ).whenComplete(() {
-          if (identical(_coursePreparationInFlight, run)) {
-            _coursePreparationInFlight = null;
-          }
-          unawaited(
-            AiCostTracker.event(
-              feature: 'course_generation',
-              event: 'course_prepare_finished',
-              requestId: requestId,
-              extra: {
-                'max_lessons': limit,
-                if (harnessSkill != null) 'harness_skill': harnessSkill,
-                if (sessionId != null) 'session_id': sessionId,
-              },
-            ),
-          );
-        });
-    _coursePreparationInFlight = run;
-    return run;
+        );
+      } finally {
+        unawaited(
+          AiCostTracker.event(
+            feature: 'course_generation',
+            event: 'course_prepare_finished',
+            requestId: requestId,
+            extra: requestMetadata,
+          ),
+        );
+      }
+    });
   }
 
   Future<int> _prepareAdaptiveCourseLessons(
@@ -2083,23 +2078,25 @@ class SyncService {
     for (var index = 0; index < maxLessons; index++) {
       try {
         final vocabularyCandidates = _courseVocabularyCandidates();
+        final body = <String, dynamic>{};
+        if (harnessSkill != null) body['harness_skill'] = harnessSkill;
+        if (sessionId != null) body['session_id'] = sessionId;
+        if (vocabularyCandidates.isNotEmpty) {
+          body['vocabulary_candidates'] = vocabularyCandidates;
+        }
         final result = await _client.functions.invoke(
           'prepare-course-lesson',
-          body: {
-            if (harnessSkill != null) 'harness_skill': harnessSkill,
-            if (sessionId != null) 'session_id': sessionId,
-            if (vocabularyCandidates.isNotEmpty)
-              'vocabulary_candidates': vocabularyCandidates,
-          },
+          body: body,
         );
+        final responseMetadata = <String, Object?>{'attempt_index': index};
+        if (harnessSkill != null) {
+          responseMetadata['harness_skill'] = harnessSkill;
+        }
         unawaited(
           AiCostTracker.event(
             feature: 'course_generation',
             event: 'course_edge_response_received',
-            extra: {
-              'attempt_index': index,
-              if (harnessSkill != null) 'harness_skill': harnessSkill,
-            },
+            extra: responseMetadata,
           ),
         );
         final data = result.data;

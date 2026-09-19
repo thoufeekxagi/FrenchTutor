@@ -47,6 +47,17 @@
 				<string>com.googleusercontent.apps.292413403347-i0jbk1eqcftm7tosjn58m2o52ioe4bj9</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.thoufeekx.frenchtutor.auth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Supabase signup-confirmation callback. -->
+				<string>com.thoufeekx.frenchtutor</string>
+			</array>
+		</dict>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

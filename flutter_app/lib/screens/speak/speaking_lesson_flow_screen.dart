@@ -122,6 +122,8 @@ class SpeakingLessonFlowScreen extends ConsumerStatefulWidget {
 class _SpeakingLessonFlowScreenState
     extends ConsumerState<SpeakingLessonFlowScreen>
     with WidgetsBindingObserver {
+  static const _liveTurnResolutionTimeout = Duration(seconds: 3);
+
   final Stopwatch _sessionClock = Stopwatch();
   late final InlineCallController _murray;
   late final SessionRecorder _recorder;
@@ -462,7 +464,10 @@ $instruction
         _error = null;
         _guidedFeedback = null;
       });
-      final started = await _murray.startLearnerTurn();
+      final started = await _murray.startLearnerTurn(
+        interruptTutor: true,
+        fadeOutDuration: const Duration(milliseconds: 160),
+      );
       if (!started && mounted && !_isFreeTalk) {
         _murrayInputActive = false;
         setState(() {
@@ -603,6 +608,7 @@ $instruction
     required String feedback,
   }) {
     if (!mounted) return;
+    _guidedGradeTimeout?.cancel();
     final cleanHeard = heard.trim();
     final cleanCorrection = correction.trim();
     final cleanFeedback = feedback.trim();
@@ -712,29 +718,58 @@ $instruction
       _murrayTurnClosing = true;
       setState(() => _state = _SpeakingStepState.checking);
       await _murray.endLearnerTurn();
-      if (!_isFreeTalk && !_murrayGuidedGradeReceived) {
+      if (!_murrayGuidedGradeReceived && !_murrayFreeTalkGradeReceived) {
         _guidedGradeTimeout?.cancel();
-        _guidedGradeTimeout = Timer(const Duration(seconds: 20), () {
+        _guidedGradeTimeout = Timer(_liveTurnResolutionTimeout, () {
           if (!mounted ||
-              _isFreeTalk ||
               _state != _SpeakingStepState.checking ||
               !_murrayTurnClosing ||
-              _murrayGuidedGradeReceived) {
+              _murrayGuidedGradeReceived ||
+              _murrayFreeTalkGradeReceived) {
             return;
           }
-          _murrayTurnClosing = false;
-          _murrayFinalizing = false;
-          setState(() {
-            _state = _SpeakingStepState.retry;
-            _hasSubmittedCurrentPhrase = true;
-            _error =
-                'The tutor could not finish checking this attempt. Please try again.';
-          });
+          _resolveLiveTurnFromCapturedTranscript();
         });
       }
       return;
     }
     await LessonSpeechService.shared.stopListening();
+  }
+
+  /// The Live transcript normally resolves as soon as Gemini sends it. If a
+  /// turn-complete callback is delayed or omitted after barge-in, do not leave
+  /// the learner on "Checking" for 20 seconds or discard words already heard.
+  /// Resolve locally from the bounded transcript collected during recording.
+  void _resolveLiveTurnFromCapturedTranscript() {
+    if (!mounted || !_murrayTurnClosing) return;
+    _guidedGradeTimeout?.cancel();
+    _murrayTurnClosing = false;
+    _murrayFinalizing = false;
+    final transcript = _heard.trim();
+    if (transcript.isEmpty) {
+      setState(() {
+        _state = _SpeakingStepState.retry;
+        _hasSubmittedCurrentPhrase = true;
+        _error = 'No French speech was transcribed. Please try again.';
+      });
+      return;
+    }
+    if (_isFreeTalk) {
+      _murrayFreeTalkGradeReceived = true;
+      _applyFreeTalkResult(
+        accepted: _matchesTarget(transcript, _step.french),
+        heard: transcript,
+        correction: '',
+        feedback: '',
+      );
+      return;
+    }
+    _murrayGuidedGradeReceived = true;
+    _applyGuidedResult(
+      matched: _matchesTarget(transcript, _step.french),
+      heard: transcript,
+      feedback: '',
+    );
   }
 
   bool get _isGuidedExercise =>

@@ -61,6 +61,8 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
     this.grammarExplanation,
     this.grammarTabLabel = 'Grammar',
     this.courseContentKey,
+    this.completeOnFirstVoiceover = false,
+    this.onCourseCompleted,
   });
 
   final GeneratedStory story;
@@ -81,6 +83,16 @@ class StoryReaderScreen extends ConsumerStatefulWidget {
   /// Generated Course readers use this key to join the transcript/session to
   /// the persisted lesson artifact in Review and Warm-up.
   final String? courseContentKey;
+
+  /// Course Reading treats one successful, whole-story narration from the
+  /// first segment as the core completion event. Other reader entry points
+  /// retain their existing explicit-finish behavior.
+  final bool completeOnFirstVoiceover;
+
+  /// Course Reading commits its completion when the first full narration is
+  /// heard, but keeps the reader open so the learner can replay, inspect
+  /// vocabulary, or continue through the other tabs before leaving.
+  final VoidCallback? onCourseCompleted;
 
   /// True when this screen is a step in a larger flow (e.g. a mission) that
   /// needs the learner to explicitly finish and hand back a graded result —
@@ -117,6 +129,9 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   int _currentSegment = 0;
   bool _isPlaying = false;
   bool _isLoadingAudio = false;
+  bool _firstVoiceoverCompleted = false;
+  bool _courseCompletionNotified = false;
+  final Set<int> _heardFirstVoiceoverSegments = <int>{};
   int _livePlaybackGeneration = 0;
   String _liveOutputTranscript = '';
   int? _liveTranscriptWordIndex;
@@ -397,6 +412,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
       for (var index = fromIndex; index < segments.length; index++) {
         if (!mounted || generation != _livePlaybackGeneration) break;
         await _playLiveSegment(index, generation);
+        if (!mounted || generation != _livePlaybackGeneration) break;
+        if (widget.completeOnFirstVoiceover && _tab == _StoryTab.story) {
+          _heardFirstVoiceoverSegments.add(index);
+        }
       }
     } catch (error) {
       if (mounted && generation == _livePlaybackGeneration) {
@@ -415,6 +434,36 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
         });
       }
     }
+    if (mounted &&
+        widget.completeOnFirstVoiceover &&
+        _tab == _StoryTab.story &&
+        _heardFirstVoiceoverSegments.length == segments.length) {
+      _completeCourseReading();
+    }
+  }
+
+  void _completeCourseReading() {
+    if (!widget.completeOnFirstVoiceover) return;
+    if (mounted && !_firstVoiceoverCompleted) {
+      setState(() {
+        _firstVoiceoverCompleted = true;
+        _isMarkedLearned = true;
+      });
+    } else {
+      _firstVoiceoverCompleted = true;
+      _isMarkedLearned = true;
+    }
+    if (_courseCompletionNotified) return;
+    _courseCompletionNotified = true;
+    widget.onCourseCompleted?.call();
+  }
+
+  void _closeReader() {
+    if (widget.completeOnFirstVoiceover && _firstVoiceoverCompleted) {
+      Navigator.pop(context, const StoryReaderResult(correct: 0, attempted: 0));
+      return;
+    }
+    Navigator.maybePop(context);
   }
 
   Future<bool> _ensureMarieReady() async {
@@ -473,6 +522,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     // generation boundary.
     var audioFeedTail = Future<void>.value();
     var audioFeedFailed = false;
+    var audioChunksReceived = 0;
     setState(() {
       _currentSegment = index;
       _currentWord = null;
@@ -489,7 +539,12 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
           'French sentence once and stop. Do not skip it, combine it with '
           'another sentence, or explain it: ${segment.fr}',
       onAudioChunk: (bytes) {
-        if (!mounted || generation != _livePlaybackGeneration) return;
+        if (!mounted ||
+            generation != _livePlaybackGeneration ||
+            bytes.isEmpty) {
+          return;
+        }
+        audioChunksReceived++;
         audioFeedTail = audioFeedTail.then((_) async {
           try {
             await _liveNarrationAudio.playAudioChunk(
@@ -534,7 +589,7 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
     );
     await audioFeedTail;
     if (!mounted || generation != _livePlaybackGeneration) return;
-    if (audioFeedFailed) {
+    if (audioFeedFailed || audioChunksReceived == 0) {
       throw StateError('Story narration audio could not be queued');
     }
     await _liveNarrationAudio.waitForPlaybackDrained();
@@ -834,6 +889,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
 
   void _markAsLearned() {
     setState(() => _isMarkedLearned = true);
+    if (widget.completeOnFirstVoiceover) {
+      _completeCourseReading();
+      return;
+    }
     if (widget.showFinishButton) {
       _finish();
       return;
@@ -939,7 +998,13 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
                       darkMode: _darkMode,
                       selectedWord: _selectedWordEntry(),
                       learned: _isMarkedLearned,
-                      onBack: () => Navigator.maybePop(context),
+                      markActionLabel: widget.completeOnFirstVoiceover
+                          ? 'Mark as read'
+                          : 'Mark as learned',
+                      markedLabel: widget.completeOnFirstVoiceover
+                          ? 'Read'
+                          : 'Learned',
+                      onBack: _closeReader,
                       onMarkLearned: _markAsLearned,
                       onSettings: _showSettings,
                       onConjugate: _selectedWordCanConjugate
@@ -1031,6 +1096,10 @@ class _StoryReaderScreenState extends ConsumerState<StoryReaderScreen>
   }
 
   void _finish() {
+    if (widget.completeOnFirstVoiceover) {
+      _completeCourseReading();
+      return;
+    }
     final quiz = _story.quiz;
     var correct = 0;
     for (var i = 0; i < quiz.length; i++) {
@@ -1595,6 +1664,8 @@ class _StoryBookHeader extends StatelessWidget {
     required this.darkMode,
     this.selectedWord,
     required this.learned,
+    required this.markActionLabel,
+    required this.markedLabel,
     required this.onBack,
     required this.onMarkLearned,
     required this.onSettings,
@@ -1605,6 +1676,8 @@ class _StoryBookHeader extends StatelessWidget {
   final bool darkMode;
   final VocabEntry? selectedWord;
   final bool learned;
+  final String markActionLabel;
+  final String markedLabel;
   final VoidCallback onBack;
   final VoidCallback onMarkLearned;
   final VoidCallback onSettings;
@@ -1682,7 +1755,7 @@ class _StoryBookHeader extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  learned ? 'Learned' : 'Mark as learned',
+                                  learned ? markedLabel : markActionLabel,
                                   style: DesignTokens.body(
                                     12,
                                     weight: FontWeight.w700,

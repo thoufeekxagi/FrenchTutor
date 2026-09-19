@@ -35,12 +35,23 @@ class ListeningPracticeScreen extends ConsumerStatefulWidget {
     this.enrichment,
     this.showFinishButton = false,
     this.courseContentKey,
+    this.completeOnFirstVoiceover = false,
+    this.onCourseCompleted,
   });
 
   final GeneratedStory story;
   final Future<ReadingStoryEnrichment>? enrichment;
   final bool showFinishButton;
   final String? courseContentKey;
+
+  /// Course Listening completes after the learner successfully hears the
+  /// entire first-listen narration. Other Listening entry points keep their
+  /// existing explicit-finish behavior.
+  final bool completeOnFirstVoiceover;
+
+  /// Lets Course persist completion and prepare the same-skill successor in
+  /// the background while this Listening lesson remains open for the learner.
+  final VoidCallback? onCourseCompleted;
 
   @override
   ConsumerState<ListeningPracticeScreen> createState() =>
@@ -79,6 +90,9 @@ class _ListeningPracticeScreenState
   String? _shadowFeedback;
   double _rate = 1.0;
   bool _finishedSession = false;
+  bool _firstVoiceoverCompleted = false;
+  bool _courseCompletionNotified = false;
+  final Set<int> _heardFirstVoiceoverSegments = <int>{};
   bool _isMarkedLearned = false;
   double _textScale = 1;
   bool _highlightWords = true;
@@ -449,6 +463,7 @@ class _ListeningPracticeScreenState
   Future<void> _playStory({int fromIndex = 0}) async {
     if (_segments.isEmpty || _audioLoading) return;
     if (!await _ensureMarieReady()) return;
+    final isInitialListen = _stage == _ListeningStage.firstListen;
     final generation = ++_livePlaybackGeneration;
     setState(() {
       _isPlaying = true;
@@ -460,6 +475,10 @@ class _ListeningPracticeScreenState
       for (var index = fromIndex; index < _segments.length; index++) {
         if (!mounted || generation != _livePlaybackGeneration) break;
         await _playLiveSegment(index, generation);
+        if (!mounted || generation != _livePlaybackGeneration) break;
+        if (isInitialListen && widget.completeOnFirstVoiceover) {
+          _heardFirstVoiceoverSegments.add(index);
+        }
       }
     } catch (error) {
       if (mounted && generation == _livePlaybackGeneration) {
@@ -479,6 +498,28 @@ class _ListeningPracticeScreenState
         });
       }
     }
+    if (mounted &&
+        widget.completeOnFirstVoiceover &&
+        isInitialListen &&
+        _heardFirstVoiceoverSegments.length == _segments.length) {
+      _completeCourseListening();
+    }
+  }
+
+  void _completeCourseListening() {
+    if (!widget.completeOnFirstVoiceover) return;
+    if (mounted && !_firstVoiceoverCompleted) {
+      setState(() {
+        _firstVoiceoverCompleted = true;
+        _isMarkedLearned = true;
+      });
+    } else {
+      _firstVoiceoverCompleted = true;
+      _isMarkedLearned = true;
+    }
+    if (_courseCompletionNotified) return;
+    _courseCompletionNotified = true;
+    widget.onCourseCompleted?.call();
   }
 
   Future<void> _playLine(int index) async {
@@ -546,6 +587,7 @@ class _ListeningPracticeScreenState
     // generation boundary.
     var audioFeedTail = Future<void>.value();
     var audioFeedFailed = false;
+    var audioChunksReceived = 0;
     setState(() {
       _currentSegment = index;
       _currentWord = null;
@@ -561,7 +603,12 @@ class _ListeningPracticeScreenState
           'French sentence once and stop. Do not skip it, combine it with '
           'another sentence, or explain it: ${segment.fr}',
       onAudioChunk: (bytes) {
-        if (!mounted || generation != _livePlaybackGeneration) return;
+        if (!mounted ||
+            generation != _livePlaybackGeneration ||
+            bytes.isEmpty) {
+          return;
+        }
+        audioChunksReceived++;
         audioFeedTail = audioFeedTail.then((_) async {
           try {
             await _liveNarrationAudio.playAudioChunk(
@@ -606,7 +653,7 @@ class _ListeningPracticeScreenState
     );
     await audioFeedTail;
     if (!mounted || generation != _livePlaybackGeneration) return;
-    if (audioFeedFailed) {
+    if (audioFeedFailed || audioChunksReceived == 0) {
       throw StateError('Listening narration audio could not be queued');
     }
     await _liveNarrationAudio.waitForPlaybackDrained();
@@ -1017,7 +1064,21 @@ class _ListeningPracticeScreenState
 
   void _finishAndPop() {
     _finishSession();
-    Navigator.of(context).pop(widget.showFinishButton ? true : null);
+    final bool? completed = widget.completeOnFirstVoiceover
+        ? _firstVoiceoverCompleted
+        : widget.showFinishButton
+        ? true
+        : null;
+    Navigator.of(context).pop(completed);
+  }
+
+  void _markAsCompleted() {
+    setState(() => _isMarkedLearned = true);
+    if (widget.completeOnFirstVoiceover) {
+      _completeCourseListening();
+      return;
+    }
+    _finishAndPop();
   }
 
   Future<void> _showSettings() async {
@@ -1065,8 +1126,17 @@ class _ListeningPracticeScreenState
                     isMarkedLearned: _isMarkedLearned,
                     isDarkMode: _darkMode,
                     onBack: _finishAndPop,
-                    onMarkLearned: () =>
-                        setState(() => _isMarkedLearned = !_isMarkedLearned),
+                    markActionLabel: widget.completeOnFirstVoiceover
+                        ? 'Mark as completed'
+                        : 'Mark as listened',
+                    markedLabel: widget.completeOnFirstVoiceover
+                        ? 'Completed'
+                        : 'Listened',
+                    onMarkLearned: widget.completeOnFirstVoiceover
+                        ? _markAsCompleted
+                        : () => setState(
+                            () => _isMarkedLearned = !_isMarkedLearned,
+                          ),
                     onSettings: _showSettings,
                   ),
                 ),
@@ -1929,6 +1999,8 @@ class _ListeningTopBar extends StatelessWidget {
     required this.isMarkedLearned,
     required this.isDarkMode,
     required this.onBack,
+    required this.markActionLabel,
+    required this.markedLabel,
     required this.onMarkLearned,
     required this.onSettings,
   });
@@ -1936,6 +2008,8 @@ class _ListeningTopBar extends StatelessWidget {
   final bool isMarkedLearned;
   final bool isDarkMode;
   final VoidCallback onBack;
+  final String markActionLabel;
+  final String markedLabel;
   final VoidCallback onMarkLearned;
   final VoidCallback onSettings;
 
@@ -1957,7 +2031,7 @@ class _ListeningTopBar extends StatelessWidget {
                 : CupertinoIcons.checkmark_circle,
             size: 17,
           ),
-          label: Text(isMarkedLearned ? 'Listened' : 'Mark as listened'),
+          label: Text(isMarkedLearned ? markedLabel : markActionLabel),
           style: TextButton.styleFrom(
             foregroundColor: isDarkMode
                 ? DesignTokens.nightAccent

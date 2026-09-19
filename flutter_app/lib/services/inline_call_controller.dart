@@ -532,25 +532,36 @@ class InlineCallController {
   /// Guided cards use this for a deliberate barge-in: the learner's recording
   /// is more important than waiting for a long tutor phrase to finish. The
   /// Live socket stays open; only already-buffered tutor audio is discarded.
-  /// Suppression is armed only while Gemini is actually generating so a late
-  /// tap cannot swallow the learner's next legitimate response.
-  Future<bool> startLearnerTurn({bool interruptTutor = false}) async {
+  /// A deliberate interrupt first silences stale tutor output and discards
+  /// queued app speech; [beginAudioTurn] then reopens output for the learner's
+  /// fresh feedback response.
+  Future<bool> startLearnerTurn({
+    bool interruptTutor = false,
+    Duration fadeOutDuration = Duration.zero,
+  }) async {
     if (_externalPlaybackPaused ||
         !isReadyForLearnerTurn ||
         gemini == null ||
         audio == null) {
       return false;
     }
-    if (interruptTutor && tutorTurnActive) {
-      if (gemini!.isModelGenerating) {
-        gemini!.suppressCurrentReply();
-      }
-      // Gentle stopping clears queued Live PCM without tearing down the native
-      // player. This avoids the close/reopen race that can make the next turn
-      // silent on iOS, while silencing the tutor immediately for barge-in.
-      await audio!.stopPlayback();
+    if (interruptTutor) {
+      final currentGemini = gemini!;
+      final currentAudio = audio!;
+      // The learner's Record tap wins even if the server has just completed
+      // generation but audio remains buffered locally. Drop any queued speech
+      // for an older step before fading the player and opening the mic.
+      currentGemini.cancelPendingSpokenContext();
+      currentGemini.suppressCurrentReply();
+      final shouldFade =
+          fadeOutDuration > Duration.zero && currentAudio.hasPendingPlayback;
+      // Leave the native player open: restarting flutter_sound here previously
+      // raced the next Live chunk and could silence the rest of the call.
+      await currentAudio.stopPlayback(
+        fadeOutDuration: shouldFade ? fadeOutDuration : Duration.zero,
+      );
       tutorSpeaking = false;
-      audio!.isOutputActive = false;
+      currentAudio.isOutputActive = false;
       _notify();
     }
     gemini!.beginAudioTurn();

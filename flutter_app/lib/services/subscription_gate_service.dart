@@ -85,6 +85,10 @@ abstract final class PremiumAreaMapping {
 /// updates, purchases, and restores. Supabase is not consulted for paid
 /// access, and no app-side code can create a paid entitlement.
 class SubscriptionGateService {
+  /// Course Units 1 and 2 are the free onboarding path. Every later unit is
+  /// subscription-only, independent of the shared daily premium preview.
+  static const firstSubscriptionLockedCourseUnit = 3;
+
   SubscriptionGateService({
     required this.infrastructure,
     required this.database,
@@ -105,6 +109,13 @@ class SubscriptionGateService {
     if (DevSubscriptionOverride.enabled) return true;
     return infrastructure.entitlement().isPaidActive;
   }
+
+  /// Course access intentionally does not use the app-wide daily preview:
+  /// the first two units are always free, while Unit 3+ requires a verified,
+  /// active paid entitlement. Keep this separate from generation state so
+  /// locked lesson content can still be generated and synced in the buffer.
+  bool isCourseUnitLocked(int unit) =>
+      unit >= firstSubscriptionLockedCourseUnit && !hasPremiumAccess;
 
   /// Whether the learner may enter [area] right now. This is intentionally
   /// synchronous so every route can make the same decision before pushing a

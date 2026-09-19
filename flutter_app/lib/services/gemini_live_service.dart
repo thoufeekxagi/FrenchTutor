@@ -94,11 +94,14 @@ class GeminiLiveService {
   // Quality/reliability wins over cost here.
   static const _model = 'models/gemini-3.1-flash-live-preview';
 
-  // Keep only the recent conversational turns that can affect the current
-  // exercise. Guided cards use a smaller window because the app replaces the
-  // active step on every Next tap; other Live surfaces retain the prior policy.
+  // Keep only recent conversational turns that can affect the current
+  // exercise. Speaking needs enough room for a natural back-and-forth, while
+  // still compressing before the Live session can accumulate an unbounded
+  // transcript. The active lesson step is separately bounded and refreshed.
   static const _defaultContextCompressionTriggerTokens = 8000;
   static const _defaultContextCompressionTargetTokens = 4000;
+  static const _compactSpeakingCompressionTriggerTokens = 8000;
+  static const _compactSpeakingCompressionTargetTokens = 4000;
   static const _compactGuidedCompressionTriggerTokens = 2000;
   static const _compactGuidedCompressionTargetTokens = 1000;
   static const _compactLiaisonCompressionTriggerTokens = 1400;
@@ -116,6 +119,8 @@ class GeminiLiveService {
             ? _compactLiaisonCompressionTriggerTokens
             : sessionType == LiveSessionType.writingGuide
             ? _compactWritingCompressionTriggerTokens
+            : sessionType == LiveSessionType.speakingGuided
+            ? _compactSpeakingCompressionTriggerTokens
             : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
@@ -124,6 +129,8 @@ class GeminiLiveService {
             ? _compactLiaisonCompressionTargetTokens
             : sessionType == LiveSessionType.writingGuide
             ? _compactWritingCompressionTargetTokens
+            : sessionType == LiveSessionType.speakingGuided
+            ? _compactSpeakingCompressionTargetTokens
             : _compactGuidedCompressionTargetTokens
       : _defaultContextCompressionTargetTokens;
 
@@ -453,11 +460,12 @@ class GeminiLiveService {
   }
 
   void beginAudioTurn() {
-    if (!_isSetupComplete || !manualActivityBoundaries) return;
+    if (!_isSetupComplete) return;
     // A prior card change may have suppressed a stale reply while the socket
     // stayed open. The learner's next explicit recording starts a fresh turn,
     // so its feedback must be delivered normally.
     _suppressPreInjection = false;
+    if (!manualActivityBoundaries) return;
     _send({
       'realtimeInput': {'activityStart': {}},
     });
@@ -659,6 +667,13 @@ class GeminiLiveService {
     } else {
       _suppressPreInjection = true;
     }
+  }
+
+  /// Cancels an app-directed spoken prompt that has not reached the model yet.
+  /// A learner pressing Record takes precedence over a queued prompt for the
+  /// step they just left; the host can refresh the latest step silently.
+  void cancelPendingSpokenContext() {
+    _pendingSpokenContext = null;
   }
 
   void _clearStaleSuppression() {

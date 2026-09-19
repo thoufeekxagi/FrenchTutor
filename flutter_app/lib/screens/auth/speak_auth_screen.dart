@@ -18,6 +18,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
   final _password = TextEditingController();
   late var _signUp = widget.initialSignUp;
   var _loading = false;
+  var _awaitingEmailConfirmation = false;
   String? _message;
 
   @override
@@ -37,11 +38,97 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
     if (!mounted) return;
     setState(() {
       _loading = false;
+      switch (result.outcome) {
+        case AuthOutcome.success:
+        case AuthOutcome.cancelled:
+          _awaitingEmailConfirmation = false;
+          _message = null;
+          break;
+        case AuthOutcome.needsEmailConfirmation:
+          _awaitingEmailConfirmation = true;
+          _message =
+              'Check your inbox for the confirmation link. Open it on this device to finish signing in.';
+          break;
+        case AuthOutcome.accountMayAlreadyExist:
+          _awaitingEmailConfirmation = false;
+          _message = null;
+          break;
+        case AuthOutcome.failure:
+          _awaitingEmailConfirmation = false;
+          _message = result.message;
+          break;
+      }
+    });
+    if (result.outcome == AuthOutcome.accountMayAlreadyExist) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.black,
+            content: Text(
+              AuthResult.accountMayAlreadyExistMessage,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+    }
+  }
+
+  Future<void> _resendConfirmation() async {
+    if (_loading) return;
+    final email = _email.text.trim();
+    if (email.isEmpty) {
+      setState(() => _message = 'Enter your email address first.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _message = null;
+    });
+    final result = await AuthService.shared.resendSignupConfirmation(email);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      // Keep the recovery action available on transient resend errors so the
+      // learner can retry without switching screens or re-entering a password.
+      _awaitingEmailConfirmation = true;
       _message = switch (result.outcome) {
-        AuthOutcome.success => null,
+        AuthOutcome.success =>
+          'If this account still needs confirmation, a fresh link has been sent. Check your inbox and spam folder.',
         AuthOutcome.cancelled => null,
         AuthOutcome.needsEmailConfirmation =>
-          'Check your email to confirm your account.',
+          'Check your inbox for the confirmation link.',
+        AuthOutcome.accountMayAlreadyExist =>
+          AuthResult.accountMayAlreadyExistMessage,
+        AuthOutcome.failure => result.message,
+      };
+    });
+  }
+
+  Future<void> _sendPasswordReset() async {
+    if (_loading) return;
+    final email = _email.text.trim();
+    if (email.isEmpty) {
+      setState(() => _message = 'Enter your email address first.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _message = null;
+    });
+    final result = await AuthService.shared.sendPasswordReset(email);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _message = switch (result.outcome) {
+        AuthOutcome.success =>
+          'If this email is registered, a reset link has been sent. Open it on this device to choose a new password.',
+        AuthOutcome.cancelled => null,
+        AuthOutcome.needsEmailConfirmation =>
+          'Check your inbox for the confirmation link first.',
+        AuthOutcome.accountMayAlreadyExist =>
+          AuthResult.accountMayAlreadyExistMessage,
         AuthOutcome.failure => result.message,
       };
     });
@@ -160,6 +247,14 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
             Icons.lock_outline_rounded,
             obscure: true,
           ),
+          if (!_signUp)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _loading ? null : _sendPasswordReset,
+                child: const Text('Forgot password?'),
+              ),
+            ),
           if (_message != null) ...[
             const SizedBox(height: 10),
             Text(
@@ -168,6 +263,12 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
               style: DesignTokens.body(12).copyWith(color: SpeakColors.inkSoft),
             ),
           ],
+          if (_awaitingEmailConfirmation)
+            TextButton.icon(
+              onPressed: _loading ? null : _resendConfirmation,
+              icon: const Icon(Icons.mark_email_unread_outlined, size: 18),
+              label: Text(_loading ? 'Sending…' : 'Resend confirmation email'),
+            ),
           const SizedBox(height: 16),
           SpeakPrimaryButton(
             label: _loading
@@ -183,6 +284,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
             child: GestureDetector(
               onTap: () => setState(() {
                 _signUp = !_signUp;
+                _awaitingEmailConfirmation = false;
                 _message = null;
               }),
               child: Text(

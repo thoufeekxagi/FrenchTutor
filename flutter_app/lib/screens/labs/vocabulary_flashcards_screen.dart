@@ -15,6 +15,7 @@ import '../../services/inline_call_controller.dart';
 import '../../services/lesson_speech_service.dart';
 import '../../services/srs_service.dart';
 import '../../services/tutor_helper_settings.dart';
+import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/v3/v3_surface.dart';
 
 enum VocabularyStudyDepth { wordsOnly, wordsAndSentences }
@@ -178,9 +179,20 @@ class _VocabularyFlashcardsScreenState
     } else {
       unawaited(_prepareSet());
     }
-    // Vocabulary is a cached study surface. Do not open a Gemini Live tutor
-    // session just because the card screen was mounted; the learner must tap
-    // the explicit tutor control first.
+    // Course vocabulary lessons begin with Marie connected, matching the
+    // dedicated vocabulary pathway. Do not show a surprise disclosure sheet
+    // on lesson entry: auto-connect only when voice consent was already
+    // granted; otherwise the existing explicit Marie control can request it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_autoConnectMarieForLesson());
+    });
+  }
+
+  Future<void> _autoConnectMarieForLesson() async {
+    if (!mounted || _entries.isEmpty || _loadError != null) return;
+    if (!await AiVoiceDisclosure.isAccepted()) return;
+    if (!mounted || _murray.isLive) return;
+    await _setMurrayEnabled(true);
   }
 
   String _murrayContext() {

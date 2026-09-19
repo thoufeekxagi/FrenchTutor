@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
-
 import '../../config/theme.dart';
 import '../../data/content_service.dart';
 import '../../data/database/learning_store.dart';
@@ -47,15 +46,31 @@ class FingerprintView extends StatefulWidget {
   State<FingerprintView> createState() => _FingerprintViewState();
 }
 
-class _FingerprintViewState extends State<FingerprintView> {
+class _FingerprintViewState extends State<FingerprintView>
+    with SingleTickerProviderStateMixin {
+  static const _sceneSize = Size(1100, 820);
   final TransformationController _transform = TransformationController();
   late FingerprintGraph _graph;
+  late final AnimationController _transformAnimationController;
+  Animation<Matrix4>? _transformAnimation;
   FingerprintNode? _selected;
+  Size _viewportSize = Size.zero;
+  Matrix4 _fitTransform = Matrix4.identity();
+  double _fitScale = 1;
+  bool _hasFitted = false;
+  bool _isZoomed = false;
+  Offset? _doubleTapPosition;
 
   @override
   void initState() {
     super.initState();
     _graph = widget.graph ?? _buildGraph(widget);
+    _transformAnimationController =
+        AnimationController(vsync: this, duration: DesignTokens.durationMedium)
+          ..addListener(() {
+            final animation = _transformAnimation;
+            if (animation != null) _transform.value = animation.value;
+          });
   }
 
   @override
@@ -73,6 +88,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     if (graphChanged) {
       _graph = widget.graph ?? _buildGraph(widget);
       _selected = null;
+      _hasFitted = false;
     }
   }
 
@@ -88,8 +104,91 @@ class _FingerprintViewState extends State<FingerprintView> {
 
   @override
   void dispose() {
+    _transformAnimationController.dispose();
     _transform.dispose();
     super.dispose();
+  }
+
+  Rect get _graphBounds {
+    if (_graph.nodes.isEmpty) return Offset.zero & _sceneSize;
+    var left = double.infinity;
+    var top = double.infinity;
+    var right = double.negativeInfinity;
+    var bottom = double.negativeInfinity;
+    for (final node in _graph.nodes) {
+      final padding = node.radius + 30;
+      left = math.min(left, node.position.dx - padding);
+      top = math.min(top, node.position.dy - padding);
+      right = math.max(right, node.position.dx + padding);
+      bottom = math.max(bottom, node.position.dy + padding + 18);
+    }
+    return Rect.fromLTRB(left, top, right, bottom);
+  }
+
+  Matrix4 _matrixForViewport(Size viewport) {
+    final bounds = _graphBounds;
+    // Keep the constellation clear of the inline legend and interaction hint.
+    final usableWidth = math.max(1.0, viewport.width - 28);
+    final usableHeight = math.max(1.0, viewport.height - 104);
+    final scale = math
+        .min(
+          usableWidth / math.max(1.0, bounds.width),
+          usableHeight / math.max(1.0, bounds.height),
+        )
+        .clamp(0.35, 1.15)
+        .toDouble();
+    _fitScale = scale;
+    final dx =
+        (viewport.width - bounds.width * scale) / 2 - bounds.left * scale;
+    final dy =
+        54 + (usableHeight - bounds.height * scale) / 2 - bounds.top * scale;
+    return Matrix4.identity()
+      ..setEntry(0, 0, scale)
+      ..setEntry(1, 1, scale)
+      ..setEntry(2, 2, scale)
+      ..setEntry(0, 3, dx)
+      ..setEntry(1, 3, dy);
+  }
+
+  void _scheduleInitialFit(Size viewport) {
+    if (_hasFitted && viewport == _viewportSize) return;
+    _viewportSize = viewport;
+    _fitTransform = _matrixForViewport(viewport);
+    if (_hasFitted) return;
+    _hasFitted = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _transform.value = _fitTransform.clone();
+      _updateZoomState();
+    });
+  }
+
+  void _animateTransform(Matrix4 target) {
+    _transformAnimationController.stop();
+    _transformAnimation =
+        Matrix4Tween(
+          begin: _transform.value.clone(),
+          end: target.clone(),
+        ).animate(
+          CurvedAnimation(
+            parent: _transformAnimationController,
+            curve: DesignTokens.curveStandard,
+          ),
+        );
+    _transformAnimationController.forward(from: 0);
+  }
+
+  void _resetView() {
+    setState(() {
+      _selected = null;
+      _isZoomed = false;
+    });
+    _animateTransform(_fitTransform);
+  }
+
+  void _updateZoomState() {
+    final zoomed = _transform.value.getMaxScaleOnAxis() > _fitScale * 1.06;
+    if (zoomed != _isZoomed && mounted) setState(() => _isZoomed = zoomed);
   }
 
   void _selectNode(Offset point) {
@@ -105,6 +204,44 @@ class _FingerprintViewState extends State<FingerprintView> {
     setState(() => _selected = nearest);
   }
 
+  FingerprintNode? _nodeAt(Offset scenePoint) {
+    FingerprintNode? nearest;
+    var nearestDistance = double.infinity;
+    for (final node in _graph.nodes) {
+      final distance = (node.position - scenePoint).distance;
+      if (distance <= math.max(22, node.radius + 12) &&
+          distance < nearestDistance) {
+        nearest = node;
+        nearestDistance = distance;
+      }
+    }
+    return nearest;
+  }
+
+  void _handleTap(Offset viewportPoint) {
+    _selectNode(_transform.toScene(viewportPoint));
+  }
+
+  void _handleDoubleTap() {
+    final viewportPoint = _doubleTapPosition;
+    if (viewportPoint == null) return;
+    final node = _nodeAt(_transform.toScene(viewportPoint));
+    if (node == null || _isZoomed) {
+      _resetView();
+      return;
+    }
+    setState(() => _selected = node);
+    final scale = math.max(_fitScale * 1.8, 1.15).clamp(1.15, 2.2).toDouble();
+    final target = Matrix4.identity()
+      ..setEntry(0, 0, scale)
+      ..setEntry(1, 1, scale)
+      ..setEntry(2, 2, scale)
+      ..setEntry(0, 3, _viewportSize.width / 2 - node.position.dx * scale)
+      ..setEntry(1, 3, _viewportSize.height / 2 - node.position.dy * scale);
+    setState(() => _isZoomed = true);
+    _animateTransform(target);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -114,48 +251,91 @@ class _FingerprintViewState extends State<FingerprintView> {
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
             height: widget.height,
-            child: Stack(
-              children: [
-                // The dark backdrop lives here, OUTSIDE the InteractiveViewer,
-                // so it's a fixed frame that never pans or zooms — only the
-                // graph drawn inside InteractiveViewer's child does. Previously
-                // the backdrop was painted as part of that same zoomable
-                // CustomPaint, so pinching/dragging moved the "background"
-                // right along with the dots instead of staying put.
-                Positioned.fill(child: ColoredBox(color: DesignTokens.ink)),
-                Positioned.fill(
-                  child: InteractiveViewer(
-                    transformationController: _transform,
-                    constrained: false,
-                    alignment: Alignment.center,
-                    panEnabled: true,
-                    scaleEnabled: true,
-                    boundaryMargin: const EdgeInsets.all(280),
-                    minScale: 0.45,
-                    maxScale: 3.5,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      // The child is in scene coordinates. Handling the tap
-                      // here avoids the old viewport/scene mismatch and lets
-                      // InteractiveViewer keep ownership of drag and pinch.
-                      onTapUp: (details) => _selectNode(details.localPosition),
-                      child: CustomPaint(
-                        size: const Size(1100, 820),
-                        painter: _FingerprintPainter(
-                          graph: _graph,
-                          selected: _selected,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final viewport = Size(
+                  constraints.maxWidth,
+                  constraints.maxHeight,
+                );
+                _scheduleInitialFit(viewport);
+                return Stack(
+                  children: [
+                    // This is an intentionally dark, fixed presentation layer.
+                    // `ink` is a text token and becomes near-white in dark mode,
+                    // which caused the old beige canvas.
+                    Positioned.fill(
+                      child: ColoredBox(color: DesignTokens.canvasFor(true)),
+                    ),
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapUp: (details) => _handleTap(details.localPosition),
+                        onDoubleTapDown: (details) =>
+                            _doubleTapPosition = details.localPosition,
+                        onDoubleTap: _handleDoubleTap,
+                        child: InteractiveViewer(
+                          transformationController: _transform,
+                          constrained: false,
+                          alignment: Alignment.topLeft,
+                          // At the fitted scale, vertical drags belong to the
+                          // parent ListView. Once zoomed, they pan the map.
+                          panEnabled: _isZoomed,
+                          scaleEnabled: true,
+                          boundaryMargin: const EdgeInsets.all(240),
+                          minScale: 0.30,
+                          maxScale: 3.0,
+                          onInteractionUpdate: (_) => _updateZoomState(),
+                          onInteractionEnd: (_) => _updateZoomState(),
+                          child: CustomPaint(
+                            size: _sceneSize,
+                            painter: _FingerprintPainter(
+                              graph: _graph,
+                              selected: _selected,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: _chip('Pinch · drag · tap'),
-                ),
-                Positioned(top: 12, left: 12, child: _modalityLegend()),
-              ],
+                    Positioned(top: 12, left: 12, child: _modalityLegend()),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Semantics(
+                        button: true,
+                        label: 'Reset fingerprint view',
+                        child: IconButton(
+                          tooltip: 'Reset view',
+                          onPressed: _resetView,
+                          icon: const Icon(Icons.refresh_rounded),
+                          color: Colors.white.withValues(alpha: 0.82),
+                          style: IconButton.styleFrom(
+                            backgroundColor: DesignTokens.surfaceFor(
+                              true,
+                            ).withValues(alpha: 0.88),
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 14,
+                      bottom: 12,
+                      child: IgnorePointer(
+                        child: Text(
+                          _isZoomed
+                              ? 'Drag to explore · double-tap to reset'
+                              : 'Pinch to zoom · tap a word',
+                          style: DesignTokens.body(11.5).copyWith(
+                            color: Colors.white.withValues(alpha: 0.60),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -180,8 +360,11 @@ class _FingerprintViewState extends State<FingerprintView> {
                   margin: const EdgeInsets.only(top: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: DesignTokens.infoSoft,
+                    color: DesignTokens.surfaceFor(true),
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: DesignTokens.primary.withValues(alpha: 0.22),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -195,10 +378,12 @@ class _FingerprintViewState extends State<FingerprintView> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${_selected!.entry.en} · ${_selected!.theme}',
-                              style: DesignTokens.body(
-                                13,
-                              ).copyWith(color: DesignTokens.mutedDim),
+                              _selected!.entry.en.isEmpty
+                                  ? _selected!.theme
+                                  : '${_selected!.entry.en} · ${_selected!.theme}',
+                              style: DesignTokens.body(13).copyWith(
+                                color: Colors.white.withValues(alpha: 0.62),
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -234,7 +419,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                               height: 44,
                               child: Icon(
                                 CupertinoIcons.speaker_2_fill,
-                                color: DesignTokens.info,
+                                color: DesignTokens.primary,
                               ),
                             ),
                           ),
@@ -245,7 +430,7 @@ class _FingerprintViewState extends State<FingerprintView> {
                             style: DesignTokens.body(
                               12,
                               weight: FontWeight.w700,
-                            ).copyWith(color: DesignTokens.info),
+                            ).copyWith(color: DesignTokens.primary),
                           ),
                         ],
                       ),
@@ -261,7 +446,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: DesignTokens.surface,
+        color: DesignTokens.canvasFor(true),
         borderRadius: BorderRadius.circular(100),
         border: Border.all(
           color: _modalityColor(source).withValues(alpha: 0.4),
@@ -284,7 +469,7 @@ class _FingerprintViewState extends State<FingerprintView> {
             style: DesignTokens.body(
               11.5,
               weight: FontWeight.w600,
-            ).copyWith(color: DesignTokens.inkSoft),
+            ).copyWith(color: Colors.white.withValues(alpha: 0.78)),
           ),
         ],
       ),
@@ -295,7 +480,7 @@ class _FingerprintViewState extends State<FingerprintView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
-        color: DesignTokens.ink.withValues(alpha: 0.78),
+        color: DesignTokens.surfaceFor(true).withValues(alpha: 0.94),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
@@ -322,24 +507,6 @@ class _FingerprintViewState extends State<FingerprintView> {
             if (source != ModalitySource.values.last) const SizedBox(width: 10),
           ],
         ],
-      ),
-    );
-  }
-
-  Widget _chip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: DesignTokens.ink.withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Text(
-        label,
-        style: DesignTokens.body(
-          12,
-          weight: FontWeight.w600,
-        ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
       ),
     );
   }
@@ -389,7 +556,10 @@ class _FingerprintPainter extends CustomPainter {
 
   Color _nodeColor(FingerprintNode node) {
     if (graph.isDemo) return DesignTokens.muted;
-    return _themeColors[node.theme] ?? DesignTokens.info;
+    final source = _themeColors[node.theme] ?? DesignTokens.info;
+    // Keep modality colors as accents inside the dark app rather than bright
+    // pastel discs. This preserves hue while substantially lowering luminance.
+    return Color.lerp(DesignTokens.canvasFor(true), source, 0.62)!;
   }
 
   bool _isRelated(FingerprintNode node) {
@@ -425,9 +595,9 @@ class _FingerprintPainter extends CustomPainter {
           edge.a.position,
           edge.b.position,
           Paint()
-            ..color = color.withValues(alpha: graph.isDemo ? 0.10 : 0.16)
-            ..strokeWidth = 3.5
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+            ..color = color.withValues(alpha: graph.isDemo ? 0.06 : 0.10)
+            ..strokeWidth = 2.8
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
         );
       }
       final dashed = edge.kind == FingerprintEdgeKind.cooccurrence;
@@ -438,7 +608,7 @@ class _FingerprintPainter extends CustomPainter {
           edge.b.position,
           Paint()
             ..color = color.withValues(
-              alpha: highlighted ? (graph.isDemo ? 0.30 : 0.5) : 0.08,
+              alpha: highlighted ? (graph.isDemo ? 0.22 : 0.34) : 0.05,
             )
             ..strokeWidth = 1.3,
         );
@@ -448,7 +618,7 @@ class _FingerprintPainter extends CustomPainter {
           edge.b.position,
           Paint()
             ..color = color.withValues(
-              alpha: highlighted ? (graph.isDemo ? 0.28 : 0.45) : 0.07,
+              alpha: highlighted ? (graph.isDemo ? 0.20 : 0.30) : 0.05,
             )
             ..strokeWidth = edge.kind == FingerprintEdgeKind.session
                 ? 1.4
@@ -471,23 +641,23 @@ class _FingerprintPainter extends CustomPainter {
         node.radius * 2.4,
         Paint()
           ..color = color.withValues(
-            alpha: (graph.isDemo ? 0.10 : 0.22) * strength * dimFactor,
+            alpha: (graph.isDemo ? 0.06 : 0.11) * strength * dimFactor,
           )
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, node.radius * 1.1),
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, node.radius * 0.8),
       );
       canvas.drawCircle(
         node.position,
         node.radius * 1.25,
         Paint()
           ..color = color.withValues(
-            alpha: (graph.isDemo ? 0.2 : 0.4) * strength * dimFactor,
+            alpha: (graph.isDemo ? 0.12 : 0.20) * strength * dimFactor,
           )
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5),
       );
       final core = Color.lerp(
         color,
         Colors.white,
-        graph.isDemo ? 0.1 : 0.25 + 0.3 * strength,
+        graph.isDemo ? 0.04 : 0.06 + 0.10 * strength,
       )!;
       canvas.drawCircle(
         node.position,
@@ -506,7 +676,7 @@ class _FingerprintPainter extends CustomPainter {
           Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.6
-            ..color = Colors.white.withValues(alpha: 0.85),
+            ..color = Colors.white.withValues(alpha: 0.62),
         );
       }
 
@@ -567,7 +737,7 @@ class _FingerprintPainter extends CustomPainter {
           ..shader =
               RadialGradient(
                 colors: [
-                  color.withValues(alpha: graph.isDemo ? 0.05 : 0.10),
+                  color.withValues(alpha: graph.isDemo ? 0.025 : 0.045),
                   Colors.transparent,
                 ],
               ).createShader(
@@ -582,7 +752,7 @@ class _FingerprintPainter extends CustomPainter {
           center: Alignment.center,
           radius: 0.9,
           colors: [
-            Colors.white.withValues(alpha: graph.isDemo ? 0.02 : 0.04),
+            Colors.white.withValues(alpha: graph.isDemo ? 0.01 : 0.018),
             Colors.transparent,
           ],
         ).createShader(Offset.zero & size),

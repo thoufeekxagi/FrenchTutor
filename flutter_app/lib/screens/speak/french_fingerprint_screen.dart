@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
+import '../../services/universal_learning_data_service.dart';
 import '../path/fingerprint_engine.dart';
 import '../path/learning_graph_view.dart';
 import 'speak_ui.dart';
@@ -25,6 +26,10 @@ class FrenchFingerprintScreen extends ConsumerWidget {
     final grammarStories = ref.watch(generatedGrammarStoryStoreProvider).list();
     final roleplays = ref.watch(generatedRoleplayStoreProvider).list();
     final writingTasks = ref.watch(generatedWritingTaskStoreProvider).list();
+    final snapshot = UniversalLearningDataService.buildSnapshot(
+      ref.watch(databaseProvider),
+      store.profile(),
+    );
     final graph = buildFingerprintGraph(
       store,
       content,
@@ -33,6 +38,7 @@ class FrenchFingerprintScreen extends ConsumerWidget {
       grammarStories: grammarStories,
       roleplays: roleplays,
       writingTasks: writingTasks,
+      recentSnapshot: snapshot,
     );
     final sessions = ref.watch(storageServiceProvider).getAllSessions();
     final practiceSignals = _practiceSignals(sessions);
@@ -85,7 +91,7 @@ class FrenchFingerprintScreen extends ConsumerWidget {
             grammarStories: grammarStories,
             roleplays: roleplays,
             writingTasks: writingTasks,
-            height: 500,
+            height: MediaQuery.sizeOf(context).height < 720 ? 340 : 390,
           ),
           const SizedBox(height: 24),
           Text('Practice signals', style: DesignTokens.display(20)),
@@ -178,34 +184,60 @@ class _PracticeSignal {
 List<_PracticeSignal> _practiceSignals(List<dynamic> sessions) {
   final counts = <String, int>{};
   for (final session in sessions) {
-    final stage = session.stage as String?;
+    final stage = (session.stage as String?)?.toLowerCase();
     if (stage == null || stage.isEmpty) continue;
-    counts[stage] = (counts[stage] ?? 0) + 1;
+    String? bucket;
+    if (stage.contains('vocab')) {
+      bucket = 'vocabulary';
+    } else if (stage.contains('listen') || stage == 'reading_listening') {
+      bucket = 'listening';
+    } else if (stage.contains('read') || stage.contains('story')) {
+      bucket = 'reading';
+    } else if (stage.contains('writ')) {
+      bucket = 'writing';
+    } else if (stage.contains('speak') || stage.contains('roleplay')) {
+      bucket = 'speaking';
+    } else if (stage.contains('grammar')) {
+      bucket = 'grammar';
+    }
+    if (bucket != null) counts[bucket] = (counts[bucket] ?? 0) + 1;
   }
   return [
     _PracticeSignal(
       'Vocabulary',
-      counts['vocab'] ?? 0,
+      counts['vocabulary'] ?? 0,
       Icons.style_rounded,
       SpeakColors.accent,
     ),
     _PracticeSignal(
-      'Grammar',
-      counts['grammar'] ?? 0,
-      Icons.auto_awesome_rounded,
-      SpeakColors.orange,
-    ),
-    _PracticeSignal(
-      'Stories',
-      (counts['story'] ?? 0) + (counts['reading_listening'] ?? 0),
+      'Reading',
+      counts['reading'] ?? 0,
       Icons.menu_book_rounded,
       SpeakColors.green,
+    ),
+    _PracticeSignal(
+      'Listening',
+      counts['listening'] ?? 0,
+      Icons.headphones_rounded,
+      SpeakColors.orange,
     ),
     _PracticeSignal(
       'Speaking',
       (counts['speaking'] ?? 0) + (counts['roleplay'] ?? 0),
       Icons.mic_none_rounded,
       DesignTokens.secondary,
+    ),
+    _PracticeSignal(
+      'Writing',
+      counts['writing'] ?? 0,
+      Icons.edit_rounded,
+      DesignTokens.success,
+    ),
+    _PracticeSignal(
+      'Grammar',
+      counts['grammar'] ?? 0,
+      Icons.auto_awesome_rounded,
+      DesignTokens.mastery,
     ),
   ];
 }
@@ -229,9 +261,9 @@ class _SignalStrip extends StatelessWidget {
             width: 124,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: DesignTokens.surfaceFor(true),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: SpeakColors.line),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

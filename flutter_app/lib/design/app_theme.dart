@@ -11,6 +11,11 @@ import 'tokens.dart';
 /// page transitions, scroll physics, ripple suppression. Screens must never
 /// check `Platform.isIOS` themselves; they inherit this.
 abstract final class AppTheme {
+  /// All transient SnackBars/toasts use fixed high-contrast colors regardless
+  /// of the learner's selected app appearance.
+  static const snackBarBackgroundColor = Colors.black;
+  static const snackBarForegroundColor = Colors.white;
+
   static bool get isCupertino =>
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.iOS ||
@@ -282,8 +287,16 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: ink,
-        contentTextStyle: DesignTokens.body(14).copyWith(color: Colors.white),
+        // SnackBars/toasts keep the same high-contrast treatment in both app
+        // appearances. Never derive this from `ink`: in dark mode ink is
+        // white, which produced a white background with white text.
+        backgroundColor: snackBarBackgroundColor,
+        contentTextStyle: DesignTokens.body(
+          14,
+        ).copyWith(color: snackBarForegroundColor),
+        actionTextColor: snackBarForegroundColor,
+        disabledActionTextColor: snackBarForegroundColor,
+        closeIconColor: snackBarForegroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
         ),

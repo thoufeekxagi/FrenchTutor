@@ -44,4 +44,18 @@ void main() {
     expect(error.isRateLimited, isFalse);
     expect(error.retryAfter, isNull);
   });
+
+  test('keeps OpenRouter failures distinguishable from Gemini failures', () {
+    final error = AiProviderHttpError(
+      'openrouter',
+      400,
+      message: 'invalid response format',
+    );
+
+    expect(
+      error.toString(),
+      'OpenRouterHttpError(400): invalid response format',
+    );
+    expect(error.isRateLimited, isFalse);
+  });
 }

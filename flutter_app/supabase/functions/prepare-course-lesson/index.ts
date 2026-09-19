@@ -1,5 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import {
+  selectVocabularyCandidates,
+  type VocabularyCandidate,
+} from "./vocabulary_candidates.ts";
 
 const headers = {
   "Content-Type": "application/json",
@@ -9,14 +13,6 @@ const headers = {
 };
 
 type Json = Record<string, unknown>;
-
-type VocabularyCandidate = Json & {
-  id: string;
-  fr: string;
-  en: string;
-  phonetic: string;
-  role: "review" | "new";
-};
 
 // Mirrors adaptiveCourseFoundationSize/adaptiveCourseBatchSize in
 // lib/data/database/adaptive_course_store.dart. Sequences 1-5 (foundation)
@@ -711,7 +707,10 @@ function promptFor(
       : vocabularyCandidates
         .map((candidate) => `${candidate.id}|${candidate.fr}|${candidate.en}|${candidate.phonetic}|${candidate.role}`)
         .join("; ");
-    return `${base}${rules}\nChoose every entry from this app lexicon slice only. Each candidate is marked review or new. Aim for two reviewed words and three new words when the supplied pools allow it; never invent a French word or id. LEXICON: ${candidateText}\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
+    const mixInstruction = vocabularyCandidates.length === 5
+      ? `The lexicon below contains exactly five candidates for exactly five entries. Use ALL five candidate IDs exactly once, keep each French/English/phonetic value paired with its listed ID, and preserve the listed review/new roles. The fixed mix is ${vocabularyCandidates.filter((candidate) => candidate.role === "review").length} reviewed and ${vocabularyCandidates.filter((candidate) => candidate.role === "new").length} new words.`
+      : "Use five distinct, safe common words; do not invent IDs when a candidate list is supplied.";
+    return `${base}${rules}\n${mixInstruction} Choose every entry from this app lexicon slice only when one is supplied; never invent a French word or ID. LEXICON: ${candidateText}\nReturn exactly: {"entries":[exactly 5 {"id":"stable-short-id","fr":"word or short phrase","en":"English","phonetic":"simple pronunciation"}],"storyExamples":{"same-id":{"fr":"sentence","en":"translation"}}}. The five example sentences must form one connected mini-story in order. Each sentence must naturally use its matching French entry.`;
   }
   if (kind === "reading" || kind === "listening") {
     return `${base}${rules}\nReturn exactly: {"passage":{"id":"passage","title":"French title","titleEn":"English title","segments":[4 to 6 {"fr":"French sentence","en":"English translation","grammarNote":"short useful note","pronunciationTip":"short useful tip"}],"fullText":"the exact French segments joined in order"},"quiz":[2 or 3 {"q":"French question","q_en":"English question","choices":[3 French choices],"choices_en":[3 English choices],"answerIndex":0}],"keywords":[up to 5 {"id":"id","fr":"French","en":"English","phonetic":"pronunciation"}]}. Every answerIndex must be 0, 1, or 2 and point to the correct choice.`;
@@ -787,12 +786,32 @@ async function generateArtifact(
   // more expensive without improving the saved artifact. Gemini remains
   // reserved for explicit Live/audio work, not ordinary lesson JSON.
   const provider = "openrouter";
+  const selectedVocabularyCandidates = kind === "vocabulary"
+    ? selectVocabularyCandidates(vocabularyCandidates)
+    : vocabularyCandidates;
+  if (kind === "vocabulary" && vocabularyCandidates.length > 0) {
+    if (selectedVocabularyCandidates.length === 0) {
+      console.warn(JSON.stringify({
+        event: "course_vocabulary_candidate_pool_insufficient",
+        session_id: text(session.id),
+        candidate_count: vocabularyCandidates.length,
+      }));
+    } else {
+      console.info(JSON.stringify({
+        event: "course_vocabulary_candidates_selected",
+        session_id: text(session.id),
+        candidate_count: selectedVocabularyCandidates.length,
+        review_count: selectedVocabularyCandidates.filter((candidate) => candidate.role === "review").length,
+        new_count: selectedVocabularyCandidates.filter((candidate) => candidate.role === "new").length,
+      }));
+    }
+  }
   const messages: Array<{ role: string; content: string }> = [
     {
       role: "system",
       content: "You prepare one small, coherent French lesson at a time. Follow the requested JSON schema exactly and keep the learner context minimal.",
     },
-    { role: "user", content: promptFor(session, kind, vocabularyCandidates) },
+    { role: "user", content: promptFor(session, kind, selectedVocabularyCandidates) },
   ];
 
   let lastError: Error | null = null;
@@ -842,7 +861,7 @@ async function generateArtifact(
         ...baseArtifact(session, kind),
         ...generated,
       });
-      validateArtifact(artifact, session, kind, vocabularyCandidates);
+      validateArtifact(artifact, session, kind, selectedVocabularyCandidates);
       console.info(JSON.stringify({
         event: "course_artifact_ready",
         session_id: text(session.id),

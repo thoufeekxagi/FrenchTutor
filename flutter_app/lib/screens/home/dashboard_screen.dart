@@ -18,6 +18,7 @@ import '../../services/free_talk_session_launcher.dart';
 import '../../services/notification_scheduler_service.dart';
 import '../../services/premium_access_gate.dart';
 import '../../services/subscription_gate_service.dart';
+import '../../services/weekly_report_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
 import '../../widgets/passeport_card.dart';
 import '../../widgets/session_row.dart';
@@ -34,6 +35,7 @@ import '../labs/writing_lab_screen.dart';
 import '../reading/reading_library_screen.dart';
 import '../notes/notes_review_screen.dart';
 import '../speak/speaking_practice_screen.dart';
+import 'weekly_review_screen.dart';
 import '../settings/settings_screen.dart';
 import 'today_mission_widget.dart';
 import 'daily_summary_card.dart';
@@ -55,6 +57,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Session> _sessions = [];
   DailySummary? _summary;
+  WeeklyReport? _weeklyReport;
 
   @override
   void initState() {
@@ -130,6 +133,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     } catch (_) {
       // A summary must never take the dashboard down.
     }
+    try {
+      final weekly = WeeklyReportService(
+        learning: ref.read(learningStoreProvider),
+        storage: storage,
+        vocabularySessions: ref.read(vocabularySessionStoreProvider),
+        content: ref.read(contentServiceProvider),
+      ).compute();
+      if (mounted) setState(() => _weeklyReport = weekly);
+    } catch (_) {
+      // The report is helpful, but must never interfere with the home screen.
+    }
   }
 
   @override
@@ -156,6 +170,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               _primaryStartAction(),
               const SizedBox(height: 16),
               _quickActions(),
+              const SizedBox(height: 20),
+              _weeklyReviewCard(),
               const SizedBox(height: 30),
               KeyedSubtree(key: AppTour.marieKey, child: _practiceFeature()),
               const SizedBox(height: 34),
@@ -174,6 +190,91 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _openWeeklyReview() async {
+    await AppRouter.push(context, (_) => const WeeklyReviewScreen());
+    if (mounted) _reload();
+  }
+
+  Widget _weeklyReviewCard() {
+    final report = _weeklyReport;
+    final details = report == null
+        ? 'Your week updates as you practise.'
+        : report.activeDays == 0
+        ? 'Your first practice will appear here.'
+        : '${report.activeDays} active ${report.activeDays == 1 ? 'day' : 'days'}'
+              '  ·  ${report.sessions.length} ${report.sessions.length == 1 ? 'session' : 'sessions'}'
+              '  ·  ${report.practiceMinutes} min so far';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvasDim,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(
+                  Icons.insights_rounded,
+                  size: 20,
+                  color: DesignTokens.primary,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  'Your weekly review',
+                  style: DesignTokens.body(16, weight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                'LIVE',
+                style: DesignTokens.label(
+                  10,
+                  weight: FontWeight.w800,
+                ).copyWith(color: DesignTokens.primary, letterSpacing: 1.2),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            details,
+            style: DesignTokens.body(
+              13,
+            ).copyWith(color: DesignTokens.mutedDim, height: 1.35),
+          ),
+          const SizedBox(height: 13),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: OutlinedButton.icon(
+              onPressed: _openWeeklyReview,
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              label: const Text('Look at your weekly review'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: DesignTokens.ink,
+                side: BorderSide(color: DesignTokens.hairline),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                textStyle: DesignTokens.body(13, weight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -511,6 +612,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               key: AppTour.keepPractisingKey,
               child: _keepPractising(),
             ),
+            const SizedBox(height: DesignTokens.space5),
+            const WebSectionHeader(title: 'Weekly review'),
+            _weeklyReviewCard(),
             const SizedBox(height: DesignTokens.space6),
             WebSectionHeader(
               title: 'Practice with ${ActiveTutor.current.displayName}',

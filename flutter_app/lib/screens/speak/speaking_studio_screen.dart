@@ -14,6 +14,7 @@ import '../../services/free_talk_session_launcher.dart';
 import '../../services/learning_streak_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
+import '../home/weekly_review_screen.dart';
 import '../labs/listening_lab_screen.dart';
 import '../labs/vocab_lab_screen.dart';
 import '../labs/writing_lab_screen.dart';
@@ -147,7 +148,6 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       profile,
       completedContentKeys: completedContentKeys,
       adaptiveSessions: adaptivePlan.sessions,
-      generationHarness: CourseGenerationTestHarness.current,
     );
     final next = roadmap.nextSession;
     final lessonCards = _lessonCards(roadmap);
@@ -459,10 +459,20 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const ClampingScrollPhysics(),
-        itemCount: modes.length,
+        itemCount: modes.length + 1,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final (label, skill, icon, destination) = modes[index];
+          if (index == 0) {
+            return _ModePill(
+              label: 'Report',
+              icon: Icons.assessment_outlined,
+              selected: false,
+              onTap: () =>
+                  AppRouter.push(context, (_) => const WeeklyReviewScreen()),
+            );
+          }
+
+          final (label, skill, icon, destination) = modes[index - 1];
           return _ModePill(
             label: label,
             icon: icon,

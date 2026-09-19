@@ -117,7 +117,274 @@ void main() {
     expect(plan.sessions.where((session) => session.unit == 3), hasLength(1));
   });
 
-  test('an unfinished skill creates no future lesson', () {
+  test('a successful route commits completion and queues its successor', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'route-completion-regression',
+      goal: 'everyday',
+      level: 'a1',
+    );
+
+    final initial = store.ensureCurrentPlan(profile);
+    final listening = initial.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.listening,
+    );
+    store.markStarted(listening.contentKey);
+    expect(store.sessionById(listening.id)?.status, 'active');
+
+    final advanced = store.completeAndEnsureSuccessor(
+      profile,
+      listening.contentKey,
+    );
+
+    expect(store.sessionById(listening.id)?.status, 'completed');
+    final successor = advanced.sessions.singleWhere(
+      (session) =>
+          session.unit == 3 && session.primarySkill == SpeakSkill.listening,
+    );
+    expect(successor.generationStatus, 'queued');
+
+    // Repeated route results or sync callbacks cannot duplicate the slot.
+    final repeated = store.completeAndEnsureSuccessor(
+      profile,
+      listening.contentKey,
+    );
+    expect(
+      repeated.sessions.where(
+        (session) =>
+            session.unit == 3 && session.primarySkill == SpeakSkill.listening,
+      ),
+      hasLength(1),
+    );
+  });
+
+  test('every authored Unit 2 skill gets its own Unit 3 successor', () {
+    for (final skill in const [
+      SpeakSkill.vocabulary,
+      SpeakSkill.reading,
+      SpeakSkill.listening,
+      SpeakSkill.writing,
+      SpeakSkill.speaking,
+      SpeakSkill.grammar,
+    ]) {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final store = AdaptiveCourseStore(db);
+      final profile = Profile(
+        id: 'unit-two-${skill.wireName}',
+        goal: 'everyday',
+        level: 'a1',
+      );
+      final plan = store.ensureCurrentPlan(profile);
+      final completed = plan.sessions.singleWhere(
+        (session) => session.unit == 2 && session.primarySkill == skill,
+      );
+
+      final advanced = store.completeAndEnsureSuccessor(
+        profile,
+        completed.contentKey,
+      );
+      final successor = advanced.sessions.singleWhere(
+        (session) => session.unit == 3 && session.primarySkill == skill,
+      );
+
+      expect(store.sessionById(completed.id)?.status, 'completed');
+      expect(successor.generationStatus, 'queued');
+      expect(successor.status, 'planned');
+    }
+  });
+
+  test(
+    'same-skill progression keeps generating beyond the authored Unit 2',
+    () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final store = AdaptiveCourseStore(
+        db,
+        generationHarness: const CourseGenerationTestHarness(
+          enabled: true,
+          skill: CourseGenerationHarnessSkill.grammar,
+        ),
+      );
+      final profile = Profile(
+        id: 'multi-unit-auto-progression',
+        goal: 'everyday',
+        level: 'a1',
+      );
+
+      var plan = store.ensureCurrentPlan(profile);
+      var current = plan.sessions.singleWhere(
+        (session) =>
+            session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+      );
+      for (final nextUnit in [3, 4, 5]) {
+        plan = store.completeAndEnsureSuccessor(profile, current.contentKey);
+        current = plan.sessions.singleWhere(
+          (session) =>
+              session.unit == nextUnit &&
+              session.primarySkill == SpeakSkill.reading,
+        );
+        expect(current.generationStatus, 'queued');
+        expect(current.status, 'planned');
+      }
+
+      // Unit 2 is the authored baseline. Each completed lesson from there
+      // deterministically adds the next same-skill generated slot, once.
+      expect(
+        plan.sessions.where(
+          (session) =>
+              session.primarySkill == SpeakSkill.reading && session.unit >= 3,
+        ),
+        hasLength(3),
+      );
+      final repeated = store.completeAndEnsureSuccessor(
+        profile,
+        plan.sessions
+            .singleWhere(
+              (session) =>
+                  session.unit == 4 &&
+                  session.primarySkill == SpeakSkill.reading,
+            )
+            .contentKey,
+      );
+      expect(
+        repeated.sessions.where(
+          (session) =>
+              session.unit == 5 && session.primarySkill == SpeakSkill.reading,
+        ),
+        hasLength(1),
+      );
+    },
+  );
+
+  test('test harness configuration is opt-in, not enabled by Debug mode', () {
+    final explicitlyEnabled = bool.fromEnvironment(
+      'PARLESPRINT_COURSE_HARNESS_ENABLED',
+      defaultValue: false,
+    );
+    expect(CourseGenerationTestHarness.current.enabled, explicitlyEnabled);
+  });
+
+  test('manual generation advances a selected skill before completion', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'manual-unfinished-lane',
+      goal: 'everyday',
+      level: 'a1',
+    );
+
+    final initial = store.ensureCurrentPlan(profile);
+    final currentWriting = initial.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.writing,
+    );
+    expect(currentWriting.status, isNot('completed'));
+
+    final plan = store.ensureSuccessorForSkill(profile, SpeakSkill.writing);
+    final nextWriting = plan.sessions.singleWhere(
+      (session) =>
+          session.unit == 3 && session.primarySkill == SpeakSkill.writing,
+    );
+    expect(nextWriting.generationStatus, 'queued');
+    expect(
+      plan.sessions
+          .where(
+            (session) =>
+                session.unit == 2 && session.primarySkill == SpeakSkill.writing,
+          )
+          .single
+          .status,
+      isNot('completed'),
+    );
+
+    // A second explicit request appends the following canonical slot instead
+    // of overwriting the already queued lesson.
+    final extended = store.ensureSuccessorForSkill(profile, SpeakSkill.writing);
+    expect(
+      extended.sessions.where(
+        (session) =>
+            session.unit == 4 && session.primarySkill == SpeakSkill.writing,
+      ),
+      hasLength(1),
+    );
+  });
+
+  test('manual and automatic triggers share slots without collisions', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'manual-auto-interoperation',
+      goal: 'everyday',
+      level: 'a1',
+    );
+
+    var plan = store.ensureCurrentPlan(profile);
+    for (final skill in const [
+      SpeakSkill.vocabulary,
+      SpeakSkill.reading,
+      SpeakSkill.listening,
+    ]) {
+      plan = store.ensureSuccessorForSkill(profile, skill);
+    }
+
+    // Three manual requests create three sparse Unit 3 lanes, not a second
+    // batch or a competing plan.
+    expect(plan.sessions.where((session) => session.unit == 3), hasLength(3));
+
+    // A learner can explicitly prepare another lesson in one selected lane.
+    plan = store.ensureSuccessorForSkill(profile, SpeakSkill.reading);
+    expect(
+      plan.sessions.where(
+        (session) =>
+            session.unit == 4 && session.primarySkill == SpeakSkill.reading,
+      ),
+      hasLength(1),
+    );
+
+    // Automatic completion later resolves the same Unit 3 slot rather than
+    // duplicating or replacing the manually prepared lesson.
+    final unitTwoReading = plan.sessions.singleWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.reading,
+    );
+    _finishSession(db, store, unitTwoReading);
+    plan = store.ensureSuccessorForCompleted(
+      profile,
+      unitTwoReading.contentKey,
+    );
+    expect(plan.sessions.where((session) => session.unit == 3), hasLength(3));
+    expect(
+      plan.sessions
+          .where((session) => session.unit == 3)
+          .map((session) => session.primarySkill)
+          .toSet(),
+      {SpeakSkill.vocabulary, SpeakSkill.reading, SpeakSkill.listening},
+    );
+
+    // Completing the manually buffered lesson lets automatic progression
+    // continue. Since the next slot already exists, no second row is added.
+    final bufferedReading = plan.sessions.singleWhere(
+      (session) =>
+          session.unit == 3 && session.primarySkill == SpeakSkill.reading,
+    );
+    _finishSession(db, store, bufferedReading);
+    plan = store.ensureSuccessorForCompleted(
+      profile,
+      bufferedReading.contentKey,
+    );
+    expect(
+      plan.sessions.where(
+        (session) =>
+            session.unit == 4 && session.primarySkill == SpeakSkill.reading,
+      ),
+      hasLength(1),
+    );
+  });
+
+  test('automatic progression does not advance an unfinished lesson', () {
     final db = sqlite3.openInMemory();
     final store = AdaptiveCourseStore(db);
     final profile = Profile(id: 'skip-lane', goal: 'everyday', level: 'a1');
@@ -497,6 +764,40 @@ void main() {
     expect(retried.generationStatus, 'queued');
     expect(retried.generationAttempts, 2);
     expect(retried.generationError, 'Manual retry requested');
+  });
+
+  test('bounded system recovery can retain an accurate retry reason', () {
+    final db = sqlite3.openInMemory();
+    final store = AdaptiveCourseStore(db);
+    final profile = Profile(
+      id: 'automatic-retry',
+      goal: 'everyday',
+      level: 'a1',
+    );
+    var plan = store.ensureCurrentPlan(profile);
+    final vocabulary = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 2 && session.primarySkill == SpeakSkill.vocabulary,
+    );
+    store.markCompleted(vocabulary.contentKey);
+    plan = store.ensureSuccessorForCompleted(profile, vocabulary.contentKey);
+    final successor = plan.sessions.firstWhere(
+      (session) =>
+          session.unit == 3 && session.primarySkill == SpeakSkill.vocabulary,
+    );
+    db.execute(
+      "UPDATE adaptive_course_sessions SET generation_status = 'failed', "
+      'generation_attempts = 2, generation_error = ? WHERE id = ?',
+      ['Vocabulary must balance reviewed and new lexical items', successor.id],
+    );
+
+    final requeued = store.requeueFailedSession(
+      successor.id,
+      generationError: 'Retrying vocabulary after validator fix',
+    )!;
+    expect(requeued.generationStatus, 'queued');
+    expect(requeued.generationAttempts, 2);
+    expect(requeued.generationError, 'Retrying vocabulary after validator fix');
   });
 
   test(

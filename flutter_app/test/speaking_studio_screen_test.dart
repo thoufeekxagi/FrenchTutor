@@ -68,6 +68,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'Explore starts with a Report shortcut that opens the weekly view',
+    (tester) async {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(db)],
+          child: MaterialApp(
+            theme: AppTheme.themeData(darkMode: true),
+            home: const SpeakingStudioScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView).first, const Offset(0, -1800));
+      await tester.pumpAndSettle();
+
+      final report = find.text('Report');
+      final listening = find.text('Listening');
+      expect(report, findsOneWidget);
+      expect(listening, findsOneWidget);
+      expect(
+        tester.getTopLeft(report).dx,
+        lessThan(tester.getTopLeft(listening).dx),
+      );
+
+      await tester.tap(report);
+      await tester.pumpAndSettle();
+      expect(find.text('Your French this week'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Home keeps the authored route stable until a lesson completes', (
     tester,
   ) async {

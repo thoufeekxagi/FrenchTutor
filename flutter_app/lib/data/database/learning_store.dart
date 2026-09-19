@@ -378,6 +378,34 @@ class LearningStore {
         .toList();
   }
 
+  /// Read-only review history for a local calendar interval. Unlike
+  /// [reviewsOn], this compares the exact UTC instants at both boundaries so
+  /// a weekly report remains correct across local midnight/time-zone edges.
+  List<({String entryId, SRSGrade grade, DateTime reviewedAt})> reviewsBetween(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) {
+    final rows = _db.select(
+      '''SELECT entry_id, grade, reviewed_at FROM vocab_reviews
+         WHERE reviewed_at >= ? AND reviewed_at < ? ORDER BY reviewed_at''',
+      [
+        startInclusive.toUtc().toIso8601String(),
+        endExclusive.toUtc().toIso8601String(),
+      ],
+    );
+    return rows
+        .map(
+          (row) => (
+            entryId: row['entry_id'] as String,
+            grade:
+                SRSGrade.values.asNameMap()[row['grade'] as String] ??
+                SRSGrade.good,
+            reviewedAt: DateTime.parse(row['reviewed_at'] as String),
+          ),
+        )
+        .toList(growable: false);
+  }
+
   /// Distinct entries recalled successfully (good/easy) since [since] —
   /// the evidence behind "this week you can now…" progress framing.
   List<String> entriesRecalledSince(DateTime since) {
@@ -440,6 +468,24 @@ class LearningStore {
     );
     unawaited(_sync?.syncDailySession(session));
     return session;
+  }
+
+  /// Looks up an already-saved day without creating an empty row or syncing a
+  /// new one. Historical progress/report reads must never mutate learner data.
+  DailySession? existingDailySession({DateTime? on}) {
+    final date = dayString(on ?? DateTime.now());
+    final rows = _db.select(
+      'SELECT * FROM daily_sessions WHERE local_date = ? AND deleted_at IS NULL',
+      [date],
+    );
+    if (rows.isEmpty) return null;
+    try {
+      return _dailyFromRow(rows.first);
+    } catch (_) {
+      // A malformed legacy row is missing report evidence, not a reason for
+      // the weekly summary screen to fail.
+      return null;
+    }
   }
 
   /// Soft-deletes today's row so the next [dailySession] call mints a fresh

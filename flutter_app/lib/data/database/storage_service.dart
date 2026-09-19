@@ -146,7 +146,10 @@ class StorageService {
   /// the roadmap's backwards-compatible count fallback.
   Set<String> completedContentKeys() {
     final rows = _db.select(
-      'SELECT DISTINCT content_key FROM sessions WHERE content_key IS NOT NULL AND content_key != ? AND deleted_at IS NULL',
+      '''SELECT DISTINCT content_key FROM sessions
+         WHERE content_key IS NOT NULL AND content_key != ?
+           AND summary LIKE 'Completed the course session:%'
+           AND deleted_at IS NULL''',
       [''],
     );
     return rows.map((row) => row['content_key'] as String).toSet();
@@ -160,11 +163,53 @@ class StorageService {
     required String stage,
     String? lessonMaterial,
   }) {
-    final existing = _db.select(
-      'SELECT 1 FROM sessions WHERE content_key = ? AND deleted_at IS NULL LIMIT 1',
+    final existingCompletion = _db.select(
+      '''SELECT 1 FROM sessions
+         WHERE content_key = ?
+           AND summary LIKE 'Completed the course session:%'
+           AND deleted_at IS NULL
+         LIMIT 1''',
       [contentKey],
     );
-    if (existing.isNotEmpty) return;
+    if (existingCompletion.isNotEmpty) return;
+
+    // Course activities also save ordinary practice-history sessions with
+    // this content key when the learner leaves the screen. Reuse the latest
+    // one as the durable completion marker instead of letting any such row
+    // imply completion or creating a duplicate entry in Recent Practice.
+    final priorActivity = _db.select(
+      '''SELECT * FROM sessions
+         WHERE content_key = ? AND deleted_at IS NULL
+         ORDER BY ended_at DESC, started_at DESC
+         LIMIT 1''',
+      [contentKey],
+    );
+    if (priorActivity.isNotEmpty) {
+      final session = _sessionFromRow(priorActivity.first);
+      final oldSummary = session.summary?.trim() ?? '';
+      session.summary = [
+        'Completed the course session: $topic',
+        if (oldSummary.isNotEmpty) 'Practice: $oldSummary',
+      ].join('\n');
+      final now = DateTime.now().toUtc().toIso8601String();
+      _db.execute(
+        'UPDATE sessions SET summary = ?, updated_at = ? WHERE id = ?',
+        [session.summary, now, session.id],
+      );
+      unawaited(_sync?.syncSession(session, updatedAt: now));
+      _saveCourseMaterialSnapshotIfNeeded(session);
+      if (lessonMaterial != null &&
+          lessonMaterial.trim().isNotEmpty &&
+          getSessionMessages(sessionId: session.id).isEmpty) {
+        _saveBoundedCourseMaterial(
+          sessionId: session.id,
+          material: lessonMaterial,
+        );
+      }
+      ReviewContextCacheService.schedule(_db);
+      return;
+    }
+
     final now = DateTime.now().toUtc().toIso8601String();
     final session = Session(
       id: _uuid.v4(),

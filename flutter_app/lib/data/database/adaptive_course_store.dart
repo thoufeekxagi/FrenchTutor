@@ -600,16 +600,64 @@ class AdaptiveCourseStore {
       return plan;
     }
 
-    final successorUnit = completed.unit + 1;
+    return _ensureSuccessorForSession(profile, plan, completed);
+  }
+
+  /// Commits a successful Course route and advances that exact skill lane in
+  /// one store operation. Both writes are idempotent, so the activity wrapper
+  /// and roadmap may safely repeat the completion signal after navigation.
+  AdaptiveCoursePlanSnapshot completeAndEnsureSuccessor(
+    Profile profile,
+    String contentKey,
+  ) {
+    // Completion can be reported by a Course entry point before that device
+    // has materialized its local plan (for example after an auth refresh).
+    // Ensure the authored Unit 1/2 rows exist before marking the completed
+    // content key, otherwise markCompleted would silently find no active row.
+    if (_activePlanRow() == null) ensureCurrentPlan(profile);
+    markCompleted(contentKey);
+    return ensureSuccessorForCompleted(profile, contentKey);
+  }
+
+  /// Adds the next lesson in [skill]'s lane whether or not its current lesson
+  /// has been completed. Automatic completion and the manual Course action
+  /// share canonical unit/skill slots: an existing slot is reused, while a
+  /// further explicit manual request advances to the following unit.
+  AdaptiveCoursePlanSnapshot ensureSuccessorForSkill(
+    Profile profile,
+    SpeakSkill skill,
+  ) {
+    final plan = ensureCurrentPlan(profile);
+    AdaptiveCourseSessionSpec? latestInLane;
+    for (final session in plan.sessions) {
+      if (session.primarySkill != skill ||
+          session.unit < 2 ||
+          session.status == 'replaced') {
+        continue;
+      }
+      if (latestInLane == null || session.sequence > latestInLane.sequence) {
+        latestInLane = session;
+      }
+    }
+    if (latestInLane == null) return plan;
+    return _ensureSuccessorForSession(profile, plan, latestInLane);
+  }
+
+  AdaptiveCoursePlanSnapshot _ensureSuccessorForSession(
+    Profile profile,
+    AdaptiveCoursePlanSnapshot plan,
+    AdaptiveCourseSessionSpec source,
+  ) {
+    final successorUnit = source.unit + 1;
     final existing = plan.sessions.any(
       (session) =>
           session.status != 'replaced' &&
           session.unit == successorUnit &&
-          session.primarySkill == completed!.primarySkill,
+          session.primarySkill == source.primarySkill,
     );
     if (existing) return plan;
 
-    final successorSequence = completed.sequence + adaptiveCourseBatchSize;
+    final successorSequence = source.sequence + adaptiveCourseBatchSize;
     final sequenceOccupied = plan.sessions.any(
       (session) =>
           session.status != 'replaced' && session.sequence == successorSequence,
@@ -625,7 +673,7 @@ class AdaptiveCourseStore {
       startSequence: successorSequence,
       batchSize: 1,
       snapshot: UniversalLearningDataService.buildSnapshot(_db, profile),
-      forcedPersonalizedSkill: completed.primarySkill,
+      forcedPersonalizedSkill: source.primarySkill,
     );
     final expanded = _snapshotForPlan(plan.id);
     _notifyPlan(expanded);
@@ -634,7 +682,8 @@ class AdaptiveCourseStore {
 
   /// Compatibility entry point retained for Home and older call sites.
   /// Course no longer pre-creates Reading/Listening: every lane advances only
-  /// from completion through [ensureSuccessorForCompleted].
+  /// when selected manually or after completion through
+  /// [ensureSuccessorForSkill] and [ensureSuccessorForCompleted].
   AdaptiveCoursePlanSnapshot ensureMediaBuffer(Profile profile) {
     return ensureCurrentPlan(profile);
   }
@@ -668,16 +717,19 @@ class AdaptiveCourseStore {
   /// Requeues one terminal failed lesson after an explicit learner tap.
   /// Attempts are deliberately retained: production can distinguish a manual
   /// retry from the single automatic retry and will never loop it itself.
-  AdaptiveCourseSessionSpec? requeueFailedSession(String sessionId) {
+  AdaptiveCourseSessionSpec? requeueFailedSession(
+    String sessionId, {
+    String generationError = 'Manual retry requested',
+  }) {
     final now = _now();
     _db.execute(
       '''UPDATE adaptive_course_sessions
          SET generation_status = 'queued',
-             generation_error = 'Manual retry requested',
+             generation_error = ?,
              updated_at = ?
          WHERE id = ? AND generation_status = 'failed'
            AND status IN ('planned', 'active') AND deleted_at IS NULL''',
-      [now, sessionId],
+      [generationError, now, sessionId],
     );
     final session = sessionById(sessionId);
     if (session != null) _notifySession(session);

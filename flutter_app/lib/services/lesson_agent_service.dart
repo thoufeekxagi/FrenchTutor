@@ -42,12 +42,73 @@ The app renders all learner-facing text outside the image.
 ///
 /// General text generation uses the pinned OpenRouter GPT-5.6 Luna route;
 /// individual multimodal/transcription callers explicitly request Gemini.
-/// Thrown by any raw Gemini HTTP call in this file (text
-/// generation) instead of the generic [AgentError] so callers can tell a
-/// rate limit (429, back off longer and retry) apart from any other
-/// failure (back off briefly and retry, then give up).
-class GeminiHttpError implements Exception {
-  GeminiHttpError(this.statusCode, {this.retryAfter});
+/// Provider-aware HTTP failure returned by the shared Supabase AI function.
+///
+/// Text generation normally uses OpenRouter, while a few multimodal callers
+/// explicitly use Gemini.  Keeping the provider on the exception prevents a
+/// warm-up/OpenRouter failure from being reported as a misleading Gemini
+/// error, and lets the caller apply the same retry policy to both providers.
+class AiProviderHttpError implements Exception {
+  AiProviderHttpError(
+    this.provider,
+    this.statusCode, {
+    this.retryAfter,
+    this.message,
+  });
+
+  factory AiProviderHttpError.fromFunctionException(
+    FunctionException error, {
+    required String provider,
+  }) {
+    Duration? retryAfter;
+    String? message;
+    final details = error.details;
+    if (details is Map) {
+      final seconds = double.tryParse(details['retryAfter']?.toString() ?? '');
+      if (seconds != null) {
+        retryAfter = Duration(milliseconds: (seconds * 1000).ceil() + 500);
+      }
+      final rawMessage = details['error'] ?? details['message'];
+      if (rawMessage != null && rawMessage.toString().trim().isNotEmpty) {
+        message = rawMessage.toString().trim();
+      }
+    } else if (details != null && details.toString().trim().isNotEmpty) {
+      message = details.toString().trim();
+    }
+    return AiProviderHttpError(
+      provider,
+      error.status,
+      retryAfter: retryAfter,
+      message: message,
+    );
+  }
+
+  final String provider;
+  final int statusCode;
+  final Duration? retryAfter;
+  final String? message;
+
+  bool get isRateLimited => statusCode == 429;
+
+  @override
+  String toString() {
+    final label = switch (provider.toLowerCase()) {
+      'gemini' => 'GeminiHttpError',
+      'openrouter' => 'OpenRouterHttpError',
+      _ =>
+        '${provider.isEmpty ? 'AI' : provider[0].toUpperCase()}${provider.length > 1 ? provider.substring(1) : ''}HttpError',
+    };
+    return message == null || message!.isEmpty
+        ? '$label($statusCode)'
+        : '$label($statusCode): $message';
+  }
+}
+
+/// Backwards-compatible Gemini-specific type retained for older callers and
+/// retry-policy tests. New function errors use [AiProviderHttpError].
+class GeminiHttpError extends AiProviderHttpError {
+  GeminiHttpError(int statusCode, {super.retryAfter})
+    : super('gemini', statusCode);
 
   /// Retained for retry-policy tests and older callers. Production provider
   /// responses now arrive as Edge Function errors, never as direct app HTTP.
@@ -75,14 +136,6 @@ class GeminiHttpError implements Exception {
     }
     return GeminiHttpError(error.status, retryAfter: retryAfter);
   }
-
-  final int statusCode;
-  final Duration? retryAfter;
-
-  bool get isRateLimited => statusCode == 429;
-
-  @override
-  String toString() => 'GeminiHttpError($statusCode)';
 }
 
 class AgentError implements Exception {
@@ -3384,17 +3437,15 @@ Rules:
   present future content as already mastered.
 - Keep the result concise enough for another lesson engine to use directly.
 ''';
-    final raw = await _complete(
+    Future<String> request(Map<String, dynamic> dossier) => _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {
           'role': 'user',
-          // The Edge Function intentionally caps each text field at 12k
-          // characters. Keep the structured dossier below that ceiling while
-          // preserving its shape; this trims optional evidence before it can
-          // make the composer request fail.
-          'content':
-              'REQUESTED REVIEW PLAN:\n${jsonEncode(_boundedReviewDossier(plan))}',
+          // Review and Warm-up deliberately share this request contract. The
+          // only difference is the bounded dossier window supplied by the
+          // planner, never the provider or generation path.
+          'content': 'REQUESTED REVIEW PLAN:\n${jsonEncode(dossier)}',
         },
       ],
       maxTokens: 2600,
@@ -3403,10 +3454,27 @@ Rules:
       traceFeature: 'review_composer',
       maxAttempts: 2,
     );
-    return _parseReviewBlueprint(raw, plan);
+
+    try {
+      final raw = await request(_boundedReviewDossier(plan));
+      return _parseReviewBlueprint(raw, plan);
+    } on AiProviderHttpError catch (error) {
+      // A future Course artifact can contain a verbose generated payload. If
+      // the provider rejects the first warm-up request, retry the *same Review
+      // flow* with only the compact future summaries. Review itself is not
+      // changed, and no Gemini fallback is introduced.
+      if (plan.kind != 'warmup' || error.statusCode != 400) rethrow;
+      final raw = await request(
+        _boundedReviewDossier(plan, compactWarmup: true),
+      );
+      return _parseReviewBlueprint(raw, plan);
+    }
   }
 
-  Map<String, dynamic> _boundedReviewDossier(PersonalizedReviewPlan plan) {
+  Map<String, dynamic> _boundedReviewDossier(
+    PersonalizedReviewPlan plan, {
+    bool compactWarmup = false,
+  }) {
     final decoded = jsonDecode(jsonEncode(plan.gptDossier));
     if (decoded is! Map) {
       throw StateError('Review dossier is not a JSON object');
@@ -3417,6 +3485,24 @@ Rules:
       final ids = coverage['sourceSessionIds'];
       if (ids is List) {
         coverage['sourceSessionIds'] = ids.take(24).toList(growable: false);
+      }
+    }
+
+    if (compactWarmup && plan.kind == 'warmup') {
+      final request = dossier['request'];
+      if (request is Map) {
+        final futureSummaries = request['futureLessonSummaries'];
+        final compactFuture = futureSummaries is List
+            ? futureSummaries
+                  .whereType<String>()
+                  .take(3)
+                  .map(
+                    (value) =>
+                        value.length > 700 ? value.substring(0, 700) : value,
+                  )
+                  .join('\n')
+            : '';
+        request['futureCourseContext'] = compactFuture;
       }
     }
 
@@ -3682,7 +3768,7 @@ Rules:
         return normalizeGeneratedText(text);
       } catch (e) {
         if (attempt == maxAttempts) rethrow;
-        final retryAfter = e is GeminiHttpError && e.isRateLimited
+        final retryAfter = e is AiProviderHttpError && e.isRateLimited
             ? e.retryAfter
             : null;
         await Future.delayed(
@@ -3782,7 +3868,10 @@ Rules:
       if (error.status == 401 || error.status == 403) {
         throw AgentError.requestFailed;
       }
-      throw GeminiHttpError.fromFunctionException(error);
+      throw AiProviderHttpError.fromFunctionException(
+        error,
+        provider: requestedProvider,
+      );
     } on AgentError {
       unawaited(
         AiCostTracker.event(

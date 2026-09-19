@@ -113,6 +113,25 @@ class VocabularySessionStore {
     return rows.map(_fromRow).toList(growable: false);
   }
 
+  /// Returns vocabulary decks started within a calendar interval. The report
+  /// uses the frozen deck/results already stored here; it never regenerates
+  /// content or makes a network request.
+  List<VocabularySessionRecord> startedBetween(
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) {
+    final rows = _db.select(
+      '''SELECT * FROM vocabulary_sessions
+         WHERE deleted_at IS NULL AND started_at >= ? AND started_at < ?
+         ORDER BY started_at''',
+      [
+        startInclusive.toUtc().toIso8601String(),
+        endExclusive.toUtc().toIso8601String(),
+      ],
+    );
+    return rows.map(_fromRow).toList(growable: false);
+  }
+
   VocabularySessionRecord? latestOpen() {
     final rows = _db.select(
       "SELECT * FROM vocabulary_sessions "

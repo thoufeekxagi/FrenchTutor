@@ -21,7 +21,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        List.generate(43, (index) => index + 1),
+        List.generate(45, (index) => index + 1),
       );
     });
 
@@ -78,6 +78,109 @@ void main() {
       expect(gate.hasPremiumAccess, isTrue);
       expect(gate.tryEnter(PremiumArea.writing), isTrue);
     });
+
+    test('Course Units 1–2 stay free after the shared preview is used', () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final infrastructure = PilotInfrastructureStore(db);
+      final gate = SubscriptionGateService(
+        infrastructure: infrastructure,
+        database: db,
+      );
+
+      expect(gate.isCourseUnitLocked(1), isFalse);
+      expect(gate.isCourseUnitLocked(2), isFalse);
+      expect(gate.isCourseUnitLocked(3), isTrue);
+      expect(gate.isCourseUnitLocked(4), isTrue);
+
+      // Consuming a preview in another area must not alter the Course free
+      // boundary or accidentally grant a Unit 3 preview.
+      expect(gate.tryEnter(PremiumArea.reading), isTrue);
+      expect(gate.isCourseUnitLocked(1), isFalse);
+      expect(gate.isCourseUnitLocked(2), isFalse);
+      expect(gate.isCourseUnitLocked(3), isTrue);
+    });
+
+    test('only a valid paid entitlement unlocks Course Unit 3+', () {
+      final db = sqlite3.openInMemory();
+      addTearDown(db.dispose);
+      final infrastructure = PilotInfrastructureStore(db);
+      final gate = SubscriptionGateService(
+        infrastructure: infrastructure,
+        database: db,
+      );
+      infrastructure.setEntitlementUser('test-user');
+
+      infrastructure.saveEntitlement(
+        PilotEntitlement(
+          productId: 'com.parlesprint.pro.annual',
+          status: PilotEntitlementStatus.active,
+          source: 'revenuecat',
+          verifiedAt: DateTime.now().toUtc(),
+          expiresAt: DateTime.now().toUtc().subtract(const Duration(days: 1)),
+        ),
+      );
+      expect(gate.isCourseUnitLocked(3), isTrue);
+
+      infrastructure.clearEntitlements();
+      infrastructure.setEntitlementUser('test-user');
+      infrastructure.saveEntitlement(
+        PilotEntitlement(
+          productId: 'invite:OLD-CODE',
+          status: PilotEntitlementStatus.active,
+          source: 'legacy_code',
+          verifiedAt: DateTime.now().toUtc(),
+        ),
+      );
+      expect(gate.isCourseUnitLocked(3), isTrue);
+
+      infrastructure.clearEntitlements();
+      infrastructure.setEntitlementUser('test-user');
+      infrastructure.saveEntitlement(
+        PilotEntitlement(
+          productId: 'com.parlesprint.pro.annual',
+          status: PilotEntitlementStatus.grace,
+          source: 'revenuecat',
+          verifiedAt: DateTime.now().toUtc(),
+          expiresAt: DateTime.now().toUtc().add(const Duration(days: 1)),
+        ),
+      );
+      expect(gate.isCourseUnitLocked(3), isFalse);
+      expect(gate.isCourseUnitLocked(20), isFalse);
+    });
+
+    test(
+      'inactive, unverifiable, and local-preview states keep Unit 3 locked',
+      () {
+        final db = sqlite3.openInMemory();
+        addTearDown(db.dispose);
+        final infrastructure = PilotInfrastructureStore(db);
+        final gate = SubscriptionGateService(
+          infrastructure: infrastructure,
+          database: db,
+        );
+
+        expect(gate.isCourseUnitLocked(3), isTrue);
+        infrastructure.setEntitlementUser('test-user');
+        for (final status in [
+          PilotEntitlementStatus.inactive,
+          PilotEntitlementStatus.verificationUnavailable,
+          PilotEntitlementStatus.localPreview,
+        ]) {
+          infrastructure.clearEntitlements();
+          infrastructure.setEntitlementUser('test-user');
+          infrastructure.saveEntitlement(
+            PilotEntitlement(
+              productId: 'com.parlesprint.pro.annual',
+              status: status,
+              source: 'revenuecat',
+              verifiedAt: DateTime.now().toUtc(),
+            ),
+          );
+          expect(gate.isCourseUnitLocked(3), isTrue, reason: status.name);
+        }
+      },
+    );
 
     test('legacy invite entitlements never grant release access', () {
       final entitlement = PilotEntitlement(

@@ -167,6 +167,24 @@ void main() {
       expect(prompt, isNot(contains('one short correction or encouragement')));
     });
 
+    test('compact guided speaking feedback stays brief and current', () {
+      final prompt = LivePrompts.compactGuidedSpeaking(
+        persona: TutorPersona.marie,
+      );
+      expect(prompt, contains('plain confirmation'));
+      expect(prompt, contains('Good pronunciation'));
+      expect(prompt, contains('one improvement'));
+      expect(prompt, contains('If the audio is'));
+      expect(prompt, contains('Never continue or finish a sentence'));
+      expect(prompt, contains('priority over your previous reply'));
+      expect(
+        prompt,
+        contains('clearly asks a question about the current word'),
+      );
+      expect(prompt, contains('answer it directly in one brief sentence'));
+      expect(prompt, contains('no extra praise or follow-up question'));
+    });
+
     test(
       'compact writing course guide follows the grammar screen contract',
       () {

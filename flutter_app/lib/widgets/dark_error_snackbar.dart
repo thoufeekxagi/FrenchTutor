@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../design/app_theme.dart';
+
 /// The shared error surface for tutor/session failures.
 ///
 /// Session screens use dark artwork and white controls, so the platform's
@@ -16,13 +18,13 @@ void showDarkErrorSnackBar(BuildContext context, String message) {
         content: Text(
           message,
           style: const TextStyle(
-            color: Colors.white,
+            color: AppTheme.snackBarForegroundColor,
             fontSize: 14,
             height: 1.25,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: const Color(0xFF202024),
+        backgroundColor: AppTheme.snackBarBackgroundColor,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 96),
         shape: const RoundedRectangleBorder(

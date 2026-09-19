@@ -39,6 +39,23 @@ function providerStatus(response: Response): number {
   return response.status === 429 ? 429 : response.status >= 500 ? 502 : 400;
 }
 
+function providerError(
+  provider: string,
+  model: string,
+  traceFeature: string,
+  response: Response,
+  details: unknown,
+) {
+  return json({
+    error: errorMessage(details),
+    provider,
+    model,
+    traceFeature,
+    upstreamStatus: response.status,
+    retryAfter: response.headers.get("retry-after"),
+  }, providerStatus(response));
+}
+
 function validateContents(contents: unknown): contents is unknown[] {
   if (!Array.isArray(contents) || contents.length === 0 || contents.length > MAX_MESSAGES) {
     return false;
@@ -175,7 +192,13 @@ async function callGemini(
   }
   const response = lastResponse!;
   const details = await response.json().catch(() => ({}));
-  return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
+  return providerError(
+    "gemini",
+    GEMINI_MODEL,
+    traceFeature,
+    response,
+    details,
+  );
 }
 
 async function callOpenRouter(
@@ -204,7 +227,13 @@ async function callOpenRouter(
   });
   if (!response.ok) {
     const details = await response.json().catch(() => ({}));
-    return json({ error: errorMessage(details), retryAfter: response.headers.get("retry-after") }, providerStatus(response));
+    return providerError(
+      "openrouter",
+      OPENROUTER_MODEL,
+      traceFeature,
+      response,
+      details,
+    );
   }
   const data = await response.json();
   const choices = data?.choices;
