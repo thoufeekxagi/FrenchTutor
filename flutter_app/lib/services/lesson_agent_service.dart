@@ -3446,10 +3446,14 @@ Rules:
         {'role': 'system', 'content': system + languageGuardrail},
         {
           'role': 'user',
-          // Review and Warm-up deliberately share this request contract. The
-          // only difference is the bounded dossier window supplied by the
-          // planner, never the provider or generation path.
-          'content': _reviewComposerMessage(plan, minimalWarmup: minimalWarmup),
+          // Review keeps its proven bounded dossier contract. Warm-up has a
+          // deliberately smaller forward-looking contract: one completed
+          // Course lesson plus up to three upcoming Course lessons. This
+          // prevents future rows (which do not have review history) from
+          // being serialized as malformed review evidence.
+          'content': plan.kind == 'warmup'
+              ? _warmupOpenAiMessage(plan)
+              : _reviewComposerMessage(plan, minimalWarmup: minimalWarmup),
         },
       ],
       maxTokens: 2600,
@@ -3479,6 +3483,39 @@ Rules:
     plan.gptDossier,
     minimalWarmup: minimalWarmup && plan.kind == 'warmup',
   );
+
+  String _warmupOpenAiMessage(PersonalizedReviewPlan plan) {
+    String safe(String value, [int limit = 420]) {
+      final clean = value
+          .replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]'), ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      return clean.length > limit ? clean.substring(0, limit) : clean;
+    }
+
+    final lines = <String>[
+      'WARM-UP INPUT: create a short French lesson from the Course path below.',
+      'Use the completed lesson only as a bridge. Future lessons are not mastered yet.',
+    ];
+    final completed = plan.snapshot.evidence
+        .where((item) => item.source.toLowerCase() == 'course')
+        .take(1);
+    for (final item in completed) {
+      final title = item.topic.trim().isEmpty ? item.mode : item.topic;
+      lines.add(
+        'LAST COMPLETED COURSE: ${safe(title)} — ${safe(item.summary)}',
+      );
+    }
+    final ids = plan.futureSessionIds.take(3).toList(growable: false);
+    final summaries = plan.futureLessonSummaries
+        .take(3)
+        .toList(growable: false);
+    for (var index = 0; index < summaries.length; index++) {
+      final id = index < ids.length ? ids[index] : 'upcoming-${index + 1}';
+      lines.add('UPCOMING COURSE $id: ${safe(summaries[index])}');
+    }
+    return lines.join('\n');
+  }
 
   /// Encodes the exact user message sent by both Review and Warm-up.
   ///
