@@ -5,6 +5,30 @@ deleting a learner account. It uses the Supabase Auth admin API, the REST API,
 and Storage API with the service-role key kept in the shell environment. It
 does not call the app, Edge Functions, or a broad SQL delete.
 
+## Local operator setup
+
+The repository ignores `flutter_app/tool/.env`. Keep the production key in that
+file only; never commit it, put it in Flutter code, or paste it into chat.
+
+Create `flutter_app/tool/.env` with:
+
+```sh
+SUPABASE_URL=https://oxfnrsjskdjbroekxdco.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=the-legacy-service-role-key
+# Optional newer key kept for backend migration; the current Dart tool uses the line above.
+SUPABASE_SECRET_KEY=the-sb-secret-key
+```
+
+Then run the exact-email wrapper from `flutter_app/tool`:
+
+```sh
+./run_delete_test_user.sh thoufeekbaber1@gmail.com
+```
+
+The wrapper requires one exact email, loads the ignored local `.env`, passes the
+exact confirmation automatically, and runs the script's existing post-delete
+verification. It cannot enumerate or bulk-delete accounts.
+
 ## Interactive use
 
 Put only the accounts that are safe to remove in the allowlist. The blank
