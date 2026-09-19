@@ -78,7 +78,11 @@ void main() {
       },
       'recentSessions': List.generate(
         20,
-        (index) => {'id': 'recent-$index', 'summary': huge},
+        (index) => {
+          'id': 'recent-$index',
+          'source': index == 0 ? 'course' : 'practice',
+          'summary': huge,
+        },
       ),
       'vocabularyEvidence': List.generate(20, (_) => huge),
       'recentLearnerTranscriptExcerpts': List.generate(20, (_) => huge),
@@ -93,8 +97,9 @@ void main() {
     expect(request['futureLessonSummaries'], isEmpty);
     expect(request['futureCourseContext'], isNull);
     final evidence = dossier['recentSessions'] as List;
-    expect(evidence, hasLength(3));
-    expect((evidence.first as Map)['source'], 'upcoming_course');
+    expect(evidence, hasLength(4));
+    expect((evidence.first as Map)['source'], 'course');
+    expect((evidence[1] as Map)['source'], 'upcoming_course');
     expect(dossier['vocabularyEvidence'], isEmpty);
     expect(dossier['recentLearnerTranscriptExcerpts'], isEmpty);
     expect(dossier['performanceSignals'], isEmpty);

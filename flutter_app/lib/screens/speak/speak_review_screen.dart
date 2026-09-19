@@ -95,10 +95,12 @@ class _SpeakReviewScreenState extends ConsumerState<SpeakReviewScreen> {
           const SizedBox(height: 18),
           _planCard(context, plan, sessions, canStart, isWarmup),
           const SizedBox(height: 28),
-          _recentPractice(sessions),
-          if (sessions.isNotEmpty) ...[
-            const SizedBox(height: 22),
-            _retrySavedPractice(sessions),
+          if (!isWarmup) ...[
+            _recentPractice(sessions),
+            if (sessions.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              _retrySavedPractice(sessions),
+            ],
           ],
         ],
       ),

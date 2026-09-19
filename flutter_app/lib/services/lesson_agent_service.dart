@@ -3441,7 +3441,7 @@ Rules:
   present future content as already mastered.
 - Keep the result concise enough for another lesson engine to use directly.
 ''';
-    Future<String> request({bool compactWarmup = false}) => _complete(
+    Future<String> request({bool minimalWarmup = false}) => _complete(
       messages: [
         {'role': 'system', 'content': system + languageGuardrail},
         {
@@ -3449,7 +3449,7 @@ Rules:
           // Review and Warm-up deliberately share this request contract. The
           // only difference is the bounded dossier window supplied by the
           // planner, never the provider or generation path.
-          'content': _reviewComposerMessage(plan, compactWarmup: compactWarmup),
+          'content': _reviewComposerMessage(plan, minimalWarmup: minimalWarmup),
         },
       ],
       maxTokens: 2600,
@@ -3463,22 +3463,21 @@ Rules:
       final raw = await request();
       return _parseReviewBlueprint(raw, plan);
     } on AiProviderHttpError catch (error) {
-      // A future Course artifact can contain a verbose generated payload. If
-      // the provider rejects the first warm-up request, retry the *same Review
-      // flow* with only the compact future summaries. Review itself is not
-      // changed, and no Gemini fallback is introduced.
+      // If one stored future field is malformed, retry the same Review flow
+      // with a tiny valid Warm-up request. Review itself is untouched and no
+      // Gemini fallback is introduced.
       if (plan.kind != 'warmup' || error.statusCode != 400) rethrow;
-      final raw = await request(compactWarmup: true);
+      final raw = await request(minimalWarmup: true);
       return _parseReviewBlueprint(raw, plan);
     }
   }
 
   String _reviewComposerMessage(
     PersonalizedReviewPlan plan, {
-    bool compactWarmup = false,
+    bool minimalWarmup = false,
   }) => buildBoundedReviewMessageForTest(
     plan.gptDossier,
-    compactWarmup: compactWarmup && plan.kind == 'warmup',
+    minimalWarmup: minimalWarmup && plan.kind == 'warmup',
   );
 
   /// Encodes the exact user message sent by both Review and Warm-up.
@@ -3489,7 +3488,7 @@ Rules:
   @visibleForTesting
   static String buildBoundedReviewMessageForTest(
     Map<String, dynamic> rawDossier, {
-    bool compactWarmup = false,
+    bool minimalWarmup = false,
   }) {
     final decoded = jsonDecode(jsonEncode(rawDossier));
     if (decoded is! Map) {
@@ -3497,7 +3496,18 @@ Rules:
     }
     final dossier = decoded.cast<String, dynamic>();
     _normalizeWarmupAsReviewEvidence(dossier);
-    _boundReviewDossier(dossier, compactWarmup: compactWarmup);
+    if (minimalWarmup && dossier['request'] is Map) {
+      final request = dossier['request'] as Map;
+      request['primaryTopic'] = 'the next Course lesson';
+      request['futureCourseContext'] = null;
+      dossier['recentSessions'] = const <Map<String, dynamic>>[];
+      dossier['courseAndPracticeCoverage'] = const {
+        'courseSessions': 0,
+        'practiceSessions': 0,
+        'sourceSessionIds': <String>[],
+      };
+    }
+    _boundReviewDossier(dossier, compactWarmup: false);
 
     var message = '$_reviewRequestPrefix${jsonEncode(dossier)}';
     if (message.length <= _reviewRequestBudget) return message;
@@ -3567,10 +3577,16 @@ Rules:
               .toList(growable: false)
         : const <String>[];
 
-    // Feed upcoming lessons through the same evidence channel that the
-    // working Review composer already consumes. Never send the raw generated
-    // Course artifact or a separate Warm-up-only context payload.
-    dossier['recentSessions'] = List.generate(summaries.length, (index) {
+    // Keep exactly the last completed Course lesson as a small bridge, then
+    // append up to three upcoming lessons. This is the entire Warm-up window.
+    final existing = dossier['recentSessions'];
+    final lastCompleted = existing is List
+        ? existing.whereType<Map>().firstWhere(
+            (item) => item['source']?.toString() == 'course',
+            orElse: () => <String, dynamic>{},
+          )
+        : <String, dynamic>{};
+    final upcoming = List.generate(summaries.length, (index) {
       return <String, dynamic>{
         'id': index < ids.length ? ids[index] : 'upcoming-${index + 1}',
         'source': 'upcoming_course',
@@ -3580,6 +3596,10 @@ Rules:
         'details': const <String>[],
       };
     }, growable: false);
+    dossier['recentSessions'] = <Map<String, dynamic>>[
+      if (lastCompleted.isNotEmpty) lastCompleted.cast<String, dynamic>(),
+      ...upcoming,
+    ];
     request['futureSessionId'] = null;
     request['futureSessionIds'] = const <String>[];
     request['futureLessonSummaries'] = const <String>[];
@@ -3705,8 +3725,12 @@ Rules:
     if (value is Map) {
       for (final key in value.keys.toList()) {
         final item = value[key];
-        if (item is String && item.length > limit) {
-          value[key] = item.substring(0, limit);
+        if (item is String) {
+          final clean = item.replaceAll(
+            RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]'),
+            ' ',
+          );
+          value[key] = clean.length > limit ? clean.substring(0, limit) : clean;
         } else {
           _clampJsonStrings(item, limit);
         }
@@ -3714,8 +3738,14 @@ Rules:
     } else if (value is List) {
       for (var index = 0; index < value.length; index++) {
         final item = value[index];
-        if (item is String && item.length > limit) {
-          value[index] = item.substring(0, limit);
+        if (item is String) {
+          final clean = item.replaceAll(
+            RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]'),
+            ' ',
+          );
+          value[index] = clean.length > limit
+              ? clean.substring(0, limit)
+              : clean;
         } else {
           _clampJsonStrings(item, limit);
         }
