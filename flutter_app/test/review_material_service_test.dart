@@ -242,6 +242,14 @@ void main() {
     expect(plan.kind, 'warmup');
     expect(plan.futureSessionId, isNotNull);
     expect(plan.futureSessionIds, hasLength(3));
+    // Warm-up must preview the tail of the active Course path, not the first
+    // authored rows. The initial plan has eleven lessons, so after completing
+    // the first row the three highest available sequence rows are 9–11.
+    expect(plan.futureSessionIds, [
+      coursePlan.sessions[8].id,
+      coursePlan.sessions[9].id,
+      coursePlan.sessions[10].id,
+    ]);
     expect(plan.futureLessonSummaries, hasLength(3));
     expect(plan.futureContext, contains('RECENT COMPLETED COURSE MATERIAL'));
     expect(plan.futureContext, contains('UPCOMING COURSE WINDOW'));

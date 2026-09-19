@@ -783,16 +783,41 @@ abstract final class ReviewMaterialService {
     int limit = warmupFutureSessionLimit,
   }) {
     try {
+      // Course can retain replaced plans locally while a sync is in flight.
+      // Warm-up must follow the same active-plan lane as Course, otherwise a
+      // stale foundation row from an older plan can win the bounded query.
+      final profileRows = db.select(
+        'SELECT user_id FROM profiles WHERE deleted_at IS NULL LIMIT 1',
+      );
+      final activePlanRows = profileRows.isEmpty
+          ? db.select(
+              "SELECT id FROM adaptive_course_plans "
+              "WHERE status = 'active' AND deleted_at IS NULL "
+              'ORDER BY version DESC, created_at DESC LIMIT 1',
+            )
+          : db.select(
+              "SELECT id FROM adaptive_course_plans "
+              "WHERE status = 'active' AND deleted_at IS NULL AND user_id IS ? "
+              'ORDER BY version DESC, created_at DESC LIMIT 1',
+              [profileRows.first['user_id']],
+            );
+      if (activePlanRows.isEmpty) return const [];
+      final activePlanId = activePlanRows.first['id']?.toString();
+      if (activePlanId == null || activePlanId.isEmpty) return const [];
       final rows = db.select(
         '''SELECT id, title, subtitle, context, primary_skill,
                   grammar_focus_json, success_criteria_json,
                   target_phrases_json, artifact_json, sequence, status
            FROM adaptive_course_sessions
-           WHERE deleted_at IS NULL AND status IN ('planned', 'active')
-           ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END, sequence
+           WHERE plan_id = ? AND deleted_at IS NULL
+             AND status IN ('planned', 'active')
+           ORDER BY sequence DESC
            LIMIT ?''',
-        [limit.clamp(1, warmupFutureSessionLimit)],
+        [activePlanId, limit.clamp(1, warmupFutureSessionLimit)],
       );
+      // The query takes the tail of the current Course pathway. Present that
+      // bounded tail in normal course order so the prompt/card reads from the
+      // earliest of the selected lessons to the latest.
       return rows
           .map((row) {
             final artifact = _jsonMap(row['artifact_json']);
@@ -810,6 +835,8 @@ abstract final class ReviewMaterialService {
               'status': row['status'],
             };
           })
+          .toList(growable: false)
+          .reversed
           .toList(growable: false);
     } catch (_) {
       return const [];
