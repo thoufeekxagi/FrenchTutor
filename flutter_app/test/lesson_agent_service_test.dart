@@ -81,6 +81,8 @@ void main() {
         (index) => {'id': 'recent-$index', 'summary': huge},
       ),
       'vocabularyEvidence': List.generate(20, (_) => huge),
+      'recentLearnerTranscriptExcerpts': List.generate(20, (_) => huge),
+      'performanceSignals': List.generate(20, (_) => huge),
     });
 
     expect(message.length, lessThanOrEqualTo(6000));
@@ -93,5 +95,8 @@ void main() {
     final evidence = dossier['recentSessions'] as List;
     expect(evidence, hasLength(3));
     expect((evidence.first as Map)['source'], 'upcoming_course');
+    expect(dossier['vocabularyEvidence'], isEmpty);
+    expect(dossier['recentLearnerTranscriptExcerpts'], isEmpty);
+    expect(dossier['performanceSignals'], isEmpty);
   });
 }

@@ -3584,6 +3584,33 @@ Rules:
     request['futureSessionIds'] = const <String>[];
     request['futureLessonSummaries'] = const <String>[];
     request['futureCourseContext'] = null;
+
+    // Warm-up previews future Course material only. Do not append the Review
+    // history window (transcripts, mistakes, exam signals, or prior phrases)
+    // to this request; those belong to Smart Review and were the only payload
+    // difference left between the passing production probe and the app call.
+    for (final key in const [
+      'recentLearnerTranscriptExcerpts',
+      'vocabularyEvidence',
+      'learnerPhrases',
+      'repeatedMistakes',
+      'performanceSignals',
+      'writingEvidence',
+      'examEvidence',
+    ]) {
+      dossier[key] = const <String>[];
+    }
+    dossier['courseAndPracticeCoverage'] = <String, dynamic>{
+      'courseSessions': summaries.length,
+      'practiceSessions': 0,
+      'sourceSessionIds': ids,
+    };
+    dossier['localSignals'] = <String, dynamic>{
+      'retrievalTargets': const <String>[],
+      'hardSignals': const <String>[],
+      'recentTopics': const <String>[],
+      'primaryTopic': request['primaryTopic']?.toString() ?? '',
+    };
   }
 
   static void _boundReviewDossier(
