@@ -323,9 +323,9 @@ class LiveIntentVerdict {
 
 class LessonAgentService {
   static const _reviewRequestPrefix = 'REQUESTED REVIEW PLAN:\n';
-  // The ai-text Edge Function accepts at most 12,000 characters per message.
-  // Leave room for encoding differences and future envelope fields.
-  static const _reviewRequestBudget = 10_500;
+  // Keep Review and Warm-up comfortably below every deployed ai-text message
+  // ceiling. The request contains only selected evidence, never raw lessons.
+  static const _reviewRequestBudget = 6_000;
   LessonAgentService._();
 
   static final LessonAgentService shared = LessonAgentService._();
@@ -3496,6 +3496,7 @@ Rules:
       throw StateError('Review dossier is not a JSON object');
     }
     final dossier = decoded.cast<String, dynamic>();
+    _normalizeWarmupAsReviewEvidence(dossier);
     _boundReviewDossier(dossier, compactWarmup: compactWarmup);
 
     var message = '$_reviewRequestPrefix${jsonEncode(dossier)}';
@@ -3547,6 +3548,42 @@ Rules:
       throw StateError('Unable to safely encode Review dossier');
     }
     return message;
+  }
+
+  static void _normalizeWarmupAsReviewEvidence(Map<String, dynamic> dossier) {
+    final request = dossier['request'];
+    if (request is! Map || request['kind'] != 'warmup') return;
+
+    final ids = request['futureSessionIds'] is List
+        ? (request['futureSessionIds'] as List)
+              .map((value) => value.toString())
+              .take(3)
+              .toList(growable: false)
+        : const <String>[];
+    final summaries = request['futureLessonSummaries'] is List
+        ? (request['futureLessonSummaries'] as List)
+              .map((value) => value.toString())
+              .take(3)
+              .toList(growable: false)
+        : const <String>[];
+
+    // Feed upcoming lessons through the same evidence channel that the
+    // working Review composer already consumes. Never send the raw generated
+    // Course artifact or a separate Warm-up-only context payload.
+    dossier['recentSessions'] = List.generate(summaries.length, (index) {
+      return <String, dynamic>{
+        'id': index < ids.length ? ids[index] : 'upcoming-${index + 1}',
+        'source': 'upcoming_course',
+        'skill': 'course',
+        'topic': request['primaryTopic']?.toString() ?? '',
+        'summary': summaries[index],
+        'details': const <String>[],
+      };
+    }, growable: false);
+    request['futureSessionId'] = null;
+    request['futureSessionIds'] = const <String>[];
+    request['futureLessonSummaries'] = const <String>[];
+    request['futureCourseContext'] = null;
   }
 
   static void _boundReviewDossier(

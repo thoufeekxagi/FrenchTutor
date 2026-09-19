@@ -83,11 +83,15 @@ void main() {
       'vocabularyEvidence': List.generate(20, (_) => huge),
     });
 
-    expect(message.length, lessThanOrEqualTo(10500));
+    expect(message.length, lessThanOrEqualTo(6000));
     final dossier = jsonDecode(message.split('\n').skip(1).join('\n')) as Map;
     final request = dossier['request'] as Map;
     expect(request['kind'], 'warmup');
-    expect(request['futureSessionIds'], hasLength(3));
-    expect(request['futureLessonSummaries'], hasLength(3));
+    expect(request['futureSessionIds'], isEmpty);
+    expect(request['futureLessonSummaries'], isEmpty);
+    expect(request['futureCourseContext'], isNull);
+    final evidence = dossier['recentSessions'] as List;
+    expect(evidence, hasLength(3));
+    expect((evidence.first as Map)['source'], 'upcoming_course');
   });
 }
