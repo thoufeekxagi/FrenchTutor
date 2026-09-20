@@ -345,7 +345,10 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
                     children: [
                       Row(
                         children: [
-                          Text('NEXT UP', style: _eyebrow()),
+                          Text(
+                            session.completed ? 'RECENT' : 'NEXT UP',
+                            style: _eyebrow(),
+                          ),
                           const Spacer(),
                           Text(
                             '${session.estimatedMinutes} MINUTES',
@@ -392,7 +395,9 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
-                              'Continue  →',
+                              session.completed
+                                  ? 'Open again  →'
+                                  : 'Continue  →',
                               style: _body(
                                 12,
                                 color: Colors.black,
@@ -700,7 +705,23 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
       }
       if (nextForSkill != null) cards.add(nextForSkill);
     }
-    return cards;
+    if (cards.isNotEmpty) return cards;
+
+    // The hero is image-led, so an empty state is worse than showing the
+    // learner's latest completed media lesson. Use Course sequence (not the
+    // list's current position) so this remains correct as new units append.
+    final latestCompletedMedia =
+        roadmap.sessions
+            .where(
+              (session) =>
+                  session.completed &&
+                  session.contentReady &&
+                  (session.primarySkill == SpeakSkill.reading ||
+                      session.primarySkill == SpeakSkill.listening),
+            )
+            .toList(growable: false)
+          ..sort((a, b) => b.sequence.compareTo(a.sequence));
+    return latestCompletedMedia.take(1).toList(growable: false);
   }
 
   TextStyle _display(double size) =>

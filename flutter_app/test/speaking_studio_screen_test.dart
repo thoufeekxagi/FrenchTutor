@@ -158,6 +158,8 @@ void main() {
     final refreshed = store.currentPlan(profile);
     expect(refreshed?.id, initial.id);
     expect(find.text('Your next session'), findsOneWidget);
+    expect(find.text('Your next lesson will appear here.'), findsNothing);
+    expect(find.text('RECENT'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
