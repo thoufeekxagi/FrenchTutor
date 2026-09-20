@@ -721,7 +721,18 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
             )
             .toList(growable: false)
           ..sort((a, b) => b.sequence.compareTo(a.sequence));
-    return latestCompletedMedia.take(1).toList(growable: false);
+    if (latestCompletedMedia.isNotEmpty) {
+      return latestCompletedMedia.take(1).toList(growable: false);
+    }
+
+    // During first hydration there may be no completed media yet. Still use
+    // the newest ready Course row rather than rendering an empty hero.
+    final latestReady =
+        roadmap.sessions
+            .where((session) => session.contentReady)
+            .toList(growable: false)
+          ..sort((a, b) => b.sequence.compareTo(a.sequence));
+    return latestReady.take(1).toList(growable: false);
   }
 
   TextStyle _display(double size) =>
