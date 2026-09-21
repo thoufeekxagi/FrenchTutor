@@ -121,9 +121,9 @@ class GeminiLiveService {
   static const _compactWritingCompressionTargetTokens = 1100;
   static const _liveTutorCompressionTriggerTokens = 4200;
   static const _liveTutorCompressionTargetTokens = 2400;
-  // Keep a short natural pause, but do not add the extra 700–1000ms that made
-  // Live Tutor feel like it was waiting for a scripted turn to end.
-  static const _liveTutorSilenceDurationMs = 1800;
+  // Live Tutor should tolerate a short thinking pause, but wait up to three
+  // seconds before deciding that the learner has finished.
+  static const _liveTutorSilenceDurationMs = 3000;
 
   int get _contextCompressionTriggerTokens => liveTutorMode
       ? _liveTutorCompressionTriggerTokens

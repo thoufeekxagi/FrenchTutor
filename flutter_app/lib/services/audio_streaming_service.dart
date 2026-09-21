@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
@@ -334,6 +335,7 @@ class AudioStreamingService {
     if (!_isStreaming) return;
     _isStreaming = false;
     _audioChunkCallback = null;
+    _resetBargeInDetector();
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
 
     try {
@@ -359,6 +361,15 @@ class AudioStreamingService {
   /// finish before accepting the next answer.
   bool allowBargeIn = false;
 
+  // Keep barge-in available, but do not let a cough, click, or short noise
+  // burst cut the tutor off. Three consecutive speech-like packets is a small
+  // amount of real speech while restoring most of the previous stability.
+  static const _bargeInSpeechThreshold = 0.10;
+  static const _bargeInSpeechChunksRequired = 3;
+  final Queue<Uint8List> _bargeInPreRoll = Queue<Uint8List>();
+  int _bargeInSpeechChunks = 0;
+  bool _bargeInSpeechDetected = false;
+
   void _handleMicChunk(Uint8List chunk) {
     if (!allowBargeIn) {
       final blockedByOutput = isOutputActive;
@@ -367,9 +378,68 @@ class AudioStreamingService {
           Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round()),
         ),
       );
-      if (blockedByOutput || withinTailGrace) return;
+      if (blockedByOutput || withinTailGrace) {
+        _resetBargeInDetector();
+        return;
+      }
+      _resetBargeInDetector();
+      _audioChunkCallback?.call(chunk);
+      return;
     }
-    _audioChunkCallback?.call(chunk);
+
+    // Once playback is finished, send normally and start the next tutor turn
+    // with a clean interruption detector.
+    if (!hasPendingPlayback) {
+      _resetBargeInDetector();
+      _audioChunkCallback?.call(chunk);
+      return;
+    }
+
+    if (_bargeInSpeechDetected) {
+      _audioChunkCallback?.call(chunk);
+      return;
+    }
+
+    // Hold a small pre-roll so the first syllable is preserved while deciding
+    // whether the learner is really speaking or there was only a noise spike.
+    _bargeInPreRoll.addLast(chunk);
+    while (_bargeInPreRoll.length > _bargeInSpeechChunksRequired) {
+      _bargeInPreRoll.removeFirst();
+    }
+    if (_micSpeechLevel(chunk) >= _bargeInSpeechThreshold) {
+      _bargeInSpeechChunks++;
+    } else {
+      _bargeInSpeechChunks = 0;
+    }
+    if (_bargeInSpeechChunks < _bargeInSpeechChunksRequired) return;
+
+    _bargeInSpeechDetected = true;
+    while (_bargeInPreRoll.isNotEmpty) {
+      _audioChunkCallback?.call(_bargeInPreRoll.removeFirst());
+    }
+  }
+
+  double _micSpeechLevel(Uint8List bytes) {
+    var sumSquares = 0.0;
+    var peak = 0.0;
+    var samples = 0;
+    for (var index = 0; index + 1 < bytes.length; index += 2) {
+      var sample = bytes[index] | (bytes[index + 1] << 8);
+      if (sample >= 0x8000) sample -= 0x10000;
+      final normalized = sample.abs() / 32768.0;
+      sumSquares += normalized * normalized;
+      if (normalized > peak) peak = normalized;
+      samples++;
+    }
+    if (samples == 0) return 0;
+    final rms = math.sqrt(sumSquares / samples);
+    return (rms * 4.5 + peak * 0.15).clamp(0.0, 1.0);
+  }
+
+  void _resetBargeInDetector() {
+    _bargeInPreRoll.clear();
+    _bargeInSpeechChunks = 0;
+    _bargeInSpeechDetected = false;
   }
 
   /// Latched so concurrent callers (audio chunks arrive in bursts, each calling
@@ -621,6 +691,7 @@ class AudioStreamingService {
     Duration fadeOutDuration = Duration.zero,
   }) async {
     _playbackGeneration++;
+    _resetBargeInDetector();
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
     // interruption keep draining and playing after the model was told to stop (barge-in /
     // card-change cut). The player itself is deliberately LEFT RUNNING: tearing it down here

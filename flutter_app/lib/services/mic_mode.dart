@@ -39,17 +39,20 @@ class MicModePrefs {
 /// live screens behave identically. Pure logic — the audio service and socket are
 /// injected as callbacks, which also makes this fully unit-testable.
 class MicController {
+  /// Default silent tail: 10 × 300ms = 3 seconds.
+  static const silenceTailChunks = 10;
+
   MicController({
     required this.startStream,
     required this.stopStream,
     required this.sendAudio,
-    this.silenceTailChunks = 10,
+    this.silenceTailChunkCount = silenceTailChunks,
   });
 
   final Future<void> Function() startStream;
   final Future<void> Function() stopStream;
   final void Function(List<int> pcmBytes) sendAudio;
-  final int silenceTailChunks;
+  final int silenceTailChunkCount;
 
   MicMode _mode = MicMode.auto;
   MicMode get mode => _mode;
@@ -87,7 +90,8 @@ class MicController {
   /// Server VAD closes an utterance on ~2.5s of silence. In push-to-talk we cut the
   /// stream at release, so the server would otherwise wait forever for end-of-speech —
   /// this tail of silent PCM (16kHz mono 16-bit) closes the turn deterministically.
-  /// The default is 10 × 300ms; fast live surfaces can provide a shorter tail.
+  /// The default is 10 × 300ms; a surface can provide a different count when
+  /// it intentionally needs a different endpointing tradeoff.
   static const silenceChunkBytes = 9600; // 300ms at 16kHz mono PCM16
 
   /// Call once the live socket reports connected and mic permission is granted.
@@ -136,7 +140,7 @@ class MicController {
     _held = false;
     await _stopStream();
     final silence = List<int>.filled(silenceChunkBytes, 0);
-    for (var i = 0; i < silenceTailChunks; i++) {
+    for (var i = 0; i < silenceTailChunkCount; i++) {
       sendAudio(silence);
     }
   }

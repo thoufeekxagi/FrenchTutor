@@ -227,7 +227,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
       stopStream: _audio.stopStreaming,
       sendAudio: _gemini.sendAudioChunk,
-      silenceTailChunks: _isLiveTutor ? 6 : 10,
+      silenceTailChunkCount: _isLiveTutor ? 10 : 10,
     );
     MicModePrefs.load().then((saved) {
       if (!mounted) return;
