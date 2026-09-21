@@ -2,6 +2,7 @@ import '../../widgets/adaptive/adaptive.dart';
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -127,9 +128,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   String _errorMessage = '';
   String _liveTutorPartialText = '';
   bool _liveTutorScolding = false;
-  int _liveTutorSpeechPulse = 0;
   bool _liveTutorResponseStarted = false;
   bool _liveTutorKickoffRetried = false;
+  double _liveTutorVoiceLevel = 0;
   bool _sessionSaved = false;
   int _callDuration = 0;
   bool _isSpeakerOn = true;
@@ -545,7 +546,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       _markLiveTutorResponseStarted();
       setState(() {
         _liveTutorPartialText += delta;
-        _liveTutorSpeechPulse += 1;
         _liveTutorScolding = _isCorrectionLine(_liveTutorPartialText);
       });
     };
@@ -555,8 +555,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       _clearStaleConnectionError();
       _audio.isOutputActive = true;
       _audio.playAudioChunk(audioData);
-      if (mounted && _callStatus != CallStatus.tutorSpeaking) {
-        setState(() => _callStatus = CallStatus.tutorSpeaking);
+      if (mounted) {
+        final level = _isLiveTutor ? _liveTutorPcmLevel(audioData) : 0.0;
+        final statusChanged = _callStatus != CallStatus.tutorSpeaking;
+        final levelChanged = (level - _liveTutorVoiceLevel).abs() > 0.01;
+        if (statusChanged || levelChanged) {
+          setState(() {
+            _liveTutorVoiceLevel = level;
+            if (statusChanged) _callStatus = CallStatus.tutorSpeaking;
+          });
+        }
       }
     };
 
@@ -566,16 +574,26 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       // a few seconds later, whenever that turn happens to finish, and was
       // unconditionally overwriting the user's mute back to "listening"
       // without them touching anything.
-      if (mounted && _callStatus != CallStatus.muted) {
-        setState(() => _callStatus = CallStatus.listening);
+      if (mounted) {
+        setState(() {
+          _liveTutorVoiceLevel = 0;
+          if (_callStatus != CallStatus.muted) {
+            _callStatus = CallStatus.listening;
+          }
+        });
       }
     };
 
     _gemini.onInterrupted = () {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
-      if (mounted && _callStatus != CallStatus.muted) {
-        setState(() => _callStatus = CallStatus.listening);
+      if (mounted) {
+        setState(() {
+          _liveTutorVoiceLevel = 0;
+          if (_callStatus != CallStatus.muted) {
+            _callStatus = CallStatus.listening;
+          }
+        });
       }
     };
   }
@@ -913,6 +931,27 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     return LiveTutorMascotMood.listening;
   }
 
+  /// Gemini Live sends the tutor voice as little-endian, 16-bit mono PCM at
+  /// 24 kHz. Use the actual outgoing samples to drive the mascot's two
+  /// existing mouth states, so silence closes it and voiced sound opens it.
+  /// This deliberately measures the tutor output, not the learner's mic.
+  double _liveTutorPcmLevel(List<int> bytes) {
+    var sumSquares = 0.0;
+    var peak = 0.0;
+    var samples = 0;
+    for (var index = 0; index + 1 < bytes.length; index += 2) {
+      var sample = bytes[index] | (bytes[index + 1] << 8);
+      if (sample >= 0x8000) sample -= 0x10000;
+      final normalized = sample.abs() / 32768.0;
+      sumSquares += normalized * normalized;
+      if (normalized > peak) peak = normalized;
+      samples++;
+    }
+    if (samples == 0) return 0;
+    final rms = math.sqrt(sumSquares / samples);
+    return (rms * 4.5 + peak * 0.15).clamp(0.0, 1.0);
+  }
+
   bool get _liveTutorIsConnected =>
       _gemini.isConnected &&
       _callStatus != CallStatus.connecting &&
@@ -1048,7 +1087,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   LiveTutorMascot(
                     size: 188,
                     mood: _liveTutorMascotMood,
-                    speechPulse: _liveTutorSpeechPulse,
+                    voiceLevel: _liveTutorVoiceLevel,
                   ),
                   const SizedBox(height: 16),
                   _liveTutorTranscript(),
@@ -1155,55 +1194,97 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     final transcriptKey = visible.map((message) => message.content).join('|');
     return SizedBox(
       width: double.infinity,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 240),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.08),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          ),
-        ),
-        child: Column(
-          key: ValueKey(transcriptKey),
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var index = 0; index < visible.length; index++) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 350),
-                  child: Text(
-                    visible[index].content,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        DesignTokens.body(
-                          visible[index].isUser ? 16.5 : 18,
-                          weight: visible[index].isUser
-                              ? FontWeight.w500
-                              : FontWeight.w700,
-                        ).copyWith(
-                          color: visible[index].isUser
-                              ? DesignTokens.nightAccent.withValues(alpha: 0.86)
-                              : DesignTokens.nightText,
-                          height: 1.18,
-                        ),
-                  ),
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textWidth = math.min(
+            350.0,
+            math.max(1.0, constraints.maxWidth - 44),
+          );
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 240),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.08),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               ),
-              if (index < visible.length - 1) const SizedBox(height: 8),
-            ],
-          ],
-        ),
+            ),
+            child: Column(
+              key: ValueKey(transcriptKey),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var index = 0; index < visible.length; index++) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 350),
+                      child: Builder(
+                        builder: (context) {
+                          final message = visible[index];
+                          final style =
+                              DesignTokens.body(
+                                message.isUser ? 16.5 : 18,
+                                weight: message.isUser
+                                    ? FontWeight.w500
+                                    : FontWeight.w700,
+                              ).copyWith(
+                                color: message.isUser
+                                    ? DesignTokens.nightAccent.withValues(
+                                        alpha: 0.86,
+                                      )
+                                    : DesignTokens.nightText,
+                                height: 1.18,
+                              );
+                          return Text(
+                            _tailForTwoLines(message.content, style, textWidth),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            // The rolling window already removes the older
+                            // words. Never add an ellipsis at the beginning;
+                            // the newest word must remain the final word on
+                            // screen.
+                            overflow: TextOverflow.clip,
+                            style: style,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  if (index < visible.length - 1) const SizedBox(height: 8),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
+  }
+
+  /// Returns the longest suffix that fits in two rendered lines. The suffix
+  /// is chosen by words rather than characters, so the newest word is always
+  /// preserved and the visible window reads naturally from left to right.
+  String _tailForTwoLines(String text, TextStyle style, double maxWidth) {
+    final normalized = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (normalized.isEmpty) return normalized;
+
+    final words = normalized.split(' ');
+    var best = words.last;
+    for (var start = words.length - 2; start >= 0; start--) {
+      final candidate = words.sublist(start).join(' ');
+      final painter = TextPainter(
+        text: TextSpan(text: candidate, style: style),
+        textDirection: TextDirection.ltr,
+        maxLines: 2,
+      )..layout(maxWidth: maxWidth);
+      if (painter.didExceedMaxLines) break;
+      best = candidate;
+    }
+    return best;
   }
 
   Widget _callHeader() {
