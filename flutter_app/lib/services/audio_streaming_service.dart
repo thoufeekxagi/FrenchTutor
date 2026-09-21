@@ -311,6 +311,7 @@ class AudioStreamingService {
   }) async {
     if (_isStreaming) return;
     _audioChunkCallback = onChunk;
+    _resetSpeechGate();
     await _configureSessionIfNeeded();
     _listenForRouteChanges(await AudioSession.instance);
 
@@ -342,6 +343,7 @@ class AudioStreamingService {
     _isStreaming = false;
     _audioChunkCallback = null;
     _resetBargeInDetector();
+    _resetSpeechGate();
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
 
     try {
@@ -367,6 +369,16 @@ class AudioStreamingService {
   /// finish before accepting the next answer.
   bool allowBargeIn = false;
 
+  /// When enabled, Live Tutor forwards only speech-like PCM instead of an
+  /// always-open stream of silence and room noise. This is deliberately opt-in
+  /// so the deterministic lesson surfaces keep their existing audio behavior.
+  bool speechGateEnabled = false;
+
+  /// Called once the local speech gate sees a natural end to a spoken phrase.
+  /// Live Tutor uses this to close the server turn without waiting for a long
+  /// server-side silence timeout.
+  void Function()? onSpeechEnded;
+
   // Keep barge-in available, but do not let a cough, click, or short noise
   // burst cut the tutor off. Three consecutive speech-like packets is a small
   // amount of real speech while restoring most of the previous stability.
@@ -376,7 +388,21 @@ class AudioStreamingService {
   int _bargeInSpeechChunks = 0;
   bool _bargeInSpeechDetected = false;
 
+  static const _speechGateStartMs = 140.0;
+  static const _speechGateEndSilenceMs = 800.0;
+  static const _speechGatePreRollMs = 280.0;
+  double _speechNoiseFloor = 0.035;
+  double _speechCandidateMs = 0;
+  double _speechSilenceMs = 0;
+  bool _speechGateActive = false;
+  final Queue<Uint8List> _speechPreRoll = Queue<Uint8List>();
+  int _speechPreRollBytes = 0;
+
   void _handleMicChunk(Uint8List chunk) {
+    if (speechGateEnabled) {
+      _handleSpeechGatedMicChunk(chunk);
+      return;
+    }
     if (!allowBargeIn) {
       final blockedByOutput = isOutputActive;
       final withinTailGrace = DateTime.now().isBefore(
@@ -425,6 +451,58 @@ class AudioStreamingService {
     }
   }
 
+  void _handleSpeechGatedMicChunk(Uint8List chunk) {
+    final durationMs = chunk.length / 2 / _inputSampleRate * 1000;
+    if (durationMs <= 0) return;
+    final level = _micSpeechLevel(chunk);
+    final threshold = math
+        .max(0.055, _speechNoiseFloor * 2.2 + 0.012)
+        .toDouble();
+    final speechLike = level >= threshold;
+
+    if (!_speechGateActive) {
+      // Learn only quiet room noise. Tutor playback is intentionally excluded
+      // from the baseline so speaker bleed cannot teach the gate a high floor.
+      if (!hasPendingPlayback && !speechLike) {
+        _speechNoiseFloor = (_speechNoiseFloor * 0.96 + level * 0.04)
+            .clamp(0.015, 0.16)
+            .toDouble();
+      }
+      _speechPreRoll.addLast(chunk);
+      _speechPreRollBytes += chunk.length;
+      final maxPreRollBytes =
+          (_speechGatePreRollMs / 1000 * _inputSampleRate * 2).round();
+      while (_speechPreRollBytes > maxPreRollBytes &&
+          _speechPreRoll.isNotEmpty) {
+        _speechPreRollBytes -= _speechPreRoll.removeFirst().length;
+      }
+      _speechCandidateMs = speechLike ? _speechCandidateMs + durationMs : 0;
+      if (_speechCandidateMs < _speechGateStartMs) return;
+
+      _speechGateActive = true;
+      _speechSilenceMs = 0;
+      while (_speechPreRoll.isNotEmpty) {
+        _audioChunkCallback?.call(_speechPreRoll.removeFirst());
+      }
+      _speechPreRollBytes = 0;
+      return;
+    }
+
+    // Once speech begins, forward every frame—including quiet consonants and
+    // word endings—so the server receives natural speech rather than a gated,
+    // robotic signal.
+    _audioChunkCallback?.call(chunk);
+    _speechSilenceMs = speechLike ? 0 : _speechSilenceMs + durationMs;
+    if (_speechSilenceMs < _speechGateEndSilenceMs) return;
+
+    _speechGateActive = false;
+    _speechCandidateMs = 0;
+    _speechSilenceMs = 0;
+    _speechPreRoll.clear();
+    _speechPreRollBytes = 0;
+    onSpeechEnded?.call();
+  }
+
   double _micSpeechLevel(Uint8List bytes) {
     var sumSquares = 0.0;
     var peak = 0.0;
@@ -446,6 +524,15 @@ class AudioStreamingService {
     _bargeInPreRoll.clear();
     _bargeInSpeechChunks = 0;
     _bargeInSpeechDetected = false;
+  }
+
+  void _resetSpeechGate() {
+    _speechNoiseFloor = 0.035;
+    _speechCandidateMs = 0;
+    _speechSilenceMs = 0;
+    _speechGateActive = false;
+    _speechPreRoll.clear();
+    _speechPreRollBytes = 0;
   }
 
   /// Latched so concurrent callers (audio chunks arrive in bursts, each calling

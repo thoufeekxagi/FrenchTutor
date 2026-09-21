@@ -119,8 +119,12 @@ class GeminiLiveService {
   // intact while remaining much smaller than a full conversation window.
   static const _compactWritingCompressionTriggerTokens = 2200;
   static const _compactWritingCompressionTargetTokens = 1100;
-  static const _liveTutorCompressionTriggerTokens = 4200;
-  static const _liveTutorCompressionTargetTokens = 2400;
+  // Live Tutor is intentionally the cheapest conversational profile. The Live
+  // API re-processes active context on later turns, so a small compression
+  // window matters more than the WebSocket itself. This keeps roughly the
+  // latest couple of short exchanges plus a compact summary.
+  static const _liveTutorCompressionTriggerTokens = 1600;
+  static const _liveTutorCompressionTargetTokens = 800;
   // Live Tutor should tolerate a short thinking pause without making the
   // learner wait several seconds before the next turn begins.
   // Google recommends roughly 500–800ms for general Live API VAD. A slightly
@@ -158,8 +162,9 @@ class GeminiLiveService {
   // cap is a final safety bound because ProgressService already supplies a
   // compact summary (level, goal, focus, and one recent issue).
   static const _maxLearnerProfileCharacters = 500;
+  static const _maxLiveTutorProfileCharacters = 250;
   static const _maxLessonContextCharacters = 2200;
-  static const _maxLiveTutorLessonContextCharacters = 1400;
+  static const _maxLiveTutorLessonContextCharacters = 600;
 
   /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
   /// was dialed with, even across reconnects — the voice and identity never
@@ -407,6 +412,8 @@ class GeminiLiveService {
         requestId: socketId,
         inputAudioSeconds: _usageInputPcmBytes / 2 / 16000,
         outputAudioSeconds: _usageOutputPcmBytes / 2 / 24000,
+        inputTokens: _usagePromptTokens,
+        outputTokens: _usageResponseTokens,
         extra: {
           'input_pcm_bytes': _usageInputPcmBytes,
           'output_pcm_bytes': _usageOutputPcmBytes,
@@ -594,6 +601,28 @@ class GeminiLiveService {
   }
 
   Future<String> _fullSystemPrompt() async {
+    if (liveTutorMode) {
+      var compactPrompt = LivePrompts.compactLiveTutor(
+        persona: _persona,
+        languageMix: await TutorTuning.languageMix(),
+        voiceSpeed: await TutorTuning.voiceSpeed(),
+      );
+      final profile = await _learnerProfile();
+      if (profile.isNotEmpty) {
+        compactPrompt +=
+            '\n\nSTUDENT PROFILE (calibration only; never read aloud):\n'
+            '${_boundDynamicContext(profile, _maxLiveTutorProfileCharacters)}';
+      }
+      final level = levelOverride ?? await _learnerLevel();
+      if (level != null) compactPrompt += '\n\nLEVEL: $level';
+      final ctx = lessonContext;
+      if (ctx != null && ctx.trim().isNotEmpty) {
+        compactPrompt +=
+            '\n\nCURRENT LESSON HINT (optional, not a script):\n'
+            '${_boundDynamicContext(ctx, _lessonContextLimit)}';
+      }
+      return compactPrompt;
+    }
     if (compactGuidedContext &&
         (sessionType == LiveSessionType.speakingGuided ||
             sessionType == LiveSessionType.vocabStage ||

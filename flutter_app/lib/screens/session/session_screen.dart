@@ -200,6 +200,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     });
     _audio = AudioStreamingService();
     _audio.allowBargeIn = _isLiveTutor;
+    _audio.speechGateEnabled = _isLiveTutor;
     _audio.onPlaybackChunk = _handleLiveTutorPlaybackChunk;
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
@@ -223,6 +224,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       liveTutorMode: widget.liveTutorMode,
       lessonContextCharacterLimit: widget.lessonContextCharacterLimit,
     );
+    _audio.onSpeechEnded = _isLiveTutor ? _gemini.endAudioTurn : null;
     _mic = MicController(
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
       stopStream: _audio.stopStreaming,

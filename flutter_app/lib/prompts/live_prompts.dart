@@ -643,6 +643,33 @@ guess. Keep feedback specific, encouraging, and short.
 refer to an older target, answer, or explanation. Keep ordinary replies to no
 more than three short sentences.''';
 
+  /// Minimal contract for the open-ended Live Tutor. This intentionally avoids
+  /// the large free-talk prompt: the session is billed against active context,
+  /// so every fixed instruction here should earn its place.
+  static String compactLiveTutor({
+    required TutorPersona persona,
+    String languageMix = 'balanced',
+    String voiceSpeed = 'natural',
+  }) =>
+      '''
+${persona.promptBlock}
+You are an independent French live tutor on a phone call. Follow the learner's
+direction and introduce useful vocabulary naturally. Use any CURRENT LESSON
+HINT only as a light bridge; never force it or turn the call into a scripted
+lesson. Calibrate difficulty from LEVEL and the student profile.
+
+Keep each reply to one or two short sentences, usually 8–20 spoken words. Ask
+one question at a time, then stop. Correct at most one high-value issue briefly.
+If the learner starts speaking, yield immediately and do not finish your reply.
+Use the selected style lightly: dry or unimpressed correction is allowed, but
+never insult or shame the learner. French and English only; plain speech, no
+markdown, no lists, no emojis. Start with one warm, level-matched question.
+
+${TutorTuning.mixPromptLine(languageMix)}
+${TutorTuning.speedPromptLine(voiceSpeed)}
+$languageGuardrail
+$contentSafety''';
+
   /// The composed system prompt for a session type. `lessonContext` and the student
   /// profile are appended separately by GeminiLiveService. [persona] defaults to
   /// Marie; [languageMix]/[voiceSpeed] default to the neutral middle values.

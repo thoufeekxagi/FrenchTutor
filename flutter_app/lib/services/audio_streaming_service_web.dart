@@ -135,6 +135,24 @@ class WebAudioStreamingService implements AudioStreamingService {
   @override
   bool isOutputActive = false;
 
+  @override
+  bool allowBargeIn = false;
+
+  @override
+  bool speechGateEnabled = false;
+
+  @override
+  void Function()? onSpeechEnded;
+
+  @override
+  void Function(List<int> chunk)? onPlaybackChunk;
+
+  @override
+  bool get hasPendingPlayback =>
+      isOutputActive ||
+      _scheduled.isNotEmpty ||
+      (_nextStartTime > (_outputContext?.currentTime ?? 0));
+
   /// Mirrors the native implementation: `isOutputActive` goes false the moment
   /// the server signals turnComplete, but audio already scheduled keeps
   /// physically playing for a while after. Reopening the mic at turnComplete
@@ -457,6 +475,7 @@ class WebAudioStreamingService implements AudioStreamingService {
   Future<void> stopPlayback({
     bool hardStop = false,
     bool waitForSilence = false,
+    Duration fadeOutDuration = Duration.zero,
   }) async {
     for (final node in List.of(_scheduled)) {
       try {
