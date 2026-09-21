@@ -123,8 +123,8 @@ class GeminiLiveService {
   // API re-processes active context on later turns, so a small compression
   // window matters more than the WebSocket itself. This keeps roughly the
   // latest couple of short exchanges plus a compact summary.
-  static const _liveTutorCompressionTriggerTokens = 1600;
-  static const _liveTutorCompressionTargetTokens = 800;
+  static const _liveTutorCompressionTriggerTokens = 1200;
+  static const _liveTutorCompressionTargetTokens = 600;
   // Live Tutor should tolerate a short thinking pause without making the
   // learner wait several seconds before the next turn begins.
   // Google recommends roughly 500–800ms for general Live API VAD. A slightly
@@ -162,9 +162,7 @@ class GeminiLiveService {
   // cap is a final safety bound because ProgressService already supplies a
   // compact summary (level, goal, focus, and one recent issue).
   static const _maxLearnerProfileCharacters = 500;
-  static const _maxLiveTutorProfileCharacters = 250;
   static const _maxLessonContextCharacters = 2200;
-  static const _maxLiveTutorLessonContextCharacters = 600;
 
   /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
   /// was dialed with, even across reconnects — the voice and identity never
@@ -268,6 +266,9 @@ class GeminiLiveService {
               _contextCompressionTargetTokens,
           'input_audio_transcription': true,
           'output_audio_transcription': true,
+          'live_tutor_dynamic_context': liveTutorMode
+              ? 'selected_level_only'
+              : 'session_context_policy',
         },
       ),
     );
@@ -607,20 +608,12 @@ class GeminiLiveService {
         languageMix: await TutorTuning.languageMix(),
         voiceSpeed: await TutorTuning.voiceSpeed(),
       );
-      final profile = await _learnerProfile();
-      if (profile.isNotEmpty) {
-        compactPrompt +=
-            '\n\nSTUDENT PROFILE (calibration only; never read aloud):\n'
-            '${_boundDynamicContext(profile, _maxLiveTutorProfileCharacters)}';
-      }
+      // Deliberately do not append the learner profile or lesson context here.
+      // Live Tutor is an open conversation; those blocks become persistent
+      // context and are reprocessed by the provider on later turns. The setup
+      // screen's selected level is the only dynamic calibration it needs.
       final level = levelOverride ?? await _learnerLevel();
       if (level != null) compactPrompt += '\n\nLEVEL: $level';
-      final ctx = lessonContext;
-      if (ctx != null && ctx.trim().isNotEmpty) {
-        compactPrompt +=
-            '\n\nCURRENT LESSON HINT (optional, not a script):\n'
-            '${_boundDynamicContext(ctx, _lessonContextLimit)}';
-      }
       return compactPrompt;
     }
     if (compactGuidedContext &&
@@ -693,11 +686,6 @@ class GeminiLiveService {
 
   int get _lessonContextLimit {
     final explicit = lessonContextCharacterLimit;
-    if (liveTutorMode) {
-      return (explicit ?? _maxLiveTutorLessonContextCharacters)
-          .clamp(600, _maxLiveTutorLessonContextCharacters)
-          .toInt();
-    }
     if (explicit != null) return explicit.clamp(2200, 12000).toInt();
     return switch (sessionType) {
       LiveSessionType.readingNarration => 8000,
@@ -849,6 +837,12 @@ class GeminiLiveService {
     // default so that experience stays exactly as natural/varied as it's always been.
     if (tools.isNotEmpty) {
       generationConfig['temperature'] = 0.65;
+    }
+    if (liveTutorMode) {
+      // The prompt already limits replies to 1–2 short sentences. This hard
+      // ceiling prevents an occasional long spoken answer from multiplying
+      // output-audio and transcription tokens.
+      generationConfig['maxOutputTokens'] = 96;
     }
     final setupBody = <String, dynamic>{
       'model': _model,
