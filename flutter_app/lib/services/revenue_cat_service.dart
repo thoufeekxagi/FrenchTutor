@@ -163,7 +163,8 @@ class RevenueCatService {
   Future<CustomerInfo?> purchasePackage(Package package) async {
     if (!_initialized) return null;
     try {
-      final info = await Purchases.purchasePackage(package);
+      final result = await Purchases.purchase(PurchaseParams.package(package));
+      final info = result.customerInfo;
       _customerInfoListener?.call(info);
       return info;
     } catch (_) {
