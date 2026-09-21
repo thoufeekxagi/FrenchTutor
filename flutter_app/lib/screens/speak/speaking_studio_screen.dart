@@ -10,7 +10,6 @@ import '../../models/speak_curriculum.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/course_generation_test_harness.dart';
-import '../../services/free_talk_session_launcher.dart';
 import '../../services/learning_streak_service.dart';
 import '../../services/speak_roadmap_service.dart';
 import '../../services/starter_cover_resolver.dart';
@@ -24,6 +23,7 @@ import 'speak_review_screen.dart';
 import 'speaking_flow_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
+import 'live_tutor_setup_screen.dart';
 
 /// Speaking Studio: a compact next-action surface over the existing course/session
 /// data flow. The redesign changes hierarchy and presentation only.
@@ -123,7 +123,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   }
 
   Future<void> _callTutor() async {
-    await openFreeTalkSession(context, ref);
+    await AppRouter.push(context, (_) => const LiveTutorSetupScreen());
     if (mounted) {
       _loadSessions();
       setState(() {});
@@ -516,9 +516,9 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: _QuickStartCard(
-            icon: Icons.phone_in_talk_rounded,
-            label: 'Free talk',
-            detail: 'Choose a topic',
+            icon: Icons.record_voice_over_rounded,
+            label: 'Live tutor',
+            detail: 'Choose your style',
             onTap: _callTutor,
           ),
         ),

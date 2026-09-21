@@ -31,6 +31,7 @@ import '../../services/trial_call_gate.dart';
 import '../../widgets/ai_voice_disclosure.dart';
 import '../../widgets/error_notice.dart';
 import '../../widgets/floating_notetaker.dart';
+import '../../widgets/live_tutor_mascot.dart';
 import '../../widgets/mic_mode_bar.dart';
 import '../../widgets/report_problem_button.dart';
 import '../../widgets/speaking_session_result.dart';
@@ -66,6 +67,8 @@ class SessionScreen extends ConsumerStatefulWidget {
     this.wrapUpNote,
     this.wrapUpLeadSeconds = 30,
     this.popResultImmediately = false,
+    this.liveTutorMode = false,
+    this.liveTutorLessonTitle = 'French vocabulary',
   });
 
   /// Legacy constructor input retained for route compatibility. Gemini Live
@@ -98,6 +101,13 @@ class SessionScreen extends ConsumerStatefulWidget {
   /// their own recap.
   final bool popResultImmediately;
 
+  /// The minimal mascot/transcript presentation used by the new Live tutor
+  /// entry point. The existing SessionScreen lifecycle and Gemini Live plumbing
+  /// remain shared so saved sessions, quotas, and reconnect behavior do not
+  /// fork between speaking surfaces.
+  final bool liveTutorMode;
+  final String liveTutorLessonTitle;
+
   /// Set when this call is the Daily Pathway's speaking stage — links the
   /// ai_sessions record to today's pathway row.
   final String? dailySessionId;
@@ -115,6 +125,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   final List<ChatMessage> _messages = [];
   CallStatus _callStatus = CallStatus.connecting;
   String _errorMessage = '';
+  String _liveTutorPartialText = '';
+  bool _liveTutorScolding = false;
+  int _liveTutorSpeechPulse = 0;
+  bool _liveTutorResponseStarted = false;
+  bool _liveTutorKickoffRetried = false;
   bool _sessionSaved = false;
   int _callDuration = 0;
   bool _isSpeakerOn = true;
@@ -127,6 +142,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   String? _aiSessionRecordId;
 
   Timer? _timer;
+  Timer? _liveTutorKickoffWatchdog;
   final ScrollController _scrollController = ScrollController();
 
   late final GeminiLiveService _gemini;
@@ -145,10 +161,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   bool get _isRoleplay => widget.stage == 'speaking';
   bool get _isGuided => widget.stage == 'speaking_guided';
-  bool get _isFreeTalk => widget.stage == null || widget.stage == 'free_talk';
+  bool get _isLiveTutor => widget.liveTutorMode;
+  bool get _isFreeTalk =>
+      widget.stage == null || widget.stage == 'free_talk' || _isLiveTutor;
 
   String get _practiceLabel {
     if (widget.reviewSession) return 'Personal review';
+    if (_isLiveTutor) return 'Live tutor';
     if (_isGuided) return 'Guided conversation';
     if (_isRoleplay) return 'Guided roleplay';
     if (widget.stage == 'speaking_exam') return 'TEF / TCF practice';
@@ -176,7 +195,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
       isTrial: widget.stage == 'trial',
-      sessionType: widget.examMode
+      sessionType: widget.liveTutorMode
+          ? LiveSessionType.liveTutor
+          : widget.examMode
           ? LiveSessionType.speakingExam
           : widget.stage == 'trial'
           ? LiveSessionType.onboardingCalibration
@@ -190,6 +211,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       lessonContext: widget.lessonContext,
       levelOverride: widget.levelOverride,
       learningStoreForProfile: _learningStore,
+      liveTutorMode: widget.liveTutorMode,
       lessonContextCharacterLimit: widget.lessonContextCharacterLimit,
     );
     _mic = MicController(
@@ -211,6 +233,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    _liveTutorKickoffWatchdog?.cancel();
     _endCall();
     _scrollController.dispose();
     super.dispose();
@@ -418,27 +441,31 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         if (!mounted || _sessionSaved || !_gemini.isConnected) return;
         // Stage-aware kickoff (P0.3): the roleplay opens IN the scene — generic
         // "what do you want to practice?" greetings broke the roleplay contract.
-        _gemini.sendText(
-          widget.kickoffMessage ??
-              (widget.reviewSession
-                  ? '(Note from the app, not the student: the learner just joined a '
-                        'deterministic review. Ask one short French retrieval question '
-                        'about an exact target in the REVIEW BLUEPRINT, then stop and wait. '
-                        'Do not create a scene, character, café, station, travel situation, '
-                        'or generic roleplay.)'
-                  : _isGuided
-                  ? '(Note from the app, not the student: the learner just joined a '
-                        'guided conversation. Begin the first stage from the speaking task '
-                        'plan: introduce one phrase, model it once, then stop and wait for '
-                        'the learner to repeat it. Do not jump ahead.)'
-                  : _isRoleplay
-                  ? '(Note from the app, not the student: the student just joined the '
-                        'roleplay call. Open the scene NOW exactly as your role rules say, '
-                        'one short English sentence to set the scene from today\'s material, '
-                        'then your first line in French, in character. Do not greet '
-                        'generically, do not ask what they want to practice.)'
-                  : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)"),
-        );
+        final kickoff =
+            widget.kickoffMessage ??
+            (widget.reviewSession
+                ? '(Note from the app, not the student: the learner just joined a '
+                      'deterministic review. Ask one short French retrieval question '
+                      'about an exact target in the REVIEW BLUEPRINT, then stop and wait. '
+                      'Do not create a scene, character, café, station, travel situation, '
+                      'or generic roleplay.)'
+                : _isGuided
+                ? '(Note from the app, not the student: the learner just joined a '
+                      'guided conversation. Begin the first stage from the speaking task '
+                      'plan: introduce one phrase, model it once, then stop and wait for '
+                      'the learner to repeat it. Do not jump ahead.)'
+                : _isRoleplay
+                ? '(Note from the app, not the student: the student just joined the '
+                      'roleplay call. Open the scene NOW exactly as your role rules say, '
+                      'one short English sentence to set the scene from today\'s material, '
+                      'then your first line in French, in character. Do not greet '
+                      'generically, do not ask what they want to practice.)'
+                : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)");
+        if (_isLiveTutor) {
+          _sendLiveTutorKickoff(kickoff);
+        } else {
+          _gemini.sendText(kickoff);
+        }
       } catch (e) {
         setState(() => _errorMessage = 'Mic error: $e');
       }
@@ -496,16 +523,35 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!isFrenchEnglishTranscript(text)) return;
       _userUtteranceCount += 1;
       if (!mounted) return;
+      if (_isLiveTutor) _liveTutorScolding = false;
       _appendMessage(ChatMessage(role: 'user', content: text));
     };
 
     _gemini.onTutorTranscript = (text) {
       if (!mounted) return;
+      _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
+      if (_isLiveTutor) {
+        setState(() {
+          _liveTutorPartialText = '';
+          _liveTutorScolding = _isCorrectionLine(text);
+        });
+      }
       _appendMessage(ChatMessage(role: 'tutor', content: text));
     };
 
+    _gemini.onTranscriptDelta = (delta) {
+      if (!_isLiveTutor || !mounted) return;
+      _markLiveTutorResponseStarted();
+      setState(() {
+        _liveTutorPartialText += delta;
+        _liveTutorSpeechPulse += 1;
+        _liveTutorScolding = _isCorrectionLine(_liveTutorPartialText);
+      });
+    };
+
     _gemini.onAudioChunk = (audioData) {
+      _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
       _audio.isOutputActive = true;
       _audio.playAudioChunk(audioData);
@@ -532,6 +578,32 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         setState(() => _callStatus = CallStatus.listening);
       }
     };
+  }
+
+  void _markLiveTutorResponseStarted() {
+    if (!_isLiveTutor || _liveTutorResponseStarted) return;
+    _liveTutorResponseStarted = true;
+    _liveTutorKickoffWatchdog?.cancel();
+  }
+
+  void _sendLiveTutorKickoff(String kickoff, {bool retry = false}) {
+    if (!_isLiveTutor || _sessionSaved || !_gemini.isConnected) return;
+    if (retry) _liveTutorKickoffRetried = true;
+    _gemini.sendOpeningPrompt(kickoff);
+    _liveTutorKickoffWatchdog?.cancel();
+    _liveTutorKickoffWatchdog = Timer(const Duration(seconds: 6), () {
+      if (!mounted || _sessionSaved || _liveTutorResponseStarted) return;
+      if (!_liveTutorKickoffRetried) {
+        // A transient Live turn can be accepted but fail to start audio. One
+        // bounded replay recovers that state without creating duplicate tutor
+        // replies during a slow but healthy connection.
+        _sendLiveTutorKickoff(kickoff, retry: true);
+        return;
+      }
+      setState(
+        () => _errorMessage = 'The tutor is taking longer than expected.',
+      );
+    });
   }
 
   /// A provider error can arrive just before a valid queued tutor turn. Do not
@@ -831,6 +903,41 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
   }
 
+  LiveTutorMascotMood get _liveTutorMascotMood {
+    if (_callStatus == CallStatus.tutorSpeaking && _liveTutorScolding) {
+      return LiveTutorMascotMood.scolding;
+    }
+    if (_callStatus == CallStatus.tutorSpeaking) {
+      return LiveTutorMascotMood.speaking;
+    }
+    return LiveTutorMascotMood.listening;
+  }
+
+  bool get _liveTutorIsConnected =>
+      _gemini.isConnected &&
+      _callStatus != CallStatus.connecting &&
+      _callStatus != CallStatus.reconnecting &&
+      _callStatus != CallStatus.ended;
+
+  bool _isCorrectionLine(String text) {
+    final lower = text.toLowerCase();
+    const cues = [
+      'non,',
+      'non —',
+      'attention',
+      'répète',
+      'repete',
+      'corrige',
+      'correction',
+      'presque',
+      'pas exactement',
+      'not quite',
+      'try again',
+      'actually',
+    ];
+    return cues.any(lower.contains);
+  }
+
   Future<void> _confirmEnd() async {
     if (_sessionSaved) return;
     final shouldEnd = await showPSConfirmDialog(
@@ -893,33 +1000,207 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       child: Scaffold(
         backgroundColor: DesignTokens.nightCanvas,
         body: SafeArea(
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  _callHeader(),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) =>
-                          SpeakingTranscriptStrip(
-                            messages: _messages,
-                            controller: _scrollController,
-                            tutorName: _gemini.persona.displayName,
-                            dark: true,
-                            height: constraints.maxHeight > 8
-                                ? constraints.maxHeight - 8
-                                : 0,
+          child: _isLiveTutor
+              ? _liveTutorLayout()
+              : Stack(
+                  children: [
+                    Column(
+                      children: [
+                        _callHeader(),
+                        Expanded(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) =>
+                                SpeakingTranscriptStrip(
+                                  messages: _messages,
+                                  controller: _scrollController,
+                                  tutorName: _gemini.persona.displayName,
+                                  dark: true,
+                                  height: constraints.maxHeight > 8
+                                      ? constraints.maxHeight - 8
+                                      : 0,
+                                ),
                           ),
+                        ),
+                        if (_errorMessage.isNotEmpty)
+                          ErrorNotice(message: _errorMessage),
+                        _callControls(),
+                      ],
                     ),
+                    FloatingNotetakerOverlay(state: notetaker),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _liveTutorLayout() {
+    return Column(
+      children: [
+        _liveTutorHeader(),
+        Expanded(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LiveTutorMascot(
+                    size: 188,
+                    mood: _liveTutorMascotMood,
+                    speechPulse: _liveTutorSpeechPulse,
                   ),
-                  if (_errorMessage.isNotEmpty)
-                    ErrorNotice(message: _errorMessage),
-                  _callControls(),
+                  const SizedBox(height: 16),
+                  _liveTutorTranscript(),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    Text(
+                      _errorMessage,
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.body(
+                        12,
+                      ).copyWith(color: DesignTokens.danger),
+                    ),
+                  ],
                 ],
               ),
-              FloatingNotetakerOverlay(state: notetaker),
-            ],
+            ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _liveTutorHeader() {
+    return SizedBox(
+      height: 62,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 4, 16, 0),
+        child: Row(
+          children: [
+            IconButton(
+              tooltip: 'End session',
+              onPressed: _confirmEnd,
+              icon: Icon(
+                CupertinoIcons.chevron_back,
+                color: DesignTokens.nightText,
+                size: 22,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Live tutor',
+                    style: DesignTokens.body(
+                      17,
+                      weight: FontWeight.w700,
+                    ).copyWith(color: DesignTokens.nightText),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'Lesson · ${widget.liveTutorLessonTitle}',
+                    style: DesignTokens.body(
+                      11,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                  const SizedBox(height: 3),
+                  Semantics(
+                    label: _liveTutorIsConnected
+                        ? 'Live connection active'
+                        : _statusText,
+                    child: Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: _liveTutorIsConnected
+                            ? DesignTokens.success
+                            : DesignTokens.warning,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ReportProblemButton(
+              sessionType: widget.stage ?? 'live_tutor',
+              personaName: _gemini.persona.displayName,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _liveTutorTranscript() {
+    final visible = _messages.length <= 2
+        ? List<ChatMessage>.of(_messages)
+        : _messages.sublist(_messages.length - 2);
+    final partial = _liveTutorPartialText.trim();
+    if (partial.isNotEmpty) {
+      if (visible.isNotEmpty && !visible.last.isUser) {
+        visible[visible.length - 1] = ChatMessage(
+          role: 'tutor',
+          content: partial,
+        );
+      } else {
+        visible.add(ChatMessage(role: 'tutor', content: partial));
+        if (visible.length > 2) visible.removeAt(0);
+      }
+    }
+
+    if (visible.isEmpty) return const SizedBox(height: 86);
+    final transcriptKey = visible.map((message) => message.content).join('|');
+    return SizedBox(
+      width: double.infinity,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 240),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.08),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        ),
+        child: Column(
+          key: ValueKey(transcriptKey),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var index = 0; index < visible.length; index++) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 350),
+                  child: Text(
+                    visible[index].content,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        DesignTokens.body(
+                          visible[index].isUser ? 16.5 : 18,
+                          weight: visible[index].isUser
+                              ? FontWeight.w500
+                              : FontWeight.w700,
+                        ).copyWith(
+                          color: visible[index].isUser
+                              ? DesignTokens.nightAccent.withValues(alpha: 0.86)
+                              : DesignTokens.nightText,
+                          height: 1.18,
+                        ),
+                  ),
+                ),
+              ),
+              if (index < visible.length - 1) const SizedBox(height: 8),
+            ],
+          ],
         ),
       ),
     );
@@ -1006,8 +1287,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  Widget _callControls() =>
-      _isFreeTalk ? _freeTalkControls() : _legacyCallControls();
+  Widget _callControls() {
+    if (_isLiveTutor) return const SizedBox.shrink();
+    return _isFreeTalk ? _freeTalkControls() : _legacyCallControls();
+  }
 
   Widget _freeTalkControls() {
     final enabled =

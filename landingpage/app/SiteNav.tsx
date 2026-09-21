@@ -21,12 +21,12 @@ export function SiteNav() {
             <Link href="/#pricing" className="hover:text-[#1C1E21] transition-colors">Pricing</Link>
             <Link href="/#for-canada" className="hover:text-[#1C1E21] transition-colors">For Canada</Link>
           </div>
-          <Link href="/blog" className="font-bold text-[#007BFF] hover:text-[#0062CC] transition-colors">Blog</Link>
-          <Link href="/stories" className="font-bold text-[#007BFF] hover:text-[#0062CC] transition-colors">Stories</Link>
+          <Link href="/blog" className="font-bold text-[#F2C14E] hover:text-[#F7CE68] transition-colors">Blog</Link>
+          <Link href="/stories" className="font-bold text-[#F2C14E] hover:text-[#F7CE68] transition-colors">Stories</Link>
         </div>
         <Link
           href="/#join"
-          className="bg-[#1C1E21] text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-[#33383F] hover:scale-105 transition-all shadow-md"
+          className="bg-[#F2C14E] text-[#090B0E] px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-[#F7CE68] hover:scale-105 transition-all shadow-md"
         >
           Join Waitlist
         </Link>

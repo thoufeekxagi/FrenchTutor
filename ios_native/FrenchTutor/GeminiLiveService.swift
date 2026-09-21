@@ -32,6 +32,7 @@ class GeminiLiveService: NSObject {
     private var isIntentionalDisconnect = false
     private let lessonContext: String?
     private let tools: [AgentTool]
+    private let personaPrompt: String?
 
     static let systemPrompt = """
 You are Marie, a warm, encouraging French tutor speaking to a student on a phone call. The \
@@ -68,10 +69,11 @@ START THE CALL WITH A WARM GREETING PITCHED AT THE STUDENT'S LEVEL FROM THE PROF
 CONTEXT is provided, jump straight into practicing that material instead of a generic greeting.
 """
 
-    init(apiKey: String, lessonContext: String? = nil, tools: [AgentTool] = []) {
+    init(apiKey: String, lessonContext: String? = nil, tools: [AgentTool] = [], personaPrompt: String? = nil) {
         self.apiKey = apiKey
         self.lessonContext = lessonContext
         self.tools = tools
+        self.personaPrompt = personaPrompt
         self.session = URLSession(configuration: .default)
         super.init()
     }
@@ -137,7 +139,7 @@ CONTEXT is provided, jump straight into practicing that material instead of a ge
     }
 
     private var fullSystemPrompt: String {
-        var prompt = GeminiLiveService.systemPrompt
+        var prompt = personaPrompt ?? GeminiLiveService.systemPrompt
         let profile = learnerProfile()
         if !profile.isEmpty {
             prompt += "\n\nSTUDENT PROFILE — use this to calibrate level and pacing; never read it aloud:\n" + profile

@@ -42,7 +42,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Home quick start leads with Review, Warm-up, and Free talk', (
+  testWidgets('Home quick start leads with Review, Warm-up, and Live tutor', (
     tester,
   ) async {
     final db = sqlite3.openInMemory();
@@ -61,10 +61,10 @@ void main() {
 
     expect(find.text('Review'), findsOneWidget);
     expect(find.text('Warm-up'), findsOneWidget);
-    expect(find.text('Free talk'), findsOneWidget);
+    expect(find.text('Live tutor'), findsOneWidget);
     expect(find.text('Past lessons'), findsOneWidget);
     expect(find.text('Next lesson'), findsOneWidget);
-    expect(find.text('Choose a topic'), findsOneWidget);
+    expect(find.text('Choose your style'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

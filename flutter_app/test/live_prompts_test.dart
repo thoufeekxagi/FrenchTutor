@@ -57,6 +57,19 @@ void main() {
       expect(prompt, contains('START THE CALL WITH A WARM GREETING'));
     });
 
+    test(
+      'Live tutor follows the learner and treats course context as optional',
+      () {
+        final prompt = LivePrompts.forSession(LiveSessionType.liveTutor);
+        expect(prompt, contains('INDEPENDENT LIVE TUTOR'));
+        expect(prompt, contains('COURSE BRIDGE RULE'));
+        expect(prompt, contains('optional inspiration only'));
+        expect(prompt, contains('create useful vocabulary'));
+        expect(prompt, contains('learner wants to talk about'));
+        expect(prompt, contains('not a scripted lesson'));
+      },
+    );
+
     test('onboarding calibration uses the selected goal and level', () {
       final role = LivePrompts.forSession(
         LiveSessionType.onboardingCalibration,

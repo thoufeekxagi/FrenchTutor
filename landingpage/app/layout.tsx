@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#007bff", colorScheme: "light" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#090b0e", colorScheme: "dark" };
 
 const structuredData = [
   {
@@ -96,7 +96,7 @@ const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-CA" className={inter.variable}>
-      <body className="font-sans antialiased">
+      <body className="theme-gold font-sans antialiased">
         {children}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
         {gaId && <SiteAnalytics gaId={gaId} />}

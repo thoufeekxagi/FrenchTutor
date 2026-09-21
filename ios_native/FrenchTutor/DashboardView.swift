@@ -4,6 +4,7 @@ struct DashboardView: View {
     @State private var sessions: [Session] = []
     @State private var loading = true
     @State private var showSession = false
+    @State private var showFreeTalkBeta = false
     @State private var selectedSession: Session?
     @State private var streak = 0
     @State private var currentMonth: RoadmapMonth?
@@ -22,6 +23,7 @@ struct DashboardView: View {
                     VStack(spacing: 14) {
                         header
                         dailyPathwayCard
+                        freeTalkBetaCard
                         callMarieCard
                         speakingTopicsCard
                         recentSessions
@@ -45,6 +47,9 @@ struct DashboardView: View {
             SessionView(apiKey: geminiApiKey, lessonContext: marieLessonContext)
                 .overlay(FloatingNotetakerOverlay())
                 .onAppear { NotetakerState.shared.currentContext = "Speaking" }
+        }
+        .fullScreenCover(isPresented: $showFreeTalkBeta, onDismiss: reload) {
+            FreeTalkBetaPickerView()
         }
         .onAppear { reload() }
     }
@@ -86,6 +91,25 @@ struct DashboardView: View {
             .overlay(Capsule().stroke(Passeport.hairline, lineWidth: 1))
         }
         .padding(.top, 6)
+    }
+
+    private var freeTalkBetaCard: some View {
+        Button(action: { showFreeTalkBeta = true }) {
+            HStack(spacing: 10) {
+                BetaMascotView(mood: .skeptical, isSpeaking: false).frame(width: 40, height: 40)
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 7) {
+                        Text("Free Talk Beta").font(Passeport.body(13.5, weight: .medium)).foregroundColor(Passeport.parchment)
+                        Text("BETA").font(Passeport.mono(8, weight: .bold)).foregroundColor(Passeport.ink)
+                            .padding(.horizontal, 5).padding(.vertical, 3).background(Passeport.brass).clipShape(Capsule())
+                    }
+                    Text("Choose a level. Let the mascot judge your French.").font(Passeport.mono(10)).foregroundColor(Passeport.slate)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Passeport.slate)
+            }
+            .padding(14).background(Passeport.ink).clipShape(RoundedRectangle(cornerRadius: 12))
+        }.buttonStyle(PlainButtonStyle())
     }
 
     /// Secondary/unstructured option — free-form call with no pathway stages.
@@ -239,6 +263,7 @@ struct SessionCard: View {
         case "reading_listening": return "Reading"
         case "writing": return "Writing"
         case "speaking": return "Speaking"
+        case "passive_aggressive": return "Free Talk Beta"
         default: return nil
         }
     }

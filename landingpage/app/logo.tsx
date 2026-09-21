@@ -10,8 +10,8 @@ export function LogoMark({ size = 32 }: { size?: number }) {
     >
       <defs>
         <linearGradient id="ps-mark-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1A8CFF" />
-          <stop offset="100%" stopColor="#0062CC" />
+          <stop offset="0%" stopColor="#F7CE68" />
+          <stop offset="100%" stopColor="#C9942E" />
         </linearGradient>
       </defs>
       <rect width="1024" height="1024" rx="224" fill="url(#ps-mark-bg)" />
@@ -22,7 +22,7 @@ export function LogoMark({ size = 32 }: { size?: number }) {
       <path
         d="M 560 600 L 700 600 L 636 708 L 730 708 L 540 940 L 596 768 L 508 768 Z"
         fill="#FFFFFF"
-        stroke="#0062CC"
+        stroke="#C9942E"
         strokeWidth="26"
         strokeLinejoin="round"
       />
@@ -34,8 +34,8 @@ export function Logo({ size = 32 }: { size?: number }) {
   return (
     <span className="flex items-center gap-2">
       <LogoMark size={size} />
-      <span className="font-bold text-xl tracking-tight text-[#1C1E21]">
-        Parle<span className="text-[#007BFF]">Sprint</span>
+      <span className="font-bold text-xl tracking-tight text-[#F6F4EE]">
+        Parle<span className="text-[#F2C14E]">Sprint</span>
       </span>
     </span>
   );

@@ -33,6 +33,7 @@ class GeminiLiveService {
     this.manualActivityBoundaries = false,
     this.deferUserTranscriptUntilTurnComplete = false,
     this.compactGuidedContext = false,
+    this.liveTutorMode = false,
     this.lessonContextCharacterLimit,
   });
 
@@ -64,6 +65,11 @@ class GeminiLiveService {
   /// Uses a small guided-speaking system contract and context window. Other
   /// Live surfaces keep their existing prompt and compression policy.
   final bool compactGuidedContext;
+
+  /// Live tutor stays open-ended, but uses a smaller rolling context window so
+  /// a five-to-ten-minute session remains comfortably below the 6,000-token
+  /// product budget. Its lesson bridge is a hint, never a script.
+  final bool liveTutorMode;
 
   /// Optional feature-owned context budget. Review/Warm-up uses this to keep
   /// the ranked learner evidence intact while still applying a hard bound.
@@ -113,8 +119,12 @@ class GeminiLiveService {
   // intact while remaining much smaller than a full conversation window.
   static const _compactWritingCompressionTriggerTokens = 2200;
   static const _compactWritingCompressionTargetTokens = 1100;
+  static const _liveTutorCompressionTriggerTokens = 4200;
+  static const _liveTutorCompressionTargetTokens = 2400;
 
-  int get _contextCompressionTriggerTokens => compactGuidedContext
+  int get _contextCompressionTriggerTokens => liveTutorMode
+      ? _liveTutorCompressionTriggerTokens
+      : compactGuidedContext
       ? sessionType == LiveSessionType.liaisonStage
             ? _compactLiaisonCompressionTriggerTokens
             : sessionType == LiveSessionType.writingGuide
@@ -124,7 +134,9 @@ class GeminiLiveService {
             : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
-  int get _contextCompressionTargetTokens => compactGuidedContext
+  int get _contextCompressionTargetTokens => liveTutorMode
+      ? _liveTutorCompressionTargetTokens
+      : compactGuidedContext
       ? sessionType == LiveSessionType.liaisonStage
             ? _compactLiaisonCompressionTargetTokens
             : sessionType == LiveSessionType.writingGuide
@@ -141,6 +153,7 @@ class GeminiLiveService {
   // compact summary (level, goal, focus, and one recent issue).
   static const _maxLearnerProfileCharacters = 500;
   static const _maxLessonContextCharacters = 2200;
+  static const _maxLiveTutorLessonContextCharacters = 1400;
 
   /// Persona is captured ONCE at construction (P2.1): a call keeps the tutor it
   /// was dialed with, even across reconnects — the voice and identity never
@@ -237,6 +250,7 @@ class GeminiLiveService {
           'manual_activity_boundaries': manualActivityBoundaries,
           'auto_reconnect': autoReconnect,
           'compact_guided_context': compactGuidedContext,
+          'live_tutor_mode': liveTutorMode,
           'context_window_compression_trigger_tokens':
               _contextCompressionTriggerTokens,
           'context_window_compression_target_tokens':
@@ -521,6 +535,12 @@ class GeminiLiveService {
   /// silent background update, like a periodic draft sync.
   void sendText(String text, {bool expectReply = true}) {
     if (!_isSetupComplete) return;
+    if (expectReply && liveTutorMode) {
+      // Live tutor app-directed turns must be closed explicitly, just like the
+      // opening turn. This also covers a timed wrap-up message.
+      sendOpeningPrompt(text);
+      return;
+    }
     if (expectReply) {
       // Gemini 3.1 Live requires new conversational text to use
       // realtimeInput. clientContent is reserved for initial history and can
@@ -541,6 +561,28 @@ class GeminiLiveService {
           },
         ],
         'turnComplete': expectReply,
+      },
+    });
+  }
+
+  /// Starts a tutor-led turn using the same explicit `clientContent` boundary
+  /// as the reliable legacy Live tutor. Realtime text is excellent for
+  /// incremental notes, but an opening instruction must be a complete user
+  /// turn or the model can reasonably wait for more input.
+  void sendOpeningPrompt(String text) {
+    if (!_isSetupComplete || text.trim().isEmpty) return;
+    _suppressPreInjection = false;
+    _send({
+      'clientContent': {
+        'turns': [
+          {
+            'role': 'user',
+            'parts': [
+              {'text': text.trim()},
+            ],
+          },
+        ],
+        'turnComplete': true,
       },
     });
   }
@@ -616,6 +658,11 @@ class GeminiLiveService {
 
   int get _lessonContextLimit {
     final explicit = lessonContextCharacterLimit;
+    if (liveTutorMode) {
+      return (explicit ?? _maxLiveTutorLessonContextCharacters)
+          .clamp(600, _maxLiveTutorLessonContextCharacters)
+          .toInt();
+    }
     if (explicit != null) return explicit.clamp(2200, 12000).toInt();
     return switch (sessionType) {
       LiveSessionType.readingNarration => 8000,
@@ -703,11 +750,17 @@ class GeminiLiveService {
         : '(Note de contexte silencieuse pour toi, ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     if (expectReply) {
-      // Gemini 3.1 Live only permits clientContent while seeding initial
-      // history. This is a new turn, so send it on the realtime text stream.
-      _send({
-        'realtimeInput': {'text': framed},
-      });
+      if (liveTutorMode) {
+        // Keep app-directed Live tutor turns deterministic and complete. A
+        // realtime text note without an explicit boundary can leave the model
+        // waiting for the learner's microphone turn.
+        sendOpeningPrompt(framed);
+      } else {
+        // Other open calls use realtime text so they can remain incremental.
+        _send({
+          'realtimeInput': {'text': framed},
+        });
+      }
     } else {
       _send({
         'clientContent': {
@@ -800,6 +853,7 @@ class GeminiLiveService {
         extra: {
           'model': _model,
           'compact_guided_context': compactGuidedContext,
+          'live_tutor_mode': liveTutorMode,
           'prompt_chars': systemPrompt.length,
           'context_window_compression_trigger_tokens':
               _contextCompressionTriggerTokens,

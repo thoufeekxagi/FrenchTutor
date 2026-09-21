@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, BookOpen, Brain, Check, Clock, GraduationCap, Headphones, MapPin, MessageCircle, Mic, PenLine, Briefcase, Repeat, RotateCcw, Smartphone, Monitor, X } from "lucide-react";
 import { Logo, LogoMark } from "./logo";
 import { SiteNav } from "./SiteNav";
@@ -17,7 +18,9 @@ import { getSortedPosts } from "./blog/data";
 // ----------------------------------------------------------------------
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  // Start visible so the first viewport is never blank if hydration or the observer
+  // is delayed in an embedded browser preview.
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -422,41 +425,24 @@ export function ModernLanding() {
           </div>
         </Reveal>
 
-        {/* The Orbital Animation */}
+        {/* The current app preview keeps the marketing page visually anchored to the product. */}
         <Reveal delay={0.2} className="relative hidden lg:block">
-          <div className="orbit-container scale-90 origin-center">
-            {/* Center Core */}
-            <div className="orbit-center">
-              <span className="font-bold text-3xl tracking-tight text-[#1C1E21]">Today</span>
-              <span className="text-[#007BFF] font-bold text-sm mt-1">14 min</span>
+          <div className="relative mx-auto w-[min(100%,430px)] rotate-[2deg] rounded-[2.4rem] border border-[#2d3037] bg-[#111317] p-3 shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
+            <div className="absolute -left-10 top-20 rounded-2xl border border-[#f2c14e]/25 bg-[#17191e] px-4 py-3 text-left shadow-xl">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#f2c14e]">Today&apos;s loop</div>
+              <div className="mt-1 text-sm font-semibold text-[#f6f4ee]">Speak with confidence</div>
             </div>
-
-            {/* Orbit Rings */}
-            <div className="orbit-ring orbit-ring-1">
-              <div className="orbit-item item-1">
-                <BookOpen className="w-4 h-4 text-[#17A2B8]" /> Learn
-              </div>
-              <div className="orbit-item item-2">
-                <PenLine className="w-4 h-4 text-[#17A2B8]" /> Write
-              </div>
-            </div>
-
-            <div className="orbit-ring orbit-ring-2">
-              <div className="orbit-item item-1">
-                <Mic className="w-4 h-4 text-[#28A745]" /> Speak
-              </div>
-              <div className="orbit-item item-2">
-                <Headphones className="w-4 h-4 text-[#007BFF]" /> Listen
-              </div>
-            </div>
-
-            <div className="orbit-ring orbit-ring-3">
-              <div className="orbit-item item-1">
-                <MessageCircle className="w-4 h-4 text-[#007BFF]" /> Apply
-              </div>
-              <div className="orbit-item item-2">
-                <RotateCcw className="w-4 h-4 text-[#28A745]" /> Remember
-              </div>
+            <Image
+              src="/app-speaking-preview.png"
+              alt="ParleSprint speaking practice screen"
+              width={1284}
+              height={2778}
+              priority
+              className="h-auto w-full rounded-[2rem]"
+            />
+            <div className="absolute -bottom-5 -right-8 rounded-2xl border border-[#f2c14e]/25 bg-[#17191e] px-4 py-3 text-left shadow-xl">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9b9ea7]">Tutor memory</div>
+              <div className="mt-1 text-sm font-semibold text-[#f6f4ee]">Every mistake remembered</div>
             </div>
           </div>
         </Reveal>
