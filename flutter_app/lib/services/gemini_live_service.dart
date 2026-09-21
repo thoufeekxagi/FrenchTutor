@@ -121,9 +121,12 @@ class GeminiLiveService {
   static const _compactWritingCompressionTargetTokens = 1100;
   static const _liveTutorCompressionTriggerTokens = 4200;
   static const _liveTutorCompressionTargetTokens = 2400;
-  // Live Tutor should tolerate a short thinking pause, but wait up to three
-  // seconds before deciding that the learner has finished.
-  static const _liveTutorSilenceDurationMs = 3000;
+  // Live Tutor should tolerate a short thinking pause without making the
+  // learner wait several seconds before the next turn begins.
+  // Google recommends roughly 500–800ms for general Live API VAD. A slightly
+  // longer 900ms window gives French learners room to breathe without adding
+  // the noticeable delay of a multi-second endpoint.
+  static const _liveTutorSilenceDurationMs = 900;
 
   int get _contextCompressionTriggerTokens => liveTutorMode
       ? _liveTutorCompressionTriggerTokens

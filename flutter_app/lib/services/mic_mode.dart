@@ -46,12 +46,14 @@ class MicController {
     required this.startStream,
     required this.stopStream,
     required this.sendAudio,
+    this.endTurn,
     this.silenceTailChunkCount = silenceTailChunks,
   });
 
   final Future<void> Function() startStream;
   final Future<void> Function() stopStream;
   final void Function(List<int> pcmBytes) sendAudio;
+  final void Function()? endTurn;
   final int silenceTailChunkCount;
 
   MicMode _mode = MicMode.auto;
@@ -133,12 +135,17 @@ class MicController {
     await _startStream();
   }
 
-  /// Hold-to-talk released: stop capturing, then close the utterance for the
-  /// server's VAD with a silent tail.
+  /// Hold-to-talk released: stop capturing, then close the utterance. Live
+  /// Tutor can use Gemini's immediate audioStreamEnd marker; other surfaces
+  /// retain the silent-tail fallback for their existing behavior.
   Future<void> pttUp() async {
     if (_mode != MicMode.pushToTalk || !_held) return;
     _held = false;
     await _stopStream();
+    if (endTurn != null) {
+      endTurn!();
+      return;
+    }
     final silence = List<int>.filled(silenceChunkBytes, 0);
     for (var i = 0; i < silenceTailChunkCount; i++) {
       sendAudio(silence);

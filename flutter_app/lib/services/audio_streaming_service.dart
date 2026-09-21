@@ -278,6 +278,9 @@ class AudioStreamingService {
           toStream: _micStreamController!.sink,
           sampleRate: _inputSampleRate,
           numChannels: 1,
+          enableVoiceProcessing: true,
+          enableNoiseSuppression: true,
+          enableEchoCancellation: true,
         );
       }
     } catch (_) {
@@ -324,6 +327,9 @@ class AudioStreamingService {
       toStream: _micStreamController!.sink,
       sampleRate: _inputSampleRate,
       numChannels: 1,
+      enableVoiceProcessing: true,
+      enableNoiseSuppression: true,
+      enableEchoCancellation: true,
     );
 
     await _ensurePlayerStarted();
