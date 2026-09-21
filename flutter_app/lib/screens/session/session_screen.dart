@@ -127,10 +127,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   CallStatus _callStatus = CallStatus.connecting;
   String _errorMessage = '';
   String _liveTutorPartialText = '';
+  String _liveTutorTranscriptBuffer = '';
   bool _liveTutorScolding = false;
   bool _liveTutorResponseStarted = false;
   bool _liveTutorKickoffRetried = false;
   double _liveTutorVoiceLevel = 0;
+  int _liveTutorDisplayedCharacters = 0;
+  bool _liveTutorAudioStarted = false;
+  bool _liveTutorTurnComplete = false;
+  bool _liveTutorFinalizing = false;
+  Timer? _liveTutorTranscriptTimer;
   bool _sessionSaved = false;
   int _callDuration = 0;
   bool _isSpeakerOn = true;
@@ -193,6 +199,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       ref.read(notetakerStateProvider).currentContext = 'Speaking';
     });
     _audio = AudioStreamingService();
+    _audio.allowBargeIn = _isLiveTutor;
+    _audio.onPlaybackChunk = _handleLiveTutorPlaybackChunk;
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
       isTrial: widget.stage == 'trial',
@@ -219,6 +227,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
       stopStream: _audio.stopStreaming,
       sendAudio: _gemini.sendAudioChunk,
+      silenceTailChunks: _isLiveTutor ? 6 : 10,
     );
     MicModePrefs.load().then((saved) {
       if (!mounted) return;
@@ -235,6 +244,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _liveTutorKickoffWatchdog?.cancel();
+    _liveTutorTranscriptTimer?.cancel();
     _endCall();
     _scrollController.dispose();
     super.dispose();
@@ -533,10 +543,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
       if (_isLiveTutor) {
+        // Keep the final normalized text in the audio-paced buffer. Do not
+        // append it to `_messages` yet: doing that would replace the slowly
+        // revealed transcript with Gemini's complete response immediately.
+        _liveTutorTranscriptBuffer = text.trim();
+        _liveTutorTurnComplete = true;
         setState(() {
-          _liveTutorPartialText = '';
           _liveTutorScolding = _isCorrectionLine(text);
         });
+        _startLiveTutorTranscriptTicker();
+        unawaited(_finishLiveTutorTurnAfterPlayback());
+        return;
       }
       _appendMessage(ChatMessage(role: 'tutor', content: text));
     };
@@ -544,32 +561,45 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onTranscriptDelta = (delta) {
       if (!_isLiveTutor || !mounted) return;
       _markLiveTutorResponseStarted();
-      setState(() {
-        _liveTutorPartialText += delta;
-        _liveTutorScolding = _isCorrectionLine(_liveTutorPartialText);
-      });
+      _liveTutorTranscriptBuffer += delta;
+      _liveTutorScolding = _isCorrectionLine(_liveTutorTranscriptBuffer);
+      _startLiveTutorTranscriptTicker();
     };
 
     _gemini.onAudioChunk = (audioData) {
       _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
+      if (_isLiveTutor && !_liveTutorAudioStarted) {
+        // The playback timeline is the clock for transcript reveal. Reset it
+        // only at the first chunk of each tutor turn, before this chunk is
+        // queued, so network bursts cannot make the text jump ahead.
+        _audio.resetPlaybackTimeline();
+        _liveTutorAudioStarted = true;
+      }
       _audio.isOutputActive = true;
       _audio.playAudioChunk(audioData);
       if (mounted) {
-        final level = _isLiveTutor ? _liveTutorPcmLevel(audioData) : 0.0;
         final statusChanged = _callStatus != CallStatus.tutorSpeaking;
-        final levelChanged = (level - _liveTutorVoiceLevel).abs() > 0.01;
-        if (statusChanged || levelChanged) {
+        if (statusChanged) {
           setState(() {
-            _liveTutorVoiceLevel = level;
-            if (statusChanged) _callStatus = CallStatus.tutorSpeaking;
+            _callStatus = CallStatus.tutorSpeaking;
           });
         }
       }
+      if (_isLiveTutor) _startLiveTutorTranscriptTicker();
     };
 
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
+      if (_isLiveTutor) {
+        // The server has finished generating, but the native player may still
+        // have buffered PCM. Keep the tutor turn alive until that real audio
+        // tail finishes, then commit the final two-line transcript.
+        _liveTutorTurnComplete = true;
+        _startLiveTutorTranscriptTicker();
+        unawaited(_finishLiveTutorTurnAfterPlayback());
+        return;
+      }
       // A mute pressed while the tutor was mid-turn must stick — this fires
       // a few seconds later, whenever that turn happens to finish, and was
       // unconditionally overwriting the user's mute back to "listening"
@@ -587,15 +617,126 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onInterrupted = () {
       _audio.isOutputActive = false;
       _audio.stopPlayback();
+      if (_isLiveTutor) {
+        // A barge-in invalidates the unspoken part of the buffered response.
+        // Keep only the words that had actually reached the display.
+        _liveTutorTurnComplete = false;
+        _liveTutorFinalizing = false;
+        _commitInterruptedLiveTutorTranscript();
+      }
       if (mounted) {
         setState(() {
           _liveTutorVoiceLevel = 0;
+          _liveTutorAudioStarted = false;
           if (_callStatus != CallStatus.muted) {
             _callStatus = CallStatus.listening;
           }
         });
       }
     };
+  }
+
+  void _handleLiveTutorPlaybackChunk(List<int> audioData) {
+    if (!_isLiveTutor || !mounted) return;
+    final level = _liveTutorPcmLevel(audioData);
+    if ((level - _liveTutorVoiceLevel).abs() <= 0.01) return;
+    setState(() => _liveTutorVoiceLevel = level);
+  }
+
+  void _startLiveTutorTranscriptTicker() {
+    if (!_isLiveTutor || _liveTutorTranscriptTimer != null) return;
+    _liveTutorTranscriptTimer = Timer.periodic(
+      const Duration(milliseconds: 50),
+      (_) => _advanceLiveTutorTranscript(),
+    );
+  }
+
+  void _advanceLiveTutorTranscript() {
+    if (!mounted || !_isLiveTutor) return;
+    final source = _liveTutorTranscriptBuffer;
+    if (source.isEmpty) return;
+
+    final duration = _audio.playbackTimelineDuration;
+    final position = _audio.playbackTimelinePosition;
+    var target = _liveTutorDisplayedCharacters;
+    if (duration > Duration.zero) {
+      final seconds = position.inMicroseconds / Duration.microsecondsPerSecond;
+      if (_liveTutorTurnComplete) {
+        final ratio = (position.inMicroseconds / duration.inMicroseconds).clamp(
+          0.0,
+          1.0,
+        );
+        target = math.max(target, (source.length * ratio).floor());
+      } else {
+        // Before the final transcript arrives, reveal at a human speech pace
+        // from the actual playback clock. This prevents bursty network text
+        // from racing to the end of the response.
+        target = math.max(target, (seconds * 16.0).floor());
+        target = math.min(target, source.length);
+      }
+      if (_liveTutorTurnComplete &&
+          position + const Duration(milliseconds: 50) >= duration) {
+        target = source.length;
+      }
+    }
+
+    target = _endOfWholeWord(source, target);
+    if (target <= _liveTutorDisplayedCharacters) return;
+    _liveTutorDisplayedCharacters = target;
+    setState(() {
+      _liveTutorPartialText = source.substring(0, target).trimRight();
+    });
+  }
+
+  int _endOfWholeWord(String text, int target) {
+    final bounded = target.clamp(0, text.length);
+    if (bounded >= text.length) return text.length;
+    var end = bounded;
+    while (end < text.length && !RegExp(r'\s').hasMatch(text[end])) {
+      end++;
+    }
+    return end;
+  }
+
+  Future<void> _finishLiveTutorTurnAfterPlayback() async {
+    if (!_isLiveTutor || _liveTutorFinalizing) return;
+    _liveTutorFinalizing = true;
+    await _audio.waitForPlaybackDrained();
+    if (!mounted || !_liveTutorTurnComplete) {
+      _liveTutorFinalizing = false;
+      return;
+    }
+
+    final finalText = _liveTutorTranscriptBuffer.trim();
+    _liveTutorTranscriptTimer?.cancel();
+    _liveTutorTranscriptTimer = null;
+    _liveTutorTranscriptBuffer = '';
+    _liveTutorPartialText = '';
+    _liveTutorDisplayedCharacters = 0;
+    _liveTutorAudioStarted = false;
+    _liveTutorTurnComplete = false;
+    _liveTutorFinalizing = false;
+    _liveTutorVoiceLevel = 0;
+
+    if (finalText.isNotEmpty) {
+      _appendMessage(ChatMessage(role: 'tutor', content: finalText));
+    }
+    if (mounted && _callStatus != CallStatus.muted) {
+      setState(() => _callStatus = CallStatus.listening);
+    }
+  }
+
+  void _commitInterruptedLiveTutorTranscript() {
+    _liveTutorTranscriptTimer?.cancel();
+    _liveTutorTranscriptTimer = null;
+    final displayed = _liveTutorPartialText.trim();
+    _liveTutorTranscriptBuffer = '';
+    _liveTutorPartialText = '';
+    _liveTutorDisplayedCharacters = 0;
+    _liveTutorAudioStarted = false;
+    if (displayed.isNotEmpty) {
+      _appendMessage(ChatMessage(role: 'tutor', content: displayed));
+    }
   }
 
   void _markLiveTutorResponseStarted() {

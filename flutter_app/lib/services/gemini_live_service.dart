@@ -121,6 +121,9 @@ class GeminiLiveService {
   static const _compactWritingCompressionTargetTokens = 1100;
   static const _liveTutorCompressionTriggerTokens = 4200;
   static const _liveTutorCompressionTargetTokens = 2400;
+  // Keep a short natural pause, but do not add the extra 700–1000ms that made
+  // Live Tutor feel like it was waiting for a scripted turn to end.
+  static const _liveTutorSilenceDurationMs = 1800;
 
   int get _contextCompressionTriggerTokens => liveTutorMode
       ? _liveTutorCompressionTriggerTokens
@@ -837,7 +840,9 @@ class GeminiLiveService {
           'startOfSpeechSensitivity': 'START_SENSITIVITY_LOW',
           'endOfSpeechSensitivity': 'END_SENSITIVITY_LOW',
           'prefixPaddingMs': 300,
-          'silenceDurationMs': 2500,
+          'silenceDurationMs': liveTutorMode
+              ? _liveTutorSilenceDurationMs
+              : 2500,
         },
       },
       // Always request resumption handles; on reconnect, present the last handle so

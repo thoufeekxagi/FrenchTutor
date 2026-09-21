@@ -43,11 +43,13 @@ class MicController {
     required this.startStream,
     required this.stopStream,
     required this.sendAudio,
+    this.silenceTailChunks = 10,
   });
 
   final Future<void> Function() startStream;
   final Future<void> Function() stopStream;
   final void Function(List<int> pcmBytes) sendAudio;
+  final int silenceTailChunks;
 
   MicMode _mode = MicMode.auto;
   MicMode get mode => _mode;
@@ -85,8 +87,7 @@ class MicController {
   /// Server VAD closes an utterance on ~2.5s of silence. In push-to-talk we cut the
   /// stream at release, so the server would otherwise wait forever for end-of-speech —
   /// this tail of silent PCM (16kHz mono 16-bit) closes the turn deterministically.
-  /// 10 × 300ms = 3.0s of silence, comfortably past the 2.5s VAD threshold.
-  static const silenceTailChunks = 10;
+  /// The default is 10 × 300ms; fast live surfaces can provide a shorter tail.
   static const silenceChunkBytes = 9600; // 300ms at 16kHz mono PCM16
 
   /// Call once the live socket reports connected and mic permission is granted.

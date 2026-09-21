@@ -47,6 +47,11 @@ class AudioStreamingService {
   bool _isSessionConfigured = false;
   void Function(List<int> chunk)? _audioChunkCallback;
 
+  /// Receives output PCM when the serialized playback drain hands it to the
+  /// native player. UI consumers can synchronize animation to playback rather
+  /// than to bursty WebSocket arrival.
+  void Function(List<int> chunk)? onPlaybackChunk;
+
   /// Latched exactly like `_playerStartLatch` below — `startStreaming()` and
   /// the interruption-recovery path can both want to open the recorder
   /// close together in time (e.g. a real interruption landing right as a
@@ -349,7 +354,10 @@ class AudioStreamingService {
   /// flushes to the intent judge on its own debounce (see GeminiLiveService), never
   /// waiting on Marie — and the on-screen Back/Next buttons work mid-speech for anyone
   /// who truly can't wait.
-  static const allowBargeIn = false;
+  /// Live Tutor enables this so a learner can naturally interrupt the tutor.
+  /// Structured speaking surfaces keep it disabled so their planned turns can
+  /// finish before accepting the next answer.
+  bool allowBargeIn = false;
 
   void _handleMicChunk(Uint8List chunk) {
     if (!allowBargeIn) {
@@ -583,6 +591,13 @@ class AudioStreamingService {
         final bytes = _playbackQueue.removeFirst();
         try {
           _playbackTimelineStartTime ??= DateTime.now();
+          try {
+            onPlaybackChunk?.call(bytes);
+          } catch (error) {
+            debugPrint(
+              'AudioStreamingService: playback observer failed: $error',
+            );
+          }
           await _player.feedUint8FromStream(bytes);
         } catch (error, stackTrace) {
           // Keep the live call alive on a transient chunk failure, but expose
@@ -729,6 +744,7 @@ class AudioStreamingService {
   void setSpeakerEnabled(bool enabled) {}
 
   Future<void> dispose() async {
+    onPlaybackChunk = null;
     await _interruptionSub?.cancel();
     _interruptionSub = null;
     await _devicesChangedSub?.cancel();
