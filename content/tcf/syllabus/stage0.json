@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "stage": "S0",
+  "title": "Sounds and Spelling",
+  "audience": "True beginner. Assume nothing: not what an accent mark is, not why letters go silent.",
+  "model_voice": "Marie (clear standard French) for explanations and drills. Camille and Mathieu (Québec) for the Hear it in Canada clip in each lesson.",
+  "lesson_template": ["hear", "repeat", "contrast", "check", "hear_in_canada"],
+  "lessons": [
+    {"id": "s0-01", "title": "How French works", "goal": "Know that French spelling is not read like English, that most final letters are silent, and that French has even rhythm with no stressed syllables.", "canada_note": "Words you already know from Canadian signs (sortie, arrêt, ouvert, fermé) read aloud."},
+    {"id": "s0-02", "title": "The alphabet and spelling your name", "goal": "Say all 26 letter names and spell your own name and email aloud.", "canada_note": "Spelling out a name on the phone with Service Canada, a clinic or a landlord."},
+    {"id": "s0-03", "title": "Accent marks", "goal": "Tell é, è, ê, ë, à, â, ù, û, ô, î, ï, ç and œ apart. Know which change the sound (é vs è) and which only change spelling.", "canada_note": "Reading names and street names with accents (Montréal, Québec, Rue Saint-Jacques)."},
+    {"id": "s0-04", "title": "Core vowels", "goal": "Say a, e (three different e sounds), i, o, u and the pairs ai/ei, au/eau, oi, eu.", "canada_note": "Hear how long vowels become diphthongs in Québec (fête, pâte)."},
+    {"id": "s0-05", "title": "u vs ou and the rounded vowels", "goal": "Tell u from ou, eu from ou, and say them. Minimal pairs: dessus/dessous, tu/tout, rue/roue.", "canada_note": "Hear short u/i/ou become relaxed in Québec (petite, lune)."},
+    {"id": "s0-06", "title": "Nasal vowels", "goal": "Recognise and say an/en, on, in/ain/ein, un. Minimal pairs: banc/bon/bain, vent/vont/vin.", "canada_note": "Nasals in Québec French (maintenant, quinze)."},
+    {"id": "s0-07", "title": "Consonants and silent letters", "goal": "Know which final consonants are silent and the CaReFuL exceptions (c, r, f, l). Say c/ç, g/gu, qu, ch, gn, j, s between vowels, h (silent). Know th and ph.", "canada_note": "Affrication: t and d before i/u sound like ts/dz in Québec (tu, dire)."},
+    {"id": "s0-08", "title": "The French r", "goal": "Produce a usable French r in the throat, in initial, medial and final position.", "canada_note": "Québec r variants. A clear standard r is enough for the exam."},
+    {"id": "s0-09", "title": "Liaison, enchaînement and élision", "goal": "Explain and apply: les amis (lez-amis), un ami, il est ici. Forbidden after et. Elision: le+ami = l'ami, je+ai = j'ai, ce+est = c'est.", "canada_note": "Fast Canadian speech: je suis becomes chu, tu es becomes t'es."},
+    {"id": "s0-10", "title": "Numbers 0 to 20", "goal": "Hear and say 0 to 20 and read them in a phone number, a time and a price.", "canada_note": "Postal codes, 911, phone numbers, bus numbers."},
+    {"id": "s0-11", "title": "Numbers 20 to 1000 and beyond", "goal": "Hear and say 20 to 100 (soixante-dix, quatre-vingts, quatre-vingt-dix), hundreds, thousands. Note that Québec and France both use soixante-dix and quatre-vingt-dix.", "canada_note": "Prices in dollars and cents, rent, salaries, years and dates."},
+    {"id": "s0-12", "title": "Rhythm, intonation and questions", "goal": "Say short sentences with even rhythm, rising intonation for yes/no questions, falling for statements.", "canada_note": "Canadian intonation patterns in everyday questions."},
+    {"id": "s0-13", "title": "Hear it in Canada: a first listening", "goal": "Understand a short clear Canadian French message and a short France French message, and notice what differs.", "canada_note": "Introduces the accent variety the exam can contain."}
+  ]
+}

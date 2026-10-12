@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "note": "Grammar points in teaching order. A unit may teach (grammar_new) or revisit (grammar_review) only ids introduced in this unit or earlier. Beginner explanation first, French second.",
+  "points": [
+    {"id": "g01", "title": "être (to be): je suis, tu es, il/elle est", "level": "A1"},
+    {"id": "g02", "title": "avoir (to have): j'ai, tu as, il/elle a, age with avoir", "level": "A1"},
+    {"id": "g03", "title": "tu vs vous: when to use which in Canada", "level": "A1"},
+    {"id": "g04", "title": "subject pronouns: je, tu, il, elle, on, nous, vous, ils, elles", "level": "A1"},
+    {"id": "g05", "title": "gender and articles: le/la/l'/les and un/une/des", "level": "A1"},
+    {"id": "g06", "title": "plural nouns and the silent s", "level": "A1"},
+    {"id": "g07a", "title": "de + le = du, de + les = des, and the partitive du/de la/de l'/des", "level": "A1"},
+    {"id": "g07b", "title": "à + le = au, à + les = aux (vs à la, à l')", "level": "A1"},
+    {"id": "g08", "title": "negation: ne ... pas, and pas de", "level": "A1"},
+    {"id": "g09a", "title": "-er verbs, je/tu/il/elle: habiter, parler, travailler, s'appeler", "level": "A1"},
+    {"id": "g09b", "title": "-er verbs, nous/vous/ils/elles", "level": "A1"},
+    {"id": "g10", "title": "asking questions: intonation, est-ce que, qui/où/quand/comment/combien/pourquoi", "level": "A1"},
+    {"id": "g11", "title": "possessives: mon/ma/mes, ton/ta/tes, son/sa/ses", "level": "A1"},
+    {"id": "g12", "title": "adjective agreement: gender, plural, position", "level": "A1"},
+    {"id": "g13", "title": "demonstratives: ce/cet/cette/ces", "level": "A1"},
+    {"id": "g14", "title": "numbers, prices and dollars", "level": "A1"},
+    {"id": "g15", "title": "days, dates, time and appointments", "level": "A1"},
+    {"id": "g16", "title": "aller and the futur proche (je vais + infinitive)", "level": "A1"},
+    {"id": "g17", "title": "prepositions of place: à, dans, sur, sous, devant, derrière, chez, près de", "level": "A1"},
+    {"id": "g18", "title": "il y a, c'est vs il est", "level": "A1"},
+    {"id": "g19", "title": "vouloir, pouvoir, je voudrais (polite requests)", "level": "A1"},
+    {"id": "g20", "title": "faire, prendre, and weather expressions (il fait froid)", "level": "A1"},
+    {"id": "g21", "title": "avoir mal à + contractions (j'ai mal au dos, aux pieds)", "level": "A1"},
+    {"id": "g22", "title": "aimer, préférer + noun or infinitive", "level": "A1"}
+  ]
+}

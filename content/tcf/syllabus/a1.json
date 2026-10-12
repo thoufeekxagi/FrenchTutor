@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "stage": "A1",
+  "title": "A1: Survive and be understood in Canada",
+  "outcome": "Understand and say basic things in real Canadian situations, and answer the first (easiest) items of a TCF listening and reading test. TCF scale for this band: listening/reading 100 to 199.",
+  "word_target_total": 630,
+  "unit_template": [
+    {"slot": 1, "kind": "words_a", "title": "New words (1 of 2)", "note": "exactly 5 words with sound, meaning, example"},
+    {"slot": 2, "kind": "words_b", "title": "New words (2 of 2)", "note": "exactly 5 words with sound, meaning, example"},
+    {"slot": 3, "kind": "phrases", "title": "Useful phrases", "note": "hear, repeat, Marie answers"},
+    {"slot": 4, "kind": "grammar", "title": "One rule", "note": "plain English first, then French examples and drills"},
+    {"slot": 5, "kind": "dialogue", "title": "Hear it, read it", "note": "short Canadian scene using only taught words"},
+    {"slot": 6, "kind": "tcf_corner", "title": "TCF corner and checkpoint", "note": "exam-format items from this unit only, then 10-question checkpoint"}
+  ],
+  "units": [
+    {
+      "id": "a1-u01", "title": "Introduce yourself",
+      "situation": "Meeting a neighbour, a coworker or a clinic receptionist for the first time.",
+      "can_do": "Say my name, where I am from, what languages I speak, and greet people politely.",
+      "grammar_new": ["g01", "g03", "g04", "g09a"], "grammar_review": [],
+      "new_words_target": 40,
+      "word_themes": ["greetings", "countries and nationalities", "languages", "first and last name", "yes/no and basics"],
+      "canada_context": "Allô and bonjour, tu vs vous with a stranger or an official, introducing yourself at an immigration or clinic desk.",
+      "canada_vs_france": ["allô is a normal greeting in Canada", "bonjour is also used as goodbye in Québec"],
+      "tcf_corner": {"listening": "short self-introductions, 4 options", "reading": "name tags and short bios", "speaking": "Task 1 style: introduce yourself", "writing": "guided: complete a short introduction"}
+    },
+    {
+      "id": "a1-u02", "title": "Greet, be polite, spell your name",
+      "situation": "Starting a phone call, spelling a name and an email, thanking someone.",
+      "can_do": "Greet at different times of day, be polite, ask someone to repeat or spell, and spell my own name and email.",
+      "grammar_new": ["g02", "g10"], "grammar_review": ["g01", "g04"],
+      "new_words_target": 40,
+      "word_themes": ["politeness", "asking for help or repetition", "alphabet in use", "age and basic questions", "email and phone words"],
+      "canada_context": "Spelling a name to Service Canada or a landlord, giving a courriel, answering the phone.",
+      "canada_vs_france": ["bienvenue means you're welcome in Canada", "courriel is the Canadian word for email"],
+      "tcf_corner": {"listening": "spelled names and emails, 4 options", "reading": "short polite messages", "speaking": "Task 1 style: spell and give details", "writing": "guided: reply with thanks"}
+    },
+    {
+      "id": "a1-u03", "title": "Forms and papers",
+      "situation": "Filling in a form at a clinic, bank or government office.",
+      "can_do": "Understand and fill basic personal details on a form and say them aloud.",
+      "grammar_new": ["g05", "g06"], "grammar_review": ["g02"],
+      "new_words_target": 45,
+      "word_themes": ["personal details", "address and postal code", "date of birth", "ID documents", "provinces and cities"],
+      "canada_context": "NAS (numéro d'assurance sociale), health card, postal code, province, permanent resident paperwork.",
+      "canada_vs_france": ["code postal format (A1A 1A1)", "province vs département"],
+      "tcf_corner": {"listening": "an agent reading details back, 4 options", "reading": "a simple form", "speaking": "Task 1 style: give my details", "writing": "guided: complete a form message"}
+    },
+    {
+      "id": "a1-u04", "title": "Family and people",
+      "situation": "Showing photos and talking about family at work or with a neighbour.",
+      "can_do": "Name family members, say whose something is, and describe a person simply.",
+      "grammar_new": ["g11", "g12", "g09b"], "grammar_review": ["g01", "g02", "g05"],
+      "new_words_target": 45,
+      "word_themes": ["family members", "describing people", "colours", "common adjectives", "possessives in use"],
+      "canada_context": "conjoint(e) and enfants on official forms, family sponsorship vocabulary at a basic level.",
+      "canada_vs_france": ["conjoint(e) is the official term for spouse or partner in Canada"],
+      "tcf_corner": {"listening": "someone describing family, 4 options", "reading": "a short message about a family", "speaking": "Task 1 style: talk about family", "writing": "guided: describe a person"}
+    },
+    {
+      "id": "a1-u05", "title": "Numbers, money and prices",
+      "situation": "Paying at a store, reading a price, understanding rent or a bill.",
+      "can_do": "Understand and say numbers and prices in dollars, and read simple prices.",
+      "grammar_new": ["g14"], "grammar_review": ["g02", "g05"],
+      "new_words_target": 40,
+      "word_themes": ["numbers in use", "dollars and cents", "taxes and discounts", "paying", "bills and rent"],
+      "canada_context": "Dollars, cents, TPS/TVQ style taxes at a basic level, tipping, rabais and soldes.",
+      "canada_vs_france": ["dollars and cents, not euros", "taxes are added at the register"],
+      "tcf_corner": {"listening": "prices and quantities, 4 options", "reading": "a store flyer", "speaking": "Task 1 style: ask a price", "writing": "guided: short message about a price"},
+      "mini_mock_after": "a1-series-1"
+    },
+    {
+      "id": "a1-u06", "title": "Days, time and appointments",
+      "situation": "Booking and confirming an appointment, reading a schedule.",
+      "can_do": "Say and understand days, dates and clock times, and arrange a simple appointment.",
+      "grammar_new": ["g15"], "grammar_review": ["g10", "g14"],
+      "new_words_target": 45,
+      "word_themes": ["days of the week", "months and seasons", "clock times", "dates", "appointments and schedules"],
+      "canada_context": "Clinic appointments, bus schedules, office hours, written time like 9 h 30.",
+      "canada_vs_france": ["Canadian written time uses h (9 h 30)", "24 hour and 12 hour usage"],
+      "tcf_corner": {"listening": "an appointment confirmation, 4 options", "reading": "an office hours notice", "speaking": "Task 1 style: arrange a time", "writing": "guided: confirm an appointment"}
+    },
+    {
+      "id": "a1-u07", "title": "Eating: déjeuner, dîner, souper",
+      "situation": "Ordering at a restaurant and talking about meals.",
+      "can_do": "Name common foods and meals, order, and say what I like.",
+      "grammar_new": ["g07a", "g19"], "grammar_review": ["g05", "g14"],
+      "new_words_target": 50,
+      "word_themes": ["meals and meal times", "common foods", "drinks", "at the restaurant", "asking politely"],
+      "canada_context": "Restaurant ordering, tipping, meal words and times as used in Canada.",
+      "canada_vs_france": ["Canada: déjeuner = breakfast, dîner = lunch, souper = dinner", "France: petit-déjeuner, déjeuner, dîner"],
+      "tcf_corner": {"listening": "a restaurant order, 4 options", "reading": "a short menu", "speaking": "Task 1 style: order food", "writing": "guided: a short note about a meal"}
+    },
+    {
+      "id": "a1-u08", "title": "Groceries and shopping",
+      "situation": "Buying groceries and everyday items.",
+      "can_do": "Ask for items and quantities, understand a store notice, and say what is missing.",
+      "grammar_new": ["g08", "g13"], "grammar_review": ["g07a", "g14"],
+      "new_words_target": 45,
+      "word_themes": ["store types", "quantities and containers", "clothes and household items", "at the register", "asking where something is"],
+      "canada_context": "Dépanneur, épicerie, supermarché, pharmacie, bags and receipts.",
+      "canada_vs_france": ["dépanneur (corner store) is a Québec word", "magasiner means to shop in Canada"],
+      "tcf_corner": {"listening": "a store announcement, 4 options", "reading": "a shopping list and a notice", "speaking": "Task 1 style: buy things", "writing": "guided: a short shopping message"}
+    },
+    {
+      "id": "a1-u09", "title": "Getting around",
+      "situation": "Asking directions, using the bus and metro, travelling in a city.",
+      "can_do": "Ask and understand simple directions, buy a ticket, and say where I am going.",
+      "grammar_new": ["g07b", "g16", "g17"], "grammar_review": ["g07a", "g15"],
+      "new_words_target": 50,
+      "word_themes": ["places in a city", "directions", "transport", "tickets and stops", "near and far"],
+      "canada_context": "Autobus, métro, arrêt, stationnement, street signs, ride schedules.",
+      "canada_vs_france": ["autobus and stationnement in Canada vs bus and parking", "Canadian road signs"],
+      "tcf_corner": {"listening": "a transit announcement, 4 options", "reading": "a transit map or sign", "speaking": "Task 1 style: ask directions", "writing": "guided: explain how to get somewhere"}
+    },
+    {
+      "id": "a1-u10", "title": "Housing and the lease",
+      "situation": "Looking at an apartment, talking to a landlord.",
+      "can_do": "Describe a home, understand a rental ad, and ask basic questions about an apartment.",
+      "grammar_new": ["g18"], "grammar_review": ["g17", "g12", "g05"],
+      "new_words_target": 45,
+      "word_themes": ["rooms and furniture", "rental ads", "landlord and tenant", "rent and bills", "moving in"],
+      "canada_context": "Appartement, bail, loyer, propriétaire, locataire, Québec apartment notation like 3 1/2.",
+      "canada_vs_france": ["bail and loyer, with 3 1/2 style counting in Québec", "logement vs appartement"],
+      "tcf_corner": {"listening": "a landlord voicemail, 4 options", "reading": "a rental ad", "speaking": "Task 1 style: ask about an apartment", "writing": "guided: a short message to a landlord"},
+      "mini_mock_after": "a1-series-2"
+    },
+    {
+      "id": "a1-u11", "title": "Weather and clothes",
+      "situation": "Talking about the weather and what to wear in a Canadian winter.",
+      "can_do": "Understand a simple forecast, say what the weather is, and choose clothes.",
+      "grammar_new": ["g20"], "grammar_review": ["g12", "g08"],
+      "new_words_target": 40,
+      "word_themes": ["weather", "seasons", "winter clothes", "temperatures in Celsius", "talking about today"],
+      "canada_context": "Winter weather, snow, cold, forecast words, temperatures in degrees Celsius.",
+      "canada_vs_france": ["tuque is a Canadian word for a winter hat", "Celsius, with very low winter temperatures"],
+      "tcf_corner": {"listening": "a weather forecast, 4 options", "reading": "a weather notice", "speaking": "Task 1 style: talk about the weather", "writing": "guided: describe today's weather"}
+    },
+    {
+      "id": "a1-u12", "title": "Work and studies",
+      "situation": "Talking about your job, your studies and your workday.",
+      "can_do": "Say what job or studies I have, describe a simple workday, and ask a coworker simple questions.",
+      "grammar_new": [], "grammar_review": ["g09a", "g09b", "g10", "g15"],
+      "new_words_target": 50,
+      "word_themes": ["jobs", "workplace", "schedule and hours", "studies and school", "coworkers and manager"],
+      "canada_context": "Entrevue (interview), CV, employer, schedule, university and cégep recognition.",
+      "canada_vs_france": ["entrevue in Canada vs entretien", "cégep is Québec only"],
+      "tcf_corner": {"listening": "a coworker talking about work, 4 options", "reading": "a short job ad", "speaking": "Task 1 style: talk about my work", "writing": "guided: a short work message"}
+    },
+    {
+      "id": "a1-u13", "title": "Health and services",
+      "situation": "Describing a problem at a pharmacy or walk-in clinic and calling for help.",
+      "can_do": "Name body parts, say what hurts, understand basic instructions, and call for help.",
+      "grammar_new": ["g21"], "grammar_review": ["g19", "g15", "g10"],
+      "new_words_target": 50,
+      "word_themes": ["body parts", "symptoms", "pharmacy", "clinic and doctor", "emergencies"],
+      "canada_context": "Clinique sans rendez-vous, pharmacie, urgence, ordonnance, médecin de famille, 911.",
+      "canada_vs_france": ["clinique sans rendez-vous (walk-in clinic)", "health card instead of the French carte vitale"],
+      "tcf_corner": {"listening": "a pharmacist or receptionist, 4 options", "reading": "a short clinic notice", "speaking": "Task 1 style: describe a health problem", "writing": "guided: a short message to a clinic"}
+    },
+    {
+      "id": "a1-u14", "title": "Free time and simple plans",
+      "situation": "Inviting a friend, talking about weekends and plans.",
+      "can_do": "Say what I like to do, invite someone, accept or refuse, and say what I will do this weekend.",
+      "grammar_new": ["g22"], "grammar_review": ["g16", "g19", "g15"],
+      "new_words_target": 45,
+      "word_themes": ["hobbies and sports", "inviting and replying", "weekend plans", "likes and dislikes", "meeting up"],
+      "canada_context": "Fin de semaine plans, hockey and winter sports, invitations, community events.",
+      "canada_vs_france": ["fin de semaine is common in Canada, week-end in France"],
+      "tcf_corner": {"listening": "an invitation, 4 options", "reading": "an event poster", "speaking": "Task 1 style: invite someone", "writing": "guided: reply to an invitation"},
+      "mini_mock_after": "a1-mock-final"
+    }
+  ],
+  "mini_mocks": [
+    {"id": "a1-series-1", "after_unit": "a1-u05", "listening_items": 12, "reading_items": 12, "timed": true, "note": "one-play listening, 4 options, answers hidden until the end"},
+    {"id": "a1-series-2", "after_unit": "a1-u10", "listening_items": 15, "reading_items": 15, "timed": true, "note": "adds Canadian accents (Camille, Mathieu) to the listening"},
+    {"id": "a1-mock-final", "after_unit": "a1-u14", "listening_items": 20, "reading_items": 20, "timed": true, "speaking": "Task 1 style with Marie", "writing": "guided task", "note": "ends with estimated A1 level and what to fix"}
+  ]
+}
